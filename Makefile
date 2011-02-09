@@ -3,9 +3,9 @@ BINDIR    = bin
 INCDIR    = include
 OBJDIR    = obj
 SRCDIR    = src
-LIBDIR    = /home/abetts/programs/rose-0.9.5a-13059_inst/lib
-BOOST_DIR = /home/abetts/programs/boost_1_45_0_inst
-ROSE_DIR  = /home/abetts/programs/rose-0.9.5a-13219_inst
+LIBDIR    = $(OP2_ROSE_INST_DIR)/lib
+BOOST_DIR = $(OP2_BOOST_INST_DIR)
+ROSE_DIR  = $(OP2_ROSE_INST_DIR)
 LDFLAGS   = -s -L$(ROSE_DIR)/lib -lrose
 CXXFLAGS  = -I$(BOOST_DIR)/include -I$(ROSE_DIR)/include -I$(INCDIR) -O3 -Wall
 
