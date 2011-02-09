@@ -1,0 +1,16 @@
+Note that configuration and building of ROSE requires the Boost libraries to be in your path
+
+To configure and build do the following:
+
+1) Create two directories
+a) rose_build:  where the ROSE sources will be built.
+b) rose_inst:  where the ROSE libraries and includes will be installed.
+
+2) Run the configure command from the 'rose_build' directory with the following options:
+--prefix=/path/to/rose_inst --with-boost=/path/to/boost --enable-cuda --enable-opencl --with-java --without-haskell --with-CXX_DEBUG=-g --with-CXX_OPTIMIZE=-O0
+
+3) Run 'make'
+
+4) Run 'make install'
+
+See the ROSE documentation for more assistance.
