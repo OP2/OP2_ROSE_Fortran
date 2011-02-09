@@ -1,0 +1,19 @@
+namespace X
+{
+   namespace Y
+   {
+      class B;
+   }
+}
+
+namespace Y {
+   using namespace X::Y;
+   B* b1;
+// DQ (2/21/2010): This is ambiguous with the 4.0 compiler.
+#if !( (__GNUC__ == 4) && (__GNUC_MINOR__ == 0) )
+   void B();
+#endif
+   class B* b2;
+}
+
+

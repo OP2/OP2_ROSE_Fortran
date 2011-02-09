@@ -1,0 +1,175 @@
+#!/usr/bin/env ruby
+
+require 'fileutils'
+
+
+NmiHostsFile = "#{ENV['HOME']}/.nmi-hosts"
+
+
+def check_host!
+    host = `hostname -f`.chomp
+
+    unless host =~ %r{cs\.wisc\.edu}
+        puts "
+            Your host #{host} does not seem to be on the cs.wisc.edu domain.
+            Are you sure you're running nmi-postmortem from an nmi submit host?
+        ".gsub( /^[ \t]\s*/, '' )
+
+        exit 1
+    end
+end
+
+
+def args!
+    if ARGV.size != 1
+         puts "
+            Usage: #{File.basename( __FILE__ )} <runid>
+         ".gsub( /^\s+/, '' )
+
+         exit 1
+    end
+
+    return ARGV.first
+end
+
+def setup_ssh!( host )
+    FileUtils.touch NmiHostsFile
+    hosts = File.readlines( NmiHostsFile ).map{|l| l.chomp }
+    return true if hosts.include? host
+
+    puts "
+
+        Host #{host} is not known to have been set up.  I will now do this for
+        you.  You will be asked to enter the password for the #{ENV['USER']}
+        account twice.  This step will not be necessary for future postmortems
+        of runs on this host.
+
+    ".gsub( /^[ \t]\s*/, '' )
+
+    linux_script = "/etc/profile.d/makehomedir.sh"
+    linux_cmd = "/bin/sh #{linux_script}"
+    darwin_script = "/sw/etc/profile.d/makehomedir.sh"
+    darwin_cmd = "/bin/sh #{darwin_script}"
+    system [
+        "ssh #{host} '#{[
+                "if [ -f #{linux_script} ]; then #{linux_cmd}; elif [ -f #{darwin_script} ]; then #{darwin_cmd} ; fi",
+                "mkdir -p $HOME/.ssh",
+                "chmod 700 $HOME/.ssh",
+            ].join( " && " )}'",
+        "scp #{ENV['HOME']}/.ssh/id_rsa.pub #{host}:~/.ssh/authorized_keys"
+    ].join( '&&' )
+    return false unless $?.success?
+
+    File.open( NmiHostsFile, 'a' ) {|f| f.puts host }
+
+    true
+end
+
+def get_runhost( run_id )
+    url = "http://localhost/nmi/index.php?page=results/runDetails&runid=#{run_id}&MetronomeSessID=qhr7buvggpva74m3kf04t8h6f1&opt_project=rose+compiler"
+    response = `wget -O - '#{url}' 2> /dev/null`
+    response =~ %r{remote_task.*?<td>.*?<a.*?"View Host Information".*?>(.*?)</a>.*?</td>}m
+
+    $1
+end
+
+def main
+    check_host!
+    run_id = args!
+
+    puts "Downloading run host information from nmi website"
+    run_host = get_runhost( run_id )
+    unless setup_ssh! run_host
+        puts "
+
+            Error setting up #{run_host}!  I was either unable to setup the home
+            directory or $HOME/.ssh.  Either way, nmi-postmortem cannot
+            continue.  Please report the error.  In the meantime, you can
+            continue manually by doing the following:
+
+            copy the file ~/.ssh/id_rsa.pub (on this machine) to
+            #{run_host}:~/.ssh/authorized_keys
+            
+            ensure that the remote .ssh directory has mode 700.
+
+            re-run nmi-postmortem.  If you have done this, but nmi-postmortem
+            still complains, add the line:
+                #{run_host}
+            to the file ~/.nmi-hosts on this machine.
+
+            You should be able to accomplish the above with the following commands:
+
+                ssh #{run_host}
+                # on #{run_host}
+                mkdir .ssh
+                chmod 700 .ssh
+                exit
+
+                # back on this machine
+                scp #{ENV['HOME']}/.ssh/id_rsa.pub #{run_host}:~/.ssh/authorized_keys
+
+                # re-run nmi-postmortem
+                nmi-postmortem #{run_id}
+
+        ".gsub( /^[ \t]\s{11}/, '' )
+        exit 1
+    end
+
+    run_dir = (
+        `nmi_rundir #{run_id}` =~ /\d+: (.*)/;
+        $1
+    )
+
+
+    # FIXME 2: Apparently, messing around with .bash_profile is unnecessary.  We
+    # can simply do the following:
+    #   ssh #{run_host} -t '/bin/bash --rcfile .nmi-postmortem'
+    # although whether this works on the darwin boxes (e.g. nmi-0068) is not
+    # clear.
+    #   
+    #
+    #
+    # We ssh -t -t to force a pseudo tty allocation.  The motivation for this is
+    # it prevents bash_profile from being read.  per the ssh man page, it seems
+    # that this should be unnecessary: invoking ssh with a command should be
+    # enough.  However, empirical testing suggests otherwise.  With a
+    # bash_profile that changes directory to run, we get the following:
+    #
+    #    [heller@nmi-s005 ~]$ ssh nmi-0061 pwd
+    #    /home/heller/run
+    #    [heller@nmi-s005 ~]$ ssh -t nmi-0061 pwd
+    #    /home/heller
+    #
+    # Similarly, the convoluted process of sshing to the run host in order to
+    # invoke scp to copy results.tar.gz is aimed to circumvent this problem.
+    #
+    # Using bash_profile in the first place is motivated by the need to do the
+    # following:
+    #   (1) ssh to a target host
+    #   (2) ensure that some arbitrary commands are run 
+    #       (in this case cd run && source env.sh)
+    #   (3) leave the user with a functioning shell so they can issue commands
+    #       in an environment very similar to the one for the NMI run
+    puts "Copying and extracting results.tar.gz and setting up .nmi-postmortem"
+    system [
+        "ssh-add 2> /dev/null",
+        "ssh -t -t #{run_host} 'rm -fr run; mkdir -p run;' 2> /dev/null",
+        %Q{ssh -A -t #{run_host} 'scp -o "StrictHostKeyChecking no" #{run_dir}/userdir/nmi*/results.tar.gz run/ > /dev/null 2>/dev/null' 2> /dev/null},
+        "ssh -t -t #{run_host} 'cd run && tar xfz results.tar.gz' 2> /dev/null",
+        %Q{ssh -t -t #{run_host} 'touch .bash_profile; grep -q .nmi-postmortem .bash_profile || echo "if [ -f .nmi-postmortem ]; then source .nmi-postmortem; fi" >> .bash_profile' 2> /dev/null},
+        %Q{ssh -t -t #{run_host} 'echo "cd run && source env.sh" > .nmi-postmortem' 2> /dev/null},
+    ].join( " && " )
+
+    puts "
+
+        Connecting to the run host #{run_host}.  You will be placed into the run
+        directory and the environment sourced.
+
+    ".gsub( /^[ \t]\s*/, '' )
+    exec "ssh #{run_host}"
+end
+
+
+main if __FILE__ == $0
+
+# vim:et sta ai sw=4 ts=4:
