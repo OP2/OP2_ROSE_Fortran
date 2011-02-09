@@ -58,113 +58,6 @@ OpParLoop::setSourcePositionCompilerGenerated (SgLocatedNode* locatedNode)
   locatedNode->get_endOfConstruct ()->setCompilerGenerated ();
 }
 
-SgModuleStatement *
-OpParLoop::buildModuleStatementAndDefinition (std::string name,
-    SgScopeStatement* scope)
-{
-
-  using namespace SageBuilder;
-  using namespace SageInterface;
-
-  // This function builds a class declaration and definition
-  // (both the defining and nondefining declarations as required).
-
-  // This is the class definition (the fileInfo is the position of the opening brace)
-  SgClassDefinition* classDefinition = new SgClassDefinition ();
-  assert (classDefinition != NULL);
-
-  // DQ (11/28/2010): Added specification of case insensitivity for Fortran.
-  classDefinition->setCaseInsensitive (true);
-
-  // classDefinition->set_endOfConstruct(SOURCE_POSITION);
-  setSourcePosition (classDefinition);
-
-  Sg_File_Info * generatedFileInfo = new Sg_File_Info ();
-  generatedFileInfo->setCompilerGenerated ();
-  classDefinition->set_file_info (generatedFileInfo);
-
-  setSourcePositionCompilerGenerated (classDefinition);
-
-  // Set the end of construct explictly (where not a transformation this is the location of the closing brace)
-  //  classDefinition->set_endOfConstruct(SOURCE_POSITION);
-
-  // This is the defining declaration for the class (with a reference to the class definition)
-  SgModuleStatement* classDeclaration = new SgModuleStatement (name.c_str (),
-      SgClassDeclaration::e_struct, NULL, classDefinition);
-  assert (classDeclaration != NULL);
-  //   classDeclaration->set_endOfConstruct(SOURCE_POSITION);
-
-  // This is set later when the source position is more accurately known
-  setSourcePosition (classDeclaration);
-
-  // Set the defining declaration in the defining declaration!
-  classDeclaration->set_definingDeclaration (classDeclaration);
-
-  // Set the non defining declaration in the defining declaration (both are required)
-  SgModuleStatement* nondefiningClassDeclaration = new SgModuleStatement (
-      name.c_str (), SgClassDeclaration::e_struct, NULL, classDefinition);
-  assert (classDeclaration != NULL);
-  // nondefiningClassDeclaration->set_endOfConstruct(SOURCE_POSITION);
-  setSourcePosition (nondefiningClassDeclaration);
-
-  // Liao 10/30/2009. we now ask for explicit creation of SgClassType. The constructor will not create it by default
-  if (nondefiningClassDeclaration->get_type () == NULL)
-    nondefiningClassDeclaration->set_type (SgClassType::createType (
-        nondefiningClassDeclaration));
-  classDeclaration->set_type (nondefiningClassDeclaration->get_type ());
-
-  // Set the internal reference to the non-defining declaration
-  classDeclaration->set_firstNondefiningDeclaration (
-      nondefiningClassDeclaration);
-
-  // Set the parent explicitly
-  nondefiningClassDeclaration->set_parent (scope);
-
-  // Set the defining and no-defining declarations in the non-defining class declaration!
-  nondefiningClassDeclaration->set_firstNondefiningDeclaration (
-      nondefiningClassDeclaration);
-  nondefiningClassDeclaration->set_definingDeclaration (classDeclaration);
-
-  // Set the nondefining declaration as a forward declaration!
-  nondefiningClassDeclaration->setForward ();
-
-  // Don't forget the set the declaration in the definition (IR node constructors are side-effect free!)!
-  classDefinition->set_declaration (classDeclaration);
-
-  // set the scope explicitly (name qualification tricks can imply it is not always the parent IR node!)
-  classDeclaration->set_scope (scope);
-  nondefiningClassDeclaration->set_scope (scope);
-
-  // Set the parent explicitly
-  classDeclaration->set_parent (scope);
-
-  // A type should have been build at this point, since we will need it later!
-  ROSE_ASSERT (classDeclaration->get_type () != NULL);
-
-  // We use the nondefiningClassDeclaration, though it might be that for Fortran the rules that cause this to be important are not so complex as for C/C++.
-  SgClassSymbol* classSymbol = new SgClassSymbol (nondefiningClassDeclaration);
-
-  // Add the symbol to the current scope (the specified input scope)
-  scope->insert_symbol (name, classSymbol);
-
-  classSymbol = new SgClassSymbol (classDeclaration);
-  scope->insert_symbol (name, classSymbol);
-
-  ROSE_ASSERT (scope->lookup_class_symbol (name) != NULL);
-
-  // some error checking
-  assert (classDeclaration->get_definingDeclaration () != NULL);
-  assert (classDeclaration->get_firstNondefiningDeclaration () != NULL);
-  assert (classDeclaration->get_definition () != NULL);
-
-  ROSE_ASSERT (classDeclaration->get_definition ()->get_parent () != NULL);
-
-  //      appendStatement ( nondefiningClassDeclaration, scope );
-  //      appendStatement ( classDeclaration, scope );
-
-  return classDeclaration;
-}
-
 SgContainsStatement *
 OpParLoop::buildContainsStatement (Sg_File_Info * fileInfo,
     SgScopeStatement * scope)
@@ -229,6 +122,9 @@ OpParLoop::createHostDeviceLocals (SgScopeStatement* scope)
 
   SgVariableDeclaration* CreturnDeclaration = buildVariableDeclaration ("CRet",
       buildIntType (), NULL, scope);
+	CreturnDeclaration->get_declarationModifier ().get_accessModifier().setUndefined();
+	
+	
   appendStatement (CreturnDeclaration, scope);
 
   for (int i = 0; i < numberOfArgumentGroups; ++i)
@@ -236,6 +132,8 @@ OpParLoop::createHostDeviceLocals (SgScopeStatement* scope)
     string name = "data" + boost::lexical_cast <string> (i) + "Size";
     SgVariableDeclaration* dataSizeDeclaration = buildVariableDeclaration (
         name, buildIntType (), NULL, scope);
+		dataSizeDeclaration->get_declarationModifier ().get_accessModifier().setUndefined();
+		
     appendStatement (dataSizeDeclaration, scope);
   }
 }
@@ -287,6 +185,8 @@ OpParLoop::createIndirectionDeclaration (SgFunctionParameterList* parameters,
    */
   indirectionDeclaration->get_declarationModifier ().get_typeModifier ().setIntent_in ();
 
+	indirectionDeclaration->get_declarationModifier ().get_accessModifier().setUndefined();
+	
   appendStatement (indirectionDeclaration, scope);
 }
 
@@ -337,6 +237,9 @@ OpParLoop::createOpAccessDeclaration (SgFunctionParameterList* parameters,
    */
   opAccessDeclaration->get_declarationModifier ().get_typeModifier ().setIntent_in ();
 
+	opAccessDeclaration->get_declarationModifier ().get_accessModifier().setUndefined();
+
+	
   appendStatement (opAccessDeclaration, scope);
 }
 
@@ -381,6 +284,10 @@ OpParLoop::createOpDatDeclaration (SgFunctionParameterList* parameters,
    */
   parameters->append_arg (*(opDatDeclaration->get_variables ().begin ()));
 
+	
+	opDatDeclaration->get_declarationModifier ().get_accessModifier().setUndefined();
+
+	
   appendStatement (opDatDeclaration, scope);
 }
 
@@ -425,6 +332,8 @@ OpParLoop::createOpMapDeclaration (SgFunctionParameterList* parameters,
    */
   parameters->append_arg (*(opMapDeclaration->get_variables ().begin ()));
 
+	opMapDeclaration->get_declarationModifier ().get_accessModifier().setUndefined();
+	
   appendStatement (opMapDeclaration, scope);
 }
 
@@ -454,6 +363,9 @@ OpParLoop::createOpSetDeclaration (SgFunctionParameterList* parameters,
    */
   opSetDeclaration->get_declarationModifier ().get_typeModifier ().setIntent_in ();
 
+	opSetDeclaration->get_declarationModifier ().get_accessModifier().setUndefined();
+
+	
   appendStatement (opSetDeclaration, scope);
 }
 
@@ -507,20 +419,23 @@ OpParLoop::createSubroutineName (SgFunctionParameterList* parameters,
   /*
    * Append the variable to the formal parameter list
    */
-  parameters->append_arg (*(charArrayDeclaration->get_variables ().begin ()));
+  parameters->append_arg ( *(charArrayDeclaration->get_variables ().begin ()) );
 
   /*
    * Set the attributes of the formal parameter
    */
   charArrayDeclaration->get_declarationModifier ().get_typeModifier ().setIntent_in ();
 
+	charArrayDeclaration->get_declarationModifier ().get_accessModifier ().setUndefined ();
+	
+	
   appendStatement (charArrayDeclaration, scope);
 }
 
 void
 OpParLoop::createHostSubroutine (std::string kernelName,
     SgExpressionPtrList& args, SgSourceFile& sourceFile,
-    SgModuleStatement& moduleStatement)
+    SgScopeStatement * scope)
 {
   using namespace SageBuilder;
   using namespace SageInterface;
@@ -540,11 +455,14 @@ OpParLoop::createHostSubroutine (std::string kernelName,
    */
   SgProcedureHeaderStatement* subroutineStatement =
       buildProcedureHeaderStatement (kernelName.c_str (), buildVoidType (),
-          hostParameters,
-          SgProcedureHeaderStatement::e_subroutine_subprogram_kind,
-          moduleStatement.get_definition ()->get_scope ());
-  statements.push_back (subroutineStatement);
-  scopes.push_back (moduleStatement.get_definition ()->get_scope ());
+																		 hostParameters,
+																		 SgProcedureHeaderStatement::e_subroutine_subprogram_kind,
+																		 scope
+																		);
+	
+	appendStatement ( subroutineStatement, scope );
+//  statements.push_back (subroutineStatement);
+//  scopes.push_back (moduleStatement.get_definition ()->get_scope ());
 
   SgBasicBlock* subroutineScope =
       subroutineStatement->get_definition ()->get_body ();
@@ -637,13 +555,98 @@ OpParLoop::createHostSubroutine (std::string kernelName,
   createHostDeviceLocals (subroutineScope);
 }
 
-SgModuleStatement*
+
+
+
+/*
+ * Build a module
+ */
+SgModuleStatement *
+OpParLoop::buildClassDeclarationAndDefinition (std::string name, SgScopeStatement* scope)
+{
+	using namespace SageBuilder;
+  using namespace SageInterface;
+	
+  // This function builds a class declaration and definition 
+  // (both the defining and nondefining declarations as required).
+	
+  // Build a file info object marked as a transformation
+	Sg_File_Info* fileInfo = Sg_File_Info::generateDefaultFileInfoForCompilerGeneratedNode();
+	//	fileInfo->setOutputFileGeneration();
+	fileInfo->setOutputInCodeGeneration();
+	
+	assert(fileInfo != NULL);
+	
+  // This is the class definition (the fileInfo is the position of the opening brace)
+	SgClassDefinition* classDefinition   = new SgClassDefinition(fileInfo);
+	assert(classDefinition != NULL);
+	
+	
+	/*	SgModuleStatement::SgModuleStatement 	( 	Sg_File_Info *  	startOfConstruct,
+	 SgName  	name = "",
+	 SgClassDeclaration::class_types  	class_type = SgClassDeclaration::e_class,
+	 SgClassType *  	type = NULL,
+	 SgClassDefinition *  	definition = NULL	 
+	 ) 	
+	 */
+  // Set the end of construct explictly (where not a transformation this is the location of the closing brace)
+	classDefinition->set_endOfConstruct(fileInfo);
+	
+  // This is the defining declaration for the class (with a reference to the class definition)
+	SgModuleStatement * classDeclaration = new SgModuleStatement(fileInfo,name.c_str(),SgClassDeclaration::e_struct,NULL,classDefinition);
+	assert(classDeclaration != NULL);
+	
+  // Set the defining declaration in the defining declaration!
+	classDeclaration->set_definingDeclaration(classDeclaration);
+	
+  // Set the non defining declaration in the defining declaration (both are required)
+	SgClassDeclaration* nondefiningClassDeclaration = new SgClassDeclaration(fileInfo,name.c_str(),SgClassDeclaration::e_struct,NULL,NULL);
+	assert(classDeclaration != NULL);
+	nondefiningClassDeclaration->set_type(SgClassType::createType(nondefiningClassDeclaration));
+	
+  // Set the internal reference to the non-defining declaration
+	classDeclaration->set_firstNondefiningDeclaration(nondefiningClassDeclaration);
+	classDeclaration->set_type(nondefiningClassDeclaration->get_type());
+	
+  // Set the defining and no-defining declarations in the non-defining class declaration!
+	nondefiningClassDeclaration->set_firstNondefiningDeclaration(nondefiningClassDeclaration);
+	nondefiningClassDeclaration->set_definingDeclaration(classDeclaration);
+	
+  // Set the nondefining declaration as a forward declaration!
+	nondefiningClassDeclaration->setForward();
+	
+  // Don't forget the set the declaration in the definition (IR node constructors are side-effect free!)!
+	classDefinition->set_declaration(classDeclaration);
+	
+  // set the scope explicitly (name qualification tricks can imply it is not always the parent IR node!)
+	classDeclaration->set_scope(scope);
+	nondefiningClassDeclaration->set_scope(scope);
+	
+  // some error checking
+	assert(classDeclaration->get_definingDeclaration() != NULL);
+	assert(classDeclaration->get_firstNondefiningDeclaration() != NULL);
+	assert(classDeclaration->get_definition() != NULL);
+	
+  // DQ (9/8/2007): Need to add function symbol to global scope!
+	printf ("Fixing up the symbol table in scope = %p = %s for class = %p = %s \n",scope,scope->class_name().c_str(),classDeclaration,classDeclaration->get_name().str());
+	SgClassSymbol* classSymbol = new SgClassSymbol(classDeclaration);
+	scope->insert_symbol(classDeclaration->get_name(),classSymbol);
+	ROSE_ASSERT(scope->lookup_class_symbol(classDeclaration->get_name()) != NULL);
+	
+	return classDeclaration;
+}
+
+
+
+SgModuleStatement *
 OpParLoop::createModule (std::string kernelName, SgSourceFile& sourceFile)
 {
   using namespace SageBuilder;
   using namespace SageInterface;
   using namespace std;
 
+	SgGlobal * globalScope = sourceFile.get_globalScope();
+		
   /*
    * Create module name
    */
@@ -652,26 +655,122 @@ OpParLoop::createModule (std::string kernelName, SgSourceFile& sourceFile)
   /*
    * Create the module statement
    */
-  SgModuleStatement* moduleStatement = buildModuleStatementAndDefinition (
-      moduleName, sourceFile.get_globalScope ());
-
-  /*
-   * Create the contains statement
-   */
-  SgContainsStatement* containsStatement = buildContainsStatement (
-      sourceFile.get_file_info (), moduleStatement->get_definition ());
-
-  statements.push_back (moduleStatement->get_firstNondefiningDeclaration ());
-  scopes.push_back (sourceFile.get_globalScope ());
-
-  statements.push_back (containsStatement);
-  scopes.push_back (moduleStatement->get_definition ()->get_scope ());
-
-  statements.push_back (moduleStatement->get_definingDeclaration ());
-  scopes.push_back (sourceFile.get_globalScope ());
-
+	SgModuleStatement * moduleStatement = buildClassDeclarationAndDefinition ( moduleName, globalScope );
+	
+	
+	moduleStatement->get_definition()->setCaseInsensitive ( true );
+	
+	appendStatement ( moduleStatement, globalScope );
+	
+	
   return moduleStatement;
 }
+
+
+
+SgProcedureHeaderStatement *
+OpParLoop::generateCUDAUserKernel ( SgScopeStatement * scope )
+{
+	using namespace SageBuilder;
+	using namespace SageInterface;
+	using namespace std;
+	
+	// I need to find the definition inside the correct file (otherwise the definition would be empty)
+	vector < SgProcedureHeaderStatement * >::iterator it = inputSubroutines.begin();
+	
+	while ( (*it)->get_name().getString() != (userKernelFunction->get_name()).getString() ) {
+		it++;
+		cout << "comparing: " << ((*it)->get_name()).getString() << " and " << (userKernelFunction->get_name()).getString() << endl;
+	}
+	
+	SgProcedureHeaderStatement *subroutine;
+	
+	if ( (*it)->get_name().getString() == (userKernelFunction->get_name()).getString() ) {
+		cout << "OK, found!!" << endl;
+		
+		SgProcedureHeaderStatement * realRoutine = (*it);
+		
+		//		subroutine = (SgProcedureHeaderStatement *) realRoutine->copy ( *(new SgTreeCopy) );
+		
+		subroutine = buildProcedureHeaderStatement ( (realRoutine->get_name()).str(),
+																								buildVoidType (),
+																								realRoutine->get_parameterList(),
+																								SgProcedureHeaderStatement::e_subroutine_subprogram_kind,
+																								scope );
+		
+		/* 
+		 * now visiting the subtree to: 
+		 * 1. append the statement to the statements to be unparse (visiting the statement list)
+		 *		(TODO: may not work for nested bodies: the alternative is to use a copy routine that currently does
+		 *		 not work)
+		 * 2. set its OutputInCodeGeneration flag to true (using a special visitor)
+		 */
+		
+		Rose_STL_Container < SgStatement * > toFill =	subroutine->get_definition()->get_body()->get_statements();
+		
+		Rose_STL_Container < SgStatement * > filling = realRoutine->get_definition()->get_body()->get_statements();
+		
+		Rose_STL_Container < SgStatement * >::iterator copyIt;
+		
+		for ( copyIt = filling.begin(); copyIt != filling.end(); copyIt++ ) {
+			
+			// adding the statement to the statement list
+			toFill.push_back ( *copyIt );
+			
+			// appending statement too
+			appendStatement ( *copyIt, subroutine->get_definition()->get_body() );	
+			
+		}
+		
+		deepVisitAndSetGeneration * newVisit = new deepVisitAndSetGeneration ();
+		newVisit->traverse ( (SgNode *) subroutine, preorder );
+		
+		// now modifying the formal parameter declaration adding the "device" attribute
+		SgFunctionParameterList * parameterList = subroutine->get_parameterList();
+//		(SgFunctionParameterList * ) deepCopy ( subroutine->get_parameterList() );
+		
+		
+		
+		// scan the parameter list and the statements: when a same name is found, we add the device attribute
+		// typedef in rose is   Rose_STL_Container<SgInitializedName*> --> SgInitializedNamePtrList 
+		// TODO: this is somehow too general, if we consider that all fortran formal parameters are 
+		// declared at the beginning of the declaration section and their number is known (!)
+		SgInitializedNamePtrList list = parameterList->get_args();
+		
+		SgInitializedNamePtrList::iterator varMod;
+		
+		for ( varMod = list.begin(); varMod != list.end(); varMod++ ) {
+			
+			// checking every statement inside the subroutine
+			copyIt = toFill.begin();
+			while ( copyIt != toFill.end() ) {
+				// check is copyIt is pointing to a SgVariableDeclaration
+				SgVariableDeclaration * isVar;
+				if ( (isVar = isSgVariableDeclaration ( *copyIt ) ) != NULL ) {
+					// check if the name corresponds to the one we are looking for
+					if ( isVar->get_definition()->get_vardefn()->get_name().getString() == 
+							(*varMod)->get_name().getString() ) {
+						// found the variable: adding the DEVICE attribute
+						(*varMod)->get_declaration()->get_declarationModifier().get_typeModifier().setDevice();
+						// if I have found the variable, I can stop searching
+						break;
+					}
+				}
+				copyIt++;
+			}
+		}
+	}
+	
+	
+	appendStatement ( subroutine, scope );
+
+	
+	return subroutine;
+	
+}
+
+
+
 
 /*
  * Creates a CUDA source file
@@ -724,13 +823,66 @@ OpParLoop::createSourceFile (std::string kernelName)
    */
   sourceFile->set_fortran_implicit_none (true);
 
+	
+	sourceFile->set_outputFormat ( SgFile::e_free_form_output_format );
+
+	
   /*
    * Store the file so it can be unparsed after AST construction
    */
-  kernelOutputFiles.push_back (sourceFile);
-
+	kernelOutputFiles.push_back (sourceFile);	
+	
   return sourceFile;
 }
+
+
+void
+OpParLoop::createCudaModule ( std::string kernelName, SgSourceFile& sourceFile, SgExpressionPtrList& args )
+{
+	
+	using namespace std;
+
+	cout << "Creating CUDA module" << endl;
+	
+	SgModuleStatement * cudaModule = createModule (  kernelName, sourceFile);
+
+	cout << "Creating contains statement" << endl;
+
+	
+	/*
+   * Create the contains statement and append it to the module list of declarations
+   */
+  SgContainsStatement * containsStatement = buildContainsStatement ( sourceFile.get_file_info (), 
+																																	   cudaModule->get_definition ()
+																																	);
+	
+
+	cout << "Pushing bask contains statement" << endl;
+	
+	vector<SgDeclarationStatement *> & statementList = cudaModule->get_definition()->getDeclarationList();
+	statementList.push_back ( containsStatement );
+	
+	
+	cout << "Creating kernelCUDAVersionDecl" << endl;
+	
+	
+	// generating and modifying user kernel and appending it to the contains scope
+	SgProcedureHeaderStatement * kernelCUDAVersionDecl = generateCUDAUserKernel ( containsStatement->get_scope() );
+	
+/*	
+	SgProcedureHeaderStatement * kernelMainRoutine = buildMainKernelRoutine ( subroutineName,
+																																					 contains->get_scope(),
+																																					 computeOpDatArgNumber ( args.size() ),
+																																					 args );
+*/
+	
+
+	cout << "Creating Host subroutine" << endl;
+	
+	createHostSubroutine (kernelName, args, sourceFile, containsStatement->get_scope() );
+	
+}
+
 
 /*
  * ====================================================================================================
@@ -755,6 +907,20 @@ OpParLoop::visit (SgNode* node)
 
   switch (node->variantT ())
   {
+			
+		// I need to remember all subroutine definition because I need to recover actual kernel definitions later
+		// to copy them in the new files
+		case V_SgProcedureHeaderStatement:
+		{
+
+			inputSubroutines.push_back ( (SgProcedureHeaderStatement *) node );
+			
+//			Rose_STL_Container < SgStatement * > stuff = 
+//					((SgProcedureHeaderStatement *) node)->get_definition()->get_body()->get_statements();
+			
+			break;
+		}
+	
     case V_SgFunctionCallExp:
     {
       /*
@@ -794,6 +960,14 @@ OpParLoop::visit (SgNode* node)
             + "' with " + boost::lexical_cast <string> (args.size ())
             + " arguments", 2);
 
+				/*
+				 * I need the kernel definition to copy it later in the implementation of the module
+				 */
+				SgNode *firstArg = args.front();
+				this->setUserKernelDeclaration ( (SgProcedureHeaderStatement *) 
+																				(isSgFunctionRefExp (firstArg))->getAssociatedFunctionDeclaration () );
+
+				
         /*
          * An 'op_par_loop_2' always has 10 arguments
          */
@@ -818,20 +992,13 @@ OpParLoop::visit (SgNode* node)
               /*
                * Generate the CUDA file for this kernel
                */
-              SgSourceFile* sourceFile = createSourceFile (kernelName);
-              SgModuleStatement* moduleStatement = createModule (kernelName,
-                  *sourceFile);
-              createHostSubroutine (kernelName, args, *sourceFile,
-                  *moduleStatement);
+              SgSourceFile * sourceFile = createSourceFile (kernelName);
 
-              for (vector <SgStatement*>::iterator it = statements.begin (); it
-                  != statements.end (); ++it)
-              {
-                SgScopeStatement* scope = scopes.back ();
-                scopes.pop_back ();
-                appendStatement ((*it), scope);
-              }
-
+							/*
+							 * Generate and fill the CUDA module
+							 */
+							createCudaModule ( kernelName, *sourceFile, args );
+							
             }
             else
             {
@@ -897,4 +1064,11 @@ OpParLoop::unparse ()
      */
     project->unparse ();
   }
+}
+
+void deepVisitAndSetGeneration::visit ( SgNode * nextNode )
+{
+	SgLocatedNode * castedNode;
+	if ( (castedNode = isSgLocatedNode ( nextNode )) != NULL )
+		castedNode->setOutputInCodeGeneration();
 }
