@@ -3,7 +3,6 @@ BINDIR    = bin
 INCDIR    = include
 OBJDIR    = obj
 SRCDIR    = src
-LIBDIR    = $(OP2_ROSE_INST_DIR)/lib
 BOOST_DIR = $(OP2_BOOST_INST_DIR)
 ROSE_DIR  = $(OP2_ROSE_INST_DIR)
 LDFLAGS   = -s -L$(ROSE_DIR)/lib -lrose
