@@ -1,0 +1,376 @@
+\chapter{Virtual CFG}
+
+The ROSE virtual control flow graph interface provides a higher level of
+detail than ROSE's other control flow graph interfaces.  It expresses
+control flow even within expressions, and handles short-circuited logical
+and conditional operators properly\footnote{It assumes operands of
+expressions are computed in left-to-right order, unlike the actual language
+semantics, however.}.  The interface is referred to as ``virtual'' because
+no explicit graph is ever created: only the particular CFG nodes and edges
+used in a given program ever exist.  CFG nodes and edges are value classes
+(they are copied around by value, reducing the need for explicit memory
+management).
+
+A CFG node consists of two components: an AST node pointer, and an index of
+a particular CFG node within that AST node.  There can be several CFG nodes
+corresponding to a given AST node, and thus the AST node pointers cannot be
+used to index CFG nodes.  The particular index values for the different AST
+node types are explained in Section~\ref{cfg_index_values}.
+
+\section{CFGNode Index values}
+\label{cfg_index_values}
+To facilitate traversal and represent sufficient details,
+each eligible ROSE AST node (expression, statement and SgInitializedName)
+has several corresponding CFGNodes in virtual CFG. 
+These CFGNodes have indices from 0 to n. CFGNode of index value of 0 is 
+used to represent the beginning CFG node for an AST node, while the CFGNode
+of index n is the end CFGNode for the AST node.
+The
+beginning node represents the point in the control flow immediately before
+the construct starts to execute, and the ending node represents the point
+immediately after the construct has finished executing.  Note that these
+two nodes do not dominate the other CFG nodes in the construct due to
+\lstinline{goto} statements and labels.
+
+Reimplementation of {\textit SgNode::cfgIndexForEnd()} returns the index value for n of each
+eligible SgNode type. See source file
+\textit{src/frontend/SageIII/virtualCFG/memberFunctions.C} for valid index
+values for each type of eligible SgNode. 
+
+
+\section{Important functions}
+
+The main body of the virtual CFG interface is in \lstinline{virtualCFG.h};
+the source code is in \lstinline{src/frontend/SageIII/virtualCFG/} and is
+linked into \lstinline{librose}.  The filtered CFG interface explained
+below is in \lstinline{filteredCFG.h}, and functions for converting the CFG
+to a graph in Dot format are in \lstinline{cfgToDot.h}.
+
+Two functions provide the basic way of converting from AST nodes to CFG
+nodes.  Each \lstinline{SgNode} has two methods,
+\lstinline{cfgForBeginning()} and \lstinline{cfgForEnd()}, to generate the
+corresponding beginning and end CFG nodes, respectively.  
+These functions require that the AST node is
+either an expression, a statement, or a \lstinline{SgInitializedName}.  
+\subsection{Node methods}
+
+\begin{itemize}
+\item \lstinline{CFGNode(SgNode* node, unsigned int index)}: Build a CFG
+node from the given AST node and index.  Valid index values are in
+Section~\ref{cfg_index_values}. 
+\item \lstinline{toString()}: Produce a string representing the information
+in the node.
+\item \lstinline{toStringForDebugging()}: Similar, but with more internal
+debugging information.
+\item \lstinline{id()}: A C identifier representing the node.
+\item \lstinline{getNode()}: Get the underlying AST node.
+\item \lstinline{getIndex()}: Get the index (as explained in
+Section~\ref{cfg_index_values}) for this CFG node within its underlying AST
+node.
+\item \lstinline{outEdges()}: Return a vector of outgoing CFG edges from
+this node. This function internally calls 
+\lstinline{cfgOutEdges(unsigned int idx)} to
+generate out edges for each CFGNode of a given index value. 
+\item \lstinline{inEdges()}: Return a vector of CFG edges coming into this
+node (note that the sources and targets of the edges are not reversed, and
+so each in edge has its target as the current node). This function
+internally calls \lstinline{cfgInEdges(unsigned int idx) } to generate
+in edges for each CFGNode of a given index value. 
+\item \lstinline{isInteresting()}: See
+Section~\ref{interesting_node_filter}.
+\item Nodes are also comparable using the operators \lstinline{==},
+\lstinline{!=}, and \lstinline{<}.
+\end{itemize}
+
+\subsection{Edge methods}
+
+\begin{itemize}
+\item \lstinline{toString()}: Produce a string representing the information
+      in the node.
+\item \lstinline{toStringForDebugging()}: Similar, but with more internal
+      debugging information.
+\item \lstinline{id()}: A C identifier representing the node.
+\item \lstinline{source()}: The starting CFG node for this edge.
+\item \lstinline{target()}: The ending CFG node for this edge.
+\item \lstinline{condition()}: When there are multiple CFG edges from the
+      same starting node, each of them is taken under certain conditions.  The
+\lstinline{condition()} method returns the condition, of type
+\lstinline{EdgeConditionKind}.  The possible return values are:
+  \begin{itemize}
+  \item \lstinline{eckUnconditional}: An edge that is always taken.
+  \item \lstinline{eckTrue}: True case of a two-way branch (either an
+                             \lstinline{if} statement or a loop
+  \item \lstinline{eckFalse}: False case of a two-way branch
+  \item \lstinline{eckCaseLabel}: Case label in a \lstinline{switch} statement (key is given by \lstinline{caseLabel()})
+  \item \lstinline{eckDefault}: Default label of a \lstinline{switch} statement
+  \item \lstinline{eckDoConditionPassed}: Enter Fortran \lstinline{do} loop body
+  \item \lstinline{eckDoConditionFailed}: Fortran \lstinline{do} loop finished
+  \item \lstinline{eckForallIndicesInRange}: Start testing \lstinline{forall} mask
+  \item \lstinline{eckForallIndicesNotInRange}: End of \lstinline{forall} loop
+  \item \lstinline{eckComputedGotoCaseLabel}: Case in computed \lstinline{goto} -- number needs to be computed separately
+  \item \lstinline{eckArithmeticIfLess}: Edge for the arithmetic \lstinline{if} expression being less than zero
+  \item \lstinline{eckArithmeticIfEqual}: Edge for the arithmetic \lstinline{if} expression being equal to zero
+  \item \lstinline{eckArithmeticIfGreater}: Edge for the arithmetic \lstinline{if} expression being greater than zero
+  \end{itemize}
+\item \lstinline{caseLabel()}: For an edge with condition
+      \lstinline{eckCaseLabel}, an expression representing the key for the case
+      label.
+\item \lstinline{computedGotoCaseIndex()}: The index of this edge's case
+      within a Fortran computed \lstinline{goto} (an edge of kind
+      \lstinline{eckComputedGotoCaseLabel}).
+\item \lstinline{conditionBasedOn()}: The test expression or
+      \lstinline{switch} expression that is tested by this edge.
+\item \lstinline{scopesBeingExited()}, \lstinline{scopesBeingEntered()}:
+      Variables leaving and entering scope during this edge.  This information
+      has not been extensively verified, and should not be relied upon.
+\item Edges can also be compared using the operators \lstinline{==} and
+      \lstinline{!=}.  They are not ordered to avoid dependencies on pointer
+      comparison on different computers.
+\end{itemize}
+
+\section{Drawing a graph of the CFG}
+
+Fig.~\ref{Tutorial:BuildVirtualCFG1} shows a translator to dump 
+full (debug) virtual control flow graphs for all functions within input
+source files. It also dumps a simplified version (interesting) version of 
+virtual control flow graphs. A standalone tool named \textit{virtualCFG} is
+installed under \textit{ROSE\_INSTALL\_TREE/bin} for users to generate both
+debug and interesting dot files of virtual CFGs. 
+
+%---------------------------------------------------------------------------
+\begin{figure}%[!h]
+{\indent
+  {\mySmallFontSize
+    \begin{latexonly}
+    \lstinputlisting{\TutorialExampleDirectory/virtualCFG.C}
+    \end{latexonly}
+
+    \begin{htmlonly}
+    \verbatiminput{\TutorialExampleDirectory/virtualCFG.C}
+    \end{htmlonly}
+
+    % end of scope in font size
+  }
+  % End of scope in indentation
+}
+\label{Tutorial:BuildVirtualCFG1}
+\caption{Example source code showing visualization of virtual control flow graph.}
+\end{figure}
+
+
+
+The example input code is given in
+Fig.~\ref{Tutorial:exampleInputCode_virtualCFG}. 
+Debug and interesting virtualCFG of function \lstinline{main()}
+are shown in Fig.~\ref{tutorial:exampleOutputCodeMainDebugPDF} and
+Fig.~\ref{tutorial:exampleOutputCodeMainInterestingPDF}, respectively.
+Debug and interesting virtualCFG of function \lstinline{testIf()}
+are shown in Fig.~\ref{tutorial:exampleOutputCodeDebugPDF} and
+Fig.~\ref{tutorial:exampleOutputCodeInterestingPDF}, respectively.
+
+As we can see in Fig.~\ref{tutorial:exampleOutputCodeDebugPDF}, the debug
+dot graph has all CFGNodes for each eligible SgNode. 
+For example, there are three CFGNodes for SgIfStmt, with indices from 0 to
+2. The interesting CFGNode of SgIfStmt has solid line oval while
+non-essential CFGNodes have dashed line ovals in the graph. 
+The caption of each node has a format of
+\textit{$<$SgNode-Enum-value$>$@line-number:CFGNode-index-value}. 
+It is obvious from the graph that SgIfStmt's interesting CFGNode has an index value of 1. 
+In comparison, Fig.~\ref{tutorial:exampleOutputCodeInterestingPDF} only
+shows interesting CFGNodes with solid line ovals. Again, the captions tells
+line numbers and CFGNode's index values for each CFGNode. 
+
+%---------------------------------------------------------------------------
+\begin{figure}%[!h]
+{\indent
+  {\mySmallFontSize
+    \begin{latexonly}
+    \lstinputlisting{\TutorialExampleDirectory/inputCode_ControlFlowGraphAnalysis.C}
+    \end{latexonly}
+
+    \begin{htmlonly}
+    \verbatiminput{\TutorialExampleDirectory/inputCode_ControlFlowGraphAnalysis.C}
+    \end{htmlonly}
+
+    % end of scope in font size
+  }
+  % End of scope in indentation
+}
+\label{Tutorial:exampleInputCode_virtualCFG}
+\caption{Example source code used as input to build virtual control graphs.}
+\end{figure}
+
+%---------------------------------------------------------------------------
+\begin{figure}
+\includegraphics[height=0.9\textheight]{\TutorialExampleBuildDirectory/vcfg_main_debug.pdf}
+\caption{The debug virtual control flow graph for function \textit{main()} shows all virtual CFG nodes
+and edges}
+\label{tutorial:exampleOutputCodeMainDebugPDF}
+\end{figure}
+
+
+\begin{figure}
+\includegraphics[height=0.9\textheight]{\TutorialExampleBuildDirectory/vcfg_main_interesting.pdf}
+\caption{The virtual control flow graph for function \textit{main()} shows only interesting virtual
+CFG nodes and edges. Each CFGNode's caption tells associated source line
+number and CFGNode index value (@line-num:index-value)  }
+\label{tutorial:exampleOutputCodeMainInterestingPDF}
+\end{figure}
+
+
+%---------------------------------------------------------------------------
+\begin{figure}
+\includegraphics[height=0.9\textheight]{\TutorialExampleBuildDirectory/vcfg_testIf_debug.pdf}
+\caption{The debug virtual control flow graph for function \textit{testIf()} shows all virtual CFG nodes
+and edges}
+\label{tutorial:exampleOutputCodeDebugPDF}
+\end{figure}
+
+
+\begin{figure}
+\includegraphics[height=0.9\textheight]{\TutorialExampleBuildDirectory/vcfg_testIf_interesting.pdf}
+\caption{The virtual control flow graph for function \textit{testIf()} shows only interesting virtual
+CFG nodes and edges. Each CFGNode's caption tells associated source line
+number and CFGNode index value (@line-num:index-value)  }
+\label{tutorial:exampleOutputCodeInterestingPDF}
+\end{figure}
+
+\clearpage
+\section{Robustness to AST changes}
+
+Control flow graph nodes and edges can be kept (i.e., are not invalidated)
+in many cases when the underlying AST changes.  However, there are some
+limitations to this capability.  Changing the AST node that is pointed to
+by a given CFG node is not safe.  CFG nodes for deleted AST nodes are of
+course invalid, as are those pointing to AST nodes whose parent pointers
+become invalid.
+
+\section{Limitations}
+
+Although workable for intraprocedural analysis of C code, the virtual CFG
+code has several limitations for other languages and uses.
+
+\subsection{Fortran support}
+
+The virtual control flow graph includes support for many Fortran
+constructs, but that support is fairly limited and not well tested.  It is
+not recommended for production use.
+
+\subsection{Exception handling}
+
+The virtual CFG interface does not support control flow due to exceptions
+or the \lstinline{setjmp}/\lstinline{longjmp} constructs.
+It does, however, support \lstinline{break}, \lstinline{continue},
+\lstinline{goto}, and early returns from functions.
+
+\subsection{Interprocedural control flow analysis}
+
+In virtual CFGs, interprocedural control flow analysis is disabled by default. It can be enabled
+by setting the parameter \texttt{virtualInteproceduralControlFlowGraphs} in SgNode::cfgInEdges, 
+SgNode::cfgOutEdges, and their subclasses' definitions. Interprocedural edges are labeled 
+with the \texttt{eckInterprocedural} EdgeConditionKind.
+
+In cases where the flow of control cannot be determined statically (calls of virtual
+functions, function pointers, or functors), the interprocedural control flow
+graph contains all possible options. In keeping with the `virtual' nature of
+ROSE's control flow graphs, the set of options is computed on-the-fly;
+therefore, changes to the AST will be reflected in subsequent interaction with
+the control flow graph.  
+
+
+\section{Node filtering}
+
+FIXME
+
+\subsection{``Interesting'' node filter}
+\label{interesting_node_filter}
+To simplify the virtual CFG, non-essential CFGNodes, such as the beginning
+and the end CFGNodes for each AST node, can be filtered out. 
+Each eligible SgNode type has a most important CFGNode out of its all
+CFGNodes. The interesting CFGNode's index value for each Node type is returned by calling
+the derived implementation of \textit {virtual bool SgNode::cfgIsIndexInteresting(int idx)}. 
+
+\subsection{Arbitrary filtering}
+
+\section{Static CFG}
+
+Since a virtual CFG does not produce any real graph, it is quite inefficient to
+traverse a virtual CFG frequently. It is necessary to build a static CFG which may
+improve the performance of some specific operations. 
+
+A \textit{SgGraph} object (actually, it's a \textit{SgIncidenceDirectedGraph} object) is created to 
+store the static CFG. Each node in the graph is a \textit{SgGraphNode} object. In a virtual 
+CFG, each node contains two members: node and index. A \textit{SgGraphNode} already holds a 
+pointer to \textit{SgNode}, and we have to add the other property ``index'' to our \textit{SgGraphNode}.
+This can be done by adding the corresponding attribute to \textit{SgGraphNode}.
+
+\subsection{Class methods}
+
+\begin{itemize}
+\item \lstinline{CFG()}: The default constructor. 
+\item \lstinline{CFG(SgNode* node, bool isFiltered = false)}: Initialize a static CFG with the start 
+node to build from and a flag indicating if the CFG is a full or filtered one.                                              
+\item \lstinline{setStart(SgNode* node)}: Set the start node for building a static CFG. Note that the argument
+has to be an object of any of the following classes: \textit{SgProject}, \textit{SgStatement}, \textit{SgExpression},
+and \textit{SgInitializedName}. If a \textit{SgProject} object is passed in, several graphs are built for every
+function definition. 
+\item \lstinline{isFilteredCFG()}: Return the \textit{isFiltered} flag.
+\item \lstinline{setFiltered(bool flag)}: Set the \textit{isFiltered} flag.                 
+\item \lstinline{buildCFG()}: Build a full or filtered CFG according to the \textit{isFiltered} flag.
+\item \lstinline{buildFullCFG()}: Build a full CFG for debugging.
+\item \lstinline{buildFilteredCFG()}: Build a filtered CFG which only contains interesting nodes.
+\item \lstinline{getOutEdges(SgGraphNode* node)}: Return a vector of outgoing CFG edges (\textit{SgDirectedGraphEdge} objects) from the given node.
+\item \lstinline{getInEdges(SgGraphNode* node)}: Return a vector of CFG edges coming into the given node.
+\item \lstinline{cfgForBeginning(SgNode* node)}: Return the CFG node for just before this AST node.                               
+\item \lstinline{cfgForEnd(SgNode* node)}: Return the CFG node for just after this AST node.                               
+\item \lstinline{getIndex(SgGraphNode* node)}: Return the index of the given CFG node.
+\item \lstinline{cfgToDot(SgNode* node, const std::string& filename)}: Generate a DOT file for the current CFG. Note that the start node
+to be drawn can be indicated which is not necessary to be the start node of the CFG.                                                      
+\end{itemize}
+
+\subsection{Drawing a graph of the CFG}
+Figure~\ref{Tutorial:BuildStaticCFG} shows a translator to dump 
+full (debug) static control flow graphs for all functions within input
+source files. It also dumps a simplified version (interesting) version of 
+static control flow graphs. 
+
+%---------------------------------------------------------------------------
+\begin{figure}[!h]
+{\indent
+  {\mySmallFontSize
+    \begin{latexonly}
+    \lstinputlisting{\TutorialExampleDirectory/staticCFG.C}
+    \end{latexonly}
+
+    \begin{htmlonly}
+    \verbatiminput{\TutorialExampleDirectory/staticCFG.C}
+    \end{htmlonly}
+
+    % end of scope in font size
+  }
+  % End of scope in indentation
+}
+\label{Tutorial:BuildStaticCFG}
+\caption{Example source code showing visualization of static control flow graph.}
+\end{figure}
+
+The example input code is given in
+Fig.~\ref{Tutorial:exampleInputCode_virtualCFG}. Debug and interesting static CFG 
+are shown in Fig.~\ref{tutorial:exampleOutputCodeDebugPDF} and
+Fig.~\ref{tutorial:exampleOutputCodeInterestingPDF}, respectively.
+
+\section{Static, Interprocedural CFGs}
+
+ROSE supports construction of interprocedural control flow graphs using the InterproceduralCFG class, 
+a subclass of StaticCFG. Like the StaticCFG, the InterproceduralCFG can be constructed 
+from any SgNode that affects control flow. If an InterproceduralCFG is constructed from a given node, 
+it will contain all possible paths of execution from that point. 
+Edges between procedures will be labelled with the `eckInterprocedural' 
+{\tt EdgeConditionKind}.
+
+In cases where a function call cannot be statically resolved to a function definition, the 
+InterproceduralCFG includes edges from the call node to all possible definitions, which are
+determined by ROSE's CallGraph.  
+
+
+% \section{Control flow graph on binaries}

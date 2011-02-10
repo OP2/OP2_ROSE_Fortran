@@ -1,0 +1,10 @@
+operator sqrt( double val)
+    {
+      modify none; read{val}; alias none;
+    }
+
+operator sqrt( float val)
+    {
+      modify none; read{val}; alias none;
+    }
+

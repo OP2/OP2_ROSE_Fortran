@@ -1,0 +1,4 @@
++:AllowedFunctions
++:ForbiddenFunctions
++:NoAsmStmtsOps
+-:FileReadOnlyAccess
