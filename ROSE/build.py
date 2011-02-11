@@ -1,5 +1,7 @@
 import glob
 import os
+import re
+import string
 from subprocess import Popen
 
 def getNewDirectory (msg):
@@ -32,7 +34,30 @@ if not os.path.exists(defaultBuildDir):
 if not os.path.exists(defaultInstallDir):
 	os.mkdir(defaultInstallDir)
 	
-configureString  = "../configure"
-configureCommand = Popen(args='ls -al', cwd=defaultBuildDir, shell='/bin/bash') 
+boostInstallDir = None
+pattern = re.compile("boost")
+LD_LIBRARY_PATH = string.split( os.environ.get("LD_LIBRARY_PATH"), ':')
+for path in LD_LIBRARY_PATH:
+	if pattern.search(path):
+		boostInstallDir = path
+		
+if boostInstallDir is None:
+	print("Could not find BOOST in your LD_LIBRARY_PATH")
+	sys.exit(1)
+	
+configureString  = """%s/configure --prefix=%s --with-boost=%s --enable-cuda --enable-opencl --with-java --without-haskell --with-CXX_DEBUG=-g --with-CXX_OPTIMIZE=-O0""" % (roseVersion[0], defaultInstallDir, boostInstallDir[:-4]) 
+					
+configureCommand = Popen(args=configureString, cwd=defaultBuildDir, shell='/bin/bash') 
 if configureCommand.wait() != 0:
 	print("The configure command '%s' failed" % (configureString))
+	sys.exit(1)
+
+makeCommand = Popen(args='make', cwd=defaultBuildDir+'/src', shell='/bin/bash') 
+if makeCommand.wait() != 0:
+	print("Command 'make' failed")
+	sys.exit(1)
+	
+makeInstallCommand = Popen(args='make install', cwd=defaultBuildDir+'/src', shell='/bin/bash') 
+if makeCommand.wait() != 0:
+	print("Command 'make install' failed")
+	sys.exit(1)
