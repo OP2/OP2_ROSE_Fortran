@@ -1,5 +1,0 @@
-enum X
-   {
-     True,
-     False
-   };

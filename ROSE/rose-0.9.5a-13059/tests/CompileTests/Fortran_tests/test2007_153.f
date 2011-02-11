@@ -1,6 +1,0 @@
-      INTEGER :: i = 0
-   20 CONTINUE
-   30 CONTINUE
-   40 CONTINUE
-   10 IF (i) 20,30,40
-      END

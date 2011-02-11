@@ -1,5 +1,0 @@
-DO I=1,100
-  J = J + I
-END DO
-
-END
