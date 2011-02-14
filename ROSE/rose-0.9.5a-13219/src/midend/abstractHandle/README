@@ -1,0 +1,104 @@
+Support for abstract handles for arbitrary language constructs.
+By Liao, 10/9/2008
+
+A handle has the following syntax
+---------------syntax --------------------------------
+
+/* a handle is a link of handle items, separated by :: */
+
+handle ::= handle_item | handle '::' handle_item
+
+handle_item ::= construct_type specifier | compiler_generated_handle
+
+/* Free style internal handles for compiler/tools, 
+could be mangled names, memory pool addresses, etc
+*/
+compiler_generated_handle::= string_lit| int_lit
+
+
+/* 
+construct types are implementation dependent.
+For rose, they are class_name for each node types. 
+*/
+construct_type ::= Project | File | 
+                ForStmt|VariableDeclaration | ...
+
+/* A specifier is used to locate a particular construct
+  e.g: <name, "foo">
+*/
+
+specifier::= '<' specifier_type ',' specifier_value '>'                
+
+/* tokens for specifier types: name, position,numbering, label, 
+
+specifier type is necessary to avoid ambiguity for specifier values, 
+because a same value could be interpreted in different specifier types otherwise
+*/
+
+specifier_type::= name | position | numbering | label 
+
+/* the possible values for a specifier */
+specifier_value::= string_lit|int_lit|position_value| label_value
+
+label_value::= int_lit | string_lit
+
+/* e.g.: 13.5-55.4,  13,  13.5 , 13.5-55 */
+position_value:: = line_number[ '.' column_number][ '-' line_number[ '.' column_number]]
+
+/* one or more digits */
+int_lit ::= [0-9]+
+
+/*  start with a letter, followed by zero or more letters or digits */
+string_lit ::= [a-z][a-z0-9]*
+
+---------example handles --------------------------
+* a project handle
+  Project<name,"project1">
+
+* a file handle
+  Project<name,"project1">::File<name,"/home/PERI/test111.f">
+
+* a function handle using a name
+ Project<name,"project1">::File<name,"/home/PERI/test111.f">::FunctionDeclaration<name,"foo">
+
+* a function handle using source position
+ Project<name,"project1">::File<name,"/home/PERI/test111.f">::FunctionDeclaration<position,"12.1-30.1">
+
+* a function handle using numbering
+
+  Project<name,"project1">::File<name,/home/PERI/test111.f">::FunctionDeclaration<numbering,1>
+
+* a return statement using source position
+
+  Project<name,"project1">::File<name,/home/PERI/test222.c>::ReturnStatement<position,"100">
+
+* a loop using numbering information
+
+  Project<name,"project1">::File<name,"/home/PERI/test222.c">::FunctionDeclaration<name,"main">::ForStatement<numbering,2>
+
+-------------- Reference Implementation-----------
+README
+Interface of abstract handles:
+* abstract_handle.cpp
+* abstract_handle.h
+
+An example for a thin client using a flat list of 
+* myloop.h
+* loopAdapter.cpp
+* loopAdapter.h
+* testMyLoop.cpp
+* makefile-myloop
+
+To run it: just type
+  make -f makefile-myloop
+  ./testMyLoop
+
+Another example for a fat client using a compiler infrastructure(ROSE)
+
+* roseAdapter.cpp
+* roseAdapter.h
+* Makefile.am
+
+See Rose Tutorial Chapter 46. Abstract Handles to Language Constructs for
+executables, input and output.
+

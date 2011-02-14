@@ -1,0 +1,272 @@
+#!/usr/bin/env ruby
+
+require 'optparse'
+
+# driscoll6 10/22/2010 nmi-s005 is a development machine
+# NmiDefaultSubmitHost = 'heller@nmi-s005.cs.wisc.edu'
+NmiDefaultSubmitHost = 'heller@nmi-s003.cs.wisc.edu'
+
+SummaryWidth = 32
+
+
+String.class_eval do
+    # A helper function that makes it easier to present strings nicely while
+    # keeping source code clean.
+    def clean
+        indent = (self =~ /^([ \t]\s*)\S/; $1.size)
+        self.strip.gsub( /^[ \t]\s{#{indent - 1}}/, '' )
+    end
+
+    def start_with?( prefix )
+        if size >= prefix.size and self[ (0..prefix.size-1) ] == prefix
+            true
+        else
+            false
+        end
+    end
+end
+
+File.instance_eval do
+    def resolve_path( path )
+        expand_path(
+            path.split( "/" ).inject( Dir.pwd ) do |path, next_part|
+                next "" if next_part.empty?
+                
+                full_path = "#{path}/#{next_part}".chomp( "/" )
+                if File.symlink? full_path
+                    next_part = File.readlink( full_path ).chomp( "/" )
+                end
+
+
+                # symlink may be absolute or relative, so we may need to
+                # prepend +path+ again.
+                case File.expand_path( next_part ).chomp( "/" )
+                when next_part
+                    next_part
+                else
+                    "#{path}/#{next_part}"
+                end
+            end
+        )
+    end
+end
+
+
+
+# Converts +arg+ to a path relative to the nmiBuildAndTestFarm directory
+def find_rel_path( arg )
+    path = File.resolve_path( arg )
+    subtree_root = File.resolve_path( File.dirname( __FILE__ ))
+
+    if path.start_with? subtree_root
+        path[ (subtree_root.size + 1)..-1 ]
+    else
+        nil
+    end
+end
+
+
+def parse_options( args )
+    options = ( Struct.new( 
+        :user_dir, :submit_host, :tarball, :configs, :skip_update, :fork
+    ).class_eval do
+        def initialize; self.configs = []; end
+        self
+    end).new
+
+    op = OptionParser.new do |opts|
+        opts.set_summary_width SummaryWidth
+        opts.set_summary_indent "    "
+
+        # set default(s)
+        options.submit_host = NmiDefaultSubmitHost
+        options.user_dir = "#{`id -un`.chomp}-rose-nmi"
+        options.skip_update = false
+        options.fork = true
+
+        opts.banner = "
+            Usage: nmi-submit [options] [TARBALL] CONFIG [CONFIG...]
+            Submit TARBALL to platforms specified by each CONFIG, which must be
+            files in the subtree #{File.expand_path( File.dirname( __FILE__ ))}.
+        ".clean
+
+        opts.separator ""
+        opts.on(    "--no-tarball",
+                    *("
+                        Submit the current HEAD of the public subversion
+                        repository instead of a tarball.
+                    ".clean.split( "\n" ))) do
+
+            options.tarball = :none
+        end
+
+        opts.separator ""
+        opts.on(    "--[no-]skip-update",
+                    *("
+                        With --no-skip-update, nmi-submit will copy files (e.g.
+                        submit.sh, glue.pl, &c) to the submit host to ensure
+                        that they are up-to-date.  This step can be skipped to
+                        speed up nmi-submit.  Defaults to --no-skip-update.
+                    ".clean.split( "\n" ))) do |arg|
+
+            options.skip_update = arg
+        end
+
+        opts.separator ""
+        opts.on(    "--[no-]fork",
+                    *("
+                        If --fork is specified, all subprocesses are forked.
+                        This allows nmi-submit to be more responsive to INT
+                        signals, but then requres that ssh and scp can be run
+                        passwordless (e.g. because ssh-agent has an appropriate
+                        identity loaded).  Defaults to --fork.
+                    ".clean.split( "\n" ))) do |arg|
+
+            options.fork = arg
+        end
+
+        opts.separator ""
+        opts.on(    "--submit-host = HOST",
+                    *("
+                        Specify the submission host to use.  Defaults to
+                        #{options.submit_host}.
+                    ".clean.split( "\n" ))) do |arg|
+
+            options.submit_host = arg
+        end
+
+        opts.separator ""
+        opts.on(    "--user-dir = REMOTE_DIR",
+                    *("
+                        Use REMOTE_DIR on the submission host as a working area
+                        to stage files and run the submission from.  Defaults to
+                        #{options.user_dir}.
+                        WARNING: nmi-submit will write to REMOTE_DIR
+                        indiscriminately.  Don't keep your family photos there.
+                    ".clean.split( "\n" ))) do |arg|
+
+            options.user_dir = arg
+        end
+
+        opts.separator ""
+        opts.on_tail( "-h", "--help", "Show this message" ) do
+            puts opts
+            exit
+        end
+    end
+
+
+    begin
+        op.parse! args
+        op.order! args do |arg|
+            next options.tarball = arg unless options.tarball
+            options.configs << arg
+        end 
+
+        # do we have all the options?
+        raise OptionParser::MissingArgument, "
+            Specify a TARBALL or use the --no-tarball option.
+        ".clean unless options.tarball
+
+        raise OptionParser::MissingArgument, "
+            At least one CONFIG must be specified.
+        ".clean if options.configs.empty?
+
+
+        # are any of the options invalid?
+        raise OptionParser::InvalidArgument, "
+            Could not find tarball #{options.tarball}
+        ".clean unless options.tarball == :none or File.file? options.tarball
+
+
+        missing_configs = options.configs.reject do |config| 
+            File.file? "#{File.dirname( __FILE__ )}/#{find_rel_path( config )}"
+        end
+        raise OptionParser::InvalidArgument, "
+            Could not find the following CONFIG files:
+                #{"\n    " + missing_configs.join( "\n    " )}
+            Please specify config files that are in the subtree 
+            #{File.dirname( __FILE__ )}.
+        ".clean unless missing_configs.empty?
+
+        # Each CONFIG must be relative to the nmi scripts directory.  This is
+        # because submit.sh expects to be given
+        # "build_configs/PLATFORM/options", i.e. it extracts the platform
+        # information from the path.
+        options.configs.map!{|config| find_rel_path( config )}
+    rescue OptionParser::ParseError => e
+        puts "#{e.message}\n\n"
+        op.parse! [ "--help" ]
+    end
+
+    options
+end
+
+
+# Submits the runs to nmi
+#
+#   1. creates the directory, if necessary.
+#   2. scps the tarball (if provided) and File.dir(__FILE__)/*
+#       this ensures that, e.g. submit.sh is up-to-date.
+#   3. submits the runs to nmi.
+def run( options )
+    if !options.fork or !( cpid = Process.fork )
+        # Child ignores INT, parent can deal with it.
+        Signal.trap( "INT" ) {} if options.fork
+
+        # (remote) [h]ost
+        h = options.submit_host
+        # (remote) dir
+        d = options.user_dir
+
+        target = "#{h}:#{d}"
+
+        # make sure host:user_dir exists
+        puts "Ensuring #{target} exists."
+        system "ssh #{h} mkdir -p #{d} > /dev/null"
+
+        unless options.skip_update
+            # copy the nmi scripts to the remote host, so we're using ones that are
+            # up-to-date
+            puts "Updating #{File.basename( File.expand_path( File.dirname( __FILE__ )))} files on #{h}."
+            # FIXME 2: This copies all of the .svn directories
+            #   should tar --exclude .svn and scp, extract that file
+            system "scp -r #{File.dirname( __FILE__ )} #{target}/ > /dev/null"
+        end
+
+        unless options.tarball == :none
+            # copy the tarball to host
+            puts "Copying tarball to #{target}."
+            system "scp #{options.tarball} #{target}/rose.tar.gz > /dev/null"
+        end
+
+
+        nmi_output = ''
+
+        tarball = "rose.tar.gz" unless options.tarball == :none
+        # submit the job remotely
+        options.configs.each do |c|
+            # submit the configuration on the remote host
+            puts "Submitting #{c}."
+            nmi_output << `ssh #{h} 'cd #{d} && ./submit.sh #{c} #{tarball}'`
+        end
+
+        unless options.tarball == :none
+            puts "Cleaning up."
+            system "ssh #{h} rm #{d}/rose.tar.gz > /dev/null"
+        end
+
+        puts "\nNMI Output:\n#{nmi_output}"
+    elsif options.fork
+        Signal.trap( "INT" ) do
+            STDERR.puts "Interrupted.  Quitting."
+            Process.kill( "ABRT", cpid )
+            exit 2
+        end
+        Process.wait
+    end
+end
+
+
+run( parse_options( ARGV )) if $0 == __FILE__
+
