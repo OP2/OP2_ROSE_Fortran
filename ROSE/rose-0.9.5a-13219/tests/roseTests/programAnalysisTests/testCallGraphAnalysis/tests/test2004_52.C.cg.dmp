@@ -1,0 +1,3 @@
+call -> X::test
+X::test -> globalTest
+globalTest ->

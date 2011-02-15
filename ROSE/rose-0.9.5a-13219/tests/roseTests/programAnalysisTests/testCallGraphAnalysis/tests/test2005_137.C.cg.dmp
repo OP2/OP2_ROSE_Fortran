@@ -1,0 +1,4 @@
+main -> foo < A >  foo < int > 
+foo < A >  -> A::increment
+A::increment ->
+foo < int >  ->
