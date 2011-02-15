@@ -10,6 +10,9 @@ def writeFileDependencies(makefile):
     for line in dependencyFile:
         fileName = line.strip()
         dotCharacter = fileName.find('.')
+        # Guard against files without extensions
+        if dotCharacter == - 1:
+            dotCharacter = len(fileName))
         fileName = fileName[:dotCharacter]
         
         if len(fileList) > 0:
