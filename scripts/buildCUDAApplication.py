@@ -30,6 +30,8 @@ def tabbedNewLine ():
 CCompilerVariable = "CC"
 FortranCompilerVariable = "FC"
 executableName = "airfoil"
+COBJS = "C_OBJS"
+FortranOBJS = "FORTRAN_OBJS"
 
 # Write Makefile variables
 makefile.write("%s = pgcc -g" % (CCompilerVariable))
@@ -38,13 +40,13 @@ makefile.write("%s = pgfortran -Mcuda=cuda3.1 -fast -Minform=inform" % (FortranC
 
 # Target 'cfiles'
 doubleNewLine()
-makefile.write("cOBJS: op_seq.h op_seq.c debug.c")
+makefile.write("%s: op_seq.h op_seq.c debug.c" % (COBJS))
 tabbedNewLine()
 makefile.write("$(%s) -c op_seq.c debug.c" % (CCompilerVariable))
 
 # Target 'fortranfiles'
 doubleNewLine()
-makefile.write("fortranOBJS: $(wildcard *{.F95,.CUF})")
+makefile.write("%s: $(wildcard *{.F95,.CUF})" % (FortranOBJS))
 tabbedNewLine()
 makefile.write("$(%s) -c $(fortranOBJS)" % (FortranCompilerVariable))
 
@@ -60,7 +62,7 @@ makefile.write(".PHONY: all clean")
 
 # Target 'all'
 doubleNewLine()
-makefile.write("all: cOBJS fortranOBJS link") 
+makefile.write("all: %s %s link" % (COBJS, FortranOBJS)) 
 
 # Target 'clean'
 doubleNewLine()

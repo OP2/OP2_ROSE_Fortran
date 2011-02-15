@@ -1,3 +1,0 @@
-
-_Bool trueFalseValue;
-

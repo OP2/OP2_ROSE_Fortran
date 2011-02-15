@@ -1,3 +1,0 @@
-main ->
-prod ->
-B::prod -> prod
