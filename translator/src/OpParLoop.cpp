@@ -333,57 +333,57 @@ OpParLoop::declareC2FortranVariables ( SgScopeStatement * scope )
 		string name = "argument" + boost::lexical_cast <string> (i);
 		
 		// building array type with : shape specifier
-		SgColonShapeExp * colonExp = new SgColonShapeExp ();
-		Sg_File_Info* colonFileInfo = new Sg_File_Info ();
-		colonExp->set_startOfConstruct (colonFileInfo);
-		colonExp->set_endOfConstruct (colonFileInfo);
+//		SgColonShapeExp * colonExp = new SgColonShapeExp ();
+//		Sg_File_Info* colonFileInfo = new Sg_File_Info ();
+//		colonExp->set_startOfConstruct (colonFileInfo);
+//		colonExp->set_endOfConstruct (colonFileInfo);
 				
 		// retrieve base type from the op_decl_dat call
 		SgType * baseType = actualArgumentsTypes[i];
 		
 		// check if it is a kind=* variable
-		SgArrayType * arrayType = isSgArrayType ( baseType );
-		SgModifierType * modType = isSgModifierType ( arrayType->get_base_type() );
-		if ( modType != NULL ) {
-
-			std::cout << "inside modtype" << std::endl;
-			// change attributes here
-			modType->get_typeModifier().setDevice();
-			modType->get_typeModifier().setAllocatable();
-			
-			baseType = modType;
-//			exit ( 0 );
-		} else {
-			std::cout << "class is " << arrayType->get_base_type()->class_name() << std::endl;
-//			exit ( 0 );
-		}
-		
-		SgArrayType * arrayColonType = buildArrayType ( baseType, colonExp );
-		
-		/*
-		 * The dimension of the array is the colon shape
-		 */
-		SgExprListExp* dimensionExprList = buildExprListExp ( colonExp );
-		arrayColonType->set_dim_info ( dimensionExprList );
-		
-		/*
-		 * The fortrnArg array only has one dimension
-		 */
-		arrayColonType->set_rank (1);
+//		SgArrayType * arrayType = isSgArrayType ( baseType );
+//		SgModifierType * modType = isSgModifierType ( arrayType->get_base_type() );
+//		if ( modType != NULL ) {
+//
+//			std::cout << "inside modtype" << std::endl;
+//			// change attributes here
+//			modType->get_typeModifier().setDevice();
+//			modType->get_typeModifier().setAllocatable();
+//			
+//			baseType = modType;
+////			exit ( 0 );
+//		} else {
+//			std::cout << "class is " << arrayType->get_base_type()->class_name() << std::endl;
+////			exit ( 0 );
+//		}
+//		
+//		SgArrayType * arrayColonType = buildArrayType ( baseType, colonExp );
+//		
+//		/*
+//		 * The dimension of the array is the colon shape
+//		 */
+//		SgExprListExp* dimensionExprList = buildExprListExp ( colonExp );
+//		arrayColonType->set_dim_info ( dimensionExprList );
+//		
+//		/*
+//		 * The fortrnArg array only has one dimension
+//		 */
+//		arrayColonType->set_rank (1);
 		
 		SgVariableDeclaration * fortranArgVar = buildVariableDeclaration ( name,
-																																			arrayColonType,
+																																			baseType,
 																																			NULL,
 																																			scope
 																																			);
 		
 		
-		if ( modType == NULL ) {
+	//	if ( modType == NULL ) {
 			// not a kind=* fortran variable: we have to set attributes on the variable declaration
 			
 			fortranArgVar->get_declarationModifier ().get_typeModifier().setDevice();
 			fortranArgVar->get_declarationModifier ().get_typeModifier().setAllocatable();
-		}
+	//	}
 		
 		fortranArgVar->get_declarationModifier ().get_accessModifier().setUndefined();
 		

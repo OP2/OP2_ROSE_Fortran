@@ -1992,7 +1992,7 @@ FortranCodeGeneration_locatedNode::unparseVarDeclStmt(SgStatement* stmt, SgUnpar
             // printf ("arrayTypeBaseType = %p \n",arrayTypeBaseType);
                if (arrayTypeBaseType != NULL)
                   {
-                    isSameVariant = false;
+										isSameVariant = false;
                   }
 
             // if (previousArrayType->get_rank() == arrayType->get_rank())
