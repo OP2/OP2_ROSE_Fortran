@@ -1,5 +1,5 @@
 /*
- * Written by Adam Betts
+ * Written by Adam Betts and Carlo Bertolli
  *
  * The parallel loop class used to recognise and manipulate 'op_par_loop' calls
  * in Fortran code.
@@ -8,21 +8,18 @@
  * utilities to traverse the Abstract Syntax Tree (AST).
  */
 
+// TODO: restructure in such a way that we have a single OpParLoop object per each op_par_loop call 
+// found in the code (or an additional data structure per each call)
+
 #ifndef OPPARLOOP_H
 #define OPPARLOOP_H
 
 #include <rose.h>
 
-// macros for positions inside the op_par_loop arguments
-// we assume the following style:
-// op_par_loop_* ( kernel, iteration_set,
-//								 arg0, idx0, map0, acc0,
-//								 ...
-//								 argN-1, idxN-1, mapN-1, accN-1
-//							 )
-#define ARG_LINE_LENGTH 4
-#define OP_SET_INDEX_IN_ARG 1
-#define BASE_OPDAT_ARG_INDEX 2
+
+#include "OP2CommonDefinitions.h"
+#include "OpDeclaredVariables.h"
+
 
 
 class OpParLoop: public AstSimpleProcessing
@@ -39,25 +36,40 @@ class OpParLoop: public AstSimpleProcessing
      */
     SgProject *project;
 
+		/*
+		 * The previously filled OpDeclaredVariables object, used to retrieve op_dat types 
+		 * (and all other declarations, if needed)
+		 */
+		OpDeclaredVariables * opDeclaredVariables;
+	
+		/*
+		 *
+		 */
+		std::string kernelName;
+	
     /*
      * The kernel output files
      */
     std::vector <SgSourceFile *> kernelOutputFiles;
 
+		/*
+		 * Number of arguments in a OP_DAT line of op_par_loop
+		 */
+		int argLineLength;	
+	
     /*
      * Each 'op_par_loop' in Fortran takes 2+4n arguments.
      * We need the number n to declare a certain number of variables
      * in the host function
      */
     int numberOfArgumentGroups;
-
+	
     /*
      * The statements to append to the file and their associated
      * scope stack
      */
-    std::vector <SgStatement*> statements;
-    std::vector <SgScopeStatement*> scopes;
-
+    std::vector < SgStatement * > statements;
+    std::vector < SgScopeStatement * > scopes;
 	
 		/*
 		 * SgFunctionDeclaration object corresponding to input user kernel (copied inside the new module)
@@ -69,21 +81,74 @@ class OpParLoop: public AstSimpleProcessing
 		 */
 		std::vector < SgProcedureHeaderStatement * > inputSubroutines;
 		
-		/*
-		 * Number of arguments in a OP_DAT line of op_par_loop
-		 */
-		int argLineLength;
 	
+		/*
+		 * set of declarations of local variables in the host routine (CRet, data0Size, ..., dataN-1Size)
+		 */
+		std::vector < SgVariableDeclaration * > declaredHostRoutineLocals;
+	
+		/*
+		 * set of declarations of variables used in the host routine to transform a C pointer into a Fortran pointer
+		 * (argument0, ..., argumentN-1, c2fPtr0, ..., c2fPtrN-1)
+		 */	
+		std::vector < SgVariableDeclaration * > declaredC2FortranVariables;
+
+		/*
+		 * set of declarations of CUDA configuration variables
+		 * (bsize, gsize, etc.. )
+		 */	
+		std::vector < SgVariableDeclaration * > declaredCUDAConfigurationParameters;
+
+		/*
+		 * set of declarations of op_dat formal parameters
+		 * (arg0, ..., argN-1)
+		 */
+		std::vector < SgVariableDeclaration * > opDatFormalArgs;
+
+		/*
+		 * data types of the op_par_loop actual arguments ordered w.r.t. the input ordering
+		 */
+		std::vector < SgType * > actualArgumentsTypes;
+	
+		/*
+		 * dimension values passed to op_decl_dat calls ordered w.r.t. the input ordering (the same of actualArgumentTypes)
+		 */
+		std::vector < int > actualArgumentsDimValues;
+	
+		/*
+		 * set of declarations of indirection index formal parameters
+		 * (idx0, ..., idxN-1)
+		 */
+		std::vector < SgVariableDeclaration * > indirectionFormalArgs;
+
+		/*
+		 * set of declarations of op_map formal parameters
+		 * (map0, ..., mapN-1)
+		 */
+		std::vector < SgVariableDeclaration * > mapFormalArgs;
+
+		/*
+		 * set of declarations of access formal parameters
+		 * (access0, ..., accessN-1)
+		 */
+		std::vector < SgVariableDeclaration * > accessFormalArgs;
+	
+		/*
+		 * declaration of formal argument corresponding to op_set iteration variable
+		 */
+		SgVariableDeclaration * iterationSetFormalArg;
+		
 		/*
 		 * compute the number of op_dat arguments passed to a op_par_loop based on total arguments number
 		 * It is equal to the subscript of op_par_loop_*, but at a certain point we are going to remove it!
 		 * The formula is: (totArgNum - 2) / argLineLength
 		 */
-		inline unsigned int computeOpDatArgNumber ( int argSize ) 
+		inline unsigned int 
+		computeOpDatArgNumber ( int argSize ) 
 		{ return ( (unsigned int ) (argSize - 2) / argLineLength ); }
 	
 
-		inline void setUserKernelDeclaration ( SgProcedureHeaderStatement * kernelRef )
+		 void setUserKernelDeclaration ( SgProcedureHeaderStatement * kernelRef )
 		{ userKernelFunction = kernelRef; }
 	
 	
@@ -92,16 +157,23 @@ class OpParLoop: public AstSimpleProcessing
      * Private functions
      * ====================================================================================================
      */
+	
+		/*
+		 * This function is called before the creation of the CUDA module to retrieve the op_par_loop arguments data types
+		 * It fills up the actualArgumentsTypes vector by comparing op_par_loop arguments with opDeclaredVariables variables
+		 */
 
-    void
-    setSourcePosition (SgLocatedNode* locatedNode);
+		void retrieveArgumentsTypes ( SgExpressionPtrList& args );
+	
+//    void
+ //   setSourcePosition (SgLocatedNode* locatedNode);
 
     /*
      * used to tell Rose that the generated node is actually generated by ourselves, and not as some transformation of the
      * parser result (i.e. from input source files)
      */
-    void
-    setSourcePositionCompilerGenerated (SgLocatedNode * locatedNode);
+//    void
+//    setSourcePositionCompilerGenerated (SgLocatedNode * locatedNode);
 
 		SgModuleStatement *
 		buildClassDeclarationAndDefinition (std::string name, SgScopeStatement* scope);
@@ -121,10 +193,27 @@ class OpParLoop: public AstSimpleProcessing
     generateKernelSubroutine (SgSourceFile &sourceFile,
         std::string subroutineName, SgExpressionPtrList& args);
 
-    void
-    createHostDeviceLocals (SgScopeStatement* scope);
+		void
+	declareCUDAConfigurationParameters ( SgScopeStatement * scope );
+//																				 SgExpressionPtrList& args
+//																			 );
 
-    /*
+		void
+		declareC2FortranVariables ( SgScopeStatement * scope );
+	
+    void
+		createHostDeviceLocals ( SgScopeStatement* scope, 
+														 SgExpressionPtrList& args
+													 );
+
+		void	
+		createMainRoutineStatements ( SgScopeStatement * scope,
+																	SgExpressionPtrList& args
+	//																std::vector < SgVariableDeclaration * > ** decalredHostRoutineLocals,
+	//																std::vector < SgVariableDeclaration * > ** declaredC2FortranVariables,
+	//																std::vector < SgVariableDeclaration * > ** declaredCUDAConfigurationParameters
+																);
+	/*
      * Creates an integer declaration, representing the indirection of the data
      * set to be iterated, and attaches it to the formal parameter list
      */
@@ -175,9 +264,9 @@ class OpParLoop: public AstSimpleProcessing
     /*
      * Creates a host subroutine for the kernel
      */
-    void
-	createHostSubroutine (std::string kernelName, SgExpressionPtrList& args,
-												SgSourceFile& sourceFile, SgScopeStatement * scope );
+    SgProcedureHeaderStatement *
+		createHostSubroutine (std::string kernelName, SgExpressionPtrList& args,
+													SgSourceFile& sourceFile, SgScopeStatement * scope );
 
 		/*
 		 * Copies the user kernel function definition, makes some modifications and append it to the scope
@@ -191,31 +280,59 @@ class OpParLoop: public AstSimpleProcessing
 		 * The following two functions are used to generate the main CUDA kernel routine: not implemented for now
 		 */
 		void 
-		lookupArgumentsTypes ( std::vector<SgType *> * argTypes, SgExpressionPtrList& args, int loopDatArgNumber );
+		lookupArgumentsTypes ( std::vector<SgType *> * argTypes, 
+													 SgExpressionPtrList& args, 
+													 int loopDatArgNumber,
+													 SgVariableDeclaration * setSizeFormalPar
+												 );
 	
+	
+	
+		/*
+		 * Builds the parameter of the user kernel subroutine called by the main kernel subroutine
+		 */		
+		SgExprListExp *
+		buildUserKernelParams ( SgFunctionParameterList * mainKernelParameters,
+														SgVarRefExp * iterSetVarRef,
+														SgScopeStatement * subroutineScope
+													 );
+
 	
 		SgProcedureHeaderStatement *
 		buildMainKernelRoutine ( std::string subroutineName,
 														 SgScopeStatement * scope,
 														 unsigned int opArgNumber, 
-														 SgExpressionPtrList& args
+														 SgExpressionPtrList& args,
+														 SgProcedureHeaderStatement * kernelCUDAVersionDecl,
+														 Sg_File_Info & fileInfo
 													 );
 	
 	
 	
 		/*
+		 * Creates a Fortran module to which the Fortran subroutines will
+		 * be inserted
+		 */
+		SgModuleStatement*
+		createModule (std::string kernelName, SgSourceFile& sourceFile);
+	
+	
+		/*
 		 * Creates the whole module including all subroutines implementing an op_par_loop
 		 */
-		void
-		createCudaModule ( std::string kernelName, SgSourceFile& sourceFile, SgExpressionPtrList& args );
+		SgProcedureHeaderStatement *
+		createDirectLoopCudaModule ( std::string kernelName, SgSourceFile& sourceFile, SgExpressionPtrList& args );
 	
-    /*
-     * Creates a Fortran module to which the Fortran subroutines will
-     * be inserted
-     */
-    SgModuleStatement*
-    createModule (std::string kernelName, SgSourceFile& sourceFile);
-
+    
+	
+		/*
+		 * Transforms a op_par_loop_* in call to proper stub function, like op_par_loop_save_soln
+		 */
+		void fixParLoops ( SgFunctionCallExp * functionCallExp,
+											 std::string kernelName,
+											 SgProcedureHeaderStatement * hostSubroutine,
+											 SgScopeStatement * scope 
+										 );
     /*
      * Creates the source file to be unparsed
      */
@@ -233,7 +350,7 @@ class OpParLoop: public AstSimpleProcessing
      * Constructor requires the source files contained in the
      * project to detect 'op_par_loops'
      */
-    OpParLoop (SgProject *project);
+		OpParLoop ( SgProject * project, OpDeclaredVariables * opDeclaredVariables );
 
     /*
      * Visit each vertex in the AST

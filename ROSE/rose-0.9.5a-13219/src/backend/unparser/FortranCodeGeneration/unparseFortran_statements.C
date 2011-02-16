@@ -3982,6 +3982,12 @@ FortranCodeGeneration_locatedNode::unparseVarDecl(SgStatement* stmt, SgInitializ
        // DIMENSION is already handled (within the unparsing of the type)
        // DQ (3/23/2008): Likely POINTER should also be handled in the unparsing of the type!
 
+					// CARLO (02/08/2010): added device attribute to enable CUDA Fortran kernel generation
+					if (variableDeclaration->get_declarationModifier().get_typeModifier().isDevice() == true)
+					{
+						curprint(", DEVICE");
+					}
+					
        // printf ("variableDeclaration->get_declarationModifier().get_typeModifier().isAllocatable() = %s \n",variableDeclaration->get_declarationModifier().get_typeModifier().isAllocatable() ? "true" : "false");
           if (variableDeclaration->get_declarationModifier().get_typeModifier().isAllocatable() == true)
              {

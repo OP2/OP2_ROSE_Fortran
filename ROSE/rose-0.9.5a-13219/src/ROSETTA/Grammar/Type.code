@@ -160,6 +160,7 @@ HEADER_START
                e_target,
                e_value,
                e_volatile,
+							 e_device,
                e_last_attribute_specifier
              };
 

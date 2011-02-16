@@ -1194,6 +1194,10 @@ HEADER_TYPE_MODIFIER_START
                e_gnu_attribute__nonnull__            = 27,/*!< GNU specific attribute for function type (GNU extension) */
                e_gnu_attribute__sentinel__           = 28,/*!< GNU specific attribute for function type (GNU extension) */
 
+						// Carlo (08/02/2011): added new attribute to enable generation of Fortran CUDA kernels
+							 e_device															 = 29,
+
+
             // Last attribute enum (used for internal bounds checking)
                e_last_modifier /*!< last value (upper bound on range of values, used in error checking) */
              };
@@ -1296,6 +1300,13 @@ HEADER_TYPE_MODIFIER_START
           bool isRestrict() const;
           void setRestrict();
           void unsetRestrict();
+
+
+					// Carlo (02/08/2011): added support for generation of CUDA Fortran kernels
+          bool isDevice() const;
+          void setDevice();
+					void unsetDevice();
+
 
        // Fortran specific attribute
           bool isAllocatable() const;
@@ -2968,7 +2979,14 @@ void SgTypeModifier::unsetRestrict()    { unsetBit(e_restrict,p_modifierVector);
                e_save           = 13,/*!< save attribute specifier (for Fortran 77) */
                e_target         = 14,/*!< target attribute specifier (for Fortran 90) */
                e_value          = 15,/*!< value attribute specifier (for Fortran 2003) */
+ 						// Carlo (08/02/2011): added new attribute to enable generation of Fortran CUDA kernels
+							e_device					= 16,
 #endif
+
+// Carlo (08/02/2011): added new attribute to enable generation of Fortran CUDA kernels
+bool SgTypeModifier::isDevice() const  { return checkBit(e_device,p_modifierVector); }
+void SgTypeModifier::setDevice()       { setBit(e_device,p_modifierVector); }
+void SgTypeModifier::unsetDevice()     { unsetBit(e_device,p_modifierVector); }
 
 // Fortran specific attribute
 bool SgTypeModifier::isAllocatable() const  { return checkBit(e_allocatable,p_modifierVector); }
@@ -3163,6 +3181,11 @@ bool operator== (const $CLASSNAME& lhs, const $CLASSNAME& rhs)
 	       (lhs.isGnuAttributeWarnUnusedResult() == rhs.isGnuAttributeWarnUnusedResult()) &&
 	       (lhs.isGnuAttributeNonnull()          == rhs.isGnuAttributeNonnull()         ) &&
 	       (lhs.isGnuAttributeSentinel()         == rhs.isGnuAttributeSentinel()        ) &&
+				 
+						// CARLO: Fortran CUDA modification, see similar modifications for e_device attribute
+	       //(lhs.isDevice()											 == rhs.isDevice()											) &&
+
+				 
 		   true;
 }
 
