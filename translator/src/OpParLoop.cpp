@@ -14,6 +14,7 @@
 namespace
 {
 	const std::string METANAME = "Name";
+	const std::string USER_KERNEL_TRANSFORMED = "_FORTRAN_CUDA";
   const std::string OP_PAR_LOOP_PREFIX = "op_par_loop";
   const std::string FORTRAN_FILE_SUFFIX = ".f95";
 }
@@ -828,6 +829,8 @@ OpParLoop::createMainRoutineStatements ( SgScopeStatement * scope,
 
 	localVarIt++;
 		
+	SgStatement * lastAppendedStatement = NULL;
+	
 	for ( int i = 0; i < numberOfArgumentGroups; i++, argIt++, localVarIt++ )
 	{
 
@@ -859,6 +862,9 @@ OpParLoop::createMainRoutineStatements ( SgScopeStatement * scope,
 		// finally append the statement
 		SgStatement * assignDataISizeStmt = buildExprStatement ( assignDataISize );
 		appendStatement ( assignDataISizeStmt, scope );
+		
+		if ( i == numberOfArgumentGroups-1 ) // last iteration
+			lastAppendedStatement = assignDataISizeStmt;
 	}
 
 	// the first set of numberOfArgumentGroups variables in declaredC2FortranVariables
@@ -917,13 +923,27 @@ OpParLoop::createMainRoutineStatements ( SgScopeStatement * scope,
 																													 );
 		// build function call
 		SgFunctionSymbol * allocateIntrinsicSymbol =  allocateRef->get_symbol_i();
-		SgFunctionCallExp * allocateIntrinsicCall = buildFunctionCallExp ( allocateIntrinsicSymbol,
-																																			 fakeArrayAccessList
-																																		 ); 
-					
-		SgStatement * allocateIntrinsicCallStmt = buildExprStatement ( allocateIntrinsicCall );
+
+		// Unfortunately, we cannot use CALL with a Fortran function: we have to use addTextForUnaparser for now
+		std::string allocateStringfied = "allocate";
+		std::string allocateParamsStringfied = fakeArrayAccessList->unparseToString ();
+		std::string allocateStmtStringfied = allocateStringfied + 
+																				 "(" + 
+																				 allocateParamsStringfied +
+																					")\n";
 		
-		appendStatement ( allocateIntrinsicCallStmt, scope );
+		addTextForUnparser ( lastAppendedStatement, 
+												 allocateStmtStringfied,
+												 AstUnparseAttribute::e_before
+											 );
+		
+//		SgFunctionCallExp * allocateIntrinsicCall = buildFunctionCallExp ( allocateIntrinsicSymbol,
+//																																			 fakeArrayAccessList
+//																																		 ); 
+					
+//		SgStatement * allocateIntrinsicCallStmt = buildExprStatement ( allocateIntrinsicCall );
+		
+//		appendStatement ( allocateIntrinsicCallStmt, scope );
 	}
 	
 	// build: 	call c_f_pointer ( arg0%dat, c2fPtr0, (/data0Size/) )
@@ -1319,6 +1339,76 @@ OpParLoop::createModule (std::string kernelName, SgSourceFile& sourceFile)
 }
 
 
+void 
+OpParLoop::createAndAppendUserKernelFormalParameters ( SgFunctionParameterList * newParList,
+																											 SgFunctionParameterList * originalParams, 
+																											 SgScopeStatement * subroutineScope
+																										 )
+{
+	using namespace SageBuilder;
+	using namespace SageInterface;
+	
+	// now creating declarations of formal parameters
+	ROSE_ASSERT ( newParList != NULL );
+	ROSE_ASSERT ( originalParams != NULL );
+	
+	SgInitializedNamePtrList list = originalParams->get_args();
+	
+	SgInitializedNamePtrList::iterator varMod;
+	
+	for ( varMod = list.begin(); varMod != list.end(); varMod++ ) {
+
+		SgVariableDeclaration * newVarDec = 
+		buildVariableDeclaration ( *(new SgName((*varMod)->get_name().getString())),
+															(*varMod)->get_typeptr(),
+															NULL,
+															subroutineScope
+															);
+		
+		newVarDec->get_declarationModifier ().get_accessModifier().setUndefined();
+		newVarDec->get_declarationModifier ().get_typeModifier().setDevice();
+		
+		
+		newParList->append_arg ( *(newVarDec->get_variables().begin()) );
+		
+		
+		// appending variable declaration in body
+		appendStatement ( newVarDec, subroutineScope );	
+		
+	}
+}
+
+					
+bool 
+OpParLoop::checkAlreadyDeclared ( SgVariableDeclaration * possiblyAvoidCopy, SgFunctionParameterList * newParList)
+{
+	using namespace SageBuilder;
+	using namespace SageInterface;
+
+	
+	// not yet found implicit none statement => not yet declared formal parameters
+	if ( newParList == NULL )
+		return false;
+	
+	SgInitializedNamePtrList list = newParList->get_args();
+	
+	SgInitializedNamePtrList::iterator varMod;
+	
+	for ( varMod = list.begin(); varMod != list.end(); varMod++ ) {
+		if ( strcmp ( possiblyAvoidCopy->get_definition()->get_vardefn()->get_name().str(),
+								  (*varMod)->get_name().str() )
+				== 0 ) {
+				// found a variable declaration in original kernel which is a formal parameter
+				// => do not re-declare it
+			return true;
+		} 
+	}
+
+	// if not formal par is equal to the found var decl, I have to append the statement
+	return false;
+}
+																								
+
 
 SgProcedureHeaderStatement *
 OpParLoop::generateCUDAUserKernel ( SgScopeStatement * scope )
@@ -1336,19 +1426,32 @@ OpParLoop::generateCUDAUserKernel ( SgScopeStatement * scope )
 		it++;
 	}
 	
-	SgProcedureHeaderStatement *subroutine;
+	SgProcedureHeaderStatement * subroutine;
+	SgProcedureHeaderStatement * realRoutine;
+	SgFunctionParameterList * newParList = NULL;
+	SgFunctionParameterList * originalParams = NULL;
 	
 	if ( (*it)->get_name().getString() == (userKernelFunction->get_name()).getString() ) {
 		
-		SgProcedureHeaderStatement * realRoutine = (*it);
+		realRoutine = (*it);
 		
 		//		subroutine = (SgProcedureHeaderStatement *) realRoutine->copy ( *(new SgTreeCopy) );
 		
-		subroutine = buildProcedureHeaderStatement ( (realRoutine->get_name()).str(),
+		const string newKernelName = (realRoutine->get_name()).str() + USER_KERNEL_TRANSFORMED;
+		
+		
+		originalParams = realRoutine->get_parameterList();
+		newParList = buildFunctionParameterList ();
+		
+		
+		subroutine = buildProcedureHeaderStatement ( newKernelName.c_str(),
 																								buildVoidType (),
-																								realRoutine->get_parameterList(),
+																								newParList,
 																								SgProcedureHeaderStatement::e_subroutine_subprogram_kind,
 																								scope );
+		
+
+		
 		
 		/* 
 		 * now visiting the subtree to: 
@@ -1358,27 +1461,45 @@ OpParLoop::generateCUDAUserKernel ( SgScopeStatement * scope )
 		 * 2. set its OutputInCodeGeneration flag to true (using a special visitor)
 		 */
 		
+		SgScopeStatement * subroutineScope = subroutine->get_definition()->get_body();
+		
 		Rose_STL_Container < SgStatement * > toFill =	subroutine->get_definition()->get_body()->get_statements();
 		
 		Rose_STL_Container < SgStatement * > filling = realRoutine->get_definition()->get_body()->get_statements();
 		
 		Rose_STL_Container < SgStatement * >::iterator copyIt;
 		
+		SgVariableDeclaration * possiblyAvoidCopy = NULL;
+		
 		for ( copyIt = filling.begin(); copyIt != filling.end(); copyIt++ ) {
 			
-			// adding the statement to the statement list
-			toFill.push_back ( *copyIt );
+			// copy if: 1. it is not a variable declaration OR
+			//			    2. it is a variable declaration BUT it is not a formal parameter declaration
+			if ( ( ( possiblyAvoidCopy = isSgVariableDeclaration ( *copyIt ) ) == NULL ) ||
+					 ( ( ( possiblyAvoidCopy = isSgVariableDeclaration ( *copyIt ) ) == NULL ) &&
+						checkAlreadyDeclared ( possiblyAvoidCopy, newParList ) == false ) ) {
 			
-			// appending statement too
-			appendStatement ( *copyIt, subroutine->get_definition()->get_body() );	
-			
+				// adding the statement to the statement list
+				toFill.push_back ( *copyIt );
+				
+				// appending statement too
+				appendStatement ( *copyIt, subroutineScope );	
+		
+		
+				if ( isSgImplicitStatement ( *copyIt ) != NULL ) {
+						// immediately after the implicit none statement, we append the new variable declarations
+					createAndAppendUserKernelFormalParameters ( newParList, originalParams, subroutineScope );
+				}
+			}
 		}
+	}
+		
 		
 		deepVisitAndSetGeneration * newVisit = new deepVisitAndSetGeneration ();
 		newVisit->traverse ( (SgNode *) subroutine, preorder );
 		
 		// now modifying the formal parameter declaration adding the "device" attribute
-		SgFunctionParameterList * parameterList = subroutine->get_parameterList();
+//		SgFunctionParameterList * parameterList = subroutine->get_parameterList();
 //		(SgFunctionParameterList * ) deepCopy ( subroutine->get_parameterList() );
 		
 		
@@ -1387,38 +1508,44 @@ OpParLoop::generateCUDAUserKernel ( SgScopeStatement * scope )
 		// typedef in rose is   Rose_STL_Container<SgInitializedName*> --> SgInitializedNamePtrList 
 		// TODO: this is somehow too general, if we consider that all fortran formal parameters are 
 		// declared at the beginning of the declaration section and their number is known (!)
-		SgInitializedNamePtrList list = parameterList->get_args();
+
+//		SgInitializedNamePtrList list = newParList->get_args();
+//
+//		SgInitializedNamePtrList::iterator varMod;
+//		
+//		for ( varMod = list.begin(); varMod != list.end(); varMod++ ) {
+//
+//			(*varMod)->get_declaration()->get_definingDeclaration()->get_declarationModifier().get_typeModifier().setDevice();
+			
+			
 		
-		SgInitializedNamePtrList::iterator varMod;
-		
-		for ( varMod = list.begin(); varMod != list.end(); varMod++ ) {
 			
 			// checking every statement inside the subroutine
-			copyIt = toFill.begin();
-			while ( copyIt != toFill.end() ) {
-				// check is copyIt is pointing to a SgVariableDeclaration
-				SgVariableDeclaration * isVar;
-				if ( (isVar = isSgVariableDeclaration ( *copyIt ) ) != NULL ) {
-					// check if the name corresponds to the one we are looking for
-					if ( isVar->get_definition()->get_vardefn()->get_name().getString() == 
-							(*varMod)->get_name().getString() ) {
-						// found the variable: adding the DEVICE attribute
-						(*varMod)->get_declaration()->get_declarationModifier().get_typeModifier().setDevice();
-						// if I have found the variable, I can stop searching
-						break;
-					}
-				}
-				copyIt++;
-			}
-		}
-	}
-	
+//			copyIt = toFill.begin();
+//			while ( copyIt != toFill.end() ) {
+//				// check is copyIt is pointing to a SgVariableDeclaration
+//				SgVariableDeclaration * isVar;
+//				if ( (isVar = isSgVariableDeclaration ( *copyIt ) ) != NULL ) {
+//					// check if the name corresponds to the one we are looking for
+//					if ( isVar->get_definition()->get_vardefn()->get_name().getString() == 
+//							(*varMod)->get_name().getString() ) {
+//						
+//						// found the variable: adding the DEVICE attribute
+//						(*varMod)->get_declaration()->get_declarationModifier().get_typeModifier().setDevice();
+//						// if I have found the variable, I can stop searching
+//						
+//						break;
+//					}
+//				}
+//				copyIt++;
+//			}
+		//}
+																							//}
 	// first let's add the attribute statement
 	addTextForUnparser ( subroutine, "attributes(device) ", AstUnparseAttribute::e_before );
 
 	// then let's add the statement to the module
 	appendStatement ( subroutine, scope );
-
 	
 	return subroutine;
 	
@@ -1984,7 +2111,7 @@ void OpParLoop::fixParLoops ( SgFunctionCallExp * functionCallExp,
 														  std::string kernelName,
 														  SgProcedureHeaderStatement * hostSubroutine,
 															SgScopeStatement * scope,
-														  SgSourceFile * sourceFile
+														 std::string createdCUDAModuleName
 														)
 {
 	using namespace SageBuilder;
@@ -2008,7 +2135,7 @@ void OpParLoop::fixParLoops ( SgFunctionCallExp * functionCallExp,
 	SgStatement * isImplicitNone;// = getNextStatement ( lastDeclStmt );
 	
 	SgScopeStatement * parent = scope;
-	
+		
 	// recursively go back in the scopes until we can find a declaration statement
 	// we assume that there must be at least one declaration statement (TODO: fix this)
 	while ( lastDeclStmt == NULL ) {
@@ -2025,30 +2152,43 @@ void OpParLoop::fixParLoops ( SgFunctionCallExp * functionCallExp,
 		
 		lastDeclStmt = findLastDeclarationStatement ( parent );
 	}
+	
+	
 	/*
-	 * Add the use <new module name> statement at the beginning of the program
+	 * Add the use <new CUDA module name> statement at the beginning of the program
 	 */
-	SgFunctionDeclaration * mainDeclaration = findMain ( lastDeclStmt );
+	const string cazziLib = "cazziemazzi";
 	
-	SgProgramHeaderStatement * programDeclaration = isSgProgramHeaderStatement ( mainDeclaration );
+	SgStatement * lookForUse = lastDeclStmt;
+	SgUseStatement * gotUseStatement;
 	
-	if ( programDeclaration != NULL ) {
+	do {
+		lookForUse = getPreviousStatement ( lookForUse );
+		gotUseStatement = isSgUseStatement ( lookForUse );
 	
-		const string cazziLib = "cazziemazzi";
+	}	while ( gotUseStatement == NULL );
 		
-		SgUseStatement* useStatement1 = new SgUseStatement (
-																						sourceFile->get_file_info (), cazziLib, false);
-		useStatement1->set_definingDeclaration ( programDeclaration );
-		prependStatement ( useStatement1, scope );
-	} else {
-		
-		cout << "No' va: " << endl;
-		if ( mainDeclaration == NULL ) 
-			cout << " --> per niente" <<  endl;	
-		exit ( 0 );
-		
-	}
+	cout << "Found use statement" << endl;	
 	
+	SgFile * enclosingFile = getEnclosingFileNode ( gotUseStatement );
+	//enclosingFile->get_file_info()->setTransformation();
+	
+	
+	Sg_File_Info * newFileInfo = new Sg_File_Info();
+
+	
+	SgUseStatement* useStatement1 = new SgUseStatement ( enclosingFile->get_file_info(), 
+																											 createdCUDAModuleName,
+																											 false
+																										 );
+
+	SgModuleStatement * gotUseModule = gotUseStatement->get_module();
+	useStatement1->set_definingDeclaration ( gotUseModule );
+	
+	ROSE_ASSERT ( useStatement1 != NULL );
+	ROSE_ASSERT ( gotUseStatement != NULL );
+	
+	insertStatement ( gotUseStatement, useStatement1 );
 	
   /*
    * Build the type, which is a character array
@@ -2346,11 +2486,15 @@ OpParLoop::visit ( SgNode * node )
 								
 								
 								
+								const string createdCUDAModuleName = OP_PAR_LOOP_PREFIX +
+																										 "_" +
+																										 kernelName + 
+																										 "_module";			
 								fixParLoops ( functionCallExp,
 														  kernelName,
 														  hostSubroutine,
 														  exprStat->get_scope(),
-															sourceFile
+															createdCUDAModuleName
 														);
 								
 //								exit ( 0 );

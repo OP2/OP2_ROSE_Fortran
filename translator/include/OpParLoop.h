@@ -158,6 +158,16 @@ class OpParLoop: public AstSimpleProcessing
      * ====================================================================================================
      */
 	
+	
+	bool checkAlreadyDeclared ( SgVariableDeclaration * possiblyAvoidCopy, SgFunctionParameterList * newParList);
+
+	
+	void createAndAppendUserKernelFormalParameters ( SgFunctionParameterList * newParList,
+																									SgFunctionParameterList * originalParams, 
+																									SgScopeStatement * subroutineScope
+																									);
+	
+	
 		/*
 		 * This function is called before the creation of the CUDA module to retrieve the op_par_loop arguments data types
 		 * It fills up the actualArgumentsTypes vector by comparing op_par_loop arguments with opDeclaredVariables variables
@@ -323,8 +333,6 @@ class OpParLoop: public AstSimpleProcessing
 		SgProcedureHeaderStatement *
 		createDirectLoopCudaModule ( std::string kernelName, SgSourceFile& sourceFile, SgExpressionPtrList& args );
 	
-    
-	
 		/*
 		 * Transforms a op_par_loop_* in call to proper stub function, like op_par_loop_save_soln
 		 */
@@ -332,7 +340,7 @@ class OpParLoop: public AstSimpleProcessing
 											 std::string kernelName,
 											 SgProcedureHeaderStatement * hostSubroutine,
 											 SgScopeStatement * scope,
-											 SgSourceFile * sourceFile
+											 std::string createdCUDAModuleName
 										 );
     /*
      * Creates the source file to be unparsed
