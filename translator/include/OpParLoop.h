@@ -331,7 +331,8 @@ class OpParLoop: public AstSimpleProcessing
 		void fixParLoops ( SgFunctionCallExp * functionCallExp,
 											 std::string kernelName,
 											 SgProcedureHeaderStatement * hostSubroutine,
-											 SgScopeStatement * scope 
+											 SgScopeStatement * scope,
+											 SgSourceFile * sourceFile
 										 );
     /*
      * Creates the source file to be unparsed

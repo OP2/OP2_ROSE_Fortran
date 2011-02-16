@@ -4486,6 +4486,17 @@ FortranCodeGeneration_locatedNode::unparseProcHdrStmt(SgStatement* stmt, SgUnpar
                unp->u_fortran_type->unparseType(returnType,info);
              }
 
+					// CB: Commented for now because we can circumvent it by adding a attributes(*) &
+					// before the subroutine declaration. Doing this would require the modification
+					// of the SgProcedureHeaderStatement class definition = the Rose Grammar...
+					// which is currently generated automatically
+					// CB (2/16/2011): added attributes for Fortran CUDA to SgProcedureHeaderStatement class					
+//					if ( procedureHeader->getPGICudaAttributes() != NULL )
+//						curprint ( "attributes(" + 
+//											 procedureHeader->getPGICudaAttributes().c_str() +
+//											 ") "
+//										 );
+						
        // Are there possible qualifiers that we are missing?
           curprint(typeOfFunction + " ");
           curprint(procedureHeader->get_name().str());

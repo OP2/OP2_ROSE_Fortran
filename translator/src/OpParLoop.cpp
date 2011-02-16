@@ -1099,8 +1099,13 @@ OpParLoop::createHostSubroutine (std::string kernelName,
 																		  scope
 																		);
 	
+	// first let's add the attribute statement
+	addTextForUnparser ( subroutineStatement, "attributes(host) ", AstUnparseAttribute::e_before );
+	
+	// then let's append the subroutine defining declaration
 	appendStatement ( subroutineStatement, scope );
-//  statements.push_back (subroutineStatement);
+
+	//  statements.push_back (subroutineStatement);
 //  scopes.push_back (moduleStatement.get_definition ()->get_scope ());
 
   SgBasicBlock* subroutineScope =
@@ -1408,7 +1413,10 @@ OpParLoop::generateCUDAUserKernel ( SgScopeStatement * scope )
 		}
 	}
 	
-	
+	// first let's add the attribute statement
+	addTextForUnparser ( subroutine, "attributes(device) ", AstUnparseAttribute::e_before );
+
+	// then let's add the statement to the module
 	appendStatement ( subroutine, scope );
 
 	
@@ -1466,6 +1474,14 @@ OpParLoop::lookupArgumentsTypes ( std::vector<SgType *> * argTypes,
 		
 		// the correct type can be retrieved from the stored information
 		SgType * baseType = actualArgumentsTypes[i];
+		
+		SgArrayType * guessArrayType = NULL;
+		if ( ( guessArrayType = isSgArrayType ( baseType ) ) != NULL ) {
+			// if the user-defined type is already an array (as it is always or nearly the case), we need to modify
+			// the array subscript. If we copy the array type, we won't get the attributes, hence we copy
+			// only the base type and we re-create the array type
+			baseType = guessArrayType->get_base_type();
+		}
 		
 		// build array type (real(8) for now) with the correct subscript
 		SgArrayType * arrayType = buildArrayType ( baseType, arraySubScript );
@@ -1612,7 +1628,10 @@ OpParLoop::buildMainKernelRoutine ( std::string subroutineName,
 	
 	
 	
-	// appending subroutine declaration to contains scope
+	// first let's add the attribute statement
+	addTextForUnparser ( mainHostSubroutine, "attributes(global) ", AstUnparseAttribute::e_before );
+	
+	// then let's add the statement to the module
 	appendStatement ( mainHostSubroutine, scope );
 
 	// obtain the subroutine scope to append parameter declaration, local variable declarations and body
@@ -1633,6 +1652,7 @@ OpParLoop::buildMainKernelRoutine ( std::string subroutineName,
 
 	setSizeFormalPar->get_declarationModifier ().get_accessModifier().setUndefined();
 	setSizeFormalPar->get_declarationModifier ().get_typeModifier().setValue();
+
 	
 	// not needed
 	//setSizeFormalPar->get_declarationModifier ().get_typeModifier().setIntent_in();
@@ -1915,7 +1935,6 @@ OpParLoop::createDirectLoopCudaModule ( std::string kernelName, SgSourceFile& so
 	using namespace std;
 	
 	SgModuleStatement * cudaModule = createModule (  kernelName, sourceFile);
-
 	
 	addUseStatements ( sourceFile, cudaModule, cudaModule->get_definition() );
 										
@@ -1964,7 +1983,8 @@ OpParLoop::createDirectLoopCudaModule ( std::string kernelName, SgSourceFile& so
 void OpParLoop::fixParLoops ( SgFunctionCallExp * functionCallExp,
 														  std::string kernelName,
 														  SgProcedureHeaderStatement * hostSubroutine,
-															SgScopeStatement * scope 
+															SgScopeStatement * scope,
+														  SgSourceFile * sourceFile
 														)
 {
 	using namespace SageBuilder;
@@ -2005,7 +2025,31 @@ void OpParLoop::fixParLoops ( SgFunctionCallExp * functionCallExp,
 		
 		lastDeclStmt = findLastDeclarationStatement ( parent );
 	}
+	/*
+	 * Add the use <new module name> statement at the beginning of the program
+	 */
+	SgFunctionDeclaration * mainDeclaration = findMain ( lastDeclStmt );
+	
+	SgProgramHeaderStatement * programDeclaration = isSgProgramHeaderStatement ( mainDeclaration );
+	
+	if ( programDeclaration != NULL ) {
+	
+		const string cazziLib = "cazziemazzi";
 		
+		SgUseStatement* useStatement1 = new SgUseStatement (
+																						sourceFile->get_file_info (), cazziLib, false);
+		useStatement1->set_definingDeclaration ( programDeclaration );
+		prependStatement ( useStatement1, scope );
+	} else {
+		
+		cout << "No' va: " << endl;
+		if ( mainDeclaration == NULL ) 
+			cout << " --> per niente" <<  endl;	
+		exit ( 0 );
+		
+	}
+	
+	
   /*
    * Build the type, which is a character array
    */
@@ -2302,7 +2346,12 @@ OpParLoop::visit ( SgNode * node )
 								
 								
 								
-								fixParLoops ( functionCallExp, kernelName, hostSubroutine, exprStat->get_scope() );
+								fixParLoops ( functionCallExp,
+														  kernelName,
+														  hostSubroutine,
+														  exprStat->get_scope(),
+															sourceFile
+														);
 								
 //								exit ( 0 );
 								

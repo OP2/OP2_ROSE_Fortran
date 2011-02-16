@@ -2,7 +2,7 @@ CXX       = g++
 BINDIR    = bin
 OBJDIR    = obj
 SRCDIR    = src
-LDFLAGS   = -L$(OP2_ROSE_INST_DIR)/lib -lrose -s
+LDFLAGS   = -L$(OP2_ROSE_INST_DIR)/lib -lrose
 INCLUDES  = -Iinclude -I$(OP2_ROSE_INST_DIR)/include -I$(OP2_BOOST_INST_DIR)/include
 CXXFLAGS  = $(INCLUDES) -O3 -Wall
 
