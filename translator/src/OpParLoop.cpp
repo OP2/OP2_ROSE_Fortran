@@ -252,16 +252,17 @@ OpParLoop::declareCUDAConfigurationParameters ( SgScopeStatement * scope
 
 	// build: set%size - 1
 	SgExpression * setSizeMinusOne = buildSubtractOp ( setSizeAccess, buildIntVal ( 1 ) );
-	
-	// build: bsize + 1
-	SgVarRefExp * bSizeVarRef = buildVarRefExp ( bSizeDecl );
-	SgExpression * bsizePlusOne = buildAddOp ( bSizeVarRef, buildIntVal ( 1 ) );
 
-	// build: ((set%size - 1) / bsize + 1)
-	SgExpression * divisionExpression = buildDivideOp ( setSizeMinusOne, bsizePlusOne );
+	// build: (set%size - 1) / bsize 
+	SgVarRefExp * bSizeVarRef = buildVarRefExp ( bSizeDecl );
+	SgExpression * divisionExpression = buildDivideOp ( setSizeMinusOne, bSizeVarRef );
+	
+	// build: (set%size - 1) / bsize  + 1
+	SgExpression * intParam = buildAddOp ( divisionExpression, buildIntVal ( 1 ) );
+
 	
 	// build: int ((set%size - 1) / bsize + 1)
-	SgExprListExp * intParams = buildExprListExp ( divisionExpression );
+	SgExprListExp * intParams = buildExprListExp ( intParam );
 	string intName = "int";
 	
 	// build function type for intrinsic int
@@ -934,7 +935,7 @@ OpParLoop::createMainRoutineStatements ( SgScopeStatement * scope,
 		
 		addTextForUnparser ( lastAppendedStatement, 
 												 allocateStmtStringfied,
-												 AstUnparseAttribute::e_before
+												 AstUnparseAttribute::e_after
 											 );
 		
 //		SgFunctionCallExp * allocateIntrinsicCall = buildFunctionCallExp ( allocateIntrinsicSymbol,
@@ -1079,7 +1080,7 @@ OpParLoop::createMainRoutineStatements ( SgScopeStatement * scope,
 		SgVarRefExp * argumentIRef = buildVarRefExp ( *argumentIVarIt );
 		SgVarRefExp * c2FPtrIRef = buildVarRefExp ( *c2fPtrVarIt );
 		
-		SgExpression * assignArgumentIToC2FPtrI = buildAssignOp ( argumentIRef, c2FPtrIRef );
+		SgExpression * assignArgumentIToC2FPtrI = buildAssignOp ( c2FPtrIRef, argumentIRef );
 		SgStatement * assignArgumentIToC2FPtrIStmt = buildExprStatement ( assignArgumentIToC2FPtrI );
 		
 		appendStatement ( assignArgumentIToC2FPtrIStmt, scope );
@@ -1476,7 +1477,7 @@ OpParLoop::generateCUDAUserKernel ( SgScopeStatement * scope )
 			// copy if: 1. it is not a variable declaration OR
 			//			    2. it is a variable declaration BUT it is not a formal parameter declaration
 			if ( ( ( possiblyAvoidCopy = isSgVariableDeclaration ( *copyIt ) ) == NULL ) ||
-					 ( ( ( possiblyAvoidCopy = isSgVariableDeclaration ( *copyIt ) ) == NULL ) &&
+					 ( ( ( possiblyAvoidCopy = isSgVariableDeclaration ( *copyIt ) ) != NULL ) &&
 						checkAlreadyDeclared ( possiblyAvoidCopy, newParList ) == false ) ) {
 			
 				// adding the statement to the statement list
@@ -1894,13 +1895,16 @@ OpParLoop::buildMainKernelRoutine ( std::string subroutineName,
 	ROSE_ASSERT ( blockthreadIdXAcc != NULL );
 	ROSE_ASSERT ( blockIdXMinusOne != NULL );
 	
-	// building (threadidx%x - 1) + (blockidx%x -1)
-	SgExpression * thIdPlusBlockId = buildAddOp ( threadIdXMinusOne, blockIdXMinusOne );
-
-	ROSE_ASSERT ( thIdPlusBlockId != NULL );
+	// building (blockidx%x -1)  * blockdim%x
+	SgExpression * blockIdXMinusOnePerBlockDimx = buildMultiplyOp ( blockIdXMinusOne, blockDimXAcc );
 	
-	// building  (threadidx%x - 1) + (blockidx%x -1)  * blockdim%x
-	SgExpression * setIterInitValue = buildMultiplyOp ( thIdPlusBlockId, blockDimXAcc );
+	// building (threadidx%x - 1) + (blockidx%x -1)  * blockdim%x
+	SgExpression * setIterInitValue = buildAddOp ( threadIdXMinusOne, blockIdXMinusOnePerBlockDimx );
+
+//	ROSE_ASSERT ( thIdPlusBlockId != NULL );
+	
+	// building  (threadidx%x - 1) + 
+
 	
 	ROSE_ASSERT ( setIterInitValue != NULL );
 		
