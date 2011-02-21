@@ -1,79 +1,17 @@
 # Written by Adam Betts
 #
-# Generates a Makefile for a Fortran application with CUDA calls.
-# The Makefile requires the PGI compiler suite, in particular 'pgcc' and
-# 'pgfortran' must be in the path to compile the executable.
+# Generates two Makefiles:
+# 1) For the source-to-source translation of Fortran files using the ROSE framework.
+# 2) To compile a Fortran application with CUDA calls using the PGI compiler suite.
+#    In particular, this Makefile requires 'pgcc' and 'pgfortran' to be in the path 
+#    to compile the executable.
 
-import glob
-import os
-import re
-from collections import defaultdict
+from FileDependencies import determineModuleDependencies
 
 # Create the Makefiles   
 CUDAMakefile = open("Makefile.CUDA", "w")
 ROSEMakefile = open("Makefile.ROSE", "w")
-dependencyList = []
 
-def getBaseFileName (fileName):
-    lastDirectorySeparator = fileName.rfind('/') 
-    fileExtensionCharacter = fileName.rfind('.')
-    return fileName[lastDirectorySeparator+1:fileExtensionCharacter]
-
-def determineModuleDependencies ():
-    moduleNameToFileName = {}
-    fileNameToModuleDependencies = defaultdict(set)
-    
-    fileList = glob.glob(os.getcwd() + os.sep + "*.[fF]95") + glob.glob(os.getcwd() + os.sep + "*.CUF")
-    for fileName in fileList:
-        file = open(fileName)
-            
-        use_line_regex = re.compile("^\s*use")
-        module_line_regex = re.compile("^\s*module\s+(\S+)\s*$")
-        
-        for line in file:
-            if use_line_regex.search(line):
-                lexemes = line.split()
-                fileNameToModuleDependencies[fileName].add(lexemes[len(lexemes) - 1])
-            
-            if module_line_regex.search(line):
-                lexemes = line.split()
-                moduleNameToFileName[lexemes[len(lexemes) - 1]] = fileName
-        file.close()
-    
-    for fileName in fileList:
-        # Ignore any CUDA files lying around
-        if os.path.splitext(fileName)[1] != ".CUF":
-            baseFileName = getBaseFileName(fileName)
-            if fileName in fileNameToModuleDependencies:
-                CUDAMakefile.write(baseFileName + ".o: ")
-                writeToDependencyList = True
-                for moduleName in fileNameToModuleDependencies[fileName]:
-                    if moduleName in moduleNameToFileName:
-                        baseModuleFileName = getBaseFileName(moduleNameToFileName[moduleName])
-                        CUDAMakefile.write(baseModuleFileName + ".o ")
-                        if baseModuleFileName not in dependencyList:
-                            writeToDependencyList = False
-                        
-                CUDAMakefile.write("\n\n")
-                
-                if writeToDependencyList:
-                    dependencyList.append(baseFileName)
-                
-            else:
-                dependencyList.append(baseFileName)
-    
-    # This is a REAL hack! It naively assumes that all of the 
-    # dependencies between files have been resolved and, therefore,
-    # we can write out the remaining files. 
-    # The proper way to do this is to build an acyclic graph and then 
-    # do a topological sort
-    for fileName in fileList:
-        # Ignore any CUDA files lying around
-        if os.path.splitext(fileName)[1] != ".CUF":
-            baseFileName = getBaseFileName(fileName)
-            if baseFileName not in dependencyList:
-                dependencyList.append(baseFileName)
-        
 
 def createCUDAMakefile():    
     # Makefile variables
@@ -142,22 +80,16 @@ def createROSEMakefile():
     # Translation of Fortran into Fortran with CUDA
     ROSEMakefile.write("# Suffix rules\n")
     ROSEMakefile.write("s2s: ")
-    for file in dependencyList:
-        ROSEMakefile.write(file + ".F95 ")
     ROSEMakefile.write("\n\t")
     ROSEMakefile.write("@echo \"\\n===== TRANSLATING =====\"\n\t")
     ROSEMakefile.write("$(FC) -d $(DEBUG) ")
-    for file in dependencyList:
-        ROSEMakefile.write(file + ".F95 ")
     ROSEMakefile.write("\n\n")
 
 # Write out the variables and rules 
 createCUDAMakefile()
 
 # Work out the dependencies between Fortran modules 
-# And write them to the CUDA Makefile so that the correct compilation 
-# order is maintained
-determineModuleDependencies()
+determineModuleDependencies(['F95', 'CUF'])
 
 # Create the ROSE Makefile. Note that it must be called AFTER
 # module dependencies have been resolved
