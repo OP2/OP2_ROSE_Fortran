@@ -5,9 +5,9 @@
 
 from Vertex import Vertex
 
-dummyFileName = "dummy" 
-
 class Graph():    
+    dummyFileName = "dummy" 
+    
     def __init__ (self):
         self.vertices = {}
     
@@ -31,13 +31,13 @@ class Graph():
         s.addPredecessor(predName)
     
     def addDummyStartVertex (self):
-        dummyv = Vertex(dummyFileName)
-        self.vertices[dummyFileName] = dummyv
+        dummyv = Vertex(Graph.dummyFileName)
+        self.vertices[Graph.dummyFileName] = dummyv
         
         for key in self.vertices:
             v = self.vertices[key]
-            if v.numberOfPredecessors() == 0 and v.getFileName() != dummyFileName:
-                self.addEdge(dummyFileName, v.getFileName())
+            if v.numberOfPredecessors() == 0 and v.getFileName() != Graph.dummyFileName:
+                self.addEdge(Graph.dummyFileName, v.getFileName())
                 
     def visit (self, visited, sort, v):
         visited[v.getFileName()] = True
@@ -45,7 +45,7 @@ class Graph():
             if not visited[s]:
                 self.visit(visited, sort, self.getVertex(s))
                 
-        if v.getFileName() != dummyFileName:
+        if v.getFileName() != Graph.dummyFileName:
             sort.insert(0,v.getFileName())
                 
     def getTopologicalSort (self):
@@ -55,7 +55,6 @@ class Graph():
         for key in self.vertices:
             visited[key] = False
         
-        self.visit(visited, sort, self.getVertex(dummyFileName))   
+        self.visit(visited, sort, self.getVertex(Graph.dummyFileName))   
         
-        return sort 
-    
+        return sort

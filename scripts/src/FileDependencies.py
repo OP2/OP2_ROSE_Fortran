@@ -3,14 +3,15 @@ import os
 import re
 from Graph import Graph
 
-g = Graph()
-
 def getBaseFileName (fileName):
     lastDirectorySeparator = fileName.rfind(os.sep) 
     fileExtensionCharacter = fileName.rfind('.')
     return fileName[lastDirectorySeparator+1:fileExtensionCharacter]
 
 def determineModuleDependencies (fileExtensions):
+    # The graph models the dependencies and is returned by this function
+    g = Graph()
+    
     # Mapping from a module name to its file name
     moduleNameToFileName = {}
     
@@ -39,7 +40,6 @@ def determineModuleDependencies (fileExtensions):
                 lexemes = line.split()
                 moduleName = lexemes[len(lexemes) - 1]
                 if moduleName in moduleNameToFileName:
-                    print(fileName + " depends on " + moduleNameToFileName[moduleName])
                     g.addEdge(moduleNameToFileName[moduleName], fileName)            
         file.close()
     

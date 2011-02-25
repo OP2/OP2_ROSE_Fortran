@@ -7,6 +7,11 @@
 #    to compile the executable.
 
 import os
+import sys
+
+# Add the 'src' directory to the module search and PYTHONPATH
+sys.path.append(sys.path[0] + os.sep + "src")
+
 from FileDependencies import getBaseFileName, determineModuleDependencies
 from Graph import Graph
 
@@ -70,10 +75,19 @@ CUDAMakefile.write("$(FORTRAN_OBJS) $(CUDA_OBJS): $(C_OBJS)\n\n")
 CUDAMakefile.write("# Per-file dependencies\n")
 # Loop through each vertex in the graph
 for v in g.getVertices():
-    CUDAMakefile.write(getBaseFileName(v.getFileName()) + ".o: ")
+    dependencies = []
+    # Discover non-dummy dependencies in the graph. This is 
+    # because we currently add a dummy start vertex to the graph
+    # and connect it to every vertex without predecessors.
+    # (This is needed for the topological sort.)
     for p in v.getPredecessors():
-        if p != "dummy":
-            CUDAMakefile.write(getBaseFileName(p) + ".o ")
-    CUDAMakefile.write("\n\n")
+        if p != Graph.dummyFileName:
+            dependencies.append(p)
+                    
+    if len(dependencies) > 0:
+        CUDAMakefile.write(getBaseFileName(v.getFileName()) + ".o: ")
+        for d in dependencies:
+            CUDAMakefile.write(getBaseFileName(d) + ".o ")
+        CUDAMakefile.write("\n\n")
 
 CUDAMakefile.close()
