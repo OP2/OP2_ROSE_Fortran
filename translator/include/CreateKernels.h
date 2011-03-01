@@ -62,7 +62,7 @@ class CreateKernels: public AstSimpleProcessing
     std::vector <SgProcedureHeaderStatement *> inputSubroutines;
 
     /*
-     * set of declarations of local variables in the host routine (CRet, data0Size, ..., dataN-1Size)
+     * set of declarations of local variables in the host routine (data0Size, ..., dataN-1Size)
      */
     std::vector <SgVariableDeclaration *> declaredHostRoutineLocals;
 
@@ -73,16 +73,10 @@ class CreateKernels: public AstSimpleProcessing
     std::vector <SgVariableDeclaration *> declaredC2FortranVariables;
 
     /*
-     * set of declarations of CUDA configuration variables
-     * (bsize, gsize, etc.. )
-     */
-    std::vector <SgVariableDeclaration *> declaredCUDAConfigurationParameters;
-
-    /*
      * set of declarations of op_dat formal parameters
      * (arg0, ..., argN-1)
      */
-    std::vector <SgVariableDeclaration *> opDatFormalArgs;
+    std::vector <SgVariableDeclaration *> OP_DAT_FormalArguments;
 
     /*
      * data types of the op_par_loop actual arguments ordered w.r.t. the input ordering
@@ -98,24 +92,24 @@ class CreateKernels: public AstSimpleProcessing
      * set of declarations of indirection index formal parameters
      * (idx0, ..., idxN-1)
      */
-    std::vector <SgVariableDeclaration *> indirectionFormalArgs;
+    std::vector <SgVariableDeclaration *> Indirection_FormalArguments;
 
     /*
      * set of declarations of op_map formal parameters
      * (map0, ..., mapN-1)
      */
-    std::vector <SgVariableDeclaration *> mapFormalArgs;
+    std::vector <SgVariableDeclaration *> OP_MAP_FormalArguments;
 
     /*
      * set of declarations of access formal parameters
      * (access0, ..., accessN-1)
      */
-    std::vector <SgVariableDeclaration *> accessFormalArgs;
+    std::vector <SgVariableDeclaration *> OP_ACCESS_FormalArguments;
 
     /*
      * declaration of formal argument corresponding to op_set iteration variable
      */
-    SgVariableDeclaration * iterationSetFormalArg;
+    SgVariableDeclaration * Iteration_Set_FormalArgument;
 
     /*
      * ====================================================================================================
@@ -147,65 +141,19 @@ class CreateKernels: public AstSimpleProcessing
         std::string subroutineName, SgExpressionPtrList& args);
 
     void
-    declareCUDAConfigurationParameters (SgScopeStatement * scope);
+    createHostSubroutineCUDAVariables (SgScopeStatement * scope);
 
     void
-    declareC2FortranVariables (SgScopeStatement * scope);
-
-    void
-    createHostDeviceLocals (SgScopeStatement* scope, SgExpressionPtrList& args);
-
-    void
-    createMainRoutineStatements (SgScopeStatement * scope,
+    createHostSubroutineLocals (SgScopeStatement* scope,
         SgExpressionPtrList& args);
 
-    /*
-     * Creates an integer declaration, representing the indirection of the data
-     * set to be iterated, and attaches it to the formal parameter list
-     */
     void
-    createIndirectionDeclaration (SgFunctionParameterList* parameters,
-        SgScopeStatement* scope);
+    createHostSubroutineFormalParamaters (SgScopeStatement* scope,
+        SgExpressionPtrList& args, SgFunctionParameterList * hostParameters);
 
-    /*
-     * Creates an OP_ACCESS declaration and attaches it to the
-     * formal parameter list
-     */
     void
-    createOpAccessDeclaration (SgFunctionParameterList* parameters,
-        SgScopeStatement* scope);
-
-    /*
-     * Creates an OP_DAT declaration and attaches it to the
-     * formal parameter list
-     */
-    void
-    createOpDatDeclaration (SgFunctionParameterList* parameters,
-        SgScopeStatement* scope, SgType* opDatType);
-
-    /*
-     * Creates an OP_Map declaration and attaches it to the
-     * formal parameter list
-     */
-    void
-    createOpMapDeclaration (SgFunctionParameterList* parameters,
-        SgScopeStatement* scope, SgType* opMapType);
-
-    /*
-     * Creates an OP_SET declaration and attaches it to the
-     * formal parameter list
-     */
-    void
-    createOpSetDeclaration (SgFunctionParameterList* parameters,
-        SgScopeStatement* scope, SgType* opSetType);
-
-    /*
-     * Creates a char array declaration, which is the kernel name,
-     * and attaches it to the formal parameter list
-     */
-    void
-    createSubroutineName (SgFunctionParameterList* parameters,
-        SgScopeStatement* scope);
+    createHostSubroutineStatements (SgScopeStatement * scope,
+        SgExpressionPtrList& args);
 
     /*
      * Creates a host subroutine for the kernel

@@ -32,11 +32,14 @@ CreateKernels::addImplicitStatement (SgSourceFile& sourceFile,
 }
 
 void
-CreateKernels::declareCUDAConfigurationParameters (SgScopeStatement * scope)
+CreateKernels::createHostSubroutineCUDAVariables (SgScopeStatement * scope)
 {
   using namespace SageBuilder;
   using namespace SageInterface;
   using namespace std;
+
+  Debug::getInstance ()->debugMessage (
+      "Creating CUDA configuration parameters", 2);
 
   /*
    * This function builds the following Fortran code:
@@ -101,13 +104,6 @@ CreateKernels::declareCUDAConfigurationParameters (SgScopeStatement * scope)
   appendStatement (variable_reduct_shared, scope);
   appendStatement (variable_const_bytes, scope);
 
-  declaredCUDAConfigurationParameters.push_back (variable_bsize);
-  declaredCUDAConfigurationParameters.push_back (variable_gsize);
-  declaredCUDAConfigurationParameters.push_back (variable_reduct_bytes);
-  declaredCUDAConfigurationParameters.push_back (variable_reduct_size);
-  declaredCUDAConfigurationParameters.push_back (variable_reduct_shared);
-  declaredCUDAConfigurationParameters.push_back (variable_const_bytes);
-
   /*
    * ====================================================================================================
    * Create statement 'gsize = int ((set%size - 1) / bsize + 1)'
@@ -116,7 +112,7 @@ CreateKernels::declareCUDAConfigurationParameters (SgScopeStatement * scope)
 
   // 'set%size'
   SgExpression * setPERCENTsize = buildDotExp (buildVarRefExp (
-      iterationSetFormalArg), buildOpaqueVarRefExp ("size", scope));
+      Iteration_Set_FormalArgument), buildOpaqueVarRefExp ("size", scope));
 
   // 'set%size - 1'
   SgExpression * setPERCENTsize_minusOne = buildSubtractOp (setPERCENTsize,
@@ -171,22 +167,48 @@ CreateKernels::declareCUDAConfigurationParameters (SgScopeStatement * scope)
 }
 
 void
-CreateKernels::declareC2FortranVariables (SgScopeStatement * scope)
+CreateKernels::createHostSubroutineLocals (SgScopeStatement* scope,
+    SgExpressionPtrList& args)
 {
   using boost::lexical_cast;
-  using SageInterface::appendStatement;
-  using SageBuilder::buildVariableDeclaration;
+  using SageBuilder::buildIntType;
   using SageBuilder::buildPointerType;
+  using SageBuilder::buildVariableDeclaration;
+  using SageInterface::appendStatement;
   using std::string;
+
+  Debug::getInstance ()->debugMessage ("Creating local variables", 2);
 
   /*
    * This function builds the following Fortran code:
    *
+   * INTEGER :: data0Size
+   * INTEGER :: dataNSize
    * real(8), dimension(:), allocatable, device :: argument0
    * real(8), dimension(:), allocatable, device :: argumentN-1
    * real(8), dimension(:), pointer :: c2fPtr0
    * real(8), dimension(:), pointer :: c2fPtrN-1
    */
+
+  /*
+   * ====================================================================================================
+   * INTEGER :: data0Size
+   * INTEGER :: dataNSize
+   * ====================================================================================================
+   */
+  for (unsigned int i = 0; i < numberOfArgumentGroups; ++i)
+  {
+    string const variableName = "data" + lexical_cast <string> (i) + "Size";
+
+    SgVariableDeclaration * variable_dataNSize = buildVariableDeclaration (
+        variableName, buildIntType (), NULL, scope);
+
+    variable_dataNSize->get_declarationModifier ().get_accessModifier ().setUndefined ();
+
+    declaredHostRoutineLocals.push_back (variable_dataNSize);
+
+    appendStatement (variable_dataNSize, scope);
+  }
 
   /*
    * ====================================================================================================
@@ -229,318 +251,286 @@ CreateKernels::declareC2FortranVariables (SgScopeStatement * scope)
 
     appendStatement (variable_c2fptr_n, scope);
   }
+
+  /*
+   * ====================================================================================================
+   * Add CUDA configuration parameters
+   * ====================================================================================================
+   */
+  createHostSubroutineCUDAVariables (scope);
 }
 
 void
-CreateKernels::createHostDeviceLocals (SgScopeStatement* scope,
-    SgExpressionPtrList& args)
+CreateKernels::createHostSubroutineFormalParamaters (SgScopeStatement* scope,
+    SgExpressionPtrList& args, SgFunctionParameterList * hostParameters)
 {
   using boost::lexical_cast;
-  using SageBuilder::buildIntType;
+  using SageBuilder::buildCharType;
+  using SageBuilder::buildExprListExp;
+  using SageBuilder::buildArrayType;
   using SageBuilder::buildVariableDeclaration;
+  using SageBuilder::buildIntType;
   using SageInterface::appendStatement;
+  using std::vector;
   using std::string;
 
   /*
-   * We need a local variable to record the size of each OP_DAT argument
+   * ====================================================================================================
+   * These are the prefixes used by Mike Giles for variables of a particular OP2 data type
+   * ====================================================================================================
    */
-  for (unsigned int i = 0; i < numberOfArgumentGroups; ++i)
+  string const indirectionPrefix = "idx";
+  string const OP_ACCESS_Prefix = "access";
+  string const OP_DAT_Prefix = "arg";
+  string const OP_MAP_Prefix = "ptr";
+
+  int suffix = -1;
+
+  for (vector <SgExpression *>::iterator it = args.begin (); it != args.end (); ++it)
   {
-    string const variableName = "data" + lexical_cast <string> (i) + "Size";
+    SgExpression* argument = *it;
 
-    SgVariableDeclaration * variable_dataNSize = buildVariableDeclaration (
-        variableName, buildIntType (), NULL, scope);
+    Debug::getInstance ()->debugMessage ("Argument type: "
+        + argument->class_name (), 8);
 
-    variable_dataNSize->get_declarationModifier ().get_accessModifier ().setUndefined ();
+    switch (argument->variantT ())
+    {
+      case V_SgFunctionRefExp:
+      {
+        /*
+         * ====================================================================================================
+         * Found the kernel name argument
+         * ====================================================================================================
+         */
 
-    declaredHostRoutineLocals.push_back (variable_dataNSize);
+        string const variableName = "subroutineName";
 
-    appendStatement (variable_dataNSize, scope);
+        /*
+         * Build asterisk shape expression indicating that the size of the
+         * array is decided at run time
+         */
+        SgAsteriskShapeExp* asterisk = new SgAsteriskShapeExp ();
+        Sg_File_Info* asteriskFileInfo = new Sg_File_Info ();
+        asterisk->set_startOfConstruct (asteriskFileInfo);
+        asterisk->set_endOfConstruct (asteriskFileInfo);
+
+        /*
+         * Build the type, which is a character array
+         */
+        SgArrayType* charArray = buildArrayType (buildCharType (), asterisk);
+
+        /*
+         * The dimension of the array is the asterisk
+         */
+        SgExprListExp* dimensionExprList = buildExprListExp (asterisk);
+        charArray->set_dim_info (dimensionExprList);
+
+        /*
+         * The character array only has one dimension
+         */
+        charArray->set_rank (1);
+
+        SgVariableDeclaration* charArrayDeclaration = buildVariableDeclaration (
+            variableName, charArray, NULL, scope);
+
+        hostParameters->append_arg (*(charArrayDeclaration->get_variables ().begin ()));
+
+        charArrayDeclaration->get_declarationModifier ().get_typeModifier ().setIntent_in ();
+        charArrayDeclaration->get_declarationModifier ().get_accessModifier ().setUndefined ();
+
+        appendStatement (charArrayDeclaration, scope);
+
+        break;
+      }
+
+      case V_SgVarRefExp:
+      {
+        SgVarRefExp* variableReference = isSgVarRefExp (argument);
+
+        switch (variableReference->get_type ()->variantT ())
+        {
+          case V_SgClassType:
+          {
+            SgClassType* classReference = isSgClassType (
+                variableReference->get_type ());
+            string const className = classReference->get_name ().getString ();
+
+            if (strcmp (className.c_str (), OP2::OP_SET_NAME.c_str ()) == 0)
+            {
+              /*
+               * ====================================================================================================
+               * Found an OP_SET argument
+               * ====================================================================================================
+               */
+              SgVariableDeclaration* opSetDeclaration =
+                  buildVariableDeclaration ("iterationSet", classReference,
+                      NULL, scope);
+
+              hostParameters->append_arg (
+                  *(opSetDeclaration->get_variables ().begin ()));
+
+              opSetDeclaration->get_declarationModifier ().get_typeModifier ().setIntent_in ();
+              opSetDeclaration->get_declarationModifier ().get_accessModifier ().setUndefined ();
+
+              Iteration_Set_FormalArgument = opSetDeclaration;
+
+              appendStatement (opSetDeclaration, scope);
+            }
+
+            else if (strcmp (className.c_str (), OP2::OP_MAP_NAME.c_str ()) == 0)
+            {
+              /*
+               * ====================================================================================================
+               * Found an OP_MAP argument
+               * ====================================================================================================
+               */
+              string const variableName = OP_MAP_Prefix
+                  + lexical_cast <string> (suffix);
+
+              SgVariableDeclaration* opMapDeclaration =
+                  buildVariableDeclaration (variableName, classReference, NULL,
+                      scope);
+
+              hostParameters->append_arg (
+                  *(opMapDeclaration->get_variables ().begin ()));
+
+              opMapDeclaration->get_declarationModifier ().get_accessModifier ().setUndefined ();
+
+              OP_MAP_FormalArguments.push_back (opMapDeclaration);
+
+              appendStatement (opMapDeclaration, scope);
+            }
+
+            else if (strcmp (className.c_str (), OP2::OP_DAT_NAME.c_str ()) == 0)
+            {
+              /*
+               * ====================================================================================================
+               * Found an OP_DAT argument
+               * ====================================================================================================
+               */
+              suffix++;
+
+              string const variableName = OP_DAT_Prefix
+                  + lexical_cast <string> (suffix);
+
+              SgVariableDeclaration * opDatDeclaration =
+                  buildVariableDeclaration (variableName, classReference, NULL,
+                      scope);
+
+              hostParameters->append_arg (
+                  *(opDatDeclaration->get_variables ().begin ()));
+
+              opDatDeclaration->get_declarationModifier ().get_accessModifier ().setUndefined ();
+
+              OP_DAT_FormalArguments.push_back (opDatDeclaration);
+
+              appendStatement (opDatDeclaration, scope);
+            }
+            else
+            {
+              Debug::getInstance ()->debugMessage ("Unrecognised class: "
+                  + className, 1);
+              exit (1);
+            }
+
+            break;
+          }
+
+          case V_SgTypeInt:
+          {
+            /*
+             * ====================================================================================================
+             * Found an OP_ACCESS argument
+             * ====================================================================================================
+             */
+
+            string const variableName = OP_ACCESS_Prefix
+                + lexical_cast <string> (suffix);
+
+            SgVariableDeclaration* opAccessDeclaration =
+                buildVariableDeclaration (variableName, buildIntType (), NULL,
+                    scope);
+
+            hostParameters->append_arg (
+                *(opAccessDeclaration->get_variables ().begin ()));
+
+            opAccessDeclaration->get_declarationModifier ().get_typeModifier ().setIntent_in ();
+            opAccessDeclaration->get_declarationModifier ().get_accessModifier ().setUndefined ();
+
+            OP_ACCESS_FormalArguments.push_back (opAccessDeclaration);
+
+            appendStatement (opAccessDeclaration, scope);
+
+            break;
+          }
+
+          default:
+          {
+            break;
+          }
+        }
+
+        break;
+      }
+
+      case V_SgMinusOp:
+      {
+        /*
+         * ====================================================================================================
+         * Found an indirection argument
+         * ====================================================================================================
+         */
+
+        string const variableName = indirectionPrefix + lexical_cast <string> (
+            suffix);
+
+        SgVariableDeclaration* variable_idx = buildVariableDeclaration (
+            variableName, buildIntType (), NULL, scope);
+
+        hostParameters->append_arg (*(variable_idx->get_variables ().begin ()));
+
+        variable_idx->get_declarationModifier ().get_typeModifier ().setIntent_in ();
+        variable_idx->get_declarationModifier ().get_accessModifier ().setUndefined ();
+
+        Indirection_FormalArguments.push_back (variable_idx);
+
+        appendStatement (variable_idx, scope);
+
+        break;
+      }
+
+      default:
+      {
+        break;
+      }
+    }
   }
-
-  declareC2FortranVariables (scope);
-
-  declareCUDAConfigurationParameters (scope);
 }
 
 void
-CreateKernels::createIndirectionDeclaration (
-    SgFunctionParameterList* parameters, SgScopeStatement* scope)
-{
-  using boost::lexical_cast;
-  using SageBuilder::buildVariableDeclaration;
-  using SageBuilder::buildIntType;
-  using SageInterface::appendStatement;
-  using std::string;
-
-  /*
-   * This is the prefix for a data type representing indirection as
-   * used by Mike Giles in his documentation
-   */
-  string const namePrefix = "idx";
-
-  /*
-   * Static so that the number of declarations of this type is
-   * remembered
-   */
-  static int nameSuffix = 0;
-
-  string const variableName = namePrefix + lexical_cast <string> (nameSuffix);
-
-  /*
-   * Increase the suffix in readiness for the next declaration
-   */
-  nameSuffix++;
-
-  SgVariableDeclaration* variable_idx = buildVariableDeclaration (variableName,
-      buildIntType (), NULL, scope);
-
-  parameters->append_arg (*(variable_idx->get_variables ().begin ()));
-
-  /*
-   * Set the attributes of the formal parameter
-   */
-  variable_idx->get_declarationModifier ().get_typeModifier ().setIntent_in ();
-  variable_idx->get_declarationModifier ().get_accessModifier ().setUndefined ();
-
-  indirectionFormalArgs.push_back (variable_idx);
-
-  appendStatement (variable_idx, scope);
-}
-
-void
-CreateKernels::createOpAccessDeclaration (SgFunctionParameterList* parameters,
-    SgScopeStatement* scope)
-{
-  using boost::lexical_cast;
-  using SageBuilder::buildVariableDeclaration;
-  using SageBuilder::buildIntType;
-  using SageInterface::appendStatement;
-  using std::string;
-
-  /*
-   * This is the prefix for OP_ACCESS data types used by Mike Giles
-   * in his documentation
-   */
-  string const namePrefix = "access";
-
-  /*
-   * Static so that the number of declarations of this type is
-   * remembered
-   */
-  static int nameSuffix = 0;
-
-  string const variableName = namePrefix + lexical_cast <string> (nameSuffix);
-
-  /*
-   * Increase the suffix in readiness for the next declaration
-   */
-  nameSuffix++;
-
-  SgVariableDeclaration* opAccessDeclaration = buildVariableDeclaration (
-      variableName, buildIntType (), NULL, scope);
-
-  parameters->append_arg (*(opAccessDeclaration->get_variables ().begin ()));
-
-  /*
-   * Set the attributes of the formal parameter
-   */
-  opAccessDeclaration->get_declarationModifier ().get_typeModifier ().setIntent_in ();
-
-  opAccessDeclaration->get_declarationModifier ().get_accessModifier ().setUndefined ();
-
-  accessFormalArgs.push_back (opAccessDeclaration);
-
-  appendStatement (opAccessDeclaration, scope);
-}
-
-void
-CreateKernels::createOpDatDeclaration (SgFunctionParameterList* parameters,
-    SgScopeStatement* scope, SgType* opDatType)
-{
-  using boost::lexical_cast;
-  using SageBuilder::buildVariableDeclaration;
-  using SageInterface::appendStatement;
-  using std::string;
-
-  /*
-   * This is the prefix for OP_DAT data types used by Mike Giles
-   * in his documentation
-   */
-  string const namePrefix = "arg";
-
-  /*
-   * Static so that the number of declarations of this type is
-   * remembered
-   */
-  static int nameSuffix = 0;
-
-  string const variableName = namePrefix + boost::lexical_cast <string> (
-      nameSuffix);
-
-  /*
-   * Increase the suffix in readiness for the next declaration
-   */
-  nameSuffix++;
-
-  SgVariableDeclaration* opDatDeclaration = buildVariableDeclaration (
-      variableName, opDatType, NULL, scope);
-
-  parameters->append_arg (*(opDatDeclaration->get_variables ().begin ()));
-
-  opDatDeclaration->get_declarationModifier ().get_accessModifier ().setUndefined ();
-
-  opDatFormalArgs.push_back (opDatDeclaration);
-
-  appendStatement (opDatDeclaration, scope);
-}
-
-void
-CreateKernels::createOpMapDeclaration (SgFunctionParameterList* parameters,
-    SgScopeStatement* scope, SgType* opMapType)
-{
-  using boost::lexical_cast;
-  using SageBuilder::buildVariableDeclaration;
-  using SageInterface::appendStatement;
-  using std::string;
-
-  /*
-   * This is the prefix for OP_MAP data types used by Mike Giles
-   * in his documentation
-   */
-  string const namePrefix = "ptr";
-
-  /*
-   * Static so that the number of declarations of this type is
-   * remembered
-   */
-  static int nameSuffix = 0;
-
-  string const variableName = namePrefix + lexical_cast <string> (nameSuffix);
-
-  /*
-   * Increase the suffix in readiness for the next declaration
-   */
-  nameSuffix++;
-
-  SgVariableDeclaration* opMapDeclaration = buildVariableDeclaration (
-      variableName, opMapType, NULL, scope);
-
-  parameters->append_arg (*(opMapDeclaration->get_variables ().begin ()));
-
-  opMapDeclaration->get_declarationModifier ().get_accessModifier ().setUndefined ();
-
-  mapFormalArgs.push_back (opMapDeclaration);
-
-  appendStatement (opMapDeclaration, scope);
-}
-
-void
-CreateKernels::createOpSetDeclaration (SgFunctionParameterList* parameters,
-    SgScopeStatement* scope, SgType* opSetType)
-{
-  using boost::lexical_cast;
-  using SageBuilder::buildVariableDeclaration;
-  using SageInterface::appendStatement;
-  using std::string;
-
-  string const name = "iterationSet";
-
-  SgVariableDeclaration* opSetDeclaration = buildVariableDeclaration (name,
-      opSetType, NULL, scope);
-
-  parameters->append_arg (*(opSetDeclaration->get_variables ().begin ()));
-
-  /*
-   * Set the attributes of the formal parameter
-   */
-  opSetDeclaration->get_declarationModifier ().get_typeModifier ().setIntent_in ();
-  opSetDeclaration->get_declarationModifier ().get_accessModifier ().setUndefined ();
-
-  iterationSetFormalArg = opSetDeclaration;
-
-  appendStatement (opSetDeclaration, scope);
-}
-
-void
-CreateKernels::createSubroutineName (SgFunctionParameterList* parameters,
-    SgScopeStatement* scope)
-{
-  using namespace SageBuilder;
-  using namespace SageInterface;
-  using namespace std;
-
-  /*
-   * The name of the subroutine
-   */
-  string const variableName = "subroutineName";
-
-  /*
-   * Build asterisk shape expression indicating that the size of the
-   * array is decided at run time
-   */
-  SgAsteriskShapeExp* asterisk = new SgAsteriskShapeExp ();
-  Sg_File_Info* asteriskFileInfo = new Sg_File_Info ();
-  asterisk->set_startOfConstruct (asteriskFileInfo);
-  asterisk->set_endOfConstruct (asteriskFileInfo);
-
-  /*
-   * Build the type, which is a character array
-   */
-  SgArrayType* charArray = buildArrayType (buildCharType (), asterisk);
-
-  /*
-   * The dimension of the array is the asterisk
-   */
-  SgExprListExp* dimensionExprList = buildExprListExp (asterisk);
-  charArray->set_dim_info (dimensionExprList);
-
-  /*
-   * The character array only has one dimension
-   */
-  charArray->set_rank (1);
-
-  SgVariableDeclaration* charArrayDeclaration = buildVariableDeclaration (
-      variableName, charArray, NULL, scope);
-
-  parameters->append_arg (*(charArrayDeclaration->get_variables ().begin ()));
-
-  /*
-   * Set the attributes of the formal parameter
-   */
-  charArrayDeclaration->get_declarationModifier ().get_typeModifier ().setIntent_in ();
-  charArrayDeclaration->get_declarationModifier ().get_accessModifier ().setUndefined ();
-
-  appendStatement (charArrayDeclaration, scope);
-}
-
-void
-CreateKernels::createMainRoutineStatements (SgScopeStatement * scope,
+CreateKernels::createHostSubroutineStatements (SgScopeStatement * scope,
     SgExpressionPtrList& args)
 {
   using namespace SageBuilder;
   using namespace SageInterface;
   using namespace std;
+
+  Debug::getInstance ()->debugMessage ("Adding statements to host subroutine",
+      2);
 
   // build:		data0Size = ( arg0%dim * (arg0%set)%size)
   //					data1Size = ( arg1%dim * (arg1%set)%size)
 
   // iterator over op_dat formal parameters
-  vector <SgVariableDeclaration *>::iterator argIt = opDatFormalArgs.begin ();
+  vector <SgVariableDeclaration *>::iterator argIt = OP_DAT_FormalArguments.begin ();
 
   // iterator over local variables
-  // the first local variable declaration is CRet, then followed by dataISize,
-  // thus we discard the first element
   vector <SgVariableDeclaration *>::iterator localVarIt =
       declaredHostRoutineLocals.begin ();
 
-  localVarIt++;
-
   SgStatement * lastAppendedStatement = NULL;
-
   for (unsigned int i = 0; i < numberOfArgumentGroups; i++, argIt++, localVarIt++)
   {
-
     // transform the expression to a variable reference
     SgExpression * opDatArgRef = buildVarRefExp (*argIt);
 
@@ -585,9 +575,6 @@ CreateKernels::createMainRoutineStatements (SgScopeStatement * scope,
 
   // we need the dataISize variables again
   localVarIt = declaredHostRoutineLocals.begin ();
-
-  // avoid to consider the CRet variable
-  localVarIt++;
 
   for (unsigned int i = 0; i < numberOfArgumentGroups; i++, c2fVarIt++, localVarIt++)
   {
@@ -634,13 +621,10 @@ CreateKernels::createMainRoutineStatements (SgScopeStatement * scope,
   //					call c_f_pointer ( arg1%dat, c2fPtr1, (/data1Size/) )
 
   // iterator over op_dat formal parameters
-  argIt = opDatFormalArgs.begin ();
+  argIt = OP_DAT_FormalArguments.begin ();
 
   // we need the dataISize variables again
   localVarIt = declaredHostRoutineLocals.begin ();
-
-  // avoid to consider the CRet variable
-  localVarIt++;
 
   string const c2fFunName = "c_f_pointer";
 
@@ -723,7 +707,7 @@ CreateKernels::createMainRoutineStatements (SgScopeStatement * scope,
   SgExprListExp * kPars = buildExprListExp ();
 
   // build: set%size
-  SgExpression * iterationSetVarRef = buildVarRefExp (iterationSetFormalArg);
+  SgExpression * iterationSetVarRef = buildVarRefExp (Iteration_Set_FormalArgument);
   SgVarRefExp * setSizeField = buildOpaqueVarRefExp ("size", scope);
   SgExpression * setFieldSizeExpr = buildDotExp (iterationSetVarRef,
       setSizeField);
@@ -747,7 +731,6 @@ CreateKernels::createMainRoutineStatements (SgScopeStatement * scope,
   c2fPtrVarIt += numberOfArgumentGroups; // exploiting pointer arithmetics!
 
   for (unsigned int i = 0; i < numberOfArgumentGroups; i++, argumentIVarIt++, c2fPtrVarIt++)
-
   {
     SgVarRefExp * argumentIRef = buildVarRefExp (*argumentIVarIt);
     SgVarRefExp * c2FPtrIRef = buildVarRefExp (*c2fPtrVarIt);
@@ -771,124 +754,51 @@ CreateKernels::createHostSubroutine (std::string kernelName,
   using namespace std;
   using namespace OP2;
 
-  /*
-   * Create host subroutine parameters
-   */
-  SgFunctionParameterList* hostParameters = buildFunctionParameterList ();
+  Debug::getInstance ()->debugMessage ("Creating host subroutine", 2);
 
   /*
-   * Create host subroutine and append it to statements inside module
+   * ====================================================================================================
+   * Create the host subroutine
+   * ====================================================================================================
    */
-
-  // generating name" op_par_loop_<kernel_name>
   string const hostSubroutineName = OP_PAR_LOOP_PREFIX + "_"
       + kernelName.c_str ();
+
+  SgFunctionParameterList * hostParameters = buildFunctionParameterList ();
 
   SgProcedureHeaderStatement* subroutineStatement =
       buildProcedureHeaderStatement (hostSubroutineName.c_str (),
           buildVoidType (), hostParameters,
           SgProcedureHeaderStatement::e_subroutine_subprogram_kind, scope);
 
-  // first let's add the attribute statement
+  appendStatement (subroutineStatement, scope);
+
   addTextForUnparser (subroutineStatement, "attributes(host) ",
       AstUnparseAttribute::e_before);
 
-  // then let's append the subroutine defining declaration
-  appendStatement (subroutineStatement, scope);
-
-  SgBasicBlock* subroutineScope =
+  SgBasicBlock * subroutineScope =
       subroutineStatement->get_definition ()->get_body ();
 
-  for (vector <SgExpression*>::iterator it = args.begin (); it != args.end (); ++it)
-  {
-    SgExpression* argument = (*it);
-    Debug::getInstance ()->debugMessage ("Argument type: "
-        + argument->class_name (), 8);
+  /*
+   * ====================================================================================================
+   * Add formal parameters
+   * ====================================================================================================
+   */
+  createHostSubroutineFormalParamaters (subroutineScope, args, hostParameters);
 
-    switch (argument->variantT ())
-    {
-      case V_SgFunctionRefExp:
-      {
-        createSubroutineName (hostParameters, subroutineScope);
-        break;
-      }
+  /*
+   * ====================================================================================================
+   * Add local variables
+   * ====================================================================================================
+   */
+  createHostSubroutineLocals (subroutineScope, args);
 
-      case V_SgVarRefExp:
-      {
-        SgVarRefExp* variableReference = isSgVarRefExp (argument);
-        Debug::getInstance ()->debugMessage (
-            "Variable reference expression type: "
-                + variableReference->get_type ()->class_name (), 9);
-
-        switch (variableReference->get_type ()->variantT ())
-        {
-          case V_SgClassType:
-          {
-            SgClassType* classReference = isSgClassType (
-                variableReference->get_type ());
-            string const className = classReference->get_name ().getString ();
-
-            Debug::getInstance ()->debugMessage ("Class reference to: "
-                + className, 10);
-
-            if (strcmp (className.c_str (), OP_SET_NAME.c_str ()) == 0)
-            {
-              createOpSetDeclaration (hostParameters, subroutineScope,
-                  classReference);
-            }
-            else if (strcmp (className.c_str (), OP_MAP_NAME.c_str ()) == 0)
-            {
-              createOpMapDeclaration (hostParameters, subroutineScope,
-                  classReference);
-            }
-            else if (strcmp (className.c_str (), OP_DAT_NAME.c_str ()) == 0)
-            {
-              createOpDatDeclaration (hostParameters, subroutineScope,
-                  classReference);
-            }
-            else
-            {
-              Debug::getInstance ()->debugMessage ("Unrecognised class: "
-                  + className, 1);
-              exit (1);
-            }
-
-            break;
-          }
-
-          case V_SgTypeInt:
-          {
-            createOpAccessDeclaration (hostParameters, subroutineScope);
-            break;
-          }
-
-          default:
-          {
-            break;
-          }
-        }
-
-        break;
-      }
-
-      case V_SgMinusOp:
-      {
-        createIndirectionDeclaration (hostParameters, subroutineScope);
-        break;
-      }
-
-      default:
-      {
-        break;
-      }
-    }
-  }
-
-  // creating local variables of the host subroutine
-  createHostDeviceLocals (subroutineScope, args);
-
-  // creating the main statements of the host subroutine (actual kernel calls)
-  createMainRoutineStatements (subroutineScope, args);
+  /*
+   * ====================================================================================================
+   * Add main statements, which includes allocation of memory on the device and kernel calls
+   * ====================================================================================================
+   */
+  createHostSubroutineStatements (subroutineScope, args);
 
   return subroutineStatement;
 }
@@ -897,6 +807,8 @@ SgModuleStatement *
 CreateKernels::buildClassDeclarationAndDefinition (std::string name,
     SgScopeStatement* scope)
 {
+  Debug::getInstance ()->debugMessage ("Building module", 2);
+
   /*
    * ====================================================================================================
    * This function builds a class declaration and definition
@@ -1004,6 +916,9 @@ CreateKernels::generateCUDAUserKernel (SgScopeStatement * moduleScope)
   using SageInterface::addTextForUnparser;
   using std::vector;
   using std::string;
+
+  Debug::getInstance ()->debugMessage (
+      "Outputting original kernel to CUDA file", 2);
 
   SgProcedureHeaderStatement * newSubroutine;
   SgFunctionParameterList * newParameters;
@@ -1152,6 +1067,8 @@ CreateKernels::lookupArgumentsTypes (std::vector <SgType *> * argTypes,
   using namespace std;
   using namespace SageBuilder;
 
+  Debug::getInstance ()->debugMessage ("Looking op types of arguments", 2);
+
   // build: user type arrays with bounds 0:op_set%size * op_dat%dim - 1
   for (unsigned int i = 0; i < numberOfArgumentGroups; i++)
   {
@@ -1218,8 +1135,7 @@ CreateKernels::buildUserKernelParams (
   using namespace std;
   using namespace SageBuilder;
 
-  Debug::getInstance ()->debugMessage (
-      "Inside 'OpParLoop::buildUserKernelParams'", 0);
+  Debug::getInstance ()->debugMessage ("Obtaining kernel parameters", 2);
 
   // obtain argument list from input parameters list
   SgInitializedNamePtrList mainKernelArgs = mainKernelParameters->get_args ();
@@ -1316,6 +1232,8 @@ CreateKernels::buildMainKernelRoutine (SgScopeStatement * scope,
   using SageBuilder::buildFunctionParameterList;
   using SageInterface::appendStatement;
   using SageInterface::addTextForUnparser;
+
+  Debug::getInstance ()->debugMessage ("Building main kernel routine", 2);
 
   /*
    * ====================================================================================================
@@ -1534,6 +1452,8 @@ CreateKernels::createSourceFile (std::string kernelName)
   using std::string;
   using SageBuilder::buildFile;
 
+  Debug::getInstance ()->debugMessage ("Creating source file", 2);
+
   /*
    * To create a new file (to which the AST is later unparsed), the API expects
    * the name of an existing file and the name of the output file. There is no
@@ -1594,6 +1514,8 @@ CreateKernels::createDirectLoopCUDAModule (SgSourceFile& sourceFile,
   using std::vector;
   using SageInterface::appendStatement;
 
+  Debug::getInstance ()->debugMessage ("Creating direct loop CUDA module", 2);
+
   SgGlobal * globalScope = sourceFile.get_globalScope ();
 
   /*
@@ -1645,6 +1567,8 @@ CreateKernels::fixParLoops (SgFunctionCallExp * functionCallExp,
   using namespace SageBuilder;
   using namespace SageInterface;
   using namespace std;
+
+  Debug::getInstance ()->debugMessage ("Fixing parallel loop invocations", 2);
 
   SgLocatedNode * functionCallNode = isSgLocatedNode (functionCallExp);
 
@@ -1762,6 +1686,8 @@ CreateKernels::retrieveArgumentsTypes (SgExpressionPtrList& args)
 {
   using std::vector;
   using OP2::OP_DAT_NAME;
+
+  Debug::getInstance ()->debugMessage ("Retrieving types of arguments", 2);
 
   /*
    * Scan OP_DAT arguments and get the types by comparing the
