@@ -1,10 +1,8 @@
 #include <boost/algorithm/string/predicate.hpp>
 #include <boost/lexical_cast.hpp>
 
-#include "OP2CommonDefinitions.h"
 #include "Debug.h"
 #include "CreateKernels.h"
-#include "OpParLoop.h"
 
 /*
  * ====================================================================================================
@@ -13,7 +11,7 @@
  */
 
 bool
-checkFormalParameter (SgVariableDeclaration * variableDeclaration,
+checkIsFormalParameter (SgVariableDeclaration * variableDeclaration,
     SgFunctionParameterList * parameterList)
 {
   using std::string;
@@ -46,7 +44,7 @@ checkFormalParameter (SgVariableDeclaration * variableDeclaration,
 void
 CreateKernels::fix_OP_PAR_LOOP_Calls (SgFunctionCallExp * functionCallExp,
     SgProcedureHeaderStatement * hostSubroutine, SgScopeStatement * scope,
-    std::string createdCUDAModuleName)
+    OP2ParallelLoop * op2ParallelLoop)
 {
   using namespace SageBuilder;
   using namespace SageInterface;
@@ -77,7 +75,7 @@ CreateKernels::fix_OP_PAR_LOOP_Calls (SgFunctionCallExp * functionCallExp,
     {
       Debug::getInstance ()->debugMessage (
           "Error: cannot locate a place to declare the kernel name while transforming: '"
-              + opParLoop->getKernelHostName () + "'", 1);
+              + op2ParallelLoop->getKernelHostName () + "'", 1);
       exit (1);
     }
 
@@ -97,7 +95,8 @@ CreateKernels::fix_OP_PAR_LOOP_Calls (SgFunctionCallExp * functionCallExp,
   SgFile * enclosingFile = getEnclosingFileNode (gotUseStatement);
 
   SgUseStatement* useStatement1 = new SgUseStatement (
-      enclosingFile->get_file_info (), createdCUDAModuleName, false);
+      enclosingFile->get_file_info (), op2ParallelLoop->getCUDAModuleName (),
+      false);
 
   SgModuleStatement * gotUseModule = gotUseStatement->get_module ();
   useStatement1->set_definingDeclaration (gotUseModule);
@@ -110,20 +109,15 @@ CreateKernels::fix_OP_PAR_LOOP_Calls (SgFunctionCallExp * functionCallExp,
   /*
    * Build the type, which is a character array
    */
-  SgExpression * index = buildIntVal (opParLoop->getKernelHostName ().size ());
+  SgExpression * index = buildIntVal (
+      op2ParallelLoop->getKernelHostName ().size ());
 
-  // not used for now
-  //    std::string cCharName = "c_char";
-  //    SgModifierType * cCharType = buildFortranKindType ( buildCharType (), buildWcharVal_nfi ( 0, cCharName ) );
-
-
-  SgArrayType* charArray = buildArrayType (buildCharType (), index);
+  SgArrayType * charArray = buildArrayType (buildCharType (), index);
 
   /*
    * The dimension of the array is the asterisk
    */
-  SgExprListExp* dimensionExprList = buildExprListExp (index);
-  charArray->set_dim_info (dimensionExprList);
+  charArray->set_dim_info (buildExprListExp (index));
 
   /*
    * The character array only has one dimension
@@ -131,15 +125,15 @@ CreateKernels::fix_OP_PAR_LOOP_Calls (SgFunctionCallExp * functionCallExp,
   charArray->set_rank (1);
 
   SgAssignInitializer * kernelNameInit = buildAssignInitializer (
-      buildStringVal (opParLoop->getKernelHostName ()), charArray);
+      buildStringVal (op2ParallelLoop->getKernelHostName ()), charArray);
 
   /*
    * Create the declaration and append it
    */
   string const METANAME = "Name";
   SgVariableDeclaration * kernelMetaName = buildVariableDeclaration (
-      opParLoop->getKernelHostName () + METANAME, charArray, kernelNameInit,
-      getScope (lastDeclStmt));
+      op2ParallelLoop->getKernelHostName () + METANAME, charArray,
+      kernelNameInit, getScope (lastDeclStmt));
 
   insertStatementAfter (lastDeclStmt, kernelMetaName);
 
@@ -162,77 +156,11 @@ CreateKernels::fix_OP_PAR_LOOP_Calls (SgFunctionCallExp * functionCallExp,
   exprs.insert (exprs.begin (), buildVarRefExp (kernelMetaName));
 }
 
-void
-CreateKernels::lookupArgumentsTypes (std::vector <SgType *> * argTypes,
-    SgExpressionPtrList& args, SgVariableDeclaration * setSizeFormalPar)
-{
-  using namespace std;
-  using namespace SageBuilder;
-
-  Debug::getInstance ()->debugMessage ("Looking up types of arguments", 2);
-
-  // build: user type arrays with bounds 0:op_set%size * op_dat%dim - 1
-  for (unsigned int i = 0; i < opParLoop->getNumberOf_OP_DAT_ArgumentGroups (); i++)
-  {
-    // build setsize * op_dat%dim (for now I fixed the dimension)
-    // access to actualArgumentsDimValues to get the op_dat dimension
-
-    int datDimension = opParLoop->get_OP_DAT_Dimension (i);
-
-    SgExpression * multiplySubscr = buildMultiplyOp (buildVarRefExp (
-        setSizeFormalPar), buildIntVal (datDimension));
-
-    ROSE_ASSERT (multiplySubscr != NULL);
-
-    // building (op_set%size * op_dat%dim)  -1
-    SgExpression * upperBound = buildSubtractOp (multiplySubscr,
-        buildIntVal (1));
-
-    ROSE_ASSERT (upperBound != NULL);
-
-    // We need a file_info because we need to tell rose that the subscript expression
-    // must be generated in the output file. If we use the same file_info of the
-    // source file we end up with an empty output file
-    Sg_File_Info * newFileInfo = new Sg_File_Info ();
-
-    // 0: op_set%size * op_dat%dim - 1
-    //(for now we know that the set is the same for all arguments = args[2].size
-    SgSubscriptExpression * arraySubScript = new SgSubscriptExpression (
-        newFileInfo, buildIntVal (0), upperBound, buildIntVal (1));
-
-    // as we are not using a builder from the SageBuilder interface we need to set things properly..
-    arraySubScript->set_endOfConstruct (newFileInfo);
-    arraySubScript->setCompilerGenerated ();
-    arraySubScript->setOutputInCodeGeneration ();
-
-    // the correct type can be retrieved from the stored information
-    SgType * baseType = opParLoop->get_OP_DAT_ActualType (i);
-
-    SgArrayType * guessArrayType = NULL;
-    if ((guessArrayType = isSgArrayType (baseType)) != NULL)
-    {
-      // if the user-defined type is already an array (as it is always or nearly the case), we need to modify
-      // the array subscript. If we copy the array type, we won't get the attributes, hence we copy
-      // only the base type and we re-create the array type
-      baseType = guessArrayType->get_base_type ();
-    }
-
-    // build array type (real(8) for now) with the correct subscript
-    SgArrayType * arrayType = buildArrayType (baseType, arraySubScript);
-
-    SgExprListExp * dimensionExprList = buildExprListExp (arraySubScript);
-
-    arrayType->set_dim_info (dimensionExprList);
-    arrayType->set_rank (1);
-
-    argTypes->push_back (arrayType);
-  }
-}
-
 SgExprListExp *
 CreateKernels::buildUserKernelParams (
     SgFunctionParameterList * mainKernelParameters,
-    SgVarRefExp * iterSetVarRef, SgScopeStatement * subroutineScope)
+    SgVarRefExp * iterSetVarRef, SgScopeStatement * subroutineScope,
+    OP2ParallelLoop * op2ParallelLoop)
 {
   using namespace std;
   using namespace SageBuilder;
@@ -261,7 +189,8 @@ CreateKernels::buildUserKernelParams (
     //(for now we know that the set is the same for all arguments = args[2].size
 
     // setIter * 4
-    SgIntVal * opDatDim = buildIntVal (opParLoop->get_OP_DAT_Dimension (i));
+    SgIntVal * opDatDim = buildIntVal (
+        op2ParallelLoop->get_OP_DAT_Dimension (i));
 
     SgExpression * lowerBound = buildMultiplyOp (iterSetVarRef, opDatDim);
 
@@ -309,7 +238,7 @@ CreateKernels::buildUserKernelParams (
 
 void
 CreateKernels::createHostSubroutineStatements (SgScopeStatement * scope,
-    SgExpressionPtrList& args)
+    OP2ParallelLoop * op2ParallelLoop)
 {
   using namespace SageBuilder;
   using namespace SageInterface;
@@ -339,14 +268,15 @@ CreateKernels::createHostSubroutineStatements (SgScopeStatement * scope,
 
   // iterator over op_dat formal parameters
   vector <SgVariableDeclaration *>::const_iterator argIt =
-      opParLoop->get_OP_DAT_Arguments ();
+      op2ParallelLoop->get_OP_DAT_Arguments ();
 
   // iterator over local variables
   vector <SgVariableDeclaration *>::const_iterator localVarIt =
-      opParLoop->get_Host_Subroutine_Variables ();
+      op2ParallelLoop->get_Host_Subroutine_Variables ();
 
   SgStatement * lastAppendedStatement = NULL;
-  for (unsigned int i = 0; i < opParLoop->getNumberOf_OP_DAT_ArgumentGroups (); i++, argIt++, localVarIt++)
+  for (unsigned int i = 0; i
+      < op2ParallelLoop->getNumberOf_OP_DAT_ArgumentGroups (); i++, argIt++, localVarIt++)
   {
     // transform the expression to a variable reference
     SgExpression * opDatArgRef = buildVarRefExp (*argIt);
@@ -378,22 +308,23 @@ CreateKernels::createHostSubroutineStatements (SgScopeStatement * scope,
     SgStatement * assignDataISizeStmt = buildExprStatement (assignDataISize);
     appendStatement (assignDataISizeStmt, scope);
 
-    if (i == opParLoop->getNumberOf_OP_DAT_ArgumentGroups () - 1) // last iteration
+    if (i == op2ParallelLoop->getNumberOf_OP_DAT_ArgumentGroups () - 1) // last iteration
       lastAppendedStatement = assignDataISizeStmt;
   }
 
   // the first set of opParLoop->getNumberOf_OP_DAT_ArgumentGroups() variables in declaredC2FortranVariables
   // is the one of the argumentI variables, which is the ones that we are going to use now
   vector <SgVariableDeclaration *>::const_iterator c2fVarIt =
-      opParLoop->get_C_To_Fortran_Variables ();
+      op2ParallelLoop->get_C_To_Fortran_Variables ();
 
   // build:     allocate ( argument0 ( data0Size ) )
   //                                    allocate ( argumentN-11 ( dataN-11Size ) )
 
   // we need the dataISize variables again
-  localVarIt = opParLoop->get_Host_Subroutine_Variables ();
+  localVarIt = op2ParallelLoop->get_Host_Subroutine_Variables ();
 
-  for (unsigned int i = 0; i < opParLoop->getNumberOf_OP_DAT_ArgumentGroups (); i++, c2fVarIt++, localVarIt++)
+  for (unsigned int i = 0; i
+      < op2ParallelLoop->getNumberOf_OP_DAT_ArgumentGroups (); i++, c2fVarIt++, localVarIt++)
   {
     // build function type for allocate subroutine
     string const allocateName = "allocate";
@@ -438,15 +369,16 @@ CreateKernels::createHostSubroutineStatements (SgScopeStatement * scope,
   //                                    call c_f_pointer ( arg1%dat, c2fPtr1, (/data1Size/) )
 
   // iterator over op_dat formal parameters
-  argIt = opParLoop->get_OP_DAT_Arguments ();
+  argIt = op2ParallelLoop->get_OP_DAT_Arguments ();
 
   // we need the dataISize variables again
-  localVarIt = opParLoop->get_Host_Subroutine_Variables ();
+  localVarIt = op2ParallelLoop->get_Host_Subroutine_Variables ();
 
   string const c2fFunName = "c_f_pointer";
 
   // The good news is that the c2fVarIt should point exactly to the first c2fPtrI
-  for (unsigned int i = 0; i < opParLoop->getNumberOf_OP_DAT_ArgumentGroups (); i++, c2fVarIt++, argIt++, localVarIt++)
+  for (unsigned int i = 0; i
+      < op2ParallelLoop->getNumberOf_OP_DAT_ArgumentGroups (); i++, c2fVarIt++, argIt++, localVarIt++)
   {
     // build: argI%dat
 
@@ -496,15 +428,16 @@ CreateKernels::createHostSubroutineStatements (SgScopeStatement * scope,
 
   // first come the argumentI variables
   vector <SgVariableDeclaration *>::const_iterator argumentIVarIt =
-      opParLoop->get_C_To_Fortran_Variables ();
+      op2ParallelLoop->get_C_To_Fortran_Variables ();
 
   // then, after <opParLoop->getNumberOf_OP_DAT_ArgumentGroups()> argumentI variables, we have the c2fPtrI variables
   vector <SgVariableDeclaration *>::const_iterator c2fPtrVarIt =
-      opParLoop->get_C_To_Fortran_Variables ();
-  c2fPtrVarIt += opParLoop->getNumberOf_OP_DAT_ArgumentGroups (); // exploiting pointer arithmetics!
+      op2ParallelLoop->get_C_To_Fortran_Variables ();
+  c2fPtrVarIt += op2ParallelLoop->getNumberOf_OP_DAT_ArgumentGroups (); // exploiting pointer arithmetics!
 
 
-  for (unsigned int i = 0; i < opParLoop->getNumberOf_OP_DAT_ArgumentGroups (); i++, argumentIVarIt++, c2fPtrVarIt++)
+  for (unsigned int i = 0; i
+      < op2ParallelLoop->getNumberOf_OP_DAT_ArgumentGroups (); i++, argumentIVarIt++, c2fPtrVarIt++)
   {
     SgVarRefExp * argumentIRef = buildVarRefExp (*argumentIVarIt);
     SgVarRefExp * c2FPtrIRef = buildVarRefExp (*c2fPtrVarIt);
@@ -520,36 +453,38 @@ CreateKernels::createHostSubroutineStatements (SgScopeStatement * scope,
   // build: call op_cuda_save_soln<<<gsize,bsize,reduct_shared>>> ( set%size, argument0, argument1  )
 
   // build: argument0, argument1, set%size
-  argumentIVarIt = opParLoop->get_C_To_Fortran_Variables ();
+  argumentIVarIt = op2ParallelLoop->get_C_To_Fortran_Variables ();
   SgExprListExp * kPars = buildExprListExp ();
 
   // build: set%size
   SgExpression * iterationSetVarRef = buildVarRefExp (
-      opParLoop->get_OP_SET_Argument ());
+      op2ParallelLoop->get_OP_SET_Argument ());
   SgVarRefExp * setSizeField = buildOpaqueVarRefExp ("size", scope);
   SgExpression * setFieldSizeExpr = buildDotExp (iterationSetVarRef,
       setSizeField);
   kPars->append_expression (setFieldSizeExpr);
 
   // build: argumentI
-  for (unsigned int i = 0; i < opParLoop->getNumberOf_OP_DAT_ArgumentGroups (); i++, argumentIVarIt++)
+  for (unsigned int i = 0; i
+      < op2ParallelLoop->getNumberOf_OP_DAT_ArgumentGroups (); i++, argumentIVarIt++)
   {
     SgVarRefExp * argumentIRef = buildVarRefExp (*argumentIVarIt);
     kPars->append_expression (argumentIRef);
   }
 
   SgExprStatement * kCall = buildFunctionCallStmt ("op_cuda_"
-      + opParLoop->getKernelHostName () + "<<<gsize,bsize,reduct_shared>>>",
-      buildVoidType (), kPars, scope);
+      + op2ParallelLoop->getKernelHostName ()
+      + "<<<gsize,bsize,reduct_shared>>>", buildVoidType (), kPars, scope);
 
   appendStatement (kCall, scope);
 
   // building copy back
-  argumentIVarIt = opParLoop->get_C_To_Fortran_Variables ();
-  c2fPtrVarIt = opParLoop->get_C_To_Fortran_Variables ();
-  c2fPtrVarIt += opParLoop->getNumberOf_OP_DAT_ArgumentGroups (); // exploiting pointer arithmetics!
+  argumentIVarIt = op2ParallelLoop->get_C_To_Fortran_Variables ();
+  c2fPtrVarIt = op2ParallelLoop->get_C_To_Fortran_Variables ();
+  c2fPtrVarIt += op2ParallelLoop->getNumberOf_OP_DAT_ArgumentGroups (); // exploiting pointer arithmetics!
 
-  for (unsigned int i = 0; i < opParLoop->getNumberOf_OP_DAT_ArgumentGroups (); i++, argumentIVarIt++, c2fPtrVarIt++)
+  for (unsigned int i = 0; i
+      < op2ParallelLoop->getNumberOf_OP_DAT_ArgumentGroups (); i++, argumentIVarIt++, c2fPtrVarIt++)
   {
     SgVarRefExp * argumentIRef = buildVarRefExp (*argumentIVarIt);
     SgVarRefExp * c2FPtrIRef = buildVarRefExp (*c2fPtrVarIt);
@@ -564,7 +499,8 @@ CreateKernels::createHostSubroutineStatements (SgScopeStatement * scope,
 }
 
 void
-CreateKernels::createHostSubroutineCUDAVariables (SgScopeStatement * scope)
+CreateKernels::createHostSubroutineCUDAVariables (SgScopeStatement * scope,
+    OP2ParallelLoop * op2ParallelLoop)
 {
   using namespace SageBuilder;
   using namespace SageInterface;
@@ -644,7 +580,8 @@ CreateKernels::createHostSubroutineCUDAVariables (SgScopeStatement * scope)
 
   // 'set%size'
   SgExpression * setPERCENTsize = buildDotExp (buildVarRefExp (
-      opParLoop->get_OP_SET_Argument ()), buildOpaqueVarRefExp ("size", scope));
+      op2ParallelLoop->get_OP_SET_Argument ()), buildOpaqueVarRefExp ("size",
+      scope));
 
   // 'set%size - 1'
   SgExpression * setPERCENTsize_minusOne = buildSubtractOp (setPERCENTsize,
@@ -700,7 +637,7 @@ CreateKernels::createHostSubroutineCUDAVariables (SgScopeStatement * scope)
 
 void
 CreateKernels::createHostSubroutineLocals (SgScopeStatement* subroutineScope,
-    SgExpressionPtrList& args)
+    OP2ParallelLoop * op2ParallelLoop)
 {
   using boost::lexical_cast;
   using SageBuilder::buildIntType;
@@ -728,7 +665,8 @@ CreateKernels::createHostSubroutineLocals (SgScopeStatement* subroutineScope,
    * INTEGER :: dataNSize
    * ====================================================================================================
    */
-  for (unsigned int i = 0; i < opParLoop->getNumberOf_OP_DAT_ArgumentGroups (); ++i)
+  for (unsigned int i = 0; i
+      < op2ParallelLoop->getNumberOf_OP_DAT_ArgumentGroups (); ++i)
   {
     string const variableName = "data" + lexical_cast <string> (i) + "Size";
 
@@ -737,7 +675,7 @@ CreateKernels::createHostSubroutineLocals (SgScopeStatement* subroutineScope,
 
     variable_dataNSize->get_declarationModifier ().get_accessModifier ().setUndefined ();
 
-    opParLoop->set_Host_Subroutine_Variable (variable_dataNSize);
+    op2ParallelLoop->set_Host_Subroutine_Variable (variable_dataNSize);
 
     appendStatement (variable_dataNSize, subroutineScope);
   }
@@ -748,19 +686,20 @@ CreateKernels::createHostSubroutineLocals (SgScopeStatement* subroutineScope,
    * real(8), dimension(:), allocatable, device :: argumentN-1
    * ====================================================================================================
    */
-  for (unsigned int i = 0; i < opParLoop->getNumberOf_OP_DAT_ArgumentGroups (); ++i)
+  for (unsigned int i = 0; i
+      < op2ParallelLoop->getNumberOf_OP_DAT_ArgumentGroups (); ++i)
   {
     string const variableName = "c2fPtr" + lexical_cast <string> (i);
 
     SgVariableDeclaration * variable_argument_n = buildVariableDeclaration (
-        variableName, opParLoop->get_OP_DAT_ActualType (i), NULL,
+        variableName, op2ParallelLoop->get_OP_DAT_ActualType (i), NULL,
         subroutineScope);
 
     variable_argument_n->get_declarationModifier ().get_typeModifier ().setDevice ();
     variable_argument_n->get_declarationModifier ().get_typeModifier ().setAllocatable ();
     variable_argument_n->get_declarationModifier ().get_accessModifier ().setUndefined ();
 
-    opParLoop->set_C_To_Fortran_Variable (variable_argument_n);
+    op2ParallelLoop->set_C_To_Fortran_Variable (variable_argument_n);
 
     appendStatement (variable_argument_n, subroutineScope);
   }
@@ -771,17 +710,18 @@ CreateKernels::createHostSubroutineLocals (SgScopeStatement* subroutineScope,
    * real(8), dimension(:), pointer :: c2fPtrN-1
    * ====================================================================================================
    */
-  for (unsigned int i = 0; i < opParLoop->getNumberOf_OP_DAT_ArgumentGroups (); ++i)
+  for (unsigned int i = 0; i
+      < op2ParallelLoop->getNumberOf_OP_DAT_ArgumentGroups (); ++i)
   {
     string const variableName = "c2fPtr" + lexical_cast <string> (i);
 
     SgVariableDeclaration * variable_c2fptr_n = buildVariableDeclaration (
-        variableName, buildPointerType (opParLoop->get_OP_DAT_ActualType (i)),
-        NULL, subroutineScope);
+        variableName, buildPointerType (op2ParallelLoop->get_OP_DAT_ActualType (
+            i)), NULL, subroutineScope);
 
     variable_c2fptr_n->get_declarationModifier ().get_accessModifier ().setUndefined ();
 
-    opParLoop->set_C_To_Fortran_Variable (variable_c2fptr_n);
+    op2ParallelLoop->set_C_To_Fortran_Variable (variable_c2fptr_n);
 
     appendStatement (variable_c2fptr_n, subroutineScope);
   }
@@ -791,13 +731,13 @@ CreateKernels::createHostSubroutineLocals (SgScopeStatement* subroutineScope,
    * Add CUDA configuration parameters
    * ====================================================================================================
    */
-  createHostSubroutineCUDAVariables (subroutineScope);
+  createHostSubroutineCUDAVariables (subroutineScope, op2ParallelLoop);
 }
 
 void
 CreateKernels::createHostSubroutineFormalParamaters (
-    SgScopeStatement * subroutineScope, SgExpressionPtrList & args,
-    SgFunctionParameterList * hostParameters)
+    SgScopeStatement * subroutineScope,
+    SgFunctionParameterList * hostParameters, OP2ParallelLoop * op2ParallelLoop)
 {
   using boost::lexical_cast;
   using SageBuilder::buildCharType;
@@ -821,7 +761,9 @@ CreateKernels::createHostSubroutineFormalParamaters (
 
   int suffix = -1;
 
-  for (vector <SgExpression *>::iterator it = args.begin (); it != args.end (); ++it)
+  for (vector <SgExpression *>::const_iterator it =
+      op2ParallelLoop->getActualArguments ().begin (); it
+      != op2ParallelLoop->getActualArguments ().end (); ++it)
   {
     SgExpression* argument = *it;
 
@@ -910,7 +852,7 @@ CreateKernels::createHostSubroutineFormalParamaters (
 
               appendStatement (opSetDeclaration, subroutineScope);
 
-              opParLoop->set_OP_SET_Argument (opSetDeclaration);
+              op2ParallelLoop->set_OP_SET_Argument (opSetDeclaration);
             }
 
             else if (strcmp (className.c_str (), OP2::OP_MAP_NAME.c_str ())
@@ -935,7 +877,7 @@ CreateKernels::createHostSubroutineFormalParamaters (
 
               appendStatement (opMapDeclaration, subroutineScope);
 
-              opParLoop->set_OP_MAP_Argument (opMapDeclaration);
+              op2ParallelLoop->set_OP_MAP_Argument (opMapDeclaration);
             }
 
             else if (strcmp (className.c_str (), OP2::OP_DAT_NAME.c_str ())
@@ -962,7 +904,7 @@ CreateKernels::createHostSubroutineFormalParamaters (
 
               appendStatement (opDatDeclaration, subroutineScope);
 
-              opParLoop->set_OP_DAT_Argument (opDatDeclaration);
+              op2ParallelLoop->set_OP_DAT_Argument (opDatDeclaration);
             }
             else
             {
@@ -997,7 +939,7 @@ CreateKernels::createHostSubroutineFormalParamaters (
 
             appendStatement (opAccessDeclaration, subroutineScope);
 
-            opParLoop->set_OP_ACESS_Argument (opAccessDeclaration);
+            op2ParallelLoop->set_OP_ACESS_Argument (opAccessDeclaration);
 
             break;
           }
@@ -1034,7 +976,7 @@ CreateKernels::createHostSubroutineFormalParamaters (
 
         appendStatement (opIndirectionDeclaration, subroutineScope);
 
-        opParLoop->set_OP_INDIRECTION_Argument (opIndirectionDeclaration);
+        op2ParallelLoop->set_OP_INDIRECTION_Argument (opIndirectionDeclaration);
 
         break;
       }
@@ -1048,8 +990,8 @@ CreateKernels::createHostSubroutineFormalParamaters (
 }
 
 SgProcedureHeaderStatement *
-CreateKernels::createHostSubroutine (SgExpressionPtrList & args,
-    SgSourceFile & sourceFile, SgScopeStatement * moduleScope)
+CreateKernels::createHostSubroutine (SgScopeStatement * moduleScope,
+    OP2ParallelLoop * op2ParallelLoop)
 {
   using namespace SageBuilder;
   using namespace SageInterface;
@@ -1064,7 +1006,7 @@ CreateKernels::createHostSubroutine (SgExpressionPtrList & args,
    * ====================================================================================================
    */
   string const hostSubroutineName = OP_PAR_LOOP_PREFIX + "_"
-      + opParLoop->getKernelHostName ().c_str ();
+      + op2ParallelLoop->getKernelHostName ().c_str ();
 
   SgFunctionParameterList * hostParameters = buildFunctionParameterList ();
 
@@ -1088,28 +1030,98 @@ CreateKernels::createHostSubroutine (SgExpressionPtrList & args,
    * Add formal parameters
    * ====================================================================================================
    */
-  createHostSubroutineFormalParamaters (subroutineScope, args, hostParameters);
+  createHostSubroutineFormalParamaters (subroutineScope, hostParameters,
+      op2ParallelLoop);
 
   /*
    * ====================================================================================================
    * Add local variables
    * ====================================================================================================
    */
-  createHostSubroutineLocals (subroutineScope, args);
+  createHostSubroutineLocals (subroutineScope, op2ParallelLoop);
 
   /*
    * ====================================================================================================
    * Add main statements, which includes allocation of memory on the device and kernel calls
    * ====================================================================================================
    */
-  createHostSubroutineStatements (subroutineScope, args);
+  createHostSubroutineStatements (subroutineScope, op2ParallelLoop);
 
   return subroutineStatement;
 }
 
 void
+CreateKernels::setUp_OP_DAT_ArgumentTypes (
+    std::vector <SgType *> & opDatArgumentTypes,
+    SgVariableDeclaration * setSizeFormalParameter,
+    OP2ParallelLoop * op2ParallelLoop)
+{
+  using namespace std;
+  using namespace SageBuilder;
+
+  Debug::getInstance ()->debugMessage ("Looking up types of arguments", 2);
+
+  // build: user type arrays with bounds 0:op_set%size * op_dat%dim - 1
+  for (unsigned int i = 0; i
+      < op2ParallelLoop->getNumberOf_OP_DAT_ArgumentGroups (); i++)
+  {
+    /*
+     *  'setsize * op_dat%dim'
+     *  Currently 'op_dat%dim' is a constant
+     */
+    SgExpression * setSizeBy_OP_DAT_Dimension = buildMultiplyOp (
+        buildVarRefExp (setSizeFormalParameter), buildIntVal (
+            op2ParallelLoop->get_OP_DAT_Dimension (i)));
+
+    // 'op_set%size * op_dat%dim -1'
+    SgExpression * upperBound = buildSubtractOp (setSizeBy_OP_DAT_Dimension,
+        buildIntVal (1));
+
+    // '0: op_set%size * op_dat%dim - 1'
+    SgSubscriptExpression * arraySubscript = new SgSubscriptExpression (
+        buildIntVal (0), upperBound, buildIntVal (1));
+
+    /*
+     * We need a new Sg_File_Info to tell ROSE that the subscript expression
+     * must be generated in the output file. Using the same Sg_File_Info as the
+     * source file produces an empty output file
+     */
+    Sg_File_Info * fileInfo = new Sg_File_Info ();
+    arraySubscript->set_startOfConstruct (fileInfo);
+    arraySubscript->set_endOfConstruct (fileInfo);
+    arraySubscript->setCompilerGenerated ();
+    arraySubscript->setOutputInCodeGeneration ();
+
+    /*
+     * Obtain the base type of the OP_DAT argument
+     */
+    SgType * opDatBaseType = op2ParallelLoop->get_OP_DAT_ActualType (i);
+
+    SgArrayType * isArrayType = isSgArrayType (opDatBaseType);
+    if (isArrayType != NULL)
+    {
+      /*
+       * If the base type is an array (as is always or nearly the case), we need to
+       * modify the array subscript. If we copy the array type, we won't get the attributes, hence we copy
+       * only the base type and we re-create the array type
+       */
+      opDatBaseType = isArrayType->get_base_type ();
+    }
+
+    /*
+     * Build array type (real(8) for now) with the correct subscript
+     */
+    SgArrayType * arrayType = buildArrayType (opDatBaseType, arraySubscript);
+    arrayType->set_rank (1);
+    arrayType->set_dim_info (buildExprListExp (arraySubscript));
+
+    opDatArgumentTypes.push_back (arrayType);
+  }
+}
+
+void
 CreateKernels::createMainKernelSubroutine (SgScopeStatement * moduleScope,
-    SgExpressionPtrList & args, Sg_File_Info & fileInfo)
+    OP2ParallelLoop * op2ParallelLoop)
 {
   using boost::lexical_cast;
   using SageBuilder::buildVariableDeclaration;
@@ -1144,7 +1156,8 @@ CreateKernels::createMainKernelSubroutine (SgScopeStatement * moduleScope,
    * ====================================================================================================
    */
 
-  string const newSubroutineName = "op_cuda_" + opParLoop->getKernelHostName ();
+  string const newSubroutineName = "op_cuda_"
+      + op2ParallelLoop->getKernelHostName ();
 
   SgFunctionParameterList * newSubroutineParameters =
       buildFunctionParameterList ();
@@ -1179,27 +1192,27 @@ CreateKernels::createMainKernelSubroutine (SgScopeStatement * moduleScope,
   appendStatement (setSizeFormalParameter, newSubroutineScope);
 
   // b. Building remaining formal parameters types from program
-  vector <SgType *> * argTypes = new vector <SgType *> ;
-
-  lookupArgumentsTypes (argTypes, args, setSizeFormalParameter);
+  vector <SgType *> argTypes;
+  setUp_OP_DAT_ArgumentTypes (argTypes, setSizeFormalParameter, op2ParallelLoop);
 
   // check that the size of argTypes is exactly the expected number of arguments to avoid wrong accesses to argTypes below
-  ROSE_ASSERT ( argTypes->size() == opParLoop->getNumberOf_OP_DAT_ArgumentGroups() );
+  ROSE_ASSERT ( argTypes.size() == op2ParallelLoop->getNumberOf_OP_DAT_ArgumentGroups() );
 
   // b. create formal parameters (we have a OP_DAT argument starting from 3 and then every 4 arguments
   // (4 is stored inside a macro (ARG_LINE_LENGTH) copied inside variable argLineLength in constructor
   // retriving op_dat original type from argument: must generate real(8), dimension(0:setsize * 4 -1)
   // where 4 is the carinality of each input op_dat element associate to each set element (can be found
   // in the op_decl_dat call)
-  for (unsigned int i = 0; i < opParLoop->getNumberOf_OP_DAT_ArgumentGroups (); i++)
+  for (unsigned int i = 0; i
+      < op2ParallelLoop->getNumberOf_OP_DAT_ArgumentGroups (); i++)
   {
     /*
      * Create 'arg_i' formal parameter
      */
-    string const argName = "arg_" + lexical_cast <string> (i);
+    string const argName = "arg" + lexical_cast <string> (i);
 
     SgVariableDeclaration * argFormalParameter = buildVariableDeclaration (
-        argName, (*argTypes)[i], NULL, newSubroutineScope);
+        argName, argTypes[i], NULL, newSubroutineScope);
 
     newSubroutineParameters->append_arg (
         *(argFormalParameter->get_variables ().begin ()));
@@ -1294,13 +1307,14 @@ CreateKernels::createMainKernelSubroutine (SgScopeStatement * moduleScope,
   /*
    *  Build a call to the user kernel subroutine
    */
-  SgFunctionRefExp * userKernelRefExp = buildFunctionRefExp (
-      opParLoop->getKernelDeviceName (), newSubroutineScope->get_scope ());
+  SgFunctionRefExp * userKernelRefExp =
+      buildFunctionRefExp (op2ParallelLoop->getKernelDeviceName (),
+          newSubroutineScope->get_scope ());
 
   // 2. build parameters: q(setIter * dim:setIter * dim + dim - 1), qold(setIter * dim:setIter*dim + dim - 1)
   // dim is obtained from the previous parsing
   SgExprListExp * userKernelParams = buildUserKernelParams (
-      newSubroutineParameters, setIterRef, newSubroutineScope);
+      newSubroutineParameters, setIterRef, newSubroutineScope, op2ParallelLoop);
 
   // 3. build call
   SgFunctionCallExp * userKernelCall = buildFunctionCallExp (userKernelRefExp,
@@ -1350,7 +1364,8 @@ CreateKernels::createMainKernelSubroutine (SgScopeStatement * moduleScope,
 }
 
 void
-CreateKernels::createCUDAKernel (SgScopeStatement * moduleScope)
+CreateKernels::createCUDAKernel (SgScopeStatement * moduleScope,
+    OP2ParallelLoop * op2ParallelLoop)
 {
   using SageBuilder::buildProcedureHeaderStatement;
   using SageBuilder::buildFunctionParameterList;
@@ -1380,7 +1395,7 @@ CreateKernels::createCUDAKernel (SgScopeStatement * moduleScope)
   {
     SgProcedureHeaderStatement * subroutine = *it;
 
-    if (opParLoop->getKernelHostName ().compare (
+    if (op2ParallelLoop->getKernelHostName ().compare (
         subroutine->get_name ().getString ()) == 0)
     {
       /*
@@ -1401,7 +1416,7 @@ CreateKernels::createCUDAKernel (SgScopeStatement * moduleScope)
   newParameters = buildFunctionParameterList ();
 
   newSubroutine = buildProcedureHeaderStatement (
-      opParLoop->getKernelDeviceName ().c_str (), buildVoidType (),
+      op2ParallelLoop->getKernelDeviceName ().c_str (), buildVoidType (),
       newParameters, SgProcedureHeaderStatement::e_subroutine_subprogram_kind,
       moduleScope);
 
@@ -1471,7 +1486,7 @@ CreateKernels::createCUDAKernel (SgScopeStatement * moduleScope)
         }
       }
     }
-    else if (!checkFormalParameter (isVariableDeclaration, newParameters))
+    else if (!checkIsFormalParameter (isVariableDeclaration, newParameters))
     {
       /*
        * Append the statement to the new subroutine
@@ -1502,15 +1517,15 @@ CreateKernels::createCUDAKernel (SgScopeStatement * moduleScope)
 }
 
 SgModuleStatement *
-CreateKernels::buildClassDeclarationAndDefinition (std::string moduleName,
-    SgScopeStatement * fileScope)
+CreateKernels::buildClassDeclarationAndDefinition (
+    SgScopeStatement * fileScope, OP2ParallelLoop * op2ParallelLoop)
 {
   Debug::getInstance ()->debugMessage ("Building module", 2);
 
   /*
    * ====================================================================================================
    * This function builds a class declaration and definition
-   * (both the defining and nondefining declarations as required)
+   * (both the defining and non-defining declarations as required)
    * ====================================================================================================
    */
 
@@ -1520,23 +1535,30 @@ CreateKernels::buildClassDeclarationAndDefinition (std::string moduleName,
   fileInfo->setOutputInCodeGeneration ();
 
   /*
-   * This is the class definition (the fileInfo specifies the position of the opening brace).
-   * Must also set the end of construct explicitly otherwise ROSE complains (where this is not a
-   * transformation, it is the location of the closing brace)
+   * This is the class definition.
+   * Must explicitly set the position of the opening and closing braces otherwise
+   * ROSE complains
    */
-  SgClassDefinition * classDefinition = new SgClassDefinition (fileInfo);
+  SgClassDefinition * classDefinition = new SgClassDefinition ();
+  classDefinition->set_startOfConstruct (fileInfo);
   classDefinition->set_endOfConstruct (fileInfo);
 
-  // This is the defining declaration for the class (with a reference to the class definition)
-  SgModuleStatement * classDeclaration = new SgModuleStatement (fileInfo,
-      moduleName.c_str (), SgClassDeclaration::e_struct, NULL, classDefinition);
-
-  // Set the defining declaration in the defining declaration!
+  /*
+   * This is the defining declaration for the class
+   */
+  SgModuleStatement * classDeclaration = new SgModuleStatement (
+      op2ParallelLoop->getCUDAModuleName (), SgClassDeclaration::e_struct,
+      NULL, classDefinition);
+  classDeclaration->set_startOfConstruct (fileInfo);
+  classDeclaration->set_endOfConstruct (fileInfo);
   classDeclaration->set_definingDeclaration (classDeclaration);
 
   // Set the non defining declaration in the defining declaration (both are required)
   SgClassDeclaration * nondefiningClassDeclaration = new SgClassDeclaration (
-      fileInfo, moduleName.c_str (), SgClassDeclaration::e_struct, NULL, NULL);
+      op2ParallelLoop->getCUDAModuleName (), SgClassDeclaration::e_struct,
+      NULL, NULL);
+  nondefiningClassDeclaration->set_startOfConstruct (fileInfo);
+  nondefiningClassDeclaration->set_endOfConstruct (fileInfo);
   nondefiningClassDeclaration->set_type (SgClassType::createType (
       nondefiningClassDeclaration));
 
@@ -1579,7 +1601,7 @@ CreateKernels::buildClassDeclarationAndDefinition (std::string moduleName,
 
 SgScopeStatement *
 CreateKernels::createDirectLoopCUDAModule (SgSourceFile & sourceFile,
-    std::string const moduleName)
+    OP2ParallelLoop * op2ParallelLoop)
 {
   using std::string;
   using std::vector;
@@ -1593,7 +1615,7 @@ CreateKernels::createDirectLoopCUDAModule (SgSourceFile & sourceFile,
    * Create the module statement
    */
   SgModuleStatement * cudaModule = buildClassDeclarationAndDefinition (
-      moduleName, globalScope);
+      globalScope, op2ParallelLoop);
 
   cudaModule->get_definition ()->setCaseInsensitive (true);
 
@@ -1623,7 +1645,7 @@ CreateKernels::createDirectLoopCUDAModule (SgSourceFile & sourceFile,
   containsStatement->set_parent (cudaModule->get_definition ());
   containsStatement->set_definingDeclaration (containsStatement);
 
-  vector <SgDeclarationStatement *> & statementList =
+  SgDeclarationStatementPtrList & statementList =
       cudaModule->get_definition ()->getDeclarationList ();
   statementList.push_back (containsStatement);
 
@@ -1631,12 +1653,10 @@ CreateKernels::createDirectLoopCUDAModule (SgSourceFile & sourceFile,
 }
 
 SgSourceFile*
-CreateKernels::createSourceFile ()
+CreateKernels::createSourceFile (OP2ParallelLoop * op2ParallelLoop)
 {
   using std::string;
   using SageBuilder::buildFile;
-
-  Debug::getInstance ()->debugMessage ("Creating source file", 2);
 
   /*
    * To create a new file (to which the AST is later unparsed), the API expects
@@ -1644,12 +1664,14 @@ CreateKernels::createSourceFile ()
    * input file corresponding to our output file, therefore we first create a
    * dummy Fortran file
    */
-  string const FORTRAN_FILE_SUFFIX = ".F95";
-  string const inputFileName = "BLANK" + FORTRAN_FILE_SUFFIX;
+  string const inputFileName = "BLANK_" + op2ParallelLoop->getCUDAModuleName ()
+      + ".F95";
 
   FILE* inputFile = fopen (inputFileName.c_str (), "w+");
   if (inputFile != NULL)
   {
+    Debug::getInstance ()->debugMessage ("Creating dummy source file '"
+        + inputFileName + "'", 2);
     fclose (inputFile);
   }
   else
@@ -1662,12 +1684,10 @@ CreateKernels::createSourceFile ()
   /*
    * Now generate the CUDA file
    */
-  string const CUDA_FILE_NAME_SUFFIX = "_cuda_module.CUF";
-  string const outputFileName = opParLoop->getKernelHostName ()
-      + CUDA_FILE_NAME_SUFFIX;
+  string const outputFileName = op2ParallelLoop->getCUDAModuleName () + ".CUF";
 
   Debug::getInstance ()->debugMessage ("Generating CUDA file '"
-      + outputFileName + "'", 1);
+      + outputFileName + "'", 2);
 
   SgSourceFile* sourceFile = isSgSourceFile (buildFile (inputFileName,
       outputFileName, NULL));
@@ -1687,77 +1707,9 @@ CreateKernels::createSourceFile ()
   /*
    * Store the file so it can be unparsed after AST construction
    */
-  kernelOutputFiles.push_back (sourceFile);
+  CUDAOutputFiles.push_back (sourceFile);
 
   return sourceFile;
-}
-
-void
-CreateKernels::retrieveArgumentsTypes (SgExpressionPtrList & args)
-{
-  using boost::lexical_cast;
-  using std::string;
-  using std::vector;
-
-  Debug::getInstance ()->debugMessage (
-      "Retrieving actual types of OP_DAT arguments", 2);
-
-  /*
-   * Scan OP_DAT arguments and get their actual base types.
-   * Note that the first OP_DAT argument starts at BASE_OPDAT_ARG_INDEX.
-   * Then we have an OP_DAT argument every NUMBER_OF_OP_DAT_ARGUMENTS
-   */
-  for (vector <SgExpression *>::iterator it = args.begin ()
-      + OP2::BASE_OP_DAT_ARG_INDEX; it != args.end (); it
-      += OP2::NUMBER_OF_OP_DAT_ARGUMENTS)
-  {
-    if ((*it)->variantT () == V_SgVarRefExp)
-    {
-      /*
-       * The argument of the OP_PAR_LOOP is a variable reference (expression)
-       */
-      SgVarRefExp * variableReference = isSgVarRefExp (*it);
-
-      if (variableReference->get_type ()->variantT () == V_SgClassType)
-      {
-        SgClassType* classReference = isSgClassType (
-            variableReference->get_type ());
-
-        string const className = classReference->get_name ().getString ();
-
-        if (className.compare (OP2::OP_DAT_NAME) == 0)
-        {
-          /*
-           * Found an OP_DAT variable, so retrieve the type of the corresponding input
-           * data from the its name
-           */
-          SgExpressionPtrList declarationArgs =
-              opDeclaredVariables->getDeclaredOpDatArgs (
-                  variableReference->get_symbol ()->get_name ().getString ());
-
-          SgVarRefExp * opDatInputArg = isSgVarRefExp (
-              declarationArgs[OP2::OP_DECL_DAT_INPUT_REF]);
-
-          SgType * opDatInputType = opDatInputArg->get_type ();
-
-          SgIntVal * opDatDimension = isSgIntVal (
-              declarationArgs[OP2::OP_DECL_DAT_DIMENSION_VAL]);
-
-          ROSE_ASSERT (opDatInputType != NULL);
-          ROSE_ASSERT (opDatDimension != NULL);
-
-          opParLoop->set_OP_DAT_ActualType (opDatInputType);
-          opParLoop->set_OP_DAT_Dimension (opDatDimension->get_value ());
-
-          Debug::getInstance ()->debugMessage ("The OP_DAT variable '"
-              + variableReference->get_symbol ()->get_name ().getString ()
-              + "' has type " + opDatInputType->class_name ()
-              + " and dimension " + lexical_cast <string> (
-              opDatDimension->get_value ()), 6);
-        }
-      }
-    }
-  }
 }
 
 /*
@@ -1775,7 +1727,8 @@ CreateKernels::visit (SgNode * node)
   using boost::lexical_cast;
   using boost::starts_with;
   using std::string;
-  using OP2::OP_PAR_LOOP_PREFIX;
+  using std::pair;
+  using std::make_pair;
 
   switch (node->variantT ())
   {
@@ -1813,97 +1766,91 @@ CreateKernels::visit (SgNode * node)
        * parameters. Therefore, any match of this prefix indicates a call of interest
        * to the translator
        */
-      if (starts_with (calleeName, OP_PAR_LOOP_PREFIX))
+      if (starts_with (calleeName, OP2::OP_PAR_LOOP_PREFIX))
       {
         /*
-         * Retrieve the arguments of the call
+         * The first argument to an 'op_par_loop' call should be a reference to
+         * the kernel function. Cast it and proceed, otherwise throw an exception
          */
-        SgExpressionPtrList& args =
+        SgExpressionPtrList & actualArguments =
             functionCallExp->get_args ()->get_expressions ();
 
-        Debug::getInstance ()->debugMessage ("Found call to '" + calleeName
-            + "'", 2);
-
-        /*
-         * TODO: Remove this comparison to handle arbitrary OP_PAR_LOOPs
-         * An 'op_par_loop_2' always has 10 arguments
-         */
-        if (args.size () == 10)
+        SgFunctionRefExp * functionRefExp = isSgFunctionRefExp (
+            actualArguments.front ());
+        try
         {
-          /*
-           * The first argument to an 'op_par_loop' call should be a reference to
-           * the kernel function. Cast it and proceed, otherwise throw an exception
-           */
-          SgFunctionRefExp * functionRefExp =
-              isSgFunctionRefExp (args.front ());
-          try
+          if (functionRefExp != NULL)
           {
-            if (functionRefExp != NULL)
+            string const
+                kernelHostName =
+                    functionRefExp->getAssociatedFunctionDeclaration ()->get_name ().getString ();
+
+            Debug::getInstance ()->debugMessage ("Found '" + calleeName
+                + "' with host kernel '" + kernelHostName + "'", 1);
+
+            if (op2ParallelLoops.find (kernelHostName)
+                == op2ParallelLoops.end ())
             {
-              opParLoop
-                  = new OpParLoop (
-                      functionRefExp->getAssociatedFunctionDeclaration ()->get_name ().getString (),
-                      (args.size () - 2) / 4);
-
-              Debug::getInstance ()->debugMessage ("Found kernel '"
-                  + opParLoop->getKernelHostName () + "'", 2);
-
               /*
-               * Retrieve arguments data types
+               * If this kernel has not been previously encountered then build
+               * the CUDA-Fortran file and modify the calls in the original
+               * Fortran source code
                */
-              retrieveArgumentsTypes (args);
 
-              /*
-               * Generate the CUDA file for this kernel
-               */
-              SgSourceFile * sourceFile = createSourceFile ();
+              OP2ParallelLoop * op2ParallelLoop = new OP2ParallelLoop (
+                  kernelHostName, actualArguments, op2DeclaredVariables);
 
-              // TODO: substitute with a check of the input arguments to understand if it
-              // is a direct or indirect loop
-              if (true)
+              op2ParallelLoops.insert (make_pair (kernelHostName,
+                  op2ParallelLoop));
+
+              if (op2ParallelLoop->isDirectLoop ())
               {
                 /*
-                 * The name of the generated CUDA-Fortran module
+                 * Generate the CUDA file for this kernel
                  */
-                string const CUDAModuleName = OP_PAR_LOOP_PREFIX + "_"
-                    + opParLoop->getKernelHostName () + "_module";
+                SgSourceFile * sourceFile = createSourceFile (op2ParallelLoop);
 
                 /*
                  * Create the CUDA module
                  */
                 SgScopeStatement * moduleScope = createDirectLoopCUDAModule (
-                    *sourceFile, CUDAModuleName);
+                    *sourceFile, op2ParallelLoop);
 
                 /*
                  * Generate and modify user kernel so that it can run on the device
                  */
-                createCUDAKernel (moduleScope);
+                createCUDAKernel (moduleScope, op2ParallelLoop);
 
-                createMainKernelSubroutine (moduleScope, args,
-                    *(sourceFile)->get_file_info ());
+                createMainKernelSubroutine (moduleScope, op2ParallelLoop);
 
                 SgProcedureHeaderStatement * hostSubroutine =
-                    createHostSubroutine (args, *sourceFile, moduleScope);
+                    createHostSubroutine (moduleScope, op2ParallelLoop);
 
                 SgExprStatement * exprStat = isSgExprStatement (
                     node->get_parent ());
 
                 fix_OP_PAR_LOOP_Calls (functionCallExp, hostSubroutine,
-                    exprStat->get_scope (), CUDAModuleName);
+                    exprStat->get_scope (), op2ParallelLoop);
+              }
+              else
+              {
+                /*
+                 * TODO: Implement indirect loops
+                 */
               }
             }
-            else
-            {
-              throw args.front ();
-            }
           }
-          catch (SgNode *exceptionNode)
+          else
           {
-            Debug::getInstance ()->debugMessage (
-                "First argument to 'OP_PAR_LOOP' is not a kernel. The argument has type '"
-                    + exceptionNode->class_name () + "'", 1);
-            exit (1);
+            throw actualArguments.front ();
           }
+        }
+        catch (SgNode *exceptionNode)
+        {
+          Debug::getInstance ()->debugMessage (
+              "First argument to 'OP_PAR_LOOP' is not a kernel. The argument has type '"
+                  + exceptionNode->class_name () + "'", 1);
+          exit (1);
         }
       }
 
@@ -1933,8 +1880,8 @@ CreateKernels::unparse ()
 
   Debug::getInstance ()->verboseMessage ("Generating CUDA files");
 
-  for (vector <SgSourceFile *>::const_iterator it = kernelOutputFiles.begin (); it
-      != kernelOutputFiles.end (); ++it)
+  for (vector <SgSourceFile *>::const_iterator it = CUDAOutputFiles.begin (); it
+      != CUDAOutputFiles.end (); ++it)
   {
     Debug::getInstance ()->debugMessage ("Unparsing AST to "
         + (*it)->getFileName (), 1);

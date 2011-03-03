@@ -3,7 +3,7 @@
 #include "CommandLine.h"
 #include "Debug.h"
 #include "CreateKernels.h"
-#include "OpDeclaredVariables.h"
+#include "OP2DeclaredVariables.h"
 
 int
 main (int argc, char ** argv)
@@ -29,14 +29,15 @@ main (int argc, char ** argv)
    * We first need to get all OP2 declarations that will be used later to build the CUDA modules
    */
   Debug::getInstance ()->debugMessage ("Retrieving OP2 declarations", 2);
-  OpDeclaredVariables * opDeclaredVariables = new OpDeclaredVariables (project);
-  opDeclaredVariables->traverseInputFiles (project, preorder);
+  OP2DeclaredVariables * op2DeclaredVariables = new OP2DeclaredVariables (
+      project);
+  op2DeclaredVariables->traverseInputFiles (project, preorder);
 
   /*
    * Create the parallel loop object with these files
    */
   Debug::getInstance ()->debugMessage ("Creating parallel loops", 2);
-  CreateKernels * opParLoop = new CreateKernels (project, opDeclaredVariables);
+  CreateKernels * opParLoop = new CreateKernels (project, op2DeclaredVariables);
 
   /*
    * Traverse the ASTs of the input files in pre-order

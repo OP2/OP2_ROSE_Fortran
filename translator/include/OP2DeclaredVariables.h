@@ -13,70 +13,64 @@
 
 #include <rose.h>
 
-class OpDeclaredVariables: public AstSimpleProcessing
+class OP2DeclaredVariables: public AstSimpleProcessing
 {
   private:
+
     /*
      * The project which the source-to-source translator operates upon
      */
     SgProject * project;
 
     /*
-     * Actual arguments passed to every declaration of OP_SET in the program
+     * Actual arguments passed to every OP_DECL_SET in the program
      */
     std::map <std::string, SgExpressionPtrList> OP_SET_Declarations;
 
     /*
-     * Actual arguments passed to every declaration of OP_MAP in the program
+     * Actual arguments passed to every OP_DECL_MAP in the program
      */
     std::map <std::string, SgExpressionPtrList> OP_MAP_Declarations;
 
     /*
-     * Actual arguments passed to every declaration of OP_DAT in the program
+     * Actual arguments passed to every OP_DECL_DAT in the program
      */
     std::map <std::string, SgExpressionPtrList> OP_DAT_Declarations;
 
+    /*
+     * Actual arguments passed to every OP_DECL_GBL in the program
+     */
+    std::map <std::string, SgExpressionPtrList> OP_GBL_Declarations;
+
   public:
 
-    OpDeclaredVariables (SgProject * project)
+    OP2DeclaredVariables (SgProject * project)
     {
       this->project = project;
     }
 
-    std::map <std::string, SgExpressionPtrList>
-    getDeclaredOpSets ()
+    SgExpressionPtrList
+    get_OP_DECL_SET_Arguments (std::string opSETName)
     {
-      return OP_SET_Declarations;
-    }
-
-    std::map <std::string, SgExpressionPtrList>
-    getDeclaredOpMaps ()
-    {
-      return OP_MAP_Declarations;
-    }
-
-    std::map <std::string, SgExpressionPtrList>
-    getDeclaredOpDats ()
-    {
-      return OP_DAT_Declarations;
+      return OP_SET_Declarations[opSETName];
     }
 
     SgExpressionPtrList
-    getDeclaredOpSetArgs (std::string opSetName)
+    get_OP_DECL_MAP_Arguments (std::string opMAPName)
     {
-      return OP_SET_Declarations[opSetName];
+      return OP_MAP_Declarations[opMAPName];
     }
 
     SgExpressionPtrList
-    getDeclaredOpMapArgs (std::string opMapName)
+    get_OP_DECL_DAT_Arguments (std::string opDATName)
     {
-      return OP_MAP_Declarations[opMapName];
+      return OP_DAT_Declarations[opDATName];
     }
 
     SgExpressionPtrList
-    getDeclaredOpDatArgs (std::string opDatName)
+    get_OP_DECL_GBL_Arguments (std::string opGBLName)
     {
-      return OP_DAT_Declarations[opDatName];
+      return OP_DAT_Declarations[opGBLName];
     }
 
     /*

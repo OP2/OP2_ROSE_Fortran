@@ -8,17 +8,14 @@
  * utilities to traverse the Abstract Syntax Tree (AST).
  */
 
-// TODO: restructure in such a way that we have a single OpParLoop object per each op_par_loop call 
-// found in the code (or an additional data structure per each call)
-
-#ifndef CREATEKERNELS_H
-#define CREATEKERNELS_H
+#ifndef CREATE_KERNELS_H
+#define CREATE_KERNELS_H
 
 #include <rose.h>
 
 #include "OP2CommonDefinitions.h"
-#include "OpDeclaredVariables.h"
-#include "OpParLoop.h"
+#include "OP2DeclaredVariables.h"
+#include "OP2ParallelLoop.h"
 
 class CreateKernels: public AstSimpleProcessing
 {
@@ -35,21 +32,25 @@ class CreateKernels: public AstSimpleProcessing
     SgProject * project;
 
     /*
-     * Used to retrieve OP_DAT types and all other declarations, if needed
-     */
-    OpDeclaredVariables * opDeclaredVariables;
-
-    /*
-     * The kernel output files
-     */
-    std::vector <SgSourceFile *> kernelOutputFiles;
-
-    /*
      * References to all subroutines found during the visit of the input files
      */
     std::vector <SgProcedureHeaderStatement *> inputSubroutines;
 
-    OpParLoop * opParLoop;
+    /*
+     * The generated CUDA-Fortran output files for each kernel
+     */
+    std::vector <SgSourceFile *> CUDAOutputFiles;
+
+    /*
+     * Used to retrieve OP_DAT types and all other declarations, if needed
+     */
+    OP2DeclaredVariables * op2DeclaredVariables;
+
+    /*
+     * A mapping from a kernel name to our internal representation of an
+     * OP_PAR_LOOP
+     */
+    std::map <std::string, OP2ParallelLoop *> op2ParallelLoops;
 
     /*
      * ====================================================================================================
@@ -60,40 +61,44 @@ class CreateKernels: public AstSimpleProcessing
     void
     fix_OP_PAR_LOOP_Calls (SgFunctionCallExp * functionCallExp,
         SgProcedureHeaderStatement * hostSubroutine, SgScopeStatement * scope,
-        std::string createdCUDAModuleName);
+        OP2ParallelLoop * op2ParallelLoop);
 
     void
     generateKernelSubroutine (SgSourceFile & sourceFile,
-        std::string subroutineName, SgExpressionPtrList & args);
+        std::string subroutineName, OP2ParallelLoop * op2ParallelLoop);
 
     /*
      * The following two functions are used to generate the main CUDA kernel routine: not implemented for now
      */
     void
-    lookupArgumentsTypes (std::vector <SgType *> * argTypes,
-        SgExpressionPtrList& args, SgVariableDeclaration * setSizeFormalPar);
+    setUp_OP_DAT_ArgumentTypes (std::vector <SgType *> & opDatArgumentTypes,
+        SgVariableDeclaration * setSizeFormalParameter,
+        OP2ParallelLoop * op2ParallelLoop);
 
     /*
      * Builds the parameter of the user kernel subroutine called by the main kernel subroutine
      */
     SgExprListExp *
     buildUserKernelParams (SgFunctionParameterList * mainKernelParameters,
-        SgVarRefExp * iterSetVarRef, SgScopeStatement * subroutineScope);
+        SgVarRefExp * iterSetVarRef, SgScopeStatement * subroutineScope,
+        OP2ParallelLoop * op2ParallelLoop);
 
     void
     createHostSubroutineStatements (SgScopeStatement * subroutineScope,
-        SgExpressionPtrList & args);
+        OP2ParallelLoop * op2ParallelLoop);
 
     void
-    createHostSubroutineCUDAVariables (SgScopeStatement * subroutineScope);
+    createHostSubroutineCUDAVariables (SgScopeStatement * subroutineScope,
+        OP2ParallelLoop * op2ParallelLoop);
 
     void
     createHostSubroutineLocals (SgScopeStatement * subroutineScope,
-        SgExpressionPtrList & args);
+        OP2ParallelLoop * op2ParallelLoop);
 
     void
     createHostSubroutineFormalParamaters (SgScopeStatement * subroutineScope,
-        SgExpressionPtrList & args, SgFunctionParameterList * hostParameters);
+        SgFunctionParameterList * hostParameters,
+        OP2ParallelLoop * op2ParallelLoop);
 
     /*
      * Creates a host subroutine which sets up CUDA run-time variables, such as block
@@ -101,8 +106,8 @@ class CreateKernels: public AstSimpleProcessing
      * memory
      */
     SgProcedureHeaderStatement *
-    createHostSubroutine (SgExpressionPtrList & args, SgSourceFile & sourceFile,
-        SgScopeStatement * moduleScope);
+    createHostSubroutine (SgScopeStatement * moduleScope,
+        OP2ParallelLoop * op2ParallelLoop);
 
     /*
      * Creates the main kernel, which is launched from the host and calls the
@@ -110,37 +115,32 @@ class CreateKernels: public AstSimpleProcessing
      */
     void
     createMainKernelSubroutine (SgScopeStatement * moduleScope,
-        SgExpressionPtrList & args, Sg_File_Info & fileInfo);
+        OP2ParallelLoop * op2ParallelLoop);
 
     /*
      * Copies the user kernel function definition with some modifications so
      * that it can run on the device
      */
     void
-    createCUDAKernel (SgScopeStatement * moduleScope);
+    createCUDAKernel (SgScopeStatement * moduleScope,
+        OP2ParallelLoop * op2ParallelLoop);
 
     SgModuleStatement *
-    buildClassDeclarationAndDefinition (std::string moduleName,
-        SgScopeStatement * fileScope);
+    buildClassDeclarationAndDefinition (SgScopeStatement * fileScope,
+        OP2ParallelLoop * op2ParallelLoop);
 
     /*
      * Creates the Fortran module including all subroutines implementing an OP_PAR_LOOP
      */
     SgScopeStatement *
     createDirectLoopCUDAModule (SgSourceFile & sourceFile,
-        std::string const moduleName);
+        OP2ParallelLoop * op2ParallelLoop);
 
     /*
      * Creates the source file to be unparsed
      */
     SgSourceFile *
-    createSourceFile ();
-
-    /*
-     * Retrieves the OP_PAR_LOOP argument data types
-     */
-    void
-    retrieveArgumentsTypes (SgExpressionPtrList & args);
+    createSourceFile (OP2ParallelLoop * op2ParallelLoop);
 
   public:
     /*
@@ -154,10 +154,10 @@ class CreateKernels: public AstSimpleProcessing
      * project to detect OP_PAR_LOOPs
      */
     CreateKernels (SgProject * project,
-        OpDeclaredVariables * opDeclaredVariables)
+        OP2DeclaredVariables * op2DeclaredVariables)
     {
       this->project = project;
-      this->opDeclaredVariables = opDeclaredVariables;
+      this->op2DeclaredVariables = op2DeclaredVariables;
     }
 
     /*

@@ -1,77 +1,103 @@
-#include <boost/algorithm/string/predicate.hpp>
-#include <boost/lexical_cast.hpp>
+#include <boost/algorithm/string.hpp>
 
-#include "OpDeclaredVariables.h"
+#include "OP2DeclaredVariables.h"
 #include "OP2CommonDefinitions.h"
 #include "Debug.h"
 
 void
-OpDeclaredVariables::visit (SgNode * node)
+OP2DeclaredVariables::visit (SgNode * node)
 {
+  using boost::iequals;
   using std::string;
   using std::pair;
+  using std::make_pair;
 
   if (node->variantT () == V_SgFunctionCallExp)
   {
     /*
-     * Function call found in the AST.
-     * Get its arguments and its name
+     * Function call found in the AST. Get its arguments and its name
      */
     SgFunctionCallExp * functionCallExp = isSgFunctionCallExp (node);
 
-    SgExpressionPtrList & args =
+    SgExpressionPtrList & actualArguments =
         functionCallExp->get_args ()->get_expressions ();
 
     string const
         calleeName =
             functionCallExp->getAssociatedFunctionSymbol ()->get_name ().getString ();
 
-    if (calleeName.compare (OP2::OP_DECL_SET_PREFIX) == 0)
+    if (iequals (calleeName, OP2::OP_DECL_SET_PREFIX))
     {
       /*
-       * Add a new map associating the op_set variable reference with the arguments
+       * Associate the OP_SET variable with its arguments in an OP_DECL_SET call
        */
-      SgVarRefExp * setRef = isSgVarRefExp (args[OP2::OP_DECL_SET_VAR_REF]);
-      ROSE_ASSERT (setRef != NULL);
 
-      OP_SET_Declarations.insert (pair <SgName, SgExpressionPtrList> (
-          setRef->get_symbol ()->get_name (), args));
+      SgVarRefExp * opSetReference = isSgVarRefExp (
+          actualArguments[OP2::INDEX_OF_OP_SET_IN_OP_DECL_SET_PARAMETER_LIST]);
+      ROSE_ASSERT (opSetReference != NULL);
 
-      Debug::getInstance ()->debugMessage (OP2::OP_DECL_SET_PREFIX
-          + " call found: " + calleeName + " with name "
-          + setRef->get_symbol ()->get_name ().getString (), 5);
+      string const opSetName =
+          opSetReference->get_symbol ()->get_name ().getString ();
+
+      OP_SET_Declarations.insert (make_pair (opSetName, actualArguments));
+
+      Debug::getInstance ()->debugMessage ("'" + OP2::OP_DECL_SET_PREFIX
+          + "' call found with OP_SET variable '" + opSetName + "'", 5);
     }
-
-    if (calleeName.compare (OP2::OP_DECL_MAP_PREFIX) == 0)
+    else if (iequals (calleeName, OP2::OP_DECL_MAP_PREFIX))
     {
       /*
-       * Add a new map associating the op_map variable reference with the arguments
+       * Associate the OP_MAP variable with its arguments in an OP_DECL_MAP call
        */
-      SgVarRefExp * mapRef = isSgVarRefExp (args[OP2::OP_DECL_MAP_VAR_REF]);
-      ROSE_ASSERT (mapRef != NULL);
 
-      OP_MAP_Declarations.insert (pair <SgName, SgExpressionPtrList> (
-          mapRef->get_symbol ()->get_name (), args));
+      SgVarRefExp * opMapReference = isSgVarRefExp (
+          actualArguments[OP2::INDEX_OF_OP_MAP_IN_OP_DECL_MAP_PARAMETER_LIST]);
+      ROSE_ASSERT (opMapReference != NULL);
 
-      Debug::getInstance ()->debugMessage (OP2::OP_DECL_MAP_PREFIX
-          + " call found: " + calleeName + " with name "
-          + mapRef->get_symbol ()->get_name ().getString (), 5);
+      string const opMapName =
+          opMapReference->get_symbol ()->get_name ().getString ();
+
+      OP_MAP_Declarations.insert (make_pair (opMapName, actualArguments));
+
+      Debug::getInstance ()->debugMessage ("'" + OP2::OP_DECL_MAP_PREFIX
+          + "' call found with OP_MAP variable '" + opMapName + "'", 5);
     }
-
-    if (calleeName.compare (OP2::OP_DECL_DAT_PREFIX) == 0)
+    else if (iequals (calleeName, OP2::OP_DECL_DAT_PREFIX))
     {
       /*
-       * Add a new map associating the OP_DAT variable reference with the arguments
+       * Associate the OP_DAT variable with its arguments in an OP_DECL_DAT call
        */
-      SgVarRefExp * datRef = isSgVarRefExp (args[OP2::OP_DECL_DAT_VAR_REF]);
-      ROSE_ASSERT (datRef != NULL);
 
-      OP_DAT_Declarations.insert (pair <SgName, SgExpressionPtrList> (
-          datRef->get_symbol ()->get_name (), args));
+      SgVarRefExp * opDatReference = isSgVarRefExp (
+          actualArguments[OP2::INDEX_OF_OP_DAT_IN_OP_DECL_DAT_PARAMETER_LIST]);
+      ROSE_ASSERT (opDatReference != NULL);
 
-      Debug::getInstance ()->debugMessage (OP2::OP_DECL_DAT_PREFIX
-          + " call found: " + calleeName + " with name "
-          + datRef->get_symbol ()->get_name ().getString (), 5);
+      string const opDatName =
+          opDatReference->get_symbol ()->get_name ().getString ();
+
+      OP_DAT_Declarations.insert (make_pair (opDatName, actualArguments));
+
+      Debug::getInstance ()->debugMessage ("'" + OP2::OP_DECL_DAT_PREFIX
+          + "' call found with OP_DAT variable '" + opDatName + "'", 5);
+    }
+    else if (iequals (calleeName, OP2::OP_DECL_GBL_PREFIX))
+    {
+      /*
+       * Associate the OP_DAT variable with its arguments in an OP_DECL_GBL call
+       */
+
+      SgVarRefExp * opDatReference = isSgVarRefExp (
+          actualArguments[OP2::INDEX_OF_OP_DAT_IN_OP_DECL_GBL_PARAMETER_LIST]);
+      ROSE_ASSERT (opDatReference != NULL);
+
+      string const opDatName =
+          opDatReference->get_symbol ()->get_name ().getString ();
+
+      OP_GBL_Declarations.insert (make_pair (opDatName, actualArguments));
+
+      Debug::getInstance ()->debugMessage ("'" + OP2::OP_DECL_GBL_PREFIX
+          + "' call found with OP_DAT variable '" + opDatName + "'", 5);
     }
   }
+
 }

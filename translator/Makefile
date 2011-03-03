@@ -10,11 +10,8 @@ SRCS  := $(wildcard $(SRCDIR)/*.cpp)
 OBJS  := $(patsubst $(SRCDIR)/%.cpp,$(OBJDIR)/%.o,$(SRCS))
 OUT   := $(BINDIR)/translator
 
-.PHONY: all depend clean
-all: clean $(OUT)
-
-depend: $(SRCS)
-	makedepend $(INCLUDES) $^
+.PHONY: all clean
+all: $(OUT)
 
 clean:
 	rm -f $(BINDIR)/* $(OBJDIR)/* *~
@@ -26,5 +23,3 @@ $(OBJDIR)/%.o: $(SRCDIR)/%.cpp
 $(OUT): $(OBJS) 
 	@echo "\n===== LINKING $@ ====="
 	$(CXX) $(LDFLAGS) $(OBJS) -o $(OUT) 
-
-

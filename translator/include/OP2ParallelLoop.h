@@ -4,12 +4,15 @@
  * This class models an OP_PAR_LOOP call discovered in Fortran code
  */
 
-#ifndef OPPARLOOP_H
-#define OPPARLOOP_H
+#ifndef OP2_PARALLEL_LOOP_H
+#define OP2_PARALLEL_LOOP_H
 
 #include <rose.h>
 
-class OpParLoop
+#include "OP2CommonDefinitions.h"
+#include "OP2DeclaredVariables.h"
+
+class OP2ParallelLoop
 {
   private:
     /*
@@ -29,11 +32,19 @@ class OpParLoop
     std::string kernelDeviceName;
 
     /*
-     * Arguments to OP_PAR_LOOP are grouped into batches of 4 arguments, plus
-     * another two, i.e. there are 2+4n parameters.
-     * This variable stores the value n in the expression 2+4n
+     * The name of the generated CUDA-Fortran module for this OP_PAR_LOOP
      */
-    unsigned int OP_DAT_ArgumentGroups;
+    std::string CUDAModuleName;
+
+    /*
+     * The actual arguments passed to the OP_PAR_LOOP
+     */
+    SgExpressionPtrList actualArguments;
+
+    /*
+     * Is this a direct or indirect loop?
+     */
+    bool isDirect;
 
     /*
      * The formal OP_SET argument in the generated host subroutine
@@ -76,12 +87,12 @@ class OpParLoop
     std::vector <SgVariableDeclaration *> CToFortranVariables;
 
     /*
-     * The actual data types of an OP_DAT argument
+     * The actual data types of OP_DAT arguments
      */
     std::vector <SgType *> OP_DAT_ActualTypes;
 
     /*
-     * The dimension values passed to op_decl_dat calls
+     * The dimensions (number of data items per set element) of OP_DAT arguments
      */
     std::vector <unsigned int> OP_DAT_Dimensions;
 
@@ -92,11 +103,22 @@ class OpParLoop
      * ====================================================================================================
      */
 
-    OpParLoop (std::string kernelHostName, unsigned int OP_DAT_ArgumentGroups)
+    OP2ParallelLoop (std::string kernelHostName,
+        SgExpressionPtrList & actualArguments,
+        OP2DeclaredVariables * op2DeclaredVariables)
     {
       this->kernelHostName = kernelHostName;
       this->kernelDeviceName = kernelHostName + "_device";
-      this->OP_DAT_ArgumentGroups = OP_DAT_ArgumentGroups;
+      this->CUDAModuleName = "CUDA_" + kernelHostName + "_module";
+      this->actualArguments = actualArguments;
+
+      /*
+       * Assume that this OP_PAR_LOOP is direct.
+       * It will be set accordingly through the subsequent function call
+       */
+      this->isDirect = true;
+
+      retrieveArgumentTypes (op2DeclaredVariables);
     }
 
     std::string
@@ -111,10 +133,29 @@ class OpParLoop
       return kernelDeviceName;
     }
 
+    std::string
+    getCUDAModuleName () const
+    {
+      return CUDAModuleName;
+    }
+
+    SgExpressionPtrList &
+    getActualArguments ()
+    {
+      return actualArguments;
+    }
+
+    bool
+    isDirectLoop () const
+    {
+      return isDirect;
+    }
+
     unsigned int
     getNumberOf_OP_DAT_ArgumentGroups () const
     {
-      return OP_DAT_ArgumentGroups;
+      return (actualArguments.size () - OP2::NUMBER_OF_NON_OP_DAT_ARGUMENTS)
+          / OP2::NUMBER_OF_ARGUMENTS_PER_OP_DAT;
     }
 
     void
@@ -226,6 +267,16 @@ class OpParLoop
     {
       return OP_DAT_Dimensions[index];
     }
+
+  private:
+
+    /*
+     * Retrieves the base types of OP_DAT variables.
+     * It also discovers whether all OP_MAPs are direct, and hence whether this
+     * OP_PAR_LOOP has direct or indirect access to its data
+     */
+    void
+    retrieveArgumentTypes (OP2DeclaredVariables * op2DeclaredVariables);
 };
 
 #endif
