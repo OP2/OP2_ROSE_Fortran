@@ -18,6 +18,7 @@
 
 #include "OP2CommonDefinitions.h"
 #include "OpDeclaredVariables.h"
+#include "OpParLoop.h"
 
 class CreateKernels: public AstSimpleProcessing
 {
@@ -34,15 +35,9 @@ class CreateKernels: public AstSimpleProcessing
     SgProject * project;
 
     /*
-     * The previously filled OpDeclaredVariables object, used to retrieve op_dat types
-     * (and all other declarations, if needed)
+     * Used to retrieve OP_DAT types and all other declarations, if needed
      */
     OpDeclaredVariables * opDeclaredVariables;
-
-    /*
-     * The name of the kernel function
-     */
-    std::string kernelName;
 
     /*
      * The kernel output files
@@ -50,66 +45,11 @@ class CreateKernels: public AstSimpleProcessing
     std::vector <SgSourceFile *> kernelOutputFiles;
 
     /*
-     * Each 'op_par_loop' in Fortran takes 2+4n arguments.
-     * We need the number n to declare a certain number of variables
-     * in the host function
-     */
-    unsigned int numberOfArgumentGroups;
-
-    /*
      * References to all subroutines found during the visit of the input files
      */
     std::vector <SgProcedureHeaderStatement *> inputSubroutines;
 
-    /*
-     * set of declarations of local variables in the host routine (data0Size, ..., dataN-1Size)
-     */
-    std::vector <SgVariableDeclaration *> declaredHostRoutineLocals;
-
-    /*
-     * set of declarations of variables used in the host routine to transform a C pointer into a Fortran pointer
-     * (argument0, ..., argumentN-1, c2fPtr0, ..., c2fPtrN-1)
-     */
-    std::vector <SgVariableDeclaration *> declaredC2FortranVariables;
-
-    /*
-     * set of declarations of op_dat formal parameters
-     * (arg0, ..., argN-1)
-     */
-    std::vector <SgVariableDeclaration *> OP_DAT_FormalArguments;
-
-    /*
-     * data types of the op_par_loop actual arguments ordered w.r.t. the input ordering
-     */
-    std::vector <SgType *> actualArgumentsTypes;
-
-    /*
-     * dimension values passed to op_decl_dat calls ordered w.r.t. the input ordering (the same of actualArgumentTypes)
-     */
-    std::vector <int> actualArgumentsDimValues;
-
-    /*
-     * set of declarations of indirection index formal parameters
-     * (idx0, ..., idxN-1)
-     */
-    std::vector <SgVariableDeclaration *> Indirection_FormalArguments;
-
-    /*
-     * set of declarations of op_map formal parameters
-     * (map0, ..., mapN-1)
-     */
-    std::vector <SgVariableDeclaration *> OP_MAP_FormalArguments;
-
-    /*
-     * set of declarations of access formal parameters
-     * (access0, ..., accessN-1)
-     */
-    std::vector <SgVariableDeclaration *> OP_ACCESS_FormalArguments;
-
-    /*
-     * declaration of formal argument corresponding to op_set iteration variable
-     */
-    SgVariableDeclaration * Iteration_Set_FormalArgument;
+    OpParLoop * opParLoop;
 
     /*
      * ====================================================================================================
@@ -117,58 +57,14 @@ class CreateKernels: public AstSimpleProcessing
      * ====================================================================================================
      */
 
-    bool
-    checkFormalParameter (SgVariableDeclaration * variableDeclaration,
-        SgFunctionParameterList * parameterList);
-
-    /*
-     * This function is called before the creation of the CUDA module to retrieve the op_par_loop arguments data types
-     * It fills up the actualArgumentsTypes std::vector by comparing op_par_loop arguments with opDeclaredVariables variables
-     */
     void
-    retrieveArgumentsTypes (SgExpressionPtrList& args);
-
-    SgModuleStatement *
-    buildClassDeclarationAndDefinition (std::string name,
-        SgScopeStatement* scope);
+    fix_OP_PAR_LOOP_Calls (SgFunctionCallExp * functionCallExp,
+        SgProcedureHeaderStatement * hostSubroutine, SgScopeStatement * scope,
+        std::string createdCUDAModuleName);
 
     void
-    addImplicitStatement (SgSourceFile& sourceFile,
-        SgDeclarationStatement* definingDeclaration, SgScopeStatement* scope);
-
-    void
-    generateKernelSubroutine (SgSourceFile &sourceFile,
-        std::string subroutineName, SgExpressionPtrList& args);
-
-    void
-    createHostSubroutineCUDAVariables (SgScopeStatement * scope);
-
-    void
-    createHostSubroutineLocals (SgScopeStatement* scope,
-        SgExpressionPtrList& args);
-
-    void
-    createHostSubroutineFormalParamaters (SgScopeStatement* scope,
-        SgExpressionPtrList& args, SgFunctionParameterList * hostParameters);
-
-    void
-    createHostSubroutineStatements (SgScopeStatement * scope,
-        SgExpressionPtrList& args);
-
-    /*
-     * Creates a host subroutine for the kernel
-     */
-    SgProcedureHeaderStatement *
-    createHostSubroutine (std::string kernelName, SgExpressionPtrList& args,
-        SgSourceFile& sourceFile, SgScopeStatement * scope);
-
-    /*
-     * Copies the user kernel function definition with some modifications so
-     * that it can run on the device.
-     * Returns the name of the generated Kernel subroutine
-     */
-    SgName
-    generateCUDAUserKernel (SgScopeStatement * scope);
+    generateKernelSubroutine (SgSourceFile & sourceFile,
+        std::string subroutineName, SgExpressionPtrList & args);
 
     /*
      * The following two functions are used to generate the main CUDA kernel routine: not implemented for now
@@ -184,33 +80,67 @@ class CreateKernels: public AstSimpleProcessing
     buildUserKernelParams (SgFunctionParameterList * mainKernelParameters,
         SgVarRefExp * iterSetVarRef, SgScopeStatement * subroutineScope);
 
+    void
+    createHostSubroutineStatements (SgScopeStatement * subroutineScope,
+        SgExpressionPtrList & args);
+
+    void
+    createHostSubroutineCUDAVariables (SgScopeStatement * subroutineScope);
+
+    void
+    createHostSubroutineLocals (SgScopeStatement * subroutineScope,
+        SgExpressionPtrList & args);
+
+    void
+    createHostSubroutineFormalParamaters (SgScopeStatement * subroutineScope,
+        SgExpressionPtrList & args, SgFunctionParameterList * hostParameters);
+
     /*
-     * Creates the main kernel which calls the user one and is called by the host subroutine
+     * Creates a host subroutine which sets up CUDA run-time variables, such as block
+     * and grid sizes, allocates memory on the device, calls the kernel, and deallocates
+     * memory
+     */
+    SgProcedureHeaderStatement *
+    createHostSubroutine (SgExpressionPtrList & args, SgSourceFile & sourceFile,
+        SgScopeStatement * moduleScope);
+
+    /*
+     * Creates the main kernel, which is launched from the host and calls the
+     * user-supplied subroutine
      */
     void
-    buildMainKernelRoutine (SgScopeStatement * scope,
-        SgExpressionPtrList& args, SgName & deviceKernelName,
-        Sg_File_Info & fileInfo);
+    createMainKernelSubroutine (SgScopeStatement * moduleScope,
+        SgExpressionPtrList & args, Sg_File_Info & fileInfo);
+
+    /*
+     * Copies the user kernel function definition with some modifications so
+     * that it can run on the device
+     */
+    void
+    createCUDAKernel (SgScopeStatement * moduleScope);
+
+    SgModuleStatement *
+    buildClassDeclarationAndDefinition (std::string moduleName,
+        SgScopeStatement * fileScope);
 
     /*
      * Creates the Fortran module including all subroutines implementing an OP_PAR_LOOP
      */
     SgScopeStatement *
-    createDirectLoopCUDAModule (SgSourceFile& sourceFile,
+    createDirectLoopCUDAModule (SgSourceFile & sourceFile,
         std::string const moduleName);
 
     /*
-     * Transforms a op_par_loop_* in call to proper stub function, like op_par_loop_save_soln
-     */
-    void
-    fixParLoops (SgFunctionCallExp * functionCallExp, std::string kernelName,
-        SgProcedureHeaderStatement * hostSubroutine, SgScopeStatement * scope,
-        std::string createdCUDAModuleName);
-    /*
      * Creates the source file to be unparsed
      */
-    SgSourceFile*
-    createSourceFile (std::string kernelName);
+    SgSourceFile *
+    createSourceFile ();
+
+    /*
+     * Retrieves the OP_PAR_LOOP argument data types
+     */
+    void
+    retrieveArgumentsTypes (SgExpressionPtrList & args);
 
   public:
     /*
@@ -221,7 +151,7 @@ class CreateKernels: public AstSimpleProcessing
 
     /*
      * Constructor requires the source files contained in the
-     * project to detect 'op_par_loops'
+     * project to detect OP_PAR_LOOPs
      */
     CreateKernels (SgProject * project,
         OpDeclaredVariables * opDeclaredVariables)
@@ -231,13 +161,13 @@ class CreateKernels: public AstSimpleProcessing
     }
 
     /*
-     * Visit each vertex in the AST
+     * Visits each vertex in the AST
      */
     virtual void
     visit (SgNode *n);
 
     /*
-     * Generate output files for each kernel
+     * Generates output files for each kernel
      */
     void
     unparse ();

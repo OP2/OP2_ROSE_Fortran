@@ -8,12 +8,10 @@
  *
  */
 
-#ifndef OP_DECLARED_VARIABLES_H
-#define OP_DECLARED_VARIABLES_H
+#ifndef OP2_DECLARED_VARIABLES_H
+#define OP2_DECLARED_VARIABLES_H
 
 #include <rose.h>
-
-using namespace std;
 
 class OpDeclaredVariables: public AstSimpleProcessing
 {
@@ -26,16 +24,17 @@ class OpDeclaredVariables: public AstSimpleProcessing
     /*
      * Actual arguments passed to every declaration of OP_SET in the program
      */
-    map <SgName, SgExpressionPtrList> declaredOpSets;
+    std::map <std::string, SgExpressionPtrList> OP_SET_Declarations;
 
     /*
      * Actual arguments passed to every declaration of OP_MAP in the program
      */
-    map <SgName, SgExpressionPtrList> declaredOpMaps;
+    std::map <std::string, SgExpressionPtrList> OP_MAP_Declarations;
+
     /*
      * Actual arguments passed to every declaration of OP_DAT in the program
      */
-    map <SgName, SgExpressionPtrList> declaredOpDats;
+    std::map <std::string, SgExpressionPtrList> OP_DAT_Declarations;
 
   public:
 
@@ -44,48 +43,49 @@ class OpDeclaredVariables: public AstSimpleProcessing
       this->project = project;
     }
 
-    map <SgName, SgExpressionPtrList>
+    std::map <std::string, SgExpressionPtrList>
     getDeclaredOpSets ()
     {
-      return declaredOpSets;
+      return OP_SET_Declarations;
     }
 
-    map <SgName, SgExpressionPtrList>
+    std::map <std::string, SgExpressionPtrList>
     getDeclaredOpMaps ()
     {
-      return declaredOpMaps;
+      return OP_MAP_Declarations;
     }
 
-    map <SgName, SgExpressionPtrList>
+    std::map <std::string, SgExpressionPtrList>
     getDeclaredOpDats ()
     {
-      return declaredOpDats;
+      return OP_DAT_Declarations;
     }
 
     SgExpressionPtrList
-    getDeclaredOpSetArgs (SgName * opSetName)
+    getDeclaredOpSetArgs (std::string opSetName)
     {
-      return declaredOpSets[*opSetName];
+      return OP_SET_Declarations[opSetName];
     }
 
     SgExpressionPtrList
-    getDeclaredOpMapArgs (SgName * opMapName)
+    getDeclaredOpMapArgs (std::string opMapName)
     {
-      return declaredOpMaps[*opMapName];
+      return OP_MAP_Declarations[opMapName];
     }
 
     SgExpressionPtrList
-    getDeclaredOpDatArgs (SgName * opDatName)
+    getDeclaredOpDatArgs (std::string opDatName)
     {
-      return declaredOpDats[*opDatName];
+      return OP_DAT_Declarations[opDatName];
     }
 
     /*
-     * Visit the program and fill up the private variables above
+     * Traverses the supplied Fortran files to discover
+     * OP_DECL_SET, OP_DECL_MAP, OP_DECL_DAT function calls
+     * and store their actual arguments
      */
     void
     visit (SgNode * currentNode);
-
 };
 
 #endif
