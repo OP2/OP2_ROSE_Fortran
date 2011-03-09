@@ -22,14 +22,27 @@ class OP2ParallelLoop
      */
 
     /*
-     * The name of the kernel function on the host
+     * The name of the user function on the host
      */
-    std::string kernelHostName;
+    std::string userHostFunctionName;
 
     /*
-     * The name of the kernel function on the device
+     * The name of the user function on the device
      */
-    std::string kernelDeviceName;
+    std::string userDeviceFunctionName;
+
+    /*
+     * The name of the subroutine called from the host to launch
+     * the kernel
+     */
+    std::string mainKernelDeviceName;
+
+    /*
+     * The name of the host subroutine that is called in place of
+     * an OP_PAR_LOOP after the source-to-source transformation.
+     * This is the subroutine that initiates the device code
+     */
+    std::string mainKernelHostName;
 
     /*
      * The name of the generated CUDA-Fortran module for this OP_PAR_LOOP
@@ -81,10 +94,16 @@ class OP2ParallelLoop
     std::vector <SgVariableDeclaration *> hostSubroutineVariables;
 
     /*
-     * Local variables (argument0, ..., argumentN-1, c2fPtr0, ..., c2fPtrN-1)
+     * Local variables (c2fPtr0, ..., c2fPtrN-1)
      * in the generated host subroutine to transform a C pointer into a Fortran pointer
      */
-    std::vector <SgVariableDeclaration *> CToFortranVariables;
+    std::vector <SgVariableDeclaration *> CToFortranPointers;
+
+    /*
+     * Device allocatable variables for the formal parameters of the user supplied
+     * function
+     */
+    std::vector <SgVariableDeclaration *> UserFunctionArguments;
 
     /*
      * The actual data types of OP_DAT arguments
@@ -103,18 +122,20 @@ class OP2ParallelLoop
      * ====================================================================================================
      */
 
-    OP2ParallelLoop (std::string kernelHostName,
+    OP2ParallelLoop (std::string userFunctionName,
         SgExpressionPtrList & actualArguments,
         OP2DeclaredVariables * op2DeclaredVariables)
     {
-      this->kernelHostName = kernelHostName;
-      this->kernelDeviceName = kernelHostName + "_device";
-      this->CUDAModuleName = "CUDA_" + kernelHostName + "_module";
+      this->userHostFunctionName = userFunctionName;
+      this->userDeviceFunctionName = userFunctionName + "_device";
+      this->mainKernelDeviceName = userFunctionName + "_kernel";
+      this->mainKernelHostName = userFunctionName + "_host";
+      this->CUDAModuleName = userFunctionName + "_cudafor";
       this->actualArguments = actualArguments;
 
       /*
        * Assume that this OP_PAR_LOOP is direct.
-       * It will be set accordingly through the subsequent function call
+       * It will be set accordingly through the following function call
        */
       this->isDirect = true;
 
@@ -122,15 +143,27 @@ class OP2ParallelLoop
     }
 
     std::string
-    getKernelHostName () const
+    getUserHostFunctionName () const
     {
-      return kernelHostName;
+      return userHostFunctionName;
     }
 
     std::string
-    getKernelDeviceName () const
+    getUserDeviceFunctionName () const
     {
-      return kernelDeviceName;
+      return userDeviceFunctionName;
+    }
+
+    std::string
+    getMainKernelDeviceName () const
+    {
+      return mainKernelDeviceName;
+    }
+
+    std::string
+    getMainKernelHostName () const
+    {
+      return mainKernelHostName;
     }
 
     std::string
@@ -197,9 +230,15 @@ class OP2ParallelLoop
     }
 
     void
-    set_C_To_Fortran_Variable (SgVariableDeclaration * cToFortranVariable)
+    setCToFortranPointer (SgVariableDeclaration * cToFortranPointer)
     {
-      CToFortranVariables.push_back (cToFortranVariable);
+      CToFortranPointers.push_back (cToFortranPointer);
+    }
+
+    void
+    setUserFunctionArgument (SgVariableDeclaration * argument)
+    {
+      UserFunctionArguments.push_back (argument);
     }
 
     void
@@ -251,9 +290,15 @@ class OP2ParallelLoop
     }
 
     std::vector <SgVariableDeclaration *>::const_iterator
-    get_C_To_Fortran_Variables () const
+    getCToFortranPointers () const
     {
-      return CToFortranVariables.begin ();
+      return CToFortranPointers.begin ();
+    }
+
+    std::vector <SgVariableDeclaration *>::const_iterator
+    getUserFunctionArguments () const
+    {
+      return UserFunctionArguments.begin ();
     }
 
     SgType *

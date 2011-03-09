@@ -101,12 +101,12 @@ OP2ParallelLoop::retrieveArgumentTypes (
 
   if (isDirect)
   {
-    Debug::getInstance ()->debugMessage ("'" + kernelHostName
+    Debug::getInstance ()->debugMessage ("'" + userHostFunctionName
         + "' is a DIRECT loop", 5);
   }
   else
   {
-    Debug::getInstance ()->debugMessage ("'" + kernelHostName
+    Debug::getInstance ()->debugMessage ("'" + userHostFunctionName
         + "' is an INDIRECT loop", 5);
   }
 }

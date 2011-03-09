@@ -59,27 +59,17 @@ class CreateKernels: public AstSimpleProcessing
      */
 
     void
-    fix_OP_PAR_LOOP_Calls (SgFunctionCallExp * functionCallExp,
-        SgProcedureHeaderStatement * hostSubroutine, SgScopeStatement * scope,
-        OP2ParallelLoop * op2ParallelLoop);
+    fix_OP_PAR_LOOP_Calls (SgScopeStatement * scope,
+        OP2ParallelLoop * op2ParallelLoop, SgFunctionCallExp * functionCallExp,
+        SgProcedureHeaderStatement * hostSubroutine);
 
-    void
-    generateKernelSubroutine (SgSourceFile & sourceFile,
-        std::string subroutineName, OP2ParallelLoop * op2ParallelLoop);
-
-    /*
-     * The following two functions are used to generate the main CUDA kernel routine: not implemented for now
-     */
     void
     setUp_OP_DAT_ArgumentTypes (std::vector <SgType *> & opDatArgumentTypes,
         SgVariableDeclaration * setSizeFormalParameter,
         OP2ParallelLoop * op2ParallelLoop);
 
-    /*
-     * Builds the parameter of the user kernel subroutine called by the main kernel subroutine
-     */
     SgExprListExp *
-    buildUserKernelParams (SgFunctionParameterList * mainKernelParameters,
+    createUserDeviceFunctionParameters (SgFunctionParameterList * mainKernelParameters,
         SgVarRefExp * iterSetVarRef, SgScopeStatement * subroutineScope,
         OP2ParallelLoop * op2ParallelLoop);
 
@@ -111,18 +101,18 @@ class CreateKernels: public AstSimpleProcessing
 
     /*
      * Creates the main kernel, which is launched from the host and calls the
-     * user-supplied subroutine
+     * user-supplied function
      */
     void
-    createMainKernelSubroutine (SgScopeStatement * moduleScope,
+    createMainKernelDeviceSubroutine (SgScopeStatement * moduleScope,
         OP2ParallelLoop * op2ParallelLoop);
 
     /*
-     * Copies the user kernel function definition with some modifications so
-     * that it can run on the device
+     * Copies the user function (supplied to the kernel) and applies some
+     * modifications so that it can run on the device
      */
     void
-    createCUDAKernel (SgScopeStatement * moduleScope,
+    copyAndModifyUserFunction (SgScopeStatement * moduleScope,
         OP2ParallelLoop * op2ParallelLoop);
 
     SgModuleStatement *

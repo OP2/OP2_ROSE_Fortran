@@ -30,6 +30,11 @@ namespace OP2
   std::string const OP_DECL_DAT_PREFIX = "op_decl_dat";
   std::string const OP_DECL_GBL_PREFIX = "op_decl_gbl";
 
+  std::string const OP_INDIRECTION_VariableNamePrefix = "opIndirection";
+  std::string const OP_ACCESS_VariableNamePrefix = "opAccess";
+  std::string const OP_DAT_VariableNamePrefix = "opDat";
+  std::string const OP_MAP_VariableNamePrefix = "opMap";
+
   /*
    * Positions of arguments inside OP_PAR_LOOP
    * The following style is assumed:
