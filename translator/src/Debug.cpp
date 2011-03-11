@@ -1,7 +1,9 @@
+#include <cstdlib>
 #include <iostream>
+
 #include "Debug.h"
 
-Debug* Debug::debugInstance = 0;
+Debug * Debug::debugInstance = 0;
 
 Debug::Debug ()
 {
@@ -56,7 +58,8 @@ Debug::getDebugLevel ()
 void
 Debug::verboseMessage (std::string message)
 {
-  using namespace std;
+  using std::cout;
+  using std::endl;
 
   if (debugInstance->verbose)
   {
@@ -67,11 +70,22 @@ Debug::verboseMessage (std::string message)
 void
 Debug::debugMessage (std::string message, int debugLevel)
 {
-  using namespace std;
+  using std::cout;
+  using std::endl;
 
   if (debugLevel <= debugInstance->debugLevel && debugInstance->debugLevel
       > LOWEST_DEBUG_LEVEL)
   {
     cout << message + "." << endl;
   }
+}
+
+void
+Debug::errorMessage (std::string message)
+{
+  using std::cout;
+  using std::endl;
+
+  cout << message + "." << endl;
+  exit (1);
 }

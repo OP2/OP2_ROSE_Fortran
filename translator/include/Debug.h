@@ -77,6 +77,12 @@ class Debug
      */
     void
     debugMessage (std::string message, int debugLevel);
+
+    /*
+     * Print this message then exit
+     */
+    void
+    errorMessage (std::string message);
 };
 
 #endif /* DEBUG_H_ */

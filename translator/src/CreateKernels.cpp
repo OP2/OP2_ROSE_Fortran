@@ -15,9 +15,21 @@ CreateKernels::fix_OP_PAR_LOOP_Calls (SgScopeStatement * scope,
     OP2ParallelLoop * op2ParallelLoop, SgFunctionCallExp * functionCallExp,
     SgProcedureHeaderStatement * hostSubroutine)
 {
-  using namespace SageBuilder;
-  using namespace SageInterface;
-  using namespace std;
+  using SageBuilder::buildAssignInitializer;
+  using SageBuilder::buildCharType;
+  using SageBuilder::buildIntType;
+  using SageBuilder::buildIntVal;
+  using SageBuilder::buildArrayType;
+  using SageBuilder::buildStringVal;
+  using SageBuilder::buildExprListExp;
+  using SageBuilder::buildFunctionRefExp;
+  using SageBuilder::buildVarRefExp;
+  using SageBuilder::buildVariableDeclaration;
+  using SageInterface::getScope;
+  using SageInterface::getEnclosingFileNode;
+  using SageInterface::insertStatementAfter;
+  using SageInterface::getPreviousStatement;
+  using SageInterface::findLastDeclarationStatement;
 
   Debug::getInstance ()->debugMessage ("Patching call to OP_PAR_LOOP", 2);
 
@@ -41,9 +53,8 @@ CreateKernels::fix_OP_PAR_LOOP_Calls (SgScopeStatement * scope,
 
   if (lastDeclarationStatement == NULL)
   {
-    Debug::getInstance ()->debugMessage (
-        "Could not find declaration statements", 1);
-    exit (1);
+    Debug::getInstance ()->errorMessage (
+        "Could not find declaration statements");
   }
 
   /*
@@ -60,9 +71,7 @@ CreateKernels::fix_OP_PAR_LOOP_Calls (SgScopeStatement * scope,
 
   if (lastUseStatement == NULL)
   {
-    Debug::getInstance ()->debugMessage ("Could not find last 'use' statement",
-        1);
-    exit (1);
+    Debug::getInstance ()->errorMessage ("Could not find last 'use' statement");
   }
 
   /*
@@ -893,9 +902,8 @@ CreateKernels::createHostSubroutineFormalParamaters (
             }
             else
             {
-              Debug::getInstance ()->debugMessage ("Unrecognised class: "
-                  + className, 1);
-              exit (1);
+              Debug::getInstance ()->errorMessage ("Unrecognised class: "
+                  + className);
             }
 
             break;
@@ -1570,7 +1578,7 @@ CreateKernels::buildClassDeclarationAndDefinition (
 }
 
 SgScopeStatement *
-CreateKernels::createDirectLoopCUDAModule (SgSourceFile & sourceFile,
+CreateKernels::createCUDAModule (SgSourceFile & sourceFile,
     OP2ParallelLoop * op2ParallelLoop)
 {
   using std::string;
@@ -1646,9 +1654,8 @@ CreateKernels::createSourceFile (OP2ParallelLoop * op2ParallelLoop)
   }
   else
   {
-    Debug::getInstance ()->debugMessage (
-        "Could not create dummy Fortran file '" + inputFileName + "'", 1);
-    exit (1);
+    Debug::getInstance ()->errorMessage (
+        "Could not create dummy Fortran file '" + inputFileName + "'");
   }
 
   /*
@@ -1739,7 +1746,7 @@ CreateKernels::visit (SgNode * node)
       if (starts_with (calleeName, OP2::OP_PAR_LOOP_PREFIX))
       {
         /*
-         * The first argument to an 'op_par_loop' call should be a reference to
+         * The first argument to an 'OP_PAR_LOOP' call should be a reference to
          * the kernel function. Cast it and proceed, otherwise throw an exception
          */
         SgExpressionPtrList & actualArguments =
@@ -1773,24 +1780,24 @@ CreateKernels::visit (SgNode * node)
               op2ParallelLoops.insert (make_pair (kernelHostName,
                   op2ParallelLoop));
 
+              /*
+               * Generate the CUDA file for this kernel
+               */
+              SgSourceFile * sourceFile = createSourceFile (op2ParallelLoop);
+
+              /*
+               * Create the CUDA module
+               */
+              SgScopeStatement * moduleScope = createCUDAModule (*sourceFile,
+                  op2ParallelLoop);
+
+              /*
+               * Generate and modify user kernel so that it can run on the device
+               */
+              copyAndModifyUserFunction (moduleScope, op2ParallelLoop);
+
               if (op2ParallelLoop->isDirectLoop ())
               {
-                /*
-                 * Generate the CUDA file for this kernel
-                 */
-                SgSourceFile * sourceFile = createSourceFile (op2ParallelLoop);
-
-                /*
-                 * Create the CUDA module
-                 */
-                SgScopeStatement * moduleScope = createDirectLoopCUDAModule (
-                    *sourceFile, op2ParallelLoop);
-
-                /*
-                 * Generate and modify user kernel so that it can run on the device
-                 */
-                copyAndModifyUserFunction (moduleScope, op2ParallelLoop);
-
                 createMainKernelDeviceSubroutine (moduleScope, op2ParallelLoop);
 
                 SgProcedureHeaderStatement * hostSubroutine =
@@ -1821,10 +1828,9 @@ CreateKernels::visit (SgNode * node)
         }
         catch (SgNode *exceptionNode)
         {
-          Debug::getInstance ()->debugMessage (
+          Debug::getInstance ()->errorMessage (
               "First argument to 'OP_PAR_LOOP' is not a kernel. The argument has type '"
-                  + exceptionNode->class_name () + "'", 1);
-          exit (1);
+                  + exceptionNode->class_name () + "'");
         }
       }
 

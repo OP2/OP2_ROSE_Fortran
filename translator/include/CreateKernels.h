@@ -123,7 +123,7 @@ class CreateKernels: public AstSimpleProcessing
      * Creates the Fortran module including all subroutines implementing an OP_PAR_LOOP
      */
     SgScopeStatement *
-    createDirectLoopCUDAModule (SgSourceFile & sourceFile,
+    createCUDAModule (SgSourceFile & sourceFile,
         OP2ParallelLoop * op2ParallelLoop);
 
     /*
