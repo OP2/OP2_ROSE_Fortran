@@ -23,10 +23,10 @@ main (int argc, char ** argv)
    */
   SgProject * project = frontend (commandLine->getNumberOfArguments (),
       commandLine->getArguments ());
-  ROSE_ASSERT ( project != NULL );
+  ROSE_ASSERT (project != NULL);
 
   /*
-   * We first need to get all OP2 declarations that will be used later to build the CUDA modules
+   * We first need to get all OP2 declarations
    */
   Debug::getInstance ()->debugMessage ("Retrieving OP2 declarations", 2);
   OP2DeclaredVariables * op2DeclaredVariables = new OP2DeclaredVariables (
@@ -36,21 +36,22 @@ main (int argc, char ** argv)
   /*
    * Create the parallel loop object with these files
    */
-  Debug::getInstance ()->debugMessage ("Creating parallel loops", 2);
-  CreateKernels * opParLoop = new CreateKernels (project, op2DeclaredVariables);
+  Debug::getInstance ()->debugMessage ("Creating kernels for OP_PAR_LOOPs", 2);
+  CreateKernels * createKernels = new CreateKernels (project, op2DeclaredVariables);
 
   /*
    * Traverse the ASTs of the input files in pre-order
    */
-  opParLoop->traverseInputFiles (project, preorder);
+  createKernels->traverseInputFiles (project, preorder);
 
   /*
    * Generate CUDA files
    */
-  opParLoop->unparse ();
+  createKernels->unparse ();
 
   /*
-   * Unparse input source files
+   * Unparse input source files as function calls to OP_PAR_LOOPs
+   * will now have changed
    */
   project->unparse ();
 
