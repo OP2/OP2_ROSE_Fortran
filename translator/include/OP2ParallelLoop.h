@@ -139,7 +139,7 @@ class OP2ParallelLoop
        */
       this->isDirect = true;
 
-      retrieveArgumentTypes (op2DeclaredVariables);
+      retrieve_OP_DAT_BaseArgumentTypes (op2DeclaredVariables);
     }
 
     std::string
@@ -321,7 +321,7 @@ class OP2ParallelLoop
      * OP_PAR_LOOP has direct or indirect access to its data
      */
     void
-    retrieveArgumentTypes (OP2DeclaredVariables * op2DeclaredVariables);
+    retrieve_OP_DAT_BaseArgumentTypes (OP2DeclaredVariables * op2DeclaredVariables);
 };
 
 #endif

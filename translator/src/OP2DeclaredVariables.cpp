@@ -4,7 +4,7 @@
 #include "OP2CommonDefinitions.h"
 #include "Debug.h"
 
-OP_SET_Declaration &
+OP_SET_Declaration *
 OP2DeclaredVariables::get_OP_SET_Declaration (std::string const & opSETName)
     throw (std::string const &)
 {
@@ -22,7 +22,7 @@ OP2DeclaredVariables::get_OP_SET_Declaration (std::string const & opSETName)
   throw opSETName;
 }
 
-OP_MAP_Declaration &
+OP_MAP_Declaration *
 OP2DeclaredVariables::get_OP_MAP_Declaration (std::string const & opMAPName)
     throw (std::string const &)
 {
@@ -40,7 +40,7 @@ OP2DeclaredVariables::get_OP_MAP_Declaration (std::string const & opMAPName)
   throw opMAPName;
 }
 
-OP_DAT_Declaration &
+OP_DAT_Declaration *
 OP2DeclaredVariables::get_OP_DAT_Declaration (std::string const & opDATName)
     throw (std::string const &)
 {
@@ -58,7 +58,7 @@ OP2DeclaredVariables::get_OP_DAT_Declaration (std::string const & opDATName)
   throw opDATName;
 }
 
-OP_GBL_Declaration &
+OP_GBL_Declaration *
 OP2DeclaredVariables::get_OP_GBL_Declaration (std::string const & opGBLName)
     throw (std::string const &)
 {

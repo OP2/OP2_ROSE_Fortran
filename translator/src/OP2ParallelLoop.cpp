@@ -4,7 +4,7 @@
 #include "OP2ParallelLoop.h"
 
 void
-OP2ParallelLoop::retrieveArgumentTypes (
+OP2ParallelLoop::retrieve_OP_DAT_BaseArgumentTypes (
     OP2DeclaredVariables * op2DeclaredVariables)
 {
   using boost::iequals;
@@ -44,22 +44,21 @@ OP2ParallelLoop::retrieveArgumentTypes (
         {
           /*
            * Found an OP_DAT variable, so retrieve its dimensions and its
-           * type from the arguments passed to OP_DECL_DAT
+           * type from the arguments passed to OP_DECL_D
+           *
+           * TODO: this needs to be fixed. OP_DAT variables can be declared in 2 ways:
+           * 1) Through OP_DECL_DAT
+           * 2) Through OP_DECL_GBL
+           * Therefore, we might NOT find the OP_DAT from the OP_DAT declarations, but
+           * instead find it in the OP_GBL declarations
            */
           try
           {
-            OP_DAT_Declaration & opDatDeclaration =
+            OP_DAT_Declaration * opDatDeclaration =
                 op2DeclaredVariables->get_OP_DAT_Declaration (variableName);
 
-            /*
-             * TODO: this needs to be fixed. OP_DAT variables can be declared in 2 ways:
-             * 1) Through OP_DECL_DAT
-             * 2) Through OP_DECL_GBL
-             * An OP_DECL_GBL has 3 parameters, whereas an OP_DECL_DAT has 4 parameters
-             */
-
-            set_OP_DAT_Dimension (opDatDeclaration.getDimension ());
-            set_OP_DAT_ActualType (opDatDeclaration.getActualType ());
+            set_OP_DAT_Dimension (opDatDeclaration->getDimension ());
+            set_OP_DAT_ActualType (opDatDeclaration->getActualType ());
           }
           catch (std::string const & variableName)
           {

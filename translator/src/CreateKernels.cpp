@@ -255,6 +255,10 @@ CreateKernels::createHostSubroutineStatements (SgScopeStatement * scope,
    * c2fPtr0 = userArgument0
    * ...
    * c2fPtrN-1 = userArgumentN-1
+   *
+   * deallocate(c2fPtr0(data0Size))
+   * ...
+   * deallocate(c2fPtr1(dataN-1Size))
    */
 
   vector <SgVariableDeclaration *>::const_iterator OP_DATArgumentIt;
@@ -482,6 +486,53 @@ CreateKernels::createHostSubroutineStatements (SgScopeStatement * scope,
         *cToFortranPointerIt), buildVarRefExp (*argumentIt));
 
     appendStatement (buildExprStatement (assignmentExpression), scope);
+  }
+
+  /*
+   * ====================================================================================================
+   *  'deallocate ( userArgument0 ( data0Size ) )'
+   *  ...
+   *  'deallocate ( userArgumentN-1 ( dataN-1Size ) )'
+   * ====================================================================================================
+   */
+
+  Debug::getInstance ()->debugMessage (
+      "Adding 'deallocate' function calls for device variables", 5);
+
+  dataSizeArgumentIt = op2ParallelLoop.get_Host_Subroutine_Variables ();
+  argumentIt = op2ParallelLoop.getUserFunctionArguments ();
+
+  for (unsigned int i = 0; i
+      < op2ParallelLoop.getNumberOf_OP_DAT_ArgumentGroups (); ++i, ++argumentIt, ++dataSizeArgumentIt)
+  {
+    /*
+     * 'argumentI ( dataISize )'
+     * We have to use a trick: we treat 'argumentI' as an array (as it is)
+     * and we dereference it with 'dataISize'
+     */
+
+    // transform the expression argumentI to a variable reference
+    SgVarRefExp * argumentIArgumentReference = buildVarRefExp (*argumentIt);
+    SgVarRefExp * dataISizeArgumentReference = buildVarRefExp (
+        *dataSizeArgumentIt);
+
+    SgExprListExp * fakeArrayAccessList = buildExprListExp (buildPntrArrRefExp (
+        argumentIArgumentReference, dataISizeArgumentReference));
+
+    /*
+     * TODO: The type is currently fixed to real(8) (i.e. double precision).
+     * However, we should obtain it from the OP_DECL_DAT declaration of input data
+     */
+
+    /*
+     * TODO: Unfortunately, we cannot use CALL with a Fortran function
+     * Instead we have to use 'addTextForUnaparser' for now
+     */
+    string const allocateStatement = "deallocate ("
+        + fakeArrayAccessList->unparseToString () + ")\n";
+
+    addTextForUnparser (lastAppendedStatement, allocateStatement,
+        AstUnparseAttribute::e_after);
   }
 }
 
