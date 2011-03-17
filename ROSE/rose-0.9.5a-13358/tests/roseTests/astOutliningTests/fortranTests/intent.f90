@@ -1,3 +1,0 @@
- SUBROUTINE pop(i)
-   INTEGER, INTENT(OUT) :: i
- END SUBROUTINE pop

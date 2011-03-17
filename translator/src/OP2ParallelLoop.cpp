@@ -48,7 +48,7 @@ OP2ParallelLoop::retrieveArgumentTypes (
            */
           try
           {
-            OP_DAT_Declaration * opDatDeclaration =
+            OP_DAT_Declaration & opDatDeclaration =
                 op2DeclaredVariables->get_OP_DAT_Declaration (variableName);
 
             /*
@@ -58,14 +58,8 @@ OP2ParallelLoop::retrieveArgumentTypes (
              * An OP_DECL_GBL has 3 parameters, whereas an OP_DECL_DAT has 4 parameters
              */
 
-            if (opDatDeclaration != NULL)
-            {
-              set_OP_DAT_Dimension (opDatDeclaration->getDimension ());
-              set_OP_DAT_ActualType (opDatDeclaration->getActualType ());
-            }
-            else
-            {
-            }
+            set_OP_DAT_Dimension (opDatDeclaration.getDimension ());
+            set_OP_DAT_ActualType (opDatDeclaration.getActualType ());
           }
           catch (std::string const & variableName)
           {

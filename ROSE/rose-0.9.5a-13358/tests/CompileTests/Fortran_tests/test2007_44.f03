@@ -1,4 +1,0 @@
-FLUSH (10, IOSTAT=N)
-end
-
-

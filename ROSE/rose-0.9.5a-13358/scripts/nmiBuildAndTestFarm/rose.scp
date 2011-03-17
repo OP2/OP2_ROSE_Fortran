@@ -1,2 +1,0 @@
-method = scp
-scp_file = $(ROSE_TARBALL_TEMPDIR)/rose.tar.gz

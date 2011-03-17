@@ -1,6 +1,0 @@
-bar -> foo
-foo ->
-main -> A::f1 A::f2
-A::f1 ->
-A::f2 ->
-A::f3 ->
