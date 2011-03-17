@@ -4,18 +4,88 @@
 #include "OP2CommonDefinitions.h"
 #include "Debug.h"
 
+OP_SET_Declaration *
+OP2DeclaredVariables::get_OP_SET_Declaration (std::string const & opSETName)
+    throw (std::string const &)
+{
+  using boost::iequals;
+
+  for (std::vector <OP_SET_Declaration *>::iterator it =
+      OP_SET_Declarations.begin (); it != OP_SET_Declarations.end (); ++it)
+  {
+    if (iequals ((*it)->getVariableName (), opSETName))
+    {
+      return *it;
+    }
+  }
+
+  throw opSETName;
+}
+
+OP_MAP_Declaration *
+OP2DeclaredVariables::get_OP_MAP_Declaration (std::string const & opMAPName)
+    throw (std::string const &)
+{
+  using boost::iequals;
+
+  for (std::vector <OP_MAP_Declaration *>::iterator it =
+      OP_MAP_Declarations.begin (); it != OP_MAP_Declarations.end (); ++it)
+  {
+    if (iequals ((*it)->getVariableName (), opMAPName))
+    {
+      return *it;
+    }
+  }
+
+  throw opMAPName;
+}
+
+OP_DAT_Declaration *
+OP2DeclaredVariables::get_OP_DAT_Declaration (std::string const & opDATName)
+    throw (std::string const &)
+{
+  using boost::iequals;
+
+  for (std::vector <OP_DAT_Declaration *>::iterator it =
+      OP_DAT_Declarations.begin (); it != OP_DAT_Declarations.end (); ++it)
+  {
+    if (iequals ((*it)->getVariableName (), opDATName))
+    {
+      return *it;
+    }
+  }
+
+  throw opDATName;
+}
+
+OP_GBL_Declaration *
+OP2DeclaredVariables::get_OP_GBL_Declaration (std::string const & opGBLName)
+    throw (std::string const &)
+{
+  using boost::iequals;
+
+  for (std::vector <OP_GBL_Declaration *>::iterator it =
+      OP_GBL_Declarations.begin (); it != OP_GBL_Declarations.end (); ++it)
+  {
+    if (iequals ((*it)->getVariableName (), opGBLName))
+    {
+      return *it;
+    }
+  }
+
+  throw opGBLName;
+}
+
 void
 OP2DeclaredVariables::visit (SgNode * node)
 {
   using boost::iequals;
   using std::string;
-  using std::pair;
-  using std::make_pair;
 
   if (node->variantT () == V_SgFunctionCallExp)
   {
     /*
-     * Function call found in the AST. Get its arguments and its name
+     * Function call found in the AST. Get its actual arguments and the callee name
      */
     SgFunctionCallExp * functionCallExp = isSgFunctionCallExp (node);
 
@@ -29,74 +99,46 @@ OP2DeclaredVariables::visit (SgNode * node)
     if (iequals (calleeName, OP2::OP_DECL_SET_PREFIX))
     {
       /*
-       * Associate the OP_SET variable with its arguments in an OP_DECL_SET call
+       * An OP_SET variable declared through an OP_DECL_SET call
        */
 
-      SgVarRefExp * opSetReference = isSgVarRefExp (
-          actualArguments[OP2::INDEX_OF_OP_SET_IN_OP_DECL_SET_PARAMETER_LIST]);
-      ROSE_ASSERT (opSetReference != NULL);
+      OP_SET_Declaration * opSetDeclaration = new OP_SET_Declaration (
+          actualArguments);
 
-      string const opSetName =
-          opSetReference->get_symbol ()->get_name ().getString ();
-
-      OP_SET_Declarations.insert (make_pair (opSetName, actualArguments));
-
-      Debug::getInstance ()->debugMessage ("'" + OP2::OP_DECL_SET_PREFIX
-          + "' call found with OP_SET variable '" + opSetName + "'", 5);
+      OP_SET_Declarations.push_back (opSetDeclaration);
     }
     else if (iequals (calleeName, OP2::OP_DECL_MAP_PREFIX))
     {
       /*
-       * Associate the OP_MAP variable with its arguments in an OP_DECL_MAP call
+       * An OP_MAP variable declared through an OP_DECL_MAP call
        */
 
-      SgVarRefExp * opMapReference = isSgVarRefExp (
-          actualArguments[OP2::INDEX_OF_OP_MAP_IN_OP_DECL_MAP_PARAMETER_LIST]);
-      ROSE_ASSERT (opMapReference != NULL);
+      OP_MAP_Declaration * opMapDeclaration = new OP_MAP_Declaration (
+          actualArguments);
 
-      string const opMapName =
-          opMapReference->get_symbol ()->get_name ().getString ();
-
-      OP_MAP_Declarations.insert (make_pair (opMapName, actualArguments));
-
-      Debug::getInstance ()->debugMessage ("'" + OP2::OP_DECL_MAP_PREFIX
-          + "' call found with OP_MAP variable '" + opMapName + "'", 5);
+      OP_MAP_Declarations.push_back (opMapDeclaration);
     }
     else if (iequals (calleeName, OP2::OP_DECL_DAT_PREFIX))
     {
       /*
-       * Associate the OP_DAT variable with its arguments in an OP_DECL_DAT call
+       * An OP_DAT variable declared through an OP_DECL_DAT call
        */
 
-      SgVarRefExp * opDatReference = isSgVarRefExp (
-          actualArguments[OP2::INDEX_OF_OP_DAT_IN_OP_DECL_DAT_PARAMETER_LIST]);
-      ROSE_ASSERT (opDatReference != NULL);
+      OP_DAT_Declaration * opDatDeclaration = new OP_DAT_Declaration (
+          actualArguments);
 
-      string const opDatName =
-          opDatReference->get_symbol ()->get_name ().getString ();
-
-      OP_DAT_Declarations.insert (make_pair (opDatName, actualArguments));
-
-      Debug::getInstance ()->debugMessage ("'" + OP2::OP_DECL_DAT_PREFIX
-          + "' call found with OP_DAT variable '" + opDatName + "'", 5);
+      OP_DAT_Declarations.push_back (opDatDeclaration);
     }
     else if (iequals (calleeName, OP2::OP_DECL_GBL_PREFIX))
     {
       /*
-       * Associate the OP_DAT variable with its arguments in an OP_DECL_GBL call
+       * An OP_DAT variable declared through an OP_DECL_GBL call
        */
 
-      SgVarRefExp * opDatReference = isSgVarRefExp (
-          actualArguments[OP2::INDEX_OF_OP_DAT_IN_OP_DECL_GBL_PARAMETER_LIST]);
-      ROSE_ASSERT (opDatReference != NULL);
+      OP_GBL_Declaration * opGblDeclaration = new OP_GBL_Declaration (
+          actualArguments);
 
-      string const opDatName =
-          opDatReference->get_symbol ()->get_name ().getString ();
-
-      OP_GBL_Declarations.insert (make_pair (opDatName, actualArguments));
-
-      Debug::getInstance ()->debugMessage ("'" + OP2::OP_DECL_GBL_PREFIX
-          + "' call found with OP_DAT variable '" + opDatName + "'", 5);
+      OP_GBL_Declarations.push_back (opGblDeclaration);
     }
   }
 

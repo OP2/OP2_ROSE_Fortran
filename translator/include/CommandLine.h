@@ -14,25 +14,24 @@
 class CommandLine
 {
   private:
-    std::vector<std::string> ROSE_arguments;
+    std::vector <std::string> ROSE_arguments;
 
   public:
-    CommandLine(int argc, char **argv);
+    CommandLine (int argc, char ** argv);
 
     /*
      * Effectively returns 'argc' after we have stripped
      * out the extra command-line options our tool accepts
      */
-    int
-    getNumberOfArguments();
+    unsigned int
+    getNumberOfArguments () const;
 
     /*
      * Effectively returns 'argv' after we have stripped
      * out the extra command-line options our tool accepts
      */
-    char**
-    getArguments();
+    char **
+    getArguments () const;
 };
-
 
 #endif /* COMMANDLINE_H_ */

@@ -1,4 +1,3 @@
-#include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp>
 
 #include "Debug.h"
@@ -8,7 +7,6 @@ void
 OP2ParallelLoop::retrieveArgumentTypes (
     OP2DeclaredVariables * op2DeclaredVariables)
 {
-  using boost::lexical_cast;
   using boost::iequals;
   using std::string;
   using std::vector;
@@ -48,39 +46,33 @@ OP2ParallelLoop::retrieveArgumentTypes (
            * Found an OP_DAT variable, so retrieve its dimensions and its
            * type from the arguments passed to OP_DECL_DAT
            */
-          SgExpressionPtrList OP_DECL_DAT_Arguments =
-              op2DeclaredVariables->get_OP_DECL_DAT_Arguments (variableName);
-
-          if (OP_DECL_DAT_Arguments.size () > 0)
+          try
           {
+            OP_DAT_Declaration * opDatDeclaration =
+                op2DeclaredVariables->get_OP_DAT_Declaration (variableName);
+
             /*
              * TODO: this needs to be fixed. OP_DAT variables can be declared in 2 ways:
              * 1) Through OP_DECL_DAT
              * 2) Through OP_DECL_GBL
              * An OP_DECL_GBL has 3 parameters, whereas an OP_DECL_DAT has 4 parameters
              */
-            SgIntVal
-                * opDatDimension =
-                    isSgIntVal (
-                        OP_DECL_DAT_Arguments[OP2::INDEX_OF_DIMENSION_IN_OP_DECL_DAT_PARAMETER_LIST]);
-            ROSE_ASSERT (opDatDimension != NULL);
-            set_OP_DAT_Dimension (opDatDimension->get_value ());
 
-            SgVarRefExp
-                * opDatInputArg =
-                    isSgVarRefExp (
-                        OP_DECL_DAT_Arguments[OP2::INDEX_OF_DATA_TYPE_IN_OP_DECL_DAT_PARAMETER_LIST]);
-            ROSE_ASSERT (opDatInputArg != NULL);
-            set_OP_DAT_ActualType (opDatInputArg->get_type ());
-
-            Debug::getInstance ()->debugMessage ("The OP_DAT variable '"
-                + variableName + "' has actual type "
-                + opDatInputArg->get_type ()->class_name () + " and "
-                + lexical_cast <string> (opDatDimension->get_value ())
-                + " dimensions", 6);
+            if (opDatDeclaration != NULL)
+            {
+              set_OP_DAT_Dimension (opDatDeclaration->getDimension ());
+              set_OP_DAT_ActualType (opDatDeclaration->getActualType ());
+            }
+            else
+            {
+            }
           }
-          else
+          catch (std::string const & variableName)
           {
+            Debug::getInstance ()->debugMessage (
+                "'" + variableName
+                    + "' has not been declared through OP_DECL_DAT. It must have been declared using OP_DECL_GBL",
+                1);
           }
         }
         else if (iequals (className, OP2::OP_MAP_NAME))

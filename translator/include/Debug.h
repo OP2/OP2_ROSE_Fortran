@@ -36,7 +36,7 @@ class Debug
      * This always returns a single instance of the Debug
      * class to make it compliant with the singleton pattern
      */
-    static Debug*
+    static Debug *
     getInstance ();
 
     /*
@@ -49,7 +49,7 @@ class Debug
      * Is verbose enabled?
      */
     bool
-    isVerbose ();
+    isVerbose () const;
 
     /*
      * Set the debug level
@@ -61,13 +61,13 @@ class Debug
      * What is the debug level?
      */
     int
-    getDebugLevel ();
+    getDebugLevel () const;
 
     /*
      * Print this message if verbose mode enabled
      */
     void
-    verboseMessage (std::string message);
+    verboseMessage (std::string const & message) const;
 
     /*
      * Print this message if the debug level has been
@@ -76,13 +76,13 @@ class Debug
      * is ignored
      */
     void
-    debugMessage (std::string message, int debugLevel);
+    debugMessage (std::string const & message, int const debugLevel) const;
 
     /*
      * Print this message then exit
      */
     void
-    errorMessage (std::string message);
+    errorMessage (std::string const & message) const;
 };
 
 #endif /* DEBUG_H_ */

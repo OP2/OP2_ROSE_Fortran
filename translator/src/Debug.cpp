@@ -1,4 +1,5 @@
 #include <cstdlib>
+#include <typeinfo>
 #include <iostream>
 
 #include "Debug.h"
@@ -32,7 +33,7 @@ Debug::setVerbose (bool verbose)
 }
 
 bool
-Debug::isVerbose ()
+Debug::isVerbose () const
 {
   return debugInstance->verbose;
 }
@@ -50,13 +51,13 @@ Debug::setDebugLevel (int debugLevel)
 }
 
 int
-Debug::getDebugLevel ()
+Debug::getDebugLevel () const
 {
   return debugInstance->debugLevel;
 }
 
 void
-Debug::verboseMessage (std::string message)
+Debug::verboseMessage (std::string const & message) const
 {
   using std::cout;
   using std::endl;
@@ -68,7 +69,7 @@ Debug::verboseMessage (std::string message)
 }
 
 void
-Debug::debugMessage (std::string message, int debugLevel)
+Debug::debugMessage (std::string const & message, int const debugLevel) const
 {
   using std::cout;
   using std::endl;
@@ -81,7 +82,7 @@ Debug::debugMessage (std::string message, int debugLevel)
 }
 
 void
-Debug::errorMessage (std::string message)
+Debug::errorMessage (std::string const & message) const
 {
   using std::cout;
   using std::endl;

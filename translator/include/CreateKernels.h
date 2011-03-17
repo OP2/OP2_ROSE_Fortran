@@ -60,35 +60,35 @@ class CreateKernels: public AstSimpleProcessing
 
     void
     fix_OP_PAR_LOOP_Calls (SgScopeStatement * scope,
-        OP2ParallelLoop * op2ParallelLoop, SgFunctionCallExp * functionCallExp,
+        OP2ParallelLoop & op2ParallelLoop, SgFunctionCallExp * functionCallExp,
         SgProcedureHeaderStatement * hostSubroutine);
 
     void
     setUp_OP_DAT_ArgumentTypes (std::vector <SgType *> & opDatArgumentTypes,
         SgVariableDeclaration * setSizeFormalParameter,
-        OP2ParallelLoop * op2ParallelLoop);
+        OP2ParallelLoop & op2ParallelLoop);
 
     SgExprListExp *
     createUserDeviceFunctionParameters (SgFunctionParameterList * mainKernelParameters,
         SgVarRefExp * iterSetVarRef, SgScopeStatement * subroutineScope,
-        OP2ParallelLoop * op2ParallelLoop);
+        OP2ParallelLoop & op2ParallelLoop);
 
     void
     createHostSubroutineStatements (SgScopeStatement * subroutineScope,
-        OP2ParallelLoop * op2ParallelLoop);
+        OP2ParallelLoop & op2ParallelLoop);
 
     void
     createHostSubroutineCUDAVariables (SgScopeStatement * subroutineScope,
-        OP2ParallelLoop * op2ParallelLoop);
+        OP2ParallelLoop & op2ParallelLoop);
 
     void
     createHostSubroutineLocals (SgScopeStatement * subroutineScope,
-        OP2ParallelLoop * op2ParallelLoop);
+        OP2ParallelLoop & op2ParallelLoop);
 
     void
     createHostSubroutineFormalParamaters (SgScopeStatement * subroutineScope,
         SgFunctionParameterList * hostParameters,
-        OP2ParallelLoop * op2ParallelLoop);
+        OP2ParallelLoop & op2ParallelLoop);
 
     /*
      * Creates a host subroutine which sets up CUDA run-time variables, such as block
@@ -97,7 +97,7 @@ class CreateKernels: public AstSimpleProcessing
      */
     SgProcedureHeaderStatement *
     createHostSubroutine (SgScopeStatement * moduleScope,
-        OP2ParallelLoop * op2ParallelLoop);
+        OP2ParallelLoop & op2ParallelLoop);
 
     /*
      * Creates the main kernel, which is launched from the host and calls the
@@ -105,7 +105,7 @@ class CreateKernels: public AstSimpleProcessing
      */
     void
     createMainKernelDeviceSubroutine (SgScopeStatement * moduleScope,
-        OP2ParallelLoop * op2ParallelLoop);
+        OP2ParallelLoop & op2ParallelLoop);
 
     /*
      * Copies the user function (supplied to the kernel) and applies some
@@ -113,24 +113,24 @@ class CreateKernels: public AstSimpleProcessing
      */
     void
     copyAndModifyUserFunction (SgScopeStatement * moduleScope,
-        OP2ParallelLoop * op2ParallelLoop);
+        OP2ParallelLoop & op2ParallelLoop);
 
     SgModuleStatement *
     buildClassDeclarationAndDefinition (SgScopeStatement * fileScope,
-        OP2ParallelLoop * op2ParallelLoop);
+        OP2ParallelLoop & op2ParallelLoop);
 
     /*
      * Creates the Fortran module including all subroutines implementing an OP_PAR_LOOP
      */
     SgScopeStatement *
     createCUDAModule (SgSourceFile & sourceFile,
-        OP2ParallelLoop * op2ParallelLoop);
+        OP2ParallelLoop & op2ParallelLoop);
 
     /*
      * Creates the source file to be unparsed
      */
-    SgSourceFile *
-    createSourceFile (OP2ParallelLoop * op2ParallelLoop);
+    SgSourceFile &
+    createSourceFile (OP2ParallelLoop & op2ParallelLoop);
 
   public:
     /*
@@ -154,7 +154,7 @@ class CreateKernels: public AstSimpleProcessing
      * Visits each vertex in the AST
      */
     virtual void
-    visit (SgNode *n);
+    visit (SgNode * node);
 
     /*
      * Generates output files for each kernel

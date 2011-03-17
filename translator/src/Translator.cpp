@@ -37,7 +37,8 @@ main (int argc, char ** argv)
    * Create the parallel loop object with these files
    */
   Debug::getInstance ()->debugMessage ("Creating kernels for OP_PAR_LOOPs", 2);
-  CreateKernels * createKernels = new CreateKernels (project, op2DeclaredVariables);
+  CreateKernels * createKernels = new CreateKernels (project,
+      op2DeclaredVariables);
 
   /*
    * Traverse the ASTs of the input files in pre-order

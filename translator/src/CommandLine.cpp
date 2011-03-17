@@ -7,10 +7,12 @@
 
 CommandLine::CommandLine (int argc, char **argv)
 {
-  using namespace std;
+  using boost::bad_lexical_cast;
+  using boost::lexical_cast;
+  using std::cout;
 
-  const std::string debugOption = "-d";
-  const std::string verboseOption = "-v";
+  std::string const debugOption = "-d";
+  std::string const verboseOption = "-v";
   bool debugMode = false;
 
   for (int i = 0; i < argc; ++i)
@@ -30,7 +32,7 @@ CommandLine::CommandLine (int argc, char **argv)
          * Check that the character array is an integer,
          * otherwise throw an exception
          */
-        int debug = boost::lexical_cast<int> (argv[i]);
+        int debug = lexical_cast <int> (argv[i]);
 
         /*
          * Only the ordained debug levels are permissible
@@ -45,9 +47,9 @@ CommandLine::CommandLine (int argc, char **argv)
           Debug::getInstance ()->setDebugLevel (debug);
         }
       }
-      catch (boost::bad_lexical_cast const&)
+      catch (bad_lexical_cast const &)
       {
-        cout << "Error: '" << argv[i] << "' is not a valid debug level" << endl;
+        cout << "Error: '" << argv[i] << "' is not a valid debug level\n";
         exit (1);
       }
       catch (int debug)
@@ -65,7 +67,7 @@ CommandLine::CommandLine (int argc, char **argv)
 
         cout << "Permissible range of debug levels = ["
             << Debug::LOWEST_DEBUG_LEVEL << ".." << Debug::HIGHEST_DEBUG_LEVEL
-            << "]." << endl;
+            << "].\n";
 
         exit (1);
       }
@@ -97,24 +99,24 @@ CommandLine::CommandLine (int argc, char **argv)
   }
 }
 
-int
-CommandLine::getNumberOfArguments ()
+unsigned int
+CommandLine::getNumberOfArguments () const
 {
   return ROSE_arguments.size ();
 }
 
 char **
-CommandLine::getArguments ()
+CommandLine::getArguments () const
 {
   using namespace std;
 
   /* Allocate enough space for all the command-line
    * arguments recognised as ROSE ones
    */
-  char** argv = new char*[ROSE_arguments.size ()];
+  char ** argv = new char*[ROSE_arguments.size ()];
 
   int i = 0;
-  for (vector<string>::iterator it = ROSE_arguments.begin (); it
+  for (vector <string>::const_iterator it = ROSE_arguments.begin (); it
       != ROSE_arguments.end (); ++it)
   {
     /*

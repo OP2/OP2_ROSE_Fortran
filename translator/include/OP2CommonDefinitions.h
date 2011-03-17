@@ -1,8 +1,7 @@
 /*
  * Written by Adam Betts and Carlo Bertolli
  *  
- * Includes macros of all common configuration parameters of the OP2 API
- * as well as a namespace for the various names that OP2 employs
+ * A namespace for the various names that OP2 employs
  */
 
 #ifndef OP2_COMMON_DEFINITIONS_H
@@ -45,36 +44,6 @@ namespace OP2
    */
   unsigned int const NUMBER_OF_ARGUMENTS_PER_OP_DAT = 4; // For every OP_DAT, there is an int, OP_MAP, and an OP_ACCESS
   unsigned int const NUMBER_OF_NON_OP_DAT_ARGUMENTS = 2; // 2 because of 'kernelName' and 'OP_SET' arguments
-
-  /*
-   * Positions of arguments inside OP_DECL_SET
-   * The following style is assumed:
-   * OP_DECL_SET (setCardinality, OP_SET)
-   */
-  unsigned int const INDEX_OF_OP_SET_IN_OP_DECL_SET_PARAMETER_LIST = 1;
-
-  /*
-   * Positions of arguments inside OP_DECL_MAP
-   * The following style is assumed:
-   * OP_DECL_MAP (OP_SET_FROM, OP_SET_TO, cardinality, inputData, OP_MAP)
-   */
-  unsigned int const INDEX_OF_OP_MAP_IN_OP_DECL_MAP_PARAMETER_LIST = 4;
-
-  /*
-   * Positions of arguments inside OP_DECL_DAT
-   * The following style is assumed:
-   * OP_DECL_DAT (OP_SET, cardinality, inputData, OP_DAT)
-   */
-  unsigned int const INDEX_OF_DIMENSION_IN_OP_DECL_DAT_PARAMETER_LIST = 1;
-  unsigned int const INDEX_OF_DATA_TYPE_IN_OP_DECL_DAT_PARAMETER_LIST = 2;
-  unsigned int const INDEX_OF_OP_DAT_IN_OP_DECL_DAT_PARAMETER_LIST = 3;
-
-  /*
-   * Positions of arguments inside OP_DECL_GBL
-   * The following style is assumed:
-   * OP_DECL_GBL (OP_SET, cardinality, OP_DAT)
-   */
-  unsigned int const INDEX_OF_OP_DAT_IN_OP_DECL_GBL_PARAMETER_LIST = 2;
 }
 
 #endif

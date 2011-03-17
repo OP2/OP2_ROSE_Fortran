@@ -5,13 +5,14 @@
  * 
  * This class extends AstSimpleProcessing since that class provides
  * utilities to traverse the Abstract Syntax Tree (AST).
- *
  */
 
 #ifndef OP2_DECLARED_VARIABLES_H
 #define OP2_DECLARED_VARIABLES_H
 
 #include <rose.h>
+
+#include "OP2Variables.h"
 
 class OP2DeclaredVariables: public AstSimpleProcessing
 {
@@ -25,22 +26,22 @@ class OP2DeclaredVariables: public AstSimpleProcessing
     /*
      * Actual arguments passed to every OP_DECL_SET in the program
      */
-    std::map <std::string, SgExpressionPtrList> OP_SET_Declarations;
+    std::vector <OP_SET_Declaration *> OP_SET_Declarations;
 
     /*
      * Actual arguments passed to every OP_DECL_MAP in the program
      */
-    std::map <std::string, SgExpressionPtrList> OP_MAP_Declarations;
+    std::vector <OP_MAP_Declaration *> OP_MAP_Declarations;
 
     /*
      * Actual arguments passed to every OP_DECL_DAT in the program
      */
-    std::map <std::string, SgExpressionPtrList> OP_DAT_Declarations;
+    std::vector <OP_DAT_Declaration *> OP_DAT_Declarations;
 
     /*
      * Actual arguments passed to every OP_DECL_GBL in the program
      */
-    std::map <std::string, SgExpressionPtrList> OP_GBL_Declarations;
+    std::vector <OP_GBL_Declaration *> OP_GBL_Declarations;
 
   public:
 
@@ -49,37 +50,28 @@ class OP2DeclaredVariables: public AstSimpleProcessing
       this->project = project;
     }
 
-    SgExpressionPtrList
-    get_OP_DECL_SET_Arguments (std::string opSETName)
-    {
-      return OP_SET_Declarations[opSETName];
-    }
+    OP_SET_Declaration *
+    get_OP_SET_Declaration (std::string const & opSETName)
+        throw (std::string const &);
 
-    SgExpressionPtrList
-    get_OP_DECL_MAP_Arguments (std::string opMAPName)
-    {
-      return OP_MAP_Declarations[opMAPName];
-    }
+    OP_MAP_Declaration *
+    get_OP_MAP_Declaration (std::string const & opMAPName)
+        throw (std::string const &);
 
-    SgExpressionPtrList
-    get_OP_DECL_DAT_Arguments (std::string opDATName)
-    {
-      return OP_DAT_Declarations[opDATName];
-    }
+    OP_DAT_Declaration *
+    get_OP_DAT_Declaration (std::string const & opDATName)
+        throw (std::string const &);
 
-    SgExpressionPtrList
-    get_OP_DECL_GBL_Arguments (std::string opGBLName)
-    {
-      return OP_DAT_Declarations[opGBLName];
-    }
+    OP_GBL_Declaration *
+    get_OP_GBL_Declaration (std::string const & opGBLName)
+        throw (std::string const &);
 
     /*
-     * Traverses the supplied Fortran files to discover
-     * OP_DECL_SET, OP_DECL_MAP, OP_DECL_DAT function calls
-     * and store their actual arguments
+     * Traverses the supplied Fortran files to discover OP_DECL_SET, OP_DECL_MAP,
+     * OP_DECL_DAT, OP_DECL_GBL function calls and store their actual arguments
      */
     void
-    visit (SgNode * currentNode);
+    visit (SgNode * node);
 };
 
 #endif
