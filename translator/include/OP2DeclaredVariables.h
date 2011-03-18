@@ -2,9 +2,6 @@
  * Written by Carlo Bertolli and Adam Betts
  *
  * This class stores all OP2 declared variables in the context of a OP2 program
- * 
- * This class extends AstSimpleProcessing since that class provides
- * utilities to traverse the Abstract Syntax Tree (AST).
  */
 
 #ifndef OP2_DECLARED_VARIABLES_H

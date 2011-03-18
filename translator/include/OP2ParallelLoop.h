@@ -115,6 +115,21 @@ class OP2ParallelLoop
      */
     std::vector <unsigned int> OP_DAT_Dimensions;
 
+  private:
+
+    /*
+     * Discovers whether all OP_MAPs are direct, and hence whether this
+     * OP_PAR_LOOP has direct or indirect access to its data
+     */
+    void
+    setDirectOrIndirectLoop (OP2DeclaredVariables * op2DeclaredVariables);
+
+    /*
+     * Retrieves the base types of OP_DAT variables.
+     */
+    void
+    retrieve_OP_DAT_BaseTypes (OP2DeclaredVariables * op2DeclaredVariables);
+
   public:
     /*
      * ====================================================================================================
@@ -133,13 +148,8 @@ class OP2ParallelLoop
       this->CUDAModuleName = userFunctionName + "_cudafor";
       this->actualArguments = actualArguments;
 
-      /*
-       * Assume that this OP_PAR_LOOP is direct.
-       * It will be set accordingly through the following function call
-       */
-      this->isDirect = true;
-
-      retrieve_OP_DAT_BaseArgumentTypes (op2DeclaredVariables);
+      setDirectOrIndirectLoop (op2DeclaredVariables);
+      retrieve_OP_DAT_BaseTypes (op2DeclaredVariables);
     }
 
     std::string
@@ -241,18 +251,6 @@ class OP2ParallelLoop
       UserFunctionArguments.push_back (argument);
     }
 
-    void
-    set_OP_DAT_ActualType (SgType * type)
-    {
-      OP_DAT_ActualTypes.push_back (type);
-    }
-
-    void
-    set_OP_DAT_Dimension (int dimension)
-    {
-      OP_DAT_Dimensions.push_back (dimension);
-    }
-
     SgVariableDeclaration * const
     get_OP_SET_Argument () const
     {
@@ -312,16 +310,6 @@ class OP2ParallelLoop
     {
       return OP_DAT_Dimensions[index];
     }
-
-  private:
-
-    /*
-     * Retrieves the base types of OP_DAT variables.
-     * It also discovers whether all OP_MAPs are direct, and hence whether this
-     * OP_PAR_LOOP has direct or indirect access to its data
-     */
-    void
-    retrieve_OP_DAT_BaseArgumentTypes (OP2DeclaredVariables * op2DeclaredVariables);
 };
 
 #endif
