@@ -3,6 +3,7 @@
 
 #include "Debug.h"
 #include "CreateKernels.h"
+#include "FortranTypeDeclarations.h"
 
 /*
  * ======================================================
@@ -10,17 +11,74 @@
  * ======================================================
  */
 
+SgClassDeclaration *
+CreateKernels::buildNewTypeDeclaration (std::string const & typeName,
+    SgScopeStatement * scope, bool fortranModule)
+{
+  Sg_File_Info * fileInfo =
+      Sg_File_Info::generateDefaultFileInfoForCompilerGeneratedNode ();
+  fileInfo->setOutputInCodeGeneration ();
+
+  SgClassDefinition * classDefinition = new SgClassDefinition (fileInfo);
+
+  SgClassDeclaration * nonDefiningClassDeclaration = new SgClassDeclaration (
+      fileInfo, typeName, SgClassDeclaration::e_class, NULL, NULL);
+
+  SgClassDeclaration * classDeclaration;
+
+  if (fortranModule)
+  {
+    classDeclaration = new SgModuleStatement (fileInfo, typeName,
+        SgClassDeclaration::e_class, NULL, classDefinition);
+  }
+  else
+  {
+    classDeclaration = new SgClassDeclaration (fileInfo, typeName,
+        SgClassDeclaration::e_class, NULL, classDefinition);
+  }
+
+  classDefinition->set_endOfConstruct (fileInfo);
+  classDefinition->set_declaration (classDeclaration);
+
+  nonDefiningClassDeclaration->set_endOfConstruct (fileInfo);
+  nonDefiningClassDeclaration->set_definingDeclaration (classDeclaration);
+  nonDefiningClassDeclaration->set_firstNondefiningDeclaration (
+      nonDefiningClassDeclaration);
+  nonDefiningClassDeclaration->set_scope (scope);
+  nonDefiningClassDeclaration->set_parent (scope);
+  nonDefiningClassDeclaration->set_type (SgClassType::createType (
+      nonDefiningClassDeclaration));
+  nonDefiningClassDeclaration->setForward ();
+
+  classDeclaration->set_endOfConstruct (fileInfo);
+  classDeclaration->set_definingDeclaration (classDeclaration);
+  classDeclaration->set_firstNondefiningDeclaration (
+      nonDefiningClassDeclaration);
+  classDeclaration->set_scope (scope);
+  classDeclaration->set_parent (scope);
+  classDeclaration->set_type (nonDefiningClassDeclaration->get_type ());
+
+  SgClassSymbol * classSymbol = new SgClassSymbol (classDeclaration);
+  scope->insert_symbol (classDeclaration->get_name (), classSymbol);
+
+  return classDeclaration;
+}
+
 void
 CreateKernels::createHostSubroutineDeclarationsForPlanFunction (
-    SgScopeStatement * subroutineScope, OP2ParallelLoop & op2ParallelLoop)
+    SgScopeStatement * subroutineScope, OP2ParallelLoop & op2ParallelLoop,
+    SgScopeStatement * fileScope)
 {
+  using SageBuilder::buildComment;
   using SageBuilder::buildIntType;
   using SageBuilder::buildArrayType;
   using SageBuilder::buildExprListExp;
   using SageBuilder::buildIntVal;
   using SageBuilder::buildVariableDeclaration;
   using SageBuilder::buildExprStatement;
+  using SageBuilder::buildPointerType;
   using SageInterface::appendStatement;
+  using SageInterface::addTextForUnparser;
   using std::vector;
   using std::string;
 
@@ -38,11 +96,7 @@ CreateKernels::createHostSubroutineDeclarationsForPlanFunction (
         op2ParallelLoop.getNumberOf_OP_DAT_ArgumentGroups ());
 
     SgArrayType * intArray = buildArrayType (buildIntType (), arrayDimension);
-
-    SgExprListExp* dimensionExprList = buildExprListExp (arrayDimension);
-
-    intArray->set_dim_info (dimensionExprList);
-
+    intArray->set_dim_info (buildExprListExp (arrayDimension));
     intArray->set_rank (1);
 
     SgVariableDeclaration * intArrayDeclaration = buildVariableDeclaration (
@@ -53,21 +107,60 @@ CreateKernels::createHostSubroutineDeclarationsForPlanFunction (
     appendStatement (intArrayDeclaration, subroutineScope);
   }
 
-  vector <string> planIntegerVariables;
-  planIntegerVariables.push_back ("opDatsNumber");
-  planIntegerVariables.push_back ("indsNumber");
-  planIntegerVariables.push_back ("iter");
+  vector <string> integerVariables;
+  integerVariables.push_back ("argsNumber");
+  integerVariables.push_back ("indsNumber");
+  integerVariables.push_back ("iter");
+  integerVariables.push_back ("blockOffset");
+  integerVariables.push_back ("col");
+  integerVariables.push_back ("nblocks");
+  integerVariables.push_back ("nthread");
+  integerVariables.push_back ("nshared");
+  integerVariables.push_back ("i");
+  integerVariables.push_back ("m");
+  integerVariables.push_back ("threadSynchRet");
 
-  for (vector <string>::iterator it = planIntegerVariables.begin (); it
-      != planIntegerVariables.end (); ++it)
+  for (vector <string>::iterator it = integerVariables.begin (); it
+      != integerVariables.end (); ++it)
   {
     SgVariableDeclaration * intDeclaration = buildVariableDeclaration (*it,
-        buildIntType (), NULL, subroutineScope);
+        FortranTypeDeclarations::getFourByteInteger (), NULL, subroutineScope);
 
     intDeclaration->get_declarationModifier ().get_accessModifier ().setUndefined ();
 
     appendStatement (intDeclaration, subroutineScope);
   }
+
+  SgClassType * c_ptrType = buildNewTypeDeclaration ("c_ptr", subroutineScope,
+      false)->get_type ();
+  SgVariableDeclaration * planRetDeclaration = buildVariableDeclaration (
+      "planRet", c_ptrType, NULL, subroutineScope);
+  planRetDeclaration->get_declarationModifier ().get_accessModifier ().setUndefined ();
+  appendStatement (planRetDeclaration, subroutineScope);
+
+  SgClassType * opPlanType = buildNewTypeDeclaration ("op_plan",
+      subroutineScope, false)->get_type ();
+  SgVariableDeclaration * opPlanDeclaration = buildVariableDeclaration (
+      "actualPlan", opPlanType, NULL, subroutineScope);
+  opPlanDeclaration->get_declarationModifier ().get_accessModifier ().setUndefined ();
+  appendStatement (opPlanDeclaration, subroutineScope);
+
+  vector <string> integerPointerVariables;
+  integerPointerVariables.push_back ("ncolblk");
+  integerPointerVariables.push_back ("pnindirect");
+
+  for (vector <string>::iterator it = integerPointerVariables.begin (); it
+      != integerPointerVariables.end (); ++it)
+  {
+    SgVariableDeclaration * intPointerDeclaration = buildVariableDeclaration (
+        *it, buildPointerType (buildIntType ()), NULL, subroutineScope);
+
+    intPointerDeclaration->get_declarationModifier ().get_accessModifier ().setUndefined ();
+    intPointerDeclaration->get_declarationModifier ().get_typeModifier().setDimension();
+
+    appendStatement (intPointerDeclaration, subroutineScope);
+  }
+
 }
 
 void
@@ -596,39 +689,35 @@ CreateKernels::createHostSubroutineCUDAVariables (SgScopeStatement * scope,
 
   /*
    * ======================================================
-   * Declaration and initialisation of variables and opaque variables
+   * Declaration and initialisation of variables and opaque
+   * variables
    * ======================================================
    */
-  SgModifierType * intFour = buildFortranKindType (buildIntType (),
-      buildIntVal (4));
-
-  SgModifierType * realEight = buildFortranKindType (buildFloatType (),
-      buildIntVal (8));
-
   SgVarRefExp * variable_BSIZE_DEFAULT = buildOpaqueVarRefExp ("BSIZE_DEFAULT",
       scope);
 
   SgVariableDeclaration * variable_bsize = buildVariableDeclaration ("bsize",
-      intFour,
-      buildAssignInitializer (variable_BSIZE_DEFAULT, buildIntType ()), scope);
+      FortranTypeDeclarations::getFourByteInteger (), buildAssignInitializer (
+          variable_BSIZE_DEFAULT, buildIntType ()), scope);
 
   SgVariableDeclaration * variable_gsize = buildVariableDeclaration ("gsize",
-      intFour, NULL, scope);
+      FortranTypeDeclarations::getFourByteInteger (), NULL, scope);
 
   SgVariableDeclaration * variable_reduct_bytes = buildVariableDeclaration (
-      "reduct_bytes", intFour, buildAssignInitializer (buildIntVal (0),
-          buildIntType ()), scope);
+      "reduct_bytes", FortranTypeDeclarations::getFourByteInteger (),
+      buildAssignInitializer (buildIntVal (0), buildIntType ()), scope);
 
   SgVariableDeclaration * variable_reduct_size = buildVariableDeclaration (
-      "reduct_size", intFour, buildAssignInitializer (buildIntVal (0),
-          buildIntType ()), scope);
+      "reduct_size", FortranTypeDeclarations::getFourByteInteger (),
+      buildAssignInitializer (buildIntVal (0), buildIntType ()), scope);
 
   SgVariableDeclaration * variable_reduct_shared = buildVariableDeclaration (
-      "reduct_shared", realEight, NULL, scope);
+      "reduct_shared", FortranTypeDeclarations::getDoublePrecisionFloat (),
+      NULL, scope);
 
   SgVariableDeclaration * variable_const_bytes = buildVariableDeclaration (
-      "const_bytes", intFour, buildAssignInitializer (buildIntVal (0),
-          buildIntType ()), scope);
+      "const_bytes", FortranTypeDeclarations::getFourByteInteger (),
+      buildAssignInitializer (buildIntVal (0), buildIntType ()), scope);
 
   variable_bsize->get_declarationModifier ().get_accessModifier ().setUndefined ();
   variable_gsize->get_declarationModifier ().get_accessModifier ().setUndefined ();
@@ -900,8 +989,10 @@ CreateKernels::createMainKernelDeviceSubroutine_ForDirectLoop (
 
   /*
    * ======================================================
-   * Build opaque variable references needed in the following expressions. These are opaque because
-   * the variables are provided as part of the CUDA library and are not seen by ROSE
+   * Build opaque variable references needed in the following
+   * expressions. These are opaque because the variables are
+   * provided as part of the CUDA library and are not seen
+   * by ROSE
    * ======================================================
    */
   SgVarRefExp * variableThreadidx = buildOpaqueVarRefExp ("threadidx",
@@ -1070,18 +1161,21 @@ CreateKernels::copyAndModifyUserFunction (SgScopeStatement * moduleScope,
   appendStatement (newSubroutine, moduleScope);
 
   /*
-   * Currently have to add the 'attribute' statement by hand as there is no grammar
-   * support
+   * ======================================================
+   * Currently have to add the 'attribute' statement by hand
+   * as there is no grammar support
+   * ======================================================
    */
   addTextForUnparser (newSubroutine, "attributes(device) ",
       AstUnparseAttribute::e_before);
 
   /*
    * ======================================================
-   * Visit all the statements in the original subroutine and append them to new subroutine while making
-   * necessary changes.
-   * TODO: This may not work for nested bodies. The alternative is to use a copy routine, but currently
-   * not working either
+   * Visit all the statements in the original subroutine
+   * and append them to new subroutine while making necessary
+   * changes.
+   * TODO: This may not work for nested bodies. The alternative
+   * is to use a copy routine, but currently not working either
    * ======================================================
    */
   SgScopeStatement * newSubroutineScope =
@@ -1166,8 +1260,9 @@ CreateKernels::copyAndModifyUserFunction (SgScopeStatement * moduleScope,
 
   /*
    * ======================================================
-   * The following class visits every created node for the subroutine and ensures that it is generated
-   * during unparsing
+   * The following class visits every created node for the
+   * subroutine and ensures that it is generated during
+   * unparsing
    * ======================================================
    */
   class GenerateAllNodesInUnparser: public AstSimpleProcessing
@@ -1343,19 +1438,15 @@ CreateKernels::createHostSubroutineFormalParamaters (
         asterisk->set_endOfConstruct (asteriskFileInfo);
 
         /*
-         * Build the type, which is a character array
+         * Build an array of characters
          */
         SgArrayType * charArray = buildArrayType (buildCharType (), asterisk);
 
         /*
          * The dimension of the array is the asterisk
          */
-        SgExprListExp* dimensionExprList = buildExprListExp (asterisk);
+        SgExprListExp * dimensionExprList = buildExprListExp (asterisk);
         charArray->set_dim_info (dimensionExprList);
-
-        /*
-         * The character array only has one dimension
-         */
         charArray->set_rank (1);
 
         SgVariableDeclaration * charArrayDeclaration =
@@ -1440,8 +1531,10 @@ CreateKernels::createHostSubroutineFormalParamaters (
                */
 
               /*
+               * ======================================================
                * A new batch of OP_DAT arguments has been discovered
                * Therefore, increment the variable name suffix
+               * ======================================================
                */
               variableNameSuffix++;
 
@@ -1575,7 +1668,6 @@ CreateKernels::createHostSubroutine (SgScopeStatement * moduleScope,
 
   addTextForUnparser (subroutineStatement, "attributes(host) ",
       AstUnparseAttribute::e_before);
-  ;
 
   /*
    * ======================================================
@@ -1587,59 +1679,6 @@ CreateKernels::createHostSubroutine (SgScopeStatement * moduleScope,
       op2ParallelLoop);
 
   return subroutineStatement;
-}
-
-SgModuleStatement *
-CreateKernels::buildClassDeclarationAndDefinition (
-    SgScopeStatement * fileScope, OP2ParallelLoop & op2ParallelLoop)
-{
-  Debug::getInstance ()->debugMessage ("Building Fortran module", 2);
-
-  /*
-   * ======================================================
-   * This function builds a class declaration and definition
-   * Both the defining and non-defining class declarations are required
-   * ======================================================
-   */
-
-  SgClassDefinition * classDefinition = new SgClassDefinition ();
-
-  SgModuleStatement * classDeclaration = new SgModuleStatement (
-      op2ParallelLoop.getCUDAModuleName (), SgClassDeclaration::e_struct, NULL,
-      classDefinition);
-
-  SgClassDeclaration * nonDefiningClassDeclaration = new SgClassDeclaration (
-      op2ParallelLoop.getCUDAModuleName (), SgClassDeclaration::e_struct, NULL,
-      NULL);
-
-  classDeclaration->set_definingDeclaration (classDeclaration);
-  classDeclaration->set_firstNondefiningDeclaration (
-      nonDefiningClassDeclaration);
-  classDeclaration->set_scope (fileScope);
-
-  nonDefiningClassDeclaration->set_definingDeclaration (classDeclaration);
-  nonDefiningClassDeclaration->set_firstNondefiningDeclaration (
-      nonDefiningClassDeclaration);
-  nonDefiningClassDeclaration->set_scope (fileScope);
-  nonDefiningClassDeclaration->set_definingDeclaration (classDeclaration);
-
-  classDefinition->set_declaration (classDeclaration);
-
-  /*
-   * Must explicitly set the position of the opening and closing braces otherwise
-   * ROSE complains
-   */
-  Sg_File_Info * fileInfo =
-      Sg_File_Info::generateDefaultFileInfoForCompilerGeneratedNode ();
-  fileInfo->setOutputInCodeGeneration ();
-  classDeclaration->set_startOfConstruct (fileInfo);
-  classDeclaration->set_endOfConstruct (fileInfo);
-  nonDefiningClassDeclaration->set_startOfConstruct (fileInfo);
-  nonDefiningClassDeclaration->set_endOfConstruct (fileInfo);
-  classDefinition->set_startOfConstruct (fileInfo);
-  classDefinition->set_endOfConstruct (fileInfo);
-
-  return classDeclaration;
 }
 
 SgScopeStatement *
@@ -1657,8 +1696,9 @@ CreateKernels::createCUDAModule (SgSourceFile & sourceFile,
   /*
    * Create the module statement
    */
-  SgModuleStatement * cudaModule = buildClassDeclarationAndDefinition (
-      globalScope, op2ParallelLoop);
+  SgModuleStatement * cudaModule =
+      dynamic_cast <SgModuleStatement *> (buildNewTypeDeclaration (
+          op2ParallelLoop.getCUDAModuleName (), globalScope, true));
 
   cudaModule->get_definition ()->setCaseInsensitive (true);
 
@@ -1702,10 +1742,13 @@ CreateKernels::createSourceFile (OP2ParallelLoop & op2ParallelLoop)
   using SageBuilder::buildFile;
 
   /*
-   * To create a new file (to which the AST is later unparsed), the API expects
-   * the name of an existing file and the name of the output file. There is no
-   * input file corresponding to our output file, therefore we first create a
-   * dummy Fortran file
+   * ======================================================
+   * To create a new file (to which the AST is later unparsed),
+   * the API expects the name of an existing file and the
+   * name of the output file. There is no input file corresponding
+   * to our output file, therefore we first create a dummy
+   * Fortran file
+   * ======================================================
    */
   string const inputFileName = "BLANK_" + op2ParallelLoop.getCUDAModuleName ()
       + ".F95";
@@ -1724,7 +1767,9 @@ CreateKernels::createSourceFile (OP2ParallelLoop & op2ParallelLoop)
   }
 
   /*
+   * ======================================================
    * Now generate the CUDA file
+   * ======================================================
    */
   string const outputFileName = op2ParallelLoop.getCUDAModuleName () + ".CUF";
 
@@ -1735,19 +1780,27 @@ CreateKernels::createSourceFile (OP2ParallelLoop & op2ParallelLoop)
       outputFileName, NULL));
 
   /*
+   * ======================================================
    * Later unparse according to the Fortran 95 standard
+   * ======================================================
    */
   sourceFile->set_F95_only (true);
 
   /*
-   * No implicit symbols shall be allowed in the generated Fortran file
+   * ======================================================
+   * No implicit symbols shall be allowed in the generated
+   * Fortran file
+   * ======================================================
    */
   sourceFile->set_fortran_implicit_none (true);
 
   sourceFile->set_outputFormat (SgFile::e_free_form_output_format);
 
   /*
-   * Store the file so it can be unparsed after AST construction
+   * ======================================================
+   * Store the file so it can be unparsed after AST
+   * construction
+   * ======================================================
    */
   generatedFiles.push_back (sourceFile);
 
@@ -1774,6 +1827,10 @@ CreateKernels::visit (SgNode * node)
     case V_SgProcedureHeaderStatement:
     {
       /*
+       * ======================================================
+       * ======================================================
+       */
+      /*
        * We need to store all subroutine definitions since we later have
        * to copy and modify the user kernel subroutine
        */
@@ -1791,7 +1848,9 @@ CreateKernels::visit (SgNode * node)
     case V_SgFunctionCallExp:
     {
       /*
-       * Function call found in the AST
+       * ======================================================
+       * Function call found in AST
+       * ======================================================
        */
       SgFunctionCallExp* functionCallExp = isSgFunctionCallExp (node);
 
@@ -1800,16 +1859,22 @@ CreateKernels::visit (SgNode * node)
               functionCallExp->getAssociatedFunctionDeclaration ()->get_name ().getString ();
 
       /*
-       * The prefix of all parallel loop calls in Fortran contains 'op_par_loop'.
-       * The suffix of the call, however, changes depending on the number of expected
-       * parameters. Therefore, any match of this prefix indicates a call of interest
+       * ======================================================
+       * The prefix of all parallel loop calls in Fortran contains
+       * 'OP_PAR_LOOP'. The suffix of the call, however, changes
+       * depending on the number of expected parameters. Therefore,
+       * any match of this prefix indicates a call of interest
        * to the translator
+       * ======================================================
        */
       if (starts_with (calleeName, OP2::OP_PAR_LOOP_PREFIX))
       {
         /*
-         * The first argument to an 'OP_PAR_LOOP' call should be a reference to
-         * the kernel function. Cast it and proceed, otherwise throw an exception
+         * ======================================================
+         * The first argument to an 'OP_PAR_LOOP' call should be
+         * a reference to the kernel function. Cast it and proceed,
+         * otherwise throw an exception
+         * ======================================================
          */
         SgExpressionPtrList & actualArguments =
             functionCallExp->get_args ()->get_expressions ();
@@ -1843,18 +1908,25 @@ CreateKernels::visit (SgNode * node)
                   op2ParallelLoop));
 
               /*
-               * Generate the CUDA file for this kernel
+               * ======================================================
+               * Generate an additional source file for this OP_PAR_LOOP
+               * ======================================================
                */
               SgSourceFile & sourceFile = createSourceFile (*op2ParallelLoop);
 
               /*
+               * ======================================================
                * Create the CUDA module
+               * ======================================================
                */
               SgScopeStatement * moduleScope = createCUDAModule (sourceFile,
                   *op2ParallelLoop);
 
               /*
-               * Generate and modify user kernel so that it can run on the device
+               * ======================================================
+               * Generate and modify user kernel so that it can run on
+               * the device
+               * ======================================================
                */
               copyAndModifyUserFunction (moduleScope, *op2ParallelLoop);
 
@@ -1922,7 +1994,8 @@ CreateKernels::visit (SgNode * node)
                     hostSubroutine->get_definition ()->get_body ();
 
                 createHostSubroutineDeclarationsForPlanFunction (
-                    subroutineScope, *op2ParallelLoop);
+                    subroutineScope, *op2ParallelLoop,
+                    sourceFile.get_globalScope ());
               }
             }
           }
@@ -1934,7 +2007,7 @@ CreateKernels::visit (SgNode * node)
         catch (SgNode * exceptionNode)
         {
           Debug::getInstance ()->errorMessage (
-              "First argument to 'OP_PAR_LOOP' is not a kernel. The argument has type '"
+              "First argument to 'OP_PAR_LOOP' is not a function. The argument has type '"
                   + exceptionNode->class_name () + "'");
         }
       }

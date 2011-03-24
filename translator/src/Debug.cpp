@@ -4,7 +4,7 @@
 
 #include "Debug.h"
 
-Debug * Debug::debugInstance = 0;
+Debug * Debug::debugInstance = NULL;
 
 Debug::Debug ()
 {
@@ -16,10 +16,10 @@ Debug::Debug ()
   debugLevel = 0;
 }
 
-Debug*
+Debug *
 Debug::getInstance ()
 {
-  if (debugInstance == 0)
+  if (debugInstance == NULL)
   {
     debugInstance = new Debug ();
   }

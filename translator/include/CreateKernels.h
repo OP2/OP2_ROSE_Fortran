@@ -20,44 +20,56 @@
 class CreateKernels: public AstSimpleProcessing
 {
   private:
-    /*
-     * ====================================================================================================
-     * Private data
-     * ====================================================================================================
-     */
 
     /*
-     * The project which the source-to-source translator operates upon
+     * ======================================================
+     * The project which the source-to-source translator
+     * operates upon
+     * ======================================================
      */
     SgProject * project;
 
     /*
-     * References to all subroutines found during the visit of the input files
+     * ======================================================
+     * References to all subroutines found during the visit
+     * of the input files
+     * ======================================================
      */
     std::vector <SgProcedureHeaderStatement *> inputSubroutines;
 
     /*
+     * ======================================================
      * The generated output files for each OP_PAR_LOOP
+     * ======================================================
      */
     std::vector <SgSourceFile *> generatedFiles;
 
     /*
-     * Used to retrieve base types and dimensions of OP_DAT variables
-     * (and all other OP2 declarations, if needed)
+     * ======================================================
+     * Used to retrieve base types and dimensions of OP_DAT
+     * variables (and all other OP2 declarations, if needed)
+     * ======================================================
      */
     OP2DeclaredVariables * op2DeclaredVariables;
 
     /*
-     * A mapping from a user kernel name to our internal representation of an
-     * OP_PAR_LOOP
+     * ======================================================
+     * A mapping from a user kernel name to our internal
+     * representation of an OP_PAR_LOOP
+     * ======================================================
      */
     std::map <std::string, OP2ParallelLoop *> op2ParallelLoops;
 
     /*
-     * ====================================================================================================
-     * Private functions
-     * ====================================================================================================
+     * ======================================================
+     * Creates a new type declaration and definition in the
+     * given scope with the given name. The boolean indicates
+     * whether the declaration is a Fortran module
+     * ======================================================
      */
+    SgClassDeclaration *
+    buildNewTypeDeclaration (std::string const & typeName,
+        SgScopeStatement * scope, bool fortranModule);
 
     void
     fix_OP_PAR_LOOP_Calls (SgScopeStatement * scope,
@@ -89,7 +101,8 @@ class CreateKernels: public AstSimpleProcessing
 
     void
     createHostSubroutineDeclarationsForPlanFunction (
-        SgScopeStatement * subroutineScope, OP2ParallelLoop & op2ParallelLoop);
+        SgScopeStatement * subroutineScope, OP2ParallelLoop & op2ParallelLoop,
+        SgScopeStatement *);
 
     void
     createHostSubroutineFormalParamaters (SgScopeStatement * subroutineScope,
@@ -97,71 +110,80 @@ class CreateKernels: public AstSimpleProcessing
         OP2ParallelLoop & op2ParallelLoop);
 
     /*
-     * Creates a host subroutine which sets up CUDA run-time variables, such as block
-     * and grid sizes, allocates memory on the device, calls the kernel, and deallocates
+     * ======================================================
+     * Creates a host subroutine which sets up CUDA run-time
+     * variables, such as block and grid sizes, allocates memory
+     * on the device, calls the kernel, and deallocates
      * memory
+     * ======================================================
      */
     SgProcedureHeaderStatement *
     createHostSubroutine (SgScopeStatement * moduleScope,
         OP2ParallelLoop & op2ParallelLoop);
 
     /*
-     * Creates the main kernel, which is launched from the host and calls the
-     * user-supplied function. Specific to an indirect loop
+     * ======================================================
+     * Creates the main kernel, which is launched from the
+     * host and calls the user-supplied function. Specific to
+     * an indirect loop
+     * ======================================================
      */
     void
     createMainKernelDeviceSubroutine_ForIndirectLoop (
         SgScopeStatement * moduleScope, OP2ParallelLoop & op2ParallelLoop);
 
     /*
-     * Creates the main kernel, which is launched from the host and calls the
-     * user-supplied function. Specific to a direct loop
+     * ======================================================
+     * Creates the main kernel, which is launched from the host
+     * and calls the user-supplied function. Specific to a
+     * direct loop
+     * ======================================================
      */
     void
     createMainKernelDeviceSubroutine_ForDirectLoop (
         SgScopeStatement * moduleScope, OP2ParallelLoop & op2ParallelLoop);
 
     /*
-     * Copies the user function (launched by the kernel) and applies some
-     * modifications so that it can run on the device
+     * ======================================================
+     * Copies the user function (launched by the kernel) and
+     * applies some modifications so that it can run on the device
+     * ======================================================
      */
     void
     copyAndModifyUserFunction (SgScopeStatement * moduleScope,
         OP2ParallelLoop & op2ParallelLoop);
 
     /*
-     * Creates the
-     */
-    SgModuleStatement *
-    buildClassDeclarationAndDefinition (SgScopeStatement * fileScope,
-        OP2ParallelLoop & op2ParallelLoop);
-
-    /*
-     * Creates the actual Fortran module
+     * ======================================================
+     * Creates a new type declaration and definition in the
+     * given scope with the given name. The boolean indicates
+     * whether the declaration is a Fortran module
+     * ======================================================
      */
     SgScopeStatement *
     createCUDAModule (SgSourceFile & sourceFile,
         OP2ParallelLoop & op2ParallelLoop);
 
     /*
-     * Creates the Fortran/C/C++ source file to be unparsed that contains the
-     * host subroutine (which sets up the kernel), the kernel, and the user
-     * function launched by the kernel
+     * ======================================================
+     * Creates the Fortran/C/C++ source file to be unparsed
+     * that contains the host subroutine (which sets up the
+     * kernel), the kernel, and the user function launched
+     * by the kernel
+     * ======================================================
      */
     SgSourceFile &
     createSourceFile (OP2ParallelLoop & op2ParallelLoop);
 
   public:
-    /*
-     * ====================================================================================================
-     * Public functions
-     * ====================================================================================================
-     */
 
     /*
-     * Constructor requires the Fortran/C++/C source files (contained in the
-     * SgProject) to detect OP_PAR_LOOPs and the declaration of OP2 variables
-     * (contained in OP2DeclaredVariables)
+     * ======================================================
+     * Constructor requires the Fortran/C++/C source files
+     * (contained in the SgProject) to detect OP_PAR_LOOPs and
+     * the declaration of OP2 variables (contained in
+     * OP2DeclaredVariables)
+     * ======================================================
      */
     CreateKernels (SgProject * project,
         OP2DeclaredVariables * op2DeclaredVariables)
@@ -171,13 +193,18 @@ class CreateKernels: public AstSimpleProcessing
     }
 
     /*
-     * Over-riding implementation of the AST vertex traversal function
+     * ======================================================
+     * Over-riding implementation of the AST vertex traversal
+     * function
+     * ======================================================
      */
     virtual void
     visit (SgNode * node);
 
     /*
+     * ======================================================
      * Generates output files for each kernel
+     * ======================================================
      */
     void
     unparse ();
