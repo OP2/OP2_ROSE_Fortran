@@ -141,3 +141,39 @@ void op_decl_gbl_map ( op_map * map )
 	map->name = "gbl";
 }
 
+op_arg construct_gbl_arg(op_dat * data, enum op_access acc)
+{
+  op_arg arg = (op_arg) {0, data, {0, 0}, {0, 0}, acc};
+  /*arg.form = 0;*/
+  /*arg.dat = data;*/
+  /*arg.idx = { 0, 0 };*/
+  /*arg.map = { 0, 0 };*/
+  /*arg.acc = acc;*/
+
+  return arg;
+}
+
+op_arg construct_vec_arg(op_dat * data, int idx, op_map * map, enum op_access acc)
+{
+  op_arg arg = (op_arg) {0, data, { idx, 0 }, { map, 0 }, acc};
+  /*arg.form = 0;*/
+  /*arg.dat = data;*/
+  /*arg.idx = { idx, 0 };*/
+  /*arg.map = { map, 0 };*/
+  /*arg.acc = acc;*/
+
+  return arg;
+}
+
+op_arg construct_mat_arg(op_dat * data, int idx0, op_map * map0, int idx1, op_map * map1, enum op_access acc)
+{
+  op_arg arg = (op_arg) {0, data, { idx0, idx1 }, { map0, map1 }, acc};
+  /*arg.form = 0;*/
+  /*arg.dat = data;*/
+  /*arg.idx = { idx0, idx1 };*/
+  /*arg.map = { map0, map1 };*/
+  /*arg.acc = acc;*/
+
+  return arg;
+}
+
