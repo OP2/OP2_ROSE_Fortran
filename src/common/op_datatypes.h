@@ -80,10 +80,10 @@ typedef struct {
 #define OP_ALL -2
 
 /* identity mapping */
-#define OP_ID  (op_map) {{0,0,"null"},{0,0,"null"},0,-1,NULL,"id"}
+#define OP_ID  (op_map) {{0,0,"null"},{0,0,"null"},0,0,NULL,"id"}
 
 /* global identifier */
-#define OP_GBL (op_map) {{0,0,"null"},{0,0,"null"},0,-2,NULL,"gbl"}
+#define OP_GBL (op_map) {{0,0,"null"},{0,0,"null"},-1,0,NULL,"gbl"}
 
 typedef struct {
   /* input arguments */
@@ -123,32 +123,11 @@ typedef struct {
  * Low-level initialisation functions
  */
 
-inline void intialise_set ( op_set * set, int size, int index, char const * name )
-{
-  set->size = size;
-  set->index = index;
-  set->name = name;
-}
+void intialise_set ( op_set * set, int size, char const * name );
 
-inline void intialise_map ( op_map * mapping, op_set * from, op_set * to, int dim, int index, int * map, char const * name )
-{
-  mapping->from = *from;
-  mapping->to   = *to;
-  mapping->dim  = dim;
-  mapping->index = index;
-  mapping->map  = map;
-  mapping->name = name;
-}
+void intialise_map ( op_map * mapping, op_set * from, op_set * to, int dim, int * map, char const * name );
 
-inline void intialise_dat ( op_dat * data, op_set * set, int dim, int index, int type_size, void * dat, char const * name )
-{
-  data->set   = *set;
-  data->dim   = dim;
-  data->index = index;
-  data->dat   = dat;
-  data->size  = dim*type_size;
-	data->name = name;
-}
+void intialise_dat ( op_dat * data, op_set * set, int dim, int type_size, void * dat, char const * name );
 
 /*
  * Structure initialisation

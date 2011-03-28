@@ -2,19 +2,6 @@
 
 #include "op_common.h"
 
-//
-// global variables
-//
-
-int OP_set_index=0, OP_set_max=0,
-    OP_map_index=0, OP_map_max=0,
-    OP_dat_index=0, OP_dat_max=0,
-    OP_diags    =0;
-
-op_set  **OP_set_list;
-op_map  **OP_map_list;
-op_dat  **OP_dat_list;
-
 /*
  * OP functions
  */
