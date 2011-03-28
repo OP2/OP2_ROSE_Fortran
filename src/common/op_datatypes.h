@@ -143,6 +143,8 @@ void op_decl_id_map ( op_map * map );
 
 void op_decl_gbl_map ( op_map * map );
 
+void op_decl_const ( void * dat, int dim, int type_size );
+
 #ifdef __cplusplus
 } /* extern "C" */
 #endif

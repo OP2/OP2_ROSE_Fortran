@@ -15,3 +15,5 @@ void op_decl_dat ( op_dat * data, op_set * set, int dim, int size, void *dat, ch
   initialise_dat ( data, set, dim, size, dat, name );
 }
 
+void op_decl_const ( void * dat, int dim, int type_size ) {}
+
