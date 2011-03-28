@@ -116,8 +116,8 @@ with open(file_h,"w") as h:
     c.write(header_c)
 
     for numargs in range(1,maxargs+1):
-      par_loop_sig  = "void op_par_loop_%d ( void (*kernel)(char *" % numargs + (numargs-1) * ", char *" + "), char const * name, op_set * set,\n"
-      par_loop_sig += ",\n".join(["                  op_arg arg%d" % (i) for i in range(numargs)])
+      par_loop_sig  = "void op_par_loop_%d ( void (*kernel)(void *" % numargs + (numargs-1) * ", void *" + "), char const * name, op_set * set,\n"
+      par_loop_sig += ",\n".join(["                     op_arg arg%d" % (i) for i in range(numargs)])
       par_loop_sig += "\n                   );\n"
 
       par_loop_body = """
