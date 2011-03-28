@@ -23,7 +23,7 @@ extern "C" {
  * enum list for op_par_loop
  */
 
-enum op_access   { OP_READ, OP_WRITE, OP_RW, OP_INC, OP_MIN, OP_MAX };
+typedef enum { OP_READ, OP_WRITE, OP_RW, OP_INC, OP_MIN, OP_MAX } op_access;
 
 /*
  * add in user's datatypes
@@ -79,7 +79,7 @@ typedef struct {
   op_dat     *dat;
   int         idx[2];
   op_map     *map[2];
-  enum op_access   acc;
+  op_access   acc;
 } op_arg;
 
 /* index for direct mapping */
@@ -99,7 +99,7 @@ typedef struct {
   int          set_index, nargs;
   int         *arg_idxs, *idxs, *map_idxs, *dims;
   char const **typs;
-  enum op_access   *accs;
+  op_access   *accs;
 
   /* execution plan */
   int        *nthrcol;  /* number of thread colors for each block */
@@ -153,11 +153,11 @@ void op_decl_gbl_map ( op_map * map );
 
 void op_decl_const ( void * dat, int dim, int type_size );
 
-op_arg construct_gbl_arg(op_dat * data, enum op_access acc);
+op_arg construct_gbl_arg(op_dat * data, op_access acc);
 
-op_arg construct_vec_arg(op_dat * data, int idx, op_map * mapping, enum op_access acc);
+op_arg construct_vec_arg(op_dat * data, int idx, op_map * mapping, op_access acc);
 
-op_arg construct_mat_arg(op_dat * data, int idx0, op_map * map0, int idx1, op_map * map1, enum op_access acc);
+op_arg construct_mat_arg(op_dat * data, int idx0, op_map * map0, int idx1, op_map * map1, op_access acc);
 
 
 #ifdef __cplusplus
