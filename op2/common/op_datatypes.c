@@ -143,36 +143,39 @@ void op_decl_gbl_map ( op_map * map )
 
 op_arg op_construct_gbl_arg(op_dat * data, op_access acc)
 {
-  op_arg arg = (op_arg) {0, data, {0, 0}, {0, 0}, acc};
-  /*arg.form = 0;*/
-  /*arg.dat = data;*/
-  /*arg.idx = { 0, 0 };*/
-  /*arg.map = { 0, 0 };*/
-  /*arg.acc = acc;*/
+  op_arg arg = (op_arg) {
+    0,      /*arg.form = 0;*/
+    data,   /*arg.dat = data;*/
+    {0, 0}, /*arg.idx = { 0, 0 };*/
+    {0, 0}, /*arg.map = { 0, 0 };*/
+    acc     /*arg.acc = acc;*/
+  };
 
   return arg;
 }
 
 op_arg op_construct_vec_arg(op_dat * data, int idx, op_map * map, op_access acc)
 {
-  op_arg arg = (op_arg) {0, data, { idx, 0 }, { map, 0 }, acc};
-  /*arg.form = 0;*/
-  /*arg.dat = data;*/
-  /*arg.idx = { idx, 0 };*/
-  /*arg.map = { map, 0 };*/
-  /*arg.acc = acc;*/
+  op_arg arg = (op_arg) {
+    1,          /*arg.form = 1;*/
+    data,       /*arg.dat = data;*/
+    { idx, 0 }, /*arg.idx = { idx, 0 };*/
+    { map, 0 }, /*arg.map = { map, 0 };*/
+    acc         /*arg.acc = acc;*/
+  };
 
   return arg;
 }
 
 op_arg op_construct_mat_arg(op_dat * data, int idx0, op_map * map0, int idx1, op_map * map1, op_access acc)
 {
-  op_arg arg = (op_arg) {0, data, { idx0, idx1 }, { map0, map1 }, acc};
-  /*arg.form = 0;*/
-  /*arg.dat = data;*/
-  /*arg.idx = { idx0, idx1 };*/
-  /*arg.map = { map0, map1 };*/
-  /*arg.acc = acc;*/
+  op_arg arg = (op_arg) {
+    2,              /*arg.form = 2;*/
+    data,           /*arg.dat = data;*/
+    { idx0, idx1 }, /*arg.idx = { idx0, idx1 };*/
+    { map0, map1 }, /*arg.map = { map0, map1 };*/
+    acc             /*arg.acc = acc;*/
+  };
 
   return arg;
 }
