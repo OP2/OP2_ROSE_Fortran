@@ -93,6 +93,9 @@ typedef struct {
 /* global identifier */
 #define OP_GBL (op_map) {{0,0,"null"},{0,0,"null"},-1,0,NULL,"gbl"}
 
+/* empty set */
+#define OP_NULL_SET (op_set) {0, 0, "null_set"}
+
 typedef struct {
   /* input arguments */
   char const  *name;
@@ -131,11 +134,11 @@ typedef struct {
  * Low-level initialisation functions
  */
 
-void intialise_set ( op_set * set, int size, char const * name );
+void initialise_set ( op_set * set, int size, char const * name );
 
-void intialise_map ( op_map * mapping, op_set * from, op_set * to, int dim, int * map, char const * name );
+void initialise_map ( op_map * mapping, op_set * from, op_set * to, int dim, int * map, char const * name );
 
-void intialise_dat ( op_dat * data, op_set * set, int dim, int type_size, void * dat, char const * name );
+void initialise_dat ( op_dat * data, op_set * set, int dim, int type_size, void * dat, char const * name );
 
 /*
  * Structure initialisation

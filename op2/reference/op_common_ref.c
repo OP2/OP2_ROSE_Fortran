@@ -1,6 +1,7 @@
 #include <stdio.h>
 
-#include "op_common.h"
+#include <op2/common/op_globals.h>
+#include <op2/common/op_common.h>
 
 /*
  * OP functions

@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "op_datatypes.h"
+#include <op2/common/op_datatypes.h>
 
 /*
  * Global variables
@@ -17,7 +17,7 @@ op_set  **OP_set_list;
 op_map  **OP_map_list;
 op_dat  **OP_dat_list;
 
-void initialise_set ( op_set * set, int size, int index, char const * name )
+void initialise_set ( op_set * set, int size, char const * name )
 {
   set->size = size;
   set->index = OP_set_index;
@@ -35,7 +35,7 @@ void initialise_set ( op_set * set, int size, int index, char const * name )
   OP_set_list[OP_set_index++] = set;
 }
 
-void initialise_map ( op_map * mapping, op_set * from, op_set * to, int dim, int index, int * map, char const * name )
+void initialise_map ( op_map * mapping, op_set * from, op_set * to, int dim, int * map, char const * name )
 {
 
   if ( (from->index<0) || (from->index>=OP_set_index) ||
@@ -84,11 +84,11 @@ void initialise_map ( op_map * mapping, op_set * from, op_set * to, int dim, int
   OP_map_list[OP_map_index++] = mapping;
 }
 
-void initialise_dat ( op_dat * data, op_set * set, int dim, int index, int size, void *dat, char const * name )
+void initialise_dat ( op_dat * data, op_set * set, int dim, int size, void *dat, char const * name )
 {
 
-  if ( (set->index<0) || (set->index>=OP_set_index) ||
-       strcmp(OP_set_list[set->index]->name,set->name) ) {
+  if ( set && (set->index<0 || set->index>=OP_set_index ||
+       strcmp(OP_set_list[set->index]->name,set->name)) ) {
     printf("op_decl_dat error -- invalid set for data: %s\n",name);
     exit(-1);
   }
@@ -98,7 +98,7 @@ void initialise_dat ( op_dat * data, op_set * set, int dim, int index, int size,
     exit(-1);
   }
 
-  data->set   = *set;
+  data->set   = set ? *set : OP_NULL_SET;
   data->dim   = dim;
   data->index = OP_dat_index;
   data->dat   = dat;

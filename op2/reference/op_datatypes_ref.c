@@ -1,4 +1,4 @@
-#include "op_datatypes.h"
+#include <op2/common/op_datatypes.h>
 
 void op_decl_set ( op_set * set, int size, char const * name )
 {

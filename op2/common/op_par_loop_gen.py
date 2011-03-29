@@ -2,7 +2,7 @@
 
 import sys
 
-maxargs = 3
+maxargs = 8
 if len(sys.argv) > 1:
   maxargs = int(sys.argv[1])
 
@@ -17,7 +17,7 @@ header_h = """
 #ifndef __OP_PAR_LOOP_H
 #define __OP_PAR_LOOP_H
 
-#include "op_datatypes.h"
+#include <op2/common/op_datatypes.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -126,7 +126,7 @@ with open(file_h,"w") as h:
       for i in range(numargs):
         par_loop_body += "  arg_check ( set, %d, &arg%d , name );\n" % (i,i)
 
-      par_loop_body += "\n  char " + ", ".join(["* ptr%d" % i for i in range(numargs)]) + ";\n\n"
+      par_loop_body += "\n  char " + ", ".join(["* ptr%d = 0" % i for i in range(numargs)]) + ";\n\n"
 
       par_loop_body += "  // Allocate memory for copy-in\n"
       for i in range(numargs):
