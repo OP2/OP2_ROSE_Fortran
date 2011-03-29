@@ -126,7 +126,7 @@ set(OP2_TESTS
   )
 
 # Add tests but do not add to default target
-#foreach(TEST ${OP2_TESTS})
-  #add_subdirectory(test/${TEST} EXCLUDE_FROM_ALL)
-#endforeach()
+foreach(TEST ${OP2_TESTS})
+  add_subdirectory(test/${TEST} EXCLUDE_FROM_ALL)
+endforeach()
 
