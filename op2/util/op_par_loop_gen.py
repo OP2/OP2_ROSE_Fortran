@@ -6,18 +6,14 @@ maxargs = 8
 if len(sys.argv) > 1:
   maxargs = int(sys.argv[1])
 
-filename = "op_par_loop"
-if len(sys.argv) > 2:
-  filename = sys.argv[2]
-
-file_c = filename + ".c"
-file_h = filename + ".h"
+file_c = "../reference/op_par_loop_ref.c"
+file_h = "../common/op_par_loop.h"
 
 header_h = """
 #ifndef __OP_PAR_LOOP_H
 #define __OP_PAR_LOOP_H
 
-#include <op2/common/op_datatypes.h>
+#include "op_datatypes.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -44,7 +40,7 @@ header_c = """
 #include <string.h>
 #include <math.h>
 
-#include "op_par_loop.h"
+#include <op2/common/op_par_loop.h>
 
 static inline void arg_check(op_set * set, int argnum, op_arg * argument, const char * kernel) {
 
