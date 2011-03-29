@@ -46,7 +46,7 @@ header_c = """
 
 #include "op_par_loop.h"
 
-inline void arg_check(op_set * set, int argnum, op_arg * argument, const char * kernel) {
+static inline void arg_check(op_set * set, int argnum, op_arg * argument, const char * kernel) {
 
   for (int i = 0; i < argument->form; ++i) {
     if (argument->map[i] == NULL) {
@@ -73,7 +73,7 @@ inline void arg_check(op_set * set, int argnum, op_arg * argument, const char * 
 }
 
 // FIXME: what to do with matrix (2-form) arguments???
-inline void arg_set (int displacement, op_arg * argument, char ** p_arg)
+static inline void arg_set (int displacement, op_arg * argument, char ** p_arg)
 {
   int n2;
 
@@ -89,7 +89,7 @@ inline void arg_set (int displacement, op_arg * argument, char ** p_arg)
   *p_arg = (char*) argument->dat->dat + n2 * argument->dat->size;
 }
 
-inline void copy_in(int n, op_dat * arg, op_map * map, char *p_arg){
+static inline void copy_in(int n, op_dat * arg, op_map * map, char *p_arg){
   // For each index in the target dimension of map, copy the chunk of data for
   // the current element
   for (int i = 0; i < map->dim; ++i) {
@@ -97,7 +97,7 @@ inline void copy_in(int n, op_dat * arg, op_map * map, char *p_arg){
   }
 }
 
-inline void copy_out(int n, op_dat * arg, op_map * map, char *p_arg){
+static inline void copy_out(int n, op_dat * arg, op_map * map, char *p_arg){
   // For each index in the target dimension of map, copy the chunk of data for
   // the current element
   for (int i = 0; i < map->dim; ++i) {
