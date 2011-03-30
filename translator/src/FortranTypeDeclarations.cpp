@@ -1,79 +1,182 @@
 #include "FortranTypeDeclarations.h"
 
-SgModifierType * FortranTypeDeclarations::twoByteInteger;
-SgModifierType * FortranTypeDeclarations::fourByteInteger;
-SgModifierType * FortranTypeDeclarations::eightByteInteger;
-SgModifierType * FortranTypeDeclarations::singlePrecisionFloat;
-SgModifierType * FortranTypeDeclarations::doublePrecisionFloat;
+/*
+ * ======================================================
+ * Allocation of class-wide static variables
+ * ======================================================
+ */
 
-SgModifierType *
+SgTypeInt * FortranTypeDeclarations::twoByteInteger;
+SgTypeInt * FortranTypeDeclarations::fourByteInteger;
+SgTypeInt * FortranTypeDeclarations::eightByteInteger;
+SgTypeFloat * FortranTypeDeclarations::singlePrecisionFloat;
+SgTypeFloat * FortranTypeDeclarations::doublePrecisionFloat;
+
+Sg_File_Info * FortranTypeDeclarations::fileInfo =
+    Sg_File_Info::generateDefaultFileInfoForCompilerGeneratedNode ();
+
+/*
+ * ======================================================
+ * Private functions
+ * ======================================================
+ */
+
+SgArrayType *
+FortranTypeDeclarations::getArray_RankOne (int lowerBound, int upperBound,
+    SgType * baseType)
+{
+  using SageBuilder::buildExprListExp;
+
+  SgExpression * lowerBoundExpression;
+  SgExpression * upperBoundExpression;
+
+  if (lowerBound == -1)
+  {
+    lowerBoundExpression = new SgNullExpression (fileInfo);
+  }
+  else
+  {
+    lowerBoundExpression = new SgIntVal (fileInfo, lowerBound);
+  }
+  lowerBoundExpression->set_endOfConstruct (fileInfo);
+
+  if (upperBound == -1)
+  {
+    upperBoundExpression = new SgNullExpression (fileInfo);
+  }
+  else
+  {
+    upperBoundExpression = new SgIntVal (fileInfo, upperBound);
+  }
+  upperBoundExpression->set_endOfConstruct (fileInfo);
+
+  SgIntVal * strideExpression = new SgIntVal (fileInfo, 1);
+  strideExpression->set_endOfConstruct (fileInfo);
+
+  SgSubscriptExpression * arrayDimensionExpression = new SgSubscriptExpression (
+      fileInfo, lowerBoundExpression, upperBoundExpression, strideExpression);
+  arrayDimensionExpression->set_endOfConstruct (fileInfo);
+
+  SgArrayType * array = new SgArrayType (baseType, arrayDimensionExpression);
+  arrayDimensionExpression->set_parent (baseType);
+
+  array->set_dim_info (buildExprListExp (arrayDimensionExpression));
+  array->set_rank (1);
+
+  return array;
+}
+
+/*
+ * ======================================================
+ * Public functions
+ * ======================================================
+ */
+
+SgTypeInt *
 FortranTypeDeclarations::getTwoByteInteger ()
 {
-  using SageBuilder::buildFortranKindType;
-  using SageBuilder::buildIntType;
-  using SageBuilder::buildIntVal;
-
   if (twoByteInteger == NULL)
   {
-    twoByteInteger = buildFortranKindType (buildIntType (), buildIntVal (2));
+    twoByteInteger = new SgTypeInt ();
+    SgIntVal * bytesPerInt = new SgIntVal (fileInfo, 2);
+    bytesPerInt->set_endOfConstruct (fileInfo);
+    twoByteInteger->set_type_kind (bytesPerInt);
   }
   return twoByteInteger;
 }
 
-SgModifierType *
+SgTypeInt *
 FortranTypeDeclarations::getFourByteInteger ()
 {
-  using SageBuilder::buildFortranKindType;
-  using SageBuilder::buildIntType;
-  using SageBuilder::buildIntVal;
-
   if (fourByteInteger == NULL)
   {
-    fourByteInteger = buildFortranKindType (buildIntType (), buildIntVal (4));
+    fourByteInteger = new SgTypeInt ();
+    SgIntVal * bytesPerInt = new SgIntVal (fileInfo, 4);
+    bytesPerInt->set_endOfConstruct (fileInfo);
+    fourByteInteger->set_type_kind (bytesPerInt);
   }
   return fourByteInteger;
 }
 
-SgModifierType *
+SgTypeInt *
 FortranTypeDeclarations::getEightByteInteger ()
 {
-  using SageBuilder::buildFortranKindType;
-  using SageBuilder::buildIntType;
-  using SageBuilder::buildIntVal;
-
   if (eightByteInteger == NULL)
   {
-    eightByteInteger = buildFortranKindType (buildIntType (), buildIntVal (8));
+    eightByteInteger = new SgTypeInt ();
+    SgIntVal * bytesPerInt = new SgIntVal (fileInfo, 8);
+    bytesPerInt->set_endOfConstruct (fileInfo);
+    eightByteInteger->set_type_kind (bytesPerInt);
   }
   return eightByteInteger;
 }
 
-SgModifierType *
+SgTypeFloat *
 FortranTypeDeclarations::getSinglePrecisionFloat ()
 {
-  using SageBuilder::buildFortranKindType;
-  using SageBuilder::buildFloatType;
-  using SageBuilder::buildIntVal;
-
   if (singlePrecisionFloat == NULL)
   {
-    singlePrecisionFloat = buildFortranKindType (buildFloatType (),
-        buildIntVal (4));
+    singlePrecisionFloat = new SgTypeFloat ();
+    SgIntVal * bytesPerFloat = new SgIntVal (fileInfo, 4);
+    bytesPerFloat->set_endOfConstruct (fileInfo);
+    singlePrecisionFloat->set_type_kind (bytesPerFloat);
   }
   return singlePrecisionFloat;
 }
 
-SgModifierType *
+SgTypeFloat *
 FortranTypeDeclarations::getDoublePrecisionFloat ()
 {
-  using SageBuilder::buildFortranKindType;
-  using SageBuilder::buildFloatType;
-  using SageBuilder::buildIntVal;
-
   if (doublePrecisionFloat == NULL)
   {
-    doublePrecisionFloat = buildFortranKindType (buildFloatType (),
-        buildIntVal (4));
+    doublePrecisionFloat = new SgTypeFloat ();
+    SgIntVal * bytesPerFloat = new SgIntVal (fileInfo, 8);
+    bytesPerFloat->set_endOfConstruct (fileInfo);
+    doublePrecisionFloat->set_type_kind (bytesPerFloat);
   }
   return doublePrecisionFloat;
+}
+
+SgArrayType *
+FortranTypeDeclarations::getTwoByteIntegerArray_RankOne (int lowerBound,
+    int upperBound)
+{
+  return getArray_RankOne (lowerBound, upperBound, getTwoByteInteger ());
+}
+
+SgArrayType *
+FortranTypeDeclarations::getFourByteIntegerArray_RankOne (int lowerBound,
+    int upperBound)
+{
+  return getArray_RankOne (lowerBound, upperBound, getFourByteInteger ());
+}
+
+SgArrayType *
+FortranTypeDeclarations::getEightByteIntegerArray_RankOne (int lowerBound,
+    int upperBound)
+{
+  return getArray_RankOne (lowerBound, upperBound, getEightByteInteger ());
+}
+
+SgArrayType *
+FortranTypeDeclarations::getSinglePrecisionFloatArray_RankOne (int lowerBound,
+    int upperBound)
+{
+  return getArray_RankOne (lowerBound, upperBound, getSinglePrecisionFloat ());
+}
+
+SgArrayType *
+FortranTypeDeclarations::getDoublePrecisionFloatArray_RankOne (int lowerBound,
+    int upperBound)
+{
+  return getArray_RankOne (lowerBound, upperBound, getDoublePrecisionFloat ());
+}
+
+SgTypeString *
+FortranTypeDeclarations::getString (int length)
+{
+  SgIntVal * numberOfCharacters = new SgIntVal (fileInfo, length);
+  numberOfCharacters->set_endOfConstruct (fileInfo);
+  SgTypeString * string = new SgTypeString (numberOfCharacters);
+  return string;
 }

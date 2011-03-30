@@ -10,8 +10,11 @@
 namespace OP2
 {
   /*
+   * ======================================================
    * Declaration of names specific to OP2
+   * ======================================================
    */
+
   std::string const OP_SET_NAME = "op_set";
   std::string const OP_DAT_NAME = "op_dat";
   std::string const OP_MAP_NAME = "op_map";
@@ -35,15 +38,34 @@ namespace OP2
   std::string const OP_MAP_VariableNamePrefix = "opMap";
 
   /*
-   * Positions of arguments inside OP_PAR_LOOP
-   * The following style is assumed:
-   * OP_PAR_LOOP_<N> (kernelName, OP_SET,
-   *                  OP_DAT,     int,     OP_MAP,     OP_ACCESS,
-   *                  ...
-   *                  OP_DAT_N-1, int_N-1, OP_MAP_N-1, OP_ACCESS_N-1)
+   * ======================================================
+   * The following constants assume that each call to an
+   * OP_PAR_LOOP in Fortran is constructed as follows:
+   *
+   * OP_PAR_LOOP_<N>
+   *   (nameOfUserSubroutine,
+   *    OP_SET,
+   *    OP_DAT,   int,   OP_MAP,   OP_ACCESS,
+   *    ...
+   *    OP_DAT_N, int_N, OP_MAP_N, OP_ACCESS_N)
+   * ======================================================
    */
-  unsigned int const NUMBER_OF_ARGUMENTS_PER_OP_DAT = 4; // For every OP_DAT, there is an int, OP_MAP, and an OP_ACCESS
-  unsigned int const NUMBER_OF_NON_OP_DAT_ARGUMENTS = 2; // 2 because of 'kernelName' and 'OP_SET' arguments
+
+  /*
+   * ======================================================
+   * Currently, for every OP_DAT, there is an int, an OP_MAP,
+   * and an OP_ACCESS
+   * ======================================================
+   */
+  unsigned int const NUMBER_OF_ARGUMENTS_PER_OP_DAT = 4;
+
+  /*
+   * ======================================================
+   * There are 2 non-OP_DAT arguments, namely
+   * 'nameOfUserSubroutine' and 'OP_SET'
+   * ======================================================
+   */
+  unsigned int const NUMBER_OF_NON_OP_DAT_ARGUMENTS = 2;
 }
 
 #endif

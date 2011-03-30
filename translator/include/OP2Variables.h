@@ -1,5 +1,7 @@
 /*
  * Written by Adam Betts and Carlo Bertolli
+ *
+ * These classes model OP2 variable declarations
  */
 
 #ifndef OP2VARIABLES_H
@@ -10,9 +12,9 @@
 class OP2Declaration
 {
     /*
-     * ====================================================================================================
+     * ======================================================
      * Base class to model an OP2 variable declaration
-     * ====================================================================================================
+     * ======================================================
      */
 
   protected:
@@ -35,10 +37,12 @@ class OP2Declaration
 class OP_DAT_Declaration: public OP2Declaration
 {
     /*
-     * ====================================================================================================
-     * Models an OP_DAT declaration
+     * ======================================================
+     * Models an OP_DAT declaration.
+     *
+     * The following style in Fortran is assumed:
      * OP_DECL_DAT (OP_SET, setCardinality, inputData, OP_DAT)
-     * ====================================================================================================
+     * ======================================================
      */
 
   private:
@@ -49,6 +53,7 @@ class OP_DAT_Declaration: public OP2Declaration
     static int const index_OP_DAT = 3;
 
     int dimension;
+
     SgType * actualType;
 
   public:
@@ -71,11 +76,12 @@ class OP_DAT_Declaration: public OP2Declaration
 class OP_SET_Declaration: public OP2Declaration
 {
     /*
-     * ====================================================================================================
-     * Models an OP_SET declaration
-     * The following style is assumed:
+     * ======================================================
+     * Models an OP_SET declaration.
+     *
+     * The following style in Fortran is assumed:
      * OP_DECL_SET (setCardinality, OP_SET)
-     * ====================================================================================================
+     * ======================================================
      */
 
   private:
@@ -91,11 +97,12 @@ class OP_SET_Declaration: public OP2Declaration
 class OP_MAP_Declaration: public OP2Declaration
 {
     /*
-     * ====================================================================================================
-     * Models an OP_MAP declaration
-     * The following style is assumed:
+     * ======================================================
+     * Models an OP_MAP declaration.
+     *
+     * The following style in Fortran is assumed:
      * OP_DECL_MAP (source_OP_SET, destination_OP_SET, setCardinality, inputData, OP_MAP)
-     * ====================================================================================================
+     * ======================================================
      */
 
   private:
@@ -114,11 +121,12 @@ class OP_MAP_Declaration: public OP2Declaration
 class OP_GBL_Declaration: public OP2Declaration
 {
     /*
-     * ====================================================================================================
-     * Models an OP_GBL declaration
-     * The following style is assumed:
+     * ======================================================
+     * Models an OP_GBL declaration.
+     *
+     * The following style in Fortran is assumed:
      * OP_DECL_GBL (inputData, dimension, OP_DAT)
-     * ====================================================================================================
+     * ======================================================
      */
 
   private:
@@ -128,6 +136,7 @@ class OP_GBL_Declaration: public OP2Declaration
     static int const index_OP_DAT = 2;
 
     int dimension;
+
     SgType * actualType;
 
   public:

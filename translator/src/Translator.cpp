@@ -29,7 +29,7 @@ main (int argc, char ** argv)
    * We first need to get all OP2 declarations
    */
   Debug::getInstance ()->debugMessage ("Retrieving OP2 declarations", 2);
-  OP2DeclaredVariables * op2DeclaredVariables = new OP2DeclaredVariables (
+  Declarations * op2DeclaredVariables = new Declarations (
       project);
   op2DeclaredVariables->traverseInputFiles (project, preorder);
 

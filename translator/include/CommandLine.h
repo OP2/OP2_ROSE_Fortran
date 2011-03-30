@@ -5,8 +5,8 @@
  * Could be extended to include others
  */
 
-#ifndef COMMANDLINE_H_
-#define COMMANDLINE_H_
+#ifndef COMMANDLINE_H
+#define COMMANDLINE_H
 
 #include <vector>
 #include <string>

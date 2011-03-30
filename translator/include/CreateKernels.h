@@ -21,6 +21,8 @@ class CreateKernels: public AstSimpleProcessing
 {
   private:
 
+    Sg_File_Info * fileInfo;
+
     /*
      * ======================================================
      * The project which the source-to-source translator
@@ -28,14 +30,6 @@ class CreateKernels: public AstSimpleProcessing
      * ======================================================
      */
     SgProject * project;
-
-    /*
-     * ======================================================
-     * References to all subroutines found during the visit
-     * of the input files
-     * ======================================================
-     */
-    std::vector <SgProcedureHeaderStatement *> inputSubroutines;
 
     /*
      * ======================================================
@@ -50,7 +44,7 @@ class CreateKernels: public AstSimpleProcessing
      * variables (and all other OP2 declarations, if needed)
      * ======================================================
      */
-    OP2DeclaredVariables * op2DeclaredVariables;
+    Declarations * declarations;
 
     /*
      * ======================================================
@@ -101,8 +95,7 @@ class CreateKernels: public AstSimpleProcessing
 
     void
     createHostSubroutineDeclarationsForPlanFunction (
-        SgScopeStatement * subroutineScope, OP2ParallelLoop & op2ParallelLoop,
-        SgScopeStatement *);
+        SgScopeStatement * subroutineScope, OP2ParallelLoop & op2ParallelLoop);
 
     void
     createHostSubroutineFormalParamaters (SgScopeStatement * subroutineScope,
@@ -145,16 +138,6 @@ class CreateKernels: public AstSimpleProcessing
 
     /*
      * ======================================================
-     * Copies the user function (launched by the kernel) and
-     * applies some modifications so that it can run on the device
-     * ======================================================
-     */
-    void
-    copyAndModifyUserFunction (SgScopeStatement * moduleScope,
-        OP2ParallelLoop & op2ParallelLoop);
-
-    /*
-     * ======================================================
      * Creates a new type declaration and definition in the
      * given scope with the given name. The boolean indicates
      * whether the declaration is a Fortran module
@@ -186,10 +169,14 @@ class CreateKernels: public AstSimpleProcessing
      * ======================================================
      */
     CreateKernels (SgProject * project,
-        OP2DeclaredVariables * op2DeclaredVariables)
+        Declarations * op2DeclaredVariables)
     {
       this->project = project;
-      this->op2DeclaredVariables = op2DeclaredVariables;
+      this->declarations = op2DeclaredVariables;
+
+      fileInfo
+          = Sg_File_Info::generateDefaultFileInfoForCompilerGeneratedNode ();
+      fileInfo->setOutputInCodeGeneration ();
     }
 
     /*
