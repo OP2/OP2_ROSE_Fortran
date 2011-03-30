@@ -123,6 +123,8 @@ add_subdirectory(op2)
 
 set(OP2_TESTS
   airfoil
+  jac1
+  jac2
   )
 
 # Add tests but do not add to default target
