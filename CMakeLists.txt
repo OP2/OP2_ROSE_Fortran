@@ -119,16 +119,16 @@ set(OP2_INCLUDE_DIR "include" CACHE PATH "C/C++ header installation directory.")
 add_subdirectory(op2)
 
 #------------------------------------------------------------------------------
-# OP2 tests
+# OP2 examples
 
-set(OP2_TESTS
+set(OP2_EXAMPLES
   airfoil
   jac1
   jac2
   )
 
 # Add tests but do not add to default target
-foreach(TEST ${OP2_TESTS})
-  add_subdirectory(test/${TEST} EXCLUDE_FROM_ALL)
+foreach(EXAMPLE ${OP2_EXAMPLES})
+  add_subdirectory(examples/C/${EXAMPLE} EXCLUDE_FROM_ALL)
 endforeach()
 
