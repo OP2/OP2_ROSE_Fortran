@@ -20,6 +20,10 @@ if (COMMAND cmake_policy)
   cmake_policy(SET CMP0004 OLD)
 endif()
 
+# Set location of our FindFoo.cmake modules
+set(OP2_CMAKE_DIR "${OP2_SOURCE_DIR}/cmake" CACHE INTERNAL "")
+set(CMAKE_MODULE_PATH "${OP2_CMAKE_DIR}/modules")
+
 #------------------------------------------------------------------------------
 # Configurable options for how we want to build
 
@@ -100,6 +104,12 @@ endif()
 # Set 'Developer' build type flags
 set(CMAKE_CXX_FLAGS_DEVELOPER ${OP2_CXX_DEVELOPER_FLAGS} CACHE STRING
   "Flags used by the compiler during development.")
+
+#------------------------------------------------------------------------------
+# Run tests to find required packages
+
+# Check for PETSc
+find_package(PETSc REQUIRED)
 
 #------------------------------------------------------------------------------
 # Run tests to find optional packages

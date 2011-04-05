@@ -37,6 +37,8 @@
 
 #ifdef __cplusplus
 extern "C" {
+#else
+#include <stdlib.h>
 #endif
 
 /*
@@ -126,6 +128,15 @@ typedef struct {
 #define OP_NULL_SET (op_set) {0, 0, "null_set"}
 
 typedef struct {
+  size_t nrows;
+  size_t ncols;
+  size_t *nnz;
+  size_t *rowptr;
+  size_t *colidx;
+  size_t max_nonzeros;
+} op_sparsity;
+
+typedef struct {
   /* input arguments */
   char const  *name;
   int          set_index, nargs;
@@ -190,6 +201,12 @@ op_arg op_construct_gbl_arg(op_dat * data, op_access acc);
 op_arg op_construct_vec_arg(op_dat * data, int idx, op_map * mapping, op_access acc);
 
 op_arg op_construct_mat_arg(op_dat * data, int idx0, op_map * map0, int idx1, op_map * map1, op_access acc);
+
+void op_decl_sparsity ( op_sparsity * sparsity, op_map * rowmap, op_map * colmap );
+
+void op_decl_mat( op_dat * mat, op_sparsity * sparsity, char const * name );
+
+void op_mat_addto( op_dat * mat, const void* values, int nrows, const int *irows, int ncols, const int *icols );
 
 #ifdef __cplusplus
 } /* extern "C" */

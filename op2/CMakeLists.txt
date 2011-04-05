@@ -22,10 +22,23 @@ foreach(DIR ${OP2_DIRS})
 endforeach()
 
 #------------------------------------------------------------------------------
+# Add include directories and libs of required packages
+
+# PETSc
+if (PETSC_FOUND)
+  list(APPEND OP2_CXX_DEFINITIONS "-DHAS_PETSC")
+  list(APPEND OP2_INCLUDE_DIRECTORIES ${PETSC_INCLUDE_DIRS})
+  list(APPEND OP2_TARGET_LINK_LIBRARIES ${PETSC_LIBRARIES})
+endif()
+
+#------------------------------------------------------------------------------
 # Set compiler flags, include directories and library dependencies
 
 # Add compiler include directories
 include_directories(${OP2_SOURCE_DIR} ${OP2_INCLUDE_DIRECTORIES})
+
+# Add CXX defintions
+add_definitions(${OP2_CXX_DEFINITIONS})
 
 # Define libraries
 if (CUDA_FOUND)
@@ -36,6 +49,9 @@ else()
   add_library(op2 ${OP2_H} ${HEADERS} ${SOURCES})
   #set_target_properties(op2 PROPERTIES ${OP2_LIBRARY_PROPERTIES})
 endif()
+
+# Link against target libraries
+target_link_libraries(op2 ${OP2_TARGET_LINK_LIBRARIES})
 
 #------------------------------------------------------------------------------
 # Install

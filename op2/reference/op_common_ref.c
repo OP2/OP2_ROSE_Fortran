@@ -30,6 +30,8 @@
 
 #include <stdio.h>
 
+#include <petscsys.h>
+
 #include <op2/common/op_globals.h>
 #include <op2/common/op_common.h>
 
@@ -40,6 +42,7 @@
 void op_init(int argc, char **argv, int diags)
 {
   OP_diags = diags;
+  PetscInitialize(&argc,&argv,(char *)0,(char *)0);
 }
 
 void op_fetch_data(op_dat dat) {}
@@ -75,5 +78,7 @@ void op_diagnostic_output(){
 
 void op_timing_output() {}
 
-void op_exit() {}
+void op_exit() {
+  PetscFinalize();
+}
 
