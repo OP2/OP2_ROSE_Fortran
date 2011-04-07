@@ -14,6 +14,8 @@
 
 #include <op2.h>
 
+typedef double Real;
+
 // kernel routines for parallel loops
 
 #include "laplace.h"
@@ -30,9 +32,9 @@ int main(int argc, char **argv) {
   int   nnode = (NN+1);
 
   int    *p_elem_node = (int *)malloc(2*sizeof(int)*NN);
-  float  *p_xn = (float *)malloc(sizeof(float)*nnode);
-  float  *p_x  = (float *)malloc(sizeof(float)*nnode);
-  float  *p_y  = (float *)malloc(sizeof(float)*nnode);
+  Real  *p_xn = (Real *)malloc(sizeof(Real)*nnode);
+  Real  *p_x  = (Real *)malloc(sizeof(Real)*nnode);
+  Real  *p_y  = (Real *)malloc(sizeof(Real)*nnode);
 
   // create element -> node mapping
   for (int i = 0; i < NN; ++i) {
@@ -64,9 +66,9 @@ int main(int argc, char **argv) {
 
   dump_map(&elem_node, "map");
 
-  op_decl_dat(&x, &nodes, 1, sizeof(float), p_x, "x");
-  op_decl_dat(&y, &nodes, 1, sizeof(float), p_y, "y");
-  op_decl_dat(&xn, &nodes, 1, sizeof(float), p_xn, "xn");
+  op_decl_dat(&x, &nodes, 1, sizeof(Real), p_x, "x");
+  op_decl_dat(&y, &nodes, 1, sizeof(Real), p_y, "y");
+  op_decl_dat(&xn, &nodes, 1, sizeof(Real), p_xn, "xn");
 
   op_decl_sparsity(&mat_sparsity, &elem_node, &elem_node);
 
@@ -74,6 +76,8 @@ int main(int argc, char **argv) {
 
   op_decl_mat(&mat, &mat_sparsity, "matrix");
 
+  op_diagnostic_output();
+  
   // construct the matrix
   op_par_loop_2((void(*)(void*,void*))laplace, "laplace", &elements,
                 op_construct_mat_arg(&mat, OP_ALL, &elem_node, OP_ALL, &elem_node, OP_INC),
