@@ -5,16 +5,14 @@
  * attributes, such as an integer with n bytes
  */
 
-#ifndef FORTRAN_TYPE_DECLARATIONS_H
-#define FORTRAN_TYPE_DECLARATIONS_H
+#ifndef FORTRAN_TYPES_BUILDER_H
+#define FORTRAN_TYPES_BUILDER_H
 
 #include <rose.h>
 
-class FortranTypeDeclarations
+class FortranTypesBuilder
 {
   private:
-
-    static Sg_File_Info * fileInfo;
 
     static SgTypeInt * twoByteInteger;
 
@@ -28,14 +26,29 @@ class FortranTypeDeclarations
 
     static std::vector <SgArrayType *> arrays;
 
+  private:
+
     /*
      * ======================================================
-     * A helper function to construct the correct type of
-     * Fortran array
+     * A helper function to initiate the construction of a
+     * function by setting up ROSE-specific information
      * ======================================================
      */
-    static SgArrayType *
-    getArray_RankOne (int lowerBound, int upperBound, SgType * baseType);
+    static SgFunctionSymbol *
+    buildFunctionDeclaration (std::string const & functionName,
+        SgScopeStatement * scope);
+
+    /*
+     * ======================================================
+     * A helper function to complete the construction of a
+     * class declaration by setting up ROSE-specific information
+     * ======================================================
+     */
+    static void
+    completeNewDeclaration (SgClassDefinition * classDefinition,
+        SgClassDeclaration * classDeclaration,
+        SgClassDeclaration * nonDefiningClassDeclaration,
+        SgScopeStatement * scope);
 
   public:
 
@@ -84,8 +97,8 @@ class FortranTypeDeclarations
 
     /*
      * ======================================================
-     * Returns a one-dimensional Fortran array containing 2-byte
-     * integers.
+     * Returns a one-dimensional Fortran array of elements
+     * of the given type.
      * If lowerBound = -1, this indicates that the lower
      * bound of the array is unknown.
      * If upperBound = -1, this indicates that the upper
@@ -93,61 +106,7 @@ class FortranTypeDeclarations
      * ======================================================
      */
     static SgArrayType *
-    getTwoByteIntegerArray_RankOne (int lowerBound = -1, int upperBound = -1);
-
-    /*
-     * ======================================================
-     * Returns a one-dimensional Fortran array containing 4-byte
-     * integers.
-     * If lowerBound = -1, this indicates that the lower
-     * bound of the array is unknown.
-     * If upperBound = -1, this indicates that the upper
-     * bound of the array is unknown.
-     * ======================================================
-     */
-    static SgArrayType *
-    getFourByteIntegerArray_RankOne (int lowerBound = -1, int upperBound = -1);
-
-    /*
-     * ======================================================
-     * Returns a one-dimensional Fortran array containing 8-byte
-     * integers.
-     * If lowerBound = -1, this indicates that the lower
-     * bound of the array is unknown.
-     * If upperBound = -1, this indicates that the upper
-     * bound of the array is unknown.
-     * ======================================================
-     */
-    static SgArrayType *
-    getEightByteIntegerArray_RankOne (int lowerBound = -1, int upperBound = -1);
-
-    /*
-     * ======================================================
-     * Returns a one-dimensional Fortran array containing
-     * single-precision floating-point numbers.
-     * If lowerBound = -1, this indicates that the lower
-     * bound of the array is unknown.
-     * If upperBound = -1, this indicates that the upper
-     * bound of the array is unknown.
-     * ======================================================
-     */
-    static SgArrayType *
-    getSinglePrecisionFloatArray_RankOne (int lowerBound = -1, int upperBound =
-        -1);
-
-    /*
-     * ======================================================
-     * Returns a one-dimensional Fortran array containing
-     * double-precision floating-point numbers.
-     * If lowerBound = -1, this indicates that the lower
-     * bound of the array is unknown.
-     * If upperBound = -1, this indicates that the upper
-     * bound of the array is unknown.
-     * ======================================================
-     */
-    static SgArrayType *
-    getDoublePrecisionFloatArray_RankOne (int lowerBound = -1, int upperBound =
-        -1);
+    getArray_RankOne (SgType * baseType, int lowerBound = -1, int upperBound = -1);
 
     /*
      * ======================================================
@@ -157,6 +116,46 @@ class FortranTypeDeclarations
      */
     static SgTypeString *
     getString (int length = 1);
+
+    /*
+     * ======================================================
+     * Creates a new Fortran module declaration and definition
+     * in the given scope with the given name
+     * ======================================================
+     */
+    static SgModuleStatement *
+    buildNewFortranModuleDeclaration (std::string const & moduleName,
+        SgScopeStatement * scope);
+
+    /*
+     * ======================================================
+     * Creates a new type declaration and definition in the
+     * given scope with the given name
+     * ======================================================
+     */
+    static SgClassDeclaration *
+    buildNewTypeDeclaration (std::string const & typeName,
+        SgScopeStatement * scope);
+
+    /*
+     * ======================================================
+     * Creates a new Fortran function in the given scope with
+     * the given name
+     * ======================================================
+     */
+    static SgFunctionSymbol *
+    buildNewFortranFunction (std::string const & functionName,
+        SgScopeStatement * scope);
+
+    /*
+     * ======================================================
+     * Creates a new Fortran subroutine in the given scope with
+     * the given name
+     * ======================================================
+     */
+    static SgFunctionSymbol *
+    buildNewFortranSubroutine (std::string const & functionName,
+        SgScopeStatement * scope);
 };
 
 #endif

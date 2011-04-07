@@ -1,10 +1,16 @@
 #include <boost/algorithm/string/predicate.hpp>
-#include <DeviceSubroutines.h>
+#include <UserDeviceSubroutine.h>
 #include <Debug.h>
+
+/*
+ * ======================================================
+ * Private functions
+ * ======================================================
+ */
 
 void
 UserDeviceSubroutine::copyAndModifySubroutine (SgScopeStatement * moduleScope,
-    UserHostSubroutine & userHostSubroutine, Declarations & declarations)
+    Declarations & declarations)
 {
   using boost::iequals;
   using SageBuilder::buildProcedureHeaderStatement;
@@ -19,9 +25,6 @@ UserDeviceSubroutine::copyAndModifySubroutine (SgScopeStatement * moduleScope,
   Debug::getInstance ()->debugMessage (
       "Modifying and outputting original kernel to CUDA file", 2);
 
-  SgProcedureHeaderStatement * newSubroutine;
-  SgFunctionParameterList * newParameters;
-
   SgProcedureHeaderStatement * originalSubroutine = NULL;
   SgFunctionParameterList * originalParameters = NULL;
 
@@ -33,15 +36,17 @@ UserDeviceSubroutine::copyAndModifySubroutine (SgScopeStatement * moduleScope,
    */
 
   for (vector <SgProcedureHeaderStatement *>::const_iterator it =
-      declarations.first_Subroutine (); it != declarations.last_Subroutine (); ++it)
+      declarations.first_SubroutineInSourceCode (); it
+      != declarations.last_SubroutineInSourceCode (); ++it)
   {
     SgProcedureHeaderStatement * subroutine = *it;
 
-    if (iequals (userHostSubroutine.getSubroutineName (),
-        subroutine->get_name ().getString ()))
+    if (iequals (userHostSubroutineName, subroutine->get_name ().getString ()))
     {
       /*
+       * ======================================================
        * Grab the subroutine and its parameters
+       * ======================================================
        */
       originalSubroutine = subroutine;
       originalParameters = subroutine->get_parameterList ();
@@ -56,13 +61,13 @@ UserDeviceSubroutine::copyAndModifySubroutine (SgScopeStatement * moduleScope,
    * Create the new subroutine
    * ======================================================
    */
-  newParameters = buildFunctionParameterList ();
+  formalParameters = buildFunctionParameterList ();
 
-  newSubroutine = buildProcedureHeaderStatement (subroutineName.c_str (),
-      buildVoidType (), newParameters,
+  subroutineHeaderStatement = buildProcedureHeaderStatement (
+      subroutineName.c_str (), buildVoidType (), formalParameters,
       SgProcedureHeaderStatement::e_subroutine_subprogram_kind, moduleScope);
 
-  appendStatement (newSubroutine, moduleScope);
+  appendStatement (subroutineHeaderStatement, moduleScope);
 
   /*
    * ======================================================
@@ -70,7 +75,7 @@ UserDeviceSubroutine::copyAndModifySubroutine (SgScopeStatement * moduleScope,
    * as there is no grammar support
    * ======================================================
    */
-  addTextForUnparser (newSubroutine, "attributes(device) ",
+  addTextForUnparser (subroutineHeaderStatement, "attributes(device) ",
       AstUnparseAttribute::e_before);
 
   /*
@@ -82,8 +87,7 @@ UserDeviceSubroutine::copyAndModifySubroutine (SgScopeStatement * moduleScope,
    * is to use a copy routine, but currently not working either
    * ======================================================
    */
-  SgScopeStatement * newSubroutineScope =
-      newSubroutine->get_definition ()->get_body ();
+  subroutineScope = subroutineHeaderStatement->get_definition ()->get_body ();
 
   vector <SgStatement *> originalStatements =
       originalSubroutine->get_definition ()->get_body ()->get_statements ();
@@ -104,7 +108,7 @@ UserDeviceSubroutine::copyAndModifySubroutine (SgScopeStatement * moduleScope,
 
     if (isVariableDeclaration == NULL)
     {
-      appendStatement (*it, newSubroutineScope);
+      appendStatement (*it, subroutineScope);
 
       if (isSgImplicitStatement (*it) != NULL)
       {
@@ -127,7 +131,7 @@ UserDeviceSubroutine::copyAndModifySubroutine (SgScopeStatement * moduleScope,
            */
           SgVariableDeclaration * newVariableDeclaration =
               buildVariableDeclaration ((*paramIt)->get_name ().getString (),
-                  (*paramIt)->get_typeptr (), NULL, newSubroutineScope);
+                  (*paramIt)->get_typeptr (), NULL, subroutineScope);
 
           /*
            * ======================================================
@@ -137,7 +141,7 @@ UserDeviceSubroutine::copyAndModifySubroutine (SgScopeStatement * moduleScope,
           newVariableDeclaration->get_declarationModifier ().get_accessModifier ().setUndefined ();
           newVariableDeclaration->get_declarationModifier ().get_typeModifier ().setDevice ();
 
-          newParameters->append_arg (
+          formalParameters->append_arg (
               *(newVariableDeclaration->get_variables ().begin ()));
 
           /*
@@ -146,7 +150,7 @@ UserDeviceSubroutine::copyAndModifySubroutine (SgScopeStatement * moduleScope,
            * subroutine
            * ======================================================
            */
-          appendStatement (newVariableDeclaration, newSubroutineScope);
+          appendStatement (newVariableDeclaration, subroutineScope);
         }
       }
     }
@@ -159,8 +163,8 @@ UserDeviceSubroutine::copyAndModifySubroutine (SgScopeStatement * moduleScope,
               isVariableDeclaration->get_definition ()->get_vardefn ()->get_name ().getString ();
 
       for (SgInitializedNamePtrList::iterator paramIt =
-          newParameters->get_args ().begin (); paramIt
-          != newParameters->get_args ().end (); ++paramIt)
+          formalParameters->get_args ().begin (); paramIt
+          != formalParameters->get_args ().end (); ++paramIt)
       {
         string const parameterName = (*paramIt)->get_name ().getString ();
 
@@ -178,7 +182,7 @@ UserDeviceSubroutine::copyAndModifySubroutine (SgScopeStatement * moduleScope,
          * is not a formal parameter
          * ======================================================
          */
-        appendStatement (*it, newSubroutineScope);
+        appendStatement (*it, subroutineScope);
       }
     }
   }
@@ -202,5 +206,21 @@ UserDeviceSubroutine::copyAndModifySubroutine (SgScopeStatement * moduleScope,
         }
       }
   };
-  (new GenerateAllNodesInUnparser ())->traverse (newSubroutine, preorder);
+  (new GenerateAllNodesInUnparser ())->traverse (subroutineHeaderStatement,
+      preorder);
+}
+
+/*
+ * ======================================================
+ * Public functions
+ * ======================================================
+ */
+
+UserDeviceSubroutine::UserDeviceSubroutine (std::string const & subroutineName,
+    SgScopeStatement * moduleScope, Declarations & declarations) :
+  Subroutine (subroutineName + "_device")
+{
+  userHostSubroutineName = subroutineName;
+
+  copyAndModifySubroutine (moduleScope, declarations);
 }

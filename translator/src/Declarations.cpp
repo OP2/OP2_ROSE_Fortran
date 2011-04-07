@@ -1,8 +1,7 @@
 #include <boost/algorithm/string.hpp>
-
-#include "OP2DeclaredVariables.h"
-#include "OP2CommonDefinitions.h"
-#include "Debug.h"
+#include <Declarations.h>
+#include <OP2CommonDefinitions.h>
+#include <Debug.h>
 
 OP_SET_Declaration *
 Declarations::get_OP_SET_Declaration (std::string const & opSETName)
@@ -95,7 +94,7 @@ Declarations::visit (SgNode * node)
       SgProcedureHeaderStatement * procedureHeaderStatement =
           isSgProcedureHeaderStatement (node);
 
-      inputSubroutines.push_back (procedureHeaderStatement);
+      subroutinesInSourceCode.push_back (procedureHeaderStatement);
 
       Debug::getInstance ()->debugMessage ("Found procedure header statement '"
           + procedureHeaderStatement->get_name ().getString () + "'", 8);

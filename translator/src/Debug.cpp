@@ -1,16 +1,17 @@
 #include <cstdlib>
 #include <typeinfo>
 #include <iostream>
-
-#include "Debug.h"
+#include <Debug.h>
 
 Debug * Debug::debugInstance = NULL;
 
 Debug::Debug ()
 {
   /*
+   * ======================================================
    * Assume that there is no verbose and no debug information
    * to be output
+   * ======================================================
    */
   verbose = false;
   debugLevel = 0;
@@ -43,7 +44,12 @@ Debug::setDebugLevel (int debugLevel)
 {
   debugInstance->debugLevel = debugLevel;
 
-  // By default turn verbose messages provided the debug level is above 0
+  /*
+   * ======================================================
+   * By default turn verbose messages provided the debug
+   * level is above 0
+   * ======================================================
+   */
   if (debugLevel > LOWEST_DEBUG_LEVEL)
   {
     debugInstance->verbose = true;

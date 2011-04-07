@@ -1,29 +1,34 @@
 /*
  * Written by Adam Betts and Carlo Bertolli
  *
- * This class models an OP_PAR_LOOP call discovered in the code
+ * This class models an OP_PAR_LOOP call discovered in the
+ * user-supplied code
  */
 
-#ifndef OP2_PARALLEL_LOOP_H
-#define OP2_PARALLEL_LOOP_H
+#ifndef PARALLEL_LOOP_H
+#define PARALLEL_LOOP_H
 
 #include <rose.h>
 #include <OP2CommonDefinitions.h>
-#include <OP2DeclaredVariables.h>
+#include <Declarations.h>
 #include <OP2Variables.h>
-#include <DeviceSubroutines.h>
 
-class OP2ParallelLoop
+enum MAPPING_VALUE
+{
+  DIRECT, INDIRECT
+};
+
+class ParallelLoop
 {
   private:
 
     /*
      * ======================================================
-     * The name of the generated CUDA-Fortran module for this
+     * The name of the generated Fortran/C++ module for this
      * OP_PAR_LOOP
      * ======================================================
      */
-    std::string CUDAModuleName;
+    std::string moduleName;
 
     /*
      * ======================================================
@@ -31,13 +36,6 @@ class OP2ParallelLoop
      * ======================================================
      */
     SgExpressionPtrList actualArguments;
-
-    /*
-     * ======================================================
-     * Is this a direct or indirect loop?
-     * ======================================================
-     */
-    bool isDirect;
 
     /*
      * ======================================================
@@ -55,37 +53,33 @@ class OP2ParallelLoop
      * variable is passed
      * ======================================================
      */
-    std::map <std::string, unsigned int> OP_DAT_Occurrences;
+    std::map <std::string, unsigned int> numberOfOP_DAT_Occurrences;
 
     /*
      * ======================================================
-     * The host subroutine generated for this OP_PAR_LOOP
+     * The same OP_DAT variable can be passed as an argument
+     * to OP_PAR_LOOP. This map records the first OP_DAT argument
+     * group where the OP_DAT is passed
      * ======================================================
      */
-    HostSubroutine * hostSubroutine;
+    std::map <std::string, unsigned int> firstOP_DAT_Occurrence;
 
     /*
      * ======================================================
-     * The kernel subroutine generated for this OP_PAR_LOOP
+     * How is the data in this OP_DAT variable accessed: through
+     * a mapping or directly?
      * ======================================================
      */
-    KernelSubroutine * kernelSubroutine;
+    std::map <std::string, MAPPING_VALUE> OP_DAT_MappingDescriptors;
 
     /*
      * ======================================================
-     * The user subroutine generated for this OP_PAR_LOOP
-     * (which runs on the device)
+     * How is the data for the OP_DAT variables in this position
+     * (in the actual arguments) accessed: through
+     * a mapping or directly?
      * ======================================================
      */
-    UserDeviceSubroutine * userDeviceSubroutine;
-
-    /*
-     * ======================================================
-     * The user subroutine passed to this OP_PAR_LOOP
-     * (which originally runs on the host)
-     * ======================================================
-     */
-    UserHostSubroutine * userHostSubroutine;
+    std::map <unsigned int, MAPPING_VALUE> OP_DAT_PositionMappingDescriptors;
 
   private:
 
@@ -97,7 +91,7 @@ class OP2ParallelLoop
      * ======================================================
      */
     void
-    setDirectOrIndirectLoop (Declarations * op2DeclaredVariables);
+    setDirectOrIndirectLoop (Declarations * declarations);
 
     /*
      * ======================================================
@@ -107,18 +101,24 @@ class OP2ParallelLoop
      * ======================================================
      */
     void
-    retrieve_OP_DAT_Declarations (Declarations * op2DeclaredVariables);
+    retrieveOP_DATDeclarations (Declarations * declarations);
 
   public:
 
-    OP2ParallelLoop (std::string userSubroutineName,
+    ParallelLoop (std::string userSubroutineName,
         SgExpressionPtrList & actualArguments,
         Declarations * op2DeclaredVariables);
 
+    bool
+    isDirectLoop () const;
+
+    unsigned int
+    getNumberOfDistinctIndirect_OP_DAT_Arguments () const;
+
     std::string
-    getCUDAModuleName () const
+    getModuleName () const
     {
-      return CUDAModuleName;
+      return moduleName;
     }
 
     SgExpressionPtrList &
@@ -127,41 +127,17 @@ class OP2ParallelLoop
       return actualArguments;
     }
 
-    bool
-    isDirectLoop () const
-    {
-      return isDirect;
-    }
-
-    HostSubroutine &
-    getHostSubroutine () const
-    {
-      return *hostSubroutine;
-    }
-
-    KernelSubroutine &
-    getKernelSubroutine () const
-    {
-      return *kernelSubroutine;
-    }
-
-    UserDeviceSubroutine &
-    getUserDeviceSubroutine () const
-    {
-      return *userDeviceSubroutine;
-    }
-
-    UserHostSubroutine &
-    getUserHostSubroutine () const
-    {
-      return *userHostSubroutine;
-    }
-
     unsigned int
     getNumberOf_OP_DAT_ArgumentGroups () const
     {
       return (actualArguments.size () - OP2::NUMBER_OF_NON_OP_DAT_ARGUMENTS)
           / OP2::NUMBER_OF_ARGUMENTS_PER_OP_DAT;
+    }
+
+    unsigned int
+    getNumberOfDistinct_OP_DAT_Arguments () const
+    {
+      return OP_DATs.size ();
     }
 
     std::map <std::string, OP_DAT_Declaration *>::const_iterator
@@ -177,9 +153,21 @@ class OP2ParallelLoop
     }
 
     unsigned int
-    get_OP_DAT_Occurrences (std::string const & variableName)
+    getNumberOfOP_DATOccurrences (std::string const & variableName)
     {
-      return OP_DAT_Occurrences[variableName];
+      return numberOfOP_DAT_Occurrences[variableName];
+    }
+
+    unsigned int
+    getFirstOP_DATOccurrence (std::string const & variableName)
+    {
+      return firstOP_DAT_Occurrence[variableName];
+    }
+
+    MAPPING_VALUE
+    get_OP_MAP_Value (unsigned int positionOf_OP_DAT_InActualArguments)
+    {
+      return OP_DAT_PositionMappingDescriptors[positionOf_OP_DAT_InActualArguments];
     }
 };
 

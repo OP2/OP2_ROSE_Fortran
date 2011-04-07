@@ -1,11 +1,13 @@
 /*
  * Written by Carlo Bertolli and Adam Betts
  *
- * This class stores all OP2 declared variables in the context of a OP2 program
+ * This class stores all OP2 declared variables and
+ * subroutines encountered while parsing the user-supplied
+ * source code
  */
 
-#ifndef OP2_DECLARED_VARIABLES_H
-#define OP2_DECLARED_VARIABLES_H
+#ifndef DECLARATIONS_H
+#define DECLARATIONS_H
 
 #include <rose.h>
 #include <OP2Variables.h>
@@ -28,7 +30,7 @@ class Declarations: public AstSimpleProcessing
      * of the input files
      * ======================================================
      */
-    std::vector <SgProcedureHeaderStatement *> inputSubroutines;
+    std::vector <SgProcedureHeaderStatement *> subroutinesInSourceCode;
 
     /*
      * ======================================================
@@ -86,20 +88,20 @@ class Declarations: public AstSimpleProcessing
         throw (std::string const &);
 
     std::vector <SgProcedureHeaderStatement *>::const_iterator
-    first_Subroutine ()
+    first_SubroutineInSourceCode ()
     {
-      return inputSubroutines.begin ();
+      return subroutinesInSourceCode.begin ();
     }
 
     std::vector <SgProcedureHeaderStatement *>::const_iterator
-    last_Subroutine ()
+    last_SubroutineInSourceCode ()
     {
-      return inputSubroutines.end ();
+      return subroutinesInSourceCode.end ();
     }
 
     /*
      * ======================================================
-     * Traverses the supplied Fortran files to discover
+     * Traverses the supplied files to discover
      * OP_DECL_SET, OP_DECL_MAP, OP_DECL_DAT, OP_DECL_GBL calls
      * and store their actual arguments
      * ======================================================

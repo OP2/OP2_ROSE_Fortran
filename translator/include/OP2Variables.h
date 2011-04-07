@@ -48,8 +48,11 @@ class OP_DAT_Declaration: public OP2Declaration
   private:
 
     static int const index_OP_SET = 0;
+
     static int const index_dimension = 1;
+
     static int const index_inputData = 2;
+
     static int const index_OP_DAT = 3;
 
     int dimension;
@@ -87,6 +90,7 @@ class OP_SET_Declaration: public OP2Declaration
   private:
 
     static int const index_setCardinality = 0;
+
     static int const index_OP_SET = 1;
 
   public:
@@ -108,9 +112,13 @@ class OP_MAP_Declaration: public OP2Declaration
   private:
 
     static int const index_Source_OP_SET = 0;
+
     static int const index_Destination_OP_SET = 1;
+
     static int const index_setCardinality = 2;
+
     static int const index_inputData = 3;
+
     static int const index_OP_MAP = 4;
 
   public:
@@ -132,7 +140,9 @@ class OP_GBL_Declaration: public OP2Declaration
   private:
 
     static int const index_inputData = 0;
+
     static int const index_dimension = 1;
+
     static int const index_OP_DAT = 2;
 
     int dimension;

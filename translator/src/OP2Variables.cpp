@@ -1,7 +1,6 @@
 #include <boost/lexical_cast.hpp>
-
-#include "OP2Variables.h"
-#include "Debug.h"
+#include <OP2Variables.h>
+#include <Debug.h>
 
 OP_DAT_Declaration::OP_DAT_Declaration (SgExpressionPtrList & parameters)
 {
@@ -11,8 +10,10 @@ OP_DAT_Declaration::OP_DAT_Declaration (SgExpressionPtrList & parameters)
   dimension = isSgIntVal (parameters[index_dimension])->get_value ();
 
   /*
-   * The 'inputData' parameter to OP_DECL_DAT holds the base type of the
-   * OP_DAT variable
+   * ======================================================
+   * The 'inputData' parameter to OP_DECL_DAT holds the base
+   * type of the OP_DAT variable
+   * ======================================================
    */
   actualType = isSgVarRefExp (parameters[index_inputData])->get_type ();
 
@@ -56,8 +57,10 @@ OP_GBL_Declaration::OP_GBL_Declaration (SgExpressionPtrList & parameters)
   dimension = isSgIntVal (parameters[index_dimension])->get_value ();
 
   /*
-   * The 'inputData' parameter to OP_DECL_GBL holds the base type of the
-   * OP_DAT variable
+   * ======================================================
+   * The 'inputData' parameter to OP_DECL_GBL holds the base
+   * type of the OP_DAT variable
+   * ======================================================
    */
   actualType = isSgVarRefExp (parameters[index_inputData])->get_type ();
 

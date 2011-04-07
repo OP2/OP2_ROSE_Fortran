@@ -13,11 +13,14 @@
 class Debug
 {
   private:
+
     static Debug * debugInstance;
 
     bool verbose;
 
     int debugLevel;
+
+  private:
 
     /*
      * ======================================================
@@ -37,6 +40,7 @@ class Debug
      * ======================================================
      */
     static int const LOWEST_DEBUG_LEVEL = 0;
+
     static int const HIGHEST_DEBUG_LEVEL = 10;
 
     /*
