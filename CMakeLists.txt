@@ -135,6 +135,7 @@ set(OP2_EXAMPLES
   airfoil
   jac1
   jac2
+  laplace1d
   )
 
 # Add tests but do not add to default target
