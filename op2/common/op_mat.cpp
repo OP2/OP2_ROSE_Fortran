@@ -54,29 +54,29 @@ void op_decl_sparsity ( op_sparsity * sparsity, op_map * rowmap, op_map * colmap
   // Create and populate auxiliary data structure: for each element of the from
   // set, for each row pointed to by the row map, add all columns pointed to by
   // the col map
-  std::vector< std::set< size_t > > s(nrows);
+  std::vector< std::set< int > > s(nrows);
   for ( int e = 0; e < rowmap->from.size; ++e ) {
     for ( int i = 0; i < rowmap->dim; ++i ) {
       int row = rowmap->map[i + e*rowmap->dim];
       s[row].insert( colmap->map + e*colmap->dim, colmap->map + (e+1)*colmap->dim );
     }
   }
-  std::ostream_iterator<size_t> ositer(std::cout, " ");
-  for ( size_t row = 0; row < nrows; ++row ) {
-    std::copy(s[row].begin(), s[row].end(), ositer);
-    std::cout << s[row].size() << std::endl;
-  }
+  //std::ostream_iterator<int> ositer(std::cout, " ");
+  //for ( size_t row = 0; row < nrows; ++row ) {
+    //std::copy(s[row].begin(), s[row].end(), ositer);
+    //std::cout << s[row].size() << std::endl;
+  //}
 
   // Create final sparsity structure
-  size_t *nnz = (size_t*)malloc(nrows * sizeof(size_t));
-  size_t *rowptr = (size_t*)malloc((nrows+1) * sizeof(size_t));
+  int *nnz = (int*)malloc(nrows * sizeof(int));
+  int *rowptr = (int*)malloc((nrows+1) * sizeof(int));
   rowptr[0] = 0;
   for ( size_t row = 0; row < nrows; ++row ) {
     nnz[row] = s[row].size();
     rowptr[row+1] = rowptr[row] + nnz[row];
     if ( max_nonzeros < s[row].size() ) max_nonzeros = s[row].size();
   }
-  size_t *colidx = (size_t*)malloc(rowptr[nrows] * sizeof(size_t));
+  int *colidx = (int*)malloc(rowptr[nrows] * sizeof(int));
   for ( size_t row = 0; row < nrows; ++row ) {
     std::copy(s[row].begin(), s[row].end(), colidx + rowptr[row]);
   }
@@ -87,12 +87,12 @@ void op_decl_sparsity ( op_sparsity * sparsity, op_map * rowmap, op_map * colmap
   sparsity->rowptr = rowptr;
   sparsity->colidx = colidx;
   sparsity->max_nonzeros = max_nonzeros;
-  std::copy(sparsity->nnz, sparsity->nnz+nrows, ositer);
-  std::cout << std::endl;
-  std::copy(sparsity->rowptr, sparsity->rowptr+nrows+1, ositer);
-  std::cout << std::endl;
-  std::copy(sparsity->colidx, sparsity->colidx + sparsity->rowptr[nrows], ositer);
-  std::cout << std::endl;
+  //std::copy(sparsity->nnz, sparsity->nnz+nrows, ositer);
+  //std::cout << std::endl;
+  //std::copy(sparsity->rowptr, sparsity->rowptr+nrows+1, ositer);
+  //std::cout << std::endl;
+  //std::copy(sparsity->colidx, sparsity->colidx + sparsity->rowptr[nrows], ositer);
+  //std::cout << std::endl;
 }
 
 void op_decl_mat( op_dat * mat, op_sparsity * sparsity, char const * name ) {

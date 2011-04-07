@@ -82,5 +82,6 @@ int main(int argc, char **argv) {
   // spmv
   /*op_mat_mult(mat, x, y);*/
 
+  op_exit();
 }
 

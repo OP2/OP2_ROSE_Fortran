@@ -210,23 +210,23 @@ op_arg op_construct_mat_arg(op_dat * data, int idx0, op_map * map0, int idx1, op
   return arg;
 }
 
-static void print_array_int( FILE* f, unsigned int const * v, size_t n ) {
+static void print_array_int( FILE* f, int const * v, size_t n ) {
   for (size_t i = 0; i < n; ++i)
-    fprintf(f, "%u\n", v[i]);
+    fprintf(f, "%d\n", v[i]);
   fprintf(f, "\n");
 }
 
 void dump_map ( op_map const * map, char const * filename ) {
   FILE *f = fopen(filename, "w");
-  print_array_int(f, (unsigned int const *) map->map, map->from.size * map->dim);
+  print_array_int(f, map->map, map->from.size * map->dim);
   fclose(f);
 }
 
 void dump_sparsity ( op_sparsity const * sparsity, char const * filename ) {
   FILE *f = fopen(filename, "w");
-  print_array_int(f, (unsigned int const *) sparsity->nnz, sparsity->nrows);
-  print_array_int(f, (unsigned int const *) sparsity->rowptr, sparsity->nrows + 1);
-  print_array_int(f, (unsigned int const *) sparsity->colidx, sparsity->rowptr[sparsity->nrows]);
+  print_array_int(f, sparsity->nnz, sparsity->nrows);
+  print_array_int(f, sparsity->rowptr, sparsity->nrows + 1);
+  print_array_int(f, sparsity->colidx, sparsity->rowptr[sparsity->nrows]);
   fclose(f);
 }
 

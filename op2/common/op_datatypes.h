@@ -130,9 +130,9 @@ typedef struct {
 typedef struct {
   size_t nrows;
   size_t ncols;
-  size_t *nnz;
-  size_t *rowptr;
-  size_t *colidx;
+  int    *nnz;
+  int    *rowptr;
+  int    *colidx;
   size_t max_nonzeros;
 } op_sparsity;
 
