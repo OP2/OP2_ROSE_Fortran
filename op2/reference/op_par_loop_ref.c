@@ -137,13 +137,13 @@ void op_par_loop_1 ( void (*kernel)(void *), char const * name, op_set * set,
     } else if (arg0.form == 2) {
       const int rows = arg0.map[0]->dim;
       const int cols = arg0.map[1]->dim;
-      op_mat_addto( arg0.dat->dat, ptr0, rows, arg0.map[0]->map + i*rows, cols, arg0.map[1]->map + i*cols);
+      op_mat_addto( arg0.dat, ptr0, rows, arg0.map[0]->map + i*rows, cols, arg0.map[1]->map + i*cols);
     }
 
   }
 
   if ((arg0.form == 1 && arg0.idx[0]  == OP_ALL) || arg0.form == 2) free(ptr0);
-  if (arg0.form == 2) op_mat_assemble(arg0.dat->dat);
+  if (arg0.form == 2) op_mat_assemble(arg0.dat);
 
 }
 
@@ -212,7 +212,7 @@ void op_par_loop_2 ( void (*kernel)(void *, void *), char const * name, op_set *
     } else if (arg0.form == 2) {
       const int rows = arg0.map[0]->dim;
       const int cols = arg0.map[1]->dim;
-      op_mat_addto( arg0.dat->dat, ptr0, rows, arg0.map[0]->map + i*rows, cols, arg0.map[1]->map + i*cols);
+      op_mat_addto( arg0.dat, ptr0, rows, arg0.map[0]->map + i*rows, cols, arg0.map[1]->map + i*cols);
     }
 
     if (arg1.form == 1 && arg1.idx[0]  == OP_ALL) {
@@ -221,15 +221,15 @@ void op_par_loop_2 ( void (*kernel)(void *, void *), char const * name, op_set *
     } else if (arg1.form == 2) {
       const int rows = arg1.map[0]->dim;
       const int cols = arg1.map[1]->dim;
-      op_mat_addto( arg1.dat->dat, ptr1, rows, arg1.map[0]->map + i*rows, cols, arg1.map[1]->map + i*cols);
+      op_mat_addto( arg1.dat, ptr1, rows, arg1.map[0]->map + i*rows, cols, arg1.map[1]->map + i*cols);
     }
 
   }
 
   if ((arg0.form == 1 && arg0.idx[0]  == OP_ALL) || arg0.form == 2) free(ptr0);
-  if (arg0.form == 2) op_mat_assemble(arg0.dat->dat);
+  if (arg0.form == 2) op_mat_assemble(arg0.dat);
   if ((arg1.form == 1 && arg1.idx[0]  == OP_ALL) || arg1.form == 2) free(ptr1);
-  if (arg1.form == 2) op_mat_assemble(arg1.dat->dat);
+  if (arg1.form == 2) op_mat_assemble(arg1.dat);
 
 }
 
@@ -321,7 +321,7 @@ void op_par_loop_3 ( void (*kernel)(void *, void *, void *), char const * name, 
     } else if (arg0.form == 2) {
       const int rows = arg0.map[0]->dim;
       const int cols = arg0.map[1]->dim;
-      op_mat_addto( arg0.dat->dat, ptr0, rows, arg0.map[0]->map + i*rows, cols, arg0.map[1]->map + i*cols);
+      op_mat_addto( arg0.dat, ptr0, rows, arg0.map[0]->map + i*rows, cols, arg0.map[1]->map + i*cols);
     }
 
     if (arg1.form == 1 && arg1.idx[0]  == OP_ALL) {
@@ -330,7 +330,7 @@ void op_par_loop_3 ( void (*kernel)(void *, void *, void *), char const * name, 
     } else if (arg1.form == 2) {
       const int rows = arg1.map[0]->dim;
       const int cols = arg1.map[1]->dim;
-      op_mat_addto( arg1.dat->dat, ptr1, rows, arg1.map[0]->map + i*rows, cols, arg1.map[1]->map + i*cols);
+      op_mat_addto( arg1.dat, ptr1, rows, arg1.map[0]->map + i*rows, cols, arg1.map[1]->map + i*cols);
     }
 
     if (arg2.form == 1 && arg2.idx[0]  == OP_ALL) {
@@ -339,17 +339,17 @@ void op_par_loop_3 ( void (*kernel)(void *, void *, void *), char const * name, 
     } else if (arg2.form == 2) {
       const int rows = arg2.map[0]->dim;
       const int cols = arg2.map[1]->dim;
-      op_mat_addto( arg2.dat->dat, ptr2, rows, arg2.map[0]->map + i*rows, cols, arg2.map[1]->map + i*cols);
+      op_mat_addto( arg2.dat, ptr2, rows, arg2.map[0]->map + i*rows, cols, arg2.map[1]->map + i*cols);
     }
 
   }
 
   if ((arg0.form == 1 && arg0.idx[0]  == OP_ALL) || arg0.form == 2) free(ptr0);
-  if (arg0.form == 2) op_mat_assemble(arg0.dat->dat);
+  if (arg0.form == 2) op_mat_assemble(arg0.dat);
   if ((arg1.form == 1 && arg1.idx[0]  == OP_ALL) || arg1.form == 2) free(ptr1);
-  if (arg1.form == 2) op_mat_assemble(arg1.dat->dat);
+  if (arg1.form == 2) op_mat_assemble(arg1.dat);
   if ((arg2.form == 1 && arg2.idx[0]  == OP_ALL) || arg2.form == 2) free(ptr2);
-  if (arg2.form == 2) op_mat_assemble(arg2.dat->dat);
+  if (arg2.form == 2) op_mat_assemble(arg2.dat);
 
 }
 
@@ -464,7 +464,7 @@ void op_par_loop_4 ( void (*kernel)(void *, void *, void *, void *), char const 
     } else if (arg0.form == 2) {
       const int rows = arg0.map[0]->dim;
       const int cols = arg0.map[1]->dim;
-      op_mat_addto( arg0.dat->dat, ptr0, rows, arg0.map[0]->map + i*rows, cols, arg0.map[1]->map + i*cols);
+      op_mat_addto( arg0.dat, ptr0, rows, arg0.map[0]->map + i*rows, cols, arg0.map[1]->map + i*cols);
     }
 
     if (arg1.form == 1 && arg1.idx[0]  == OP_ALL) {
@@ -473,7 +473,7 @@ void op_par_loop_4 ( void (*kernel)(void *, void *, void *, void *), char const 
     } else if (arg1.form == 2) {
       const int rows = arg1.map[0]->dim;
       const int cols = arg1.map[1]->dim;
-      op_mat_addto( arg1.dat->dat, ptr1, rows, arg1.map[0]->map + i*rows, cols, arg1.map[1]->map + i*cols);
+      op_mat_addto( arg1.dat, ptr1, rows, arg1.map[0]->map + i*rows, cols, arg1.map[1]->map + i*cols);
     }
 
     if (arg2.form == 1 && arg2.idx[0]  == OP_ALL) {
@@ -482,7 +482,7 @@ void op_par_loop_4 ( void (*kernel)(void *, void *, void *, void *), char const 
     } else if (arg2.form == 2) {
       const int rows = arg2.map[0]->dim;
       const int cols = arg2.map[1]->dim;
-      op_mat_addto( arg2.dat->dat, ptr2, rows, arg2.map[0]->map + i*rows, cols, arg2.map[1]->map + i*cols);
+      op_mat_addto( arg2.dat, ptr2, rows, arg2.map[0]->map + i*rows, cols, arg2.map[1]->map + i*cols);
     }
 
     if (arg3.form == 1 && arg3.idx[0]  == OP_ALL) {
@@ -491,19 +491,19 @@ void op_par_loop_4 ( void (*kernel)(void *, void *, void *, void *), char const 
     } else if (arg3.form == 2) {
       const int rows = arg3.map[0]->dim;
       const int cols = arg3.map[1]->dim;
-      op_mat_addto( arg3.dat->dat, ptr3, rows, arg3.map[0]->map + i*rows, cols, arg3.map[1]->map + i*cols);
+      op_mat_addto( arg3.dat, ptr3, rows, arg3.map[0]->map + i*rows, cols, arg3.map[1]->map + i*cols);
     }
 
   }
 
   if ((arg0.form == 1 && arg0.idx[0]  == OP_ALL) || arg0.form == 2) free(ptr0);
-  if (arg0.form == 2) op_mat_assemble(arg0.dat->dat);
+  if (arg0.form == 2) op_mat_assemble(arg0.dat);
   if ((arg1.form == 1 && arg1.idx[0]  == OP_ALL) || arg1.form == 2) free(ptr1);
-  if (arg1.form == 2) op_mat_assemble(arg1.dat->dat);
+  if (arg1.form == 2) op_mat_assemble(arg1.dat);
   if ((arg2.form == 1 && arg2.idx[0]  == OP_ALL) || arg2.form == 2) free(ptr2);
-  if (arg2.form == 2) op_mat_assemble(arg2.dat->dat);
+  if (arg2.form == 2) op_mat_assemble(arg2.dat);
   if ((arg3.form == 1 && arg3.idx[0]  == OP_ALL) || arg3.form == 2) free(ptr3);
-  if (arg3.form == 2) op_mat_assemble(arg3.dat->dat);
+  if (arg3.form == 2) op_mat_assemble(arg3.dat);
 
 }
 
@@ -641,7 +641,7 @@ void op_par_loop_5 ( void (*kernel)(void *, void *, void *, void *, void *), cha
     } else if (arg0.form == 2) {
       const int rows = arg0.map[0]->dim;
       const int cols = arg0.map[1]->dim;
-      op_mat_addto( arg0.dat->dat, ptr0, rows, arg0.map[0]->map + i*rows, cols, arg0.map[1]->map + i*cols);
+      op_mat_addto( arg0.dat, ptr0, rows, arg0.map[0]->map + i*rows, cols, arg0.map[1]->map + i*cols);
     }
 
     if (arg1.form == 1 && arg1.idx[0]  == OP_ALL) {
@@ -650,7 +650,7 @@ void op_par_loop_5 ( void (*kernel)(void *, void *, void *, void *, void *), cha
     } else if (arg1.form == 2) {
       const int rows = arg1.map[0]->dim;
       const int cols = arg1.map[1]->dim;
-      op_mat_addto( arg1.dat->dat, ptr1, rows, arg1.map[0]->map + i*rows, cols, arg1.map[1]->map + i*cols);
+      op_mat_addto( arg1.dat, ptr1, rows, arg1.map[0]->map + i*rows, cols, arg1.map[1]->map + i*cols);
     }
 
     if (arg2.form == 1 && arg2.idx[0]  == OP_ALL) {
@@ -659,7 +659,7 @@ void op_par_loop_5 ( void (*kernel)(void *, void *, void *, void *, void *), cha
     } else if (arg2.form == 2) {
       const int rows = arg2.map[0]->dim;
       const int cols = arg2.map[1]->dim;
-      op_mat_addto( arg2.dat->dat, ptr2, rows, arg2.map[0]->map + i*rows, cols, arg2.map[1]->map + i*cols);
+      op_mat_addto( arg2.dat, ptr2, rows, arg2.map[0]->map + i*rows, cols, arg2.map[1]->map + i*cols);
     }
 
     if (arg3.form == 1 && arg3.idx[0]  == OP_ALL) {
@@ -668,7 +668,7 @@ void op_par_loop_5 ( void (*kernel)(void *, void *, void *, void *, void *), cha
     } else if (arg3.form == 2) {
       const int rows = arg3.map[0]->dim;
       const int cols = arg3.map[1]->dim;
-      op_mat_addto( arg3.dat->dat, ptr3, rows, arg3.map[0]->map + i*rows, cols, arg3.map[1]->map + i*cols);
+      op_mat_addto( arg3.dat, ptr3, rows, arg3.map[0]->map + i*rows, cols, arg3.map[1]->map + i*cols);
     }
 
     if (arg4.form == 1 && arg4.idx[0]  == OP_ALL) {
@@ -677,21 +677,21 @@ void op_par_loop_5 ( void (*kernel)(void *, void *, void *, void *, void *), cha
     } else if (arg4.form == 2) {
       const int rows = arg4.map[0]->dim;
       const int cols = arg4.map[1]->dim;
-      op_mat_addto( arg4.dat->dat, ptr4, rows, arg4.map[0]->map + i*rows, cols, arg4.map[1]->map + i*cols);
+      op_mat_addto( arg4.dat, ptr4, rows, arg4.map[0]->map + i*rows, cols, arg4.map[1]->map + i*cols);
     }
 
   }
 
   if ((arg0.form == 1 && arg0.idx[0]  == OP_ALL) || arg0.form == 2) free(ptr0);
-  if (arg0.form == 2) op_mat_assemble(arg0.dat->dat);
+  if (arg0.form == 2) op_mat_assemble(arg0.dat);
   if ((arg1.form == 1 && arg1.idx[0]  == OP_ALL) || arg1.form == 2) free(ptr1);
-  if (arg1.form == 2) op_mat_assemble(arg1.dat->dat);
+  if (arg1.form == 2) op_mat_assemble(arg1.dat);
   if ((arg2.form == 1 && arg2.idx[0]  == OP_ALL) || arg2.form == 2) free(ptr2);
-  if (arg2.form == 2) op_mat_assemble(arg2.dat->dat);
+  if (arg2.form == 2) op_mat_assemble(arg2.dat);
   if ((arg3.form == 1 && arg3.idx[0]  == OP_ALL) || arg3.form == 2) free(ptr3);
-  if (arg3.form == 2) op_mat_assemble(arg3.dat->dat);
+  if (arg3.form == 2) op_mat_assemble(arg3.dat);
   if ((arg4.form == 1 && arg4.idx[0]  == OP_ALL) || arg4.form == 2) free(ptr4);
-  if (arg4.form == 2) op_mat_assemble(arg4.dat->dat);
+  if (arg4.form == 2) op_mat_assemble(arg4.dat);
 
 }
 

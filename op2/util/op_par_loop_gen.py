@@ -232,7 +232,7 @@ with open(file_h,"w") as h:
     } else if (arg%d.form == 2) {
       const int rows = arg%d.map[0]->dim;
       const int cols = arg%d.map[1]->dim;
-      op_mat_addto( arg%d.dat->dat, ptr%d, rows, arg%d.map[0]->map + i*rows, cols, arg%d.map[1]->map + i*cols);
+      op_mat_addto( arg%d.dat, ptr%d, rows, arg%d.map[0]->map + i*rows, cols, arg%d.map[1]->map + i*cols);
     }
 """ % tuple(15*[i])
 
@@ -243,7 +243,7 @@ with open(file_h,"w") as h:
       # build scratch memory frees
       for i in range(numargs):
         par_loop_body += "  if ((arg%d.form == 1 && arg%d.idx[0]  == OP_ALL) || arg%d.form == 2) free(ptr%d);\n" % (i,i,i,i)
-        par_loop_body += "  if (arg%d.form == 2) op_mat_assemble(arg%d.dat->dat);\n" % (i,i)
+        par_loop_body += "  if (arg%d.form == 2) op_mat_assemble(arg%d.dat);\n" % (i,i)
 
       par_loop_body += """
 }

@@ -223,6 +223,12 @@ void dump_map ( op_map const * map, char const * filename ) {
   fclose(f);
 }
 
+void dump_dat ( op_dat const * dat, char const * filename ) {
+  FILE *f = fopen(filename, "w");
+  fprintf(f,"%s %d %d %x %x\n", dat->name, dat->dim, dat->size, dat->dat, dat->dat_d);
+  fclose(f);
+}
+
 void dump_sparsity ( op_sparsity const * sparsity, char const * filename ) {
   FILE *f = fopen(filename, "w");
   fprintf(f,"%zu %zu %zu\n\n", sparsity->nrows, sparsity->ncols, sparsity->max_nonzeros);
