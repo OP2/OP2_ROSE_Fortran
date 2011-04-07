@@ -57,8 +57,8 @@ FortranStatementsAndExpressionsBuilder::buildShapeExpression (
 {
   using SageBuilder::buildOpaqueVarRefExp;
 
-  SgExpression * shapeExpression = buildOpaqueVarRefExp ("["
-      + ROSEHelper::getFirstVariableName (variableDeclaration) + "]", scope);
+  SgExpression * shapeExpression = buildOpaqueVarRefExp ("(/"
+      + ROSEHelper::getFirstVariableName (variableDeclaration) + "/)", scope);
 
   return shapeExpression;
 }

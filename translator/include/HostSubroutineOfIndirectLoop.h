@@ -52,6 +52,7 @@ namespace
   std::string const variableName_pnthrcol = "pnthrcol";
   std::string const variableName_pthrcol = "pthrcol";
   std::string const variableName_pindMaps = "pindMaps";
+  std::string const variableName_pindMapsSize = "pindMapsSize";
   std::string const variableName_pmaps = "pmaps";
 }
 
@@ -59,7 +60,7 @@ class HostSubroutineOfIndirectLoop: public HostSubroutine
 {
   private:
 
-    std::map <std::string, SgVariableDeclaration *> localVariables_Remaining;
+    std::map <std::string, SgVariableDeclaration *> localVariables_Others;
 
     std::map <std::string, SgVariableDeclaration *>
         localVariables_ExecutionPlan_OP_DAT;
@@ -72,6 +73,12 @@ class HostSubroutineOfIndirectLoop: public HostSubroutine
 
     std::map <unsigned int, SgVariableDeclaration *>
         localVariables_ExecutionPlan_OP_MAP_Size;
+
+    std::map <unsigned int, SgVariableDeclaration *>
+        localVariables_ExecutionPlan_IndirectMaps;
+
+    std::map <unsigned int, SgVariableDeclaration *>
+        localVariables_ExecutionPlan_IndirectMaps_Size;
 
   private:
 
@@ -89,13 +96,10 @@ class HostSubroutineOfIndirectLoop: public HostSubroutine
     createDoLoopToCorrectIndexing (ParallelLoop & parallelLoop);
 
     void
-    createStatementsForExecutionPlan (ParallelLoop & parallelLoop);
+    createExecutionPlanStatements (ParallelLoop & parallelLoop);
 
     void
-    createLocalVariables (ParallelLoop & parallelLoop);
-
-    void
-    createExecutionPlanVariables (ParallelLoop & parallelLoop);
+    createExecutionPlanLocalVariables (ParallelLoop & parallelLoop);
 
   public:
 
