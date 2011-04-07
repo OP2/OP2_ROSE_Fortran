@@ -105,13 +105,24 @@ void op_decl_mat( op_dat * mat, op_sparsity * sparsity, char const * name ) {
       (const PetscInt*)sparsity->nnz,
       &p_mat);
   // Set the column indices (FIXME: benchmark is this is worth it)
-  MatSeqAIJSetColumnIndices(p_mat, (PetscInt*)sparsity->colidx);
+  //MatSeqAIJSetColumnIndices(p_mat, (PetscInt*)sparsity->colidx);
 
-  initialise_dat(mat, NULL, 1, sizeof(float), p_mat, name);
+  initialise_dat(mat, NULL, 1, sizeof(PetscScalar), p_mat, name);
 }
 
 void op_mat_addto( op_dat * mat, const void* values, int nrows, const int *irows, int ncols, const int *icols ) {
+  for (int i = 0; i < nrows; ++i) {
+    for (int j = 0; j < nrows; ++j) {
+      printf("(%d,%d)->(%d,%d): %f\n", i, j, ((const PetscInt *)irows)[i], ((const PetscInt *)icols)[j], ((const PetscScalar*)values)[i*ncols+j]);
+    }
+  }
   MatSetValues((Mat) mat->dat, nrows, (const PetscInt *)irows, ncols, (const PetscInt *)icols, (const PetscScalar *)values, ADD_VALUES);
+}
+
+void op_mat_assemble( op_dat * mat ) {
+  MatAssemblyBegin((Mat) mat->dat,MAT_FINAL_ASSEMBLY);
+  MatAssemblyEnd((Mat) mat->dat,MAT_FINAL_ASSEMBLY);
+  MatView((Mat) mat->dat,PETSC_VIEWER_STDOUT_WORLD);
 }
 
 } /* extern "C" */

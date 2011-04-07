@@ -218,12 +218,14 @@ static void print_array_int( FILE* f, int const * v, size_t n ) {
 
 void dump_map ( op_map const * map, char const * filename ) {
   FILE *f = fopen(filename, "w");
+  fprintf(f,"%s %d\n\n", map->name, map->dim);
   print_array_int(f, map->map, map->from.size * map->dim);
   fclose(f);
 }
 
 void dump_sparsity ( op_sparsity const * sparsity, char const * filename ) {
   FILE *f = fopen(filename, "w");
+  fprintf(f,"%zu %zu %zu\n\n", sparsity->nrows, sparsity->ncols, sparsity->max_nonzeros);
   print_array_int(f, sparsity->nnz, sparsity->nrows);
   print_array_int(f, sparsity->rowptr, sparsity->nrows + 1);
   print_array_int(f, sparsity->colidx, sparsity->rowptr[sparsity->nrows]);

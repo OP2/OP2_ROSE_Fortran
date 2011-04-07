@@ -143,6 +143,7 @@ void op_par_loop_1 ( void (*kernel)(void *), char const * name, op_set * set,
   }
 
   if ((arg0.form == 1 && arg0.idx[0]  == OP_ALL) || arg0.form == 2) free(ptr0);
+  if (arg0.form == 2) op_mat_assemble(arg0.dat->dat);
 
 }
 
@@ -226,7 +227,9 @@ void op_par_loop_2 ( void (*kernel)(void *, void *), char const * name, op_set *
   }
 
   if ((arg0.form == 1 && arg0.idx[0]  == OP_ALL) || arg0.form == 2) free(ptr0);
+  if (arg0.form == 2) op_mat_assemble(arg0.dat->dat);
   if ((arg1.form == 1 && arg1.idx[0]  == OP_ALL) || arg1.form == 2) free(ptr1);
+  if (arg1.form == 2) op_mat_assemble(arg1.dat->dat);
 
 }
 
@@ -342,8 +345,11 @@ void op_par_loop_3 ( void (*kernel)(void *, void *, void *), char const * name, 
   }
 
   if ((arg0.form == 1 && arg0.idx[0]  == OP_ALL) || arg0.form == 2) free(ptr0);
+  if (arg0.form == 2) op_mat_assemble(arg0.dat->dat);
   if ((arg1.form == 1 && arg1.idx[0]  == OP_ALL) || arg1.form == 2) free(ptr1);
+  if (arg1.form == 2) op_mat_assemble(arg1.dat->dat);
   if ((arg2.form == 1 && arg2.idx[0]  == OP_ALL) || arg2.form == 2) free(ptr2);
+  if (arg2.form == 2) op_mat_assemble(arg2.dat->dat);
 
 }
 
@@ -491,9 +497,13 @@ void op_par_loop_4 ( void (*kernel)(void *, void *, void *, void *), char const 
   }
 
   if ((arg0.form == 1 && arg0.idx[0]  == OP_ALL) || arg0.form == 2) free(ptr0);
+  if (arg0.form == 2) op_mat_assemble(arg0.dat->dat);
   if ((arg1.form == 1 && arg1.idx[0]  == OP_ALL) || arg1.form == 2) free(ptr1);
+  if (arg1.form == 2) op_mat_assemble(arg1.dat->dat);
   if ((arg2.form == 1 && arg2.idx[0]  == OP_ALL) || arg2.form == 2) free(ptr2);
+  if (arg2.form == 2) op_mat_assemble(arg2.dat->dat);
   if ((arg3.form == 1 && arg3.idx[0]  == OP_ALL) || arg3.form == 2) free(ptr3);
+  if (arg3.form == 2) op_mat_assemble(arg3.dat->dat);
 
 }
 
@@ -673,10 +683,15 @@ void op_par_loop_5 ( void (*kernel)(void *, void *, void *, void *, void *), cha
   }
 
   if ((arg0.form == 1 && arg0.idx[0]  == OP_ALL) || arg0.form == 2) free(ptr0);
+  if (arg0.form == 2) op_mat_assemble(arg0.dat->dat);
   if ((arg1.form == 1 && arg1.idx[0]  == OP_ALL) || arg1.form == 2) free(ptr1);
+  if (arg1.form == 2) op_mat_assemble(arg1.dat->dat);
   if ((arg2.form == 1 && arg2.idx[0]  == OP_ALL) || arg2.form == 2) free(ptr2);
+  if (arg2.form == 2) op_mat_assemble(arg2.dat->dat);
   if ((arg3.form == 1 && arg3.idx[0]  == OP_ALL) || arg3.form == 2) free(ptr3);
+  if (arg3.form == 2) op_mat_assemble(arg3.dat->dat);
   if ((arg4.form == 1 && arg4.idx[0]  == OP_ALL) || arg4.form == 2) free(ptr4);
+  if (arg4.form == 2) op_mat_assemble(arg4.dat->dat);
 
 }
 

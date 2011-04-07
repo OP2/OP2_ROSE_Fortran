@@ -243,6 +243,7 @@ with open(file_h,"w") as h:
       # build scratch memory frees
       for i in range(numargs):
         par_loop_body += "  if ((arg%d.form == 1 && arg%d.idx[0]  == OP_ALL) || arg%d.form == 2) free(ptr%d);\n" % (i,i,i,i)
+        par_loop_body += "  if (arg%d.form == 2) op_mat_assemble(arg%d.dat->dat);\n" % (i,i)
 
       par_loop_body += """
 }

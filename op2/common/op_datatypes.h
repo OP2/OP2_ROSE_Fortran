@@ -208,6 +208,8 @@ void op_decl_mat( op_dat * mat, op_sparsity * sparsity, char const * name );
 
 void op_mat_addto( op_dat * mat, const void* values, int nrows, const int *irows, int ncols, const int *icols );
 
+void op_mat_assemble( op_dat * mat );
+
 void dump_set ( op_set const * set, char const * filename );
 
 void dump_map ( op_map const * map, char const * filename );
