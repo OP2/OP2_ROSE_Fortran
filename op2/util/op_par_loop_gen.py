@@ -126,14 +126,11 @@ static inline void arg_check(op_set * set, int argnum, op_arg * argument, const 
   }
 }
 
-// FIXME: what to do with matrix (2-form) arguments???
 static inline void arg_set (int displacement, op_arg * argument, char ** p_arg)
 {
   int n2;
 
-  if ( argument->form == 0 )					      // global variable, no mapping at all
-		n2 = 0;
-  else if ( argument->map[0] == 0 )			// identity mapping
+  if ( argument->map[0] == 0 )			// identity mapping
 		n2 = displacement;
   else if ( argument->map[0]->dim > 0 ) // standard pointers
     n2 = argument->map[0]->map[argument->idx[0] + displacement * argument->map[0]->dim];
@@ -169,7 +166,10 @@ with open(file_h,"w") as h:
     h.write(header_h)
     c.write(header_c)
 
+# Loop over arguments
+
     for numargs in range(1,maxargs+1):
+      # build op_par_loop signature
       par_loop_sig  = "void op_par_loop_%d ( void (*kernel)(void *" % numargs + (numargs-1) * ", void *" + "), char const * name, op_set * set,\n"
       par_loop_sig += ",\n".join(["                     op_arg arg%d" % (i) for i in range(numargs)])
       par_loop_sig += "\n                   );\n"
@@ -177,40 +177,74 @@ with open(file_h,"w") as h:
       par_loop_body = """
 {
 """
+      # build argument check calls
       for i in range(numargs):
         par_loop_body += "  arg_check ( set, %d, &arg%d , name );\n" % (i,i)
 
-      par_loop_body += "\n  char " + ", ".join(["* ptr%d = 0" % i for i in range(numargs)]) + ";\n\n"
+      # build kernel parameter declarations
+      par_loop_body += "\n  char " + ", ".join(["* ptr%d = 0" % i for i in range(numargs)]) + ";\n"
 
-      par_loop_body += "  // Allocate memory for copy-in\n"
+      # build scratch memory allocation
       for i in range(numargs):
-        par_loop_body += "  if (arg%d.idx[0]  == OP_ALL) ptr%d = (char*) malloc(arg%d.map[0]->dim * arg%d.dat->size);\n" % (i,i,i,i)
+        par_loop_body += """
+  switch( arg%d.form ) {
+  case 0:
+    ptr%d = (char*) arg%d.dat->dat;
+    break;
+  case 1:
+    if (arg%d.idx[0]  == OP_ALL) ptr%d = (char*) malloc(arg%d.map[0]->dim * arg%d.dat->size);
+    break;
+  case 2:
+    ptr%d = (char*) malloc(arg%d.map[0]->dim * arg%d.map[1]->dim * arg%d.dat->size);
+    break;
+  }
+""" % tuple(11*[i])
 
+      # build loop over set elements
       par_loop_body += """
 
   // Loop over set elements
   for ( int i = 0; i < set->size; i++ ) {
 """
 
+      # build copy-in / setting of pointer
       for i in range(numargs):
         par_loop_body += """
-    if (arg%d.idx[0]  == OP_ALL) {
-      if (arg%d.acc  == OP_READ || arg%d.acc  == OP_RW || arg%d.acc  == OP_INC)
-        copy_in(i, arg%d.dat, arg%d.map[0], ptr%d );
-    } else {
-      arg_set ( i, &arg%d, &ptr%d );
-    }""" % tuple(9*[i])
+    if (arg%d.form == 1) {
+      if (arg%d.idx[0]  == OP_ALL) {
+        if (arg%d.acc  == OP_READ || arg%d.acc  == OP_RW || arg%d.acc  == OP_INC)
+          copy_in(i, arg%d.dat, arg%d.map[0], ptr%d );
+      } else {
+        arg_set ( i, &arg%d, &ptr%d );
+      }
+    }
+""" % tuple(10*[i])
 
+      # build kernel call
       par_loop_body += "\n    kernel(" + ", ".join(["ptr%d" % i for i in range(numargs)]) + ");\n"
 
+      # build copy-out / matrix assembly call
       for i in range(numargs):
         par_loop_body += """
-    if (arg%d.idx[0]  == OP_ALL)
+    if (arg%d.form == 1 && arg%d.idx[0]  == OP_ALL) {
       if (arg%d.acc  == OP_WRITE || arg%d.acc  == OP_RW || arg%d.acc  == OP_INC)
-        copy_out(i, arg%d.dat, arg%d.map[0], ptr%d );""" % tuple(7*[i])
+        copy_out(i, arg%d.dat, arg%d.map[0], ptr%d );
+    } else if (arg%d.form == 2) {
+      const int rows = arg%d.map[0]->dim;
+      const int cols = arg%d.map[1]->dim;
+      op_mat_addto( arg%d.dat->dat, ptr%d, rows, arg%d.map[0]->map + i*rows, cols, arg%d.map[1]->map + i*cols);
+    }
+""" % tuple(15*[i])
 
       par_loop_body += """
   }
+
+"""
+      # build scratch memory frees
+      for i in range(numargs):
+        par_loop_body += "  if ((arg%d.form == 1 && arg%d.idx[0]  == OP_ALL) || arg%d.form == 2) free(ptr%d);\n" % (i,i,i,i)
+
+      par_loop_body += """
 }
 """
 
@@ -218,6 +252,8 @@ with open(file_h,"w") as h:
 
       h.write(par_loop_sig + "\n")
       c.write(par_loop_func + "\n")
+
+# End loop over arguments
 
     h.write(footer_h)
     c.write(footer_c)

@@ -17,7 +17,7 @@ foreach(DIR ${OP2_DIRS})
   list(APPEND HEADERS ${_HEADERS})
   install(FILES ${_HEADERS} DESTINATION ${OP2_INCLUDE_DIR}/op2/${DIR} COMPONENT Development)
 
-  file(GLOB _SOURCES ${DIR}/*.c)
+  file(GLOB _SOURCES ${DIR}/*.c ${DIR}/*.cpp)
   list(APPEND SOURCES ${_SOURCES})
 endforeach()
 
