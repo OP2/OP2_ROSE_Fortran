@@ -34,6 +34,7 @@
 #include <vector>
 
 #include <petscmat.h>
+#include <petscvec.h>
 
 #include "op_datatypes.h"
 
@@ -112,6 +113,21 @@ void op_mat_assemble( op_dat * mat ) {
   MatAssemblyBegin((Mat) mat->dat,MAT_FINAL_ASSEMBLY);
   MatAssemblyEnd((Mat) mat->dat,MAT_FINAL_ASSEMBLY);
   MatView((Mat) mat->dat,PETSC_VIEWER_STDOUT_WORLD);
+}
+
+void op_create_vec ( op_dat * vec ) {
+  Vec p_vec;
+  // Create a PETSc vector and pass it the user-allocated storage
+  VecCreateSeqWithArray(MPI_COMM_SELF,vec->dim * vec->set.size,(PetscScalar*)vec->dat,&p_vec);
+  VecAssemblyBegin(p_vec);
+  VecAssemblyEnd(p_vec);
+
+  vec->dat = p_vec;
+}
+
+void op_mat_mult ( const op_dat * mat, const op_dat * v_in, op_dat * v_out ) {
+  MatMult((Mat) mat->dat,(Vec) v_in->dat,(Vec) v_out->dat);
+  VecView((Vec) v_out->dat,PETSC_VIEWER_STDOUT_WORLD);
 }
 
 } /* extern "C" */

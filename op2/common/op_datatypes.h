@@ -190,6 +190,8 @@ void op_decl_map ( op_map * mapping, op_set * from, op_set * to, int dim, int * 
 
 void op_decl_dat ( op_dat * data, op_set * set, int dim, int type_size, void * dat, char const * name );
 
+void op_create_vec ( op_dat * vec );
+
 void op_decl_id_map ( op_map * map );
 
 void op_decl_gbl_map ( op_map * map );
@@ -209,6 +211,8 @@ void op_decl_mat( op_dat * mat, op_sparsity * sparsity, char const * name );
 void op_mat_addto( op_dat * mat, const void* values, int nrows, const int *irows, int ncols, const int *icols );
 
 void op_mat_assemble( op_dat * mat );
+
+void op_mat_mult ( const op_dat * mat, const op_dat * v_in, op_dat * v_out );
 
 void dump_set ( op_set const * set, char const * filename );
 
