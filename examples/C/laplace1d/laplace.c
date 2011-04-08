@@ -22,7 +22,7 @@ typedef double Real;
 
 // define problem size
 
-#define NN       2
+#define NN       6
 #define NITER    2
 
 // main program
@@ -64,7 +64,7 @@ int main(int argc, char **argv) {
 
   op_decl_map(&elem_node, &elements, &nodes, 2, p_elem_node, "elem_node");
 
-  dump_map(&elem_node, "map");
+  /*dump_map(&elem_node, "map");*/
 
   op_decl_dat(&x, &nodes, 1, sizeof(Real), p_x, "x");
   op_decl_dat(&y, &nodes, 1, sizeof(Real), p_y, "y");
@@ -72,9 +72,11 @@ int main(int argc, char **argv) {
 
   op_decl_sparsity(&mat_sparsity, &elem_node, &elem_node);
 
-  dump_sparsity(&mat_sparsity, "sparsity");
+  /*dump_sparsity(&mat_sparsity, "sparsity");*/
 
   op_decl_mat(&mat, &mat_sparsity, "matrix");
+
+  /*dump_dat(&mat, "matrix");*/
 
   op_diagnostic_output();
   

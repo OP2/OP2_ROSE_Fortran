@@ -61,11 +61,6 @@ void op_decl_sparsity ( op_sparsity * sparsity, op_map * rowmap, op_map * colmap
       s[row].insert( colmap->map + e*colmap->dim, colmap->map + (e+1)*colmap->dim );
     }
   }
-  //std::ostream_iterator<int> ositer(std::cout, " ");
-  //for ( size_t row = 0; row < nrows; ++row ) {
-    //std::copy(s[row].begin(), s[row].end(), ositer);
-    //std::cout << s[row].size() << std::endl;
-  //}
 
   // Create final sparsity structure
   int *nnz = (int*)malloc(nrows * sizeof(int));
@@ -87,12 +82,6 @@ void op_decl_sparsity ( op_sparsity * sparsity, op_map * rowmap, op_map * colmap
   sparsity->rowptr = rowptr;
   sparsity->colidx = colidx;
   sparsity->max_nonzeros = max_nonzeros;
-  //std::copy(sparsity->nnz, sparsity->nnz+nrows, ositer);
-  //std::cout << std::endl;
-  //std::copy(sparsity->rowptr, sparsity->rowptr+nrows+1, ositer);
-  //std::cout << std::endl;
-  //std::copy(sparsity->colidx, sparsity->colidx + sparsity->rowptr[nrows], ositer);
-  //std::cout << std::endl;
 }
 
 void op_decl_mat( op_dat * mat, op_sparsity * sparsity, char const * name ) {
@@ -105,7 +94,7 @@ void op_decl_mat( op_dat * mat, op_sparsity * sparsity, char const * name ) {
       (const PetscInt*)sparsity->nnz,
       &p_mat);
   // Set the column indices (FIXME: benchmark is this is worth it)
-  //MatSeqAIJSetColumnIndices(p_mat, (PetscInt*)sparsity->colidx);
+  MatSeqAIJSetColumnIndices(p_mat, (PetscInt*)sparsity->colidx);
 
   initialise_dat(mat, NULL, 1, sizeof(PetscScalar), p_mat, name);
 }
