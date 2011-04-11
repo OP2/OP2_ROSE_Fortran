@@ -112,8 +112,7 @@ int main(int argc, char **argv){
 
         if ( (i2==0) || (i2==NN) || (j2==0) || (j2==NN) ) {
           r[n] += 0.25f;
-	}
-        else {
+        } else {
           pp[2*e]   = n;
           pp[2*e+1] = i2-1 + (j2-1)*(NN-1);
           A[e]      = 0.25f;

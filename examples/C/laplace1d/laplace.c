@@ -31,9 +31,10 @@ int main(int argc, char **argv) {
 
   int   nnode = (NN+1);
 
-  int    *p_elem_node = (int *)malloc(2*sizeof(int)*NN);
+  int   *p_elem_node = (int *)malloc(2*sizeof(int)*NN);
   Real  *p_xn = (Real *)malloc(sizeof(Real)*nnode);
   Real  *p_x  = (Real *)malloc(sizeof(Real)*nnode);
+  Real  *p_xref = (Real *)malloc(sizeof(Real)*nnode);
   Real  *p_y  = (Real *)malloc(sizeof(Real)*nnode);
 
   // create element -> node mapping
@@ -44,8 +45,10 @@ int main(int argc, char **argv) {
 
   // create coordinates and populate x with -1/pi^2*sin(pi*x)
   for (int i = 0; i < nnode; ++i) {
-    p_xn[i] = sin(0.5*M_PI*i/NN);
-    p_x[i] = -1./(M_PI*M_PI)*sin(M_PI*p_xn[i]);
+    /*p_xn[i] = sin(0.5*M_PI*i/NN);*/
+    p_xn[i] = (Real)i/NN;
+    p_x[i] = (-1./(M_PI*M_PI))*sin(M_PI*p_xn[i]);
+    p_xref[i] = sin(M_PI*p_xn[i]);
   }
 
   // OP initialisation
@@ -75,6 +78,8 @@ int main(int argc, char **argv) {
   /*dump_sparsity(&mat_sparsity, "sparsity");*/
 
   op_decl_mat(&mat, &mat_sparsity, "matrix");
+  op_create_vec(&x);
+  op_create_vec(&y);
 
   /*dump_dat(&mat, "matrix");*/
 
@@ -86,7 +91,11 @@ int main(int argc, char **argv) {
                 op_construct_vec_arg(&xn, 0, &elem_node, OP_READ));
 
   // spmv
-  /*op_mat_mult(mat, x, y);*/
+  op_mat_mult(&mat, &x, &y);
+
+  for (int i = 0; i < nnode; ++i) {
+    printf("%f\n", p_xref[i]);
+  }
 
   op_exit();
 }
