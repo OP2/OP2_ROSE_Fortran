@@ -11,29 +11,269 @@
  */
 
 void
-HostSubroutineOfIndirectLoop::createStatementsToConvertPositionsInExecutionPlanMaps (
+HostSubroutineOfIndirectLoop::createPlanCToForttranPointerConversionStatements (
     ParallelLoop & parallelLoop)
 {
   using SageBuilder::buildVarRefExp;
-  using SageBuilder::buildDotExp;
-  using SageBuilder::buildOpaqueVarRefExp;
-  using SageBuilder::buildIntVal;
-  using SageBuilder::buildPntrArrRefExp;
-  using SageBuilder::buildAssignOp;
-  using SageBuilder::buildIntType;
-  using SageBuilder::buildVoidType;
   using SageBuilder::buildExprListExp;
+  using SageBuilder::buildFunctionCallExp;
   using SageBuilder::buildExprStatement;
+  using SageBuilder::buildOpaqueVarRefExp;
+  using SageBuilder::buildDotExp;
+  using SageBuilder::buildPntrArrRefExp;
+  using SageBuilder::buildIntVal;
   using SageBuilder::buildGreaterOrEqualOp;
   using SageBuilder::buildFunctionCallExp;
   using SageBuilder::buildBasicBlock;
+  using SageBuilder::buildAssignOp;
+  using SageBuilder::buildMultiplyOp;
   using SageInterface::appendStatement;
-  using std::string;
   using std::map;
+  using std::string;
 
-  map <unsigned int, SgVariableDeclaration *>::const_iterator it;
+  /*
+   * ======================================================
+   * Field names inside structs
+   * ======================================================
+   */
 
-  for (it = localVariables_ExecutionPlan_OP_MAP_Size.begin (); it
+  string const blkmap_FieldName = "blkmap";
+  string const ind_maps_FieldName = "ind_maps";
+  string const ind_offs_FieldName = "ind_offs";
+  string const ind_sizes_FieldName = "ind_sizes";
+  string const maps_FieldName = "maps";
+  string const nblocks_FieldName = "nblocks";
+  string const ncolblk_FieldName = "ncolblk";
+  string const nelems_FieldName = "nelems";
+  string const nindirect_FieldName = "nindirect";
+  string const nthrcol_FieldName = "nthrcol";
+  string const offset_FieldName = "offset";
+  string const size_FieldName = "size";
+  string const thrcol_FieldName = "thrcol";
+
+  /*
+   * ======================================================
+   * Variable references needed in the following expressions
+   * and statements
+   * ======================================================
+   */
+
+  SgVarRefExp * actualPlanReference = buildVarRefExp (
+      localVariables_Others[variableName_actualPlan]);
+
+  SgVarRefExp * indsReference = buildVarRefExp (
+      localVariables_Others[variableName_inds]);
+
+  SgVarRefExp * indsNumberReference = buildVarRefExp (
+      localVariables_Others[variableName_indsNumber]);
+
+  SgVarRefExp * mapsReference = buildVarRefExp (
+      localVariables_Others[variableName_maps]);
+
+  SgVarRefExp * ncolblkReference = buildVarRefExp (
+      localVariables_Others[variableName_ncolblk]);
+
+  SgVarRefExp * opSetFormalArgumentReference = buildVarRefExp (
+      formalParameter_OP_SET);
+
+  SgVarRefExp * pblkMapReference = buildVarRefExp (
+      localVariables_Others[variableName_pblkMap]);
+
+  SgVarRefExp * pblkMapSizeReference = buildVarRefExp (
+      localVariables_Others[variableName_pblkMapSize]);
+
+  SgVarRefExp * planRetReference = buildVarRefExp (
+      localVariables_Others[variableName_planRet]);
+
+  SgVarRefExp * pmapsReference = buildVarRefExp (
+      localVariables_Others[variableName_pmaps]);
+
+  SgVarRefExp * pnindirectReference = buildVarRefExp (
+      localVariables_Others[variableName_pnindirect]);
+
+  SgVarRefExp * pindMapsReference = buildVarRefExp (
+      localVariables_Others[variableName_pindMaps]);
+
+  SgVarRefExp * pindSizesReference = buildVarRefExp (
+      localVariables_Others[variableName_pindSizes]);
+
+  SgVarRefExp * pindSizesSizeReference = buildVarRefExp (
+      localVariables_Others[variableName_pindSizesSize]);
+
+  SgVarRefExp * pindOffsReference = buildVarRefExp (
+      localVariables_Others[variableName_pindOffs]);
+
+  SgVarRefExp * pindOffsSizeReference = buildVarRefExp (
+      localVariables_Others[variableName_pindOffsSize]);
+
+  SgVarRefExp * pnelemsReference = buildVarRefExp (
+      localVariables_Others[variableName_pnelems]);
+
+  SgVarRefExp * pnelemsSizeReference = buildVarRefExp (
+      localVariables_Others[variableName_pnelemsSize]);
+
+  SgVarRefExp * pnthrcolReference = buildVarRefExp (
+      localVariables_Others[variableName_pnthrcol]);
+
+  SgVarRefExp * pnthrcolSizeReference = buildVarRefExp (
+      localVariables_Others[variableName_pnthrcolSize]);
+
+  SgVarRefExp * poffsetReference = buildVarRefExp (
+      localVariables_Others[variableName_poffset]);
+
+  SgVarRefExp * poffsetSizeReference = buildVarRefExp (
+      localVariables_Others[variableName_poffsetSize]);
+
+  SgVarRefExp * pthrcolReference = buildVarRefExp (
+      localVariables_Others[variableName_pthrcol]);
+
+  SgVarRefExp * pthrcolSizeReference = buildVarRefExp (
+      localVariables_Others[variableName_pthrcolSize]);
+
+  /*
+   * ======================================================
+   * Opaque variable references needed in the following
+   * expressions and statements
+   * ======================================================
+   */
+
+  SgVarRefExp * blkmap_Reference = buildOpaqueVarRefExp (blkmap_FieldName,
+      subroutineScope);
+
+  SgVarRefExp * ind_maps_Reference = buildOpaqueVarRefExp (ind_maps_FieldName,
+      subroutineScope);
+
+  SgVarRefExp * ind_offs_Reference = buildOpaqueVarRefExp (ind_offs_FieldName,
+      subroutineScope);
+
+  SgVarRefExp * ind_sizes_Reference = buildOpaqueVarRefExp (
+      ind_sizes_FieldName, subroutineScope);
+
+  SgVarRefExp * nblocks_Reference = buildOpaqueVarRefExp (nblocks_FieldName,
+      subroutineScope);
+
+  SgVarRefExp * nelems_Reference = buildOpaqueVarRefExp (nelems_FieldName,
+      subroutineScope);
+
+  SgVarRefExp * nindirect_Reference = buildOpaqueVarRefExp (
+      nindirect_FieldName, subroutineScope);
+
+  SgVarRefExp * nthrcol_Reference = buildOpaqueVarRefExp (nthrcol_FieldName,
+      subroutineScope);
+
+  SgVarRefExp * offset_Reference = buildOpaqueVarRefExp (offset_FieldName,
+      subroutineScope);
+
+  SgVarRefExp * size_Reference = buildOpaqueVarRefExp (size_FieldName,
+      subroutineScope);
+
+  SgVarRefExp * thrcol_Reference = buildOpaqueVarRefExp (thrcol_FieldName,
+      subroutineScope);
+
+  /*
+   * ======================================================
+   * Shape expressions of Fortran arrays needed in the following
+   * expressions and statements
+   * ======================================================
+   */
+
+  SgExpression * indsNumberShapeExpression =
+      FortranStatementsAndExpressionsBuilder::buildShapeExpression (
+          localVariables_Others[variableName_indsNumber], subroutineScope);
+
+  SgExpression * argsNumberShapeExpression =
+      FortranStatementsAndExpressionsBuilder::buildShapeExpression (
+          localVariables_Others[variableName_argsNumber], subroutineScope);
+
+  /*
+   * ======================================================
+   * New c_f_pointer call
+   * ======================================================
+   */
+
+  SgStatement * callStatement = createCallToC_F_POINTER (planRetReference,
+      actualPlanReference);
+
+  appendStatement (callStatement, subroutineScope);
+
+  /*
+   * ======================================================
+   * New c_f_pointer call
+   * ======================================================
+   */
+
+  callStatement = createCallToC_F_POINTER (buildDotExp (actualPlanReference,
+      nindirect_Reference), pnindirectReference, indsNumberShapeExpression);
+
+  appendStatement (callStatement, subroutineScope);
+
+  /*
+   * ======================================================
+   * New c_f_pointer call
+   * ======================================================
+   */
+
+  callStatement = createCallToC_F_POINTER (buildDotExp (actualPlanReference,
+      ind_maps_Reference), pindMapsReference, indsNumberShapeExpression);
+
+  appendStatement (callStatement, subroutineScope);
+
+  /*
+   * ======================================================
+   * New c_f_pointer call
+   * ======================================================
+   */
+
+  callStatement = createCallToC_F_POINTER (buildDotExp (actualPlanReference,
+      buildOpaqueVarRefExp (maps_FieldName, subroutineScope)), pmapsReference,
+      argsNumberShapeExpression);
+
+  appendStatement (callStatement, subroutineScope);
+
+  /*
+   * ======================================================
+   * New c_f_pointer call
+   * ======================================================
+   */
+
+  callStatement = createCallToC_F_POINTER (buildDotExp (actualPlanReference,
+      buildOpaqueVarRefExp (maps_FieldName, subroutineScope)), pmapsReference,
+      argsNumberShapeExpression);
+
+  appendStatement (callStatement, subroutineScope);
+
+  /*
+   * ======================================================
+   * New c_f_pointer calls
+   * ======================================================
+   */
+
+  for (unsigned int i = 1; i
+      <= parallelLoop.getNumberOfDistinctIndirect_OP_DAT_Arguments (); ++i)
+  {
+    SgExpression * indexExpression = buildIntVal (i);
+
+    SgExpression * pindMapsArraySubscriptReference = buildPntrArrRefExp (
+        pindMapsReference, indexExpression);
+
+    SgExpression * pnindirectArraySubscriptReference = buildPntrArrRefExp (
+        pnindirectReference, indexExpression);
+
+    callStatement = createCallToC_F_POINTER (pindMapsArraySubscriptReference,
+        buildVarRefExp (localVariables_ExecutionPlan_IndirectMaps[i]),
+        pnindirectArraySubscriptReference);
+
+    appendStatement (callStatement, subroutineScope);
+  }
+
+  /*
+   * ======================================================
+   * New c_f_pointer calls
+   * ======================================================
+   */
+
+  for (map <unsigned int, SgVariableDeclaration *>::const_iterator it =
+      localVariables_ExecutionPlan_OP_MAP_Size.begin (); it
       != localVariables_ExecutionPlan_OP_MAP_Size.end (); ++it)
   {
     /*
@@ -42,13 +282,10 @@ HostSubroutineOfIndirectLoop::createStatementsToConvertPositionsInExecutionPlanM
      * ======================================================
      */
 
-    SgVarRefExp * indsArrayReference = buildVarRefExp (
-        localVariables_Others[variableName_inds]);
-
     SgExpression * indexExpression = buildIntVal (it->first);
 
-    SgExpression * arrayIndexExpression = buildPntrArrRefExp (
-        indsArrayReference, indexExpression);
+    SgExpression * arrayIndexExpression = buildPntrArrRefExp (indsReference,
+        indexExpression);
 
     SgExpression * ifGuardExpression = buildGreaterOrEqualOp (
         arrayIndexExpression, buildIntVal (0));
@@ -65,19 +302,10 @@ HostSubroutineOfIndirectLoop::createStatementsToConvertPositionsInExecutionPlanM
      * ======================================================
      */
 
-    SgVarRefExp * executionPlanMapSizeReference = buildVarRefExp (it->second);
+    SgExpression * expression1 = buildAssignOp (buildVarRefExp (it->second),
+        buildDotExp (opSetFormalArgumentReference, size_Reference));
 
-    SgVarRefExp * opSetFormalArgumentReference = buildVarRefExp (
-        formalParameter_OP_SET);
-
-    SgExpression * sizeField = buildDotExp (opSetFormalArgumentReference,
-        buildOpaqueVarRefExp ("size", subroutineScope));
-
-    SgExpression * assignmentExpression = buildAssignOp (
-        executionPlanMapSizeReference, sizeField);
-
-    SgStatement * assignmentStatement = buildExprStatement (
-        assignmentExpression);
+    SgStatement * statement1 = buildExprStatement (expression1);
 
     /*
      * ======================================================
@@ -85,13 +313,9 @@ HostSubroutineOfIndirectLoop::createStatementsToConvertPositionsInExecutionPlanM
      * ======================================================
      */
 
-    SgVarRefExp * opMapArrayReference = buildVarRefExp (
-        localVariables_Others[variableName_maps]);
-
     indexExpression = buildIntVal (it->first);
 
-    arrayIndexExpression = buildPntrArrRefExp (opMapArrayReference,
-        indexExpression);
+    arrayIndexExpression = buildPntrArrRefExp (mapsReference, indexExpression);
 
     SgVarRefExp * executionPlanMapReference = buildVarRefExp (
         localVariables_ExecutionPlan_OP_MAP[it->first]);
@@ -100,8 +324,8 @@ HostSubroutineOfIndirectLoop::createStatementsToConvertPositionsInExecutionPlanM
         FortranStatementsAndExpressionsBuilder::buildShapeExpression (
             it->second, subroutineScope);
 
-    SgStatement * callStatement = createCallToC_F_POINTER (
-        arrayIndexExpression, executionPlanMapReference, shapeExpression);
+    SgStatement * statement2 = createCallToC_F_POINTER (arrayIndexExpression,
+        executionPlanMapReference, shapeExpression);
 
     /*
      * ======================================================
@@ -109,8 +333,7 @@ HostSubroutineOfIndirectLoop::createStatementsToConvertPositionsInExecutionPlanM
      * ======================================================
      */
 
-    SgBasicBlock * ifBlock = buildBasicBlock (assignmentStatement,
-        callStatement);
+    SgBasicBlock * ifBlock = buildBasicBlock (statement1, statement2);
 
     SgIfStmt * ifStatement =
         FortranStatementsAndExpressionsBuilder::buildIfStatementWithEmptyElse (
@@ -118,74 +341,146 @@ HostSubroutineOfIndirectLoop::createStatementsToConvertPositionsInExecutionPlanM
 
     appendStatement (ifStatement, subroutineScope);
   }
-}
-
-void
-HostSubroutineOfIndirectLoop::createPlanCToForttranPointerConversionStatements ()
-{
-  using SageBuilder::buildVarRefExp;
-  using SageBuilder::buildExprListExp;
-  using SageBuilder::buildFunctionCallExp;
-  using SageBuilder::buildExprStatement;
-  using SageBuilder::buildOpaqueVarRefExp;
-  using SageBuilder::buildDotExp;
-  using SageInterface::appendStatement;
-
-  SgVarRefExp * planRetReference = buildVarRefExp (
-      localVariables_Others[variableName_planRet]);
-
-  SgVarRefExp * actualPlanReference = buildVarRefExp (
-      localVariables_Others[variableName_actualPlan]);
 
   /*
    * ======================================================
-   * First call to c_f_pointer
+   * New c_f_pointer call
    * ======================================================
    */
 
-  SgStatement * callStatement = createCallToC_F_POINTER (planRetReference,
-      actualPlanReference);
+  callStatement = createCallToC_F_POINTER (buildDotExp (actualPlanReference,
+      ncolblkReference), ncolblkReference, argsNumberShapeExpression);
 
   appendStatement (callStatement, subroutineScope);
 
   /*
    * ======================================================
-   * Second call to c_f_pointer
+   * New c_f_pointer call
    * ======================================================
    */
 
-  SgExpression * nindirectField = buildDotExp (actualPlanReference,
-      buildOpaqueVarRefExp ("nindirect", subroutineScope));
+  SgExpression * actualPlan_dot_nblocks_Reference = buildDotExp (
+      actualPlanReference, nblocks_Reference);
 
-  SgVarRefExp * pnindirectReference = buildVarRefExp (
-      localVariables_Others[variableName_pnindirect]);
+  SgExpression * assignmentExpression = buildAssignOp (pindSizesSizeReference,
+      buildMultiplyOp (actualPlan_dot_nblocks_Reference, indsNumberReference));
 
-  SgExpression * shapeExpression =
+  appendStatement (buildExprStatement (assignmentExpression), subroutineScope);
+
+  callStatement = createCallToC_F_POINTER (buildDotExp (actualPlanReference,
+      ind_sizes_Reference), pindSizesReference,
       FortranStatementsAndExpressionsBuilder::buildShapeExpression (
-          localVariables_Others[variableName_indsNumber], subroutineScope);
-
-  callStatement = createCallToC_F_POINTER (nindirectField, pnindirectReference,
-      shapeExpression);
+          localVariables_Others[variableName_pindSizesSize], subroutineScope));
 
   appendStatement (callStatement, subroutineScope);
 
   /*
    * ======================================================
-   * Third call to c_f_pointer
+   * New c_f_pointer call
    * ======================================================
    */
 
-  /*
-   * ======================================================
-   * Fourth call to c_f_pointer
-   * ======================================================
-   */
+  assignmentExpression = buildAssignOp (pindOffsSizeReference,
+      buildVarRefExp(localVariables_Others[variableName_pindSizesSize]));
+
+  appendStatement (buildExprStatement (assignmentExpression), subroutineScope);
+
+  callStatement = createCallToC_F_POINTER (buildDotExp (actualPlanReference,
+      ind_offs_Reference), pindOffsReference,
+      FortranStatementsAndExpressionsBuilder::buildShapeExpression (
+          localVariables_Others[variableName_pindOffsSize], subroutineScope));
+
+  appendStatement (callStatement, subroutineScope);
 
   /*
    * ======================================================
-   * Fifth call to c_f_pointer
+   * New c_f_pointer call
    * ======================================================
    */
+
+  assignmentExpression = buildAssignOp (pblkMapSizeReference,
+      actualPlan_dot_nblocks_Reference);
+
+  appendStatement (buildExprStatement (assignmentExpression), subroutineScope);
+
+  callStatement = createCallToC_F_POINTER (buildDotExp (actualPlanReference,
+      blkmap_Reference), pblkMapReference,
+      FortranStatementsAndExpressionsBuilder::buildShapeExpression (
+          localVariables_Others[variableName_pblkMapSize], subroutineScope));
+
+  appendStatement (callStatement, subroutineScope);
+
+  /*
+   * ======================================================
+   * New c_f_pointer call
+   * ======================================================
+   */
+
+  assignmentExpression = buildAssignOp (poffsetSizeReference,
+      actualPlan_dot_nblocks_Reference);
+
+  appendStatement (buildExprStatement (assignmentExpression), subroutineScope);
+
+  callStatement = createCallToC_F_POINTER (buildDotExp (actualPlanReference,
+      offset_Reference), poffsetReference,
+      FortranStatementsAndExpressionsBuilder::buildShapeExpression (
+          localVariables_Others[variableName_poffsetSize], subroutineScope));
+
+  appendStatement (callStatement, subroutineScope);
+
+  /*
+   * ======================================================
+   * New c_f_pointer call
+   * ======================================================
+   */
+
+  assignmentExpression = buildAssignOp (pnelemsSizeReference,
+      actualPlan_dot_nblocks_Reference);
+
+  appendStatement (buildExprStatement (assignmentExpression), subroutineScope);
+
+  callStatement = createCallToC_F_POINTER (buildDotExp (actualPlanReference,
+      nelems_Reference), pnelemsReference,
+      FortranStatementsAndExpressionsBuilder::buildShapeExpression (
+          localVariables_Others[variableName_pnelemsSize], subroutineScope));
+
+  appendStatement (callStatement, subroutineScope);
+
+  /*
+   * ======================================================
+   * New c_f_pointer call
+   * ======================================================
+   */
+
+  assignmentExpression = buildAssignOp (pnthrcolSizeReference,
+      actualPlan_dot_nblocks_Reference);
+
+  appendStatement (buildExprStatement (assignmentExpression), subroutineScope);
+
+  callStatement = createCallToC_F_POINTER (buildDotExp (actualPlanReference,
+      nthrcol_Reference), pnthrcolReference,
+      FortranStatementsAndExpressionsBuilder::buildShapeExpression (
+          localVariables_Others[variableName_pnthrcolSize], subroutineScope));
+
+  appendStatement (callStatement, subroutineScope);
+
+  /*
+   * ======================================================
+   * New c_f_pointer call
+   * ======================================================
+   */
+
+  assignmentExpression = buildAssignOp (pthrcolSizeReference,
+      actualPlan_dot_nblocks_Reference);
+
+  appendStatement (buildExprStatement (assignmentExpression), subroutineScope);
+
+  callStatement = createCallToC_F_POINTER (buildDotExp (actualPlanReference,
+      thrcol_Reference), pthrcolReference,
+      FortranStatementsAndExpressionsBuilder::buildShapeExpression (
+          localVariables_Others[variableName_pthrcolSize], subroutineScope));
+
+  appendStatement (callStatement, subroutineScope);
 }
 
 void
@@ -532,19 +827,19 @@ HostSubroutineOfIndirectLoop::createExecutionPlanLocalVariables (
   SgType * c_ptrType = FortranTypesBuilder::buildNewTypeDeclaration ("c_ptr",
       subroutineScope)->get_type ();
 
-  SgType * op_planType = FortranTypesBuilder::buildNewTypeDeclaration (
-      "op_plan", subroutineScope)->get_type ();
-
-  SgVariableDeclaration * variableDeclaration_ExecutionPlan_CPointer =
+  SgVariableDeclaration * variableDeclaration =
       FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
           variableName_planRet, c_ptrType, subroutineScope);
+
+  localVariables_Others.insert (make_pair (variableName_planRet,
+      variableDeclaration));
+
+  SgType * op_planType = FortranTypesBuilder::buildNewTypeDeclaration (
+      "op_plan", subroutineScope)->get_type ();
 
   SgVariableDeclaration * variableDeclaration_ExecutionPlan_FortranPointer =
       FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
           variableName_actualPlan, op_planType, subroutineScope);
-
-  localVariables_Others.insert (make_pair (variableName_planRet,
-      variableDeclaration_ExecutionPlan_CPointer));
 
   localVariables_Others.insert (make_pair (variableName_actualPlan,
       variableDeclaration_ExecutionPlan_FortranPointer));
@@ -558,19 +853,28 @@ HostSubroutineOfIndirectLoop::createExecutionPlanLocalVariables (
   SgType * c_devptrType = FortranTypesBuilder::buildNewTypeDeclaration (
       "c_devptr", subroutineScope)->get_type ();
 
-  SgVariableDeclaration * variableDeclaration_pindMaps =
-      FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
+  variableDeclaration
+      = FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
           variableName_pindMaps,
           buildPointerType (FortranTypesBuilder::getArray_RankOne (
               c_devptrType, 1,
               parallelLoop.getNumberOfDistinctIndirect_OP_DAT_Arguments ())),
           subroutineScope);
 
-  localVariables_Others.insert (make_pair (variableName_actualPlan,
-      variableDeclaration_pindMaps));
+  localVariables_Others.insert (make_pair (variableName_pindMaps,
+      variableDeclaration));
 
-  SgVariableDeclaration * variableDeclaration =
-      FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
+  variableDeclaration
+      = FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
+          variableName_pmaps, buildPointerType (
+              FortranTypesBuilder::getArray_RankOne (c_devptrType)),
+          subroutineScope);
+
+  localVariables_Others.insert (make_pair (variableName_pmaps,
+      variableDeclaration));
+
+  variableDeclaration
+      = FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
           variableName_pindMapsSize,
           FortranTypesBuilder::getFourByteInteger (), subroutineScope);
 
@@ -860,9 +1164,7 @@ HostSubroutineOfIndirectLoop::HostSubroutineOfIndirectLoop (
 
   createPlanFunctionCallStatement ();
 
-  createPlanCToForttranPointerConversionStatements ();
-
-  createStatementsToConvertPositionsInExecutionPlanMaps (parallelLoop);
+  createPlanCToForttranPointerConversionStatements (parallelLoop);
 
   createKernelCall (kernelSubroutine, parallelLoop);
 

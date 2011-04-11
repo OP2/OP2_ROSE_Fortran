@@ -36,7 +36,8 @@ class FortranStatementsAndExpressionsBuilder
 
     /*
      * ======================================================
-     * Builds an 'if' construct which has an empty 'else'
+     * Builds a Fortran shape expression for a call to
+     * 'c_f_pointer'
      * ======================================================
      */
     static SgExpression *

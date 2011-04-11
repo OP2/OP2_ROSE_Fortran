@@ -83,11 +83,8 @@ class HostSubroutineOfIndirectLoop: public HostSubroutine
   private:
 
     void
-    createStatementsToConvertPositionsInExecutionPlanMaps (
+    createPlanCToForttranPointerConversionStatements (
         ParallelLoop & parallelLoop);
-
-    void
-    createPlanCToForttranPointerConversionStatements ();
 
     void
     createPlanFunctionCallStatement ();
