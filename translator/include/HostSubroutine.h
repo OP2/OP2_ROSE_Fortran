@@ -111,10 +111,6 @@ class HostSubroutine: public Subroutine
     copyDataBackFromDeviceAndDeallocate (ParallelLoop & parallelLoop);
 
     void
-    createKernelCall (KernelSubroutine & kernelSubroutine,
-        ParallelLoop & parallelLoop);
-
-    void
     initialiseDataMarshallingLocalVariables (ParallelLoop & parallelLoop);
 
     void

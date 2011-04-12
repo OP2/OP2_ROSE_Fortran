@@ -2,6 +2,7 @@
 #include <HostSubroutineOfIndirectLoop.h>
 #include <FortranTypesBuilder.h>
 #include <FortranStatementsAndExpressionsBuilder.h>
+#include <ROSEHelper.h>
 #include <Debug.h>
 
 /*
@@ -9,6 +10,215 @@
  * Private functions
  * ======================================================
  */
+
+void
+HostSubroutineOfIndirectLoop::createExecutionPlanExecutionStatements (
+    KernelSubroutine & kernelSubroutine, ParallelLoop & parallelLoop)
+{
+  using SageBuilder::buildVoidType;
+  using SageBuilder::buildPntrArrRefExp;
+  using SageBuilder::buildIntVal;
+  using SageBuilder::buildDotExp;
+  using SageBuilder::buildAddOp;
+  using SageBuilder::buildSubtractOp;
+  using SageBuilder::buildVarRefExp;
+  using SageBuilder::buildOpaqueVarRefExp;
+  using SageBuilder::buildFunctionCallExp;
+  using SageBuilder::buildAssignOp;
+  using SageBuilder::buildExprListExp;
+  using SageBuilder::buildExprStatement;
+  using SageBuilder::buildFunctionCallStmt;
+  using SageBuilder::buildBasicBlock;
+  using SageInterface::appendStatement;
+  using std::string;
+
+  /*
+   * ======================================================
+   * The loop starts counting from 0
+   * ======================================================
+   */
+
+  SgExpression * initializationExpression = buildIntVal (0);
+
+  /*
+   * ======================================================
+   * The loop stops counting at the number of colours in
+   * the plan, minus one
+   * ======================================================
+   */
+
+  SgVarRefExp * ncolors_Reference = buildOpaqueVarRefExp (ncolors_FieldName,
+      subroutineScope);
+
+  SgVarRefExp * actualPlanReference = buildVarRefExp (
+      localVariables_Others[variableName_actualPlan]);
+
+  SgExpression * upperBoundExpression = buildDotExp (actualPlanReference,
+      buildSubtractOp (ncolors_Reference, buildIntVal (1)));
+
+  /*
+   * ======================================================
+   * The stride of the loop counter is 1
+   * ======================================================
+   */
+
+  SgExpression * strideExpression = buildIntVal (1);
+
+  /*
+   * ======================================================
+   * Build the statements inside the body of the loop
+   * ======================================================
+   */
+
+  /*
+   * ======================================================
+   * Statement to initialise the grid dimension of the
+   * CUDA kernel
+   * ======================================================
+   */
+
+  SgVarRefExp * blocksPerGridReference = buildVarRefExp (
+      CUDAVariable_blocksPerGrid);
+
+  SgVarRefExp * colReference = buildVarRefExp (
+      localVariables_Others[variableName_col]);
+
+  SgVarRefExp * ncolblkReference = buildVarRefExp (
+      localVariables_Others[variableName_ncolblk]);
+
+  SgExpression * arrayIndexExpression = buildAddOp (colReference, buildIntVal (
+      1));
+
+  SgExpression * arrayExpression = buildPntrArrRefExp (ncolblkReference,
+      arrayIndexExpression);
+
+  SgStatement * statement1 = buildExprStatement (buildAssignOp (
+      blocksPerGridReference, arrayExpression));
+
+  /*
+   * ======================================================
+   * Statement to initialise the number of threads per block
+   * in the CUDA kernel
+   * ======================================================
+   */
+
+  SgVarRefExp * threadsPerBlockReference = buildVarRefExp (
+      CUDAVariable_threadsPerBlock);
+
+  string const FOP_BLOCK_SIZE_VariableName = "FOP_BLOCK_SIZE";
+
+  SgVarRefExp * FOP_BLOCK_SIZE_Reference = buildOpaqueVarRefExp (
+      FOP_BLOCK_SIZE_VariableName, subroutineScope);
+
+  SgStatement * statement2 = buildExprStatement (buildAssignOp (
+      threadsPerBlockReference, FOP_BLOCK_SIZE_Reference));
+
+  /*
+   * ======================================================
+   * Statement to initialise the shared memory size in the
+   * CUDA kernel
+   * ======================================================
+   */
+
+  SgVarRefExp * sharedMemorySizeReference = buildVarRefExp (
+      CUDAVariable_sharedMemorySize);
+
+  SgVarRefExp * nshared_Reference = buildOpaqueVarRefExp (nshared_FieldName,
+      subroutineScope);
+
+  SgStatement * statement3 = buildExprStatement (buildAssignOp (
+      sharedMemorySizeReference, buildDotExp (actualPlanReference,
+          nshared_Reference)));
+
+  /*
+   * ======================================================
+   * Statement to launch the CUDA kernel
+   * ======================================================
+   */
+
+  SgExprListExp * kernelParameters = buildExprListExp ();
+
+  SgExprStatement * statement4 = buildFunctionCallStmt (
+      kernelSubroutine.getSubroutineName () + "<<<"
+          + ROSEHelper::getFirstVariableName (CUDAVariable_blocksPerGrid)
+          + ", " + ROSEHelper::getFirstVariableName (
+          CUDAVariable_threadsPerBlock) + ", "
+          + ROSEHelper::getFirstVariableName (CUDAVariable_sharedMemorySize)
+          + ">>>", buildVoidType (), kernelParameters, subroutineScope);
+
+  /*
+   * ======================================================
+   * Statement to wait for CUDA threads to synchronize
+   * ======================================================
+   */
+
+  SgFunctionSymbol * cudaThreadSynchronizeFunctionSymbol =
+      FortranTypesBuilder::buildNewFortranFunction ("cudaThreadSynchronize",
+          subroutineScope);
+
+  SgVarRefExp * threadSynchRetReference = buildVarRefExp (
+      localVariables_Others[variableName_threadSynchRet]);
+
+  SgFunctionCallExp * threadSynchRetFunctionCall = buildFunctionCallExp (
+      cudaThreadSynchronizeFunctionSymbol, buildExprListExp ());
+
+  SgStatement * statement5 = buildExprStatement (buildAssignOp (
+      threadSynchRetReference, threadSynchRetFunctionCall));
+
+  /*
+   * ======================================================
+   * Statement to increment the block offset
+   * ======================================================
+   */
+
+  SgVarRefExp * blockOffsetReference = buildVarRefExp (
+      localVariables_Others[variableName_blockOffset]);
+
+  SgAddOp * incrementExpression = buildAddOp (blockOffsetReference,
+      blocksPerGridReference);
+
+  SgStatement * statement6 = buildExprStatement (buildAssignOp (
+      blockOffsetReference, incrementExpression));
+
+  /*
+   * ======================================================
+   * Add the do-while loop
+   * ======================================================
+   */
+
+  SgBasicBlock * loopBody = buildBasicBlock (statement1, statement2,
+      statement3, statement4, statement5, statement6);
+
+  SgFortranDo * fortranDoStatement =
+      FortranStatementsAndExpressionsBuilder::buildFortranDoStatement (
+          initializationExpression, upperBoundExpression, strideExpression,
+          loopBody);
+
+  appendStatement (fortranDoStatement, subroutineScope);
+}
+
+void
+HostSubroutineOfIndirectLoop::initialiseVariablesAndConstants (
+    InitialiseConstantsSubroutine & initialiseConstantsSubroutine)
+{
+  using SageBuilder::buildIntVal;
+  using SageBuilder::buildVoidType;
+  using SageBuilder::buildExprListExp;
+  using SageBuilder::buildFunctionCallStmt;
+  using SageInterface::appendStatement;
+
+  FortranStatementsAndExpressionsBuilder::appendAssignmentStatement (
+      localVariables_Others[variableName_blockOffset], buildIntVal (0),
+      subroutineScope);
+
+  SgExprListExp * initialseConstantsParameters = buildExprListExp ();
+
+  SgExprStatement * initialseConstantsCall = buildFunctionCallStmt (
+      initialiseConstantsSubroutine.getSubroutineName (), buildVoidType (),
+      initialseConstantsParameters, subroutineScope);
+
+  appendStatement (initialseConstantsCall, subroutineScope);
+}
 
 void
 HostSubroutineOfIndirectLoop::createPlanCToForttranPointerConversionStatements (
@@ -30,26 +240,6 @@ HostSubroutineOfIndirectLoop::createPlanCToForttranPointerConversionStatements (
   using SageInterface::appendStatement;
   using std::map;
   using std::string;
-
-  /*
-   * ======================================================
-   * Field names inside structs
-   * ======================================================
-   */
-
-  string const blkmap_FieldName = "blkmap";
-  string const ind_maps_FieldName = "ind_maps";
-  string const ind_offs_FieldName = "ind_offs";
-  string const ind_sizes_FieldName = "ind_sizes";
-  string const maps_FieldName = "maps";
-  string const nblocks_FieldName = "nblocks";
-  string const ncolblk_FieldName = "ncolblk";
-  string const nelems_FieldName = "nelems";
-  string const nindirect_FieldName = "nindirect";
-  string const nthrcol_FieldName = "nthrcol";
-  string const offset_FieldName = "offset";
-  string const size_FieldName = "size";
-  string const thrcol_FieldName = "thrcol";
 
   /*
    * ======================================================
@@ -380,8 +570,8 @@ HostSubroutineOfIndirectLoop::createPlanCToForttranPointerConversionStatements (
    * ======================================================
    */
 
-  assignmentExpression = buildAssignOp (pindOffsSizeReference,
-      buildVarRefExp(localVariables_Others[variableName_pindSizesSize]));
+  assignmentExpression = buildAssignOp (pindOffsSizeReference, buildVarRefExp (
+      localVariables_Others[variableName_pindSizesSize]));
 
   appendStatement (buildExprStatement (assignmentExpression), subroutineScope);
 
@@ -1142,8 +1332,9 @@ HostSubroutineOfIndirectLoop::createExecutionPlanLocalVariables (
 HostSubroutineOfIndirectLoop::HostSubroutineOfIndirectLoop (
     std::string const & subroutineName,
     UserDeviceSubroutine & userDeviceSubroutine,
-    KernelSubroutine & kernelSubroutine, ParallelLoop & parallelLoop,
-    SgScopeStatement * moduleScope) :
+    KernelSubroutine & kernelSubroutine,
+    InitialiseConstantsSubroutine & initialiseConstantsSubroutine,
+    ParallelLoop & parallelLoop, SgScopeStatement * moduleScope) :
   HostSubroutine (subroutineName, userDeviceSubroutine, parallelLoop,
       moduleScope)
 {
@@ -1166,7 +1357,9 @@ HostSubroutineOfIndirectLoop::HostSubroutineOfIndirectLoop (
 
   createPlanCToForttranPointerConversionStatements (parallelLoop);
 
-  createKernelCall (kernelSubroutine, parallelLoop);
+  initialiseVariablesAndConstants (initialiseConstantsSubroutine);
+
+  createExecutionPlanExecutionStatements (kernelSubroutine, parallelLoop);
 
   copyDataBackFromDeviceAndDeallocate (parallelLoop);
 }

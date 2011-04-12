@@ -10,6 +10,66 @@
  */
 
 void
+HostSubroutineOfDirectLoop::createKernelCall (KernelSubroutine & kernelSubroutine,
+    ParallelLoop & parallelLoop)
+{
+  using SageBuilder::buildDotExp;
+  using SageBuilder::buildOpaqueVarRefExp;
+  using SageBuilder::buildVarRefExp;
+  using SageBuilder::buildFunctionCallStmt;
+  using SageBuilder::buildExprListExp;
+  using SageBuilder::buildVoidType;
+  using SageInterface::appendStatement;
+  using std::map;
+  using std::string;
+
+  Debug::getInstance ()->debugMessage ("Creating kernel call", 2);
+
+  map <string, OP_DAT_Declaration *>::const_iterator OP_DAT_iterator;
+
+  SgExprListExp * kernelParameters = buildExprListExp ();
+
+  SgExpression * opSetFormalArgumentReference = buildVarRefExp (
+      formalParameter_OP_SET);
+
+  SgExpression * sizeFieldExpression = buildDotExp (
+      opSetFormalArgumentReference, buildOpaqueVarRefExp ("size",
+          subroutineScope));
+
+  kernelParameters->append_expression (sizeFieldExpression);
+
+  for (OP_DAT_iterator = parallelLoop.first_OP_DAT (); OP_DAT_iterator
+      != parallelLoop.last_OP_DAT (); ++OP_DAT_iterator)
+  {
+    string const OP_DATVariableName = OP_DAT_iterator->first;
+
+    SgVarRefExp * opDatDeviceReference = buildVarRefExp (
+        localVariables_OP_DAT_VariablesOnDevice[OP_DATVariableName]);
+
+    kernelParameters->append_expression (opDatDeviceReference);
+  }
+
+  string const
+      CUDAVariable_blocksPerGridVariableName =
+          CUDAVariable_blocksPerGrid->get_variables ().front ()->get_name ().getString ();
+  string const
+      CUDAVariable_threadsPerBlockVariableName =
+          CUDAVariable_threadsPerBlock->get_variables ().front ()->get_name ().getString ();
+  string const
+      CUDAVariable_sharedMemorySizeVariableName =
+          CUDAVariable_sharedMemorySize->get_variables ().front ()->get_name ().getString ();
+
+  SgExprStatement * kernelCall = buildFunctionCallStmt (
+      kernelSubroutine.getSubroutineName () + "<<<"
+          + CUDAVariable_blocksPerGridVariableName + ", "
+          + CUDAVariable_threadsPerBlockVariableName + ", "
+          + CUDAVariable_sharedMemorySizeVariableName + ">>>",
+      buildVoidType (), kernelParameters, subroutineScope);
+
+  appendStatement (kernelCall, subroutineScope);
+}
+
+void
 HostSubroutineOfDirectLoop::createCUDAVariables (ParallelLoop & parallelLoop)
 {
   using SageBuilder::buildOpaqueVarRefExp;

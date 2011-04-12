@@ -27,6 +27,15 @@ class HostSubroutineOfDirectLoop: public HostSubroutine
 
     /*
      * ======================================================
+     * Creates the kernel call
+     * ======================================================
+     */
+    void
+    createKernelCall (KernelSubroutine & kernelSubroutine,
+        ParallelLoop & parallelLoop);
+
+    /*
+     * ======================================================
      * Creates the CUDA-specific variables and initialises
      * them inside the host subroutine
      * ======================================================

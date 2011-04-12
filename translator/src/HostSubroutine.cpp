@@ -63,66 +63,6 @@ HostSubroutine::copyDataBackFromDeviceAndDeallocate (
 }
 
 void
-HostSubroutine::createKernelCall (KernelSubroutine & kernelSubroutine,
-    ParallelLoop & parallelLoop)
-{
-  using SageBuilder::buildDotExp;
-  using SageBuilder::buildOpaqueVarRefExp;
-  using SageBuilder::buildVarRefExp;
-  using SageBuilder::buildFunctionCallStmt;
-  using SageBuilder::buildExprListExp;
-  using SageBuilder::buildVoidType;
-  using SageInterface::appendStatement;
-  using std::map;
-  using std::string;
-
-  Debug::getInstance ()->debugMessage ("Creating kernel call", 2);
-
-  map <string, OP_DAT_Declaration *>::const_iterator OP_DAT_iterator;
-
-  SgExprListExp * kernelParameters = buildExprListExp ();
-
-  SgExpression * opSetFormalArgumentReference = buildVarRefExp (
-      formalParameter_OP_SET);
-
-  SgExpression * sizeFieldExpression = buildDotExp (
-      opSetFormalArgumentReference, buildOpaqueVarRefExp ("size",
-          subroutineScope));
-
-  kernelParameters->append_expression (sizeFieldExpression);
-
-  for (OP_DAT_iterator = parallelLoop.first_OP_DAT (); OP_DAT_iterator
-      != parallelLoop.last_OP_DAT (); ++OP_DAT_iterator)
-  {
-    string const OP_DATVariableName = OP_DAT_iterator->first;
-
-    SgVarRefExp * opDatDeviceReference = buildVarRefExp (
-        localVariables_OP_DAT_VariablesOnDevice[OP_DATVariableName]);
-
-    kernelParameters->append_expression (opDatDeviceReference);
-  }
-
-  string const
-      CUDAVariable_blocksPerGridVariableName =
-          CUDAVariable_blocksPerGrid->get_variables ().front ()->get_name ().getString ();
-  string const
-      CUDAVariable_threadsPerBlockVariableName =
-          CUDAVariable_threadsPerBlock->get_variables ().front ()->get_name ().getString ();
-  string const
-      CUDAVariable_sharedMemorySizeVariableName =
-          CUDAVariable_sharedMemorySize->get_variables ().front ()->get_name ().getString ();
-
-  SgExprStatement * kernelCall = buildFunctionCallStmt (
-      kernelSubroutine.getSubroutineName () + "<<<"
-          + CUDAVariable_blocksPerGridVariableName + ", "
-          + CUDAVariable_threadsPerBlockVariableName + ", "
-          + CUDAVariable_sharedMemorySizeVariableName + ">>>",
-      buildVoidType (), kernelParameters, subroutineScope);
-
-  appendStatement (kernelCall, subroutineScope);
-}
-
-void
 HostSubroutine::initialiseDataMarshallingLocalVariables (
     ParallelLoop & parallelLoop)
 {
@@ -183,6 +123,30 @@ HostSubroutine::initialiseDataMarshallingLocalVariables (
   {
     string const OP_DATVariableName = OP_DAT_iterator->first;
 
+    SgVarRefExp * opDatFormalArgumentReference = buildVarRefExp (
+        formalParameters_OP_DAT[OP_DATVariableName]);
+
+    SgVarRefExp * c2FortranPointerReference = buildVarRefExp (
+        localVariables_CToFortranPointers[OP_DATVariableName]);
+
+    SgExpression * datField = buildDotExp (opDatFormalArgumentReference,
+        buildOpaqueVarRefExp ("dat", subroutineScope));
+
+    SgExpression * shapeExpression =
+        FortranStatementsAndExpressionsBuilder::buildShapeExpression (
+            localVariables_OP_DAT_Sizes[OP_DATVariableName], subroutineScope);
+
+    SgStatement * callStatement = createCallToC_F_POINTER (datField,
+        c2FortranPointerReference, shapeExpression);
+
+    appendStatement (callStatement, subroutineScope);
+  }
+
+  for (OP_DAT_iterator = parallelLoop.first_OP_DAT (); OP_DAT_iterator
+      != parallelLoop.last_OP_DAT (); ++OP_DAT_iterator)
+  {
+    string const OP_DATVariableName = OP_DAT_iterator->first;
+
     SgVarRefExp * opDatSizeReference = buildVarRefExp (
         localVariables_OP_DAT_Sizes[OP_DATVariableName]);
 
@@ -204,23 +168,19 @@ HostSubroutine::initialiseDataMarshallingLocalVariables (
   {
     string const OP_DATVariableName = OP_DAT_iterator->first;
 
-    SgVarRefExp * opDatFormalArgumentReference = buildVarRefExp (
-        formalParameters_OP_DAT[OP_DATVariableName]);
+    SgVarRefExp * opDatDeviceReference = buildVarRefExp (
+        localVariables_OP_DAT_VariablesOnDevice[OP_DATVariableName]);
 
     SgVarRefExp * c2FortranPointerReference = buildVarRefExp (
         localVariables_CToFortranPointers[OP_DATVariableName]);
 
-    SgExpression * datField = buildDotExp (opDatFormalArgumentReference,
-        buildOpaqueVarRefExp ("dat", subroutineScope));
+    SgExpression * assignmentExpression = buildAssignOp (opDatDeviceReference,
+        c2FortranPointerReference);
 
-    SgExpression * shapeExpression =
-        FortranStatementsAndExpressionsBuilder::buildShapeExpression (
-            localVariables_OP_DAT_Sizes[OP_DATVariableName], subroutineScope);
+    SgStatement * assignmentStatement = buildExprStatement (
+        assignmentExpression);
 
-    SgStatement * callStatement = createCallToC_F_POINTER (datField,
-        c2FortranPointerReference, shapeExpression);
-
-    appendStatement (callStatement, subroutineScope);
+    appendStatement (assignmentStatement, subroutineScope);
   }
 }
 
@@ -608,7 +568,8 @@ HostSubroutine::createCallToC_F_POINTER (SgExpression * parameter1,
       FortranTypesBuilder::buildNewFortranSubroutine ("c_f_pointer",
           subroutineScope);
 
-  SgExprListExp * actualParameters = buildExprListExp (parameter1, parameter2, parameter3);
+  SgExprListExp * actualParameters = buildExprListExp (parameter1, parameter2,
+      parameter3);
 
   SgFunctionCallExp * subroutineCall = buildFunctionCallExp (functionSymbol,
       actualParameters);

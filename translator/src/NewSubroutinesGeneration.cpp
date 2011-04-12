@@ -7,6 +7,7 @@
 #include <KernelSubroutineOfIndirectLoop.h>
 #include <HostSubroutineOfDirectLoop.h>
 #include <HostSubroutineOfIndirectLoop.h>
+#include <InitialiseConstantsSubroutine.h>
 
 /*
  * ======================================================
@@ -380,21 +381,6 @@ NewSubroutinesGeneration::visit (SgNode * node)
               SgScopeStatement * moduleScope = createCUDAModule (sourceFile,
                   *parallelLoop);
 
-              /*
-               * ======================================================
-               * Generate and modify user kernel so that it can run on
-               * the device
-               * ======================================================
-               */
-
-              UserDeviceSubroutine * userDeviceSubroutine =
-                  new UserDeviceSubroutine (userSubroutineName, moduleScope,
-                      *declarations);
-
-              KernelSubroutine * kernelSubroutine;
-
-              HostSubroutine * hostSubroutine;
-
               if (parallelLoop->isDirectLoop ())
               {
                 /*
@@ -403,13 +389,39 @@ NewSubroutinesGeneration::visit (SgNode * node)
                  * ======================================================
                  */
 
-                kernelSubroutine = new KernelSubroutineOfDirectLoop (
-                    userSubroutineName, *userDeviceSubroutine, *parallelLoop,
-                    moduleScope);
+                /*
+                 * ======================================================
+                 * Generate and modify user kernel so that it can run on
+                 * the device
+                 * ======================================================
+                 */
 
-                hostSubroutine = new HostSubroutineOfDirectLoop (
-                    userSubroutineName, *userDeviceSubroutine,
-                    *kernelSubroutine, *parallelLoop, moduleScope);
+                UserDeviceSubroutine * userDeviceSubroutine =
+                    new UserDeviceSubroutine (userSubroutineName, moduleScope,
+                        *declarations);
+
+                KernelSubroutine * kernelSubroutine =
+                    new KernelSubroutineOfDirectLoop (userSubroutineName,
+                        *userDeviceSubroutine, *parallelLoop, moduleScope);
+
+                HostSubroutine * hostSubroutine =
+                    new HostSubroutineOfDirectLoop (userSubroutineName,
+                        *userDeviceSubroutine, *kernelSubroutine,
+                        *parallelLoop, moduleScope);
+
+                /*
+                 * ======================================================
+                 * Get the scope of the AST node representing the entire
+                 * call statement
+                 * ======================================================
+                 */
+                SgScopeStatement * scope = isSgExprStatement (
+                    node->get_parent ())->get_scope ();
+
+                ROSE_ASSERT (scope != NULL);
+
+                patchOP_PAR_LOOPCalls (*parallelLoop, *userDeviceSubroutine,
+                    *hostSubroutine, scope, functionCallExp);
               }
               else
               {
@@ -419,28 +431,52 @@ NewSubroutinesGeneration::visit (SgNode * node)
                  * ======================================================
                  */
 
-                kernelSubroutine = new KernelSubroutineOfIndirectLoop (
-                    userSubroutineName, *userDeviceSubroutine, *parallelLoop,
-                    moduleScope);
+                /*
+                 * ======================================================
+                 * Indirect loops use global constants. Declare them and
+                 * generate the subroutine which initialises them
+                 * ======================================================
+                 */
 
-                hostSubroutine = new HostSubroutineOfIndirectLoop (
-                    userSubroutineName, *userDeviceSubroutine,
-                    *kernelSubroutine, *parallelLoop, moduleScope);
+                InitialiseConstantsSubroutine * initialiseConstantsSubroutine =
+                    new InitialiseConstantsSubroutine (userSubroutineName,
+                        moduleScope);
+
+                /*
+                 * ======================================================
+                 * Generate and modify user kernel so that it can run on
+                 * the device
+                 * ======================================================
+                 */
+
+                UserDeviceSubroutine * userDeviceSubroutine =
+                    new UserDeviceSubroutine (userSubroutineName, moduleScope,
+                        *declarations);
+
+                KernelSubroutine * kernelSubroutine =
+                    new KernelSubroutineOfIndirectLoop (userSubroutineName,
+                        *userDeviceSubroutine, *parallelLoop, moduleScope);
+
+                HostSubroutine * hostSubroutine =
+                    new HostSubroutineOfIndirectLoop (userSubroutineName,
+                        *userDeviceSubroutine, *kernelSubroutine,
+                        *initialiseConstantsSubroutine, *parallelLoop,
+                        moduleScope);
+
+                /*
+                 * ======================================================
+                 * Get the scope of the AST node representing the entire
+                 * call statement
+                 * ======================================================
+                 */
+                SgScopeStatement * scope = isSgExprStatement (
+                    node->get_parent ())->get_scope ();
+
+                ROSE_ASSERT (scope != NULL);
+
+                patchOP_PAR_LOOPCalls (*parallelLoop, *userDeviceSubroutine,
+                    *hostSubroutine, scope, functionCallExp);
               }
-
-              /*
-               * ======================================================
-               * Get the scope of the AST node representing the entire
-               * call statement
-               * ======================================================
-               */
-              SgScopeStatement * scope =
-                  isSgExprStatement (node->get_parent ())->get_scope ();
-
-              ROSE_ASSERT (scope != NULL);
-
-              patchOP_PAR_LOOPCalls (*parallelLoop, *userDeviceSubroutine,
-                  *hostSubroutine, scope, functionCallExp);
             }
           }
           else
