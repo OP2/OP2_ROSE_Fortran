@@ -63,7 +63,6 @@ FortranTypesBuilder::completeNewDeclaration (
   classDeclaration->set_type (nonDefiningClassDeclaration->get_type ());
 
   SgClassSymbol * classSymbol = new SgClassSymbol (classDeclaration);
-
   scope->insert_symbol (classDeclaration->get_name (), classSymbol);
 }
 

@@ -1,6 +1,7 @@
 #include <InitialiseConstantsSubroutine.h>
 #include <FortranStatementsAndExpressionsBuilder.h>
 #include <FortranTypesBuilder.h>
+#include <ROSEHelper.h>
 
 /*
  * ======================================================
@@ -371,6 +372,17 @@ InitialiseConstantsSubroutine::declareConstants (SgScopeStatement * moduleScope)
 
     constantDeclarations.insert (make_pair (*it, variableDeclaration));
   }
+
+  SgVariableDeclaration * iDecl = SageBuilder::buildVariableDeclaration ("i",
+      FortranTypesBuilder::getFourByteInteger (), NULL, moduleScope);
+  iDecl->get_declarationModifier ().get_accessModifier ().setUndefined ();
+
+  SgDerivedTypeStatement * typeStatement =
+      FortranStatementsAndExpressionsBuilder::buildTypeDeclaration ("newType",
+          moduleScope);
+  typeStatement->get_definition ()->append_member (iDecl);
+
+  SageInterface::appendStatement (typeStatement, moduleScope);
 }
 
 InitialiseConstantsSubroutine::InitialiseConstantsSubroutine (

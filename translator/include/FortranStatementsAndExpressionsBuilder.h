@@ -36,6 +36,15 @@ class FortranStatementsAndExpressionsBuilder
 
     /*
      * ======================================================
+     * Builds a type declaration
+     * ======================================================
+     */
+    static SgDerivedTypeStatement *
+    buildTypeDeclaration (std::string const & typeName,
+        SgScopeStatement * scope);
+
+    /*
+     * ======================================================
      * Builds a Fortran shape expression for a call to
      * 'c_f_pointer'
      * ======================================================

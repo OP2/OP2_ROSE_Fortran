@@ -51,6 +51,54 @@ FortranStatementsAndExpressionsBuilder::buildIfStatementWithEmptyElse (
   return ifStatement;
 }
 
+SgDerivedTypeStatement *
+FortranStatementsAndExpressionsBuilder::buildTypeDeclaration (
+    std::string const & typeName, SgScopeStatement * scope)
+{
+  SgClassDefinition * classDefinition = new SgClassDefinition (
+      ROSEHelper::getFileInfo ());
+  classDefinition->set_endOfConstruct (ROSEHelper::getFileInfo ());
+  classDefinition->setCaseInsensitive (true);
+
+  SgDerivedTypeStatement* classDeclaration = new SgDerivedTypeStatement (
+      ROSEHelper::getFileInfo (), typeName, SgClassDeclaration::e_struct, NULL,
+      classDefinition);
+  classDeclaration->set_endOfConstruct (ROSEHelper::getFileInfo ());
+  classDeclaration->set_definingDeclaration (classDeclaration);
+
+  SgDerivedTypeStatement* nondefiningClassDeclaration =
+      new SgDerivedTypeStatement (ROSEHelper::getFileInfo (), typeName,
+          SgClassDeclaration::e_struct, NULL, NULL);
+  nondefiningClassDeclaration->set_endOfConstruct (ROSEHelper::getFileInfo ());
+  nondefiningClassDeclaration->set_parent (scope);
+
+  nondefiningClassDeclaration->set_type (SgClassType::createType (
+      nondefiningClassDeclaration));
+  classDeclaration->set_type (nondefiningClassDeclaration->get_type ());
+
+  classDeclaration->set_firstNondefiningDeclaration (
+      nondefiningClassDeclaration);
+
+  nondefiningClassDeclaration->set_firstNondefiningDeclaration (
+      nondefiningClassDeclaration);
+  nondefiningClassDeclaration->set_definingDeclaration (classDeclaration);
+
+  nondefiningClassDeclaration->setForward ();
+
+  classDefinition->set_declaration (classDeclaration);
+
+  classDeclaration->set_scope (scope);
+  nondefiningClassDeclaration->set_scope (scope);
+
+  classDeclaration->set_parent (scope);
+
+  SgClassSymbol * classSymbol = new SgClassSymbol (nondefiningClassDeclaration);
+
+  scope->insert_symbol (typeName, classSymbol);
+
+  return classDeclaration;
+}
+
 SgExpression *
 FortranStatementsAndExpressionsBuilder::buildShapeExpression (
     SgVariableDeclaration * variableDeclaration, SgScopeStatement * scope)
