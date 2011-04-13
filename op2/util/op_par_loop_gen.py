@@ -111,8 +111,8 @@ static inline void arg_check(op_set * set, int argnum, op_arg * argument, const 
       }
     }
     else {
-      if (set->index != argument->map[i]->from.index
-          || argument->dat->set.index != argument->map[i]->to.index) {
+      if (set->index != argument->map[i]->from->index
+          || (argument->dat->set && argument->dat->set->index != argument->map[i]->to->index)) {
         printf("error: arg %d in kernel %s\\n", argnum, kernel);
         printf("invalid mapping %d\\n", i);
         exit(1);

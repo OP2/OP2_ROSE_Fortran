@@ -31,6 +31,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <assert.h>
 
 #include <op2/common/op_datatypes.h>
 
@@ -49,6 +50,8 @@ op_dat  **OP_dat_list;
 
 void initialise_set ( op_set * set, int size, char const * name )
 {
+  assert(set);
+
   set->size = size;
   set->index = OP_set_index;
   set->name = name;
@@ -67,6 +70,7 @@ void initialise_set ( op_set * set, int size, char const * name )
 
 void initialise_map ( op_map * mapping, op_set * from, op_set * to, int dim, int * map, char const * name )
 {
+  assert( mapping && from && to && map );
 
   if ( (from->index<0) || (from->index>=OP_set_index) ||
        strcmp(OP_set_list[from->index]->name,from->name) ) {
@@ -95,8 +99,8 @@ void initialise_map ( op_map * mapping, op_set * from, op_set * to, int dim, int
     }
   }
 
-  mapping->from = *from;
-  mapping->to   = *to;
+  mapping->from = from;
+  mapping->to   = to;
   mapping->dim  = dim;
   mapping->index = OP_map_index;
   mapping->map  = map;
@@ -116,6 +120,7 @@ void initialise_map ( op_map * mapping, op_set * from, op_set * to, int dim, int
 
 void initialise_dat ( op_dat * data, op_set * set, int dim, int size, void *dat, char const * name )
 {
+  assert( data );
 
   if ( set && (set->index<0 || set->index>=OP_set_index ||
        strcmp(OP_set_list[set->index]->name,set->name)) ) {
@@ -128,10 +133,11 @@ void initialise_dat ( op_dat * data, op_set * set, int dim, int size, void *dat,
     exit(-1);
   }
 
-  data->set   = set ? *set : OP_NULL_SET;
+  data->set   = set;
   data->dim   = dim;
   data->index = OP_dat_index;
   data->dat   = dat;
+  data->dat_d = NULL;
   data->size  = dim*size;
 	data->name = name;
 
@@ -149,10 +155,10 @@ void initialise_dat ( op_dat * data, op_set * set, int dim, int size, void *dat,
 
 void op_decl_id_map ( op_map * map )
 {
-	op_set nullSet = {0,0,"null"};
+  assert(map);
 
-	map->from = nullSet;
-	map->to = nullSet;
+	map->from = NULL;
+	map->to = NULL;
 	map->dim = 0; //set to the proper value in Fortran
 	map->index= -1; // no position in OP_map_list
 	map->map = 0;
@@ -161,10 +167,10 @@ void op_decl_id_map ( op_map * map )
 
 void op_decl_gbl_map ( op_map * map )
 {
-	op_set nullSet = {0,0,"null"};
+  assert(map);
 
-	map->from = nullSet;
-	map->to = nullSet;
+	map->from = NULL;
+	map->to = NULL;
 	map->dim = 0; //set to the proper value in Fortran
 	map->index= -2; // no position in OP_map_list
 	map->map = 0;
@@ -219,7 +225,7 @@ static void print_array_int( FILE* f, int const * v, size_t n ) {
 void dump_map ( op_map const * map, char const * filename ) {
   FILE *f = fopen(filename, "w");
   fprintf(f,"%s %d\n\n", map->name, map->dim);
-  print_array_int(f, map->map, map->from.size * map->dim);
+  print_array_int(f, map->map, map->from->size * map->dim);
   fclose(f);
 }
 

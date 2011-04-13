@@ -87,8 +87,8 @@ typedef struct {
 } op_set;
 
 typedef struct {
-  op_set      from,   /* set pointed from */
-              to;     /* set pointed to */
+  op_set     *from,   /* set pointed from */
+             *to;     /* set pointed to */
   int         dim,    /* dimension of pointer */
               index,  /* index into list of pointers */
              *map;    /* array defining pointer */
@@ -96,7 +96,7 @@ typedef struct {
 } op_map;
 
 typedef struct {
-  op_set      set;    /* set on which data is defined */
+  op_set     *set;    /* set on which data is defined */
   int         dim,    /* dimension of data */
               index,  /* index into list of datasets */
               size;   /* size of each element in dataset */

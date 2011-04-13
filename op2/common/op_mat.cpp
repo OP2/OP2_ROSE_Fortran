@@ -43,20 +43,20 @@ extern "C" {
 void op_decl_sparsity ( op_sparsity * sparsity, op_map * rowmap, op_map * colmap )
 {
   // FIXME add consistency checks
-  if ( rowmap->from.index != colmap->from.index ) {
+  if ( rowmap->from->index != colmap->from->index ) {
     printf("op_decl_sparsity: row map and col map do not map from the same set\n");
     exit(1);
   }
   
-  const size_t nrows = rowmap->to.size;
-  const size_t ncols = colmap->to.size;
+  const size_t nrows = rowmap->to->size;
+  const size_t ncols = colmap->to->size;
   size_t max_nonzeros = 0;
 
   // Create and populate auxiliary data structure: for each element of the from
   // set, for each row pointed to by the row map, add all columns pointed to by
   // the col map
   std::vector< std::set< int > > s(nrows);
-  for ( int e = 0; e < rowmap->from.size; ++e ) {
+  for ( int e = 0; e < rowmap->from->size; ++e ) {
     for ( int i = 0; i < rowmap->dim; ++i ) {
       int row = rowmap->map[i + e*rowmap->dim];
       s[row].insert( colmap->map + e*colmap->dim, colmap->map + (e+1)*colmap->dim );
@@ -118,7 +118,7 @@ void op_mat_assemble( op_dat * mat ) {
 void op_create_vec ( op_dat * vec ) {
   Vec p_vec;
   // Create a PETSc vector and pass it the user-allocated storage
-  VecCreateSeqWithArray(MPI_COMM_SELF,vec->dim * vec->set.size,(PetscScalar*)vec->dat,&p_vec);
+  VecCreateSeqWithArray(MPI_COMM_SELF,vec->dim * vec->set->size,(PetscScalar*)vec->dat,&p_vec);
   VecAssemblyBegin(p_vec);
   VecAssemblyEnd(p_vec);
 
