@@ -1334,6 +1334,7 @@ HostSubroutineOfIndirectLoop::HostSubroutineOfIndirectLoop (
     UserDeviceSubroutine & userDeviceSubroutine,
     KernelSubroutine & kernelSubroutine,
     InitialiseConstantsSubroutine & initialiseConstantsSubroutine,
+    DeviceDataSizesDeclaration & deviceDataSizesDeclaration,
     ParallelLoop & parallelLoop, SgScopeStatement * moduleScope) :
   HostSubroutine (subroutineName, userDeviceSubroutine, parallelLoop,
       moduleScope)

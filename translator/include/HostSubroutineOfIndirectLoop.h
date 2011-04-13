@@ -11,6 +11,7 @@
 #include <HostSubroutine.h>
 #include <KernelSubroutine.h>
 #include <InitialiseConstantsSubroutine.h>
+#include <DeviceDataSizesDeclaration.h>
 
 /*
  * ======================================================
@@ -117,7 +118,8 @@ class HostSubroutineOfIndirectLoop: public HostSubroutine
         KernelSubroutine & kernelSubroutine, ParallelLoop & parallelLoop);
 
     void
-    initialiseVariablesAndConstants (InitialiseConstantsSubroutine & initialiseConstantsSubroutine);
+    initialiseVariablesAndConstants (
+        InitialiseConstantsSubroutine & initialiseConstantsSubroutine);
 
     void
     createPlanCToForttranPointerConversionStatements (
@@ -141,6 +143,7 @@ class HostSubroutineOfIndirectLoop: public HostSubroutine
         UserDeviceSubroutine & userDeviceSubroutine,
         KernelSubroutine & kernelSubroutine,
         InitialiseConstantsSubroutine & initialiseConstantsSubroutine,
+        DeviceDataSizesDeclaration & deviceDataSizesDeclaration,
         ParallelLoop & parallelLoop, SgScopeStatement * moduleScope);
 };
 

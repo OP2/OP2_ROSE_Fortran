@@ -1,6 +1,7 @@
 #include <boost/lexical_cast.hpp>
 #include <HostSubroutineOfDirectLoop.h>
 #include <FortranTypesBuilder.h>
+#include <ROSEHelper.h>
 #include <Debug.h>
 
 /*
@@ -10,8 +11,8 @@
  */
 
 void
-HostSubroutineOfDirectLoop::createKernelCall (KernelSubroutine & kernelSubroutine,
-    ParallelLoop & parallelLoop)
+HostSubroutineOfDirectLoop::createKernelCall (
+    KernelSubroutine & kernelSubroutine, ParallelLoop & parallelLoop)
 {
   using SageBuilder::buildDotExp;
   using SageBuilder::buildOpaqueVarRefExp;
@@ -49,22 +50,13 @@ HostSubroutineOfDirectLoop::createKernelCall (KernelSubroutine & kernelSubroutin
     kernelParameters->append_expression (opDatDeviceReference);
   }
 
-  string const
-      CUDAVariable_blocksPerGridVariableName =
-          CUDAVariable_blocksPerGrid->get_variables ().front ()->get_name ().getString ();
-  string const
-      CUDAVariable_threadsPerBlockVariableName =
-          CUDAVariable_threadsPerBlock->get_variables ().front ()->get_name ().getString ();
-  string const
-      CUDAVariable_sharedMemorySizeVariableName =
-          CUDAVariable_sharedMemorySize->get_variables ().front ()->get_name ().getString ();
-
   SgExprStatement * kernelCall = buildFunctionCallStmt (
       kernelSubroutine.getSubroutineName () + "<<<"
-          + CUDAVariable_blocksPerGridVariableName + ", "
-          + CUDAVariable_threadsPerBlockVariableName + ", "
-          + CUDAVariable_sharedMemorySizeVariableName + ">>>",
-      buildVoidType (), kernelParameters, subroutineScope);
+          + ROSEHelper::getFirstVariableName (CUDAVariable_blocksPerGrid)
+          + ", " + ROSEHelper::getFirstVariableName (
+          CUDAVariable_threadsPerBlock) + ", "
+          + ROSEHelper::getFirstVariableName (CUDAVariable_sharedMemorySize)
+          + ">>>", buildVoidType (), kernelParameters, subroutineScope);
 
   appendStatement (kernelCall, subroutineScope);
 }
@@ -150,46 +142,27 @@ HostSubroutineOfDirectLoop::createCUDAVariables (ParallelLoop & parallelLoop)
    * ======================================================
    */
 
-  // 'set%size'
-  SgExpression * setPERCENTsize = buildDotExp (buildVarRefExp (
+  SgExpression * sizeFieldReference = buildDotExp (buildVarRefExp (
       formalParameter_OP_SET), buildOpaqueVarRefExp ("size", subroutineScope));
 
-  // 'set%size - 1'
-  SgExpression * setPERCENTsize_minusOne = buildSubtractOp (setPERCENTsize,
+  SgExpression * minusOneExpression = buildSubtractOp (sizeFieldReference,
       buildIntVal (1));
 
-  // '(set%size - 1) / bsize  + 1'
-  SgExpression * castIntegerParameter = buildAddOp (buildDivideOp (
-      setPERCENTsize_minusOne, buildVarRefExp (CUDAVariable_blocksPerGrid)),
-      buildIntVal (1));
+  SgExpression * parameter1 = buildAddOp (buildDivideOp (minusOneExpression,
+      buildVarRefExp (CUDAVariable_blocksPerGrid)), buildIntVal (1));
 
-  /*
-   * ======================================================
-   * 'int ((set%size - 1) / bsize + 1)'
-   *
-   * To do this we have to build a function type for the
-   * intrinsic 'int'. We do not care about the fact that the
-   * function is already defined (also via an intrinsic): we
-   * just tell ROSE all the information needed to build a new
-   * function
-   * ======================================================
-   */
-  SgFunctionType * functionDoubleToInteger = buildFunctionType (
-      buildIntType (), buildFunctionParameterTypeList (buildDoubleType ()));
+  SgFunctionSymbol * intFunctionSymbol =
+      FortranTypesBuilder::buildNewFortranFunction ("int", subroutineScope);
 
-  SgFunctionRefExp * referenceToIntegerFunction = buildFunctionRefExp ("int",
-      functionDoubleToInteger, subroutineScope);
-
-  SgExprListExp * intParams = buildExprListExp (castIntegerParameter);
+  SgExprListExp * actualParameters = buildExprListExp (parameter1);
 
   SgFunctionCallExp * intIntrinsicCall = buildFunctionCallExp (
-      referenceToIntegerFunction->get_symbol (), intParams);
+      intFunctionSymbol, actualParameters);
 
-  SgExpression * variable_gsize_assignment = buildAssignOp (buildVarRefExp (
+  SgExpression * expression1 = buildAssignOp (buildVarRefExp (
       CUDAVariable_threadsPerBlock), intIntrinsicCall);
 
-  appendStatement (buildExprStatement (variable_gsize_assignment),
-      subroutineScope);
+  appendStatement (buildExprStatement (expression1), subroutineScope);
 
   /*
    * ======================================================
@@ -197,15 +170,15 @@ HostSubroutineOfDirectLoop::createCUDAVariables (ParallelLoop & parallelLoop)
    * ======================================================
    */
 
-  SgExpression * rhsOfExpression = buildMultiplyOp (buildVarRefExp (
-      variable_reduct_size), buildDivideOp (variable_BSIZE_DEFAULT,
-      buildIntVal (2)));
+  SgVarRefExp * reduct_sizeReference = buildVarRefExp (variable_reduct_size);
 
-  SgExpression * variable_reduct_shared_assignment = buildAssignOp (
-      buildVarRefExp (CUDAVariable_sharedMemorySize), rhsOfExpression);
+  SgExpression * rhsOfExpression = buildMultiplyOp (reduct_sizeReference,
+      buildDivideOp (variable_BSIZE_DEFAULT, buildIntVal (2)));
 
-  appendStatement (buildExprStatement (variable_reduct_shared_assignment),
-      subroutineScope);
+  SgExpression * expression2 = buildAssignOp (buildVarRefExp (
+      CUDAVariable_sharedMemorySize), rhsOfExpression);
+
+  appendStatement (buildExprStatement (expression2), subroutineScope);
 }
 
 /*

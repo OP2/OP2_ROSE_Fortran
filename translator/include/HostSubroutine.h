@@ -16,15 +16,6 @@ class HostSubroutine: public Subroutine
      * of the user device subroutine
      * ======================================================
      */
-
-    std::map <std::string, SgFunctionSymbol *> functionDeclarations;
-
-    /*
-     * ======================================================
-     * The formal parameter which a string containing the name
-     * of the user device subroutine
-     * ======================================================
-     */
     SgVariableDeclaration * formalParameter_SubroutineName;
 
     /*

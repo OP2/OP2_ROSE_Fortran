@@ -48,7 +48,7 @@ class InitialiseConstantsSubroutine: public Subroutine
 
     std::map <std::string, SgVariableDeclaration *> constantDeclarations;
 
-  private:
+  public:
 
     /*
      * ======================================================
@@ -56,7 +56,7 @@ class InitialiseConstantsSubroutine: public Subroutine
      * ======================================================
      */
     void
-    generateSubroutine ();
+    generateSubroutine (SgScopeStatement * moduleScope);
 
     /*
      * ======================================================
@@ -67,10 +67,7 @@ class InitialiseConstantsSubroutine: public Subroutine
     void
     declareConstants (SgScopeStatement * moduleScope);
 
-  public:
-
-    InitialiseConstantsSubroutine (std::string const & subroutineName,
-        SgScopeStatement * moduleScope);
+    InitialiseConstantsSubroutine (std::string const & subroutineName);
 };
 
 #endif

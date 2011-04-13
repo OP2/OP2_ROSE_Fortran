@@ -8,6 +8,7 @@
 #include <HostSubroutineOfDirectLoop.h>
 #include <HostSubroutineOfIndirectLoop.h>
 #include <InitialiseConstantsSubroutine.h>
+#include <DeviceDataSizesDeclaration.h>
 
 /*
  * ======================================================
@@ -431,6 +432,10 @@ NewSubroutinesGeneration::visit (SgNode * node)
                  * ======================================================
                  */
 
+                DeviceDataSizesDeclaration * deviceDataSizesDeclaration =
+                    new DeviceDataSizesDeclaration (*parallelLoop,
+                        userSubroutineName, sourceFile.get_globalScope ());
+
                 /*
                  * ======================================================
                  * Indirect loops use global constants. Declare them and
@@ -439,8 +444,13 @@ NewSubroutinesGeneration::visit (SgNode * node)
                  */
 
                 InitialiseConstantsSubroutine * initialiseConstantsSubroutine =
-                    new InitialiseConstantsSubroutine (userSubroutineName,
-                        moduleScope);
+                    new InitialiseConstantsSubroutine (userSubroutineName);
+
+                initialiseConstantsSubroutine->declareConstants (
+                    sourceFile.get_globalScope ());
+
+                initialiseConstantsSubroutine->generateSubroutine (
+                    moduleScope);
 
                 /*
                  * ======================================================
@@ -457,11 +467,13 @@ NewSubroutinesGeneration::visit (SgNode * node)
                     new KernelSubroutineOfIndirectLoop (userSubroutineName,
                         *userDeviceSubroutine, *parallelLoop, moduleScope);
 
-                HostSubroutine * hostSubroutine =
-                    new HostSubroutineOfIndirectLoop (userSubroutineName,
-                        *userDeviceSubroutine, *kernelSubroutine,
-                        *initialiseConstantsSubroutine, *parallelLoop,
-                        moduleScope);
+                HostSubroutine
+                    * hostSubroutine =
+                        new HostSubroutineOfIndirectLoop (userSubroutineName,
+                            *userDeviceSubroutine, *kernelSubroutine,
+                            *initialiseConstantsSubroutine,
+                            *deviceDataSizesDeclaration, *parallelLoop,
+                            moduleScope);
 
                 /*
                  * ======================================================

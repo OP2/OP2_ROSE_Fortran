@@ -10,7 +10,8 @@
  */
 
 void
-InitialiseConstantsSubroutine::generateSubroutine ()
+InitialiseConstantsSubroutine::generateSubroutine (
+    SgScopeStatement * moduleScope)
 {
   using SageBuilder::buildVarRefExp;
   using SageBuilder::buildExprStatement;
@@ -24,11 +25,34 @@ InitialiseConstantsSubroutine::generateSubroutine ()
   using SageBuilder::buildIntVal;
   using SageBuilder::buildFunctionCallExp;
   using SageBuilder::buildExprListExp;
+  using SageBuilder::buildFunctionParameterList;
+  using SageBuilder::buildVoidType;
+  using SageBuilder::buildProcedureHeaderStatement;
   using SageInterface::appendStatement;
+  using SageInterface::addTextForUnparser;
   using std::make_pair;
   using std::map;
   using std::string;
   using std::vector;
+
+  /*
+   * ======================================================
+   * Build the subroutine declaration
+   * ======================================================
+   */
+
+  formalParameters = buildFunctionParameterList ();
+
+  subroutineHeaderStatement = buildProcedureHeaderStatement (
+      this->subroutineName.c_str (), buildVoidType (), formalParameters,
+      SgProcedureHeaderStatement::e_subroutine_subprogram_kind, moduleScope);
+
+  appendStatement (subroutineHeaderStatement, moduleScope);
+
+  addTextForUnparser (subroutineHeaderStatement, "attributes(host) ",
+      AstUnparseAttribute::e_before);
+
+  subroutineScope = subroutineHeaderStatement->get_definition ()->get_body ();
 
   /*
    * ======================================================
@@ -347,6 +371,8 @@ InitialiseConstantsSubroutine::declareConstants (SgScopeStatement * moduleScope)
         FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (*it,
             FortranTypesBuilder::getDoublePrecisionFloat (), moduleScope);
 
+    variableDeclaration->get_declarationModifier ().get_accessModifier ().setUndefined ();
+
     constantDeclarations.insert (make_pair (*it, variableDeclaration));
   }
 
@@ -370,54 +396,15 @@ InitialiseConstantsSubroutine::declareConstants (SgScopeStatement * moduleScope)
                 FortranTypesBuilder::getDoublePrecisionFloat (), 1, 4),
             moduleScope);
 
+    variableDeclaration->get_declarationModifier ().get_accessModifier ().setUndefined ();
+
     constantDeclarations.insert (make_pair (*it, variableDeclaration));
   }
-
-  SgVariableDeclaration * iDecl = SageBuilder::buildVariableDeclaration ("i",
-      FortranTypesBuilder::getFourByteInteger (), NULL, moduleScope);
-  iDecl->get_declarationModifier ().get_accessModifier ().setUndefined ();
-
-  SgDerivedTypeStatement * typeStatement =
-      FortranStatementsAndExpressionsBuilder::buildTypeDeclaration ("newType",
-          moduleScope);
-  typeStatement->get_definition ()->append_member (iDecl);
-
-  SageInterface::appendStatement (typeStatement, moduleScope);
 }
 
 InitialiseConstantsSubroutine::InitialiseConstantsSubroutine (
-    std::string const & subroutineName, SgScopeStatement * moduleScope) :
+    std::string const & subroutineName) :
   Subroutine (subroutineName + "_initialiseConstants")
 {
-  using SageBuilder::buildFunctionParameterList;
-  using SageBuilder::buildVoidType;
-  using SageBuilder::buildProcedureHeaderStatement;
-  using SageInterface::appendStatement;
-  using SageInterface::addTextForUnparser;
-
-  /*
-   * ======================================================
-   * First declare the constants (before the subroutine initialising
-   * them) to ensure their visibility
-   * ======================================================
-   */
-
   variableNamePrefix = subroutineName;
-
-  declareConstants (moduleScope);
-
-  formalParameters = buildFunctionParameterList ();
-
-  subroutineHeaderStatement = buildProcedureHeaderStatement (
-      this->subroutineName.c_str (), buildVoidType (), formalParameters,
-      SgProcedureHeaderStatement::e_subroutine_subprogram_kind, moduleScope);
-
-  appendStatement (subroutineHeaderStatement, moduleScope);
-
-  addTextForUnparser (subroutineHeaderStatement, "attributes(host) ",
-      AstUnparseAttribute::e_before);
-
-  subroutineScope = subroutineHeaderStatement->get_definition ()->get_body ();
-
-  generateSubroutine ();
 }
