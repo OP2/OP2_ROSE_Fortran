@@ -96,17 +96,19 @@ typedef struct {
 } op_map;
 
 typedef struct {
-  op_set     *set;    /* set on which data is defined */
+  int         set_rank; /* are we a global, vector or matrix? */
+  op_set      set[2]; /* set on which data is defined */
   int         dim,    /* dimension of data */
               index,  /* index into list of datasets */
-              size;   /* size of each element in dataset */
+              size,   /* size of each element in dataset */
+              data_rank, /* rank of individual data items. */
+              data_shape[4]; /* shape of individual data items. */
   void       *dat,    /* data on host */
              *dat_d;  /* data on device (GPU) */
   char const *name;   /* name of dataset */
 } op_dat;
 
 typedef struct {
-  int         form;   /* form of the argument: 0 global, 1 vector, 2 matrix */
   op_dat     *dat;    /* argument to pass to the user kernel */
   int         idx[2]; /* indices into mappings */
   op_map     *map[2]; /* mappings for indirect access */
