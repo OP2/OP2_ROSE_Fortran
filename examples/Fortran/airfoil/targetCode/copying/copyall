@@ -1,0 +1,1 @@
+scp Makefile qsub_script *.{CUF,F95,c,cpp,h} cbertoll@login-0.cx1.hpc.ic.ac.uk:/work/cbertoll/airfoil-cuda-full
