@@ -39,38 +39,38 @@ class ParallelLoop
 
     /*
      * ======================================================
-     * The declarations corresponding to each distinct
-     * OP_DAT argument. The key to this map is the name of the
-     * actual argument passed to the OP_PAR_LOOP
+     * The same OP_DAT variable can be passed as an argument
+     * to OP_PAR_LOOP. This vector records the names of the
+     * unique OP_DATs
      * ======================================================
      */
-    std::map <std::string, OP_DAT_Declaration *> OP_DATs;
+    std::vector <std::string> unique_OP_DATs;
+
+    /*
+     * ======================================================
+     * The base type of each OP_DAT. The map is indexed by
+     * the argument group number
+     * ======================================================
+     */
+    std::map <unsigned int, SgType *> OP_DAT_Types;
+
+    /*
+     * ======================================================
+     * The dimension of each OP_DAT. The map is indexed by
+     * the argument group number
+     * ======================================================
+     */
+    std::map <unsigned int, unsigned int> OP_DAT_Dimensions;
 
     /*
      * ======================================================
      * The same OP_DAT variable can be passed as an argument
-     * to OP_PAR_LOOP. This map records how many times an OP_DAT
-     * variable is passed
+     * to OP_PAR_LOOP. This map records whether the OP_DAT argument
+     * at this position (in the actual arguments) is a duplicate
+     * of a previous OP_DAT argument
      * ======================================================
      */
-    std::map <std::string, unsigned int> numberOfOP_DAT_Occurrences;
-
-    /*
-     * ======================================================
-     * The same OP_DAT variable can be passed as an argument
-     * to OP_PAR_LOOP. This map records the first OP_DAT argument
-     * group where the OP_DAT is passed
-     * ======================================================
-     */
-    std::map <std::string, unsigned int> firstOP_DAT_Occurrence;
-
-    /*
-     * ======================================================
-     * How is the data in this OP_DAT variable accessed: through
-     * a mapping or directly?
-     * ======================================================
-     */
-    std::map <std::string, MAPPING_VALUE> OP_DAT_MappingDescriptors;
+    std::map <unsigned int, bool> OP_DAT_Duplicates;
 
     /*
      * ======================================================
@@ -79,19 +79,9 @@ class ParallelLoop
      * a mapping or directly?
      * ======================================================
      */
-    std::map <unsigned int, MAPPING_VALUE> OP_DAT_PositionMappingDescriptors;
+    std::map <unsigned int, MAPPING_VALUE> OP_DAT_MappingDescriptors;
 
   private:
-
-    /*
-     * ======================================================
-     * Discovers whether all OP_MAPs are direct, and hence
-     * whether this OP_PAR_LOOP has direct or indirect access
-     * to its data
-     * ======================================================
-     */
-    void
-    setDirectOrIndirectLoop (Declarations * declarations);
 
     /*
      * ======================================================
@@ -113,7 +103,7 @@ class ParallelLoop
     isDirectLoop () const;
 
     unsigned int
-    getNumberOfDistinctIndirect_OP_DAT_Arguments () const;
+    getNumberOfDistinctIndirect_OP_DAT_Arguments ();
 
     std::string
     getModuleName () const
@@ -134,40 +124,28 @@ class ParallelLoop
           / OP2::NUMBER_OF_ARGUMENTS_PER_OP_DAT;
     }
 
-    unsigned int
-    getNumberOfDistinct_OP_DAT_Arguments () const
+    SgType *
+    get_OP_DAT_Type (unsigned int OP_DAT_ArgumentGroup)
     {
-      return OP_DATs.size ();
-    }
-
-    std::map <std::string, OP_DAT_Declaration *>::const_iterator
-    first_OP_DAT ()
-    {
-      return OP_DATs.begin ();
-    }
-
-    std::map <std::string, OP_DAT_Declaration *>::const_iterator
-    last_OP_DAT ()
-    {
-      return OP_DATs.end ();
+      return OP_DAT_Types[OP_DAT_ArgumentGroup];
     }
 
     unsigned int
-    getNumberOfOP_DATOccurrences (std::string const & variableName)
+    get_OP_DAT_Dimension (unsigned int OP_DAT_ArgumentGroup)
     {
-      return numberOfOP_DAT_Occurrences[variableName];
+      return OP_DAT_Dimensions[OP_DAT_ArgumentGroup];
     }
 
-    unsigned int
-    getFirstOP_DATOccurrence (std::string const & variableName)
+    bool
+    isDuplicate_OP_DAT (unsigned int OP_DAT_ArgumentGroup)
     {
-      return firstOP_DAT_Occurrence[variableName];
+      return OP_DAT_Duplicates[OP_DAT_ArgumentGroup];
     }
 
     MAPPING_VALUE
-    get_OP_MAP_Value (unsigned int positionOf_OP_DAT_InActualArguments)
+    get_OP_MAP_Value (unsigned int OP_DAT_ArgumentGroup)
     {
-      return OP_DAT_PositionMappingDescriptors[positionOf_OP_DAT_InActualArguments];
+      return OP_DAT_MappingDescriptors[OP_DAT_ArgumentGroup];
     }
 };
 

@@ -26,39 +26,41 @@ HostSubroutine::copyDataBackFromDeviceAndDeallocate (
   Debug::getInstance ()->debugMessage (
       "Creating statements to copy data back from device and deallocate", 2);
 
-  map <string, OP_DAT_Declaration *>::const_iterator OP_DAT_iterator;
-
-  for (OP_DAT_iterator = parallelLoop.first_OP_DAT (); OP_DAT_iterator
-      != parallelLoop.last_OP_DAT (); ++OP_DAT_iterator)
+  for (unsigned int i = 1; i
+      <= parallelLoop.getNumberOf_OP_DAT_ArgumentGroups (); ++i)
   {
-    string const OP_DATVariableName = OP_DAT_iterator->first;
+    if (parallelLoop.isDuplicate_OP_DAT (i) == false)
+    {
+      SgVarRefExp * opDatDeviceReference = buildVarRefExp (
+          localVariables_OP_DAT_VariablesOnDevice[i]);
 
-    SgVarRefExp * opDatDeviceReference = buildVarRefExp (
-        localVariables_OP_DAT_VariablesOnDevice[OP_DATVariableName]);
+      SgVarRefExp * c2FortranPointerReference = buildVarRefExp (
+          localVariables_CToFortranPointers[i]);
 
-    SgVarRefExp * c2FortranPointerReference = buildVarRefExp (
-        localVariables_CToFortranPointers[OP_DATVariableName]);
+      SgExpression * assignmentExpression = buildAssignOp (
+          c2FortranPointerReference, opDatDeviceReference);
 
-    SgExpression * assignmentExpression = buildAssignOp (
-        c2FortranPointerReference, opDatDeviceReference);
+      SgExprStatement * assignmentStatement = buildExprStatement (
+          assignmentExpression);
 
-    SgExprStatement * assignmentStatement = buildExprStatement (
-        assignmentExpression);
-
-    appendStatement (assignmentStatement, subroutineScope);
+      appendStatement (assignmentStatement, subroutineScope);
+    }
   }
 
-  for (OP_DAT_iterator = parallelLoop.first_OP_DAT (); OP_DAT_iterator
-      != parallelLoop.last_OP_DAT (); ++OP_DAT_iterator)
+  for (unsigned int i = 1; i
+      <= parallelLoop.getNumberOf_OP_DAT_ArgumentGroups (); ++i)
   {
-    SgVarRefExp * opDatDeviceReference = buildVarRefExp (
-        localVariables_OP_DAT_VariablesOnDevice[OP_DAT_iterator->first]);
+    if (parallelLoop.isDuplicate_OP_DAT (i) == false)
+    {
+      SgVarRefExp * opDatDeviceReference = buildVarRefExp (
+          localVariables_OP_DAT_VariablesOnDevice[i]);
 
-    SgExprListExp * deallocateParameters = buildExprListExp (
-        opDatDeviceReference);
+      SgExprListExp * deallocateParameters = buildExprListExp (
+          opDatDeviceReference);
 
-    FortranStatementsAndExpressionsBuilder::appendDeallocateStatement (
-        deallocateParameters, subroutineScope);
+      FortranStatementsAndExpressionsBuilder::appendDeallocateStatement (
+          deallocateParameters, subroutineScope);
+    }
   }
 }
 
@@ -86,101 +88,107 @@ HostSubroutine::initialiseDataMarshallingLocalVariables (
 
   map <string, OP_DAT_Declaration *>::const_iterator OP_DAT_iterator;
 
-  for (OP_DAT_iterator = parallelLoop.first_OP_DAT (); OP_DAT_iterator
-      != parallelLoop.last_OP_DAT (); ++OP_DAT_iterator)
+  for (unsigned int i = 1; i
+      <= parallelLoop.getNumberOf_OP_DAT_ArgumentGroups (); ++i)
   {
-    string const OP_DATVariableName = OP_DAT_iterator->first;
+    if (parallelLoop.isDuplicate_OP_DAT (i) == false)
+    {
+      SgVarRefExp * opDatFormalArgumentReference = buildVarRefExp (
+          formalParameters_OP_DAT[i]);
 
-    SgVarRefExp * opDatFormalArgumentReference = buildVarRefExp (
-        formalParameters_OP_DAT[OP_DATVariableName]);
+      SgVarRefExp * opDatSizeReference = buildVarRefExp (
+          localVariables_OP_DAT_Sizes[i]);
 
-    SgVarRefExp * opDatSizeReference = buildVarRefExp (
-        localVariables_OP_DAT_Sizes[OP_DATVariableName]);
+      SgExpression * setField = buildDotExp (opDatFormalArgumentReference,
+          buildOpaqueVarRefExp ("set", subroutineScope));
 
-    SgExpression * setField = buildDotExp (opDatFormalArgumentReference,
-        buildOpaqueVarRefExp ("set", subroutineScope));
+      SgExpression * setSizeField = buildDotExp (setField,
+          buildOpaqueVarRefExp ("size", subroutineScope));
 
-    SgExpression * setSizeField = buildDotExp (setField, buildOpaqueVarRefExp (
-        "size", subroutineScope));
+      SgExpression * dimField = buildDotExp (opDatFormalArgumentReference,
+          buildOpaqueVarRefExp ("dim", subroutineScope));
 
-    SgExpression * dimField = buildDotExp (opDatFormalArgumentReference,
-        buildOpaqueVarRefExp ("dim", subroutineScope));
+      SgExpression * multiplyExpression = buildMultiplyOp (dimField,
+          setSizeField);
 
-    SgExpression * multiplyExpression =
-        buildMultiplyOp (dimField, setSizeField);
+      SgExpression * assignmentExpression = buildAssignOp (opDatSizeReference,
+          multiplyExpression);
 
-    SgExpression * assignmentExpression = buildAssignOp (opDatSizeReference,
-        multiplyExpression);
+      SgStatement * assignmentStatement = buildExprStatement (
+          assignmentExpression);
 
-    SgStatement * assignmentStatement = buildExprStatement (
-        assignmentExpression);
-
-    appendStatement (assignmentStatement, subroutineScope);
+      appendStatement (assignmentStatement, subroutineScope);
+    }
   }
 
-  for (OP_DAT_iterator = parallelLoop.first_OP_DAT (); OP_DAT_iterator
-      != parallelLoop.last_OP_DAT (); ++OP_DAT_iterator)
+  for (unsigned int i = 1; i
+      <= parallelLoop.getNumberOf_OP_DAT_ArgumentGroups (); ++i)
   {
-    string const OP_DATVariableName = OP_DAT_iterator->first;
+    if (parallelLoop.isDuplicate_OP_DAT (i) == false)
+    {
+      SgVarRefExp * opDatFormalArgumentReference = buildVarRefExp (
+          formalParameters_OP_DAT[i]);
 
-    SgVarRefExp * opDatFormalArgumentReference = buildVarRefExp (
-        formalParameters_OP_DAT[OP_DATVariableName]);
+      SgVarRefExp * c2FortranPointerReference = buildVarRefExp (
+          localVariables_CToFortranPointers[i]);
 
-    SgVarRefExp * c2FortranPointerReference = buildVarRefExp (
-        localVariables_CToFortranPointers[OP_DATVariableName]);
+      SgExpression * datField = buildDotExp (opDatFormalArgumentReference,
+          buildOpaqueVarRefExp ("dat", subroutineScope));
 
-    SgExpression * datField = buildDotExp (opDatFormalArgumentReference,
-        buildOpaqueVarRefExp ("dat", subroutineScope));
+      SgExpression * shapeExpression =
+          FortranStatementsAndExpressionsBuilder::buildShapeExpression (
+              localVariables_OP_DAT_Sizes[i], subroutineScope);
 
-    SgExpression * shapeExpression =
-        FortranStatementsAndExpressionsBuilder::buildShapeExpression (
-            localVariables_OP_DAT_Sizes[OP_DATVariableName], subroutineScope);
+      SgStatement * callStatement = createCallToC_F_POINTER (datField,
+          c2FortranPointerReference, shapeExpression);
 
-    SgStatement * callStatement = createCallToC_F_POINTER (datField,
-        c2FortranPointerReference, shapeExpression);
-
-    appendStatement (callStatement, subroutineScope);
+      appendStatement (callStatement, subroutineScope);
+    }
   }
 
-  for (OP_DAT_iterator = parallelLoop.first_OP_DAT (); OP_DAT_iterator
-      != parallelLoop.last_OP_DAT (); ++OP_DAT_iterator)
+  for (unsigned int i = 1; i
+      <= parallelLoop.getNumberOf_OP_DAT_ArgumentGroups (); ++i)
   {
-    string const OP_DATVariableName = OP_DAT_iterator->first;
+    if (parallelLoop.isDuplicate_OP_DAT (i) == false)
+    {
 
-    SgVarRefExp * opDatSizeReference = buildVarRefExp (
-        localVariables_OP_DAT_Sizes[OP_DATVariableName]);
+      SgVarRefExp * opDatSizeReference = buildVarRefExp (
+          localVariables_OP_DAT_Sizes[i]);
 
-    SgVarRefExp * opDatDeviceReference = buildVarRefExp (
-        localVariables_OP_DAT_VariablesOnDevice[OP_DATVariableName]);
+      SgVarRefExp * opDatDeviceReference = buildVarRefExp (
+          localVariables_OP_DAT_VariablesOnDevice[i]);
 
-    SgExprListExp * arrayIndexExpression =
-        buildExprListExp (opDatSizeReference);
+      SgExprListExp * arrayIndexExpression = buildExprListExp (
+          opDatSizeReference);
 
-    SgPntrArrRefExp * subscriptExpression = buildPntrArrRefExp (
-        opDatDeviceReference, arrayIndexExpression);
+      SgPntrArrRefExp * subscriptExpression = buildPntrArrRefExp (
+          opDatDeviceReference, arrayIndexExpression);
 
-    FortranStatementsAndExpressionsBuilder::appendAllocateStatement (
-        buildExprListExp (subscriptExpression), subroutineScope);
+      FortranStatementsAndExpressionsBuilder::appendAllocateStatement (
+          buildExprListExp (subscriptExpression), subroutineScope);
+    }
   }
 
-  for (OP_DAT_iterator = parallelLoop.first_OP_DAT (); OP_DAT_iterator
-      != parallelLoop.last_OP_DAT (); ++OP_DAT_iterator)
+  for (unsigned int i = 1; i
+      <= parallelLoop.getNumberOf_OP_DAT_ArgumentGroups (); ++i)
   {
-    string const OP_DATVariableName = OP_DAT_iterator->first;
+    if (parallelLoop.isDuplicate_OP_DAT (i) == false)
+    {
 
-    SgVarRefExp * opDatDeviceReference = buildVarRefExp (
-        localVariables_OP_DAT_VariablesOnDevice[OP_DATVariableName]);
+      SgVarRefExp * opDatDeviceReference = buildVarRefExp (
+          localVariables_OP_DAT_VariablesOnDevice[i]);
 
-    SgVarRefExp * c2FortranPointerReference = buildVarRefExp (
-        localVariables_CToFortranPointers[OP_DATVariableName]);
+      SgVarRefExp * c2FortranPointerReference = buildVarRefExp (
+          localVariables_CToFortranPointers[i]);
 
-    SgExpression * assignmentExpression = buildAssignOp (opDatDeviceReference,
-        c2FortranPointerReference);
+      SgExpression * assignmentExpression = buildAssignOp (
+          opDatDeviceReference, c2FortranPointerReference);
 
-    SgStatement * assignmentStatement = buildExprStatement (
-        assignmentExpression);
+      SgStatement * assignmentStatement = buildExprStatement (
+          assignmentExpression);
 
-    appendStatement (assignmentStatement, subroutineScope);
+      appendStatement (assignmentStatement, subroutineScope);
+    }
   }
 }
 
@@ -200,64 +208,67 @@ HostSubroutine::createDataMarshallingLocalVariables (
       "Creating local variables to allow data marshalling between host and device",
       2);
 
-  map <string, OP_DAT_Declaration *>::const_iterator OP_DAT_iterator;
-
-  for (OP_DAT_iterator = parallelLoop.first_OP_DAT (); OP_DAT_iterator
-      != parallelLoop.last_OP_DAT (); ++OP_DAT_iterator)
+  for (unsigned int i = 1; i
+      <= parallelLoop.getNumberOf_OP_DAT_ArgumentGroups (); ++i)
   {
-    string const variableName = "arg" + lexical_cast <string> (
-        parallelLoop.getFirstOP_DATOccurrence (OP_DAT_iterator->first))
-        + "Size";
+    if (parallelLoop.isDuplicate_OP_DAT (i) == false)
+    {
+      string const variableName = "arg" + lexical_cast <string> (i) + "Size";
 
-    SgVariableDeclaration * variableDeclaration = buildVariableDeclaration (
-        variableName, FortranTypesBuilder::getFourByteInteger (), NULL,
-        subroutineScope);
+      SgVariableDeclaration * variableDeclaration = buildVariableDeclaration (
+          variableName, FortranTypesBuilder::getFourByteInteger (), NULL,
+          subroutineScope);
 
-    variableDeclaration->get_declarationModifier ().get_accessModifier ().setUndefined ();
+      variableDeclaration->get_declarationModifier ().get_accessModifier ().setUndefined ();
 
-    localVariables_OP_DAT_Sizes.insert (make_pair (OP_DAT_iterator->first,
-        variableDeclaration));
+      localVariables_OP_DAT_Sizes.insert (make_pair (i, variableDeclaration));
 
-    appendStatement (variableDeclaration, subroutineScope);
+      appendStatement (variableDeclaration, subroutineScope);
+    }
   }
 
-  for (OP_DAT_iterator = parallelLoop.first_OP_DAT (); OP_DAT_iterator
-      != parallelLoop.last_OP_DAT (); ++OP_DAT_iterator)
+  for (unsigned int i = 1; i
+      <= parallelLoop.getNumberOf_OP_DAT_ArgumentGroups (); ++i)
   {
-    string const variableName = "c2fPtrArg" + lexical_cast <string> (
-        parallelLoop.getFirstOP_DATOccurrence (OP_DAT_iterator->first));
+    if (parallelLoop.isDuplicate_OP_DAT (i) == false)
+    {
+      string const variableName = "c2fPtrArg" + lexical_cast <string> (i);
 
-    SgVariableDeclaration * variableDeclaration = buildVariableDeclaration (
-        variableName, buildPointerType (FortranTypesBuilder::getArray_RankOne (
-            FortranTypesBuilder::getDoublePrecisionFloat ())), NULL,
-        subroutineScope);
+      SgVariableDeclaration * variableDeclaration = buildVariableDeclaration (
+          variableName, buildPointerType (
+              FortranTypesBuilder::getArray_RankOne (
+                  FortranTypesBuilder::getDoublePrecisionFloat ())), NULL,
+          subroutineScope);
 
-    variableDeclaration->get_declarationModifier ().get_accessModifier ().setUndefined ();
+      variableDeclaration->get_declarationModifier ().get_accessModifier ().setUndefined ();
 
-    localVariables_CToFortranPointers.insert (make_pair (
-        OP_DAT_iterator->first, variableDeclaration));
+      localVariables_CToFortranPointers.insert (make_pair (i,
+          variableDeclaration));
 
-    appendStatement (variableDeclaration, subroutineScope);
+      appendStatement (variableDeclaration, subroutineScope);
+    }
   }
 
-  for (OP_DAT_iterator = parallelLoop.first_OP_DAT (); OP_DAT_iterator
-      != parallelLoop.last_OP_DAT (); ++OP_DAT_iterator)
+  for (unsigned int i = 1; i
+      <= parallelLoop.getNumberOf_OP_DAT_ArgumentGroups (); ++i)
   {
-    string const variableName = "argument" + lexical_cast <string> (
-        parallelLoop.getFirstOP_DATOccurrence (OP_DAT_iterator->first));
+    if (parallelLoop.isDuplicate_OP_DAT (i) == false)
+    {
+      string const variableName = "argument" + lexical_cast <string> (i);
 
-    SgVariableDeclaration * variableDeclaration = buildVariableDeclaration (
-        variableName, OP_DAT_iterator->second->getActualType (), NULL,
-        subroutineScope);
+      SgVariableDeclaration * variableDeclaration =
+          buildVariableDeclaration (variableName, parallelLoop.get_OP_DAT_Type (
+              i), NULL, subroutineScope);
 
-    variableDeclaration->get_declarationModifier ().get_accessModifier ().setUndefined ();
-    variableDeclaration->get_declarationModifier ().get_typeModifier ().setDevice ();
-    variableDeclaration->get_declarationModifier ().get_typeModifier ().setAllocatable ();
+      variableDeclaration->get_declarationModifier ().get_accessModifier ().setUndefined ();
+      variableDeclaration->get_declarationModifier ().get_typeModifier ().setDevice ();
+      variableDeclaration->get_declarationModifier ().get_typeModifier ().setAllocatable ();
 
-    localVariables_OP_DAT_VariablesOnDevice.insert (make_pair (
-        OP_DAT_iterator->first, variableDeclaration));
+      localVariables_OP_DAT_VariablesOnDevice.insert (make_pair (i,
+          variableDeclaration));
 
-    appendStatement (variableDeclaration, subroutineScope);
+      appendStatement (variableDeclaration, subroutineScope);
+    }
   }
 }
 
@@ -323,7 +334,7 @@ HostSubroutine::createFormalParameters (
    * parameters in an OP_DAT batch of arguments
    * ======================================================
    */
-  int variableNameSuffix = -1;
+  int variableNameSuffix = 0;
 
   for (vector <SgExpression *>::const_iterator it =
       parallelLoop.getActualArguments ().begin (); it
@@ -426,7 +437,8 @@ HostSubroutine::createFormalParameters (
 
               appendStatement (opMapDeclaration, subroutineScope);
 
-              formalParameters_OP_MAP.push_back (opMapDeclaration);
+              formalParameters_OP_MAP.insert (make_pair (variableNameSuffix,
+                  opMapDeclaration));
             }
 
             else if (iequals (className, OP2::OP_DAT_NAME))
@@ -462,11 +474,8 @@ HostSubroutine::createFormalParameters (
 
               appendStatement (opDatDeclaration, subroutineScope);
 
-              formalParameters_OP_DAT.insert (make_pair (
-                  variableReference->get_symbol ()->get_name ().getString (),
+              formalParameters_OP_DAT.insert (make_pair (variableNameSuffix,
                   opDatDeclaration));
-
-              formalParameters_OP_DAT_List.push_back (opDatDeclaration);
             }
             else
             {
@@ -502,7 +511,8 @@ HostSubroutine::createFormalParameters (
 
             appendStatement (opAccessDeclaration, subroutineScope);
 
-            formalParameters_OP_ACCESS.push_back (opAccessDeclaration);
+            formalParameters_OP_ACCESS.insert (make_pair (variableNameSuffix,
+                opAccessDeclaration));
 
             break;
           }
@@ -542,7 +552,8 @@ HostSubroutine::createFormalParameters (
 
         appendStatement (opIndirectionDeclaration, subroutineScope);
 
-        formalParameters_OP_INDIRECTION.push_back (opIndirectionDeclaration);
+        formalParameters_OP_INDIRECTION.insert (make_pair (variableNameSuffix,
+            opIndirectionDeclaration));
 
         break;
       }

@@ -93,10 +93,10 @@ class HostSubroutineOfIndirectLoop: public HostSubroutine
 
     std::map <std::string, SgVariableDeclaration *> localVariables_Others;
 
-    std::map <std::string, SgVariableDeclaration *>
+    std::map <unsigned int, SgVariableDeclaration *>
         localVariables_ExecutionPlan_OP_DAT;
 
-    std::map <std::string, SgVariableDeclaration *>
+    std::map <unsigned int, SgVariableDeclaration *>
         localVariables_ExecutionPlan_OP_DAT_Size;
 
     std::map <unsigned int, SgVariableDeclaration *>

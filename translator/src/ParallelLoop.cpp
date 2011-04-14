@@ -1,4 +1,5 @@
 #include <boost/algorithm/string.hpp>
+#include <algorithm>
 #include <Debug.h>
 #include <ParallelLoop.h>
 #include <HostSubroutineOfDirectLoop.h>
@@ -11,9 +12,10 @@
  */
 
 void
-ParallelLoop::retrieveOP_DATDeclarations (Declarations * op2DeclaredVariables)
+ParallelLoop::retrieveOP_DATDeclarations (Declarations * declarations)
 {
   using boost::iequals;
+  using std::find;
   using std::string;
   using std::vector;
   using std::map;
@@ -21,9 +23,7 @@ ParallelLoop::retrieveOP_DATDeclarations (Declarations * op2DeclaredVariables)
 
   Debug::getInstance ()->debugMessage ("Retrieving OP_DAT declarations", 2);
 
-  int OP_DATCounter = -1;
-
-  string current_OP_DAT_VariableName;
+  int OP_DATCounter = 0;
 
   for (vector <SgExpression *>::iterator it = actualArguments.begin ()
       + OP2::NUMBER_OF_NON_OP_DAT_ARGUMENTS; it != actualArguments.end (); ++it)
@@ -53,8 +53,6 @@ ParallelLoop::retrieveOP_DATDeclarations (Declarations * op2DeclaredVariables)
 
           if (iequals (className, OP2::OP_DAT_NAME))
           {
-            current_OP_DAT_VariableName = variableName;
-
             OP_DATCounter++;
 
             /*
@@ -68,29 +66,45 @@ ParallelLoop::retrieveOP_DATDeclarations (Declarations * op2DeclaredVariables)
             try
             {
               OP_DAT_Declaration * opDatDeclaration =
-                  op2DeclaredVariables->get_OP_DAT_Declaration (variableName);
+                  declarations->get_OP_DAT_Declaration (variableName);
 
-              if (OP_DATs.count (variableName) == 0)
+              OP_DAT_Types.insert (make_pair (OP_DATCounter,
+                  opDatDeclaration->getActualType ()));
+
+              OP_DAT_Dimensions.insert (make_pair (OP_DATCounter,
+                  opDatDeclaration->getDimension ()));
+
+              if (find (unique_OP_DATs.begin (), unique_OP_DATs.end (),
+                  variableName) == unique_OP_DATs.end ())
               {
-                OP_DATs.insert (make_pair (variableName, opDatDeclaration));
+                unique_OP_DATs.push_back (variableName);
 
-                numberOfOP_DAT_Occurrences.insert (make_pair (variableName, 1));
-
-                firstOP_DAT_Occurrence.insert (make_pair (variableName,
-                    OP_DATCounter));
+                OP_DAT_Duplicates.insert (make_pair (OP_DATCounter, false));
               }
               else
               {
-                unsigned int occurrences =
-                    numberOfOP_DAT_Occurrences[variableName] + 1;
-
-                numberOfOP_DAT_Occurrences[variableName] = occurrences;
+                OP_DAT_Duplicates.insert (make_pair (OP_DATCounter, true));
               }
             }
-            catch (const std::string & exception)
+            catch (const std::string &)
             {
-              Debug::getInstance ()->debugMessage ("'" + variableName
-                  + "' must have been declared through OP_DECL_GBL", 1);
+              Debug::getInstance ()->debugMessage (
+                  "'" + variableName
+                      + "' has been declared through OP_DECL_GBL (and not through OP_DECL_DAT)",
+                  1);
+
+              OP_GBL_Declaration * opGBLDeclaration =
+                  declarations->get_OP_GBL_Declaration (variableName);
+
+              OP_DAT_Types.insert (make_pair (OP_DATCounter,
+                  opGBLDeclaration->getActualType ()));
+
+              OP_DAT_Dimensions.insert (make_pair (OP_DATCounter,
+                  opGBLDeclaration->getDimension ()));
+
+              unique_OP_DATs.push_back (variableName);
+
+              OP_DAT_Duplicates.insert (make_pair (OP_DATCounter, false));
             }
           }
 
@@ -104,17 +118,11 @@ ParallelLoop::retrieveOP_DATDeclarations (Declarations * op2DeclaredVariables)
                * access to the data
                * ======================================================
                */
-              OP_DAT_MappingDescriptors.insert (make_pair (
-                  current_OP_DAT_VariableName, DIRECT));
-
-              OP_DAT_PositionMappingDescriptors[OP_DATCounter] = DIRECT;
+              OP_DAT_MappingDescriptors[OP_DATCounter] = DIRECT;
             }
             else
             {
-              OP_DAT_MappingDescriptors.insert (make_pair (
-                  current_OP_DAT_VariableName, INDIRECT));
-
-              OP_DAT_PositionMappingDescriptors[OP_DATCounter] = INDIRECT;
+              OP_DAT_MappingDescriptors[OP_DATCounter] = INDIRECT;
             }
           }
         }
@@ -122,7 +130,7 @@ ParallelLoop::retrieveOP_DATDeclarations (Declarations * op2DeclaredVariables)
 
       default:
       {
-
+        break;
       }
     }
   }
@@ -140,7 +148,7 @@ ParallelLoop::isDirectLoop () const
   using std::map;
   using std::string;
 
-  for (map <string, MAPPING_VALUE>::const_iterator it =
+  for (map <unsigned int, MAPPING_VALUE>::const_iterator it =
       OP_DAT_MappingDescriptors.begin (); it
       != OP_DAT_MappingDescriptors.end (); ++it)
   {
@@ -154,20 +162,21 @@ ParallelLoop::isDirectLoop () const
 }
 
 unsigned int
-ParallelLoop::getNumberOfDistinctIndirect_OP_DAT_Arguments () const
+ParallelLoop::getNumberOfDistinctIndirect_OP_DAT_Arguments ()
 {
   using std::map;
   using std::string;
 
   unsigned int count = 0;
 
-  for (map <string, MAPPING_VALUE>::const_iterator it =
-      OP_DAT_MappingDescriptors.begin (); it
-      != OP_DAT_MappingDescriptors.end (); ++it)
+  for (unsigned int i = 1; i <= getNumberOf_OP_DAT_ArgumentGroups (); ++i)
   {
-    if (it->second == INDIRECT)
+    if (OP_DAT_Duplicates[i] == false)
     {
-      count++;
+      if (OP_DAT_MappingDescriptors[i] == INDIRECT)
+      {
+        count++;
+      }
     }
   }
 

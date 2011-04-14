@@ -30,29 +30,29 @@ class HostSubroutine: public Subroutine
      * The formal indirection index parameters
      * ======================================================
      */
-    std::vector <SgVariableDeclaration *> formalParameters_OP_INDIRECTION;
+    std::map <unsigned int, SgVariableDeclaration *>
+        formalParameters_OP_INDIRECTION;
 
     /*
      * ======================================================
      * The formal OP_DAT parameters
      * ======================================================
      */
-    std::map <std::string, SgVariableDeclaration *> formalParameters_OP_DAT;
-    std::vector <SgVariableDeclaration *> formalParameters_OP_DAT_List;
+    std::map <unsigned int, SgVariableDeclaration *> formalParameters_OP_DAT;
 
     /*
      * ======================================================
      * The formal OP_MAP parameters
      * ======================================================
      */
-    std::vector <SgVariableDeclaration *> formalParameters_OP_MAP;
+    std::map <unsigned int, SgVariableDeclaration *> formalParameters_OP_MAP;
 
     /*
      * ======================================================
      * The formal OP_ACCESS parameters
      * ======================================================
      */
-    std::vector <SgVariableDeclaration *> formalParameters_OP_ACCESS;
+    std::map <unsigned int, SgVariableDeclaration *> formalParameters_OP_ACCESS;
 
     /*
      * ======================================================
@@ -61,7 +61,8 @@ class HostSubroutine: public Subroutine
      * host and the device
      * ======================================================
      */
-    std::map <std::string, SgVariableDeclaration *> localVariables_OP_DAT_Sizes;
+    std::map <unsigned int, SgVariableDeclaration *>
+        localVariables_OP_DAT_Sizes;
 
     /*
      * ======================================================
@@ -70,7 +71,7 @@ class HostSubroutine: public Subroutine
      * between the host and the device
      * ======================================================
      */
-    std::map <std::string, SgVariableDeclaration *>
+    std::map <unsigned int, SgVariableDeclaration *>
         localVariables_CToFortranPointers;
 
     /*
@@ -80,7 +81,7 @@ class HostSubroutine: public Subroutine
      * host and the device
      * ======================================================
      */
-    std::map <std::string, SgVariableDeclaration *>
+    std::map <unsigned int, SgVariableDeclaration *>
         localVariables_OP_DAT_VariablesOnDevice;
 
     /*

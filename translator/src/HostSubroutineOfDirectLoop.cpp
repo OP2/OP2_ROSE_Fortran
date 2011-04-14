@@ -26,8 +26,6 @@ HostSubroutineOfDirectLoop::createKernelCall (
 
   Debug::getInstance ()->debugMessage ("Creating kernel call", 2);
 
-  map <string, OP_DAT_Declaration *>::const_iterator OP_DAT_iterator;
-
   SgExprListExp * kernelParameters = buildExprListExp ();
 
   SgExpression * opSetFormalArgumentReference = buildVarRefExp (
@@ -39,15 +37,17 @@ HostSubroutineOfDirectLoop::createKernelCall (
 
   kernelParameters->append_expression (sizeFieldExpression);
 
-  for (OP_DAT_iterator = parallelLoop.first_OP_DAT (); OP_DAT_iterator
-      != parallelLoop.last_OP_DAT (); ++OP_DAT_iterator)
+  for (unsigned int i = 1; i
+      <= parallelLoop.getNumberOf_OP_DAT_ArgumentGroups (); ++i)
   {
-    string const OP_DATVariableName = OP_DAT_iterator->first;
+    if (parallelLoop.isDuplicate_OP_DAT (i) == false)
+    {
 
-    SgVarRefExp * opDatDeviceReference = buildVarRefExp (
-        localVariables_OP_DAT_VariablesOnDevice[OP_DATVariableName]);
+      SgVarRefExp * opDatDeviceReference = buildVarRefExp (
+          localVariables_OP_DAT_VariablesOnDevice[i]);
 
-    kernelParameters->append_expression (opDatDeviceReference);
+      kernelParameters->append_expression (opDatDeviceReference);
+    }
   }
 
   SgExprStatement * kernelCall = buildFunctionCallStmt (
@@ -90,22 +90,6 @@ HostSubroutineOfDirectLoop::createCUDAVariables (ParallelLoop & parallelLoop)
 
   /*
    * ======================================================
-   * This function builds the following Fortran code:
-   *
-   * integer(4) :: bsize          = BSIZE_DEFAULT
-   * integer(4) :: reduct_bytes   = 0
-   * integer(4) :: reduct_size    = 0
-   * integer(4) :: const_bytes    = 0
-   * integer(4) :: gsize
-   * real(8)    :: reduct_shared
-   *
-   * gsize         = int ((set%size - 1) / bsize + 1)
-   * reduct_shared = reduct_size * (BSIZE_DEFAULT / 2)
-   * ======================================================
-   */
-
-  /*
-   * ======================================================
    * Declaration and initialisation of variables and opaque
    * variables
    * ======================================================
@@ -138,31 +122,41 @@ HostSubroutineOfDirectLoop::createCUDAVariables (ParallelLoop & parallelLoop)
 
   /*
    * ======================================================
-   * gsize = int ((set%size - 1) / bsize + 1)
+   * nblocks = int ((set%size - 1) / nthread + 1)
    * ======================================================
    */
 
-  SgExpression * sizeFieldReference = buildDotExp (buildVarRefExp (
-      formalParameter_OP_SET), buildOpaqueVarRefExp ("size", subroutineScope));
+  SgVarRefExp * opSetFormalParameterReference = buildVarRefExp (
+      formalParameter_OP_SET);
 
-  SgExpression * minusOneExpression = buildSubtractOp (sizeFieldReference,
-      buildIntVal (1));
+  SgVarRefExp * blocksPerGridReference = buildVarRefExp (
+      CUDAVariable_blocksPerGrid);
+
+  SgVarRefExp * threadsPerBlockReference = buildVarRefExp (
+      CUDAVariable_threadsPerBlock);
+
+  SgExpression * opSet_SizeField_Reference = buildDotExp (
+      opSetFormalParameterReference, buildOpaqueVarRefExp ("size",
+          subroutineScope));
+
+  SgExpression * minusOneExpression = buildSubtractOp (
+      opSet_SizeField_Reference, buildIntVal (1));
 
   SgExpression * parameter1 = buildAddOp (buildDivideOp (minusOneExpression,
-      buildVarRefExp (CUDAVariable_blocksPerGrid)), buildIntVal (1));
+      threadsPerBlockReference), buildIntVal (1));
 
   SgFunctionSymbol * intFunctionSymbol =
       FortranTypesBuilder::buildNewFortranFunction ("int", subroutineScope);
 
   SgExprListExp * actualParameters = buildExprListExp (parameter1);
 
-  SgFunctionCallExp * intIntrinsicCall = buildFunctionCallExp (
+  SgFunctionCallExp * intFunctionCall = buildFunctionCallExp (
       intFunctionSymbol, actualParameters);
 
-  SgExpression * expression1 = buildAssignOp (buildVarRefExp (
-      CUDAVariable_threadsPerBlock), intIntrinsicCall);
+  SgExpression * assignExpression1 = buildAssignOp (blocksPerGridReference,
+      intFunctionCall);
 
-  appendStatement (buildExprStatement (expression1), subroutineScope);
+  appendStatement (buildExprStatement (assignExpression1), subroutineScope);
 
   /*
    * ======================================================
@@ -170,15 +164,21 @@ HostSubroutineOfDirectLoop::createCUDAVariables (ParallelLoop & parallelLoop)
    * ======================================================
    */
 
+  SgVarRefExp * sharedMemorySizeReference = buildVarRefExp (
+      CUDAVariable_sharedMemorySize);
+
   SgVarRefExp * reduct_sizeReference = buildVarRefExp (variable_reduct_size);
 
-  SgExpression * rhsOfExpression = buildMultiplyOp (reduct_sizeReference,
-      buildDivideOp (variable_BSIZE_DEFAULT, buildIntVal (2)));
+  SgDivideOp * divideExpression = buildDivideOp (variable_BSIZE_DEFAULT,
+      buildIntVal (2));
 
-  SgExpression * expression2 = buildAssignOp (buildVarRefExp (
-      CUDAVariable_sharedMemorySize), rhsOfExpression);
+  SgMultiplyOp * multiplyExpression = buildMultiplyOp (reduct_sizeReference,
+      divideExpression);
 
-  appendStatement (buildExprStatement (expression2), subroutineScope);
+  SgExpression * assignExpression2 = buildAssignOp (sharedMemorySizeReference,
+      multiplyExpression);
+
+  appendStatement (buildExprStatement (assignExpression2), subroutineScope);
 }
 
 /*
