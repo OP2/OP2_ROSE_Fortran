@@ -87,12 +87,12 @@ typedef struct {
 } op_set;
 
 typedef struct {
-  op_set     *from,   /* set pointed from */
-             *to;     /* set pointed to */
-  int         dim,    /* dimension of pointer */
-              index,  /* index into list of pointers */
-             *map;    /* array defining pointer */
-  char const *name;   /* name of pointer */
+  op_set     *from,   /* set mapped from */
+             *to;     /* set mapped to */
+  int         dim,    /* dimension of map */
+              index,  /* index into list of maps */
+             *map;    /* array defining map */
+  char const *name;   /* name of map */
 } op_map;
 
 typedef struct {
@@ -106,11 +106,11 @@ typedef struct {
 } op_dat;
 
 typedef struct {
-  int         form;
-  op_dat     *dat;
-  int         idx[2];
-  op_map     *map[2];
-  op_access   acc;
+  int         form;   /* form of the argument: 0 global, 1 vector, 2 matrix */
+  op_dat     *dat;    /* argument to pass to the user kernel */
+  int         idx[2]; /* indices into mappings */
+  op_map     *map[2]; /* mappings for indirect access */
+  op_access   acc;    /* access descriptor for the argument */
 } op_arg;
 
 /* index for direct mapping */
@@ -128,12 +128,12 @@ typedef struct {
 #define OP_NULL_SET (op_set) {0, 0, "null_set"}
 
 typedef struct {
-  size_t nrows;
-  size_t ncols;
-  int    *nnz;
-  int    *rowptr;
-  int    *colidx;
-  size_t max_nonzeros;
+  size_t nrows;       /* number of rows */
+  size_t ncols;       /* number of columns */
+  int    *nnz;        /* vector of number of nonzeros per row */
+  int    *rowptr;     /* csr row pointer (accumulation of nnz) */
+  int    *colidx;     /* csr column indices for each row */
+  size_t max_nonzeros;/* maximum number of nonzeros per row */
 } op_sparsity;
 
 typedef struct {
@@ -171,13 +171,16 @@ typedef struct {
 
 
 /* 
- * Low-level initialisation functions
+ * Low-level initialisation functions (independent of the target platform)
  */
 
+/* Initialise a set data structure */
 void initialise_set ( op_set * set, int size, char const * name );
 
+/* Initialise a map data structure */
 void initialise_map ( op_map * mapping, op_set * from, op_set * to, int dim, int * map, char const * name );
 
+/* Initialise a map data structure */
 void initialise_dat ( op_dat * data, op_set * set, int dim, int type_size, void * dat, char const * name );
 
 /*
@@ -189,8 +192,6 @@ void op_decl_set ( op_set * set, int size, char const * name );
 void op_decl_map ( op_map * mapping, op_set * from, op_set * to, int dim, int * map, char const * name );
 
 void op_decl_dat ( op_dat * data, op_set * set, int dim, int type_size, void * dat, char const * name );
-
-void op_create_vec ( op_dat * vec );
 
 void op_decl_id_map ( op_map * map );
 
@@ -204,7 +205,13 @@ op_arg op_construct_vec_arg(op_dat * data, int idx, op_map * mapping, op_access 
 
 op_arg op_construct_mat_arg(op_dat * data, int idx0, op_map * map0, int idx1, op_map * map1, op_access acc);
 
+/*
+ * Linear algebra
+ */
+
 void op_decl_sparsity ( op_sparsity * sparsity, op_map * rowmap, op_map * colmap );
+
+void op_create_vec ( op_dat * vec );
 
 void op_decl_mat( op_dat * mat, op_sparsity * sparsity, char const * name );
 
@@ -213,6 +220,10 @@ void op_mat_addto( op_dat * mat, const void* values, int nrows, const int *irows
 void op_mat_assemble( op_dat * mat );
 
 void op_mat_mult ( const op_dat * mat, const op_dat * v_in, op_dat * v_out );
+
+/*
+ * Auxiliary output functions
+ */
 
 void dump_set ( op_set const * set, char const * filename );
 
