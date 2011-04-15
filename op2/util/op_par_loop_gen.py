@@ -102,7 +102,7 @@ header_c = """/*
 
 static inline void arg_check(op_set * set, int argnum, op_arg * argument, const char * kernel) {
 
-  for (int i = 0; i < argument->form; ++i) {
+  for (int i = 0; i < argument->dat->rank; ++i) {
     if (argument->map[i] == NULL) {
       if (argument->idx[i] != OP_NONE) {
         printf("error: arg %d in kernel %s\\n", argnum, kernel);
@@ -112,7 +112,7 @@ static inline void arg_check(op_set * set, int argnum, op_arg * argument, const 
     }
     else {
       if (set->index != argument->map[i]->from->index
-          || (argument->dat->set && argument->dat->set->index != argument->map[i]->to->index)) {
+          || argument->dat->set[i]->index != argument->map[i]->to->index) {
         printf("error: arg %d in kernel %s\\n", argnum, kernel);
         printf("invalid mapping %d\\n", i);
         exit(1);
@@ -187,7 +187,7 @@ with open(file_h,"w") as h:
       # build scratch memory allocation
       for i in range(numargs):
         par_loop_body += """
-  switch( arg%d.form ) {
+  switch( arg%d.dat->rank ) {
   case 0:
     ptr%d = (char*) arg%d.dat->dat;
     break;
@@ -210,7 +210,7 @@ with open(file_h,"w") as h:
       # build copy-in / setting of pointer
       for i in range(numargs):
         par_loop_body += """
-    if (arg%d.form == 1) {
+    if (arg%d.dat->rank == 1) {
       if (arg%d.idx[0]  == OP_ALL) {
         if (arg%d.acc  == OP_READ || arg%d.acc  == OP_RW || arg%d.acc  == OP_INC)
           copy_in(i, arg%d.dat, arg%d.map[0], ptr%d );
@@ -226,10 +226,10 @@ with open(file_h,"w") as h:
       # build copy-out / matrix assembly call
       for i in range(numargs):
         par_loop_body += """
-    if (arg%d.form == 1 && arg%d.idx[0]  == OP_ALL) {
+    if (arg%d.dat->rank == 1 && arg%d.idx[0]  == OP_ALL) {
       if (arg%d.acc  == OP_WRITE || arg%d.acc  == OP_RW || arg%d.acc  == OP_INC)
         copy_out(i, arg%d.dat, arg%d.map[0], ptr%d );
-    } else if (arg%d.form == 2) {
+    } else if (arg%d.dat->rank == 2) {
       const int rows = arg%d.map[0]->dim;
       const int cols = arg%d.map[1]->dim;
       op_mat_addto( arg%d.dat, ptr%d, rows, arg%d.map[0]->map + i*rows, cols, arg%d.map[1]->map + i*cols);
@@ -242,8 +242,8 @@ with open(file_h,"w") as h:
 """
       # build scratch memory frees
       for i in range(numargs):
-        par_loop_body += "  if ((arg%d.form == 1 && arg%d.idx[0]  == OP_ALL) || arg%d.form == 2) free(ptr%d);\n" % (i,i,i,i)
-        par_loop_body += "  if (arg%d.form == 2) op_mat_assemble(arg%d.dat);\n" % (i,i)
+        par_loop_body += "  if ((arg%d.dat->rank == 1 && arg%d.idx[0]  == OP_ALL) || arg%d.dat->rank == 2) free(ptr%d);\n" % (i,i,i,i)
+        par_loop_body += "  if (arg%d.dat->rank == 2) op_mat_assemble(arg%d.dat);\n" % (i,i)
 
       par_loop_body += """
 }

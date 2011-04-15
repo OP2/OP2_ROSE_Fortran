@@ -67,36 +67,6 @@ void op_par_loop_5 ( void (*kernel)(void *, void *, void *, void *, void *), cha
                      op_arg arg4
                    );
 
-void op_par_loop_6 ( void (*kernel)(void *, void *, void *, void *, void *, void *), char const * name, op_set * set,
-                     op_arg arg0,
-                     op_arg arg1,
-                     op_arg arg2,
-                     op_arg arg3,
-                     op_arg arg4,
-                     op_arg arg5
-                   );
-
-void op_par_loop_7 ( void (*kernel)(void *, void *, void *, void *, void *, void *, void *), char const * name, op_set * set,
-                     op_arg arg0,
-                     op_arg arg1,
-                     op_arg arg2,
-                     op_arg arg3,
-                     op_arg arg4,
-                     op_arg arg5,
-                     op_arg arg6
-                   );
-
-void op_par_loop_8 ( void (*kernel)(void *, void *, void *, void *, void *, void *, void *, void *), char const * name, op_set * set,
-                     op_arg arg0,
-                     op_arg arg1,
-                     op_arg arg2,
-                     op_arg arg3,
-                     op_arg arg4,
-                     op_arg arg5,
-                     op_arg arg6,
-                     op_arg arg7
-                   );
-
 
 
 #ifdef __cplusplus

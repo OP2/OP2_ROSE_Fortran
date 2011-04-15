@@ -27,6 +27,7 @@
 * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#include <assert.h>
 #include <algorithm>
 #include <iostream>
 #include <iterator>
@@ -85,7 +86,9 @@ void op_decl_sparsity ( op_sparsity * sparsity, op_map * rowmap, op_map * colmap
   sparsity->max_nonzeros = max_nonzeros;
 }
 
-void op_decl_mat( op_dat * mat, op_sparsity * sparsity, char const * name ) {
+void op_decl_mat( op_dat * data, op_set * rowset, op_set * colset, int data_rank, int data_shape[4], int type_size, op_sparsity * sparsity, char const * name ) {
+  assert( rowset->size == sparsity->nrows && colset->size == sparsity->ncols );
+
   Mat p_mat;
   // Create a PETSc CSR sparse matrix and pre-allocate storage
   MatCreateSeqAIJ(PETSC_COMM_SELF,
@@ -97,7 +100,15 @@ void op_decl_mat( op_dat * mat, op_sparsity * sparsity, char const * name ) {
   // Set the column indices (FIXME: benchmark is this is worth it)
   MatSeqAIJSetColumnIndices(p_mat, (PetscInt*)sparsity->colidx);
 
-  initialise_dat(mat, NULL, 1, sizeof(PetscScalar), p_mat, name);
+  initialise_dat( data,
+                  2,
+                  rowset,
+                  colset,
+                  data_rank,
+                  data_shape,
+                  type_size,
+                  p_mat,
+                  name );
 }
 
 void op_mat_addto( op_dat * mat, const void* values, int nrows, const int *irows, int ncols, const int *icols ) {
@@ -115,19 +126,23 @@ void op_mat_assemble( op_dat * mat ) {
   MatView((Mat) mat->dat,PETSC_VIEWER_STDOUT_WORLD);
 }
 
-void op_create_vec ( op_dat * vec ) {
+static Vec op_create_vec ( const op_dat * vec ) {
   Vec p_vec;
   // Create a PETSc vector and pass it the user-allocated storage
-  VecCreateSeqWithArray(MPI_COMM_SELF,vec->dim * vec->set->size,(PetscScalar*)vec->dat,&p_vec);
+  VecCreateSeqWithArray(MPI_COMM_SELF,vec->dim * vec->set[0]->size,(PetscScalar*)vec->dat,&p_vec);
   VecAssemblyBegin(p_vec);
   VecAssemblyEnd(p_vec);
 
-  vec->dat = p_vec;
+  return p_vec;
 }
 
 void op_mat_mult ( const op_dat * mat, const op_dat * v_in, op_dat * v_out ) {
-  MatMult((Mat) mat->dat,(Vec) v_in->dat,(Vec) v_out->dat);
-  VecView((Vec) v_out->dat,PETSC_VIEWER_STDOUT_WORLD);
+  Vec p_v_in = op_create_vec(v_in);
+  Vec p_v_out = op_create_vec(v_out);
+  MatMult((Mat) mat->dat, p_v_in, p_v_out);
+  VecView(p_v_out, PETSC_VIEWER_STDOUT_WORLD);
+  VecDestroy(p_v_in);
+  VecDestroy(p_v_out);
 }
 
 } /* extern "C" */

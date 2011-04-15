@@ -96,8 +96,8 @@ typedef struct {
 } op_map;
 
 typedef struct {
-  int         set_rank; /* are we a global, vector or matrix? */
-  op_set      set[2]; /* set on which data is defined */
+  int         rank; /* are we a global, vector or matrix? */
+  op_set     *set[2]; /* set on which data is defined */
   int         dim,    /* dimension of data */
               index,  /* index into list of datasets */
               size,   /* size of each element in dataset */
@@ -182,8 +182,16 @@ void initialise_set ( op_set * set, int size, char const * name );
 /* Initialise a map data structure */
 void initialise_map ( op_map * mapping, op_set * from, op_set * to, int dim, int * map, char const * name );
 
-/* Initialise a map data structure */
-void initialise_dat ( op_dat * data, op_set * set, int dim, int type_size, void * dat, char const * name );
+/* Initialise a dat data structure */
+void initialise_dat ( op_dat * data,
+                      int rank,
+                      op_set * set0,
+                      op_set * set1,
+                      int data_rank,
+                      int data_shape[4],
+                      int size,
+                      void *dat,
+                      char const * name );
 
 /*
  * Structure initialisation
@@ -193,7 +201,14 @@ void op_decl_set ( op_set * set, int size, char const * name );
 
 void op_decl_map ( op_map * mapping, op_set * from, op_set * to, int dim, int * map, char const * name );
 
-void op_decl_dat ( op_dat * data, op_set * set, int dim, int type_size, void * dat, char const * name );
+/* Declare a 0-form op_dat (a global) */
+void op_decl_gbl ( op_dat * data, int data_rank, int data_shape[4], int type_size, void * dat, char const * name );
+
+/* Declare a 1-form op_dat (a vector) */
+void op_decl_vec ( op_dat * data, op_set * set, int data_rank, int data_shape[4], int type_size, void * dat, char const * name );
+
+/* Declare a 2-form op_dat (a matrix) */
+void op_decl_mat( op_dat * data, op_set * rowset, op_set * colset, int data_rank, int data_shape[4], int type_size, op_sparsity * sparsity, char const * name );
 
 void op_decl_id_map ( op_map * map );
 
@@ -207,15 +222,11 @@ op_arg op_construct_vec_arg(op_dat * data, int idx, op_map * mapping, op_access 
 
 op_arg op_construct_mat_arg(op_dat * data, int idx0, op_map * map0, int idx1, op_map * map1, op_access acc);
 
+void op_decl_sparsity ( op_sparsity * sparsity, op_map * rowmap, op_map * colmap );
+
 /*
  * Linear algebra
  */
-
-void op_decl_sparsity ( op_sparsity * sparsity, op_map * rowmap, op_map * colmap );
-
-void op_create_vec ( op_dat * vec );
-
-void op_decl_mat( op_dat * mat, op_sparsity * sparsity, char const * name );
 
 void op_mat_addto( op_dat * mat, const void* values, int nrows, const int *irows, int ncols, const int *icols );
 

@@ -41,7 +41,7 @@
 
 static inline void arg_check(op_set * set, int argnum, op_arg * argument, const char * kernel) {
 
-  for (int i = 0; i < argument->form; ++i) {
+  for (int i = 0; i < argument->dat->rank; ++i) {
     if (argument->map[i] == NULL) {
       if (argument->idx[i] != OP_NONE) {
         printf("error: arg %d in kernel %s\n", argnum, kernel);
@@ -51,7 +51,7 @@ static inline void arg_check(op_set * set, int argnum, op_arg * argument, const 
     }
     else {
       if (set->index != argument->map[i]->from->index
-          || (argument->dat->set && argument->dat->set->index != argument->map[i]->to->index)) {
+          || argument->dat->set[i]->index != argument->map[i]->to->index) {
         printf("error: arg %d in kernel %s\n", argnum, kernel);
         printf("invalid mapping %d\n", i);
         exit(1);
@@ -104,7 +104,7 @@ void op_par_loop_1 ( void (*kernel)(void *), char const * name, op_set * set,
 
   char * ptr0 = 0;
 
-  switch( arg0.form ) {
+  switch( arg0.dat->rank ) {
   case 0:
     ptr0 = (char*) arg0.dat->dat;
     break;
@@ -120,7 +120,7 @@ void op_par_loop_1 ( void (*kernel)(void *), char const * name, op_set * set,
   // Loop over set elements
   for ( int i = 0; i < set->size; i++ ) {
 
-    if (arg0.form == 1) {
+    if (arg0.dat->rank == 1) {
       if (arg0.idx[0]  == OP_ALL) {
         if (arg0.acc  == OP_READ || arg0.acc  == OP_RW || arg0.acc  == OP_INC)
           copy_in(i, arg0.dat, arg0.map[0], ptr0 );
@@ -131,10 +131,10 @@ void op_par_loop_1 ( void (*kernel)(void *), char const * name, op_set * set,
 
     kernel(ptr0);
 
-    if (arg0.form == 1 && arg0.idx[0]  == OP_ALL) {
+    if (arg0.dat->rank == 1 && arg0.idx[0]  == OP_ALL) {
       if (arg0.acc  == OP_WRITE || arg0.acc  == OP_RW || arg0.acc  == OP_INC)
         copy_out(i, arg0.dat, arg0.map[0], ptr0 );
-    } else if (arg0.form == 2) {
+    } else if (arg0.dat->rank == 2) {
       const int rows = arg0.map[0]->dim;
       const int cols = arg0.map[1]->dim;
       op_mat_addto( arg0.dat, ptr0, rows, arg0.map[0]->map + i*rows, cols, arg0.map[1]->map + i*cols);
@@ -142,8 +142,8 @@ void op_par_loop_1 ( void (*kernel)(void *), char const * name, op_set * set,
 
   }
 
-  if ((arg0.form == 1 && arg0.idx[0]  == OP_ALL) || arg0.form == 2) free(ptr0);
-  if (arg0.form == 2) op_mat_assemble(arg0.dat);
+  if ((arg0.dat->rank == 1 && arg0.idx[0]  == OP_ALL) || arg0.dat->rank == 2) free(ptr0);
+  if (arg0.dat->rank == 2) op_mat_assemble(arg0.dat);
 
 }
 
@@ -158,7 +158,7 @@ void op_par_loop_2 ( void (*kernel)(void *, void *), char const * name, op_set *
 
   char * ptr0 = 0, * ptr1 = 0;
 
-  switch( arg0.form ) {
+  switch( arg0.dat->rank ) {
   case 0:
     ptr0 = (char*) arg0.dat->dat;
     break;
@@ -170,7 +170,7 @@ void op_par_loop_2 ( void (*kernel)(void *, void *), char const * name, op_set *
     break;
   }
 
-  switch( arg1.form ) {
+  switch( arg1.dat->rank ) {
   case 0:
     ptr1 = (char*) arg1.dat->dat;
     break;
@@ -186,7 +186,7 @@ void op_par_loop_2 ( void (*kernel)(void *, void *), char const * name, op_set *
   // Loop over set elements
   for ( int i = 0; i < set->size; i++ ) {
 
-    if (arg0.form == 1) {
+    if (arg0.dat->rank == 1) {
       if (arg0.idx[0]  == OP_ALL) {
         if (arg0.acc  == OP_READ || arg0.acc  == OP_RW || arg0.acc  == OP_INC)
           copy_in(i, arg0.dat, arg0.map[0], ptr0 );
@@ -195,7 +195,7 @@ void op_par_loop_2 ( void (*kernel)(void *, void *), char const * name, op_set *
       }
     }
 
-    if (arg1.form == 1) {
+    if (arg1.dat->rank == 1) {
       if (arg1.idx[0]  == OP_ALL) {
         if (arg1.acc  == OP_READ || arg1.acc  == OP_RW || arg1.acc  == OP_INC)
           copy_in(i, arg1.dat, arg1.map[0], ptr1 );
@@ -206,19 +206,19 @@ void op_par_loop_2 ( void (*kernel)(void *, void *), char const * name, op_set *
 
     kernel(ptr0, ptr1);
 
-    if (arg0.form == 1 && arg0.idx[0]  == OP_ALL) {
+    if (arg0.dat->rank == 1 && arg0.idx[0]  == OP_ALL) {
       if (arg0.acc  == OP_WRITE || arg0.acc  == OP_RW || arg0.acc  == OP_INC)
         copy_out(i, arg0.dat, arg0.map[0], ptr0 );
-    } else if (arg0.form == 2) {
+    } else if (arg0.dat->rank == 2) {
       const int rows = arg0.map[0]->dim;
       const int cols = arg0.map[1]->dim;
       op_mat_addto( arg0.dat, ptr0, rows, arg0.map[0]->map + i*rows, cols, arg0.map[1]->map + i*cols);
     }
 
-    if (arg1.form == 1 && arg1.idx[0]  == OP_ALL) {
+    if (arg1.dat->rank == 1 && arg1.idx[0]  == OP_ALL) {
       if (arg1.acc  == OP_WRITE || arg1.acc  == OP_RW || arg1.acc  == OP_INC)
         copy_out(i, arg1.dat, arg1.map[0], ptr1 );
-    } else if (arg1.form == 2) {
+    } else if (arg1.dat->rank == 2) {
       const int rows = arg1.map[0]->dim;
       const int cols = arg1.map[1]->dim;
       op_mat_addto( arg1.dat, ptr1, rows, arg1.map[0]->map + i*rows, cols, arg1.map[1]->map + i*cols);
@@ -226,10 +226,10 @@ void op_par_loop_2 ( void (*kernel)(void *, void *), char const * name, op_set *
 
   }
 
-  if ((arg0.form == 1 && arg0.idx[0]  == OP_ALL) || arg0.form == 2) free(ptr0);
-  if (arg0.form == 2) op_mat_assemble(arg0.dat);
-  if ((arg1.form == 1 && arg1.idx[0]  == OP_ALL) || arg1.form == 2) free(ptr1);
-  if (arg1.form == 2) op_mat_assemble(arg1.dat);
+  if ((arg0.dat->rank == 1 && arg0.idx[0]  == OP_ALL) || arg0.dat->rank == 2) free(ptr0);
+  if (arg0.dat->rank == 2) op_mat_assemble(arg0.dat);
+  if ((arg1.dat->rank == 1 && arg1.idx[0]  == OP_ALL) || arg1.dat->rank == 2) free(ptr1);
+  if (arg1.dat->rank == 2) op_mat_assemble(arg1.dat);
 
 }
 
@@ -246,7 +246,7 @@ void op_par_loop_3 ( void (*kernel)(void *, void *, void *), char const * name, 
 
   char * ptr0 = 0, * ptr1 = 0, * ptr2 = 0;
 
-  switch( arg0.form ) {
+  switch( arg0.dat->rank ) {
   case 0:
     ptr0 = (char*) arg0.dat->dat;
     break;
@@ -258,7 +258,7 @@ void op_par_loop_3 ( void (*kernel)(void *, void *, void *), char const * name, 
     break;
   }
 
-  switch( arg1.form ) {
+  switch( arg1.dat->rank ) {
   case 0:
     ptr1 = (char*) arg1.dat->dat;
     break;
@@ -270,7 +270,7 @@ void op_par_loop_3 ( void (*kernel)(void *, void *, void *), char const * name, 
     break;
   }
 
-  switch( arg2.form ) {
+  switch( arg2.dat->rank ) {
   case 0:
     ptr2 = (char*) arg2.dat->dat;
     break;
@@ -286,7 +286,7 @@ void op_par_loop_3 ( void (*kernel)(void *, void *, void *), char const * name, 
   // Loop over set elements
   for ( int i = 0; i < set->size; i++ ) {
 
-    if (arg0.form == 1) {
+    if (arg0.dat->rank == 1) {
       if (arg0.idx[0]  == OP_ALL) {
         if (arg0.acc  == OP_READ || arg0.acc  == OP_RW || arg0.acc  == OP_INC)
           copy_in(i, arg0.dat, arg0.map[0], ptr0 );
@@ -295,7 +295,7 @@ void op_par_loop_3 ( void (*kernel)(void *, void *, void *), char const * name, 
       }
     }
 
-    if (arg1.form == 1) {
+    if (arg1.dat->rank == 1) {
       if (arg1.idx[0]  == OP_ALL) {
         if (arg1.acc  == OP_READ || arg1.acc  == OP_RW || arg1.acc  == OP_INC)
           copy_in(i, arg1.dat, arg1.map[0], ptr1 );
@@ -304,7 +304,7 @@ void op_par_loop_3 ( void (*kernel)(void *, void *, void *), char const * name, 
       }
     }
 
-    if (arg2.form == 1) {
+    if (arg2.dat->rank == 1) {
       if (arg2.idx[0]  == OP_ALL) {
         if (arg2.acc  == OP_READ || arg2.acc  == OP_RW || arg2.acc  == OP_INC)
           copy_in(i, arg2.dat, arg2.map[0], ptr2 );
@@ -315,28 +315,28 @@ void op_par_loop_3 ( void (*kernel)(void *, void *, void *), char const * name, 
 
     kernel(ptr0, ptr1, ptr2);
 
-    if (arg0.form == 1 && arg0.idx[0]  == OP_ALL) {
+    if (arg0.dat->rank == 1 && arg0.idx[0]  == OP_ALL) {
       if (arg0.acc  == OP_WRITE || arg0.acc  == OP_RW || arg0.acc  == OP_INC)
         copy_out(i, arg0.dat, arg0.map[0], ptr0 );
-    } else if (arg0.form == 2) {
+    } else if (arg0.dat->rank == 2) {
       const int rows = arg0.map[0]->dim;
       const int cols = arg0.map[1]->dim;
       op_mat_addto( arg0.dat, ptr0, rows, arg0.map[0]->map + i*rows, cols, arg0.map[1]->map + i*cols);
     }
 
-    if (arg1.form == 1 && arg1.idx[0]  == OP_ALL) {
+    if (arg1.dat->rank == 1 && arg1.idx[0]  == OP_ALL) {
       if (arg1.acc  == OP_WRITE || arg1.acc  == OP_RW || arg1.acc  == OP_INC)
         copy_out(i, arg1.dat, arg1.map[0], ptr1 );
-    } else if (arg1.form == 2) {
+    } else if (arg1.dat->rank == 2) {
       const int rows = arg1.map[0]->dim;
       const int cols = arg1.map[1]->dim;
       op_mat_addto( arg1.dat, ptr1, rows, arg1.map[0]->map + i*rows, cols, arg1.map[1]->map + i*cols);
     }
 
-    if (arg2.form == 1 && arg2.idx[0]  == OP_ALL) {
+    if (arg2.dat->rank == 1 && arg2.idx[0]  == OP_ALL) {
       if (arg2.acc  == OP_WRITE || arg2.acc  == OP_RW || arg2.acc  == OP_INC)
         copy_out(i, arg2.dat, arg2.map[0], ptr2 );
-    } else if (arg2.form == 2) {
+    } else if (arg2.dat->rank == 2) {
       const int rows = arg2.map[0]->dim;
       const int cols = arg2.map[1]->dim;
       op_mat_addto( arg2.dat, ptr2, rows, arg2.map[0]->map + i*rows, cols, arg2.map[1]->map + i*cols);
@@ -344,12 +344,12 @@ void op_par_loop_3 ( void (*kernel)(void *, void *, void *), char const * name, 
 
   }
 
-  if ((arg0.form == 1 && arg0.idx[0]  == OP_ALL) || arg0.form == 2) free(ptr0);
-  if (arg0.form == 2) op_mat_assemble(arg0.dat);
-  if ((arg1.form == 1 && arg1.idx[0]  == OP_ALL) || arg1.form == 2) free(ptr1);
-  if (arg1.form == 2) op_mat_assemble(arg1.dat);
-  if ((arg2.form == 1 && arg2.idx[0]  == OP_ALL) || arg2.form == 2) free(ptr2);
-  if (arg2.form == 2) op_mat_assemble(arg2.dat);
+  if ((arg0.dat->rank == 1 && arg0.idx[0]  == OP_ALL) || arg0.dat->rank == 2) free(ptr0);
+  if (arg0.dat->rank == 2) op_mat_assemble(arg0.dat);
+  if ((arg1.dat->rank == 1 && arg1.idx[0]  == OP_ALL) || arg1.dat->rank == 2) free(ptr1);
+  if (arg1.dat->rank == 2) op_mat_assemble(arg1.dat);
+  if ((arg2.dat->rank == 1 && arg2.idx[0]  == OP_ALL) || arg2.dat->rank == 2) free(ptr2);
+  if (arg2.dat->rank == 2) op_mat_assemble(arg2.dat);
 
 }
 
@@ -368,7 +368,7 @@ void op_par_loop_4 ( void (*kernel)(void *, void *, void *, void *), char const 
 
   char * ptr0 = 0, * ptr1 = 0, * ptr2 = 0, * ptr3 = 0;
 
-  switch( arg0.form ) {
+  switch( arg0.dat->rank ) {
   case 0:
     ptr0 = (char*) arg0.dat->dat;
     break;
@@ -380,7 +380,7 @@ void op_par_loop_4 ( void (*kernel)(void *, void *, void *, void *), char const 
     break;
   }
 
-  switch( arg1.form ) {
+  switch( arg1.dat->rank ) {
   case 0:
     ptr1 = (char*) arg1.dat->dat;
     break;
@@ -392,7 +392,7 @@ void op_par_loop_4 ( void (*kernel)(void *, void *, void *, void *), char const 
     break;
   }
 
-  switch( arg2.form ) {
+  switch( arg2.dat->rank ) {
   case 0:
     ptr2 = (char*) arg2.dat->dat;
     break;
@@ -404,7 +404,7 @@ void op_par_loop_4 ( void (*kernel)(void *, void *, void *, void *), char const 
     break;
   }
 
-  switch( arg3.form ) {
+  switch( arg3.dat->rank ) {
   case 0:
     ptr3 = (char*) arg3.dat->dat;
     break;
@@ -420,7 +420,7 @@ void op_par_loop_4 ( void (*kernel)(void *, void *, void *, void *), char const 
   // Loop over set elements
   for ( int i = 0; i < set->size; i++ ) {
 
-    if (arg0.form == 1) {
+    if (arg0.dat->rank == 1) {
       if (arg0.idx[0]  == OP_ALL) {
         if (arg0.acc  == OP_READ || arg0.acc  == OP_RW || arg0.acc  == OP_INC)
           copy_in(i, arg0.dat, arg0.map[0], ptr0 );
@@ -429,7 +429,7 @@ void op_par_loop_4 ( void (*kernel)(void *, void *, void *, void *), char const 
       }
     }
 
-    if (arg1.form == 1) {
+    if (arg1.dat->rank == 1) {
       if (arg1.idx[0]  == OP_ALL) {
         if (arg1.acc  == OP_READ || arg1.acc  == OP_RW || arg1.acc  == OP_INC)
           copy_in(i, arg1.dat, arg1.map[0], ptr1 );
@@ -438,7 +438,7 @@ void op_par_loop_4 ( void (*kernel)(void *, void *, void *, void *), char const 
       }
     }
 
-    if (arg2.form == 1) {
+    if (arg2.dat->rank == 1) {
       if (arg2.idx[0]  == OP_ALL) {
         if (arg2.acc  == OP_READ || arg2.acc  == OP_RW || arg2.acc  == OP_INC)
           copy_in(i, arg2.dat, arg2.map[0], ptr2 );
@@ -447,7 +447,7 @@ void op_par_loop_4 ( void (*kernel)(void *, void *, void *, void *), char const 
       }
     }
 
-    if (arg3.form == 1) {
+    if (arg3.dat->rank == 1) {
       if (arg3.idx[0]  == OP_ALL) {
         if (arg3.acc  == OP_READ || arg3.acc  == OP_RW || arg3.acc  == OP_INC)
           copy_in(i, arg3.dat, arg3.map[0], ptr3 );
@@ -458,37 +458,37 @@ void op_par_loop_4 ( void (*kernel)(void *, void *, void *, void *), char const 
 
     kernel(ptr0, ptr1, ptr2, ptr3);
 
-    if (arg0.form == 1 && arg0.idx[0]  == OP_ALL) {
+    if (arg0.dat->rank == 1 && arg0.idx[0]  == OP_ALL) {
       if (arg0.acc  == OP_WRITE || arg0.acc  == OP_RW || arg0.acc  == OP_INC)
         copy_out(i, arg0.dat, arg0.map[0], ptr0 );
-    } else if (arg0.form == 2) {
+    } else if (arg0.dat->rank == 2) {
       const int rows = arg0.map[0]->dim;
       const int cols = arg0.map[1]->dim;
       op_mat_addto( arg0.dat, ptr0, rows, arg0.map[0]->map + i*rows, cols, arg0.map[1]->map + i*cols);
     }
 
-    if (arg1.form == 1 && arg1.idx[0]  == OP_ALL) {
+    if (arg1.dat->rank == 1 && arg1.idx[0]  == OP_ALL) {
       if (arg1.acc  == OP_WRITE || arg1.acc  == OP_RW || arg1.acc  == OP_INC)
         copy_out(i, arg1.dat, arg1.map[0], ptr1 );
-    } else if (arg1.form == 2) {
+    } else if (arg1.dat->rank == 2) {
       const int rows = arg1.map[0]->dim;
       const int cols = arg1.map[1]->dim;
       op_mat_addto( arg1.dat, ptr1, rows, arg1.map[0]->map + i*rows, cols, arg1.map[1]->map + i*cols);
     }
 
-    if (arg2.form == 1 && arg2.idx[0]  == OP_ALL) {
+    if (arg2.dat->rank == 1 && arg2.idx[0]  == OP_ALL) {
       if (arg2.acc  == OP_WRITE || arg2.acc  == OP_RW || arg2.acc  == OP_INC)
         copy_out(i, arg2.dat, arg2.map[0], ptr2 );
-    } else if (arg2.form == 2) {
+    } else if (arg2.dat->rank == 2) {
       const int rows = arg2.map[0]->dim;
       const int cols = arg2.map[1]->dim;
       op_mat_addto( arg2.dat, ptr2, rows, arg2.map[0]->map + i*rows, cols, arg2.map[1]->map + i*cols);
     }
 
-    if (arg3.form == 1 && arg3.idx[0]  == OP_ALL) {
+    if (arg3.dat->rank == 1 && arg3.idx[0]  == OP_ALL) {
       if (arg3.acc  == OP_WRITE || arg3.acc  == OP_RW || arg3.acc  == OP_INC)
         copy_out(i, arg3.dat, arg3.map[0], ptr3 );
-    } else if (arg3.form == 2) {
+    } else if (arg3.dat->rank == 2) {
       const int rows = arg3.map[0]->dim;
       const int cols = arg3.map[1]->dim;
       op_mat_addto( arg3.dat, ptr3, rows, arg3.map[0]->map + i*rows, cols, arg3.map[1]->map + i*cols);
@@ -496,14 +496,14 @@ void op_par_loop_4 ( void (*kernel)(void *, void *, void *, void *), char const 
 
   }
 
-  if ((arg0.form == 1 && arg0.idx[0]  == OP_ALL) || arg0.form == 2) free(ptr0);
-  if (arg0.form == 2) op_mat_assemble(arg0.dat);
-  if ((arg1.form == 1 && arg1.idx[0]  == OP_ALL) || arg1.form == 2) free(ptr1);
-  if (arg1.form == 2) op_mat_assemble(arg1.dat);
-  if ((arg2.form == 1 && arg2.idx[0]  == OP_ALL) || arg2.form == 2) free(ptr2);
-  if (arg2.form == 2) op_mat_assemble(arg2.dat);
-  if ((arg3.form == 1 && arg3.idx[0]  == OP_ALL) || arg3.form == 2) free(ptr3);
-  if (arg3.form == 2) op_mat_assemble(arg3.dat);
+  if ((arg0.dat->rank == 1 && arg0.idx[0]  == OP_ALL) || arg0.dat->rank == 2) free(ptr0);
+  if (arg0.dat->rank == 2) op_mat_assemble(arg0.dat);
+  if ((arg1.dat->rank == 1 && arg1.idx[0]  == OP_ALL) || arg1.dat->rank == 2) free(ptr1);
+  if (arg1.dat->rank == 2) op_mat_assemble(arg1.dat);
+  if ((arg2.dat->rank == 1 && arg2.idx[0]  == OP_ALL) || arg2.dat->rank == 2) free(ptr2);
+  if (arg2.dat->rank == 2) op_mat_assemble(arg2.dat);
+  if ((arg3.dat->rank == 1 && arg3.idx[0]  == OP_ALL) || arg3.dat->rank == 2) free(ptr3);
+  if (arg3.dat->rank == 2) op_mat_assemble(arg3.dat);
 
 }
 
@@ -524,7 +524,7 @@ void op_par_loop_5 ( void (*kernel)(void *, void *, void *, void *, void *), cha
 
   char * ptr0 = 0, * ptr1 = 0, * ptr2 = 0, * ptr3 = 0, * ptr4 = 0;
 
-  switch( arg0.form ) {
+  switch( arg0.dat->rank ) {
   case 0:
     ptr0 = (char*) arg0.dat->dat;
     break;
@@ -536,7 +536,7 @@ void op_par_loop_5 ( void (*kernel)(void *, void *, void *, void *, void *), cha
     break;
   }
 
-  switch( arg1.form ) {
+  switch( arg1.dat->rank ) {
   case 0:
     ptr1 = (char*) arg1.dat->dat;
     break;
@@ -548,7 +548,7 @@ void op_par_loop_5 ( void (*kernel)(void *, void *, void *, void *, void *), cha
     break;
   }
 
-  switch( arg2.form ) {
+  switch( arg2.dat->rank ) {
   case 0:
     ptr2 = (char*) arg2.dat->dat;
     break;
@@ -560,7 +560,7 @@ void op_par_loop_5 ( void (*kernel)(void *, void *, void *, void *, void *), cha
     break;
   }
 
-  switch( arg3.form ) {
+  switch( arg3.dat->rank ) {
   case 0:
     ptr3 = (char*) arg3.dat->dat;
     break;
@@ -572,7 +572,7 @@ void op_par_loop_5 ( void (*kernel)(void *, void *, void *, void *, void *), cha
     break;
   }
 
-  switch( arg4.form ) {
+  switch( arg4.dat->rank ) {
   case 0:
     ptr4 = (char*) arg4.dat->dat;
     break;
@@ -588,7 +588,7 @@ void op_par_loop_5 ( void (*kernel)(void *, void *, void *, void *, void *), cha
   // Loop over set elements
   for ( int i = 0; i < set->size; i++ ) {
 
-    if (arg0.form == 1) {
+    if (arg0.dat->rank == 1) {
       if (arg0.idx[0]  == OP_ALL) {
         if (arg0.acc  == OP_READ || arg0.acc  == OP_RW || arg0.acc  == OP_INC)
           copy_in(i, arg0.dat, arg0.map[0], ptr0 );
@@ -597,7 +597,7 @@ void op_par_loop_5 ( void (*kernel)(void *, void *, void *, void *, void *), cha
       }
     }
 
-    if (arg1.form == 1) {
+    if (arg1.dat->rank == 1) {
       if (arg1.idx[0]  == OP_ALL) {
         if (arg1.acc  == OP_READ || arg1.acc  == OP_RW || arg1.acc  == OP_INC)
           copy_in(i, arg1.dat, arg1.map[0], ptr1 );
@@ -606,7 +606,7 @@ void op_par_loop_5 ( void (*kernel)(void *, void *, void *, void *, void *), cha
       }
     }
 
-    if (arg2.form == 1) {
+    if (arg2.dat->rank == 1) {
       if (arg2.idx[0]  == OP_ALL) {
         if (arg2.acc  == OP_READ || arg2.acc  == OP_RW || arg2.acc  == OP_INC)
           copy_in(i, arg2.dat, arg2.map[0], ptr2 );
@@ -615,7 +615,7 @@ void op_par_loop_5 ( void (*kernel)(void *, void *, void *, void *, void *), cha
       }
     }
 
-    if (arg3.form == 1) {
+    if (arg3.dat->rank == 1) {
       if (arg3.idx[0]  == OP_ALL) {
         if (arg3.acc  == OP_READ || arg3.acc  == OP_RW || arg3.acc  == OP_INC)
           copy_in(i, arg3.dat, arg3.map[0], ptr3 );
@@ -624,7 +624,7 @@ void op_par_loop_5 ( void (*kernel)(void *, void *, void *, void *, void *), cha
       }
     }
 
-    if (arg4.form == 1) {
+    if (arg4.dat->rank == 1) {
       if (arg4.idx[0]  == OP_ALL) {
         if (arg4.acc  == OP_READ || arg4.acc  == OP_RW || arg4.acc  == OP_INC)
           copy_in(i, arg4.dat, arg4.map[0], ptr4 );
@@ -635,46 +635,46 @@ void op_par_loop_5 ( void (*kernel)(void *, void *, void *, void *, void *), cha
 
     kernel(ptr0, ptr1, ptr2, ptr3, ptr4);
 
-    if (arg0.form == 1 && arg0.idx[0]  == OP_ALL) {
+    if (arg0.dat->rank == 1 && arg0.idx[0]  == OP_ALL) {
       if (arg0.acc  == OP_WRITE || arg0.acc  == OP_RW || arg0.acc  == OP_INC)
         copy_out(i, arg0.dat, arg0.map[0], ptr0 );
-    } else if (arg0.form == 2) {
+    } else if (arg0.dat->rank == 2) {
       const int rows = arg0.map[0]->dim;
       const int cols = arg0.map[1]->dim;
       op_mat_addto( arg0.dat, ptr0, rows, arg0.map[0]->map + i*rows, cols, arg0.map[1]->map + i*cols);
     }
 
-    if (arg1.form == 1 && arg1.idx[0]  == OP_ALL) {
+    if (arg1.dat->rank == 1 && arg1.idx[0]  == OP_ALL) {
       if (arg1.acc  == OP_WRITE || arg1.acc  == OP_RW || arg1.acc  == OP_INC)
         copy_out(i, arg1.dat, arg1.map[0], ptr1 );
-    } else if (arg1.form == 2) {
+    } else if (arg1.dat->rank == 2) {
       const int rows = arg1.map[0]->dim;
       const int cols = arg1.map[1]->dim;
       op_mat_addto( arg1.dat, ptr1, rows, arg1.map[0]->map + i*rows, cols, arg1.map[1]->map + i*cols);
     }
 
-    if (arg2.form == 1 && arg2.idx[0]  == OP_ALL) {
+    if (arg2.dat->rank == 1 && arg2.idx[0]  == OP_ALL) {
       if (arg2.acc  == OP_WRITE || arg2.acc  == OP_RW || arg2.acc  == OP_INC)
         copy_out(i, arg2.dat, arg2.map[0], ptr2 );
-    } else if (arg2.form == 2) {
+    } else if (arg2.dat->rank == 2) {
       const int rows = arg2.map[0]->dim;
       const int cols = arg2.map[1]->dim;
       op_mat_addto( arg2.dat, ptr2, rows, arg2.map[0]->map + i*rows, cols, arg2.map[1]->map + i*cols);
     }
 
-    if (arg3.form == 1 && arg3.idx[0]  == OP_ALL) {
+    if (arg3.dat->rank == 1 && arg3.idx[0]  == OP_ALL) {
       if (arg3.acc  == OP_WRITE || arg3.acc  == OP_RW || arg3.acc  == OP_INC)
         copy_out(i, arg3.dat, arg3.map[0], ptr3 );
-    } else if (arg3.form == 2) {
+    } else if (arg3.dat->rank == 2) {
       const int rows = arg3.map[0]->dim;
       const int cols = arg3.map[1]->dim;
       op_mat_addto( arg3.dat, ptr3, rows, arg3.map[0]->map + i*rows, cols, arg3.map[1]->map + i*cols);
     }
 
-    if (arg4.form == 1 && arg4.idx[0]  == OP_ALL) {
+    if (arg4.dat->rank == 1 && arg4.idx[0]  == OP_ALL) {
       if (arg4.acc  == OP_WRITE || arg4.acc  == OP_RW || arg4.acc  == OP_INC)
         copy_out(i, arg4.dat, arg4.map[0], ptr4 );
-    } else if (arg4.form == 2) {
+    } else if (arg4.dat->rank == 2) {
       const int rows = arg4.map[0]->dim;
       const int cols = arg4.map[1]->dim;
       op_mat_addto( arg4.dat, ptr4, rows, arg4.map[0]->map + i*rows, cols, arg4.map[1]->map + i*cols);
@@ -682,784 +682,16 @@ void op_par_loop_5 ( void (*kernel)(void *, void *, void *, void *, void *), cha
 
   }
 
-  if ((arg0.form == 1 && arg0.idx[0]  == OP_ALL) || arg0.form == 2) free(ptr0);
-  if (arg0.form == 2) op_mat_assemble(arg0.dat);
-  if ((arg1.form == 1 && arg1.idx[0]  == OP_ALL) || arg1.form == 2) free(ptr1);
-  if (arg1.form == 2) op_mat_assemble(arg1.dat);
-  if ((arg2.form == 1 && arg2.idx[0]  == OP_ALL) || arg2.form == 2) free(ptr2);
-  if (arg2.form == 2) op_mat_assemble(arg2.dat);
-  if ((arg3.form == 1 && arg3.idx[0]  == OP_ALL) || arg3.form == 2) free(ptr3);
-  if (arg3.form == 2) op_mat_assemble(arg3.dat);
-  if ((arg4.form == 1 && arg4.idx[0]  == OP_ALL) || arg4.form == 2) free(ptr4);
-  if (arg4.form == 2) op_mat_assemble(arg4.dat);
-
-}
-
-void op_par_loop_6 ( void (*kernel)(void *, void *, void *, void *, void *, void *), char const * name, op_set * set,
-                     op_arg arg0,
-                     op_arg arg1,
-                     op_arg arg2,
-                     op_arg arg3,
-                     op_arg arg4,
-                     op_arg arg5
-                   )
-
-{
-  arg_check ( set, 0, &arg0 , name );
-  arg_check ( set, 1, &arg1 , name );
-  arg_check ( set, 2, &arg2 , name );
-  arg_check ( set, 3, &arg3 , name );
-  arg_check ( set, 4, &arg4 , name );
-  arg_check ( set, 5, &arg5 , name );
-
-  char * ptr0 = 0, * ptr1 = 0, * ptr2 = 0, * ptr3 = 0, * ptr4 = 0, * ptr5 = 0;
-
-  switch( arg0.form ) {
-  case 0:
-    ptr0 = (char*) arg0.dat->dat;
-    break;
-  case 1:
-    if (arg0.idx[0]  == OP_ALL) ptr0 = (char*) malloc(arg0.map[0]->dim * arg0.dat->size);
-    break;
-  case 2:
-    ptr0 = (char*) malloc(arg0.map[0]->dim * arg0.map[1]->dim * arg0.dat->size);
-    break;
-  }
-
-  switch( arg1.form ) {
-  case 0:
-    ptr1 = (char*) arg1.dat->dat;
-    break;
-  case 1:
-    if (arg1.idx[0]  == OP_ALL) ptr1 = (char*) malloc(arg1.map[0]->dim * arg1.dat->size);
-    break;
-  case 2:
-    ptr1 = (char*) malloc(arg1.map[0]->dim * arg1.map[1]->dim * arg1.dat->size);
-    break;
-  }
-
-  switch( arg2.form ) {
-  case 0:
-    ptr2 = (char*) arg2.dat->dat;
-    break;
-  case 1:
-    if (arg2.idx[0]  == OP_ALL) ptr2 = (char*) malloc(arg2.map[0]->dim * arg2.dat->size);
-    break;
-  case 2:
-    ptr2 = (char*) malloc(arg2.map[0]->dim * arg2.map[1]->dim * arg2.dat->size);
-    break;
-  }
-
-  switch( arg3.form ) {
-  case 0:
-    ptr3 = (char*) arg3.dat->dat;
-    break;
-  case 1:
-    if (arg3.idx[0]  == OP_ALL) ptr3 = (char*) malloc(arg3.map[0]->dim * arg3.dat->size);
-    break;
-  case 2:
-    ptr3 = (char*) malloc(arg3.map[0]->dim * arg3.map[1]->dim * arg3.dat->size);
-    break;
-  }
-
-  switch( arg4.form ) {
-  case 0:
-    ptr4 = (char*) arg4.dat->dat;
-    break;
-  case 1:
-    if (arg4.idx[0]  == OP_ALL) ptr4 = (char*) malloc(arg4.map[0]->dim * arg4.dat->size);
-    break;
-  case 2:
-    ptr4 = (char*) malloc(arg4.map[0]->dim * arg4.map[1]->dim * arg4.dat->size);
-    break;
-  }
-
-  switch( arg5.form ) {
-  case 0:
-    ptr5 = (char*) arg5.dat->dat;
-    break;
-  case 1:
-    if (arg5.idx[0]  == OP_ALL) ptr5 = (char*) malloc(arg5.map[0]->dim * arg5.dat->size);
-    break;
-  case 2:
-    ptr5 = (char*) malloc(arg5.map[0]->dim * arg5.map[1]->dim * arg5.dat->size);
-    break;
-  }
-
-
-  // Loop over set elements
-  for ( int i = 0; i < set->size; i++ ) {
-
-    if (arg0.form == 1) {
-      if (arg0.idx[0]  == OP_ALL) {
-        if (arg0.acc  == OP_READ || arg0.acc  == OP_RW || arg0.acc  == OP_INC)
-          copy_in(i, arg0.dat, arg0.map[0], ptr0 );
-      } else {
-        arg_set ( i, &arg0, &ptr0 );
-      }
-    }
-
-    if (arg1.form == 1) {
-      if (arg1.idx[0]  == OP_ALL) {
-        if (arg1.acc  == OP_READ || arg1.acc  == OP_RW || arg1.acc  == OP_INC)
-          copy_in(i, arg1.dat, arg1.map[0], ptr1 );
-      } else {
-        arg_set ( i, &arg1, &ptr1 );
-      }
-    }
-
-    if (arg2.form == 1) {
-      if (arg2.idx[0]  == OP_ALL) {
-        if (arg2.acc  == OP_READ || arg2.acc  == OP_RW || arg2.acc  == OP_INC)
-          copy_in(i, arg2.dat, arg2.map[0], ptr2 );
-      } else {
-        arg_set ( i, &arg2, &ptr2 );
-      }
-    }
-
-    if (arg3.form == 1) {
-      if (arg3.idx[0]  == OP_ALL) {
-        if (arg3.acc  == OP_READ || arg3.acc  == OP_RW || arg3.acc  == OP_INC)
-          copy_in(i, arg3.dat, arg3.map[0], ptr3 );
-      } else {
-        arg_set ( i, &arg3, &ptr3 );
-      }
-    }
-
-    if (arg4.form == 1) {
-      if (arg4.idx[0]  == OP_ALL) {
-        if (arg4.acc  == OP_READ || arg4.acc  == OP_RW || arg4.acc  == OP_INC)
-          copy_in(i, arg4.dat, arg4.map[0], ptr4 );
-      } else {
-        arg_set ( i, &arg4, &ptr4 );
-      }
-    }
-
-    if (arg5.form == 1) {
-      if (arg5.idx[0]  == OP_ALL) {
-        if (arg5.acc  == OP_READ || arg5.acc  == OP_RW || arg5.acc  == OP_INC)
-          copy_in(i, arg5.dat, arg5.map[0], ptr5 );
-      } else {
-        arg_set ( i, &arg5, &ptr5 );
-      }
-    }
-
-    kernel(ptr0, ptr1, ptr2, ptr3, ptr4, ptr5);
-
-    if (arg0.form == 1 && arg0.idx[0]  == OP_ALL) {
-      if (arg0.acc  == OP_WRITE || arg0.acc  == OP_RW || arg0.acc  == OP_INC)
-        copy_out(i, arg0.dat, arg0.map[0], ptr0 );
-    } else if (arg0.form == 2) {
-      const int rows = arg0.map[0]->dim;
-      const int cols = arg0.map[1]->dim;
-      op_mat_addto( arg0.dat, ptr0, rows, arg0.map[0]->map + i*rows, cols, arg0.map[1]->map + i*cols);
-    }
-
-    if (arg1.form == 1 && arg1.idx[0]  == OP_ALL) {
-      if (arg1.acc  == OP_WRITE || arg1.acc  == OP_RW || arg1.acc  == OP_INC)
-        copy_out(i, arg1.dat, arg1.map[0], ptr1 );
-    } else if (arg1.form == 2) {
-      const int rows = arg1.map[0]->dim;
-      const int cols = arg1.map[1]->dim;
-      op_mat_addto( arg1.dat, ptr1, rows, arg1.map[0]->map + i*rows, cols, arg1.map[1]->map + i*cols);
-    }
-
-    if (arg2.form == 1 && arg2.idx[0]  == OP_ALL) {
-      if (arg2.acc  == OP_WRITE || arg2.acc  == OP_RW || arg2.acc  == OP_INC)
-        copy_out(i, arg2.dat, arg2.map[0], ptr2 );
-    } else if (arg2.form == 2) {
-      const int rows = arg2.map[0]->dim;
-      const int cols = arg2.map[1]->dim;
-      op_mat_addto( arg2.dat, ptr2, rows, arg2.map[0]->map + i*rows, cols, arg2.map[1]->map + i*cols);
-    }
-
-    if (arg3.form == 1 && arg3.idx[0]  == OP_ALL) {
-      if (arg3.acc  == OP_WRITE || arg3.acc  == OP_RW || arg3.acc  == OP_INC)
-        copy_out(i, arg3.dat, arg3.map[0], ptr3 );
-    } else if (arg3.form == 2) {
-      const int rows = arg3.map[0]->dim;
-      const int cols = arg3.map[1]->dim;
-      op_mat_addto( arg3.dat, ptr3, rows, arg3.map[0]->map + i*rows, cols, arg3.map[1]->map + i*cols);
-    }
-
-    if (arg4.form == 1 && arg4.idx[0]  == OP_ALL) {
-      if (arg4.acc  == OP_WRITE || arg4.acc  == OP_RW || arg4.acc  == OP_INC)
-        copy_out(i, arg4.dat, arg4.map[0], ptr4 );
-    } else if (arg4.form == 2) {
-      const int rows = arg4.map[0]->dim;
-      const int cols = arg4.map[1]->dim;
-      op_mat_addto( arg4.dat, ptr4, rows, arg4.map[0]->map + i*rows, cols, arg4.map[1]->map + i*cols);
-    }
-
-    if (arg5.form == 1 && arg5.idx[0]  == OP_ALL) {
-      if (arg5.acc  == OP_WRITE || arg5.acc  == OP_RW || arg5.acc  == OP_INC)
-        copy_out(i, arg5.dat, arg5.map[0], ptr5 );
-    } else if (arg5.form == 2) {
-      const int rows = arg5.map[0]->dim;
-      const int cols = arg5.map[1]->dim;
-      op_mat_addto( arg5.dat, ptr5, rows, arg5.map[0]->map + i*rows, cols, arg5.map[1]->map + i*cols);
-    }
-
-  }
-
-  if ((arg0.form == 1 && arg0.idx[0]  == OP_ALL) || arg0.form == 2) free(ptr0);
-  if (arg0.form == 2) op_mat_assemble(arg0.dat);
-  if ((arg1.form == 1 && arg1.idx[0]  == OP_ALL) || arg1.form == 2) free(ptr1);
-  if (arg1.form == 2) op_mat_assemble(arg1.dat);
-  if ((arg2.form == 1 && arg2.idx[0]  == OP_ALL) || arg2.form == 2) free(ptr2);
-  if (arg2.form == 2) op_mat_assemble(arg2.dat);
-  if ((arg3.form == 1 && arg3.idx[0]  == OP_ALL) || arg3.form == 2) free(ptr3);
-  if (arg3.form == 2) op_mat_assemble(arg3.dat);
-  if ((arg4.form == 1 && arg4.idx[0]  == OP_ALL) || arg4.form == 2) free(ptr4);
-  if (arg4.form == 2) op_mat_assemble(arg4.dat);
-  if ((arg5.form == 1 && arg5.idx[0]  == OP_ALL) || arg5.form == 2) free(ptr5);
-  if (arg5.form == 2) op_mat_assemble(arg5.dat);
-
-}
-
-void op_par_loop_7 ( void (*kernel)(void *, void *, void *, void *, void *, void *, void *), char const * name, op_set * set,
-                     op_arg arg0,
-                     op_arg arg1,
-                     op_arg arg2,
-                     op_arg arg3,
-                     op_arg arg4,
-                     op_arg arg5,
-                     op_arg arg6
-                   )
-
-{
-  arg_check ( set, 0, &arg0 , name );
-  arg_check ( set, 1, &arg1 , name );
-  arg_check ( set, 2, &arg2 , name );
-  arg_check ( set, 3, &arg3 , name );
-  arg_check ( set, 4, &arg4 , name );
-  arg_check ( set, 5, &arg5 , name );
-  arg_check ( set, 6, &arg6 , name );
-
-  char * ptr0 = 0, * ptr1 = 0, * ptr2 = 0, * ptr3 = 0, * ptr4 = 0, * ptr5 = 0, * ptr6 = 0;
-
-  switch( arg0.form ) {
-  case 0:
-    ptr0 = (char*) arg0.dat->dat;
-    break;
-  case 1:
-    if (arg0.idx[0]  == OP_ALL) ptr0 = (char*) malloc(arg0.map[0]->dim * arg0.dat->size);
-    break;
-  case 2:
-    ptr0 = (char*) malloc(arg0.map[0]->dim * arg0.map[1]->dim * arg0.dat->size);
-    break;
-  }
-
-  switch( arg1.form ) {
-  case 0:
-    ptr1 = (char*) arg1.dat->dat;
-    break;
-  case 1:
-    if (arg1.idx[0]  == OP_ALL) ptr1 = (char*) malloc(arg1.map[0]->dim * arg1.dat->size);
-    break;
-  case 2:
-    ptr1 = (char*) malloc(arg1.map[0]->dim * arg1.map[1]->dim * arg1.dat->size);
-    break;
-  }
-
-  switch( arg2.form ) {
-  case 0:
-    ptr2 = (char*) arg2.dat->dat;
-    break;
-  case 1:
-    if (arg2.idx[0]  == OP_ALL) ptr2 = (char*) malloc(arg2.map[0]->dim * arg2.dat->size);
-    break;
-  case 2:
-    ptr2 = (char*) malloc(arg2.map[0]->dim * arg2.map[1]->dim * arg2.dat->size);
-    break;
-  }
-
-  switch( arg3.form ) {
-  case 0:
-    ptr3 = (char*) arg3.dat->dat;
-    break;
-  case 1:
-    if (arg3.idx[0]  == OP_ALL) ptr3 = (char*) malloc(arg3.map[0]->dim * arg3.dat->size);
-    break;
-  case 2:
-    ptr3 = (char*) malloc(arg3.map[0]->dim * arg3.map[1]->dim * arg3.dat->size);
-    break;
-  }
-
-  switch( arg4.form ) {
-  case 0:
-    ptr4 = (char*) arg4.dat->dat;
-    break;
-  case 1:
-    if (arg4.idx[0]  == OP_ALL) ptr4 = (char*) malloc(arg4.map[0]->dim * arg4.dat->size);
-    break;
-  case 2:
-    ptr4 = (char*) malloc(arg4.map[0]->dim * arg4.map[1]->dim * arg4.dat->size);
-    break;
-  }
-
-  switch( arg5.form ) {
-  case 0:
-    ptr5 = (char*) arg5.dat->dat;
-    break;
-  case 1:
-    if (arg5.idx[0]  == OP_ALL) ptr5 = (char*) malloc(arg5.map[0]->dim * arg5.dat->size);
-    break;
-  case 2:
-    ptr5 = (char*) malloc(arg5.map[0]->dim * arg5.map[1]->dim * arg5.dat->size);
-    break;
-  }
-
-  switch( arg6.form ) {
-  case 0:
-    ptr6 = (char*) arg6.dat->dat;
-    break;
-  case 1:
-    if (arg6.idx[0]  == OP_ALL) ptr6 = (char*) malloc(arg6.map[0]->dim * arg6.dat->size);
-    break;
-  case 2:
-    ptr6 = (char*) malloc(arg6.map[0]->dim * arg6.map[1]->dim * arg6.dat->size);
-    break;
-  }
-
-
-  // Loop over set elements
-  for ( int i = 0; i < set->size; i++ ) {
-
-    if (arg0.form == 1) {
-      if (arg0.idx[0]  == OP_ALL) {
-        if (arg0.acc  == OP_READ || arg0.acc  == OP_RW || arg0.acc  == OP_INC)
-          copy_in(i, arg0.dat, arg0.map[0], ptr0 );
-      } else {
-        arg_set ( i, &arg0, &ptr0 );
-      }
-    }
-
-    if (arg1.form == 1) {
-      if (arg1.idx[0]  == OP_ALL) {
-        if (arg1.acc  == OP_READ || arg1.acc  == OP_RW || arg1.acc  == OP_INC)
-          copy_in(i, arg1.dat, arg1.map[0], ptr1 );
-      } else {
-        arg_set ( i, &arg1, &ptr1 );
-      }
-    }
-
-    if (arg2.form == 1) {
-      if (arg2.idx[0]  == OP_ALL) {
-        if (arg2.acc  == OP_READ || arg2.acc  == OP_RW || arg2.acc  == OP_INC)
-          copy_in(i, arg2.dat, arg2.map[0], ptr2 );
-      } else {
-        arg_set ( i, &arg2, &ptr2 );
-      }
-    }
-
-    if (arg3.form == 1) {
-      if (arg3.idx[0]  == OP_ALL) {
-        if (arg3.acc  == OP_READ || arg3.acc  == OP_RW || arg3.acc  == OP_INC)
-          copy_in(i, arg3.dat, arg3.map[0], ptr3 );
-      } else {
-        arg_set ( i, &arg3, &ptr3 );
-      }
-    }
-
-    if (arg4.form == 1) {
-      if (arg4.idx[0]  == OP_ALL) {
-        if (arg4.acc  == OP_READ || arg4.acc  == OP_RW || arg4.acc  == OP_INC)
-          copy_in(i, arg4.dat, arg4.map[0], ptr4 );
-      } else {
-        arg_set ( i, &arg4, &ptr4 );
-      }
-    }
-
-    if (arg5.form == 1) {
-      if (arg5.idx[0]  == OP_ALL) {
-        if (arg5.acc  == OP_READ || arg5.acc  == OP_RW || arg5.acc  == OP_INC)
-          copy_in(i, arg5.dat, arg5.map[0], ptr5 );
-      } else {
-        arg_set ( i, &arg5, &ptr5 );
-      }
-    }
-
-    if (arg6.form == 1) {
-      if (arg6.idx[0]  == OP_ALL) {
-        if (arg6.acc  == OP_READ || arg6.acc  == OP_RW || arg6.acc  == OP_INC)
-          copy_in(i, arg6.dat, arg6.map[0], ptr6 );
-      } else {
-        arg_set ( i, &arg6, &ptr6 );
-      }
-    }
-
-    kernel(ptr0, ptr1, ptr2, ptr3, ptr4, ptr5, ptr6);
-
-    if (arg0.form == 1 && arg0.idx[0]  == OP_ALL) {
-      if (arg0.acc  == OP_WRITE || arg0.acc  == OP_RW || arg0.acc  == OP_INC)
-        copy_out(i, arg0.dat, arg0.map[0], ptr0 );
-    } else if (arg0.form == 2) {
-      const int rows = arg0.map[0]->dim;
-      const int cols = arg0.map[1]->dim;
-      op_mat_addto( arg0.dat, ptr0, rows, arg0.map[0]->map + i*rows, cols, arg0.map[1]->map + i*cols);
-    }
-
-    if (arg1.form == 1 && arg1.idx[0]  == OP_ALL) {
-      if (arg1.acc  == OP_WRITE || arg1.acc  == OP_RW || arg1.acc  == OP_INC)
-        copy_out(i, arg1.dat, arg1.map[0], ptr1 );
-    } else if (arg1.form == 2) {
-      const int rows = arg1.map[0]->dim;
-      const int cols = arg1.map[1]->dim;
-      op_mat_addto( arg1.dat, ptr1, rows, arg1.map[0]->map + i*rows, cols, arg1.map[1]->map + i*cols);
-    }
-
-    if (arg2.form == 1 && arg2.idx[0]  == OP_ALL) {
-      if (arg2.acc  == OP_WRITE || arg2.acc  == OP_RW || arg2.acc  == OP_INC)
-        copy_out(i, arg2.dat, arg2.map[0], ptr2 );
-    } else if (arg2.form == 2) {
-      const int rows = arg2.map[0]->dim;
-      const int cols = arg2.map[1]->dim;
-      op_mat_addto( arg2.dat, ptr2, rows, arg2.map[0]->map + i*rows, cols, arg2.map[1]->map + i*cols);
-    }
-
-    if (arg3.form == 1 && arg3.idx[0]  == OP_ALL) {
-      if (arg3.acc  == OP_WRITE || arg3.acc  == OP_RW || arg3.acc  == OP_INC)
-        copy_out(i, arg3.dat, arg3.map[0], ptr3 );
-    } else if (arg3.form == 2) {
-      const int rows = arg3.map[0]->dim;
-      const int cols = arg3.map[1]->dim;
-      op_mat_addto( arg3.dat, ptr3, rows, arg3.map[0]->map + i*rows, cols, arg3.map[1]->map + i*cols);
-    }
-
-    if (arg4.form == 1 && arg4.idx[0]  == OP_ALL) {
-      if (arg4.acc  == OP_WRITE || arg4.acc  == OP_RW || arg4.acc  == OP_INC)
-        copy_out(i, arg4.dat, arg4.map[0], ptr4 );
-    } else if (arg4.form == 2) {
-      const int rows = arg4.map[0]->dim;
-      const int cols = arg4.map[1]->dim;
-      op_mat_addto( arg4.dat, ptr4, rows, arg4.map[0]->map + i*rows, cols, arg4.map[1]->map + i*cols);
-    }
-
-    if (arg5.form == 1 && arg5.idx[0]  == OP_ALL) {
-      if (arg5.acc  == OP_WRITE || arg5.acc  == OP_RW || arg5.acc  == OP_INC)
-        copy_out(i, arg5.dat, arg5.map[0], ptr5 );
-    } else if (arg5.form == 2) {
-      const int rows = arg5.map[0]->dim;
-      const int cols = arg5.map[1]->dim;
-      op_mat_addto( arg5.dat, ptr5, rows, arg5.map[0]->map + i*rows, cols, arg5.map[1]->map + i*cols);
-    }
-
-    if (arg6.form == 1 && arg6.idx[0]  == OP_ALL) {
-      if (arg6.acc  == OP_WRITE || arg6.acc  == OP_RW || arg6.acc  == OP_INC)
-        copy_out(i, arg6.dat, arg6.map[0], ptr6 );
-    } else if (arg6.form == 2) {
-      const int rows = arg6.map[0]->dim;
-      const int cols = arg6.map[1]->dim;
-      op_mat_addto( arg6.dat, ptr6, rows, arg6.map[0]->map + i*rows, cols, arg6.map[1]->map + i*cols);
-    }
-
-  }
-
-  if ((arg0.form == 1 && arg0.idx[0]  == OP_ALL) || arg0.form == 2) free(ptr0);
-  if (arg0.form == 2) op_mat_assemble(arg0.dat);
-  if ((arg1.form == 1 && arg1.idx[0]  == OP_ALL) || arg1.form == 2) free(ptr1);
-  if (arg1.form == 2) op_mat_assemble(arg1.dat);
-  if ((arg2.form == 1 && arg2.idx[0]  == OP_ALL) || arg2.form == 2) free(ptr2);
-  if (arg2.form == 2) op_mat_assemble(arg2.dat);
-  if ((arg3.form == 1 && arg3.idx[0]  == OP_ALL) || arg3.form == 2) free(ptr3);
-  if (arg3.form == 2) op_mat_assemble(arg3.dat);
-  if ((arg4.form == 1 && arg4.idx[0]  == OP_ALL) || arg4.form == 2) free(ptr4);
-  if (arg4.form == 2) op_mat_assemble(arg4.dat);
-  if ((arg5.form == 1 && arg5.idx[0]  == OP_ALL) || arg5.form == 2) free(ptr5);
-  if (arg5.form == 2) op_mat_assemble(arg5.dat);
-  if ((arg6.form == 1 && arg6.idx[0]  == OP_ALL) || arg6.form == 2) free(ptr6);
-  if (arg6.form == 2) op_mat_assemble(arg6.dat);
-
-}
-
-void op_par_loop_8 ( void (*kernel)(void *, void *, void *, void *, void *, void *, void *, void *), char const * name, op_set * set,
-                     op_arg arg0,
-                     op_arg arg1,
-                     op_arg arg2,
-                     op_arg arg3,
-                     op_arg arg4,
-                     op_arg arg5,
-                     op_arg arg6,
-                     op_arg arg7
-                   )
-
-{
-  arg_check ( set, 0, &arg0 , name );
-  arg_check ( set, 1, &arg1 , name );
-  arg_check ( set, 2, &arg2 , name );
-  arg_check ( set, 3, &arg3 , name );
-  arg_check ( set, 4, &arg4 , name );
-  arg_check ( set, 5, &arg5 , name );
-  arg_check ( set, 6, &arg6 , name );
-  arg_check ( set, 7, &arg7 , name );
-
-  char * ptr0 = 0, * ptr1 = 0, * ptr2 = 0, * ptr3 = 0, * ptr4 = 0, * ptr5 = 0, * ptr6 = 0, * ptr7 = 0;
-
-  switch( arg0.form ) {
-  case 0:
-    ptr0 = (char*) arg0.dat->dat;
-    break;
-  case 1:
-    if (arg0.idx[0]  == OP_ALL) ptr0 = (char*) malloc(arg0.map[0]->dim * arg0.dat->size);
-    break;
-  case 2:
-    ptr0 = (char*) malloc(arg0.map[0]->dim * arg0.map[1]->dim * arg0.dat->size);
-    break;
-  }
-
-  switch( arg1.form ) {
-  case 0:
-    ptr1 = (char*) arg1.dat->dat;
-    break;
-  case 1:
-    if (arg1.idx[0]  == OP_ALL) ptr1 = (char*) malloc(arg1.map[0]->dim * arg1.dat->size);
-    break;
-  case 2:
-    ptr1 = (char*) malloc(arg1.map[0]->dim * arg1.map[1]->dim * arg1.dat->size);
-    break;
-  }
-
-  switch( arg2.form ) {
-  case 0:
-    ptr2 = (char*) arg2.dat->dat;
-    break;
-  case 1:
-    if (arg2.idx[0]  == OP_ALL) ptr2 = (char*) malloc(arg2.map[0]->dim * arg2.dat->size);
-    break;
-  case 2:
-    ptr2 = (char*) malloc(arg2.map[0]->dim * arg2.map[1]->dim * arg2.dat->size);
-    break;
-  }
-
-  switch( arg3.form ) {
-  case 0:
-    ptr3 = (char*) arg3.dat->dat;
-    break;
-  case 1:
-    if (arg3.idx[0]  == OP_ALL) ptr3 = (char*) malloc(arg3.map[0]->dim * arg3.dat->size);
-    break;
-  case 2:
-    ptr3 = (char*) malloc(arg3.map[0]->dim * arg3.map[1]->dim * arg3.dat->size);
-    break;
-  }
-
-  switch( arg4.form ) {
-  case 0:
-    ptr4 = (char*) arg4.dat->dat;
-    break;
-  case 1:
-    if (arg4.idx[0]  == OP_ALL) ptr4 = (char*) malloc(arg4.map[0]->dim * arg4.dat->size);
-    break;
-  case 2:
-    ptr4 = (char*) malloc(arg4.map[0]->dim * arg4.map[1]->dim * arg4.dat->size);
-    break;
-  }
-
-  switch( arg5.form ) {
-  case 0:
-    ptr5 = (char*) arg5.dat->dat;
-    break;
-  case 1:
-    if (arg5.idx[0]  == OP_ALL) ptr5 = (char*) malloc(arg5.map[0]->dim * arg5.dat->size);
-    break;
-  case 2:
-    ptr5 = (char*) malloc(arg5.map[0]->dim * arg5.map[1]->dim * arg5.dat->size);
-    break;
-  }
-
-  switch( arg6.form ) {
-  case 0:
-    ptr6 = (char*) arg6.dat->dat;
-    break;
-  case 1:
-    if (arg6.idx[0]  == OP_ALL) ptr6 = (char*) malloc(arg6.map[0]->dim * arg6.dat->size);
-    break;
-  case 2:
-    ptr6 = (char*) malloc(arg6.map[0]->dim * arg6.map[1]->dim * arg6.dat->size);
-    break;
-  }
-
-  switch( arg7.form ) {
-  case 0:
-    ptr7 = (char*) arg7.dat->dat;
-    break;
-  case 1:
-    if (arg7.idx[0]  == OP_ALL) ptr7 = (char*) malloc(arg7.map[0]->dim * arg7.dat->size);
-    break;
-  case 2:
-    ptr7 = (char*) malloc(arg7.map[0]->dim * arg7.map[1]->dim * arg7.dat->size);
-    break;
-  }
-
-
-  // Loop over set elements
-  for ( int i = 0; i < set->size; i++ ) {
-
-    if (arg0.form == 1) {
-      if (arg0.idx[0]  == OP_ALL) {
-        if (arg0.acc  == OP_READ || arg0.acc  == OP_RW || arg0.acc  == OP_INC)
-          copy_in(i, arg0.dat, arg0.map[0], ptr0 );
-      } else {
-        arg_set ( i, &arg0, &ptr0 );
-      }
-    }
-
-    if (arg1.form == 1) {
-      if (arg1.idx[0]  == OP_ALL) {
-        if (arg1.acc  == OP_READ || arg1.acc  == OP_RW || arg1.acc  == OP_INC)
-          copy_in(i, arg1.dat, arg1.map[0], ptr1 );
-      } else {
-        arg_set ( i, &arg1, &ptr1 );
-      }
-    }
-
-    if (arg2.form == 1) {
-      if (arg2.idx[0]  == OP_ALL) {
-        if (arg2.acc  == OP_READ || arg2.acc  == OP_RW || arg2.acc  == OP_INC)
-          copy_in(i, arg2.dat, arg2.map[0], ptr2 );
-      } else {
-        arg_set ( i, &arg2, &ptr2 );
-      }
-    }
-
-    if (arg3.form == 1) {
-      if (arg3.idx[0]  == OP_ALL) {
-        if (arg3.acc  == OP_READ || arg3.acc  == OP_RW || arg3.acc  == OP_INC)
-          copy_in(i, arg3.dat, arg3.map[0], ptr3 );
-      } else {
-        arg_set ( i, &arg3, &ptr3 );
-      }
-    }
-
-    if (arg4.form == 1) {
-      if (arg4.idx[0]  == OP_ALL) {
-        if (arg4.acc  == OP_READ || arg4.acc  == OP_RW || arg4.acc  == OP_INC)
-          copy_in(i, arg4.dat, arg4.map[0], ptr4 );
-      } else {
-        arg_set ( i, &arg4, &ptr4 );
-      }
-    }
-
-    if (arg5.form == 1) {
-      if (arg5.idx[0]  == OP_ALL) {
-        if (arg5.acc  == OP_READ || arg5.acc  == OP_RW || arg5.acc  == OP_INC)
-          copy_in(i, arg5.dat, arg5.map[0], ptr5 );
-      } else {
-        arg_set ( i, &arg5, &ptr5 );
-      }
-    }
-
-    if (arg6.form == 1) {
-      if (arg6.idx[0]  == OP_ALL) {
-        if (arg6.acc  == OP_READ || arg6.acc  == OP_RW || arg6.acc  == OP_INC)
-          copy_in(i, arg6.dat, arg6.map[0], ptr6 );
-      } else {
-        arg_set ( i, &arg6, &ptr6 );
-      }
-    }
-
-    if (arg7.form == 1) {
-      if (arg7.idx[0]  == OP_ALL) {
-        if (arg7.acc  == OP_READ || arg7.acc  == OP_RW || arg7.acc  == OP_INC)
-          copy_in(i, arg7.dat, arg7.map[0], ptr7 );
-      } else {
-        arg_set ( i, &arg7, &ptr7 );
-      }
-    }
-
-    kernel(ptr0, ptr1, ptr2, ptr3, ptr4, ptr5, ptr6, ptr7);
-
-    if (arg0.form == 1 && arg0.idx[0]  == OP_ALL) {
-      if (arg0.acc  == OP_WRITE || arg0.acc  == OP_RW || arg0.acc  == OP_INC)
-        copy_out(i, arg0.dat, arg0.map[0], ptr0 );
-    } else if (arg0.form == 2) {
-      const int rows = arg0.map[0]->dim;
-      const int cols = arg0.map[1]->dim;
-      op_mat_addto( arg0.dat, ptr0, rows, arg0.map[0]->map + i*rows, cols, arg0.map[1]->map + i*cols);
-    }
-
-    if (arg1.form == 1 && arg1.idx[0]  == OP_ALL) {
-      if (arg1.acc  == OP_WRITE || arg1.acc  == OP_RW || arg1.acc  == OP_INC)
-        copy_out(i, arg1.dat, arg1.map[0], ptr1 );
-    } else if (arg1.form == 2) {
-      const int rows = arg1.map[0]->dim;
-      const int cols = arg1.map[1]->dim;
-      op_mat_addto( arg1.dat, ptr1, rows, arg1.map[0]->map + i*rows, cols, arg1.map[1]->map + i*cols);
-    }
-
-    if (arg2.form == 1 && arg2.idx[0]  == OP_ALL) {
-      if (arg2.acc  == OP_WRITE || arg2.acc  == OP_RW || arg2.acc  == OP_INC)
-        copy_out(i, arg2.dat, arg2.map[0], ptr2 );
-    } else if (arg2.form == 2) {
-      const int rows = arg2.map[0]->dim;
-      const int cols = arg2.map[1]->dim;
-      op_mat_addto( arg2.dat, ptr2, rows, arg2.map[0]->map + i*rows, cols, arg2.map[1]->map + i*cols);
-    }
-
-    if (arg3.form == 1 && arg3.idx[0]  == OP_ALL) {
-      if (arg3.acc  == OP_WRITE || arg3.acc  == OP_RW || arg3.acc  == OP_INC)
-        copy_out(i, arg3.dat, arg3.map[0], ptr3 );
-    } else if (arg3.form == 2) {
-      const int rows = arg3.map[0]->dim;
-      const int cols = arg3.map[1]->dim;
-      op_mat_addto( arg3.dat, ptr3, rows, arg3.map[0]->map + i*rows, cols, arg3.map[1]->map + i*cols);
-    }
-
-    if (arg4.form == 1 && arg4.idx[0]  == OP_ALL) {
-      if (arg4.acc  == OP_WRITE || arg4.acc  == OP_RW || arg4.acc  == OP_INC)
-        copy_out(i, arg4.dat, arg4.map[0], ptr4 );
-    } else if (arg4.form == 2) {
-      const int rows = arg4.map[0]->dim;
-      const int cols = arg4.map[1]->dim;
-      op_mat_addto( arg4.dat, ptr4, rows, arg4.map[0]->map + i*rows, cols, arg4.map[1]->map + i*cols);
-    }
-
-    if (arg5.form == 1 && arg5.idx[0]  == OP_ALL) {
-      if (arg5.acc  == OP_WRITE || arg5.acc  == OP_RW || arg5.acc  == OP_INC)
-        copy_out(i, arg5.dat, arg5.map[0], ptr5 );
-    } else if (arg5.form == 2) {
-      const int rows = arg5.map[0]->dim;
-      const int cols = arg5.map[1]->dim;
-      op_mat_addto( arg5.dat, ptr5, rows, arg5.map[0]->map + i*rows, cols, arg5.map[1]->map + i*cols);
-    }
-
-    if (arg6.form == 1 && arg6.idx[0]  == OP_ALL) {
-      if (arg6.acc  == OP_WRITE || arg6.acc  == OP_RW || arg6.acc  == OP_INC)
-        copy_out(i, arg6.dat, arg6.map[0], ptr6 );
-    } else if (arg6.form == 2) {
-      const int rows = arg6.map[0]->dim;
-      const int cols = arg6.map[1]->dim;
-      op_mat_addto( arg6.dat, ptr6, rows, arg6.map[0]->map + i*rows, cols, arg6.map[1]->map + i*cols);
-    }
-
-    if (arg7.form == 1 && arg7.idx[0]  == OP_ALL) {
-      if (arg7.acc  == OP_WRITE || arg7.acc  == OP_RW || arg7.acc  == OP_INC)
-        copy_out(i, arg7.dat, arg7.map[0], ptr7 );
-    } else if (arg7.form == 2) {
-      const int rows = arg7.map[0]->dim;
-      const int cols = arg7.map[1]->dim;
-      op_mat_addto( arg7.dat, ptr7, rows, arg7.map[0]->map + i*rows, cols, arg7.map[1]->map + i*cols);
-    }
-
-  }
-
-  if ((arg0.form == 1 && arg0.idx[0]  == OP_ALL) || arg0.form == 2) free(ptr0);
-  if (arg0.form == 2) op_mat_assemble(arg0.dat);
-  if ((arg1.form == 1 && arg1.idx[0]  == OP_ALL) || arg1.form == 2) free(ptr1);
-  if (arg1.form == 2) op_mat_assemble(arg1.dat);
-  if ((arg2.form == 1 && arg2.idx[0]  == OP_ALL) || arg2.form == 2) free(ptr2);
-  if (arg2.form == 2) op_mat_assemble(arg2.dat);
-  if ((arg3.form == 1 && arg3.idx[0]  == OP_ALL) || arg3.form == 2) free(ptr3);
-  if (arg3.form == 2) op_mat_assemble(arg3.dat);
-  if ((arg4.form == 1 && arg4.idx[0]  == OP_ALL) || arg4.form == 2) free(ptr4);
-  if (arg4.form == 2) op_mat_assemble(arg4.dat);
-  if ((arg5.form == 1 && arg5.idx[0]  == OP_ALL) || arg5.form == 2) free(ptr5);
-  if (arg5.form == 2) op_mat_assemble(arg5.dat);
-  if ((arg6.form == 1 && arg6.idx[0]  == OP_ALL) || arg6.form == 2) free(ptr6);
-  if (arg6.form == 2) op_mat_assemble(arg6.dat);
-  if ((arg7.form == 1 && arg7.idx[0]  == OP_ALL) || arg7.form == 2) free(ptr7);
-  if (arg7.form == 2) op_mat_assemble(arg7.dat);
+  if ((arg0.dat->rank == 1 && arg0.idx[0]  == OP_ALL) || arg0.dat->rank == 2) free(ptr0);
+  if (arg0.dat->rank == 2) op_mat_assemble(arg0.dat);
+  if ((arg1.dat->rank == 1 && arg1.idx[0]  == OP_ALL) || arg1.dat->rank == 2) free(ptr1);
+  if (arg1.dat->rank == 2) op_mat_assemble(arg1.dat);
+  if ((arg2.dat->rank == 1 && arg2.idx[0]  == OP_ALL) || arg2.dat->rank == 2) free(ptr2);
+  if (arg2.dat->rank == 2) op_mat_assemble(arg2.dat);
+  if ((arg3.dat->rank == 1 && arg3.idx[0]  == OP_ALL) || arg3.dat->rank == 2) free(ptr3);
+  if (arg3.dat->rank == 2) op_mat_assemble(arg3.dat);
+  if ((arg4.dat->rank == 1 && arg4.idx[0]  == OP_ALL) || arg4.dat->rank == 2) free(ptr4);
+  if (arg4.dat->rank == 2) op_mat_assemble(arg4.dat);
 
 }
 

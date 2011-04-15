@@ -66,11 +66,11 @@ void op_diagnostic_output(){
       printf("%10s %10d %10s %10s\n",map.name,map.dim,map.from->name,map.to->name);
     }
 
-    printf("\n       dat        dim        set\n");
-    printf(  "  ------------------------------\n");
+    printf("\n       dat        dim        set        set\n");
+    printf(  "  -----------------------------------------\n");
     for(int n=0; n<OP_dat_index; n++) {
       op_dat dat=*OP_dat_list[n];
-      printf("%10s %10d %10s\n",dat.name,dat.dim,dat.set ? dat.set->name : "-");
+      printf("%10s %10d %10s %10s\n",dat.name,dat.dim,dat.rank > 0 ? dat.set[0]->name : "-",dat.rank > 1 ? dat.set[1]->name : "-");
     }
     printf("\n");
   }

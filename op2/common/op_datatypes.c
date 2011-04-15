@@ -48,6 +48,11 @@ op_set  **OP_set_list;
 op_map  **OP_map_list;
 op_dat  **OP_dat_list;
 
+static int check_set ( const op_set * set ) {
+  return (set->index<0) || (set->index>=OP_set_index) ||
+       strcmp(OP_set_list[set->index]->name,set->name);
+}
+
 void initialise_set ( op_set * set, int size, char const * name )
 {
   assert(set);
@@ -72,14 +77,12 @@ void initialise_map ( op_map * mapping, op_set * from, op_set * to, int dim, int
 {
   assert( mapping && from && to && map );
 
-  if ( (from->index<0) || (from->index>=OP_set_index) ||
-       strcmp(OP_set_list[from->index]->name,from->name) ) {
+  if ( check_set( from ) ) {
     printf(" op_decl_map error -- invalid 'from' set for map %s\n",name);
     exit(-1);
   }
 
-  if ( (to->index<0) || (to->index>=OP_set_index) ||
-       strcmp(OP_set_list[to->index]->name,to->name) ) {
+  if ( check_set( to ) ) {
     printf("op_decl_map error -- invalid 'to' set for map %s\n",name);
     exit(-1);
   }
@@ -118,24 +121,44 @@ void initialise_map ( op_map * mapping, op_set * from, op_set * to, int dim, int
   OP_map_list[OP_map_index++] = mapping;
 }
 
-void initialise_dat ( op_dat * data, op_set * set, int dim, int size, void *dat, char const * name )
+void initialise_dat ( op_dat * data,
+                      int rank,
+                      op_set * set0,
+                      op_set * set1,
+                      int data_rank,
+                      int data_shape[4],
+                      int size,
+                      void *dat,
+                      char const * name )
 {
-  assert( data );
+  assert( data && data_rank <= 4 );
 
-  if ( set && (set->index<0 || set->index>=OP_set_index ||
-       strcmp(OP_set_list[set->index]->name,set->name)) ) {
+  if ( rank < 0 || rank > 2 ) {
+    printf("op_decl_dat error -- invalid rank for data: %s (0 <= rank <= 2)\n",name);
+    exit(-1);
+  }
+
+  if ( rank > 0 && check_set(set0) || rank > 1 && check_set(set1) ) {
     printf("op_decl_dat error -- invalid set for data: %s\n",name);
     exit(-1);
   }
 
-  if (dim<=0) {
-    printf("op_decl_dat error -- negative/zero dimension for data: %s\n",name);
-    exit(-1);
+  int dim = 1;
+  for (int i = 0; i < data_rank; ++i) {
+    if (data_shape[i]<=0) {
+      printf("op_decl_dat error -- negative/zero dimension for data: %s\n",name);
+      exit(-1);
+    }
+    dim *= data_shape[i];
+    data->data_shape[i] = data_shape[i];
   }
 
-  data->set   = set;
+  data->rank = rank;
+  data->set[0]= set0;
+  data->set[1]= set1;
   data->dim   = dim;
   data->index = OP_dat_index;
+  data->data_rank = data_rank;
   data->dat   = dat;
   data->dat_d = NULL;
   data->size  = dim*size;
@@ -180,7 +203,6 @@ void op_decl_gbl_map ( op_map * map )
 op_arg op_construct_gbl_arg(op_dat * data, op_access acc)
 {
   op_arg arg = (op_arg) {
-    0,      /*arg.form = 0;*/
     data,   /*arg.dat = data;*/
     {0, 0}, /*arg.idx = { 0, 0 };*/
     {0, 0}, /*arg.map = { 0, 0 };*/
@@ -193,7 +215,6 @@ op_arg op_construct_gbl_arg(op_dat * data, op_access acc)
 op_arg op_construct_vec_arg(op_dat * data, int idx, op_map * map, op_access acc)
 {
   op_arg arg = (op_arg) {
-    1,          /*arg.form = 1;*/
     data,       /*arg.dat = data;*/
     { idx, 0 }, /*arg.idx = { idx, 0 };*/
     { map, 0 }, /*arg.map = { map, 0 };*/
@@ -206,7 +227,6 @@ op_arg op_construct_vec_arg(op_dat * data, int idx, op_map * map, op_access acc)
 op_arg op_construct_mat_arg(op_dat * data, int idx0, op_map * map0, int idx1, op_map * map1, op_access acc)
 {
   op_arg arg = (op_arg) {
-    2,              /*arg.form = 2;*/
     data,           /*arg.dat = data;*/
     { idx0, idx1 }, /*arg.idx = { idx0, idx1 };*/
     { map0, map1 }, /*arg.map = { map0, map1 };*/
