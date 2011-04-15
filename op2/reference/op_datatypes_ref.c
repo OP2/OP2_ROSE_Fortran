@@ -40,27 +40,25 @@ void op_decl_map ( op_map * mapping, op_set * from, op_set * to, int dim, int * 
   initialise_map ( mapping, from, to, dim, map, name );
 }
 
-void op_decl_gbl ( op_dat * data, int data_rank, int data_shape[4], int type_size, void * dat, char const * name )
+void op_decl_gbl ( op_dat * data, int dim, int type_size, void * dat, char const * name )
 {
   initialise_dat( data,
                   0,
                   NULL,
                   NULL,
-                  data_rank,
-                  data_shape,
+                  dim,
                   type_size,
                   dat,
                   name );
 }
 
-void op_decl_vec ( op_dat * data, op_set * set, int data_rank, int data_shape[4], int type_size, void * dat, char const * name )
+void op_decl_vec ( op_dat * data, op_set * set, int dim, int type_size, void * dat, char const * name )
 {
   initialise_dat( data,
                   1,
                   set,
                   NULL,
-                  data_rank,
-                  data_shape,
+                  dim,
                   type_size,
                   dat,
                   name );

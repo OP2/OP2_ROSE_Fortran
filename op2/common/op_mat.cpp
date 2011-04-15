@@ -86,7 +86,7 @@ void op_decl_sparsity ( op_sparsity * sparsity, op_map * rowmap, op_map * colmap
   sparsity->max_nonzeros = max_nonzeros;
 }
 
-void op_decl_mat( op_dat * data, op_set * rowset, op_set * colset, int data_rank, int data_shape[4], int type_size, op_sparsity * sparsity, char const * name ) {
+void op_decl_mat( op_dat * data, op_set * rowset, op_set * colset, int dim, int type_size, op_sparsity * sparsity, char const * name ) {
   assert( rowset->size == sparsity->nrows && colset->size == sparsity->ncols );
 
   Mat p_mat;
@@ -104,8 +104,7 @@ void op_decl_mat( op_dat * data, op_set * rowset, op_set * colset, int data_rank
                   2,
                   rowset,
                   colset,
-                  data_rank,
-                  data_shape,
+                  dim,
                   type_size,
                   p_mat,
                   name );

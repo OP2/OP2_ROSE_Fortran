@@ -100,9 +100,7 @@ typedef struct {
   op_set     *set[2]; /* set on which data is defined */
   int         dim,    /* dimension of data */
               index,  /* index into list of datasets */
-              size,   /* size of each element in dataset */
-              data_rank, /* rank of individual data items. */
-              data_shape[4]; /* shape of individual data items. */
+              size;   /* size of each element in dataset */
   void       *dat,    /* data on host */
              *dat_d;  /* data on device (GPU) */
   char const *name;   /* name of dataset */
@@ -187,9 +185,8 @@ void initialise_dat ( op_dat * data,
                       int rank,
                       op_set * set0,
                       op_set * set1,
-                      int data_rank,
-                      int data_shape[4],
-                      int size,
+                      int dim,
+                      int type_size,
                       void *dat,
                       char const * name );
 
@@ -202,13 +199,13 @@ void op_decl_set ( op_set * set, int size, char const * name );
 void op_decl_map ( op_map * mapping, op_set * from, op_set * to, int dim, int * map, char const * name );
 
 /* Declare a 0-form op_dat (a global) */
-void op_decl_gbl ( op_dat * data, int data_rank, int data_shape[4], int type_size, void * dat, char const * name );
+void op_decl_gbl ( op_dat * data, int dim, int type_size, void * dat, char const * name );
 
 /* Declare a 1-form op_dat (a vector) */
-void op_decl_vec ( op_dat * data, op_set * set, int data_rank, int data_shape[4], int type_size, void * dat, char const * name );
+void op_decl_vec ( op_dat * data, op_set * set, int dim, int type_size, void * dat, char const * name );
 
 /* Declare a 2-form op_dat (a matrix) */
-void op_decl_mat( op_dat * data, op_set * rowset, op_set * colset, int data_rank, int data_shape[4], int type_size, op_sparsity * sparsity, char const * name );
+void op_decl_mat( op_dat * data, op_set * rowset, op_set * colset, int dim, int type_size, op_sparsity * sparsity, char const * name );
 
 void op_decl_id_map ( op_map * map );
 

@@ -125,13 +125,12 @@ void initialise_dat ( op_dat * data,
                       int rank,
                       op_set * set0,
                       op_set * set1,
-                      int data_rank,
-                      int data_shape[4],
-                      int size,
+                      int dim,
+                      int type_size,
                       void *dat,
                       char const * name )
 {
-  assert( data && data_rank <= 4 );
+  assert( data );
 
   if ( rank < 0 || rank > 2 ) {
     printf("op_decl_dat error -- invalid rank for data: %s (0 <= rank <= 2)\n",name);
@@ -143,14 +142,9 @@ void initialise_dat ( op_dat * data,
     exit(-1);
   }
 
-  int dim = 1;
-  for (int i = 0; i < data_rank; ++i) {
-    if (data_shape[i]<=0) {
-      printf("op_decl_dat error -- negative/zero dimension for data: %s\n",name);
-      exit(-1);
-    }
-    dim *= data_shape[i];
-    data->data_shape[i] = data_shape[i];
+  if (dim<=0) {
+    printf("op_decl_dat error -- negative/zero dimension for data: %s\n",name);
+    exit(-1);
   }
 
   data->rank = rank;
@@ -158,10 +152,9 @@ void initialise_dat ( op_dat * data,
   data->set[1]= set1;
   data->dim   = dim;
   data->index = OP_dat_index;
-  data->data_rank = data_rank;
   data->dat   = dat;
   data->dat_d = NULL;
-  data->size  = dim*size;
+  data->size  = dim*type_size;
 	data->name = name;
 
   if (OP_dat_index==OP_dat_max) {
