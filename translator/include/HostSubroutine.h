@@ -122,6 +122,14 @@ class HostSubroutine: public Subroutine
     HostSubroutine (std::string const & subroutineName,
         UserDeviceSubroutine & userDeviceSubroutine,
         ParallelLoop & parallelLoop, SgScopeStatement * moduleScope);
+
+  public:
+
+    SgVariableDeclaration *
+    get_OP_DAT_VariableOnDevice (unsigned int OP_DAT_ArgumentGroup)
+    {
+      return localVariables_OP_DAT_VariablesOnDevice[OP_DAT_ArgumentGroup];
+    }
 };
 
 #endif

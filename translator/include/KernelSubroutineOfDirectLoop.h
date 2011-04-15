@@ -15,26 +15,34 @@ class KernelSubroutineOfDirectLoop: public KernelSubroutine
 {
   private:
 
-    SgVariableDeclaration * variable_iterationSet;
-
     /*
      * ======================================================
-     * The following variables are provided as
-     * part of the CUDA library
+     * The first formal parameter in a direct loop is the size
+     * of the OP_SET
      * ======================================================
      */
 
-    SgVarRefExp * variable_Threadidx;
+    SgVariableDeclaration * formalParameter_setSize;
 
-    SgVarRefExp * variable_X;
+    /*
+     * ======================================================
+     * A local variable to count
+     * ======================================================
+     */
 
-    SgVarRefExp * variable_Blockidx;
-
-    SgVarRefExp * variable_Blockdim;
-
-    SgVarRefExp * variable_GridDim;
+    SgVariableDeclaration * variable_IterationCounter;
 
   private:
+
+    /*
+     * ======================================================
+     * Creates the actual parameters for the call to the
+     * device version of the user subroutine
+     * ======================================================
+     */
+    SgStatement *
+    createUserSubroutineCall (UserDeviceSubroutine & userDeviceSubroutine,
+        ParallelLoop & parallelLoop);
 
     /*
      * ======================================================
@@ -52,6 +60,12 @@ class KernelSubroutineOfDirectLoop: public KernelSubroutine
      */
     void
     createLocalVariables ();
+
+    void
+    create_OP_DAT_FormalParameters (ParallelLoop & parallelLoop);
+
+    void
+    createSetSizeFormalParameter ();
 
   public:
 

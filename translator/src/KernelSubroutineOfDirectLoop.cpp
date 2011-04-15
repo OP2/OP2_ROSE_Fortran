@@ -1,5 +1,8 @@
 #include <boost/lexical_cast.hpp>
 #include <KernelSubroutineOfDirectLoop.h>
+#include <FortranTypesBuilder.h>
+#include <ROSEHelper.h>
+#include <Debug.h>
 
 /*
  * ======================================================
@@ -7,14 +10,69 @@
  * ======================================================
  */
 
+SgStatement *
+KernelSubroutineOfDirectLoop::createUserSubroutineCall (
+    UserDeviceSubroutine & userDeviceSubroutine, ParallelLoop & parallelLoop)
+{
+  using SageBuilder::buildFunctionCallStmt;
+  using SageBuilder::buildVoidType;
+  using SageBuilder::buildIntVal;
+  using SageBuilder::buildMultiplyOp;
+  using SageBuilder::buildAddOp;
+  using SageBuilder::buildSubtractOp;
+  using SageBuilder::buildVarRefExp;
+  using SageBuilder::buildPntrArrRefExp;
+  using SageBuilder::buildExprListExp;
+  using std::vector;
+
+  Debug::getInstance ()->debugMessage (
+      "Creating call to user device subroutine", 2);
+
+  SgExprListExp * userDeviceSubroutineParameters = buildExprListExp ();
+
+  SgVarRefExp * iterationCounterReference = buildVarRefExp (
+      variable_IterationCounter);
+
+  for (unsigned int i = 1; i
+      <= parallelLoop.getNumberOf_OP_DAT_ArgumentGroups (); ++i)
+  {
+    if (parallelLoop.isDuplicate_OP_DAT (i) == false)
+    {
+      SgExpression * lowerBound = buildMultiplyOp (iterationCounterReference,
+          buildIntVal (parallelLoop.get_OP_DAT_Dimension (i)));
+
+      SgExpression * upperBound =
+          buildSubtractOp (buildAddOp (lowerBound, buildIntVal (
+              parallelLoop.get_OP_DAT_Dimension (i))), buildIntVal (1));
+
+      SgSubscriptExpression * arraySubscriptExpression =
+          new SgSubscriptExpression (ROSEHelper::getFileInfo (), lowerBound,
+              upperBound, buildIntVal (1));
+
+      arraySubscriptExpression->set_endOfConstruct (ROSEHelper::getFileInfo ());
+      arraySubscriptExpression->setCompilerGenerated ();
+      arraySubscriptExpression->setOutputInCodeGeneration ();
+
+      SgExpression * opDatFormalParameterReference = buildVarRefExp (
+          formalParameter_OP_DATs[i]);
+
+      SgExpression * parameterExpression = buildPntrArrRefExp (
+          opDatFormalParameterReference, arraySubscriptExpression);
+
+      userDeviceSubroutineParameters->append_expression (parameterExpression);
+    }
+  }
+
+  return buildFunctionCallStmt (userDeviceSubroutine.getSubroutineName (),
+      buildVoidType (), userDeviceSubroutineParameters, subroutineScope);
+}
+
 void
 KernelSubroutineOfDirectLoop::createStatements (
-    UserDeviceSubroutine & userDeviceSubroutine, ParallelLoop & op2ParallelLoop)
+    UserDeviceSubroutine & userDeviceSubroutine, ParallelLoop & parallelLoop)
 {
   using boost::lexical_cast;
   using SageBuilder::buildVarRefExp;
-  using SageBuilder::buildFunctionCallExp;
-  using SageBuilder::buildFunctionRefExp;
   using SageBuilder::buildIntVal;
   using SageBuilder::buildDotExp;
   using SageBuilder::buildAssignOp;
@@ -31,37 +89,58 @@ KernelSubroutineOfDirectLoop::createStatements (
 
   /*
    * ======================================================
-   * 'setIter = (threadidx%x - 1) + (blockidx%x -1)  * blockdim%x'
+   * Initialise the set iteration counter
    * ======================================================
    */
 
-  // 'threadidx%x - 1'
-  SgExpression * threadIdXMinusOne = buildSubtractOp (buildDotExp (
+  SgSubtractOp * subtractExpression1 = buildSubtractOp (buildDotExp (
       variable_Threadidx, variable_X), buildIntVal (1));
 
-  // 'blockidx%x - 1'
-  SgExpression * blockIdXMinusOne = buildSubtractOp (buildDotExp (
+  SgSubtractOp * subtractExpression2 = buildSubtractOp (buildDotExp (
       variable_Blockidx, variable_X), buildIntVal (1));
 
-  // 'blockdim%x'
   SgExpression * blockDimX = buildDotExp (variable_Blockdim, variable_X);
 
-  // '(blockidx%x -1)  * blockdim%x'
-  SgExpression * blockIdXMinusOnePerBlockDimx = buildMultiplyOp (
-      blockIdXMinusOne, blockDimX);
+  SgMultiplyOp * multiplyExpression = buildMultiplyOp (subtractExpression1,
+      blockDimX);
 
-  // 'setIter = (threadidx%x - 1) + (blockidx%x -1)  * blockdim%x'
-  SgVarRefExp
-      * setIterRef =
-          buildVarRefExp (
-              (*variable_iterationSet->get_variables ().begin ())->get_name ().getString (),
-              subroutineScope);
+  SgVarRefExp * iterationCounterReference = buildVarRefExp (
+      variable_IterationCounter);
 
-  SgExpression * setIterInitialAssignement = buildAssignOp (setIterRef,
-      buildAddOp (threadIdXMinusOne, blockIdXMinusOnePerBlockDimx));
+  SgExpression * assignmentExpression = buildAssignOp (
+      iterationCounterReference, buildAddOp (subtractExpression2,
+          multiplyExpression));
 
-  appendStatement (buildExprStatement (setIterInitialAssignement),
-      subroutineScope);
+  appendStatement (buildExprStatement (assignmentExpression), subroutineScope);
+
+  /*
+   * ======================================================
+   * Statement to call user device subroutine
+   * ======================================================
+   */
+
+  SgStatement * statement1 = createUserSubroutineCall (userDeviceSubroutine,
+      parallelLoop);
+
+  /*
+   * ======================================================
+   * Statement to increment set iteration counter
+   * ======================================================
+   */
+
+  SgExpression * gridDimXExpression =
+      buildDotExp (variable_GridDim, variable_X);
+
+  SgMultiplyOp * multiplyExpression2 = buildMultiplyOp (blockDimX,
+      gridDimXExpression);
+
+  SgAddOp * addExpression = buildAddOp (iterationCounterReference,
+      multiplyExpression2);
+
+  SgAssignOp * assignmentExpression2 = buildAssignOp (
+      iterationCounterReference, addExpression);
+
+  SgExprStatement * statement2 = buildExprStatement (assignmentExpression2);
 
   /*
    * ======================================================
@@ -69,63 +148,19 @@ KernelSubroutineOfDirectLoop::createStatements (
    * ======================================================
    */
 
-  SgFunctionRefExp * userKernelRefExp = buildFunctionRefExp (
-      userDeviceSubroutine.getSubroutineName (), subroutineScope->get_scope ());
+  SgBasicBlock * loopBody = buildBasicBlock (statement1, statement2);
 
-  // 2. build parameters: q(setIter * dim:setIter * dim + dim - 1), qold(setIter * dim:setIter*dim + dim - 1)
-  // dim is obtained from the previous parsing
-  SgExprListExp * userKernelParams =
-      createActualParametersForUserDeviceSubroutine (setIterRef,
-          subroutineScope, op2ParallelLoop);
+  SgVarRefExp * setSizeFormalArgumentReference = buildVarRefExp (
+      formalParameter_setSize);
 
-  // 3. build call
-  SgFunctionCallExp * userKernelCall = buildFunctionCallExp (userKernelRefExp,
-      userKernelParams);
+  SgExpression * loopGuard = buildLessThanOp (iterationCounterReference,
+      setSizeFormalArgumentReference);
 
-  // 4. build corresponding statement
-  SgExprStatement * userKernelCallStmt = buildExprStatement (userKernelCall);
+  SgWhileStmt * whileStatement = buildWhileStmt (loopGuard, loopBody);
 
-  // build set iteration variable increment: setIter = setIter + blockdim%x * griddim%x
-  // (we are only missing griddim%x)
-  SgExpression * gridDimXAcc = buildDotExp (variable_GridDim, variable_X);
+  whileStatement->set_has_end_statement (true);
 
-  // build multiplication: blockdim%x * griddim%x
-  SgExpression * blockDimMult = buildMultiplyOp (blockDimX, gridDimXAcc);
-
-  // build sum: setIter + blockdim%x * griddim%x
-  SgExpression * sumIterPlusBlockGridX = buildAddOp (setIterRef, blockDimMult);
-
-  // build assignment: setIter = setIter + blockdim%x * griddim%x
-  SgExpression * setIterUpdate = buildAssignOp (setIterRef,
-      sumIterPlusBlockGridX);
-
-  // 4. build corresponding statement
-  SgExprStatement * setIterUpdateStmt = buildExprStatement (setIterUpdate);
-
-  SgBasicBlock * doWhileBlock = buildBasicBlock (userKernelCallStmt,
-      setIterUpdateStmt);
-
-  // Build do while statement (do while ( setIter < setsize ))
-
-  // building reference to setsize parameter
-  SgVarRefExp
-      * setSizeFormalParRef =
-          buildVarRefExp (
-              (*formalParameter_setSize->get_variables ().begin ())->get_name ().getString (),
-              subroutineScope);
-
-  // build do-while guard
-  SgExpression * inequalityExp = buildLessThanOp (setIterRef,
-      setSizeFormalParRef);
-
-  // build do-while statement
-  SgWhileStmt * setWhileStmt = buildWhileStmt (inequalityExp, doWhileBlock);
-
-  // we need to set the end do statement, because the unparse is not able to infer it automatically
-  setWhileStmt->set_has_end_statement (true);
-
-  // append do-while statement
-  appendStatement (setWhileStmt, subroutineScope);
+  appendStatement (whileStatement, subroutineScope);
 }
 
 void
@@ -136,13 +171,13 @@ KernelSubroutineOfDirectLoop::createLocalVariables ()
   using SageBuilder::buildIntType;
   using SageInterface::appendStatement;
 
-  variable_iterationSet = buildVariableDeclaration ("setIter", buildIntType (),
-      NULL, subroutineScope);
+  variable_IterationCounter = buildVariableDeclaration ("setIter",
+      buildIntType (), NULL, subroutineScope);
 
-  variable_iterationSet->get_declarationModifier ().get_typeModifier ().setDevice ();
-  variable_iterationSet->get_declarationModifier ().get_accessModifier ().setUndefined ();
+  variable_IterationCounter->get_declarationModifier ().get_typeModifier ().setDevice ();
+  variable_IterationCounter->get_declarationModifier ().get_accessModifier ().setUndefined ();
 
-  appendStatement (variable_iterationSet, subroutineScope);
+  appendStatement (variable_IterationCounter, subroutineScope);
 
   /*
    * ======================================================
@@ -152,11 +187,136 @@ KernelSubroutineOfDirectLoop::createLocalVariables ()
    * by ROSE
    * ======================================================
    */
+
   variable_Threadidx = buildOpaqueVarRefExp ("threadidx", subroutineScope);
   variable_X = buildOpaqueVarRefExp ("x", subroutineScope);
   variable_Blockidx = buildOpaqueVarRefExp ("blockidx", subroutineScope);
   variable_Blockdim = buildOpaqueVarRefExp ("blockdim", subroutineScope);
   variable_GridDim = buildOpaqueVarRefExp ("griddim", subroutineScope);
+}
+
+void
+KernelSubroutineOfDirectLoop::create_OP_DAT_FormalParameters (
+    ParallelLoop & parallelLoop)
+{
+  using boost::lexical_cast;
+  using SageBuilder::buildVariableDeclaration;
+  using SageBuilder::buildMultiplyOp;
+  using SageBuilder::buildSubtractOp;
+  using SageBuilder::buildIntVal;
+  using SageBuilder::buildVarRefExp;
+  using SageBuilder::buildArrayType;
+  using SageBuilder::buildExprListExp;
+  using SageInterface::appendStatement;
+  using std::string;
+  using std::map;
+
+  Debug::getInstance ()->debugMessage ("Creating OP_DAT formal parameters", 2);
+
+  for (unsigned int i = 1; i
+      <= parallelLoop.getNumberOf_OP_DAT_ArgumentGroups (); ++i)
+  {
+    if (parallelLoop.isDuplicate_OP_DAT (i) == false)
+    {
+      /*
+       * ======================================================
+       * Obtain the base type of the OP_DAT argument.
+       * The base type is almost always an array
+       * ======================================================
+       */
+
+      SgType * opDatBaseType = parallelLoop.get_OP_DAT_Type (i);
+
+      SgArrayType * isArrayType = isSgArrayType (opDatBaseType);
+
+      ROSE_ASSERT (isArrayType != NULL);
+
+      opDatBaseType = isArrayType->get_base_type ();
+
+      /*
+       * ======================================================
+       * Build the upper bound of the OP_DAT array which
+       * is: (size of OP_SET) * (dimension of OP_DAT) - 1.
+       * The term (dimension of OP_DAT) is currently assumed to be
+       * a constant
+       * ======================================================
+       */
+
+      SgIntVal * dimensionOfOP_DAT = buildIntVal (
+          parallelLoop.get_OP_DAT_Dimension (i));
+
+      SgMultiplyOp * multiplyExpression = buildMultiplyOp (buildVarRefExp (
+          formalParameter_setSize), dimensionOfOP_DAT);
+
+      SgExpression * minusOneExpression = buildSubtractOp (multiplyExpression,
+          buildIntVal (1));
+
+      SgSubscriptExpression * arraySubscriptExpression =
+          new SgSubscriptExpression (ROSEHelper::getFileInfo (),
+              buildIntVal (0), minusOneExpression, buildIntVal (1));
+
+      arraySubscriptExpression->set_endOfConstruct (ROSEHelper::getFileInfo ());
+      arraySubscriptExpression->setCompilerGenerated ();
+      arraySubscriptExpression->setOutputInCodeGeneration ();
+
+      /*
+       * ======================================================
+       * Build array type with the correct subscript
+       * ======================================================
+       */
+
+      SgArrayType * arrayType = buildArrayType (opDatBaseType,
+          arraySubscriptExpression);
+
+      arrayType->set_rank (1);
+
+      arrayType->set_dim_info (buildExprListExp (arraySubscriptExpression));
+
+      /*
+       * ======================================================
+       * Build the variable declaration
+       * ======================================================
+       */
+
+      string const & variableName = "argument" + lexical_cast <string> (i);
+
+      SgVariableDeclaration * opDatFormalParameter = buildVariableDeclaration (
+          variableName, arrayType, NULL, subroutineScope);
+
+      formalParameters->append_arg (
+          *(opDatFormalParameter->get_variables ().begin ()));
+
+      opDatFormalParameter->get_declarationModifier ().get_typeModifier ().setIntent_in ();
+      opDatFormalParameter->get_declarationModifier ().get_typeModifier ().setDevice ();
+      opDatFormalParameter->get_declarationModifier ().get_accessModifier ().setUndefined ();
+
+      appendStatement (opDatFormalParameter, subroutineScope);
+
+      formalParameter_OP_DATs[i] = opDatFormalParameter;
+    }
+  }
+}
+
+void
+KernelSubroutineOfDirectLoop::createSetSizeFormalParameter ()
+{
+  using SageBuilder::buildVariableDeclaration;
+  using SageBuilder::buildIntType;
+  using SageInterface::appendStatement;
+
+  Debug::getInstance ()->debugMessage ("Creating OP_SET size formal parameter",
+      2);
+
+  formalParameter_setSize = buildVariableDeclaration ("setSize",
+      buildIntType (), NULL, subroutineScope);
+
+  formalParameter_setSize->get_declarationModifier ().get_accessModifier ().setUndefined ();
+  formalParameter_setSize->get_declarationModifier ().get_typeModifier ().setValue ();
+
+  formalParameters->append_arg (
+      *(formalParameter_setSize->get_variables ().begin ()));
+
+  appendStatement (formalParameter_setSize, subroutineScope);
 }
 
 /*
@@ -167,18 +327,15 @@ KernelSubroutineOfDirectLoop::createLocalVariables ()
 
 KernelSubroutineOfDirectLoop::KernelSubroutineOfDirectLoop (
     std::string const & subroutineName,
-    UserDeviceSubroutine & userDeviceSubroutine,
-    ParallelLoop & op2ParallelLoop, SgScopeStatement * moduleScope) :
+    UserDeviceSubroutine & userDeviceSubroutine, ParallelLoop & ParallelLoop,
+    SgScopeStatement * moduleScope) :
   KernelSubroutine (subroutineName)
 {
-  using SageBuilder::buildVariableDeclaration;
   using SageBuilder::buildProcedureHeaderStatement;
   using SageBuilder::buildVoidType;
   using SageBuilder::buildFunctionParameterList;
   using SageInterface::appendStatement;
   using SageInterface::addTextForUnparser;
-  using std::string;
-  using std::vector;
 
   formalParameters = buildFunctionParameterList ();
 
@@ -193,9 +350,11 @@ KernelSubroutineOfDirectLoop::KernelSubroutineOfDirectLoop (
 
   subroutineScope = subroutineHeaderStatement->get_definition ()->get_body ();
 
-  createFormalParameters (op2ParallelLoop);
+  createSetSizeFormalParameter ();
+
+  create_OP_DAT_FormalParameters (ParallelLoop);
 
   createLocalVariables ();
 
-  createStatements (userDeviceSubroutine, op2ParallelLoop);
+  createStatements (userDeviceSubroutine, ParallelLoop);
 }

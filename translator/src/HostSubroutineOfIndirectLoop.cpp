@@ -1,9 +1,10 @@
 #include <boost/lexical_cast.hpp>
+#include <Debug.h>
 #include <HostSubroutineOfIndirectLoop.h>
 #include <FortranTypesBuilder.h>
 #include <FortranStatementsAndExpressionsBuilder.h>
+#include <OP2CommonDefinitions.h>
 #include <ROSEHelper.h>
-#include <Debug.h>
 
 /*
  * ======================================================
@@ -138,6 +139,75 @@ HostSubroutineOfIndirectLoop::createExecutionPlanExecutionStatements (
 
   SgExprListExp * kernelParameters = buildExprListExp ();
 
+  SgVarRefExp * argsSizesReference = buildVarRefExp (
+      localVariables_Others[IndirectLoopVariables::argsSizes]);
+
+  kernelParameters->append_expression (argsSizesReference);
+
+  for (unsigned int i = 1; i
+      <= parallelLoop.getNumberOf_OP_DAT_ArgumentGroups (); ++i)
+  {
+    if (parallelLoop.isDuplicate_OP_DAT (i) == false)
+    {
+      SgVarRefExp * OP_DAT_argumentReference = buildVarRefExp (
+          localVariables_OP_DAT_VariablesOnDevice[i]);
+
+      kernelParameters->append_expression (OP_DAT_argumentReference);
+    }
+  }
+
+  for (unsigned int i = 1; i
+      <= parallelLoop.getNumberOf_OP_DAT_ArgumentGroups (); ++i)
+  {
+    if (parallelLoop.get_OP_MAP_Value (i) == INDIRECT)
+    {
+      SgVarRefExp * OP_MAP_argumentReference = buildVarRefExp (
+          localVariables_ExecutionPlan_OP_MAP[i]);
+
+      kernelParameters->append_expression (OP_MAP_argumentReference);
+    }
+  }
+
+  SgVarRefExp * pindSizesReference = buildVarRefExp (
+      localVariables_Others[PlanFunctionVariables::pindSizes]);
+
+  kernelParameters->append_expression (pindSizesReference);
+
+  SgVarRefExp * pindOffsReference = buildVarRefExp (
+      localVariables_Others[PlanFunctionVariables::pindOffs]);
+
+  kernelParameters->append_expression (pindOffsReference);
+
+  SgVarRefExp * blockOffsetReference = buildVarRefExp (
+      localVariables_Others[variableName_blockOffset]);
+
+  kernelParameters->append_expression (blockOffsetReference);
+
+  SgVarRefExp * pblkMapReference = buildVarRefExp (
+      localVariables_Others[PlanFunctionVariables::pblkMap]);
+
+  kernelParameters->append_expression (pblkMapReference);
+
+  SgVarRefExp * poffsetReference = buildVarRefExp (
+      localVariables_Others[PlanFunctionVariables::poffset]);
+
+  kernelParameters->append_expression (poffsetReference);
+
+  SgVarRefExp * pnelemsReference = buildVarRefExp (
+      localVariables_Others[PlanFunctionVariables::pnelems]);
+
+  kernelParameters->append_expression (pnelemsReference);
+
+  SgVarRefExp * pnthrcolReference = buildVarRefExp (
+      localVariables_Others[PlanFunctionVariables::pnthrcol]);
+
+  kernelParameters->append_expression (pnthrcolReference);
+
+  SgVarRefExp * pthrcolReference = buildVarRefExp (
+      localVariables_Others[PlanFunctionVariables::pthrcol]);
+
+  kernelParameters->append_expression (pthrcolReference);
+
   SgExprStatement * statement4 = buildFunctionCallStmt (
       kernelSubroutine.getSubroutineName () + "<<<"
           + ROSEHelper::getFirstVariableName (CUDAVariable_blocksPerGrid)
@@ -170,9 +240,6 @@ HostSubroutineOfIndirectLoop::createExecutionPlanExecutionStatements (
    * Statement to increment the block offset
    * ======================================================
    */
-
-  SgVarRefExp * blockOffsetReference = buildVarRefExp (
-      localVariables_Others[variableName_blockOffset]);
 
   SgAddOp * incrementExpression = buildAddOp (blockOffsetReference,
       blocksPerGridReference);
@@ -267,58 +334,58 @@ HostSubroutineOfIndirectLoop::createPlanCToForttranPointerConversionStatements (
       formalParameter_OP_SET);
 
   SgVarRefExp * pblkMapReference = buildVarRefExp (
-      localVariables_Others[variableName_pblkMap]);
+      localVariables_Others[PlanFunctionVariables::pblkMap]);
 
   SgVarRefExp * pblkMapSizeReference = buildVarRefExp (
-      localVariables_Others[variableName_pblkMapSize]);
+      localVariables_Others[PlanFunctionVariables::pblkMapSize]);
 
   SgVarRefExp * planRetReference = buildVarRefExp (
       localVariables_Others[variableName_planRet]);
 
   SgVarRefExp * pmapsReference = buildVarRefExp (
-      localVariables_Others[variableName_pmaps]);
+      localVariables_Others[PlanFunctionVariables::pmaps]);
 
   SgVarRefExp * pnindirectReference = buildVarRefExp (
-      localVariables_Others[variableName_pnindirect]);
+      localVariables_Others[PlanFunctionVariables::pnindirect]);
 
   SgVarRefExp * pindMapsReference = buildVarRefExp (
-      localVariables_Others[variableName_pindMaps]);
+      localVariables_Others[PlanFunctionVariables::pindMaps]);
 
   SgVarRefExp * pindSizesReference = buildVarRefExp (
-      localVariables_Others[variableName_pindSizes]);
+      localVariables_Others[PlanFunctionVariables::pindSizes]);
 
   SgVarRefExp * pindSizesSizeReference = buildVarRefExp (
-      localVariables_Others[variableName_pindSizesSize]);
+      localVariables_Others[PlanFunctionVariables::pindSizesSize]);
 
   SgVarRefExp * pindOffsReference = buildVarRefExp (
-      localVariables_Others[variableName_pindOffs]);
+      localVariables_Others[PlanFunctionVariables::pindOffs]);
 
   SgVarRefExp * pindOffsSizeReference = buildVarRefExp (
-      localVariables_Others[variableName_pindOffsSize]);
+      localVariables_Others[PlanFunctionVariables::pindOffsSize]);
 
   SgVarRefExp * pnelemsReference = buildVarRefExp (
-      localVariables_Others[variableName_pnelems]);
+      localVariables_Others[PlanFunctionVariables::pnelems]);
 
   SgVarRefExp * pnelemsSizeReference = buildVarRefExp (
-      localVariables_Others[variableName_pnelemsSize]);
+      localVariables_Others[PlanFunctionVariables::pnelemsSize]);
 
   SgVarRefExp * pnthrcolReference = buildVarRefExp (
-      localVariables_Others[variableName_pnthrcol]);
+      localVariables_Others[PlanFunctionVariables::pnthrcol]);
 
   SgVarRefExp * pnthrcolSizeReference = buildVarRefExp (
-      localVariables_Others[variableName_pnthrcolSize]);
+      localVariables_Others[PlanFunctionVariables::pnthrcolSize]);
 
   SgVarRefExp * poffsetReference = buildVarRefExp (
-      localVariables_Others[variableName_poffset]);
+      localVariables_Others[PlanFunctionVariables::poffset]);
 
   SgVarRefExp * poffsetSizeReference = buildVarRefExp (
-      localVariables_Others[variableName_poffsetSize]);
+      localVariables_Others[PlanFunctionVariables::poffsetSize]);
 
   SgVarRefExp * pthrcolReference = buildVarRefExp (
-      localVariables_Others[variableName_pthrcol]);
+      localVariables_Others[PlanFunctionVariables::pthrcol]);
 
   SgVarRefExp * pthrcolSizeReference = buildVarRefExp (
-      localVariables_Others[variableName_pthrcolSize]);
+      localVariables_Others[PlanFunctionVariables::pthrcolSize]);
 
   /*
    * ======================================================
@@ -466,74 +533,79 @@ HostSubroutineOfIndirectLoop::createPlanCToForttranPointerConversionStatements (
    * ======================================================
    */
 
-  for (map <unsigned int, SgVariableDeclaration *>::const_iterator it =
-      localVariables_ExecutionPlan_OP_MAP_Size.begin (); it
-      != localVariables_ExecutionPlan_OP_MAP_Size.end (); ++it)
+  for (unsigned int i = 1; i
+      <= parallelLoop.getNumberOf_OP_DAT_ArgumentGroups (); ++i)
   {
-    /*
-     * ======================================================
-     * Build the guard of the if statement
-     * ======================================================
-     */
+    if (parallelLoop.get_OP_MAP_Value (i) == INDIRECT)
+    {
+      /*
+       * ======================================================
+       * Build the guard of the if statement
+       * ======================================================
+       */
 
-    SgExpression * indexExpression = buildIntVal (it->first);
+      SgExpression * indexExpression = buildIntVal (i);
 
-    SgExpression * arrayIndexExpression = buildPntrArrRefExp (indsReference,
-        indexExpression);
+      SgExpression * arrayIndexExpression = buildPntrArrRefExp (indsReference,
+          indexExpression);
 
-    SgExpression * ifGuardExpression = buildGreaterOrEqualOp (
-        arrayIndexExpression, buildIntVal (0));
+      SgExpression * ifGuardExpression = buildGreaterOrEqualOp (
+          arrayIndexExpression, buildIntVal (0));
 
-    /*
-     * ======================================================
-     * Build the body of the if statement
-     * ======================================================
-     */
+      /*
+       * ======================================================
+       * Build the body of the if statement
+       * ======================================================
+       */
 
-    /*
-     * ======================================================
-     * 1st statement
-     * ======================================================
-     */
+      /*
+       * ======================================================
+       * 1st statement
+       * ======================================================
+       */
 
-    SgExpression * expression1 = buildAssignOp (buildVarRefExp (it->second),
-        buildDotExp (opSetFormalArgumentReference, size_Reference));
+      SgExpression * expression1 = buildAssignOp (buildVarRefExp (
+          localVariables_ExecutionPlan_OP_MAP_Size[i]), buildDotExp (
+          opSetFormalArgumentReference, size_Reference));
 
-    SgStatement * statement1 = buildExprStatement (expression1);
+      SgStatement * statement1 = buildExprStatement (expression1);
 
-    /*
-     * ======================================================
-     * 2nd statement
-     * ======================================================
-     */
+      /*
+       * ======================================================
+       * 2nd statement
+       * ======================================================
+       */
 
-    indexExpression = buildIntVal (it->first);
+      indexExpression = buildIntVal (i);
 
-    arrayIndexExpression = buildPntrArrRefExp (mapsReference, indexExpression);
+      arrayIndexExpression
+          = buildPntrArrRefExp (mapsReference, indexExpression);
 
-    SgVarRefExp * executionPlanMapReference = buildVarRefExp (
-        localVariables_ExecutionPlan_OP_MAP[it->first]);
+      SgVarRefExp * executionPlanMapReference = buildVarRefExp (
+          localVariables_ExecutionPlan_OP_MAP[i]);
 
-    SgExpression * shapeExpression =
-        FortranStatementsAndExpressionsBuilder::buildShapeExpression (
-            it->second, subroutineScope);
+      SgExpression * shapeExpression =
+          FortranStatementsAndExpressionsBuilder::buildShapeExpression (
+              localVariables_ExecutionPlan_OP_MAP_Size[i], subroutineScope);
 
-    SgStatement * statement2 = createCallToC_F_POINTER (arrayIndexExpression,
-        executionPlanMapReference, shapeExpression);
+      SgStatement * statement2 = createCallToC_F_POINTER (arrayIndexExpression,
+          executionPlanMapReference, shapeExpression);
 
-    /*
-     * ======================================================
-     * Add the if statement with a NULL else block
-     * ======================================================
-     */
+      /*
+       * ======================================================
+       * Add the if statement with a NULL else block
+       * ======================================================
+       */
 
-    SgBasicBlock * ifBlock = buildBasicBlock (statement1, statement2);
+      SgBasicBlock * ifBlock = buildBasicBlock (statement1, statement2);
 
-    SgIfStmt * ifStatement =
-        FortranStatementsAndExpressionsBuilder::buildIfStatementWithEmptyElse (
-            ifGuardExpression, ifBlock);
+      SgIfStmt
+          * ifStatement =
+              FortranStatementsAndExpressionsBuilder::buildIfStatementWithEmptyElse (
+                  ifGuardExpression, ifBlock);
 
-    appendStatement (ifStatement, subroutineScope);
+      appendStatement (ifStatement, subroutineScope);
+    }
   }
 
   /*
@@ -564,7 +636,8 @@ HostSubroutineOfIndirectLoop::createPlanCToForttranPointerConversionStatements (
   callStatement = createCallToC_F_POINTER (buildDotExp (actualPlanReference,
       ind_sizes_Reference), pindSizesReference,
       FortranStatementsAndExpressionsBuilder::buildShapeExpression (
-          localVariables_Others[variableName_pindSizesSize], subroutineScope));
+          localVariables_Others[PlanFunctionVariables::pindSizesSize],
+          subroutineScope));
 
   appendStatement (callStatement, subroutineScope);
 
@@ -575,14 +648,15 @@ HostSubroutineOfIndirectLoop::createPlanCToForttranPointerConversionStatements (
    */
 
   assignmentExpression = buildAssignOp (pindOffsSizeReference, buildVarRefExp (
-      localVariables_Others[variableName_pindSizesSize]));
+      localVariables_Others[PlanFunctionVariables::pindSizesSize]));
 
   appendStatement (buildExprStatement (assignmentExpression), subroutineScope);
 
   callStatement = createCallToC_F_POINTER (buildDotExp (actualPlanReference,
       ind_offs_Reference), pindOffsReference,
       FortranStatementsAndExpressionsBuilder::buildShapeExpression (
-          localVariables_Others[variableName_pindOffsSize], subroutineScope));
+          localVariables_Others[PlanFunctionVariables::pindOffsSize],
+          subroutineScope));
 
   appendStatement (callStatement, subroutineScope);
 
@@ -600,7 +674,8 @@ HostSubroutineOfIndirectLoop::createPlanCToForttranPointerConversionStatements (
   callStatement = createCallToC_F_POINTER (buildDotExp (actualPlanReference,
       blkmap_Reference), pblkMapReference,
       FortranStatementsAndExpressionsBuilder::buildShapeExpression (
-          localVariables_Others[variableName_pblkMapSize], subroutineScope));
+          localVariables_Others[PlanFunctionVariables::pblkMapSize],
+          subroutineScope));
 
   appendStatement (callStatement, subroutineScope);
 
@@ -618,7 +693,8 @@ HostSubroutineOfIndirectLoop::createPlanCToForttranPointerConversionStatements (
   callStatement = createCallToC_F_POINTER (buildDotExp (actualPlanReference,
       offset_Reference), poffsetReference,
       FortranStatementsAndExpressionsBuilder::buildShapeExpression (
-          localVariables_Others[variableName_poffsetSize], subroutineScope));
+          localVariables_Others[PlanFunctionVariables::poffsetSize],
+          subroutineScope));
 
   appendStatement (callStatement, subroutineScope);
 
@@ -636,7 +712,8 @@ HostSubroutineOfIndirectLoop::createPlanCToForttranPointerConversionStatements (
   callStatement = createCallToC_F_POINTER (buildDotExp (actualPlanReference,
       nelems_Reference), pnelemsReference,
       FortranStatementsAndExpressionsBuilder::buildShapeExpression (
-          localVariables_Others[variableName_pnelemsSize], subroutineScope));
+          localVariables_Others[PlanFunctionVariables::pnelemsSize],
+          subroutineScope));
 
   appendStatement (callStatement, subroutineScope);
 
@@ -654,7 +731,8 @@ HostSubroutineOfIndirectLoop::createPlanCToForttranPointerConversionStatements (
   callStatement = createCallToC_F_POINTER (buildDotExp (actualPlanReference,
       nthrcol_Reference), pnthrcolReference,
       FortranStatementsAndExpressionsBuilder::buildShapeExpression (
-          localVariables_Others[variableName_pnthrcolSize], subroutineScope));
+          localVariables_Others[PlanFunctionVariables::pnthrcolSize],
+          subroutineScope));
 
   appendStatement (callStatement, subroutineScope);
 
@@ -672,7 +750,8 @@ HostSubroutineOfIndirectLoop::createPlanCToForttranPointerConversionStatements (
   callStatement = createCallToC_F_POINTER (buildDotExp (actualPlanReference,
       thrcol_Reference), pthrcolReference,
       FortranStatementsAndExpressionsBuilder::buildShapeExpression (
-          localVariables_Others[variableName_pthrcolSize], subroutineScope));
+          localVariables_Others[PlanFunctionVariables::pthrcolSize],
+          subroutineScope));
 
   appendStatement (callStatement, subroutineScope);
 }
@@ -687,7 +766,6 @@ HostSubroutineOfIndirectLoop::createPlanFunctionCallStatement ()
   using SageBuilder::buildExprStatement;
   using SageInterface::appendStatement;
   using std::map;
-  using std::make_pair;
   using std::string;
 
   SgVarRefExp * parameter1 = buildVarRefExp (formalParameter_SubroutineName);
@@ -977,6 +1055,7 @@ HostSubroutineOfIndirectLoop::createExecutionPlanStatements (
 
 void
 HostSubroutineOfIndirectLoop::createExecutionPlanLocalVariables (
+    DeviceDataSizesDeclaration & deviceDataSizesDeclaration,
     ParallelLoop & parallelLoop)
 {
   using boost::lexical_cast;
@@ -985,10 +1064,24 @@ HostSubroutineOfIndirectLoop::createExecutionPlanLocalVariables (
   using SageInterface::appendStatement;
   using std::map;
   using std::string;
-  using std::make_pair;
   using std::vector;
 
   Debug::getInstance ()->debugMessage ("Creating execution plan variables", 2);
+
+  /*
+   * ======================================================
+   * Create the variable which passes the sizes of arguments
+   * to the kernel
+   * ======================================================
+   */
+
+  SgVariableDeclaration * variableDeclaration2 =
+      FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
+          IndirectLoopVariables::argsSizes,
+          deviceDataSizesDeclaration.getType (), subroutineScope);
+
+  localVariables_Others[IndirectLoopVariables::argsSizes]
+      = variableDeclaration2;
 
   /*
    * ======================================================
@@ -1004,8 +1097,7 @@ HostSubroutineOfIndirectLoop::createExecutionPlanLocalVariables (
       FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
           variableName_planRet, c_ptrType, subroutineScope);
 
-  localVariables_Others.insert (make_pair (variableName_planRet,
-      variableDeclaration));
+  localVariables_Others[variableName_planRet] = variableDeclaration;
 
   SgType * op_planType = FortranTypesBuilder::buildNewTypeDeclaration (
       "op_plan", subroutineScope)->get_type ();
@@ -1014,8 +1106,8 @@ HostSubroutineOfIndirectLoop::createExecutionPlanLocalVariables (
       FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
           variableName_actualPlan, op_planType, subroutineScope);
 
-  localVariables_Others.insert (make_pair (variableName_actualPlan,
-      variableDeclaration_ExecutionPlan_FortranPointer));
+  localVariables_Others[variableName_actualPlan]
+      = variableDeclaration_ExecutionPlan_FortranPointer;
 
   /*
    * ======================================================
@@ -1028,31 +1120,29 @@ HostSubroutineOfIndirectLoop::createExecutionPlanLocalVariables (
 
   variableDeclaration
       = FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
-          variableName_pindMaps,
+          PlanFunctionVariables::pindMaps,
           buildPointerType (FortranTypesBuilder::getArray_RankOne (
               c_devptrType, 1,
               parallelLoop.getNumberOfDistinctIndirect_OP_DAT_Arguments ())),
           subroutineScope);
 
-  localVariables_Others.insert (make_pair (variableName_pindMaps,
-      variableDeclaration));
+  localVariables_Others[PlanFunctionVariables::pindMaps] = variableDeclaration;
 
   variableDeclaration
       = FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
-          variableName_pmaps, buildPointerType (
+          PlanFunctionVariables::pmaps, buildPointerType (
               FortranTypesBuilder::getArray_RankOne (c_devptrType)),
           subroutineScope);
 
-  localVariables_Others.insert (make_pair (variableName_pmaps,
-      variableDeclaration));
+  localVariables_Others[PlanFunctionVariables::pmaps] = variableDeclaration;
 
   variableDeclaration
       = FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
-          variableName_pindMapsSize,
+          PlanFunctionVariables::pindMapsSize,
           FortranTypesBuilder::getFourByteInteger (), subroutineScope);
 
-  localVariables_Others.insert (make_pair (variableName_pindMapsSize,
-      variableDeclaration));
+  localVariables_Others[PlanFunctionVariables::pindMapsSize]
+      = variableDeclaration;
 
   for (unsigned int i = 1; i
       <= parallelLoop.getNumberOf_OP_DAT_ArgumentGroups (); ++i)
@@ -1070,8 +1160,7 @@ HostSubroutineOfIndirectLoop::createExecutionPlanLocalVariables (
       variableDeclaration->get_declarationModifier ().get_typeModifier ().setDevice ();
       variableDeclaration->get_declarationModifier ().get_typeModifier ().setAllocatable ();
 
-      localVariables_ExecutionPlan_IndirectMaps.insert (make_pair (i,
-          variableDeclaration));
+      localVariables_ExecutionPlan_IndirectMaps[i] = variableDeclaration;
     }
   }
 
@@ -1089,8 +1178,7 @@ HostSubroutineOfIndirectLoop::createExecutionPlanLocalVariables (
               variableName, FortranTypesBuilder::getFourByteInteger (),
               subroutineScope);
 
-      localVariables_ExecutionPlan_IndirectMaps_Size.insert (make_pair (i,
-          variableDeclaration));
+      localVariables_ExecutionPlan_IndirectMaps_Size[i] = variableDeclaration;
     }
   }
 
@@ -1125,7 +1213,7 @@ HostSubroutineOfIndirectLoop::createExecutionPlanLocalVariables (
                 parallelLoop.getNumberOf_OP_DAT_ArgumentGroups ()),
             subroutineScope);
 
-    localVariables_Others.insert (make_pair (*it, variableDeclaration));
+    localVariables_Others[*it] = variableDeclaration;
   }
 
   /*
@@ -1149,8 +1237,7 @@ HostSubroutineOfIndirectLoop::createExecutionPlanLocalVariables (
       variableDeclaration->get_declarationModifier ().get_typeModifier ().setDevice ();
       variableDeclaration->get_declarationModifier ().get_typeModifier ().setAllocatable ();
 
-      localVariables_ExecutionPlan_OP_DAT.insert (make_pair (i,
-          variableDeclaration));
+      localVariables_ExecutionPlan_OP_DAT[i] = variableDeclaration;
     }
   }
 
@@ -1174,8 +1261,7 @@ HostSubroutineOfIndirectLoop::createExecutionPlanLocalVariables (
               variableName, FortranTypesBuilder::getFourByteInteger (),
               subroutineScope);
 
-      localVariables_ExecutionPlan_OP_DAT_Size.insert (make_pair (i,
-          variableDeclaration));
+      localVariables_ExecutionPlan_OP_DAT_Size[i] = variableDeclaration;
     }
   }
 
@@ -1188,18 +1274,20 @@ HostSubroutineOfIndirectLoop::createExecutionPlanLocalVariables (
   for (unsigned int i = 1; i
       <= parallelLoop.getNumberOf_OP_DAT_ArgumentGroups (); ++i)
   {
-    string const variableName = "pMaps" + lexical_cast <string> (i);
+    if (parallelLoop.get_OP_MAP_Value (i) == INDIRECT)
+    {
+      string const variableName = "pMaps" + lexical_cast <string> (i);
 
-    SgVariableDeclaration * variableDeclaration =
-        FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
-            variableName, FortranTypesBuilder::getArray_RankOne (
-                FortranTypesBuilder::getTwoByteInteger ()), subroutineScope);
+      SgVariableDeclaration * variableDeclaration =
+          FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
+              variableName, FortranTypesBuilder::getArray_RankOne (
+                  FortranTypesBuilder::getTwoByteInteger ()), subroutineScope);
 
-    variableDeclaration->get_declarationModifier ().get_typeModifier ().setDevice ();
-    variableDeclaration->get_declarationModifier ().get_typeModifier ().setAllocatable ();
+      variableDeclaration->get_declarationModifier ().get_typeModifier ().setDevice ();
+      variableDeclaration->get_declarationModifier ().get_typeModifier ().setAllocatable ();
 
-    localVariables_ExecutionPlan_OP_MAP.insert (make_pair (i,
-        variableDeclaration));
+      localVariables_ExecutionPlan_OP_MAP[i] = variableDeclaration;
+    }
   }
 
   /*
@@ -1211,15 +1299,17 @@ HostSubroutineOfIndirectLoop::createExecutionPlanLocalVariables (
   for (unsigned int i = 1; i
       <= parallelLoop.getNumberOf_OP_DAT_ArgumentGroups (); ++i)
   {
-    string const variableName = "pMaps" + lexical_cast <string> (i) + "Size";
+    if (parallelLoop.get_OP_MAP_Value (i) == INDIRECT)
+    {
+      string const variableName = "pMaps" + lexical_cast <string> (i) + "Size";
 
-    SgVariableDeclaration * variableDeclaration =
-        FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
-            variableName, FortranTypesBuilder::getFourByteInteger (),
-            subroutineScope);
+      SgVariableDeclaration * variableDeclaration =
+          FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
+              variableName, FortranTypesBuilder::getFourByteInteger (),
+              subroutineScope);
 
-    localVariables_ExecutionPlan_OP_MAP_Size.insert (make_pair (i,
-        variableDeclaration));
+      localVariables_ExecutionPlan_OP_MAP_Size[i] = variableDeclaration;
+    }
   }
 
   /*
@@ -1239,13 +1329,13 @@ HostSubroutineOfIndirectLoop::createExecutionPlanLocalVariables (
   fourByteIntegerVariables.push_back (variableName_blockOffset);
   fourByteIntegerVariables.push_back (variableName_col);
   fourByteIntegerVariables.push_back (variableName_threadSynchRet);
-  fourByteIntegerVariables.push_back (variableName_pindSizesSize);
-  fourByteIntegerVariables.push_back (variableName_pindOffsSize);
-  fourByteIntegerVariables.push_back (variableName_pblkMapSize);
-  fourByteIntegerVariables.push_back (variableName_poffsetSize);
-  fourByteIntegerVariables.push_back (variableName_pnelemsSize);
-  fourByteIntegerVariables.push_back (variableName_pnthrcolSize);
-  fourByteIntegerVariables.push_back (variableName_pthrcolSize);
+  fourByteIntegerVariables.push_back (PlanFunctionVariables::pindSizesSize);
+  fourByteIntegerVariables.push_back (PlanFunctionVariables::pindOffsSize);
+  fourByteIntegerVariables.push_back (PlanFunctionVariables::pblkMapSize);
+  fourByteIntegerVariables.push_back (PlanFunctionVariables::poffsetSize);
+  fourByteIntegerVariables.push_back (PlanFunctionVariables::pnelemsSize);
+  fourByteIntegerVariables.push_back (PlanFunctionVariables::pnthrcolSize);
+  fourByteIntegerVariables.push_back (PlanFunctionVariables::pthrcolSize);
 
   for (vector <string>::iterator it = fourByteIntegerVariables.begin (); it
       != fourByteIntegerVariables.end (); ++it)
@@ -1255,7 +1345,7 @@ HostSubroutineOfIndirectLoop::createExecutionPlanLocalVariables (
             buildPointerType (FortranTypesBuilder::getFourByteInteger ()),
             subroutineScope);
 
-    localVariables_Others.insert (make_pair (*it, variableDeclaration));
+    localVariables_Others[*it] = variableDeclaration;
   }
 
   /*
@@ -1270,7 +1360,7 @@ HostSubroutineOfIndirectLoop::createExecutionPlanLocalVariables (
   vector <string> integerPointerVariables;
 
   integerPointerVariables.push_back (variableName_ncolblk);
-  integerPointerVariables.push_back (variableName_pnindirect);
+  integerPointerVariables.push_back (PlanFunctionVariables::pnindirect);
 
   for (vector <string>::iterator it = integerPointerVariables.begin (); it
       != integerPointerVariables.end (); ++it)
@@ -1280,7 +1370,7 @@ HostSubroutineOfIndirectLoop::createExecutionPlanLocalVariables (
             buildPointerType (FortranTypesBuilder::getArray_RankOne (
                 FortranTypesBuilder::getFourByteInteger ())), subroutineScope);
 
-    localVariables_Others.insert (make_pair (*it, variableDeclaration));
+    localVariables_Others[*it] = variableDeclaration;
   }
 
   /*
@@ -1294,13 +1384,13 @@ HostSubroutineOfIndirectLoop::createExecutionPlanLocalVariables (
 
   vector <string> deviceIntegerArrayVariables;
 
-  deviceIntegerArrayVariables.push_back (variableName_pindSizes);
-  deviceIntegerArrayVariables.push_back (variableName_pindOffs);
-  deviceIntegerArrayVariables.push_back (variableName_pblkMap);
-  deviceIntegerArrayVariables.push_back (variableName_poffset);
-  deviceIntegerArrayVariables.push_back (variableName_pnelems);
-  deviceIntegerArrayVariables.push_back (variableName_pnthrcol);
-  deviceIntegerArrayVariables.push_back (variableName_pthrcol);
+  deviceIntegerArrayVariables.push_back (PlanFunctionVariables::pindSizes);
+  deviceIntegerArrayVariables.push_back (PlanFunctionVariables::pindOffs);
+  deviceIntegerArrayVariables.push_back (PlanFunctionVariables::pblkMap);
+  deviceIntegerArrayVariables.push_back (PlanFunctionVariables::poffset);
+  deviceIntegerArrayVariables.push_back (PlanFunctionVariables::pnelems);
+  deviceIntegerArrayVariables.push_back (PlanFunctionVariables::pnthrcol);
+  deviceIntegerArrayVariables.push_back (PlanFunctionVariables::pthrcol);
 
   for (vector <string>::iterator it = deviceIntegerArrayVariables.begin (); it
       != deviceIntegerArrayVariables.end (); ++it)
@@ -1313,7 +1403,7 @@ HostSubroutineOfIndirectLoop::createExecutionPlanLocalVariables (
     variableDeclaration->get_declarationModifier ().get_typeModifier ().setDevice ();
     variableDeclaration->get_declarationModifier ().get_typeModifier ().setAllocatable ();
 
-    localVariables_Others.insert (make_pair (*it, variableDeclaration));
+    localVariables_Others[*it] = variableDeclaration;
   }
 }
 
@@ -1340,7 +1430,7 @@ HostSubroutineOfIndirectLoop::HostSubroutineOfIndirectLoop (
 
   createDataMarshallingLocalVariables (parallelLoop);
 
-  createExecutionPlanLocalVariables (parallelLoop);
+  createExecutionPlanLocalVariables (deviceDataSizesDeclaration, parallelLoop);
 
   createCUDAKernelVariables ();
 

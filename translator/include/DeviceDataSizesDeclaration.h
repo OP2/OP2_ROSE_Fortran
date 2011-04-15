@@ -19,22 +19,42 @@
 
 #include<ParallelLoop.h>
 
-namespace DeviceDataSizesFields
-{
-  std::string const pindSizesSize = "pindSizesSize";
-  std::string const pindOffsSize = "pindOffsSize";
-  std::string const pblkMapSize = "pblkMapSize";
-  std::string const poffsetSize = "poffsetSize";
-  std::string const pnelemsSize = "pnelemsSize";
-  std::string const pnthrcolSize = "pnthrcolSize";
-  std::string const pthrcolSize = "pthrcolSize";
-}
-
 class DeviceDataSizesDeclaration
 {
   private:
 
+    /*
+     * ======================================================
+     * The type definition declaration statement
+     * ======================================================
+     */
     SgDerivedTypeStatement * deviceDatatypeStatement;
+
+    /*
+     * ======================================================
+     * A mapping from an OP_DAT argument to its
+     * declaration representing its size. This is a field inside
+     * the above type definition declaration statement
+     * ======================================================
+     */
+    std::map <unsigned int, SgVariableDeclaration *> OP_DAT_Sizes;
+
+    /*
+     * ======================================================
+     * A mapping from an indirect map argument to its
+     * declaration representing its size. This is a field inside
+     * the above type definition declaration statement
+     * ======================================================
+     */
+    std::map <unsigned int, SgVariableDeclaration *> OP_MAP_IndirectSizes;
+
+    /*
+     * ======================================================
+     * A mapping to the other fields inside the above type
+     * definition declaration statement
+     * ======================================================
+     */
+    std::map <std::string, SgVariableDeclaration *> otherFieldDeclarations;
 
   private:
 
@@ -42,6 +62,30 @@ class DeviceDataSizesDeclaration
     addFields (ParallelLoop & parallelLoop, SgScopeStatement * moduleScope);
 
   public:
+
+    SgClassType *
+    getType ()
+    {
+      return deviceDatatypeStatement->get_type ();
+    }
+
+    SgVariableDeclaration *
+    get_OP_DAT_SizeFieldDeclaration (unsigned int OP_DAT_ArgumentGroup)
+    {
+      return OP_DAT_Sizes[OP_DAT_ArgumentGroup];
+    }
+
+    SgVariableDeclaration *
+    get_OP_MAP_IndirectSizeFieldDeclaration (unsigned int OP_DAT_ArgumentGroup)
+    {
+      return OP_MAP_IndirectSizes[OP_DAT_ArgumentGroup];
+    }
+
+    SgVariableDeclaration *
+    get_OP_MAP_IndirectSizeFieldDeclaration (std::string const & fieldName)
+    {
+      return otherFieldDeclarations[fieldName];
+    }
 
     DeviceDataSizesDeclaration (ParallelLoop & parallelLoop,
         std::string const & subroutineName, SgScopeStatement * moduleScope);

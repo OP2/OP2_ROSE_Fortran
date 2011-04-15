@@ -2,6 +2,7 @@
 #include <Debug.h>
 #include <NewSubroutinesGeneration.h>
 #include <FortranTypesBuilder.h>
+#include <ROSEHelper.h>
 #include <UserDeviceSubroutine.h>
 #include <KernelSubroutineOfDirectLoop.h>
 #include <KernelSubroutineOfIndirectLoop.h>
@@ -155,36 +156,16 @@ NewSubroutinesGeneration::patchOP_PAR_LOOPCalls (ParallelLoop & parallelLoop,
   functionCallLocation->get_file_info ()->setTransformation ();
 }
 
-SgScopeStatement *
-NewSubroutinesGeneration::createCUDAModule (SgSourceFile & sourceFile,
-    ParallelLoop & parallelLoop)
+void
+NewSubroutinesGeneration::addLibraries (SgModuleStatement * moduleStatement)
 {
   using std::string;
   using std::vector;
   using SageInterface::appendStatement;
 
-  Debug::getInstance ()->debugMessage ("Creating direct loop CUDA module", 2);
+  Debug::getInstance ()->debugMessage (
+      "Adding 'use' statements to CUDA module", 2);
 
-  SgGlobal * globalScope = sourceFile.get_globalScope ();
-
-  /*
-   * ======================================================
-   * Create the module statement
-   * ======================================================
-   */
-  SgModuleStatement * cudaModule =
-      FortranTypesBuilder::buildNewFortranModuleDeclaration (
-          parallelLoop.getModuleName (), globalScope);
-
-  cudaModule->get_definition ()->setCaseInsensitive (true);
-
-  appendStatement (cudaModule, globalScope);
-
-  /*
-   * ======================================================
-   * Add the 'use' statements of this module
-   * ======================================================
-   */
   vector <string> libs;
   libs.push_back ("ISO_C_BINDING");
   libs.push_back ("OP2_C");
@@ -193,26 +174,48 @@ NewSubroutinesGeneration::createCUDAModule (SgSourceFile & sourceFile,
   for (vector <string>::const_iterator it = libs.begin (); it != libs.end (); ++it)
   {
     SgUseStatement* useStatement = new SgUseStatement (
-        sourceFile.get_file_info (), (*it), false);
-    useStatement->set_definingDeclaration (cudaModule);
-    appendStatement (useStatement, cudaModule->get_definition ());
-  }
+        ROSEHelper::getFileInfo (), *it, false);
 
-  /*
-   * ======================================================
-   * Add the 'contains' statement
-   * ======================================================
-   */
+    useStatement->set_definingDeclaration (moduleStatement);
+
+    appendStatement (useStatement, moduleStatement->get_definition ());
+  }
+}
+
+void
+NewSubroutinesGeneration::addContains (SgModuleStatement * moduleStatement)
+{
+  using SageInterface::appendStatement;
+
   SgContainsStatement * containsStatement = new SgContainsStatement (
-      sourceFile.get_file_info ());
-  containsStatement->set_parent (cudaModule->get_definition ());
+      ROSEHelper::getFileInfo ());
+
   containsStatement->set_definingDeclaration (containsStatement);
 
-  SgDeclarationStatementPtrList & statementList =
-      cudaModule->get_definition ()->getDeclarationList ();
-  statementList.push_back (containsStatement);
+  appendStatement (containsStatement, moduleStatement->get_definition ());
+}
 
-  return containsStatement->get_scope ();
+SgModuleStatement *
+NewSubroutinesGeneration::createCUDAModule (SgSourceFile & sourceFile,
+    ParallelLoop & parallelLoop)
+{
+  using std::string;
+  using std::vector;
+  using SageInterface::appendStatement;
+
+  Debug::getInstance ()->debugMessage ("Creating CUDA module", 2);
+
+  SgGlobal * globalScope = sourceFile.get_globalScope ();
+
+  SgModuleStatement * moduleStatement =
+      FortranTypesBuilder::buildNewFortranModuleDeclaration (
+          parallelLoop.getModuleName (), globalScope);
+
+  moduleStatement->get_definition ()->setCaseInsensitive (true);
+
+  appendStatement (moduleStatement, globalScope);
+
+  return moduleStatement;
 }
 
 SgSourceFile &
@@ -379,8 +382,13 @@ NewSubroutinesGeneration::visit (SgNode * node)
                * Create the CUDA module
                * ======================================================
                */
-              SgScopeStatement * moduleScope = createCUDAModule (sourceFile,
-                  *parallelLoop);
+              SgModuleStatement * moduleStatement = createCUDAModule (
+                  sourceFile, *parallelLoop);
+
+              addLibraries (moduleStatement);
+
+              SgScopeStatement * moduleScope =
+                  moduleStatement->get_definition ();
 
               if (parallelLoop->isDirectLoop ())
               {
@@ -389,6 +397,8 @@ NewSubroutinesGeneration::visit (SgNode * node)
                  * Direct loop
                  * ======================================================
                  */
+
+                addContains (moduleStatement);
 
                 /*
                  * ======================================================
@@ -434,7 +444,7 @@ NewSubroutinesGeneration::visit (SgNode * node)
 
                 DeviceDataSizesDeclaration * deviceDataSizesDeclaration =
                     new DeviceDataSizesDeclaration (*parallelLoop,
-                        userSubroutineName, sourceFile.get_globalScope ());
+                        userSubroutineName, moduleScope);
 
                 /*
                  * ======================================================
@@ -446,11 +456,11 @@ NewSubroutinesGeneration::visit (SgNode * node)
                 InitialiseConstantsSubroutine * initialiseConstantsSubroutine =
                     new InitialiseConstantsSubroutine (userSubroutineName);
 
-                initialiseConstantsSubroutine->declareConstants (
-                    sourceFile.get_globalScope ());
+                initialiseConstantsSubroutine->declareConstants (moduleScope);
 
-                initialiseConstantsSubroutine->generateSubroutine (
-                    moduleScope);
+                addContains (moduleStatement);
+
+                initialiseConstantsSubroutine->generateSubroutine (moduleScope);
 
                 /*
                  * ======================================================
@@ -465,7 +475,8 @@ NewSubroutinesGeneration::visit (SgNode * node)
 
                 KernelSubroutine * kernelSubroutine =
                     new KernelSubroutineOfIndirectLoop (userSubroutineName,
-                        *userDeviceSubroutine, *parallelLoop, moduleScope);
+                        *userDeviceSubroutine, *deviceDataSizesDeclaration,
+                        *parallelLoop, moduleScope);
 
                 HostSubroutine
                     * hostSubroutine =

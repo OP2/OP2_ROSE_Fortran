@@ -41,25 +41,7 @@ namespace
   std::string const variableName_indsNumber = "indsNumber";
   std::string const variableName_maps = "maps";
   std::string const variableName_ncolblk = "ncolblk";
-  std::string const variableName_pblkMapSize = "pblkMapSize";
-  std::string const variableName_pindMaps = "pindMaps";
-  std::string const variableName_pindMapsSize = "pindMapsSize";
-  std::string const variableName_pindOffsSize = "pindOffsSize";
-  std::string const variableName_pindSizesSize = "pindSizesSize";
   std::string const variableName_planRet = "planRet";
-  std::string const variableName_poffsetSize = "poffsetSize";
-  std::string const variableName_pnelemsSize = "pnelemsSize";
-  std::string const variableName_pnthrcolSize = "pnthrcolSize";
-  std::string const variableName_pthrcolSize = "pthrcolSize";
-  std::string const variableName_pnindirect = "pnindirect";
-  std::string const variableName_pindSizes = "pindSizes";
-  std::string const variableName_pindOffs = "pindOffs";
-  std::string const variableName_pblkMap = "pblkMap";
-  std::string const variableName_poffset = "poffset";
-  std::string const variableName_pnelems = "pnelems";
-  std::string const variableName_pnthrcol = "pnthrcol";
-  std::string const variableName_pthrcol = "pthrcol";
-  std::string const variableName_pmaps = "pmaps";
   std::string const variableName_threadSynchRet = "threadSynchRet";
 
   /*
@@ -135,7 +117,9 @@ class HostSubroutineOfIndirectLoop: public HostSubroutine
     createExecutionPlanStatements (ParallelLoop & parallelLoop);
 
     void
-    createExecutionPlanLocalVariables (ParallelLoop & parallelLoop);
+    createExecutionPlanLocalVariables (
+        DeviceDataSizesDeclaration & deviceDataSizesDeclaration,
+        ParallelLoop & parallelLoop);
 
   public:
 

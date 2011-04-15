@@ -9,19 +9,32 @@ class KernelSubroutine: public Subroutine
 {
   protected:
 
-    SgVariableDeclaration * formalParameter_setSize;
+    /*
+     * ======================================================
+     * The OP_DAT formal parameters
+     * ======================================================
+     */
 
-    SgExprListExp *
-    createActualParametersForUserDeviceSubroutine (SgVarRefExp * iterSetVarRef,
-        SgScopeStatement * subroutineScope, ParallelLoop & op2ParallelLoop);
+    std::map <unsigned int, SgVariableDeclaration *> formalParameter_OP_DATs;
 
-    void
-    setUp_OP_DAT_ArgumentTypes (std::vector <SgType *> & opDatArgumentTypes,
-        SgVariableDeclaration * setSizeFormalParameter,
-        ParallelLoop & op2ParallelLoop);
+    /*
+     * ======================================================
+     * The following variables are provided as part of the
+     * CUDA library
+     * ======================================================
+     */
 
-    void
-    createFormalParameters (ParallelLoop & op2ParallelLoop);
+    SgVarRefExp * variable_Threadidx;
+
+    SgVarRefExp * variable_X;
+
+    SgVarRefExp * variable_Blockidx;
+
+    SgVarRefExp * variable_Blockdim;
+
+    SgVarRefExp * variable_GridDim;
+
+  protected:
 
     KernelSubroutine (std::string const & subroutineName) :
       Subroutine (subroutineName + "_kernel")

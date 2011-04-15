@@ -66,6 +66,12 @@ class NewSubroutinesGeneration: public AstSimpleProcessing
 
   private:
 
+    /*
+     * ======================================================
+     * Patches the calls to OP_PAR_LOOPs with the new
+     * subroutine call
+     * ======================================================
+     */
     void
     patchOP_PAR_LOOPCalls (ParallelLoop & parallelLoop,
         UserDeviceSubroutine & userDeviceSubroutine,
@@ -74,20 +80,34 @@ class NewSubroutinesGeneration: public AstSimpleProcessing
 
     /*
      * ======================================================
-     * Creates a new type declaration and definition in the
-     * given scope with the given name. The boolean indicates
-     * whether the declaration is a Fortran module
+     * Adds the relevant library 'use' statements to the
+     * generated module
      * ======================================================
      */
-    SgScopeStatement *
+    void
+    addLibraries (SgModuleStatement * moduleStatement);
+
+    /*
+     * ======================================================
+     * Adds the Fortran 'contains' statement to the module
+     * which must precede all subroutine declarations
+     * ======================================================
+     */
+    void
+    addContains (SgModuleStatement * moduleStatement);
+
+    /*
+     * ======================================================
+     * Creates the Fortran module
+     * ======================================================
+     */
+    SgModuleStatement *
     createCUDAModule (SgSourceFile & sourceFile, ParallelLoop & parallelLoop);
 
     /*
      * ======================================================
      * Creates the Fortran/C/C++ source file to be unparsed
-     * that contains the host subroutine (which sets up the
-     * kernel), the kernel, and the user function launched
-     * by the kernel
+     * that contains the generated subroutines and declarations
      * ======================================================
      */
     SgSourceFile &
