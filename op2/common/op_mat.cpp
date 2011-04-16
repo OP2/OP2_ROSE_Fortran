@@ -34,8 +34,7 @@
 #include <set>
 #include <vector>
 
-#include <petscmat.h>
-#include <petscvec.h>
+#include <petscksp.h>
 
 #include "op_datatypes.h"
 
@@ -111,18 +110,18 @@ void op_decl_mat( op_dat * data, op_set * rowset, op_set * colset, int dim, int 
 }
 
 void op_mat_addto( op_dat * mat, const void* values, int nrows, const int *irows, int ncols, const int *icols ) {
-  for (int i = 0; i < nrows; ++i) {
-    for (int j = 0; j < nrows; ++j) {
-      printf("(%d,%d)->(%d,%d): %f\n", i, j, ((const PetscInt *)irows)[i], ((const PetscInt *)icols)[j], ((const PetscScalar*)values)[i*ncols+j]);
-    }
-  }
+  //for (int i = 0; i < nrows; ++i) {
+    //for (int j = 0; j < nrows; ++j) {
+      //printf("(%d,%d)->(%d,%d): %f\n", i, j, ((const PetscInt *)irows)[i], ((const PetscInt *)icols)[j], ((const PetscScalar*)values)[i*ncols+j]);
+    //}
+  //}
   MatSetValues((Mat) mat->dat, nrows, (const PetscInt *)irows, ncols, (const PetscInt *)icols, (const PetscScalar *)values, ADD_VALUES);
 }
 
 void op_mat_assemble( op_dat * mat ) {
   MatAssemblyBegin((Mat) mat->dat,MAT_FINAL_ASSEMBLY);
   MatAssemblyEnd((Mat) mat->dat,MAT_FINAL_ASSEMBLY);
-  MatView((Mat) mat->dat,PETSC_VIEWER_STDOUT_WORLD);
+  //MatView((Mat) mat->dat,PETSC_VIEWER_STDOUT_WORLD);
 }
 
 static Vec op_create_vec ( const op_dat * vec ) {
@@ -138,10 +137,36 @@ static Vec op_create_vec ( const op_dat * vec ) {
 void op_mat_mult ( const op_dat * mat, const op_dat * v_in, op_dat * v_out ) {
   Vec p_v_in = op_create_vec(v_in);
   Vec p_v_out = op_create_vec(v_out);
+
   MatMult((Mat) mat->dat, p_v_in, p_v_out);
-  VecView(p_v_out, PETSC_VIEWER_STDOUT_WORLD);
+
+  //VecView(p_v_out, PETSC_VIEWER_STDOUT_WORLD);
+  
   VecDestroy(p_v_in);
   VecDestroy(p_v_out);
+}
+
+void op_solve ( const op_dat * mat, const op_dat * b, op_dat * x ) {
+  Vec p_b = op_create_vec(b);
+  Vec p_x = op_create_vec(x);
+  Mat A = (Mat) mat->dat;
+  KSP ksp;
+  PC pc;
+
+  KSPCreate(PETSC_COMM_WORLD,&ksp);
+  KSPSetOperators(ksp,A,A,DIFFERENT_NONZERO_PATTERN);
+  KSPGetPC(ksp,&pc);
+  PCSetType(pc,PCJACOBI);
+  KSPSetTolerances(ksp,1.e-7,PETSC_DEFAULT,PETSC_DEFAULT,PETSC_DEFAULT);
+
+  KSPSolve(ksp,p_b,p_x);
+
+  //KSPView(ksp,PETSC_VIEWER_STDOUT_WORLD);
+  //VecView(p_x, PETSC_VIEWER_STDOUT_WORLD);
+
+  VecDestroy(p_b);
+  VecDestroy(p_x);
+  KSPDestroy(ksp);
 }
 
 } /* extern "C" */

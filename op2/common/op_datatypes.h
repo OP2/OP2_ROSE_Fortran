@@ -231,6 +231,8 @@ void op_mat_assemble( op_dat * mat );
 
 void op_mat_mult ( const op_dat * mat, const op_dat * v_in, op_dat * v_out );
 
+void op_solve ( const op_dat * mat, const op_dat * b, op_dat * x );
+
 /*
  * Auxiliary output functions
  */
