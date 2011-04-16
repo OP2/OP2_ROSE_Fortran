@@ -135,13 +135,13 @@ int main(int argc, char **argv){
 
   op_decl_map(&ppedge,&edges,&nodes,2,pp, "ppedge");
 
-  op_decl_dat(&p_A, &edges,1,sizeof(float),     A,  "p_A" );
-  op_decl_dat(&p_r, &nodes,1,sizeof(float),     r,  "p_r" );
-  op_decl_dat(&p_u, &nodes,1,sizeof(float),     u,  "p_u" );
-  op_decl_dat(&p_du,&nodes,1,sizeof(float),     du, "p_du");
-  op_decl_dat(&p_beta,   0,1,sizeof(float),  &beta, "p_beta");
-  op_decl_dat(&p_u_sum,  0,1,sizeof(float), &u_sum, "p_u_sum");
-  op_decl_dat(&p_u_max,  0,1,sizeof(float), &u_max, "p_u_max");
+  op_decl_vec(&p_A, &edges,1,sizeof(float),     A,  "p_A" );
+  op_decl_vec(&p_r, &nodes,1,sizeof(float),     r,  "p_r" );
+  op_decl_vec(&p_u, &nodes,1,sizeof(float),     u,  "p_u" );
+  op_decl_vec(&p_du,&nodes,1,sizeof(float),     du, "p_du");
+  op_decl_gbl(&p_beta,     1,sizeof(float),  &beta, "p_beta");
+  op_decl_gbl(&p_u_sum,    1,sizeof(float), &u_sum, "p_u_sum");
+  op_decl_gbl(&p_u_max,    1,sizeof(float), &u_max, "p_u_max");
 
   alpha = 1.0f;
   op_decl_const(&alpha,1,sizeof(float));

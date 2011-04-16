@@ -170,13 +170,13 @@ int main(int argc, char **argv){
   op_decl_map(&pbecell,&bedges,&cells,1,becell,"pbecell");
   op_decl_map(&pcell,  &cells, &nodes,4,cell,  "pcell");
 
-  op_decl_dat(&p_bound,&bedges,1,sizeof(int),bound,"p_bound");
-  op_decl_dat(&p_x    ,&nodes ,2,sizeof(float),x    ,"p_x");
-  op_decl_dat(&p_q    ,&cells ,4,sizeof(float),q    ,"p_q");
-  op_decl_dat(&p_qold ,&cells ,4,sizeof(float),qold ,"p_qold");
-  op_decl_dat(&p_adt  ,&cells ,1,sizeof(float),adt  ,"p_adt");
-  op_decl_dat(&p_res  ,&cells ,4,sizeof(float),res  ,"p_res");
-  op_decl_dat(&p_rms  ,     0 ,1,sizeof(float),&rms ,"p_rms");
+  op_decl_vec(&p_bound,&bedges,1,sizeof(int),bound,"p_bound");
+  op_decl_vec(&p_x    ,&nodes ,2,sizeof(float),x    ,"p_x");
+  op_decl_vec(&p_q    ,&cells ,4,sizeof(float),q    ,"p_q");
+  op_decl_vec(&p_qold ,&cells ,4,sizeof(float),qold ,"p_qold");
+  op_decl_vec(&p_adt  ,&cells ,1,sizeof(float),adt  ,"p_adt");
+  op_decl_vec(&p_res  ,&cells ,4,sizeof(float),res  ,"p_res");
+  op_decl_gbl(&p_rms          ,1,sizeof(float),&rms ,"p_rms");
 
   op_decl_const(&gam,  1, sizeof(float));
   op_decl_const(&gm1,  1, sizeof(float));

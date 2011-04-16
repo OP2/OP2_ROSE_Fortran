@@ -47,7 +47,7 @@ int main(int argc, char **argv) {
   for (int i = 0; i < nnode; ++i) {
     /*p_xn[i] = sin(0.5*M_PI*i/NN);*/
     p_xn[i] = (Real)i/NN;
-    p_x[i] = (-1./(M_PI*M_PI))*sin(M_PI*p_xn[i]);
+    p_x[i] = (1./(M_PI*M_PI))*sin(M_PI*p_xn[i]);
     p_xref[i] = sin(M_PI*p_xn[i]);
   }
 
@@ -69,33 +69,41 @@ int main(int argc, char **argv) {
 
   /*dump_map(&elem_node, "map");*/
 
-  op_decl_dat(&x, &nodes, 1, sizeof(Real), p_x, "x");
-  op_decl_dat(&y, &nodes, 1, sizeof(Real), p_y, "y");
-  op_decl_dat(&xn, &nodes, 1, sizeof(Real), p_xn, "xn");
+  op_decl_vec(&x, &nodes, 1, sizeof(Real), p_x, "x");
+  op_decl_vec(&y, &nodes, 1, sizeof(Real), p_y, "y");
+  op_decl_vec(&xn, &nodes, 1, sizeof(Real), p_xn, "xn");
 
   op_decl_sparsity(&mat_sparsity, &elem_node, &elem_node);
 
   /*dump_sparsity(&mat_sparsity, "sparsity");*/
 
-  op_decl_mat(&mat, &mat_sparsity, "matrix");
-  op_create_vec(&x);
-  op_create_vec(&y);
+  op_decl_mat(&mat, &nodes, &nodes, 1, sizeof(Real), &mat_sparsity, "matrix");
 
   /*dump_dat(&mat, "matrix");*/
 
   op_diagnostic_output();
   
+  // Fix the values of the boundary nodes to get a unique solution
+  Real val = 1e308;
+  int idx = 0;
+  op_mat_addto(&mat, &val, 1, &idx, 1, &idx);
+  idx = NN;
+  op_mat_addto(&mat, &val, 1, &idx, 1, &idx);
+
   // construct the matrix
   op_par_loop_2((void(*)(void*,void*))laplace, "laplace", &elements,
                 op_construct_mat_arg(&mat, OP_ALL, &elem_node, OP_ALL, &elem_node, OP_INC),
                 op_construct_vec_arg(&xn, 0, &elem_node, OP_READ));
 
   // spmv
-  op_mat_mult(&mat, &x, &y);
+  /*op_mat_mult(&mat, &x, &y);*/
 
-  for (int i = 0; i < nnode; ++i) {
-    printf("%f\n", p_xref[i]);
-  }
+  // solve
+  op_solve(&mat, &x, &y);
+
+  /*for (int i = 0; i < nnode; ++i) {*/
+    /*printf("%f\n", p_xref[i]);*/
+  /*}*/
 
   op_exit();
 }
