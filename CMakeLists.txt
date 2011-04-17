@@ -141,5 +141,8 @@ set(OP2_EXAMPLES
 # Add tests but do not add to default target
 foreach(EXAMPLE ${OP2_EXAMPLES})
   add_subdirectory(examples/C/${EXAMPLE} EXCLUDE_FROM_ALL)
+  set(EXAMPLE_TARGETS ${EXAMPLE}_example ${EXAMPLE_TARGETS})
 endforeach()
+
+ADD_CUSTOM_TARGET( examples DEPENDS ${EXAMPLE_TARGETS} COMMENT "Build examples" )
 

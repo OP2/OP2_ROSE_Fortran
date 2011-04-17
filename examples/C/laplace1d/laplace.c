@@ -101,9 +101,9 @@ int main(int argc, char **argv) {
   // solve
   op_solve(&mat, &x, &y);
 
-  /*for (int i = 0; i < nnode; ++i) {*/
-    /*printf("%f\n", p_xref[i]);*/
-  /*}*/
+  for (int i = 0; i < nnode; ++i) {
+    printf("%f\n", p_x[i]);
+  }
 
   op_exit();
 }
