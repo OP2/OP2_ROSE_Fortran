@@ -42,6 +42,8 @@ extern "C" {
 
 void op_decl_sparsity ( op_sparsity * sparsity, op_map * rowmap, op_map * colmap )
 {
+  assert(sparsity && rowmap && colmap);
+
   // FIXME add consistency checks
   if ( rowmap->from->index != colmap->from->index ) {
     printf("op_decl_sparsity: row map and col map do not map from the same set\n");
@@ -86,6 +88,7 @@ void op_decl_sparsity ( op_sparsity * sparsity, op_map * rowmap, op_map * colmap
 }
 
 void op_decl_mat( op_dat * data, op_set * rowset, op_set * colset, int dim, int type_size, op_sparsity * sparsity, char const * name ) {
+  assert( data && rowset && colset && sparsity );
   assert( rowset->size == sparsity->nrows && colset->size == sparsity->ncols );
 
   Mat p_mat;
@@ -110,6 +113,9 @@ void op_decl_mat( op_dat * data, op_set * rowset, op_set * colset, int dim, int 
 }
 
 void op_mat_addto( op_dat * mat, const void* values, int nrows, const int *irows, int ncols, const int *icols ) {
+  assert( mat && values && irows && icols );
+  assert( mat->rank == 2 );
+
   //for (int i = 0; i < nrows; ++i) {
     //for (int j = 0; j < nrows; ++j) {
       //printf("(%d,%d)->(%d,%d): %f\n", i, j, ((const PetscInt *)irows)[i], ((const PetscInt *)icols)[j], ((const PetscScalar*)values)[i*ncols+j]);
@@ -119,12 +125,16 @@ void op_mat_addto( op_dat * mat, const void* values, int nrows, const int *irows
 }
 
 void op_mat_assemble( op_dat * mat ) {
+  assert( mat && mat->rank == 2 );
+
   MatAssemblyBegin((Mat) mat->dat,MAT_FINAL_ASSEMBLY);
   MatAssemblyEnd((Mat) mat->dat,MAT_FINAL_ASSEMBLY);
   //MatView((Mat) mat->dat,PETSC_VIEWER_STDOUT_WORLD);
 }
 
 static Vec op_create_vec ( const op_dat * vec ) {
+  assert( vec && vec->rank == 1 );
+
   Vec p_vec;
   // Create a PETSc vector and pass it the user-allocated storage
   VecCreateSeqWithArray(MPI_COMM_SELF,vec->dim * vec->set[0]->size,(PetscScalar*)vec->dat,&p_vec);
@@ -135,6 +145,9 @@ static Vec op_create_vec ( const op_dat * vec ) {
 }
 
 void op_mat_mult ( const op_dat * mat, const op_dat * v_in, op_dat * v_out ) {
+  assert( mat && v_in && v_out );
+  assert( mat->rank == 2 && v_in->rank == 1 && v_out->rank == 1 );
+
   Vec p_v_in = op_create_vec(v_in);
   Vec p_v_out = op_create_vec(v_out);
 
@@ -147,6 +160,9 @@ void op_mat_mult ( const op_dat * mat, const op_dat * v_in, op_dat * v_out ) {
 }
 
 void op_solve ( const op_dat * mat, const op_dat * b, op_dat * x ) {
+  assert( mat && b && x );
+  assert( mat->rank == 2 && b->rank == 1 && x->rank == 1 );
+
   Vec p_b = op_create_vec(b);
   Vec p_x = op_create_vec(x);
   Mat A = (Mat) mat->dat;

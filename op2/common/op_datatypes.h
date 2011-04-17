@@ -213,24 +213,32 @@ void op_decl_gbl_map ( op_map * map );
 
 void op_decl_const ( void * dat, int dim, int type_size );
 
+/* Return a kernel argument for a global dat */
 op_arg op_construct_gbl_arg(op_dat * data, op_access acc);
 
+/* Return a kernel argument for a vector dat */
 op_arg op_construct_vec_arg(op_dat * data, int idx, op_map * mapping, op_access acc);
 
+/* Return a kernel argument for a matrix dat */
 op_arg op_construct_mat_arg(op_dat * data, int idx0, op_map * map0, int idx1, op_map * map1, op_access acc);
 
+/* Construct a sparsity pattern from a row and column map */
 void op_decl_sparsity ( op_sparsity * sparsity, op_map * rowmap, op_map * colmap );
 
 /*
  * Linear algebra
  */
 
+/* Add a logically 2D array values of size nrows x ncols to the matrix at positions given by the indices in irows and icols */
 void op_mat_addto( op_dat * mat, const void* values, int nrows, const int *irows, int ncols, const int *icols );
 
+/* Assemble the matrix (must be called after the last addto call) */
 void op_mat_assemble( op_dat * mat );
 
+/* Multiply a vector v_in to a matrix and obtain v_out */
 void op_mat_mult ( const op_dat * mat, const op_dat * v_in, op_dat * v_out );
 
+/* Solve a system with right-hand-side b for solution x */
 void op_solve ( const op_dat * mat, const op_dat * b, op_dat * x );
 
 /*
