@@ -168,6 +168,19 @@ HostSubroutineOfIndirectLoop::createExecutionPlanExecutionStatements (
     }
   }
 
+  for (unsigned int i = 1; i
+      <= parallelLoop.getNumberOf_OP_DAT_ArgumentGroups (); ++i)
+  {
+    if (parallelLoop.isDuplicate_OP_DAT (i) == false
+        && parallelLoop.get_OP_MAP_Value (i) == INDIRECT)
+    {
+      SgVarRefExp * IndirectMap_argumentReference = buildVarRefExp (
+          localVariables_ExecutionPlan_IndirectMaps[i]);
+
+      kernelParameters->append_expression (IndirectMap_argumentReference);
+    }
+  }
+
   SgVarRefExp * pindSizesReference = buildVarRefExp (
       localVariables_Others[PlanFunctionVariables::pindSizes]);
 
@@ -337,7 +350,7 @@ HostSubroutineOfIndirectLoop::createPlanCToForttranPointerConversionStatements (
       localVariables_Others[PlanFunctionVariables::pblkMap]);
 
   SgVarRefExp * pblkMapSizeReference = buildVarRefExp (
-      localVariables_Others[PlanFunctionVariables::pblkMapSize]);
+      localVariables_Others[PlanFunctionSizeVariables::pblkMapSize]);
 
   SgVarRefExp * planRetReference = buildVarRefExp (
       localVariables_Others[variableName_planRet]);
@@ -355,37 +368,37 @@ HostSubroutineOfIndirectLoop::createPlanCToForttranPointerConversionStatements (
       localVariables_Others[PlanFunctionVariables::pindSizes]);
 
   SgVarRefExp * pindSizesSizeReference = buildVarRefExp (
-      localVariables_Others[PlanFunctionVariables::pindSizesSize]);
+      localVariables_Others[PlanFunctionSizeVariables::pindSizesSize]);
 
   SgVarRefExp * pindOffsReference = buildVarRefExp (
       localVariables_Others[PlanFunctionVariables::pindOffs]);
 
   SgVarRefExp * pindOffsSizeReference = buildVarRefExp (
-      localVariables_Others[PlanFunctionVariables::pindOffsSize]);
+      localVariables_Others[PlanFunctionSizeVariables::pindOffsSize]);
 
   SgVarRefExp * pnelemsReference = buildVarRefExp (
       localVariables_Others[PlanFunctionVariables::pnelems]);
 
   SgVarRefExp * pnelemsSizeReference = buildVarRefExp (
-      localVariables_Others[PlanFunctionVariables::pnelemsSize]);
+      localVariables_Others[PlanFunctionSizeVariables::pnelemsSize]);
 
   SgVarRefExp * pnthrcolReference = buildVarRefExp (
       localVariables_Others[PlanFunctionVariables::pnthrcol]);
 
   SgVarRefExp * pnthrcolSizeReference = buildVarRefExp (
-      localVariables_Others[PlanFunctionVariables::pnthrcolSize]);
+      localVariables_Others[PlanFunctionSizeVariables::pnthrcolSize]);
 
   SgVarRefExp * poffsetReference = buildVarRefExp (
       localVariables_Others[PlanFunctionVariables::poffset]);
 
   SgVarRefExp * poffsetSizeReference = buildVarRefExp (
-      localVariables_Others[PlanFunctionVariables::poffsetSize]);
+      localVariables_Others[PlanFunctionSizeVariables::poffsetSize]);
 
   SgVarRefExp * pthrcolReference = buildVarRefExp (
       localVariables_Others[PlanFunctionVariables::pthrcol]);
 
   SgVarRefExp * pthrcolSizeReference = buildVarRefExp (
-      localVariables_Others[PlanFunctionVariables::pthrcolSize]);
+      localVariables_Others[PlanFunctionSizeVariables::pthrcolSize]);
 
   /*
    * ======================================================
@@ -636,7 +649,7 @@ HostSubroutineOfIndirectLoop::createPlanCToForttranPointerConversionStatements (
   callStatement = createCallToC_F_POINTER (buildDotExp (actualPlanReference,
       ind_sizes_Reference), pindSizesReference,
       FortranStatementsAndExpressionsBuilder::buildShapeExpression (
-          localVariables_Others[PlanFunctionVariables::pindSizesSize],
+          localVariables_Others[PlanFunctionSizeVariables::pindSizesSize],
           subroutineScope));
 
   appendStatement (callStatement, subroutineScope);
@@ -648,14 +661,14 @@ HostSubroutineOfIndirectLoop::createPlanCToForttranPointerConversionStatements (
    */
 
   assignmentExpression = buildAssignOp (pindOffsSizeReference, buildVarRefExp (
-      localVariables_Others[PlanFunctionVariables::pindSizesSize]));
+      localVariables_Others[PlanFunctionSizeVariables::pindSizesSize]));
 
   appendStatement (buildExprStatement (assignmentExpression), subroutineScope);
 
   callStatement = createCallToC_F_POINTER (buildDotExp (actualPlanReference,
       ind_offs_Reference), pindOffsReference,
       FortranStatementsAndExpressionsBuilder::buildShapeExpression (
-          localVariables_Others[PlanFunctionVariables::pindOffsSize],
+          localVariables_Others[PlanFunctionSizeVariables::pindOffsSize],
           subroutineScope));
 
   appendStatement (callStatement, subroutineScope);
@@ -674,7 +687,7 @@ HostSubroutineOfIndirectLoop::createPlanCToForttranPointerConversionStatements (
   callStatement = createCallToC_F_POINTER (buildDotExp (actualPlanReference,
       blkmap_Reference), pblkMapReference,
       FortranStatementsAndExpressionsBuilder::buildShapeExpression (
-          localVariables_Others[PlanFunctionVariables::pblkMapSize],
+          localVariables_Others[PlanFunctionSizeVariables::pblkMapSize],
           subroutineScope));
 
   appendStatement (callStatement, subroutineScope);
@@ -693,7 +706,7 @@ HostSubroutineOfIndirectLoop::createPlanCToForttranPointerConversionStatements (
   callStatement = createCallToC_F_POINTER (buildDotExp (actualPlanReference,
       offset_Reference), poffsetReference,
       FortranStatementsAndExpressionsBuilder::buildShapeExpression (
-          localVariables_Others[PlanFunctionVariables::poffsetSize],
+          localVariables_Others[PlanFunctionSizeVariables::poffsetSize],
           subroutineScope));
 
   appendStatement (callStatement, subroutineScope);
@@ -712,7 +725,7 @@ HostSubroutineOfIndirectLoop::createPlanCToForttranPointerConversionStatements (
   callStatement = createCallToC_F_POINTER (buildDotExp (actualPlanReference,
       nelems_Reference), pnelemsReference,
       FortranStatementsAndExpressionsBuilder::buildShapeExpression (
-          localVariables_Others[PlanFunctionVariables::pnelemsSize],
+          localVariables_Others[PlanFunctionSizeVariables::pnelemsSize],
           subroutineScope));
 
   appendStatement (callStatement, subroutineScope);
@@ -731,7 +744,7 @@ HostSubroutineOfIndirectLoop::createPlanCToForttranPointerConversionStatements (
   callStatement = createCallToC_F_POINTER (buildDotExp (actualPlanReference,
       nthrcol_Reference), pnthrcolReference,
       FortranStatementsAndExpressionsBuilder::buildShapeExpression (
-          localVariables_Others[PlanFunctionVariables::pnthrcolSize],
+          localVariables_Others[PlanFunctionSizeVariables::pnthrcolSize],
           subroutineScope));
 
   appendStatement (callStatement, subroutineScope);
@@ -750,7 +763,7 @@ HostSubroutineOfIndirectLoop::createPlanCToForttranPointerConversionStatements (
   callStatement = createCallToC_F_POINTER (buildDotExp (actualPlanReference,
       thrcol_Reference), pthrcolReference,
       FortranStatementsAndExpressionsBuilder::buildShapeExpression (
-          localVariables_Others[PlanFunctionVariables::pthrcolSize],
+          localVariables_Others[PlanFunctionSizeVariables::pthrcolSize],
           subroutineScope));
 
   appendStatement (callStatement, subroutineScope);
@@ -1138,10 +1151,10 @@ HostSubroutineOfIndirectLoop::createExecutionPlanLocalVariables (
 
   variableDeclaration
       = FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
-          PlanFunctionVariables::pindMapsSize,
+          PlanFunctionSizeVariables::pindMapsSize,
           FortranTypesBuilder::getFourByteInteger (), subroutineScope);
 
-  localVariables_Others[PlanFunctionVariables::pindMapsSize]
+  localVariables_Others[PlanFunctionSizeVariables::pindMapsSize]
       = variableDeclaration;
 
   for (unsigned int i = 1; i
@@ -1329,13 +1342,13 @@ HostSubroutineOfIndirectLoop::createExecutionPlanLocalVariables (
   fourByteIntegerVariables.push_back (variableName_blockOffset);
   fourByteIntegerVariables.push_back (variableName_col);
   fourByteIntegerVariables.push_back (variableName_threadSynchRet);
-  fourByteIntegerVariables.push_back (PlanFunctionVariables::pindSizesSize);
-  fourByteIntegerVariables.push_back (PlanFunctionVariables::pindOffsSize);
-  fourByteIntegerVariables.push_back (PlanFunctionVariables::pblkMapSize);
-  fourByteIntegerVariables.push_back (PlanFunctionVariables::poffsetSize);
-  fourByteIntegerVariables.push_back (PlanFunctionVariables::pnelemsSize);
-  fourByteIntegerVariables.push_back (PlanFunctionVariables::pnthrcolSize);
-  fourByteIntegerVariables.push_back (PlanFunctionVariables::pthrcolSize);
+  fourByteIntegerVariables.push_back (PlanFunctionSizeVariables::pindSizesSize);
+  fourByteIntegerVariables.push_back (PlanFunctionSizeVariables::pindOffsSize);
+  fourByteIntegerVariables.push_back (PlanFunctionSizeVariables::pblkMapSize);
+  fourByteIntegerVariables.push_back (PlanFunctionSizeVariables::poffsetSize);
+  fourByteIntegerVariables.push_back (PlanFunctionSizeVariables::pnelemsSize);
+  fourByteIntegerVariables.push_back (PlanFunctionSizeVariables::pnthrcolSize);
+  fourByteIntegerVariables.push_back (PlanFunctionSizeVariables::pthrcolSize);
 
   for (vector <string>::iterator it = fourByteIntegerVariables.begin (); it
       != fourByteIntegerVariables.end (); ++it)

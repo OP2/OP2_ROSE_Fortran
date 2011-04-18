@@ -26,18 +26,45 @@ class KernelSubroutineOfIndirectLoop: public KernelSubroutine
 
     SgVariableDeclaration * formalParameter_argsSizes;
 
+    std::map <std::string, SgVariableDeclaration *>
+        formalParameters_PlanVariables;
+
+    std::map <unsigned int, SgVariableDeclaration *>
+        formalParameters_LocalToGlobalMapping;
+
+    std::map <unsigned int, SgVariableDeclaration *>
+        formalParameters_GlobalToLocalMapping;
+
     /*
      * ======================================================
-     * The OP_MAP formal parameters
+     * Remaining local variables
      * ======================================================
      */
 
-    std::map <unsigned int, SgVariableDeclaration *> formalParameter_OP_MAPs;
+    std::map <unsigned int, SgVariableDeclaration *> localVariables_indArgSizes;
+
+    std::map <std::string, SgVariableDeclaration *> localVariables_Others;
 
   private:
 
     void
-    create_OP_DAT_FormalParameters (ParallelLoop & parallelLoop);
+    createThreadZeroStatements (ParallelLoop & parallelLoop);
+
+    void
+    createRemainingLocalVariables ();
+
+    void
+    createSharedLocalVariables (ParallelLoop & parallelLoop);
+
+    void
+    createPlanFormalParameters (
+        DeviceDataSizesDeclaration & deviceDataSizesDeclaration,
+        ParallelLoop & parallelLoop);
+
+    void
+    create_OP_DAT_FormalParameters (
+        DeviceDataSizesDeclaration & deviceDataSizesDeclaration,
+        ParallelLoop & parallelLoop);
 
     void
     createArgsSizesFormalParameter (
