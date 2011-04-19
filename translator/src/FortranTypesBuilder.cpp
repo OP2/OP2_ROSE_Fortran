@@ -185,7 +185,6 @@ FortranTypesBuilder::getArray_RankOne (SgType * baseType, int lowerBound,
   return array;
 }
 
-<<<<<<< HEAD
 
 SgArrayType *
 FortranTypesBuilder::getArray_RankOne ( SgType * baseType,
@@ -232,7 +231,6 @@ FortranTypesBuilder::getArray_RankOne ( SgType * baseType,
   return array;
 }
 
-=======
 SgArrayType *
 FortranTypesBuilder::getArray_RankOne_WithLowerBound (SgType * baseType,
     SgExpression * lowerBoundExpression)
@@ -316,7 +314,6 @@ FortranTypesBuilder::getArray_RankOne_WithLowerAndUpperBounds (
 
   return array;
 }
->>>>>>> 6fa71e283c1d3079827b543ac5d92f314e6a3f93
 
 SgTypeString *
 FortranTypesBuilder::getString (int length)
