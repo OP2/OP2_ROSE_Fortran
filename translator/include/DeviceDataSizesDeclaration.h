@@ -46,7 +46,18 @@ class DeviceDataSizesDeclaration
      * the above type definition declaration statement
      * ======================================================
      */
-    std::map <unsigned int, SgVariableDeclaration *> OP_MAP_IndirectSizes;
+    std::map <unsigned int, SgVariableDeclaration *>
+        localToGlobalRenumberingOfIndirectMappingSizes;
+
+    /*
+     * ======================================================
+     * A mapping from an indirect map argument to its
+     * declaration representing its size. This is a field inside
+     * the above type definition declaration statement
+     * ======================================================
+     */
+    std::map <unsigned int, SgVariableDeclaration *>
+        globalToLocalRenumberingOfIndirectMappingSizes;
 
     /*
      * ======================================================
@@ -76,15 +87,23 @@ class DeviceDataSizesDeclaration
     }
 
     SgVariableDeclaration *
-    get_OP_MAP_IndirectSizeFieldDeclaration (unsigned int OP_DAT_ArgumentGroup)
+    get_LocalToGlobalMappingSizeFieldDeclaration (
+        unsigned int OP_DAT_ArgumentGroup)
     {
-      return OP_MAP_IndirectSizes[OP_DAT_ArgumentGroup];
+      return localToGlobalRenumberingOfIndirectMappingSizes[OP_DAT_ArgumentGroup];
     }
 
     SgVariableDeclaration *
-    get_OP_MAP_IndirectSizeFieldDeclaration (std::string const & fieldName)
+    get_GlobalToLocalMappingSizeFieldDeclaration (
+        unsigned int OP_DAT_ArgumentGroup)
     {
-      return otherFieldDeclarations[fieldName];
+      return globalToLocalRenumberingOfIndirectMappingSizes[OP_DAT_ArgumentGroup];
+    }
+
+    SgVariableDeclaration *
+    getPlanVariableSizeFieldDeclaration (std::string planVariableSizeName)
+    {
+      return otherFieldDeclarations[planVariableSizeName];
     }
 
     DeviceDataSizesDeclaration (ParallelLoop & parallelLoop,

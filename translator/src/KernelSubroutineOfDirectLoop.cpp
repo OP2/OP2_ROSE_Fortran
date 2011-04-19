@@ -72,6 +72,7 @@ KernelSubroutineOfDirectLoop::createStatements (
     UserDeviceSubroutine & userDeviceSubroutine, ParallelLoop & parallelLoop)
 {
   using boost::lexical_cast;
+  using SageBuilder::buildOpaqueVarRefExp;
   using SageBuilder::buildVarRefExp;
   using SageBuilder::buildIntVal;
   using SageBuilder::buildDotExp;
@@ -86,6 +87,30 @@ KernelSubroutineOfDirectLoop::createStatements (
   using SageInterface::appendStatement;
   using std::string;
   using std::vector;
+
+  /*
+   * ======================================================
+   * Build opaque variable references needed in the following
+   * expressions. These are opaque because the variables are
+   * provided as part of the CUDA library and are not seen
+   * by ROSE
+   * ======================================================
+   */
+
+  SgVarRefExp * variable_Threadidx = buildOpaqueVarRefExp (
+      variableName_threadidx, subroutineScope);
+
+  SgVarRefExp * variable_X = buildOpaqueVarRefExp (variableName_x,
+      subroutineScope);
+
+  SgVarRefExp * variable_Blockidx = buildOpaqueVarRefExp (
+      variableName_blockidx, subroutineScope);
+
+  SgVarRefExp * variable_Blockdim = buildOpaqueVarRefExp (
+      variableName_blockdim, subroutineScope);
+
+  SgVarRefExp * variable_GridDim = buildOpaqueVarRefExp (variableName_griddim,
+      subroutineScope);
 
   /*
    * ======================================================
@@ -167,32 +192,15 @@ void
 KernelSubroutineOfDirectLoop::createLocalVariables ()
 {
   using SageBuilder::buildVariableDeclaration;
-  using SageBuilder::buildOpaqueVarRefExp;
-  using SageBuilder::buildIntType;
   using SageInterface::appendStatement;
 
   variable_IterationCounter = buildVariableDeclaration ("setIter",
-      buildIntType (), NULL, subroutineScope);
+      FortranTypesBuilder::getFourByteInteger (), NULL, subroutineScope);
 
   variable_IterationCounter->get_declarationModifier ().get_typeModifier ().setDevice ();
   variable_IterationCounter->get_declarationModifier ().get_accessModifier ().setUndefined ();
 
   appendStatement (variable_IterationCounter, subroutineScope);
-
-  /*
-   * ======================================================
-   * Build opaque variable references needed in the following
-   * expressions. These are opaque because the variables are
-   * provided as part of the CUDA library and are not seen
-   * by ROSE
-   * ======================================================
-   */
-
-  variable_Threadidx = buildOpaqueVarRefExp ("threadidx", subroutineScope);
-  variable_X = buildOpaqueVarRefExp ("x", subroutineScope);
-  variable_Blockidx = buildOpaqueVarRefExp ("blockidx", subroutineScope);
-  variable_Blockdim = buildOpaqueVarRefExp ("blockdim", subroutineScope);
-  variable_GridDim = buildOpaqueVarRefExp ("griddim", subroutineScope);
 }
 
 void

@@ -108,7 +108,40 @@ class FortranTypesBuilder
 		 */
 	
     static SgArrayType *
-    getArray_RankOne (SgType * baseType, int lowerBound = -1, int upperBound = -1);
+    getArray_RankOne (SgType * baseType, int lowerBound = -1, int upperBound =
+        -1);
+
+    /*
+     * ======================================================
+     * Returns a one-dimensional Fortran array of elements
+     * of the given type with this specific lower bound
+     * ======================================================
+     */
+    static SgArrayType *
+    getArray_RankOne_WithLowerBound (SgType * baseType,
+        SgExpression * lowerBoundExpression);
+
+    /*
+     * ======================================================
+     * Returns a one-dimensional Fortran array of elements
+     * of the given type with this specific upper bound
+     * ======================================================
+     */
+    static SgArrayType *
+    getArray_RankOne_WithUpperBound (SgType * baseType,
+        SgExpression * upperBoundExpression);
+
+    /*
+     * ======================================================
+     * Returns a one-dimensional Fortran array of elements
+     * of the given type with these specific lower and upper
+     * bounds
+     * ======================================================
+     */
+    static SgArrayType *
+    getArray_RankOne_WithLowerAndUpperBounds (SgType * baseType,
+        SgExpression * lowerBoundExpression,
+        SgExpression * upperBoundExpression);
 
 		/*
 		 * ======================================================

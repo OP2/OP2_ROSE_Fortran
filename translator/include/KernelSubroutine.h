@@ -5,6 +5,15 @@
 #include <UserDeviceSubroutine.h>
 #include <ParallelLoop.h>
 
+namespace
+{
+  std::string const variableName_threadidx = "threadidx";
+  std::string const variableName_x = "x";
+  std::string const variableName_blockidx = "blockidx";
+  std::string const variableName_blockdim = "blockdim";
+  std::string const variableName_griddim = "griddim";
+}
+
 class KernelSubroutine: public Subroutine
 {
   protected:
@@ -16,23 +25,6 @@ class KernelSubroutine: public Subroutine
      */
 
     std::map <unsigned int, SgVariableDeclaration *> formalParameter_OP_DATs;
-
-    /*
-     * ======================================================
-     * The following variables are provided as part of the
-     * CUDA library
-     * ======================================================
-     */
-
-    SgVarRefExp * variable_Threadidx;
-
-    SgVarRefExp * variable_X;
-
-    SgVarRefExp * variable_Blockidx;
-
-    SgVarRefExp * variable_Blockdim;
-
-    SgVarRefExp * variable_GridDim;
 
   protected:
 
