@@ -185,6 +185,53 @@ FortranTypesBuilder::getArray_RankOne (SgType * baseType, int lowerBound,
   return array;
 }
 
+
+SgArrayType *
+FortranTypesBuilder::getArray_RankOne ( SgType * baseType,
+																			  int lowerBound,
+																			  SgExpression * upperBoundExpression
+																			)
+{
+	using SageBuilder::buildExprListExp;
+	
+  SgExpression * lowerBoundExpression;
+	
+  if (lowerBound == -1)
+  {
+    lowerBoundExpression = new SgNullExpression (ROSEHelper::getFileInfo ());
+  }
+  else
+  {
+    lowerBoundExpression
+    = new SgIntVal (ROSEHelper::getFileInfo (), lowerBound);
+  }
+  lowerBoundExpression->set_endOfConstruct (ROSEHelper::getFileInfo ());
+	
+  if ( upperBoundExpression == NULL )
+  {
+    upperBoundExpression = new SgNullExpression (ROSEHelper::getFileInfo ());
+  }
+
+  upperBoundExpression->set_endOfConstruct (ROSEHelper::getFileInfo ());
+	
+  SgIntVal * strideExpression = new SgIntVal (ROSEHelper::getFileInfo (), 1);
+  strideExpression->set_endOfConstruct (ROSEHelper::getFileInfo ());
+	
+  SgSubscriptExpression * arrayDimensionExpression = new SgSubscriptExpression (
+																																								ROSEHelper::getFileInfo (), lowerBoundExpression, upperBoundExpression,
+																																								strideExpression);
+  arrayDimensionExpression->set_endOfConstruct (ROSEHelper::getFileInfo ());
+	
+  SgArrayType * array = new SgArrayType (baseType, arrayDimensionExpression);
+  arrayDimensionExpression->set_parent (baseType);
+	
+  array->set_dim_info (buildExprListExp (arrayDimensionExpression));
+  array->set_rank (1);
+	
+  return array;
+}
+
+
 SgTypeString *
 FortranTypesBuilder::getString (int length)
 {

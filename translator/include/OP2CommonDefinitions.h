@@ -90,4 +90,10 @@ namespace IndirectLoopVariables
   std::string const argsSizes = "argsSizes";
 }
 
+namespace FortranVariableDeafultKinds
+{
+	int const DEFAULT_KIND_INT = 4;
+	int const DEFAULT_KIND_REAL = 4;
+}
+
 #endif

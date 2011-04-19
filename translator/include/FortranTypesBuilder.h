@@ -95,19 +95,40 @@ class FortranTypesBuilder
     static SgTypeFloat *
     getDoublePrecisionFloat ();
 
-    /*
-     * ======================================================
-     * Returns a one-dimensional Fortran array of elements
-     * of the given type.
-     * If lowerBound = -1, this indicates that the lower
-     * bound of the array is unknown.
-     * If upperBound = -1, this indicates that the upper
-     * bound of the array is unknown.
-     * ======================================================
-     */
+	
+		/*
+		 * ======================================================
+		 * Returns a one-dimensional Fortran array of elements
+		 * of the given type.
+		 * If lowerBound = -1, this indicates that the lower
+		 * bound of the array is unknown.
+		 * If upperBound = -1, this indicates that the upper
+		 * bound of the array is unknown.
+		 * ======================================================
+		 */
+	
     static SgArrayType *
     getArray_RankOne (SgType * baseType, int lowerBound = -1, int upperBound = -1);
 
+		/*
+		 * ======================================================
+		 * Returns a one-dimensional Fortran array of elements
+		 * of the given type, where the upper bound can be an
+		 * expression.
+		 * If lowerBound = -1, this indicates that the lower
+		 * bound of the array is unknown.
+		 * If upperBound = NULL, this indicates that the upper
+		 * bound of the array is unknown.
+		 * ======================================================
+		 */	
+	
+		static SgArrayType *
+		getArray_RankOne ( SgType * baseType,
+											 int lowerBound,
+											 SgExpression * upperBoundExpression = NULL
+										 );
+
+	
     /*
      * ======================================================
      * Returns a Fortran string of the given length.

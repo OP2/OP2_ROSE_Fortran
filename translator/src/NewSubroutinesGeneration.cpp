@@ -10,6 +10,8 @@
 #include <HostSubroutineOfIndirectLoop.h>
 #include <InitialiseConstantsSubroutine.h>
 #include <DeviceDataSizesDeclaration.h>
+#include <ReductionSubroutine.h>
+
 
 /*
  * ======================================================
@@ -304,6 +306,11 @@ NewSubroutinesGeneration::visit (SgNode * node)
   using std::pair;
   using std::string;
 
+	// to be removed
+	using SageBuilder::buildIntVal;
+	using SageBuilder::buildArrayType;
+	
+	
   switch (node->variantT ())
   {
     case V_SgFunctionCallExp:
@@ -406,6 +413,7 @@ NewSubroutinesGeneration::visit (SgNode * node)
                  * the device
                  * ======================================================
                  */
+
 
                 UserDeviceSubroutine * userDeviceSubroutine =
                     new UserDeviceSubroutine (userSubroutineName, moduleScope,
