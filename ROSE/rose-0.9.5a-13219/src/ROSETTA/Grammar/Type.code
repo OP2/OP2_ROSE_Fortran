@@ -160,7 +160,11 @@ HEADER_START
                e_target,
                e_value,
                e_volatile,
+								// Carlo (08/02/2011): added support for fortran cuda device attribute
 							 e_device,
+								// Carlo (26/04/2011): added support for fortran cuda shared and constant attributes
+							 e_shared,
+ 							 e_constant,
                e_last_attribute_specifier
              };
 

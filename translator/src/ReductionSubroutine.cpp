@@ -303,27 +303,8 @@ void ReductionSubroutine::createStatements ()
 	 * ======================================================
 	 */
 	
-	
   appendStatement (	createCallToSynchThreads (), subroutineScope );
-	//
-//	synchthreadsFunctionSymbol =
-//		FortranTypesBuilder::buildNewFortranFunction ( "syncthreads", subroutineScope );
-//	
-//  SgExprListExp * emptyParameters = buildExprListExp ( );
-//	
-//  SgFunctionCallExp * synchThreadsFunctionCall =
-//		buildFunctionCallExp ( synchthreadsFunctionSymbol,
-//												   emptyParameters
-//												 );
-//		
-//	appendStatement ( buildExprStatement ( synchThreadsFunctionCall ), subroutineScope );
-//  SgFunctionCallExp * synchthreadsFunctionCall = buildFunctionCallStmt ( synchthreadsFunctionSymbol, 
-//																																			  emptyParameters
-//																																		  );
 	
-//  appendStatement ( buildExprStatement ( synchthreadsFunctionCall ), subroutineScope );
-	
-
 	/*
 	 * ======================================================
 	 * builds initial assignment of computed value to shared

@@ -1197,6 +1197,12 @@ HEADER_TYPE_MODIFIER_START
 						// Carlo (08/02/2011): added new attribute to enable generation of Fortran CUDA kernels
 							 e_device															 = 29,
 
+						// Carlo (27/04/2011): added new attributes to enable generation of Fortran CUDA kernels
+							 e_shared															 = 30,
+							 e_constant														 = 31,
+
+
+
 
             // Last attribute enum (used for internal bounds checking)
                e_last_modifier /*!< last value (upper bound on range of values, used in error checking) */
@@ -1302,10 +1308,20 @@ HEADER_TYPE_MODIFIER_START
           void unsetRestrict();
 
 
-					// Carlo (02/08/2011): added support for generation of CUDA Fortran kernels
+					// Carlo (08/02/2011): added support for generation of CUDA Fortran kernels
           bool isDevice() const;
           void setDevice();
 					void unsetDevice();
+
+					// Carlo (26/04/2011): added further support for generation of CUDA Fortran kernels
+          bool isShared() const;
+          void setShared();
+					void unsetShared();
+
+          bool isConstant() const;
+          void setConstant();
+					void unsetConstant();
+
 
 
        // Fortran specific attribute
@@ -2981,12 +2997,26 @@ void SgTypeModifier::unsetRestrict()    { unsetBit(e_restrict,p_modifierVector);
                e_value          = 15,/*!< value attribute specifier (for Fortran 2003) */
  						// Carlo (08/02/2011): added new attribute to enable generation of Fortran CUDA kernels
 							e_device					= 16,
+ 						// Carlo (26/04/2011): added new attributes to enable generation of Fortran CUDA kernels
+							e_device					= 17,
+							e_device					= 18,
+
 #endif
 
 // Carlo (08/02/2011): added new attribute to enable generation of Fortran CUDA kernels
 bool SgTypeModifier::isDevice() const  { return checkBit(e_device,p_modifierVector); }
 void SgTypeModifier::setDevice()       { setBit(e_device,p_modifierVector); }
 void SgTypeModifier::unsetDevice()     { unsetBit(e_device,p_modifierVector); }
+
+// Carlo (26/04/2011): added new attributes to enable generation of Fortran CUDA kernels
+bool SgTypeModifier::isShared() const  { return checkBit(e_shared,p_modifierVector); }
+void SgTypeModifier::setShared()       { setBit(e_shared,p_modifierVector); }
+void SgTypeModifier::unsetShared()     { unsetBit(e_shared,p_modifierVector); }
+
+bool SgTypeModifier::isConstant() const  { return checkBit(e_constant,p_modifierVector); }
+void SgTypeModifier::setConstant()       { setBit(e_constant,p_modifierVector); }
+void SgTypeModifier::unsetConstant()     { unsetBit(e_constant,p_modifierVector); }
+
 
 // Fortran specific attribute
 bool SgTypeModifier::isAllocatable() const  { return checkBit(e_allocatable,p_modifierVector); }
@@ -3184,6 +3214,7 @@ bool operator== (const $CLASSNAME& lhs, const $CLASSNAME& rhs)
 				 
 						// CARLO: Fortran CUDA modification, see similar modifications for e_device attribute
 	       //(lhs.isDevice()											 == rhs.isDevice()											) &&
+
 
 				 
 		   true;
