@@ -5,6 +5,8 @@
 #include <KernelSubroutine.h>
 #include <UserDeviceSubroutine.h>
 #include <ParallelLoop.h>
+#include <DeviceDataSizesDeclaration.h>
+
 
 class HostSubroutine: public Subroutine
 {
@@ -118,7 +120,7 @@ class HostSubroutine: public Subroutine
     SgStatement *
     createCallToC_F_POINTER (SgExpression * parameter1,
         SgExpression * parameter2, SgExpression * parameter3 = NULL);
-
+		
     HostSubroutine (std::string const & subroutineName,
         UserDeviceSubroutine & userDeviceSubroutine,
         ParallelLoop & parallelLoop, SgScopeStatement * moduleScope);

@@ -140,7 +140,7 @@ HostSubroutineOfIndirectLoop::createExecutionPlanExecutionStatements (
   SgExprListExp * kernelParameters = buildExprListExp ();
 
   SgVarRefExp * argsSizesReference = buildVarRefExp (
-      localVariables_Others[IndirectLoopVariables::argsSizes]);
+      localVariables_Others[LoopVariables::argsSizes]);
 
   kernelParameters->append_expression (argsSizesReference);
 
@@ -1090,10 +1090,10 @@ HostSubroutineOfIndirectLoop::createExecutionPlanLocalVariables (
 
   SgVariableDeclaration * variableDeclaration2 =
       FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
-          IndirectLoopVariables::argsSizes,
+          LoopVariables::argsSizes,
           deviceDataSizesDeclaration.getType (), subroutineScope);
 
-  localVariables_Others[IndirectLoopVariables::argsSizes]
+  localVariables_Others[LoopVariables::argsSizes]
       = variableDeclaration2;
 
   /*

@@ -1,6 +1,7 @@
 #include <boost/lexical_cast.hpp>
 #include <HostSubroutineOfDirectLoop.h>
 #include <FortranTypesBuilder.h>
+#include <FortranStatementsAndExpressionsBuilder.h>
 #include <ROSEHelper.h>
 #include <Debug.h>
 
@@ -181,6 +182,73 @@ HostSubroutineOfDirectLoop::createCUDAVariables (ParallelLoop & parallelLoop)
   appendStatement (buildExprStatement (assignExpression2), subroutineScope);
 }
 
+void
+HostSubroutineOfDirectLoop::createDeviceVariablesSizesVariable ( 
+  DeviceDataSizesDeclarationDirectLoops & deviceDataSizesDeclarationDirectLoops ) 
+{
+
+	Debug::getInstance ()->debugMessage ("Creating device data sizes variable", 2);
+	
+  /*
+   * ======================================================
+   * Create the variable which passes the sizes of arguments
+   * to the kernel
+   * ======================================================
+   */
+	
+  SgVariableDeclaration * variableDeclaration2 =
+	FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
+		LoopVariables::argsSizes,
+		deviceDataSizesDeclarationDirectLoops.getType (),
+		subroutineScope);
+	
+  localVariables_Others[LoopVariables::argsSizes]
+		= variableDeclaration2;
+}
+
+
+void
+HostSubroutineOfDirectLoop::initialiseDeviceVariablesSizesVariable ( 
+	ParallelLoop & parallelLoop )
+{
+	using std::string;
+  using boost::lexical_cast;
+	using SageBuilder::buildOpaqueVarRefExp;
+	using SageBuilder::buildDotExp;
+	using SageBuilder::buildVarRefExp;
+	using SageBuilder::buildAssignOp;
+	using SageBuilder::buildExprStatement;
+	using SageInterface::appendStatement;
+	
+	/*
+   * ======================================================
+   * In direct loop sizes are only related to op_dat
+	 * variables
+   * ======================================================
+   */
+	
+	for (unsigned int i = 1; i
+			 <= parallelLoop.getNumberOf_OP_DAT_ArgumentGroups (); ++i)
+  {
+    if (parallelLoop.isDuplicate_OP_DAT (i) == false)
+    {			
+			string const sizeFieldExpression = "parg" + lexical_cast < string > ( i ) + "DatDSize";
+			
+      SgExpression * sizeVariableField = buildDotExp ( 
+				buildVarRefExp ( localVariables_Others[LoopVariables::argsSizes] ),
+				buildOpaqueVarRefExp ( sizeFieldExpression, subroutineScope ) );
+			
+
+			SgExpression * assignExpression = buildAssignOp ( sizeVariableField,
+				buildVarRefExp ( localVariables_OP_DAT_Sizes[i] ) );
+			
+      appendStatement ( buildExprStatement ( assignExpression ), subroutineScope);
+    }
+	}
+}
+																											 
+
+
 /*
  * ======================================================
  * Public functions
@@ -190,7 +258,9 @@ HostSubroutineOfDirectLoop::createCUDAVariables (ParallelLoop & parallelLoop)
 HostSubroutineOfDirectLoop::HostSubroutineOfDirectLoop (
     std::string const & subroutineName,
     UserDeviceSubroutine & userDeviceSubroutine,
-    KernelSubroutine & kernelSubroutine, ParallelLoop & parallelLoop,
+    KernelSubroutine & kernelSubroutine, 
+		DeviceDataSizesDeclarationDirectLoops & deviceDataSizesDeclarationDirectLoops,
+    ParallelLoop & parallelLoop,
     SgScopeStatement * moduleScope) :
   HostSubroutine (subroutineName, userDeviceSubroutine, parallelLoop,
       moduleScope)
@@ -200,14 +270,18 @@ HostSubroutineOfDirectLoop::HostSubroutineOfDirectLoop (
 
   createFormalParameters (userDeviceSubroutine, parallelLoop);
 
+	createDeviceVariablesSizesVariable ( deviceDataSizesDeclarationDirectLoops );
+	
   createDataMarshallingLocalVariables (parallelLoop);
-
+	
   createCUDAKernelVariables ();
 
   createCUDAVariables (parallelLoop);
 
   initialiseDataMarshallingLocalVariables (parallelLoop);
 
+	initialiseDeviceVariablesSizesVariable ( parallelLoop );
+	
   createKernelCall (kernelSubroutine, parallelLoop);
 
   copyDataBackFromDeviceAndDeallocate (parallelLoop);

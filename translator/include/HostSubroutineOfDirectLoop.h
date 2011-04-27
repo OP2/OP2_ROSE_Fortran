@@ -20,10 +20,16 @@
 
 #include <HostSubroutine.h>
 #include <KernelSubroutine.h>
+#include <DeviceDataSizesDeclarationDirectLoops.h>
+
 
 class HostSubroutineOfDirectLoop: public HostSubroutine
 {
   private:
+
+	
+		std::map <std::string, SgVariableDeclaration *> localVariables_Others;
+	
 
     /*
      * ======================================================
@@ -43,12 +49,33 @@ class HostSubroutineOfDirectLoop: public HostSubroutine
     void
     createCUDAVariables (ParallelLoop & parallelLoop);
 
+		/*
+		 * ======================================================
+		 * Generates the declaration of the variable
+		 * encapsulating device variables sizes
+		 * ======================================================
+		 */
+		void
+		createDeviceVariablesSizesVariable ( 
+			DeviceDataSizesDeclarationDirectLoops & deviceDataSizesDeclarationDirectLoops );
+
+		/*
+		 * ======================================================
+		 * Generates the code initialising the device variable
+		 * sizes variable
+		 * ======================================================
+		 */
+		void
+		initialiseDeviceVariablesSizesVariable ( ParallelLoop & parallelLoop );
+
   public:
 
     HostSubroutineOfDirectLoop (std::string const & subroutineName,
         UserDeviceSubroutine & userDeviceSubroutine,
-        KernelSubroutine & kernelSubroutine, ParallelLoop & parallelLoop,
-        SgScopeStatement * moduleScope);
+        KernelSubroutine & kernelSubroutine, 
+				DeviceDataSizesDeclarationDirectLoops & deviceDataSizesDeclarationDirectLoops,
+				ParallelLoop & parallelLoop,
+        SgScopeStatement * moduleScope );
 };
 
 #endif

@@ -550,7 +550,7 @@ KernelSubroutineOfIndirectLoop::createArgsSizesFormalParameter (
       2);
 
   formalParameter_argsSizes = buildVariableDeclaration (
-      IndirectLoopVariables::argsSizes, deviceDataSizesDeclaration.getType (),
+      LoopVariables::argsSizes, deviceDataSizesDeclaration.getType (),
       NULL, subroutineScope);
 
   formalParameter_argsSizes->get_declarationModifier ().get_accessModifier ().setUndefined ();

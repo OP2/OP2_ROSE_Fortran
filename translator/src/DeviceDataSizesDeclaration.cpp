@@ -127,5 +127,5 @@ DeviceDataSizesDeclaration::DeviceDataSizesDeclaration (
 
   appendStatement (deviceDatatypeStatement, moduleScope);
 
-  addFields (parallelLoop, moduleScope);
+ // addFields (parallelLoop, moduleScope);
 }

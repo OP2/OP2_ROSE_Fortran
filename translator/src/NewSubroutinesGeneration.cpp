@@ -10,6 +10,7 @@
 #include <HostSubroutineOfIndirectLoop.h>
 #include <InitialiseConstantsSubroutine.h>
 #include <DeviceDataSizesDeclaration.h>
+#include <DeviceDataSizesDeclarationDirectLoops.h>
 #include <ReductionSubroutine.h>
 
 
@@ -399,6 +400,33 @@ NewSubroutinesGeneration::visit (SgNode * node)
 
               if (parallelLoop->isDirectLoop ())
               {
+								
+								
+								/*
+                 * ======================================================
+                 * Indirect loop
+                 * ======================================================
+                 */
+								
+                DeviceDataSizesDeclarationDirectLoops * deviceDataSizesDeclarationDirectLoops =
+								new DeviceDataSizesDeclarationDirectLoops ( *parallelLoop,
+																													  userSubroutineName, moduleScope);
+								
+								deviceDataSizesDeclarationDirectLoops->initialise( *parallelLoop, moduleScope );
+								
+                /*
+                 * ======================================================
+                 * Indirect loops use global constants. Declare them and
+                 * generate the subroutine which initialises them
+                 * ======================================================
+                 */
+								
+                InitialiseConstantsSubroutine * initialiseConstantsSubroutine =
+								new InitialiseConstantsSubroutine (userSubroutineName);
+								
+                initialiseConstantsSubroutine->declareConstants (moduleScope);
+								
+								
                 /*
                  * ======================================================
                  * Direct loop
@@ -426,6 +454,7 @@ NewSubroutinesGeneration::visit (SgNode * node)
                 HostSubroutine * hostSubroutine =
                     new HostSubroutineOfDirectLoop (userSubroutineName,
                         *userDeviceSubroutine, *kernelSubroutine,
+												*deviceDataSizesDeclarationDirectLoops,
                         *parallelLoop, moduleScope);
 
                 /*
@@ -454,6 +483,7 @@ NewSubroutinesGeneration::visit (SgNode * node)
                     new DeviceDataSizesDeclaration (*parallelLoop,
                         userSubroutineName, moduleScope);
 
+								deviceDataSizesDeclaration->initialise ( *parallelLoop, moduleScope );
                 /*
                  * ======================================================
                  * Indirect loops use global constants. Declare them and

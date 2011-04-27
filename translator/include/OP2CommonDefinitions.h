@@ -90,7 +90,7 @@ namespace PlanFunctionSizeVariables
   std::string const pthrcolSize = "pthrcolSize";
 }
 
-namespace IndirectLoopVariables
+namespace LoopVariables
 {
   std::string const argsSizes = "argsSizes";
 }

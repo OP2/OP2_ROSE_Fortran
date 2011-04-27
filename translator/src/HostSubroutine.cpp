@@ -306,6 +306,15 @@ HostSubroutine::createCUDAKernelVariables ()
   appendStatement (CUDAVariable_sharedMemorySize, subroutineScope);
 }
 
+
+void
+HostSubroutine::initialiseDeviceVariableSizes (
+	DeviceDataSizesDeclaration * deviceDataSizesDeclaration )
+{
+	
+}
+
+
 void
 HostSubroutine::createFormalParameters (
     UserDeviceSubroutine & userDeviceSubroutine, ParallelLoop & parallelLoop)
