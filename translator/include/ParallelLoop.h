@@ -15,7 +15,12 @@
 
 enum MAPPING_VALUE
 {
-  DIRECT, INDIRECT
+  DIRECT, INDIRECT, GLOBAL
+};
+
+enum ACCESS_CODE_VALUE
+{
+  READ_ACCESS, WRITE_ACCESS, RW_ACCESS, INC_ACCESS
 };
 
 class ParallelLoop
@@ -80,6 +85,14 @@ class ParallelLoop
      * ======================================================
      */
     std::map <unsigned int, MAPPING_VALUE> OP_DAT_MappingDescriptors;
+
+    /*
+     * ======================================================
+     * How is the data for the OP_DAT variables in this position
+     * (in the actual arguments) accessed: read, written, etc.
+     * ======================================================
+     */
+    std::map <unsigned int, ACCESS_CODE_VALUE> OP_DAT_AccessDescriptors;
 
   private:
 
@@ -146,6 +159,12 @@ class ParallelLoop
     get_OP_MAP_Value (unsigned int OP_DAT_ArgumentGroup)
     {
       return OP_DAT_MappingDescriptors[OP_DAT_ArgumentGroup];
+    }
+
+    ACCESS_CODE_VALUE
+    get_OP_Access_Value (unsigned int OP_DAT_ArgumentGroup)
+    {
+      return OP_DAT_AccessDescriptors[OP_DAT_ArgumentGroup];
     }
 };
 
