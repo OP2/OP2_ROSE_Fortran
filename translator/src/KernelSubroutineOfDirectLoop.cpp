@@ -183,15 +183,15 @@ KernelSubroutineOfDirectLoop::createStatements (
    */
 
   SgSubtractOp * subtractExpression1 = buildSubtractOp (buildDotExp (
-      variable_Threadidx, variable_X), buildIntVal (1));
+      variable_Blockidx, variable_X), buildIntVal (1));
 
   SgSubtractOp * subtractExpression2 = buildSubtractOp (buildDotExp (
-      variable_Blockidx, variable_X), buildIntVal (1));
+      variable_Threadidx, variable_X), buildIntVal (1));
 
   SgExpression * blockDimX = buildDotExp (variable_Blockdim, variable_X);
 
-  SgMultiplyOp * multiplyExpression = buildMultiplyOp (subtractExpression1,
-      blockDimX);
+  SgMultiplyOp * multiplyExpression = buildMultiplyOp ( subtractExpression1,
+      blockDimX );
 
   SgVarRefExp * iterationCounterReference = buildVarRefExp (
       variable_setElementCounter );

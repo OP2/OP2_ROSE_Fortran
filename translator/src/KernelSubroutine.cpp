@@ -80,8 +80,8 @@ KernelSubroutine::createLocalThreadVariables ( ParallelLoop & parallelLoop,
 			
 			opDatBaseType = arrayType->get_base_type ();
 			
-			SgArrayType * variableType = FortranTypesBuilder::getArrayTypePlainDimension ( 
-				opDatBaseType, parallelLoop.get_OP_DAT_Dimension ( i ) );
+			SgArrayType * variableType = FortranTypesBuilder::getArray_RankOne ( 
+				opDatBaseType, 0, dim -1 );
 			
 
 			SgVariableDeclaration * variableDeclaration =
