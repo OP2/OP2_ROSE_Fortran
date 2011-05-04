@@ -285,11 +285,7 @@ KernelSubroutineOfIndirectLoop::createSharedLocalVariables (
           subroutineScope);
 
       variableDeclaration->get_declarationModifier ().get_accessModifier ().setUndefined ();
-
-      /*
-       * Not yet supported by ROSE
-       */
-      //variableDeclaration->get_declarationModifier ().get_accessModifier ().setShared ();
+			//variableDeclaration->get_declarationModifier ().get_accessModifier ().setShared ();
 
       appendStatement (variableDeclaration, subroutineScope);
 
@@ -538,29 +534,6 @@ KernelSubroutineOfIndirectLoop::create_OP_DAT_FormalParameters (
   }
 }
 
-void
-KernelSubroutineOfIndirectLoop::createArgsSizesFormalParameter (
-    DeviceDataSizesDeclaration & deviceDataSizesDeclaration)
-{
-  using SageBuilder::buildVariableDeclaration;
-  using SageBuilder::buildIntType;
-  using SageInterface::appendStatement;
-
-  Debug::getInstance ()->debugMessage ("Creating OP_SET size formal parameter",
-      2);
-
-  formalParameter_argsSizes = buildVariableDeclaration (
-      LoopVariables::argsSizes, deviceDataSizesDeclaration.getType (),
-      NULL, subroutineScope);
-
-  formalParameter_argsSizes->get_declarationModifier ().get_accessModifier ().setUndefined ();
-  formalParameter_argsSizes->get_declarationModifier ().get_typeModifier ().setDevice ();
-
-  formalParameters->append_arg (
-      *(formalParameter_argsSizes->get_variables ().begin ()));
-
-  appendStatement (formalParameter_argsSizes, subroutineScope);
-}
 
 KernelSubroutineOfIndirectLoop::KernelSubroutineOfIndirectLoop (
     std::string const & subroutineName,

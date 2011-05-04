@@ -81,7 +81,7 @@ class ParallelLoop
      * ======================================================
      * How is the data for the OP_DAT variables in this position
      * (in the actual arguments) accessed: through
-     * a mapping or directly?
+     * a mapping or directly or as a global variable?
      * ======================================================
      */
     std::map <unsigned int, MAPPING_VALUE> OP_DAT_MappingDescriptors;

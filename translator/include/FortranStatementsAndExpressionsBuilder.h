@@ -89,6 +89,18 @@ class FortranStatementsAndExpressionsBuilder
     static void
     appendDeallocateStatement (SgExprListExp * deallocateParameters,
         SgScopeStatement * scope);
+
+		/*
+		 * ======================================================
+		 * Creates and appends the autoshared variable 
+		 * declaration
+		 * ======================================================
+		 */
+		static SgVariableDeclaration *
+		createAndAppendAutosharedVariable ( SgType * variableType,
+			SgScopeStatement * scopeStatement );
+	
+				
 };
 
 #endif

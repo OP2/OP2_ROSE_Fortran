@@ -16,16 +16,6 @@ class KernelSubroutineOfIndirectLoop: public KernelSubroutine
 {
   private:
 
-    /*
-     * ======================================================
-     * The first formal parameter in an indirect loop is a
-     * variable containing the size information of the other
-     * formal parameters
-     * ======================================================
-     */
-
-    SgVariableDeclaration * formalParameter_argsSizes;
-
     std::map <std::string, SgVariableDeclaration *>
         formalParameters_PlanVariables;
 
@@ -65,10 +55,6 @@ class KernelSubroutineOfIndirectLoop: public KernelSubroutine
     create_OP_DAT_FormalParameters (
         DeviceDataSizesDeclaration & deviceDataSizesDeclaration,
         ParallelLoop & parallelLoop);
-
-    void
-    createArgsSizesFormalParameter (
-        DeviceDataSizesDeclaration & deviceDataSizesDeclaration);
 
   public:
 

@@ -42,7 +42,6 @@ namespace
   std::string const variableName_maps = "maps";
   std::string const variableName_ncolblk = "ncolblk";
   std::string const variableName_planRet = "planRet";
-  std::string const variableName_threadSynchRet = "threadSynchRet";
 
   /*
    * ======================================================
@@ -72,8 +71,6 @@ namespace
 class HostSubroutineOfIndirectLoop: public HostSubroutine
 {
   private:
-
-    std::map <std::string, SgVariableDeclaration *> localVariables_Others;
 
     std::map <unsigned int, SgVariableDeclaration *>
         localVariables_ExecutionPlan_OP_DAT;

@@ -61,6 +61,17 @@ namespace OP2
    * ======================================================
    */
   unsigned int const NUMBER_OF_NON_OP_DAT_ARGUMENTS = 2;
+	
+  /*
+   * ======================================================
+   * Position of first OP_ACCESS (the following ones
+	 * are in following + NUMBER_OF_ARGUMENTS_PER_OP_DAT
+	 * positions 
+   * ======================================================
+   */
+  unsigned int const POSITION_OF_FIRST_OP_ACCESS = 6;
+	
+	
 }
 
 namespace PlanFunctionVariables
@@ -93,6 +104,18 @@ namespace PlanFunctionSizeVariables
 namespace LoopVariables
 {
   std::string const argsSizes = "argsSizes";
+}
+
+namespace kernelDatArgumentsNames
+{
+	std::string const argNamePrefix = "argument";
+	std::string const argNameSizePostfix = "Size";
+}
+
+namespace kernelLocalThreadVarsNames
+{
+	std::string const localVarNamePrefix = "arg";
+	std::string const localVarNamePostfix = "_l";
 }
 
 namespace FortranVariableDeafultKinds

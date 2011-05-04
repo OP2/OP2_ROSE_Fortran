@@ -2998,8 +2998,8 @@ void SgTypeModifier::unsetRestrict()    { unsetBit(e_restrict,p_modifierVector);
  						// Carlo (08/02/2011): added new attribute to enable generation of Fortran CUDA kernels
 							e_device					= 16,
  						// Carlo (26/04/2011): added new attributes to enable generation of Fortran CUDA kernels
-							e_device					= 17,
-							e_device					= 18,
+							e_shared					= 17,
+							e_constant					= 18,
 
 #endif
 

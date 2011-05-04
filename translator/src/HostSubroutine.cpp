@@ -279,8 +279,6 @@ HostSubroutine::createCUDAKernelVariables ()
   using SageInterface::appendStatement;
   using std::string;
 
-  Debug::getInstance ()->debugMessage ("Creating CUDA kernel variables", 2);
-
   string const CUDAVariable_blocksPerGridVariableName = "nblocks";
   string const CUDAVariable_threadsPerBlockVariableName = "nthread";
   string const CUDAVariable_sharedMemorySizeVariableName = "nshared";
@@ -304,6 +302,17 @@ HostSubroutine::createCUDAKernelVariables ()
   appendStatement (CUDAVariable_blocksPerGrid, subroutineScope);
   appendStatement (CUDAVariable_threadsPerBlock, subroutineScope);
   appendStatement (CUDAVariable_sharedMemorySize, subroutineScope);
+
+  /*
+   * ======================================================
+   * Also builds threadSynchRet
+   * ======================================================
+   */
+  localVariables_Others[variableName_threadSynchRet]
+      = FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
+          variableName_threadSynchRet,
+          FortranTypesBuilder::getFourByteInteger (), subroutineScope);
+
 }
 
 void
@@ -586,6 +595,32 @@ HostSubroutine::createCallToC_F_POINTER (SgExpression * parameter1,
       actualParameters);
 
   return buildExprStatement (subroutineCall);
+}
+
+SgStatement *
+HostSubroutine::buildThreadSynchroniseFunctionCall (
+    SgScopeStatement * subroutineScope)
+{
+  using SageBuilder::buildVarRefExp;
+  using SageBuilder::buildExprListExp;
+  using SageBuilder::buildFunctionCallExp;
+  using SageBuilder::buildAssignOp;
+  using SageBuilder::buildExprStatement;
+
+  SgFunctionSymbol * cudaThreadSynchronizeFunctionSymbol =
+      FortranTypesBuilder::buildNewFortranFunction ("cudaThreadSynchronize",
+          subroutineScope);
+
+  SgVarRefExp * threadSynchRetReference = buildVarRefExp (
+      localVariables_Others[variableName_threadSynchRet]);
+
+  SgFunctionCallExp * threadSynchRetFunctionCall = buildFunctionCallExp (
+      cudaThreadSynchronizeFunctionSymbol, buildExprListExp ());
+
+  SgStatement * threadSynchFunctionCall = buildExprStatement (buildAssignOp (
+      threadSynchRetReference, threadSynchRetFunctionCall));
+
+  return threadSynchFunctionCall;
 }
 
 HostSubroutine::HostSubroutine (std::string const & subroutineName,

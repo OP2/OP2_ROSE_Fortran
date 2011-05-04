@@ -235,19 +235,8 @@ HostSubroutineOfIndirectLoop::createExecutionPlanExecutionStatements (
    * ======================================================
    */
 
-  SgFunctionSymbol * cudaThreadSynchronizeFunctionSymbol =
-      FortranTypesBuilder::buildNewFortranFunction ("cudaThreadSynchronize",
-          subroutineScope);
-
-  SgVarRefExp * threadSynchRetReference = buildVarRefExp (
-      localVariables_Others[variableName_threadSynchRet]);
-
-  SgFunctionCallExp * threadSynchRetFunctionCall = buildFunctionCallExp (
-      cudaThreadSynchronizeFunctionSymbol, buildExprListExp ());
-
-  SgStatement * statement5 = buildExprStatement (buildAssignOp (
-      threadSynchRetReference, threadSynchRetFunctionCall));
-
+  SgStatement * statement5 = buildThreadSynchroniseFunctionCall ( subroutineScope );
+	
   /*
    * ======================================================
    * Statement to increment the block offset
@@ -1241,7 +1230,7 @@ HostSubroutineOfIndirectLoop::createExecutionPlanLocalVariables (
   {
     if (parallelLoop.isDuplicate_OP_DAT (i) == false)
     {
-      string const variableName = "pArg" + lexical_cast <string> (i) + "DatD";
+      string const variableName = kernelDatArgumentsNames::argNamePrefix + lexical_cast <string> (i);
 
       SgVariableDeclaration * variableDeclaration =
           FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
@@ -1266,8 +1255,8 @@ HostSubroutineOfIndirectLoop::createExecutionPlanLocalVariables (
   {
     if (parallelLoop.isDuplicate_OP_DAT (i) == false)
     {
-      string const variableName = "pArg" + lexical_cast <string> (i)
-          + "DatDSize";
+      string const variableName = kernelDatArgumentsNames::argNamePrefix + lexical_cast <string> (i)
+          + kernelDatArgumentsNames::argNameSizePostfix;
 
       SgVariableDeclaration * variableDeclaration =
           FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
@@ -1341,7 +1330,6 @@ HostSubroutineOfIndirectLoop::createExecutionPlanLocalVariables (
   fourByteIntegerVariables.push_back (variableName_IterationCounter);
   fourByteIntegerVariables.push_back (variableName_blockOffset);
   fourByteIntegerVariables.push_back (variableName_col);
-  fourByteIntegerVariables.push_back (variableName_threadSynchRet);
   fourByteIntegerVariables.push_back (PlanFunctionSizeVariables::pindSizesSize);
   fourByteIntegerVariables.push_back (PlanFunctionSizeVariables::pindOffsSize);
   fourByteIntegerVariables.push_back (PlanFunctionSizeVariables::pblkMapSize);
@@ -1349,6 +1337,16 @@ HostSubroutineOfIndirectLoop::createExecutionPlanLocalVariables (
   fourByteIntegerVariables.push_back (PlanFunctionSizeVariables::pnelemsSize);
   fourByteIntegerVariables.push_back (PlanFunctionSizeVariables::pnthrcolSize);
   fourByteIntegerVariables.push_back (PlanFunctionSizeVariables::pthrcolSize);
+
+  /*
+   * ======================================================
+   * threadSynchRet is used by both direct and indirect
+	 * loops, then it is now moved to the
+	 * createCUDAKernelVariables routine
+   * ======================================================
+   */
+	// fourByteIntegerVariables.push_back (variableName_threadSynchRet);
+
 
   for (vector <string>::iterator it = fourByteIntegerVariables.begin (); it
       != fourByteIntegerVariables.end (); ++it)
