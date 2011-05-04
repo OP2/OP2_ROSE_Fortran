@@ -198,7 +198,6 @@ FortranStatementsAndExpressionsBuilder::createAndAppendAutosharedVariable (
 	SgVariableDeclaration * autosharedVariable = buildVariableDeclaration ( "autoshared",
 		autosharedType, NULL, scopeStatement );
 
-	// TODO: add shared attribute to ROSE
 	autosharedVariable->get_declarationModifier ().get_typeModifier ().setShared ();
 	autosharedVariable->get_declarationModifier ().get_accessModifier ().setUndefined ();
 
