@@ -185,6 +185,21 @@ FortranTypesBuilder::getArray_RankOne (SgType * baseType, int lowerBound,
   return array;
 }
 
+SgArrayType *
+FortranTypesBuilder::getArrayTypePlainDimension ( SgType * baseType, int dimension )
+{
+	using SageBuilder::buildArrayType;
+	using SageBuilder::buildIntVal;
+	using SageBuilder::buildExprListExp;
+			
+	SgArrayType * returnedType = buildArrayType ( baseType );
+	SgExpression * dimensionExpression = buildIntVal ( dimension );
+	returnedType->set_dim_info ( buildExprListExp ( dimensionExpression ) );
+	returnedType->set_rank (1);
+	
+	return returnedType;
+}
+
 
 SgArrayType *
 FortranTypesBuilder::getArray_RankOne ( SgType * baseType,

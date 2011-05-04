@@ -25,8 +25,14 @@ ParallelLoop::retrieveOP_DATDeclarations (Declarations * declarations)
 
   int OP_DATCounter = 0;
 
+	/*
+	 * ======================================================
+	 * We start from position: NUMBER_OF_NON_OP_DAT_ARGUMENTS
+	 * ======================================================
+	 */
+	 
   for (vector <SgExpression *>::iterator it = actualArguments.begin ()
-      + OP2::NUMBER_OF_NON_OP_DAT_ARGUMENTS; it != actualArguments.end (); ++it)
+      + OP2::NUMBER_OF_NON_OP_DAT_ARGUMENTS; it != actualArguments.end (); ++it )
   {
     switch ((*it)->variantT ())
     {
@@ -50,6 +56,7 @@ ParallelLoop::retrieveOP_DATDeclarations (Declarations * declarations)
               variableReference->get_symbol ()->get_name ().getString ();
 
           string const className = classReference->get_name ().getString ();
+
 
           if (iequals (className, OP2::OP_DAT_NAME))
           {
@@ -122,13 +129,44 @@ ParallelLoop::retrieveOP_DATDeclarations (Declarations * declarations)
             }
             else
             {
-              OP_DAT_MappingDescriptors[OP_DATCounter] = INDIRECT;
-            }
-          }
-        }
-      }
+							if (iequals (variableName, OP2::OP_GBL_NAME))
+							{
+								/*
+								 * ======================================================
+								 * OP_GBL signals that the op_dat is a global variable
+								 * ======================================================
+								 */
+								OP_DAT_MappingDescriptors[OP_DATCounter] = GLOBAL;
+							}
+							else
+							{
+								OP_DAT_MappingDescriptors[OP_DATCounter] = INDIRECT;
+							}
+						}
+					}
+				}
+				if ( variableReference->get_type ()->variantT () == V_SgTypeInt )
+				{
+					string const variableName =
+					variableReference->get_symbol ()->get_name ().getString ();
 
-      default:
+					if ( iequals ( variableName, OP2::OP_READ_NAME ) )					
+							OP_DAT_AccessDescriptors[OP_DATCounter] = READ_ACCESS;
+
+					if ( iequals ( variableName, OP2::OP_WRITE_NAME )	)				
+							OP_DAT_AccessDescriptors[OP_DATCounter] = WRITE_ACCESS;
+
+					if ( iequals ( variableName, OP2::OP_INC_NAME )	)			
+							OP_DAT_AccessDescriptors[OP_DATCounter] = INC_ACCESS;
+
+					if ( iequals ( variableName, OP2::OP_RW_NAME ))				
+							OP_DAT_AccessDescriptors[OP_DATCounter] = RW_ACCESS;
+
+				}
+				break;
+			}
+      			
+			default:
       {
         break;
       }

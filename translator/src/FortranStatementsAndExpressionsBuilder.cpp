@@ -1,4 +1,5 @@
 #include <FortranStatementsAndExpressionsBuilder.h>
+#include <FortranTypesBuilder.h>
 #include <ROSEHelper.h>
 
 /*
@@ -173,4 +174,36 @@ FortranStatementsAndExpressionsBuilder::appendDeallocateStatement (
   deallocateStatement->set_expr_list (deallocateParameters);
 
   appendStatement (deallocateStatement, scope);
+}
+
+
+SgVariableDeclaration *
+FortranStatementsAndExpressionsBuilder::createAndAppendAutosharedVariable (
+  SgType * variableType, SgScopeStatement * scopeStatement )
+{
+
+	using SageBuilder::buildIntVal;
+	using SageBuilder::buildVariableDeclaration;
+	using SageInterface::appendStatement;
+
+//	SgExpression * lowerBound = buildIntVal ( 0 );
+
+	SgExpression * upperBound = new SgAsteriskShapeExp ( ROSEHelper::getFileInfo () );
+
+
+	SgArrayType * autosharedType =
+		FortranTypesBuilder::getArray_RankOne ( variableType,
+			0, upperBound );
+
+	SgVariableDeclaration * autosharedVariable = buildVariableDeclaration ( "autoshared",
+		autosharedType, NULL, scopeStatement );
+
+	// TODO: add shared attribute to ROSE
+	autosharedVariable->get_declarationModifier ().get_typeModifier ().setShared ();
+	autosharedVariable->get_declarationModifier ().get_accessModifier ().setUndefined ();
+
+	appendStatement ( autosharedVariable, scopeStatement );
+
+	return autosharedVariable;
+
 }

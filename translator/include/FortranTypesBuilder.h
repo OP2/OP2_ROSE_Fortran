@@ -121,6 +121,16 @@ class FortranTypesBuilder
     getArray_RankOne_WithLowerBound (SgType * baseType,
         SgExpression * lowerBoundExpression);
 
+		/*
+		 * ======================================================
+		 * Returns a one-dimensional Fortran array of elements
+		 * of the given type with this specific number of 
+		 * elements
+		 * ======================================================
+		 */
+		static SgArrayType *
+		getArrayTypePlainDimension ( SgType * baseType, int dimension );
+
     /*
      * ======================================================
      * Returns a one-dimensional Fortran array of elements

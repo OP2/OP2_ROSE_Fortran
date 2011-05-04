@@ -216,7 +216,7 @@ NewSubroutinesGeneration::createCUDAModule (SgSourceFile & sourceFile,
 
   moduleStatement->get_definition ()->setCaseInsensitive (true);
 
-  appendStatement (moduleStatement, globalScope);
+  appendStatement ( moduleStatement, globalScope );	
 
   return moduleStatement;
 }
@@ -371,6 +371,7 @@ NewSubroutinesGeneration::visit (SgNode * node)
                * Fortran source code
                * ======================================================
                */
+							
 
               ParallelLoop * parallelLoop = new ParallelLoop (
                   userSubroutineName, actualArguments, declarations);
@@ -401,18 +402,18 @@ NewSubroutinesGeneration::visit (SgNode * node)
               if (parallelLoop->isDirectLoop ())
               {
 								
+								Debug::getInstance ()->debugMessage ( "Direct Loop", 2 );
 								
 								/*
                  * ======================================================
-                 * Indirect loop
+                 * Direct loop
                  * ======================================================
                  */
-								
                 DeviceDataSizesDeclarationDirectLoops * deviceDataSizesDeclarationDirectLoops =
-								new DeviceDataSizesDeclarationDirectLoops ( *parallelLoop,
-																													  userSubroutineName, moduleScope);
+								  new DeviceDataSizesDeclarationDirectLoops ( *parallelLoop,
+									  userSubroutineName, moduleScope );
 								
-								deviceDataSizesDeclarationDirectLoops->initialise( *parallelLoop, moduleScope );
+								deviceDataSizesDeclarationDirectLoops->initialise ( *parallelLoop, moduleScope );
 								
                 /*
                  * ======================================================
@@ -427,11 +428,6 @@ NewSubroutinesGeneration::visit (SgNode * node)
                 initialiseConstantsSubroutine->declareConstants (moduleScope);
 								
 								
-                /*
-                 * ======================================================
-                 * Direct loop
-                 * ======================================================
-                 */
 
                 addContains (moduleStatement);
 
@@ -449,7 +445,8 @@ NewSubroutinesGeneration::visit (SgNode * node)
 
                 KernelSubroutine * kernelSubroutine =
                     new KernelSubroutineOfDirectLoop (userSubroutineName,
-                        *userDeviceSubroutine, *parallelLoop, moduleScope);
+                        *userDeviceSubroutine, *deviceDataSizesDeclarationDirectLoops,
+												*parallelLoop, moduleScope);
 
                 HostSubroutine * hostSubroutine =
                     new HostSubroutineOfDirectLoop (userSubroutineName,
@@ -478,6 +475,8 @@ NewSubroutinesGeneration::visit (SgNode * node)
                  * Indirect loop
                  * ======================================================
                  */
+
+								Debug::getInstance ()->debugMessage ( "Indirect Loop", 2 );
 
                 DeviceDataSizesDeclaration * deviceDataSizesDeclaration =
                     new DeviceDataSizesDeclaration (*parallelLoop,

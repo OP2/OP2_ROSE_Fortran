@@ -27,9 +27,16 @@ class HostSubroutineOfDirectLoop: public HostSubroutine
 {
   private:
 
-	
-		std::map <std::string, SgVariableDeclaration *> localVariables_Others;
-	
+		/*
+		 * ======================================================
+		 * CUDA variables specific of direct loops
+		 * ======================================================
+		 */
+		SgVariableDeclaration * CUDAVariable_offsetS;
+		
+		SgVariableDeclaration * CUDAVariable_warpSizeOP2;
+		
+		SgVariableDeclaration * CUDAVariable_threadSynchRet;
 
     /*
      * ======================================================
@@ -47,7 +54,7 @@ class HostSubroutineOfDirectLoop: public HostSubroutine
      * ======================================================
      */
     void
-    createCUDAVariables (ParallelLoop & parallelLoop);
+    createCUDAVariablesDirectLoops (ParallelLoop & parallelLoop);
 
 		/*
 		 * ======================================================
@@ -68,6 +75,15 @@ class HostSubroutineOfDirectLoop: public HostSubroutine
 		void
 		initialiseDeviceVariablesSizesVariable ( ParallelLoop & parallelLoop );
 
+		/*
+		 * ======================================================
+		 * Initialises: nblocks, nthreads, nshared, offsetS and
+		 * warpSizeOP2
+		 * ======================================================
+		 */		
+		void
+		initialiseAllCUDAVariables ( ParallelLoop & parallelLoop );
+	
   public:
 
     HostSubroutineOfDirectLoop (std::string const & subroutineName,

@@ -25,8 +25,8 @@ DeviceDataSizesDeclaration::addFields (ParallelLoop & parallelLoop,
   {
     if (parallelLoop.isDuplicate_OP_DAT (i) == false)
     {
-      string const variableName = "parg" + lexical_cast <string> (i)
-          + "DatDSize";
+      string const variableName = kernelDatArgumentsNames::argNamePrefix + lexical_cast <string> (i)
+          + kernelDatArgumentsNames::argNameSizePostfix;
 
       SgVariableDeclaration * fieldDeclaration = buildVariableDeclaration (
           variableName, FortranTypesBuilder::getFourByteInteger (), NULL,

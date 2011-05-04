@@ -637,7 +637,7 @@ UnparseLanguageIndependentConstructs::unparseStatement(SgStatement* stmt, SgUnpa
         {
        // DQ (12/5/2007): This assertion appears to work better.       
 			 // CB ( 2/16/2011): Commented out because it makes the Fortran module creation crush		
-			 //   ROSE_ASSERT(savedScope != NULL || isSgGlobal(scopeStatement) != NULL);
+			 // ROSE_ASSERT(savedScope != NULL || isSgGlobal(scopeStatement) != NULL);
 
 #if 0
           printf ("At end of scope: Setting the current_scope in info: scopeStatement = %p = %s = %s \n",

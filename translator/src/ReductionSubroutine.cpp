@@ -126,30 +126,9 @@ void ReductionSubroutine::createLocalVariables ( )
 	 * base type of the reduction variable
 	 * ======================================================
 	 */
-	SgExpression * lowerBound = buildIntVal ( 0 );
-	
-	SgExpression * upperBound = new SgAsteriskShapeExp ( ROSEHelper::getFileInfo () );
-	
-	
-	SgArrayType * autosharedType =
-		FortranTypesBuilder::getArray_RankOne ( reductionVariableType->get_base_type(),
-																						0,
-																						upperBound
-																					);
 
-	
-	localVariables_autoshared = buildVariableDeclaration ( "autoshared",
-																												 autosharedType,
-																												 NULL,
-																												 subroutineScope
-																											 );
-	
-	// TODO: add shared attribute to ROSE
-//  localVariables_autoshared->get_declarationModifier ().get_accessModifier ().setShared ();
-  localVariables_autoshared->get_declarationModifier ().get_accessModifier ().setUndefined ();
-	
-  appendStatement (localVariables_autoshared, subroutineScope);
-	
+	localVariables_autoshared =  FortranStatementsAndExpressionsBuilder::createAndAppendAutosharedVariable ( 
+	  reductionVariableType->get_base_type(), subroutineScope );
 		
 	localVariables_IterationCounter = buildVariableDeclaration ( "iterCount",
 																															 buildIntType (),
@@ -161,7 +140,6 @@ void ReductionSubroutine::createLocalVariables ( )
 	
   appendStatement (localVariables_IterationCounter, subroutineScope);
 
-	
 	localVariables_threadID = buildVariableDeclaration ( "tid",
 																											 buildIntType (),
 																											 NULL,
@@ -172,7 +150,6 @@ void ReductionSubroutine::createLocalVariables ( )
 	
   appendStatement ( localVariables_threadID, subroutineScope );
 
-
 	/*
 	 * ======================================================
 	 * create opaque reference to threadid%x
@@ -182,7 +159,6 @@ void ReductionSubroutine::createLocalVariables ( )
 	variable_Threadidx = buildOpaqueVarRefExp ("threadidx", subroutineScope);	
 	variable_Blockdim = buildOpaqueVarRefExp ("blockdim", subroutineScope);
 	variable_X = buildOpaqueVarRefExp ("x", subroutineScope);
-
 	
 }
 
@@ -272,7 +248,8 @@ void ReductionSubroutine::createStatements ()
 	 * ======================================================
 	 */
 	
-	if ( autosharedKindSize == NULL ) {
+	if ( autosharedKindSize == NULL ) 
+	{
 		
 		if ( isSgTypeInt ( reductionVariableType->get_base_type() ) != NULL )
 			autosharedKindSize = buildIntVal ( FortranVariableDeafultKinds::DEFAULT_KIND_INT );
