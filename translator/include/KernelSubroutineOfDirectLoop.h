@@ -169,6 +169,26 @@ class KernelSubroutineOfDirectLoop: public KernelSubroutine
 		detectOPDatsBaseKindType ( ParallelLoop & parallelLoop );
 
 
+		/*
+		 * ======================================================
+		 * Builds the statements included in the main
+		 * set elements-based loop
+		 * ======================================================
+		 */
+		SgBasicBlock *
+		buildMainLoopStatements ( ParallelLoop & parallelLoop, SgScopeStatement * scopeStatement );
+	
+
+		/*
+		 * ======================================================
+		 * Builds the assignments of shared memory and local 
+		 * thread variables, if needed
+		 * ======================================================
+		 */	
+		SgBasicBlock *
+		createSharedMemAndLocalThreadVarsAssignments ( 
+      ParallelLoop & parallelLoop, SgScopeStatement * scopeStatement );
+	
   public:
 
     KernelSubroutineOfDirectLoop (std::string const & subroutineName,

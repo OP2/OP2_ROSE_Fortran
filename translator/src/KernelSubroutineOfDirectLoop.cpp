@@ -68,6 +68,186 @@ KernelSubroutineOfDirectLoop::createUserSubroutineCall (
       buildVoidType (), userDeviceSubroutineParameters, subroutineScope);
 }
 
+SgBasicBlock *
+KernelSubroutineOfDirectLoop::createSharedMemAndLocalThreadVarsAssignments ( 
+  ParallelLoop & parallelLoop, SgScopeStatement * scopeStatement )
+{
+	using SageBuilder::buildBasicBlock_nfi;
+	using SageBuilder::buildBasicBlock;
+	using SageBuilder::buildVarRefExp;
+	using SageBuilder::buildIntVal;
+	using SageBuilder::buildAssignOp;
+	using SageBuilder::buildMultiplyOp;
+	using SageBuilder::buildAddOp;
+	using SageBuilder::buildPntrArrRefExp;
+	using SageBuilder::buildExprStatement;
+	using SageBuilder::buildNullExpression;
+	
+	/*
+	 * ======================================================
+	 * We essentially do a similar thing to the one we make
+	 * when we declare local thread variables
+	 * ======================================================
+	 */
+	
+	std::vector< SgStatement * > loopStatements;
+	SgFortranDo * firstLoopStatement;
+	
+	for (unsigned int i = 1; i
+			 <= parallelLoop.getNumberOf_OP_DAT_ArgumentGroups (); ++i)
+  {
+		int dim = parallelLoop.get_OP_DAT_Dimension ( i );
+
+		if ( parallelLoop.get_OP_MAP_Value ( i ) != GLOBAL &&
+				 parallelLoop.get_OP_Access_Value ( i ) != WRITE_ACCESS &&
+				 dim != 1)
+		{
+		
+			SgVarRefExp * displVarRef = buildVarRefExp ( variable_displacementInAutoshared );
+			SgVarRefExp * tidVarRef = buildVarRefExp ( variable_tIdModWarpSize );
+			SgVarRefExp * mVarRef = buildVarRefExp ( variable_dataPerElementCounter );
+			SgVarRefExp * nemelsVarRef = buildVarRefExp ( variable_numberOfThreadInWarpOrRemainingElems );
+			SgVarRefExp * offsetVarRef = buildVarRefExp ( variable_offsetInThreadBlock );
+			SgVarRefExp * autoSharedVarRef = buildVarRefExp ( localVariables_autoshared );
+			ROSE_ASSERT ( displVarRef != NULL );
+			ROSE_ASSERT ( tidVarRef != NULL );
+			ROSE_ASSERT ( mVarRef != NULL );
+			ROSE_ASSERT ( nemelsVarRef != NULL );
+			ROSE_ASSERT ( offsetVarRef != NULL );
+			
+		
+			SgExpression * initLoop = buildAssignOp ( mVarRef, buildIntVal ( 0 ) );
+
+			SgExpression * upperBoundExpression = buildIntVal ( dim - 1 );
+
+			SgExpression * autosharedAccessFirst = buildAddOp ( displVarRef,
+			  buildAddOp ( tidVarRef, buildMultiplyOp ( mVarRef, nemelsVarRef ) ) );
+
+			SgExpression * opdatArgAccess = buildAddOp ( tidVarRef,
+				  buildAddOp ( buildMultiplyOp ( mVarRef, nemelsVarRef ), 
+					  buildMultiplyOp( offsetVarRef, buildIntVal ( dim ) ) ) );
+			
+			SgExpression * assignAutosharedInit = buildAssignOp (
+			  buildPntrArrRefExp ( autoSharedVarRef,
+				  autosharedAccessFirst ), 
+				buildPntrArrRefExp ( buildVarRefExp ( formalParameter_OP_DATs[i] ), 
+					opdatArgAccess ) );
+
+			SgBasicBlock * firstLoopBody = buildBasicBlock (
+				buildExprStatement ( assignAutosharedInit ) );
+
+
+			firstLoopStatement = 
+			FortranStatementsAndExpressionsBuilder::buildFortranDoStatement (
+        initLoop, upperBoundExpression, buildIntVal ( 1 ),
+				firstLoopBody );
+			
+			ROSE_ASSERT ( firstLoopBody->get_parent() != NULL );
+
+			loopStatements.push_back ( firstLoopStatement );
+
+
+	//			do m = 0, 3
+//				arg0_l(m) = autoshared ( argSDisplacement + ( m + tid * 4 ) )
+//				end do
+
+			SgExpression * autoSharedAccessSecond = buildAddOp ( 
+			  displVarRef, 
+				buildAddOp( mVarRef, 
+				  buildMultiplyOp ( tidVarRef , buildIntVal ( dim ) ) ) );
+
+			SgExpression * assignLocalThreadVarInit = buildAssignOp (
+        buildPntrArrRefExp ( buildVarRefExp ( localVariables_localThreadVariables[i] ),
+				  mVarRef ), 
+				buildPntrArrRefExp ( autoSharedVarRef , 
+				  autoSharedAccessSecond ) );
+			
+			SgBasicBlock * secondLoopBody = buildBasicBlock (
+				buildExprStatement ( assignLocalThreadVarInit ) );
+
+			SgFortranDo * secondLoopStatement = 
+			FortranStatementsAndExpressionsBuilder::buildFortranDoStatement (
+        initLoop, upperBoundExpression, buildIntVal ( 1 ),
+				secondLoopBody );
+			
+			loopStatements.push_back ( secondLoopStatement );
+
+		}
+	}	
+
+	SgBasicBlock * assignBlock = buildBasicBlock ();
+
+
+
+	std::vector< SgStatement * >::iterator it;
+	for ( it = loopStatements.begin(); it != loopStatements.end(); it++ )
+		assignBlock = buildBasicBlock( assignBlock, (*it) );
+	
+
+	return assignBlock;
+
+}
+
+SgBasicBlock *
+KernelSubroutineOfDirectLoop::buildMainLoopStatements ( 
+  ParallelLoop & parallelLoop, SgScopeStatement * scopeStatement )
+{
+	using SageBuilder::buildBasicBlock;
+	using SageBuilder::buildVarRefExp;
+	using SageBuilder::buildSubtractOp;
+	using SageBuilder::buildAssignOp;
+	using SageBuilder::buildExprListExp;
+	using SageBuilder::buildFunctionCallExp;
+	using SageBuilder::buildExprStatement;
+	
+	/*
+   * ======================================================
+   * Update offset variable value
+   * ======================================================
+   */
+	SgExpression * initOffsetVariable = buildAssignOp ( 
+	  buildVarRefExp ( variable_offsetInThreadBlock ) , 
+		buildSubtractOp ( buildVarRefExp ( variable_setElementCounter ) , 
+		  buildVarRefExp ( variable_tIdModWarpSize ) ) );
+	
+	/*
+   * ======================================================
+   * Update nelems variable value
+   * ======================================================
+   */
+	//nelems = min ( warpSizeOP2, (setSize - offset) )
+	
+	SgFunctionSymbol * minFunctionSymbol =
+	  FortranTypesBuilder::buildNewFortranFunction ("min", subroutineScope);
+	
+	SgExpression * setSizeMinusOffset = buildSubtractOp ( 
+	  buildVarRefExp ( formalParameter_setSize ), buildVarRefExp ( variable_offsetInThreadBlock ) );
+	
+  SgExprListExp * minActualParameters = buildExprListExp ( 
+    buildVarRefExp ( formalParameter_warpSizeOP2 ),
+		setSizeMinusOffset );
+	
+  SgFunctionCallExp * minFunctionCall = buildFunctionCallExp ( minFunctionSymbol,
+		minActualParameters );
+	
+	SgAssignOp * assignNelems = buildAssignOp ( 
+	  buildVarRefExp ( variable_numberOfThreadInWarpOrRemainingElems ),
+		minFunctionCall );
+	
+	SgBasicBlock * preAssignments =
+	  createSharedMemAndLocalThreadVarsAssignments ( parallelLoop, scopeStatement );
+
+
+	SgBasicBlock * mainLoopStmt = buildBasicBlock ( 
+	  buildExprStatement ( initOffsetVariable ),
+		buildExprStatement ( assignNelems ),
+		preAssignments );
+
+	ROSE_ASSERT ( preAssignments->get_parent() != NULL );
+
+	return mainLoopStmt;
+}
+
 void
 KernelSubroutineOfDirectLoop::createStatements (
     UserDeviceSubroutine & userDeviceSubroutine, ParallelLoop & parallelLoop)
@@ -196,60 +376,69 @@ KernelSubroutineOfDirectLoop::createStatements (
   SgVarRefExp * iterationCounterReference = buildVarRefExp (
       variable_setElementCounter );
 
-  SgExpression * assignmentExpression = buildAssignOp (
+  SgExpression * mainLoopInitExpr = buildAssignOp (
       iterationCounterReference, buildAddOp (subtractExpression2,
           multiplyExpression));
 
-  appendStatement (buildExprStatement (assignmentExpression), subroutineScope);
+	/*
+	 * ======================================================
+	 * Statement to increment set iteration counter
+	 * ======================================================
+	 */
+	
+	SgExpression * gridDimXExpression = buildDotExp (variable_GridDim, variable_X);
+	
+	SgMultiplyOp * incrAssignmentExpression = buildMultiplyOp (blockDimX,
+		gridDimXExpression);
+	
+//	SgAddOp * incrAssignmentExpression = buildAddOp ( iterationCounterReference,
+//		multiplyExpression2 );
+	
+//	SgAssignOp * incrAssignmentExpression = buildAssignOp (
+//		iterationCounterReference, addExpression);
+	
+
+	/*
+	 * ======================================================
+	 * Main loop upper bound expression
+	 * ======================================================
+	 */
+	
+	SgExpression * upperBoundExpression = buildSubtractOp (
+		buildVarRefExp ( formalParameter_setSize ), buildIntVal ( 1 ) );
+
+	/*
+	 * ======================================================
+	 * Build main loop statements
+	 * ======================================================
+	 */
+  SgBasicBlock * loopBody = buildMainLoopStatements ( parallelLoop, subroutineScope );
+
+
+	/*
+	 * ======================================================
+	 * Build main loop statements
+	 * ======================================================
+	 */
+	
+	SgFortranDo * fortranDoStatement =
+	FortranStatementsAndExpressionsBuilder::buildFortranDoStatement (
+		mainLoopInitExpr, upperBoundExpression, incrAssignmentExpression,
+		loopBody );
+	
+	appendStatement ( fortranDoStatement, subroutineScope );
+	
+
 
   /*
    * ======================================================
    * Statement to call user device subroutine
    * ======================================================
    */
+//
+//  SgStatement * statement1 = createUserSubroutineCall ( userDeviceSubroutine,
+//      parallelLoop );
 
-  SgStatement * statement1 = createUserSubroutineCall (userDeviceSubroutine,
-      parallelLoop);
-
-  /*
-   * ======================================================
-   * Statement to increment set iteration counter
-   * ======================================================
-   */
-
-  SgExpression * gridDimXExpression =
-      buildDotExp (variable_GridDim, variable_X);
-
-  SgMultiplyOp * multiplyExpression2 = buildMultiplyOp (blockDimX,
-      gridDimXExpression);
-
-  SgAddOp * addExpression = buildAddOp (iterationCounterReference,
-      multiplyExpression2);
-
-  SgAssignOp * assignmentExpression2 = buildAssignOp (
-      iterationCounterReference, addExpression);
-
-  SgExprStatement * statement2 = buildExprStatement (assignmentExpression2);
-
-  /*
-   * ======================================================
-   * Build the do-while loop
-   * ======================================================
-   */
-
-  SgBasicBlock * loopBody = buildBasicBlock (statement1, statement2);
-
-  SgVarRefExp * setSizeFormalArgumentReference = buildVarRefExp (
-      formalParameter_setSize);
-
-  SgExpression * loopGuard = buildLessThanOp (iterationCounterReference,
-      setSizeFormalArgumentReference);
-
-  SgWhileStmt * whileStatement = buildWhileStmt (loopGuard, loopBody);
-
-  whileStatement->set_has_end_statement (true);
-
-  appendStatement (whileStatement, subroutineScope);
 }
 
 void
