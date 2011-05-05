@@ -180,6 +180,9 @@ class ParallelLoop
     {
       return OP_DAT_VariableNames[OP_DAT_ArgumentGroup];
     }
+
+    int
+    getNumberOfIndirectDataSets ();
 };
 
 #endif

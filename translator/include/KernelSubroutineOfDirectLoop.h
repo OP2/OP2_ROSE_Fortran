@@ -113,8 +113,8 @@ class KernelSubroutineOfDirectLoop: public KernelSubroutine
      * ======================================================
      */
     SgStatement *
-    createUserSubroutineCall (UserDeviceSubroutine & userDeviceSubroutine,
-        ParallelLoop & parallelLoop);
+    createUserSubroutineCall ( UserDeviceSubroutine & userDeviceSubroutine,
+        ParallelLoop & parallelLoop );
 
     /*
      * ======================================================
@@ -122,7 +122,7 @@ class KernelSubroutineOfDirectLoop: public KernelSubroutine
      * ======================================================
      */
     void
-    createStatements (UserDeviceSubroutine & userDeviceSubroutine,
+    createStatements ( UserDeviceSubroutine & userDeviceSubroutine,
         ParallelLoop & parallelLoop);
 
     /*
@@ -169,6 +169,38 @@ class KernelSubroutineOfDirectLoop: public KernelSubroutine
 		detectOPDatsBaseKindType ( ParallelLoop & parallelLoop );
 
 
+		/*
+		 * ======================================================
+		 * Builds the statements included in the main
+		 * set elements-based loop
+		 * ======================================================
+		 */
+		SgBasicBlock *
+		buildMainLoopStatements ( UserDeviceSubroutine & userDeviceSubroutine,
+		  ParallelLoop & parallelLoop, SgScopeStatement * scopeStatement );
+	
+
+		/*
+		 * ======================================================
+		 * Builds the assignments of shared memory and local 
+		 * thread variables, if needed
+		 * ======================================================
+		 */	
+		SgBasicBlock *
+		stageInFromDeviceMemoryToLocalThreadVariables ( 
+      ParallelLoop & parallelLoop, SgScopeStatement * scopeStatement );
+
+		/*
+		 * ======================================================
+		 * Builds the assignments of shared memory and local 
+		 * thread variables, if needed
+		 * ======================================================
+		 */	
+		SgBasicBlock *
+		stageOutFromLocalThreadVariablesToDeviceMemory ( 
+			ParallelLoop & parallelLoop, SgScopeStatement * scopeStatement );
+	
+	
   public:
 
     KernelSubroutineOfDirectLoop (std::string const & subroutineName,

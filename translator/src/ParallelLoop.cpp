@@ -258,6 +258,22 @@ ParallelLoop::getNumberOfDistinctIndirect_OP_DAT_Arguments ()
   return count;
 }
 
+int
+ParallelLoop::getNumberOfIndirectDataSets ()
+{
+  int numberOfIndirectDatasets = 0;
+
+  for (unsigned int i = 1; i <= getNumberOf_OP_DAT_ArgumentGroups (); ++i)
+  {
+    if (OP_DAT_MappingDescriptors[i] == INDIRECT)
+    {
+      numberOfIndirectDatasets++;
+    }
+  }
+
+  return numberOfIndirectDatasets;
+}
+
 ParallelLoop::ParallelLoop (std::string userSubroutineName,
     SgExpressionPtrList & actualArguments, Declarations * op2DeclaredVariables)
 {
