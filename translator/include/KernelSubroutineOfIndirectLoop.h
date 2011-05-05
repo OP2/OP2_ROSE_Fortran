@@ -16,6 +16,8 @@ class KernelSubroutineOfIndirectLoop: public KernelSubroutine
 {
   private:
 
+    std::map <std::string, unsigned int> positionOf_nbytes;
+
     std::map <std::string, SgVariableDeclaration *>
         formalParameters_PlanVariables;
 
@@ -33,15 +35,38 @@ class KernelSubroutineOfIndirectLoop: public KernelSubroutine
 
     std::map <unsigned int, SgVariableDeclaration *> localVariables_indArgSizes;
 
+    std::map <unsigned int, SgVariableDeclaration *> localVariables_nbytes;
+
+    std::map <unsigned int, SgVariableDeclaration *> localVariables_inRoundUps;
+
+    std::map <unsigned int, SgVariableDeclaration *>
+        localVariables_incrementAccessMaps;
+
+    std::map <unsigned int, SgVariableDeclaration *>
+        localVariables_incrementAccessArrays;
+
     std::map <std::string, SgVariableDeclaration *> localVariables_Others;
 
   private:
+
+    void
+    createPlanWhileLoop (UserDeviceSubroutine & userDeviceSubroutine,
+        ParallelLoop & parallelLoop);
+
+    void
+    createAutosharedWhileLoops (ParallelLoop & parallelLoop);
+
+    void
+    initialiseLocalVariables (ParallelLoop & parallelLoop);
 
     void
     createThreadZeroStatements (ParallelLoop & parallelLoop);
 
     void
     createRemainingLocalVariables ();
+
+    void
+    createLocalVariables (ParallelLoop & parallelLoop);
 
     void
     createSharedLocalVariables (ParallelLoop & parallelLoop);
