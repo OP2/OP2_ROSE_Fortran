@@ -166,6 +166,12 @@ class ParallelLoop
     {
       return OP_DAT_AccessDescriptors[OP_DAT_ArgumentGroup];
     }
+		
+		int
+		getNumberOfIndirectDataSets ( );
+	
+	
+		
 };
 
 #endif

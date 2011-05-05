@@ -113,8 +113,8 @@ class KernelSubroutineOfDirectLoop: public KernelSubroutine
      * ======================================================
      */
     SgStatement *
-    createUserSubroutineCall (UserDeviceSubroutine & userDeviceSubroutine,
-        ParallelLoop & parallelLoop);
+    createUserSubroutineCall ( UserDeviceSubroutine & userDeviceSubroutine,
+        ParallelLoop & parallelLoop );
 
     /*
      * ======================================================
@@ -122,7 +122,7 @@ class KernelSubroutineOfDirectLoop: public KernelSubroutine
      * ======================================================
      */
     void
-    createStatements (UserDeviceSubroutine & userDeviceSubroutine,
+    createStatements ( UserDeviceSubroutine & userDeviceSubroutine,
         ParallelLoop & parallelLoop);
 
     /*
@@ -176,7 +176,8 @@ class KernelSubroutineOfDirectLoop: public KernelSubroutine
 		 * ======================================================
 		 */
 		SgBasicBlock *
-		buildMainLoopStatements ( ParallelLoop & parallelLoop, SgScopeStatement * scopeStatement );
+		buildMainLoopStatements ( UserDeviceSubroutine & userDeviceSubroutine,
+		  ParallelLoop & parallelLoop, SgScopeStatement * scopeStatement );
 	
 
 		/*
@@ -186,8 +187,19 @@ class KernelSubroutineOfDirectLoop: public KernelSubroutine
 		 * ======================================================
 		 */	
 		SgBasicBlock *
-		createSharedMemAndLocalThreadVarsAssignments ( 
+		stageInFromDeviceMemoryToLocalThreadVariables ( 
       ParallelLoop & parallelLoop, SgScopeStatement * scopeStatement );
+
+		/*
+		 * ======================================================
+		 * Builds the assignments of shared memory and local 
+		 * thread variables, if needed
+		 * ======================================================
+		 */	
+		SgBasicBlock *
+		stageOutFromLocalThreadVariablesToDeviceMemory ( 
+			ParallelLoop & parallelLoop, SgScopeStatement * scopeStatement );
+	
 	
   public:
 
