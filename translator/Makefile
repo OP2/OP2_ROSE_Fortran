@@ -1,4 +1,5 @@
 CXX       := g++
+INCDIR		:= include
 BINDIR    := bin
 OBJDIR    := obj
 SRCDIR    := src
@@ -7,6 +8,7 @@ INCLUDES  := -Iinclude -I$(OP2_ROSE_INST_DIR)/include -I$(OP2_BOOST_INST_DIR)/in
 CXXFLAGS  := $(INCLUDES) -Wall #-O2 commented out for debugging
 
 SRCS  := $(wildcard $(SRCDIR)/*.cpp)
+INCS  := $(wildcard $(INCDIR)/*.h)
 OBJS  := $(patsubst $(SRCDIR)/%.cpp,$(OBJDIR)/%.o,$(SRCS))
 OUT   := $(BINDIR)/translator
 
@@ -16,7 +18,7 @@ all: $(OUT)
 clean:
 	rm -f $(BINDIR)/* $(OBJDIR)/* *~
 
-$(OBJDIR)/%.o: $(SRCDIR)/%.cpp
+$(OBJDIR)/%.o: $(SRCDIR)/%.cpp $(INCDIR)/%.h
 	@echo "\n===== BUILDING OBJECT FILE $@ ====="
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 

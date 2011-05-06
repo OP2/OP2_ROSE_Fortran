@@ -331,38 +331,43 @@ KernelSubroutine::createAndAppendReductionSubroutineCall (
 						 * ======================================================
 						 */
 						
-//						SgVarRefExp * blockidx_Reference1 = buildOpaqueVarRefExp (
-//							variableName_blockidx, subroutineScope);
-//						
-//						SgVarRefExp * x_Reference1 = buildOpaqueVarRefExp (variableName_x,
-//							subroutineScope);
-//						
-//						SgExpression * blockidXDotX = buildDotExp ( blockidx_Reference1, x_Reference1 );
-//						
-//						SgExpression * blockidXDotXMinus1 = buildSubtractOp ( blockidXDotX, buildIntVal ( 1 ) ); 
-//						
-//						SgExpression * baseIndexDevVar = buildAddOp ( iterationVarRef,
-//							buildMultiplyOp ( blockidXDotXMinus1, buildIntVal ( 1 ) ) );
-//						  
-//
-//						SgExpression * endIndexDevVar = buildMultiplyOp ( baseIndexDevVar,
-//						  buildIntVal ( dim - 1 ) );
+						SgVarRefExp * blockidx_Reference1 = buildOpaqueVarRefExp (
+							variableName_blockidx, subroutineScope);
 						
-						// n + (blockidx%x -1) * 1 : n + (blockidx%x -1) * 1
-//						SgSubscriptExpression * deviceVarAccess =
-//						new SgSubscriptExpression ( ROSEHelper::getFileInfo (),
-//																			  baseIndexDevVar, endIndexDevVar, buildIntVal ( 1 ) );
-//						
-//						deviceVarAccess->set_endOfConstruct ( ROSEHelper::getFileInfo () );
-//						deviceVarAccess->setCompilerGenerated ();
-//						deviceVarAccess->setOutputInCodeGeneration ();
-//						
-//						SgExpression * deviceVar = buildPntrArrRefExp ( 
-//							buildVarRefExp ( formalParameter_OP_DATs[i] ),
-//							deviceVarAccess );
+						SgVarRefExp * x_Reference1 = buildOpaqueVarRefExp (variableName_x,
+							subroutineScope);
+						
+						SgExpression * blockidXDotX = buildDotExp ( blockidx_Reference1, x_Reference1 );
+						
+						SgExpression * blockidXDotXMinus1 = buildSubtractOp ( blockidXDotX, buildIntVal ( 1 ) ); 
+						
+						SgExpression * baseIndexDevVar = buildAddOp ( iterationVarRef,
+							buildMultiplyOp ( blockidXDotXMinus1, buildIntVal ( 1 ) ) );
+						  
+
+						SgExpression * endIndexDevVar = buildAddOp ( baseIndexDevVar,
+						  buildIntVal ( dim - 1 ) );
+						
+						SgSubscriptExpression * deviceVarAccess =
+						new SgSubscriptExpression ( ROSEHelper::getFileInfo (),
+																			  baseIndexDevVar, endIndexDevVar, buildIntVal ( 1 ) );
+						
+						deviceVarAccess->set_endOfConstruct ( ROSEHelper::getFileInfo () );
+						deviceVarAccess->setCompilerGenerated ();
+						deviceVarAccess->setOutputInCodeGeneration ();
+						
+						SgExpression * deviceVar = buildPntrArrRefExp ( 
+							buildVarRefExp ( formalParameter_OP_DATs[i] ),
+							deviceVarAccess );
+						
+						SgExpression * localThreadVar = buildPntrArrRefExp ( 
+						  buildVarRefExp ( localVariables_localThreadVariables[i] ),
+							iterationVarRef );
 						
 						
-						SgExprListExp * reductionActualParams = buildExprListExp ( );//deviceVar );
+						SgExprListExp * reductionActualParams = buildExprListExp ( deviceVar, localThreadVar,
+						  buildVarRefExp ( formalParameter_warpSizeOP2 ),
+							buildVarRefExp ( formalParameter_offsetForReduction ) );
 							
 						
 						SgFunctionCallExp * reductionFunctionCall = buildFunctionCallExp ( reductionFunctionSymbol,

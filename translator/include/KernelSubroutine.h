@@ -51,6 +51,22 @@ class KernelSubroutine: public Subroutine
 		
 		/*
 		 * ======================================================
+		 * Size of the warp for OP2 when implementing direct
+		 * loops or reduction variables. 
+		 * This value must be passed to CUDA kernels of
+		 * direct loops because the access to the related		 
+		 * intrinsic CUDA Fortran variable gives place to an
+		 * error.
+		 * It is also used in reduction subroutines both in
+		 * diret and indirect loops
+		 * ======================================================
+		 */
+		
+		SgVariableDeclaration * formalParameter_warpSizeOP2;
+	
+		
+		/*
+		 * ======================================================
 		 * Local thread variables
 		 * ======================================================
 		 */	

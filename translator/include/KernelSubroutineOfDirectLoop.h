@@ -35,20 +35,7 @@ class KernelSubroutineOfDirectLoop: public KernelSubroutine
      * ======================================================
      */
 
-    SgVariableDeclaration * formalParameter_setSize;
-
-		/*
-		 * ======================================================
-		 * Size of the warp for OP2 when implementing direct
-		 * loops. This value must be passed to CUDA kernels of
-		 * direct loops because the access to the related		 
-		 * intrinsic CUDA Fortran variable gives place to an
-		 * error. 
-		 * ======================================================
-		 */
-
-		SgVariableDeclaration * formalParameter_warpSizeOP2;
-	
+    SgVariableDeclaration * formalParameter_setSize;	
 
     /*
      * ======================================================

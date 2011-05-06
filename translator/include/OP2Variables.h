@@ -44,7 +44,7 @@ class OP_DAT_Declaration: public OP2Declaration
      * OP_DECL_DAT (OP_SET, setCardinality, inputData, OP_DAT)
      * ======================================================
      */
-
+		 
   private:
 
     static int const index_OP_SET = 0;
