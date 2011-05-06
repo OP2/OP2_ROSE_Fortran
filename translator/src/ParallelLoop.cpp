@@ -85,6 +85,8 @@ ParallelLoop::retrieveOP_DATDeclarations (Declarations * declarations)
                 OP_DAT_Dimensions.insert (make_pair (OP_DATCounter,
                     opDatDeclaration->getDimension ()));
 
+                OP_DAT_VariableNames[OP_DATCounter] = variableName;
+
                 if (find (unique_OP_DATs.begin (), unique_OP_DATs.end (),
                     variableName) == unique_OP_DATs.end ())
                 {
@@ -112,6 +114,8 @@ ParallelLoop::retrieveOP_DATDeclarations (Declarations * declarations)
 
                 OP_DAT_Dimensions.insert (make_pair (OP_DATCounter,
                     opGBLDeclaration->getDimension ()));
+
+                OP_DAT_VariableNames[OP_DATCounter] = variableName;
 
                 unique_OP_DATs.push_back (variableName);
 
@@ -255,14 +259,19 @@ ParallelLoop::getNumberOfDistinctIndirect_OP_DAT_Arguments ()
 }
 
 int
-ParallelLoop::getNumberOfIndirectDataSets ( )
+ParallelLoop::getNumberOfIndirectDataSets ()
 {
-	int numberOfIndirectDatasets = 0;
+  int numberOfIndirectDatasets = 0;
 
-	for (unsigned int i = 1; i <= getNumberOf_OP_DAT_ArgumentGroups (); ++i)
-		if ( OP_DAT_MappingDescriptors[i] == INDIRECT ) numberOfIndirectDatasets++;
-		
-	return numberOfIndirectDatasets;
+  for (unsigned int i = 1; i <= getNumberOf_OP_DAT_ArgumentGroups (); ++i)
+  {
+    if (OP_DAT_MappingDescriptors[i] == INDIRECT)
+    {
+      numberOfIndirectDatasets++;
+    }
+  }
+
+  return numberOfIndirectDatasets;
 }
 
 bool

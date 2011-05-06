@@ -94,6 +94,14 @@ class ParallelLoop
      */
     std::map <unsigned int, ACCESS_CODE_VALUE> OP_DAT_AccessDescriptors;
 
+    /*
+     * ======================================================
+     * What is OP_DAT variable name in this position
+     * (in the actual arguments)?
+     * ======================================================
+     */
+    std::map <unsigned int, std::string> OP_DAT_VariableNames;
+
   private:
 
     /*
@@ -175,7 +183,13 @@ class ParallelLoop
 	
 		bool
 		isReductionRequiredForSpecificArgument ( int opDatIndex );
-		
+
+    std::string
+    get_OP_DAT_VariableName (unsigned int OP_DAT_ArgumentGroup)
+    {
+      return OP_DAT_VariableNames[OP_DAT_ArgumentGroup];
+    }
+
 };
 
 #endif
