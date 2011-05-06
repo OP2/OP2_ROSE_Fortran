@@ -200,12 +200,24 @@ class KernelSubroutineOfDirectLoop: public KernelSubroutine
 		stageOutFromLocalThreadVariablesToDeviceMemory ( 
 			ParallelLoop & parallelLoop, SgScopeStatement * scopeStatement );
 	
+		/*
+		 * ======================================================
+		 * Creates all formal parameters
+		 * ======================================================
+		 */	
+	
+		void
+		createAndAppendFormalParameters (
+			DeviceDataSizesDeclarationDirectLoops & DeviceDataSizesDeclarationDirectLoops,
+			ParallelLoop & parallelLoop );
+		
 	
   public:
 
     KernelSubroutineOfDirectLoop (std::string const & subroutineName,
         UserDeviceSubroutine & userDeviceSubroutine,
 				DeviceDataSizesDeclarationDirectLoops & DeviceDataSizesDeclarationDirectLoops,
+				std::map < unsigned int, SgProcedureHeaderStatement *> &reductSubroutines,
         ParallelLoop & parallelLoop, SgScopeStatement * moduleScope);
 };
 

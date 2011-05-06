@@ -118,6 +118,14 @@ namespace kernelLocalThreadVarsNames
 	std::string const localVarNamePostfix = "_l";
 }
 
+namespace reductionSubroutineNames
+{
+	std::string const reductionSubroutinePostfix = "_reduction";
+	std::string const reductionSubroutineTypeInteger = "_integer";
+	std::string const reductionSubroutineTypeReal = "_real";
+}
+
+
 namespace FortranVariableDeafultKinds
 {
 	int const DEFAULT_KIND_INT = 4;

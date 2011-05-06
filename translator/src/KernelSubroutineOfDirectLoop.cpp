@@ -379,7 +379,6 @@ KernelSubroutineOfDirectLoop::stageOutFromLocalThreadVariablesToDeviceMemory (
 			 * variables
 			 * ======================================================
 			 */
-			//parg1 ( tid + m * nelems + offset * 4 ) = autoshared ( argSDisplacement + ( tid + m * nelems ) )
 
 			SgExpression * deviceVarAccessSecond = buildAddOp ( tidVarRef, 
 			  buildAddOp ( buildMultiplyOp ( mVarRef , nelemsVarRef ), 
@@ -633,13 +632,6 @@ KernelSubroutineOfDirectLoop::createStatements (
 	
 	SgMultiplyOp * incrAssignmentExpression = buildMultiplyOp (blockDimX,
 		gridDimXExpression);
-	
-//	SgAddOp * incrAssignmentExpression = buildAddOp ( iterationCounterReference,
-//		multiplyExpression2 );
-	
-//	SgAssignOp * incrAssignmentExpression = buildAssignOp (
-//		iterationCounterReference, addExpression);
-	
 
 	/*
 	 * ======================================================
@@ -671,17 +663,15 @@ KernelSubroutineOfDirectLoop::createStatements (
 		loopBody );
 	
 	appendStatement ( fortranDoStatement, subroutineScope );
-	
 
 
   /*
    * ======================================================
-   * Statement to call user device subroutine
+   * Add final support for reduction variables, if needed
    * ======================================================
    */
-//
-//  SgStatement * statement1 = createUserSubroutineCall ( userDeviceSubroutine,
-//      parallelLoop );
+	createAndAppendReductionSubroutineCall ( parallelLoop, 
+	 buildVarRefExp ( variable_setElementCounter ), subroutineScope );
 
 }
 
@@ -994,6 +984,35 @@ KernelSubroutineOfDirectLoop::detectOPDatsBaseKindType ( ParallelLoop & parallel
 	}
 }
 
+void
+KernelSubroutineOfDirectLoop::createAndAppendFormalParameters (
+  DeviceDataSizesDeclarationDirectLoops & DeviceDataSizesDeclarationDirectLoops,
+	ParallelLoop & parallelLoop )
+{
+	createArgsSizesFormalParameter ( DeviceDataSizesDeclarationDirectLoops );
+
+	createSetSizeFormalParameter ();
+
+	create_OP_DAT_FormalParameters ( parallelLoop );
+
+	createAndAppendOffsetSFormalParameter ();
+
+	appendSetSizeFormalParameter ();
+
+	createAndAppendWarpSizeOP2FormalParameter ();
+
+	/*
+	 * ======================================================
+	 * Add offset parameter in shared memory for reductions
+	 * ======================================================
+	 */
+	
+	if ( parallelLoop.isReductionRequired () == true ) {
+		createAndAppendSharedMemoryOffesetForReduction ( parallelLoop );
+	}
+}
+
+
 /*
  * ======================================================
  * Public functions
@@ -1004,9 +1023,10 @@ KernelSubroutineOfDirectLoop::KernelSubroutineOfDirectLoop (
     std::string const & subroutineName,
     UserDeviceSubroutine & userDeviceSubroutine, 
     DeviceDataSizesDeclarationDirectLoops & DeviceDataSizesDeclarationDirectLoops,
+		std::map < unsigned int, SgProcedureHeaderStatement *> & _reductSubroutines,
 		ParallelLoop & parallelLoop,
     SgScopeStatement * moduleScope) :
-  KernelSubroutine (subroutineName), compilerExpr_opDatKindSize ( NULL )
+  KernelSubroutine ( subroutineName, _reductSubroutines ), compilerExpr_opDatKindSize ( NULL )
 {
   using SageBuilder::buildProcedureHeaderStatement;
   using SageBuilder::buildVoidType;
@@ -1027,17 +1047,8 @@ KernelSubroutineOfDirectLoop::KernelSubroutineOfDirectLoop (
 
   subroutineScope = subroutineHeaderStatement->get_definition ()->get_body ();
 
-  createArgsSizesFormalParameter ( DeviceDataSizesDeclarationDirectLoops );
-
-  createSetSizeFormalParameter ();
-	
-  create_OP_DAT_FormalParameters ( parallelLoop );
-
-	createAndAppendOffsetSFormalParameter ();
-
-  appendSetSizeFormalParameter ();
-
-	createAndAppendWarpSizeOP2FormalParameter ();
+	createAndAppendFormalParameters ( DeviceDataSizesDeclarationDirectLoops,
+	   parallelLoop );
 
 	detectOPDatsBaseKindType ( parallelLoop );
 

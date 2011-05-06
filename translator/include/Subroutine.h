@@ -66,6 +66,17 @@ class Subroutine
     {
       return subroutineHeaderStatement;
     }
+		
+		/*
+		 * ======================================================
+		 * Utility function that given an opDatBaseType returns
+		 * its actual fortran kind or a default one (in case
+		 * of types without kind)
+		 * ======================================================
+		 */	
+
+		static SgExpression * 
+		getFortranKindOfOpDat ( SgType * opDatBaseType );
 };
 
 #endif

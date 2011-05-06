@@ -10,6 +10,7 @@
 #define REDUCTION_SUBROUTINE_H
 
 #include <Subroutine.h>
+#include <ParallelLoop.h>
 
 class ReductionSubroutine: public Subroutine
 {
@@ -149,29 +150,30 @@ class ReductionSubroutine: public Subroutine
     SgArrayType * reductionVariableType;
 
   public:
-
+	
     ReductionSubroutine (std::string const & subroutineAndVariableName,
         SgScopeStatement * moduleScope, SgArrayType * reductionVariableType);
+				
+
+	/*
+	 * ======================================================
+	 * Static functions
+	 * ======================================================
+	 */
+	
+				
+	/*
+	 * ======================================================
+	 * Generates all proper reduction subroutines: one per
+	 * type and kind
+	 * ======================================================
+	 */
+	
+	static std::map < unsigned int, SgProcedureHeaderStatement *>
+	generateReductionSubroutines ( 
+		ParallelLoop & parallelLoop, SgScopeStatement * scopeStatement );
+	
 };
-
-// The following code tests the reduction procedure generation and can be called in
-// the NewSubroutineGeneration.cpp file, visit function
-
-//								string const
-//									reductName = "reductionQ";
-//
-//								SgType * fortranType = parallelLoop->get_OP_DAT_Type (1);
-//
-//								SgArrayType * isArrayType = isSgArrayType (fortranType);
-//								
-//								ROSE_ASSERT (isArrayType != NULL);
-//								
-//								
-//								ReductionSubroutine * reductSubroutine =
-//										new ReductionSubroutine ( reductName,
-//																						  moduleScope,
-//																						  isArrayType
-//																						 );
 
 
 #endif

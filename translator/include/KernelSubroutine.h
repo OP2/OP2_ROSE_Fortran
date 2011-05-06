@@ -39,6 +39,16 @@ class KernelSubroutine: public Subroutine
 
     std::map <unsigned int, SgVariableDeclaration *> formalParameter_OP_DATs;
 		
+		
+		/*
+		 * ======================================================
+		 * Offset in shared memory for reduction variables,
+		 * in case it is needed
+		 * ======================================================
+		 */	
+		SgVariableDeclaration * formalParameter_offsetForReduction;
+
+		
 		/*
 		 * ======================================================
 		 * Local thread variables
@@ -85,26 +95,62 @@ class KernelSubroutine: public Subroutine
 
 		/*
 		 * ======================================================
-		 * Initialises local thread variables, for those
-		 * for which it is needed
+		 * Initialises local thread variables
 		 * ======================================================
 		 */
 	
 		void
-		initialiseLocalThreadVariables ( ParallelLoop & parallelLoop, 
-		  SgScopeStatement * scopeStatement );
-
-
-		void
 		initialiseLocalThreadVariables ( ParallelLoop & parallelLoop,
 		  SgScopeStatement * scopeStatement, SgVarRefExp * iterationVariableReference );
+
+		/*
+		 * ======================================================
+		 * Support for reduction variables
+		 * ======================================================
+		 */	
 	
+		void
+		createAndAppendReductionSubroutineCall ( 
+			ParallelLoop & parallelLoop, SgVarRefExp * iterationVarRef,
+			SgScopeStatement * scopeStatement );
 	
+		/*
+		 * ======================================================
+		 * Generation of formal parameter for offset in shared
+		 * memory reserved to reductions
+		 * ======================================================
+		 */	
+	
+		void
+		createAndAppendSharedMemoryOffesetForReduction ( ParallelLoop & parallelLoop );
+
 
     KernelSubroutine (std::string const & subroutineName) :
       Subroutine (subroutineName + "_kernel")
     {
     }
+		
+		KernelSubroutine ( std::string const & subroutineName,
+		  std::map < unsigned int, SgProcedureHeaderStatement *> & _reductSubroutines ) :
+			Subroutine (subroutineName + "_kernel"),
+			reductionSubroutines ( _reductSubroutines )
+		{
+		}
+		
+	
+
+		
+		/*
+		 * ======================================================
+		 * repository of SgProcedureHeaderStatements for
+		 * reduction subroutines (one per type), given the
+		 * corresponding op_dat index
+		 * ======================================================
+		 */	
+		
+		std::map < unsigned int, SgProcedureHeaderStatement *> reductionSubroutines;
+	
+		
 };
 
 #endif

@@ -4,6 +4,7 @@
 #include <OP2CommonDefinitions.h>
 #include <FortranTypesBuilder.h>
 #include <FortranStatementsAndExpressionsBuilder.h>
+#include <ROSEHelper.h>
 
 void
 KernelSubroutine::createArgsSizesFormalParameter (
@@ -258,6 +259,7 @@ KernelSubroutine::initialiseLocalThreadVariables (
 			 * Add the do-loop statement
 			 * ======================================================
 			 */
+
 			SgFortranDo * fortranDoStatement =
 			FortranStatementsAndExpressionsBuilder::buildFortranDoStatement (
 				initializationExpression, upperBoundExpression, strideExpression,
@@ -266,6 +268,168 @@ KernelSubroutine::initialiseLocalThreadVariables (
 			appendStatement ( fortranDoStatement, scopeStatement );
 
 		}
-	}			
+	}
+}
+
+void
+KernelSubroutine::createAndAppendReductionSubroutineCall ( 
+  ParallelLoop & parallelLoop, SgVarRefExp * iterationVarRef, 
+	SgScopeStatement * scopeStatement )
+{
+	using SageBuilder::buildIntVal;
+	using SageBuilder::buildAssignOp;
+	using SageBuilder::buildExprListExp;
+	using SageBuilder::buildFunctionCallExp;
+	using SageBuilder::buildBasicBlock;
+	using SageBuilder::buildExprStatement;
+	using SageBuilder::buildOpaqueVarRefExp;
+	using SageBuilder::buildDotExp;
+	using SageBuilder::buildPntrArrRefExp;
+	using SageBuilder::buildSubtractOp;
+	using SageBuilder::buildMultiplyOp;
+	using SageBuilder::buildAddOp;
+	using SageBuilder::buildVarRefExp;
+	using SageInterface::appendStatement;
+	using boost::lexical_cast;
+	using std::string;
+
+	if ( parallelLoop.isReductionRequired () == true )
+	{
+		for (unsigned int i = 1; i
+				 <= parallelLoop.getNumberOf_OP_DAT_ArgumentGroups (); ++i)
+		{
+			if ( parallelLoop.isReductionRequiredForSpecificArgument ( i ) == true )
+			{
+				int dim = parallelLoop.get_OP_DAT_Dimension ( i );
+				
+				switch ( parallelLoop.get_OP_Access_Value ( i ) )
+				{
+					case INC_ACCESS:
+					{
+						
+						SgExpression * reductInitLoop = buildAssignOp ( iterationVarRef, buildIntVal ( 0 ) );
+						SgExpression * reductUpperBound = buildIntVal ( dim - 1 );						
+						SgExpression * reductIncrementLoop = buildIntVal ( 1 );
+												
+						/*
+						 * ======================================================
+						 * Get the reduction subroutine symbol
+						 * ======================================================
+						 */
+						
+						
+						SgSymbol * reductionSymbol = reductionSubroutines[i]->
+						  search_for_symbol_from_symbol_table ( );
+						
+						SgFunctionSymbol * reductionFunctionSymbol = isSgFunctionSymbol ( reductionSymbol );
+						
+						ROSE_ASSERT ( reductionFunctionSymbol != NULL );
+						
+						/*
+						 * ======================================================
+						 * Creating parameters
+						 * ======================================================
+						 */
+						
+//						SgVarRefExp * blockidx_Reference1 = buildOpaqueVarRefExp (
+//							variableName_blockidx, subroutineScope);
+//						
+//						SgVarRefExp * x_Reference1 = buildOpaqueVarRefExp (variableName_x,
+//							subroutineScope);
+//						
+//						SgExpression * blockidXDotX = buildDotExp ( blockidx_Reference1, x_Reference1 );
+//						
+//						SgExpression * blockidXDotXMinus1 = buildSubtractOp ( blockidXDotX, buildIntVal ( 1 ) ); 
+//						
+//						SgExpression * baseIndexDevVar = buildAddOp ( iterationVarRef,
+//							buildMultiplyOp ( blockidXDotXMinus1, buildIntVal ( 1 ) ) );
+//						  
+//
+//						SgExpression * endIndexDevVar = buildMultiplyOp ( baseIndexDevVar,
+//						  buildIntVal ( dim - 1 ) );
+						
+						// n + (blockidx%x -1) * 1 : n + (blockidx%x -1) * 1
+//						SgSubscriptExpression * deviceVarAccess =
+//						new SgSubscriptExpression ( ROSEHelper::getFileInfo (),
+//																			  baseIndexDevVar, endIndexDevVar, buildIntVal ( 1 ) );
+//						
+//						deviceVarAccess->set_endOfConstruct ( ROSEHelper::getFileInfo () );
+//						deviceVarAccess->setCompilerGenerated ();
+//						deviceVarAccess->setOutputInCodeGeneration ();
+//						
+//						SgExpression * deviceVar = buildPntrArrRefExp ( 
+//							buildVarRefExp ( formalParameter_OP_DATs[i] ),
+//							deviceVarAccess );
+						
+						
+						SgExprListExp * reductionActualParams = buildExprListExp ( );//deviceVar );
+							
+						
+						SgFunctionCallExp * reductionFunctionCall = buildFunctionCallExp ( reductionFunctionSymbol,
+							reductionActualParams );
+						
+
+						SgBasicBlock * reductCallLoopBody = buildBasicBlock ( 
+						 buildExprStatement ( reductionFunctionCall ) );
+												
+						SgFortranDo * reductionLoop = 
+						FortranStatementsAndExpressionsBuilder::buildFortranDoStatement (
+							reductInitLoop, reductUpperBound, reductIncrementLoop,
+							reductCallLoopBody );
+						
+						appendStatement ( reductionLoop, scopeStatement );
+						
+						break;
+					}
+					case MAX_ACCESS:
+					{
+						Debug::getInstance ()->errorMessage (
+							"Error: OP_MAX on reduction variables is not supported");
+	
+						break;
+					}
+					case MIN_ACCESS:
+					{
+						Debug::getInstance ()->errorMessage (
+							"Error: OP_MIN on reduction variables is not supported");
+						
+						break;
+					}
+					default:
+					{
+						Debug::getInstance ()->errorMessage (
+							"Error: wrong accessing code for global variable");
+						break;
+					}
+				}
+			}		
+		}
+	}
+}
+
+void
+KernelSubroutine::createAndAppendSharedMemoryOffesetForReduction ( ParallelLoop & parallelLoop )
+{
+
+	using SageBuilder::buildVariableDeclaration;
+  using SageBuilder::buildIntType;
+  using SageInterface::appendStatement;
+
+	
+  Debug::getInstance ()->debugMessage ( "Creating reduction offset in shared memory formal parameter",
+																			 2 );
+	
+  formalParameter_offsetForReduction = buildVariableDeclaration ( "redStartOffset",
+		buildIntType (), NULL, subroutineScope );
+	
+  formalParameter_offsetForReduction->get_declarationModifier ().get_accessModifier ().setUndefined ();
+  formalParameter_offsetForReduction->get_declarationModifier ().get_typeModifier ().setValue ();
+
+
+	formalParameters->append_arg (
+		*(formalParameter_offsetForReduction->get_variables ().begin ()));
+	
+  appendStatement ( formalParameter_offsetForReduction, subroutineScope );
+	
 
 }

@@ -20,7 +20,7 @@ enum MAPPING_VALUE
 
 enum ACCESS_CODE_VALUE
 {
-  READ_ACCESS, WRITE_ACCESS, RW_ACCESS, INC_ACCESS
+  READ_ACCESS, WRITE_ACCESS, RW_ACCESS, INC_ACCESS, MAX_ACCESS, MIN_ACCESS
 };
 
 class ParallelLoop
@@ -170,7 +170,11 @@ class ParallelLoop
 		int
 		getNumberOfIndirectDataSets ( );
 	
+		bool
+		isReductionRequired ( );
 	
+		bool
+		isReductionRequiredForSpecificArgument ( int opDatIndex );
 		
 };
 

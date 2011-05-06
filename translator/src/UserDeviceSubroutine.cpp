@@ -208,6 +208,11 @@ UserDeviceSubroutine::copyAndModifySubroutine (SgScopeStatement * moduleScope,
   };
   (new GenerateAllNodesInUnparser ())->traverse (subroutineHeaderStatement,
       preorder);
+			
+			
+	Debug::getInstance ()->debugMessage (
+		"Modified and outputted original kernel to CUDA file", 2);
+
 }
 
 /*

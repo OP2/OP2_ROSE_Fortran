@@ -4,6 +4,9 @@
 #include <FortranTypesBuilder.h>
 #include <OP2CommonDefinitions.h>
 #include <FortranStatementsAndExpressionsBuilder.h>
+#include <FortranTypesBuilder.h>
+#include <boost/lexical_cast.hpp>
+
 
 // TO DO: generate code for OP_MIN and OP_MAX as well
 
@@ -435,7 +438,7 @@ ReductionSubroutine::ReductionSubroutine ( std::string const & subroutineAndVari
 																					SgScopeStatement * moduleScope,
 																					SgArrayType * _reductionVariableType
 																					):
-Subroutine ( subroutineAndVariableName + "_reduction" ), 
+Subroutine ( subroutineAndVariableName ), 
 reductionVariableType ( _reductionVariableType ) 
 {
 	using SageBuilder::buildProcedureHeaderStatement;
@@ -455,10 +458,10 @@ reductionVariableType ( _reductionVariableType )
 																	  moduleScope
 																	);
 	
-  addTextForUnparser (subroutineHeaderStatement, "attributes(device) ",
-											AstUnparseAttribute::e_before);
+  addTextForUnparser ( subroutineHeaderStatement, "attributes(device) ",
+											 AstUnparseAttribute::e_before);
 	
-  appendStatement (subroutineHeaderStatement, moduleScope);
+  appendStatement ( subroutineHeaderStatement, moduleScope );
 	
   subroutineScope = subroutineHeaderStatement->get_definition ()->get_body ();
 	
@@ -468,5 +471,92 @@ reductionVariableType ( _reductionVariableType )
 	
   createStatements ( );
 	
+}
+
+
+
+std::map < unsigned int, SgProcedureHeaderStatement *>
+ReductionSubroutine::generateReductionSubroutines (
+	ParallelLoop & parallelLoop, SgScopeStatement * scopeStatement )
+{
+	using std::string;
+	using boost::lexical_cast;
+	
+	std::map < unsigned int, SgProcedureHeaderStatement *> reductionSubroutines;
+
+	
+	if ( parallelLoop.isReductionRequired () == true )
+	{
+		for (unsigned int i = 1; i
+				 <= parallelLoop.getNumberOf_OP_DAT_ArgumentGroups (); ++i)
+		{
+			if ( parallelLoop.isReductionRequiredForSpecificArgument ( i ) == true )
+			{
+				
+				/*
+				 * ======================================================
+				 * Generates the reduction subroutine name:
+				 * <userKernelName> + "_reduction" + "_type"
+				 * ======================================================
+				 */
+								
+				SgType * opDatType = parallelLoop.get_OP_DAT_Type ( i );
+
+				SgArrayType * isArrayType = isSgArrayType ( opDatType );	
+
+				ROSE_ASSERT ( isArrayType != NULL );
+
+				SgExpression * opDatKindSize = Subroutine::getFortranKindOfOpDat (
+				  isArrayType );
+
+				SgIntVal * isKindIntVal = isSgIntVal ( opDatKindSize );
+
+				ROSE_ASSERT ( isKindIntVal != NULL );
+
+				string typeName;
+
+				if ( isSgTypeInt ( isArrayType->get_base_type() ) != NULL )
+					typeName = reductionSubroutineNames::reductionSubroutineTypeInteger;
+				else if ( isSgTypeFloat ( isArrayType->get_base_type() ) != NULL ) 
+					typeName = reductionSubroutineNames::reductionSubroutineTypeReal;
+				else
+				Debug::getInstance ()->errorMessage ( 
+				 "Error: type for reduction variable is not supported" );
+
+
+				/*
+				 * ======================================================
+				 * For now we distinguish between subroutines by
+				 * appending also the index of the related op_dat
+				 * argument. Eventually, the factorisation will solve
+				 * this problem
+				 * ======================================================
+				 */
+				string const & ReductionSubroutineName = 
+				kernelDatArgumentsNames::argNamePrefix + 
+				lexical_cast < string > ( i ) +
+				reductionSubroutineNames::reductionSubroutinePostfix +
+				typeName +
+				lexical_cast < string > ( isKindIntVal->get_value () );
+
+				ReductionSubroutine * reductSubroutine =
+					new ReductionSubroutine ( ReductionSubroutineName,
+																		scopeStatement,
+																		isArrayType
+																	);
+
+				/*
+				 * ======================================================
+				 * generate one per reduction variable, eventually
+				 * we will have to factorise
+				 * ======================================================
+				 */
+				
+				reductionSubroutines[i] = reductSubroutine->getSubroutineHeaderStatement ();
+			}
+		}
+	}	
+	
+	return reductionSubroutines;
 }
 

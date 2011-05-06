@@ -437,15 +437,24 @@ NewSubroutinesGeneration::visit (SgNode * node)
                  * the device
                  * ======================================================
                  */
+								 
+								Debug::getInstance ()->debugMessage ( "Adding reduction stuff", 2 );
+								 
+								 
+								std::map < unsigned int, SgProcedureHeaderStatement *> reductionSubroutines =
+								ReductionSubroutine::generateReductionSubroutines ( 
+								  *parallelLoop, moduleScope );
 
+								Debug::getInstance ()->debugMessage ( "after adding reduction stuff", 2 );
 
                 UserDeviceSubroutine * userDeviceSubroutine =
-                    new UserDeviceSubroutine (userSubroutineName, moduleScope,
+                    new UserDeviceSubroutine ( userSubroutineName, moduleScope,
                         *declarations);
 
                 KernelSubroutine * kernelSubroutine =
                     new KernelSubroutineOfDirectLoop (userSubroutineName,
                         *userDeviceSubroutine, *deviceDataSizesDeclarationDirectLoops,
+												reductionSubroutines,
 												*parallelLoop, moduleScope);
 
                 HostSubroutine * hostSubroutine =
