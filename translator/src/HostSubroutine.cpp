@@ -623,6 +623,395 @@ HostSubroutine::buildThreadSynchroniseFunctionCall (
   return threadSynchFunctionCall;
 }
 
+
+
+void
+HostSubroutine::createReductionVariables ( ParallelLoop & parallelLoop )
+{
+	using SageBuilder::buildIntVal;
+	using SageBuilder::buildIntType;
+	using SageBuilder::buildAssignInitializer;
+	using SageBuilder::buildVariableDeclaration;
+	using SageInterface::appendStatement;
+	
+	/*
+	 * ======================================================
+	 * Check if we need the reduction support
+	 * ======================================================
+	 */
+	if ( parallelLoop.isReductionRequired () == true ) {
+		
+		for (unsigned int i = 1; i
+				 <= parallelLoop.getNumberOf_OP_DAT_ArgumentGroups (); ++i)
+		{
+			if ( parallelLoop.isReductionRequiredForSpecificArgument ( i ) == true )
+			{
+				
+				/*
+				 * ======================================================
+				 * Create CUDA variables for reduction if needed
+				 * ======================================================
+				 */
+				reductionVariable_baseOffsetInSharedMemory = buildVariableDeclaration (
+					"redStartOffset", FortranTypesBuilder::getFourByteInteger (),
+					buildAssignInitializer (buildIntVal (0), buildIntType ()),
+					subroutineScope );
+				
+				reductionVariable_maxBytesInSharedMemory = buildVariableDeclaration (
+					"maxReductionSize", FortranTypesBuilder::getFourByteInteger (),
+					buildAssignInitializer (buildIntVal (0), buildIntType ()),
+					subroutineScope );
+				
+				reductionVariable_numberOfThreadItems = buildVariableDeclaration (
+					"reductItems", FortranTypesBuilder::getFourByteInteger (),
+					buildAssignInitializer (buildIntVal (0), buildIntType ()),
+					subroutineScope );
+
+				reductionVariable_maximumNumberOfThreadBlocks = buildVariableDeclaration (
+					"maxBlocks", FortranTypesBuilder::getFourByteInteger (),
+					buildAssignInitializer (buildIntVal (0), buildIntType ()),
+					subroutineScope );
+				
+				reductionVariable_reductionArrayOnHost = buildVariableDeclaration (
+					"redArrayHost", parallelLoop.get_OP_DAT_Type ( i ),
+					NULL,
+					//buildAssignInitializer (buildIntVal (0), buildIntType ()),
+					subroutineScope ); 
+				
+				reductionVariable_reductionArrayOnHost->
+				get_declarationModifier ().get_typeModifier ().setAllocatable ();
+				
+				reductionVariable_reductionArrayOnDevice = buildVariableDeclaration (
+					"redArrayDevice", parallelLoop.get_OP_DAT_Type ( i ),
+					NULL,
+					//buildAssignInitializer (buildIntVal (0), buildIntType ()),
+					subroutineScope );
+				
+				reductionVariable_reductionArrayOnDevice->
+				get_declarationModifier ().get_typeModifier ().setAllocatable ();
+				
+				reductionVariable_reductionArrayOnDevice->
+				get_declarationModifier ().get_typeModifier ().setDevice ();				
+				
+				reductionVariable_baseOffsetInSharedMemory->
+					get_declarationModifier ().get_accessModifier ().setUndefined ();
+				reductionVariable_maxBytesInSharedMemory->
+					get_declarationModifier ().get_accessModifier ().setUndefined ();
+				reductionVariable_numberOfThreadItems->
+					get_declarationModifier ().get_accessModifier ().setUndefined ();
+				reductionVariable_maximumNumberOfThreadBlocks->
+					get_declarationModifier ().get_accessModifier ().setUndefined ();
+				reductionVariable_reductionArrayOnHost->
+					get_declarationModifier ().get_accessModifier ().setUndefined ();
+				reductionVariable_reductionArrayOnDevice->
+					get_declarationModifier ().get_accessModifier ().setUndefined ();
+				
+				
+				appendStatement ( reductionVariable_baseOffsetInSharedMemory, subroutineScope );
+				appendStatement ( reductionVariable_maxBytesInSharedMemory, subroutineScope );
+				appendStatement ( reductionVariable_numberOfThreadItems, subroutineScope );
+				appendStatement ( reductionVariable_maximumNumberOfThreadBlocks, subroutineScope );
+				appendStatement ( reductionVariable_reductionArrayOnHost, subroutineScope );				
+				appendStatement ( reductionVariable_reductionArrayOnDevice, subroutineScope );
+				
+			}
+		}
+	}
+}
+
+void
+HostSubroutine::createAndAppendThreadSynchCall ( )
+{
+	using SageInterface::appendStatement;
+	
+	/*
+	 * ======================================================
+	 * threadSynchRet = cudaThreadSynchronize()
+	 * ======================================================
+	 */	 		
+
+	SgStatement * threadSynchCallStmt = buildThreadSynchroniseFunctionCall ( subroutineScope );
+
+	appendStatement ( threadSynchCallStmt, subroutineScope);
+}
+
+void
+HostSubroutine::createSupportForReductionVariablesBeforeKernel ( ParallelLoop & parallelLoop )
+{
+	using SageBuilder::buildVarRefExp;
+	using SageBuilder::buildAssignOp;
+	using SageBuilder::buildExprStatement;
+	using SageBuilder::buildIntVal;
+	using SageBuilder::buildMultiplyOp;
+	using SageBuilder::buildExprListExp;
+	using SageBuilder::buildFunctionCallExp;
+	using SageBuilder::buildPntrArrRefExp;
+	using SageBuilder::buildFloatVal;
+	using SageBuilder::buildBasicBlock;
+	using SageBuilder::buildAddOp;
+	using SageInterface::appendStatement;
+			
+	/*
+	 * ======================================================
+	 * First check if we actualy need a reduction variable
+	 * support
+	 * ======================================================
+	 */	 		
+	
+	if ( parallelLoop.isReductionRequired () == false ) return;
+
+	/*
+	 * ======================================================
+	 * We need to allocate enough additional shared memory
+	 * thus we need the highest fortra kind for op_dats
+	 * of reduction variables
+	 * ======================================================
+	 */
+	int maxUsedFortranKind = -1;
+	
+	int dim = -1;
+	
+	for (unsigned int i = 1; i
+			 <= parallelLoop.getNumberOf_OP_DAT_ArgumentGroups (); ++i)
+	{
+		if ( parallelLoop.isReductionRequiredForSpecificArgument ( i ) == true )
+		{
+			int currentDim = parallelLoop.get_OP_DAT_Dimension ( i );
+			if ( currentDim  > dim ) dim = currentDim;
+			
+			SgExpression * fortranKind = getFortranKindOfOpDat ( 
+				parallelLoop.get_OP_DAT_Type ( i ) );
+			
+			SgIntVal * kindVal = isSgIntVal ( fortranKind );
+			
+			ROSE_ASSERT ( kindVal != NULL );
+			
+			int actualValue = -1;
+			
+			if ( maxUsedFortranKind < ( actualValue = kindVal->get_value() ) )
+				maxUsedFortranKind = actualValue;
+		}
+	}
+	
+	SgVarRefExp * maxBlockVarRef = buildVarRefExp ( reductionVariable_maximumNumberOfThreadBlocks );
+	
+	SgExpression * initMaxBlocks = buildAssignOp ( maxBlockVarRef,
+		buildVarRefExp ( CUDAVariable_blocksPerGrid ) );
+	
+	appendStatement ( buildExprStatement ( initMaxBlocks ) , subroutineScope );
+
+	SgExpression * assignReductItems = buildAssignOp ( 
+		buildVarRefExp ( reductionVariable_numberOfThreadItems ),
+		buildMultiplyOp ( maxBlockVarRef,buildIntVal ( dim ) ) );
+	
+	appendStatement ( buildExprStatement ( assignReductItems ), subroutineScope );
+	
+	SgVarRefExp * reductItemsVarRef = buildVarRefExp ( reductionVariable_numberOfThreadItems );
+
+	SgVarRefExp * redArrayHost = 
+		buildVarRefExp ( reductionVariable_reductionArrayOnHost );
+	
+	SgPntrArrRefExp * allocateHostRedVarParams = buildPntrArrRefExp (
+		redArrayHost, reductItemsVarRef );
+	
+	FortranStatementsAndExpressionsBuilder::appendAllocateStatement (
+		buildExprListExp ( allocateHostRedVarParams ), subroutineScope );
+
+	SgVarRefExp * redArrayDev = 
+		buildVarRefExp ( reductionVariable_reductionArrayOnDevice );
+
+	SgPntrArrRefExp * allocateDeviceRedVarParams = buildPntrArrRefExp (
+		redArrayDev, 
+		reductItemsVarRef );
+	
+	FortranStatementsAndExpressionsBuilder::appendAllocateStatement (
+		buildExprListExp ( allocateDeviceRedVarParams ), subroutineScope );
+
+	SgVarRefExp * itVar1VarRef = 
+	  buildVarRefExp ( localVariables_Others[reductionSubroutineNames::iterationVarForReductionName1] );
+	
+	SgExpression * initLoop = buildAssignOp ( itVar1VarRef,	buildIntVal ( 0 ) );
+	
+	/*
+	 * ======================================================
+	 * Warning: for now, only real values are supported!
+	 * ======================================================
+	 */
+	
+	SgExpression * setToZeroRedArrayHost = buildAssignOp ( 
+	  buildPntrArrRefExp ( redArrayHost, itVar1VarRef ), 
+		buildFloatVal ( 0.0 ) );
+	
+	SgBasicBlock * initLoopBody = buildBasicBlock ( 
+	  buildExprStatement ( setToZeroRedArrayHost ) );
+	
+	SgFortranDo * initLoopStatement =
+	FortranStatementsAndExpressionsBuilder::buildFortranDoStatement (
+		initLoop, reductItemsVarRef, buildIntVal (1), initLoopBody );
+	
+	appendStatement ( initLoopStatement , subroutineScope );
+
+	SgExpression * copyHostToDeviceArray = buildAssignOp ( redArrayDev, redArrayHost );
+	
+	appendStatement ( buildExprStatement ( copyHostToDeviceArray ), subroutineScope );
+	
+	SgVarRefExp * nSharedVarRef = buildVarRefExp ( CUDAVariable_sharedMemorySize );
+	
+	SgExpression * assignReductionOffset = buildAssignOp ( 
+	 buildVarRefExp ( reductionVariable_baseOffsetInSharedMemory ),
+	 nSharedVarRef );
+	
+	appendStatement ( buildExprStatement ( assignReductionOffset ), subroutineScope );
+
+	SgVarRefExp * maxRedSizeVarRef = buildVarRefExp ( reductionVariable_maxBytesInSharedMemory );
+	SgExpression * initMaxShared = buildAssignOp (
+	  maxRedSizeVarRef, buildMultiplyOp ( buildVarRefExp ( CUDAVariable_threadsPerBlock ),
+		  buildIntVal ( maxUsedFortranKind ) ) );	
+	
+	appendStatement ( buildExprStatement ( initMaxShared ), subroutineScope );
+
+	SgExpression * recomputeNshared = buildAssignOp ( 
+		nSharedVarRef, buildAddOp ( nSharedVarRef, maxRedSizeVarRef ) );
+	
+	appendStatement ( buildExprStatement ( recomputeNshared ), subroutineScope );
+	
+}
+
+void
+HostSubroutine::createSupportForReductionVariablesAfterKernel ( ParallelLoop & parallelLoop )
+{
+	using SageBuilder::buildAssignOp;
+	using SageBuilder::buildExprStatement;
+	using SageBuilder::buildVarRefExp;
+	using SageBuilder::buildIntVal;
+	using SageBuilder::buildMultiplyOp;
+	using SageBuilder::buildAddOp;
+	using SageBuilder::buildPntrArrRefExp;
+	using SageBuilder::buildBasicBlock;
+	using SageInterface::appendStatement;
+		
+	/*
+	 * ======================================================
+	 * First check if we actualy need a reduction variable
+	 * support
+	 * ======================================================
+	 */	 		
+	
+	if ( parallelLoop.isReductionRequired () == false ) return;
+		
+	SgExpression * redArrayHostVarRef = buildVarRefExp ( reductionVariable_reductionArrayOnHost );
+	
+	SgExpression * copyDeviceTohostArray = buildAssignOp ( redArrayHostVarRef,
+		buildVarRefExp ( reductionVariable_reductionArrayOnDevice ) );
+		
+	appendStatement ( buildExprStatement ( copyDeviceTohostArray ), subroutineScope );
+	
+	/*
+	 * ======================================================
+	 * final reduce on host for each reduction variable
+	 * Warning: only one variable supported for now
+	 * ======================================================
+	 */
+
+	/*
+	 * ======================================================
+	 * Get dimension of reduction variable (we remember the
+	 * position of the reduction variable in the op_dat
+	 * argument list in the variable positionInOPDatsArray
+	 * ======================================================
+	 */
+	
+	int dim = -1;
+	int positionInOPDatsArray = -1;
+	
+	for ( unsigned int i = 1; i
+			 <= parallelLoop.getNumberOf_OP_DAT_ArgumentGroups (); ++i)
+		if ( parallelLoop.isReductionRequiredForSpecificArgument ( i ) == true ) {
+			dim = parallelLoop.get_OP_DAT_Dimension ( i );
+			positionInOPDatsArray = i;
+		}
+	
+	SgVarRefExp * itVar2VarRef = 
+	  buildVarRefExp ( localVariables_Others[reductionSubroutineNames::iterationVarForReductionName2] );
+
+	
+	SgExpression * initInnerLoop = buildAssignOp ( 
+	  itVar2VarRef, buildIntVal ( 0 ) );
+
+	SgExpression * c2fPtrAccess = buildPntrArrRefExp (
+	  buildVarRefExp ( localVariables_CToFortranPointers[positionInOPDatsArray] ),
+			buildAddOp ( itVar2VarRef , buildIntVal ( 1 ) ) );
+
+	SgVarRefExp * itVar1VarRef = 
+	  buildVarRefExp ( localVariables_Others[reductionSubroutineNames::iterationVarForReductionName1] );
+
+	SgExpression * assignExpInHostReduction = buildAddOp ( 
+	  c2fPtrAccess,
+		buildPntrArrRefExp ( redArrayHostVarRef,
+		  buildAddOp ( itVar2VarRef, buildMultiplyOp ( itVar1VarRef,
+			buildIntVal ( dim ) ) ) ) );
+
+
+	SgExpression * finalReduceOnHostExpr = buildAssignOp ( c2fPtrAccess,
+		assignExpInHostReduction );
+
+	SgBasicBlock * innerLoopBody = buildBasicBlock ( 
+	  buildExprStatement ( finalReduceOnHostExpr ) );
+
+	SgFortranDo * innerRedCopyLoop =
+	FortranStatementsAndExpressionsBuilder::buildFortranDoStatement (
+		initInnerLoop, buildIntVal ( dim - 1 ), buildIntVal (1), innerLoopBody );
+	
+	SgBasicBlock * outerLoopBody = buildBasicBlock ( innerRedCopyLoop );
+
+	SgExpression * initOuterLoop = buildAssignOp ( itVar1VarRef, buildIntVal ( 0 ) );
+	
+	SgFortranDo * outerRedCopyLoop =
+	  FortranStatementsAndExpressionsBuilder::buildFortranDoStatement (
+		  initOuterLoop, buildVarRefExp ( reductionVariable_numberOfThreadItems ),
+			buildIntVal (1), outerLoopBody );
+	
+	
+	appendStatement ( outerRedCopyLoop, subroutineScope );	
+		
+}
+
+
+void
+HostSubroutine::createAndAppendIterationVariablesForReduction ( ParallelLoop & parallelLoop )
+{
+	using SageBuilder::buildIntVal;
+	using SageBuilder::buildIntType;
+	using SageBuilder::buildAssignInitializer;
+	using SageBuilder::buildVariableDeclaration;
+	using SageInterface::appendStatement;
+	using std::string;
+	
+	if ( parallelLoop.isReductionRequired () == true ) {
+
+		string const iterVariableName1 = reductionSubroutineNames::iterationVarForReductionName1;
+		string const iterVariableName2 = reductionSubroutineNames::iterationVarForReductionName2;
+
+		localVariables_Others[iterVariableName1] = buildVariableDeclaration (
+		iterVariableName1, FortranTypesBuilder::getFourByteInteger (),
+		buildAssignInitializer (buildIntVal (0), buildIntType ()),
+		subroutineScope);
+
+		localVariables_Others[iterVariableName2] = buildVariableDeclaration (
+			iterVariableName1, FortranTypesBuilder::getFourByteInteger (),
+			buildAssignInitializer (buildIntVal (0), buildIntType ()),
+			subroutineScope);
+		
+		localVariables_Others[iterVariableName1]->
+			get_declarationModifier ().get_accessModifier ().setUndefined ();
+		localVariables_Others[iterVariableName2]->
+			get_declarationModifier ().get_accessModifier ().setUndefined ();
+		
+		appendStatement ( localVariables_Others[iterVariableName1], subroutineScope );
+		appendStatement ( localVariables_Others[iterVariableName2], subroutineScope );
+	}
+}
+
 HostSubroutine::HostSubroutine (std::string const & subroutineName,
     UserDeviceSubroutine & userDeviceSubroutine, ParallelLoop & parallelLoop,
     SgScopeStatement * moduleScope) :
@@ -647,3 +1036,5 @@ HostSubroutine::HostSubroutine (std::string const & subroutineName,
 
   subroutineScope = subroutineHeaderStatement->get_definition ()->get_body ();
 }
+
+

@@ -48,10 +48,25 @@ HostSubroutineOfDirectLoop::createKernelCall (
     if (parallelLoop.isDuplicate_OP_DAT (i) == false)
     {
 
-      SgVarRefExp * opDatDeviceReference = buildVarRefExp (
-          localVariables_OP_DAT_VariablesOnDevice[i]);
+			/*
+			 * ======================================================
+			 * check if it is a reduction variable
+			 * ======================================================
+			 */
+			if ( parallelLoop.isReductionRequiredForSpecificArgument ( i ) == false )
+			{
+				SgVarRefExp * opDatDeviceReference = buildVarRefExp (
+						localVariables_OP_DAT_VariablesOnDevice[i]);
 
-      kernelParameters->append_expression (opDatDeviceReference);
+				kernelParameters->append_expression (opDatDeviceReference);
+			}
+			else
+			{
+				SgVarRefExp * redArrayOnDeviceRef = buildVarRefExp (
+					reductionVariable_reductionArrayOnDevice );
+				
+				kernelParameters->append_expression ( redArrayOnDeviceRef );
+			}
     }
   }
 
@@ -81,7 +96,18 @@ HostSubroutineOfDirectLoop::createKernelCall (
    * ======================================================
 	 */	 	
 	kernelParameters->append_expression ( buildVarRefExp ( CUDAVariable_warpSizeOP2 ) );
-	
+
+	/*
+   * ======================================================
+   * offset in shared memory for reductions (if needed)
+   * ======================================================
+	 */	 	
+	if ( parallelLoop.isReductionRequired () == true )
+	{
+		kernelParameters->append_expression (
+		  buildVarRefExp ( reductionVariable_baseOffsetInSharedMemory ) );
+	}
+	 
 	 
   SgExprStatement * kernelCall = buildFunctionCallStmt (
       kernelSubroutine.getSubroutineName () + "<<<"
@@ -94,14 +120,6 @@ HostSubroutineOfDirectLoop::createKernelCall (
   appendStatement (kernelCall, subroutineScope);
 	
 	
-	/*
-   * ======================================================
-   * threadSynchRet = cudaThreadSynchronize()
-   * ======================================================
-	 */	 		
-	SgStatement * threadSynchCallStmt = buildThreadSynchroniseFunctionCall ( subroutineScope );
-	
-  appendStatement ( threadSynchCallStmt, subroutineScope);
 	
 }
 
@@ -147,7 +165,6 @@ HostSubroutineOfDirectLoop::createCUDAVariablesDirectLoops (ParallelLoop & paral
       "warpSizeOP2", FortranTypesBuilder::getFourByteInteger (),
       buildAssignInitializer (buildIntVal (0), buildIntType ()),
       subroutineScope);
-
 	
   CUDAVariable_threadSynchRet = buildVariableDeclaration (
 		"threadSynchRet", FortranTypesBuilder::getFourByteInteger (),
@@ -159,19 +176,12 @@ HostSubroutineOfDirectLoop::createCUDAVariablesDirectLoops (ParallelLoop & paral
   CUDAVariable_warpSizeOP2->get_declarationModifier ().get_accessModifier ().setUndefined ();
   CUDAVariable_threadSynchRet->get_declarationModifier ().get_accessModifier ().setUndefined ();
 	
-  Debug::getInstance ()->debugMessage (
-		"Before appending the statements", 2);
-
-	
   appendStatement ( CUDAVariable_offsetS, subroutineScope );
   appendStatement ( CUDAVariable_warpSizeOP2, subroutineScope );
   appendStatement ( CUDAVariable_threadSynchRet, subroutineScope );
-
-  Debug::getInstance ()->debugMessage (
-		"After appending the statements", 2);
-
-
+	
 }
+
 
 void
 HostSubroutineOfDirectLoop::createDeviceVariablesSizesVariable ( 
@@ -232,10 +242,27 @@ HostSubroutineOfDirectLoop::initialiseDeviceVariablesSizesVariable (
 				buildVarRefExp ( localVariables_Others[LoopVariables::argsSizes] ),
 				buildOpaqueVarRefExp ( sizeFieldExpression, subroutineScope ) );
 			
+			SgVarRefExp * varRefExpression = NULL;
+
+			
+			/*
+			 * ======================================================
+			 * The size value changes for reduction variables
+			 * ======================================================
+			 */
+						
+			if ( parallelLoop.isReductionRequiredForSpecificArgument ( i ) == false )
+			{
+				varRefExpression = buildVarRefExp ( localVariables_OP_DAT_Sizes[i]  );
+			}
+			else
+			{
+				varRefExpression = buildVarRefExp ( reductionVariable_numberOfThreadItems  );
+			}
 
 			SgExpression * assignExpression = buildAssignOp ( sizeVariableField,
-				buildVarRefExp ( localVariables_OP_DAT_Sizes[i] ) );
-			
+				varRefExpression );
+				
       appendStatement ( buildExprStatement ( assignExpression ), subroutineScope );
     }
 	}
@@ -401,17 +428,27 @@ HostSubroutineOfDirectLoop::HostSubroutineOfDirectLoop (
 	
   createDataMarshallingLocalVariables (parallelLoop);
 	
+	createAndAppendIterationVariablesForReduction ( parallelLoop );
+	
   createCUDAKernelVariables ();
 
-  createCUDAVariablesDirectLoops (parallelLoop);
+  createCUDAVariablesDirectLoops ( parallelLoop );
+
+	createReductionVariables ( parallelLoop );
 
 	initialiseAllCUDAVariables ( parallelLoop );
 	
   initialiseDataMarshallingLocalVariables (parallelLoop);
-
+	
+	createSupportForReductionVariablesBeforeKernel ( parallelLoop );
+	
 	initialiseDeviceVariablesSizesVariable ( parallelLoop );
 	
   createKernelCall (kernelSubroutine, parallelLoop);
+
+	createAndAppendThreadSynchCall ( );
+
+	createSupportForReductionVariablesAfterKernel ( parallelLoop );
 
   copyDataBackFromDeviceAndDeallocate (parallelLoop);
 	

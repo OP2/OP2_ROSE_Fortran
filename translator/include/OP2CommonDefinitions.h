@@ -123,6 +123,8 @@ namespace reductionSubroutineNames
 	std::string const reductionSubroutinePostfix = "_reduction";
 	std::string const reductionSubroutineTypeInteger = "_integer";
 	std::string const reductionSubroutineTypeReal = "_real";
+	std::string const iterationVarForReductionName1 = "iterationRed1";
+	std::string const iterationVarForReductionName2 = "iterationRed2";
 }
 
 

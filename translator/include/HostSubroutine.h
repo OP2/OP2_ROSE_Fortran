@@ -112,6 +112,24 @@ class HostSubroutine: public Subroutine
 
     SgVariableDeclaration * CUDAVariable_sharedMemorySize;
 
+		/*
+		 * ======================================================
+		 * Variables required to implement reductions
+		 * ======================================================
+		 */
+		SgVariableDeclaration * reductionVariable_baseOffsetInSharedMemory;
+	
+		SgVariableDeclaration * reductionVariable_maxBytesInSharedMemory;
+
+		SgVariableDeclaration * reductionVariable_numberOfThreadItems;
+
+		SgVariableDeclaration * reductionVariable_maximumNumberOfThreadBlocks;
+
+		SgVariableDeclaration * reductionVariable_reductionArrayOnHost;
+
+		SgVariableDeclaration * reductionVariable_reductionArrayOnDevice;
+
+
   protected:
 
     void
@@ -136,6 +154,22 @@ class HostSubroutine: public Subroutine
 		
 		SgStatement *
 		buildThreadSynchroniseFunctionCall ( SgScopeStatement * subroutineScope );
+
+		void
+		createReductionVariables ( ParallelLoop & parallelLoop );
+		
+		void
+		createAndAppendThreadSynchCall ( );
+		
+		void
+		createSupportForReductionVariablesBeforeKernel ( ParallelLoop & parallelLoop );
+		
+		void
+		createSupportForReductionVariablesAfterKernel ( ParallelLoop & parallelLoop );
+		
+		void
+		createAndAppendIterationVariablesForReduction ( ParallelLoop & parallelLoop );
+
 		
     HostSubroutine (std::string const & subroutineName,
         UserDeviceSubroutine & userDeviceSubroutine,

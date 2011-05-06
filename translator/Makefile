@@ -18,7 +18,7 @@ all: $(OUT)
 clean:
 	rm -f $(BINDIR)/* $(OBJDIR)/* *~
 
-$(OBJDIR)/%.o: $(SRCDIR)/%.cpp $(INCDIR)/%.h
+$(OBJDIR)/%.o: $(SRCDIR)/%.cpp # $(INCDIR)/%.h commented out because it requires a .h for each .cpp
 	@echo "\n===== BUILDING OBJECT FILE $@ ====="
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
