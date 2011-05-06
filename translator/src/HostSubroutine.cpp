@@ -26,24 +26,34 @@ HostSubroutine::copyDataBackFromDeviceAndDeallocate (
   Debug::getInstance ()->debugMessage (
       "Creating statements to copy data back from device and deallocate", 2);
 
+	/*
+	 * ======================================================
+	 * Copy back and de-allocation only used for op_dat
+	 * which are *not* reduction variables
+	 * ======================================================
+	 */	
+
   for (unsigned int i = 1; i
       <= parallelLoop.getNumberOf_OP_DAT_ArgumentGroups (); ++i)
   {
     if (parallelLoop.isDuplicate_OP_DAT (i) == false)
     {
-      SgVarRefExp * opDatDeviceReference = buildVarRefExp (
-          localVariables_OP_DAT_VariablesOnDevice[i]);
+			if ( parallelLoop.isReductionRequiredForSpecificArgument ( i ) == false ) {
+	
+				SgVarRefExp * opDatDeviceReference = buildVarRefExp (
+						localVariables_OP_DAT_VariablesOnDevice[i]);
 
-      SgVarRefExp * c2FortranPointerReference = buildVarRefExp (
-          localVariables_CToFortranPointers[i]);
+				SgVarRefExp * c2FortranPointerReference = buildVarRefExp (
+						localVariables_CToFortranPointers[i]);
 
-      SgExpression * assignmentExpression = buildAssignOp (
-          c2FortranPointerReference, opDatDeviceReference);
+				SgExpression * assignmentExpression = buildAssignOp (
+						c2FortranPointerReference, opDatDeviceReference);
 
-      SgExprStatement * assignmentStatement = buildExprStatement (
-          assignmentExpression);
+				SgExprStatement * assignmentStatement = buildExprStatement (
+						assignmentExpression);
 
-      appendStatement (assignmentStatement, subroutineScope);
+				appendStatement (assignmentStatement, subroutineScope);
+			}
     }
   }
 
@@ -52,14 +62,17 @@ HostSubroutine::copyDataBackFromDeviceAndDeallocate (
   {
     if (parallelLoop.isDuplicate_OP_DAT (i) == false)
     {
-      SgVarRefExp * opDatDeviceReference = buildVarRefExp (
-          localVariables_OP_DAT_VariablesOnDevice[i]);
+			if ( parallelLoop.isReductionRequiredForSpecificArgument ( i ) == false )
+			{
+				SgVarRefExp * opDatDeviceReference = buildVarRefExp (
+						localVariables_OP_DAT_VariablesOnDevice[i]);
 
-      SgExprListExp * deallocateParameters = buildExprListExp (
-          opDatDeviceReference);
+				SgExprListExp * deallocateParameters = buildExprListExp (
+						opDatDeviceReference);
 
-      FortranStatementsAndExpressionsBuilder::appendDeallocateStatement (
-          deallocateParameters, subroutineScope);
+				FortranStatementsAndExpressionsBuilder::appendDeallocateStatement (
+						deallocateParameters, subroutineScope);
+			}
     }
   }
 }
@@ -125,7 +138,7 @@ HostSubroutine::initialiseDataMarshallingLocalVariables (
       <= parallelLoop.getNumberOf_OP_DAT_ArgumentGroups (); ++i)
   {
     if (parallelLoop.isDuplicate_OP_DAT (i) == false)
-    {
+    {		
       SgVarRefExp * opDatFormalArgumentReference = buildVarRefExp (
           formalParameters_OP_DAT[i]);
 
@@ -146,26 +159,35 @@ HostSubroutine::initialiseDataMarshallingLocalVariables (
     }
   }
 
+	/*
+	 * ======================================================
+	 * Allocation and copy in only used for op_dat
+	 * which are *not* reduction variables
+	 * ======================================================
+	 */
+
   for (unsigned int i = 1; i
       <= parallelLoop.getNumberOf_OP_DAT_ArgumentGroups (); ++i)
   {
     if (parallelLoop.isDuplicate_OP_DAT (i) == false)
     {
+			if ( parallelLoop.isReductionRequiredForSpecificArgument ( i ) == false )
+			{
+				SgVarRefExp * opDatSizeReference = buildVarRefExp (
+						localVariables_OP_DAT_Sizes[i]);
 
-      SgVarRefExp * opDatSizeReference = buildVarRefExp (
-          localVariables_OP_DAT_Sizes[i]);
+				SgVarRefExp * opDatDeviceReference = buildVarRefExp (
+						localVariables_OP_DAT_VariablesOnDevice[i]);
 
-      SgVarRefExp * opDatDeviceReference = buildVarRefExp (
-          localVariables_OP_DAT_VariablesOnDevice[i]);
+				SgExprListExp * arrayIndexExpression = buildExprListExp (
+						opDatSizeReference);
 
-      SgExprListExp * arrayIndexExpression = buildExprListExp (
-          opDatSizeReference);
+				SgPntrArrRefExp * subscriptExpression = buildPntrArrRefExp (
+						opDatDeviceReference, arrayIndexExpression);
 
-      SgPntrArrRefExp * subscriptExpression = buildPntrArrRefExp (
-          opDatDeviceReference, arrayIndexExpression);
-
-      FortranStatementsAndExpressionsBuilder::appendAllocateStatement (
-          buildExprListExp (subscriptExpression), subroutineScope);
+				FortranStatementsAndExpressionsBuilder::appendAllocateStatement (
+						buildExprListExp (subscriptExpression), subroutineScope);
+			}
     }
   }
 
@@ -174,20 +196,22 @@ HostSubroutine::initialiseDataMarshallingLocalVariables (
   {
     if (parallelLoop.isDuplicate_OP_DAT (i) == false)
     {
+			if ( parallelLoop.isReductionRequiredForSpecificArgument ( i ) == false )
+			{
+				SgVarRefExp * opDatDeviceReference = buildVarRefExp (
+						localVariables_OP_DAT_VariablesOnDevice[i]);
 
-      SgVarRefExp * opDatDeviceReference = buildVarRefExp (
-          localVariables_OP_DAT_VariablesOnDevice[i]);
+				SgVarRefExp * c2FortranPointerReference = buildVarRefExp (
+						localVariables_CToFortranPointers[i]);
 
-      SgVarRefExp * c2FortranPointerReference = buildVarRefExp (
-          localVariables_CToFortranPointers[i]);
+				SgExpression * assignmentExpression = buildAssignOp (
+						opDatDeviceReference, c2FortranPointerReference);
 
-      SgExpression * assignmentExpression = buildAssignOp (
-          opDatDeviceReference, c2FortranPointerReference);
+				SgStatement * assignmentStatement = buildExprStatement (
+						assignmentExpression);
 
-      SgStatement * assignmentStatement = buildExprStatement (
-          assignmentExpression);
-
-      appendStatement (assignmentStatement, subroutineScope);
+				appendStatement (assignmentStatement, subroutineScope);
+			}
     }
   }
 }
@@ -249,25 +273,37 @@ HostSubroutine::createDataMarshallingLocalVariables (
     }
   }
 
+	/*
+	 * ======================================================
+	 * argument variable on device only needed if op_dat
+	 * argument is *not* a reduction variable
+	 * ======================================================
+	 */
+	
+
   for (unsigned int i = 1; i
       <= parallelLoop.getNumberOf_OP_DAT_ArgumentGroups (); ++i)
   {
     if (parallelLoop.isDuplicate_OP_DAT (i) == false)
     {
-      string const variableName = "argument" + lexical_cast <string> (i);
+			if ( parallelLoop.isReductionRequiredForSpecificArgument ( i ) == false )
+			{		
+				string const variableName = kernelDatArgumentsNames::argNamePrefix + 
+				  lexical_cast <string> (i);
 
-      SgVariableDeclaration * variableDeclaration =
-          buildVariableDeclaration (variableName, parallelLoop.get_OP_DAT_Type (
-              i), NULL, subroutineScope);
+				SgVariableDeclaration * variableDeclaration =
+						buildVariableDeclaration (variableName, parallelLoop.get_OP_DAT_Type (
+								i), NULL, subroutineScope);
 
-      variableDeclaration->get_declarationModifier ().get_accessModifier ().setUndefined ();
-      variableDeclaration->get_declarationModifier ().get_typeModifier ().setDevice ();
-      variableDeclaration->get_declarationModifier ().get_typeModifier ().setAllocatable ();
+				variableDeclaration->get_declarationModifier ().get_accessModifier ().setUndefined ();
+				variableDeclaration->get_declarationModifier ().get_typeModifier ().setDevice ();
+				variableDeclaration->get_declarationModifier ().get_typeModifier ().setAllocatable ();
 
-      localVariables_OP_DAT_VariablesOnDevice.insert (make_pair (i,
-          variableDeclaration));
+				localVariables_OP_DAT_VariablesOnDevice.insert (make_pair (i,
+						variableDeclaration));
 
-      appendStatement (variableDeclaration, subroutineScope);
+				appendStatement (variableDeclaration, subroutineScope);
+			}
     }
   }
 }
