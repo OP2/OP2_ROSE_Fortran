@@ -1,9 +1,8 @@
 #include <boost/lexical_cast.hpp>
 #include <iostream>
 #include <string.h>
-
-#include "CommandLine.h"
-#include "Debug.h"
+#include <CommandLine.h>
+#include <Debug.h>
 
 CommandLine::CommandLine (int argc, char **argv)
 {
@@ -20,22 +19,27 @@ CommandLine::CommandLine (int argc, char **argv)
     if (debugMode)
     {
       /*
+       * ======================================================
        * The string in argv[i-1] was '-d'. Therefore, this
        * argument should represent the debug level, an integer
+       * ======================================================
        */
-
       debugMode = false;
 
       try
       {
         /*
+         * ======================================================
          * Check that the character array is an integer,
          * otherwise throw an exception
+         * ======================================================
          */
         int debug = lexical_cast <int> (argv[i]);
 
         /*
+         * ======================================================
          * Only the ordained debug levels are permissible
+         * ======================================================
          */
         if (debug < Debug::LOWEST_DEBUG_LEVEL || debug
             > Debug::HIGHEST_DEBUG_LEVEL)
@@ -77,7 +81,9 @@ CommandLine::CommandLine (int argc, char **argv)
       if (debugOption.compare (argv[i]) == 0)
       {
         /*
+         * ======================================================
          * Debug flag recognised
+         * ======================================================
          */
         debugMode = true;
       }
@@ -91,7 +97,9 @@ CommandLine::CommandLine (int argc, char **argv)
       else
       {
         /*
+         * ======================================================
          * Do not recognise it so assume it is a ROSE flag
+         * ======================================================
          */
         ROSE_arguments.push_back (argv[i]);
       }
@@ -110,8 +118,11 @@ CommandLine::getArguments () const
 {
   using namespace std;
 
-  /* Allocate enough space for all the command-line
+  /*
+   * ======================================================
+   * Allocate enough space for all the command-line
    * arguments recognised as ROSE ones
+   * ======================================================
    */
   char ** argv = new char*[ROSE_arguments.size ()];
 
@@ -120,20 +131,26 @@ CommandLine::getArguments () const
       != ROSE_arguments.end (); ++it)
   {
     /*
+     * ======================================================
      * Allocate space for the character array which represents
      * a command-line argument
+     * ======================================================
      */
     argv[i] = new char[it->size ()];
 
     /*
+     * ======================================================
      * Have to do a 'strcpy' because 'c_str' returns a pointer
      * to a constant character array and we need a modifiable
      * character array
+     * ======================================================
      */
     strcpy (argv[i], (*it).c_str ());
 
     /*
+     * ======================================================
      * Advance the index into argv
+     * ======================================================
      */
     i++;
   }

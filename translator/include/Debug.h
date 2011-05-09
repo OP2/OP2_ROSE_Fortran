@@ -5,19 +5,22 @@
  * create a single Debug class
  */
 
-#ifndef DEBUG_H_
-#define DEBUG_H_
+#ifndef DEBUG_H
+#define DEBUG_H
 
 #include <string>
 
 class Debug
 {
   private:
+
     static Debug * debugInstance;
 
     bool verbose;
 
     int debugLevel;
+
+  private:
 
     /*
      * ======================================================
@@ -37,6 +40,7 @@ class Debug
      * ======================================================
      */
     static int const LOWEST_DEBUG_LEVEL = 0;
+
     static int const HIGHEST_DEBUG_LEVEL = 10;
 
     /*

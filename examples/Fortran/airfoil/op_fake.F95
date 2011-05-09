@@ -14,13 +14,15 @@ module OP2_C
   integer(4) :: OP_RW =     4
 
   type op_set
+  integer:: id
   end type op_set
 
   type op_map
-
+  integer:: id
   end type op_map
 
   type op_dat
+  integer:: id
   end type op_dat
 
   ! declaration of identity map
