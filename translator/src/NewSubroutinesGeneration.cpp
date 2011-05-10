@@ -13,7 +13,6 @@
 #include <DeviceDataSizesDeclarationDirectLoops.h>
 #include <ReductionSubroutine.h>
 
-
 /*
  * ======================================================
  * Private functions
@@ -96,7 +95,7 @@ NewSubroutinesGeneration::patchOP_PAR_LOOPCalls (ParallelLoop & parallelLoop,
           getEnclosingFileNode (lastUseStatement)->get_file_info (),
           parallelLoop.getModuleName (), false);
 
-  insertStatementAfter (lastUseStatement, newUseStatement);	
+  insertStatementAfter (lastUseStatement, newUseStatement);
 
   /*
    * ======================================================
@@ -172,7 +171,7 @@ NewSubroutinesGeneration::addLibraries (SgModuleStatement * moduleStatement)
   vector <string> libs;
   libs.push_back ("ISO_C_BINDING");
   libs.push_back ("OP2_C");
-//  libs.push_back ("cudaConfigurationParams");
+  //  libs.push_back ("cudaConfigurationParams");
   libs.push_back ("cudafor");
 
   for (vector <string>::const_iterator it = libs.begin (); it != libs.end (); ++it)
@@ -217,7 +216,7 @@ NewSubroutinesGeneration::createCUDAModule (SgSourceFile & sourceFile,
 
   moduleStatement->get_definition ()->setCaseInsensitive (true);
 
-  appendStatement ( moduleStatement, globalScope );	
+  appendStatement (moduleStatement, globalScope);
 
   return moduleStatement;
 }
@@ -308,11 +307,10 @@ NewSubroutinesGeneration::visit (SgNode * node)
   using std::pair;
   using std::string;
 
-	// to be removed
-	using SageBuilder::buildIntVal;
-	using SageBuilder::buildArrayType;
-	
-	
+  // to be removed
+  using SageBuilder::buildIntVal;
+  using SageBuilder::buildArrayType;
+
   switch (node->variantT ())
   {
     case V_SgFunctionCallExp:
@@ -372,7 +370,6 @@ NewSubroutinesGeneration::visit (SgNode * node)
                * Fortran source code
                * ======================================================
                */
-							
 
               ParallelLoop * parallelLoop = new ParallelLoop (
                   userSubroutineName, actualArguments, declarations);
@@ -398,43 +395,46 @@ NewSubroutinesGeneration::visit (SgNode * node)
               addLibraries (moduleStatement);
 
               SgScopeStatement * moduleScope =
-                  moduleStatement->get_definition ();							
+                  moduleStatement->get_definition ();
 
               if (parallelLoop->isDirectLoop ())
               {
-								
-								Debug::getInstance ()->debugMessage ( "Direct Loop", 2 );
-								
-								/*
+
+                Debug::getInstance ()->debugMessage ("Direct Loop", 2);
+
+                /*
                  * ======================================================
                  * Direct loop
                  * ======================================================
                  */
-                DeviceDataSizesDeclarationDirectLoops * deviceDataSizesDeclarationDirectLoops =
-								  new DeviceDataSizesDeclarationDirectLoops ( *parallelLoop,
-									  userSubroutineName, moduleScope );
-								
-								deviceDataSizesDeclarationDirectLoops->initialise ( *parallelLoop, moduleScope );
-								
+                DeviceDataSizesDeclarationDirectLoops
+                    * deviceDataSizesDeclarationDirectLoops =
+                        new DeviceDataSizesDeclarationDirectLoops (
+                            *parallelLoop, userSubroutineName, moduleScope);
+
+                deviceDataSizesDeclarationDirectLoops->initialise (
+                    *parallelLoop, moduleScope);
+
                 /*
                  * ======================================================
                  * Indirect loops use global constants. Declare them and
                  * generate the subroutine which initialises them
                  * ======================================================
                  */
-								
-								Debug::getInstance ()->debugMessage ( "Before creating constants", 2 );
-								
-                InitialiseConstantsSubroutine * initialiseConstantsSubroutine =
-								new InitialiseConstantsSubroutine (userSubroutineName);
-								
-								Debug::getInstance ()->debugMessage ( "Before declare constants", 2 );
 
-								
+                Debug::getInstance ()->debugMessage (
+                    "Before creating constants", 2);
+
+                InitialiseConstantsSubroutine * initialiseConstantsSubroutine =
+                    new InitialiseConstantsSubroutine (userSubroutineName);
+
+                Debug::getInstance ()->debugMessage (
+                    "Before declare constants", 2);
+
                 initialiseConstantsSubroutine->declareConstants (moduleScope);
-								
-								
-								Debug::getInstance ()->debugMessage ( "Adding contain statement", 2 );
+
+                Debug::getInstance ()->debugMessage (
+                    "Adding contain statement", 2);
 
                 addContains (moduleStatement);
 
@@ -444,32 +444,33 @@ NewSubroutinesGeneration::visit (SgNode * node)
                  * the device
                  * ======================================================
                  */
-								 
-								Debug::getInstance ()->debugMessage ( "Adding reduction stuff", 2 );
-								 
-								 
-								std::map < unsigned int, SgProcedureHeaderStatement *> reductionSubroutines =
-								ReductionSubroutine::generateReductionSubroutines ( 
-								  *parallelLoop, moduleScope );
 
-								Debug::getInstance ()->debugMessage ( "after adding reduction stuff", 2 );
+                Debug::getInstance ()->debugMessage ("Adding reduction stuff",
+                    2);
+
+                std::map <unsigned int, SgProcedureHeaderStatement *>
+                    reductionSubroutines =
+                        ReductionSubroutine::generateReductionSubroutines (
+                            *parallelLoop, moduleScope);
+
+                Debug::getInstance ()->debugMessage (
+                    "after adding reduction stuff", 2);
 
                 UserDeviceSubroutine * userDeviceSubroutine =
-                    new UserDeviceSubroutine ( userSubroutineName, moduleScope,
-												initialiseConstantsSubroutine,
-                        *declarations);
+                    new UserDeviceSubroutine (userSubroutineName, moduleScope,
+                        initialiseConstantsSubroutine, *declarations);
 
                 KernelSubroutine * kernelSubroutine =
                     new KernelSubroutineOfDirectLoop (userSubroutineName,
-                        *userDeviceSubroutine, *deviceDataSizesDeclarationDirectLoops,
-												reductionSubroutines,
-												*parallelLoop, moduleScope);
+                        *userDeviceSubroutine,
+                        *deviceDataSizesDeclarationDirectLoops,
+                        reductionSubroutines, *parallelLoop, moduleScope);
 
                 HostSubroutine * hostSubroutine =
                     new HostSubroutineOfDirectLoop (userSubroutineName,
                         *userDeviceSubroutine, *kernelSubroutine,
-												*deviceDataSizesDeclarationDirectLoops,
-                        *parallelLoop, moduleScope);
+                        *deviceDataSizesDeclarationDirectLoops, *parallelLoop,
+                        moduleScope);
 
                 /*
                  * ======================================================
@@ -493,13 +494,14 @@ NewSubroutinesGeneration::visit (SgNode * node)
                  * ======================================================
                  */
 
-								Debug::getInstance ()->debugMessage ( "Indirect Loop", 2 );
+                Debug::getInstance ()->debugMessage ("Indirect Loop", 2);
 
                 DeviceDataSizesDeclaration * deviceDataSizesDeclaration =
                     new DeviceDataSizesDeclaration (*parallelLoop,
                         userSubroutineName, moduleScope);
 
-								deviceDataSizesDeclaration->initialise ( *parallelLoop, moduleScope );
+                deviceDataSizesDeclaration->initialise (*parallelLoop,
+                    moduleScope);
                 /*
                  * ======================================================
                  * Indirect loops use global constants. Declare them and
@@ -512,10 +514,10 @@ NewSubroutinesGeneration::visit (SgNode * node)
 
                 initialiseConstantsSubroutine->declareConstants (moduleScope);
 
-
                 addContains (moduleStatement);
 
-                initialiseConstantsSubroutine->generateSubroutineForAlreadyComputedValues (moduleScope);
+                initialiseConstantsSubroutine->generateSubroutineForAlreadyComputedValues (
+                    moduleScope);
 
                 /*
                  * ======================================================
@@ -526,8 +528,7 @@ NewSubroutinesGeneration::visit (SgNode * node)
 
                 UserDeviceSubroutine * userDeviceSubroutine =
                     new UserDeviceSubroutine (userSubroutineName, moduleScope,
-										    initialiseConstantsSubroutine,
-                        *declarations);
+                        initialiseConstantsSubroutine, *declarations);
 
                 KernelSubroutine * kernelSubroutine =
                     new KernelSubroutineOfIndirectLoop (userSubroutineName,
