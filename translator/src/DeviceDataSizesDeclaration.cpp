@@ -23,9 +23,11 @@ DeviceDataSizesDeclaration::addFields (ParallelLoop & parallelLoop,
   for (unsigned int i = 1; i
       <= parallelLoop.getNumberOf_OP_DAT_ArgumentGroups (); ++i)
   {
-    if (parallelLoop.isDuplicate_OP_DAT (i) == false)
+    if (parallelLoop.isDuplicate_OP_DAT (i) == false
+        && parallelLoop.get_OP_MAP_Value (i) == INDIRECT)
     {
-      string const variableName = kernelDatArgumentsNames::argNamePrefix + lexical_cast <string> (i)
+      string const variableName = kernelDatArgumentsNames::argNamePrefix
+          + lexical_cast <string> (i)
           + kernelDatArgumentsNames::argNameSizePostfix;
 
       SgVariableDeclaration * fieldDeclaration = buildVariableDeclaration (
@@ -48,7 +50,7 @@ DeviceDataSizesDeclaration::addFields (ParallelLoop & parallelLoop,
         && parallelLoop.get_OP_MAP_Value (i) == INDIRECT)
     {
       string const variableName = "pindMaps" + lexical_cast <string> (i)
-          + "Size";
+          + kernelDatArgumentsNames::argNameSizePostfix;
 
       SgVariableDeclaration * fieldDeclaration = buildVariableDeclaration (
           variableName, FortranTypesBuilder::getFourByteInteger (), NULL,
@@ -68,7 +70,8 @@ DeviceDataSizesDeclaration::addFields (ParallelLoop & parallelLoop,
   {
     if (parallelLoop.get_OP_MAP_Value (i) == INDIRECT)
     {
-      string const variableName = "pmaps" + lexical_cast <string> (i) + "Size";
+      string const variableName = "pmaps" + lexical_cast <string> (i)
+          + kernelDatArgumentsNames::argNameSizePostfix;
 
       SgVariableDeclaration * fieldDeclaration = buildVariableDeclaration (
           variableName, FortranTypesBuilder::getFourByteInteger (), NULL,
@@ -80,6 +83,29 @@ DeviceDataSizesDeclaration::addFields (ParallelLoop & parallelLoop,
           fieldDeclaration);
 
       globalToLocalRenumberingOfIndirectMappingSizes[i] = fieldDeclaration;
+    }
+  }
+
+  for (unsigned int i = 1; i
+      <= parallelLoop.getNumberOf_OP_DAT_ArgumentGroups (); ++i)
+  {
+    if (parallelLoop.isDuplicate_OP_DAT (i) == false
+        && parallelLoop.get_OP_MAP_Value (i) == DIRECT)
+    {
+      string const variableName = kernelDatArgumentsNames::argNamePrefix
+          + lexical_cast <string> (i)
+          + kernelDatArgumentsNames::argNameSizePostfix;
+
+      SgVariableDeclaration * fieldDeclaration = buildVariableDeclaration (
+          variableName, FortranTypesBuilder::getFourByteInteger (), NULL,
+          moduleScope);
+
+      fieldDeclaration->get_declarationModifier ().get_accessModifier ().setUndefined ();
+
+      deviceDatatypeStatement->get_definition ()->append_member (
+          fieldDeclaration);
+
+      OP_DAT_Sizes[i] = fieldDeclaration;
     }
   }
 
@@ -126,6 +152,4 @@ DeviceDataSizesDeclaration::DeviceDataSizesDeclaration (
   deviceDatatypeStatement->get_declarationModifier ().get_accessModifier ().setUndefined ();
 
   appendStatement (deviceDatatypeStatement, moduleScope);
-
- // addFields (parallelLoop, moduleScope);
 }
