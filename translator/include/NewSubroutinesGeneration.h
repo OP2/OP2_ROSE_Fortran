@@ -20,7 +20,7 @@
 #define CREATE_KERNELS_H
 
 #include <rose.h>
-#include <OP2CommonDefinitions.h>
+#include <CommonNamespaces.h>
 #include <Declarations.h>
 #include <ParallelLoop.h>
 #include <HostSubroutine.h>

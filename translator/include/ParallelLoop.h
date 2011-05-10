@@ -8,8 +8,7 @@
 #ifndef PARALLEL_LOOP_H
 #define PARALLEL_LOOP_H
 
-#include <rose.h>
-#include <OP2CommonDefinitions.h>
+#include <CommonNamespaces.h>
 #include <Declarations.h>
 #include <OP2Variables.h>
 

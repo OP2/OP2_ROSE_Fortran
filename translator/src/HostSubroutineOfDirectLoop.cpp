@@ -236,9 +236,9 @@ HostSubroutineOfDirectLoop::initialiseDeviceVariablesSizesVariable (
     if (parallelLoop.isDuplicate_OP_DAT (i) == false)
     {			
 			
-			string const & variableName = kernelDatArgumentsNames::argNamePrefix + lexical_cast <string> (i);
+			string const & variableName = OP_DAT_ArgumentNames::OP_DAT_NamePrefix + lexical_cast <string> (i);
 
-			string const sizeFieldExpression = variableName + kernelDatArgumentsNames::argNameSizePostfix;
+			string const sizeFieldExpression = variableName + OP_DAT_ArgumentNames::OP_DAT_SizeNameSuffix;
 			
       SgExpression * sizeVariableField = buildDotExp ( 
 				buildVarRefExp ( localVariables_Others[LoopVariables::argsSizes] ),

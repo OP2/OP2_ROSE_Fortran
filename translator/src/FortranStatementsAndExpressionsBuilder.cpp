@@ -1,6 +1,6 @@
 #include <FortranStatementsAndExpressionsBuilder.h>
 #include <FortranTypesBuilder.h>
-#include <OP2CommonDefinitions.h>
+#include <CommonNamespaces.h>
 #include <ROSEHelper.h>
 
 /*
@@ -197,7 +197,7 @@ FortranStatementsAndExpressionsBuilder::createAndAppendAutosharedVariable (
 			0, upperBound );
 
 	SgVariableDeclaration * autosharedVariable = buildVariableDeclaration ( 
-		kernelSharedVariables::variableName_autoshared,
+		kernelSharedVariables::autoShared,
 		autosharedType, NULL, scopeStatement );
 
 	// TODO: add shared attribute to ROSE

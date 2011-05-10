@@ -2,7 +2,7 @@
 #include <ROSEHelper.h>
 #include <Debug.h>
 #include <FortranTypesBuilder.h>
-#include <OP2CommonDefinitions.h>
+#include <CommonNamespaces.h>
 #include <FortranStatementsAndExpressionsBuilder.h>
 #include <FortranTypesBuilder.h>
 #include <boost/lexical_cast.hpp>
@@ -529,7 +529,7 @@ ReductionSubroutine::generateReductionSubroutines (
 				 * ======================================================
 				 */
 				string const & ReductionSubroutineName = 
-				kernelDatArgumentsNames::argNamePrefix + 
+				OP_DAT_ArgumentNames::OP_DAT_NamePrefix + 
 				lexical_cast < string > ( i ) +
 				reductionSubroutineNames::reductionSubroutinePostfix +
 				typeName +

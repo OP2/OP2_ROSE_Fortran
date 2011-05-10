@@ -1,6 +1,6 @@
 #include <boost/algorithm/string.hpp>
 #include <Declarations.h>
-#include <OP2CommonDefinitions.h>
+#include <CommonNamespaces.h>
 #include <Debug.h>
 
 OP_SET_Declaration *

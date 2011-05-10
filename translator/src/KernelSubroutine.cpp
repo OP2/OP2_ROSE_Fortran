@@ -1,7 +1,7 @@
 #include <Debug.h>
 #include <boost/lexical_cast.hpp>
 #include <KernelSubroutine.h>
-#include <OP2CommonDefinitions.h>
+#include <CommonNamespaces.h>
 #include <FortranTypesBuilder.h>
 #include <FortranStatementsAndExpressionsBuilder.h>
 #include <ROSEHelper.h>
@@ -492,11 +492,11 @@ KernelSubroutine::createUserSubroutineCall (
          * ======================================================
          */
 				
-        string const & variableName = kernelDatArgumentsNames::argNamePrefix
+        string const & variableName = OP_DAT_ArgumentNames::OP_DAT_NamePrefix
 				+ lexical_cast <string> (i);
 				
         string const & argSizeName = variableName
-				+ kernelDatArgumentsNames::argNameSizePostfix;
+				+ OP_DAT_ArgumentNames::OP_DAT_SizeNameSuffix;
 				
         SgExpression * argSizeField = buildDotExp (buildVarRefExp (
 					formalParameter_argsSizes), buildOpaqueVarRefExp (argSizeName,
@@ -538,7 +538,7 @@ KernelSubroutine::createUserSubroutineCall (
     else if (parallelLoop.get_OP_MAP_Value (i) == INDIRECT)
     {
         SgVarRefExp * autoshared_Reference = buildVarRefExp (
-					localVariables_Others[kernelSharedVariables::variableName_autoshared]);
+					localVariables_Others[kernelSharedVariables::autoShared]);
 
         SgVarRefExp * globalToLocalMappingArray_Reference = buildVarRefExp (
             (*formalParameters_GlobalToLocalMapping)[i]);

@@ -288,7 +288,7 @@ HostSubroutine::createDataMarshallingLocalVariables (
     {
 			if ( parallelLoop.isReductionRequiredForSpecificArgument ( i ) == false )
 			{		
-				string const variableName = kernelDatArgumentsNames::argNamePrefix + 
+				string const variableName = OP_DAT_ArgumentNames::OP_DAT_NamePrefix + 
 				  lexical_cast <string> (i);
 
 				SgVariableDeclaration * variableDeclaration =

@@ -1,11 +1,11 @@
 /*
  * Written by Adam Betts and Carlo Bertolli
  *  
- * A namespace for the various names that OP2 employs
+ * Various public namespaces used in the compiler
  */
 
-#ifndef OP2_COMMON_DEFINITIONS_H
-#define OP2_COMMON_DEFINITIONS_H
+#ifndef COMMON_NAMESPACES_H
+#define COMMON_NAMESPACES_H
 
 namespace OP2
 {
@@ -61,17 +61,16 @@ namespace OP2
    * ======================================================
    */
   unsigned int const NUMBER_OF_NON_OP_DAT_ARGUMENTS = 2;
-	
+
   /*
    * ======================================================
    * Position of first OP_ACCESS (the following ones
-	 * are in following + NUMBER_OF_ARGUMENTS_PER_OP_DAT
-	 * positions 
+   * are in following + NUMBER_OF_ARGUMENTS_PER_OP_DAT
+   * positions
    * ======================================================
    */
   unsigned int const POSITION_OF_FIRST_OP_ACCESS = 6;
-	
-	
+
 }
 
 namespace PlanFunctionVariables
@@ -108,35 +107,34 @@ namespace LoopVariables
 
 namespace kernelSharedVariables
 {
-  std::string const variableName_autoshared = "autoshared";
+  std::string const autoShared = "autoshared";
 }
 
-namespace kernelDatArgumentsNames
+namespace OP_DAT_ArgumentNames
 {
-	std::string const argNamePrefix = "argument";
-	std::string const argNameSizePostfix = "Size";
+  std::string const OP_DAT_NamePrefix = "argument";
+  std::string const OP_DAT_SizeNameSuffix = "Size";
 }
 
 namespace kernelLocalThreadVarsNames
 {
-	std::string const localVarNamePrefix = "arg";
-	std::string const localVarNamePostfix = "_l";
+  std::string const localVarNamePrefix = "arg";
+  std::string const localVarNamePostfix = "_l";
 }
 
 namespace reductionSubroutineNames
 {
-	std::string const reductionSubroutinePostfix = "_reduction";
-	std::string const reductionSubroutineTypeInteger = "_integer";
-	std::string const reductionSubroutineTypeReal = "_real";
-	std::string const iterationVarForReductionName1 = "iterationRed1";
-	std::string const iterationVarForReductionName2 = "iterationRed2";
+  std::string const reductionSubroutinePostfix = "_reduction";
+  std::string const reductionSubroutineTypeInteger = "_integer";
+  std::string const reductionSubroutineTypeReal = "_real";
+  std::string const iterationVarForReductionName1 = "iterationRed1";
+  std::string const iterationVarForReductionName2 = "iterationRed2";
 }
-
 
 namespace FortranVariableDeafultKinds
 {
-	int const DEFAULT_KIND_INT = 4;
-	int const DEFAULT_KIND_REAL = 4;
+  int const DEFAULT_KIND_INT = 4;
+  int const DEFAULT_KIND_REAL = 4;
 }
 
 #endif

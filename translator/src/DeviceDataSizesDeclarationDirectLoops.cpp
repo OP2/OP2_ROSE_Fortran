@@ -2,7 +2,7 @@
 #include <DeviceDataSizesDeclarationDirectLoops.h>
 #include <FortranStatementsAndExpressionsBuilder.h>
 #include <FortranTypesBuilder.h>
-#include <OP2CommonDefinitions.h>
+#include <CommonNamespaces.h>
 
 /*
  * ======================================================
@@ -24,8 +24,8 @@ DeviceDataSizesDeclarationDirectLoops::addFields ( ParallelLoop & parallelLoop,
   {
     if (parallelLoop.isDuplicate_OP_DAT (i) == false)
     {
-      string const variableName = kernelDatArgumentsNames::argNamePrefix + lexical_cast <string> (i)
-			+ kernelDatArgumentsNames::argNameSizePostfix;
+      string const variableName = OP_DAT_ArgumentNames::OP_DAT_NamePrefix + lexical_cast <string> (i)
+			+ OP_DAT_ArgumentNames::OP_DAT_SizeNameSuffix;
 			
       SgVariableDeclaration * fieldDeclaration = buildVariableDeclaration (
 																																					 variableName, FortranTypesBuilder::getFourByteInteger (), NULL,

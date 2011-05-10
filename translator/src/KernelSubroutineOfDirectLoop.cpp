@@ -863,11 +863,11 @@ KernelSubroutineOfDirectLoop::create_OP_DAT_FormalParameters (
        * ======================================================
        */
 
-      string const & variableName = kernelDatArgumentsNames::argNamePrefix
+      string const & variableName = OP_DAT_ArgumentNames::OP_DAT_NamePrefix
           + lexical_cast <string> (i);
 
       string const & argSizeName = variableName
-          + kernelDatArgumentsNames::argNameSizePostfix;
+          + OP_DAT_ArgumentNames::OP_DAT_SizeNameSuffix;
 
       SgExpression * argSizeField = buildDotExp (buildVarRefExp (
           formalParameter_argsSizes), buildOpaqueVarRefExp (argSizeName,

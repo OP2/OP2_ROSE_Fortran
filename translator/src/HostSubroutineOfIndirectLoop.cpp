@@ -3,7 +3,7 @@
 #include <HostSubroutineOfIndirectLoop.h>
 #include <FortranTypesBuilder.h>
 #include <FortranStatementsAndExpressionsBuilder.h>
-#include <OP2CommonDefinitions.h>
+#include <CommonNamespaces.h>
 #include <ROSEHelper.h>
 
 /*
@@ -1482,9 +1482,9 @@ HostSubroutineOfIndirectLoop::createExecutionPlanLocalVariables (
   {
     if (parallelLoop.isDuplicate_OP_DAT (i) == false)
     {
-      string const variableName = kernelDatArgumentsNames::argNamePrefix
+      string const variableName = OP_DAT_ArgumentNames::OP_DAT_NamePrefix
           + lexical_cast <string> (i)
-          + kernelDatArgumentsNames::argNameSizePostfix;
+          + OP_DAT_ArgumentNames::OP_DAT_SizeNameSuffix;
 
       SgVariableDeclaration * variableDeclaration =
           FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (

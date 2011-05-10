@@ -2,7 +2,7 @@
 #include <DeviceDataSizesDeclaration.h>
 #include <FortranStatementsAndExpressionsBuilder.h>
 #include <FortranTypesBuilder.h>
-#include <OP2CommonDefinitions.h>
+#include <CommonNamespaces.h>
 
 /*
  * ======================================================
@@ -26,9 +26,9 @@ DeviceDataSizesDeclaration::addFields (ParallelLoop & parallelLoop,
     if (parallelLoop.isDuplicate_OP_DAT (i) == false
         && parallelLoop.get_OP_MAP_Value (i) == INDIRECT)
     {
-      string const variableName = kernelDatArgumentsNames::argNamePrefix
+      string const variableName = OP_DAT_ArgumentNames::OP_DAT_NamePrefix
           + lexical_cast <string> (i)
-          + kernelDatArgumentsNames::argNameSizePostfix;
+          + OP_DAT_ArgumentNames::OP_DAT_SizeNameSuffix;
 
       SgVariableDeclaration * fieldDeclaration = buildVariableDeclaration (
           variableName, FortranTypesBuilder::getFourByteInteger (), NULL,
@@ -50,7 +50,7 @@ DeviceDataSizesDeclaration::addFields (ParallelLoop & parallelLoop,
         && parallelLoop.get_OP_MAP_Value (i) == INDIRECT)
     {
       string const variableName = "pindMaps" + lexical_cast <string> (i)
-          + kernelDatArgumentsNames::argNameSizePostfix;
+          + OP_DAT_ArgumentNames::OP_DAT_SizeNameSuffix;
 
       SgVariableDeclaration * fieldDeclaration = buildVariableDeclaration (
           variableName, FortranTypesBuilder::getFourByteInteger (), NULL,
@@ -71,7 +71,7 @@ DeviceDataSizesDeclaration::addFields (ParallelLoop & parallelLoop,
     if (parallelLoop.get_OP_MAP_Value (i) == INDIRECT)
     {
       string const variableName = "pmaps" + lexical_cast <string> (i)
-          + kernelDatArgumentsNames::argNameSizePostfix;
+          + OP_DAT_ArgumentNames::OP_DAT_SizeNameSuffix;
 
       SgVariableDeclaration * fieldDeclaration = buildVariableDeclaration (
           variableName, FortranTypesBuilder::getFourByteInteger (), NULL,
@@ -92,9 +92,9 @@ DeviceDataSizesDeclaration::addFields (ParallelLoop & parallelLoop,
     if (parallelLoop.isDuplicate_OP_DAT (i) == false
         && parallelLoop.get_OP_MAP_Value (i) == DIRECT)
     {
-      string const variableName = kernelDatArgumentsNames::argNamePrefix
+      string const variableName = OP_DAT_ArgumentNames::OP_DAT_NamePrefix
           + lexical_cast <string> (i)
-          + kernelDatArgumentsNames::argNameSizePostfix;
+          + OP_DAT_ArgumentNames::OP_DAT_SizeNameSuffix;
 
       SgVariableDeclaration * fieldDeclaration = buildVariableDeclaration (
           variableName, FortranTypesBuilder::getFourByteInteger (), NULL,

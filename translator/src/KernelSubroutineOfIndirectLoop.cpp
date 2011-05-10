@@ -3,7 +3,7 @@
 #include <FortranTypesBuilder.h>
 #include <FortranStatementsAndExpressionsBuilder.h>
 #include <KernelSubroutineOfIndirectLoop.h>
-#include <OP2CommonDefinitions.h>
+#include <CommonNamespaces.h>
 #include <ROSEHelper.h>
 
 /*
@@ -307,12 +307,12 @@ KernelSubroutineOfIndirectLoop::createPlanWhileLoop (
       SgVarRefExp
           * autoshared_Reference_LHS =
               buildVarRefExp (
-                  localVariables_Others[kernelSharedVariables::variableName_autoshared]);
+                  localVariables_Others[kernelSharedVariables::autoShared]);
 
       SgVarRefExp
           * autoshared_Reference_RHS =
               buildVarRefExp (
-                  localVariables_Others[kernelSharedVariables::variableName_autoshared]);
+                  localVariables_Others[kernelSharedVariables::autoShared]);
 
       SgVarRefExp * incrementAccessArrays_Reference = buildVarRefExp (
           localVariables_localThreadVariables[i]);
@@ -538,7 +538,7 @@ KernelSubroutineOfIndirectLoop::createAutosharedWhileLoops (
         SgVarRefExp
             * autoShared_Reference4 =
                 buildVarRefExp (
-                    localVariables_Others[kernelSharedVariables::variableName_autoshared]);
+                    localVariables_Others[kernelSharedVariables::autoShared]);
 
         SgVarRefExp * iterationCounter_Reference4 = buildVarRefExp (
             localVariables_Others[variableName_iterationCounter]);
@@ -619,7 +619,7 @@ KernelSubroutineOfIndirectLoop::createAutosharedWhileLoops (
         SgVarRefExp
             * autoShared_Reference4 =
                 buildVarRefExp (
-                    localVariables_Others[kernelSharedVariables::variableName_autoshared]);
+                    localVariables_Others[kernelSharedVariables::autoShared]);
 
         SgVarRefExp * iterationCounter_Reference4 = buildVarRefExp (
             localVariables_Others[variableName_iterationCounter]);
@@ -1195,7 +1195,7 @@ KernelSubroutineOfIndirectLoop::createSharedLocalVariables (
       ROSEHelper::getFileInfo ());
 
   SgVariableDeclaration * variableDeclaration = buildVariableDeclaration (
-      kernelSharedVariables::variableName_autoshared,
+      kernelSharedVariables::autoShared,
       FortranTypesBuilder::getArray_RankOne (
           FortranTypesBuilder::getDoublePrecisionFloat (), 0,
           upperBoundExpression), NULL, subroutineScope);
@@ -1205,7 +1205,7 @@ KernelSubroutineOfIndirectLoop::createSharedLocalVariables (
 
   appendStatement (variableDeclaration, subroutineScope);
 
-  localVariables_Others[kernelSharedVariables::variableName_autoshared]
+  localVariables_Others[kernelSharedVariables::autoShared]
       = variableDeclaration;
 }
 
@@ -1311,7 +1311,7 @@ KernelSubroutineOfIndirectLoop::create_OP_DAT_FormalParameters (
     if (parallelLoop.isDuplicate_OP_DAT (i) == false
         && parallelLoop.get_OP_MAP_Value (i) == INDIRECT)
     {
-      string const variableName = kernelDatArgumentsNames::argNamePrefix
+      string const variableName = OP_DAT_ArgumentNames::OP_DAT_NamePrefix
           + lexical_cast <string> (i);
 
       SgIntVal * lowerBoundExpression = buildIntVal (0);
@@ -1430,7 +1430,7 @@ KernelSubroutineOfIndirectLoop::create_OP_DAT_FormalParameters (
     if (parallelLoop.isDuplicate_OP_DAT (i) == false
         && parallelLoop.get_OP_MAP_Value (i) == DIRECT)
     {
-      string const variableName = kernelDatArgumentsNames::argNamePrefix
+      string const variableName = OP_DAT_ArgumentNames::OP_DAT_NamePrefix
           + lexical_cast <string> (i);
 
       SgIntVal * lowerBoundExpression = buildIntVal (0);
