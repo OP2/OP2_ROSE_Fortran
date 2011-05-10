@@ -3,6 +3,7 @@
 
 #include <Subroutine.h>
 #include <InitialiseConstantsSubroutine.h>
+#include <ParallelLoop.h>
 
 
 class UserDeviceSubroutine: public Subroutine
@@ -23,15 +24,16 @@ class UserDeviceSubroutine: public Subroutine
      * ======================================================
      */
     void
-    copyAndModifySubroutine (SgScopeStatement * moduleScope,
-        Declarations & declarations);
+    copyAndModifySubroutine ( SgScopeStatement * moduleScope,
+        Declarations & declarations, ParallelLoop & parallelLoop );
 
   public:
 
-    UserDeviceSubroutine (std::string const & subroutineName,
+    UserDeviceSubroutine ( std::string const & subroutineName,
         SgScopeStatement * moduleScope, 
 				InitialiseConstantsSubroutine * initialiseConstantsSubroutine,
-				Declarations & declarations);
+				Declarations & declarations,
+				ParallelLoop & parallelLoop );
 
     /*
      * ======================================================

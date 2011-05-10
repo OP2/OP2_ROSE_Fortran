@@ -457,7 +457,7 @@ NewSubroutinesGeneration::visit (SgNode * node)
                 UserDeviceSubroutine * userDeviceSubroutine =
                     new UserDeviceSubroutine ( userSubroutineName, moduleScope,
 												initialiseConstantsSubroutine,
-                        *declarations);
+                        *declarations, *parallelLoop);
 
                 KernelSubroutine * kernelSubroutine =
                     new KernelSubroutineOfDirectLoop (userSubroutineName,
@@ -527,7 +527,7 @@ NewSubroutinesGeneration::visit (SgNode * node)
                 UserDeviceSubroutine * userDeviceSubroutine =
                     new UserDeviceSubroutine (userSubroutineName, moduleScope,
 										    initialiseConstantsSubroutine,
-                        *declarations);
+                        *declarations, *parallelLoop);
 
                 KernelSubroutine * kernelSubroutine =
                     new KernelSubroutineOfIndirectLoop (userSubroutineName,

@@ -12,8 +12,8 @@
  */
 
 void
-UserDeviceSubroutine::copyAndModifySubroutine (SgScopeStatement * moduleScope,
-    Declarations & declarations)
+UserDeviceSubroutine::copyAndModifySubroutine ( SgScopeStatement * moduleScope,
+  Declarations & declarations, ParallelLoop & parallelLoop )
 {
   using boost::iequals;
   using SageBuilder::buildProcedureHeaderStatement;
@@ -124,12 +124,21 @@ UserDeviceSubroutine::copyAndModifySubroutine (SgScopeStatement * moduleScope,
          * ======================================================
          * Append the variable declarations immediately after the
          * 'IMPLICIT NONE' statement
+				 * We scan the parallel loop arguments to understand
+				 * if the parameter will be allocated on shared or device
+				 * memory. It is based on the assumption that the number
+				 * of kernel parameters is equal to the number of par.
+				 * loop argument lines
          * ======================================================
          */
-
-        for (SgInitializedNamePtrList::iterator paramIt =
-            originalParameters->get_args ().begin (); paramIt
-            != originalParameters->get_args ().end (); ++paramIt)
+				
+				unsigned int parLoopArgCounter = 1;
+				
+        for ( SgInitializedNamePtrList::iterator paramIt =
+                originalParameters->get_args ().begin ();
+							paramIt != originalParameters->get_args ().end ();
+							++parLoopArgCounter,
+							++paramIt )
         {
           /*
            * ======================================================
@@ -143,11 +152,16 @@ UserDeviceSubroutine::copyAndModifySubroutine (SgScopeStatement * moduleScope,
 
           /*
            * ======================================================
-           * Set the Fortran attributes of the declared variables
+           * Set the Fortran attributes of the declared variables:
+					 * either shared or device. As device is the default
+					 * attribute in fortran cuda, we avoid to define it
            * ======================================================
            */
           newVariableDeclaration->get_declarationModifier ().get_accessModifier ().setUndefined ();
-          newVariableDeclaration->get_declarationModifier ().get_typeModifier ().setDevice ();
+
+					if ( parallelLoop.get_OP_MAP_Value ( parLoopArgCounter ) == INDIRECT &&
+							 parallelLoop.get_OP_Access_Value ( parLoopArgCounter ) == READ_ACCESS )
+						newVariableDeclaration->get_declarationModifier ().get_typeModifier ().setShared ();
 
           formalParameters->append_arg (
               *(newVariableDeclaration->get_variables ().begin ()));
@@ -300,14 +314,15 @@ UserDeviceSubroutine::copyAndModifySubroutine (SgScopeStatement * moduleScope,
  * ======================================================
  */
 
-UserDeviceSubroutine::UserDeviceSubroutine (std::string const & subroutineName,
+UserDeviceSubroutine::UserDeviceSubroutine ( std::string const & subroutineName,
     SgScopeStatement * moduleScope, 
 		InitialiseConstantsSubroutine * _initialiseConstantsSubroutine,
-		Declarations & declarations) :
+		Declarations & declarations,
+		ParallelLoop & parallelLoop ) :
   Subroutine (subroutineName + "_device")
 {
   userHostSubroutineName = subroutineName;
 	initialiseConstantsSubroutine = _initialiseConstantsSubroutine;
 
-  copyAndModifySubroutine (moduleScope, declarations);
+  copyAndModifySubroutine (moduleScope, declarations, parallelLoop);
 }
