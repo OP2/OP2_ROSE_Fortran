@@ -5252,7 +5252,8 @@ FortranCodeGeneration_locatedNode::unparseClassDeclStmt_derivedType(SgStatement*
                if(cdefn && cdefn->get_declaration()->get_class_type() == SgClassDeclaration::e_class)
                     ninfo.set_CheckAccess();
 
-               unp->u_sage->printSpecifier(classdecl_stmt, ninfo);
+							 // CB: Removed to avoid printing access specifier before new type declarations
+              // unp->u_sage->printSpecifier(classdecl_stmt, ninfo);
                info.set_access_attribute(ninfo.get_access_attribute());
              }
 

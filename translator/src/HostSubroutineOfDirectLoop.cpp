@@ -166,19 +166,19 @@ HostSubroutineOfDirectLoop::createCUDAVariablesDirectLoops (ParallelLoop & paral
       buildAssignInitializer (buildIntVal (0), buildIntType ()),
       subroutineScope);
 	
-  CUDAVariable_threadSynchRet = buildVariableDeclaration (
-		"threadSynchRet", FortranTypesBuilder::getFourByteInteger (),
-		buildAssignInitializer (buildIntVal (0), buildIntType ()),
-		subroutineScope);
+//  CUDAVariable_threadSynchRet = buildVariableDeclaration (
+//		"threadSynchRet", FortranTypesBuilder::getFourByteInteger (),
+//		buildAssignInitializer (buildIntVal (0), buildIntType ()),
+//		subroutineScope);
 	
 
   CUDAVariable_offsetS->get_declarationModifier ().get_accessModifier ().setUndefined ();
   CUDAVariable_warpSizeOP2->get_declarationModifier ().get_accessModifier ().setUndefined ();
-  CUDAVariable_threadSynchRet->get_declarationModifier ().get_accessModifier ().setUndefined ();
+//  CUDAVariable_threadSynchRet->get_declarationModifier ().get_accessModifier ().setUndefined ();
 	
   appendStatement ( CUDAVariable_offsetS, subroutineScope );
   appendStatement ( CUDAVariable_warpSizeOP2, subroutineScope );
-  appendStatement ( CUDAVariable_threadSynchRet, subroutineScope );
+//  appendStatement ( CUDAVariable_threadSynchRet, subroutineScope );
 	
 }
 
@@ -202,6 +202,8 @@ HostSubroutineOfDirectLoop::createDeviceVariablesSizesVariable (
 		LoopVariables::argsSizes,
 		deviceDataSizesDeclarationDirectLoops.getType (),
 		subroutineScope);
+	
+	variableDeclaration2->get_declarationModifier ().get_typeModifier ().setDevice ();
 	
   localVariables_Others[LoopVariables::argsSizes]
 		= variableDeclaration2;

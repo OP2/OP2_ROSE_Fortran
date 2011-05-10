@@ -30,14 +30,16 @@ namespace
    * ======================================================
    */
 
-  std::string const variableNameSuffix_air_const = "_air_const";
-  std::string const variableNameSuffix_alpha = "_alpha";
-  std::string const variableNameSuffix_cfl = "_cfl";
-  std::string const variableNameSuffix_eps = "_eps";
-  std::string const variableNameSuffix_gam = "_gam";
-  std::string const variableNameSuffix_gm1 = "_gm1";
-  std::string const variableNameSuffix_mach = "_mach";
-  std::string const variableNameSuffix_qinf = "_qinf";
+  std::string const variableNameSuffix_air_const = "air_const";
+  std::string const variableNameSuffix_alpha = "alpha";
+  std::string const variableNameSuffix_cfl = "cfl";
+  std::string const variableNameSuffix_eps = "eps";
+  std::string const variableNameSuffix_gam = "gam";
+  std::string const variableNameSuffix_gm1 = "gm1";
+  std::string const variableNameSuffix_mach = "mach";
+  std::string const variableNameSuffix_qinf = "qinf";
+	
+	std::string const divisionCharacter = "_";
 }
 
 class InitialiseConstantsSubroutine: public Subroutine
@@ -48,7 +50,14 @@ class InitialiseConstantsSubroutine: public Subroutine
 
     std::map <std::string, SgVariableDeclaration *> constantDeclarations;
 
+		std::vector < std::string > constantVariablesNamesBeforeTransformation;
+
+		std::vector < std::string > constantVariablesNamesAfterTransformation;
+
   public:
+
+		void
+		generateSubroutineForAlreadyComputedValues ( SgScopeStatement * moduleScope );
 
     /*
      * ======================================================
@@ -66,6 +75,23 @@ class InitialiseConstantsSubroutine: public Subroutine
      */
     void
     declareConstants (SgScopeStatement * moduleScope);
+
+		std::map <std::string, SgVariableDeclaration *>
+		getConstantDeclarations () {
+			return constantDeclarations;
+		}
+
+		std::vector < std::string >
+		getConstantNamesBeforeTransformation ()
+		{
+			return constantVariablesNamesBeforeTransformation;
+		}	
+
+		std::vector < std::string >
+		getConstantNamesAfterTransformation ()
+		{
+			return constantVariablesNamesAfterTransformation;
+		}	
 
     InitialiseConstantsSubroutine (std::string const & subroutineName);
 };

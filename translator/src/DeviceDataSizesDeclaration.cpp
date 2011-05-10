@@ -123,7 +123,7 @@ DeviceDataSizesDeclaration::DeviceDataSizesDeclaration (
       = FortranStatementsAndExpressionsBuilder::buildTypeDeclaration (
           subroutineName + "_variableSizes", moduleScope);
 
-  // deviceDatatypeStatement->get_declarationModifier ().get_accessModifier ().setUndefined ();
+  deviceDatatypeStatement->get_declarationModifier ().get_accessModifier ().setUndefined ();
 
   appendStatement (deviceDatatypeStatement, moduleScope);
 

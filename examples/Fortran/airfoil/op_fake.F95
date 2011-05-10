@@ -4,6 +4,7 @@
 module OP2_C
 
 
+use, intrinsic :: ISO_C_BINDING
 
   integer, parameter :: MAX_NAME_LEN = 100
 
@@ -44,33 +45,37 @@ contains
     
   end subroutine op_init
 
-  subroutine op_decl_set ( size, set )
+  subroutine op_decl_set ( size, set, setname )
     
     integer :: size
     type(op_set) :: set
+		character(kind=c_char,len=*) :: setname
 
   end subroutine op_decl_set
 
 
-  subroutine op_decl_map ( from , to, dim, dat, outmap )
+  subroutine op_decl_map ( from , to, dim, dat, outmap, mapname )
     type(op_set) :: from, to
     integer :: dim
     integer(4), dimension(:) :: dat
     type(op_map) :: outmap
+		character(kind=c_char,len=*) :: mapname
   end subroutine op_decl_map
 
-  subroutine op_decl_dat_real_8(set, dim, dat, data)
+  subroutine op_decl_dat_real_8(set, dim, dat, data, datname)
     type(op_set) :: set
     integer :: dim
     real(8), dimension(:) :: dat
     type(op_dat) :: data
+		character(kind=c_char,len=*) :: datname
   end subroutine op_decl_dat_real_8
   
-  subroutine op_decl_dat_integer_4(set, dim, dat, data)
+  subroutine op_decl_dat_integer_4(set, dim, dat, data, datname)
     type(op_set) :: set
     integer :: dim
     integer(4), dimension(:) :: dat
     type(op_dat) :: data  
+		character(kind=c_char,len=*) :: datname
   end subroutine op_decl_dat_integer_4
   
   

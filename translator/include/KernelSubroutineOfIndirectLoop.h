@@ -45,8 +45,6 @@ class KernelSubroutineOfIndirectLoop: public KernelSubroutine
     std::map <unsigned int, SgVariableDeclaration *>
         localVariables_incrementAccessArrays;
 
-    std::map <std::string, SgVariableDeclaration *> localVariables_Others;
-
   private:
 
     void

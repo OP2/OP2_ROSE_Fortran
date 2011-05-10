@@ -80,6 +80,9 @@ class KernelSubroutine: public Subroutine
 	
 		SgVariableDeclaration * localVariables_autoshared;
 		
+		
+		std::map <std::string, SgVariableDeclaration *> localVariables_Others;
+
   protected:
 
 		void
@@ -140,6 +143,16 @@ class KernelSubroutine: public Subroutine
 		void
 		createAndAppendSharedMemoryOffesetForReduction ( ParallelLoop & parallelLoop );
 
+
+		SgStatement *
+		createUserSubroutineCall ( UserDeviceSubroutine & userDeviceSubroutine,
+		  SgVariableDeclaration * variable_setElementCounter,
+			SgVariableDeclaration * variable_offsetInThreadBlock,
+			ParallelLoop & parallelLoop,
+			std::map <unsigned int, SgVariableDeclaration *> * formalParameters_GlobalToLocalMapping = NULL,
+			std::map <unsigned int, SgVariableDeclaration *> * localVariables_nbytes = NULL );
+	
+	
 
     KernelSubroutine (std::string const & subroutineName) :
       Subroutine (subroutineName + "_kernel")

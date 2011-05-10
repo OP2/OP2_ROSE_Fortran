@@ -18,7 +18,7 @@ ReductionSubroutine::createCallToSynchThreads ( )
   using SageBuilder::buildExprStatement;
 	
   SgFunctionSymbol * functionSymbol =
-	FortranTypesBuilder::buildNewFortranSubroutine ("synchthreads",
+	FortranTypesBuilder::buildNewFortranSubroutine ("syncthreads",
 																									subroutineScope);
 	
   SgExprListExp * actualParameters = buildExprListExp ( );
@@ -358,20 +358,16 @@ void ReductionSubroutine::createStatements ()
 	
 
 	SgStatement * synchthreadsFunctionCallInsideLoop = createCallToSynchThreads ();
-	
-	//buildFunctionCallStmt ( synchthreadsFunctionSymbol->get_name(),
-//																																								buildVoidType(),
-//																																								emptyParameters,
-//																																								subroutineScope	 
-//																																								);	
-//	
-	
+		
 	SgStatement * mainLoopBody = buildBasicBlock ( synchthreadsFunctionCallInsideLoop,
 																								 ifStatement,
 																								 buildExprStatement ( reassignIterationCounter )
 																							 );
 	
-	SgWhileStmt * reductionImplementation = buildWhileStmt ( buildExprStatement ( mainLoopCondition ), mainLoopBody );
+	SgWhileStmt * reductionImplementation = buildWhileStmt (
+	  buildExprStatement ( mainLoopCondition ), mainLoopBody );
+	
+	reductionImplementation->set_has_end_statement (true);
 	
 	appendStatement ( reductionImplementation, subroutineScope );
 	

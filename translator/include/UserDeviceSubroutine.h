@@ -2,12 +2,16 @@
 #define USER_DEVICE_SUBROUTINE_H
 
 #include <Subroutine.h>
+#include <InitialiseConstantsSubroutine.h>
+
 
 class UserDeviceSubroutine: public Subroutine
 {
   private:
 
     std::string userHostSubroutineName;
+
+		InitialiseConstantsSubroutine * initialiseConstantsSubroutine;
 
   private:
 
@@ -25,7 +29,9 @@ class UserDeviceSubroutine: public Subroutine
   public:
 
     UserDeviceSubroutine (std::string const & subroutineName,
-        SgScopeStatement * moduleScope, Declarations & declarations);
+        SgScopeStatement * moduleScope, 
+				InitialiseConstantsSubroutine * initialiseConstantsSubroutine,
+				Declarations & declarations);
 
     /*
      * ======================================================

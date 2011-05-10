@@ -21,7 +21,6 @@ namespace
    * ======================================================
    */
 
-  std::string const variableName_autoshared = "autoshared";
   std::string const variableName_blockID = "blockID";
   std::string const variableName_col = "col";
   std::string const variableName_col2 = "col2";
@@ -115,7 +114,7 @@ KernelSubroutineOfIndirectLoop::createPlanWhileLoop (
       SgBasicBlock * loopBodyNestingLevel2 = buildBasicBlock ();
 
       SgPntrArrRefExp * arrayExpression1 = buildPntrArrRefExp (buildVarRefExp (
-          localVariables_incrementAccessArrays[i]), buildVarRefExp (
+          localVariables_localThreadVariables[i]), buildVarRefExp (
           localVariables_Others[variableName_iterationCounter2]));
 
       SgAssignOp * innerLoopExpression1 = buildAssignOp (arrayExpression1,
@@ -133,84 +132,106 @@ KernelSubroutineOfIndirectLoop::createPlanWhileLoop (
     }
   }
 
-  SgFunctionSymbol * userSubroutineSymbol =
-      FortranTypesBuilder::buildNewFortranSubroutine (
-          userDeviceSubroutine.getSubroutineName (), subroutineScope);
+//  SgFunctionSymbol * userSubroutineSymbol =
+//      FortranTypesBuilder::buildNewFortranSubroutine (
+//          userDeviceSubroutine.getSubroutineName (), subroutineScope);
 
-  SgExprListExp * userSubroutineActualParameters = buildExprListExp ();
+//  SgExprListExp * userSubroutineActualParameters = buildExprListExp ();
 
-  SgFunctionCallExp * userSubroutineCall = buildFunctionCallExp (
-      userSubroutineSymbol, userSubroutineActualParameters);
+//  SgFunctionCallExp * userSubroutineCall = buildFunctionCallExp (
+//      userSubroutineSymbol, userSubroutineActualParameters);
 
-  for (unsigned int i = 1; i
-      <= parallelLoop.getNumberOf_OP_DAT_ArgumentGroups (); ++i)
-  {
-    if (parallelLoop.get_OP_MAP_Value (i) == INDIRECT)
-    {
-      if (parallelLoop.get_OP_Access_Value (i) == INC_ACCESS)
-      {
-        userSubroutineActualParameters->append_expression (buildVarRefExp (
-            localVariables_incrementAccessArrays[i]));
-      }
-      else
-      {
-        SgVarRefExp * autoshared_Reference = buildVarRefExp (
-            localVariables_Others[variableName_autoshared]);
+//  for (unsigned int i = 1; i
+//      <= parallelLoop.getNumberOf_OP_DAT_ArgumentGroups (); ++i)
+//  {
+//		int dim = parallelLoop.get_OP_DAT_Dimension ( i );
+//		if ( parallelLoop.get_OP_MAP_Value (i) == GLOBAL )
+//		{
+//			if ( parallelLoop.get_OP_Access_Value (i) == READ_ACCESS )
+//				SgVarRefExp * autoshared_Reference = buildVarRefExp (
+//					localVariables_Others[kernelSharedVariables::variableName_autoshared]);
+//
+//			else
+//				aaa
+//		}
+//		else if 
+//		
+//	
+//	
+//    if (parallelLoop.get_OP_MAP_Value (i) == INDIRECT)
+//    {
+//      if (parallelLoop.get_OP_Access_Value (i) == INC_ACCESS)
+//      {
+//        userSubroutineActualParameters->append_expression (buildVarRefExp (
+//            localVariables_incrementAccessArrays[i]));
+//      }
+//      else
+//      {
+//        SgVarRefExp * autoshared_Reference = buildVarRefExp (
+//					localVariables_Others[kernelSharedVariables::variableName_autoshared]);
+//
+//        SgVarRefExp * globalToLocalMappingArray_Reference = buildVarRefExp (
+//            formalParameters_GlobalToLocalMapping[i]);
+//
+//        SgVarRefExp * nbytes_Reference = buildVarRefExp (
+//            localVariables_nbytes[i]);
+//
+//        SgAddOp * lowerBound_addExpression1 = buildAddOp (buildVarRefExp (
+//            localVariables_Others[variableName_iterationCounter]),
+//            buildVarRefExp (localVariables_Others[variableName_offset_b]));
+//
+//        SgPntrArrRefExp * lowerBound_arrayExpression = buildPntrArrRefExp (
+//            globalToLocalMappingArray_Reference, lowerBound_addExpression1);
+//
+//        SgMultiplyOp * lowerBound_multiplyExpression = buildMultiplyOp (
+//            lowerBound_arrayExpression, buildIntVal (
+//                parallelLoop.get_OP_DAT_Dimension (i)));
+//
+//        SgAddOp * lowerBound_addExpression2 = buildAddOp (nbytes_Reference,
+//            lowerBound_multiplyExpression);
+//
+//        SgAddOp * upperBound_addExpression1 = buildAddOp (buildVarRefExp (
+//            localVariables_Others[variableName_iterationCounter]),
+//            buildVarRefExp (localVariables_Others[variableName_offset_b]));
+//
+//        SgPntrArrRefExp * upperBound_arrayExpression = buildPntrArrRefExp (
+//            globalToLocalMappingArray_Reference, upperBound_addExpression1);
+//
+//        SgMultiplyOp * upperBound_multiplyExpression = buildMultiplyOp (
+//            upperBound_arrayExpression, buildIntVal (
+//                parallelLoop.get_OP_DAT_Dimension (i)));
+//
+//        SgAddOp * upperBound_addExpression2 = buildAddOp (nbytes_Reference,
+//            upperBound_multiplyExpression);
+//
+//        SgAddOp * upperBound_addExpression3 = buildAddOp (
+//            upperBound_addExpression2, buildIntVal (
+//                parallelLoop.get_OP_DAT_Dimension (i)));
+//
+//        SgSubscriptExpression * subscriptExpression =
+//            new SgSubscriptExpression (ROSEHelper::getFileInfo (),
+//                lowerBound_addExpression2, upperBound_addExpression3,
+//                buildIntVal (1));
+//        subscriptExpression->set_endOfConstruct (ROSEHelper::getFileInfo ());
+//
+//        SgPntrArrRefExp * arrayExpression = buildPntrArrRefExp (
+//            autoshared_Reference, buildExprListExp (subscriptExpression));
+//
+//        userSubroutineActualParameters->append_expression (arrayExpression);
+//      }
+//    }
+//  }
 
-        SgVarRefExp * globalToLocalMappingArray_Reference = buildVarRefExp (
-            formalParameters_GlobalToLocalMapping[i]);
-
-        SgVarRefExp * nbytes_Reference = buildVarRefExp (
-            localVariables_nbytes[i]);
-
-        SgAddOp * lowerBound_addExpression1 = buildAddOp (buildVarRefExp (
-            localVariables_Others[variableName_iterationCounter]),
-            buildVarRefExp (localVariables_Others[variableName_offset_b]));
-
-        SgPntrArrRefExp * lowerBound_arrayExpression = buildPntrArrRefExp (
-            globalToLocalMappingArray_Reference, lowerBound_addExpression1);
-
-        SgMultiplyOp * lowerBound_multiplyExpression = buildMultiplyOp (
-            lowerBound_arrayExpression, buildIntVal (
-                parallelLoop.get_OP_DAT_Dimension (i)));
-
-        SgAddOp * lowerBound_addExpression2 = buildAddOp (nbytes_Reference,
-            lowerBound_multiplyExpression);
-
-        SgAddOp * upperBound_addExpression1 = buildAddOp (buildVarRefExp (
-            localVariables_Others[variableName_iterationCounter]),
-            buildVarRefExp (localVariables_Others[variableName_offset_b]));
-
-        SgPntrArrRefExp * upperBound_arrayExpression = buildPntrArrRefExp (
-            globalToLocalMappingArray_Reference, upperBound_addExpression1);
-
-        SgMultiplyOp * upperBound_multiplyExpression = buildMultiplyOp (
-            upperBound_arrayExpression, buildIntVal (
-                parallelLoop.get_OP_DAT_Dimension (i)));
-
-        SgAddOp * upperBound_addExpression2 = buildAddOp (nbytes_Reference,
-            upperBound_multiplyExpression);
-
-        SgAddOp * upperBound_addExpression3 = buildAddOp (
-            upperBound_addExpression2, buildIntVal (
-                parallelLoop.get_OP_DAT_Dimension (i)));
-
-        SgSubscriptExpression * subscriptExpression =
-            new SgSubscriptExpression (ROSEHelper::getFileInfo (),
-                lowerBound_addExpression2, upperBound_addExpression3,
-                buildIntVal (1));
-        subscriptExpression->set_endOfConstruct (ROSEHelper::getFileInfo ());
-
-        SgPntrArrRefExp * arrayExpression = buildPntrArrRefExp (
-            autoshared_Reference, buildExprListExp (subscriptExpression));
-
-        userSubroutineActualParameters->append_expression (arrayExpression);
-      }
-    }
-  }
+	SgStatement * userSubroutineCall = 
+		createUserSubroutineCall ( userDeviceSubroutine,
+		  localVariables_Others[variableName_iterationCounter],
+			localVariables_Others[variableName_offset_b],
+		  parallelLoop,
+			&formalParameters_GlobalToLocalMapping,
+			&localVariables_nbytes );
 
   ifBodyNestingLevel1->append_statement (
-      buildExprStatement (userSubroutineCall));
+      userSubroutineCall);
 
   SgAddOp * addExpression2 = buildAddOp (buildVarRefExp (
       localVariables_Others[variableName_iterationCounter]), buildVarRefExp (
@@ -287,13 +308,13 @@ KernelSubroutineOfIndirectLoop::createPlanWhileLoop (
       SgBasicBlock * loopBodyNestingLevel3 = buildBasicBlock ();
 
       SgVarRefExp * autoshared_Reference_LHS = buildVarRefExp (
-          localVariables_Others[variableName_autoshared]);
+          localVariables_Others[kernelSharedVariables::variableName_autoshared]);
 
       SgVarRefExp * autoshared_Reference_RHS = buildVarRefExp (
-          localVariables_Others[variableName_autoshared]);
+          localVariables_Others[kernelSharedVariables::variableName_autoshared]);
 
       SgVarRefExp * incrementAccessArrays_Reference = buildVarRefExp (
-          localVariables_incrementAccessArrays[i]);
+          localVariables_localThreadVariables[i]);
 
       SgVarRefExp * incrementAccessMap_Reference = buildVarRefExp (
           localVariables_incrementAccessMaps[i]);
@@ -514,7 +535,7 @@ KernelSubroutineOfIndirectLoop::createAutosharedWhileLoops (
          */
 
         SgVarRefExp * autoShared_Reference4 = buildVarRefExp (
-            localVariables_Others[variableName_autoshared]);
+            localVariables_Others[kernelSharedVariables::variableName_autoshared]);
 
         SgVarRefExp * iterationCounter_Reference4 = buildVarRefExp (
             localVariables_Others[variableName_iterationCounter]);
@@ -593,7 +614,7 @@ KernelSubroutineOfIndirectLoop::createAutosharedWhileLoops (
          * ======================================================
          */
         SgVarRefExp * autoShared_Reference4 = buildVarRefExp (
-            localVariables_Others[variableName_autoshared]);
+            localVariables_Others[kernelSharedVariables::variableName_autoshared]);
 
         SgVarRefExp * iterationCounter_Reference4 = buildVarRefExp (
             localVariables_Others[variableName_iterationCounter]);
@@ -1103,7 +1124,9 @@ KernelSubroutineOfIndirectLoop::createLocalVariables (
 
       appendStatement (variableDeclaration, subroutineScope);
 
-      localVariables_incrementAccessArrays[i] = variableDeclaration;
+			localVariables_localThreadVariables[i] = variableDeclaration;
+			
+//      localVariables_incrementAccessArrays[i] = variableDeclaration;
     }
   }
 }
@@ -1167,16 +1190,16 @@ KernelSubroutineOfIndirectLoop::createSharedLocalVariables (
       ROSEHelper::getFileInfo ());
 
   SgVariableDeclaration * variableDeclaration = buildVariableDeclaration (
-      variableName_autoshared, FortranTypesBuilder::getArray_RankOne (
+      kernelSharedVariables::variableName_autoshared, FortranTypesBuilder::getArray_RankOne (
           FortranTypesBuilder::getDoublePrecisionFloat (), 0,
           upperBoundExpression), NULL, subroutineScope);
 
-  //      autosharedVariable->get_declarationModifier ().get_typeModifier ().setShared ();
+  variableDeclaration->get_declarationModifier ().get_typeModifier ().setShared ();
   variableDeclaration->get_declarationModifier ().get_accessModifier ().setUndefined ();
 
   appendStatement (variableDeclaration, subroutineScope);
 
-  localVariables_Others[variableName_autoshared] = variableDeclaration;
+  localVariables_Others[kernelSharedVariables::variableName_autoshared] = variableDeclaration;
 }
 
 void
@@ -1223,7 +1246,7 @@ KernelSubroutineOfIndirectLoop::createPlanFormalParameters (
 
     SgVariableDeclaration * variableDeclaration = buildVariableDeclaration (
         *it, FortranTypesBuilder::getArray_RankOne_WithLowerAndUpperBounds (
-            FortranTypesBuilder::getTwoByteInteger (), lowerBoundExpression,
+            FortranTypesBuilder::getFourByteInteger (), lowerBoundExpression,
             upperBoundExpression), NULL, subroutineScope);
 
     variableDeclaration->get_declarationModifier ().get_accessModifier ().setUndefined ();
@@ -1249,6 +1272,11 @@ KernelSubroutineOfIndirectLoop::createPlanFormalParameters (
 
     variableDeclaration->get_declarationModifier ().get_accessModifier ().setUndefined ();
     variableDeclaration->get_declarationModifier ().get_typeModifier (). setValue ();
+
+		appendStatement ( variableDeclaration, subroutineScope );
+
+    formalParameters->append_arg (
+			*(variableDeclaration->get_variables ().begin ()));
 
     formalParameters_PlanVariables[*it] = variableDeclaration;
   }
@@ -1337,7 +1365,7 @@ KernelSubroutineOfIndirectLoop::create_OP_DAT_FormalParameters (
       SgVariableDeclaration * variableDeclaration = buildVariableDeclaration (
           variableName,
           FortranTypesBuilder::getArray_RankOne_WithLowerAndUpperBounds (
-              FortranTypesBuilder::getTwoByteInteger (), lowerBoundExpression,
+              FortranTypesBuilder::getFourByteInteger (), lowerBoundExpression,
               upperBoundExpression), NULL, subroutineScope);
 
       variableDeclaration->get_declarationModifier ().get_accessModifier ().setUndefined ();

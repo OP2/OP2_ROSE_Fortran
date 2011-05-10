@@ -106,6 +106,11 @@ namespace LoopVariables
   std::string const argsSizes = "argsSizes";
 }
 
+namespace kernelSharedVariables
+{
+  std::string const variableName_autoshared = "autoshared";
+}
+
 namespace kernelDatArgumentsNames
 {
 	std::string const argNamePrefix = "argument";

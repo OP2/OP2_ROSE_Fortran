@@ -91,6 +91,9 @@ class KernelSubroutineOfDirectLoop: public KernelSubroutine
 	
 	  SgExpression * compilerExpr_opDatKindSize;
 
+
+		
+
   private:
 
     /*
@@ -99,9 +102,9 @@ class KernelSubroutineOfDirectLoop: public KernelSubroutine
      * device version of the user subroutine
      * ======================================================
      */
-    SgStatement *
-    createUserSubroutineCall ( UserDeviceSubroutine & userDeviceSubroutine,
-        ParallelLoop & parallelLoop );
+//    SgStatement *
+//    createUserSubroutineCall ( UserDeviceSubroutine & userDeviceSubroutine,
+//        ParallelLoop & parallelLoop );
 
     /*
      * ======================================================

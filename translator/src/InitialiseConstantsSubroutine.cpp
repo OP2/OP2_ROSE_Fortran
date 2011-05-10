@@ -10,6 +10,246 @@
  */
 
 void
+InitialiseConstantsSubroutine::generateSubroutineForAlreadyComputedValues (
+	SgScopeStatement * moduleScope)
+{
+	using SageBuilder::buildVarRefExp;
+  using SageBuilder::buildExprStatement;
+  using SageBuilder::buildAssignOp;
+  using SageBuilder::buildSubtractOp;
+  using SageBuilder::buildMultiplyOp;
+  using SageBuilder::buildDivideOp;
+  using SageBuilder::buildAddOp;
+  using SageBuilder::buildPntrArrRefExp;
+  using SageBuilder::buildFloatVal;
+  using SageBuilder::buildIntVal;
+  using SageBuilder::buildFunctionCallExp;
+  using SageBuilder::buildExprListExp;
+  using SageBuilder::buildFunctionParameterList;
+  using SageBuilder::buildVoidType;
+  using SageBuilder::buildProcedureHeaderStatement;
+  using SageInterface::appendStatement;
+  using SageInterface::addTextForUnparser;
+  using std::make_pair;
+  using std::map;
+  using std::string;
+  using std::vector;
+	
+  /*
+   * ======================================================
+   * Build the subroutine declaration
+   * ======================================================
+   */
+	
+  formalParameters = buildFunctionParameterList ();
+	
+  subroutineHeaderStatement = buildProcedureHeaderStatement (
+																														 this->subroutineName.c_str (), buildVoidType (), formalParameters,
+																														 SgProcedureHeaderStatement::e_subroutine_subprogram_kind, moduleScope);
+	
+  appendStatement (subroutineHeaderStatement, moduleScope);
+	
+  addTextForUnparser (subroutineHeaderStatement, "attributes(host) ",
+											AstUnparseAttribute::e_before);
+	
+  subroutineScope = subroutineHeaderStatement->get_definition ()->get_body ();
+	
+  /*
+   * ======================================================
+   * Build the subroutine local variables
+   * ======================================================
+   */
+	
+//  string const variableName_e = "e";
+//  string const variableName_p = "p";
+//  string const variableName_r = "r";
+//  string const variableName_u = "u";
+//	
+//  vector <string> doublePrecisionVariables;
+//	
+//  doublePrecisionVariables.push_back (variableName_e);
+//  doublePrecisionVariables.push_back (variableName_p);
+//  doublePrecisionVariables.push_back (variableName_r);
+//  doublePrecisionVariables.push_back (variableName_u);
+//	
+//  map <string, SgVariableDeclaration *> localDeclarations;
+//	
+//  for (vector <string>::iterator it = doublePrecisionVariables.begin (); it
+//			 != doublePrecisionVariables.end (); ++it)
+//  {
+//    SgVariableDeclaration * variableDeclaration =
+//		FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (*it,
+//																																			 FortranTypesBuilder::getDoublePrecisionFloat (), subroutineScope);
+//		
+//    localDeclarations.insert (make_pair (*it, variableDeclaration));
+//  }
+	
+  /*
+   * ======================================================
+   * Build references to local variables and the constants
+   * as they are needed in the following expressions and
+   * statements
+   * ======================================================
+   */
+	
+  map <string, SgVarRefExp *> variableReferences;
+	
+//  for (map <string, SgVariableDeclaration *>::iterator it =
+//			 localDeclarations.begin (); it != localDeclarations.end (); ++it)
+//  {
+//    SgVarRefExp * variableReference = buildVarRefExp (it->second);
+//		
+//    variableReferences.insert (make_pair (it->first, variableReference));
+//  }
+	
+  for (map <string, SgVariableDeclaration *>::iterator it =
+			 constantDeclarations.begin (); it != constantDeclarations.end (); ++it)
+  {
+    SgVarRefExp * variableReference = buildVarRefExp (it->second);
+		
+    variableReferences.insert (make_pair (it->first, variableReference));
+  }
+	
+  /*
+   * ======================================================
+   * Create the expressions and statements which initialise
+   * the constants
+   * ======================================================
+   */
+	
+  /*
+   * ======================================================
+   * New statement: gam = 1.4
+   * ======================================================
+   */
+	
+  FortranStatementsAndExpressionsBuilder::appendAssignmentStatement (
+			constantDeclarations[variableNamePrefix + divisionCharacter + variableNameSuffix_gam],
+			buildFloatVal (1.4), subroutineScope);
+	
+  /*
+   * ======================================================
+   * New statement: gm1 = 1.4 - 1.0
+   * ======================================================
+   */
+	
+  FortranStatementsAndExpressionsBuilder::appendAssignmentStatement (
+		constantDeclarations[variableNamePrefix  + divisionCharacter + variableNameSuffix_gm1],
+		buildFloatVal (0.4),
+		subroutineScope);
+	
+  /*
+   * ======================================================
+   * New statement: cfl = 0.9
+   * ======================================================
+   */
+	
+  FortranStatementsAndExpressionsBuilder::appendAssignmentStatement (
+		constantDeclarations[variableNamePrefix + divisionCharacter + variableNameSuffix_cfl],
+		buildFloatVal (0.9), subroutineScope);
+	
+  /*
+   * ======================================================
+   * New statement: eps = 0.05
+   * ======================================================
+   */
+	
+  FortranStatementsAndExpressionsBuilder::appendAssignmentStatement (
+		constantDeclarations[variableNamePrefix + divisionCharacter + variableNameSuffix_eps],
+		buildFloatVal (0.05), subroutineScope);
+	
+  /*
+   * ======================================================
+   * New statement: mach = 0.4
+   * ======================================================
+   */
+	
+  FortranStatementsAndExpressionsBuilder::appendAssignmentStatement (
+		constantDeclarations[variableNamePrefix + divisionCharacter + variableNameSuffix_mach],
+		buildFloatVal (0.4), subroutineScope);
+	
+  /*
+   * ======================================================
+   * New statement: alpha = 3.0 * atan(1.0) / 45.0
+   * ======================================================
+   */
+	
+	
+
+  FortranStatementsAndExpressionsBuilder::appendAssignmentStatement (
+		constantDeclarations[variableNamePrefix + divisionCharacter + variableNameSuffix_alpha],
+		buildFloatVal ( 0.052360 ), subroutineScope);
+	
+		
+  /*
+   * ======================================================
+   * New statement: qinf(1) = r
+   * ======================================================
+   */
+	
+  SgPntrArrRefExp * arrayExpression1 = buildPntrArrRefExp (
+		variableReferences[variableNamePrefix + divisionCharacter + variableNameSuffix_qinf],
+		buildIntVal (1));
+	
+  SgExpression * assignmentExpression1 = buildAssignOp (arrayExpression1,
+			buildFloatVal(1.000000));
+	
+  appendStatement (buildExprStatement (assignmentExpression1), subroutineScope);
+	
+  /*
+   * ======================================================
+   * New statement: qinf(2) = r * u
+   * ======================================================
+   */
+	
+  SgPntrArrRefExp * arrayExpression2 = buildPntrArrRefExp (
+																													 variableReferences[variableNamePrefix + divisionCharacter + variableNameSuffix_qinf],
+																													 buildIntVal (2));
+	
+//  SgExpression * multiplyExpression2 = buildMultiplyOp (
+//				variableReferences[variableName_r], variableReferences[variableName_u]);
+	
+  SgExpression * assignmentExpression2 = buildAssignOp (arrayExpression2,
+		buildFloatVal(0.473286));
+	
+  appendStatement (buildExprStatement (assignmentExpression2), subroutineScope);
+	
+  /*
+   * ======================================================
+   * New statement: qinf(3) = 0.0
+   * ======================================================
+   */
+	
+  SgPntrArrRefExp * arrayExpression3 = buildPntrArrRefExp (
+																													 variableReferences[variableNamePrefix + divisionCharacter + variableNameSuffix_qinf],
+																													 buildIntVal (3));
+	
+  SgExpression * assignmentExpression3 = buildAssignOp (arrayExpression3,
+																												buildFloatVal (0.0));
+	
+  appendStatement (buildExprStatement (assignmentExpression3), subroutineScope);
+	
+  /*
+   * ======================================================
+   * New statement: qinf(4) = r * e
+   * ======================================================
+   */
+	
+  SgPntrArrRefExp * arrayExpression4 = buildPntrArrRefExp (
+																													 variableReferences[variableNamePrefix + divisionCharacter + variableNameSuffix_qinf],
+																													 buildIntVal (4));
+	
+//  SgExpression * multiplyExpression4 = buildMultiplyOp (
+//																												variableReferences[variableName_r], variableReferences[variableName_e]);
+	
+  SgExpression * assignmentExpression4 = buildAssignOp (arrayExpression4,
+		buildFloatVal(2.612000));
+	
+  appendStatement (buildExprStatement (assignmentExpression4), subroutineScope);
+	
+}
+
+void
 InitialiseConstantsSubroutine::generateSubroutine (
     SgScopeStatement * moduleScope)
 {
@@ -124,7 +364,7 @@ InitialiseConstantsSubroutine::generateSubroutine (
    */
 
   FortranStatementsAndExpressionsBuilder::appendAssignmentStatement (
-      constantDeclarations[variableNamePrefix + variableNameSuffix_gam],
+      constantDeclarations[variableNamePrefix + divisionCharacter + variableNameSuffix_gam],
       buildFloatVal (1.4), subroutineScope);
 
   /*
@@ -134,7 +374,7 @@ InitialiseConstantsSubroutine::generateSubroutine (
    */
 
   FortranStatementsAndExpressionsBuilder::appendAssignmentStatement (
-      constantDeclarations[variableNamePrefix + variableNameSuffix_gm1],
+      constantDeclarations[variableNamePrefix  + divisionCharacter + variableNameSuffix_gm1],
       buildSubtractOp (buildFloatVal (1.4), buildFloatVal (1.0)),
       subroutineScope);
 
@@ -145,7 +385,7 @@ InitialiseConstantsSubroutine::generateSubroutine (
    */
 
   FortranStatementsAndExpressionsBuilder::appendAssignmentStatement (
-      constantDeclarations[variableNamePrefix + variableNameSuffix_cfl],
+      constantDeclarations[variableNamePrefix + divisionCharacter + variableNameSuffix_cfl],
       buildFloatVal (0.9), subroutineScope);
 
   /*
@@ -155,7 +395,7 @@ InitialiseConstantsSubroutine::generateSubroutine (
    */
 
   FortranStatementsAndExpressionsBuilder::appendAssignmentStatement (
-      constantDeclarations[variableNamePrefix + variableNameSuffix_eps],
+      constantDeclarations[variableNamePrefix + divisionCharacter + variableNameSuffix_eps],
       buildFloatVal (0.05), subroutineScope);
 
   /*
@@ -165,7 +405,7 @@ InitialiseConstantsSubroutine::generateSubroutine (
    */
 
   FortranStatementsAndExpressionsBuilder::appendAssignmentStatement (
-      constantDeclarations[variableNamePrefix + variableNameSuffix_mach],
+      constantDeclarations[variableNamePrefix + divisionCharacter + variableNameSuffix_mach],
       buildFloatVal (0.4), subroutineScope);
 
   /*
@@ -189,7 +429,7 @@ InitialiseConstantsSubroutine::generateSubroutine (
       buildFloatVal (4.5));
 
   SgExpression * alphaAssignmentExpression = buildAssignOp (
-      variableReferences[variableNamePrefix + variableNameSuffix_alpha],
+      variableReferences[variableNamePrefix + divisionCharacter + variableNameSuffix_alpha],
       alphaDivideExpression);
 
   appendStatement (buildExprStatement (alphaAssignmentExpression),
@@ -223,7 +463,7 @@ InitialiseConstantsSubroutine::generateSubroutine (
       FortranTypesBuilder::buildNewFortranFunction ("sqrt", subroutineScope);
 
   SgMultiplyOp * sqrtMultiplyExpression = buildMultiplyOp (
-      variableReferences[variableNamePrefix + variableNameSuffix_gam],
+      variableReferences[variableNamePrefix + divisionCharacter + variableNameSuffix_gam],
       variableReferences[variableName_p]);
 
   SgDivideOp * sqrtDivideExpression = buildDivideOp (sqrtMultiplyExpression,
@@ -236,7 +476,7 @@ InitialiseConstantsSubroutine::generateSubroutine (
       sqrtFunctionSymbol, sqrtActualParameters);
 
   SgMultiplyOp * uMultiplyExpression = buildMultiplyOp (sqrtFunctionCall,
-      variableReferences[variableNamePrefix + variableNameSuffix_mach]);
+      variableReferences[variableNamePrefix + divisionCharacter + variableNameSuffix_mach]);
 
   SgExpression * uAssignmentExpression = buildAssignOp (
       variableReferences[variableName_u], uMultiplyExpression);
@@ -251,7 +491,7 @@ InitialiseConstantsSubroutine::generateSubroutine (
 
   SgMultiplyOp * eRHSOfDivideExpression = buildMultiplyOp (
       variableReferences[variableName_r], variableReferences[variableNamePrefix
-          + variableNameSuffix_gm1]);
+           + divisionCharacter + variableNameSuffix_gm1]);
 
   SgDivideOp * eLHSOfAdditionExpression = buildDivideOp (
       variableReferences[variableName_p], eRHSOfDivideExpression);
@@ -275,7 +515,7 @@ InitialiseConstantsSubroutine::generateSubroutine (
    */
 
   SgPntrArrRefExp * arrayExpression1 = buildPntrArrRefExp (
-      variableReferences[variableNamePrefix + variableNameSuffix_qinf],
+      variableReferences[variableNamePrefix + divisionCharacter + variableNameSuffix_qinf],
       buildIntVal (1));
 
   SgExpression * assignmentExpression1 = buildAssignOp (arrayExpression1,
@@ -290,7 +530,7 @@ InitialiseConstantsSubroutine::generateSubroutine (
    */
 
   SgPntrArrRefExp * arrayExpression2 = buildPntrArrRefExp (
-      variableReferences[variableNamePrefix + variableNameSuffix_qinf],
+      variableReferences[variableNamePrefix + divisionCharacter + variableNameSuffix_qinf],
       buildIntVal (2));
 
   SgExpression * multiplyExpression2 = buildMultiplyOp (
@@ -308,7 +548,7 @@ InitialiseConstantsSubroutine::generateSubroutine (
    */
 
   SgPntrArrRefExp * arrayExpression3 = buildPntrArrRefExp (
-      variableReferences[variableNamePrefix + variableNameSuffix_qinf],
+      variableReferences[variableNamePrefix + divisionCharacter + variableNameSuffix_qinf],
       buildIntVal (3));
 
   SgExpression * assignmentExpression3 = buildAssignOp (arrayExpression3,
@@ -323,7 +563,7 @@ InitialiseConstantsSubroutine::generateSubroutine (
    */
 
   SgPntrArrRefExp * arrayExpression4 = buildPntrArrRefExp (
-      variableReferences[variableNamePrefix + variableNameSuffix_qinf],
+      variableReferences[variableNamePrefix + divisionCharacter + variableNameSuffix_qinf],
       buildIntVal (4));
 
   SgExpression * multiplyExpression4 = buildMultiplyOp (
@@ -349,20 +589,28 @@ InitialiseConstantsSubroutine::declareConstants (SgScopeStatement * moduleScope)
 
   vector <string> doublePrecisionVariables;
 
-  doublePrecisionVariables.push_back (variableNamePrefix
-      + variableNameSuffix_air_const);
-  doublePrecisionVariables.push_back (variableNamePrefix
-      + variableNameSuffix_alpha);
-  doublePrecisionVariables.push_back (variableNamePrefix
-      + variableNameSuffix_cfl);
-  doublePrecisionVariables.push_back (variableNamePrefix
-      + variableNameSuffix_eps);
-  doublePrecisionVariables.push_back (variableNamePrefix
-      + variableNameSuffix_gam);
-  doublePrecisionVariables.push_back (variableNamePrefix
-      + variableNameSuffix_gm1);
-  doublePrecisionVariables.push_back (variableNamePrefix
-      + variableNameSuffix_mach);
+	string const airConstModified = variableNamePrefix + divisionCharacter + variableNameSuffix_air_const;
+	
+	string const alphaConstModified = variableNamePrefix + divisionCharacter
+	+ variableNameSuffix_alpha;
+	
+	string const cflConstModified = variableNamePrefix + divisionCharacter	+ variableNameSuffix_cfl;
+	
+	string const epsConstModified = variableNamePrefix + divisionCharacter	+ variableNameSuffix_eps;
+	
+	string const gamConstModified = variableNamePrefix + divisionCharacter	+ variableNameSuffix_gam;
+	
+	string const gm1ConstModified = variableNamePrefix + divisionCharacter	+ variableNameSuffix_gm1;
+	
+	string const machConstModified = variableNamePrefix + divisionCharacter	+ variableNameSuffix_mach;
+	
+  doublePrecisionVariables.push_back ( airConstModified );
+  doublePrecisionVariables.push_back ( alphaConstModified );
+  doublePrecisionVariables.push_back ( cflConstModified );
+  doublePrecisionVariables.push_back ( epsConstModified );
+  doublePrecisionVariables.push_back ( gamConstModified );
+  doublePrecisionVariables.push_back ( gm1ConstModified );
+  doublePrecisionVariables.push_back ( machConstModified );
 
   for (vector <string>::iterator it = doublePrecisionVariables.begin (); it
       != doublePrecisionVariables.end (); ++it)
@@ -372,7 +620,7 @@ InitialiseConstantsSubroutine::declareConstants (SgScopeStatement * moduleScope)
             FortranTypesBuilder::getDoublePrecisionFloat (), moduleScope);
 
     variableDeclaration->get_declarationModifier ().get_accessModifier ().setUndefined ();
-
+		variableDeclaration->get_declarationModifier ().get_typeModifier ().setConstant ();
     constantDeclarations.insert (make_pair (*it, variableDeclaration));
   }
 
@@ -384,8 +632,9 @@ InitialiseConstantsSubroutine::declareConstants (SgScopeStatement * moduleScope)
 
   vector <string> doublePrecisionArrayVariables;
 
-  doublePrecisionArrayVariables.push_back (variableNamePrefix
-      + variableNameSuffix_qinf);
+	string const qinfConstModified = variableNamePrefix + divisionCharacter + variableNameSuffix_qinf;
+
+  doublePrecisionArrayVariables.push_back ( qinfConstModified );
 
   for (vector <string>::iterator it = doublePrecisionArrayVariables.begin (); it
       != doublePrecisionArrayVariables.end (); ++it)
@@ -397,9 +646,10 @@ InitialiseConstantsSubroutine::declareConstants (SgScopeStatement * moduleScope)
             moduleScope);
 
     variableDeclaration->get_declarationModifier ().get_accessModifier ().setUndefined ();
+		variableDeclaration->get_declarationModifier ().get_typeModifier ().setConstant ();
 
     constantDeclarations.insert (make_pair (*it, variableDeclaration));
-  }
+  }	
 }
 
 InitialiseConstantsSubroutine::InitialiseConstantsSubroutine (
@@ -407,4 +657,32 @@ InitialiseConstantsSubroutine::InitialiseConstantsSubroutine (
   Subroutine (subroutineName + "_initialiseConstants")
 {
   variableNamePrefix = subroutineName;
+	
+	
+	constantVariablesNamesBeforeTransformation.push_back ( variableNameSuffix_air_const );
+	constantVariablesNamesBeforeTransformation.push_back ( variableNameSuffix_alpha );
+	constantVariablesNamesBeforeTransformation.push_back ( variableNameSuffix_cfl );
+	constantVariablesNamesBeforeTransformation.push_back ( variableNameSuffix_eps );
+	constantVariablesNamesBeforeTransformation.push_back ( variableNameSuffix_gam );
+	constantVariablesNamesBeforeTransformation.push_back ( variableNameSuffix_gm1 );
+	constantVariablesNamesBeforeTransformation.push_back ( variableNameSuffix_mach );
+	constantVariablesNamesBeforeTransformation.push_back ( variableNameSuffix_qinf );
+
+
+	constantVariablesNamesAfterTransformation.push_back ( 
+	  subroutineName + "_" + variableNameSuffix_air_const );
+	constantVariablesNamesAfterTransformation.push_back ( 
+	  subroutineName + "_" + variableNameSuffix_alpha );
+	constantVariablesNamesAfterTransformation.push_back ( 
+	  subroutineName + "_" + variableNameSuffix_cfl );
+	constantVariablesNamesAfterTransformation.push_back ( 
+	  subroutineName + "_" + variableNameSuffix_eps );
+	constantVariablesNamesAfterTransformation.push_back ( 
+	  subroutineName + "_" + variableNameSuffix_gam );
+	constantVariablesNamesAfterTransformation.push_back ( 
+	  subroutineName + "_" + variableNameSuffix_gm1 );
+	constantVariablesNamesAfterTransformation.push_back ( 
+	  subroutineName + "_" + variableNameSuffix_mach );
+	constantVariablesNamesAfterTransformation.push_back ( 
+	  subroutineName + "_" + variableNameSuffix_qinf );
 }

@@ -1,6 +1,9 @@
 #include <boost/algorithm/string/predicate.hpp>
 #include <UserDeviceSubroutine.h>
 #include <Debug.h>
+#include <algorithm>
+#include <vector>
+
 
 /*
  * ======================================================
@@ -17,10 +20,12 @@ UserDeviceSubroutine::copyAndModifySubroutine (SgScopeStatement * moduleScope,
   using SageBuilder::buildFunctionParameterList;
   using SageBuilder::buildVoidType;
   using SageBuilder::buildVariableDeclaration;
+	using SageBuilder::buildVarRefExp;
   using SageInterface::appendStatement;
   using SageInterface::addTextForUnparser;
   using std::vector;
   using std::string;
+	using std::iterator;
 
   Debug::getInstance ()->debugMessage (
       "Modifying and outputting original kernel to CUDA file", 2);
@@ -77,6 +82,7 @@ UserDeviceSubroutine::copyAndModifySubroutine (SgScopeStatement * moduleScope,
    */
   addTextForUnparser (subroutineHeaderStatement, "attributes(device) ",
       AstUnparseAttribute::e_before);
+	
 
   /*
    * ======================================================
@@ -105,6 +111,8 @@ UserDeviceSubroutine::copyAndModifySubroutine (SgScopeStatement * moduleScope,
      */
     SgVariableDeclaration * isVariableDeclaration = isSgVariableDeclaration (
         *it);
+
+//		std::cout << "User subr, node = " << (*it)->class_name().c_str() << std::endl;		
 
     if (isVariableDeclaration == NULL)
     {
@@ -154,7 +162,7 @@ UserDeviceSubroutine::copyAndModifySubroutine (SgScopeStatement * moduleScope,
         }
       }
     }
-    else
+		else
     {
       bool isFormalParameter = false;
 
@@ -186,6 +194,77 @@ UserDeviceSubroutine::copyAndModifySubroutine (SgScopeStatement * moduleScope,
       }
     }
   }
+
+
+	/*
+	 * ======================================================
+	 * The following class visits every found SgExpression
+	 * node and it transforms every reference to a constant
+	 * variable in the following way:
+	 * (constant_name -> subroutineName_constantName)
+	 * ======================================================
+	 */
+	class ModifyReferenceNamesToConstantVariables: public AstSimpleProcessing
+	{
+	public:
+		
+		SgScopeStatement * subroutineScope;
+		InitialiseConstantsSubroutine * initialiseConstantsSubroutine;
+		
+		void
+		setSubroutineScope ( SgScopeStatement * _subroutineScope )
+		{
+			subroutineScope = _subroutineScope;
+		}
+		void
+		setConstantNamesBefore ( InitialiseConstantsSubroutine * _initialiseConstantsSubroutine )
+		{
+			initialiseConstantsSubroutine = _initialiseConstantsSubroutine;
+		}
+		
+		
+		virtual void
+		visit ( SgNode * node )
+		{
+			
+			SgVarRefExp * isVarRefExp = isSgVarRefExp ( node ); 
+			
+			if ( isVarRefExp != NULL ) {
+				vector < string >::iterator itBefore, itAfter;
+
+				vector < string > namesBefore = 
+				  initialiseConstantsSubroutine->getConstantNamesBeforeTransformation();
+				vector < string > namesAfter = 
+					initialiseConstantsSubroutine->getConstantNamesAfterTransformation();
+				
+				std::map <std::string, SgVariableDeclaration *> constantDeclarations =
+					initialiseConstantsSubroutine->getConstantDeclarations();
+
+				for ( itBefore = namesBefore.begin(), itAfter = namesAfter.begin();
+						  itBefore != namesBefore.end(), itAfter != namesAfter.end();
+							itBefore++, itAfter++ )
+				{
+					if ( (*itBefore) == isVarRefExp->get_symbol()->get_name().getString() )
+					{						
+						SgVarRefExp * newConstRef = buildVarRefExp ( constantDeclarations[*itAfter] );
+						isVarRefExp->set_symbol ( newConstRef->get_symbol ( ) );
+					}
+				}								
+			}
+		}
+	};
+
+  /*
+   * ======================================================
+   * Now fixig up constant names
+   * ======================================================
+   */
+
+		ModifyReferenceNamesToConstantVariables	* modifyExpr =
+	new ModifyReferenceNamesToConstantVariables ();
+	modifyExpr->setSubroutineScope ( subroutineScope );
+	modifyExpr->setConstantNamesBefore ( initialiseConstantsSubroutine );
+	modifyExpr->traverse (subroutineHeaderStatement, preorder);
 
   /*
    * ======================================================
@@ -222,10 +301,13 @@ UserDeviceSubroutine::copyAndModifySubroutine (SgScopeStatement * moduleScope,
  */
 
 UserDeviceSubroutine::UserDeviceSubroutine (std::string const & subroutineName,
-    SgScopeStatement * moduleScope, Declarations & declarations) :
+    SgScopeStatement * moduleScope, 
+		InitialiseConstantsSubroutine * _initialiseConstantsSubroutine,
+		Declarations & declarations) :
   Subroutine (subroutineName + "_device")
 {
   userHostSubroutineName = subroutineName;
+	initialiseConstantsSubroutine = _initialiseConstantsSubroutine;
 
   copyAndModifySubroutine (moduleScope, declarations);
 }

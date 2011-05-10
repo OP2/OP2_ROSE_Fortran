@@ -119,7 +119,7 @@ NewSubroutinesGeneration::patchOP_PAR_LOOPCalls (ParallelLoop & parallelLoop,
       userDeviceSubroutine.getSubroutineName ()), characterArray);
 
   SgVariableDeclaration * kernelStringVariable = buildVariableDeclaration (
-      userDeviceSubroutine.getSubroutineName () + "_name", characterArray,
+      userDeviceSubroutine.getSubroutineName () + "_host", characterArray,
       initializer, getScope (lastDeclarationStatement));
 
   insertStatementAfter (lastDeclarationStatement, kernelStringVariable);
@@ -422,12 +422,18 @@ NewSubroutinesGeneration::visit (SgNode * node)
                  * ======================================================
                  */
 								
+								Debug::getInstance ()->debugMessage ( "Before creating constants", 2 );
+								
                 InitialiseConstantsSubroutine * initialiseConstantsSubroutine =
 								new InitialiseConstantsSubroutine (userSubroutineName);
+								
+								Debug::getInstance ()->debugMessage ( "Before declare constants", 2 );
+
 								
                 initialiseConstantsSubroutine->declareConstants (moduleScope);
 								
 								
+								Debug::getInstance ()->debugMessage ( "Adding contain statement", 2 );
 
                 addContains (moduleStatement);
 
@@ -449,6 +455,7 @@ NewSubroutinesGeneration::visit (SgNode * node)
 
                 UserDeviceSubroutine * userDeviceSubroutine =
                     new UserDeviceSubroutine ( userSubroutineName, moduleScope,
+												initialiseConstantsSubroutine,
                         *declarations);
 
                 KernelSubroutine * kernelSubroutine =
@@ -504,9 +511,10 @@ NewSubroutinesGeneration::visit (SgNode * node)
 
                 initialiseConstantsSubroutine->declareConstants (moduleScope);
 
+
                 addContains (moduleStatement);
 
-                initialiseConstantsSubroutine->generateSubroutine (moduleScope);
+                initialiseConstantsSubroutine->generateSubroutineForAlreadyComputedValues (moduleScope);
 
                 /*
                  * ======================================================
@@ -517,6 +525,7 @@ NewSubroutinesGeneration::visit (SgNode * node)
 
                 UserDeviceSubroutine * userDeviceSubroutine =
                     new UserDeviceSubroutine (userSubroutineName, moduleScope,
+										    initialiseConstantsSubroutine,
                         *declarations);
 
                 KernelSubroutine * kernelSubroutine =

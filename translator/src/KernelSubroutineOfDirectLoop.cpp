@@ -11,164 +11,164 @@
  * ======================================================
  */
 
-SgStatement *
-KernelSubroutineOfDirectLoop::createUserSubroutineCall (
-    UserDeviceSubroutine & userDeviceSubroutine, ParallelLoop & parallelLoop)
-{
-  using SageBuilder::buildFunctionCallStmt;
-  using SageBuilder::buildVoidType;
-  using SageBuilder::buildIntVal;
-  using SageBuilder::buildMultiplyOp;
-  using SageBuilder::buildAddOp;
-  using SageBuilder::buildSubtractOp;
-  using SageBuilder::buildOpaqueVarRefExp;
-  using SageBuilder::buildDotExp;
-  using SageBuilder::buildVarRefExp;
-  using SageBuilder::buildPntrArrRefExp;
-  using SageBuilder::buildExprListExp;
-  using boost::lexical_cast;
-  using std::string;
-  using std::vector;
-
-  Debug::getInstance ()->debugMessage (
-      "Creating call to user device subroutine", 2);
-
-  SgExprListExp * userDeviceSubroutineParameters = buildExprListExp ();
-
-  for (unsigned int i = 1; i
-      <= parallelLoop.getNumberOf_OP_DAT_ArgumentGroups (); ++i)
-  {
-    int dim = parallelLoop.get_OP_DAT_Dimension (i);
-
-    SgExpression * parameterExpression = buildIntVal (1);
-
-    if (parallelLoop.get_OP_MAP_Value (i) == GLOBAL)
-    {
-      if (parallelLoop.get_OP_Access_Value (i) == READ_ACCESS)
-      {
-
-        /*
-         * ======================================================
-         * Case of global variable accessed in read mode:
-         * we directly access the device variable, by
-         * passing the kernel the variable name in positions
-         * 0:argSize%<devVarName>-1. The name of the proper field
-         * is obtained by appending "argument", <i>, and "_Size"
-         * ======================================================
-         */
-
-        string const & variableName = kernelDatArgumentsNames::argNamePrefix
-            + lexical_cast <string> (i);
-
-        string const & argSizeName = variableName
-            + kernelDatArgumentsNames::argNameSizePostfix;
-
-        SgExpression * argSizeField = buildDotExp (buildVarRefExp (
-            formalParameter_argsSizes), buildOpaqueVarRefExp (argSizeName,
-            subroutineScope));
-
-        SgExpression * minusOneExpression = buildSubtractOp (argSizeField,
-            buildIntVal (1));
-
-        SgSubscriptExpression * arraySubscriptExpression =
-            new SgSubscriptExpression (ROSEHelper::getFileInfo (), buildIntVal (
-                0), minusOneExpression, buildIntVal (1));
-
-        arraySubscriptExpression->set_endOfConstruct (
-            ROSEHelper::getFileInfo ());
-        arraySubscriptExpression->setCompilerGenerated ();
-        arraySubscriptExpression->setOutputInCodeGeneration ();
-
-        parameterExpression = buildPntrArrRefExp (buildVarRefExp (
-            formalParameter_OP_DATs[i]), arraySubscriptExpression);
-      }
-      else
-      {
-        /*
-         * ======================================================
-         * Case of global variable accessed *not* in read mode:
-         * we access the corresponding local thread variable
-         * ======================================================
-         */
-
-        parameterExpression = buildVarRefExp (
-            localVariables_localThreadVariables[i]);
-      }
-    }
-    else if (parallelLoop.get_OP_MAP_Value (i) == INDIRECT
-        && parallelLoop.get_OP_Access_Value (i) == INC_ACCESS)
-    {
-      parameterExpression = buildVarRefExp (
-          localVariables_localThreadVariables[i]);
-    }
-    else if (parallelLoop.get_OP_MAP_Value (i) == INDIRECT)
-    {
-      Debug::getInstance ()->errorMessage (
-          "Error: the compiler does not support indirect datasets in direct loops accessed in any way different from OP_INC");
-    }
-    else if (parallelLoop.get_OP_MAP_Value (i) == DIRECT)
-    {
-      if (parallelLoop.getNumberOfIndirectDataSets () > 0)
-      {
-
-        SgExpression * deviceVarAccessDirect = buildMultiplyOp (buildAddOp (
-            buildVarRefExp (variable_setElementCounter), buildVarRefExp (
-                variable_offsetInThreadBlock)), buildIntVal (dim));
-
-        SgSubscriptExpression * arraySubscriptExpression =
-            new SgSubscriptExpression (ROSEHelper::getFileInfo (), buildIntVal (
-                0), deviceVarAccessDirect, buildIntVal (1));
-
-        arraySubscriptExpression->set_endOfConstruct (
-            ROSEHelper::getFileInfo ());
-        arraySubscriptExpression->setCompilerGenerated ();
-        arraySubscriptExpression->setOutputInCodeGeneration ();
-
-        parameterExpression = buildPntrArrRefExp (buildVarRefExp (
-            formalParameter_OP_DATs[i]), arraySubscriptExpression);
-
-      }
-      else if (dim == 1)
-      {
-
-        SgExpression * nVarRef = buildVarRefExp (variable_setElementCounter);
-        SgExpression * nPlusDimMinusOneExpr = buildAddOp (nVarRef, buildIntVal (
-            dim - 1));
-
-        SgSubscriptExpression * arraySubscriptExpression =
-            new SgSubscriptExpression (ROSEHelper::getFileInfo (), nVarRef,
-                nPlusDimMinusOneExpr, buildIntVal (1));
-
-        arraySubscriptExpression->set_endOfConstruct (
-            ROSEHelper::getFileInfo ());
-        arraySubscriptExpression->setCompilerGenerated ();
-        arraySubscriptExpression->setOutputInCodeGeneration ();
-
-        parameterExpression = buildPntrArrRefExp (buildVarRefExp (
-            formalParameter_OP_DATs[i]), arraySubscriptExpression);
-
-      }
-      else
-      {
-        parameterExpression = buildVarRefExp (
-            localVariables_localThreadVariables[i]);
-      }
-    }
-
-    /*
-     * ======================================================
-     * Before appending the parameter we must be sure that
-     * it has been created
-     * ======================================================
-     */
-    //		ROSE_ASSERT ( parameterExpression != NULL );
-
-    userDeviceSubroutineParameters->append_expression (parameterExpression);
-  }
-
-  return buildFunctionCallStmt (userDeviceSubroutine.getSubroutineName (),
-      buildVoidType (), userDeviceSubroutineParameters, subroutineScope);
-}
+//SgStatement *
+//KernelSubroutine::createUserSubroutineCall (
+//    UserDeviceSubroutine & userDeviceSubroutine, ParallelLoop & parallelLoop)
+//{
+//  using SageBuilder::buildFunctionCallStmt;
+//  using SageBuilder::buildVoidType;
+//  using SageBuilder::buildIntVal;
+//  using SageBuilder::buildMultiplyOp;
+//  using SageBuilder::buildAddOp;
+//  using SageBuilder::buildSubtractOp;
+//  using SageBuilder::buildOpaqueVarRefExp;
+//  using SageBuilder::buildDotExp;
+//  using SageBuilder::buildVarRefExp;
+//  using SageBuilder::buildPntrArrRefExp;
+//  using SageBuilder::buildExprListExp;
+//  using boost::lexical_cast;
+//  using std::string;
+//  using std::vector;
+//
+//  Debug::getInstance ()->debugMessage (
+//      "Creating call to user device subroutine", 2);
+//
+//  SgExprListExp * userDeviceSubroutineParameters = buildExprListExp ();
+//
+//  for (unsigned int i = 1; i
+//      <= parallelLoop.getNumberOf_OP_DAT_ArgumentGroups (); ++i)
+//  {
+//    int dim = parallelLoop.get_OP_DAT_Dimension (i);
+//
+//    SgExpression * parameterExpression = buildIntVal (1);
+//
+//    if (parallelLoop.get_OP_MAP_Value (i) == GLOBAL)
+//    {
+//      if (parallelLoop.get_OP_Access_Value (i) == READ_ACCESS)
+//      {
+//
+//        /*
+//         * ======================================================
+//         * Case of global variable accessed in read mode:
+//         * we directly access the device variable, by
+//         * passing the kernel the variable name in positions
+//         * 0:argSize%<devVarName>-1. The name of the proper field
+//         * is obtained by appending "argument", <i>, and "_Size"
+//         * ======================================================
+//         */
+//
+//        string const & variableName = kernelDatArgumentsNames::argNamePrefix
+//            + lexical_cast <string> (i);
+//
+//        string const & argSizeName = variableName
+//            + kernelDatArgumentsNames::argNameSizePostfix;
+//
+//        SgExpression * argSizeField = buildDotExp (buildVarRefExp (
+//            formalParameter_argsSizes), buildOpaqueVarRefExp (argSizeName,
+//            subroutineScope));
+//
+//        SgExpression * minusOneExpression = buildSubtractOp (argSizeField,
+//            buildIntVal (1));
+//
+//        SgSubscriptExpression * arraySubscriptExpression =
+//            new SgSubscriptExpression (ROSEHelper::getFileInfo (), buildIntVal (
+//                0), minusOneExpression, buildIntVal (1));
+//
+//        arraySubscriptExpression->set_endOfConstruct (
+//            ROSEHelper::getFileInfo ());
+//        arraySubscriptExpression->setCompilerGenerated ();
+//        arraySubscriptExpression->setOutputInCodeGeneration ();
+//
+//        parameterExpression = buildPntrArrRefExp (buildVarRefExp (
+//            formalParameter_OP_DATs[i]), arraySubscriptExpression);
+//      }
+//      else
+//      {
+//        /*
+//         * ======================================================
+//         * Case of global variable accessed *not* in read mode:
+//         * we access the corresponding local thread variable
+//         * ======================================================
+//         */
+//
+//        parameterExpression = buildVarRefExp (
+//            localVariables_localThreadVariables[i]);
+//      }
+//    }
+//    else if (parallelLoop.get_OP_MAP_Value (i) == INDIRECT
+//        && parallelLoop.get_OP_Access_Value (i) == INC_ACCESS)
+//    {
+//      parameterExpression = buildVarRefExp (
+//          localVariables_localThreadVariables[i]);
+//    }
+//    else if (parallelLoop.get_OP_MAP_Value (i) == INDIRECT)
+//    {
+//      Debug::getInstance ()->errorMessage (
+//          "Error: the compiler does not support indirect datasets in direct loops accessed in any way different from OP_INC");
+//    }
+//    else if (parallelLoop.get_OP_MAP_Value (i) == DIRECT)
+//    {
+//      if (parallelLoop.getNumberOfIndirectDataSets () > 0)
+//      {
+//
+//        SgExpression * deviceVarAccessDirect = buildMultiplyOp (buildAddOp (
+//            buildVarRefExp (variable_setElementCounter), buildVarRefExp (
+//                variable_offsetInThreadBlock)), buildIntVal (dim));
+//
+//        SgSubscriptExpression * arraySubscriptExpression =
+//            new SgSubscriptExpression (ROSEHelper::getFileInfo (), buildIntVal (
+//                0), deviceVarAccessDirect, buildIntVal (1));
+//
+//        arraySubscriptExpression->set_endOfConstruct (
+//            ROSEHelper::getFileInfo ());
+//        arraySubscriptExpression->setCompilerGenerated ();
+//        arraySubscriptExpression->setOutputInCodeGeneration ();
+//
+//        parameterExpression = buildPntrArrRefExp (buildVarRefExp (
+//            formalParameter_OP_DATs[i]), arraySubscriptExpression);
+//
+//      }
+//      else if (dim == 1)
+//      {
+//
+//        SgExpression * nVarRef = buildVarRefExp (variable_setElementCounter);
+//        SgExpression * nPlusDimMinusOneExpr = buildAddOp (nVarRef, buildIntVal (
+//            dim - 1));
+//
+//        SgSubscriptExpression * arraySubscriptExpression =
+//            new SgSubscriptExpression (ROSEHelper::getFileInfo (), nVarRef,
+//                nPlusDimMinusOneExpr, buildIntVal (1));
+//
+//        arraySubscriptExpression->set_endOfConstruct (
+//            ROSEHelper::getFileInfo ());
+//        arraySubscriptExpression->setCompilerGenerated ();
+//        arraySubscriptExpression->setOutputInCodeGeneration ();
+//
+//        parameterExpression = buildPntrArrRefExp (buildVarRefExp (
+//            formalParameter_OP_DATs[i]), arraySubscriptExpression);
+//
+//      }
+//      else
+//      {
+//        parameterExpression = buildVarRefExp (
+//            localVariables_localThreadVariables[i]);
+//      }
+//    }
+//
+//    /*
+//     * ======================================================
+//     * Before appending the parameter we must be sure that
+//     * it has been created
+//     * ======================================================
+//     */
+//    //		ROSE_ASSERT ( parameterExpression != NULL );
+//
+//    userDeviceSubroutineParameters->append_expression (parameterExpression);
+//  }
+//
+//  return buildFunctionCallStmt (userDeviceSubroutine.getSubroutineName (),
+//      buildVoidType (), userDeviceSubroutineParameters, subroutineScope);
+//}
 
 SgBasicBlock *
 KernelSubroutineOfDirectLoop::stageInFromDeviceMemoryToLocalThreadVariables (
@@ -473,7 +473,9 @@ KernelSubroutineOfDirectLoop::buildMainLoopStatements (
           scopeStatement);
 
   SgStatement * userFunctionCall = createUserSubroutineCall (
-      userDeviceSubroutine, parallelLoop);
+      userDeviceSubroutine, variable_setElementCounter,
+			variable_offsetInThreadBlock,
+			parallelLoop);
 
   SgBasicBlock * postAssignments =
       stageOutFromLocalThreadVariablesToDeviceMemory (parallelLoop,
@@ -907,7 +909,6 @@ KernelSubroutineOfDirectLoop::create_OP_DAT_FormalParameters (
       formalParameters->append_arg (
           *(opDatFormalParameter->get_variables ().begin ()));
 
-      opDatFormalParameter->get_declarationModifier ().get_typeModifier ().setIntent_in ();
       opDatFormalParameter->get_declarationModifier ().get_typeModifier ().setDevice ();
       opDatFormalParameter->get_declarationModifier ().get_accessModifier ().setUndefined ();
 

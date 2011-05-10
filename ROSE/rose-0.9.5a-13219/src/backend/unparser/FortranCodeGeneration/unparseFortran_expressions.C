@@ -279,16 +279,22 @@ FortranCodeGeneration_locatedNode::unparseFuncCall(SgExpression* expr, SgUnparse
     // argument list
     SgUnparse_Info ninfo(info);
     curprint("(");
+		bool firstArg = true;
     if (func_call->get_args()) {
       SgExpressionPtrList& list = func_call->get_args()->get_expressions();
       SgExpressionPtrList::iterator arg = list.begin();
       while (arg != list.end()) {
 //	SgConstructorInitializer* con_init = isSgConstructorInitializer(*arg);
-	unparseExpression((*arg), ninfo);
-	arg++;
-	if (arg != list.end()) {
-	  curprint(",");
-	}
+
+				if ( firstArg == false ) {
+				  curprint ( "& " );
+				} else firstArg = false;
+				
+				unparseExpression((*arg), ninfo);
+				arg++;
+				if (arg != list.end()) {
+					curprint(", &\n");
+				}
       }
     }
     curprint(")");

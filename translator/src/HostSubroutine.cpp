@@ -348,7 +348,6 @@ HostSubroutine::createCUDAKernelVariables ()
       = FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
           variableName_threadSynchRet,
           FortranTypesBuilder::getFourByteInteger (), subroutineScope);
-
 }
 
 void
@@ -1034,7 +1033,7 @@ HostSubroutine::createAndAppendIterationVariablesForReduction ( ParallelLoop & p
 		subroutineScope);
 
 		localVariables_Others[iterVariableName2] = buildVariableDeclaration (
-			iterVariableName1, FortranTypesBuilder::getFourByteInteger (),
+			iterVariableName2, FortranTypesBuilder::getFourByteInteger (),
 			buildAssignInitializer (buildIntVal (0), buildIntType ()),
 			subroutineScope);
 		
