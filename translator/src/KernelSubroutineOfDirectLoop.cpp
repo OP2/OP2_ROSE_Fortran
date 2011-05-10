@@ -546,7 +546,7 @@ KernelSubroutineOfDirectLoop::createStatements (
 
   SgExpression * threadidxDotX = buildDotExp (variable_Threadidx, variable_X);
 
-  SgExpression * threadidxMinusOne = buildSubtractOp (threadidxMinusOne,
+  SgExpression * threadidxMinusOne = buildSubtractOp (threadidxDotX,
       buildIntVal (1));
 
   SgFunctionSymbol * modFunctionSymbol =
