@@ -546,7 +546,7 @@ KernelSubroutineOfDirectLoop::createStatements (
 
   SgExpression * threadidxDotX = buildDotExp (variable_Threadidx, variable_X);
 
-  SgExpression * threadidxMinusOne = buildSubtractOp (threadidxDotX,
+  SgExpression * threadidxMinusOne = buildSubtractOp (threadidxMinusOne,
       buildIntVal (1));
 
   SgFunctionSymbol * modFunctionSymbol =
@@ -569,7 +569,7 @@ KernelSubroutineOfDirectLoop::createStatements (
    * ======================================================
    */
 
-  SgExpression * threadidxMinusOneDivWarpSize = buildDivideOp (threadidxDotX,
+  SgExpression * threadidxMinusOneDivWarpSize = buildDivideOp (threadidxMinusOne,
       buildVarRefExp (formalParameter_warpSizeOP2));
 
   SgExpression * argSDisplacementInitExprWithoutSize = buildMultiplyOp (

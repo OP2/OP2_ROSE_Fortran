@@ -88,7 +88,7 @@ NewSubroutinesGeneration::patchOP_PAR_LOOPCalls (ParallelLoop & parallelLoop,
 
   /*
    * ======================================================
-   * Add a new 'use' statement
+   * Add a new 'use' statement for CUDA module
    * ======================================================
    */
   SgUseStatement* newUseStatement =
@@ -96,7 +96,7 @@ NewSubroutinesGeneration::patchOP_PAR_LOOPCalls (ParallelLoop & parallelLoop,
           getEnclosingFileNode (lastUseStatement)->get_file_info (),
           parallelLoop.getModuleName (), false);
 
-  insertStatementAfter (lastUseStatement, newUseStatement);
+  insertStatementAfter (lastUseStatement, newUseStatement);	
 
   /*
    * ======================================================
@@ -172,6 +172,7 @@ NewSubroutinesGeneration::addLibraries (SgModuleStatement * moduleStatement)
   vector <string> libs;
   libs.push_back ("ISO_C_BINDING");
   libs.push_back ("OP2_C");
+//  libs.push_back ("cudaConfigurationParams");
   libs.push_back ("cudafor");
 
   for (vector <string>::const_iterator it = libs.begin (); it != libs.end (); ++it)
@@ -397,7 +398,7 @@ NewSubroutinesGeneration::visit (SgNode * node)
               addLibraries (moduleStatement);
 
               SgScopeStatement * moduleScope =
-                  moduleStatement->get_definition ();
+                  moduleStatement->get_definition ();							
 
               if (parallelLoop->isDirectLoop ())
               {
