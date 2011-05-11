@@ -140,8 +140,9 @@ class ParallelLoop
     unsigned int
     getNumberOf_OP_DAT_ArgumentGroups () const
     {
-      return (actualArguments.size () - OP2::NUMBER_OF_NON_OP_DAT_ARGUMENTS)
-          / OP2::NUMBER_OF_ARGUMENTS_PER_OP_DAT;
+      return (actualArguments.size ()
+          - OP2::Fortran::NUMBER_OF_NON_OP_DAT_ARGUMENTS)
+          / OP2::Fortran::NUMBER_OF_ARGUMENTS_PER_OP_DAT;
     }
 
     SgType *
@@ -173,15 +174,15 @@ class ParallelLoop
     {
       return OP_DAT_AccessDescriptors[OP_DAT_ArgumentGroup];
     }
-		
-		int
-		getNumberOfIndirectDataSets ( );
-	
-		bool
-		isReductionRequired ( );
-	
-		bool
-		isReductionRequiredForSpecificArgument ( int opDatIndex );
+
+    int
+    getNumberOfIndirectDataSets ();
+
+    bool
+    isReductionRequired ();
+
+    bool
+    isReductionRequiredForSpecificArgument (int opDatIndex);
 
     std::string
     get_OP_DAT_VariableName (unsigned int OP_DAT_ArgumentGroup)

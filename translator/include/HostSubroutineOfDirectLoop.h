@@ -22,21 +22,20 @@
 #include <KernelSubroutine.h>
 #include <DeviceDataSizesDeclarationDirectLoops.h>
 
-
 class HostSubroutineOfDirectLoop: public HostSubroutine
 {
   private:
 
-		/*
-		 * ======================================================
-		 * CUDA variables specific of direct loops
-		 * ======================================================
-		 */
-		SgVariableDeclaration * CUDAVariable_offsetS;
-		
-		SgVariableDeclaration * CUDAVariable_warpSizeOP2;
-		
-		SgVariableDeclaration * CUDAVariable_threadSynchRet;
+    /*
+     * ======================================================
+     * CUDA variables specific of direct loops
+     * ======================================================
+     */
+    SgVariableDeclaration * CUDAVariable_offsetS;
+
+    SgVariableDeclaration * CUDAVariable_warpSizeOP2;
+
+    SgVariableDeclaration * CUDAVariable_threadSynchRet;
 
     /*
      * ======================================================
@@ -56,42 +55,42 @@ class HostSubroutineOfDirectLoop: public HostSubroutine
     void
     createCUDAVariablesDirectLoops (ParallelLoop & parallelLoop);
 
-		/*
-		 * ======================================================
-		 * Generates the declaration of the variable
-		 * encapsulating device variables sizes
-		 * ======================================================
-		 */
-		void
-		createDeviceVariablesSizesVariable ( 
-			DeviceDataSizesDeclarationDirectLoops & deviceDataSizesDeclarationDirectLoops );
+    /*
+     * ======================================================
+     * Generates the declaration of the variable
+     * encapsulating device variables sizes
+     * ======================================================
+     */
+    void
+        createDeviceVariablesSizesVariable (
+            DeviceDataSizesDeclarationDirectLoops & deviceDataSizesDeclarationDirectLoops);
 
-		/*
-		 * ======================================================
-		 * Generates the code initialising the device variable
-		 * sizes variable
-		 * ======================================================
-		 */
-		void
-		initialiseDeviceVariablesSizesVariable ( ParallelLoop & parallelLoop );
+    /*
+     * ======================================================
+     * Generates the code initialising the device variable
+     * sizes variable
+     * ======================================================
+     */
+    void
+    initialiseDeviceVariablesSizesVariable (ParallelLoop & parallelLoop);
 
-		/*
-		 * ======================================================
-		 * Initialises: nblocks, nthreads, nshared, offsetS and
-		 * warpSizeOP2
-		 * ======================================================
-		 */		
-		void
-		initialiseAllCUDAVariables ( ParallelLoop & parallelLoop );
-	
+    /*
+     * ======================================================
+     * Initialises: nblocks, nthreads, nshared, offsetS and
+     * warpSizeOP2
+     * ======================================================
+     */
+    void
+    initialiseAllCUDAVariables (ParallelLoop & parallelLoop);
+
   public:
 
-    HostSubroutineOfDirectLoop (std::string const & subroutineName,
-        UserDeviceSubroutine & userDeviceSubroutine,
-        KernelSubroutine & kernelSubroutine, 
-				DeviceDataSizesDeclarationDirectLoops & deviceDataSizesDeclarationDirectLoops,
-				ParallelLoop & parallelLoop,
-        SgScopeStatement * moduleScope );
+        HostSubroutineOfDirectLoop (
+            std::string const & subroutineName,
+            UserDeviceSubroutine & userDeviceSubroutine,
+            KernelSubroutine & kernelSubroutine,
+            DeviceDataSizesDeclarationDirectLoops & deviceDataSizesDeclarationDirectLoops,
+            ParallelLoop & parallelLoop, SgScopeStatement * moduleScope);
 };
 
 #endif

@@ -35,7 +35,8 @@ ParallelLoop::retrieveOP_DATDeclarations (Declarations * declarations)
    */
 
   for (vector <SgExpression *>::iterator it = actualArguments.begin ()
-      + OP2::NUMBER_OF_NON_OP_DAT_ARGUMENTS; it != actualArguments.end (); ++it)
+      + OP2::Fortran::NUMBER_OF_NON_OP_DAT_ARGUMENTS; it
+      != actualArguments.end (); ++it)
   {
     switch ((*it)->variantT ())
     {
@@ -275,32 +276,28 @@ ParallelLoop::getNumberOfIndirectDataSets ()
 }
 
 bool
-ParallelLoop::isReductionRequired ( )
+ParallelLoop::isReductionRequired ()
 {
-	for (unsigned int i = 1; i <= getNumberOf_OP_DAT_ArgumentGroups (); ++i)
-		if ( OP_DAT_MappingDescriptors[i] == GLOBAL &&
-				 OP_DAT_AccessDescriptors[i] != READ_ACCESS )
+  for (unsigned int i = 1; i <= getNumberOf_OP_DAT_ArgumentGroups (); ++i)
+    if (OP_DAT_MappingDescriptors[i] == GLOBAL && OP_DAT_AccessDescriptors[i]
+        != READ_ACCESS)
 
-				 return true;
+      return true;
 
-	return false;	
+  return false;
 }
 
 bool
-ParallelLoop::isReductionRequiredForSpecificArgument ( int opDatIndex )
+ParallelLoop::isReductionRequiredForSpecificArgument (int opDatIndex)
 {
 
-	if ( OP_DAT_MappingDescriptors[opDatIndex] == GLOBAL &&
-			 OP_DAT_AccessDescriptors[opDatIndex] != READ_ACCESS )
-			 
-			return true;
-	
-	return false;	
+  if (OP_DAT_MappingDescriptors[opDatIndex] == GLOBAL
+      && OP_DAT_AccessDescriptors[opDatIndex] != READ_ACCESS)
+
+    return true;
+
+  return false;
 }
-
-
-
-
 
 ParallelLoop::ParallelLoop (std::string userSubroutineName,
     SgExpressionPtrList & actualArguments, Declarations * op2DeclaredVariables)

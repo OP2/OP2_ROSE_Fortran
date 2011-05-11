@@ -15,43 +15,6 @@
 class ReductionSubroutine: public Subroutine
 {
   private:
-
-    /*
-     * ======================================================
-     * Generates a call statement to synchthreads
-     * ======================================================
-     */
-
-    SgStatement *
-    createCallToSynchThreads ();
-
-    /*
-     * ======================================================
-     * Generates the reduction subroutine formal parameters
-     * ======================================================
-     */
-
-    void
-    createFormalParameters ();
-
-    /*
-     * ======================================================
-     * Generates the reduction subroutine local variables
-     * ======================================================
-     */
-
-    void
-    createLocalVariables ();
-
-    /*
-     * ======================================================
-     * Generates the reduction subroutine statements
-     * ======================================================
-     */
-
-    void
-    createStatements ();
-
     /*
      * ======================================================
      * The first formal parameter in a reduction subroutine
@@ -149,32 +112,60 @@ class ReductionSubroutine: public Subroutine
      */
     SgArrayType * reductionVariableType;
 
+  private:
+
+    /*
+     * ======================================================
+     * Generates a call statement to synchthreads
+     * ======================================================
+     */
+
+    SgStatement *
+    createCallToSynchThreads ();
+
+    /*
+     * ======================================================
+     * Generates the reduction subroutine formal parameters
+     * ======================================================
+     */
+
+    void
+    createFormalParameters ();
+
+    /*
+     * ======================================================
+     * Generates the reduction subroutine local variables
+     * ======================================================
+     */
+
+    void
+    createLocalVariables ();
+
+    /*
+     * ======================================================
+     * Generates the reduction subroutine statements
+     * ======================================================
+     */
+
+    void
+    createStatements ();
+
   public:
-	
+
     ReductionSubroutine (std::string const & subroutineAndVariableName,
         SgScopeStatement * moduleScope, SgArrayType * reductionVariableType);
-				
 
-	/*
-	 * ======================================================
-	 * Static functions
-	 * ======================================================
-	 */
-	
-				
-	/*
-	 * ======================================================
-	 * Generates all proper reduction subroutines: one per
-	 * type and kind
-	 * ======================================================
-	 */
-	
-	static std::map < unsigned int, SgProcedureHeaderStatement *>
-	generateReductionSubroutines ( 
-		ParallelLoop & parallelLoop, SgScopeStatement * scopeStatement );
-	
+    /*
+     * ======================================================
+     * Generates all proper reduction subroutines: one per
+     * type and kind
+     * ======================================================
+     */
+
+    static std::map <unsigned int, SgProcedureHeaderStatement *>
+    generateReductionSubroutines (ParallelLoop & parallelLoop,
+        SgScopeStatement * scope);
 };
-
 
 #endif
 

@@ -457,9 +457,9 @@ NewSubroutinesGeneration::visit (SgNode * node)
                     "after adding reduction stuff", 2);
 
                 UserDeviceSubroutine * userDeviceSubroutine =
-                    new UserDeviceSubroutine ( userSubroutineName, moduleScope,
-												initialiseConstantsSubroutine,
-                        *declarations, *parallelLoop);
+                    new UserDeviceSubroutine (userSubroutineName, moduleScope,
+                        initialiseConstantsSubroutine, *declarations,
+                        *parallelLoop);
 
                 KernelSubroutine * kernelSubroutine =
                     new KernelSubroutineOfDirectLoop (userSubroutineName,
@@ -529,8 +529,8 @@ NewSubroutinesGeneration::visit (SgNode * node)
 
                 UserDeviceSubroutine * userDeviceSubroutine =
                     new UserDeviceSubroutine (userSubroutineName, moduleScope,
-										    initialiseConstantsSubroutine,
-                        *declarations, *parallelLoop);
+                        initialiseConstantsSubroutine, *declarations,
+                        *parallelLoop);
 
                 KernelSubroutine * kernelSubroutine =
                     new KernelSubroutineOfIndirectLoop (userSubroutineName,

@@ -90,17 +90,15 @@ class FortranStatementsAndExpressionsBuilder
     appendDeallocateStatement (SgExprListExp * deallocateParameters,
         SgScopeStatement * scope);
 
-		/*
-		 * ======================================================
-		 * Creates and appends the autoshared variable 
-		 * declaration
-		 * ======================================================
-		 */
-		static SgVariableDeclaration *
-		createAndAppendAutosharedVariable ( SgType * variableType,
-			SgScopeStatement * scopeStatement );
-	
-				
+    /*
+     * ======================================================
+     * Utility function that returns the Fortran kind of an
+     * OP_DAT type  or a default one (in case of types without
+     * kind)
+     * ======================================================
+     */
+    static SgExpression *
+    getFortranKindOf_OP_DAT (SgType * OP_DAT_baseType);
 };
 
 #endif
