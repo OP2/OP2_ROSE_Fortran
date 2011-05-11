@@ -291,11 +291,11 @@ HostSubroutineOfDirectLoop::initialiseAllCUDAVariables (
 
   SgExpression * assignExpressionNblocks = buildAssignOp (buildVarRefExp (
       CUDAVariable_blocksPerGrid), buildIntVal (
-      CUDAConstantsDirectLoops::nblocks));
+      CUDA::Fortran::DirectLoop::nblocks));
 
   SgExpression * assignExpressionNthreads = buildAssignOp (buildVarRefExp (
       CUDAVariable_threadsPerBlock), buildIntVal (
-      CUDAConstantsDirectLoops::nthreads));
+      CUDA::Fortran::DirectLoop::nthreads));
 
   SgExpression * assignExpressionWarpSizeOP2 = buildAssignOp (buildVarRefExp (
       CUDAVariable_warpSizeOP2), variable_OP_WARP_SIZE);

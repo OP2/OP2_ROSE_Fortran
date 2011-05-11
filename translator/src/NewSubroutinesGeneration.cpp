@@ -320,7 +320,7 @@ NewSubroutinesGeneration::visit (SgNode * node)
        * Function call found in AST
        * ======================================================
        */
-      SgFunctionCallExp* functionCallExp = isSgFunctionCallExp (node);
+      SgFunctionCallExp * functionCallExp = isSgFunctionCallExp (node);
 
       string const
           calleeName =
@@ -399,7 +399,6 @@ NewSubroutinesGeneration::visit (SgNode * node)
 
               if (parallelLoop->isDirectLoop ())
               {
-
                 Debug::getInstance ()->debugMessage ("Direct Loop", 2);
 
                 /*
@@ -421,20 +420,10 @@ NewSubroutinesGeneration::visit (SgNode * node)
                  * generate the subroutine which initialises them
                  * ======================================================
                  */
-
-                Debug::getInstance ()->debugMessage (
-                    "Before creating constants", 2);
-
                 InitialiseConstantsSubroutine * initialiseConstantsSubroutine =
                     new InitialiseConstantsSubroutine (userSubroutineName);
 
-                Debug::getInstance ()->debugMessage (
-                    "Before declare constants", 2);
-
                 initialiseConstantsSubroutine->declareConstants (moduleScope);
-
-                Debug::getInstance ()->debugMessage (
-                    "Adding contain statement", 2);
 
                 addContains (moduleStatement);
 
@@ -445,16 +434,10 @@ NewSubroutinesGeneration::visit (SgNode * node)
                  * ======================================================
                  */
 
-                Debug::getInstance ()->debugMessage ("Adding reduction stuff",
-                    2);
-
                 std::map <unsigned int, SgProcedureHeaderStatement *>
                     reductionSubroutines =
                         ReductionSubroutine::generateReductionSubroutines (
                             *parallelLoop, moduleScope);
-
-                Debug::getInstance ()->debugMessage (
-                    "after adding reduction stuff", 2);
 
                 UserDeviceSubroutine * userDeviceSubroutine =
                     new UserDeviceSubroutine (userSubroutineName, moduleScope,

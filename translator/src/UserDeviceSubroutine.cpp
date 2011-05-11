@@ -111,8 +111,6 @@ UserDeviceSubroutine::copyAndModifySubroutine (SgScopeStatement * moduleScope,
     SgVariableDeclaration * isVariableDeclaration = isSgVariableDeclaration (
         *it);
 
-    //		std::cout << "User subr, node = " << (*it)->class_name().c_str() << std::endl;
-
     if (isVariableDeclaration == NULL)
     {
       appendStatement (*it, subroutineScope);
@@ -271,7 +269,7 @@ UserDeviceSubroutine::copyAndModifySubroutine (SgScopeStatement * moduleScope,
 
   /*
    * ======================================================
-   * Now fixig up constant names
+   * Now fix constant names
    * ======================================================
    */
 
@@ -302,9 +300,6 @@ UserDeviceSubroutine::copyAndModifySubroutine (SgScopeStatement * moduleScope,
   };
   (new GenerateAllNodesInUnparser ())->traverse (subroutineHeaderStatement,
       preorder);
-
-  Debug::getInstance ()->debugMessage (
-      "Modified and outputted original kernel to CUDA file", 2);
 }
 
 /*

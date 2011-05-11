@@ -260,6 +260,19 @@ namespace CUDA
     {
       std::string const x = "x";
     }
+
+    namespace DirectLoop
+    {
+      /*
+       * ======================================================
+       * Following values are copied from Mike Giles'
+       * implementation and may be subject to future changes
+       * ======================================================
+       */
+
+      int const nblocks = 200;
+      int const nthreads = 128;
+    }
   }
 
   namespace CPlusPlus
