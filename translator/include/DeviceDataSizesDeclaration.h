@@ -21,11 +21,7 @@
 
 class DeviceDataSizesDeclaration
 {
-	// Carlo: commented out and replaced by protected
-	// because these data structures are accessed by the
-	// lower hierarchy level addFields re-implementations
-	//  private:		
-	protected:
+  protected:
     /*
      * ======================================================
      * The type definition declaration statement
@@ -109,22 +105,21 @@ class DeviceDataSizesDeclaration
       return otherFieldDeclarations[planVariableSizeName];
     }
 
-		/*
-		 * ======================================================
-		 * This function calls the coorect addFields subclass
-		 * implementation
-		 * ======================================================
-		 */
-		
-		void
-		initialise ( ParallelLoop & parallelLoop, SgScopeStatement * moduleScope ) 
-		{ 
-			addFields ( parallelLoop, moduleScope );
-		}
-	
-	
-    DeviceDataSizesDeclaration ( ParallelLoop & parallelLoop,
-        std::string const & subroutineName, SgScopeStatement * moduleScope );
+    /*
+     * ======================================================
+     * This function calls the correct addFields subclass
+     * implementation
+     * ======================================================
+     */
+
+    void
+    initialise (ParallelLoop & parallelLoop, SgScopeStatement * moduleScope)
+    {
+      addFields (parallelLoop, moduleScope);
+    }
+
+    DeviceDataSizesDeclaration (ParallelLoop & parallelLoop,
+        std::string const & subroutineName, SgScopeStatement * moduleScope);
 };
 
 #endif

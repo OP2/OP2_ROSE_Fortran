@@ -4,7 +4,6 @@
 #include <algorithm>
 #include <vector>
 
-
 /*
  * ======================================================
  * Private functions
@@ -12,20 +11,21 @@
  */
 
 void
-UserDeviceSubroutine::copyAndModifySubroutine ( SgScopeStatement * moduleScope,
-  Declarations & declarations, ParallelLoop & parallelLoop )
+UserDeviceSubroutine::copyAndModifySubroutine (SgScopeStatement * moduleScope,
+    InitialiseConstantsSubroutine * initialiseConstantsSubroutine,
+    Declarations & declarations, ParallelLoop & parallelLoop)
 {
   using boost::iequals;
   using SageBuilder::buildProcedureHeaderStatement;
   using SageBuilder::buildFunctionParameterList;
   using SageBuilder::buildVoidType;
   using SageBuilder::buildVariableDeclaration;
-	using SageBuilder::buildVarRefExp;
+  using SageBuilder::buildVarRefExp;
   using SageInterface::appendStatement;
   using SageInterface::addTextForUnparser;
   using std::vector;
   using std::string;
-	using std::iterator;
+  using std::iterator;
 
   Debug::getInstance ()->debugMessage (
       "Modifying and outputting original kernel to CUDA file", 2);
@@ -82,7 +82,6 @@ UserDeviceSubroutine::copyAndModifySubroutine ( SgScopeStatement * moduleScope,
    */
   addTextForUnparser (subroutineHeaderStatement, "attributes(device) ",
       AstUnparseAttribute::e_before);
-	
 
   /*
    * ======================================================
@@ -112,8 +111,6 @@ UserDeviceSubroutine::copyAndModifySubroutine ( SgScopeStatement * moduleScope,
     SgVariableDeclaration * isVariableDeclaration = isSgVariableDeclaration (
         *it);
 
-//		std::cout << "User subr, node = " << (*it)->class_name().c_str() << std::endl;		
-
     if (isVariableDeclaration == NULL)
     {
       appendStatement (*it, subroutineScope);
@@ -124,21 +121,19 @@ UserDeviceSubroutine::copyAndModifySubroutine ( SgScopeStatement * moduleScope,
          * ======================================================
          * Append the variable declarations immediately after the
          * 'IMPLICIT NONE' statement
-				 * We scan the parallel loop arguments to understand
-				 * if the parameter will be allocated on shared or device
-				 * memory. It is based on the assumption that the number
-				 * of kernel parameters is equal to the number of par.
-				 * loop argument lines
+         * We scan the parallel loop arguments to understand
+         * if the parameter will be allocated on shared or device
+         * memory. It is based on the assumption that the number
+         * of kernel parameters is equal to the number of par.
+         * loop argument lines
          * ======================================================
          */
-				
-				unsigned int parLoopArgCounter = 1;
-				
-        for ( SgInitializedNamePtrList::iterator paramIt =
-                originalParameters->get_args ().begin ();
-							paramIt != originalParameters->get_args ().end ();
-							++parLoopArgCounter,
-							++paramIt )
+
+        unsigned int parLoopArgCounter = 1;
+
+        for (SgInitializedNamePtrList::iterator paramIt =
+            originalParameters->get_args ().begin (); paramIt
+            != originalParameters->get_args ().end (); ++parLoopArgCounter, ++paramIt)
         {
           /*
            * ======================================================
@@ -153,15 +148,16 @@ UserDeviceSubroutine::copyAndModifySubroutine ( SgScopeStatement * moduleScope,
           /*
            * ======================================================
            * Set the Fortran attributes of the declared variables:
-					 * either shared or device. As device is the default
-					 * attribute in fortran cuda, we avoid to define it
+           * either shared or device. As device is the default
+           * attribute in fortran cuda, we avoid to define it
            * ======================================================
            */
           newVariableDeclaration->get_declarationModifier ().get_accessModifier ().setUndefined ();
 
-					if ( parallelLoop.get_OP_MAP_Value ( parLoopArgCounter ) == INDIRECT &&
-							 parallelLoop.get_OP_Access_Value ( parLoopArgCounter ) == READ_ACCESS )
-						newVariableDeclaration->get_declarationModifier ().get_typeModifier ().setShared ();
+          if (parallelLoop.get_OP_MAP_Value (parLoopArgCounter) == INDIRECT
+              && parallelLoop.get_OP_Access_Value (parLoopArgCounter)
+                  == READ_ACCESS)
+            newVariableDeclaration->get_declarationModifier ().get_typeModifier ().setShared ();
 
           formalParameters->append_arg (
               *(newVariableDeclaration->get_variables ().begin ()));
@@ -176,7 +172,7 @@ UserDeviceSubroutine::copyAndModifySubroutine ( SgScopeStatement * moduleScope,
         }
       }
     }
-		else
+    else
     {
       bool isFormalParameter = false;
 
@@ -209,76 +205,79 @@ UserDeviceSubroutine::copyAndModifySubroutine ( SgScopeStatement * moduleScope,
     }
   }
 
+  /*
+   * ======================================================
+   * The following class visits every found SgExpression
+   * node and it transforms every reference to a constant
+   * variable in the following way:
+   * (constant_name -> subroutineName_constantName)
+   * ======================================================
+   */
+  class ModifyReferenceNamesToConstantVariables: public AstSimpleProcessing
+  {
+    public:
 
-	/*
-	 * ======================================================
-	 * The following class visits every found SgExpression
-	 * node and it transforms every reference to a constant
-	 * variable in the following way:
-	 * (constant_name -> subroutineName_constantName)
-	 * ======================================================
-	 */
-	class ModifyReferenceNamesToConstantVariables: public AstSimpleProcessing
-	{
-	public:
-		
-		SgScopeStatement * subroutineScope;
-		InitialiseConstantsSubroutine * initialiseConstantsSubroutine;
-		
-		void
-		setSubroutineScope ( SgScopeStatement * _subroutineScope )
-		{
-			subroutineScope = _subroutineScope;
-		}
-		void
-		setConstantNamesBefore ( InitialiseConstantsSubroutine * _initialiseConstantsSubroutine )
-		{
-			initialiseConstantsSubroutine = _initialiseConstantsSubroutine;
-		}
-		
-		
-		virtual void
-		visit ( SgNode * node )
-		{
-			
-			SgVarRefExp * isVarRefExp = isSgVarRefExp ( node ); 
-			
-			if ( isVarRefExp != NULL ) {
-				vector < string >::iterator itBefore, itAfter;
+      SgScopeStatement * subroutineScope;
+      InitialiseConstantsSubroutine * initialiseConstantsSubroutine;
 
-				vector < string > namesBefore = 
-				  initialiseConstantsSubroutine->getConstantNamesBeforeTransformation();
-				vector < string > namesAfter = 
-					initialiseConstantsSubroutine->getConstantNamesAfterTransformation();
-				
-				std::map <std::string, SgVariableDeclaration *> constantDeclarations =
-					initialiseConstantsSubroutine->getConstantDeclarations();
+      void
+      setSubroutineScope (SgScopeStatement * _subroutineScope)
+      {
+        subroutineScope = _subroutineScope;
+      }
+      void
+      setConstantNamesBefore (
+          InitialiseConstantsSubroutine * _initialiseConstantsSubroutine)
+      {
+        initialiseConstantsSubroutine = _initialiseConstantsSubroutine;
+      }
 
-				for ( itBefore = namesBefore.begin(), itAfter = namesAfter.begin();
-						  itBefore != namesBefore.end(), itAfter != namesAfter.end();
-							itBefore++, itAfter++ )
-				{
-					if ( (*itBefore) == isVarRefExp->get_symbol()->get_name().getString() )
-					{						
-						SgVarRefExp * newConstRef = buildVarRefExp ( constantDeclarations[*itAfter] );
-						isVarRefExp->set_symbol ( newConstRef->get_symbol ( ) );
-					}
-				}								
-			}
-		}
-	};
+      virtual void
+      visit (SgNode * node)
+      {
+
+        SgVarRefExp * isVarRefExp = isSgVarRefExp (node);
+
+        if (isVarRefExp != NULL)
+        {
+          vector <string>::iterator itBefore, itAfter;
+
+          vector <string>
+              namesBefore =
+                  initialiseConstantsSubroutine->getConstantNamesBeforeTransformation ();
+          vector <string>
+              namesAfter =
+                  initialiseConstantsSubroutine->getConstantNamesAfterTransformation ();
+
+          std::map <std::string, SgVariableDeclaration *> constantDeclarations =
+              initialiseConstantsSubroutine->getConstantDeclarations ();
+
+          for (itBefore = namesBefore.begin (), itAfter = namesAfter.begin (); itBefore
+              != namesBefore.end (), itAfter != namesAfter.end (); itBefore++, itAfter++)
+          {
+            if ((*itBefore)
+                == isVarRefExp->get_symbol ()->get_name ().getString ())
+            {
+              SgVarRefExp * newConstRef = buildVarRefExp (
+                  constantDeclarations[*itAfter]);
+              isVarRefExp->set_symbol (newConstRef->get_symbol ());
+            }
+          }
+        }
+      }
+  };
 
   /*
    * ======================================================
-   * Now fixig up constant names
+   * Now fix constant names
    * ======================================================
    */
 
-		ModifyReferenceNamesToConstantVariables	* modifyExpr =
-	new ModifyReferenceNamesToConstantVariables ();
-	modifyExpr->setSubroutineScope ( subroutineScope );
-	modifyExpr->setConstantNamesBefore ( initialiseConstantsSubroutine );
-	modifyExpr->traverse (subroutineHeaderStatement, preorder);
+  ModifyReferenceNamesToConstantVariables * modifyExpr =
+      new ModifyReferenceNamesToConstantVariables ();
+  modifyExpr->setSubroutineScope (subroutineScope);
+  modifyExpr->setConstantNamesBefore (initialiseConstantsSubroutine);
+  modifyExpr->traverse (subroutineHeaderStatement, preorder);
 
   /*
    * ======================================================
@@ -301,11 +300,6 @@ UserDeviceSubroutine::copyAndModifySubroutine ( SgScopeStatement * moduleScope,
   };
   (new GenerateAllNodesInUnparser ())->traverse (subroutineHeaderStatement,
       preorder);
-			
-			
-	Debug::getInstance ()->debugMessage (
-		"Modified and outputted original kernel to CUDA file", 2);
-
 }
 
 /*
@@ -314,15 +308,14 @@ UserDeviceSubroutine::copyAndModifySubroutine ( SgScopeStatement * moduleScope,
  * ======================================================
  */
 
-UserDeviceSubroutine::UserDeviceSubroutine ( std::string const & subroutineName,
-    SgScopeStatement * moduleScope, 
-		InitialiseConstantsSubroutine * _initialiseConstantsSubroutine,
-		Declarations & declarations,
-		ParallelLoop & parallelLoop ) :
+UserDeviceSubroutine::UserDeviceSubroutine (std::string const & subroutineName,
+    SgScopeStatement * moduleScope,
+    InitialiseConstantsSubroutine * initialiseConstantsSubroutine,
+    Declarations & declarations, ParallelLoop & parallelLoop) :
   Subroutine (subroutineName + "_device")
 {
   userHostSubroutineName = subroutineName;
-	initialiseConstantsSubroutine = _initialiseConstantsSubroutine;
 
-  copyAndModifySubroutine (moduleScope, declarations, parallelLoop);
+  copyAndModifySubroutine (moduleScope, initialiseConstantsSubroutine,
+      declarations, parallelLoop);
 }

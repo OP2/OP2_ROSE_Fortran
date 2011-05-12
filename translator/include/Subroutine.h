@@ -46,6 +46,14 @@ class Subroutine
      */
     SgScopeStatement * subroutineScope;
 
+    /*
+     * ======================================================
+     * Local variable declarations in the newly created
+     * subroutine
+     * ======================================================
+     */
+    std::map <std::string, SgVariableDeclaration *> localVariables;
+
   protected:
 
     Subroutine (std::string const & subroutineName)
@@ -66,17 +74,6 @@ class Subroutine
     {
       return subroutineHeaderStatement;
     }
-		
-		/*
-		 * ======================================================
-		 * Utility function that given an opDatBaseType returns
-		 * its actual fortran kind or a default one (in case
-		 * of types without kind)
-		 * ======================================================
-		 */	
-
-		static SgExpression * 
-		getFortranKindOfOpDat ( SgType * opDatBaseType );
 };
 
 #endif

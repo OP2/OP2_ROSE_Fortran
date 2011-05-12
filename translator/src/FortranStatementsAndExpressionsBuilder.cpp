@@ -177,35 +177,39 @@ FortranStatementsAndExpressionsBuilder::appendDeallocateStatement (
   appendStatement (deallocateStatement, scope);
 }
 
-
-SgVariableDeclaration *
-FortranStatementsAndExpressionsBuilder::createAndAppendAutosharedVariable (
-  SgType * variableType, SgScopeStatement * scopeStatement )
+SgExpression *
+FortranStatementsAndExpressionsBuilder::getFortranKindOf_OP_DAT (
+    SgType * OP_DAT_baseType)
 {
+  using SageBuilder::buildIntVal;
 
-	using SageBuilder::buildIntVal;
-	using SageBuilder::buildVariableDeclaration;
-	using SageInterface::appendStatement;
+  SgArrayType * isArrayType = isSgArrayType (OP_DAT_baseType);
 
-//	SgExpression * lowerBound = buildIntVal ( 0 );
+  ROSE_ASSERT ( isArrayType != NULL );
 
-	SgExpression * upperBound = new SgAsteriskShapeExp ( ROSEHelper::getFileInfo () );
+  SgType * arrayBaseType = isArrayType->get_base_type ();
 
+  SgExpression * sizeOf_OP_DAT_Kind = arrayBaseType->get_type_kind ();
 
-	SgArrayType * autosharedType =
-		FortranTypesBuilder::getArray_RankOne ( variableType,
-			0, upperBound );
+  /*
+   * ======================================================
+   * If a Fortran kind has not been specified, then we
+   * have to assume standard ones: integer(4) and real(4)
+   * ======================================================
+   */
+  if (sizeOf_OP_DAT_Kind == NULL)
+  {
+    if (isSgTypeInt (arrayBaseType) != NULL)
+    {
+      sizeOf_OP_DAT_Kind = buildIntVal (
+          FortranVariableDeafultKinds::DEFAULT_KIND_INT);
+    }
+    else
+    {
+      sizeOf_OP_DAT_Kind = buildIntVal (
+          FortranVariableDeafultKinds::DEFAULT_KIND_REAL);
+    }
+  }
 
-	SgVariableDeclaration * autosharedVariable = buildVariableDeclaration ( 
-		kernelSharedVariables::autoShared,
-		autosharedType, NULL, scopeStatement );
-
-	// TODO: add shared attribute to ROSE
-	autosharedVariable->get_declarationModifier ().get_typeModifier ().setShared ();
-	autosharedVariable->get_declarationModifier ().get_accessModifier ().setUndefined ();
-
-	appendStatement ( autosharedVariable, scopeStatement );
-
-	return autosharedVariable;
-
+  return sizeOf_OP_DAT_Kind;
 }

@@ -26,9 +26,8 @@ DeviceDataSizesDeclaration::addFields (ParallelLoop & parallelLoop,
     if (parallelLoop.isDuplicate_OP_DAT (i) == false
         && parallelLoop.get_OP_MAP_Value (i) == INDIRECT)
     {
-      string const variableName = OP_DAT_ArgumentNames::OP_DAT_NamePrefix
-          + lexical_cast <string> (i)
-          + OP_DAT_ArgumentNames::OP_DAT_SizeNameSuffix;
+      string const variableName = VariablePrefixes::OP_DAT_Name + lexical_cast <
+          string> (i) + VariableSuffixes::Size;
 
       SgVariableDeclaration * fieldDeclaration = buildVariableDeclaration (
           variableName, FortranTypesBuilder::getFourByteInteger (), NULL,
@@ -50,7 +49,7 @@ DeviceDataSizesDeclaration::addFields (ParallelLoop & parallelLoop,
         && parallelLoop.get_OP_MAP_Value (i) == INDIRECT)
     {
       string const variableName = "pindMaps" + lexical_cast <string> (i)
-          + OP_DAT_ArgumentNames::OP_DAT_SizeNameSuffix;
+          + VariableSuffixes::Size;
 
       SgVariableDeclaration * fieldDeclaration = buildVariableDeclaration (
           variableName, FortranTypesBuilder::getFourByteInteger (), NULL,
@@ -71,7 +70,7 @@ DeviceDataSizesDeclaration::addFields (ParallelLoop & parallelLoop,
     if (parallelLoop.get_OP_MAP_Value (i) == INDIRECT)
     {
       string const variableName = "pmaps" + lexical_cast <string> (i)
-          + OP_DAT_ArgumentNames::OP_DAT_SizeNameSuffix;
+          + VariableSuffixes::Size;
 
       SgVariableDeclaration * fieldDeclaration = buildVariableDeclaration (
           variableName, FortranTypesBuilder::getFourByteInteger (), NULL,
@@ -92,9 +91,8 @@ DeviceDataSizesDeclaration::addFields (ParallelLoop & parallelLoop,
     if (parallelLoop.isDuplicate_OP_DAT (i) == false
         && parallelLoop.get_OP_MAP_Value (i) == DIRECT)
     {
-      string const variableName = OP_DAT_ArgumentNames::OP_DAT_NamePrefix
-          + lexical_cast <string> (i)
-          + OP_DAT_ArgumentNames::OP_DAT_SizeNameSuffix;
+      string const variableName = VariablePrefixes::OP_DAT_Name + lexical_cast <
+          string> (i) + VariableSuffixes::Size;
 
       SgVariableDeclaration * fieldDeclaration = buildVariableDeclaration (
           variableName, FortranTypesBuilder::getFourByteInteger (), NULL,
@@ -110,6 +108,7 @@ DeviceDataSizesDeclaration::addFields (ParallelLoop & parallelLoop,
   }
 
   vector <string> planFunctionSizeVariables;
+<<<<<<< HEAD
   planFunctionSizeVariables.push_back (PlanFunctionSizeVariables::pblkMapSize);
 //  planFunctionSizeVariables.push_back (PlanFunctionSizeVariables::pindMapsSize);
   planFunctionSizeVariables.push_back (PlanFunctionSizeVariables::pindOffsSize);
@@ -118,6 +117,32 @@ DeviceDataSizesDeclaration::addFields (ParallelLoop & parallelLoop,
   planFunctionSizeVariables.push_back (PlanFunctionSizeVariables::pnthrcolSize);
   planFunctionSizeVariables.push_back (PlanFunctionSizeVariables::poffsetSize);
   planFunctionSizeVariables.push_back (PlanFunctionSizeVariables::pthrcolSize);
+=======
+
+  planFunctionSizeVariables.push_back (
+      IndirectLoop::Fortran::PlanFunction::VariableNames::pblkMapSize);
+
+  planFunctionSizeVariables.push_back (
+      IndirectLoop::Fortran::PlanFunction::VariableNames::pindMapsSize);
+
+  planFunctionSizeVariables.push_back (
+      IndirectLoop::Fortran::PlanFunction::VariableNames::pindOffsSize);
+
+  planFunctionSizeVariables.push_back (
+      IndirectLoop::Fortran::PlanFunction::VariableNames::pindSizesSize);
+
+  planFunctionSizeVariables.push_back (
+      IndirectLoop::Fortran::PlanFunction::VariableNames::pnelemsSize);
+
+  planFunctionSizeVariables.push_back (
+      IndirectLoop::Fortran::PlanFunction::VariableNames::pnthrcolSize);
+
+  planFunctionSizeVariables.push_back (
+      IndirectLoop::Fortran::PlanFunction::VariableNames::poffsetSize);
+
+  planFunctionSizeVariables.push_back (
+      IndirectLoop::Fortran::PlanFunction::VariableNames::pthrcolSize);
+>>>>>>> d54656112ee65584301e2d7380ea8ffaca641891
 
   for (vector <string>::iterator it = planFunctionSizeVariables.begin (); it
       != planFunctionSizeVariables.end (); ++it)

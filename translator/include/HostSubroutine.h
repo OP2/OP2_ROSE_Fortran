@@ -7,17 +7,6 @@
 #include <ParallelLoop.h>
 #include <DeviceDataSizesDeclaration.h>
 
-/*
- * ======================================================
- * The following names are in common between direct and
- * indirect loops
- * ======================================================
- */
-namespace 
-{
-	std::string const variableName_threadSynchRet = "threadSynchRet";
-}
-
 class HostSubroutine: public Subroutine
 {
   protected:
@@ -96,9 +85,8 @@ class HostSubroutine: public Subroutine
     std::map <unsigned int, SgVariableDeclaration *>
         localVariables_OP_DAT_VariablesOnDevice;
 
+    std::map <std::string, SgVariableDeclaration *> localVariables_Others;
 
-		std::map <std::string, SgVariableDeclaration *> localVariables_Others;
-		
     /*
      * ======================================================
      * Variables passed to the kernel at launch time which
@@ -112,23 +100,22 @@ class HostSubroutine: public Subroutine
 
     SgVariableDeclaration * CUDAVariable_sharedMemorySize;
 
-		/*
-		 * ======================================================
-		 * Variables required to implement reductions
-		 * ======================================================
-		 */
-		SgVariableDeclaration * reductionVariable_baseOffsetInSharedMemory;
-	
-		SgVariableDeclaration * reductionVariable_maxBytesInSharedMemory;
+    /*
+     * ======================================================
+     * Variables required to implement reductions
+     * ======================================================
+     */
+    SgVariableDeclaration * reductionVariable_baseOffsetInSharedMemory;
 
-		SgVariableDeclaration * reductionVariable_numberOfThreadItems;
+    SgVariableDeclaration * reductionVariable_maxBytesInSharedMemory;
 
-		SgVariableDeclaration * reductionVariable_maximumNumberOfThreadBlocks;
+    SgVariableDeclaration * reductionVariable_numberOfThreadItems;
 
-		SgVariableDeclaration * reductionVariable_reductionArrayOnHost;
+    SgVariableDeclaration * reductionVariable_maximumNumberOfThreadBlocks;
 
-		SgVariableDeclaration * reductionVariable_reductionArrayOnDevice;
+    SgVariableDeclaration * reductionVariable_reductionArrayOnHost;
 
+    SgVariableDeclaration * reductionVariable_reductionArrayOnDevice;
 
   protected:
 
@@ -151,26 +138,26 @@ class HostSubroutine: public Subroutine
     SgStatement *
     createCallToC_F_POINTER (SgExpression * parameter1,
         SgExpression * parameter2, SgExpression * parameter3 = NULL);
-		
-		SgStatement *
-		buildThreadSynchroniseFunctionCall ( SgScopeStatement * subroutineScope );
 
-		void
-		createReductionVariables ( ParallelLoop & parallelLoop );
-		
-		void
-		createAndAppendThreadSynchCall ( );
-		
-		void
-		createSupportForReductionVariablesBeforeKernel ( ParallelLoop & parallelLoop );
-		
-		void
-		createSupportForReductionVariablesAfterKernel ( ParallelLoop & parallelLoop );
-		
-		void
-		createAndAppendIterationVariablesForReduction ( ParallelLoop & parallelLoop );
+    SgStatement *
+    buildThreadSynchroniseFunctionCall (SgScopeStatement * subroutineScope);
 
-		
+    void
+    createReductionVariables (ParallelLoop & parallelLoop);
+
+    void
+    createAndAppendThreadSynchCall ();
+
+    void
+        createSupportForReductionVariablesBeforeKernel (
+            ParallelLoop & parallelLoop);
+
+    void
+    createSupportForReductionVariablesAfterKernel (ParallelLoop & parallelLoop);
+
+    void
+    createAndAppendIterationVariablesForReduction (ParallelLoop & parallelLoop);
+
     HostSubroutine (std::string const & subroutineName,
         UserDeviceSubroutine & userDeviceSubroutine,
         ParallelLoop & parallelLoop, SgScopeStatement * moduleScope);
@@ -178,10 +165,10 @@ class HostSubroutine: public Subroutine
   public:
 
     SgVariableDeclaration *
-		get_OP_DAT_VariableOnDevice (unsigned int OP_DAT_ArgumentGroup)
-		{
-			return localVariables_OP_DAT_VariablesOnDevice[OP_DAT_ArgumentGroup];
-		}
+    get_OP_DAT_VariableOnDevice (unsigned int OP_DAT_ArgumentGroup)
+    {
+      return localVariables_OP_DAT_VariablesOnDevice[OP_DAT_ArgumentGroup];
+    }
 };
 
 #endif

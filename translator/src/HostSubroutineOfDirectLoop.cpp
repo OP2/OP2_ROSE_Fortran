@@ -34,39 +34,40 @@ HostSubroutineOfDirectLoop::createKernelCall (
    * ======================================================
    * argSizes
    * ======================================================
-	 */	 		
-	kernelParameters->append_expression ( buildVarRefExp ( localVariables_Others[LoopVariables::argsSizes] ) );
+   */
+  kernelParameters->append_expression (buildVarRefExp (
+      localVariables_Others[OtherVariableNames::argsSizes]));
 
   /*
    * ======================================================
    * op_dat content arguments on device
    * ======================================================
-	 */
+   */
   for (unsigned int i = 1; i
       <= parallelLoop.getNumberOf_OP_DAT_ArgumentGroups (); ++i)
   {
     if (parallelLoop.isDuplicate_OP_DAT (i) == false)
     {
 
-			/*
-			 * ======================================================
-			 * check if it is a reduction variable
-			 * ======================================================
-			 */
-			if ( parallelLoop.isReductionRequiredForSpecificArgument ( i ) == false )
-			{
-				SgVarRefExp * opDatDeviceReference = buildVarRefExp (
-						localVariables_OP_DAT_VariablesOnDevice[i]);
+      /*
+       * ======================================================
+       * check if it is a reduction variable
+       * ======================================================
+       */
+      if (parallelLoop.isReductionRequiredForSpecificArgument (i) == false)
+      {
+        SgVarRefExp * opDatDeviceReference = buildVarRefExp (
+            localVariables_OP_DAT_VariablesOnDevice[i]);
 
-				kernelParameters->append_expression (opDatDeviceReference);
-			}
-			else
-			{
-				SgVarRefExp * redArrayOnDeviceRef = buildVarRefExp (
-					reductionVariable_reductionArrayOnDevice );
-				
-				kernelParameters->append_expression ( redArrayOnDeviceRef );
-			}
+        kernelParameters->append_expression (opDatDeviceReference);
+      }
+      else
+      {
+        SgVarRefExp * redArrayOnDeviceRef = buildVarRefExp (
+            reductionVariable_reductionArrayOnDevice);
+
+        kernelParameters->append_expression (redArrayOnDeviceRef);
+      }
     }
   }
 
@@ -74,41 +75,42 @@ HostSubroutineOfDirectLoop::createKernelCall (
    * ======================================================
    * offsetS
    * ======================================================
-	 */	 	
-	kernelParameters->append_expression ( buildVarRefExp ( CUDAVariable_offsetS ) );
-	
+   */
+  kernelParameters->append_expression (buildVarRefExp (CUDAVariable_offsetS));
+
   /*
    * ======================================================
    * set%size
    * ======================================================
-	 */	 
-  SgExpression * opSetFormalArgumentReference = buildVarRefExp ( formalParameter_OP_SET );
-	
+   */
+  SgExpression * opSetFormalArgumentReference = buildVarRefExp (
+      formalParameter_OP_SET);
+
   SgExpression * sizeFieldExpression = buildDotExp (
-		opSetFormalArgumentReference, buildOpaqueVarRefExp ("size",
-																		subroutineScope));
-	
+      opSetFormalArgumentReference, buildOpaqueVarRefExp ("size",
+          subroutineScope));
+
   kernelParameters->append_expression (sizeFieldExpression);
-	 
-	/*
+
+  /*
    * ======================================================
    * warpSizeOP2
    * ======================================================
-	 */	 	
-	kernelParameters->append_expression ( buildVarRefExp ( CUDAVariable_warpSizeOP2 ) );
+   */
+  kernelParameters->append_expression (
+      buildVarRefExp (CUDAVariable_warpSizeOP2));
 
-	/*
+  /*
    * ======================================================
    * offset in shared memory for reductions (if needed)
    * ======================================================
-	 */	 	
-	if ( parallelLoop.isReductionRequired () == true )
-	{
-		kernelParameters->append_expression (
-		  buildVarRefExp ( reductionVariable_baseOffsetInSharedMemory ) );
-	}
-	 
-	 
+   */
+  if (parallelLoop.isReductionRequired () == true)
+  {
+    kernelParameters->append_expression (buildVarRefExp (
+        reductionVariable_baseOffsetInSharedMemory));
+  }
+
   SgExprStatement * kernelCall = buildFunctionCallStmt (
       kernelSubroutine.getSubroutineName () + "<<<"
           + ROSEHelper::getFirstVariableName (CUDAVariable_blocksPerGrid)
@@ -118,13 +120,11 @@ HostSubroutineOfDirectLoop::createKernelCall (
           + ">>>", buildVoidType (), kernelParameters, subroutineScope);
 
   appendStatement (kernelCall, subroutineScope);
-	
-	
-	
 }
 
 void
-HostSubroutineOfDirectLoop::createCUDAVariablesDirectLoops (ParallelLoop & parallelLoop)
+HostSubroutineOfDirectLoop::createCUDAVariablesDirectLoops (
+    ParallelLoop & parallelLoop)
 {
   using SageBuilder::buildOpaqueVarRefExp;
   using SageBuilder::buildVariableDeclaration;
@@ -153,257 +153,238 @@ HostSubroutineOfDirectLoop::createCUDAVariablesDirectLoops (ParallelLoop & paral
   /*
    * ======================================================
    * Declaration and initialisation of CUDA variables
-	 * specific of direct loops
+   * specific of direct loops
    * ======================================================
    */
-  CUDAVariable_offsetS = buildVariableDeclaration (
-      "offsetS", FortranTypesBuilder::getFourByteInteger (),
-      buildAssignInitializer (buildIntVal (0), buildIntType ()),
-      subroutineScope);
+  CUDAVariable_offsetS = buildVariableDeclaration ("offsetS",
+      FortranTypesBuilder::getFourByteInteger (), buildAssignInitializer (
+          buildIntVal (0), buildIntType ()), subroutineScope);
 
-  CUDAVariable_warpSizeOP2 = buildVariableDeclaration (
-      "warpSizeOP2", FortranTypesBuilder::getFourByteInteger (),
-      buildAssignInitializer (buildIntVal (0), buildIntType ()),
-      subroutineScope);
-	
-//  CUDAVariable_threadSynchRet = buildVariableDeclaration (
-//		"threadSynchRet", FortranTypesBuilder::getFourByteInteger (),
-//		buildAssignInitializer (buildIntVal (0), buildIntType ()),
-//		subroutineScope);
-	
+  CUDAVariable_warpSizeOP2 = buildVariableDeclaration ("warpSizeOP2",
+      FortranTypesBuilder::getFourByteInteger (), buildAssignInitializer (
+          buildIntVal (0), buildIntType ()), subroutineScope);
+
+  //  CUDAVariable_threadSynchRet = buildVariableDeclaration (
+  //		"threadSynchRet", FortranTypesBuilder::getFourByteInteger (),
+  //		buildAssignInitializer (buildIntVal (0), buildIntType ()),
+  //		subroutineScope);
+
 
   CUDAVariable_offsetS->get_declarationModifier ().get_accessModifier ().setUndefined ();
   CUDAVariable_warpSizeOP2->get_declarationModifier ().get_accessModifier ().setUndefined ();
-//  CUDAVariable_threadSynchRet->get_declarationModifier ().get_accessModifier ().setUndefined ();
-	
-  appendStatement ( CUDAVariable_offsetS, subroutineScope );
-  appendStatement ( CUDAVariable_warpSizeOP2, subroutineScope );
-//  appendStatement ( CUDAVariable_threadSynchRet, subroutineScope );
-	
+  //  CUDAVariable_threadSynchRet->get_declarationModifier ().get_accessModifier ().setUndefined ();
+
+  appendStatement (CUDAVariable_offsetS, subroutineScope);
+  appendStatement (CUDAVariable_warpSizeOP2, subroutineScope);
+  //  appendStatement ( CUDAVariable_threadSynchRet, subroutineScope );
 }
 
-
 void
-HostSubroutineOfDirectLoop::createDeviceVariablesSizesVariable ( 
-  DeviceDataSizesDeclarationDirectLoops & deviceDataSizesDeclarationDirectLoops ) 
+HostSubroutineOfDirectLoop::createDeviceVariablesSizesVariable (
+    DeviceDataSizesDeclarationDirectLoops & deviceDataSizesDeclarationDirectLoops)
 {
 
-	Debug::getInstance ()->debugMessage ("Creating device data sizes variable", 2);
-	
+  Debug::getInstance ()->debugMessage ("Creating device data sizes variable", 2);
+
   /*
    * ======================================================
    * Create the variable which passes the sizes of arguments
    * to the kernel
    * ======================================================
    */
-	
+
   SgVariableDeclaration * variableDeclaration2 =
-	FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
-		LoopVariables::argsSizes,
-		deviceDataSizesDeclarationDirectLoops.getType (),
-		subroutineScope);
-	
-	variableDeclaration2->get_declarationModifier ().get_typeModifier ().setDevice ();
-	
-  localVariables_Others[LoopVariables::argsSizes]
-		= variableDeclaration2;
+      FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
+          OtherVariableNames::argsSizes,
+          deviceDataSizesDeclarationDirectLoops.getType (), subroutineScope);
+
+  variableDeclaration2->get_declarationModifier ().get_typeModifier ().setDevice ();
+
+  localVariables_Others[OtherVariableNames::argsSizes] = variableDeclaration2;
 }
 
-
 void
-HostSubroutineOfDirectLoop::initialiseDeviceVariablesSizesVariable ( 
-	ParallelLoop & parallelLoop )
+HostSubroutineOfDirectLoop::initialiseDeviceVariablesSizesVariable (
+    ParallelLoop & parallelLoop)
 {
-	using std::string;
+  using std::string;
   using boost::lexical_cast;
-	using SageBuilder::buildOpaqueVarRefExp;
-	using SageBuilder::buildDotExp;
-	using SageBuilder::buildVarRefExp;
-	using SageBuilder::buildAssignOp;
-	using SageBuilder::buildExprStatement;
-	using SageInterface::appendStatement;
-	
-	/*
+  using SageBuilder::buildOpaqueVarRefExp;
+  using SageBuilder::buildDotExp;
+  using SageBuilder::buildVarRefExp;
+  using SageBuilder::buildAssignOp;
+  using SageBuilder::buildExprStatement;
+  using SageInterface::appendStatement;
+
+  /*
    * ======================================================
    * In direct loop sizes are only related to op_dat
-	 * variables
-   * ======================================================
-   */
-	
-	for (unsigned int i = 1; i
-			 <= parallelLoop.getNumberOf_OP_DAT_ArgumentGroups (); ++i)
-  {
-    if (parallelLoop.isDuplicate_OP_DAT (i) == false)
-    {			
-			
-			string const & variableName = OP_DAT_ArgumentNames::OP_DAT_NamePrefix + lexical_cast <string> (i);
-
-			string const sizeFieldExpression = variableName + OP_DAT_ArgumentNames::OP_DAT_SizeNameSuffix;
-			
-      SgExpression * sizeVariableField = buildDotExp ( 
-				buildVarRefExp ( localVariables_Others[LoopVariables::argsSizes] ),
-				buildOpaqueVarRefExp ( sizeFieldExpression, subroutineScope ) );
-			
-			SgVarRefExp * varRefExpression = NULL;
-
-			
-			/*
-			 * ======================================================
-			 * The size value changes for reduction variables
-			 * ======================================================
-			 */
-						
-			if ( parallelLoop.isReductionRequiredForSpecificArgument ( i ) == false )
-			{
-				varRefExpression = buildVarRefExp ( localVariables_OP_DAT_Sizes[i]  );
-			}
-			else
-			{
-				varRefExpression = buildVarRefExp ( reductionVariable_numberOfThreadItems  );
-			}
-
-			SgExpression * assignExpression = buildAssignOp ( sizeVariableField,
-				varRefExpression );
-				
-      appendStatement ( buildExprStatement ( assignExpression ), subroutineScope );
-    }
-	}
-}
-		
-void
-HostSubroutineOfDirectLoop::initialiseAllCUDAVariables (
-	ParallelLoop & parallelLoop )
-
-{
-	using SageBuilder::buildOpaqueVarRefExp;
-	using SageBuilder::buildVarRefExp;
-	using SageBuilder::buildIntVal;
-	using SageBuilder::buildExprStatement;
-	using SageBuilder::buildAssignOp;
-	using SageBuilder::buildMultiplyOp;
-	using SageBuilder::buildExprListExp;
-	using SageBuilder::buildFunctionCallExp;
-	using SageInterface::appendStatement;
-
-	
-	SgVarRefExp * variable_OP_WARP_SIZE = buildOpaqueVarRefExp ( "OP_WARP_SIZE",
-		subroutineScope );
-		
-	/*
-   * ======================================================
-   * initialising fixed value variables nblocks, nthreads
-	 * and warpSizeOP2
+   * variables
    * ======================================================
    */
 
-	
-
-	SgExpression * assignExpressionNblocks =
-		buildAssignOp ( buildVarRefExp ( CUDAVariable_blocksPerGrid ),
-										buildIntVal ( CUDAConstantsDirectLoops::nblocks ) );
-
-
-	SgExpression * assignExpressionNthreads =
-	buildAssignOp ( buildVarRefExp ( CUDAVariable_threadsPerBlock ),
-								  buildIntVal ( CUDAConstantsDirectLoops::nthreads ) );
-	
-
-	SgExpression * assignExpressionWarpSizeOP2 =
-		buildAssignOp ( buildVarRefExp ( CUDAVariable_warpSizeOP2 ),
-									  variable_OP_WARP_SIZE );
-	
-
-	
-	appendStatement ( buildExprStatement ( assignExpressionNblocks ), subroutineScope );
-	appendStatement ( buildExprStatement ( assignExpressionNthreads ), subroutineScope );
-	appendStatement ( buildExprStatement ( assignExpressionWarpSizeOP2 ), subroutineScope );
-
-	/*
-   * ======================================================
-   * Computing value for nshared: an input op_dat is copied
-	 * to shared memory only if: its dimension is larger than
-	 * 1 or it is not encapsulating a global data.
-	 * Therefore, the maximum size of shared memory is
-	 * equal to maximum size * dimension op_dat copied on
-	 * shared memory, multiplied by the number of threads
-   * ======================================================
-   */
-	for (unsigned int i = 1; i
-			 <= parallelLoop.getNumberOf_OP_DAT_ArgumentGroups (); ++i)
+  for (unsigned int i = 1; i
+      <= parallelLoop.getNumberOf_OP_DAT_ArgumentGroups (); ++i)
   {
     if (parallelLoop.isDuplicate_OP_DAT (i) == false)
     {
-			int dim = parallelLoop.get_OP_DAT_Dimension ( i );
-			if (  dim > 1 &&
-					 parallelLoop.get_OP_MAP_Value ( i ) != GLOBAL )
-			{
-			
-				/*
-				 * ======================================================
-				 * nshared = max ( nshared, size * dim )
-				 * ======================================================
-				 */
-				
-			  SgFunctionSymbol * shiftFunctionSymbol =
-					FortranTypesBuilder::buildNewFortranFunction ( "max", subroutineScope );
-				
-				
-				/*
-				 * ======================================================
-				 * retriving size from type of correponding op_dat
-				 * declaration
-				 * ======================================================
-				 */
-				
-				SgType * opDatBaseType = parallelLoop.get_OP_DAT_Type ( i );
-				
-				SgExpression * opDatKindSize = getFortranKindOfOpDat ( opDatBaseType );
-				
-				SgExpression * secondParameterMaxCall = buildMultiplyOp (
-				  buildIntVal ( dim ), opDatKindSize );
-				
-				SgExprListExp * actualParameters = buildExprListExp ( 
-				  buildVarRefExp ( CUDAVariable_sharedMemorySize ), 
-					secondParameterMaxCall );
-				
-				SgFunctionCallExp * maxFunctionCall = buildFunctionCallExp ( shiftFunctionSymbol, 
-					actualParameters );
-				
-				FortranStatementsAndExpressionsBuilder::appendAssignmentStatement (
-					CUDAVariable_sharedMemorySize, maxFunctionCall, subroutineScope );
-			}
-		}
-	}
-	
-	/*
-	 * ======================================================
-	 * nshared = nshared * nthreads 
-	 * ======================================================
-	 */
-	SgExpression * multiplyNsharedPerNthreads = buildMultiplyOp (
-    buildVarRefExp ( CUDAVariable_sharedMemorySize ),
-		buildVarRefExp ( CUDAVariable_threadsPerBlock ) );
-	
-	FortranStatementsAndExpressionsBuilder::appendAssignmentStatement (
-		CUDAVariable_sharedMemorySize, multiplyNsharedPerNthreads, subroutineScope );
-	
 
+      string const & variableName = VariablePrefixes::OP_DAT_Name
+          + lexical_cast <string> (i);
 
-	/*
-	 * ======================================================
-	 * 	offsetS = nshared * OP_WARP_SIZE
-	 * ======================================================
-	 */
-	SgExpression * multiplyNsharedPerWarpSize = buildMultiplyOp (
-		buildVarRefExp ( CUDAVariable_sharedMemorySize ), variable_OP_WARP_SIZE );
-	 
-	FortranStatementsAndExpressionsBuilder::appendAssignmentStatement (
-	  CUDAVariable_offsetS, multiplyNsharedPerWarpSize, subroutineScope );
+      string const sizeFieldExpression = variableName + VariableSuffixes::Size;
 
+      SgExpression * sizeVariableField = buildDotExp (buildVarRefExp (
+          localVariables_Others[OtherVariableNames::argsSizes]),
+          buildOpaqueVarRefExp (sizeFieldExpression, subroutineScope));
 
-	
+      SgVarRefExp * varRefExpression = NULL;
+
+      /*
+       * ======================================================
+       * The size value changes for reduction variables
+       * ======================================================
+       */
+
+      if (parallelLoop.isReductionRequiredForSpecificArgument (i) == false)
+      {
+        varRefExpression = buildVarRefExp (localVariables_OP_DAT_Sizes[i]);
+      }
+      else
+      {
+        varRefExpression = buildVarRefExp (
+            reductionVariable_numberOfThreadItems);
+      }
+
+      SgExpression * assignExpression = buildAssignOp (sizeVariableField,
+          varRefExpression);
+
+      appendStatement (buildExprStatement (assignExpression), subroutineScope);
+    }
+  }
 }
 
+void
+HostSubroutineOfDirectLoop::initialiseAllCUDAVariables (
+    ParallelLoop & parallelLoop)
+
+{
+  using SageBuilder::buildOpaqueVarRefExp;
+  using SageBuilder::buildVarRefExp;
+  using SageBuilder::buildIntVal;
+  using SageBuilder::buildExprStatement;
+  using SageBuilder::buildAssignOp;
+  using SageBuilder::buildMultiplyOp;
+  using SageBuilder::buildExprListExp;
+  using SageBuilder::buildFunctionCallExp;
+  using SageInterface::appendStatement;
+
+  SgVarRefExp * variable_OP_WARP_SIZE = buildOpaqueVarRefExp ("OP_WARP_SIZE",
+      subroutineScope);
+
+  /*
+   * ======================================================
+   * initialising fixed value variables nblocks, nthreads
+   * and warpSizeOP2
+   * ======================================================
+   */
+
+  SgExpression * assignExpressionNblocks = buildAssignOp (buildVarRefExp (
+      CUDAVariable_blocksPerGrid), buildIntVal (
+      CUDA::Fortran::DirectLoop::nblocks));
+
+  SgExpression * assignExpressionNthreads = buildAssignOp (buildVarRefExp (
+      CUDAVariable_threadsPerBlock), buildIntVal (
+      CUDA::Fortran::DirectLoop::nthreads));
+
+  SgExpression * assignExpressionWarpSizeOP2 = buildAssignOp (buildVarRefExp (
+      CUDAVariable_warpSizeOP2), variable_OP_WARP_SIZE);
+
+  appendStatement (buildExprStatement (assignExpressionNblocks),
+      subroutineScope);
+  appendStatement (buildExprStatement (assignExpressionNthreads),
+      subroutineScope);
+  appendStatement (buildExprStatement (assignExpressionWarpSizeOP2),
+      subroutineScope);
+
+  /*
+   * ======================================================
+   * Computing value for nshared: an input op_dat is copied
+   * to shared memory only if: its dimension is larger than
+   * 1 or it is not encapsulating a global data.
+   * Therefore, the maximum size of shared memory is
+   * equal to maximum size * dimension op_dat copied on
+   * shared memory, multiplied by the number of threads
+   * ======================================================
+   */
+  for (unsigned int i = 1; i
+      <= parallelLoop.getNumberOf_OP_DAT_ArgumentGroups (); ++i)
+  {
+    if (parallelLoop.isDuplicate_OP_DAT (i) == false)
+    {
+      int dim = parallelLoop.get_OP_DAT_Dimension (i);
+      if (dim > 1 && parallelLoop.get_OP_MAP_Value (i) != GLOBAL)
+      {
+
+        /*
+         * ======================================================
+         * nshared = max ( nshared, size * dim )
+         * ======================================================
+         */
+
+        SgFunctionSymbol * shiftFunctionSymbol =
+            FortranTypesBuilder::buildNewFortranFunction ("max",
+                subroutineScope);
+
+        /*
+         * ======================================================
+         * Retrieving size from type of corresponding OP_DAT
+         * declaration
+         * ======================================================
+         */
+        SgExpression * opDatKindSize =
+            FortranStatementsAndExpressionsBuilder::getFortranKindOf_OP_DAT (
+                parallelLoop.get_OP_DAT_Type (i));
+
+        SgExpression * secondParameterMaxCall = buildMultiplyOp (buildIntVal (
+            dim), opDatKindSize);
+
+        SgExprListExp * actualParameters = buildExprListExp (buildVarRefExp (
+            CUDAVariable_sharedMemorySize), secondParameterMaxCall);
+
+        SgFunctionCallExp * maxFunctionCall = buildFunctionCallExp (
+            shiftFunctionSymbol, actualParameters);
+
+        FortranStatementsAndExpressionsBuilder::appendAssignmentStatement (
+            CUDAVariable_sharedMemorySize, maxFunctionCall, subroutineScope);
+      }
+    }
+  }
+
+  /*
+   * ======================================================
+   * nshared = nshared * nthreads
+   * ======================================================
+   */
+  SgExpression * multiplyNsharedPerNthreads = buildMultiplyOp (buildVarRefExp (
+      CUDAVariable_sharedMemorySize), buildVarRefExp (
+      CUDAVariable_threadsPerBlock));
+
+  FortranStatementsAndExpressionsBuilder::appendAssignmentStatement (
+      CUDAVariable_sharedMemorySize, multiplyNsharedPerNthreads,
+      subroutineScope);
+
+  /*
+   * ======================================================
+   * 	offsetS = nshared * OP_WARP_SIZE
+   * ======================================================
+   */
+  SgExpression * multiplyNsharedPerWarpSize = buildMultiplyOp (buildVarRefExp (
+      CUDAVariable_sharedMemorySize), variable_OP_WARP_SIZE);
+
+  FortranStatementsAndExpressionsBuilder::appendAssignmentStatement (
+      CUDAVariable_offsetS, multiplyNsharedPerWarpSize, subroutineScope);
+}
 
 /*
  * ======================================================
@@ -414,10 +395,9 @@ HostSubroutineOfDirectLoop::initialiseAllCUDAVariables (
 HostSubroutineOfDirectLoop::HostSubroutineOfDirectLoop (
     std::string const & subroutineName,
     UserDeviceSubroutine & userDeviceSubroutine,
-    KernelSubroutine & kernelSubroutine, 
-		DeviceDataSizesDeclarationDirectLoops & deviceDataSizesDeclarationDirectLoops,
-    ParallelLoop & parallelLoop,
-    SgScopeStatement * moduleScope) :
+    KernelSubroutine & kernelSubroutine,
+    DeviceDataSizesDeclarationDirectLoops & deviceDataSizesDeclarationDirectLoops,
+    ParallelLoop & parallelLoop, SgScopeStatement * moduleScope) :
   HostSubroutine (subroutineName, userDeviceSubroutine, parallelLoop,
       moduleScope)
 {
@@ -426,36 +406,34 @@ HostSubroutineOfDirectLoop::HostSubroutineOfDirectLoop (
 
   createFormalParameters (userDeviceSubroutine, parallelLoop);
 
-	createDeviceVariablesSizesVariable ( deviceDataSizesDeclarationDirectLoops );
-	
+  createDeviceVariablesSizesVariable (deviceDataSizesDeclarationDirectLoops);
+
   createDataMarshallingLocalVariables (parallelLoop);
-	
-	createAndAppendIterationVariablesForReduction ( parallelLoop );
-	
+
+  createAndAppendIterationVariablesForReduction (parallelLoop);
+
   createCUDAKernelVariables ();
 
-  createCUDAVariablesDirectLoops ( parallelLoop );
+  createCUDAVariablesDirectLoops (parallelLoop);
 
-	createReductionVariables ( parallelLoop );
+  createReductionVariables (parallelLoop);
 
-	initialiseAllCUDAVariables ( parallelLoop );
-	
+  initialiseAllCUDAVariables (parallelLoop);
+
   initialiseDataMarshallingLocalVariables (parallelLoop);
-	
-	createSupportForReductionVariablesBeforeKernel ( parallelLoop );
-	
-	initialiseDeviceVariablesSizesVariable ( parallelLoop );
-	
+
+  createSupportForReductionVariablesBeforeKernel (parallelLoop);
+
+  initialiseDeviceVariablesSizesVariable (parallelLoop);
+
   createKernelCall (kernelSubroutine, parallelLoop);
 
-	createAndAppendThreadSynchCall ( );
+  createAndAppendThreadSynchCall ();
 
-	createSupportForReductionVariablesAfterKernel ( parallelLoop );
+  createSupportForReductionVariablesAfterKernel (parallelLoop);
 
   copyDataBackFromDeviceAndDeallocate (parallelLoop);
-	
-	Debug::getInstance ()->debugMessage (
-	 "After the creating of the host subroutine", 2);
 
-	
+  Debug::getInstance ()->debugMessage (
+      "After the creating of the host subroutine", 2);
 }
