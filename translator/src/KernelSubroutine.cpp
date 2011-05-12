@@ -127,6 +127,7 @@ KernelSubroutine::createAutosharedVariable (ParallelLoop & parallelLoop,
 
       if (isRealType != NULL)
         autosharedType = opDatBaseType;
+
     }
   }
 
@@ -148,7 +149,7 @@ KernelSubroutine::createAutosharedVariable (ParallelLoop & parallelLoop,
                 upperBound), scopeStatement);
 
     localVariables_autoshared->get_declarationModifier ().get_typeModifier ().setShared ();
-  }
+	}
 }
 
 void

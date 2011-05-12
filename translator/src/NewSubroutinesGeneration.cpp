@@ -171,7 +171,7 @@ NewSubroutinesGeneration::addLibraries (SgModuleStatement * moduleStatement)
   vector <string> libs;
   libs.push_back ("ISO_C_BINDING");
   libs.push_back ("OP2_C");
-  //  libs.push_back ("cudaConfigurationParams");
+  libs.push_back ("cudaConfigurationParams");
   libs.push_back ("cudafor");
 
   for (vector <string>::const_iterator it = libs.begin (); it != libs.end (); ++it)
@@ -493,15 +493,25 @@ NewSubroutinesGeneration::visit (SgNode * node)
                  * ======================================================
                  */
 
+                Debug::getInstance ()->debugMessage ("Creating Constants", 2);
+
+
                 InitialiseConstantsSubroutine * initialiseConstantsSubroutine =
                     new InitialiseConstantsSubroutine (userSubroutineName);
 
+                Debug::getInstance ()->debugMessage ("Declaring them", 2);
+								
                 initialiseConstantsSubroutine->declareConstants (moduleScope);
 
                 addContains (moduleStatement);
 
+                Debug::getInstance ()->debugMessage ("Creating Subroutine to initialise Constants", 2);
+
                 initialiseConstantsSubroutine->generateSubroutineForAlreadyComputedValues (
                     moduleScope);
+
+                Debug::getInstance ()->debugMessage ("Finished with Constants", 2);
+
 
                 /*
                  * ======================================================

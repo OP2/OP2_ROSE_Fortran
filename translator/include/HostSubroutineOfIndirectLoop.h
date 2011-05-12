@@ -13,6 +13,16 @@
 #include <InitialiseConstantsSubroutine.h>
 #include <DeviceDataSizesDeclaration.h>
 
+/*
+ * ======================================================
+ * Macros used to initilise the inds generation mapping
+ * ======================================================
+ */
+
+#define INDS_UNDEF -2
+#define NO_INDS -1
+#define IND_VALS_BASE 0
+
 class HostSubroutineOfIndirectLoop: public HostSubroutine
 {
   private:

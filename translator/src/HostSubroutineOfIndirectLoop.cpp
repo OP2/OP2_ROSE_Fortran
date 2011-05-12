@@ -1209,6 +1209,7 @@ HostSubroutineOfIndirectLoop::createExecutionPlanStatements (
   using SageInterface::appendStatement;
   using std::string;
   using std::vector;
+	using std::make_pair;
 
   for (unsigned int i = 1; i
       <= parallelLoop.getNumberOf_OP_DAT_ArgumentGroups (); ++i)
@@ -1310,6 +1311,28 @@ HostSubroutineOfIndirectLoop::createExecutionPlanStatements (
     appendStatement (assignmentStatement, subroutineScope);
   }
 
+	/*
+   * ======================================================
+   * Set up a mapping between opdat names and idx values
+	 * At the beginning all is set to INDS_UNDEF
+   * ======================================================
+   */	
+	std::map < std::string, int > indsValuesPerOPDat;
+  for (unsigned int i = 1; i
+			 <= parallelLoop.getNumberOf_OP_DAT_ArgumentGroups (); ++i)
+	{
+		indsValuesPerOPDat.insert ( make_pair (
+		  parallelLoop.get_OP_DAT_VariableName ( i ) ,
+			INDS_UNDEF ) );
+	}
+
+	/*
+   * ======================================================
+   * Must start at Mike-define value...
+   * ======================================================
+   */		
+	unsigned int indValuesGenerator = IND_VALS_BASE;
+	
   for (unsigned int i = 1; i
       <= parallelLoop.getNumberOf_OP_DAT_ArgumentGroups (); ++i)
   {
@@ -1325,11 +1348,21 @@ HostSubroutineOfIndirectLoop::createExecutionPlanStatements (
 
     if (parallelLoop.get_OP_MAP_Value (i) == DIRECT)
     {
-      rhsExpression = buildIntVal (-1);
+      rhsExpression = buildIntVal ( NO_INDS );
+			indsValuesPerOPDat[parallelLoop.get_OP_DAT_VariableName ( i )] = NO_INDS;
     }
     else
     {
-      rhsExpression = buildIntVal (0);
+			if ( indsValuesPerOPDat[parallelLoop.get_OP_DAT_VariableName ( i )] == INDS_UNDEF )
+			{
+				rhsExpression = buildIntVal ( indValuesGenerator );
+				indsValuesPerOPDat[parallelLoop.get_OP_DAT_VariableName ( i )] = indValuesGenerator;
+				indValuesGenerator++;
+			}
+			else
+			{
+				rhsExpression = buildIntVal ( indsValuesPerOPDat[parallelLoop.get_OP_DAT_VariableName ( i )] );
+			}
     }
 
     SgExpression * assignmentExpression = buildAssignOp (arrayIndexExpression,

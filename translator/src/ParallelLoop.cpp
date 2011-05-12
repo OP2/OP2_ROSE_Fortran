@@ -275,6 +275,24 @@ ParallelLoop::getNumberOfIndirectDataSets ()
   return numberOfIndirectDatasets;
 }
 
+int
+ParallelLoop::getNumberOfDifferentIndirectDataSets ()
+{
+  int numberOfDifferentIndirectDatasets = 0;
+	
+  for (unsigned int i = 1; i <= getNumberOf_OP_DAT_ArgumentGroups (); ++i)
+  {
+    if (OP_DAT_MappingDescriptors[i] == INDIRECT &&
+		    isDuplicate_OP_DAT (i) == false )
+    {
+      numberOfDifferentIndirectDatasets++;
+    }
+  }
+	
+  return numberOfDifferentIndirectDatasets;
+}
+
+
 bool
 ParallelLoop::isReductionRequired ()
 {

@@ -109,16 +109,20 @@ namespace IndirectLoop
        * ======================================================
        */
 
-      std::string const air_const = "_air_const";
-      std::string const alpha = "_alpha";
-      std::string const cfl = "_cfl";
-      std::string const eps = "_eps";
-      std::string const gam = "_gam";
-      std::string const gm1 = "_gm1";
-      std::string const mach = "_mach";
-      std::string const qinf = "_qinf";
+      std::string const air_const = "air_const";
+      std::string const alpha = "alpha";
+      std::string const cfl = "cfl";
+      std::string const eps = "eps";
+      std::string const gam = "gam";
+      std::string const gm1 = "gm1";
+      std::string const mach = "mach";
+      std::string const qinf = "qinf";
     }
 
+    namespace StringSeparator
+    {
+		 std::string const constantsSeparator = "_";
+		}
     namespace PlanFunction
     {
       /*

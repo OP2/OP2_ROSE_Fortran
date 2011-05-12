@@ -255,6 +255,7 @@ UserDeviceSubroutine::copyAndModifySubroutine (SgScopeStatement * moduleScope,
           for (itBefore = namesBefore.begin (), itAfter = namesAfter.begin (); itBefore
               != namesBefore.end (), itAfter != namesAfter.end (); itBefore++, itAfter++)
           {
+
             if ((*itBefore)
                 == isVarRefExp->get_symbol ()->get_name ().getString ())
             {

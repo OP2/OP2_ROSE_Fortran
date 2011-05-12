@@ -362,6 +362,18 @@ HostSubroutineOfDirectLoop::initialiseAllCUDAVariables (
 
   /*
    * ======================================================
+   * 	offsetS = nshared * OP_WARP_SIZE
+   * ======================================================
+   */
+  SgExpression * multiplyNsharedPerWarpSize = buildMultiplyOp (buildVarRefExp (
+		CUDAVariable_sharedMemorySize), variable_OP_WARP_SIZE);
+	
+  FortranStatementsAndExpressionsBuilder::appendAssignmentStatement (
+		CUDAVariable_offsetS, multiplyNsharedPerWarpSize, subroutineScope);
+	
+
+  /*
+   * ======================================================
    * nshared = nshared * nthreads
    * ======================================================
    */
@@ -373,16 +385,6 @@ HostSubroutineOfDirectLoop::initialiseAllCUDAVariables (
       CUDAVariable_sharedMemorySize, multiplyNsharedPerNthreads,
       subroutineScope);
 
-  /*
-   * ======================================================
-   * 	offsetS = nshared * OP_WARP_SIZE
-   * ======================================================
-   */
-  SgExpression * multiplyNsharedPerWarpSize = buildMultiplyOp (buildVarRefExp (
-      CUDAVariable_sharedMemorySize), variable_OP_WARP_SIZE);
-
-  FortranStatementsAndExpressionsBuilder::appendAssignmentStatement (
-      CUDAVariable_offsetS, multiplyNsharedPerWarpSize, subroutineScope);
 }
 
 /*

@@ -12,6 +12,235 @@
  * ======================================================
  */
 
+
+void
+KernelSubroutineOfIndirectLoop::applyPointeredIncrementsOrWrites (
+	ParallelLoop & parallelLoop )
+{
+	using SageBuilder::buildOpaqueVarRefExp;
+	using SageBuilder::buildDotExp;
+	using SageBuilder::buildVarRefExp;
+	using SageBuilder::buildIntVal;
+	using SageBuilder::buildMultiplyOp;
+	using SageBuilder::buildAssignOp;
+	using SageBuilder::buildAddOp;
+	using SageBuilder::buildExprListExp;
+	using SageBuilder::buildFunctionCallExp;
+	using SageBuilder::buildPntrArrRefExp;
+	using SageBuilder::buildDivideOp;
+	using SageBuilder::buildBasicBlock;
+	using SageBuilder::buildExprStatement;
+	using SageInterface::appendStatement;
+
+	SgVarRefExp * variable_X_Reference1 = buildOpaqueVarRefExp (
+		CUDA::Fortran::FieldNames::x, subroutineScope);
+	
+	SgVarRefExp * variable_Threadidx_Reference1 = buildOpaqueVarRefExp (
+		CUDA::Fortran::VariableNames::threadidx, subroutineScope);
+	
+	SgDotExp * threadidxDotX = buildDotExp (variable_Threadidx_Reference1,
+		variable_X_Reference1);
+	
+	unsigned int pindOffsOffset = 0;
+	
+	for ( unsigned int i = 1; 
+			  i <= parallelLoop.getNumberOf_OP_DAT_ArgumentGroups (); ++i)
+  {
+    if ( parallelLoop.isDuplicate_OP_DAT (i) == false
+        && parallelLoop.get_OP_MAP_Value (i) == INDIRECT )
+		{
+			if ( parallelLoop.get_OP_Access_Value ( i ) == WRITE_ACCESS ||
+					 parallelLoop.get_OP_Access_Value ( i ) == RW_ACCESS ||
+					 parallelLoop.get_OP_Access_Value ( i ) == INC_ACCESS )
+			{
+			
+				/*
+				 * ======================================================
+				 * Defining lower and upper bounds, and increment
+				 * ======================================================
+				 */
+			
+			  SgVarRefExp * iterationVarIncWrVarsRef = buildVarRefExp ( 
+					localVariables_Others[IndirectLoop::Fortran::KernelSubroutine::VariableNames::iterationCounter] );
+
+				SgVarRefExp * indArgSize_Reference2 = buildVarRefExp (
+					localVariables_indArgSizes[i] );
+				
+				SgMultiplyOp * upperBoundUpdateIncWrVars = buildMultiplyOp (
+					indArgSize_Reference2, buildIntVal ( parallelLoop.get_OP_DAT_Dimension ( i ) ) );
+				
+				SgExpression * lowerBoundUpdateIncWrVars =
+					buildAssignOp ( iterationVarIncWrVarsRef, threadidxDotX );
+			
+				SgExpression * incrementVarIncrWrVars = buildAddOp ( iterationVarIncWrVarsRef,
+					buildDotExp (
+					  buildOpaqueVarRefExp ( CUDA::Fortran::VariableNames::blockdim, subroutineScope ),
+						buildOpaqueVarRefExp ( CUDA::Fortran::FieldNames::x, subroutineScope ) ) );
+			
+				/*
+				 * ======================================================
+				 * Defining moduled variable assignment
+				 * ======================================================
+				 */
+
+				SgVarRefExp
+				* moduled_Reference3 =
+				buildVarRefExp (
+					localVariables_Others[IndirectLoop::Fortran::KernelSubroutine::VariableNames::moduled]);
+				
+        SgFunctionSymbol * modFunctionSymbol =
+				FortranTypesBuilder::buildNewFortranFunction ( "mod",
+					subroutineScope );
+				
+        SgExprListExp * modActualParameters = buildExprListExp (
+					iterationVarIncWrVarsRef, buildIntVal (
+						parallelLoop.get_OP_DAT_Dimension ( i ) ) );
+				
+        SgFunctionCallExp * modFunctionCall = buildFunctionCallExp (
+					modFunctionSymbol, modActualParameters );
+				
+        SgAssignOp * assignmentExpressionModuled = buildAssignOp (moduled_Reference3,
+						modFunctionCall); 
+							
+				
+				/*
+				 * ======================================================
+				 * Defining device variable accessing expressions
+				 * ======================================================
+				 */
+
+				
+				SgVarRefExp
+				* blockId_Reference4 =
+				buildVarRefExp (
+					localVariables_Others[IndirectLoop::Fortran::KernelSubroutine::VariableNames::blockID]);
+				
+        SgVarRefExp
+				* pindOffs_Reference4 =
+				buildVarRefExp (
+					formalParameters_PlanVariables[IndirectLoop::Fortran::PlanFunction::VariableNames::pindOffs]);
+				
+        SgMultiplyOp * multiplyExpression4_a = buildMultiplyOp (
+					blockId_Reference4, 
+					buildIntVal ( parallelLoop.getNumberOfDifferentIndirectDataSets () ) );
+				
+        SgAddOp * addExpression4_a = buildAddOp (buildIntVal ( pindOffsOffset ),
+					multiplyExpression4_a);
+				
+        SgPntrArrRefExp * arrayIndexExpression4_a = buildPntrArrRefExp (
+					pindOffs_Reference4, addExpression4_a);
+				
+        SgVarRefExp
+				* iterationCounter_Reference4_a =
+				buildVarRefExp (
+					localVariables_Others[IndirectLoop::Fortran::KernelSubroutine::VariableNames::iterationCounter]);
+				
+        SgDivideOp * divideExpression4 = buildDivideOp (
+					iterationCounter_Reference4_a, buildIntVal (
+						parallelLoop.get_OP_DAT_Dimension (i)));
+				
+        SgAddOp * addExpression4_b = buildAddOp (arrayIndexExpression4_a,
+					divideExpression4);
+				
+        SgAddOp * addExpression4_c = buildAddOp (buildIntVal (0),
+					addExpression4_b);
+				
+        SgVarRefExp * pindMaps_Reference4 = buildVarRefExp (
+					formalParameters_LocalToGlobalMapping[i]);
+				
+        SgPntrArrRefExp * arrayIndexExpression4_b = buildPntrArrRefExp (
+					pindMaps_Reference4, addExpression4_c);
+				
+        SgMultiplyOp * multiplyExpression4_b = buildMultiplyOp (
+					arrayIndexExpression4_b, buildIntVal ( parallelLoop.get_OP_DAT_Dimension ( i ) ) );
+				
+        SgVarRefExp
+				* moduled_Reference =
+				buildVarRefExp (
+					localVariables_Others[IndirectLoop::Fortran::KernelSubroutine::VariableNames::moduled]);
+				
+        SgAddOp * addExpression4_d = buildAddOp (moduled_Reference,
+					multiplyExpression4_b);
+				
+        SgVarRefExp * OP_DAT_Reference4 = buildVarRefExp (
+					formalParameter_OP_DATs[i]);
+				
+        SgPntrArrRefExp * deviceVarField = buildPntrArrRefExp (
+					OP_DAT_Reference4, addExpression4_d);
+				
+				/*
+				 * ======================================================
+				 * Defining autoshared variable accessing expressions
+				 * ======================================================
+				 */
+								
+				SgVarRefExp * autoshared_Reference4 = buildVarRefExp (
+					localVariables_Others[OtherVariableNames::autoshared]);
+				
+        SgVarRefExp
+				* iterationCounter_Reference4 =
+				buildVarRefExp (
+					localVariables_Others[IndirectLoop::Fortran::KernelSubroutine::VariableNames::iterationCounter]);
+				
+        SgVarRefExp * nbytes_Reference4 = buildVarRefExp (
+					localVariables_nbytes[i]);
+				
+        SgAddOp * addExpression4 = buildAddOp (nbytes_Reference4,
+					iterationCounter_Reference4);
+				
+        SgPntrArrRefExp * autosharedVarField = buildPntrArrRefExp (
+					autoshared_Reference4, addExpression4);
+
+				SgAssignOp * actualUpdate = NULL;
+				
+				if ( parallelLoop.get_OP_Access_Value ( i ) == INC_ACCESS )
+				{
+					/*
+					 * ======================================================
+					 * Increment Statement
+					 * ======================================================
+					 */
+				
+					actualUpdate = buildAssignOp ( deviceVarField,
+					 buildAddOp ( deviceVarField, autosharedVarField ) );
+				}
+
+				if ( parallelLoop.get_OP_Access_Value ( i ) == WRITE_ACCESS ||
+				     parallelLoop.get_OP_Access_Value ( i ) == RW_ACCESS )
+				{
+					/*
+					 * ======================================================
+					 * Write or ReadWrite Statement
+					 * ======================================================
+					 */
+					
+					actualUpdate = buildAssignOp ( deviceVarField, autosharedVarField );				
+				}				
+
+				/*
+				 * ======================================================
+				 * Defining loop body and loop
+				 * ======================================================
+				 */				
+			
+				SgBasicBlock * loopBodyUpdateIncWrVars = buildBasicBlock (
+				  buildExprStatement ( assignmentExpressionModuled ),
+				  buildExprStatement ( actualUpdate ) );
+			
+				SgFortranDo * updateIncrWrVars =
+				FortranStatementsAndExpressionsBuilder::buildFortranDoStatement (
+					lowerBoundUpdateIncWrVars, upperBoundUpdateIncWrVars,
+					incrementVarIncrWrVars, loopBodyUpdateIncWrVars );
+			
+				
+				appendStatement ( updateIncrWrVars, subroutineScope );
+			
+			}
+			pindOffsOffset++;
+		}
+	}	
+}
+
 void
 KernelSubroutineOfIndirectLoop::createPlanWhileLoop (
     UserDeviceSubroutine & userDeviceSubroutine, ParallelLoop & parallelLoop)
@@ -622,7 +851,8 @@ KernelSubroutineOfIndirectLoop::createAutosharedWhileLoops (
                     formalParameters_PlanVariables[IndirectLoop::Fortran::PlanFunction::VariableNames::pindOffs]);
 
         SgMultiplyOp * multiplyExpression4_a = buildMultiplyOp (
-            blockId_Reference4, buildIntVal (4));
+            blockId_Reference4, 
+						buildIntVal ( parallelLoop.getNumberOfDifferentIndirectDataSets () ) );
 
         SgAddOp * addExpression4_a = buildAddOp (buildIntVal (pindOffsOffset),
             multiplyExpression4_a);
@@ -1505,12 +1735,24 @@ KernelSubroutineOfIndirectLoop::create_OP_DAT_FormalParameters (
 
       SgSubtractOp * upperBoundExpression = buildSubtractOp (
           fieldSelectionExpression, buildIntVal (1));
-
+			
+			/*
+			 * ======================================================
+			 * The base type of an op_dat must always be an array
+			 * ======================================================
+			 */
+			
+			SgType * opdatType = parallelLoop.get_OP_DAT_Type (i);
+			
+			SgArrayType * baseArrayType = isSgArrayType ( opdatType );
+			
+			ROSE_ASSERT ( baseArrayType != NULL );
+			
       SgVariableDeclaration * variableDeclaration = buildVariableDeclaration (
           variableName,
           FortranTypesBuilder::getArray_RankOne_WithLowerAndUpperBounds (
-              parallelLoop.get_OP_DAT_Type (i), lowerBoundExpression,
-              upperBoundExpression), NULL, subroutineScope);
+              baseArrayType->get_base_type(), lowerBoundExpression,
+              upperBoundExpression), NULL, subroutineScope);			
 
       variableDeclaration->get_declarationModifier ().get_accessModifier ().setUndefined ();
       variableDeclaration->get_declarationModifier ().get_typeModifier ().setDevice ();
@@ -1692,4 +1934,6 @@ KernelSubroutineOfIndirectLoop::KernelSubroutineOfIndirectLoop (
   createAutosharedWhileLoops (parallelLoop);
 
   createPlanWhileLoop (userDeviceSubroutine, parallelLoop);
+	
+	applyPointeredIncrementsOrWrites ( parallelLoop );
 }

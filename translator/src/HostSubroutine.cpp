@@ -312,6 +312,9 @@ void
 HostSubroutine::createCUDAKernelVariables ()
 {
   using SageBuilder::buildVariableDeclaration;
+  using SageBuilder::buildIntVal;
+	using SageBuilder::buildIntType;
+	using SageBuilder::buildAssignInitializer;
   using SageInterface::appendStatement;
   using std::string;
 
@@ -329,7 +332,9 @@ HostSubroutine::createCUDAKernelVariables ()
 
   CUDAVariable_sharedMemorySize = buildVariableDeclaration (
       CUDAVariable_sharedMemorySizeVariableName,
-      FortranTypesBuilder::getFourByteInteger (), NULL, subroutineScope);
+      FortranTypesBuilder::getFourByteInteger (), 
+			buildAssignInitializer (buildIntVal (0), buildIntType ()),
+			subroutineScope );
 
   CUDAVariable_blocksPerGrid->get_declarationModifier ().get_accessModifier ().setUndefined ();
   CUDAVariable_threadsPerBlock->get_declarationModifier ().get_accessModifier ().setUndefined ();

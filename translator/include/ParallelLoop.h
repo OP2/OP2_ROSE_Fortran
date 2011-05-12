@@ -178,6 +178,9 @@ class ParallelLoop
     int
     getNumberOfIndirectDataSets ();
 
+		int
+		getNumberOfDifferentIndirectDataSets ();
+
     bool
     isReductionRequired ();
 

@@ -107,10 +107,14 @@ ReductionSubroutine::createLocalVariables ()
    * ======================================================
    */
 
+	SgExpression * upperBound = new SgAsteriskShapeExp (
+		ROSEHelper::getFileInfo ());
+
   localVariables_autoshared
       = FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
           OtherVariableNames::autoshared,
-          reductionVariableType->get_base_type (), subroutineScope);
+					FortranTypesBuilder::getArray_RankOne ( reductionVariableType->get_base_type (), 0,
+					upperBound), subroutineScope );
 
   localVariables_autoshared->get_declarationModifier ().get_typeModifier ().setShared ();
 
