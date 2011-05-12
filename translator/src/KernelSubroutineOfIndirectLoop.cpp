@@ -654,10 +654,10 @@ KernelSubroutineOfIndirectLoop::createAutosharedWhileLoops (
       SgVarRefExp * variable_X_Reference5 = buildOpaqueVarRefExp (
           variableName_x, subroutineScope);
 
-      SgVarRefExp * variable_Threadidx_Reference5 = buildOpaqueVarRefExp (
-          variableName_threadidx, subroutineScope);
+      SgVarRefExp * variable_BlockDim_Reference5 = buildOpaqueVarRefExp (
+          variableName_blockdim, subroutineScope);
 
-      SgDotExp * dotExpression5 = buildDotExp (variable_Threadidx_Reference5,
+      SgDotExp * dotExpression5 = buildDotExp (variable_BlockDim_Reference5,
           variable_X_Reference5);
 
       SgAddOp * addExpression5 = buildAddOp (iterationCounter_Reference5_RHS,
@@ -824,6 +824,7 @@ KernelSubroutineOfIndirectLoop::createThreadZeroStatements (
   using SageBuilder::buildIntVal;
   using SageBuilder::buildBasicBlock;
   using SageBuilder::buildAssignStatement;
+	using SageBuilder::buildDivideOp;
   using SageInterface::appendStatement;
 
   /*
@@ -870,8 +871,9 @@ KernelSubroutineOfIndirectLoop::createThreadZeroStatements (
   SgVarRefExp * x_Reference1 = buildOpaqueVarRefExp (variableName_x,
       subroutineScope);
 
-  SgSubtractOp * subtractExpression1 = buildSubtractOp (buildDotExp (
-      blockidx_Reference1, x_Reference1), buildIntVal (1));
+	SgDotExp * blockIdxDotX = buildDotExp ( blockidx_Reference1, x_Reference1 );
+
+  SgSubtractOp * subtractExpression1 = buildSubtractOp ( blockIdxDotX, buildIntVal (1) );
 
   SgAddOp * arrayIndexExpression1 = buildAddOp (subtractExpression1,
       blockOffset_Reference1);
@@ -932,14 +934,63 @@ KernelSubroutineOfIndirectLoop::createThreadZeroStatements (
 
   /*
    * ======================================================
-   * 4th statement
+   * 4th statement: assignment of nelems2
+   * ======================================================
+   */
+	
+	SgVarRefExp * pNelems2_Reference3 = buildOpaqueVarRefExp (
+		variableName_nelems2, subroutineScope);
+
+	
+	SgVarRefExp * blockdim_Reference1 = buildOpaqueVarRefExp (
+		variableName_blockdim, subroutineScope);
+		
+	SgDotExp * blockdimxDotX = buildDotExp ( blockdim_Reference1, x_Reference1 );
+
+	SgExpression * nelem2InitSubExpr = buildAddOp ( buildIntVal ( 1 ),
+		buildDivideOp ( buildSubtractOp ( nelem_Reference2, buildIntVal ( 1 ) ),
+		  blockdimxDotX ) );
+	
+	SgExpression * nelem2InitExpr = buildMultiplyOp ( blockdimxDotX , nelem2InitSubExpr );
+	
+	SgStatement * initNelems2 = buildAssignStatement ( pNelems2_Reference3,
+		nelem2InitExpr );
+	
+	ifBlock->append_statement ( initNelems2 );
+
+	
+	/*
+   * ======================================================
+   * 5th statement: assignment of ncolor
+   * ======================================================
+   */
+	
+	SgVarRefExp * pNcolor_Reference3 = buildOpaqueVarRefExp (
+		variableName_ncolor, subroutineScope);
+
+	SgVarRefExp * pnthrcol_Reference = buildOpaqueVarRefExp (
+		PlanFunctionVariables::pnthrcol, subroutineScope);
+
+	
+	SgPntrArrRefExp * pncolorsOfBlockid = buildPntrArrRefExp ( pnthrcol_Reference ,
+		blockID_Reference3);
+
+	
+	SgStatement * initNcolor = buildAssignStatement ( pNcolor_Reference3,
+		pncolorsOfBlockid );
+	
+	ifBlock->append_statement ( initNcolor );	
+
+  /*
+   * ======================================================
+   * assignment of ind_arg_size variables
    * ======================================================
    */
 
   unsigned int pindSizesArrayOffset = 0;
 
   for (unsigned int i = 1; i
-      <= parallelLoop.getNumberOf_OP_DAT_ArgumentGroups (); ++i, ++pindSizesArrayOffset)
+      <= parallelLoop.getNumberOf_OP_DAT_ArgumentGroups (); ++i )
   {
     if (parallelLoop.isDuplicate_OP_DAT (i) == false
         && parallelLoop.get_OP_MAP_Value (i) == INDIRECT)
@@ -965,6 +1016,8 @@ KernelSubroutineOfIndirectLoop::createThreadZeroStatements (
           arrayExpression4);
 
       ifBlock->append_statement (statement4);
+
+			++pindSizesArrayOffset;
     }
   }
 
@@ -1160,7 +1213,7 @@ KernelSubroutineOfIndirectLoop::createSharedLocalVariables (
           subroutineScope);
 
       variableDeclaration->get_declarationModifier ().get_accessModifier ().setUndefined ();
-      //variableDeclaration->get_declarationModifier ().get_accessModifier ().setShared ();
+      variableDeclaration->get_declarationModifier ().get_typeModifier ().setShared ();
 
       appendStatement (variableDeclaration, subroutineScope);
 
@@ -1183,8 +1236,7 @@ KernelSubroutineOfIndirectLoop::createSharedLocalVariables (
         *it, FortranTypesBuilder::getFourByteInteger (), NULL, subroutineScope);
 
     variableDeclaration->get_declarationModifier ().get_accessModifier ().setUndefined ();
-
-    //variableDeclaration->get_declarationModifier ().get_accessModifier ().setShared ();
+		variableDeclaration->get_declarationModifier ().get_typeModifier ().setShared ();
 
     appendStatement (variableDeclaration, subroutineScope);
 

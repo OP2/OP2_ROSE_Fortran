@@ -111,7 +111,7 @@ DeviceDataSizesDeclaration::addFields (ParallelLoop & parallelLoop,
 
   vector <string> planFunctionSizeVariables;
   planFunctionSizeVariables.push_back (PlanFunctionSizeVariables::pblkMapSize);
-  planFunctionSizeVariables.push_back (PlanFunctionSizeVariables::pindMapsSize);
+//  planFunctionSizeVariables.push_back (PlanFunctionSizeVariables::pindMapsSize);
   planFunctionSizeVariables.push_back (PlanFunctionSizeVariables::pindOffsSize);
   planFunctionSizeVariables.push_back (PlanFunctionSizeVariables::pindSizesSize);
   planFunctionSizeVariables.push_back (PlanFunctionSizeVariables::pnelemsSize);
