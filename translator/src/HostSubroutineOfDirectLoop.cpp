@@ -2,7 +2,6 @@
 #include <HostSubroutineOfDirectLoop.h>
 #include <FortranTypesBuilder.h>
 #include <FortranStatementsAndExpressionsBuilder.h>
-#include <OP2CUDAConstants.h>
 #include <ROSEHelper.h>
 #include <Debug.h>
 

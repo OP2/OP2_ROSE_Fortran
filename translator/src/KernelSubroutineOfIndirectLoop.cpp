@@ -33,6 +33,7 @@ KernelSubroutineOfIndirectLoop::createPlanWhileLoop (
   using SageBuilder::buildWhileStmt;
   using SageBuilder::buildExprListExp;
   using SageBuilder::buildFunctionCallExp;
+	using SageBuilder::buildAssignStatement;
   using SageInterface::appendStatement;
 
   SgVarRefExp
@@ -420,6 +421,25 @@ KernelSubroutineOfIndirectLoop::createPlanWhileLoop (
 
   loopBodyNestingLevel1->append_statement (loopStatementNestingLevel2);
 
+
+  /*
+   * ======================================================
+   * Increment of iteration variable in nesting level 1
+   * ======================================================
+   */
+
+  SgVarRefExp * iterationVarNesting1Ref =	buildVarRefExp ( 
+	  localVariables_Others[IndirectLoop::Fortran::KernelSubroutine::VariableNames::iterationCounter] );
+
+	SgStatement * incrementIterationVariableNesting1 =
+		buildAssignStatement ( iterationVarNesting1Ref,
+		  buildAddOp ( iterationVarNesting1Ref,
+				buildDotExp (
+				  buildOpaqueVarRefExp ( CUDA::Fortran::VariableNames::blockdim, subroutineScope ),
+					buildOpaqueVarRefExp ( CUDA::Fortran::FieldNames::x, subroutineScope ) ) ) );
+																				 
+  loopBodyNestingLevel1->append_statement ( incrementIterationVariableNesting1 );	
+
   /*
    * ======================================================
    * While loop guard
@@ -706,10 +726,10 @@ KernelSubroutineOfIndirectLoop::createAutosharedWhileLoops (
           CUDA::Fortran::FieldNames::x, subroutineScope);
 
       SgVarRefExp * variable_BlockDim_Reference5 = buildOpaqueVarRefExp (
-          variableName_blockdim, subroutineScope);
+          CUDA::Fortran::VariableNames::blockdim, subroutineScope);
 
       SgDotExp * dotExpression5 = buildDotExp (variable_BlockDim_Reference5,
-          variable_X_Reference5);
+         variable_X_Reference5);
 
       SgAddOp * addExpression5 = buildAddOp (iterationCounter_Reference5_RHS,
           dotExpression5);
@@ -902,9 +922,11 @@ KernelSubroutineOfIndirectLoop::createThreadZeroStatements (
   SgVarRefExp * x_Reference = buildOpaqueVarRefExp (
       CUDA::Fortran::FieldNames::x, subroutineScope);
 
-  SgEqualityOp * ifGuardExpression = buildEqualityOp (buildDotExp (
-      threadidx_Reference, x_Reference), buildIntVal (0));
-
+  SgEqualityOp * ifGuardExpression = buildEqualityOp (
+	  buildSubtractOp ( buildDotExp ( threadidx_Reference, x_Reference),
+			buildIntVal ( 1 ) ),
+		buildIntVal (0) );
+		
   /*
    * ======================================================
    * 1st statement
@@ -1008,11 +1030,11 @@ KernelSubroutineOfIndirectLoop::createThreadZeroStatements (
    */
 	
 	SgVarRefExp * pNelems2_Reference3 = buildOpaqueVarRefExp (
-		variableName_nelems2, subroutineScope);
+		IndirectLoop::Fortran::KernelSubroutine::VariableNames::nelems2, subroutineScope);
 
 	
 	SgVarRefExp * blockdim_Reference1 = buildOpaqueVarRefExp (
-		variableName_blockdim, subroutineScope);
+		CUDA::Fortran::VariableNames::blockdim, subroutineScope);
 		
 	SgDotExp * blockdimxDotX = buildDotExp ( blockdim_Reference1, x_Reference1 );
 
@@ -1035,10 +1057,10 @@ KernelSubroutineOfIndirectLoop::createThreadZeroStatements (
    */
 	
 	SgVarRefExp * pNcolor_Reference3 = buildOpaqueVarRefExp (
-		variableName_ncolor, subroutineScope);
+		IndirectLoop::Fortran::KernelSubroutine::VariableNames::ncolor, subroutineScope);
 
 	SgVarRefExp * pnthrcol_Reference = buildOpaqueVarRefExp (
-		PlanFunctionVariables::pnthrcol, subroutineScope);
+		IndirectLoop::Fortran::PlanFunction::VariableNames::pnthrcol, subroutineScope);
 
 	
 	SgPntrArrRefExp * pncolorsOfBlockid = buildPntrArrRefExp ( pnthrcol_Reference ,
