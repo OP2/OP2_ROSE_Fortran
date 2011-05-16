@@ -299,12 +299,19 @@ HostSubroutineOfDirectLoop::initialiseAllCUDAVariables (
   SgExpression * assignExpressionWarpSizeOP2 = buildAssignOp (buildVarRefExp (
       CUDAVariable_warpSizeOP2), variable_OP_WARP_SIZE);
 
+  SgExpression * assignExpressionSharedMemorySize = buildAssignOp ( buildVarRefExp (
+		CUDAVariable_sharedMemorySize ), buildIntVal ( 0 ) );
+
+
   appendStatement (buildExprStatement (assignExpressionNblocks),
       subroutineScope);
   appendStatement (buildExprStatement (assignExpressionNthreads),
       subroutineScope);
   appendStatement (buildExprStatement (assignExpressionWarpSizeOP2),
       subroutineScope);
+			
+	appendStatement ( buildExprStatement ( assignExpressionSharedMemorySize ),
+	  subroutineScope );
 
   /*
    * ======================================================

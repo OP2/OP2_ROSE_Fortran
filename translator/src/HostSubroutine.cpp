@@ -263,20 +263,7 @@ HostSubroutine::createDataMarshallingLocalVariables (
 			SgArrayType * isArrayType = isSgArrayType ( opdatType );
 			ROSE_ASSERT ( isArrayType != NULL );
 			
-//			SgVariableDeclaration * variableDeclaration = buildVariableDeclaration (
-//				variableName, isArrayType, NULL,
-//				subroutineScope);
-
-//      SgVariableDeclaration * variableDeclaration = buildVariableDeclaration (
-//          variableName, buildPointerType (
-//              FortranTypesBuilder::getArray_RankOne (
-//							 FortranTypesBuilder::getDoublePrecisionFloat () ) ),
-//							NULL,
-//          subroutineScope);
-			
-			
-//FortranTypesBuilder::getDoublePrecisionFloat ()
-      SgVariableDeclaration * variableDeclaration = buildVariableDeclaration (
+			SgVariableDeclaration * variableDeclaration = buildVariableDeclaration (
           variableName, buildPointerType ( isArrayType ),
 							NULL,
           subroutineScope );

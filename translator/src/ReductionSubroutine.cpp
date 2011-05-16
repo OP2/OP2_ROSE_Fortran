@@ -157,6 +157,7 @@ ReductionSubroutine::createStatements ()
   using SageBuilder::buildExprListExp;
   using SageBuilder::buildFunctionCallExp;
   using SageBuilder::buildFunctionCallStmt;
+	using SageBuilder::buildLessThanOp;
   using SageBuilder::buildGreaterThanOp;
   using SageBuilder::buildBasicBlock;
   using SageBuilder::buildWhileStmt;
@@ -267,8 +268,9 @@ ReductionSubroutine::createStatements ()
   SgExpression * mainLoopCondition = buildGreaterThanOp (buildVarRefExp (
       localVariables_IterationCounter), buildIntVal (0));
 
-  SgExpression * ifGuardExpression = buildGreaterThanOp (buildVarRefExp (
-      localVariables_IterationCounter), buildIntVal (0));
+  SgExpression * ifGuardExpression = buildLessThanOp (
+	  buildVarRefExp ( localVariables_threadID ),
+	  buildVarRefExp ( localVariables_IterationCounter ) );
 
   // same expression as above
   SgPntrArrRefExp * autosharedMyThreadPosition = autosharedSubscriptExpression;
