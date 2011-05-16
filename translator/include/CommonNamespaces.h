@@ -15,25 +15,25 @@ namespace OP2
    * ======================================================
    */
 
-  std::string const OP_SET_NAME = "op_set";
-  std::string const OP_DAT_NAME = "op_dat";
-  std::string const OP_MAP_NAME = "op_map";
-  std::string const OP_ID_NAME = "op_id";
-  std::string const OP_GBL_NAME = "op_gbl";
-  std::string const OP_READ_NAME = "op_read";
-  std::string const OP_WRITE_NAME = "op_write";
-  std::string const OP_RW_NAME = "op_rw";
-  std::string const OP_INC_NAME = "op_inc";
-  std::string const OP_MAX_NAME = "op_max";
-  std::string const OP_MIN_NAME = "op_min";
-  std::string const OP_PAR_LOOP_PREFIX = "op_par_loop";
-  std::string const OP_DECL_SET_PREFIX = "op_decl_set";
-  std::string const OP_DECL_MAP_PREFIX = "op_decl_map";
-  std::string const OP_DECL_DAT_PREFIX = "op_decl_dat";
-  std::string const OP_DECL_GBL_PREFIX = "op_decl_gbl";
-
   namespace Fortran
   {
+    std::string const OP_SET = "op_set";
+    std::string const OP_DAT = "op_dat";
+    std::string const OP_MAP = "op_map";
+    std::string const OP_GBL = "op_gbl";
+    std::string const OP_ID = "op_id";
+    std::string const OP_READ = "op_read";
+    std::string const OP_WRITE = "op_write";
+    std::string const OP_RW = "op_rw";
+    std::string const OP_INC = "op_inc";
+    std::string const OP_MAX = "op_max";
+    std::string const OP_MIN = "op_min";
+    std::string const OP_PAR_LOOP_PREFIX = "op_par_loop";
+    std::string const OP_DECL_SET_PREFIX = "op_decl_set";
+    std::string const OP_DECL_MAP_PREFIX = "op_decl_map";
+    std::string const OP_DECL_DAT_PREFIX = "op_decl_dat";
+    std::string const OP_DECL_GBL_PREFIX = "op_decl_gbl";
+
     /*
      * ======================================================
      * The following constants assume that each call to an
@@ -67,7 +67,19 @@ namespace OP2
 
   namespace CPlusPlus
   {
-
+    std::string const OP_SET = "op_set";
+    std::string const OP_DAT = "op_dat";
+    std::string const OP_MAP = "op_ptr";
+    std::string const OP_DAT_GBL = "op_dat_gbl";
+    std::string const OP_ID = "op_id";
+    std::string const OP_READ = "op_read";
+    std::string const OP_WRITE = "op_write";
+    std::string const OP_RW = "op_rw";
+    std::string const OP_INC = "op_inc";
+    std::string const OP_MAX = "op_max";
+    std::string const OP_MIN = "op_min";
+    std::string const OP_DECL_CONST = "op_decl_const";
+    std::string const OP_PAR_LOOP_PREFIX = "op_par_loop";
   }
 }
 
@@ -121,8 +133,8 @@ namespace IndirectLoop
 
     namespace StringSeparator
     {
-		 std::string const constantsSeparator = "_";
-		}
+      std::string const constantsSeparator = "_";
+    }
     namespace PlanFunction
     {
       /*

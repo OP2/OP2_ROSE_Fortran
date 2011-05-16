@@ -225,7 +225,6 @@ HostSubroutine::createDataMarshallingLocalVariables (
   using SageBuilder::buildVariableDeclaration;
   using SageBuilder::buildPointerType;
   using SageInterface::appendStatement;
-  using std::make_pair;
   using std::map;
   using std::string;
 
@@ -246,7 +245,7 @@ HostSubroutine::createDataMarshallingLocalVariables (
 
       variableDeclaration->get_declarationModifier ().get_accessModifier ().setUndefined ();
 
-      localVariables_OP_DAT_Sizes.insert (make_pair (i, variableDeclaration));
+      localVariables_OP_DAT_Sizes[i] = variableDeclaration;
 
       appendStatement (variableDeclaration, subroutineScope);
     }
@@ -267,8 +266,7 @@ HostSubroutine::createDataMarshallingLocalVariables (
 
       variableDeclaration->get_declarationModifier ().get_accessModifier ().setUndefined ();
 
-      localVariables_CToFortranPointers.insert (make_pair (i,
-          variableDeclaration));
+      localVariables_CToFortranPointers[i] = variableDeclaration;
 
       appendStatement (variableDeclaration, subroutineScope);
     }
@@ -299,8 +297,7 @@ HostSubroutine::createDataMarshallingLocalVariables (
         variableDeclaration->get_declarationModifier ().get_typeModifier ().setDevice ();
         variableDeclaration->get_declarationModifier ().get_typeModifier ().setAllocatable ();
 
-        localVariables_OP_DAT_VariablesOnDevice.insert (make_pair (i,
-            variableDeclaration));
+        localVariables_OP_DAT_VariablesOnDevice[i] = variableDeclaration;
 
         appendStatement (variableDeclaration, subroutineScope);
       }
@@ -313,8 +310,8 @@ HostSubroutine::createCUDAKernelVariables ()
 {
   using SageBuilder::buildVariableDeclaration;
   using SageBuilder::buildIntVal;
-	using SageBuilder::buildIntType;
-	using SageBuilder::buildAssignInitializer;
+  using SageBuilder::buildIntType;
+  using SageBuilder::buildAssignInitializer;
   using SageInterface::appendStatement;
   using std::string;
 
@@ -332,9 +329,8 @@ HostSubroutine::createCUDAKernelVariables ()
 
   CUDAVariable_sharedMemorySize = buildVariableDeclaration (
       CUDAVariable_sharedMemorySizeVariableName,
-      FortranTypesBuilder::getFourByteInteger (), 
-			buildAssignInitializer (buildIntVal (0), buildIntType ()),
-			subroutineScope );
+      FortranTypesBuilder::getFourByteInteger (), buildAssignInitializer (
+          buildIntVal (0), buildIntType ()), subroutineScope);
 
   CUDAVariable_blocksPerGrid->get_declarationModifier ().get_accessModifier ().setUndefined ();
   CUDAVariable_threadsPerBlock->get_declarationModifier ().get_accessModifier ().setUndefined ();
@@ -367,7 +363,6 @@ HostSubroutine::createFormalParameters (
   using std::vector;
   using std::string;
   using std::map;
-  using std::make_pair;
 
   Debug::getInstance ()->debugMessage (
       "Creating host subroutine formal parameters", 2);
@@ -436,7 +431,7 @@ HostSubroutine::createFormalParameters (
 
             string const className = classReference->get_name ().getString ();
 
-            if (iequals (className, OP2::OP_SET_NAME))
+            if (iequals (className, OP2::Fortran::OP_SET))
             {
               /*
                * ======================================================
@@ -462,7 +457,7 @@ HostSubroutine::createFormalParameters (
               formalParameter_OP_SET = opSetDeclaration;
             }
 
-            else if (iequals (className, OP2::OP_MAP_NAME))
+            else if (iequals (className, OP2::Fortran::OP_MAP))
             {
               /*
                * ======================================================
@@ -486,11 +481,10 @@ HostSubroutine::createFormalParameters (
 
               appendStatement (opMapDeclaration, subroutineScope);
 
-              formalParameters_OP_MAP.insert (make_pair (variableNameSuffix,
-                  opMapDeclaration));
+              formalParameters_OP_MAP[variableNameSuffix] = opMapDeclaration;
             }
 
-            else if (iequals (className, OP2::OP_DAT_NAME))
+            else if (iequals (className, OP2::Fortran::OP_DAT))
             {
               /*
                * ======================================================
@@ -523,8 +517,7 @@ HostSubroutine::createFormalParameters (
 
               appendStatement (opDatDeclaration, subroutineScope);
 
-              formalParameters_OP_DAT.insert (make_pair (variableNameSuffix,
-                  opDatDeclaration));
+              formalParameters_OP_DAT[variableNameSuffix] = opDatDeclaration;
             }
             else
             {
@@ -560,8 +553,8 @@ HostSubroutine::createFormalParameters (
 
             appendStatement (opAccessDeclaration, subroutineScope);
 
-            formalParameters_OP_ACCESS.insert (make_pair (variableNameSuffix,
-                opAccessDeclaration));
+            formalParameters_OP_ACCESS[variableNameSuffix]
+                = opAccessDeclaration;
 
             break;
           }
@@ -601,8 +594,8 @@ HostSubroutine::createFormalParameters (
 
         appendStatement (opIndirectionDeclaration, subroutineScope);
 
-        formalParameters_OP_INDIRECTION.insert (make_pair (variableNameSuffix,
-            opIndirectionDeclaration));
+        formalParameters_OP_INDIRECTION[variableNameSuffix]
+            = opIndirectionDeclaration;
 
         break;
       }

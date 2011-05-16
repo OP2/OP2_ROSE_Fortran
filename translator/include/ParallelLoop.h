@@ -116,8 +116,7 @@ class ParallelLoop
   public:
 
     ParallelLoop (std::string userSubroutineName,
-        SgExpressionPtrList & actualArguments,
-        Declarations * op2DeclaredVariables);
+        SgExpressionPtrList & actualArguments, Declarations * declarations);
 
     bool
     isDirectLoop () const;
@@ -178,8 +177,8 @@ class ParallelLoop
     int
     getNumberOfIndirectDataSets ();
 
-		int
-		getNumberOfDifferentIndirectDataSets ();
+    int
+    getNumberOfDifferentIndirectDataSets ();
 
     bool
     isReductionRequired ();
