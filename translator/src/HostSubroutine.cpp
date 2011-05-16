@@ -259,11 +259,27 @@ HostSubroutine::createDataMarshallingLocalVariables (
     {
       string const variableName = "c2fPtrArg" + lexical_cast <string> (i);
 
+			SgType * opdatType = parallelLoop.get_OP_DAT_Type ( i );
+			SgArrayType * isArrayType = isSgArrayType ( opdatType );
+			ROSE_ASSERT ( isArrayType != NULL );
+			
+//			SgVariableDeclaration * variableDeclaration = buildVariableDeclaration (
+//				variableName, isArrayType, NULL,
+//				subroutineScope);
+
+//      SgVariableDeclaration * variableDeclaration = buildVariableDeclaration (
+//          variableName, buildPointerType (
+//              FortranTypesBuilder::getArray_RankOne (
+//							 FortranTypesBuilder::getDoublePrecisionFloat () ) ),
+//							NULL,
+//          subroutineScope);
+			
+			
+//FortranTypesBuilder::getDoublePrecisionFloat ()
       SgVariableDeclaration * variableDeclaration = buildVariableDeclaration (
-          variableName, buildPointerType (
-              FortranTypesBuilder::getArray_RankOne (
-                  FortranTypesBuilder::getDoublePrecisionFloat ())), NULL,
-          subroutineScope);
+          variableName, buildPointerType ( isArrayType ),
+							NULL,
+          subroutineScope );
 
       variableDeclaration->get_declarationModifier ().get_accessModifier ().setUndefined ();
 
@@ -291,8 +307,13 @@ HostSubroutine::createDataMarshallingLocalVariables (
         string const variableName = VariablePrefixes::OP_DAT_Name
             + lexical_cast <string> (i);
 
+
+			  SgType * opdatType = parallelLoop.get_OP_DAT_Type ( i );
+				SgArrayType * isArrayType = isSgArrayType ( opdatType );
+				ROSE_ASSERT ( isArrayType != NULL );
+				
         SgVariableDeclaration * variableDeclaration = buildVariableDeclaration (
-            variableName, parallelLoop.get_OP_DAT_Type (i), NULL,
+            variableName, isArrayType, NULL,
             subroutineScope);
 
         variableDeclaration->get_declarationModifier ().get_accessModifier ().setUndefined ();

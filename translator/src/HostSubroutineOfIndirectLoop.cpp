@@ -95,13 +95,14 @@ HostSubroutineOfIndirectLoop::initialiseDeviceVariablesSizesVariable (
 
       SgAssignOp * assignmentExpression = buildAssignOp (
           fieldSelectionExpression, buildVarRefExp (
-              localVariables_ExecutionPlan_OP_DAT_Size[i]));
+              localVariables_OP_DAT_Sizes[i]));
 
       appendStatement (buildExprStatement (assignmentExpression),
           subroutineScope);
     }
   }
 
+	unsigned int countIndirectArgs = 1;
   for (unsigned int i = 1; i
       <= parallelLoop.getNumberOf_OP_DAT_ArgumentGroups (); ++i)
   {
@@ -126,13 +127,15 @@ HostSubroutineOfIndirectLoop::initialiseDeviceVariablesSizesVariable (
                   localVariables_Others[IndirectLoop::Fortran::PlanFunction::VariableNames::pnindirect]);
 
       SgPntrArrRefExp * arrayIndexExpression = buildPntrArrRefExp (
-          pnindirect_Reference, buildIntVal (i));
+          pnindirect_Reference, buildIntVal (countIndirectArgs));
 
       SgAssignOp * assignmentExpression = buildAssignOp (
           fieldSelectionExpression, arrayIndexExpression);
 
       appendStatement (buildExprStatement (assignmentExpression),
           subroutineScope);
+
+			countIndirectArgs++;
     }
   }
 
@@ -179,7 +182,7 @@ HostSubroutineOfIndirectLoop::initialiseDeviceVariablesSizesVariable (
 
       SgAssignOp * assignmentExpression = buildAssignOp (
           fieldSelectionExpression, buildVarRefExp (
-              localVariables_ExecutionPlan_OP_DAT_Size[i]));
+              localVariables_OP_DAT_Sizes[i]));
 
       appendStatement (buildExprStatement (assignmentExpression),
           subroutineScope);
@@ -782,13 +785,14 @@ HostSubroutineOfIndirectLoop::createPlanCToForttranPointerConversionStatements (
    * ======================================================
    */
 
+	unsigned int countIndirectArgs = 1;
   for (unsigned int i = 1; i
       <= parallelLoop.getNumberOf_OP_DAT_ArgumentGroups (); ++i)
   {
     if (parallelLoop.isDuplicate_OP_DAT (i) == false
         && parallelLoop.get_OP_MAP_Value (i) == INDIRECT)
     {
-      SgExpression * indexExpression = buildIntVal (i);
+      SgExpression * indexExpression = buildIntVal ( countIndirectArgs++ );
 
       SgExpression * pindMapsArraySubscriptReference = buildPntrArrRefExp (
           pindMapsReference, indexExpression);
@@ -892,7 +896,9 @@ HostSubroutineOfIndirectLoop::createPlanCToForttranPointerConversionStatements (
    */
 
   callStatement = createCallToC_F_POINTER (buildDotExp (actualPlanReference,
-      ncolblkReference), ncolblkReference, argsNumberShapeExpression);
+		ncolblkReference ), ncolblkReference, 
+		buildDotExp (
+		  opSetFormalArgumentReference, size_Reference ) );
 
   appendStatement (callStatement, subroutineScope);
 
@@ -1034,8 +1040,8 @@ HostSubroutineOfIndirectLoop::createPlanCToForttranPointerConversionStatements (
    * ======================================================
    */
 
-  assignmentExpression = buildAssignOp (pthrcolSizeReference,
-      actualPlan_dot_nblocks_Reference);
+  assignmentExpression = buildAssignOp ( pthrcolSizeReference,
+		buildDotExp ( opSetFormalArgumentReference, size_Reference ) );
 
   appendStatement (buildExprStatement (assignmentExpression), subroutineScope);
 
@@ -1593,22 +1599,22 @@ HostSubroutineOfIndirectLoop::createExecutionPlanLocalVariables (
    * ======================================================
    */
 
-  for (unsigned int i = 1; i
-      <= parallelLoop.getNumberOf_OP_DAT_ArgumentGroups (); ++i)
-  {
-    if (parallelLoop.isDuplicate_OP_DAT (i) == false)
-    {
-      string const variableName = VariablePrefixes::OP_DAT_Name + lexical_cast <
-          string> (i) + VariableSuffixes::Size;
-
-      SgVariableDeclaration * variableDeclaration =
-          FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
-              variableName, FortranTypesBuilder::getFourByteInteger (),
-              subroutineScope);
-
-      localVariables_ExecutionPlan_OP_DAT_Size[i] = variableDeclaration;
-    }
-  }
+//  for (unsigned int i = 1; i
+//      <= parallelLoop.getNumberOf_OP_DAT_ArgumentGroups (); ++i)
+//  {
+//    if (parallelLoop.isDuplicate_OP_DAT (i) == false)
+//    {
+//      string const variableName = VariablePrefixes::OP_DAT_Name + lexical_cast <
+//          string> (i) + VariableSuffixes::Size;
+//
+//      SgVariableDeclaration * variableDeclaration =
+//          FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
+//              variableName, FortranTypesBuilder::getFourByteInteger (),
+//              subroutineScope);
+//
+//      localVariables_ExecutionPlan_OP_DAT_Size[i] = variableDeclaration;
+//    }
+//  }
 
   /*
    * ======================================================
