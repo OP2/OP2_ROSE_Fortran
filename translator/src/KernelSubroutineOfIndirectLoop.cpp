@@ -30,6 +30,9 @@ KernelSubroutineOfIndirectLoop::applyPointeredIncrementsOrWrites (
 	using SageBuilder::buildDivideOp;
 	using SageBuilder::buildBasicBlock;
 	using SageBuilder::buildExprStatement;
+	using SageBuilder::buildSubtractOp;
+	using SageBuilder::buildLessThanOp;
+	using SageBuilder::buildWhileStmt;
 	using SageInterface::appendStatement;
 
 	SgVarRefExp * variable_X_Reference1 = buildOpaqueVarRefExp (
@@ -69,14 +72,16 @@ KernelSubroutineOfIndirectLoop::applyPointeredIncrementsOrWrites (
 				SgMultiplyOp * upperBoundUpdateIncWrVars = buildMultiplyOp (
 					indArgSize_Reference2, buildIntVal ( parallelLoop.get_OP_DAT_Dimension ( i ) ) );
 				
-				SgExpression * lowerBoundUpdateIncWrVars =
-					buildAssignOp ( iterationVarIncWrVarsRef, threadidxDotX );
+				SgExpression * upperBoundUpdateIncWrVarsGuard =
+				  buildLessThanOp ( iterationVarIncWrVarsRef, upperBoundUpdateIncWrVars );
+				
+				SgExpression * initialiseIterationVariable =
+					buildAssignOp ( iterationVarIncWrVarsRef, 
+					buildSubtractOp ( threadidxDotX, buildIntVal ( 1 ) ) );
 			
-				SgExpression * incrementVarIncrWrVars = buildAddOp ( iterationVarIncWrVarsRef,
-					buildDotExp (
-					  buildOpaqueVarRefExp ( CUDA::Fortran::VariableNames::blockdim, subroutineScope ),
-						buildOpaqueVarRefExp ( CUDA::Fortran::FieldNames::x, subroutineScope ) ) );
-			
+				appendStatement ( buildExprStatement ( initialiseIterationVariable ),
+				  subroutineScope );
+						
 				/*
 				 * ======================================================
 				 * Defining moduled variable assignment
@@ -223,16 +228,40 @@ KernelSubroutineOfIndirectLoop::applyPointeredIncrementsOrWrites (
 				 * ======================================================
 				 */				
 			
+			
+//				SgExpression
+//				* loopGuardNestingLevel1 =
+//				buildLessThanOp (
+//					buildVarRefExp (
+//					localVariables_Others[IndirectLoop::Fortran::KernelSubroutine::VariableNames::iterationCounter]),
+//					buildVarRefExp (
+//					localVariables_Others[IndirectLoop::Fortran::KernelSubroutine::VariableNames::nelems2]));
+//				
+//				
+				
+				SgExpression * incrementVarIncrWrVars = buildAssignOp ( iterationVarIncWrVarsRef,
+				  buildAddOp ( iterationVarIncWrVarsRef,
+						buildDotExp (
+							buildOpaqueVarRefExp ( CUDA::Fortran::VariableNames::blockdim, subroutineScope ),
+							buildOpaqueVarRefExp ( CUDA::Fortran::FieldNames::x, subroutineScope ) ) ) );
+				
 				SgBasicBlock * loopBodyUpdateIncWrVars = buildBasicBlock (
 				  buildExprStatement ( assignmentExpressionModuled ),
-				  buildExprStatement ( actualUpdate ) );
-			
-				SgFortranDo * updateIncrWrVars =
-				FortranStatementsAndExpressionsBuilder::buildFortranDoStatement (
-					lowerBoundUpdateIncWrVars, upperBoundUpdateIncWrVars,
-					incrementVarIncrWrVars, loopBodyUpdateIncWrVars );
-			
-				
+				  buildExprStatement ( actualUpdate ),
+					buildExprStatement ( incrementVarIncrWrVars ) );
+
+
+				SgWhileStmt * updateIncrWrVars = buildWhileStmt (
+					upperBoundUpdateIncWrVarsGuard, loopBodyUpdateIncWrVars );
+//
+//			
+//				SgFortranDo * updateIncrWrVars =
+//				FortranStatementsAndExpressionsBuilder::buildFortranDoStatement (
+//					lowerBoundUpdateIncWrVars, upperBoundUpdateIncWrVars,
+//					incrementVarIncrWrVars, loopBodyUpdateIncWrVars );
+//			
+				updateIncrWrVars->set_has_end_statement (true);
+
 				appendStatement ( updateIncrWrVars, subroutineScope );
 			
 			}
