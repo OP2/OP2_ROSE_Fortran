@@ -1874,18 +1874,18 @@ HostSubroutineOfIndirectLoop::HostSubroutineOfIndirectLoop (
 
   initialiseDataMarshallingLocalVariables (parallelLoop);
 
-//  createExecutionPlanStatements (parallelLoop);
-//
-//  createPlanFunctionCallStatement ();
-//
-//  createPlanCToForttranPointerConversionStatements (parallelLoop);
-//
-//  initialiseDeviceVariablesSizesVariable (parallelLoop,
-//      deviceDataSizesDeclaration);
-//
-//  initialiseVariablesAndConstants (initialiseConstantsSubroutine);
-//
-//  createExecutionPlanExecutionStatements (kernelSubroutine, parallelLoop);
-//
-//  copyDataBackFromDeviceAndDeallocate (parallelLoop);
+  createExecutionPlanStatements (parallelLoop);
+
+  createPlanFunctionCallStatement ();
+
+  createPlanCToForttranPointerConversionStatements (parallelLoop);
+
+  initialiseDeviceVariablesSizesVariable (parallelLoop,
+      deviceDataSizesDeclaration);
+
+  initialiseVariablesAndConstants (initialiseConstantsSubroutine);
+
+  createExecutionPlanExecutionStatements (kernelSubroutine, parallelLoop);
+
+  copyDataBackFromDeviceAndDeallocate (parallelLoop);
 }

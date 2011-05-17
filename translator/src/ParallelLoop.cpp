@@ -295,23 +295,24 @@ bool
 ParallelLoop::isReductionRequired ()
 {
   for (unsigned int i = 1; i <= getNumberOf_OP_DAT_ArgumentGroups (); ++i)
+  {
     if (OP_DAT_MappingDescriptors[i] == GLOBAL && OP_DAT_AccessDescriptors[i]
         != READ_ACCESS)
-
+    {
       return true;
-
+    }
+  }
   return false;
 }
 
 bool
 ParallelLoop::isReductionRequiredForSpecificArgument (int opDatIndex)
 {
-
   if (OP_DAT_MappingDescriptors[opDatIndex] == GLOBAL
       && OP_DAT_AccessDescriptors[opDatIndex] != READ_ACCESS)
-
+  {
     return true;
-
+  }
   return false;
 }
 

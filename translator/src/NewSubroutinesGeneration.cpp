@@ -448,25 +448,25 @@ NewSubroutinesGeneration::visit (SgNode * node)
                         *deviceDataSizesDeclarationDirectLoops,
                         reductionSubroutines, *parallelLoop, moduleScope);
 
-//                HostSubroutine * hostSubroutine =
-//                    new HostSubroutineOfDirectLoop (userSubroutineName,
-//                        *userDeviceSubroutine, *kernelSubroutine,
-//                        *deviceDataSizesDeclarationDirectLoops, *parallelLoop,
-//                        moduleScope);
-//
-//                /*
-//                 * ======================================================
-//                 * Get the scope of the AST node representing the entire
-//                 * call statement
-//                 * ======================================================
-//                 */
-//                SgScopeStatement * scope = isSgExprStatement (
-//                    node->get_parent ())->get_scope ();
-//
-//                ROSE_ASSERT (scope != NULL);
-//
-//                patchOP_PAR_LOOPCalls (*parallelLoop, *userDeviceSubroutine,
-//                    *hostSubroutine, scope, functionCallExp);
+                HostSubroutine * hostSubroutine =
+                    new HostSubroutineOfDirectLoop (userSubroutineName,
+                        *userDeviceSubroutine, *kernelSubroutine,
+                        *deviceDataSizesDeclarationDirectLoops, *parallelLoop,
+                        moduleScope);
+
+                /*
+                 * ======================================================
+                 * Get the scope of the AST node representing the entire
+                 * call statement
+                 * ======================================================
+                 */
+                SgScopeStatement * scope = isSgExprStatement (
+                    node->get_parent ())->get_scope ();
+
+                ROSE_ASSERT (scope != NULL);
+
+                patchOP_PAR_LOOPCalls (*parallelLoop, *userDeviceSubroutine,
+                    *hostSubroutine, scope, functionCallExp);
               }
               else
               {
