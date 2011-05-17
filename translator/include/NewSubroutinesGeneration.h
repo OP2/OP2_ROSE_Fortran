@@ -16,8 +16,8 @@
  * subroutine
  */
 
-#ifndef CREATE_KERNELS_H
-#define CREATE_KERNELS_H
+#ifndef NEW_SUBROUTINES_GENERATION_H
+#define NEW_SUBROUTINES_GENERATION_H
 
 #include <rose.h>
 #include <CommonNamespaces.h>

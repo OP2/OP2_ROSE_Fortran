@@ -169,10 +169,14 @@ NewSubroutinesGeneration::addLibraries (SgModuleStatement * moduleStatement)
       "Adding 'use' statements to CUDA module", 2);
 
   vector <string> libs;
-  libs.push_back ("ISO_C_BINDING");
-  libs.push_back ("OP2_C");
-  libs.push_back ("cudaConfigurationParams");
-  libs.push_back ("cudafor");
+  libs.push_back (IndirectAndDirectLoop::Fortran::Libraries::ISO_C_BINDING);
+
+  libs.push_back (IndirectAndDirectLoop::Fortran::Libraries::OP2_C);
+
+  libs.push_back (
+      IndirectAndDirectLoop::Fortran::Libraries::cudaConfigurationParams);
+
+  libs.push_back (IndirectAndDirectLoop::Fortran::Libraries::cudafor);
 
   for (vector <string>::const_iterator it = libs.begin (); it != libs.end (); ++it)
   {
@@ -303,13 +307,8 @@ void
 NewSubroutinesGeneration::visit (SgNode * node)
 {
   using boost::starts_with;
-  using std::make_pair;
   using std::pair;
   using std::string;
-
-  // to be removed
-  using SageBuilder::buildIntVal;
-  using SageBuilder::buildArrayType;
 
   switch (node->variantT ())
   {
@@ -335,7 +334,7 @@ NewSubroutinesGeneration::visit (SgNode * node)
        * to the translator
        * ======================================================
        */
-      if (starts_with (calleeName, OP2::OP_PAR_LOOP_PREFIX))
+      if (starts_with (calleeName, OP2::OP_PAR_LOOP))
       {
         /*
          * ======================================================
@@ -374,8 +373,7 @@ NewSubroutinesGeneration::visit (SgNode * node)
               ParallelLoop * parallelLoop = new ParallelLoop (
                   userSubroutineName, actualArguments, declarations);
 
-              parallelLoops.insert (
-                  make_pair (userSubroutineName, parallelLoop));
+              parallelLoops[userSubroutineName] = parallelLoop;
 
               /*
                * ======================================================
@@ -495,23 +493,23 @@ NewSubroutinesGeneration::visit (SgNode * node)
 
                 Debug::getInstance ()->debugMessage ("Creating Constants", 2);
 
-
                 InitialiseConstantsSubroutine * initialiseConstantsSubroutine =
                     new InitialiseConstantsSubroutine (userSubroutineName);
 
                 Debug::getInstance ()->debugMessage ("Declaring them", 2);
-								
+
                 initialiseConstantsSubroutine->declareConstants (moduleScope);
 
                 addContains (moduleStatement);
 
-                Debug::getInstance ()->debugMessage ("Creating Subroutine to initialise Constants", 2);
+                Debug::getInstance ()->debugMessage (
+                    "Creating Subroutine to initialise Constants", 2);
 
                 initialiseConstantsSubroutine->generateSubroutineForAlreadyComputedValues (
                     moduleScope);
 
-                Debug::getInstance ()->debugMessage ("Finished with Constants", 2);
-
+                Debug::getInstance ()->debugMessage ("Finished with Constants",
+                    2);
 
                 /*
                  * ======================================================

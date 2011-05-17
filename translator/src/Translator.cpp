@@ -51,6 +51,15 @@ main (int argc, char ** argv)
 
   ROSE_ASSERT (project != NULL);
 
+  if (project->get_Cxx_only () == true)
+  {
+    Debug::getInstance ()->verboseMessage ("C++ project detected");
+  }
+  else
+  {
+    Debug::getInstance ()->verboseMessage ("Fortran project detected");
+  }
+
   /*
    * ======================================================
    * Obtain all OP2 declarations
@@ -59,9 +68,9 @@ main (int argc, char ** argv)
   Debug::getInstance ()->verboseMessage (
       "Retrieving declarations in source files");
 
-  Declarations * op2DeclaredVariables = new Declarations (project);
+  Declarations * declarations = new Declarations (project);
 
-  op2DeclaredVariables->traverseInputFiles (project, preorder);
+  declarations->traverseInputFiles (project, preorder);
 
   /*
    * ======================================================
@@ -72,7 +81,7 @@ main (int argc, char ** argv)
       "Creating subroutines for OP_PAR_LOOPs");
 
   NewSubroutinesGeneration * newSubroutines = new NewSubroutinesGeneration (
-      project, op2DeclaredVariables);
+      project, declarations);
 
   newSubroutines->traverseInputFiles (project, preorder);
 

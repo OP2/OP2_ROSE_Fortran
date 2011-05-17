@@ -1,7 +1,9 @@
 /*
  * Written by Adam Betts and Carlo Bertolli
  *  
- * Various public namespaces used in the compiler
+ * Various public namespaces used in the compiler to declare and reference
+ * variable names. Each namespace is generally split between Fortran-specific
+ * and C++-specific names.
  */
 
 #ifndef COMMON_NAMESPACES_H
@@ -15,22 +17,24 @@ namespace OP2
    * ======================================================
    */
 
-  std::string const OP_SET_NAME = "op_set";
-  std::string const OP_DAT_NAME = "op_dat";
-  std::string const OP_MAP_NAME = "op_map";
-  std::string const OP_ID_NAME = "op_id";
-  std::string const OP_GBL_NAME = "op_gbl";
-  std::string const OP_READ_NAME = "op_read";
-  std::string const OP_WRITE_NAME = "op_write";
-  std::string const OP_RW_NAME = "op_rw";
-  std::string const OP_INC_NAME = "op_inc";
-  std::string const OP_MAX_NAME = "op_max";
-  std::string const OP_MIN_NAME = "op_min";
-  std::string const OP_PAR_LOOP_PREFIX = "op_par_loop";
-  std::string const OP_DECL_SET_PREFIX = "op_decl_set";
-  std::string const OP_DECL_MAP_PREFIX = "op_decl_map";
-  std::string const OP_DECL_DAT_PREFIX = "op_decl_dat";
-  std::string const OP_DECL_GBL_PREFIX = "op_decl_gbl";
+  std::string const OP_SET = "op_set";
+  std::string const OP_DAT = "op_dat";
+  std::string const OP_DAT_GBL = "op_dat_gbl";
+  std::string const OP_MAP = "op_map";
+  std::string const OP_GBL = "op_gbl";
+  std::string const OP_ID = "op_id";
+  std::string const OP_READ = "op_read";
+  std::string const OP_WRITE = "op_write";
+  std::string const OP_RW = "op_rw";
+  std::string const OP_INC = "op_inc";
+  std::string const OP_MAX = "op_max";
+  std::string const OP_MIN = "op_min";
+  std::string const OP_PAR_LOOP = "op_par_loop";
+  std::string const OP_DECL_SET = "op_decl_set";
+  std::string const OP_DECL_MAP = "op_decl_map";
+  std::string const OP_DECL_DAT = "op_decl_dat";
+  std::string const OP_DECL_GBL = "op_decl_gbl";
+  std::string const OP_DECL_CONST = "op_decl_const";
 
   namespace Fortran
   {
@@ -67,15 +71,57 @@ namespace OP2
 
   namespace CPlusPlus
   {
-
+    std::string const OP_PTR = "op_ptr";
   }
 }
 
 namespace IndirectAndDirectLoop
 {
-  namespace HostSubroutine
+  namespace Fortran
   {
-    std::string const threadSynchRet = "threadSynchRet";
+    namespace HostSubroutine
+    {
+      std::string const subroutineName = "subroutineName";
+      std::string const set = "set";
+      std::string const size = "size";
+      std::string const dim = "dim";
+      std::string const dat = "dat";
+      std::string const cudaThreadSynchronizeSubroutineName =
+          "cudaThreadSynchronize";
+      std::string const c2FortranPointerFunctionName = "c_f_pointer";
+      std::string const c2FortranPointerVariablePrefix = "c2fPtrArg";
+      std::string const threadSynchronizeSubroutineName =
+          "cudaThreadSynchronize";
+      std::string const threadSynchronizeReturnVariableName = "threadSynchRet";
+    }
+
+    namespace VariableNames
+    {
+      std::string const argsSizes = "argsSizes";
+      std::string const autoshared = "autoshared";
+    }
+
+    namespace VariablePrefixes
+    {
+      std::string const OP_DAT = "argument";
+      std::string const OP_MAP = "map";
+      std::string const OP_ACCESS = "access";
+      std::string const OP_INDIRECTION = "idx";
+    }
+
+    namespace VariableSuffixes
+    {
+      std::string const Size = "Size";
+      std::string const localVarName = "_l";
+    }
+
+    namespace Libraries
+    {
+      std::string const ISO_C_BINDING = "ISO_C_BINDING";
+      std::string const OP2_C = "OP2_C";
+      std::string const cudaConfigurationParams = "cudaConfigurationParams";
+      std::string const cudafor = "cudafor";
+    }
   }
 }
 
@@ -89,6 +135,12 @@ namespace IndirectLoop
 
   namespace Fortran
   {
+    namespace VariablePrefixes
+    {
+      std::string const pindMaps = "pindMaps";
+      std::string const pMaps = "pMaps";
+    }
+
     namespace ConstantSuffixes
     {
       /*
@@ -109,6 +161,8 @@ namespace IndirectLoop
        * ======================================================
        */
 
+      std::string const constantsSeparator = "_";
+
       std::string const air_const = "air_const";
       std::string const alpha = "alpha";
       std::string const cfl = "cfl";
@@ -119,10 +173,6 @@ namespace IndirectLoop
       std::string const qinf = "qinf";
     }
 
-    namespace StringSeparator
-    {
-		 std::string const constantsSeparator = "_";
-		}
     namespace PlanFunction
     {
       /*
@@ -158,6 +208,41 @@ namespace IndirectLoop
 
     namespace HostSubroutine
     {
+      namespace VariableNames
+      {
+        std::string const accesses = "accesses";
+        std::string const actualPlan = "actualPlan";
+        std::string const args = "args";
+        std::string const argsNumber = "argsNumber";
+        std::string const blockOffset = "blockOffset";
+        std::string const col = "col";
+        std::string const IterationCounter = "i";
+        std::string const idxs = "idxs";
+        std::string const inds = "inds";
+        std::string const indsNumber = "indsNumber";
+        std::string const maps = "maps";
+        std::string const ncolblk = "ncolblk";
+        std::string const planRet = "planRet";
+      }
+
+      namespace FieldNames
+      {
+        std::string const blkmap = "blkmap";
+        std::string const ind_maps = "ind_maps";
+        std::string const ind_offs = "ind_offs";
+        std::string const ind_sizes = "ind_sizes";
+        std::string const maps = "maps";
+        std::string const nblocks = "nblocks";
+        std::string const ncolblk = "ncolblk";
+        std::string const ncolors = "ncolors";
+        std::string const nelems = "nelems";
+        std::string const nindirect = "nindirect";
+        std::string const nshared = "nshared";
+        std::string const nthrcol = "nthrcol";
+        std::string const offset = "offset";
+        std::string const size = "size";
+        std::string const thrcol = "thrcol";
+      }
     }
 
     namespace KernelSubroutine
@@ -254,6 +339,9 @@ namespace CUDA
   {
     namespace VariableNames
     {
+      std::string const blocksPerGrid = "nblocks";
+      std::string const threadsPerBlock = "nthread";
+      std::string const sharedMemorySize = "nshared";
       std::string const threadidx = "threadidx";
       std::string const blockidx = "blockidx";
       std::string const blockdim = "blockdim";
@@ -291,22 +379,14 @@ namespace CUDA
   }
 }
 
-namespace OtherVariableNames
+namespace SubroutineNames
 {
-  std::string const argsSizes = "argsSizes";
-  std::string const autoshared = "autoshared";
-}
-
-namespace VariablePrefixes
-{
-  std::string const OP_DAT_Name = "argument";
-  std::string const localVarNamePrefix = "arg";
-}
-
-namespace VariableSuffixes
-{
-  std::string const Size = "Size";
-  std::string const localVarName = "_l";
+  std::string const hostSuffix = "_host";
+  std::string const kernelSuffix = "_kernel";
+  std::string const deviceSuffix = "_device";
+  std::string const reductionSuffix = "_reduction";
+  std::string const integerSuffix = "_integer";
+  std::string const floatSuffix = "_float";
 }
 
 namespace ReductionSubroutineNames

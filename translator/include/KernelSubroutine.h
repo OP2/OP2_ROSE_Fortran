@@ -142,13 +142,13 @@ class KernelSubroutine: public Subroutine
                 NULL);
 
     KernelSubroutine (std::string const & subroutineName) :
-      Subroutine (subroutineName + "_kernel")
+      Subroutine (subroutineName + SubroutineNames::kernelSuffix)
     {
     }
 
     KernelSubroutine (std::string const & subroutineName, std::map <
         unsigned int, SgProcedureHeaderStatement *> & _reductSubroutines) :
-      Subroutine (subroutineName + "_kernel"), reductionSubroutines (
+      Subroutine (subroutineName +  SubroutineNames::kernelSuffix), reductionSubroutines (
           _reductSubroutines)
     {
     }

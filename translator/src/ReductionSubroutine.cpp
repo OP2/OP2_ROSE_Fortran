@@ -107,14 +107,15 @@ ReductionSubroutine::createLocalVariables ()
    * ======================================================
    */
 
-	SgExpression * upperBound = new SgAsteriskShapeExp (
-		ROSEHelper::getFileInfo ());
+  SgExpression * upperBound = new SgAsteriskShapeExp (
+      ROSEHelper::getFileInfo ());
 
   localVariables_autoshared
       = FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
-          OtherVariableNames::autoshared,
-					FortranTypesBuilder::getArray_RankOne ( reductionVariableType->get_base_type (), 0,
-					upperBound), subroutineScope );
+          IndirectAndDirectLoop::Fortran::VariableNames::autoshared,
+          FortranTypesBuilder::getArray_RankOne (
+              reductionVariableType->get_base_type (), 0, upperBound),
+          subroutineScope);
 
   localVariables_autoshared->get_declarationModifier ().get_typeModifier ().setShared ();
 
@@ -138,9 +139,14 @@ ReductionSubroutine::createLocalVariables ()
    * ======================================================
    */
 
-  variable_Threadidx = buildOpaqueVarRefExp ("threadidx", subroutineScope);
-  variable_Blockdim = buildOpaqueVarRefExp ("blockdim", subroutineScope);
-  variable_X = buildOpaqueVarRefExp ("x", subroutineScope);
+  variable_Threadidx = buildOpaqueVarRefExp (
+      CUDA::Fortran::VariableNames::threadidx, subroutineScope);
+
+  variable_Blockdim = buildOpaqueVarRefExp (
+      CUDA::Fortran::VariableNames::blockdim, subroutineScope);
+
+  variable_X = buildOpaqueVarRefExp (CUDA::Fortran::FieldNames::x,
+      subroutineScope);
 }
 
 void
@@ -438,11 +444,11 @@ ReductionSubroutine::generateReductionSubroutines (ParallelLoop & parallelLoop,
 
         if (isSgTypeInt (isArrayType->get_base_type ()) != NULL)
         {
-          typeName = "_integer";
+          typeName = SubroutineNames::integerSuffix;
         }
         else if (isSgTypeFloat (isArrayType->get_base_type ()) != NULL)
         {
-          typeName = "_real";
+          typeName = SubroutineNames::floatSuffix;
         }
         else
         {
@@ -457,9 +463,10 @@ ReductionSubroutine::generateReductionSubroutines (ParallelLoop & parallelLoop,
          * Eventually, the factorisation will solve this problem
          * ======================================================
          */
-        string const reductionSubroutineName = VariablePrefixes::OP_DAT_Name
-            + lexical_cast <string> (i) + "_reduction" + typeName
-            + lexical_cast <string> (isKindIntVal->get_value ());
+        string const reductionSubroutineName =
+            IndirectAndDirectLoop::Fortran::VariablePrefixes::OP_DAT
+                + lexical_cast <string> (i) + SubroutineNames::reductionSuffix
+                + typeName + lexical_cast <string> (isKindIntVal->get_value ());
 
         ReductionSubroutine * reductionSubroutine = new ReductionSubroutine (
             reductionSubroutineName, scopeStatement, isArrayType);

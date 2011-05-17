@@ -16,6 +16,12 @@ use, intrinsic :: ISO_C_BINDING
 
   !external save_soln, adt_calc, res_calc, bres_calc, update
 
+	! debug variables
+!	integer(c_int) :: retDebug, dataSize
+!!	character(kind=c_char) :: debfilename(20)
+!	real(c_double) :: datad
+!	integer(4) :: debugiter
+
 
   integer(4) :: iter, k, i
 
@@ -190,5 +196,17 @@ use, intrinsic :: ISO_C_BINDING
     rms(1) = sqrt ( rms(1) / ncellr )
 	
   end do ! external loop
+
+	! uncomment the following statements to get the result of the airfoil written in a file
+!	retDebug = openfile ( C_CHAR_"/work/cbertoll/airfoil-generated/q.txt"//C_NULL_CHAR )
+!
+!	do debugiter = 1, 4*ncell
+!
+!		datad = q(debugiter)
+!		retDebug = writeRealToFile ( datad )
+!
+!	retDebug = closefile ()
+!	end do
+
 
 end program airfoil

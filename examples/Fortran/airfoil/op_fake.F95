@@ -40,7 +40,6 @@ use, intrinsic :: ISO_C_BINDING
 
 contains
 
-
   subroutine op_init ()
     
   end subroutine op_init

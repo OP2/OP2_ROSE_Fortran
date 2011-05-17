@@ -13,7 +13,6 @@ OBJS  := $(patsubst $(SRCDIR)/%.cpp,$(OBJDIR)/%.o,$(SRCS))
 OUT   := $(BINDIR)/translator
 
 .PHONY: all clean
-
 all: $(OUT)
 
 clean:

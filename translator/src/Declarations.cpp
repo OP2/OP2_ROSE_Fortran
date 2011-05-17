@@ -79,6 +79,7 @@ void
 Declarations::visit (SgNode * node)
 {
   using boost::iequals;
+  using boost::starts_with;
   using std::string;
 
   switch (node->variantT ())
@@ -119,10 +120,12 @@ Declarations::visit (SgNode * node)
           calleeName =
               functionCallExp->getAssociatedFunctionSymbol ()->get_name ().getString ();
 
-      if (iequals (calleeName, OP2::OP_DECL_SET_PREFIX))
+      if (iequals (calleeName, OP2::OP_DECL_SET))
       {
         /*
+         * ======================================================
          * An OP_SET variable declared through an OP_DECL_SET call
+         * ======================================================
          */
 
         OP_SET_Declaration * opSetDeclaration = new OP_SET_Declaration (
@@ -130,10 +133,12 @@ Declarations::visit (SgNode * node)
 
         OP_SET_Declarations.push_back (opSetDeclaration);
       }
-      else if (iequals (calleeName, OP2::OP_DECL_MAP_PREFIX))
+      else if (iequals (calleeName, OP2::OP_DECL_MAP))
       {
         /*
+         * ======================================================
          * An OP_MAP variable declared through an OP_DECL_MAP call
+         * ======================================================
          */
 
         OP_MAP_Declaration * opMapDeclaration = new OP_MAP_Declaration (
@@ -141,10 +146,12 @@ Declarations::visit (SgNode * node)
 
         OP_MAP_Declarations.push_back (opMapDeclaration);
       }
-      else if (iequals (calleeName, OP2::OP_DECL_DAT_PREFIX))
+      else if (iequals (calleeName, OP2::OP_DECL_DAT))
       {
         /*
+         * ======================================================
          * An OP_DAT variable declared through an OP_DECL_DAT call
+         * ======================================================
          */
 
         OP_DAT_Declaration * opDatDeclaration = new OP_DAT_Declaration (
@@ -152,16 +159,70 @@ Declarations::visit (SgNode * node)
 
         OP_DAT_Declarations.push_back (opDatDeclaration);
       }
-      else if (iequals (calleeName, OP2::OP_DECL_GBL_PREFIX))
+      else if (iequals (calleeName, OP2::OP_DECL_GBL))
       {
         /*
+         * ======================================================
          * An OP_DAT variable declared through an OP_DECL_GBL call
+         * ======================================================
          */
 
         OP_GBL_Declaration * opGblDeclaration = new OP_GBL_Declaration (
             actualArguments);
 
         OP_GBL_Declarations.push_back (opGblDeclaration);
+      }
+
+      break;
+    }
+
+    case V_SgVariableDeclaration:
+    {
+      SgVariableDeclaration * variableDeclaration = isSgVariableDeclaration (
+          node);
+
+      switch (variableDeclaration->get_variables ().front ()->get_type ()->variantT ())
+      {
+        case V_SgClassType:
+        {
+          SgClassType * classType = isSgClassType (
+              variableDeclaration->get_variables ().front ()->get_type ());
+
+          if (starts_with (classType->get_name ().getString (), OP2::OP_DAT))
+          {
+
+          }
+          else if (starts_with (classType->get_name ().getString (),
+              OP2::OP_DAT_GBL))
+          {
+
+          }
+
+          break;
+        }
+
+        case V_SgTypedefType:
+        {
+          SgTypedefType * typedefType = isSgTypedefType (
+              variableDeclaration->get_variables ().front ()->get_type ());
+
+          if (iequals (typedefType->get_name ().getString (), OP2::OP_SET))
+          {
+
+          }
+          else if (iequals (typedefType->get_name ().getString (),
+              OP2::CPlusPlus::OP_PTR))
+          {
+
+          }
+
+          break;
+        }
+
+        default:
+        {
+          break;
+        }
       }
 
       break;

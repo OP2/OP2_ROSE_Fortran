@@ -24,8 +24,10 @@ DeviceDataSizesDeclarationDirectLoops::addFields (ParallelLoop & parallelLoop,
   {
     if (parallelLoop.isDuplicate_OP_DAT (i) == false)
     {
-      string const variableName = VariablePrefixes::OP_DAT_Name + lexical_cast <
-          string> (i) + VariableSuffixes::Size;
+      string const variableName =
+          IndirectAndDirectLoop::Fortran::VariablePrefixes::OP_DAT
+              + lexical_cast <string> (i)
+              + IndirectAndDirectLoop::Fortran::VariableSuffixes::Size;
 
       SgVariableDeclaration * fieldDeclaration = buildVariableDeclaration (
           variableName, FortranTypesBuilder::getFourByteInteger (), NULL,

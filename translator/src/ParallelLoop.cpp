@@ -21,7 +21,6 @@ ParallelLoop::retrieveOP_DATDeclarations (Declarations * declarations)
   using std::string;
   using std::vector;
   using std::map;
-  using std::make_pair;
 
   Debug::getInstance ()->debugMessage ("Retrieving OP_DAT declarations", 2);
 
@@ -63,7 +62,7 @@ ParallelLoop::retrieveOP_DATDeclarations (Declarations * declarations)
 
             string const className = classReference->get_name ().getString ();
 
-            if (iequals (className, OP2::OP_DAT_NAME))
+            if (iequals (className, OP2::OP_DAT))
             {
               OP_DATCounter++;
 
@@ -80,11 +79,11 @@ ParallelLoop::retrieveOP_DATDeclarations (Declarations * declarations)
                 OP_DAT_Declaration * opDatDeclaration =
                     declarations->get_OP_DAT_Declaration (variableName);
 
-                OP_DAT_Types.insert (make_pair (OP_DATCounter,
-                    opDatDeclaration->getActualType ()));
+                OP_DAT_Types[OP_DATCounter]
+                    = opDatDeclaration->getActualType ();
 
-                OP_DAT_Dimensions.insert (make_pair (OP_DATCounter,
-                    opDatDeclaration->getDimension ()));
+                OP_DAT_Dimensions[OP_DATCounter]
+                    = opDatDeclaration->getDimension ();
 
                 OP_DAT_VariableNames[OP_DATCounter] = variableName;
 
@@ -93,11 +92,11 @@ ParallelLoop::retrieveOP_DATDeclarations (Declarations * declarations)
                 {
                   unique_OP_DATs.push_back (variableName);
 
-                  OP_DAT_Duplicates.insert (make_pair (OP_DATCounter, false));
+                  OP_DAT_Duplicates[OP_DATCounter] = false;
                 }
                 else
                 {
-                  OP_DAT_Duplicates.insert (make_pair (OP_DATCounter, true));
+                  OP_DAT_Duplicates[OP_DATCounter] = true;
                 }
               }
               catch (const std::string &)
@@ -110,23 +109,23 @@ ParallelLoop::retrieveOP_DATDeclarations (Declarations * declarations)
                 OP_GBL_Declaration * opGBLDeclaration =
                     declarations->get_OP_GBL_Declaration (variableName);
 
-                OP_DAT_Types.insert (make_pair (OP_DATCounter,
-                    opGBLDeclaration->getActualType ()));
+                OP_DAT_Types[OP_DATCounter]
+                    = opGBLDeclaration->getActualType ();
 
-                OP_DAT_Dimensions.insert (make_pair (OP_DATCounter,
-                    opGBLDeclaration->getDimension ()));
+                OP_DAT_Dimensions[OP_DATCounter]
+                    = opGBLDeclaration->getDimension ();
 
                 OP_DAT_VariableNames[OP_DATCounter] = variableName;
 
                 unique_OP_DATs.push_back (variableName);
 
-                OP_DAT_Duplicates.insert (make_pair (OP_DATCounter, false));
+                OP_DAT_Duplicates[OP_DATCounter] = false;
               }
             }
 
-            else if (iequals (className, OP2::OP_MAP_NAME))
+            else if (iequals (className, OP2::OP_MAP))
             {
-              if (iequals (variableName, OP2::OP_ID_NAME))
+              if (iequals (variableName, OP2::OP_ID))
               {
                 /*
                  * ======================================================
@@ -138,7 +137,7 @@ ParallelLoop::retrieveOP_DATDeclarations (Declarations * declarations)
               }
               else
               {
-                if (iequals (variableName, OP2::OP_GBL_NAME))
+                if (iequals (variableName, OP2::OP_GBL))
                 {
                   /*
                    * ======================================================
@@ -164,22 +163,22 @@ ParallelLoop::retrieveOP_DATDeclarations (Declarations * declarations)
             string const variableName =
                 variableReference->get_symbol ()->get_name ().getString ();
 
-            if (iequals (variableName, OP2::OP_READ_NAME))
+            if (iequals (variableName, OP2::OP_READ))
             {
               OP_DAT_AccessDescriptors[OP_DATCounter] = READ_ACCESS;
             }
 
-            else if (iequals (variableName, OP2::OP_WRITE_NAME))
+            else if (iequals (variableName, OP2::OP_WRITE))
             {
               OP_DAT_AccessDescriptors[OP_DATCounter] = WRITE_ACCESS;
             }
 
-            else if (iequals (variableName, OP2::OP_INC_NAME))
+            else if (iequals (variableName, OP2::OP_INC))
             {
               OP_DAT_AccessDescriptors[OP_DATCounter] = INC_ACCESS;
             }
 
-            else if (iequals (variableName, OP2::OP_RW_NAME))
+            else if (iequals (variableName, OP2::OP_RW))
             {
               OP_DAT_AccessDescriptors[OP_DATCounter] = RW_ACCESS;
             }
@@ -279,51 +278,51 @@ int
 ParallelLoop::getNumberOfDifferentIndirectDataSets ()
 {
   int numberOfDifferentIndirectDatasets = 0;
-	
+
   for (unsigned int i = 1; i <= getNumberOf_OP_DAT_ArgumentGroups (); ++i)
   {
-    if (OP_DAT_MappingDescriptors[i] == INDIRECT &&
-		    isDuplicate_OP_DAT (i) == false )
+    if (OP_DAT_MappingDescriptors[i] == INDIRECT && isDuplicate_OP_DAT (i)
+        == false)
     {
       numberOfDifferentIndirectDatasets++;
     }
   }
-	
+
   return numberOfDifferentIndirectDatasets;
 }
-
 
 bool
 ParallelLoop::isReductionRequired ()
 {
   for (unsigned int i = 1; i <= getNumberOf_OP_DAT_ArgumentGroups (); ++i)
+  {
     if (OP_DAT_MappingDescriptors[i] == GLOBAL && OP_DAT_AccessDescriptors[i]
         != READ_ACCESS)
-
+    {
       return true;
-
+    }
+  }
   return false;
 }
 
 bool
 ParallelLoop::isReductionRequiredForSpecificArgument (int opDatIndex)
 {
-
   if (OP_DAT_MappingDescriptors[opDatIndex] == GLOBAL
       && OP_DAT_AccessDescriptors[opDatIndex] != READ_ACCESS)
-
+  {
     return true;
-
+  }
   return false;
 }
 
 ParallelLoop::ParallelLoop (std::string userSubroutineName,
-    SgExpressionPtrList & actualArguments, Declarations * op2DeclaredVariables)
+    SgExpressionPtrList & actualArguments, Declarations * declarations)
 {
   this->moduleName = userSubroutineName + "_cudafor";
   this->actualArguments = actualArguments;
 
-  retrieveOP_DATDeclarations (op2DeclaredVariables);
+  retrieveOP_DATDeclarations (declarations);
 
   if (isDirectLoop ())
   {

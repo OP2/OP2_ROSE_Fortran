@@ -225,7 +225,6 @@ HostSubroutine::createDataMarshallingLocalVariables (
   using SageBuilder::buildVariableDeclaration;
   using SageBuilder::buildPointerType;
   using SageInterface::appendStatement;
-  using std::make_pair;
   using std::map;
   using std::string;
 
@@ -246,7 +245,7 @@ HostSubroutine::createDataMarshallingLocalVariables (
 
       variableDeclaration->get_declarationModifier ().get_accessModifier ().setUndefined ();
 
-      localVariables_OP_DAT_Sizes.insert (make_pair (i, variableDeclaration));
+      localVariables_OP_DAT_Sizes[i] = variableDeclaration;
 
       appendStatement (variableDeclaration, subroutineScope);
     }
@@ -259,6 +258,7 @@ HostSubroutine::createDataMarshallingLocalVariables (
     {
       string const variableName = "c2fPtrArg" + lexical_cast <string> (i);
 
+//<<<<<<< HEAD
 			SgType * opdatType = parallelLoop.get_OP_DAT_Type ( i );
 			SgArrayType * isArrayType = isSgArrayType ( opdatType );
 			ROSE_ASSERT ( isArrayType != NULL );
@@ -267,11 +267,31 @@ HostSubroutine::createDataMarshallingLocalVariables (
           variableName, buildPointerType ( isArrayType ),
 							NULL,
           subroutineScope );
+//=======
+//      SgType * opdatType = parallelLoop.get_OP_DAT_Type (i);
+//      SgArrayType * isArrayType = isSgArrayType (opdatType);
+//      ROSE_ASSERT ( isArrayType != NULL );
+//
+//      //                      SgVariableDeclaration * variableDeclaration = buildVariableDeclaration (
+//      //                              variableName, isArrayType, NULL,
+//      //                              subroutineScope);
+//
+//      //      SgVariableDeclaration * variableDeclaration = buildVariableDeclaration (
+//      //          variableName, buildPointerType (
+//      //              FortranTypesBuilder::getArray_RankOne (
+//      //                                                       FortranTypesBuilder::getDoublePrecisionFloat () ) ),
+//      //                                                      NULL,
+//      //          subroutineScope);
+//
+//
+//      //FortranTypesBuilder::getDoublePrecisionFloat ()
+//      SgVariableDeclaration * variableDeclaration = buildVariableDeclaration (
+//          variableName, buildPointerType (isArrayType), NULL, subroutineScope);
+//>>>>>>> 3c96312cd30da0a25b3f8840fee70ba18fef4129
 
       variableDeclaration->get_declarationModifier ().get_accessModifier ().setUndefined ();
 
-      localVariables_CToFortranPointers.insert (make_pair (i,
-          variableDeclaration));
+      localVariables_CToFortranPointers[i] = variableDeclaration;
 
       appendStatement (variableDeclaration, subroutineScope);
     }
@@ -291,24 +311,20 @@ HostSubroutine::createDataMarshallingLocalVariables (
     {
       if (parallelLoop.isReductionRequiredForSpecificArgument (i) == false)
       {
-        string const variableName = VariablePrefixes::OP_DAT_Name
-            + lexical_cast <string> (i);
+        string const variableName = "argument" + lexical_cast <string> (i);
 
+        SgType * opdatType = parallelLoop.get_OP_DAT_Type (i);
+        SgArrayType * isArrayType = isSgArrayType (opdatType);
+        ROSE_ASSERT ( isArrayType != NULL );
 
-			  SgType * opdatType = parallelLoop.get_OP_DAT_Type ( i );
-				SgArrayType * isArrayType = isSgArrayType ( opdatType );
-				ROSE_ASSERT ( isArrayType != NULL );
-				
         SgVariableDeclaration * variableDeclaration = buildVariableDeclaration (
-            variableName, isArrayType, NULL,
-            subroutineScope);
+            variableName, isArrayType, NULL, subroutineScope);
 
         variableDeclaration->get_declarationModifier ().get_accessModifier ().setUndefined ();
         variableDeclaration->get_declarationModifier ().get_typeModifier ().setDevice ();
         variableDeclaration->get_declarationModifier ().get_typeModifier ().setAllocatable ();
 
-        localVariables_OP_DAT_VariablesOnDevice.insert (make_pair (i,
-            variableDeclaration));
+        localVariables_OP_DAT_VariablesOnDevice[i] = variableDeclaration;
 
         appendStatement (variableDeclaration, subroutineScope);
       }
@@ -321,8 +337,8 @@ HostSubroutine::createCUDAKernelVariables ()
 {
   using SageBuilder::buildVariableDeclaration;
   using SageBuilder::buildIntVal;
-	using SageBuilder::buildIntType;
-	using SageBuilder::buildAssignInitializer;
+  using SageBuilder::buildIntType;
+  using SageBuilder::buildAssignInitializer;
   using SageInterface::appendStatement;
   using std::string;
 
@@ -340,9 +356,8 @@ HostSubroutine::createCUDAKernelVariables ()
 
   CUDAVariable_sharedMemorySize = buildVariableDeclaration (
       CUDAVariable_sharedMemorySizeVariableName,
-      FortranTypesBuilder::getFourByteInteger (), 
-			buildAssignInitializer (buildIntVal (0), buildIntType ()),
-			subroutineScope );
+      FortranTypesBuilder::getFourByteInteger (), buildAssignInitializer (
+          buildIntVal (0), buildIntType ()), subroutineScope);
 
   CUDAVariable_blocksPerGrid->get_declarationModifier ().get_accessModifier ().setUndefined ();
   CUDAVariable_threadsPerBlock->get_declarationModifier ().get_accessModifier ().setUndefined ();
@@ -357,9 +372,9 @@ HostSubroutine::createCUDAKernelVariables ()
    * Also builds threadSynchRet
    * ======================================================
    */
-  localVariables_Others[IndirectAndDirectLoop::HostSubroutine::threadSynchRet]
+  localVariables_Others[IndirectAndDirectLoop::Fortran::HostSubroutine::threadSynchronizeReturnVariableName]
       = FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
-          IndirectAndDirectLoop::HostSubroutine::threadSynchRet,
+          IndirectAndDirectLoop::Fortran::HostSubroutine::threadSynchronizeReturnVariableName,
           FortranTypesBuilder::getFourByteInteger (), subroutineScope);
 }
 
@@ -375,7 +390,6 @@ HostSubroutine::createFormalParameters (
   using std::vector;
   using std::string;
   using std::map;
-  using std::make_pair;
 
   Debug::getInstance ()->debugMessage (
       "Creating host subroutine formal parameters", 2);
@@ -444,7 +458,7 @@ HostSubroutine::createFormalParameters (
 
             string const className = classReference->get_name ().getString ();
 
-            if (iequals (className, OP2::OP_SET_NAME))
+            if (iequals (className, OP2::OP_SET))
             {
               /*
                * ======================================================
@@ -470,7 +484,7 @@ HostSubroutine::createFormalParameters (
               formalParameter_OP_SET = opSetDeclaration;
             }
 
-            else if (iequals (className, OP2::OP_MAP_NAME))
+            else if (iequals (className, OP2::OP_MAP))
             {
               /*
                * ======================================================
@@ -494,11 +508,10 @@ HostSubroutine::createFormalParameters (
 
               appendStatement (opMapDeclaration, subroutineScope);
 
-              formalParameters_OP_MAP.insert (make_pair (variableNameSuffix,
-                  opMapDeclaration));
+              formalParameters_OP_MAP[variableNameSuffix] = opMapDeclaration;
             }
 
-            else if (iequals (className, OP2::OP_DAT_NAME))
+            else if (iequals (className, OP2::OP_DAT))
             {
               /*
                * ======================================================
@@ -531,8 +544,7 @@ HostSubroutine::createFormalParameters (
 
               appendStatement (opDatDeclaration, subroutineScope);
 
-              formalParameters_OP_DAT.insert (make_pair (variableNameSuffix,
-                  opDatDeclaration));
+              formalParameters_OP_DAT[variableNameSuffix] = opDatDeclaration;
             }
             else
             {
@@ -568,8 +580,8 @@ HostSubroutine::createFormalParameters (
 
             appendStatement (opAccessDeclaration, subroutineScope);
 
-            formalParameters_OP_ACCESS.insert (make_pair (variableNameSuffix,
-                opAccessDeclaration));
+            formalParameters_OP_ACCESS[variableNameSuffix]
+                = opAccessDeclaration;
 
             break;
           }
@@ -609,8 +621,8 @@ HostSubroutine::createFormalParameters (
 
         appendStatement (opIndirectionDeclaration, subroutineScope);
 
-        formalParameters_OP_INDIRECTION.insert (make_pair (variableNameSuffix,
-            opIndirectionDeclaration));
+        formalParameters_OP_INDIRECTION[variableNameSuffix]
+            = opIndirectionDeclaration;
 
         break;
       }
@@ -662,7 +674,7 @@ HostSubroutine::buildThreadSynchroniseFunctionCall (
   SgVarRefExp
       * threadSynchRetReference =
           buildVarRefExp (
-              localVariables_Others[IndirectAndDirectLoop::HostSubroutine::threadSynchRet]);
+              localVariables_Others[IndirectAndDirectLoop::Fortran::HostSubroutine::threadSynchronizeReturnVariableName]);
 
   SgFunctionCallExp * threadSynchRetFunctionCall = buildFunctionCallExp (
       cudaThreadSynchronizeFunctionSymbol, buildExprListExp ());
@@ -756,7 +768,6 @@ HostSubroutine::createReductionVariables (ParallelLoop & parallelLoop)
             subroutineScope);
         appendStatement (reductionVariable_reductionArrayOnDevice,
             subroutineScope);
-
       }
     }
   }
@@ -1032,7 +1043,6 @@ HostSubroutine::createSupportForReductionVariablesAfterKernel (
               1), outerLoopBody);
 
   appendStatement (outerRedCopyLoop, subroutineScope);
-
 }
 
 void
@@ -1096,4 +1106,3 @@ HostSubroutine::HostSubroutine (std::string const & subroutineName,
 
   subroutineScope = subroutineHeaderStatement->get_definition ()->get_body ();
 }
-
