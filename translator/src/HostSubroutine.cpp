@@ -258,27 +258,25 @@ HostSubroutine::createDataMarshallingLocalVariables (
     {
       string const variableName = "c2fPtrArg" + lexical_cast <string> (i);
 
-			SgType * opdatType = parallelLoop.get_OP_DAT_Type ( i );
-			SgArrayType * isArrayType = isSgArrayType ( opdatType );
-			ROSE_ASSERT ( isArrayType != NULL );
-			
-//			SgVariableDeclaration * variableDeclaration = buildVariableDeclaration (
-//				variableName, isArrayType, NULL,
-//				subroutineScope);
+      SgType * opdatType = parallelLoop.get_OP_DAT_Type (i);
+      SgArrayType * isArrayType = isSgArrayType (opdatType);
+      ROSE_ASSERT ( isArrayType != NULL );
 
-//      SgVariableDeclaration * variableDeclaration = buildVariableDeclaration (
-//          variableName, buildPointerType (
-//              FortranTypesBuilder::getArray_RankOne (
-//							 FortranTypesBuilder::getDoublePrecisionFloat () ) ),
-//							NULL,
-//          subroutineScope);
-			
-			
-//FortranTypesBuilder::getDoublePrecisionFloat ()
+      //                      SgVariableDeclaration * variableDeclaration = buildVariableDeclaration (
+      //                              variableName, isArrayType, NULL,
+      //                              subroutineScope);
+
+      //      SgVariableDeclaration * variableDeclaration = buildVariableDeclaration (
+      //          variableName, buildPointerType (
+      //              FortranTypesBuilder::getArray_RankOne (
+      //                                                       FortranTypesBuilder::getDoublePrecisionFloat () ) ),
+      //                                                      NULL,
+      //          subroutineScope);
+
+
+      //FortranTypesBuilder::getDoublePrecisionFloat ()
       SgVariableDeclaration * variableDeclaration = buildVariableDeclaration (
-          variableName, buildPointerType ( isArrayType ),
-							NULL,
-          subroutineScope );
+          variableName, buildPointerType (isArrayType), NULL, subroutineScope);
 
       variableDeclaration->get_declarationModifier ().get_accessModifier ().setUndefined ();
 
@@ -302,17 +300,14 @@ HostSubroutine::createDataMarshallingLocalVariables (
     {
       if (parallelLoop.isReductionRequiredForSpecificArgument (i) == false)
       {
-        string const variableName = VariablePrefixes::OP_DAT_Name
-            + lexical_cast <string> (i);
+        string const variableName = "argument" + lexical_cast <string> (i);
 
+        SgType * opdatType = parallelLoop.get_OP_DAT_Type (i);
+        SgArrayType * isArrayType = isSgArrayType (opdatType);
+        ROSE_ASSERT ( isArrayType != NULL );
 
-			  SgType * opdatType = parallelLoop.get_OP_DAT_Type ( i );
-				SgArrayType * isArrayType = isSgArrayType ( opdatType );
-				ROSE_ASSERT ( isArrayType != NULL );
-				
         SgVariableDeclaration * variableDeclaration = buildVariableDeclaration (
-            variableName, isArrayType, NULL,
-            subroutineScope);
+            variableName, isArrayType, NULL, subroutineScope);
 
         variableDeclaration->get_declarationModifier ().get_accessModifier ().setUndefined ();
         variableDeclaration->get_declarationModifier ().get_typeModifier ().setDevice ();
@@ -366,9 +361,9 @@ HostSubroutine::createCUDAKernelVariables ()
    * Also builds threadSynchRet
    * ======================================================
    */
-  localVariables_Others[IndirectAndDirectLoop::HostSubroutine::threadSynchRet]
+  localVariables_Others[IndirectAndDirectLoop::Fortran::HostSubroutine::threadSynchronizeReturnVariableName]
       = FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
-          IndirectAndDirectLoop::HostSubroutine::threadSynchRet,
+          IndirectAndDirectLoop::Fortran::HostSubroutine::threadSynchronizeReturnVariableName,
           FortranTypesBuilder::getFourByteInteger (), subroutineScope);
 }
 
@@ -452,7 +447,7 @@ HostSubroutine::createFormalParameters (
 
             string const className = classReference->get_name ().getString ();
 
-            if (iequals (className, OP2::Fortran::OP_SET))
+            if (iequals (className, OP2::OP_SET))
             {
               /*
                * ======================================================
@@ -478,7 +473,7 @@ HostSubroutine::createFormalParameters (
               formalParameter_OP_SET = opSetDeclaration;
             }
 
-            else if (iequals (className, OP2::Fortran::OP_MAP))
+            else if (iequals (className, OP2::OP_MAP))
             {
               /*
                * ======================================================
@@ -505,7 +500,7 @@ HostSubroutine::createFormalParameters (
               formalParameters_OP_MAP[variableNameSuffix] = opMapDeclaration;
             }
 
-            else if (iequals (className, OP2::Fortran::OP_DAT))
+            else if (iequals (className, OP2::OP_DAT))
             {
               /*
                * ======================================================
@@ -668,7 +663,7 @@ HostSubroutine::buildThreadSynchroniseFunctionCall (
   SgVarRefExp
       * threadSynchRetReference =
           buildVarRefExp (
-              localVariables_Others[IndirectAndDirectLoop::HostSubroutine::threadSynchRet]);
+              localVariables_Others[IndirectAndDirectLoop::Fortran::HostSubroutine::threadSynchronizeReturnVariableName]);
 
   SgFunctionCallExp * threadSynchRetFunctionCall = buildFunctionCallExp (
       cudaThreadSynchronizeFunctionSymbol, buildExprListExp ());
@@ -762,7 +757,6 @@ HostSubroutine::createReductionVariables (ParallelLoop & parallelLoop)
             subroutineScope);
         appendStatement (reductionVariable_reductionArrayOnDevice,
             subroutineScope);
-
       }
     }
   }
@@ -1038,7 +1032,6 @@ HostSubroutine::createSupportForReductionVariablesAfterKernel (
               1), outerLoopBody);
 
   appendStatement (outerRedCopyLoop, subroutineScope);
-
 }
 
 void
@@ -1102,4 +1095,3 @@ HostSubroutine::HostSubroutine (std::string const & subroutineName,
 
   subroutineScope = subroutineHeaderStatement->get_definition ()->get_body ();
 }
-

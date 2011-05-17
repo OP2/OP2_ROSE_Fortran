@@ -34,8 +34,9 @@ HostSubroutineOfDirectLoop::createKernelCall (
    * argSizes
    * ======================================================
    */
-  kernelParameters->append_expression (buildVarRefExp (
-      localVariables_Others[OtherVariableNames::argsSizes]));
+  kernelParameters->append_expression (
+      buildVarRefExp (
+          localVariables_Others[IndirectAndDirectLoop::Fortran::VariableNames::argsSizes]));
 
   /*
    * ======================================================
@@ -85,9 +86,11 @@ HostSubroutineOfDirectLoop::createKernelCall (
   SgExpression * opSetFormalArgumentReference = buildVarRefExp (
       formalParameter_OP_SET);
 
-  SgExpression * sizeFieldExpression = buildDotExp (
-      opSetFormalArgumentReference, buildOpaqueVarRefExp ("size",
-          subroutineScope));
+  SgExpression * sizeFieldExpression =
+      buildDotExp (opSetFormalArgumentReference,
+          buildOpaqueVarRefExp (
+              IndirectAndDirectLoop::Fortran::HostSubroutine::size,
+              subroutineScope));
 
   kernelParameters->append_expression (sizeFieldExpression);
 
@@ -194,12 +197,13 @@ HostSubroutineOfDirectLoop::createDeviceVariablesSizesVariable (
 
   SgVariableDeclaration * variableDeclaration2 =
       FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
-          OtherVariableNames::argsSizes,
+          IndirectAndDirectLoop::Fortran::VariableNames::argsSizes,
           deviceDataSizesDeclarationDirectLoops.getType (), subroutineScope);
 
   variableDeclaration2->get_declarationModifier ().get_typeModifier ().setDevice ();
 
-  localVariables_Others[OtherVariableNames::argsSizes] = variableDeclaration2;
+  localVariables_Others[IndirectAndDirectLoop::Fortran::VariableNames::argsSizes]
+      = variableDeclaration2;
 }
 
 void
@@ -228,14 +232,19 @@ HostSubroutineOfDirectLoop::initialiseDeviceVariablesSizesVariable (
     if (parallelLoop.isDuplicate_OP_DAT (i) == false)
     {
 
-      string const & variableName = VariablePrefixes::OP_DAT_Name
-          + lexical_cast <string> (i);
+      string const & variableName =
+          IndirectAndDirectLoop::Fortran::VariablePrefixes::OP_DAT
+              + lexical_cast <string> (i);
 
-      string const sizeFieldExpression = variableName + VariableSuffixes::Size;
+      string const sizeFieldExpression = variableName
+          + IndirectAndDirectLoop::Fortran::VariableSuffixes::Size;
 
-      SgExpression * sizeVariableField = buildDotExp (buildVarRefExp (
-          localVariables_Others[OtherVariableNames::argsSizes]),
-          buildOpaqueVarRefExp (sizeFieldExpression, subroutineScope));
+      SgExpression
+          * sizeVariableField =
+              buildDotExp (
+                  buildVarRefExp (
+                      localVariables_Others[IndirectAndDirectLoop::Fortran::VariableNames::argsSizes]),
+                  buildOpaqueVarRefExp (sizeFieldExpression, subroutineScope));
 
       SgVarRefExp * varRefExpression = NULL;
 
@@ -366,11 +375,10 @@ HostSubroutineOfDirectLoop::initialiseAllCUDAVariables (
    * ======================================================
    */
   SgExpression * multiplyNsharedPerWarpSize = buildMultiplyOp (buildVarRefExp (
-		CUDAVariable_sharedMemorySize), variable_OP_WARP_SIZE);
-	
+      CUDAVariable_sharedMemorySize), variable_OP_WARP_SIZE);
+
   FortranStatementsAndExpressionsBuilder::appendAssignmentStatement (
-		CUDAVariable_offsetS, multiplyNsharedPerWarpSize, subroutineScope);
-	
+      CUDAVariable_offsetS, multiplyNsharedPerWarpSize, subroutineScope);
 
   /*
    * ======================================================

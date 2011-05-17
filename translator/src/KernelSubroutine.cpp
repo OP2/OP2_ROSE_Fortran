@@ -14,11 +14,9 @@ KernelSubroutine::createArgsSizesFormalParameter (
   using SageBuilder::buildIntType;
   using SageInterface::appendStatement;
 
-  Debug::getInstance ()->debugMessage ("Creating arg sizes formal parameter", 2);
-
   formalParameter_argsSizes = buildVariableDeclaration (
-      OtherVariableNames::argsSizes, deviceDataSizesDeclaration.getType (),
-      NULL, subroutineScope);
+      IndirectAndDirectLoop::Fortran::VariableNames::argsSizes,
+      deviceDataSizesDeclaration.getType (), NULL, subroutineScope);
 
   formalParameter_argsSizes->get_declarationModifier ().get_accessModifier ().setUndefined ();
   formalParameter_argsSizes->get_declarationModifier ().get_typeModifier ().setDevice ();
@@ -54,12 +52,14 @@ KernelSubroutine::createLocalThreadVariables (ParallelLoop & parallelLoop,
         || (parallelLoop.get_OP_MAP_Value (i) == INDIRECT
             && parallelLoop.get_OP_Access_Value (i) == INC_ACCESS))
     {
-      string const localThreadVarName = VariablePrefixes::localVarNamePrefix
-          + lexical_cast <string> (i) + VariableSuffixes::localVarName;
+      string const localThreadVarName =
+          IndirectAndDirectLoop::Fortran::VariablePrefixes::OP_DAT
+              + lexical_cast <string> (i)
+              + IndirectAndDirectLoop::Fortran::VariableSuffixes::localVarName;
 
       /*
        * ======================================================
-       * retriving size from type of correponding op_dat
+       * Retrieving size from type of corresponding OP_DAT
        * declaration
        * ======================================================
        */
@@ -83,7 +83,6 @@ KernelSubroutine::createLocalThreadVariables (ParallelLoop & parallelLoop,
       appendStatement (variableDeclaration, &subroutineScope);
 
       localVariables_localThreadVariables[i] = variableDeclaration;
-
     }
   }
 }
@@ -144,12 +143,12 @@ KernelSubroutine::createAutosharedVariable (ParallelLoop & parallelLoop,
 
     localVariables_autoshared
         = FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
-            OtherVariableNames::autoshared,
+            IndirectAndDirectLoop::Fortran::VariableNames::autoshared,
             FortranTypesBuilder::getArray_RankOne (autosharedType, 0,
                 upperBound), scopeStatement);
 
     localVariables_autoshared->get_declarationModifier ().get_typeModifier ().setShared ();
-	}
+  }
 }
 
 void
@@ -479,10 +478,12 @@ KernelSubroutine::createUserSubroutineCall (
          * ======================================================
          */
 
-        string const variableName = VariablePrefixes::OP_DAT_Name
-            + lexical_cast <string> (i);
+        string const variableName =
+            IndirectAndDirectLoop::Fortran::VariablePrefixes::OP_DAT
+                + lexical_cast <string> (i);
 
-        string const variableSizeName = variableName + VariableSuffixes::Size;
+        string const variableSizeName = variableName
+            + IndirectAndDirectLoop::Fortran::VariableSuffixes::Size;
 
         SgExpression * argSizeField = buildDotExp (buildVarRefExp (
             formalParameter_argsSizes), buildOpaqueVarRefExp (variableSizeName,
@@ -524,8 +525,10 @@ KernelSubroutine::createUserSubroutineCall (
     }
     else if (parallelLoop.get_OP_MAP_Value (i) == INDIRECT)
     {
-      SgVarRefExp * autoshared_Reference = buildVarRefExp (
-          localVariables_Others[OtherVariableNames::autoshared]);
+      SgVarRefExp
+          * autoshared_Reference =
+              buildVarRefExp (
+                  localVariables_Others[IndirectAndDirectLoop::Fortran::VariableNames::autoshared]);
 
       SgVarRefExp * globalToLocalMappingArray_Reference = buildVarRefExp (
           (*formalParameters_GlobalToLocalMapping)[i]);

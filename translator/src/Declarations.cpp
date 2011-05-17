@@ -120,7 +120,7 @@ Declarations::visit (SgNode * node)
           calleeName =
               functionCallExp->getAssociatedFunctionSymbol ()->get_name ().getString ();
 
-      if (iequals (calleeName, OP2::Fortran::OP_DECL_SET_PREFIX))
+      if (iequals (calleeName, OP2::OP_DECL_SET))
       {
         /*
          * ======================================================
@@ -133,7 +133,7 @@ Declarations::visit (SgNode * node)
 
         OP_SET_Declarations.push_back (opSetDeclaration);
       }
-      else if (iequals (calleeName, OP2::Fortran::OP_DECL_MAP_PREFIX))
+      else if (iequals (calleeName, OP2::OP_DECL_MAP))
       {
         /*
          * ======================================================
@@ -146,7 +146,7 @@ Declarations::visit (SgNode * node)
 
         OP_MAP_Declarations.push_back (opMapDeclaration);
       }
-      else if (iequals (calleeName, OP2::Fortran::OP_DECL_DAT_PREFIX))
+      else if (iequals (calleeName, OP2::OP_DECL_DAT))
       {
         /*
          * ======================================================
@@ -159,7 +159,7 @@ Declarations::visit (SgNode * node)
 
         OP_DAT_Declarations.push_back (opDatDeclaration);
       }
-      else if (iequals (calleeName, OP2::Fortran::OP_DECL_GBL_PREFIX))
+      else if (iequals (calleeName, OP2::OP_DECL_GBL))
       {
         /*
          * ======================================================
@@ -188,13 +188,12 @@ Declarations::visit (SgNode * node)
           SgClassType * classType = isSgClassType (
               variableDeclaration->get_variables ().front ()->get_type ());
 
-          if (starts_with (classType->get_name ().getString (),
-              OP2::CPlusPlus::OP_DAT))
+          if (starts_with (classType->get_name ().getString (), OP2::OP_DAT))
           {
 
           }
           else if (starts_with (classType->get_name ().getString (),
-              OP2::CPlusPlus::OP_DAT_GBL))
+              OP2::OP_DAT_GBL))
           {
 
           }
@@ -207,13 +206,12 @@ Declarations::visit (SgNode * node)
           SgTypedefType * typedefType = isSgTypedefType (
               variableDeclaration->get_variables ().front ()->get_type ());
 
-          if (iequals (typedefType->get_name ().getString (),
-              OP2::CPlusPlus::OP_SET))
+          if (iequals (typedefType->get_name ().getString (), OP2::OP_SET))
           {
 
           }
           else if (iequals (typedefType->get_name ().getString (),
-              OP2::CPlusPlus::OP_MAP))
+              OP2::CPlusPlus::OP_PTR))
           {
 
           }

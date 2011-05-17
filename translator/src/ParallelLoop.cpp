@@ -62,7 +62,7 @@ ParallelLoop::retrieveOP_DATDeclarations (Declarations * declarations)
 
             string const className = classReference->get_name ().getString ();
 
-            if (iequals (className, OP2::Fortran::OP_DAT))
+            if (iequals (className, OP2::OP_DAT))
             {
               OP_DATCounter++;
 
@@ -123,9 +123,9 @@ ParallelLoop::retrieveOP_DATDeclarations (Declarations * declarations)
               }
             }
 
-            else if (iequals (className, OP2::Fortran::OP_MAP))
+            else if (iequals (className, OP2::OP_MAP))
             {
-              if (iequals (variableName, OP2::Fortran::OP_ID))
+              if (iequals (variableName, OP2::OP_ID))
               {
                 /*
                  * ======================================================
@@ -137,7 +137,7 @@ ParallelLoop::retrieveOP_DATDeclarations (Declarations * declarations)
               }
               else
               {
-                if (iequals (variableName, OP2::Fortran::OP_GBL))
+                if (iequals (variableName, OP2::OP_GBL))
                 {
                   /*
                    * ======================================================
@@ -163,22 +163,22 @@ ParallelLoop::retrieveOP_DATDeclarations (Declarations * declarations)
             string const variableName =
                 variableReference->get_symbol ()->get_name ().getString ();
 
-            if (iequals (variableName, OP2::Fortran::OP_READ))
+            if (iequals (variableName, OP2::OP_READ))
             {
               OP_DAT_AccessDescriptors[OP_DATCounter] = READ_ACCESS;
             }
 
-            else if (iequals (variableName, OP2::Fortran::OP_WRITE))
+            else if (iequals (variableName, OP2::OP_WRITE))
             {
               OP_DAT_AccessDescriptors[OP_DATCounter] = WRITE_ACCESS;
             }
 
-            else if (iequals (variableName, OP2::Fortran::OP_INC))
+            else if (iequals (variableName, OP2::OP_INC))
             {
               OP_DAT_AccessDescriptors[OP_DATCounter] = INC_ACCESS;
             }
 
-            else if (iequals (variableName, OP2::Fortran::OP_RW))
+            else if (iequals (variableName, OP2::OP_RW))
             {
               OP_DAT_AccessDescriptors[OP_DATCounter] = RW_ACCESS;
             }

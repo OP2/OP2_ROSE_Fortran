@@ -169,10 +169,14 @@ NewSubroutinesGeneration::addLibraries (SgModuleStatement * moduleStatement)
       "Adding 'use' statements to CUDA module", 2);
 
   vector <string> libs;
-  libs.push_back ("ISO_C_BINDING");
-  libs.push_back ("OP2_C");
-  libs.push_back ("cudaConfigurationParams");
-  libs.push_back ("cudafor");
+  libs.push_back (IndirectAndDirectLoop::Fortran::Libraries::ISO_C_BINDING);
+
+  libs.push_back (IndirectAndDirectLoop::Fortran::Libraries::OP2_C);
+
+  libs.push_back (
+      IndirectAndDirectLoop::Fortran::Libraries::cudaConfigurationParams);
+
+  libs.push_back (IndirectAndDirectLoop::Fortran::Libraries::cudafor);
 
   for (vector <string>::const_iterator it = libs.begin (); it != libs.end (); ++it)
   {
@@ -330,7 +334,7 @@ NewSubroutinesGeneration::visit (SgNode * node)
        * to the translator
        * ======================================================
        */
-      if (starts_with (calleeName, OP2::Fortran::OP_PAR_LOOP_PREFIX))
+      if (starts_with (calleeName, OP2::OP_PAR_LOOP))
       {
         /*
          * ======================================================
@@ -444,25 +448,25 @@ NewSubroutinesGeneration::visit (SgNode * node)
                         *deviceDataSizesDeclarationDirectLoops,
                         reductionSubroutines, *parallelLoop, moduleScope);
 
-                HostSubroutine * hostSubroutine =
-                    new HostSubroutineOfDirectLoop (userSubroutineName,
-                        *userDeviceSubroutine, *kernelSubroutine,
-                        *deviceDataSizesDeclarationDirectLoops, *parallelLoop,
-                        moduleScope);
-
-                /*
-                 * ======================================================
-                 * Get the scope of the AST node representing the entire
-                 * call statement
-                 * ======================================================
-                 */
-                SgScopeStatement * scope = isSgExprStatement (
-                    node->get_parent ())->get_scope ();
-
-                ROSE_ASSERT (scope != NULL);
-
-                patchOP_PAR_LOOPCalls (*parallelLoop, *userDeviceSubroutine,
-                    *hostSubroutine, scope, functionCallExp);
+//                HostSubroutine * hostSubroutine =
+//                    new HostSubroutineOfDirectLoop (userSubroutineName,
+//                        *userDeviceSubroutine, *kernelSubroutine,
+//                        *deviceDataSizesDeclarationDirectLoops, *parallelLoop,
+//                        moduleScope);
+//
+//                /*
+//                 * ======================================================
+//                 * Get the scope of the AST node representing the entire
+//                 * call statement
+//                 * ======================================================
+//                 */
+//                SgScopeStatement * scope = isSgExprStatement (
+//                    node->get_parent ())->get_scope ();
+//
+//                ROSE_ASSERT (scope != NULL);
+//
+//                patchOP_PAR_LOOPCalls (*parallelLoop, *userDeviceSubroutine,
+//                    *hostSubroutine, scope, functionCallExp);
               }
               else
               {

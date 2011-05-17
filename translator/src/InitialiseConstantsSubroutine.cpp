@@ -125,7 +125,7 @@ InitialiseConstantsSubroutine::generateSubroutineForAlreadyComputedValues (
 
   FortranStatementsAndExpressionsBuilder::appendAssignmentStatement (
       constantDeclarations[variableNamePrefix
-          + IndirectLoop::Fortran::StringSeparator::constantsSeparator
+          + IndirectLoop::Fortran::ConstantSuffixes::constantsSeparator
           + IndirectLoop::Fortran::ConstantSuffixes::gam], buildFloatVal (1.4),
       subroutineScope);
 
@@ -137,7 +137,7 @@ InitialiseConstantsSubroutine::generateSubroutineForAlreadyComputedValues (
 
   FortranStatementsAndExpressionsBuilder::appendAssignmentStatement (
       constantDeclarations[variableNamePrefix
-          + IndirectLoop::Fortran::StringSeparator::constantsSeparator
+          + IndirectLoop::Fortran::ConstantSuffixes::constantsSeparator
           + IndirectLoop::Fortran::ConstantSuffixes::gm1], buildFloatVal (0.4),
       subroutineScope);
 
@@ -149,7 +149,7 @@ InitialiseConstantsSubroutine::generateSubroutineForAlreadyComputedValues (
 
   FortranStatementsAndExpressionsBuilder::appendAssignmentStatement (
       constantDeclarations[variableNamePrefix
-          + IndirectLoop::Fortran::StringSeparator::constantsSeparator
+          + IndirectLoop::Fortran::ConstantSuffixes::constantsSeparator
           + IndirectLoop::Fortran::ConstantSuffixes::cfl], buildFloatVal (0.9),
       subroutineScope);
 
@@ -161,7 +161,7 @@ InitialiseConstantsSubroutine::generateSubroutineForAlreadyComputedValues (
 
   FortranStatementsAndExpressionsBuilder::appendAssignmentStatement (
       constantDeclarations[variableNamePrefix
-          + IndirectLoop::Fortran::StringSeparator::constantsSeparator
+          + IndirectLoop::Fortran::ConstantSuffixes::constantsSeparator
           + IndirectLoop::Fortran::ConstantSuffixes::eps],
       buildFloatVal (0.05), subroutineScope);
 
@@ -173,7 +173,7 @@ InitialiseConstantsSubroutine::generateSubroutineForAlreadyComputedValues (
 
   FortranStatementsAndExpressionsBuilder::appendAssignmentStatement (
       constantDeclarations[variableNamePrefix
-          + IndirectLoop::Fortran::StringSeparator::constantsSeparator
+          + IndirectLoop::Fortran::ConstantSuffixes::constantsSeparator
           + IndirectLoop::Fortran::ConstantSuffixes::mach],
       buildFloatVal (0.4), subroutineScope);
 
@@ -185,7 +185,7 @@ InitialiseConstantsSubroutine::generateSubroutineForAlreadyComputedValues (
 
   FortranStatementsAndExpressionsBuilder::appendAssignmentStatement (
       constantDeclarations[variableNamePrefix
-          + IndirectLoop::Fortran::StringSeparator::constantsSeparator
+          + IndirectLoop::Fortran::ConstantSuffixes::constantsSeparator
           + IndirectLoop::Fortran::ConstantSuffixes::alpha], buildFloatVal (
           0.052360), subroutineScope);
 
@@ -197,7 +197,7 @@ InitialiseConstantsSubroutine::generateSubroutineForAlreadyComputedValues (
 
   SgPntrArrRefExp * arrayExpression1 = buildPntrArrRefExp (
       variableReferences[variableNamePrefix
-          + IndirectLoop::Fortran::StringSeparator::constantsSeparator
+          + IndirectLoop::Fortran::ConstantSuffixes::constantsSeparator
           + IndirectLoop::Fortran::ConstantSuffixes::qinf], buildIntVal (1));
 
   SgExpression * assignmentExpression1 = buildAssignOp (arrayExpression1,
@@ -213,7 +213,7 @@ InitialiseConstantsSubroutine::generateSubroutineForAlreadyComputedValues (
 
   SgPntrArrRefExp * arrayExpression2 = buildPntrArrRefExp (
       variableReferences[variableNamePrefix
-          + IndirectLoop::Fortran::StringSeparator::constantsSeparator
+          + IndirectLoop::Fortran::ConstantSuffixes::constantsSeparator
           + IndirectLoop::Fortran::ConstantSuffixes::qinf], buildIntVal (2));
 
   //  SgExpression * multiplyExpression2 = buildMultiplyOp (
@@ -232,7 +232,7 @@ InitialiseConstantsSubroutine::generateSubroutineForAlreadyComputedValues (
 
   SgPntrArrRefExp * arrayExpression3 = buildPntrArrRefExp (
       variableReferences[variableNamePrefix
-          + IndirectLoop::Fortran::StringSeparator::constantsSeparator
+          + IndirectLoop::Fortran::ConstantSuffixes::constantsSeparator
           + IndirectLoop::Fortran::ConstantSuffixes::qinf], buildIntVal (3));
 
   SgExpression * assignmentExpression3 = buildAssignOp (arrayExpression3,
@@ -248,7 +248,7 @@ InitialiseConstantsSubroutine::generateSubroutineForAlreadyComputedValues (
 
   SgPntrArrRefExp * arrayExpression4 = buildPntrArrRefExp (
       variableReferences[variableNamePrefix
-          + IndirectLoop::Fortran::StringSeparator::constantsSeparator
+          + IndirectLoop::Fortran::ConstantSuffixes::constantsSeparator
           + IndirectLoop::Fortran::ConstantSuffixes::qinf], buildIntVal (4));
 
   //  SgExpression * multiplyExpression4 = buildMultiplyOp (
@@ -609,31 +609,31 @@ InitialiseConstantsSubroutine::declareConstants (SgScopeStatement * moduleScope)
   vector <string> doublePrecisionVariables;
 
   string const airConstModified = variableNamePrefix
-      + IndirectLoop::Fortran::StringSeparator::constantsSeparator
+      + IndirectLoop::Fortran::ConstantSuffixes::constantsSeparator
       + IndirectLoop::Fortran::ConstantSuffixes::air_const;
 
   string const alphaConstModified = variableNamePrefix
-      + IndirectLoop::Fortran::StringSeparator::constantsSeparator
+      + IndirectLoop::Fortran::ConstantSuffixes::constantsSeparator
       + IndirectLoop::Fortran::ConstantSuffixes::alpha;
 
   string const cflConstModified = variableNamePrefix
-      + IndirectLoop::Fortran::StringSeparator::constantsSeparator
+      + IndirectLoop::Fortran::ConstantSuffixes::constantsSeparator
       + IndirectLoop::Fortran::ConstantSuffixes::cfl;
 
   string const epsConstModified = variableNamePrefix
-      + IndirectLoop::Fortran::StringSeparator::constantsSeparator
+      + IndirectLoop::Fortran::ConstantSuffixes::constantsSeparator
       + IndirectLoop::Fortran::ConstantSuffixes::eps;
 
   string const gamConstModified = variableNamePrefix
-      + IndirectLoop::Fortran::StringSeparator::constantsSeparator
+      + IndirectLoop::Fortran::ConstantSuffixes::constantsSeparator
       + IndirectLoop::Fortran::ConstantSuffixes::gam;
 
   string const gm1ConstModified = variableNamePrefix
-      + IndirectLoop::Fortran::StringSeparator::constantsSeparator
+      + IndirectLoop::Fortran::ConstantSuffixes::constantsSeparator
       + IndirectLoop::Fortran::ConstantSuffixes::gm1;
 
   string const machConstModified = variableNamePrefix
-      + IndirectLoop::Fortran::StringSeparator::constantsSeparator
+      + IndirectLoop::Fortran::ConstantSuffixes::constantsSeparator
       + IndirectLoop::Fortran::ConstantSuffixes::mach;
 
   doublePrecisionVariables.push_back (airConstModified);
@@ -665,7 +665,7 @@ InitialiseConstantsSubroutine::declareConstants (SgScopeStatement * moduleScope)
   vector <string> doublePrecisionArrayVariables;
 
   string const qinfConstModified = variableNamePrefix
-      + IndirectLoop::Fortran::StringSeparator::constantsSeparator
+      + IndirectLoop::Fortran::ConstantSuffixes::constantsSeparator
       + IndirectLoop::Fortran::ConstantSuffixes::qinf;
 
   doublePrecisionArrayVariables.push_back (qinfConstModified);
@@ -694,43 +694,57 @@ InitialiseConstantsSubroutine::InitialiseConstantsSubroutine (
 
   constantVariablesNamesBeforeTransformation.push_back (
       IndirectLoop::Fortran::ConstantSuffixes::air_const);
+
   constantVariablesNamesBeforeTransformation.push_back (
       IndirectLoop::Fortran::ConstantSuffixes::alpha);
+
   constantVariablesNamesBeforeTransformation.push_back (
       IndirectLoop::Fortran::ConstantSuffixes::cfl);
+
   constantVariablesNamesBeforeTransformation.push_back (
       IndirectLoop::Fortran::ConstantSuffixes::eps);
+
   constantVariablesNamesBeforeTransformation.push_back (
       IndirectLoop::Fortran::ConstantSuffixes::gam);
+
   constantVariablesNamesBeforeTransformation.push_back (
       IndirectLoop::Fortran::ConstantSuffixes::gm1);
+
   constantVariablesNamesBeforeTransformation.push_back (
       IndirectLoop::Fortran::ConstantSuffixes::mach);
+
   constantVariablesNamesBeforeTransformation.push_back (
       IndirectLoop::Fortran::ConstantSuffixes::qinf);
 
   constantVariablesNamesAfterTransformation.push_back (subroutineName
-      + IndirectLoop::Fortran::StringSeparator::constantsSeparator
+      + IndirectLoop::Fortran::ConstantSuffixes::constantsSeparator
       + IndirectLoop::Fortran::ConstantSuffixes::air_const);
+
   constantVariablesNamesAfterTransformation.push_back (subroutineName
-      + IndirectLoop::Fortran::StringSeparator::constantsSeparator
+      + IndirectLoop::Fortran::ConstantSuffixes::constantsSeparator
       + IndirectLoop::Fortran::ConstantSuffixes::alpha);
+
   constantVariablesNamesAfterTransformation.push_back (subroutineName
-      + IndirectLoop::Fortran::StringSeparator::constantsSeparator
+      + IndirectLoop::Fortran::ConstantSuffixes::constantsSeparator
       + IndirectLoop::Fortran::ConstantSuffixes::cfl);
+
   constantVariablesNamesAfterTransformation.push_back (subroutineName
-      + IndirectLoop::Fortran::StringSeparator::constantsSeparator
+      + IndirectLoop::Fortran::ConstantSuffixes::constantsSeparator
       + IndirectLoop::Fortran::ConstantSuffixes::eps);
+
   constantVariablesNamesAfterTransformation.push_back (subroutineName
-      + IndirectLoop::Fortran::StringSeparator::constantsSeparator
+      + IndirectLoop::Fortran::ConstantSuffixes::constantsSeparator
       + IndirectLoop::Fortran::ConstantSuffixes::gam);
+
   constantVariablesNamesAfterTransformation.push_back (subroutineName
-      + IndirectLoop::Fortran::StringSeparator::constantsSeparator
+      + IndirectLoop::Fortran::ConstantSuffixes::constantsSeparator
       + IndirectLoop::Fortran::ConstantSuffixes::gm1);
+
   constantVariablesNamesAfterTransformation.push_back (subroutineName
-      + IndirectLoop::Fortran::StringSeparator::constantsSeparator
+      + IndirectLoop::Fortran::ConstantSuffixes::constantsSeparator
       + IndirectLoop::Fortran::ConstantSuffixes::mach);
+
   constantVariablesNamesAfterTransformation.push_back (subroutineName
-      + IndirectLoop::Fortran::StringSeparator::constantsSeparator
+      + IndirectLoop::Fortran::ConstantSuffixes::constantsSeparator
       + IndirectLoop::Fortran::ConstantSuffixes::qinf);
 }

@@ -729,7 +729,7 @@ KernelSubroutineOfDirectLoop::createLocalVariables (ParallelLoop & parallelLoop)
   variable_setElementCounter = buildVariableDeclaration ("n",
       FortranTypesBuilder::getFourByteInteger (), NULL, subroutineScope);
 
-//  variable_setElementCounter->get_declarationModifier ().get_typeModifier ().setDevice ();
+  //  variable_setElementCounter->get_declarationModifier ().get_typeModifier ().setDevice ();
   variable_setElementCounter->get_declarationModifier ().get_accessModifier ().setUndefined ();
 
   appendStatement (variable_setElementCounter, subroutineScope);
@@ -743,7 +743,7 @@ KernelSubroutineOfDirectLoop::createLocalVariables (ParallelLoop & parallelLoop)
   variable_dataPerElementCounter = buildVariableDeclaration ("m",
       FortranTypesBuilder::getFourByteInteger (), NULL, subroutineScope);
 
-//  variable_dataPerElementCounter->get_declarationModifier ().get_typeModifier ().setDevice ();
+  //  variable_dataPerElementCounter->get_declarationModifier ().get_typeModifier ().setDevice ();
   variable_dataPerElementCounter->get_declarationModifier ().get_accessModifier ().setUndefined ();
 
   appendStatement (variable_dataPerElementCounter, subroutineScope);
@@ -758,7 +758,7 @@ KernelSubroutineOfDirectLoop::createLocalVariables (ParallelLoop & parallelLoop)
   variable_tIdModWarpSize = buildVariableDeclaration ("tid",
       FortranTypesBuilder::getFourByteInteger (), NULL, subroutineScope);
 
-//  variable_tIdModWarpSize->get_declarationModifier ().get_typeModifier ().setDevice ();
+  //  variable_tIdModWarpSize->get_declarationModifier ().get_typeModifier ().setDevice ();
   variable_tIdModWarpSize->get_declarationModifier ().get_accessModifier ().setUndefined ();
 
   appendStatement (variable_tIdModWarpSize, subroutineScope);
@@ -772,7 +772,7 @@ KernelSubroutineOfDirectLoop::createLocalVariables (ParallelLoop & parallelLoop)
   variable_offsetInThreadBlock = buildVariableDeclaration ("offset",
       FortranTypesBuilder::getFourByteInteger (), NULL, subroutineScope);
 
-//  variable_offsetInThreadBlock->get_declarationModifier ().get_typeModifier ().setDevice ();
+  //  variable_offsetInThreadBlock->get_declarationModifier ().get_typeModifier ().setDevice ();
   variable_offsetInThreadBlock->get_declarationModifier ().get_accessModifier ().setUndefined ();
 
   appendStatement (variable_offsetInThreadBlock, subroutineScope);
@@ -789,7 +789,7 @@ KernelSubroutineOfDirectLoop::createLocalVariables (ParallelLoop & parallelLoop)
       "nelems", FortranTypesBuilder::getFourByteInteger (), NULL,
       subroutineScope);
 
-//  variable_numberOfThreadInWarpOrRemainingElems->get_declarationModifier ().get_typeModifier ().setDevice ();
+  //  variable_numberOfThreadInWarpOrRemainingElems->get_declarationModifier ().get_typeModifier ().setDevice ();
   variable_numberOfThreadInWarpOrRemainingElems->get_declarationModifier ().get_accessModifier ().setUndefined ();
 
   appendStatement (variable_numberOfThreadInWarpOrRemainingElems,
@@ -799,7 +799,7 @@ KernelSubroutineOfDirectLoop::createLocalVariables (ParallelLoop & parallelLoop)
       "argSDisplacement", FortranTypesBuilder::getFourByteInteger (), NULL,
       subroutineScope);
 
-//  variable_displacementInAutoshared->get_declarationModifier ().get_typeModifier ().setDevice ();
+  //  variable_displacementInAutoshared->get_declarationModifier ().get_typeModifier ().setDevice ();
   variable_displacementInAutoshared->get_declarationModifier ().get_accessModifier ().setUndefined ();
 
   appendStatement (variable_displacementInAutoshared, subroutineScope);
@@ -856,10 +856,12 @@ KernelSubroutineOfDirectLoop::create_OP_DAT_FormalParameters (
        * ======================================================
        */
 
-      string const & variableName = VariablePrefixes::OP_DAT_Name
-          + lexical_cast <string> (i);
+      string const & variableName =
+          IndirectAndDirectLoop::Fortran::VariablePrefixes::OP_DAT
+              + lexical_cast <string> (i);
 
-      string const & variableSizeName = variableName + VariableSuffixes::Size;
+      string const & variableSizeName = variableName
+          + IndirectAndDirectLoop::Fortran::VariableSuffixes::Size;
 
       SgExpression * argSizeField = buildDotExp (buildVarRefExp (
           formalParameter_argsSizes), buildOpaqueVarRefExp (variableSizeName,
