@@ -47,8 +47,8 @@ class KernelSubroutineOfIndirectLoop: public KernelSubroutine
 
   private:
 
-		void
-		applyPointeredIncrementsOrWrites ( ParallelLoop & parallelLoop );
+    void
+    applyPointeredIncrementsOrWrites (ParallelLoop & parallelLoop);
 
     void
     createPlanWhileLoop (UserDeviceSubroutine & userDeviceSubroutine,

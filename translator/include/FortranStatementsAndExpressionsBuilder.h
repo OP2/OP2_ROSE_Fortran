@@ -74,6 +74,18 @@ class FortranStatementsAndExpressionsBuilder
 
     /*
      * ======================================================
+     * Appends a variable declaration to the given scope
+     * and returns it so other properties can be set
+     * ======================================================
+     */
+    static void
+    appendVariableDeclarationAsFormalParameter (
+        std::string const & variableName, SgType * type,
+        SgScopeStatement * scope, SgFunctionParameterList * formalParameters,
+        ...);
+
+    /*
+     * ======================================================
      * Appends an allocate statement to the given scope
      * ======================================================
      */

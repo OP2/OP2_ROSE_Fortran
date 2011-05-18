@@ -150,6 +150,15 @@ FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
 }
 
 void
+FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
+    std::string const & variableName, SgType * type, SgScopeStatement * scope,
+    SgFunctionParameterList * formalParameters, ...)
+{
+  SgVariableDeclaration * variableDeclaration = appendVariableDeclaration (
+      variableName, type, scope);
+}
+
+void
 FortranStatementsAndExpressionsBuilder::appendAllocateStatement (
     SgExprListExp * allocateParameters, SgScopeStatement * scope)
 {

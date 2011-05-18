@@ -93,6 +93,40 @@ ParallelLoop::retrieveOP_DATDeclarations (Declarations * declarations)
                   unique_OP_DATs.push_back (variableName);
 
                   OP_DAT_Duplicates[OP_DATCounter] = false;
+
+                  SgArrayType * isArrayType = isSgArrayType (
+                      opDatDeclaration->getActualType ());
+
+                  if (isArrayType == NULL)
+                  {
+                    Debug::getInstance ()->errorMessage ("OP_DAT '"
+                        + variableName + "' is not an array");
+                  }
+
+                  SgType * baseType = isArrayType->get_base_type ();
+
+                  if (isSgTypeFloat (baseType) != NULL)
+                  {
+                    SgIntVal * sizeOfRealType = isSgIntVal (
+                        baseType->get_type_kind ());
+
+                    if (sizeOfRealType == NULL)
+                    {
+                      Debug::getInstance ()->errorMessage (
+                          "The size of the base type of OP_DAT '"
+                              + variableName + "' cannot be determined");
+                    }
+                    else
+                    {
+                      Debug::getInstance ()->debugMessage (
+                          "The size of the base type of OP_DAT '"
+                              + variableName + "' is "
+                              + lexical_cast <string> (
+                                  sizeOfRealType->get_value ()), 7);
+
+                      sizeOf_OP_DAT = sizeOfRealType->get_value ();
+                    }
+                  }
                 }
                 else
                 {
@@ -221,7 +255,6 @@ bool
 ParallelLoop::isDirectLoop () const
 {
   using std::map;
-  using std::string;
 
   for (map <unsigned int, MAPPING_VALUE>::const_iterator it =
       OP_DAT_MappingDescriptors.begin (); it
@@ -240,7 +273,6 @@ unsigned int
 ParallelLoop::getNumberOfDistinctIndirect_OP_DAT_Arguments ()
 {
   using std::map;
-  using std::string;
 
   unsigned int count = 0;
 
@@ -261,34 +293,34 @@ ParallelLoop::getNumberOfDistinctIndirect_OP_DAT_Arguments ()
 int
 ParallelLoop::getNumberOfIndirectDataSets ()
 {
-  int numberOfIndirectDatasets = 0;
+  int count = 0;
 
   for (unsigned int i = 1; i <= getNumberOf_OP_DAT_ArgumentGroups (); ++i)
   {
     if (OP_DAT_MappingDescriptors[i] == INDIRECT)
     {
-      numberOfIndirectDatasets++;
+      count++;
     }
   }
 
-  return numberOfIndirectDatasets;
+  return count;
 }
 
 int
 ParallelLoop::getNumberOfDifferentIndirectDataSets ()
 {
-  int numberOfDifferentIndirectDatasets = 0;
+  int count = 0;
 
   for (unsigned int i = 1; i <= getNumberOf_OP_DAT_ArgumentGroups (); ++i)
   {
     if (OP_DAT_MappingDescriptors[i] == INDIRECT && isDuplicate_OP_DAT (i)
         == false)
     {
-      numberOfDifferentIndirectDatasets++;
+      count++;
     }
   }
 
-  return numberOfDifferentIndirectDatasets;
+  return count;
 }
 
 bool
@@ -301,17 +333,6 @@ ParallelLoop::isReductionRequired ()
     {
       return true;
     }
-  }
-  return false;
-}
-
-bool
-ParallelLoop::isReductionRequiredForSpecificArgument (int opDatIndex)
-{
-  if (OP_DAT_MappingDescriptors[opDatIndex] == GLOBAL
-      && OP_DAT_AccessDescriptors[opDatIndex] != READ_ACCESS)
-  {
-    return true;
   }
   return false;
 }

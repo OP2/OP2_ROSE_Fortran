@@ -9,6 +9,8 @@
 #ifndef COMMON_NAMESPACES_H
 #define COMMON_NAMESPACES_H
 
+#include <boost/lexical_cast.hpp>
+
 namespace OP2
 {
   /*
@@ -79,6 +81,24 @@ namespace IndirectAndDirectLoop
 {
   namespace Fortran
   {
+    namespace ReductionSubroutine
+    {
+      namespace VariableNames
+      {
+        std::string const inputValue = "dat_l";
+        std::string const iterationCounter = "i";
+        std::string const reductionResultOnDevice = "dat_g";
+        std::string const sharedMemoryStartOffset = "sharedMemoryStartOffset";
+        std::string const threadID = "threadID";
+        std::string const warpSize = "warpSize";
+      }
+
+      namespace SubroutineNames
+      {
+        std::string const shift = "ishft";
+      }
+    }
+
     namespace HostSubroutine
     {
       std::string const subroutineName = "subroutineName";
@@ -93,6 +113,11 @@ namespace IndirectAndDirectLoop
       std::string const threadSynchronizeSubroutineName =
           "cudaThreadSynchronize";
       std::string const threadSynchronizeReturnVariableName = "threadSynchRet";
+    }
+
+    namespace KernelSubroutine
+    {
+      std::string const offsetForReduction = "offsetReduction";
     }
 
     namespace VariableNames
@@ -216,7 +241,7 @@ namespace IndirectLoop
         std::string const argsNumber = "argsNumber";
         std::string const blockOffset = "blockOffset";
         std::string const col = "col";
-        std::string const IterationCounter = "i";
+        std::string const iterationCounter = "i";
         std::string const idxs = "idxs";
         std::string const inds = "inds";
         std::string const indsNumber = "indsNumber";
@@ -305,7 +330,15 @@ namespace DirectLoop
 
     namespace KernelSubroutine
     {
-
+      std::string const setSize = "setSize";
+      std::string const offsetS = "offsetS";
+      std::string const warpSize = "warpSize";
+      std::string const setElementCounter = "n";
+      std::string const dataPerElementCounter = "m";
+      std::string const threadIDModulus = "tid";
+      std::string const offsetInThreadBlock = "offset";
+      std::string const remainingElements = "nelems";
+      std::string const autosharedDisplacement = "autosharedDisplacement";
     }
   }
 
@@ -351,6 +384,11 @@ namespace CUDA
     namespace FieldNames
     {
       std::string const x = "x";
+    }
+
+    namespace SubroutineNames
+    {
+      std::string const syncthreads = "syncthreads";
     }
 
     namespace DirectLoop

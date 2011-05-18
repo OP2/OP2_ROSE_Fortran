@@ -38,7 +38,7 @@ HostSubroutine::copyDataBackFromDeviceAndDeallocate (
   {
     if (parallelLoop.isDuplicate_OP_DAT (i) == false)
     {
-      if (parallelLoop.isReductionRequiredForSpecificArgument (i) == false)
+      if (parallelLoop.isReductionRequired (i) == false)
       {
 
         SgVarRefExp * opDatDeviceReference = buildVarRefExp (
@@ -63,7 +63,7 @@ HostSubroutine::copyDataBackFromDeviceAndDeallocate (
   {
     if (parallelLoop.isDuplicate_OP_DAT (i) == false)
     {
-      if (parallelLoop.isReductionRequiredForSpecificArgument (i) == false)
+      if (parallelLoop.isReductionRequired (i) == false)
       {
         SgVarRefExp * opDatDeviceReference = buildVarRefExp (
             localVariables_OP_DAT_VariablesOnDevice[i]);
@@ -172,7 +172,7 @@ HostSubroutine::initialiseDataMarshallingLocalVariables (
   {
     if (parallelLoop.isDuplicate_OP_DAT (i) == false)
     {
-      if (parallelLoop.isReductionRequiredForSpecificArgument (i) == false)
+      if (parallelLoop.isReductionRequired (i) == false)
       {
         SgVarRefExp * opDatSizeReference = buildVarRefExp (
             localVariables_OP_DAT_Sizes[i]);
@@ -197,7 +197,7 @@ HostSubroutine::initialiseDataMarshallingLocalVariables (
   {
     if (parallelLoop.isDuplicate_OP_DAT (i) == false)
     {
-      if (parallelLoop.isReductionRequiredForSpecificArgument (i) == false)
+      if (parallelLoop.isReductionRequired (i) == false)
       {
         SgVarRefExp * opDatDeviceReference = buildVarRefExp (
             localVariables_OP_DAT_VariablesOnDevice[i]);
@@ -309,7 +309,7 @@ HostSubroutine::createDataMarshallingLocalVariables (
   {
     if (parallelLoop.isDuplicate_OP_DAT (i) == false)
     {
-      if (parallelLoop.isReductionRequiredForSpecificArgument (i) == false)
+      if (parallelLoop.isReductionRequired (i) == false)
       {
         string const variableName = "argument" + lexical_cast <string> (i);
 
@@ -705,7 +705,7 @@ HostSubroutine::createReductionVariables (ParallelLoop & parallelLoop)
     for (unsigned int i = 1; i
         <= parallelLoop.getNumberOf_OP_DAT_ArgumentGroups (); ++i)
     {
-      if (parallelLoop.isReductionRequiredForSpecificArgument (i) == true)
+      if (parallelLoop.isReductionRequired (i) == true)
       {
 
         /*
@@ -831,7 +831,7 @@ HostSubroutine::createSupportForReductionVariablesBeforeKernel (
   for (unsigned int i = 1; i
       <= parallelLoop.getNumberOf_OP_DAT_ArgumentGroups (); ++i)
   {
-    if (parallelLoop.isReductionRequiredForSpecificArgument (i) == true)
+    if (parallelLoop.isReductionRequired (i) == true)
     {
       int currentDim = parallelLoop.get_OP_DAT_Dimension (i);
 
@@ -996,7 +996,7 @@ HostSubroutine::createSupportForReductionVariablesAfterKernel (
 
   for (unsigned int i = 1; i
       <= parallelLoop.getNumberOf_OP_DAT_ArgumentGroups (); ++i)
-    if (parallelLoop.isReductionRequiredForSpecificArgument (i) == true)
+    if (parallelLoop.isReductionRequired (i) == true)
     {
       dim = parallelLoop.get_OP_DAT_Dimension (i);
       positionInOPDatsArray = i;

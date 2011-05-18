@@ -9,18 +9,6 @@
 class KernelSubroutine: public Subroutine
 {
   protected:
-
-    /*
-     * ======================================================
-     * The first formal parameter of the CUDA kernel in both
-     * direct and indirect loops is a
-     * variable containing the size information of the other
-     * formal parameters
-     * ======================================================
-     */
-
-    SgVariableDeclaration * formalParameter_argsSizes;
-
     /*
      * ======================================================
      * The OP_DAT formal parameters
@@ -31,44 +19,11 @@ class KernelSubroutine: public Subroutine
 
     /*
      * ======================================================
-     * Offset in shared memory for reduction variables,
-     * in case it is needed
-     * ======================================================
-     */
-    SgVariableDeclaration * formalParameter_offsetForReduction;
-
-    /*
-     * ======================================================
-     * Size of the warp for OP2 when implementing direct
-     * loops or reduction variables.
-     * This value must be passed to CUDA kernels of
-     * direct loops because the access to the related
-     * intrinsic CUDA Fortran variable gives place to an
-     * error.
-     * It is also used in reduction subroutines both in
-     * diret and indirect loops
-     * ======================================================
-     */
-
-    SgVariableDeclaration * formalParameter_warpSizeOP2;
-
-    /*
-     * ======================================================
      * Local thread variables
      * ======================================================
      */
     std::map <unsigned int, SgVariableDeclaration *>
         localVariables_localThreadVariables;
-
-    /*
-     * ======================================================
-     * autoshared variable
-     * ======================================================
-     */
-
-    SgVariableDeclaration * localVariables_autoshared;
-
-    std::map <std::string, SgVariableDeclaration *> localVariables_Others;
 
   protected:
 
@@ -84,39 +39,31 @@ class KernelSubroutine: public Subroutine
      */
 
     void
-    createLocalThreadVariables (ParallelLoop & parallelLoop,
-        SgScopeStatement & scopeStatement, bool isDirectLoop);
+    createLocalThreadVariables (ParallelLoop & parallelLoop);
 
     /*
      * ======================================================
      * Creates the autoshared variable: only for real(8)
      * ======================================================
      */
-
     void
-    createAutosharedVariable (ParallelLoop & parallelLoop,
-        SgScopeStatement * scopeStatement);
+    createAutosharedVariable (ParallelLoop & parallelLoop);
 
     /*
      * ======================================================
      * Initialises local thread variables
      * ======================================================
      */
-
     void
-    initialiseLocalThreadVariables (ParallelLoop & parallelLoop,
-        SgScopeStatement * scopeStatement,
-        SgVarRefExp * iterationVariableReference);
+    initialiseLocalThreadVariables (ParallelLoop & parallelLoop);
 
     /*
      * ======================================================
      * Support for reduction variables
      * ======================================================
      */
-
     void
-    createAndAppendReductionSubroutineCall (ParallelLoop & parallelLoop,
-        SgVarRefExp * iterationVarRef, SgScopeStatement * scopeStatement);
+    createAndAppendReductionSubroutineCall (ParallelLoop & parallelLoop);
 
     /*
      * ======================================================
@@ -124,10 +71,8 @@ class KernelSubroutine: public Subroutine
      * memory reserved to reductions
      * ======================================================
      */
-
     void
-        createAndAppendSharedMemoryOffesetForReduction (
-            ParallelLoop & parallelLoop);
+    createAndAppendSharedMemoryOffesetForReduction ();
 
     SgStatement
         *
@@ -148,8 +93,8 @@ class KernelSubroutine: public Subroutine
 
     KernelSubroutine (std::string const & subroutineName, std::map <
         unsigned int, SgProcedureHeaderStatement *> & _reductSubroutines) :
-      Subroutine (subroutineName +  SubroutineNames::kernelSuffix), reductionSubroutines (
-          _reductSubroutines)
+      Subroutine (subroutineName + SubroutineNames::kernelSuffix),
+          reductionSubroutines (_reductSubroutines)
     {
     }
 
@@ -162,7 +107,6 @@ class KernelSubroutine: public Subroutine
      */
 
     std::map <unsigned int, SgProcedureHeaderStatement *> reductionSubroutines;
-
 };
 
 #endif

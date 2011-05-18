@@ -54,7 +54,7 @@ HostSubroutineOfDirectLoop::createKernelCall (
        * check if it is a reduction variable
        * ======================================================
        */
-      if (parallelLoop.isReductionRequiredForSpecificArgument (i) == false)
+      if (parallelLoop.isReductionRequired (i) == false)
       {
         SgVarRefExp * opDatDeviceReference = buildVarRefExp (
             localVariables_OP_DAT_VariablesOnDevice[i]);
@@ -254,7 +254,7 @@ HostSubroutineOfDirectLoop::initialiseDeviceVariablesSizesVariable (
        * ======================================================
        */
 
-      if (parallelLoop.isReductionRequiredForSpecificArgument (i) == false)
+      if (parallelLoop.isReductionRequired (i) == false)
       {
         varRefExpression = buildVarRefExp (localVariables_OP_DAT_Sizes[i]);
       }

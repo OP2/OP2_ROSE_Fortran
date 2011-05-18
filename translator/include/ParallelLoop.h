@@ -101,6 +101,14 @@ class ParallelLoop
      */
     std::map <unsigned int, std::string> OP_DAT_VariableNames;
 
+    /*
+     * ======================================================
+     * What is the size of the OP_DAT data types? Either it
+     * is real(4) or real(8), so respectively 4 or 8
+     * ======================================================
+     */
+    unsigned int sizeOf_OP_DAT;
+
   private:
 
     /*
@@ -114,9 +122,6 @@ class ParallelLoop
     retrieveOP_DATDeclarations (Declarations * declarations);
 
   public:
-
-    ParallelLoop (std::string userSubroutineName,
-        SgExpressionPtrList & actualArguments, Declarations * declarations);
 
     bool
     isDirectLoop () const;
@@ -184,7 +189,11 @@ class ParallelLoop
     isReductionRequired ();
 
     bool
-    isReductionRequiredForSpecificArgument (int opDatIndex);
+    isReductionRequired (int OP_DAT_ArgumentGroup)
+    {
+      return OP_DAT_MappingDescriptors[OP_DAT_ArgumentGroup] == GLOBAL
+          && OP_DAT_AccessDescriptors[OP_DAT_ArgumentGroup] != READ_ACCESS;
+    }
 
     std::string
     get_OP_DAT_VariableName (unsigned int OP_DAT_ArgumentGroup)
@@ -192,6 +201,14 @@ class ParallelLoop
       return OP_DAT_VariableNames[OP_DAT_ArgumentGroup];
     }
 
+    unsigned int
+    getSizeOf_OP_DAT ()
+    {
+      return sizeOf_OP_DAT;
+    }
+
+    ParallelLoop (std::string userSubroutineName,
+        SgExpressionPtrList & actualArguments, Declarations * declarations);
 };
 
 #endif

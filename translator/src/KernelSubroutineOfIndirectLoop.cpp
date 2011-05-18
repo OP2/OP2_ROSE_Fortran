@@ -65,7 +65,7 @@ KernelSubroutineOfIndirectLoop::applyPointeredIncrementsOrWrites (
         SgVarRefExp
             * iterationVarIncWrVarsRef =
                 buildVarRefExp (
-                    localVariables_Others[IndirectLoop::Fortran::KernelSubroutine::VariableNames::iterationCounter]);
+                    localVariableDeclarations[IndirectLoop::Fortran::KernelSubroutine::VariableNames::iterationCounter]);
 
         SgVarRefExp * indArgSize_Reference2 = buildVarRefExp (
             localVariables_indArgSizes[i]);
@@ -93,7 +93,7 @@ KernelSubroutineOfIndirectLoop::applyPointeredIncrementsOrWrites (
         SgVarRefExp
             * moduled_Reference3 =
                 buildVarRefExp (
-                    localVariables_Others[IndirectLoop::Fortran::KernelSubroutine::VariableNames::moduled]);
+                    localVariableDeclarations[IndirectLoop::Fortran::KernelSubroutine::VariableNames::moduled]);
 
         SgFunctionSymbol * modFunctionSymbol =
             FortranTypesBuilder::buildNewFortranFunction ("mod",
@@ -118,7 +118,7 @@ KernelSubroutineOfIndirectLoop::applyPointeredIncrementsOrWrites (
         SgVarRefExp
             * blockId_Reference4 =
                 buildVarRefExp (
-                    localVariables_Others[IndirectLoop::Fortran::KernelSubroutine::VariableNames::blockID]);
+                    localVariableDeclarations[IndirectLoop::Fortran::KernelSubroutine::VariableNames::blockID]);
 
         SgVarRefExp
             * pindOffs_Reference4 =
@@ -138,7 +138,7 @@ KernelSubroutineOfIndirectLoop::applyPointeredIncrementsOrWrites (
         SgVarRefExp
             * iterationCounter_Reference4_a =
                 buildVarRefExp (
-                    localVariables_Others[IndirectLoop::Fortran::KernelSubroutine::VariableNames::iterationCounter]);
+                    localVariableDeclarations[IndirectLoop::Fortran::KernelSubroutine::VariableNames::iterationCounter]);
 
         SgDivideOp * divideExpression4 = buildDivideOp (
             iterationCounter_Reference4_a, buildIntVal (
@@ -163,7 +163,7 @@ KernelSubroutineOfIndirectLoop::applyPointeredIncrementsOrWrites (
         SgVarRefExp
             * moduled_Reference =
                 buildVarRefExp (
-                    localVariables_Others[IndirectLoop::Fortran::KernelSubroutine::VariableNames::moduled]);
+                    localVariableDeclarations[IndirectLoop::Fortran::KernelSubroutine::VariableNames::moduled]);
 
         SgAddOp * addExpression4_d = buildAddOp (moduled_Reference,
             multiplyExpression4_b);
@@ -183,12 +183,12 @@ KernelSubroutineOfIndirectLoop::applyPointeredIncrementsOrWrites (
         SgVarRefExp
             * autoshared_Reference4 =
                 buildVarRefExp (
-                    localVariables_Others[IndirectAndDirectLoop::Fortran::VariableNames::autoshared]);
+                    localVariableDeclarations[IndirectAndDirectLoop::Fortran::VariableNames::autoshared]);
 
         SgVarRefExp
             * iterationCounter_Reference4 =
                 buildVarRefExp (
-                    localVariables_Others[IndirectLoop::Fortran::KernelSubroutine::VariableNames::iterationCounter]);
+                    localVariableDeclarations[IndirectLoop::Fortran::KernelSubroutine::VariableNames::iterationCounter]);
 
         SgVarRefExp * nbytes_Reference4 = buildVarRefExp (
             localVariables_nbytes[i]);
@@ -235,9 +235,9 @@ KernelSubroutineOfIndirectLoop::applyPointeredIncrementsOrWrites (
         //				* loopGuardNestingLevel1 =
         //				buildLessThanOp (
         //					buildVarRefExp (
-        //					localVariables_Others[IndirectLoop::Fortran::KernelSubroutine::VariableNames::iterationCounter]),
+        //					localVariableDeclarations[IndirectLoop::Fortran::KernelSubroutine::VariableNames::iterationCounter]),
         //					buildVarRefExp (
-        //					localVariables_Others[IndirectLoop::Fortran::KernelSubroutine::VariableNames::nelems2]));
+        //					localVariableDeclarations[IndirectLoop::Fortran::KernelSubroutine::VariableNames::nelems2]));
         //
         //
 
@@ -299,7 +299,7 @@ KernelSubroutineOfIndirectLoop::createPlanWhileLoop (
   SgVarRefExp
       * iterationCounter_Reference1 =
           buildVarRefExp (
-              localVariables_Others[IndirectLoop::Fortran::KernelSubroutine::VariableNames::iterationCounter]);
+              localVariableDeclarations[IndirectLoop::Fortran::KernelSubroutine::VariableNames::iterationCounter]);
 
   SgVarRefExp * variable_X_Reference1 = buildOpaqueVarRefExp (
       CUDA::Fortran::FieldNames::x, subroutineScope);
@@ -330,7 +330,7 @@ KernelSubroutineOfIndirectLoop::createPlanWhileLoop (
       * loopBodyExpression1 =
           buildAssignOp (
               buildVarRefExp (
-                  localVariables_Others[IndirectLoop::Fortran::KernelSubroutine::VariableNames::col2]),
+                  localVariableDeclarations[IndirectLoop::Fortran::KernelSubroutine::VariableNames::col2]),
               buildIntVal (-1));
 
   loopBodyNestingLevel1->append_statement (buildExprStatement (
@@ -340,9 +340,9 @@ KernelSubroutineOfIndirectLoop::createPlanWhileLoop (
       * ifGuardNestingLevel1 =
           buildLessThanOp (
               buildVarRefExp (
-                  localVariables_Others[IndirectLoop::Fortran::KernelSubroutine::VariableNames::iterationCounter]),
+                  localVariableDeclarations[IndirectLoop::Fortran::KernelSubroutine::VariableNames::iterationCounter]),
               buildVarRefExp (
-                  localVariables_Others[IndirectLoop::Fortran::KernelSubroutine::VariableNames::nelem]));
+                  localVariableDeclarations[IndirectLoop::Fortran::KernelSubroutine::VariableNames::nelem]));
 
   SgBasicBlock * ifBodyNestingLevel1 = buildBasicBlock ();
 
@@ -355,7 +355,7 @@ KernelSubroutineOfIndirectLoop::createPlanWhileLoop (
           * loopLowerBoundNestingLevel2 =
               buildAssignOp (
                   buildVarRefExp (
-                      localVariables_Others[IndirectLoop::Fortran::KernelSubroutine::VariableNames::iterationCounter2]),
+                      localVariableDeclarations[IndirectLoop::Fortran::KernelSubroutine::VariableNames::iterationCounter2]),
                   buildIntVal (0));
 
       SgIntVal * loopUpperBoundNestingLevel2 = buildIntVal (
@@ -368,7 +368,7 @@ KernelSubroutineOfIndirectLoop::createPlanWhileLoop (
               buildPntrArrRefExp (
                   buildVarRefExp (localVariables_localThreadVariables[i]),
                   buildVarRefExp (
-                      localVariables_Others[IndirectLoop::Fortran::KernelSubroutine::VariableNames::iterationCounter2]));
+                      localVariableDeclarations[IndirectLoop::Fortran::KernelSubroutine::VariableNames::iterationCounter2]));
 
       SgAssignOp * innerLoopExpression1 = buildAssignOp (arrayExpression1,
           buildIntVal (0));
@@ -402,7 +402,7 @@ KernelSubroutineOfIndirectLoop::createPlanWhileLoop (
   //		{
   //			if ( parallelLoop.get_OP_Access_Value (i) == READ_ACCESS )
   //				SgVarRefExp * autoshared_Reference = buildVarRefExp (
-  //					localVariables_Others[OtherVariableNames::variableName_autoshared]);
+  //					localVariableDeclarations[OtherVariableNames::variableName_autoshared]);
   //
   //			else
   //				aaa
@@ -421,7 +421,7 @@ KernelSubroutineOfIndirectLoop::createPlanWhileLoop (
   //      else
   //      {
   //        SgVarRefExp * autoshared_Reference = buildVarRefExp (
-  //					localVariables_Others[OtherVariableNames::variableName_autoshared]);
+  //					localVariableDeclarations[OtherVariableNames::variableName_autoshared]);
   //
   //        SgVarRefExp * globalToLocalMappingArray_Reference = buildVarRefExp (
   //            formalParameters_GlobalToLocalMapping[i]);
@@ -430,8 +430,8 @@ KernelSubroutineOfIndirectLoop::createPlanWhileLoop (
   //            localVariables_nbytes[i]);
   //
   //        SgAddOp * lowerBound_addExpression1 = buildAddOp (buildVarRefExp (
-  //            localVariables_Others[variableName_iterationCounter]),
-  //            buildVarRefExp (localVariables_Others[variableName_offset_b]));
+  //            localVariableDeclarations[variableName_iterationCounter]),
+  //            buildVarRefExp (localVariableDeclarations[variableName_offset_b]));
   //
   //        SgPntrArrRefExp * lowerBound_arrayExpression = buildPntrArrRefExp (
   //            globalToLocalMappingArray_Reference, lowerBound_addExpression1);
@@ -444,8 +444,8 @@ KernelSubroutineOfIndirectLoop::createPlanWhileLoop (
   //            lowerBound_multiplyExpression);
   //
   //        SgAddOp * upperBound_addExpression1 = buildAddOp (buildVarRefExp (
-  //            localVariables_Others[variableName_iterationCounter]),
-  //            buildVarRefExp (localVariables_Others[variableName_offset_b]));
+  //            localVariableDeclarations[variableName_iterationCounter]),
+  //            buildVarRefExp (localVariableDeclarations[variableName_offset_b]));
   //
   //        SgPntrArrRefExp * upperBound_arrayExpression = buildPntrArrRefExp (
   //            globalToLocalMappingArray_Reference, upperBound_addExpression1);
@@ -479,8 +479,8 @@ KernelSubroutineOfIndirectLoop::createPlanWhileLoop (
       * userSubroutineCall =
           createUserSubroutineCall (
               userDeviceSubroutine,
-              localVariables_Others[IndirectLoop::Fortran::KernelSubroutine::VariableNames::iterationCounter],
-              localVariables_Others[IndirectLoop::Fortran::KernelSubroutine::VariableNames::offset_b],
+              localVariableDeclarations[IndirectLoop::Fortran::KernelSubroutine::VariableNames::iterationCounter],
+              localVariableDeclarations[IndirectLoop::Fortran::KernelSubroutine::VariableNames::offset_b],
               parallelLoop, &formalParameters_GlobalToLocalMapping,
               &localVariables_nbytes);
 
@@ -490,9 +490,9 @@ KernelSubroutineOfIndirectLoop::createPlanWhileLoop (
       * addExpression2 =
           buildAddOp (
               buildVarRefExp (
-                  localVariables_Others[IndirectLoop::Fortran::KernelSubroutine::VariableNames::iterationCounter]),
+                  localVariableDeclarations[IndirectLoop::Fortran::KernelSubroutine::VariableNames::iterationCounter]),
               buildVarRefExp (
-                  localVariables_Others[IndirectLoop::Fortran::KernelSubroutine::VariableNames::offset_b]));
+                  localVariableDeclarations[IndirectLoop::Fortran::KernelSubroutine::VariableNames::offset_b]));
 
   SgPntrArrRefExp
       * arrayExpression2 =
@@ -505,7 +505,7 @@ KernelSubroutineOfIndirectLoop::createPlanWhileLoop (
       * assignmentExpression2 =
           buildAssignOp (
               buildVarRefExp (
-                  localVariables_Others[IndirectLoop::Fortran::KernelSubroutine::VariableNames::col2]),
+                  localVariableDeclarations[IndirectLoop::Fortran::KernelSubroutine::VariableNames::col2]),
               arrayExpression2);
 
   ifBodyNestingLevel1->append_statement (buildExprStatement (
@@ -538,9 +538,9 @@ KernelSubroutineOfIndirectLoop::createPlanWhileLoop (
           * addExpression =
               buildAddOp (
                   buildVarRefExp (
-                      localVariables_Others[IndirectLoop::Fortran::KernelSubroutine::VariableNames::iterationCounter]),
+                      localVariableDeclarations[IndirectLoop::Fortran::KernelSubroutine::VariableNames::iterationCounter]),
                   buildVarRefExp (
-                      localVariables_Others[IndirectLoop::Fortran::KernelSubroutine::VariableNames::offset_b]));
+                      localVariableDeclarations[IndirectLoop::Fortran::KernelSubroutine::VariableNames::offset_b]));
 
       SgPntrArrRefExp * arrayExpression = buildPntrArrRefExp (
           globalToLocalMappingArray_Reference, addExpression);
@@ -567,9 +567,9 @@ KernelSubroutineOfIndirectLoop::createPlanWhileLoop (
       * ifGuardNestingLevel2 =
           buildEqualityOp (
               buildVarRefExp (
-                  localVariables_Others[IndirectLoop::Fortran::KernelSubroutine::VariableNames::col2]),
+                  localVariableDeclarations[IndirectLoop::Fortran::KernelSubroutine::VariableNames::col2]),
               buildVarRefExp (
-                  localVariables_Others[IndirectLoop::Fortran::KernelSubroutine::VariableNames::col]));
+                  localVariableDeclarations[IndirectLoop::Fortran::KernelSubroutine::VariableNames::col]));
 
   for (unsigned int i = 1; i
       <= parallelLoop.getNumberOf_OP_DAT_ArgumentGroups (); ++i)
@@ -582,12 +582,12 @@ KernelSubroutineOfIndirectLoop::createPlanWhileLoop (
       SgVarRefExp
           * autoshared_Reference_LHS =
               buildVarRefExp (
-                  localVariables_Others[IndirectAndDirectLoop::Fortran::VariableNames::autoshared]);
+                  localVariableDeclarations[IndirectAndDirectLoop::Fortran::VariableNames::autoshared]);
 
       SgVarRefExp
           * autoshared_Reference_RHS =
               buildVarRefExp (
-                  localVariables_Others[IndirectAndDirectLoop::Fortran::VariableNames::autoshared]);
+                  localVariableDeclarations[IndirectAndDirectLoop::Fortran::VariableNames::autoshared]);
 
       SgVarRefExp * incrementAccessArrays_Reference = buildVarRefExp (
           localVariables_localThreadVariables[i]);
@@ -600,7 +600,7 @@ KernelSubroutineOfIndirectLoop::createPlanWhileLoop (
               buildPntrArrRefExp (
                   incrementAccessArrays_Reference,
                   buildVarRefExp (
-                      localVariables_Others[IndirectLoop::Fortran::KernelSubroutine::VariableNames::iterationCounter2]));
+                      localVariableDeclarations[IndirectLoop::Fortran::KernelSubroutine::VariableNames::iterationCounter2]));
 
       SgMultiplyOp * multiplyExpression = buildMultiplyOp (
           incrementAccessMap_Reference, buildIntVal (
@@ -610,7 +610,7 @@ KernelSubroutineOfIndirectLoop::createPlanWhileLoop (
           * addExpression1 =
               buildAddOp (
                   buildVarRefExp (
-                      localVariables_Others[IndirectLoop::Fortran::KernelSubroutine::VariableNames::iterationCounter2]),
+                      localVariableDeclarations[IndirectLoop::Fortran::KernelSubroutine::VariableNames::iterationCounter2]),
                   multiplyExpression);
 
       SgAddOp * addExpression2 = buildAddOp (buildVarRefExp (
@@ -632,7 +632,7 @@ KernelSubroutineOfIndirectLoop::createPlanWhileLoop (
           * loopLowerBoundNestingLevel3 =
               buildAssignOp (
                   buildVarRefExp (
-                      localVariables_Others[IndirectLoop::Fortran::KernelSubroutine::VariableNames::iterationCounter2]),
+                      localVariableDeclarations[IndirectLoop::Fortran::KernelSubroutine::VariableNames::iterationCounter2]),
                   buildIntVal (0));
 
       SgIntVal * loopUpperBoundNestingLevel3 = buildIntVal (
@@ -668,14 +668,14 @@ KernelSubroutineOfIndirectLoop::createPlanWhileLoop (
       * loopLowerBoundNestingLevel2 =
           buildAssignOp (
               buildVarRefExp (
-                  localVariables_Others[IndirectLoop::Fortran::KernelSubroutine::VariableNames::col]),
+                  localVariableDeclarations[IndirectLoop::Fortran::KernelSubroutine::VariableNames::col]),
               buildIntVal (0));
 
   SgSubtractOp
       * loopUpperBoundNestingLevel2 =
           buildSubtractOp (
               buildVarRefExp (
-                  localVariables_Others[IndirectLoop::Fortran::KernelSubroutine::VariableNames::ncolor]),
+                  localVariableDeclarations[IndirectLoop::Fortran::KernelSubroutine::VariableNames::ncolor]),
               buildIntVal (1));
 
   SgFortranDo * loopStatementNestingLevel2 =
@@ -694,7 +694,7 @@ KernelSubroutineOfIndirectLoop::createPlanWhileLoop (
   SgVarRefExp
       * iterationVarNesting1Ref =
           buildVarRefExp (
-              localVariables_Others[IndirectLoop::Fortran::KernelSubroutine::VariableNames::iterationCounter]);
+              localVariableDeclarations[IndirectLoop::Fortran::KernelSubroutine::VariableNames::iterationCounter]);
 
   SgStatement * incrementIterationVariableNesting1 = buildAssignStatement (
       iterationVarNesting1Ref, buildAddOp (iterationVarNesting1Ref,
@@ -715,9 +715,9 @@ KernelSubroutineOfIndirectLoop::createPlanWhileLoop (
       * loopGuardNestingLevel1 =
           buildLessThanOp (
               buildVarRefExp (
-                  localVariables_Others[IndirectLoop::Fortran::KernelSubroutine::VariableNames::iterationCounter]),
+                  localVariableDeclarations[IndirectLoop::Fortran::KernelSubroutine::VariableNames::iterationCounter]),
               buildVarRefExp (
-                  localVariables_Others[IndirectLoop::Fortran::KernelSubroutine::VariableNames::nelems2]));
+                  localVariableDeclarations[IndirectLoop::Fortran::KernelSubroutine::VariableNames::nelems2]));
 
   SgWhileStmt * loopStatementNestingLevel1 = buildWhileStmt (
       loopGuardNestingLevel1, loopBodyNestingLevel1);
@@ -766,7 +766,7 @@ KernelSubroutineOfIndirectLoop::createAutosharedWhileLoops (
       SgVarRefExp
           * iterationCounter_Reference1 =
               buildVarRefExp (
-                  localVariables_Others[IndirectLoop::Fortran::KernelSubroutine::VariableNames::iterationCounter]);
+                  localVariableDeclarations[IndirectLoop::Fortran::KernelSubroutine::VariableNames::iterationCounter]);
 
       SgVarRefExp * variable_X_Reference1 = buildOpaqueVarRefExp (
           CUDA::Fortran::FieldNames::x, subroutineScope);
@@ -795,7 +795,7 @@ KernelSubroutineOfIndirectLoop::createAutosharedWhileLoops (
       SgVarRefExp
           * whileLoopBound_Reference2 =
               buildVarRefExp (
-                  localVariables_Others[IndirectLoop::Fortran::KernelSubroutine::VariableNames::whileLoopBound]);
+                  localVariableDeclarations[IndirectLoop::Fortran::KernelSubroutine::VariableNames::whileLoopBound]);
 
       SgVarRefExp * indArgSize_Reference2 = buildVarRefExp (
           localVariables_indArgSizes[i]);
@@ -830,12 +830,12 @@ KernelSubroutineOfIndirectLoop::createAutosharedWhileLoops (
         SgVarRefExp
             * iterationCounter_Reference3 =
                 buildVarRefExp (
-                    localVariables_Others[IndirectLoop::Fortran::KernelSubroutine::VariableNames::iterationCounter]);
+                    localVariableDeclarations[IndirectLoop::Fortran::KernelSubroutine::VariableNames::iterationCounter]);
 
         SgVarRefExp
             * moduled_Reference3 =
                 buildVarRefExp (
-                    localVariables_Others[IndirectLoop::Fortran::KernelSubroutine::VariableNames::moduled]);
+                    localVariableDeclarations[IndirectLoop::Fortran::KernelSubroutine::VariableNames::moduled]);
 
         SgFunctionSymbol * modFunctionSymbol =
             FortranTypesBuilder::buildNewFortranFunction ("mod",
@@ -862,12 +862,12 @@ KernelSubroutineOfIndirectLoop::createAutosharedWhileLoops (
         SgVarRefExp
             * autoshared_Reference4 =
                 buildVarRefExp (
-                    localVariables_Others[IndirectAndDirectLoop::Fortran::VariableNames::autoshared]);
+                    localVariableDeclarations[IndirectAndDirectLoop::Fortran::VariableNames::autoshared]);
 
         SgVarRefExp
             * iterationCounter_Reference4 =
                 buildVarRefExp (
-                    localVariables_Others[IndirectLoop::Fortran::KernelSubroutine::VariableNames::iterationCounter]);
+                    localVariableDeclarations[IndirectLoop::Fortran::KernelSubroutine::VariableNames::iterationCounter]);
 
         SgVarRefExp * nbytes_Reference4 = buildVarRefExp (
             localVariables_nbytes[i]);
@@ -881,7 +881,7 @@ KernelSubroutineOfIndirectLoop::createAutosharedWhileLoops (
         SgVarRefExp
             * blockId_Reference4 =
                 buildVarRefExp (
-                    localVariables_Others[IndirectLoop::Fortran::KernelSubroutine::VariableNames::blockID]);
+                    localVariableDeclarations[IndirectLoop::Fortran::KernelSubroutine::VariableNames::blockID]);
 
         SgVarRefExp
             * pindOffs_Reference4 =
@@ -901,7 +901,7 @@ KernelSubroutineOfIndirectLoop::createAutosharedWhileLoops (
         SgVarRefExp
             * iterationCounter_Reference4_a =
                 buildVarRefExp (
-                    localVariables_Others[IndirectLoop::Fortran::KernelSubroutine::VariableNames::iterationCounter]);
+                    localVariableDeclarations[IndirectLoop::Fortran::KernelSubroutine::VariableNames::iterationCounter]);
 
         SgDivideOp * divideExpression4 = buildDivideOp (
             iterationCounter_Reference4_a, buildIntVal (
@@ -926,7 +926,7 @@ KernelSubroutineOfIndirectLoop::createAutosharedWhileLoops (
         SgVarRefExp
             * moduled_Reference =
                 buildVarRefExp (
-                    localVariables_Others[IndirectLoop::Fortran::KernelSubroutine::VariableNames::moduled]);
+                    localVariableDeclarations[IndirectLoop::Fortran::KernelSubroutine::VariableNames::moduled]);
 
         SgAddOp * addExpression4_d = buildAddOp (moduled_Reference,
             multiplyExpression4_b);
@@ -954,12 +954,12 @@ KernelSubroutineOfIndirectLoop::createAutosharedWhileLoops (
         SgVarRefExp
             * autoshared_Reference4 =
                 buildVarRefExp (
-                    localVariables_Others[IndirectAndDirectLoop::Fortran::VariableNames::autoshared]);
+                    localVariableDeclarations[IndirectAndDirectLoop::Fortran::VariableNames::autoshared]);
 
         SgVarRefExp
             * iterationCounter_Reference4 =
                 buildVarRefExp (
-                    localVariables_Others[IndirectLoop::Fortran::KernelSubroutine::VariableNames::iterationCounter]);
+                    localVariableDeclarations[IndirectLoop::Fortran::KernelSubroutine::VariableNames::iterationCounter]);
 
         SgVarRefExp * nbytes_Reference4 = buildVarRefExp (
             localVariables_nbytes[i]);
@@ -985,12 +985,12 @@ KernelSubroutineOfIndirectLoop::createAutosharedWhileLoops (
       SgVarRefExp
           * iterationCounter_Reference5_LHS =
               buildVarRefExp (
-                  localVariables_Others[IndirectLoop::Fortran::KernelSubroutine::VariableNames::iterationCounter]);
+                  localVariableDeclarations[IndirectLoop::Fortran::KernelSubroutine::VariableNames::iterationCounter]);
 
       SgVarRefExp
           * iterationCounter_Reference5_RHS =
               buildVarRefExp (
-                  localVariables_Others[IndirectLoop::Fortran::KernelSubroutine::VariableNames::iterationCounter]);
+                  localVariableDeclarations[IndirectLoop::Fortran::KernelSubroutine::VariableNames::iterationCounter]);
 
       SgVarRefExp * variable_X_Reference5 = buildOpaqueVarRefExp (
           CUDA::Fortran::FieldNames::x, subroutineScope);
@@ -1018,12 +1018,12 @@ KernelSubroutineOfIndirectLoop::createAutosharedWhileLoops (
       SgVarRefExp
           * iterationCounter_Reference6 =
               buildVarRefExp (
-                  localVariables_Others[IndirectLoop::Fortran::KernelSubroutine::VariableNames::iterationCounter]);
+                  localVariableDeclarations[IndirectLoop::Fortran::KernelSubroutine::VariableNames::iterationCounter]);
 
       SgVarRefExp
           * whileLoopBound_Reference6 =
               buildVarRefExp (
-                  localVariables_Others[IndirectLoop::Fortran::KernelSubroutine::VariableNames::whileLoopBound]);
+                  localVariableDeclarations[IndirectLoop::Fortran::KernelSubroutine::VariableNames::whileLoopBound]);
 
       SgExpression * loopGuard = buildLessThanOp (iterationCounter_Reference6,
           whileLoopBound_Reference6);
@@ -1205,7 +1205,7 @@ KernelSubroutineOfIndirectLoop::createThreadZeroStatements (
   SgVarRefExp
       * blockID_Reference1 =
           buildVarRefExp (
-              localVariables_Others[IndirectLoop::Fortran::KernelSubroutine::VariableNames::blockID]);
+              localVariableDeclarations[IndirectLoop::Fortran::KernelSubroutine::VariableNames::blockID]);
 
   SgVarRefExp
       * blockOffset_Reference1 =
@@ -1256,7 +1256,7 @@ KernelSubroutineOfIndirectLoop::createThreadZeroStatements (
   SgVarRefExp
       * blockID_Reference2 =
           buildVarRefExp (
-              localVariables_Others[IndirectLoop::Fortran::KernelSubroutine::VariableNames::blockID]);
+              localVariableDeclarations[IndirectLoop::Fortran::KernelSubroutine::VariableNames::blockID]);
 
   SgPntrArrRefExp * arrayExpression2 = buildPntrArrRefExp (pnelems_Reference2,
       blockID_Reference2);
@@ -1283,7 +1283,7 @@ KernelSubroutineOfIndirectLoop::createThreadZeroStatements (
   SgVarRefExp
       * blockID_Reference3 =
           buildVarRefExp (
-              localVariables_Others[IndirectLoop::Fortran::KernelSubroutine::VariableNames::blockID]);
+              localVariableDeclarations[IndirectLoop::Fortran::KernelSubroutine::VariableNames::blockID]);
 
   SgPntrArrRefExp * arrayExpression3 = buildPntrArrRefExp (poffset_Reference3,
       blockID_Reference3);
@@ -1367,7 +1367,7 @@ KernelSubroutineOfIndirectLoop::createThreadZeroStatements (
       SgVarRefExp
           * blockID_Reference4 =
               buildVarRefExp (
-                  localVariables_Others[IndirectLoop::Fortran::KernelSubroutine::VariableNames::blockID]);
+                  localVariableDeclarations[IndirectLoop::Fortran::KernelSubroutine::VariableNames::blockID]);
 
       SgAddOp * arrayIndexExpression = buildAddOp (buildIntVal (
           pindSizesArrayOffset), buildMultiplyOp (blockID_Reference4,
@@ -1460,7 +1460,7 @@ KernelSubroutineOfIndirectLoop::createRemainingLocalVariables ()
 
     appendStatement (variableDeclaration, subroutineScope);
 
-    localVariables_Others[*it] = variableDeclaration;
+    localVariableDeclarations[*it] = variableDeclaration;
   }
 }
 
@@ -1542,35 +1542,7 @@ KernelSubroutineOfIndirectLoop::createLocalVariables (
     }
   }
 
-  for (unsigned int i = 1; i
-      <= parallelLoop.getNumberOf_OP_DAT_ArgumentGroups (); ++i)
-  {
-    if (parallelLoop.get_OP_Access_Value (i) == INC_ACCESS)
-    {
-      string const variableName =
-          IndirectAndDirectLoop::Fortran::VariablePrefixes::OP_DAT
-              + lexical_cast <string> (i) + "_l";
-
-      SgIntVal * lowerBound = buildIntVal (0);
-
-      SgIntVal * upperBound = buildIntVal (
-          parallelLoop.get_OP_DAT_Dimension (i) - 1);
-
-      SgVariableDeclaration * variableDeclaration = buildVariableDeclaration (
-          variableName,
-          FortranTypesBuilder::getArray_RankOne_WithLowerAndUpperBounds (
-              parallelLoop.get_OP_DAT_Type (i), lowerBound, upperBound), NULL,
-          subroutineScope);
-
-      variableDeclaration->get_declarationModifier ().get_accessModifier ().setUndefined ();
-
-      appendStatement (variableDeclaration, subroutineScope);
-
-      localVariables_localThreadVariables[i] = variableDeclaration;
-
-      //      localVariables_incrementAccessArrays[i] = variableDeclaration;
-    }
-  }
+  createLocalThreadVariables (parallelLoop);
 }
 
 void
@@ -1634,7 +1606,7 @@ KernelSubroutineOfIndirectLoop::createSharedLocalVariables (
 
     appendStatement (variableDeclaration, subroutineScope);
 
-    localVariables_Others[*it] = variableDeclaration;
+    localVariableDeclarations[*it] = variableDeclaration;
   }
 
   SgExpression * upperBoundExpression = new SgAsteriskShapeExp (
@@ -1651,7 +1623,7 @@ KernelSubroutineOfIndirectLoop::createSharedLocalVariables (
 
   appendStatement (variableDeclaration, subroutineScope);
 
-  localVariables_Others[IndirectAndDirectLoop::Fortran::VariableNames::autoshared]
+  localVariableDeclarations[IndirectAndDirectLoop::Fortran::VariableNames::autoshared]
       = variableDeclaration;
 }
 
@@ -1698,8 +1670,10 @@ KernelSubroutineOfIndirectLoop::createPlanFormalParameters (
   {
     SgIntVal * lowerBoundExpression = buildIntVal (0);
 
-    SgVarRefExp * argsSizesReference = buildVarRefExp (
-        formalParameter_argsSizes);
+    SgVarRefExp
+        * argsSizesReference =
+            buildVarRefExp (
+                formalParameterDeclarations[IndirectAndDirectLoop::Fortran::VariableNames::argsSizes]);
 
     SgVarRefExp * fieldReference = buildVarRefExp (
         deviceDataSizesDeclaration.getPlanVariableSizeFieldDeclaration (*it
@@ -1778,8 +1752,10 @@ KernelSubroutineOfIndirectLoop::create_OP_DAT_FormalParameters (
 
       SgIntVal * lowerBoundExpression = buildIntVal (0);
 
-      SgVarRefExp * argsSizesReference = buildVarRefExp (
-          formalParameter_argsSizes);
+      SgVarRefExp
+          * argsSizesReference =
+              buildVarRefExp (
+                  formalParameterDeclarations[IndirectAndDirectLoop::Fortran::VariableNames::argsSizes]);
 
       SgVarRefExp * fieldReference = buildVarRefExp (
           deviceDataSizesDeclaration.get_OP_DAT_SizeFieldDeclaration (i));
@@ -1824,8 +1800,10 @@ KernelSubroutineOfIndirectLoop::create_OP_DAT_FormalParameters (
 
       SgIntVal * lowerBoundExpression2 = buildIntVal (0);
 
-      SgVarRefExp * argsSizesReference2 = buildVarRefExp (
-          formalParameter_argsSizes);
+      SgVarRefExp
+          * argsSizesReference2 =
+              buildVarRefExp (
+                  formalParameterDeclarations[IndirectAndDirectLoop::Fortran::VariableNames::argsSizes]);
 
       SgVarRefExp
           * fieldReference2 =
@@ -1869,8 +1847,10 @@ KernelSubroutineOfIndirectLoop::create_OP_DAT_FormalParameters (
 
       SgIntVal * lowerBoundExpression = buildIntVal (0);
 
-      SgVarRefExp * argsSizesReference = buildVarRefExp (
-          formalParameter_argsSizes);
+      SgVarRefExp
+          * argsSizesReference =
+              buildVarRefExp (
+                  formalParameterDeclarations[IndirectAndDirectLoop::Fortran::VariableNames::argsSizes]);
 
       SgVarRefExp
           * fieldReference =
@@ -1914,8 +1894,10 @@ KernelSubroutineOfIndirectLoop::create_OP_DAT_FormalParameters (
 
       SgIntVal * lowerBoundExpression = buildIntVal (0);
 
-      SgVarRefExp * argsSizesReference = buildVarRefExp (
-          formalParameter_argsSizes);
+      SgVarRefExp
+          * argsSizesReference =
+              buildVarRefExp (
+                  formalParameterDeclarations[IndirectAndDirectLoop::Fortran::VariableNames::argsSizes]);
 
       SgVarRefExp * fieldReference = buildVarRefExp (
           deviceDataSizesDeclaration.get_OP_DAT_SizeFieldDeclaration (i));

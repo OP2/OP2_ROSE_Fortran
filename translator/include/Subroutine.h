@@ -48,11 +48,19 @@ class Subroutine
 
     /*
      * ======================================================
+     * Formal parameter declarations in the newly created
+     * subroutine
+     * ======================================================
+     */
+    std::map <std::string, SgVariableDeclaration *> formalParameterDeclarations;
+
+    /*
+     * ======================================================
      * Local variable declarations in the newly created
      * subroutine
      * ======================================================
      */
-    std::map <std::string, SgVariableDeclaration *> localVariables;
+    std::map <std::string, SgVariableDeclaration *> localVariableDeclarations;
 
   protected:
 

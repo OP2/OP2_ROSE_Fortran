@@ -1153,7 +1153,7 @@ HostSubroutineOfIndirectLoop::createDoLoopToCorrectIndexing (
   SgVarRefExp
       * iterationCounterReference =
           buildVarRefExp (
-              localVariables_Others[IndirectLoop::Fortran::HostSubroutine::VariableNames::IterationCounter]);
+              localVariables_Others[IndirectLoop::Fortran::HostSubroutine::VariableNames::iterationCounter]);
 
   SgExpression * initializationExpression = buildAssignOp (
       iterationCounterReference, buildIntVal (1));
@@ -1721,7 +1721,7 @@ HostSubroutineOfIndirectLoop::createExecutionPlanLocalVariables (
       IndirectLoop::Fortran::HostSubroutine::VariableNames::indsNumber);
 
   fourByteIntegerVariables.push_back (
-      IndirectLoop::Fortran::HostSubroutine::VariableNames::IterationCounter);
+      IndirectLoop::Fortran::HostSubroutine::VariableNames::iterationCounter);
 
   fourByteIntegerVariables.push_back (
       IndirectLoop::Fortran::HostSubroutine::VariableNames::blockOffset);
