@@ -10,6 +10,11 @@
 
 #include <rose.h>
 
+enum FORTRAN_VARIABLE_ATTRIBUTES
+{
+  ALLOCATABLE, CONSTANT, DEVICE, SHARED, VALUE
+};
+
 class FortranTypesBuilder
 {
   private:

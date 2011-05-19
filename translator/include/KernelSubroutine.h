@@ -1,6 +1,7 @@
 #ifndef KERNEL_SUBROUTINE_H
 #define KERNEL_SUBROUTINE_H
 
+#include <boost/lexical_cast.hpp>
 #include <Subroutine.h>
 #include <UserDeviceSubroutine.h>
 #include <ParallelLoop.h>
@@ -9,23 +10,38 @@
 class KernelSubroutine: public Subroutine
 {
   protected:
-    /*
-     * ======================================================
-     * The OP_DAT formal parameters
-     * ======================================================
-     */
 
-    std::map <unsigned int, SgVariableDeclaration *> formalParameter_OP_DATs;
+    static std::string
+    get_OP_DAT_VariableName (unsigned int OP_DAT_ArgumentGroup)
+    {
+      using boost::lexical_cast;
+      using std::string;
 
-    /*
-     * ======================================================
-     * Local thread variables
-     * ======================================================
-     */
-    std::map <unsigned int, SgVariableDeclaration *>
-        localVariables_localThreadVariables;
+      return IndirectAndDirectLoop::Fortran::VariablePrefixes::OP_DAT
+          + lexical_cast <string> (OP_DAT_ArgumentGroup);
+    }
 
-  protected:
+    static std::string
+    get_OP_DAT_SizeVariableName (unsigned int OP_DAT_ArgumentGroup)
+    {
+      using boost::lexical_cast;
+      using std::string;
+
+      return IndirectAndDirectLoop::Fortran::VariablePrefixes::OP_DAT
+          + lexical_cast <string> (OP_DAT_ArgumentGroup)
+          + IndirectAndDirectLoop::Fortran::VariableSuffixes::Size;
+    }
+
+    static std::string
+    getLocalThread_OP_DAT_VariableName (unsigned int OP_DAT_ArgumentGroup)
+    {
+      using boost::lexical_cast;
+      using std::string;
+
+      return IndirectAndDirectLoop::Fortran::VariablePrefixes::OP_DAT
+          + lexical_cast <string> (OP_DAT_ArgumentGroup)
+          + IndirectAndDirectLoop::Fortran::VariableSuffixes::local;
+    }
 
     void
     createArgsSizesFormalParameter (
@@ -75,16 +91,11 @@ class KernelSubroutine: public Subroutine
     createAndAppendSharedMemoryOffesetForReduction ();
 
     SgStatement
-        *
-        createUserSubroutineCall (
-            UserDeviceSubroutine & userDeviceSubroutine,
-            SgVariableDeclaration * variable_setElementCounter,
-            SgVariableDeclaration * variable_offsetInThreadBlock,
-            ParallelLoop & parallelLoop,
-            std::map <unsigned int, SgVariableDeclaration *> * formalParameters_GlobalToLocalMapping =
-                NULL,
-            std::map <unsigned int, SgVariableDeclaration *> * localVariables_nbytes =
-                NULL);
+    *
+    createUserSubroutineCall (UserDeviceSubroutine & userDeviceSubroutine,
+        SgVariableDeclaration * variable_setElementCounter,
+        SgVariableDeclaration * variable_offsetInThreadBlock,
+        ParallelLoop & parallelLoop);
 
     KernelSubroutine (std::string const & subroutineName) :
       Subroutine (subroutineName + SubroutineNames::kernelSuffix)

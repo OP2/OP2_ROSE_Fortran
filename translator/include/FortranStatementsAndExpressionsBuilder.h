@@ -9,9 +9,16 @@
 #define FORTRAN_STATEMENTS_AND_EXPRESSIONS_BUILDER_H
 
 #include <rose.h>
+#include <stdarg.h>
 
 class FortranStatementsAndExpressionsBuilder
 {
+  private:
+
+    static void
+    setFortranAttributes (SgVariableDeclaration * variableDeclaration,
+        int remainingArguments, va_list attributeArguments);
+
   public:
 
     /*
@@ -70,7 +77,7 @@ class FortranStatementsAndExpressionsBuilder
      */
     static SgVariableDeclaration *
     appendVariableDeclaration (std::string const & variableName, SgType * type,
-        SgScopeStatement * scope);
+        SgScopeStatement * scope, int remainingArguments = 0, ...);
 
     /*
      * ======================================================
@@ -82,7 +89,7 @@ class FortranStatementsAndExpressionsBuilder
     appendVariableDeclarationAsFormalParameter (
         std::string const & variableName, SgType * type,
         SgScopeStatement * scope, SgFunctionParameterList * formalParameters,
-        ...);
+        int remainingArguments = 0, ...);
 
     /*
      * ======================================================

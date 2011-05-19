@@ -2,6 +2,62 @@
 #include <FortranTypesBuilder.h>
 #include <CommonNamespaces.h>
 #include <ROSEHelper.h>
+#include <Debug.h>
+
+/*
+ * ======================================================
+ * Private functions
+ * ======================================================
+ */
+
+void
+FortranStatementsAndExpressionsBuilder::setFortranAttributes (
+    SgVariableDeclaration * variableDeclaration, int remainingArguments,
+    va_list attributeArguments)
+{
+  for (int i = 0; i < remainingArguments; ++i)
+  {
+    int attribute = va_arg(attributeArguments, int);
+
+    switch (attribute)
+    {
+      case ALLOCATABLE:
+      {
+        variableDeclaration->get_declarationModifier ().get_typeModifier ().setAllocatable ();
+        break;
+      }
+
+      case CONSTANT:
+      {
+        variableDeclaration->get_declarationModifier ().get_typeModifier ().setConstant ();
+        break;
+      }
+
+      case DEVICE:
+      {
+        variableDeclaration->get_declarationModifier ().get_typeModifier ().setDevice ();
+        break;
+      }
+
+      case SHARED:
+      {
+        variableDeclaration->get_declarationModifier ().get_typeModifier ().setShared ();
+        break;
+      }
+
+      case VALUE:
+      {
+        variableDeclaration->get_declarationModifier ().get_typeModifier ().setValue ();
+        break;
+      }
+
+      default:
+      {
+        Debug::getInstance ()->errorMessage ("Unhandled Fortran attribute");
+      }
+    }
+  }
+}
 
 /*
  * ======================================================
@@ -134,7 +190,8 @@ FortranStatementsAndExpressionsBuilder::appendAssignmentStatement (
 
 SgVariableDeclaration *
 FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
-    std::string const & variableName, SgType * type, SgScopeStatement * scope)
+    std::string const & variableName, SgType * type, SgScopeStatement * scope,
+    int remainingArguments, ...)
 {
   using SageBuilder::buildVariableDeclaration;
   using SageInterface::appendStatement;
@@ -142,9 +199,18 @@ FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
   SgVariableDeclaration * variableDeclaration = buildVariableDeclaration (
       variableName, type, NULL, scope);
 
+  appendStatement (variableDeclaration, scope);
+
   variableDeclaration->get_declarationModifier ().get_accessModifier ().setUndefined ();
 
-  appendStatement (variableDeclaration, scope);
+  va_list fortranAttributes;
+
+  va_start (fortranAttributes, remainingArguments);
+
+  setFortranAttributes (variableDeclaration, remainingArguments,
+      fortranAttributes);
+
+  va_end (fortranAttributes);
 
   return variableDeclaration;
 }
@@ -152,10 +218,19 @@ FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
 void
 FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
     std::string const & variableName, SgType * type, SgScopeStatement * scope,
-    SgFunctionParameterList * formalParameters, ...)
+    SgFunctionParameterList * formalParameters, int remainingArguments, ...)
 {
   SgVariableDeclaration * variableDeclaration = appendVariableDeclaration (
       variableName, type, scope);
+
+  va_list fortranAttributes;
+
+  va_start (fortranAttributes, remainingArguments);
+
+  setFortranAttributes (variableDeclaration, remainingArguments,
+      fortranAttributes);
+
+  va_end (fortranAttributes);
 }
 
 void

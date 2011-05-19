@@ -15,6 +15,10 @@ class KernelSubroutineOfDirectLoop: public KernelSubroutine
 {
   private:
 
+    SgStatement *
+    createUserSubroutineCall (UserDeviceSubroutine & userDeviceSubroutine,
+        ParallelLoop & parallelLoop);
+
     /*
      * ======================================================
      * Creates the statements inside the kernel subroutine

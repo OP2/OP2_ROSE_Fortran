@@ -137,7 +137,7 @@ namespace IndirectAndDirectLoop
     namespace VariableSuffixes
     {
       std::string const Size = "Size";
-      std::string const localVarName = "_l";
+      std::string const local = "Local";
     }
 
     namespace Libraries
@@ -331,7 +331,7 @@ namespace DirectLoop
     namespace KernelSubroutine
     {
       std::string const setSize = "setSize";
-      std::string const offsetS = "offsetS";
+      std::string const warpScratchpadSize = "warpScratchpadSize";
       std::string const warpSize = "warpSize";
       std::string const setElementCounter = "n";
       std::string const dataPerElementCounter = "m";
