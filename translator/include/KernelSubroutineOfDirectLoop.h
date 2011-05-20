@@ -86,7 +86,6 @@ class KernelSubroutineOfDirectLoop: public KernelSubroutine
             std::string const & subroutineName,
             UserDeviceSubroutine & userDeviceSubroutine,
             DeviceDataSizesDeclarationDirectLoops & DeviceDataSizesDeclarationDirectLoops,
-            std::map <unsigned int, SgProcedureHeaderStatement *> & reductSubroutines,
             ParallelLoop & parallelLoop, SgScopeStatement * moduleScope);
 };
 

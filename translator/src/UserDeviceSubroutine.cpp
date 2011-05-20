@@ -2,7 +2,8 @@
 #include <UserDeviceSubroutine.h>
 #include <Debug.h>
 #include <algorithm>
-#include <vector>
+#include <FortranStatementsAndExpressionsBuilder.h>
+#include <FortranTypesBuilder.h>
 
 /*
  * ======================================================
@@ -135,40 +136,36 @@ UserDeviceSubroutine::copyAndModifySubroutine (SgScopeStatement * moduleScope,
             originalParameters->get_args ().begin (); paramIt
             != originalParameters->get_args ().end (); ++parLoopArgCounter, ++paramIt)
         {
-          /*
-           * ======================================================
-           * Build a new variable declaration using the properties
-           * of the original declaration
-           * ======================================================
-           */
-          SgVariableDeclaration * newVariableDeclaration =
-              buildVariableDeclaration ((*paramIt)->get_name ().getString (),
-                  (*paramIt)->get_typeptr (), NULL, subroutineScope);
+          std::string const variableName =
+              (*paramIt)->get_name ().getString ();
+
+          SgType * type = (*paramIt)->get_typeptr ();
 
           /*
            * ======================================================
            * Set the Fortran attributes of the declared variables:
            * either shared or device. As device is the default
-           * attribute in fortran cuda, we avoid to define it
+           * attribute in Fortran CUDA, we do not need to define it
            * ======================================================
            */
-          newVariableDeclaration->get_declarationModifier ().get_accessModifier ().setUndefined ();
 
           if (parallelLoop.get_OP_MAP_Value (parLoopArgCounter) == INDIRECT
               && parallelLoop.get_OP_Access_Value (parLoopArgCounter)
                   == READ_ACCESS)
-            newVariableDeclaration->get_declarationModifier ().get_typeModifier ().setShared ();
-
-          formalParameters->append_arg (
-              *(newVariableDeclaration->get_variables ().begin ()));
-
-          /*
-           * ======================================================
-           * Append the variable declaration to the body of the new
-           * subroutine
-           * ======================================================
-           */
-          appendStatement (newVariableDeclaration, subroutineScope);
+          {
+            SgVariableDeclaration
+                * variableDeclaration =
+                    FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
+                        variableName, type, subroutineScope, formalParameters,
+                        1, SHARED);
+          }
+          else
+          {
+            SgVariableDeclaration
+                * variableDeclaration =
+                    FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
+                        variableName, type, subroutineScope, formalParameters);
+          }
         }
       }
     }

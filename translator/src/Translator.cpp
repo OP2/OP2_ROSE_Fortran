@@ -25,10 +25,15 @@
 #include <Debug.h>
 #include <NewSubroutinesGeneration.h>
 #include <Declarations.h>
+#include <Globals.h>
+#include <CommonNamespaces.h>
+#include <boost/algorithm/string.hpp>
 
 int
 main (int argc, char ** argv)
 {
+  using boost::iequals;
+
   /*
    * ======================================================
    * Process the command-line arguments to separate them into
@@ -37,6 +42,14 @@ main (int argc, char ** argv)
    * ======================================================
    */
   CommandLine * commandLine = new CommandLine (argc, argv);
+
+  if (iequals (Globals::getInstance ()->getTargetBackend (),
+      TargetBackends::Unknown))
+  {
+    Debug::getInstance ()->errorMessage (
+        "You must specify a target backend on the command-line. Supported backends are: {"
+            + TargetBackends::CUDA + ", " + TargetBackends::OpenMP + "}");
+  }
 
   Debug::getInstance ()->verboseMessage ("Translation starting");
 

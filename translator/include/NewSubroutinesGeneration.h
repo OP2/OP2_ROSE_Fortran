@@ -80,12 +80,43 @@ class NewSubroutinesGeneration: public AstSimpleProcessing
 
     /*
      * ======================================================
-     * Adds the relevant library 'use' statements to the
-     * generated module
+     * Creates subroutines targeting OpenMP
      * ======================================================
      */
     void
-    addLibraries (SgModuleStatement * moduleStatement);
+    createOpenMPSubroutines (ParallelLoop & parallelLoop,
+        std::string const & userSubroutineName,
+        SgModuleStatement * moduleStatement, SgNode * node,
+        SgFunctionCallExp * functionCallExp);
+
+    /*
+     * ======================================================
+     * Creates subroutines targeting CUDA
+     * ======================================================
+     */
+    void
+    createCUDASubroutines (ParallelLoop & parallelLoop,
+        std::string const & userSubroutineName,
+        SgModuleStatement * moduleStatement, SgNode * node,
+        SgFunctionCallExp * functionCallExp);
+
+    /*
+     * ======================================================
+     * Adds the relevant library 'use' statements to the
+     * generated OpenMP module
+     * ======================================================
+     */
+    void
+    addOpenMPLibraries (SgModuleStatement * moduleStatement);
+
+    /*
+     * ======================================================
+     * Adds the relevant library 'use' statements to the
+     * generated CUDA module
+     * ======================================================
+     */
+    void
+    addCUDALibraries (SgModuleStatement * moduleStatement);
 
     /*
      * ======================================================
@@ -101,8 +132,10 @@ class NewSubroutinesGeneration: public AstSimpleProcessing
      * Creates the Fortran module
      * ======================================================
      */
-    SgModuleStatement *
-    createCUDAModule (SgSourceFile & sourceFile, ParallelLoop & parallelLoop);
+    SgModuleStatement
+        *
+        createFortranModule (SgSourceFile & sourceFile,
+            ParallelLoop & parallelLoop);
 
     /*
      * ======================================================

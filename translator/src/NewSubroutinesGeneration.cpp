@@ -12,6 +12,8 @@
 #include <DeviceDataSizesDeclaration.h>
 #include <DeviceDataSizesDeclarationDirectLoops.h>
 #include <ReductionSubroutine.h>
+#include <OpenMPModuleDeclarations.h>
+#include <Globals.h>
 
 /*
  * ======================================================
@@ -159,7 +161,187 @@ NewSubroutinesGeneration::patchOP_PAR_LOOPCalls (ParallelLoop & parallelLoop,
 }
 
 void
-NewSubroutinesGeneration::addLibraries (SgModuleStatement * moduleStatement)
+NewSubroutinesGeneration::createOpenMPSubroutines (ParallelLoop & parallelLoop,
+    std::string const & userSubroutineName,
+    SgModuleStatement * moduleStatement, SgNode * node,
+    SgFunctionCallExp * functionCallExp)
+{
+  addOpenMPLibraries (moduleStatement);
+
+  SgScopeStatement * moduleScope = moduleStatement->get_definition ();
+
+  /*
+   * ======================================================
+   * Create the reduction subroutines.
+   * Do we need these in OpenMP?????????????????????????
+   * Commented out for now...
+   * ======================================================
+   */
+  //parallelLoop.generateReductionSubroutines (moduleScope);
+
+  if (parallelLoop.isDirectLoop ())
+  {
+    /*
+     * ======================================================
+     * Direct loop
+     * ======================================================
+     */
+
+    OpenMPModuleDeclarations * openMPModuleDeclarations =
+        new OpenMPModuleDeclarations (moduleScope, userSubroutineName);
+
+    addContains (moduleStatement);
+  }
+  else
+  {
+    /*
+     * ======================================================
+     * Indirect loop
+     * ======================================================
+     */
+
+    addContains (moduleStatement);
+  }
+}
+
+void
+NewSubroutinesGeneration::createCUDASubroutines (ParallelLoop & parallelLoop,
+    std::string const & userSubroutineName,
+    SgModuleStatement * moduleStatement, SgNode * node,
+    SgFunctionCallExp * functionCallExp)
+{
+  addCUDALibraries (moduleStatement);
+
+  SgScopeStatement * moduleScope = moduleStatement->get_definition ();
+
+  /*
+   * ======================================================
+   * Create the reduction subroutines
+   * ======================================================
+   */
+  parallelLoop.generateReductionSubroutines (moduleScope);
+
+  UserDeviceSubroutine * userDeviceSubroutine;
+
+  KernelSubroutine * kernelSubroutine;
+
+  HostSubroutine * hostSubroutine;
+
+  if (parallelLoop.isDirectLoop ())
+  {
+    /*
+     * ======================================================
+     * Direct loop
+     * ======================================================
+     */
+    DeviceDataSizesDeclarationDirectLoops
+        * deviceDataSizesDeclarationDirectLoops =
+            new DeviceDataSizesDeclarationDirectLoops (parallelLoop,
+                userSubroutineName, moduleScope);
+
+    deviceDataSizesDeclarationDirectLoops->initialise (parallelLoop,
+        moduleScope);
+
+    InitialiseConstantsSubroutine * initialiseConstantsSubroutine =
+        new InitialiseConstantsSubroutine (userSubroutineName);
+
+    initialiseConstantsSubroutine->declareConstants (moduleScope);
+
+    addContains (moduleStatement);
+
+    userDeviceSubroutine
+        = new UserDeviceSubroutine (userSubroutineName, moduleScope,
+            initialiseConstantsSubroutine, *declarations, parallelLoop);
+
+    kernelSubroutine = new KernelSubroutineOfDirectLoop (userSubroutineName,
+        *userDeviceSubroutine, *deviceDataSizesDeclarationDirectLoops,
+        parallelLoop, moduleScope);
+
+    hostSubroutine = new HostSubroutineOfDirectLoop (userSubroutineName,
+        *userDeviceSubroutine, *kernelSubroutine,
+        *deviceDataSizesDeclarationDirectLoops, parallelLoop, moduleScope);
+  }
+  else
+  {
+    /*
+     * ======================================================
+     * Indirect loop
+     * ======================================================
+     */
+
+    DeviceDataSizesDeclaration * deviceDataSizesDeclaration =
+        new DeviceDataSizesDeclaration (parallelLoop, userSubroutineName,
+            moduleScope);
+
+    deviceDataSizesDeclaration->initialise (parallelLoop, moduleScope);
+
+    InitialiseConstantsSubroutine * initialiseConstantsSubroutine =
+        new InitialiseConstantsSubroutine (userSubroutineName);
+
+    initialiseConstantsSubroutine->declareConstants (moduleScope);
+
+    addContains (moduleStatement);
+
+    initialiseConstantsSubroutine->generateSubroutineForAlreadyComputedValues (
+        moduleScope);
+
+    userDeviceSubroutine
+        = new UserDeviceSubroutine (userSubroutineName, moduleScope,
+            initialiseConstantsSubroutine, *declarations, parallelLoop);
+
+    kernelSubroutine = new KernelSubroutineOfIndirectLoop (userSubroutineName,
+        *userDeviceSubroutine, *deviceDataSizesDeclaration, parallelLoop,
+        moduleScope);
+
+    hostSubroutine = new HostSubroutineOfIndirectLoop (userSubroutineName,
+        *userDeviceSubroutine, *kernelSubroutine,
+        *initialiseConstantsSubroutine, *deviceDataSizesDeclaration,
+        parallelLoop, moduleScope);
+  }
+
+  /*
+   * ======================================================
+   * Get the scope of the AST node representing the entire
+   * call statement
+   * ======================================================
+   */
+  SgScopeStatement * scope =
+      isSgExprStatement (node->get_parent ())->get_scope ();
+
+  patchOP_PAR_LOOPCalls (parallelLoop, *userDeviceSubroutine, *hostSubroutine,
+      scope, functionCallExp);
+}
+
+void
+NewSubroutinesGeneration::addOpenMPLibraries (
+    SgModuleStatement * moduleStatement)
+{
+  using std::string;
+  using std::vector;
+  using SageInterface::appendStatement;
+
+  Debug::getInstance ()->debugMessage (
+      "Adding 'use' statements to OpenMP module", 2);
+
+  vector <string> libs;
+
+  libs.push_back (IndirectAndDirectLoop::Fortran::Libraries::OP2_C);
+
+  libs.push_back (IndirectAndDirectLoop::Fortran::Libraries::OMP_LIB);
+
+  for (vector <string>::const_iterator it = libs.begin (); it != libs.end (); ++it)
+  {
+    SgUseStatement* useStatement = new SgUseStatement (
+        ROSEHelper::getFileInfo (), *it, false);
+
+    useStatement->set_definingDeclaration (moduleStatement);
+
+    appendStatement (useStatement, moduleStatement->get_definition ());
+  }
+}
+
+void
+NewSubroutinesGeneration::addCUDALibraries (SgModuleStatement * moduleStatement)
 {
   using std::string;
   using std::vector;
@@ -169,6 +351,7 @@ NewSubroutinesGeneration::addLibraries (SgModuleStatement * moduleStatement)
       "Adding 'use' statements to CUDA module", 2);
 
   vector <string> libs;
+
   libs.push_back (IndirectAndDirectLoop::Fortran::Libraries::ISO_C_BINDING);
 
   libs.push_back (IndirectAndDirectLoop::Fortran::Libraries::OP2_C);
@@ -176,7 +359,7 @@ NewSubroutinesGeneration::addLibraries (SgModuleStatement * moduleStatement)
   libs.push_back (
       IndirectAndDirectLoop::Fortran::Libraries::cudaConfigurationParams);
 
-  libs.push_back (IndirectAndDirectLoop::Fortran::Libraries::cudafor);
+  libs.push_back (IndirectAndDirectLoop::Fortran::Libraries::CUDAFOR);
 
   for (vector <string>::const_iterator it = libs.begin (); it != libs.end (); ++it)
   {
@@ -203,14 +386,14 @@ NewSubroutinesGeneration::addContains (SgModuleStatement * moduleStatement)
 }
 
 SgModuleStatement *
-NewSubroutinesGeneration::createCUDAModule (SgSourceFile & sourceFile,
+NewSubroutinesGeneration::createFortranModule (SgSourceFile & sourceFile,
     ParallelLoop & parallelLoop)
 {
   using std::string;
   using std::vector;
   using SageInterface::appendStatement;
 
-  Debug::getInstance ()->debugMessage ("Creating CUDA module", 2);
+  Debug::getInstance ()->debugMessage ("Creating Fortran module", 2);
 
   SgGlobal * globalScope = sourceFile.get_globalScope ();
 
@@ -237,7 +420,9 @@ NewSubroutinesGeneration::createSourceFile (ParallelLoop & parallelLoop)
    * the API expects the name of an existing file and the
    * name of the output file. There is no input file corresponding
    * to our output file, therefore we first create a dummy
-   * Fortran file
+   * Fortran file. This will cause the unparser to generate
+   * a warning about its internal stack state, but it can
+   * suitably be ignored
    * ======================================================
    */
   string const inputFileName = "BLANK_" + parallelLoop.getModuleName ()
@@ -248,6 +433,7 @@ NewSubroutinesGeneration::createSourceFile (ParallelLoop & parallelLoop)
   {
     Debug::getInstance ()->debugMessage ("Creating dummy source file '"
         + inputFileName + "'", 2);
+
     fclose (inputFile);
   }
   else
@@ -258,13 +444,13 @@ NewSubroutinesGeneration::createSourceFile (ParallelLoop & parallelLoop)
 
   /*
    * ======================================================
-   * Now generate the CUDA file
+   * Now generate the target backend file
    * ======================================================
    */
-  string const outputFileName = parallelLoop.getModuleName () + ".CUF";
+  string const outputFileName = parallelLoop.getModuleName () + ".F95";
 
-  Debug::getInstance ()->debugMessage ("Generating CUDA file '"
-      + outputFileName + "'", 2);
+  Debug::getInstance ()->debugMessage ("Generating file '" + outputFileName
+      + "'", 2);
 
   SgSourceFile * sourceFile = isSgSourceFile (buildFile (inputFileName,
       outputFileName, NULL));
@@ -306,6 +492,7 @@ NewSubroutinesGeneration::createSourceFile (ParallelLoop & parallelLoop)
 void
 NewSubroutinesGeneration::visit (SgNode * node)
 {
+  using boost::iequals;
   using boost::starts_with;
   using std::pair;
   using std::string;
@@ -364,12 +551,11 @@ NewSubroutinesGeneration::visit (SgNode * node)
             {
               /*
                * ======================================================
-               * If this kernel has not been previously encountered then build
-               * the CUDA-Fortran file and modify the calls in the original
+               * If this kernel has not been previously encountered then
+               * build the target code and modify the calls in the original
                * Fortran source code
                * ======================================================
                */
-
               ParallelLoop * parallelLoop = new ParallelLoop (
                   userSubroutineName, actualArguments, declarations);
 
@@ -384,171 +570,23 @@ NewSubroutinesGeneration::visit (SgNode * node)
 
               /*
                * ======================================================
-               * Create the CUDA module
+               * Create the Fortran module
                * ======================================================
                */
-              SgModuleStatement * moduleStatement = createCUDAModule (
+              SgModuleStatement * moduleStatement = createFortranModule (
                   sourceFile, *parallelLoop);
 
-              addLibraries (moduleStatement);
-
-              SgScopeStatement * moduleScope =
-                  moduleStatement->get_definition ();
-
-              if (parallelLoop->isDirectLoop ())
+              if (iequals (Globals::getInstance ()->getTargetBackend (),
+                  TargetBackends::CUDA))
               {
-                Debug::getInstance ()->debugMessage ("Direct Loop", 2);
-
-                /*
-                 * ======================================================
-                 * Direct loop
-                 * ======================================================
-                 */
-                DeviceDataSizesDeclarationDirectLoops
-                    * deviceDataSizesDeclarationDirectLoops =
-                        new DeviceDataSizesDeclarationDirectLoops (
-                            *parallelLoop, userSubroutineName, moduleScope);
-
-                deviceDataSizesDeclarationDirectLoops->initialise (
-                    *parallelLoop, moduleScope);
-
-                /*
-                 * ======================================================
-                 * Indirect loops use global constants. Declare them and
-                 * generate the subroutine which initialises them
-                 * ======================================================
-                 */
-                InitialiseConstantsSubroutine * initialiseConstantsSubroutine =
-                    new InitialiseConstantsSubroutine (userSubroutineName);
-
-                initialiseConstantsSubroutine->declareConstants (moduleScope);
-
-                addContains (moduleStatement);
-
-                /*
-                 * ======================================================
-                 * Generate and modify user kernel so that it can run on
-                 * the device
-                 * ======================================================
-                 */
-
-                std::map <unsigned int, SgProcedureHeaderStatement *>
-                    reductionSubroutines =
-                        ReductionSubroutine::generateReductionSubroutines (
-                            *parallelLoop, moduleScope);
-
-                UserDeviceSubroutine * userDeviceSubroutine =
-                    new UserDeviceSubroutine (userSubroutineName, moduleScope,
-                        initialiseConstantsSubroutine, *declarations,
-                        *parallelLoop);
-
-                KernelSubroutine * kernelSubroutine =
-                    new KernelSubroutineOfDirectLoop (userSubroutineName,
-                        *userDeviceSubroutine,
-                        *deviceDataSizesDeclarationDirectLoops,
-                        reductionSubroutines, *parallelLoop, moduleScope);
-
-                HostSubroutine * hostSubroutine =
-                    new HostSubroutineOfDirectLoop (userSubroutineName,
-                        *userDeviceSubroutine, *kernelSubroutine,
-                        *deviceDataSizesDeclarationDirectLoops, *parallelLoop,
-                        moduleScope);
-
-                /*
-                 * ======================================================
-                 * Get the scope of the AST node representing the entire
-                 * call statement
-                 * ======================================================
-                 */
-                SgScopeStatement * scope = isSgExprStatement (
-                    node->get_parent ())->get_scope ();
-
-                ROSE_ASSERT (scope != NULL);
-
-                patchOP_PAR_LOOPCalls (*parallelLoop, *userDeviceSubroutine,
-                    *hostSubroutine, scope, functionCallExp);
+                createCUDASubroutines (*parallelLoop, userSubroutineName,
+                    moduleStatement, node, functionCallExp);
               }
-              else
+              else if (iequals (Globals::getInstance ()->getTargetBackend (),
+                  TargetBackends::OpenMP))
               {
-                /*
-                 * ======================================================
-                 * Indirect loop
-                 * ======================================================
-                 */
-
-                Debug::getInstance ()->debugMessage ("Indirect Loop", 2);
-
-                DeviceDataSizesDeclaration * deviceDataSizesDeclaration =
-                    new DeviceDataSizesDeclaration (*parallelLoop,
-                        userSubroutineName, moduleScope);
-
-                deviceDataSizesDeclaration->initialise (*parallelLoop,
-                    moduleScope);
-                /*
-                 * ======================================================
-                 * Indirect loops use global constants. Declare them and
-                 * generate the subroutine which initialises them
-                 * ======================================================
-                 */
-
-                Debug::getInstance ()->debugMessage ("Creating Constants", 2);
-
-                InitialiseConstantsSubroutine * initialiseConstantsSubroutine =
-                    new InitialiseConstantsSubroutine (userSubroutineName);
-
-                Debug::getInstance ()->debugMessage ("Declaring them", 2);
-
-                initialiseConstantsSubroutine->declareConstants (moduleScope);
-
-                addContains (moduleStatement);
-
-                Debug::getInstance ()->debugMessage (
-                    "Creating Subroutine to initialise Constants", 2);
-
-                initialiseConstantsSubroutine->generateSubroutineForAlreadyComputedValues (
-                    moduleScope);
-
-                Debug::getInstance ()->debugMessage ("Finished with Constants",
-                    2);
-
-                /*
-                 * ======================================================
-                 * Generate and modify user kernel so that it can run on
-                 * the device
-                 * ======================================================
-                 */
-
-                UserDeviceSubroutine * userDeviceSubroutine =
-                    new UserDeviceSubroutine (userSubroutineName, moduleScope,
-                        initialiseConstantsSubroutine, *declarations,
-                        *parallelLoop);
-
-                KernelSubroutine * kernelSubroutine =
-                    new KernelSubroutineOfIndirectLoop (userSubroutineName,
-                        *userDeviceSubroutine, *deviceDataSizesDeclaration,
-                        *parallelLoop, moduleScope);
-
-                HostSubroutine
-                    * hostSubroutine =
-                        new HostSubroutineOfIndirectLoop (userSubroutineName,
-                            *userDeviceSubroutine, *kernelSubroutine,
-                            *initialiseConstantsSubroutine,
-                            *deviceDataSizesDeclaration, *parallelLoop,
-                            moduleScope);
-
-                /*
-                 * ======================================================
-                 * Get the scope of the AST node representing the entire
-                 * call statement
-                 * ======================================================
-                 */
-                SgScopeStatement * scope = isSgExprStatement (
-                    node->get_parent ())->get_scope ();
-
-                ROSE_ASSERT (scope != NULL);
-
-                patchOP_PAR_LOOPCalls (*parallelLoop, *userDeviceSubroutine,
-                    *hostSubroutine, scope, functionCallExp);
+                createOpenMPSubroutines (*parallelLoop, userSubroutineName,
+                    moduleStatement, node, functionCallExp);
               }
             }
           }

@@ -1,17 +1,27 @@
 #include <boost/lexical_cast.hpp>
+#include <boost/algorithm/string.hpp>
 #include <iostream>
 #include <string.h>
 #include <CommandLine.h>
 #include <Debug.h>
+#include <Globals.h>
+#include <CommonNamespaces.h>
 
 CommandLine::CommandLine (int argc, char **argv)
 {
+  using boost::iequals;
   using boost::bad_lexical_cast;
   using boost::lexical_cast;
   using std::cout;
 
   std::string const debugOption = "-d";
+
   std::string const verboseOption = "-v";
+
+  std::string const cudaOption = "--cuda";
+
+  std::string const openMPOption = "--openMP";
+
   bool debugMode = false;
 
   for (int i = 0; i < argc; ++i)
@@ -78,7 +88,7 @@ CommandLine::CommandLine (int argc, char **argv)
     }
     else
     {
-      if (debugOption.compare (argv[i]) == 0)
+      if (iequals (debugOption, argv[i]))
       {
         /*
          * ======================================================
@@ -87,12 +97,22 @@ CommandLine::CommandLine (int argc, char **argv)
          */
         debugMode = true;
       }
-      else if (verboseOption.compare (argv[i]) == 0)
+      else if (iequals (verboseOption, argv[i]))
       {
         /*
+         * ======================================================
          * Verbose flag recognised so set it globally
+         * ======================================================
          */
         Debug::getInstance ()->setVerbose (true);
+      }
+      else if (iequals (cudaOption, argv[i]))
+      {
+        Globals::getInstance ()->setTargetBackend (TargetBackends::CUDA);
+      }
+      else if (iequals (openMPOption, argv[i]))
+      {
+        Globals::getInstance ()->setTargetBackend (TargetBackends::OpenMP);
       }
       else
       {

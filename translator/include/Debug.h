@@ -1,5 +1,5 @@
 /*
- * Written by Adam Betts
+ * Written by Adam Betts and Carlo Bertolli
  *
  * Debug functionality provided by singleton pattern as we should only ever
  * create a single Debug class

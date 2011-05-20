@@ -239,15 +239,10 @@ HostSubroutine::createDataMarshallingLocalVariables (
     {
       string const variableName = "arg" + lexical_cast <string> (i) + "Size";
 
-      SgVariableDeclaration * variableDeclaration = buildVariableDeclaration (
-          variableName, FortranTypesBuilder::getFourByteInteger (), NULL,
-          subroutineScope);
-
-      variableDeclaration->get_declarationModifier ().get_accessModifier ().setUndefined ();
-
-      localVariables_OP_DAT_Sizes[i] = variableDeclaration;
-
-      appendStatement (variableDeclaration, subroutineScope);
+      localVariables_OP_DAT_Sizes[i]
+          = FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
+              variableName, FortranTypesBuilder::getFourByteInteger (),
+              subroutineScope);
     }
   }
 
@@ -258,42 +253,15 @@ HostSubroutine::createDataMarshallingLocalVariables (
     {
       string const variableName = "c2fPtrArg" + lexical_cast <string> (i);
 
-//<<<<<<< HEAD
-			SgType * opdatType = parallelLoop.get_OP_DAT_Type ( i );
-			SgArrayType * isArrayType = isSgArrayType ( opdatType );
-			ROSE_ASSERT ( isArrayType != NULL );
-			
-			SgVariableDeclaration * variableDeclaration = buildVariableDeclaration (
-          variableName, buildPointerType ( isArrayType ),
-							NULL,
-          subroutineScope );
-//=======
-//      SgType * opdatType = parallelLoop.get_OP_DAT_Type (i);
-//      SgArrayType * isArrayType = isSgArrayType (opdatType);
-//      ROSE_ASSERT ( isArrayType != NULL );
-//
-//      //                      SgVariableDeclaration * variableDeclaration = buildVariableDeclaration (
-//      //                              variableName, isArrayType, NULL,
-//      //                              subroutineScope);
-//
-//      //      SgVariableDeclaration * variableDeclaration = buildVariableDeclaration (
-//      //          variableName, buildPointerType (
-//      //              FortranTypesBuilder::getArray_RankOne (
-//      //                                                       FortranTypesBuilder::getDoublePrecisionFloat () ) ),
-//      //                                                      NULL,
-//      //          subroutineScope);
-//
-//
-//      //FortranTypesBuilder::getDoublePrecisionFloat ()
-//      SgVariableDeclaration * variableDeclaration = buildVariableDeclaration (
-//          variableName, buildPointerType (isArrayType), NULL, subroutineScope);
-//>>>>>>> 3c96312cd30da0a25b3f8840fee70ba18fef4129
+      SgType * opdatType = parallelLoop.get_OP_DAT_Type (i);
 
-      variableDeclaration->get_declarationModifier ().get_accessModifier ().setUndefined ();
+      SgArrayType * isArrayType = isSgArrayType (opdatType);
 
-      localVariables_CToFortranPointers[i] = variableDeclaration;
+      ROSE_ASSERT ( isArrayType != NULL );
 
-      appendStatement (variableDeclaration, subroutineScope);
+      localVariables_CToFortranPointers[i]
+          = FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
+              variableName, buildPointerType (isArrayType), subroutineScope);
     }
   }
 
@@ -314,19 +282,15 @@ HostSubroutine::createDataMarshallingLocalVariables (
         string const variableName = "argument" + lexical_cast <string> (i);
 
         SgType * opdatType = parallelLoop.get_OP_DAT_Type (i);
+
         SgArrayType * isArrayType = isSgArrayType (opdatType);
+
         ROSE_ASSERT ( isArrayType != NULL );
 
-        SgVariableDeclaration * variableDeclaration = buildVariableDeclaration (
-            variableName, isArrayType, NULL, subroutineScope);
-
-        variableDeclaration->get_declarationModifier ().get_accessModifier ().setUndefined ();
-        variableDeclaration->get_declarationModifier ().get_typeModifier ().setDevice ();
-        variableDeclaration->get_declarationModifier ().get_typeModifier ().setAllocatable ();
-
-        localVariables_OP_DAT_VariablesOnDevice[i] = variableDeclaration;
-
-        appendStatement (variableDeclaration, subroutineScope);
+        localVariables_OP_DAT_VariablesOnDevice[i]
+            = FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
+                variableName, isArrayType, subroutineScope, 2, DEVICE,
+                ALLOCATABLE);
       }
     }
   }
@@ -426,21 +390,11 @@ HostSubroutine::createFormalParameters (
 
         string const variableName = "subroutineName";
 
-        SgVariableDeclaration * charArrayDeclaration =
-            buildVariableDeclaration (variableName,
-                FortranTypesBuilder::getString (
-                    userDeviceSubroutine.getSubroutineName ().length ()), NULL,
-                subroutineScope);
-
-        formalParameters->append_arg (
-            *(charArrayDeclaration->get_variables ().begin ()));
-
-        charArrayDeclaration->get_declarationModifier ().get_typeModifier ().setIntent_in ();
-        charArrayDeclaration->get_declarationModifier ().get_accessModifier ().setUndefined ();
-
-        appendStatement (charArrayDeclaration, subroutineScope);
-
-        formalParameter_SubroutineName = charArrayDeclaration;
+        formalParameter_SubroutineName
+            = FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
+                variableName, FortranTypesBuilder::getString (
+                    userDeviceSubroutine.getSubroutineName ().length ()),
+                subroutineScope, formalParameters, 1, INTENT_IN);
 
         break;
       }
@@ -469,19 +423,10 @@ HostSubroutine::createFormalParameters (
 
               string const variableName = "set";
 
-              SgVariableDeclaration * opSetDeclaration =
-                  buildVariableDeclaration (variableName, classReference, NULL,
-                      subroutineScope);
-
-              opSetDeclaration->get_declarationModifier ().get_typeModifier ().setIntent_in ();
-              opSetDeclaration->get_declarationModifier ().get_accessModifier ().setUndefined ();
-
-              formalParameters->append_arg (
-                  *(opSetDeclaration->get_variables ().begin ()));
-
-              appendStatement (opSetDeclaration, subroutineScope);
-
-              formalParameter_OP_SET = opSetDeclaration;
+              formalParameter_OP_SET
+                  = FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
+                      variableName, classReference, subroutineScope,
+                      formalParameters, 1, INTENT_IN);
             }
 
             else if (iequals (className, OP2::OP_MAP))
@@ -496,19 +441,10 @@ HostSubroutine::createFormalParameters (
               string const variableName = OP_MAP_VariableNamePrefix
                   + lexical_cast <string> (variableNameSuffix);
 
-              SgVariableDeclaration * opMapDeclaration =
-                  buildVariableDeclaration (variableName, classReference, NULL,
-                      subroutineScope);
-
-              opMapDeclaration->get_declarationModifier ().get_typeModifier ().setIntent_in ();
-              opMapDeclaration->get_declarationModifier ().get_accessModifier ().setUndefined ();
-
-              formalParameters->append_arg (
-                  *(opMapDeclaration->get_variables ().begin ()));
-
-              appendStatement (opMapDeclaration, subroutineScope);
-
-              formalParameters_OP_MAP[variableNameSuffix] = opMapDeclaration;
+              formalParameters_OP_MAP[variableNameSuffix]
+                  = FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
+                      variableName, classReference, subroutineScope,
+                      formalParameters, 1, INTENT_IN);
             }
 
             else if (iequals (className, OP2::OP_DAT))
@@ -532,19 +468,10 @@ HostSubroutine::createFormalParameters (
               string const variableName = OP_DAT_VariableNamePrefix
                   + lexical_cast <string> (variableNameSuffix);
 
-              SgVariableDeclaration * opDatDeclaration =
-                  buildVariableDeclaration (variableName, classReference, NULL,
-                      subroutineScope);
-
-              opDatDeclaration->get_declarationModifier ().get_typeModifier ().setIntent_in ();
-              opDatDeclaration->get_declarationModifier ().get_accessModifier ().setUndefined ();
-
-              formalParameters->append_arg (
-                  *(opDatDeclaration->get_variables ().begin ()));
-
-              appendStatement (opDatDeclaration, subroutineScope);
-
-              formalParameters_OP_DAT[variableNameSuffix] = opDatDeclaration;
+              formalParameters_OP_DAT[variableNameSuffix]
+                  = FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
+                      variableName, classReference, subroutineScope,
+                      formalParameters, 1, INTENT_IN);
             }
             else
             {
@@ -568,20 +495,10 @@ HostSubroutine::createFormalParameters (
             string const variableName = OP_ACCESS_VariableNamePrefix
                 + lexical_cast <string> (variableNameSuffix);
 
-            SgVariableDeclaration * opAccessDeclaration =
-                buildVariableDeclaration (variableName, buildIntType (), NULL,
-                    subroutineScope);
-
-            opAccessDeclaration->get_declarationModifier ().get_typeModifier ().setIntent_in ();
-            opAccessDeclaration->get_declarationModifier ().get_accessModifier ().setUndefined ();
-
-            formalParameters->append_arg (
-                *(opAccessDeclaration->get_variables ().begin ()));
-
-            appendStatement (opAccessDeclaration, subroutineScope);
-
             formalParameters_OP_ACCESS[variableNameSuffix]
-                = opAccessDeclaration;
+                = FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
+                    variableName, FortranTypesBuilder::getFourByteInteger (),
+                    subroutineScope, formalParameters, 1, INTENT_IN);
 
             break;
           }
@@ -609,20 +526,10 @@ HostSubroutine::createFormalParameters (
         string const variableName = OP_INDIRECTION_VariableNamePrefix
             + lexical_cast <string> (variableNameSuffix);
 
-        SgVariableDeclaration * opIndirectionDeclaration =
-            buildVariableDeclaration (variableName, buildIntType (), NULL,
-                subroutineScope);
-
-        opIndirectionDeclaration->get_declarationModifier ().get_typeModifier ().setIntent_in ();
-        opIndirectionDeclaration->get_declarationModifier ().get_accessModifier ().setUndefined ();
-
-        formalParameters->append_arg (
-            *(opIndirectionDeclaration->get_variables ().begin ()));
-
-        appendStatement (opIndirectionDeclaration, subroutineScope);
-
         formalParameters_OP_INDIRECTION[variableNameSuffix]
-            = opIndirectionDeclaration;
+            = FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
+                variableName, FortranTypesBuilder::getFourByteInteger (),
+                subroutineScope, formalParameters, 1, INTENT_IN);
 
         break;
       }

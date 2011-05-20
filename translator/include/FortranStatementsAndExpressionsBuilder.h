@@ -71,8 +71,12 @@ class FortranStatementsAndExpressionsBuilder
 
     /*
      * ======================================================
-     * Appends a local variable declaration to the given scope
-     * and returns it so other properties can be set
+     * Appends a local variable declaration to the given scope.
+     * Various Fortran attributes of the variable declaration
+     * can be also be set by appending them to the end of the
+     * parameter list. When remainingArguments == 0, there
+     * are no such attributes; otherwise, remainingArguments
+     * dictates how many such attributes have been attached.
      * ======================================================
      */
     static SgVariableDeclaration *
@@ -81,11 +85,16 @@ class FortranStatementsAndExpressionsBuilder
 
     /*
      * ======================================================
-     * Appends a variable declaration to the given scope
-     * and returns it so other properties can be set
+     * Appends a variable declaration to the given scope and
+     * to the given formal parameter list.
+     * Various Fortran attributes of the variable declaration
+     * can be also be set by appending them to the end of the
+     * parameter list. When remainingArguments == 0, there
+     * are no such attributes; otherwise, remainingArguments
+     * dictates how many such attributes have been attached.
      * ======================================================
      */
-    static void
+    static SgVariableDeclaration *
     appendVariableDeclarationAsFormalParameter (
         std::string const & variableName, SgType * type,
         SgScopeStatement * scope, SgFunctionParameterList * formalParameters,

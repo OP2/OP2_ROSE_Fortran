@@ -15,6 +15,13 @@ FortranStatementsAndExpressionsBuilder::setFortranAttributes (
     SgVariableDeclaration * variableDeclaration, int remainingArguments,
     va_list attributeArguments)
 {
+  /*
+   * ======================================================
+   * The variable declaration is always undefined
+   * ======================================================
+   */
+  variableDeclaration->get_declarationModifier ().get_accessModifier ().setUndefined ();
+
   for (int i = 0; i < remainingArguments; ++i)
   {
     int attribute = va_arg(attributeArguments, int);
@@ -48,6 +55,24 @@ FortranStatementsAndExpressionsBuilder::setFortranAttributes (
       case VALUE:
       {
         variableDeclaration->get_declarationModifier ().get_typeModifier ().setValue ();
+        break;
+      }
+
+      case INTENT_IN:
+      {
+        variableDeclaration->get_declarationModifier ().get_typeModifier ().setIntent_in ();
+        break;
+      }
+
+      case INTENT_OUT:
+      {
+        variableDeclaration->get_declarationModifier ().get_typeModifier ().setIntent_out ();
+        break;
+      }
+
+      case INTENT_INOUT:
+      {
+        variableDeclaration->get_declarationModifier ().get_typeModifier ().setIntent_inout ();
         break;
       }
 
@@ -201,8 +226,6 @@ FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
 
   appendStatement (variableDeclaration, scope);
 
-  variableDeclaration->get_declarationModifier ().get_accessModifier ().setUndefined ();
-
   va_list fortranAttributes;
 
   va_start (fortranAttributes, remainingArguments);
@@ -215,13 +238,21 @@ FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
   return variableDeclaration;
 }
 
-void
+SgVariableDeclaration *
 FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
     std::string const & variableName, SgType * type, SgScopeStatement * scope,
     SgFunctionParameterList * formalParameters, int remainingArguments, ...)
 {
-  SgVariableDeclaration * variableDeclaration = appendVariableDeclaration (
-      variableName, type, scope);
+  using SageBuilder::buildVariableDeclaration;
+  using SageInterface::appendStatement;
+
+  SgVariableDeclaration * variableDeclaration = buildVariableDeclaration (
+      variableName, type, NULL, scope);
+
+  formalParameters->append_arg (
+      *(variableDeclaration->get_variables ().begin ()));
+
+  appendStatement (variableDeclaration, scope);
 
   va_list fortranAttributes;
 
@@ -231,6 +262,8 @@ FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParamet
       fortranAttributes);
 
   va_end (fortranAttributes);
+
+  return variableDeclaration;
 }
 
 void

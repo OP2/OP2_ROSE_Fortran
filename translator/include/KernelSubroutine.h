@@ -90,8 +90,7 @@ class KernelSubroutine: public Subroutine
     void
     createAndAppendSharedMemoryOffesetForReduction ();
 
-    SgStatement
-    *
+    SgStatement *
     createUserSubroutineCall (UserDeviceSubroutine & userDeviceSubroutine,
         SgVariableDeclaration * variable_setElementCounter,
         SgVariableDeclaration * variable_offsetInThreadBlock,
@@ -101,23 +100,6 @@ class KernelSubroutine: public Subroutine
       Subroutine (subroutineName + SubroutineNames::kernelSuffix)
     {
     }
-
-    KernelSubroutine (std::string const & subroutineName, std::map <
-        unsigned int, SgProcedureHeaderStatement *> & _reductSubroutines) :
-      Subroutine (subroutineName + SubroutineNames::kernelSuffix),
-          reductionSubroutines (_reductSubroutines)
-    {
-    }
-
-    /*
-     * ======================================================
-     * repository of SgProcedureHeaderStatements for
-     * reduction subroutines (one per type), given the
-     * corresponding op_dat index
-     * ======================================================
-     */
-
-    std::map <unsigned int, SgProcedureHeaderStatement *> reductionSubroutines;
 };
 
 #endif

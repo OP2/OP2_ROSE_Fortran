@@ -10,14 +10,10 @@ KernelSubroutine::createArgsSizesFormalParameter (
     DeviceDataSizesDeclaration & deviceDataSizesDeclaration)
 {
   formalParameterDeclarations[IndirectAndDirectLoop::Fortran::VariableNames::argsSizes]
-      = FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
+      = FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
           IndirectAndDirectLoop::Fortran::VariableNames::argsSizes,
-          deviceDataSizesDeclaration.getType (), subroutineScope);
-
-  formalParameterDeclarations[IndirectAndDirectLoop::Fortran::VariableNames::argsSizes]->get_declarationModifier ().get_typeModifier ().setDevice ();
-
-  formalParameters->append_arg (
-      *(formalParameterDeclarations[IndirectAndDirectLoop::Fortran::VariableNames::argsSizes]->get_variables ().begin ()));
+          deviceDataSizesDeclaration.getType (), subroutineScope,
+          formalParameters, 1, DEVICE);
 }
 
 void
@@ -173,7 +169,8 @@ KernelSubroutine::initialiseLocalThreadVariables (ParallelLoop & parallelLoop)
           * accessToIPosition =
               buildPntrArrRefExp (
                   buildVarRefExp (
-                      localVariableDeclarations[getLocalThread_OP_DAT_VariableName (i)]),
+                      localVariableDeclarations[getLocalThread_OP_DAT_VariableName (
+                          i)]),
                   buildVarRefExp (
                       localVariableDeclarations[DirectLoop::Fortran::KernelSubroutine::setElementCounter]));
 
@@ -303,8 +300,8 @@ KernelSubroutine::createAndAppendReductionSubroutineCall (
              */
 
             SgSymbol
-                * reductionSymbol =
-                    reductionSubroutines[i]-> search_for_symbol_from_symbol_table ();
+                * reductionSymbol = parallelLoop.getReductionSubroutineHeader (
+                    i)-> search_for_symbol_from_symbol_table ();
 
             SgFunctionSymbol * reductionFunctionSymbol = isSgFunctionSymbol (
                 reductionSymbol);
@@ -415,12 +412,8 @@ void
 KernelSubroutine::createAndAppendSharedMemoryOffesetForReduction ()
 {
   formalParameterDeclarations[IndirectAndDirectLoop::Fortran::KernelSubroutine::offsetForReduction]
-      = FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
+      = FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
           IndirectAndDirectLoop::Fortran::KernelSubroutine::offsetForReduction,
-          FortranTypesBuilder::getFourByteInteger (), subroutineScope);
-
-  formalParameterDeclarations[IndirectAndDirectLoop::Fortran::KernelSubroutine::offsetForReduction]->get_declarationModifier ().get_typeModifier ().setValue ();
-
-  formalParameters->append_arg (
-      *(formalParameterDeclarations[IndirectAndDirectLoop::Fortran::KernelSubroutine::offsetForReduction]->get_variables ().begin ()));
+          FortranTypesBuilder::getFourByteInteger (), subroutineScope,
+          formalParameters, 1, VALUE);
 }

@@ -813,13 +813,9 @@ KernelSubroutineOfDirectLoop::create_OP_DAT_FormalParameters (
        */
 
       formalParameterDeclarations[get_OP_DAT_VariableName (i)]
-          = FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
-              get_OP_DAT_VariableName (i), arrayType, subroutineScope);
-
-      formalParameterDeclarations[get_OP_DAT_VariableName (i)]->get_declarationModifier ().get_typeModifier ().setDevice ();
-
-      formalParameters->append_arg (
-          *(formalParameterDeclarations[get_OP_DAT_VariableName (i)]->get_variables ().begin ()));
+          = FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
+              get_OP_DAT_VariableName (i), arrayType, subroutineScope,
+              formalParameters, 1, DEVICE);
     }
   }
 }
@@ -843,14 +839,10 @@ KernelSubroutineOfDirectLoop::createAndAppendFormalParameters (
    */
 
   formalParameterDeclarations[DirectLoop::Fortran::KernelSubroutine::warpScratchpadSize]
-      = FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
+      = FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
           DirectLoop::Fortran::KernelSubroutine::warpScratchpadSize,
-          FortranTypesBuilder::getFourByteInteger (), subroutineScope);
-
-  formalParameterDeclarations[DirectLoop::Fortran::KernelSubroutine::warpScratchpadSize]->get_declarationModifier ().get_typeModifier ().setValue ();
-
-  formalParameters->append_arg (
-      *(formalParameterDeclarations[DirectLoop::Fortran::KernelSubroutine::warpScratchpadSize]->get_variables ().begin ()));
+          FortranTypesBuilder::getFourByteInteger (), subroutineScope,
+          formalParameters, 1, VALUE);
 
   /*
    * ======================================================
@@ -859,14 +851,10 @@ KernelSubroutineOfDirectLoop::createAndAppendFormalParameters (
    */
 
   formalParameterDeclarations[DirectLoop::Fortran::KernelSubroutine::setSize]
-      = FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
+      = FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
           DirectLoop::Fortran::KernelSubroutine::setSize,
-          FortranTypesBuilder::getFourByteInteger (), subroutineScope);
-
-  formalParameterDeclarations[DirectLoop::Fortran::KernelSubroutine::setSize]->get_declarationModifier ().get_typeModifier ().setValue ();
-
-  formalParameters->append_arg (
-      *(formalParameterDeclarations[DirectLoop::Fortran::KernelSubroutine::setSize]->get_variables ().begin ()));
+          FortranTypesBuilder::getFourByteInteger (), subroutineScope,
+          formalParameters, 1, VALUE);
 
   /*
    * ======================================================
@@ -875,14 +863,10 @@ KernelSubroutineOfDirectLoop::createAndAppendFormalParameters (
    */
 
   formalParameterDeclarations[DirectLoop::Fortran::KernelSubroutine::warpSize]
-      = FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
+      = FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
           DirectLoop::Fortran::KernelSubroutine::warpSize,
-          FortranTypesBuilder::getFourByteInteger (), subroutineScope);
-
-  formalParameterDeclarations[DirectLoop::Fortran::KernelSubroutine::warpSize]->get_declarationModifier ().get_typeModifier ().setValue ();
-
-  formalParameters->append_arg (
-      *(formalParameterDeclarations[DirectLoop::Fortran::KernelSubroutine::warpSize]->get_variables ().begin ()));
+          FortranTypesBuilder::getFourByteInteger (), subroutineScope,
+          formalParameters, 1, VALUE);
 
   if (parallelLoop.isReductionRequired () == true)
   {
@@ -900,9 +884,8 @@ KernelSubroutineOfDirectLoop::KernelSubroutineOfDirectLoop (
     std::string const & subroutineName,
     UserDeviceSubroutine & userDeviceSubroutine,
     DeviceDataSizesDeclarationDirectLoops & DeviceDataSizesDeclarationDirectLoops,
-    std::map <unsigned int, SgProcedureHeaderStatement *> & _reductSubroutines,
     ParallelLoop & parallelLoop, SgScopeStatement * moduleScope) :
-  KernelSubroutine (subroutineName, _reductSubroutines)
+  KernelSubroutine (subroutineName)
 {
   using SageBuilder::buildProcedureHeaderStatement;
   using SageBuilder::buildVoidType;

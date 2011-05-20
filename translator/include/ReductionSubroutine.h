@@ -60,16 +60,6 @@ class ReductionSubroutine: public Subroutine
 
     ReductionSubroutine (std::string const & subroutineAndVariableName,
         SgScopeStatement * moduleScope, SgArrayType * reductionVariableType);
-
-    /*
-     * ======================================================
-     * Generates all reduction subroutines: one per type and
-     * kind
-     * ======================================================
-     */
-    static std::map <unsigned int, SgProcedureHeaderStatement *>
-    generateReductionSubroutines (ParallelLoop & parallelLoop,
-        SgScopeStatement * scope);
 };
 
 #endif

@@ -5,6 +5,9 @@
 #include <ParallelLoop.h>
 #include <HostSubroutineOfDirectLoop.h>
 #include <HostSubroutineOfIndirectLoop.h>
+#include <ReductionSubroutine.h>
+#include <FortranStatementsAndExpressionsBuilder.h>
+#include <Globals.h>
 
 /*
  * ======================================================
@@ -251,6 +254,77 @@ ParallelLoop::retrieveOP_DATDeclarations (Declarations * declarations)
  * ======================================================
  */
 
+void
+ParallelLoop::generateReductionSubroutines (SgScopeStatement * moduleScope)
+{
+  using boost::lexical_cast;
+  using std::string;
+  using std::map;
+
+  if (isReductionRequired () == true)
+  {
+    for (unsigned int i = 1; i <= getNumberOf_OP_DAT_ArgumentGroups (); ++i)
+    {
+      if (isReductionRequired (i) == true)
+      {
+        SgType * opDatType = get_OP_DAT_Type (i);
+
+        SgArrayType * isArrayType = isSgArrayType (opDatType);
+
+        ROSE_ASSERT ( isArrayType != NULL );
+
+        SgExpression * opDatKindSize =
+            FortranStatementsAndExpressionsBuilder::getFortranKindOf_OP_DAT (
+                isArrayType);
+
+        SgIntVal * isKindIntVal = isSgIntVal (opDatKindSize);
+
+        ROSE_ASSERT ( isKindIntVal != NULL );
+
+        string typeName;
+
+        if (isSgTypeInt (isArrayType->get_base_type ()) != NULL)
+        {
+          typeName = SubroutineNames::integerSuffix;
+        }
+        else if (isSgTypeFloat (isArrayType->get_base_type ()) != NULL)
+        {
+          typeName = SubroutineNames::floatSuffix;
+        }
+        else
+        {
+          Debug::getInstance ()->errorMessage (
+              "Error: type for reduction variable is not supported");
+        }
+
+        /*
+         * ======================================================
+         * For now we distinguish between subroutines by also
+         * appending the index of the related OP_DAT argument.
+         * Eventually, the factorisation will solve this problem
+         * ======================================================
+         */
+        string const reductionSubroutineName =
+            IndirectAndDirectLoop::Fortran::VariablePrefixes::OP_DAT
+                + lexical_cast <string> (i) + SubroutineNames::reductionSuffix
+                + typeName + lexical_cast <string> (isKindIntVal->get_value ());
+
+        ReductionSubroutine * reductionSubroutine = new ReductionSubroutine (
+            reductionSubroutineName, moduleScope, isArrayType);
+
+        /*
+         * ======================================================
+         * Generate one per reduction variable, eventually
+         * we will have to factorise
+         * ======================================================
+         */
+        reductionSubroutines[i]
+            = reductionSubroutine->getSubroutineHeaderStatement ();
+      }
+    }
+  }
+}
+
 bool
 ParallelLoop::isDirectLoop () const
 {
@@ -290,7 +364,57 @@ ParallelLoop::getNumberOfDistinctIndirect_OP_DAT_Arguments ()
   return count;
 }
 
-int
+std::string
+ParallelLoop::getModuleName () const
+{
+  return moduleName;
+}
+
+SgExpressionPtrList &
+ParallelLoop::getActualArguments ()
+{
+  return actualArguments;
+}
+
+unsigned int
+ParallelLoop::getNumberOf_OP_DAT_ArgumentGroups () const
+{
+  return (actualArguments.size ()
+      - OP2::Fortran::NUMBER_OF_NON_OP_DAT_ARGUMENTS)
+      / OP2::Fortran::NUMBER_OF_ARGUMENTS_PER_OP_DAT;
+}
+
+SgType *
+ParallelLoop::get_OP_DAT_Type (unsigned int OP_DAT_ArgumentGroup)
+{
+  return OP_DAT_Types[OP_DAT_ArgumentGroup];
+}
+
+unsigned int
+ParallelLoop::get_OP_DAT_Dimension (unsigned int OP_DAT_ArgumentGroup)
+{
+  return OP_DAT_Dimensions[OP_DAT_ArgumentGroup];
+}
+
+bool
+ParallelLoop::isDuplicate_OP_DAT (unsigned int OP_DAT_ArgumentGroup)
+{
+  return OP_DAT_Duplicates[OP_DAT_ArgumentGroup];
+}
+
+MAPPING_VALUE
+ParallelLoop::get_OP_MAP_Value (unsigned int OP_DAT_ArgumentGroup)
+{
+  return OP_DAT_MappingDescriptors[OP_DAT_ArgumentGroup];
+}
+
+ACCESS_CODE_VALUE
+ParallelLoop::get_OP_Access_Value (unsigned int OP_DAT_ArgumentGroup)
+{
+  return OP_DAT_AccessDescriptors[OP_DAT_ArgumentGroup];
+}
+
+unsigned int
 ParallelLoop::getNumberOfIndirectDataSets ()
 {
   int count = 0;
@@ -306,7 +430,7 @@ ParallelLoop::getNumberOfIndirectDataSets ()
   return count;
 }
 
-int
+unsigned int
 ParallelLoop::getNumberOfDifferentIndirectDataSets ()
 {
   int count = 0;
@@ -337,11 +461,48 @@ ParallelLoop::isReductionRequired ()
   return false;
 }
 
+bool
+ParallelLoop::isReductionRequired (int OP_DAT_ArgumentGroup)
+{
+  return OP_DAT_MappingDescriptors[OP_DAT_ArgumentGroup] == GLOBAL
+      && OP_DAT_AccessDescriptors[OP_DAT_ArgumentGroup] != READ_ACCESS;
+}
+
+std::string
+ParallelLoop::get_OP_DAT_VariableName (unsigned int OP_DAT_ArgumentGroup)
+{
+  return OP_DAT_VariableNames[OP_DAT_ArgumentGroup];
+}
+
+unsigned int
+ParallelLoop::getSizeOf_OP_DAT () const
+{
+  return sizeOf_OP_DAT;
+}
+
+SgProcedureHeaderStatement *
+ParallelLoop::getReductionSubroutineHeader (unsigned int OP_DAT_ArgumentGroup)
+{
+  return reductionSubroutines[OP_DAT_ArgumentGroup];
+}
+
 ParallelLoop::ParallelLoop (std::string userSubroutineName,
     SgExpressionPtrList & actualArguments, Declarations * declarations)
 {
-  this->moduleName = userSubroutineName + "_cudafor";
+  using boost::iequals;
+
   this->actualArguments = actualArguments;
+
+  if (iequals (Globals::getInstance ()->getTargetBackend (),
+      TargetBackends::CUDA))
+  {
+    moduleName = userSubroutineName + "_cudafor";
+  }
+  else if (iequals (Globals::getInstance ()->getTargetBackend (),
+      TargetBackends::OpenMP))
+  {
+    moduleName = userSubroutineName + "_openmp";
+  }
 
   retrieveOP_DATDeclarations (declarations);
 
@@ -356,4 +517,3 @@ ParallelLoop::ParallelLoop (std::string userSubroutineName,
         + "' is an INDIRECT loop", 5);
   }
 }
-

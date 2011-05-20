@@ -41,14 +41,9 @@ ReductionSubroutine::createFormalParameters ()
    * ======================================================
    */
   formalParameterDeclarations[IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::reductionResultOnDevice]
-      = FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
+      = FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
           IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::reductionResultOnDevice,
-          reductionVariableType, subroutineScope);
-
-  formalParameterDeclarations[IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::reductionResultOnDevice]->get_declarationModifier ().get_typeModifier ().setDevice ();
-
-  formalParameters->append_arg (
-      *(formalParameterDeclarations[IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::reductionResultOnDevice]->get_variables ().begin ()));
+          reductionVariableType, subroutineScope, formalParameters, 1, DEVICE);
 
   /*
    * ======================================================
@@ -60,14 +55,10 @@ ReductionSubroutine::createFormalParameters ()
    */
 
   formalParameterDeclarations[IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::inputValue]
-      = FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
+      = FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
           IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::inputValue,
-          reductionVariableType->get_base_type (), subroutineScope);
-
-  formalParameterDeclarations[IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::inputValue]->get_declarationModifier ().get_typeModifier ().setValue ();
-
-  formalParameters->append_arg (
-      *(formalParameterDeclarations[IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::inputValue]->get_variables ().begin ()));
+          reductionVariableType->get_base_type (), subroutineScope,
+          formalParameters, 1, VALUE);
 
   /*
    * ======================================================
@@ -78,14 +69,10 @@ ReductionSubroutine::createFormalParameters ()
    */
 
   formalParameterDeclarations[IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::warpSize]
-      = FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
+      = FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
           IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::warpSize,
-          FortranTypesBuilder::getFourByteInteger (), subroutineScope);
-
-  formalParameterDeclarations[IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::warpSize]->get_declarationModifier ().get_typeModifier ().setValue ();
-
-  formalParameters->append_arg (
-      *(formalParameterDeclarations[IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::warpSize]->get_variables ().begin ()));
+          FortranTypesBuilder::getFourByteInteger (), subroutineScope,
+          formalParameters, 1, VALUE);
 
   /*
    * ======================================================
@@ -96,14 +83,10 @@ ReductionSubroutine::createFormalParameters ()
    */
 
   formalParameterDeclarations[IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::sharedMemoryStartOffset]
-      = FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
+      = FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
           IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::sharedMemoryStartOffset,
-          FortranTypesBuilder::getFourByteInteger (), subroutineScope);
-
-  formalParameterDeclarations[IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::sharedMemoryStartOffset]->get_declarationModifier ().get_typeModifier ().setValue ();
-
-  formalParameters->append_arg (
-      *(formalParameterDeclarations[IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::sharedMemoryStartOffset]->get_variables ().begin ()));
+          FortranTypesBuilder::getFourByteInteger (), subroutineScope,
+          formalParameters, 1, VALUE);
 }
 
 void
@@ -461,88 +444,4 @@ ReductionSubroutine::ReductionSubroutine (
   createLocalVariables ();
 
   createStatements ();
-}
-
-std::map <unsigned int, SgProcedureHeaderStatement *>
-ReductionSubroutine::generateReductionSubroutines (ParallelLoop & parallelLoop,
-    SgScopeStatement * scopeStatement)
-{
-  using boost::lexical_cast;
-  using std::string;
-  using std::map;
-
-  map <unsigned int, SgProcedureHeaderStatement *> reductionSubroutines;
-
-  if (parallelLoop.isReductionRequired () == true)
-  {
-    for (unsigned int i = 1; i
-        <= parallelLoop.getNumberOf_OP_DAT_ArgumentGroups (); ++i)
-    {
-      if (parallelLoop.isReductionRequired (i) == true)
-      {
-        /*
-         * ======================================================
-         * Generates the reduction subroutine name:
-         * <userKernelName> + "_reduction" + "_type"
-         * ======================================================
-         */
-
-        SgType * opDatType = parallelLoop.get_OP_DAT_Type (i);
-
-        SgArrayType * isArrayType = isSgArrayType (opDatType);
-
-        ROSE_ASSERT ( isArrayType != NULL );
-
-        SgExpression * opDatKindSize =
-            FortranStatementsAndExpressionsBuilder::getFortranKindOf_OP_DAT (
-                isArrayType);
-
-        SgIntVal * isKindIntVal = isSgIntVal (opDatKindSize);
-
-        ROSE_ASSERT ( isKindIntVal != NULL );
-
-        string typeName;
-
-        if (isSgTypeInt (isArrayType->get_base_type ()) != NULL)
-        {
-          typeName = SubroutineNames::integerSuffix;
-        }
-        else if (isSgTypeFloat (isArrayType->get_base_type ()) != NULL)
-        {
-          typeName = SubroutineNames::floatSuffix;
-        }
-        else
-        {
-          Debug::getInstance ()->errorMessage (
-              "Error: type for reduction variable is not supported");
-        }
-
-        /*
-         * ======================================================
-         * For now we distinguish between subroutines by also
-         * appending the index of the related OP_DAT argument.
-         * Eventually, the factorisation will solve this problem
-         * ======================================================
-         */
-        string const reductionSubroutineName =
-            IndirectAndDirectLoop::Fortran::VariablePrefixes::OP_DAT
-                + lexical_cast <string> (i) + SubroutineNames::reductionSuffix
-                + typeName + lexical_cast <string> (isKindIntVal->get_value ());
-
-        ReductionSubroutine * reductionSubroutine = new ReductionSubroutine (
-            reductionSubroutineName, scopeStatement, isArrayType);
-
-        /*
-         * ======================================================
-         * Generate one per reduction variable, eventually
-         * we will have to factorise
-         * ======================================================
-         */
-        reductionSubroutines[i]
-            = reductionSubroutine->getSubroutineHeaderStatement ();
-      }
-    }
-  }
-
-  return reductionSubroutines;
 }

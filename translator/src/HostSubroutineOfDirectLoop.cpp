@@ -195,15 +195,11 @@ HostSubroutineOfDirectLoop::createDeviceVariablesSizesVariable (
    * ======================================================
    */
 
-  SgVariableDeclaration * variableDeclaration2 =
-      FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
-          IndirectAndDirectLoop::Fortran::VariableNames::argsSizes,
-          deviceDataSizesDeclarationDirectLoops.getType (), subroutineScope);
-
-  variableDeclaration2->get_declarationModifier ().get_typeModifier ().setDevice ();
-
   localVariables_Others[IndirectAndDirectLoop::Fortran::VariableNames::argsSizes]
-      = variableDeclaration2;
+      = FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
+          IndirectAndDirectLoop::Fortran::VariableNames::argsSizes,
+          deviceDataSizesDeclarationDirectLoops.getType (), subroutineScope, 1,
+          DEVICE);
 }
 
 void
@@ -308,9 +304,8 @@ HostSubroutineOfDirectLoop::initialiseAllCUDAVariables (
   SgExpression * assignExpressionWarpSizeOP2 = buildAssignOp (buildVarRefExp (
       CUDAVariable_warpSizeOP2), variable_OP_WARP_SIZE);
 
-  SgExpression * assignExpressionSharedMemorySize = buildAssignOp ( buildVarRefExp (
-		CUDAVariable_sharedMemorySize ), buildIntVal ( 0 ) );
-
+  SgExpression * assignExpressionSharedMemorySize = buildAssignOp (
+      buildVarRefExp (CUDAVariable_sharedMemorySize), buildIntVal (0));
 
   appendStatement (buildExprStatement (assignExpressionNblocks),
       subroutineScope);
@@ -318,9 +313,9 @@ HostSubroutineOfDirectLoop::initialiseAllCUDAVariables (
       subroutineScope);
   appendStatement (buildExprStatement (assignExpressionWarpSizeOP2),
       subroutineScope);
-			
-	appendStatement ( buildExprStatement ( assignExpressionSharedMemorySize ),
-	  subroutineScope );
+
+  appendStatement (buildExprStatement (assignExpressionSharedMemorySize),
+      subroutineScope);
 
   /*
    * ======================================================

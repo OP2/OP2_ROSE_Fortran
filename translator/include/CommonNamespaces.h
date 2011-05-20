@@ -144,8 +144,9 @@ namespace IndirectAndDirectLoop
     {
       std::string const ISO_C_BINDING = "ISO_C_BINDING";
       std::string const OP2_C = "OP2_C";
+      std::string const CUDAFOR = "CUDAFOR";
+      std::string const OMP_LIB = "OMP_LIB";
       std::string const cudaConfigurationParams = "cudaConfigurationParams";
-      std::string const cudafor = "cudafor";
     }
   }
 }
@@ -438,6 +439,23 @@ namespace FortranVariableDeafultKinds
 {
   int const DEFAULT_KIND_INT = 4;
   int const DEFAULT_KIND_REAL = 4;
+}
+
+namespace TargetBackends
+{
+  /*
+   * ======================================================
+   * The different backends supported:
+   * 1) CUDA
+   * 2) OpenMP
+   * 3) Unknown: primarily for debug reasons, to ensure the user
+   *    is forced to select one of the above
+   * ======================================================
+   */
+
+  std::string const CUDA = "CUDA";
+  std::string const OpenMP = "OpenMP";
+  std::string const Unknown = "Unknown";
 }
 
 #endif

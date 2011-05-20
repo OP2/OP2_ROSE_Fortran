@@ -109,6 +109,14 @@ class ParallelLoop
      */
     unsigned int sizeOf_OP_DAT;
 
+    /*
+     * ======================================================
+     * Mapping from an OP_DAT which requires a reduction to
+     * its respective reduction subroutine
+     * ======================================================
+     */
+    std::map <unsigned int, SgProcedureHeaderStatement *> reductionSubroutines;
+
   private:
 
     /*
@@ -123,6 +131,15 @@ class ParallelLoop
 
   public:
 
+    /*
+     * ======================================================
+     * Generates all reduction subroutines: one per OP_DAT
+     * type and kind
+     * ======================================================
+     */
+    void
+    generateReductionSubroutines (SgScopeStatement * moduleScope);
+
     bool
     isDirectLoop () const;
 
@@ -130,82 +147,49 @@ class ParallelLoop
     getNumberOfDistinctIndirect_OP_DAT_Arguments ();
 
     std::string
-    getModuleName () const
-    {
-      return moduleName;
-    }
+    getModuleName () const;
 
     SgExpressionPtrList &
-    getActualArguments ()
-    {
-      return actualArguments;
-    }
+    getActualArguments ();
 
     unsigned int
-    getNumberOf_OP_DAT_ArgumentGroups () const
-    {
-      return (actualArguments.size ()
-          - OP2::Fortran::NUMBER_OF_NON_OP_DAT_ARGUMENTS)
-          / OP2::Fortran::NUMBER_OF_ARGUMENTS_PER_OP_DAT;
-    }
+    getNumberOf_OP_DAT_ArgumentGroups () const;
 
     SgType *
-    get_OP_DAT_Type (unsigned int OP_DAT_ArgumentGroup)
-    {
-      return OP_DAT_Types[OP_DAT_ArgumentGroup];
-    }
+    get_OP_DAT_Type (unsigned int OP_DAT_ArgumentGroup);
 
     unsigned int
-    get_OP_DAT_Dimension (unsigned int OP_DAT_ArgumentGroup)
-    {
-      return OP_DAT_Dimensions[OP_DAT_ArgumentGroup];
-    }
+    get_OP_DAT_Dimension (unsigned int OP_DAT_ArgumentGroup);
 
     bool
-    isDuplicate_OP_DAT (unsigned int OP_DAT_ArgumentGroup)
-    {
-      return OP_DAT_Duplicates[OP_DAT_ArgumentGroup];
-    }
+    isDuplicate_OP_DAT (unsigned int OP_DAT_ArgumentGroup);
 
     MAPPING_VALUE
-    get_OP_MAP_Value (unsigned int OP_DAT_ArgumentGroup)
-    {
-      return OP_DAT_MappingDescriptors[OP_DAT_ArgumentGroup];
-    }
+    get_OP_MAP_Value (unsigned int OP_DAT_ArgumentGroup);
 
     ACCESS_CODE_VALUE
-    get_OP_Access_Value (unsigned int OP_DAT_ArgumentGroup)
-    {
-      return OP_DAT_AccessDescriptors[OP_DAT_ArgumentGroup];
-    }
+    get_OP_Access_Value (unsigned int OP_DAT_ArgumentGroup);
 
-    int
+    unsigned int
     getNumberOfIndirectDataSets ();
 
-    int
+    unsigned int
     getNumberOfDifferentIndirectDataSets ();
 
     bool
     isReductionRequired ();
 
     bool
-    isReductionRequired (int OP_DAT_ArgumentGroup)
-    {
-      return OP_DAT_MappingDescriptors[OP_DAT_ArgumentGroup] == GLOBAL
-          && OP_DAT_AccessDescriptors[OP_DAT_ArgumentGroup] != READ_ACCESS;
-    }
+    isReductionRequired (int OP_DAT_ArgumentGroup);
 
     std::string
-    get_OP_DAT_VariableName (unsigned int OP_DAT_ArgumentGroup)
-    {
-      return OP_DAT_VariableNames[OP_DAT_ArgumentGroup];
-    }
+    get_OP_DAT_VariableName (unsigned int OP_DAT_ArgumentGroup);
 
     unsigned int
-    getSizeOf_OP_DAT ()
-    {
-      return sizeOf_OP_DAT;
-    }
+    getSizeOf_OP_DAT () const;
+
+    SgProcedureHeaderStatement *
+    getReductionSubroutineHeader (unsigned int OP_DAT_ArgumentGroup);
 
     ParallelLoop (std::string userSubroutineName,
         SgExpressionPtrList & actualArguments, Declarations * declarations);
