@@ -20,7 +20,7 @@
 
 #include <HostSubroutine.h>
 #include <KernelSubroutine.h>
-#include <DeviceDataSizesDeclarationDirectLoops.h>
+#include <DataSizesDeclarationOfDirectLoop.h>
 
 class HostSubroutineOfDirectLoop: public HostSubroutine
 {
@@ -62,8 +62,8 @@ class HostSubroutineOfDirectLoop: public HostSubroutine
      * ======================================================
      */
     void
-        createDeviceVariablesSizesVariable (
-            DeviceDataSizesDeclarationDirectLoops & deviceDataSizesDeclarationDirectLoops);
+    createDeviceVariablesSizesVariable (
+        DataSizesDeclarationOfDirectLoop & dataSizesDeclarationOfDirectLoop);
 
     /*
      * ======================================================
@@ -85,12 +85,11 @@ class HostSubroutineOfDirectLoop: public HostSubroutine
 
   public:
 
-        HostSubroutineOfDirectLoop (
-            std::string const & subroutineName,
-            UserDeviceSubroutine & userDeviceSubroutine,
-            KernelSubroutine & kernelSubroutine,
-            DeviceDataSizesDeclarationDirectLoops & deviceDataSizesDeclarationDirectLoops,
-            ParallelLoop & parallelLoop, SgScopeStatement * moduleScope);
+    HostSubroutineOfDirectLoop (std::string const & subroutineName,
+        UserDeviceSubroutine & userDeviceSubroutine,
+        KernelSubroutine & kernelSubroutine,
+        DataSizesDeclarationOfDirectLoop & dataSizesDeclarationOfDirectLoop,
+        ParallelLoop & parallelLoop, SgScopeStatement * moduleScope);
 };
 
 #endif

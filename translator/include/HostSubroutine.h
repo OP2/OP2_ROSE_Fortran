@@ -5,7 +5,6 @@
 #include <KernelSubroutine.h>
 #include <UserDeviceSubroutine.h>
 #include <ParallelLoop.h>
-#include <DeviceDataSizesDeclaration.h>
 
 class HostSubroutine: public Subroutine
 {

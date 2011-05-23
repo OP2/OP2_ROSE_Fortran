@@ -11,11 +11,14 @@
  * Private functions
  * ======================================================
  */
+#define INDS_UNDEF -2
+#define NO_INDS -1
+#define IND_VALS_BASE 0
 
 void
 HostSubroutineOfIndirectLoop::initialiseDeviceVariablesSizesVariable (
     ParallelLoop & parallelLoop,
-    DeviceDataSizesDeclaration & deviceDataSizesDeclaration)
+    DataSizesDeclarationOfIndirectLoop & dataSizesDeclarationOfIndirectLoop)
 {
   using SageBuilder::buildDotExp;
   using SageBuilder::buildVarRefExp;
@@ -39,7 +42,8 @@ HostSubroutineOfIndirectLoop::initialiseDeviceVariablesSizesVariable (
                   localVariables_Others[IndirectAndDirectLoop::Fortran::VariableNames::argsSizes]);
 
       SgVarRefExp * fieldReference = buildVarRefExp (
-          deviceDataSizesDeclaration.get_OP_DAT_SizeFieldDeclaration (i));
+          dataSizesDeclarationOfIndirectLoop.getFieldDeclaration (
+              dataSizesDeclarationOfIndirectLoop.get_OP_DAT_SizeFieldName (i)));
 
       SgDotExp * fieldSelectionExpression = buildDotExp (dataSizesReferences,
           fieldReference);
@@ -68,8 +72,9 @@ HostSubroutineOfIndirectLoop::initialiseDeviceVariablesSizesVariable (
       SgVarRefExp
           * fieldReference =
               buildVarRefExp (
-                  deviceDataSizesDeclaration.get_LocalToGlobalMappingSizeFieldDeclaration (
-                      i));
+                  dataSizesDeclarationOfIndirectLoop.getFieldDeclaration (
+                      dataSizesDeclarationOfIndirectLoop.getLocalToGlobalRenumberingSizeFieldName (
+                          i)));
 
       SgDotExp * fieldSelectionExpression = buildDotExp (dataSizesReferences,
           fieldReference);
@@ -105,8 +110,9 @@ HostSubroutineOfIndirectLoop::initialiseDeviceVariablesSizesVariable (
       SgVarRefExp
           * fieldReference =
               buildVarRefExp (
-                  deviceDataSizesDeclaration.get_GlobalToLocalMappingSizeFieldDeclaration (
-                      i));
+                  dataSizesDeclarationOfIndirectLoop.getFieldDeclaration (
+                      dataSizesDeclarationOfIndirectLoop.getGlobalToLocalRenumberingSizeFieldName (
+                          i)));
 
       SgDotExp * fieldSelectionExpression = buildDotExp (dataSizesReferences,
           fieldReference);
@@ -132,7 +138,8 @@ HostSubroutineOfIndirectLoop::initialiseDeviceVariablesSizesVariable (
                   localVariables_Others[IndirectAndDirectLoop::Fortran::VariableNames::argsSizes]);
 
       SgVarRefExp * fieldReference = buildVarRefExp (
-          deviceDataSizesDeclaration.get_OP_DAT_SizeFieldDeclaration (i));
+          dataSizesDeclarationOfIndirectLoop.getFieldDeclaration (
+              dataSizesDeclarationOfIndirectLoop.get_OP_DAT_SizeFieldName (i)));
 
       SgDotExp * fieldSelectionExpression = buildDotExp (dataSizesReferences,
           fieldReference);
@@ -181,7 +188,7 @@ HostSubroutineOfIndirectLoop::initialiseDeviceVariablesSizesVariable (
                 localVariables_Others[IndirectAndDirectLoop::Fortran::VariableNames::argsSizes]);
 
     SgVarRefExp * fieldReference = buildVarRefExp (
-        deviceDataSizesDeclaration.getPlanVariableSizeFieldDeclaration (*it));
+        dataSizesDeclarationOfIndirectLoop.getFieldDeclaration (*it));
 
     SgDotExp * fieldSelectionExpression = buildDotExp (dataSizesReferences,
         fieldReference);
@@ -1423,7 +1430,7 @@ HostSubroutineOfIndirectLoop::createExecutionPlanStatements (
 
 void
 HostSubroutineOfIndirectLoop::createExecutionPlanLocalVariables (
-    DeviceDataSizesDeclaration & deviceDataSizesDeclaration,
+    DataSizesDeclarationOfIndirectLoop & dataSizesDeclarationOfIndirectLoop,
     ParallelLoop & parallelLoop)
 {
   using boost::lexical_cast;
@@ -1446,7 +1453,8 @@ HostSubroutineOfIndirectLoop::createExecutionPlanLocalVariables (
   localVariables_Others[IndirectAndDirectLoop::Fortran::VariableNames::argsSizes]
       = FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
           IndirectAndDirectLoop::Fortran::VariableNames::argsSizes,
-          deviceDataSizesDeclaration.getType (), subroutineScope, 1, DEVICE);
+          dataSizesDeclarationOfIndirectLoop.getType (), subroutineScope, 1,
+          DEVICE);
 
   /*
    * ======================================================
@@ -1758,7 +1766,7 @@ HostSubroutineOfIndirectLoop::HostSubroutineOfIndirectLoop (
     UserDeviceSubroutine & userDeviceSubroutine,
     KernelSubroutine & kernelSubroutine,
     InitialiseConstantsSubroutine & initialiseConstantsSubroutine,
-    DeviceDataSizesDeclaration & deviceDataSizesDeclaration,
+    DataSizesDeclarationOfIndirectLoop & dataSizesDeclarationOfIndirectLoop,
     ParallelLoop & parallelLoop, SgScopeStatement * moduleScope) :
   HostSubroutine (subroutineName, userDeviceSubroutine, parallelLoop,
       moduleScope)
@@ -1770,7 +1778,8 @@ HostSubroutineOfIndirectLoop::HostSubroutineOfIndirectLoop (
 
   createDataMarshallingLocalVariables (parallelLoop);
 
-  createExecutionPlanLocalVariables (deviceDataSizesDeclaration, parallelLoop);
+  createExecutionPlanLocalVariables (dataSizesDeclarationOfIndirectLoop,
+      parallelLoop);
 
   createCUDAKernelVariables ();
 
@@ -1783,7 +1792,7 @@ HostSubroutineOfIndirectLoop::HostSubroutineOfIndirectLoop (
   createPlanCToForttranPointerConversionStatements (parallelLoop);
 
   initialiseDeviceVariablesSizesVariable (parallelLoop,
-      deviceDataSizesDeclaration);
+      dataSizesDeclarationOfIndirectLoop);
 
   initialiseVariablesAndConstants (initialiseConstantsSubroutine);
 

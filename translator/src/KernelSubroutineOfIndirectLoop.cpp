@@ -1715,7 +1715,7 @@ KernelSubroutineOfIndirectLoop::createSharedLocalVariables (
 
 void
 KernelSubroutineOfIndirectLoop::createPlanFormalParameters (
-    DeviceDataSizesDeclaration & deviceDataSizesDeclaration,
+    DataSizesDeclarationOfIndirectLoop & dataSizesDeclarationOfIndirectLoop,
     ParallelLoop & parallelLoop)
 {
   using SageBuilder::buildSubtractOp;
@@ -1762,8 +1762,7 @@ KernelSubroutineOfIndirectLoop::createPlanFormalParameters (
                 formalParameterDeclarations[IndirectAndDirectLoop::Fortran::VariableNames::argsSizes]);
 
     SgVarRefExp * fieldReference = buildVarRefExp (
-        deviceDataSizesDeclaration.getPlanVariableSizeFieldDeclaration (*it
-            + "Size"));
+        dataSizesDeclarationOfIndirectLoop.getFieldDeclaration (*it + "Size"));
 
     SgDotExp * fieldSelectionExpression = buildDotExp (argsSizesReference,
         fieldReference);
@@ -1796,7 +1795,7 @@ KernelSubroutineOfIndirectLoop::createPlanFormalParameters (
 
 void
 KernelSubroutineOfIndirectLoop::create_OP_DAT_FormalParameters (
-    DeviceDataSizesDeclaration & deviceDataSizesDeclaration,
+    DataSizesDeclarationOfIndirectLoop & dataSizesDeclarationOfIndirectLoop,
     ParallelLoop & parallelLoop)
 {
   using boost::lexical_cast;
@@ -1824,7 +1823,8 @@ KernelSubroutineOfIndirectLoop::create_OP_DAT_FormalParameters (
                   formalParameterDeclarations[IndirectAndDirectLoop::Fortran::VariableNames::argsSizes]);
 
       SgVarRefExp * fieldReference = buildVarRefExp (
-          deviceDataSizesDeclaration.get_OP_DAT_SizeFieldDeclaration (i));
+          dataSizesDeclarationOfIndirectLoop.getFieldDeclaration (
+              dataSizesDeclarationOfIndirectLoop.get_OP_DAT_SizeFieldName (i)));
 
       SgDotExp * fieldSelectionExpression = buildDotExp (argsSizesReference,
           fieldReference);
@@ -1862,8 +1862,9 @@ KernelSubroutineOfIndirectLoop::create_OP_DAT_FormalParameters (
       SgVarRefExp
           * fieldReference2 =
               buildVarRefExp (
-                  deviceDataSizesDeclaration.get_LocalToGlobalMappingSizeFieldDeclaration (
-                      i));
+                  dataSizesDeclarationOfIndirectLoop.getFieldDeclaration (
+                      dataSizesDeclarationOfIndirectLoop.getLocalToGlobalRenumberingSizeFieldName (
+                          i)));
 
       SgDotExp * fieldSelectionExpression2 = buildDotExp (argsSizesReference2,
           fieldReference2);
@@ -1900,8 +1901,9 @@ KernelSubroutineOfIndirectLoop::create_OP_DAT_FormalParameters (
       SgVarRefExp
           * fieldReference =
               buildVarRefExp (
-                  deviceDataSizesDeclaration.get_GlobalToLocalMappingSizeFieldDeclaration (
-                      i));
+                  dataSizesDeclarationOfIndirectLoop.getFieldDeclaration (
+                      dataSizesDeclarationOfIndirectLoop.getGlobalToLocalRenumberingSizeFieldName (
+                          i)));
 
       SgDotExp * fieldSelectionExpression = buildDotExp (argsSizesReference,
           fieldReference);
@@ -1937,7 +1939,8 @@ KernelSubroutineOfIndirectLoop::create_OP_DAT_FormalParameters (
                   formalParameterDeclarations[IndirectAndDirectLoop::Fortran::VariableNames::argsSizes]);
 
       SgVarRefExp * fieldReference = buildVarRefExp (
-          deviceDataSizesDeclaration.get_OP_DAT_SizeFieldDeclaration (i));
+          dataSizesDeclarationOfIndirectLoop.getFieldDeclaration (
+              dataSizesDeclarationOfIndirectLoop.get_OP_DAT_SizeFieldName (i)));
 
       SgDotExp * fieldSelectionExpression = buildDotExp (argsSizesReference,
           fieldReference);
@@ -1959,7 +1962,7 @@ KernelSubroutineOfIndirectLoop::create_OP_DAT_FormalParameters (
 KernelSubroutineOfIndirectLoop::KernelSubroutineOfIndirectLoop (
     std::string const & subroutineName,
     UserDeviceSubroutine & userDeviceSubroutine,
-    DeviceDataSizesDeclaration & deviceDataSizesDeclaration,
+    DataSizesDeclarationOfIndirectLoop & dataSizesDeclarationOfIndirectLoop,
     ParallelLoop & parallelLoop, SgScopeStatement * moduleScope) :
   KernelSubroutine (subroutineName)
 {
@@ -1985,11 +1988,12 @@ KernelSubroutineOfIndirectLoop::KernelSubroutineOfIndirectLoop (
 
   subroutineScope = subroutineHeaderStatement->get_definition ()->get_body ();
 
-  createArgsSizesFormalParameter (deviceDataSizesDeclaration);
+  createArgsSizesFormalParameter (dataSizesDeclarationOfIndirectLoop);
 
-  create_OP_DAT_FormalParameters (deviceDataSizesDeclaration, parallelLoop);
+  create_OP_DAT_FormalParameters (dataSizesDeclarationOfIndirectLoop,
+      parallelLoop);
 
-  createPlanFormalParameters (deviceDataSizesDeclaration, parallelLoop);
+  createPlanFormalParameters (dataSizesDeclarationOfIndirectLoop, parallelLoop);
 
   createLocalVariables (parallelLoop);
 

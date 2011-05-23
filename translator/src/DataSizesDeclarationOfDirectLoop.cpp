@@ -1,33 +1,24 @@
-#include <boost/lexical_cast.hpp>
-#include <DeviceDataSizesDeclarationDirectLoops.h>
-#include <FortranStatementsAndExpressionsBuilder.h>
+#include <DataSizesDeclarationOfDirectLoop.h>
 #include <FortranTypesBuilder.h>
-#include <CommonNamespaces.h>
 
 /*
  * ======================================================
  * Private functions
  * ======================================================
  */
+
 void
-DeviceDataSizesDeclarationDirectLoops::addFields (ParallelLoop & parallelLoop,
-    SgScopeStatement * moduleScope)
+DataSizesDeclarationOfDirectLoop::addFields (ParallelLoop & parallelLoop)
 {
-  using boost::lexical_cast;
   using SageBuilder::buildVariableDeclaration;
-  using std::map;
   using std::string;
-  using std::vector;
 
   for (unsigned int i = 1; i
       <= parallelLoop.getNumberOf_OP_DAT_ArgumentGroups (); ++i)
   {
     if (parallelLoop.isDuplicate_OP_DAT (i) == false)
     {
-      string const variableName =
-          IndirectAndDirectLoop::Fortran::VariablePrefixes::OP_DAT
-              + lexical_cast <string> (i)
-              + IndirectAndDirectLoop::Fortran::VariableSuffixes::Size;
+      string const & variableName = get_OP_DAT_SizeFieldName (i);
 
       SgVariableDeclaration * fieldDeclaration = buildVariableDeclaration (
           variableName, FortranTypesBuilder::getFourByteInteger (), NULL,
@@ -38,10 +29,9 @@ DeviceDataSizesDeclarationDirectLoops::addFields (ParallelLoop & parallelLoop,
       deviceDatatypeStatement->get_definition ()->append_member (
           fieldDeclaration);
 
-      OP_DAT_Sizes[i] = fieldDeclaration;
+      fieldDeclarations[variableName] = fieldDeclaration;
     }
   }
-
 }
 
 /*
@@ -50,10 +40,10 @@ DeviceDataSizesDeclarationDirectLoops::addFields (ParallelLoop & parallelLoop,
  * ======================================================
  */
 
-DeviceDataSizesDeclarationDirectLoops::DeviceDataSizesDeclarationDirectLoops (
+DataSizesDeclarationOfDirectLoop::DataSizesDeclarationOfDirectLoop (
     ParallelLoop & parallelLoop, std::string const & subroutineName,
     SgScopeStatement * moduleScope) :
-  DeviceDataSizesDeclaration (parallelLoop, subroutineName, moduleScope)
+  DataSizesDeclaration (subroutineName, moduleScope)
 {
-
+  addFields (parallelLoop);
 }

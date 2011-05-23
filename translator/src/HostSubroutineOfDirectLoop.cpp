@@ -183,7 +183,7 @@ HostSubroutineOfDirectLoop::createCUDAVariablesDirectLoops (
 
 void
 HostSubroutineOfDirectLoop::createDeviceVariablesSizesVariable (
-    DeviceDataSizesDeclarationDirectLoops & deviceDataSizesDeclarationDirectLoops)
+    DataSizesDeclarationOfDirectLoop & dataSizesDeclarationOfDirectLoop)
 {
 
   Debug::getInstance ()->debugMessage ("Creating device data sizes variable", 2);
@@ -198,7 +198,7 @@ HostSubroutineOfDirectLoop::createDeviceVariablesSizesVariable (
   localVariables_Others[IndirectAndDirectLoop::Fortran::VariableNames::argsSizes]
       = FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
           IndirectAndDirectLoop::Fortran::VariableNames::argsSizes,
-          deviceDataSizesDeclarationDirectLoops.getType (), subroutineScope, 1,
+          dataSizesDeclarationOfDirectLoop.getType (), subroutineScope, 1,
           DEVICE);
 }
 
@@ -407,7 +407,7 @@ HostSubroutineOfDirectLoop::HostSubroutineOfDirectLoop (
     std::string const & subroutineName,
     UserDeviceSubroutine & userDeviceSubroutine,
     KernelSubroutine & kernelSubroutine,
-    DeviceDataSizesDeclarationDirectLoops & deviceDataSizesDeclarationDirectLoops,
+    DataSizesDeclarationOfDirectLoop & dataSizesDeclarationOfDirectLoop,
     ParallelLoop & parallelLoop, SgScopeStatement * moduleScope) :
   HostSubroutine (subroutineName, userDeviceSubroutine, parallelLoop,
       moduleScope)
@@ -417,7 +417,7 @@ HostSubroutineOfDirectLoop::HostSubroutineOfDirectLoop (
 
   createFormalParameters (userDeviceSubroutine, parallelLoop);
 
-  createDeviceVariablesSizesVariable (deviceDataSizesDeclarationDirectLoops);
+  createDeviceVariablesSizesVariable (dataSizesDeclarationOfDirectLoop);
 
   createDataMarshallingLocalVariables (parallelLoop);
 
@@ -444,7 +444,4 @@ HostSubroutineOfDirectLoop::HostSubroutineOfDirectLoop (
   createSupportForReductionVariablesAfterKernel (parallelLoop);
 
   copyDataBackFromDeviceAndDeallocate (parallelLoop);
-
-  Debug::getInstance ()->debugMessage (
-      "After the creating of the host subroutine", 2);
 }

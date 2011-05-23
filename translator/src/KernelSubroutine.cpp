@@ -7,13 +7,13 @@
 
 void
 KernelSubroutine::createArgsSizesFormalParameter (
-    DeviceDataSizesDeclaration & deviceDataSizesDeclaration)
+    DataSizesDeclaration & dataSizesDeclaration)
 {
   formalParameterDeclarations[IndirectAndDirectLoop::Fortran::VariableNames::argsSizes]
       = FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
           IndirectAndDirectLoop::Fortran::VariableNames::argsSizes,
-          deviceDataSizesDeclaration.getType (), subroutineScope,
-          formalParameters, 1, DEVICE);
+          dataSizesDeclaration.getType (), subroutineScope, formalParameters,
+          1, DEVICE);
 }
 
 void

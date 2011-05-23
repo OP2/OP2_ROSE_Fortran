@@ -13,14 +13,17 @@ CommandLine::CommandLine (int argc, char **argv)
   using boost::bad_lexical_cast;
   using boost::lexical_cast;
   using std::cout;
+  using std::string;
 
-  std::string const debugOption = "-d";
-
-  std::string const verboseOption = "-v";
-
-  std::string const cudaOption = "--cuda";
-
-  std::string const openMPOption = "--openMP";
+  /*
+   * ======================================================
+   * The additional options available to the user
+   * ======================================================
+   */
+  string const debugOption = "-d";
+  string const verboseOption = "-v";
+  string const cudaOption = "--cuda";
+  string const openMPOption = "--openMP";
 
   bool debugMode = false;
 
@@ -136,7 +139,8 @@ CommandLine::getNumberOfArguments () const
 char **
 CommandLine::getArguments () const
 {
-  using namespace std;
+  using std::string;
+  using std::vector;
 
   /*
    * ======================================================
@@ -172,7 +176,7 @@ CommandLine::getArguments () const
      * Advance the index into argv
      * ======================================================
      */
-    i++;
+    ++i;
   }
 
   return argv;

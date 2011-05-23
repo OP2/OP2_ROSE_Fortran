@@ -9,8 +9,8 @@
 #include <HostSubroutineOfDirectLoop.h>
 #include <HostSubroutineOfIndirectLoop.h>
 #include <InitialiseConstantsSubroutine.h>
-#include <DeviceDataSizesDeclaration.h>
-#include <DeviceDataSizesDeclarationDirectLoops.h>
+#include <DataSizesDeclarationOfDirectLoop.h>
+#include <DataSizesDeclarationOfIndirectLoop.h>
 #include <ReductionSubroutine.h>
 #include <OpenMPModuleDeclarations.h>
 #include <Globals.h>
@@ -234,13 +234,9 @@ NewSubroutinesGeneration::createCUDASubroutines (ParallelLoop & parallelLoop,
      * Direct loop
      * ======================================================
      */
-    DeviceDataSizesDeclarationDirectLoops
-        * deviceDataSizesDeclarationDirectLoops =
-            new DeviceDataSizesDeclarationDirectLoops (parallelLoop,
-                userSubroutineName, moduleScope);
-
-    deviceDataSizesDeclarationDirectLoops->initialise (parallelLoop,
-        moduleScope);
+    DataSizesDeclarationOfDirectLoop * dataSizesDeclaration =
+        new DataSizesDeclarationOfDirectLoop (parallelLoop, userSubroutineName,
+            moduleScope);
 
     InitialiseConstantsSubroutine * initialiseConstantsSubroutine =
         new InitialiseConstantsSubroutine (userSubroutineName);
@@ -253,13 +249,14 @@ NewSubroutinesGeneration::createCUDASubroutines (ParallelLoop & parallelLoop,
         = new UserDeviceSubroutine (userSubroutineName, moduleScope,
             initialiseConstantsSubroutine, *declarations, parallelLoop);
 
-    kernelSubroutine = new KernelSubroutineOfDirectLoop (userSubroutineName,
-        *userDeviceSubroutine, *deviceDataSizesDeclarationDirectLoops,
-        parallelLoop, moduleScope);
+    kernelSubroutine
+        = new KernelSubroutineOfDirectLoop (userSubroutineName,
+            *userDeviceSubroutine, *dataSizesDeclaration, parallelLoop,
+            moduleScope);
 
     hostSubroutine = new HostSubroutineOfDirectLoop (userSubroutineName,
-        *userDeviceSubroutine, *kernelSubroutine,
-        *deviceDataSizesDeclarationDirectLoops, parallelLoop, moduleScope);
+        *userDeviceSubroutine, *kernelSubroutine, *dataSizesDeclaration,
+        parallelLoop, moduleScope);
   }
   else
   {
@@ -269,11 +266,9 @@ NewSubroutinesGeneration::createCUDASubroutines (ParallelLoop & parallelLoop,
      * ======================================================
      */
 
-    DeviceDataSizesDeclaration * deviceDataSizesDeclaration =
-        new DeviceDataSizesDeclaration (parallelLoop, userSubroutineName,
-            moduleScope);
-
-    deviceDataSizesDeclaration->initialise (parallelLoop, moduleScope);
+    DataSizesDeclarationOfIndirectLoop * dataSizesDeclaration =
+        new DataSizesDeclarationOfIndirectLoop (parallelLoop,
+            userSubroutineName, moduleScope);
 
     InitialiseConstantsSubroutine * initialiseConstantsSubroutine =
         new InitialiseConstantsSubroutine (userSubroutineName);
@@ -289,14 +284,15 @@ NewSubroutinesGeneration::createCUDASubroutines (ParallelLoop & parallelLoop,
         = new UserDeviceSubroutine (userSubroutineName, moduleScope,
             initialiseConstantsSubroutine, *declarations, parallelLoop);
 
-    kernelSubroutine = new KernelSubroutineOfIndirectLoop (userSubroutineName,
-        *userDeviceSubroutine, *deviceDataSizesDeclaration, parallelLoop,
-        moduleScope);
+    kernelSubroutine
+        = new KernelSubroutineOfIndirectLoop (userSubroutineName,
+            *userDeviceSubroutine, *dataSizesDeclaration, parallelLoop,
+            moduleScope);
 
     hostSubroutine = new HostSubroutineOfIndirectLoop (userSubroutineName,
         *userDeviceSubroutine, *kernelSubroutine,
-        *initialiseConstantsSubroutine, *deviceDataSizesDeclaration,
-        parallelLoop, moduleScope);
+        *initialiseConstantsSubroutine, *dataSizesDeclaration, parallelLoop,
+        moduleScope);
   }
 
   /*

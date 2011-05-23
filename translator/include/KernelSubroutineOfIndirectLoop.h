@@ -10,7 +10,7 @@
 #define KERNEL_SUBROUTINE_OF_INDIRECT_LOOP_H
 
 #include <KernelSubroutine.h>
-#include <DeviceDataSizesDeclaration.h>
+#include <DataSizesDeclarationOfIndirectLoop.h>
 
 class KernelSubroutineOfIndirectLoop: public KernelSubroutine
 {
@@ -88,21 +88,22 @@ class KernelSubroutineOfIndirectLoop: public KernelSubroutine
     createSharedLocalVariables (ParallelLoop & parallelLoop);
 
     void
-    createPlanFormalParameters (
-        DeviceDataSizesDeclaration & deviceDataSizesDeclaration,
-        ParallelLoop & parallelLoop);
+        createPlanFormalParameters (
+            DataSizesDeclarationOfIndirectLoop & dataSizesDeclarationOfIndirectLoop,
+            ParallelLoop & parallelLoop);
 
     void
-    create_OP_DAT_FormalParameters (
-        DeviceDataSizesDeclaration & deviceDataSizesDeclaration,
-        ParallelLoop & parallelLoop);
+        create_OP_DAT_FormalParameters (
+            DataSizesDeclarationOfIndirectLoop & dataSizesDeclarationOfIndirectLoop,
+            ParallelLoop & parallelLoop);
 
   public:
 
-    KernelSubroutineOfIndirectLoop (std::string const & subroutineName,
-        UserDeviceSubroutine & userDeviceSubroutine,
-        DeviceDataSizesDeclaration & deviceDataSizesDeclaration,
-        ParallelLoop & parallelLoop, SgScopeStatement * moduleScope);
+        KernelSubroutineOfIndirectLoop (
+            std::string const & subroutineName,
+            UserDeviceSubroutine & userDeviceSubroutine,
+            DataSizesDeclarationOfIndirectLoop & dataSizesDeclarationOfIndirectLoop,
+            ParallelLoop & parallelLoop, SgScopeStatement * moduleScope);
 
 };
 

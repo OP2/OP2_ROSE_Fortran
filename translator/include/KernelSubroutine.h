@@ -5,7 +5,7 @@
 #include <Subroutine.h>
 #include <UserDeviceSubroutine.h>
 #include <ParallelLoop.h>
-#include <DeviceDataSizesDeclaration.h>
+#include <DataSizesDeclaration.h>
 
 class KernelSubroutine: public Subroutine
 {
@@ -44,8 +44,8 @@ class KernelSubroutine: public Subroutine
     }
 
     void
-    createArgsSizesFormalParameter (
-        DeviceDataSizesDeclaration & deviceDataSizesDeclaration);
+        createArgsSizesFormalParameter (
+            DataSizesDeclaration & dataSizesDeclaration);
 
     /*
      * ======================================================

@@ -822,10 +822,10 @@ KernelSubroutineOfDirectLoop::create_OP_DAT_FormalParameters (
 
 void
 KernelSubroutineOfDirectLoop::createAndAppendFormalParameters (
-    DeviceDataSizesDeclarationDirectLoops & DeviceDataSizesDeclarationDirectLoops,
+    DataSizesDeclarationOfDirectLoop & dataSizesDeclarationOfDirectLoop,
     ParallelLoop & parallelLoop)
 {
-  createArgsSizesFormalParameter (DeviceDataSizesDeclarationDirectLoops);
+  createArgsSizesFormalParameter (dataSizesDeclarationOfDirectLoop);
 
   create_OP_DAT_FormalParameters (parallelLoop);
 
@@ -883,7 +883,7 @@ KernelSubroutineOfDirectLoop::createAndAppendFormalParameters (
 KernelSubroutineOfDirectLoop::KernelSubroutineOfDirectLoop (
     std::string const & subroutineName,
     UserDeviceSubroutine & userDeviceSubroutine,
-    DeviceDataSizesDeclarationDirectLoops & DeviceDataSizesDeclarationDirectLoops,
+    DataSizesDeclarationOfDirectLoop & dataSizesDeclarationOfDirectLoop,
     ParallelLoop & parallelLoop, SgScopeStatement * moduleScope) :
   KernelSubroutine (subroutineName)
 {
@@ -906,7 +906,7 @@ KernelSubroutineOfDirectLoop::KernelSubroutineOfDirectLoop (
 
   subroutineScope = subroutineHeaderStatement->get_definition ()->get_body ();
 
-  createAndAppendFormalParameters (DeviceDataSizesDeclarationDirectLoops,
+  createAndAppendFormalParameters (dataSizesDeclarationOfDirectLoop,
       parallelLoop);
 
   createLocalVariables (parallelLoop);

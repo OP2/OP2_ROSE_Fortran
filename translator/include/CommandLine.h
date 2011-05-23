@@ -15,11 +15,16 @@ class CommandLine
 {
   private:
 
+    /*
+     * ======================================================
+     * The arguments passed to the ROSE front end (these are
+     * the remaining arguments after our additional arguments
+     * have been stripped from the command line)
+     * ======================================================
+     */
     std::vector <std::string> ROSE_arguments;
 
   public:
-
-    CommandLine (int argc, char ** argv);
 
     /*
      * ======================================================
@@ -38,6 +43,8 @@ class CommandLine
      */
     char **
     getArguments () const;
+
+    CommandLine (int argc, char ** argv);
 };
 
 #endif

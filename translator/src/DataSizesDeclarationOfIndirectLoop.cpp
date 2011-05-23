@@ -1,22 +1,44 @@
 #include <boost/lexical_cast.hpp>
-#include <DeviceDataSizesDeclaration.h>
+#include <DataSizesDeclarationOfIndirectLoop.h>
 #include <FortranStatementsAndExpressionsBuilder.h>
 #include <FortranTypesBuilder.h>
 #include <CommonNamespaces.h>
 
 /*
  * ======================================================
- * Private functions
+ * Public functions
  * ======================================================
  */
 
+std::string
+DataSizesDeclarationOfIndirectLoop::getLocalToGlobalRenumberingSizeFieldName (
+    unsigned int OP_DAT_ArgumentGroup)
+{
+  using boost::lexical_cast;
+  using std::string;
+
+  return IndirectLoop::Fortran::VariablePrefixes::pindMaps + lexical_cast <
+      string> (OP_DAT_ArgumentGroup)
+      + IndirectAndDirectLoop::Fortran::VariableSuffixes::Size;
+}
+
+std::string
+DataSizesDeclarationOfIndirectLoop::getGlobalToLocalRenumberingSizeFieldName (
+    unsigned int OP_DAT_ArgumentGroup)
+{
+  using boost::lexical_cast;
+  using std::string;
+
+  return IndirectLoop::Fortran::VariablePrefixes::pMaps
+      + lexical_cast <string> (OP_DAT_ArgumentGroup)
+      + IndirectAndDirectLoop::Fortran::VariableSuffixes::Size;
+}
+
 void
-DeviceDataSizesDeclaration::addFields (ParallelLoop & parallelLoop,
-    SgScopeStatement * moduleScope)
+DataSizesDeclarationOfIndirectLoop::addFields (ParallelLoop & parallelLoop)
 {
   using boost::lexical_cast;
   using SageBuilder::buildVariableDeclaration;
-  using std::map;
   using std::string;
   using std::vector;
 
@@ -26,10 +48,7 @@ DeviceDataSizesDeclaration::addFields (ParallelLoop & parallelLoop,
     if (parallelLoop.isDuplicate_OP_DAT (i) == false
         && parallelLoop.get_OP_MAP_Value (i) == INDIRECT)
     {
-      string const variableName =
-          IndirectAndDirectLoop::Fortran::VariablePrefixes::OP_DAT
-              + lexical_cast <string> (i)
-              + IndirectAndDirectLoop::Fortran::VariableSuffixes::Size;
+      string const variableName = get_OP_DAT_SizeFieldName (i);
 
       SgVariableDeclaration * fieldDeclaration = buildVariableDeclaration (
           variableName, FortranTypesBuilder::getFourByteInteger (), NULL,
@@ -40,7 +59,7 @@ DeviceDataSizesDeclaration::addFields (ParallelLoop & parallelLoop,
       deviceDatatypeStatement->get_definition ()->append_member (
           fieldDeclaration);
 
-      OP_DAT_Sizes[i] = fieldDeclaration;
+      fieldDeclarations[variableName] = fieldDeclaration;
     }
   }
 
@@ -50,10 +69,7 @@ DeviceDataSizesDeclaration::addFields (ParallelLoop & parallelLoop,
     if (parallelLoop.isDuplicate_OP_DAT (i) == false
         && parallelLoop.get_OP_MAP_Value (i) == INDIRECT)
     {
-      string const variableName =
-          IndirectLoop::Fortran::VariablePrefixes::pindMaps + lexical_cast <
-              string> (i)
-              + IndirectAndDirectLoop::Fortran::VariableSuffixes::Size;
+      string const variableName = getLocalToGlobalRenumberingSizeFieldName (i);
 
       SgVariableDeclaration * fieldDeclaration = buildVariableDeclaration (
           variableName, FortranTypesBuilder::getFourByteInteger (), NULL,
@@ -64,7 +80,7 @@ DeviceDataSizesDeclaration::addFields (ParallelLoop & parallelLoop,
       deviceDatatypeStatement->get_definition ()->append_member (
           fieldDeclaration);
 
-      localToGlobalRenumberingOfIndirectMappingSizes[i] = fieldDeclaration;
+      fieldDeclarations[variableName] = fieldDeclaration;
     }
   }
 
@@ -73,10 +89,7 @@ DeviceDataSizesDeclaration::addFields (ParallelLoop & parallelLoop,
   {
     if (parallelLoop.get_OP_MAP_Value (i) == INDIRECT)
     {
-      string const variableName =
-          IndirectLoop::Fortran::VariablePrefixes::pMaps
-              + lexical_cast <string> (i)
-              + IndirectAndDirectLoop::Fortran::VariableSuffixes::Size;
+      string const variableName = getGlobalToLocalRenumberingSizeFieldName (i);
 
       SgVariableDeclaration * fieldDeclaration = buildVariableDeclaration (
           variableName, FortranTypesBuilder::getFourByteInteger (), NULL,
@@ -87,7 +100,7 @@ DeviceDataSizesDeclaration::addFields (ParallelLoop & parallelLoop,
       deviceDatatypeStatement->get_definition ()->append_member (
           fieldDeclaration);
 
-      globalToLocalRenumberingOfIndirectMappingSizes[i] = fieldDeclaration;
+      fieldDeclarations[variableName] = fieldDeclaration;
     }
   }
 
@@ -97,10 +110,7 @@ DeviceDataSizesDeclaration::addFields (ParallelLoop & parallelLoop,
     if (parallelLoop.isDuplicate_OP_DAT (i) == false
         && parallelLoop.get_OP_MAP_Value (i) == DIRECT)
     {
-      string const variableName =
-          IndirectAndDirectLoop::Fortran::VariablePrefixes::OP_DAT
-              + lexical_cast <string> (i)
-              + IndirectAndDirectLoop::Fortran::VariableSuffixes::Size;
+      string const variableName = get_OP_DAT_SizeFieldName (i);
 
       SgVariableDeclaration * fieldDeclaration = buildVariableDeclaration (
           variableName, FortranTypesBuilder::getFourByteInteger (), NULL,
@@ -111,7 +121,7 @@ DeviceDataSizesDeclaration::addFields (ParallelLoop & parallelLoop,
       deviceDatatypeStatement->get_definition ()->append_member (
           fieldDeclaration);
 
-      OP_DAT_Sizes[i] = fieldDeclaration;
+      fieldDeclarations[variableName] = fieldDeclaration;
     }
   }
 
@@ -119,9 +129,6 @@ DeviceDataSizesDeclaration::addFields (ParallelLoop & parallelLoop,
 
   planFunctionSizeVariables.push_back (
       IndirectLoop::Fortran::PlanFunction::VariableNames::pblkMapSize);
-
-  //  planFunctionSizeVariables.push_back (
-  //      IndirectLoop::Fortran::PlanFunction::VariableNames::pindMapsSize);
 
   planFunctionSizeVariables.push_back (
       IndirectLoop::Fortran::PlanFunction::VariableNames::pindOffsSize);
@@ -151,27 +158,14 @@ DeviceDataSizesDeclaration::addFields (ParallelLoop & parallelLoop,
 
     deviceDatatypeStatement->get_definition ()->append_member (fieldDeclaration);
 
-    otherFieldDeclarations[*it] = fieldDeclaration;
+    fieldDeclarations[*it] = fieldDeclaration;
   }
 }
 
-/*
- * ======================================================
- * Public functions
- * ======================================================
- */
-
-DeviceDataSizesDeclaration::DeviceDataSizesDeclaration (
+DataSizesDeclarationOfIndirectLoop::DataSizesDeclarationOfIndirectLoop (
     ParallelLoop & parallelLoop, std::string const & subroutineName,
-    SgScopeStatement * moduleScope)
+    SgScopeStatement * moduleScope) :
+  DataSizesDeclaration (subroutineName, moduleScope)
 {
-  using SageInterface::appendStatement;
-
-  deviceDatatypeStatement
-      = FortranStatementsAndExpressionsBuilder::buildTypeDeclaration (
-          subroutineName + "_variableSizes", moduleScope);
-
-  deviceDatatypeStatement->get_declarationModifier ().get_accessModifier ().setUndefined ();
-
-  appendStatement (deviceDatatypeStatement, moduleScope);
+  addFields (parallelLoop);
 }

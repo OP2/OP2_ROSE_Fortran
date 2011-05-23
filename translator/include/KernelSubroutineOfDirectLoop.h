@@ -2,14 +2,13 @@
  * Written by Adam Betts and Carlo Bertolli
  *
  * This class models the kernel subroutine for a direct loop
- *
  */
 
 #ifndef KERNEL_SUBROUTINE_OF_DIRECT_LOOP_H
 #define KERNEL_SUBROUTINE_OF_DIRECT_LOOP_H
 
 #include <KernelSubroutine.h>
-#include <DeviceDataSizesDeclarationDirectLoops.h>
+#include <DataSizesDeclarationOfDirectLoop.h>
 
 class KernelSubroutineOfDirectLoop: public KernelSubroutine
 {
@@ -74,19 +73,17 @@ class KernelSubroutineOfDirectLoop: public KernelSubroutine
      * Creates all formal parameters
      * ======================================================
      */
-
     void
-        createAndAppendFormalParameters (
-            DeviceDataSizesDeclarationDirectLoops & DeviceDataSizesDeclarationDirectLoops,
-            ParallelLoop & parallelLoop);
+    createAndAppendFormalParameters (
+        DataSizesDeclarationOfDirectLoop & dataSizesDeclarationOfDirectLoop,
+        ParallelLoop & parallelLoop);
 
   public:
 
-        KernelSubroutineOfDirectLoop (
-            std::string const & subroutineName,
-            UserDeviceSubroutine & userDeviceSubroutine,
-            DeviceDataSizesDeclarationDirectLoops & DeviceDataSizesDeclarationDirectLoops,
-            ParallelLoop & parallelLoop, SgScopeStatement * moduleScope);
+    KernelSubroutineOfDirectLoop (std::string const & subroutineName,
+        UserDeviceSubroutine & userDeviceSubroutine,
+        DataSizesDeclarationOfDirectLoop & dataSizesDeclarationOfDirectLoop,
+        ParallelLoop & parallelLoop, SgScopeStatement * moduleScope);
 };
 
 #endif

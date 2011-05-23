@@ -848,7 +848,6 @@ HostSubroutine::createSupportForReductionVariablesBeforeKernel (
       nSharedVarRef, maxRedSizeVarRef));
 
   appendStatement (buildExprStatement (recomputeNshared), subroutineScope);
-
 }
 
 void

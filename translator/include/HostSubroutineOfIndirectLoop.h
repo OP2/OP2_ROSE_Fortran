@@ -11,17 +11,7 @@
 #include <HostSubroutine.h>
 #include <KernelSubroutine.h>
 #include <InitialiseConstantsSubroutine.h>
-#include <DeviceDataSizesDeclaration.h>
-
-/*
- * ======================================================
- * Macros used to initilise the inds generation mapping
- * ======================================================
- */
-
-#define INDS_UNDEF -2
-#define NO_INDS -1
-#define IND_VALS_BASE 0
+#include <DataSizesDeclarationOfIndirectLoop.h>
 
 class HostSubroutineOfIndirectLoop: public HostSubroutine
 {
@@ -48,8 +38,9 @@ class HostSubroutineOfIndirectLoop: public HostSubroutine
   private:
 
     void
-    initialiseDeviceVariablesSizesVariable (ParallelLoop & parallelLoop,
-        DeviceDataSizesDeclaration & deviceDataSizesDeclaration);
+        initialiseDeviceVariablesSizesVariable (
+            ParallelLoop & parallelLoop,
+            DataSizesDeclarationOfIndirectLoop & dataSizesDeclarationOfIndirectLoop);
 
     void
     createExecutionPlanExecutionStatements (
@@ -73,18 +64,19 @@ class HostSubroutineOfIndirectLoop: public HostSubroutine
     createExecutionPlanStatements (ParallelLoop & parallelLoop);
 
     void
-    createExecutionPlanLocalVariables (
-        DeviceDataSizesDeclaration & deviceDataSizesDeclaration,
-        ParallelLoop & parallelLoop);
+        createExecutionPlanLocalVariables (
+            DataSizesDeclarationOfIndirectLoop & dataSizesDeclarationOfIndirectLoop,
+            ParallelLoop & parallelLoop);
 
   public:
 
-    HostSubroutineOfIndirectLoop (std::string const & subroutineName,
-        UserDeviceSubroutine & userDeviceSubroutine,
-        KernelSubroutine & kernelSubroutine,
-        InitialiseConstantsSubroutine & initialiseConstantsSubroutine,
-        DeviceDataSizesDeclaration & deviceDataSizesDeclaration,
-        ParallelLoop & parallelLoop, SgScopeStatement * moduleScope);
+        HostSubroutineOfIndirectLoop (
+            std::string const & subroutineName,
+            UserDeviceSubroutine & userDeviceSubroutine,
+            KernelSubroutine & kernelSubroutine,
+            InitialiseConstantsSubroutine & initialiseConstantsSubroutine,
+            DataSizesDeclarationOfIndirectLoop & dataSizesDeclarationOfIndirectLoop,
+            ParallelLoop & parallelLoop, SgScopeStatement * moduleScope);
 };
 
 #endif
