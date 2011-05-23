@@ -24,14 +24,16 @@ UserDeviceSubroutine::copyAndModifySubroutine (SgScopeStatement * moduleScope,
   using SageBuilder::buildVarRefExp;
   using SageInterface::appendStatement;
   using SageInterface::addTextForUnparser;
-  using std::vector;
+  using std::map;
   using std::string;
   using std::iterator;
+  using std::vector;
 
   Debug::getInstance ()->debugMessage (
-      "Modifying and outputting original kernel to CUDA file", 2);
+      "Modifying and outputting user subroutine to file", 2);
 
   SgProcedureHeaderStatement * originalSubroutine = NULL;
+
   SgFunctionParameterList * originalParameters = NULL;
 
   /*
@@ -136,8 +138,7 @@ UserDeviceSubroutine::copyAndModifySubroutine (SgScopeStatement * moduleScope,
             originalParameters->get_args ().begin (); paramIt
             != originalParameters->get_args ().end (); ++parLoopArgCounter, ++paramIt)
         {
-          std::string const variableName =
-              (*paramIt)->get_name ().getString ();
+          std::string const variableName = (*paramIt)->get_name ().getString ();
 
           SgType * type = (*paramIt)->get_typeptr ();
 
@@ -204,78 +205,50 @@ UserDeviceSubroutine::copyAndModifySubroutine (SgScopeStatement * moduleScope,
 
   /*
    * ======================================================
-   * The following class visits every found SgExpression
-   * node and it transforms every reference to a constant
-   * variable in the following way:
+   * The following class updates every reference to a
+   * constant variable in the following way:
    * (constant_name -> subroutineName_constantName)
    * ======================================================
    */
-  class ModifyReferenceNamesToConstantVariables: public AstSimpleProcessing
+  class ModifyReferencesToConstantVariables: public AstSimpleProcessing
   {
     public:
 
-      SgScopeStatement * subroutineScope;
       InitialiseConstantsSubroutine * initialiseConstantsSubroutine;
 
-      void
-      setSubroutineScope (SgScopeStatement * _subroutineScope)
+      ModifyReferencesToConstantVariables (
+          InitialiseConstantsSubroutine * initialiseConstantsSubroutine)
       {
-        subroutineScope = _subroutineScope;
-      }
-      void
-      setConstantNamesBefore (
-          InitialiseConstantsSubroutine * _initialiseConstantsSubroutine)
-      {
-        initialiseConstantsSubroutine = _initialiseConstantsSubroutine;
+        this->initialiseConstantsSubroutine = initialiseConstantsSubroutine;
       }
 
       virtual void
       visit (SgNode * node)
       {
+        SgVarRefExp * oldVarRefExp = isSgVarRefExp (node);
 
-        SgVarRefExp * isVarRefExp = isSgVarRefExp (node);
-
-        if (isVarRefExp != NULL)
+        if (oldVarRefExp != NULL)
         {
-          vector <string>::iterator itBefore, itAfter;
-
-          vector <string>
-              namesBefore =
-                  initialiseConstantsSubroutine->getConstantNamesBeforeTransformation ();
-          vector <string>
-              namesAfter =
-                  initialiseConstantsSubroutine->getConstantNamesAfterTransformation ();
-
-          std::map <std::string, SgVariableDeclaration *> constantDeclarations =
-              initialiseConstantsSubroutine->getConstantDeclarations ();
-
-          for (itBefore = namesBefore.begin (), itAfter = namesAfter.begin (); itBefore
-              != namesBefore.end (), itAfter != namesAfter.end (); itBefore++, itAfter++)
+          for (map <string, string>::const_iterator it =
+              initialiseConstantsSubroutine->getFirstConstantName (); it
+              != initialiseConstantsSubroutine->getLastConstantName (); ++it)
           {
 
-            if ((*itBefore)
-                == isVarRefExp->get_symbol ()->get_name ().getString ())
+            if (iequals (it->first,
+                oldVarRefExp->get_symbol ()->get_name ().getString ()))
             {
-              SgVarRefExp * newConstRef = buildVarRefExp (
-                  constantDeclarations[*itAfter]);
-              isVarRefExp->set_symbol (newConstRef->get_symbol ());
+              SgVarRefExp * newVarRefExp = buildVarRefExp (
+                  initialiseConstantsSubroutine->getLocalVariableDeclaration (
+                      it->second));
+
+              oldVarRefExp->set_symbol (newVarRefExp->get_symbol ());
             }
           }
         }
       }
   };
-
-  /*
-   * ======================================================
-   * Now fix constant names
-   * ======================================================
-   */
-
-  ModifyReferenceNamesToConstantVariables * modifyExpr =
-      new ModifyReferenceNamesToConstantVariables ();
-  modifyExpr->setSubroutineScope (subroutineScope);
-  modifyExpr->setConstantNamesBefore (initialiseConstantsSubroutine);
-  modifyExpr->traverse (subroutineHeaderStatement, preorder);
+  (new ModifyReferencesToConstantVariables (initialiseConstantsSubroutine))->traverse (
+      subroutineHeaderStatement, preorder);
 
   /*
    * ======================================================

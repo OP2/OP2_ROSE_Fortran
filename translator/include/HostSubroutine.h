@@ -12,95 +12,6 @@ class HostSubroutine: public Subroutine
 
     /*
      * ======================================================
-     * The formal parameter which a string containing the name
-     * of the user device subroutine
-     * ======================================================
-     */
-    SgVariableDeclaration * formalParameter_SubroutineName;
-
-    /*
-     * ======================================================
-     * The formal OP_SET parameter
-     * ======================================================
-     */
-    SgVariableDeclaration * formalParameter_OP_SET;
-
-    /*
-     * ======================================================
-     * The formal indirection index parameters
-     * ======================================================
-     */
-    std::map <unsigned int, SgVariableDeclaration *>
-        formalParameters_OP_INDIRECTION;
-
-    /*
-     * ======================================================
-     * The formal OP_DAT parameters
-     * ======================================================
-     */
-    std::map <unsigned int, SgVariableDeclaration *> formalParameters_OP_DAT;
-
-    /*
-     * ======================================================
-     * The formal OP_MAP parameters
-     * ======================================================
-     */
-    std::map <unsigned int, SgVariableDeclaration *> formalParameters_OP_MAP;
-
-    /*
-     * ======================================================
-     * The formal OP_ACCESS parameters
-     * ======================================================
-     */
-    std::map <unsigned int, SgVariableDeclaration *> formalParameters_OP_ACCESS;
-
-    /*
-     * ======================================================
-     * Local variables which store the size of OP_DAT
-     * data. These allow data to be marshalled between the
-     * host and the device
-     * ======================================================
-     */
-    std::map <unsigned int, SgVariableDeclaration *>
-        localVariables_OP_DAT_Sizes;
-
-    /*
-     * ======================================================
-     * Local variables which allow C pointers to be converted
-     * into Fortran pointers. These allow data to be marshalled
-     * between the host and the device
-     * ======================================================
-     */
-    std::map <unsigned int, SgVariableDeclaration *>
-        localVariables_CToFortranPointers;
-
-    /*
-     * ======================================================
-     * Local variables which allocate OP_DAT variables on the
-     * device. These allow data to be marshalled between the
-     * host and the device
-     * ======================================================
-     */
-    std::map <unsigned int, SgVariableDeclaration *>
-        localVariables_OP_DAT_VariablesOnDevice;
-
-    std::map <std::string, SgVariableDeclaration *> localVariables_Others;
-
-    /*
-     * ======================================================
-     * Variables passed to the kernel at launch time which
-     * are specific to the CUDA run-time, i.e. those between
-     * triple chevrons <<< >>>
-     * ======================================================
-     */
-    SgVariableDeclaration * CUDAVariable_blocksPerGrid;
-
-    SgVariableDeclaration * CUDAVariable_threadsPerBlock;
-
-    SgVariableDeclaration * CUDAVariable_sharedMemorySize;
-
-    /*
-     * ======================================================
      * Variables required to implement reductions
      * ======================================================
      */
@@ -117,6 +28,142 @@ class HostSubroutine: public Subroutine
     SgVariableDeclaration * reductionVariable_reductionArrayOnDevice;
 
   protected:
+
+    /*
+     * ======================================================
+     * Returns the name of the formal parameter which models the
+     * name of the user subroutine
+     * ======================================================
+     */
+    static std::string
+    getUserSubroutineFormalParameterName ()
+    {
+      return "subroutineName";
+    }
+
+    /*
+     * ======================================================
+     * Returns the name of the formal parameter which models the
+     * OP_SET
+     * ======================================================
+     */
+    static std::string
+    get_OP_SET_FormalParameterName ()
+    {
+      return "set";
+    }
+
+    /*
+     * ======================================================
+     * Returns the name of the indirection formal parameter
+     * in this OP_DAT argument group
+     * ======================================================
+     */
+    static std::string
+    get_OP_INDIRECTION_FormalParameterName (unsigned int OP_DAT_ArgumentGroup)
+    {
+      using boost::lexical_cast;
+      using std::string;
+
+      return IndirectAndDirectLoop::Fortran::VariablePrefixes::OP_INDIRECTION
+          + lexical_cast <string> (OP_DAT_ArgumentGroup);
+    }
+
+    /*
+     * ======================================================
+     * Returns the name of the mapping formal parameter
+     * in this OP_DAT argument group
+     * ======================================================
+     */
+    static std::string
+    get_OP_MAP_FormalParameterName (unsigned int OP_DAT_ArgumentGroup)
+    {
+      using boost::lexical_cast;
+      using std::string;
+
+      return IndirectAndDirectLoop::Fortran::VariablePrefixes::OP_MAP
+          + lexical_cast <string> (OP_DAT_ArgumentGroup);
+    }
+
+    /*
+     * ======================================================
+     * Returns the name of the access formal parameter
+     * in this OP_DAT argument group
+     * ======================================================
+     */
+    static std::string
+    get_OP_ACCESS_FormalParameterName (unsigned int OP_DAT_ArgumentGroup)
+    {
+      using boost::lexical_cast;
+      using std::string;
+
+      return IndirectAndDirectLoop::Fortran::VariablePrefixes::OP_ACCESS
+          + lexical_cast <string> (OP_DAT_ArgumentGroup);
+    }
+
+    /*
+     * ======================================================
+     * Returns the name of the OP_DAT formal parameter
+     * in this OP_DAT argument group
+     * ======================================================
+     */
+    static std::string
+    get_OP_DAT_FormalParameterName (unsigned int OP_DAT_ArgumentGroup)
+    {
+      using boost::lexical_cast;
+      using std::string;
+
+      return IndirectAndDirectLoop::Fortran::VariablePrefixes::OP_DAT
+          + lexical_cast <string> (OP_DAT_ArgumentGroup);
+    }
+
+    /*
+     * ======================================================
+     * Returns the name of the variable modelling the size of
+     * an OP_DAT in this OP_DAT argument group
+     * ======================================================
+     */
+    static std::string
+    get_OP_DAT_SizeVariableName (unsigned int OP_DAT_ArgumentGroup)
+    {
+      using boost::lexical_cast;
+      using std::string;
+
+      return IndirectAndDirectLoop::Fortran::VariablePrefixes::OP_DAT
+          + lexical_cast <string> (OP_DAT_ArgumentGroup)
+          + IndirectAndDirectLoop::Fortran::VariableSuffixes::Size;
+    }
+
+    /*
+     * ======================================================
+     * Returns the name of the OP_DAT device variable
+     * in this OP_DAT argument group
+     * ======================================================
+     */
+    static std::string
+    get_OP_DAT_DeviceVariableName (unsigned int OP_DAT_ArgumentGroup)
+    {
+      using boost::lexical_cast;
+      using std::string;
+
+      return IndirectAndDirectLoop::Fortran::VariablePrefixes::OP_DAT
+          + lexical_cast <string> (OP_DAT_ArgumentGroup) + "Device";
+    }
+
+    /*
+     * ======================================================
+     * Returns the name of the C to Fortran variable
+     * in this OP_DAT argument group
+     * ======================================================
+     */
+    static std::string
+    getCToFortranVariableName (unsigned int OP_DAT_ArgumentGroup)
+    {
+      using boost::lexical_cast;
+      using std::string;
+
+      return "cFortranPointer" + lexical_cast <string> (OP_DAT_ArgumentGroup);
+    }
 
     void
     copyDataBackFromDeviceAndDeallocate (ParallelLoop & parallelLoop);
@@ -160,14 +207,6 @@ class HostSubroutine: public Subroutine
     HostSubroutine (std::string const & subroutineName,
         UserDeviceSubroutine & userDeviceSubroutine,
         ParallelLoop & parallelLoop, SgScopeStatement * moduleScope);
-
-  public:
-
-    SgVariableDeclaration *
-    get_OP_DAT_VariableOnDevice (unsigned int OP_DAT_ArgumentGroup)
-    {
-      return localVariables_OP_DAT_VariablesOnDevice[OP_DAT_ArgumentGroup];
-    }
 };
 
 #endif

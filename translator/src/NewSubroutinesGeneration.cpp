@@ -239,9 +239,7 @@ NewSubroutinesGeneration::createCUDASubroutines (ParallelLoop & parallelLoop,
             moduleScope);
 
     InitialiseConstantsSubroutine * initialiseConstantsSubroutine =
-        new InitialiseConstantsSubroutine (userSubroutineName);
-
-    initialiseConstantsSubroutine->declareConstants (moduleScope);
+        new InitialiseConstantsSubroutine (userSubroutineName, moduleScope);
 
     addContains (moduleStatement);
 
@@ -271,13 +269,11 @@ NewSubroutinesGeneration::createCUDASubroutines (ParallelLoop & parallelLoop,
             userSubroutineName, moduleScope);
 
     InitialiseConstantsSubroutine * initialiseConstantsSubroutine =
-        new InitialiseConstantsSubroutine (userSubroutineName);
-
-    initialiseConstantsSubroutine->declareConstants (moduleScope);
+        new InitialiseConstantsSubroutine (userSubroutineName, moduleScope);
 
     addContains (moduleStatement);
 
-    initialiseConstantsSubroutine->generateSubroutineForAlreadyComputedValues (
+    initialiseConstantsSubroutine->generateSubroutine (
         moduleScope);
 
     userDeviceSubroutine

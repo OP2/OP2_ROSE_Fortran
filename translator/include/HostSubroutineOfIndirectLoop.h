@@ -17,25 +17,55 @@ class HostSubroutineOfIndirectLoop: public HostSubroutine
 {
   private:
 
-    std::map <unsigned int, SgVariableDeclaration *>
-        localVariables_ExecutionPlan_OP_DAT;
+    /*
+     * ======================================================
+     * Returns the name of the local variable which models
+     * the mappings from local indices to global indices in
+     * shared memory
+     * ======================================================
+     */
+    static std::string
+    getLocalToGlobalMappingVariableName (unsigned int OP_DAT_ArgumentGroup)
+    {
+      using boost::lexical_cast;
+      using std::string;
 
-    std::map <unsigned int, SgVariableDeclaration *>
-        localVariables_ExecutionPlan_OP_DAT_Size;
+      return IndirectLoop::Fortran::VariablePrefixes::pindMaps + lexical_cast <
+          string> (OP_DAT_ArgumentGroup);
+    }
 
-    std::map <unsigned int, SgVariableDeclaration *>
-        localVariables_ExecutionPlan_OP_MAP;
+    /*
+     * ======================================================
+     * Returns the name of the local variable which models
+     * the indirect mappings to local indices in shared memory
+     * ======================================================
+     */
+    static std::string
+    getGlobalToLocalMappingVariableName (unsigned int OP_DAT_ArgumentGroup)
+    {
+      using boost::lexical_cast;
+      using std::string;
 
-    std::map <unsigned int, SgVariableDeclaration *>
-        localVariables_ExecutionPlan_OP_MAP_Size;
+      return IndirectLoop::Fortran::VariablePrefixes::pMaps + lexical_cast <
+          string> (OP_DAT_ArgumentGroup);
+    }
 
-    std::map <unsigned int, SgVariableDeclaration *>
-        localVariables_ExecutionPlan_IndirectMaps;
+    /*
+     * ======================================================
+     * Returns the name of the local variable which models
+     * the number of indirect elements in each block
+     * ======================================================
+     */
+    static std::string
+    getGlobalToLocalMappingSizeVariableName (unsigned int OP_DAT_ArgumentGroup)
+    {
+      using boost::lexical_cast;
+      using std::string;
 
-    std::map <unsigned int, SgVariableDeclaration *>
-        localVariables_ExecutionPlan_IndirectMaps_Size;
-
-  private:
+      return IndirectLoop::Fortran::VariablePrefixes::pMaps + lexical_cast <
+          string> (OP_DAT_ArgumentGroup)
+          + IndirectAndDirectLoop::Fortran::VariableSuffixes::Size;
+    }
 
     void
         initialiseDeviceVariablesSizesVariable (

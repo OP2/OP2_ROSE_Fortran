@@ -9,16 +9,26 @@ class InitialiseConstantsSubroutine: public Subroutine
 
     std::string variableNamePrefix;
 
-    std::map <std::string, SgVariableDeclaration *> constantDeclarations;
+    /*
+     * ======================================================
+     * Mapping from the constant names BEFORE the transformation
+     * to the constant names AFTER the transformation
+     * ======================================================
+     */
+    std::map <std::string, std::string> constantVariableNames;
 
-    std::vector <std::string> constantVariablesNamesBeforeTransformation;
+  private:
 
-    std::vector <std::string> constantVariablesNamesAfterTransformation;
+    /*
+     * ======================================================
+     * Declare the constants at the scope of the generated
+     * Fortran module so each included subroutine has visibility
+     * ======================================================
+     */
+    void
+    declareConstants (SgScopeStatement * moduleScope);
 
   public:
-
-    void
-    generateSubroutineForAlreadyComputedValues (SgScopeStatement * moduleScope);
 
     /*
      * ======================================================
@@ -30,32 +40,26 @@ class InitialiseConstantsSubroutine: public Subroutine
 
     /*
      * ======================================================
-     * Declare the constants at the scope of the generated
-     * Fortran module so each included subroutine has visibility
+     * An iterator over the constant names before and after
+     * the transformation.
+     * Points to the first constant name
      * ======================================================
      */
-    void
-    declareConstants (SgScopeStatement * moduleScope);
+    std::map <std::string, std::string>::const_iterator
+    getFirstConstantName ();
 
-    std::map <std::string, SgVariableDeclaration *>
-    getConstantDeclarations ()
-    {
-      return constantDeclarations;
-    }
+    /*
+     * ======================================================
+     * An iterator over the constant names before and after
+     * the transformation.
+     * Points to the last constant name
+     * ======================================================
+     */
+    std::map <std::string, std::string>::const_iterator
+    getLastConstantName ();
 
-    std::vector <std::string>
-    getConstantNamesBeforeTransformation ()
-    {
-      return constantVariablesNamesBeforeTransformation;
-    }
-
-    std::vector <std::string>
-    getConstantNamesAfterTransformation ()
-    {
-      return constantVariablesNamesAfterTransformation;
-    }
-
-    InitialiseConstantsSubroutine (std::string const & subroutineName);
+    InitialiseConstantsSubroutine (std::string const & subroutineName,
+        SgScopeStatement * moduleScope);
 };
 
 #endif

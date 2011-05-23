@@ -64,24 +64,44 @@ class Subroutine
 
   protected:
 
-    Subroutine (std::string const & subroutineName)
-    {
-      this->subroutineName = subroutineName;
-    }
+    Subroutine (std::string const & subroutineName);
 
   public:
 
+    /*
+     * ======================================================
+     * What is the name of the subroutine?
+     * ======================================================
+     */
     std::string const &
-    getSubroutineName () const
-    {
-      return subroutineName;
-    }
+    getSubroutineName () const;
 
+    /*
+     * ======================================================
+     * Returns the procedure header statement used internally
+     * by ROSE in its abstract syntax tree
+     * ======================================================
+     */
     SgProcedureHeaderStatement *
-    getSubroutineHeaderStatement ()
-    {
-      return subroutineHeaderStatement;
-    }
+    getSubroutineHeaderStatement ();
+
+    /*
+     * ======================================================
+     * Returns the variable declaration for the given formal
+     * parameter
+     * ======================================================
+     */
+    SgVariableDeclaration *
+    getFormalParameterDeclaration (std::string const & variableName);
+
+    /*
+     * ======================================================
+     * Returns the variable declaration for the given local
+     * variable
+     * ======================================================
+     */
+    SgVariableDeclaration *
+    getLocalVariableDeclaration (std::string const & variableName);
 };
 
 #endif
