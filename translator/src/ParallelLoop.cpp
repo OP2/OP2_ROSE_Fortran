@@ -285,11 +285,11 @@ ParallelLoop::generateReductionSubroutines (SgScopeStatement * moduleScope)
 
         if (isSgTypeInt (isArrayType->get_base_type ()) != NULL)
         {
-          typeName = SubroutineNames::integerSuffix;
+          typeName = SubroutineNameSuffixes::integerSuffix;
         }
         else if (isSgTypeFloat (isArrayType->get_base_type ()) != NULL)
         {
-          typeName = SubroutineNames::floatSuffix;
+          typeName = SubroutineNameSuffixes::floatSuffix;
         }
         else
         {
@@ -306,7 +306,7 @@ ParallelLoop::generateReductionSubroutines (SgScopeStatement * moduleScope)
          */
         string const reductionSubroutineName =
             IndirectAndDirectLoop::Fortran::VariablePrefixes::OP_DAT
-                + lexical_cast <string> (i) + SubroutineNames::reductionSuffix
+                + lexical_cast <string> (i) + SubroutineNameSuffixes::reductionSuffix
                 + typeName + lexical_cast <string> (isKindIntVal->get_value ());
 
         ReductionSubroutine * reductionSubroutine = new ReductionSubroutine (

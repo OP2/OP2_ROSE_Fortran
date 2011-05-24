@@ -8,24 +8,6 @@
 
 class HostSubroutine: public Subroutine
 {
-  protected:
-
-    /*
-     * ======================================================
-     * Variables required to implement reductions
-     * ======================================================
-     */
-    SgVariableDeclaration * reductionVariable_baseOffsetInSharedMemory;
-
-    SgVariableDeclaration * reductionVariable_maxBytesInSharedMemory;
-
-    SgVariableDeclaration * reductionVariable_numberOfThreadItems;
-
-    SgVariableDeclaration * reductionVariable_maximumNumberOfThreadBlocks;
-
-    SgVariableDeclaration * reductionVariable_reductionArrayOnHost;
-
-    SgVariableDeclaration * reductionVariable_reductionArrayOnDevice;
 
   protected:
 
@@ -36,10 +18,7 @@ class HostSubroutine: public Subroutine
      * ======================================================
      */
     static std::string
-    getUserSubroutineFormalParameterName ()
-    {
-      return "subroutineName";
-    }
+    getUserSubroutineFormalParameterName ();
 
     /*
      * ======================================================
@@ -48,10 +27,7 @@ class HostSubroutine: public Subroutine
      * ======================================================
      */
     static std::string
-    get_OP_SET_FormalParameterName ()
-    {
-      return "set";
-    }
+    get_OP_SET_FormalParameterName ();
 
     /*
      * ======================================================
@@ -60,14 +36,7 @@ class HostSubroutine: public Subroutine
      * ======================================================
      */
     static std::string
-    get_OP_INDIRECTION_FormalParameterName (unsigned int OP_DAT_ArgumentGroup)
-    {
-      using boost::lexical_cast;
-      using std::string;
-
-      return IndirectAndDirectLoop::Fortran::VariablePrefixes::OP_INDIRECTION
-          + lexical_cast <string> (OP_DAT_ArgumentGroup);
-    }
+    get_OP_INDIRECTION_FormalParameterName (unsigned int OP_DAT_ArgumentGroup);
 
     /*
      * ======================================================
@@ -76,14 +45,7 @@ class HostSubroutine: public Subroutine
      * ======================================================
      */
     static std::string
-    get_OP_MAP_FormalParameterName (unsigned int OP_DAT_ArgumentGroup)
-    {
-      using boost::lexical_cast;
-      using std::string;
-
-      return IndirectAndDirectLoop::Fortran::VariablePrefixes::OP_MAP
-          + lexical_cast <string> (OP_DAT_ArgumentGroup);
-    }
+    get_OP_MAP_FormalParameterName (unsigned int OP_DAT_ArgumentGroup);
 
     /*
      * ======================================================
@@ -92,14 +54,7 @@ class HostSubroutine: public Subroutine
      * ======================================================
      */
     static std::string
-    get_OP_ACCESS_FormalParameterName (unsigned int OP_DAT_ArgumentGroup)
-    {
-      using boost::lexical_cast;
-      using std::string;
-
-      return IndirectAndDirectLoop::Fortran::VariablePrefixes::OP_ACCESS
-          + lexical_cast <string> (OP_DAT_ArgumentGroup);
-    }
+    get_OP_ACCESS_FormalParameterName (unsigned int OP_DAT_ArgumentGroup);
 
     /*
      * ======================================================
@@ -108,14 +63,7 @@ class HostSubroutine: public Subroutine
      * ======================================================
      */
     static std::string
-    get_OP_DAT_FormalParameterName (unsigned int OP_DAT_ArgumentGroup)
-    {
-      using boost::lexical_cast;
-      using std::string;
-
-      return IndirectAndDirectLoop::Fortran::VariablePrefixes::OP_DAT
-          + lexical_cast <string> (OP_DAT_ArgumentGroup);
-    }
+    get_OP_DAT_FormalParameterName (unsigned int OP_DAT_ArgumentGroup);
 
     /*
      * ======================================================
@@ -124,15 +72,7 @@ class HostSubroutine: public Subroutine
      * ======================================================
      */
     static std::string
-    get_OP_DAT_SizeVariableName (unsigned int OP_DAT_ArgumentGroup)
-    {
-      using boost::lexical_cast;
-      using std::string;
-
-      return IndirectAndDirectLoop::Fortran::VariablePrefixes::OP_DAT
-          + lexical_cast <string> (OP_DAT_ArgumentGroup)
-          + IndirectAndDirectLoop::Fortran::VariableSuffixes::Size;
-    }
+    get_OP_DAT_SizeVariableName (unsigned int OP_DAT_ArgumentGroup);
 
     /*
      * ======================================================
@@ -141,14 +81,7 @@ class HostSubroutine: public Subroutine
      * ======================================================
      */
     static std::string
-    get_OP_DAT_DeviceVariableName (unsigned int OP_DAT_ArgumentGroup)
-    {
-      using boost::lexical_cast;
-      using std::string;
-
-      return IndirectAndDirectLoop::Fortran::VariablePrefixes::OP_DAT
-          + lexical_cast <string> (OP_DAT_ArgumentGroup) + "Device";
-    }
+    get_OP_DAT_DeviceVariableName (unsigned int OP_DAT_ArgumentGroup);
 
     /*
      * ======================================================
@@ -157,13 +90,7 @@ class HostSubroutine: public Subroutine
      * ======================================================
      */
     static std::string
-    getCToFortranVariableName (unsigned int OP_DAT_ArgumentGroup)
-    {
-      using boost::lexical_cast;
-      using std::string;
-
-      return "cFortranPointer" + lexical_cast <string> (OP_DAT_ArgumentGroup);
-    }
+    getCToFortranVariableName (unsigned int OP_DAT_ArgumentGroup);
 
     void
     copyDataBackFromDeviceAndDeallocate (ParallelLoop & parallelLoop);
@@ -205,8 +132,7 @@ class HostSubroutine: public Subroutine
     createAndAppendIterationVariablesForReduction (ParallelLoop & parallelLoop);
 
     HostSubroutine (std::string const & subroutineName,
-        UserDeviceSubroutine & userDeviceSubroutine,
-        ParallelLoop & parallelLoop, SgScopeStatement * moduleScope);
+        SgScopeStatement * moduleScope);
 };
 
 #endif

@@ -8,9 +8,31 @@
 
 /*
  * ======================================================
- * Public functions
+ * Private functions
  * ======================================================
  */
+
+std::string
+KernelSubroutineOfIndirectLoop::getLocalToGlobalMappingVariableName (
+    unsigned int OP_DAT_ArgumentGroup)
+{
+  using boost::lexical_cast;
+  using std::string;
+
+  return IndirectLoop::Fortran::VariablePrefixes::pindMaps + lexical_cast <
+      string> (OP_DAT_ArgumentGroup);
+}
+
+std::string
+KernelSubroutineOfIndirectLoop::getGlobalToLocalMappingVariableName (
+    unsigned int OP_DAT_ArgumentGroup)
+{
+  using boost::lexical_cast;
+  using std::string;
+
+  return IndirectLoop::Fortran::VariablePrefixes::pMaps
+      + lexical_cast <string> (OP_DAT_ArgumentGroup);
+}
 
 SgStatement *
 KernelSubroutineOfIndirectLoop::createUserSubroutineCall (

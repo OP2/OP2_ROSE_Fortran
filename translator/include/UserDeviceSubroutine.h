@@ -9,6 +9,11 @@ class UserDeviceSubroutine: public Subroutine
 {
   private:
 
+    /*
+     * ======================================================
+     * The name of the user subroutine on the host
+     * ======================================================
+     */
     std::string userHostSubroutineName;
 
   private:

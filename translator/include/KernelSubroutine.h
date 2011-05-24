@@ -11,37 +11,32 @@ class KernelSubroutine: public Subroutine
 {
   protected:
 
+    /*
+     * ======================================================
+     * Returns the name of the OP_DAT variable in this OP_DAT
+     * argument group
+     * ======================================================
+     */
     static std::string
-    get_OP_DAT_VariableName (unsigned int OP_DAT_ArgumentGroup)
-    {
-      using boost::lexical_cast;
-      using std::string;
+    get_OP_DAT_VariableName (unsigned int OP_DAT_ArgumentGroup);
 
-      return IndirectAndDirectLoop::Fortran::VariablePrefixes::OP_DAT
-          + lexical_cast <string> (OP_DAT_ArgumentGroup);
-    }
-
+    /*
+     * ======================================================
+     * Returns the name of the variable modelling the size of
+     * an OP_DAT in this OP_DAT argument group
+     * ======================================================
+     */
     static std::string
-    get_OP_DAT_SizeVariableName (unsigned int OP_DAT_ArgumentGroup)
-    {
-      using boost::lexical_cast;
-      using std::string;
+    get_OP_DAT_SizeVariableName (unsigned int OP_DAT_ArgumentGroup);
 
-      return IndirectAndDirectLoop::Fortran::VariablePrefixes::OP_DAT
-          + lexical_cast <string> (OP_DAT_ArgumentGroup)
-          + IndirectAndDirectLoop::Fortran::VariableSuffixes::Size;
-    }
-
+    /*
+     * ======================================================
+     * Returns the name of the local thread OP_DAT variable
+     * in this OP_DAT argument group
+     * ======================================================
+     */
     static std::string
-    getLocalThread_OP_DAT_VariableName (unsigned int OP_DAT_ArgumentGroup)
-    {
-      using boost::lexical_cast;
-      using std::string;
-
-      return IndirectAndDirectLoop::Fortran::VariablePrefixes::OP_DAT
-          + lexical_cast <string> (OP_DAT_ArgumentGroup)
-          + IndirectAndDirectLoop::Fortran::VariableSuffixes::local;
-    }
+    getLocalThread_OP_DAT_VariableName (unsigned int OP_DAT_ArgumentGroup);
 
     void
         createArgsSizesFormalParameter (
@@ -97,7 +92,7 @@ class KernelSubroutine: public Subroutine
         ParallelLoop & parallelLoop);
 
     KernelSubroutine (std::string const & subroutineName) :
-      Subroutine (subroutineName + SubroutineNames::kernelSuffix)
+      Subroutine (subroutineName + SubroutineNameSuffixes::kernelSuffix)
     {
     }
 };

@@ -91,6 +91,11 @@ namespace IndirectAndDirectLoop
         std::string const sharedMemoryStartOffset = "sharedMemoryStartOffset";
         std::string const threadID = "threadID";
         std::string const warpSize = "warpSize";
+        std::string const maximumBytesInSharedMemory = "maxSharedMemoryBytes";
+        std::string const maximumNumberOfThreadBlocks = "maxThreadBlocks";
+        std::string const numberOfThreadItems = "threadItems";
+        std::string const reductionArrayHost = "reductionArrayHost";
+        std::string const reductionArrayDevice = "reductionArrayDevice";
       }
 
       namespace SubroutineNames
@@ -113,6 +118,8 @@ namespace IndirectAndDirectLoop
       std::string const threadSynchronizeSubroutineName =
           "cudaThreadSynchronize";
       std::string const threadSynchronizeReturnVariableName = "threadSynchRet";
+      std::string const reductionIterationCounter1 = "i1Reduction";
+      std::string const reductionIterationCounter2 = "i2Reduction";
     }
 
     namespace KernelSubroutine
@@ -128,10 +135,10 @@ namespace IndirectAndDirectLoop
 
     namespace VariablePrefixes
     {
-      std::string const OP_DAT = "argument";
-      std::string const OP_MAP = "map";
-      std::string const OP_ACCESS = "access";
-      std::string const OP_INDIRECTION = "idx";
+      std::string const OP_DAT = "opDat";
+      std::string const OP_MAP = "opMap";
+      std::string const OP_ACCESS = "opAccess";
+      std::string const OP_INDIRECTION = "opIndirection";
     }
 
     namespace VariableSuffixes
@@ -418,7 +425,7 @@ namespace CUDA
   }
 }
 
-namespace SubroutineNames
+namespace SubroutineNameSuffixes
 {
   std::string const hostSuffix = "_host";
   std::string const kernelSuffix = "_kernel";
@@ -426,13 +433,6 @@ namespace SubroutineNames
   std::string const reductionSuffix = "_reduction";
   std::string const integerSuffix = "_integer";
   std::string const floatSuffix = "_float";
-}
-
-namespace ReductionSubroutineNames
-{
-
-  std::string const iterationVarForReductionName1 = "iterationRed1";
-  std::string const iterationVarForReductionName2 = "iterationRed2";
 }
 
 namespace FortranVariableDeafultKinds

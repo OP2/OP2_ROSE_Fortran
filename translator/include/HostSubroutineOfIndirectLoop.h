@@ -25,14 +25,7 @@ class HostSubroutineOfIndirectLoop: public HostSubroutine
      * ======================================================
      */
     static std::string
-    getLocalToGlobalMappingVariableName (unsigned int OP_DAT_ArgumentGroup)
-    {
-      using boost::lexical_cast;
-      using std::string;
-
-      return IndirectLoop::Fortran::VariablePrefixes::pindMaps + lexical_cast <
-          string> (OP_DAT_ArgumentGroup);
-    }
+    getLocalToGlobalMappingVariableName (unsigned int OP_DAT_ArgumentGroup);
 
     /*
      * ======================================================
@@ -41,14 +34,7 @@ class HostSubroutineOfIndirectLoop: public HostSubroutine
      * ======================================================
      */
     static std::string
-    getGlobalToLocalMappingVariableName (unsigned int OP_DAT_ArgumentGroup)
-    {
-      using boost::lexical_cast;
-      using std::string;
-
-      return IndirectLoop::Fortran::VariablePrefixes::pMaps + lexical_cast <
-          string> (OP_DAT_ArgumentGroup);
-    }
+    getGlobalToLocalMappingVariableName (unsigned int OP_DAT_ArgumentGroup);
 
     /*
      * ======================================================
@@ -57,15 +43,7 @@ class HostSubroutineOfIndirectLoop: public HostSubroutine
      * ======================================================
      */
     static std::string
-    getGlobalToLocalMappingSizeVariableName (unsigned int OP_DAT_ArgumentGroup)
-    {
-      using boost::lexical_cast;
-      using std::string;
-
-      return IndirectLoop::Fortran::VariablePrefixes::pMaps + lexical_cast <
-          string> (OP_DAT_ArgumentGroup)
-          + IndirectAndDirectLoop::Fortran::VariableSuffixes::Size;
-    }
+    getGlobalToLocalMappingSizeVariableName (unsigned int OP_DAT_ArgumentGroup);
 
     void
         initialiseDeviceVariablesSizesVariable (

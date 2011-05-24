@@ -11,6 +11,102 @@
  * ======================================================
  */
 
+     std::string
+    HostSubroutine::getUserSubroutineFormalParameterName ()
+    {
+      return "subroutineName";
+    }
+
+
+     std::string
+    HostSubroutine::get_OP_SET_FormalParameterName ()
+    {
+      return "set";
+    }
+
+
+     std::string
+    HostSubroutine::get_OP_INDIRECTION_FormalParameterName (unsigned int OP_DAT_ArgumentGroup)
+    {
+      using boost::lexical_cast;
+      using std::string;
+
+      return IndirectAndDirectLoop::Fortran::VariablePrefixes::OP_INDIRECTION
+          + lexical_cast <string> (OP_DAT_ArgumentGroup);
+    }
+
+
+     std::string
+    HostSubroutine::get_OP_MAP_FormalParameterName (unsigned int OP_DAT_ArgumentGroup)
+    {
+      using boost::lexical_cast;
+      using std::string;
+
+      return IndirectAndDirectLoop::Fortran::VariablePrefixes::OP_MAP
+          + lexical_cast <string> (OP_DAT_ArgumentGroup);
+    }
+
+
+     std::string
+    HostSubroutine::get_OP_ACCESS_FormalParameterName (unsigned int OP_DAT_ArgumentGroup)
+    {
+      using boost::lexical_cast;
+      using std::string;
+
+      return IndirectAndDirectLoop::Fortran::VariablePrefixes::OP_ACCESS
+          + lexical_cast <string> (OP_DAT_ArgumentGroup);
+    }
+
+std::string
+    HostSubroutine::get_OP_DAT_FormalParameterName (unsigned int OP_DAT_ArgumentGroup)
+    {
+      using boost::lexical_cast;
+      using std::string;
+
+      return IndirectAndDirectLoop::Fortran::VariablePrefixes::OP_DAT
+          + lexical_cast <string> (OP_DAT_ArgumentGroup);
+    }
+
+
+     std::string
+    HostSubroutine::get_OP_DAT_SizeVariableName (unsigned int OP_DAT_ArgumentGroup)
+    {
+      using boost::lexical_cast;
+      using std::string;
+
+      return IndirectAndDirectLoop::Fortran::VariablePrefixes::OP_DAT
+          + lexical_cast <string> (OP_DAT_ArgumentGroup)
+          + IndirectAndDirectLoop::Fortran::VariableSuffixes::Size;
+    }
+
+
+     std::string
+    HostSubroutine::get_OP_DAT_DeviceVariableName (unsigned int OP_DAT_ArgumentGroup)
+    {
+      using boost::lexical_cast;
+      using std::string;
+
+      return IndirectAndDirectLoop::Fortran::VariablePrefixes::OP_DAT
+          + lexical_cast <string> (OP_DAT_ArgumentGroup) + "Device";
+    }
+
+
+     std::string
+    HostSubroutine::getCToFortranVariableName (unsigned int OP_DAT_ArgumentGroup)
+    {
+      using boost::lexical_cast;
+      using std::string;
+
+      return "cFortranPointer" + lexical_cast <string> (OP_DAT_ArgumentGroup);
+    }
+
+
+
+
+
+
+
+
 void
 HostSubroutine::copyDataBackFromDeviceAndDeallocate (
     ParallelLoop & parallelLoop)
@@ -548,65 +644,81 @@ HostSubroutine::createReductionVariables (ParallelLoop & parallelLoop)
     {
       if (parallelLoop.isReductionRequired (i) == true)
       {
-        /*
-         * ======================================================
-         * Create CUDA variables for reduction if needed
-         * ======================================================
-         */
-        reductionVariable_baseOffsetInSharedMemory = buildVariableDeclaration (
-            "redStartOffset", FortranTypesBuilder::getFourByteInteger (),
-            buildAssignInitializer (buildIntVal (0), buildIntType ()),
-            subroutineScope);
-
-        reductionVariable_maxBytesInSharedMemory = buildVariableDeclaration (
-            "maxReductionSize", FortranTypesBuilder::getFourByteInteger (),
-            buildAssignInitializer (buildIntVal (0), buildIntType ()),
-            subroutineScope);
-
-        reductionVariable_numberOfThreadItems = buildVariableDeclaration (
-            "reductItems", FortranTypesBuilder::getFourByteInteger (),
-            buildAssignInitializer (buildIntVal (0), buildIntType ()),
-            subroutineScope);
-
-        reductionVariable_maximumNumberOfThreadBlocks
-            = buildVariableDeclaration ("maxBlocks",
+        localVariableDeclarations[IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::sharedMemoryStartOffset]
+            = buildVariableDeclaration (
+                IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::sharedMemoryStartOffset,
                 FortranTypesBuilder::getFourByteInteger (),
                 buildAssignInitializer (buildIntVal (0), buildIntType ()),
                 subroutineScope);
 
-        reductionVariable_reductionArrayOnHost = buildVariableDeclaration (
-            "redArrayHost", parallelLoop.get_OP_DAT_Type (i), NULL,
-            //buildAssignInitializer (buildIntVal (0), buildIntType ()),
+        localVariableDeclarations[IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::sharedMemoryStartOffset]-> get_declarationModifier ().get_accessModifier ().setUndefined ();
+
+        appendStatement (
+            localVariableDeclarations[IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::sharedMemoryStartOffset],
             subroutineScope);
 
-        reductionVariable_reductionArrayOnHost-> get_declarationModifier ().get_typeModifier ().setAllocatable ();
+        localVariableDeclarations[IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::maximumBytesInSharedMemory]
+            = buildVariableDeclaration (
+                IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::maximumBytesInSharedMemory,
+                FortranTypesBuilder::getFourByteInteger (),
+                buildAssignInitializer (buildIntVal (0), buildIntType ()),
+                subroutineScope);
 
-        reductionVariable_reductionArrayOnDevice = buildVariableDeclaration (
-            "redArrayDevice", parallelLoop.get_OP_DAT_Type (i), NULL,
-            //buildAssignInitializer (buildIntVal (0), buildIntType ()),
+        localVariableDeclarations[IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::maximumBytesInSharedMemory]-> get_declarationModifier ().get_accessModifier ().setUndefined ();
+
+        appendStatement (
+            localVariableDeclarations[IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::maximumBytesInSharedMemory],
             subroutineScope);
 
-        reductionVariable_reductionArrayOnDevice-> get_declarationModifier ().get_typeModifier ().setAllocatable ();
+        localVariableDeclarations[IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::numberOfThreadItems]
+            = buildVariableDeclaration (
+                IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::numberOfThreadItems,
+                FortranTypesBuilder::getFourByteInteger (),
+                buildAssignInitializer (buildIntVal (0), buildIntType ()),
+                subroutineScope);
 
-        reductionVariable_reductionArrayOnDevice-> get_declarationModifier ().get_typeModifier ().setDevice ();
+        localVariableDeclarations[IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::numberOfThreadItems]-> get_declarationModifier ().get_accessModifier ().setUndefined ();
 
-        reductionVariable_baseOffsetInSharedMemory-> get_declarationModifier ().get_accessModifier ().setUndefined ();
-        reductionVariable_maxBytesInSharedMemory-> get_declarationModifier ().get_accessModifier ().setUndefined ();
-        reductionVariable_numberOfThreadItems-> get_declarationModifier ().get_accessModifier ().setUndefined ();
-        reductionVariable_maximumNumberOfThreadBlocks-> get_declarationModifier ().get_accessModifier ().setUndefined ();
-        reductionVariable_reductionArrayOnHost-> get_declarationModifier ().get_accessModifier ().setUndefined ();
-        reductionVariable_reductionArrayOnDevice-> get_declarationModifier ().get_accessModifier ().setUndefined ();
+        appendStatement (
+            localVariableDeclarations[IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::numberOfThreadItems],
+            subroutineScope);
 
-        appendStatement (reductionVariable_baseOffsetInSharedMemory,
+        localVariableDeclarations[IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::maximumNumberOfThreadBlocks]
+            = buildVariableDeclaration (
+                IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::maximumNumberOfThreadBlocks,
+                FortranTypesBuilder::getFourByteInteger (),
+                buildAssignInitializer (buildIntVal (0), buildIntType ()),
+                subroutineScope);
+
+        localVariableDeclarations[IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::maximumNumberOfThreadBlocks]-> get_declarationModifier ().get_accessModifier ().setUndefined ();
+
+        appendStatement (
+            localVariableDeclarations[IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::maximumNumberOfThreadBlocks],
             subroutineScope);
-        appendStatement (reductionVariable_maxBytesInSharedMemory,
+
+        localVariableDeclarations[IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::reductionArrayHost]
+            = buildVariableDeclaration (
+                IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::reductionArrayHost,
+                parallelLoop.get_OP_DAT_Type (i), NULL, subroutineScope);
+
+        localVariableDeclarations[IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::reductionArrayHost]-> get_declarationModifier ().get_accessModifier ().setUndefined ();
+        localVariableDeclarations[IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::reductionArrayHost]-> get_declarationModifier ().get_typeModifier ().setAllocatable ();
+
+        appendStatement (
+            localVariableDeclarations[IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::reductionArrayHost],
             subroutineScope);
-        appendStatement (reductionVariable_numberOfThreadItems, subroutineScope);
-        appendStatement (reductionVariable_maximumNumberOfThreadBlocks,
-            subroutineScope);
-        appendStatement (reductionVariable_reductionArrayOnHost,
-            subroutineScope);
-        appendStatement (reductionVariable_reductionArrayOnDevice,
+
+        localVariableDeclarations[IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::reductionArrayDevice]
+            = buildVariableDeclaration (
+                IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::reductionArrayDevice,
+                parallelLoop.get_OP_DAT_Type (i), NULL, subroutineScope);
+
+        localVariableDeclarations[IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::reductionArrayDevice]-> get_declarationModifier ().get_accessModifier ().setUndefined ();
+        localVariableDeclarations[IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::reductionArrayDevice]-> get_declarationModifier ().get_typeModifier ().setAllocatable ();
+        localVariableDeclarations[IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::reductionArrayDevice]-> get_declarationModifier ().get_typeModifier ().setDevice ();
+
+        appendStatement (
+            localVariableDeclarations[IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::reductionArrayDevice],
             subroutineScope);
       }
     }
@@ -697,25 +809,34 @@ HostSubroutine::createSupportForReductionVariablesBeforeKernel (
     }
   }
 
-  SgVarRefExp * maxBlockVarRef = buildVarRefExp (
-      reductionVariable_maximumNumberOfThreadBlocks);
+  SgVarRefExp
+      * maxBlockVarRef =
+          buildVarRefExp (
+              localVariableDeclarations[IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::maximumNumberOfThreadBlocks]);
 
   SgExpression * initMaxBlocks = buildAssignOp (maxBlockVarRef, buildVarRefExp (
       localVariableDeclarations[CUDA::Fortran::VariableNames::blocksPerGrid]));
 
   appendStatement (buildExprStatement (initMaxBlocks), subroutineScope);
 
-  SgExpression * assignReductItems = buildAssignOp (buildVarRefExp (
-      reductionVariable_numberOfThreadItems), buildMultiplyOp (maxBlockVarRef,
-      buildIntVal (dim)));
+  SgExpression
+      * assignReductItems =
+          buildAssignOp (
+              buildVarRefExp (
+                  localVariableDeclarations[IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::numberOfThreadItems]),
+              buildMultiplyOp (maxBlockVarRef, buildIntVal (dim)));
 
   appendStatement (buildExprStatement (assignReductItems), subroutineScope);
 
-  SgVarRefExp * reductItemsVarRef = buildVarRefExp (
-      reductionVariable_numberOfThreadItems);
+  SgVarRefExp
+      * reductItemsVarRef =
+          buildVarRefExp (
+              localVariableDeclarations[IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::numberOfThreadItems]);
 
-  SgVarRefExp * redArrayHost = buildVarRefExp (
-      reductionVariable_reductionArrayOnHost);
+  SgVarRefExp
+      * redArrayHost =
+          buildVarRefExp (
+              localVariableDeclarations[IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::reductionArrayHost]);
 
   SgPntrArrRefExp * allocateHostRedVarParams = buildPntrArrRefExp (
       redArrayHost, reductItemsVarRef);
@@ -723,8 +844,10 @@ HostSubroutine::createSupportForReductionVariablesBeforeKernel (
   FortranStatementsAndExpressionsBuilder::appendAllocateStatement (
       buildExprListExp (allocateHostRedVarParams), subroutineScope);
 
-  SgVarRefExp * redArrayDev = buildVarRefExp (
-      reductionVariable_reductionArrayOnDevice);
+  SgVarRefExp
+      * redArrayDev =
+          buildVarRefExp (
+              localVariableDeclarations[IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::reductionArrayDevice]);
 
   SgPntrArrRefExp * allocateDeviceRedVarParams = buildPntrArrRefExp (
       redArrayDev, reductItemsVarRef);
@@ -735,7 +858,7 @@ HostSubroutine::createSupportForReductionVariablesBeforeKernel (
   SgVarRefExp
       * itVar1VarRef =
           buildVarRefExp (
-              localVariableDeclarations[ReductionSubroutineNames::iterationVarForReductionName1]);
+              localVariableDeclarations[IndirectAndDirectLoop::Fortran::HostSubroutine::reductionIterationCounter1]);
 
   SgExpression * initLoop = buildAssignOp (itVar1VarRef, buildIntVal (0));
 
@@ -767,13 +890,19 @@ HostSubroutine::createSupportForReductionVariablesBeforeKernel (
           buildVarRefExp (
               localVariableDeclarations[CUDA::Fortran::VariableNames::sharedMemorySize]);
 
-  SgExpression * assignReductionOffset = buildAssignOp (buildVarRefExp (
-      reductionVariable_baseOffsetInSharedMemory), nSharedVarRef);
+  SgExpression
+      * assignReductionOffset =
+          buildAssignOp (
+              buildVarRefExp (
+                  localVariableDeclarations[IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::sharedMemoryStartOffset]),
+              nSharedVarRef);
 
   appendStatement (buildExprStatement (assignReductionOffset), subroutineScope);
 
-  SgVarRefExp * maxRedSizeVarRef = buildVarRefExp (
-      reductionVariable_maxBytesInSharedMemory);
+  SgVarRefExp
+      * maxRedSizeVarRef =
+          buildVarRefExp (
+              localVariableDeclarations[IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::maximumBytesInSharedMemory]);
 
   SgExpression
       * initMaxShared =
@@ -816,11 +945,17 @@ HostSubroutine::createSupportForReductionVariablesAfterKernel (
   if (parallelLoop.isReductionRequired () == false)
     return;
 
-  SgExpression * redArrayHostVarRef = buildVarRefExp (
-      reductionVariable_reductionArrayOnHost);
+  SgExpression
+      * redArrayHostVarRef =
+          buildVarRefExp (
+              localVariableDeclarations[IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::reductionArrayHost]);
 
-  SgExpression * copyDeviceTohostArray = buildAssignOp (redArrayHostVarRef,
-      buildVarRefExp (reductionVariable_reductionArrayOnDevice));
+  SgExpression
+      * copyDeviceTohostArray =
+          buildAssignOp (
+              redArrayHostVarRef,
+              buildVarRefExp (
+                  localVariableDeclarations[IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::reductionArrayDevice]));
 
   appendStatement (buildExprStatement (copyDeviceTohostArray), subroutineScope);
 
@@ -855,7 +990,7 @@ HostSubroutine::createSupportForReductionVariablesAfterKernel (
   SgVarRefExp
       * itVar2VarRef =
           buildVarRefExp (
-              localVariableDeclarations[ReductionSubroutineNames::iterationVarForReductionName2]);
+              localVariableDeclarations[IndirectAndDirectLoop::Fortran::HostSubroutine::reductionIterationCounter2]);
 
   SgExpression * initInnerLoop = buildAssignOp (itVar2VarRef, buildIntVal (0));
 
@@ -866,7 +1001,7 @@ HostSubroutine::createSupportForReductionVariablesAfterKernel (
   SgVarRefExp
       * itVar1VarRef =
           buildVarRefExp (
-              localVariableDeclarations[ReductionSubroutineNames::iterationVarForReductionName1]);
+              localVariableDeclarations[IndirectAndDirectLoop::Fortran::HostSubroutine::reductionIterationCounter1]);
 
   SgExpression * assignExpInHostReduction = buildAddOp (c2fPtrAccess,
       buildPntrArrRefExp (redArrayHostVarRef, buildAddOp (itVar2VarRef,
@@ -886,11 +1021,13 @@ HostSubroutine::createSupportForReductionVariablesAfterKernel (
 
   SgExpression * initOuterLoop = buildAssignOp (itVar1VarRef, buildIntVal (0));
 
-  SgFortranDo * outerRedCopyLoop =
-      FortranStatementsAndExpressionsBuilder::buildFortranDoStatement (
-          initOuterLoop,
-          buildVarRefExp (reductionVariable_numberOfThreadItems), buildIntVal (
-              1), outerLoopBody);
+  SgFortranDo
+      * outerRedCopyLoop =
+          FortranStatementsAndExpressionsBuilder::buildFortranDoStatement (
+              initOuterLoop,
+              buildVarRefExp (
+                  localVariableDeclarations[IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::numberOfThreadItems]),
+              buildIntVal (1), outerLoopBody);
 
   appendStatement (outerRedCopyLoop, subroutineScope);
 }
@@ -908,35 +1045,35 @@ HostSubroutine::createAndAppendIterationVariablesForReduction (
 
   if (parallelLoop.isReductionRequired () == true)
   {
-    string const iterVariableName1 =
-        ReductionSubroutineNames::iterationVarForReductionName1;
-    string const iterVariableName2 =
-        ReductionSubroutineNames::iterationVarForReductionName2;
+    localVariableDeclarations[IndirectAndDirectLoop::Fortran::HostSubroutine::reductionIterationCounter1]
+        = buildVariableDeclaration (
+            IndirectAndDirectLoop::Fortran::HostSubroutine::reductionIterationCounter1,
+            FortranTypesBuilder::getFourByteInteger (), buildAssignInitializer (
+                buildIntVal (0), buildIntType ()), subroutineScope);
 
-    localVariableDeclarations[iterVariableName1] = buildVariableDeclaration (
-        iterVariableName1, FortranTypesBuilder::getFourByteInteger (),
-        buildAssignInitializer (buildIntVal (0), buildIntType ()),
+    localVariableDeclarations[IndirectAndDirectLoop::Fortran::HostSubroutine::reductionIterationCounter2]
+        = buildVariableDeclaration (
+            IndirectAndDirectLoop::Fortran::HostSubroutine::reductionIterationCounter2,
+            FortranTypesBuilder::getFourByteInteger (), buildAssignInitializer (
+                buildIntVal (0), buildIntType ()), subroutineScope);
+
+    localVariableDeclarations[IndirectAndDirectLoop::Fortran::HostSubroutine::reductionIterationCounter1]-> get_declarationModifier ().get_accessModifier ().setUndefined ();
+
+    localVariableDeclarations[IndirectAndDirectLoop::Fortran::HostSubroutine::reductionIterationCounter2]-> get_declarationModifier ().get_accessModifier ().setUndefined ();
+
+    appendStatement (
+        localVariableDeclarations[IndirectAndDirectLoop::Fortran::HostSubroutine::reductionIterationCounter1],
         subroutineScope);
 
-    localVariableDeclarations[iterVariableName2] = buildVariableDeclaration (
-        iterVariableName2, FortranTypesBuilder::getFourByteInteger (),
-        buildAssignInitializer (buildIntVal (0), buildIntType ()),
-        subroutineScope);
-
-    localVariableDeclarations[iterVariableName1]-> get_declarationModifier ().get_accessModifier ().setUndefined ();
-    localVariableDeclarations[iterVariableName2]-> get_declarationModifier ().get_accessModifier ().setUndefined ();
-
-    appendStatement (localVariableDeclarations[iterVariableName1],
-        subroutineScope);
-    appendStatement (localVariableDeclarations[iterVariableName2],
+    appendStatement (
+        localVariableDeclarations[IndirectAndDirectLoop::Fortran::HostSubroutine::reductionIterationCounter2],
         subroutineScope);
   }
 }
 
 HostSubroutine::HostSubroutine (std::string const & subroutineName,
-    UserDeviceSubroutine & userDeviceSubroutine, ParallelLoop & parallelLoop,
     SgScopeStatement * moduleScope) :
-  Subroutine (subroutineName + "_host")
+  Subroutine (subroutineName + SubroutineNameSuffixes::hostSuffix)
 {
   using SageBuilder::buildFunctionParameterList;
   using SageBuilder::buildVoidType;

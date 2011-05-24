@@ -283,7 +283,7 @@ UserDeviceSubroutine::UserDeviceSubroutine (std::string const & subroutineName,
     SgScopeStatement * moduleScope,
     InitialiseConstantsSubroutine * initialiseConstantsSubroutine,
     Declarations & declarations, ParallelLoop & parallelLoop) :
-  Subroutine (subroutineName + SubroutineNames::deviceSuffix)
+  Subroutine (subroutineName + SubroutineNameSuffixes::deviceSuffix)
 {
   userHostSubroutineName = subroutineName;
 

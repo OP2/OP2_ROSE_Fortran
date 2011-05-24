@@ -28,17 +28,6 @@ class HostSubroutineOfDirectLoop: public HostSubroutine
 
     /*
      * ======================================================
-     * CUDA variables specific of direct loops
-     * ======================================================
-     */
-    SgVariableDeclaration * CUDAVariable_offsetS;
-
-    SgVariableDeclaration * CUDAVariable_warpSizeOP2;
-
-    SgVariableDeclaration * CUDAVariable_threadSynchRet;
-
-    /*
-     * ======================================================
      * Creates the kernel call
      * ======================================================
      */
@@ -76,8 +65,7 @@ class HostSubroutineOfDirectLoop: public HostSubroutine
 
     /*
      * ======================================================
-     * Initialises: nblocks, nthreads, nshared, offsetS and
-     * warpSizeOP2
+     * Initialises CUDA-specific variables
      * ======================================================
      */
     void

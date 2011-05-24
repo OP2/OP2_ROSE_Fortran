@@ -5,6 +5,44 @@
 #include <FortranStatementsAndExpressionsBuilder.h>
 #include <ROSEHelper.h>
 
+/*
+ * ======================================================
+ * Protected functions
+ * ======================================================
+ */
+
+std::string
+KernelSubroutine::get_OP_DAT_VariableName (unsigned int OP_DAT_ArgumentGroup)
+{
+  using boost::lexical_cast;
+  using std::string;
+
+  return IndirectAndDirectLoop::Fortran::VariablePrefixes::OP_DAT
+      + lexical_cast <string> (OP_DAT_ArgumentGroup);
+}
+
+std::string
+KernelSubroutine::get_OP_DAT_SizeVariableName (unsigned int OP_DAT_ArgumentGroup)
+{
+  using boost::lexical_cast;
+  using std::string;
+
+  return IndirectAndDirectLoop::Fortran::VariablePrefixes::OP_DAT
+      + lexical_cast <string> (OP_DAT_ArgumentGroup)
+      + IndirectAndDirectLoop::Fortran::VariableSuffixes::Size;
+}
+
+std::string
+KernelSubroutine::getLocalThread_OP_DAT_VariableName (unsigned int OP_DAT_ArgumentGroup)
+{
+  using boost::lexical_cast;
+  using std::string;
+
+  return IndirectAndDirectLoop::Fortran::VariablePrefixes::OP_DAT
+      + lexical_cast <string> (OP_DAT_ArgumentGroup)
+      + IndirectAndDirectLoop::Fortran::VariableSuffixes::local;
+}
+
 void
 KernelSubroutine::createArgsSizesFormalParameter (
     DataSizesDeclaration & dataSizesDeclaration)

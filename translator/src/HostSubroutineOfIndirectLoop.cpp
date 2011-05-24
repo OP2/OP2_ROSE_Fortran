@@ -11,9 +11,40 @@
  * Private functions
  * ======================================================
  */
-#define INDS_UNDEF -2
-#define NO_INDS -1
-#define IND_VALS_BASE 0
+
+std::string
+HostSubroutineOfIndirectLoop::getLocalToGlobalMappingVariableName (
+    unsigned int OP_DAT_ArgumentGroup)
+{
+  using boost::lexical_cast;
+  using std::string;
+
+  return IndirectLoop::Fortran::VariablePrefixes::pindMaps + lexical_cast <
+      string> (OP_DAT_ArgumentGroup);
+}
+
+std::string
+HostSubroutineOfIndirectLoop::getGlobalToLocalMappingVariableName (
+    unsigned int OP_DAT_ArgumentGroup)
+{
+  using boost::lexical_cast;
+  using std::string;
+
+  return IndirectLoop::Fortran::VariablePrefixes::pMaps
+      + lexical_cast <string> (OP_DAT_ArgumentGroup);
+}
+
+std::string
+HostSubroutineOfIndirectLoop::getGlobalToLocalMappingSizeVariableName (
+    unsigned int OP_DAT_ArgumentGroup)
+{
+  using boost::lexical_cast;
+  using std::string;
+
+  return IndirectLoop::Fortran::VariablePrefixes::pMaps
+      + lexical_cast <string> (OP_DAT_ArgumentGroup)
+      + IndirectAndDirectLoop::Fortran::VariableSuffixes::Size;
+}
 
 void
 HostSubroutineOfIndirectLoop::initialiseDeviceVariablesSizesVariable (
@@ -1256,7 +1287,10 @@ HostSubroutineOfIndirectLoop::createExecutionPlanStatements (
   using SageInterface::appendStatement;
   using std::string;
   using std::vector;
-  using std::make_pair;
+
+  int const INDS_UNDEFINED = -2;
+  int const NO_INDS = -1;
+  int const INDS_BASE_VAL = 0;
 
   for (unsigned int i = 1; i
       <= parallelLoop.getNumberOf_OP_DAT_ArgumentGroups (); ++i)
@@ -1378,16 +1412,17 @@ HostSubroutineOfIndirectLoop::createExecutionPlanStatements (
   for (unsigned int i = 1; i
       <= parallelLoop.getNumberOf_OP_DAT_ArgumentGroups (); ++i)
   {
-    indsValuesPerOPDat.insert (make_pair (parallelLoop.get_OP_DAT_VariableName (
-        i), INDS_UNDEF));
+    indsValuesPerOPDat[parallelLoop.get_OP_DAT_VariableName (i)]
+        = INDS_UNDEFINED;
   }
 
   /*
    * ======================================================
-   * Must start at Mike-define value...
+   * Must start at the value defined by Mike Giles in his
+   * implementation
    * ======================================================
    */
-  unsigned int indValuesGenerator = IND_VALS_BASE;
+  unsigned int indValuesGenerator = INDS_BASE_VAL;
 
   for (unsigned int i = 1; i
       <= parallelLoop.getNumberOf_OP_DAT_ArgumentGroups (); ++i)
@@ -1412,7 +1447,7 @@ HostSubroutineOfIndirectLoop::createExecutionPlanStatements (
     else
     {
       if (indsValuesPerOPDat[parallelLoop.get_OP_DAT_VariableName (i)]
-          == INDS_UNDEF)
+          == INDS_UNDEFINED)
       {
         rhsExpression = buildIntVal (indValuesGenerator);
         indsValuesPerOPDat[parallelLoop.get_OP_DAT_VariableName (i)]
@@ -1770,8 +1805,7 @@ HostSubroutineOfIndirectLoop::HostSubroutineOfIndirectLoop (
     InitialiseConstantsSubroutine & initialiseConstantsSubroutine,
     DataSizesDeclarationOfIndirectLoop & dataSizesDeclarationOfIndirectLoop,
     ParallelLoop & parallelLoop, SgScopeStatement * moduleScope) :
-  HostSubroutine (subroutineName, userDeviceSubroutine, parallelLoop,
-      moduleScope)
+  HostSubroutine (subroutineName, moduleScope)
 {
   Debug::getInstance ()->debugMessage (
       "Creating host subroutine of indirect loop", 2);
