@@ -1,3 +1,4 @@
+#include <boost/lexical_cast.hpp>
 #include <Debug.h>
 #include <KernelSubroutine.h>
 #include <CommonNamespaces.h>
@@ -22,7 +23,8 @@ KernelSubroutine::get_OP_DAT_VariableName (unsigned int OP_DAT_ArgumentGroup)
 }
 
 std::string
-KernelSubroutine::get_OP_DAT_SizeVariableName (unsigned int OP_DAT_ArgumentGroup)
+KernelSubroutine::get_OP_DAT_SizeVariableName (
+    unsigned int OP_DAT_ArgumentGroup)
 {
   using boost::lexical_cast;
   using std::string;
@@ -33,7 +35,8 @@ KernelSubroutine::get_OP_DAT_SizeVariableName (unsigned int OP_DAT_ArgumentGroup
 }
 
 std::string
-KernelSubroutine::getLocalThread_OP_DAT_VariableName (unsigned int OP_DAT_ArgumentGroup)
+KernelSubroutine::getLocalThread_OP_DAT_VariableName (
+    unsigned int OP_DAT_ArgumentGroup)
 {
   using boost::lexical_cast;
   using std::string;
@@ -44,18 +47,7 @@ KernelSubroutine::getLocalThread_OP_DAT_VariableName (unsigned int OP_DAT_Argume
 }
 
 void
-KernelSubroutine::createArgsSizesFormalParameter (
-    DataSizesDeclaration & dataSizesDeclaration)
-{
-  formalParameterDeclarations[IndirectAndDirectLoop::Fortran::VariableNames::argsSizes]
-      = FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
-          IndirectAndDirectLoop::Fortran::VariableNames::argsSizes,
-          dataSizesDeclaration.getType (), subroutineScope, formalParameters,
-          1, DEVICE);
-}
-
-void
-KernelSubroutine::createLocalThreadVariables (ParallelLoop & parallelLoop)
+KernelSubroutine::createLocalThreadVariables ()
 {
   using std::string;
   using boost::lexical_cast;
@@ -68,17 +60,17 @@ KernelSubroutine::createLocalThreadVariables (ParallelLoop & parallelLoop)
   Debug::getInstance ()->debugMessage ("Creating local thread variables", 2);
 
   for (unsigned int i = 1; i
-      <= parallelLoop.getNumberOf_OP_DAT_ArgumentGroups (); ++i)
+      <= parallelLoop->getNumberOf_OP_DAT_ArgumentGroups (); ++i)
   {
-    if ((parallelLoop.isDirectLoop () == true
-        && parallelLoop.get_OP_DAT_Dimension (i) > 1
-        && parallelLoop.get_OP_MAP_Value (i) == DIRECT)
-        || (parallelLoop.get_OP_MAP_Value (i) == GLOBAL
-            && parallelLoop.get_OP_Access_Value (i) != READ_ACCESS)
-        || (parallelLoop.get_OP_MAP_Value (i) == INDIRECT
-            && parallelLoop.get_OP_Access_Value (i) == INC_ACCESS))
+    if ((parallelLoop->isDirectLoop () == true
+        && parallelLoop->get_OP_DAT_Dimension (i) > 1
+        && parallelLoop->get_OP_MAP_Value (i) == DIRECT)
+        || (parallelLoop->get_OP_MAP_Value (i) == GLOBAL
+            && parallelLoop->get_OP_Access_Value (i) != READ_ACCESS)
+        || (parallelLoop->get_OP_MAP_Value (i) == INDIRECT
+            && parallelLoop->get_OP_Access_Value (i) == INC_ACCESS))
     {
-      SgType * opDatBaseType = parallelLoop.get_OP_DAT_Type (i);
+      SgType * opDatBaseType = parallelLoop->get_OP_DAT_Type (i);
 
       SgArrayType * arrayType = isSgArrayType (opDatBaseType);
 
@@ -90,30 +82,22 @@ KernelSubroutine::createLocalThreadVariables (ParallelLoop & parallelLoop)
           = FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
               getLocalThread_OP_DAT_VariableName (i),
               FortranTypesBuilder::getArray_RankOne (opDatBaseType, 0,
-                  parallelLoop.get_OP_DAT_Dimension (i) - 1), subroutineScope);
+                  parallelLoop->get_OP_DAT_Dimension (i) - 1), subroutineScope);
     }
   }
 }
 
 void
-KernelSubroutine::createAutosharedVariable (ParallelLoop & parallelLoop)
+KernelSubroutine::createAutosharedVariable ()
 {
-  /*
-   * ======================================================
-   * For now only real(8) or real(4): this is decided
-   * by checking the fortran type kinds of parallel loop
-   * op_dat arguments
-   * ======================================================
-   */
-
   SgType * autosharedType = NULL;
 
   for (unsigned int i = 1; i
-      <= parallelLoop.getNumberOf_OP_DAT_ArgumentGroups (); ++i)
+      <= parallelLoop->getNumberOf_OP_DAT_ArgumentGroups (); ++i)
   {
-    if (parallelLoop.isDuplicate_OP_DAT (i) == false)
+    if (parallelLoop->isDuplicate_OP_DAT (i) == false)
     {
-      SgType * opDatArrayType = parallelLoop.get_OP_DAT_Type (i);
+      SgType * opDatArrayType = parallelLoop->get_OP_DAT_Type (i);
 
       SgArrayType * isArrayType = isSgArrayType (opDatArrayType);
 
@@ -159,7 +143,7 @@ KernelSubroutine::createAutosharedVariable (ParallelLoop & parallelLoop)
 }
 
 void
-KernelSubroutine::initialiseLocalThreadVariables (ParallelLoop & parallelLoop)
+KernelSubroutine::initialiseLocalThreadVariables ()
 {
   using SageBuilder::buildOpaqueVarRefExp;
   using SageBuilder::buildPntrArrRefExp;
@@ -182,12 +166,12 @@ KernelSubroutine::initialiseLocalThreadVariables (ParallelLoop & parallelLoop)
    */
 
   for (unsigned int i = 1; i
-      <= parallelLoop.getNumberOf_OP_DAT_ArgumentGroups (); ++i)
+      <= parallelLoop->getNumberOf_OP_DAT_ArgumentGroups (); ++i)
   {
-    int dim = parallelLoop.get_OP_DAT_Dimension (i);
+    int dim = parallelLoop->get_OP_DAT_Dimension (i);
 
-    if (parallelLoop.get_OP_MAP_Value (i) == GLOBAL
-        && parallelLoop.get_OP_Access_Value (i) != READ_ACCESS)
+    if (parallelLoop->get_OP_MAP_Value (i) == GLOBAL
+        && parallelLoop->get_OP_Access_Value (i) != READ_ACCESS)
     {
       /*
        * ======================================================
@@ -212,7 +196,7 @@ KernelSubroutine::initialiseLocalThreadVariables (ParallelLoop & parallelLoop)
                   buildVarRefExp (
                       localVariableDeclarations[DirectLoop::Fortran::KernelSubroutine::setElementCounter]));
 
-      if (parallelLoop.get_OP_Access_Value (i) == INC_ACCESS)
+      if (parallelLoop->get_OP_Access_Value (i) == INC_ACCESS)
       {
         // for (int d=0; d<DIM; d++) ARG_l[d]=ZERO_TYP;
         SgExpression * assignArgToZero = buildAssignOp (accessToIPosition,
@@ -284,8 +268,7 @@ KernelSubroutine::initialiseLocalThreadVariables (ParallelLoop & parallelLoop)
 }
 
 void
-KernelSubroutine::createAndAppendReductionSubroutineCall (
-    ParallelLoop & parallelLoop)
+KernelSubroutine::createAndAppendReductionSubroutineCall ()
 {
   using SageBuilder::buildIntVal;
   using SageBuilder::buildAssignOp;
@@ -306,16 +289,16 @@ KernelSubroutine::createAndAppendReductionSubroutineCall (
 
   Debug::getInstance ()->debugMessage ("Adding reduction subroutine call", 2);
 
-  if (parallelLoop.isReductionRequired () == true)
+  if (parallelLoop->isReductionRequired () == true)
   {
     for (unsigned int i = 1; i
-        <= parallelLoop.getNumberOf_OP_DAT_ArgumentGroups (); ++i)
+        <= parallelLoop->getNumberOf_OP_DAT_ArgumentGroups (); ++i)
     {
-      if (parallelLoop.isReductionRequired (i) == true)
+      if (parallelLoop->isReductionRequired (i) == true)
       {
-        int dim = parallelLoop.get_OP_DAT_Dimension (i);
+        int dim = parallelLoop->get_OP_DAT_Dimension (i);
 
-        switch (parallelLoop.get_OP_Access_Value (i))
+        switch (parallelLoop->get_OP_Access_Value (i))
         {
           case INC_ACCESS:
           {
@@ -338,7 +321,7 @@ KernelSubroutine::createAndAppendReductionSubroutineCall (
              */
 
             SgSymbol
-                * reductionSymbol = parallelLoop.getReductionSubroutineHeader (
+                * reductionSymbol = parallelLoop->getReductionSubroutineHeader (
                     i)-> search_for_symbol_from_symbol_table ();
 
             SgFunctionSymbol * reductionFunctionSymbol = isSgFunctionSymbol (
@@ -454,4 +437,24 @@ KernelSubroutine::createAndAppendSharedMemoryOffesetForReduction ()
           IndirectAndDirectLoop::Fortran::KernelSubroutine::offsetForReduction,
           FortranTypesBuilder::getFourByteInteger (), subroutineScope,
           formalParameters, 1, VALUE);
+}
+
+void
+KernelSubroutine::createArgsSizesFormalParameter (
+    DataSizesDeclaration * dataSizesDeclaration)
+{
+  formalParameterDeclarations[IndirectAndDirectLoop::Fortran::VariableNames::argsSizes]
+      = FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
+          IndirectAndDirectLoop::Fortran::VariableNames::argsSizes,
+          dataSizesDeclaration->getType (), subroutineScope, formalParameters,
+          1, DEVICE);
+}
+
+KernelSubroutine::KernelSubroutine (std::string const & subroutineName,
+    UserDeviceSubroutine * userDeviceSubroutine, ParallelLoop * parallelLoop) :
+  Subroutine (subroutineName + SubroutineNameSuffixes::kernelSuffix)
+{
+  this->userDeviceSubroutine = userDeviceSubroutine;
+
+  this->parallelLoop = parallelLoop;
 }

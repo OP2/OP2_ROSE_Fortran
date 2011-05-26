@@ -12,7 +12,7 @@ class DataSizesDeclarationOfIndirectLoop: public DataSizesDeclaration
   private:
 
     virtual void
-    addFields (ParallelLoop & parallelLoop);
+    addFields ();
 
   public:
 
@@ -46,8 +46,8 @@ class DataSizesDeclarationOfIndirectLoop: public DataSizesDeclaration
         getGlobalToLocalRenumberingSizeFieldName (
             unsigned int OP_DAT_ArgumentGroup);
 
-    DataSizesDeclarationOfIndirectLoop (ParallelLoop & parallelLoop,
-        std::string const & subroutineName, SgScopeStatement * moduleScope);
+    DataSizesDeclarationOfIndirectLoop (std::string const & subroutineName,
+        ParallelLoop * parallelLoop, SgScopeStatement * moduleScope);
 };
 
 #endif

@@ -16,6 +16,8 @@ class KernelSubroutineOfIndirectLoop: public KernelSubroutine
 {
   private:
 
+    DataSizesDeclarationOfIndirectLoop * dataSizesDeclarationOfIndirectLoop;
+
     std::map <std::string, unsigned int> positionOf_nbytes;
 
     /*
@@ -25,10 +27,6 @@ class KernelSubroutineOfIndirectLoop: public KernelSubroutine
      */
 
     std::map <unsigned int, SgVariableDeclaration *> localVariables_indArgSizes;
-
-    std::map <unsigned int, SgVariableDeclaration *> localVariables_nbytes;
-
-    std::map <unsigned int, SgVariableDeclaration *> localVariables_inRoundUps;
 
     std::map <unsigned int, SgVariableDeclaration *>
         localVariables_incrementAccessMaps;
@@ -44,52 +42,61 @@ class KernelSubroutineOfIndirectLoop: public KernelSubroutine
     static std::string
     getGlobalToLocalMappingVariableName (unsigned int OP_DAT_ArgumentGroup);
 
+    static std::string
+    getNumberOfBytesVariableName (unsigned int OP_DAT_ArgumentGroup);
+
+    static std::string
+    getRoundUpVariableName (unsigned int OP_DAT_ArgumentGroup);
+
     SgStatement *
-    createUserSubroutineCall (UserDeviceSubroutine & userDeviceSubroutine,
-        ParallelLoop & parallelLoop);
+    createUserSubroutineCall ();
 
     void
-    applyPointeredIncrementsOrWrites (ParallelLoop & parallelLoop);
+    applyPointeredIncrementsOrWrites ();
 
     void
-    createPlanWhileLoop (UserDeviceSubroutine & userDeviceSubroutine,
-        ParallelLoop & parallelLoop);
+    createPlanWhileLoop ();
 
     void
-    createAutosharedWhileLoops (ParallelLoop & parallelLoop);
+    createAutosharedWhileLoops ();
 
     void
-    initialiseLocalVariables (ParallelLoop & parallelLoop);
+    initialiseLocalVariables ();
 
     void
-    createThreadZeroStatements (ParallelLoop & parallelLoop);
+    createThreadZeroStatements ();
 
     void
     createRemainingLocalVariables ();
 
     void
-    createLocalVariables (ParallelLoop & parallelLoop);
+    createLocalVariables ();
 
     void
-    createSharedLocalVariables (ParallelLoop & parallelLoop);
+    createSharedLocalVariables ();
 
     void
-        createPlanFormalParameters (
-            DataSizesDeclarationOfIndirectLoop & dataSizesDeclarationOfIndirectLoop,
-            ParallelLoop & parallelLoop);
+    createPlanFormalParameters ();
 
     void
-        create_OP_DAT_FormalParameters (
-            DataSizesDeclarationOfIndirectLoop & dataSizesDeclarationOfIndirectLoop,
-            ParallelLoop & parallelLoop);
+    create_OP_DAT_FormalParameters ();
+
+    virtual void
+    createStatements ();
+
+    virtual void
+    createLocalVariableDeclarations ();
+
+    virtual void
+    createFormalParameterDeclarations ();
 
   public:
 
         KernelSubroutineOfIndirectLoop (
             std::string const & subroutineName,
-            UserDeviceSubroutine & userDeviceSubroutine,
-            DataSizesDeclarationOfIndirectLoop & dataSizesDeclarationOfIndirectLoop,
-            ParallelLoop & parallelLoop, SgScopeStatement * moduleScope);
+            UserDeviceSubroutine * userDeviceSubroutine,
+            DataSizesDeclarationOfIndirectLoop * dataSizesDeclarationOfIndirectLoop,
+            ParallelLoop * parallelLoop, SgScopeStatement * moduleScope);
 
 };
 

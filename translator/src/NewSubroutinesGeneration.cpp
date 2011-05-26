@@ -22,8 +22,8 @@
  */
 
 void
-NewSubroutinesGeneration::patchOP_PAR_LOOPCalls (ParallelLoop & parallelLoop,
-    UserDeviceSubroutine & userDeviceSubroutine,
+NewSubroutinesGeneration::patchCallsToParallelLoops (
+    ParallelLoop & parallelLoop, UserDeviceSubroutine & userDeviceSubroutine,
     HostSubroutine & hostSubroutine, SgScopeStatement * scope,
     SgFunctionCallExp * functionCallExp)
 {
@@ -161,7 +161,7 @@ NewSubroutinesGeneration::patchOP_PAR_LOOPCalls (ParallelLoop & parallelLoop,
 }
 
 void
-NewSubroutinesGeneration::createOpenMPSubroutines (ParallelLoop & parallelLoop,
+NewSubroutinesGeneration::createOpenMPSubroutines (ParallelLoop * parallelLoop,
     std::string const & userSubroutineName,
     SgModuleStatement * moduleStatement, SgNode * node,
     SgFunctionCallExp * functionCallExp)
@@ -179,7 +179,7 @@ NewSubroutinesGeneration::createOpenMPSubroutines (ParallelLoop & parallelLoop,
    */
   //parallelLoop.generateReductionSubroutines (moduleScope);
 
-  if (parallelLoop.isDirectLoop ())
+  if (parallelLoop->isDirectLoop ())
   {
     /*
      * ======================================================
@@ -205,7 +205,7 @@ NewSubroutinesGeneration::createOpenMPSubroutines (ParallelLoop & parallelLoop,
 }
 
 void
-NewSubroutinesGeneration::createCUDASubroutines (ParallelLoop & parallelLoop,
+NewSubroutinesGeneration::createCUDASubroutines (ParallelLoop * parallelLoop,
     std::string const & userSubroutineName,
     SgModuleStatement * moduleStatement, SgNode * node,
     SgFunctionCallExp * functionCallExp)
@@ -219,7 +219,7 @@ NewSubroutinesGeneration::createCUDASubroutines (ParallelLoop & parallelLoop,
    * Create the reduction subroutines
    * ======================================================
    */
-  parallelLoop.generateReductionSubroutines (moduleScope);
+  parallelLoop->generateReductionSubroutines (moduleScope);
 
   UserDeviceSubroutine * userDeviceSubroutine;
 
@@ -227,7 +227,7 @@ NewSubroutinesGeneration::createCUDASubroutines (ParallelLoop & parallelLoop,
 
   HostSubroutine * hostSubroutine;
 
-  if (parallelLoop.isDirectLoop ())
+  if (parallelLoop->isDirectLoop ())
   {
     /*
      * ======================================================
@@ -235,7 +235,7 @@ NewSubroutinesGeneration::createCUDASubroutines (ParallelLoop & parallelLoop,
      * ======================================================
      */
     DataSizesDeclarationOfDirectLoop * dataSizesDeclaration =
-        new DataSizesDeclarationOfDirectLoop (parallelLoop, userSubroutineName,
+        new DataSizesDeclarationOfDirectLoop (userSubroutineName, parallelLoop,
             moduleScope);
 
     InitialiseConstantsSubroutine * initialiseConstantsSubroutine =
@@ -243,17 +243,14 @@ NewSubroutinesGeneration::createCUDASubroutines (ParallelLoop & parallelLoop,
 
     addContains (moduleStatement);
 
-    userDeviceSubroutine
-        = new UserDeviceSubroutine (userSubroutineName, moduleScope,
-            initialiseConstantsSubroutine, *declarations, parallelLoop);
+    userDeviceSubroutine = new UserDeviceSubroutine (userSubroutineName,
+        initialiseConstantsSubroutine, declarations, parallelLoop, moduleScope);
 
-    kernelSubroutine
-        = new KernelSubroutineOfDirectLoop (userSubroutineName,
-            *userDeviceSubroutine, *dataSizesDeclaration, parallelLoop,
-            moduleScope);
+    kernelSubroutine = new KernelSubroutineOfDirectLoop (userSubroutineName,
+        userDeviceSubroutine, dataSizesDeclaration, parallelLoop, moduleScope);
 
     hostSubroutine = new HostSubroutineOfDirectLoop (userSubroutineName,
-        *userDeviceSubroutine, *kernelSubroutine, *dataSizesDeclaration,
+        userDeviceSubroutine, kernelSubroutine, dataSizesDeclaration,
         parallelLoop, moduleScope);
   }
   else
@@ -265,30 +262,25 @@ NewSubroutinesGeneration::createCUDASubroutines (ParallelLoop & parallelLoop,
      */
 
     DataSizesDeclarationOfIndirectLoop * dataSizesDeclaration =
-        new DataSizesDeclarationOfIndirectLoop (parallelLoop,
-            userSubroutineName, moduleScope);
+        new DataSizesDeclarationOfIndirectLoop (userSubroutineName,
+            parallelLoop, moduleScope);
 
     InitialiseConstantsSubroutine * initialiseConstantsSubroutine =
         new InitialiseConstantsSubroutine (userSubroutineName, moduleScope);
 
     addContains (moduleStatement);
 
-    initialiseConstantsSubroutine->generateSubroutine (
-        moduleScope);
+    initialiseConstantsSubroutine->generateSubroutine (moduleScope);
 
-    userDeviceSubroutine
-        = new UserDeviceSubroutine (userSubroutineName, moduleScope,
-            initialiseConstantsSubroutine, *declarations, parallelLoop);
+    userDeviceSubroutine = new UserDeviceSubroutine (userSubroutineName,
+        initialiseConstantsSubroutine, declarations, parallelLoop, moduleScope);
 
-    kernelSubroutine
-        = new KernelSubroutineOfIndirectLoop (userSubroutineName,
-            *userDeviceSubroutine, *dataSizesDeclaration, parallelLoop,
-            moduleScope);
+    kernelSubroutine = new KernelSubroutineOfIndirectLoop (userSubroutineName,
+        userDeviceSubroutine, dataSizesDeclaration, parallelLoop, moduleScope);
 
     hostSubroutine = new HostSubroutineOfIndirectLoop (userSubroutineName,
-        *userDeviceSubroutine, *kernelSubroutine,
-        *initialiseConstantsSubroutine, *dataSizesDeclaration, parallelLoop,
-        moduleScope);
+        userDeviceSubroutine, kernelSubroutine, initialiseConstantsSubroutine,
+        dataSizesDeclaration, parallelLoop, moduleScope);
   }
 
   /*
@@ -300,8 +292,8 @@ NewSubroutinesGeneration::createCUDASubroutines (ParallelLoop & parallelLoop,
   SgScopeStatement * scope =
       isSgExprStatement (node->get_parent ())->get_scope ();
 
-  patchOP_PAR_LOOPCalls (parallelLoop, *userDeviceSubroutine, *hostSubroutine,
-      scope, functionCallExp);
+  patchCallsToParallelLoops (*parallelLoop, *userDeviceSubroutine,
+      *hostSubroutine, scope, functionCallExp);
 }
 
 void
@@ -571,13 +563,13 @@ NewSubroutinesGeneration::visit (SgNode * node)
               if (iequals (Globals::getInstance ()->getTargetBackend (),
                   TargetBackends::CUDA))
               {
-                createCUDASubroutines (*parallelLoop, userSubroutineName,
+                createCUDASubroutines (parallelLoop, userSubroutineName,
                     moduleStatement, node, functionCallExp);
               }
               else if (iequals (Globals::getInstance ()->getTargetBackend (),
                   TargetBackends::OpenMP))
               {
-                createOpenMPSubroutines (*parallelLoop, userSubroutineName,
+                createOpenMPSubroutines (parallelLoop, userSubroutineName,
                     moduleStatement, node, functionCallExp);
               }
             }

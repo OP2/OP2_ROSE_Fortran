@@ -8,6 +8,13 @@
 
 class HostSubroutine: public Subroutine
 {
+  protected:
+
+    UserDeviceSubroutine * userDeviceSubroutine;
+
+    KernelSubroutine * kernelSubroutine;
+
+    ParallelLoop * parallelLoop;
 
   protected:
 
@@ -93,45 +100,45 @@ class HostSubroutine: public Subroutine
     getCToFortranVariableName (unsigned int OP_DAT_ArgumentGroup);
 
     void
-    copyDataBackFromDeviceAndDeallocate (ParallelLoop & parallelLoop);
+    copyDataBackFromDeviceAndDeallocate ();
 
     void
-    initialiseDataMarshallingLocalVariables (ParallelLoop & parallelLoop);
+    initialiseDataMarshallingLocalVariables ();
 
     void
-    createDataMarshallingLocalVariables (ParallelLoop & parallelLoop);
+    createDataMarshallingLocalVariables ();
 
     void
     createCUDAKernelVariables ();
 
     void
-    createFormalParameters (UserDeviceSubroutine & userDeviceSubroutine,
-        ParallelLoop & parallelLoop);
+    createFormalParameters ();
 
     SgStatement *
     createCallToC_F_POINTER (SgExpression * parameter1,
         SgExpression * parameter2, SgExpression * parameter3 = NULL);
 
     SgStatement *
-    buildThreadSynchroniseFunctionCall (SgScopeStatement * subroutineScope);
+    buildThreadSynchroniseFunctionCall ();
 
     void
-    createReductionVariables (ParallelLoop & parallelLoop);
+    createReductionVariables ();
 
     void
     createAndAppendThreadSynchCall ();
 
     void
-        createSupportForReductionVariablesBeforeKernel (
-            ParallelLoop & parallelLoop);
+    createSupportForReductionVariablesBeforeKernel ();
 
     void
-    createSupportForReductionVariablesAfterKernel (ParallelLoop & parallelLoop);
+    createSupportForReductionVariablesAfterKernel ();
 
     void
-    createAndAppendIterationVariablesForReduction (ParallelLoop & parallelLoop);
+    createAndAppendIterationVariablesForReduction ();
 
     HostSubroutine (std::string const & subroutineName,
+        UserDeviceSubroutine * userDeviceSubroutine,
+        KernelSubroutine * kernelSubroutine, ParallelLoop * parallelLoop,
         SgScopeStatement * moduleScope);
 };
 

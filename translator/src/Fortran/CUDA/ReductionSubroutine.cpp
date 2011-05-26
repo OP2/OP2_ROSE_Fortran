@@ -29,113 +29,6 @@ ReductionSubroutine::createCallToSynchThreads ()
 }
 
 void
-ReductionSubroutine::createFormalParameters ()
-{
-  Debug::getInstance ()->debugMessage (
-      "Creating reduction procedure formal parameter", 2);
-
-  /*
-   * ======================================================
-   * Declare the device variable on which the result of local
-   * reductions is stored by the first thread in the block
-   * ======================================================
-   */
-  formalParameterDeclarations[IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::reductionResultOnDevice]
-      = FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
-          IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::reductionResultOnDevice,
-          reductionVariableType, subroutineScope, formalParameters, 1, DEVICE);
-
-  /*
-   * ======================================================
-   * Declare the value of the reduction variable produced by
-   * each thread which is passed by value.
-   * WARNING: the type of the input data is for now limited
-   * to a scalar value (does not manage reduction on arrays)
-   * ======================================================
-   */
-
-  formalParameterDeclarations[IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::inputValue]
-      = FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
-          IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::inputValue,
-          reductionVariableType->get_base_type (), subroutineScope,
-          formalParameters, 1, VALUE);
-
-  /*
-   * ======================================================
-   * Declare the the warp size: currently, in CUDA Fortran
-   * it is not possible to access the warpsize variable value
-   * in a device subroutine (only possible in global ones)
-   * ======================================================
-   */
-
-  formalParameterDeclarations[IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::warpSize]
-      = FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
-          IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::warpSize,
-          FortranTypesBuilder::getFourByteInteger (), subroutineScope,
-          formalParameters, 1, VALUE);
-
-  /*
-   * ======================================================
-   * Declare the the offset from which the automatically allocated
-   * shared memory variable space is reserved for use by
-   * the reduction subroutine
-   * ======================================================
-   */
-
-  formalParameterDeclarations[IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::sharedMemoryStartOffset]
-      = FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
-          IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::sharedMemoryStartOffset,
-          FortranTypesBuilder::getFourByteInteger (), subroutineScope,
-          formalParameters, 1, VALUE);
-}
-
-void
-ReductionSubroutine::createLocalVariables ()
-{
-  using std::vector;
-  using std::string;
-
-  /*
-   * ======================================================
-   * Create autoshared variable declaration with the same
-   * base type as the reduction variable
-   * ======================================================
-   */
-
-  SgExpression * upperBound = new SgAsteriskShapeExp (
-      ROSEHelper::getFileInfo ());
-
-  localVariableDeclarations[IndirectAndDirectLoop::Fortran::VariableNames::autoshared]
-      = FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
-          IndirectAndDirectLoop::Fortran::VariableNames::autoshared,
-          FortranTypesBuilder::getArray_RankOne (
-              reductionVariableType->get_base_type (), 0, upperBound),
-          subroutineScope);
-
-  localVariableDeclarations[IndirectAndDirectLoop::Fortran::VariableNames::autoshared]->get_declarationModifier ().get_typeModifier ().setShared ();
-
-  /*
-   * ======================================================
-   * Create thread ID and iteration counter variables
-   * ======================================================
-   */
-
-  vector <string> fourByteIntegers;
-  fourByteIntegers.push_back (
-      IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::iterationCounter);
-  fourByteIntegers.push_back (
-      IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::threadID);
-
-  for (vector <string>::iterator it = fourByteIntegers.begin (); it
-      != fourByteIntegers.end (); ++it)
-  {
-    localVariableDeclarations[*it]
-        = FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
-            *it, FortranTypesBuilder::getFourByteInteger (), subroutineScope);
-  }
-}
-
-void
 ReductionSubroutine::createStatements ()
 {
   using SageInterface::appendStatement;
@@ -395,6 +288,113 @@ ReductionSubroutine::createStatements ()
   appendStatement (finalIfStatement, subroutineScope);
 }
 
+void
+ReductionSubroutine::createLocalVariableDeclarations ()
+{
+  using std::vector;
+  using std::string;
+
+  /*
+   * ======================================================
+   * Create autoshared variable declaration with the same
+   * base type as the reduction variable
+   * ======================================================
+   */
+
+  SgExpression * upperBound = new SgAsteriskShapeExp (
+      ROSEHelper::getFileInfo ());
+
+  localVariableDeclarations[IndirectAndDirectLoop::Fortran::VariableNames::autoshared]
+      = FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
+          IndirectAndDirectLoop::Fortran::VariableNames::autoshared,
+          FortranTypesBuilder::getArray_RankOne (
+              reductionVariableType->get_base_type (), 0, upperBound),
+          subroutineScope);
+
+  localVariableDeclarations[IndirectAndDirectLoop::Fortran::VariableNames::autoshared]->get_declarationModifier ().get_typeModifier ().setShared ();
+
+  /*
+   * ======================================================
+   * Create thread ID and iteration counter variables
+   * ======================================================
+   */
+
+  vector <string> fourByteIntegers;
+  fourByteIntegers.push_back (
+      IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::iterationCounter);
+  fourByteIntegers.push_back (
+      IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::threadID);
+
+  for (vector <string>::iterator it = fourByteIntegers.begin (); it
+      != fourByteIntegers.end (); ++it)
+  {
+    localVariableDeclarations[*it]
+        = FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
+            *it, FortranTypesBuilder::getFourByteInteger (), subroutineScope);
+  }
+}
+
+void
+ReductionSubroutine::createFormalParameterDeclarations ()
+{
+  Debug::getInstance ()->debugMessage (
+      "Creating reduction procedure formal parameter", 2);
+
+  /*
+   * ======================================================
+   * Declare the device variable on which the result of local
+   * reductions is stored by the first thread in the block
+   * ======================================================
+   */
+  formalParameterDeclarations[IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::reductionResultOnDevice]
+      = FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
+          IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::reductionResultOnDevice,
+          reductionVariableType, subroutineScope, formalParameters, 1, DEVICE);
+
+  /*
+   * ======================================================
+   * Declare the value of the reduction variable produced by
+   * each thread which is passed by value.
+   * WARNING: the type of the input data is for now limited
+   * to a scalar value (does not manage reduction on arrays)
+   * ======================================================
+   */
+
+  formalParameterDeclarations[IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::inputValue]
+      = FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
+          IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::inputValue,
+          reductionVariableType->get_base_type (), subroutineScope,
+          formalParameters, 1, VALUE);
+
+  /*
+   * ======================================================
+   * Declare the the warp size: currently, in CUDA Fortran
+   * it is not possible to access the warpsize variable value
+   * in a device subroutine (only possible in global ones)
+   * ======================================================
+   */
+
+  formalParameterDeclarations[IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::warpSize]
+      = FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
+          IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::warpSize,
+          FortranTypesBuilder::getFourByteInteger (), subroutineScope,
+          formalParameters, 1, VALUE);
+
+  /*
+   * ======================================================
+   * Declare the the offset from which the automatically allocated
+   * shared memory variable space is reserved for use by
+   * the reduction subroutine
+   * ======================================================
+   */
+
+  formalParameterDeclarations[IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::sharedMemoryStartOffset]
+      = FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
+          IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::sharedMemoryStartOffset,
+          FortranTypesBuilder::getFourByteInteger (), subroutineScope,
+          formalParameters, 1, VALUE);
+}
+
 /*
  * ======================================================
  * Public functions
@@ -424,6 +424,8 @@ ReductionSubroutine::ReductionSubroutine (
   using SageInterface::appendStatement;
   using SageInterface::addTextForUnparser;
 
+  this->reductionVariableType = reductionVariableType;
+
   formalParameters = buildFunctionParameterList ();
 
   subroutineHeaderStatement = buildProcedureHeaderStatement (
@@ -437,11 +439,9 @@ ReductionSubroutine::ReductionSubroutine (
 
   subroutineScope = subroutineHeaderStatement->get_definition ()->get_body ();
 
-  this->reductionVariableType = reductionVariableType;
+  createFormalParameterDeclarations ();
 
-  createFormalParameters ();
-
-  createLocalVariables ();
+  createLocalVariableDeclarations ();
 
   createStatements ();
 }

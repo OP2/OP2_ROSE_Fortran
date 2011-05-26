@@ -28,6 +28,15 @@ class InitialiseConstantsSubroutine: public Subroutine
     void
     declareConstants (SgScopeStatement * moduleScope);
 
+    virtual void
+    createStatements ();
+
+    virtual void
+    createLocalVariableDeclarations ();
+
+    virtual void
+    createFormalParameterDeclarations ();
+
   public:
 
     /*

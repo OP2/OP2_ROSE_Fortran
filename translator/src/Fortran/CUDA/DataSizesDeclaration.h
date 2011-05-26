@@ -25,6 +25,13 @@ class DataSizesDeclaration
 
     /*
      * ======================================================
+     * The parallel loop
+     * ======================================================
+     */
+    ParallelLoop * parallelLoop;
+
+    /*
+     * ======================================================
      * The scope of the declaration
      * ======================================================
      */
@@ -48,10 +55,10 @@ class DataSizesDeclaration
   protected:
 
     virtual void
-    addFields (ParallelLoop & parallelLoop) = 0;
+    addFields () = 0;
 
     DataSizesDeclaration (std::string const & subroutineName,
-        SgScopeStatement * moduleScope);
+        ParallelLoop * parallelLoop, SgScopeStatement * moduleScope);
 
   public:
 

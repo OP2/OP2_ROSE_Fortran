@@ -32,29 +32,14 @@ class ReductionSubroutine: public Subroutine
     SgStatement *
     createCallToSynchThreads ();
 
-    /*
-     * ======================================================
-     * Generates the reduction subroutine formal parameters
-     * ======================================================
-     */
-    void
-    createFormalParameters ();
-
-    /*
-     * ======================================================
-     * Generates the reduction subroutine local variables
-     * ======================================================
-     */
-    void
-    createLocalVariables ();
-
-    /*
-     * ======================================================
-     * Generates the reduction subroutine statements
-     * ======================================================
-     */
-    void
+    virtual void
     createStatements ();
+
+    virtual void
+    createLocalVariableDeclarations ();
+
+    virtual void
+    createFormalParameterDeclarations ();
 
   public:
 

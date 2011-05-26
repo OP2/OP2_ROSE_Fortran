@@ -57,6 +57,24 @@ InitialiseConstantsSubroutine::declareConstants (SgScopeStatement * moduleScope)
   }
 }
 
+void
+InitialiseConstantsSubroutine::createStatements ()
+{
+
+}
+
+void
+InitialiseConstantsSubroutine::createLocalVariableDeclarations ()
+{
+
+}
+
+void
+InitialiseConstantsSubroutine::createFormalParameterDeclarations ()
+{
+
+}
+
 /*
  * ======================================================
  * Public functions

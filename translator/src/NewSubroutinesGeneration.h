@@ -73,7 +73,7 @@ class NewSubroutinesGeneration: public AstSimpleProcessing
      * ======================================================
      */
     void
-    patchOP_PAR_LOOPCalls (ParallelLoop & parallelLoop,
+    patchCallsToParallelLoops (ParallelLoop & parallelLoop,
         UserDeviceSubroutine & userDeviceSubroutine,
         HostSubroutine & hostSubroutine, SgScopeStatement * scope,
         SgFunctionCallExp * functionCallExp);
@@ -84,7 +84,7 @@ class NewSubroutinesGeneration: public AstSimpleProcessing
      * ======================================================
      */
     void
-    createOpenMPSubroutines (ParallelLoop & parallelLoop,
+    createOpenMPSubroutines (ParallelLoop * parallelLoop,
         std::string const & userSubroutineName,
         SgModuleStatement * moduleStatement, SgNode * node,
         SgFunctionCallExp * functionCallExp);
@@ -95,7 +95,7 @@ class NewSubroutinesGeneration: public AstSimpleProcessing
      * ======================================================
      */
     void
-    createCUDASubroutines (ParallelLoop & parallelLoop,
+    createCUDASubroutines (ParallelLoop * parallelLoop,
         std::string const & userSubroutineName,
         SgModuleStatement * moduleStatement, SgNode * node,
         SgFunctionCallExp * functionCallExp);

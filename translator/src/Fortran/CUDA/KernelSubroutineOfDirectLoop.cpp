@@ -12,8 +12,7 @@
  */
 
 SgStatement *
-KernelSubroutineOfDirectLoop::createUserSubroutineCall (
-    UserDeviceSubroutine & userDeviceSubroutine, ParallelLoop & parallelLoop)
+KernelSubroutineOfDirectLoop::createUserSubroutineCall ()
 {
   using SageBuilder::buildFunctionCallStmt;
   using SageBuilder::buildVoidType;
@@ -36,15 +35,15 @@ KernelSubroutineOfDirectLoop::createUserSubroutineCall (
   SgExprListExp * userDeviceSubroutineParameters = buildExprListExp ();
 
   for (unsigned int i = 1; i
-      <= parallelLoop.getNumberOf_OP_DAT_ArgumentGroups (); ++i)
+      <= parallelLoop->getNumberOf_OP_DAT_ArgumentGroups (); ++i)
   {
-    int dim = parallelLoop.get_OP_DAT_Dimension (i);
+    int dim = parallelLoop->get_OP_DAT_Dimension (i);
 
     SgExpression * parameterExpression = buildIntVal (1);
 
-    if (parallelLoop.get_OP_MAP_Value (i) == GLOBAL)
+    if (parallelLoop->get_OP_MAP_Value (i) == GLOBAL)
     {
-      if (parallelLoop.get_OP_Access_Value (i) == READ_ACCESS)
+      if (parallelLoop->get_OP_Access_Value (i) == READ_ACCESS)
       {
         /*
          * ======================================================
@@ -92,9 +91,9 @@ KernelSubroutineOfDirectLoop::createUserSubroutineCall (
             localVariableDeclarations[getLocalThread_OP_DAT_VariableName (i)]);
       }
     }
-    else if (parallelLoop.get_OP_MAP_Value (i) == DIRECT)
+    else if (parallelLoop->get_OP_MAP_Value (i) == DIRECT)
     {
-      if (parallelLoop.getNumberOfIndirectDataSets () > 0)
+      if (parallelLoop->getNumberOfIndirectDataSets () > 0)
       {
         SgExpression
             * deviceVarAccessDirectBegin =
@@ -155,13 +154,12 @@ KernelSubroutineOfDirectLoop::createUserSubroutineCall (
     userDeviceSubroutineParameters->append_expression (parameterExpression);
   }
 
-  return buildFunctionCallStmt (userDeviceSubroutine.getSubroutineName (),
+  return buildFunctionCallStmt (userDeviceSubroutine->getSubroutineName (),
       buildVoidType (), userDeviceSubroutineParameters, subroutineScope);
 }
 
 SgBasicBlock *
-KernelSubroutineOfDirectLoop::stageInFromDeviceMemoryToLocalThreadVariables (
-    ParallelLoop & parallelLoop)
+KernelSubroutineOfDirectLoop::stageInFromDeviceMemoryToLocalThreadVariables ()
 {
   using SageBuilder::buildBasicBlock;
   using SageBuilder::buildVarRefExp;
@@ -176,11 +174,11 @@ KernelSubroutineOfDirectLoop::stageInFromDeviceMemoryToLocalThreadVariables (
   SgBasicBlock * outerBlock = buildBasicBlock ();
 
   for (unsigned int i = 1; i
-      <= parallelLoop.getNumberOf_OP_DAT_ArgumentGroups (); ++i)
+      <= parallelLoop->getNumberOf_OP_DAT_ArgumentGroups (); ++i)
   {
-    if (parallelLoop.get_OP_MAP_Value (i) != GLOBAL
-        && parallelLoop.get_OP_Access_Value (i) != WRITE_ACCESS
-        && parallelLoop.get_OP_DAT_Dimension (i) != 1)
+    if (parallelLoop->get_OP_MAP_Value (i) != GLOBAL
+        && parallelLoop->get_OP_Access_Value (i) != WRITE_ACCESS
+        && parallelLoop->get_OP_DAT_Dimension (i) != 1)
     {
       SgVarRefExp
           * displVarRef =
@@ -221,15 +219,15 @@ KernelSubroutineOfDirectLoop::stageInFromDeviceMemoryToLocalThreadVariables (
       SgExpression * initLoop = buildAssignOp (mVarRef, buildIntVal (0));
 
       SgExpression * upperBoundExpression = buildIntVal (
-          parallelLoop.get_OP_DAT_Dimension (i));
+          parallelLoop->get_OP_DAT_Dimension (i));
 
       SgExpression * autosharedAccessFirst = buildAddOp (displVarRef,
           buildAddOp (tidVarRef, buildMultiplyOp (mVarRef, nelemsVarRef)));
 
       SgExpression * opdatArgAccess = buildAddOp (tidVarRef, buildAddOp (
-          buildMultiplyOp (mVarRef, nelemsVarRef),
-          buildMultiplyOp (offsetVarRef, buildIntVal (
-              parallelLoop.get_OP_DAT_Dimension (i)))));
+          buildMultiplyOp (mVarRef, nelemsVarRef), buildMultiplyOp (
+              offsetVarRef,
+              buildIntVal (parallelLoop->get_OP_DAT_Dimension (i)))));
 
       SgExpression * assignAutosharedInit = buildAssignOp (buildPntrArrRefExp (
           autoSharedVarRef, autosharedAccessFirst), buildPntrArrRefExp (
@@ -254,7 +252,7 @@ KernelSubroutineOfDirectLoop::stageInFromDeviceMemoryToLocalThreadVariables (
 
       SgExpression * autoSharedAccessSecond = buildAddOp (displVarRef,
           buildAddOp (mVarRef, buildMultiplyOp (tidVarRef, buildIntVal (
-              parallelLoop.get_OP_DAT_Dimension (i)))));
+              parallelLoop->get_OP_DAT_Dimension (i)))));
 
       SgExpression * assignLocalThreadVarInit = buildAssignOp (
           buildPntrArrRefExp (
@@ -278,8 +276,7 @@ KernelSubroutineOfDirectLoop::stageInFromDeviceMemoryToLocalThreadVariables (
 }
 
 SgBasicBlock *
-KernelSubroutineOfDirectLoop::stageOutFromLocalThreadVariablesToDeviceMemory (
-    ParallelLoop & parallelLoop)
+KernelSubroutineOfDirectLoop::stageOutFromLocalThreadVariablesToDeviceMemory ()
 {
   using SageBuilder::buildBasicBlock;
   using SageBuilder::buildVarRefExp;
@@ -294,11 +291,11 @@ KernelSubroutineOfDirectLoop::stageOutFromLocalThreadVariablesToDeviceMemory (
   SgBasicBlock * outerBlock = buildBasicBlock ();
 
   for (unsigned int i = 1; i
-      <= parallelLoop.getNumberOf_OP_DAT_ArgumentGroups (); ++i)
+      <= parallelLoop->getNumberOf_OP_DAT_ArgumentGroups (); ++i)
   {
-    if (parallelLoop.get_OP_MAP_Value (i) != GLOBAL
-        && parallelLoop.get_OP_Access_Value (i) != READ_ACCESS
-        && parallelLoop.get_OP_DAT_Dimension (i) != 1)
+    if (parallelLoop->get_OP_MAP_Value (i) != GLOBAL
+        && parallelLoop->get_OP_Access_Value (i) != READ_ACCESS
+        && parallelLoop->get_OP_DAT_Dimension (i) != 1)
     {
       SgVarRefExp
           * displVarRef =
@@ -333,7 +330,7 @@ KernelSubroutineOfDirectLoop::stageOutFromLocalThreadVariablesToDeviceMemory (
       SgExpression * initLoop = buildAssignOp (mVarRef, buildIntVal (0));
 
       SgExpression * upperBoundExpression = buildIntVal (
-          parallelLoop.get_OP_DAT_Dimension (i) - 1);
+          parallelLoop->get_OP_DAT_Dimension (i) - 1);
 
       /*
        * ======================================================
@@ -344,7 +341,7 @@ KernelSubroutineOfDirectLoop::stageOutFromLocalThreadVariablesToDeviceMemory (
 
       SgExpression * autoSharedAccessFirst = buildAddOp (displVarRef,
           buildAddOp (mVarRef, buildMultiplyOp (tidVarRef, buildIntVal (
-              parallelLoop.get_OP_DAT_Dimension (i)))));
+              parallelLoop->get_OP_DAT_Dimension (i)))));
 
       SgExpression * assignSharedMemOut = buildAssignOp (buildPntrArrRefExp (
           autoSharedVarRef, autoSharedAccessFirst),
@@ -370,9 +367,9 @@ KernelSubroutineOfDirectLoop::stageOutFromLocalThreadVariablesToDeviceMemory (
        */
 
       SgExpression * deviceVarAccessSecond = buildAddOp (tidVarRef, buildAddOp (
-          buildMultiplyOp (mVarRef, nelemsVarRef),
-          buildMultiplyOp (offsetVarRef, buildIntVal (
-              parallelLoop.get_OP_DAT_Dimension (i)))));
+          buildMultiplyOp (mVarRef, nelemsVarRef), buildMultiplyOp (
+              offsetVarRef,
+              buildIntVal (parallelLoop->get_OP_DAT_Dimension (i)))));
 
       SgExpression * autosharedAccessSecond = buildAddOp (displVarRef,
           buildAddOp (tidVarRef, buildMultiplyOp (mVarRef, nelemsVarRef)));
@@ -397,8 +394,7 @@ KernelSubroutineOfDirectLoop::stageOutFromLocalThreadVariablesToDeviceMemory (
 }
 
 SgBasicBlock *
-KernelSubroutineOfDirectLoop::buildMainLoopStatements (
-    UserDeviceSubroutine & userDeviceSubroutine, ParallelLoop & parallelLoop)
+KernelSubroutineOfDirectLoop::buildMainLoopStatements ()
 {
   using SageBuilder::buildBasicBlock;
   using SageBuilder::buildVarRefExp;
@@ -460,13 +456,12 @@ KernelSubroutineOfDirectLoop::buildMainLoopStatements (
               minFunctionCall);
 
   SgBasicBlock * preAssignments =
-      stageInFromDeviceMemoryToLocalThreadVariables (parallelLoop);
+      stageInFromDeviceMemoryToLocalThreadVariables ();
 
-  SgStatement * userFunctionCall = createUserSubroutineCall (
-      userDeviceSubroutine, parallelLoop);
+  SgStatement * userFunctionCall = createUserSubroutineCall ();
 
   SgBasicBlock * postAssignments =
-      stageOutFromLocalThreadVariablesToDeviceMemory (parallelLoop);
+      stageOutFromLocalThreadVariablesToDeviceMemory ();
 
   SgBasicBlock * mainLoopStmt = buildBasicBlock (buildExprStatement (
       initOffsetVariable), buildExprStatement (assignNelems), preAssignments,
@@ -476,8 +471,7 @@ KernelSubroutineOfDirectLoop::buildMainLoopStatements (
 }
 
 void
-KernelSubroutineOfDirectLoop::createStatements (
-    UserDeviceSubroutine & userDeviceSubroutine, ParallelLoop & parallelLoop)
+KernelSubroutineOfDirectLoop::createStatements ()
 {
   using boost::lexical_cast;
   using SageBuilder::buildOpaqueVarRefExp;
@@ -578,7 +572,7 @@ KernelSubroutineOfDirectLoop::createStatements (
 
   SgExpression * divisionExprForArgSDispl;
 
-  if (parallelLoop.getSizeOf_OP_DAT () == 8)
+  if (parallelLoop->getSizeOf_OP_DAT () == 8)
   {
     divisionExprForArgSDispl = buildDivideOp (
         argSDisplacementInitExprWithoutSize, buildIntVal (8));
@@ -604,7 +598,7 @@ KernelSubroutineOfDirectLoop::createStatements (
    * ======================================================
    */
 
-  initialiseLocalThreadVariables (parallelLoop);
+  initialiseLocalThreadVariables ();
 
   /*
    * ======================================================
@@ -661,8 +655,7 @@ KernelSubroutineOfDirectLoop::createStatements (
    * Build main loop statements
    * ======================================================
    */
-  SgBasicBlock * loopBody = buildMainLoopStatements (userDeviceSubroutine,
-      parallelLoop);
+  SgBasicBlock * loopBody = buildMainLoopStatements ();
 
   /*
    * ======================================================
@@ -682,11 +675,11 @@ KernelSubroutineOfDirectLoop::createStatements (
    * Add final support for reduction variables, if needed
    * ======================================================
    */
-  createAndAppendReductionSubroutineCall (parallelLoop);
+  createAndAppendReductionSubroutineCall ();
 }
 
 void
-KernelSubroutineOfDirectLoop::createLocalVariables (ParallelLoop & parallelLoop)
+KernelSubroutineOfDirectLoop::createLocalVariableDeclarations ()
 {
   using SageBuilder::buildVariableDeclaration;
   using SageInterface::appendStatement;
@@ -720,11 +713,14 @@ KernelSubroutineOfDirectLoop::createLocalVariables (ParallelLoop & parallelLoop)
         = FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
             *it, FortranTypesBuilder::getFourByteInteger (), subroutineScope);
   }
+
+  createLocalThreadVariables ();
+
+  createAutosharedVariable ();
 }
 
 void
-KernelSubroutineOfDirectLoop::create_OP_DAT_FormalParameters (
-    ParallelLoop & parallelLoop)
+KernelSubroutineOfDirectLoop::create_OP_DAT_FormalParameters ()
 {
   using boost::lexical_cast;
   using SageBuilder::buildVariableDeclaration;
@@ -742,9 +738,9 @@ KernelSubroutineOfDirectLoop::create_OP_DAT_FormalParameters (
   Debug::getInstance ()->debugMessage ("Creating OP_DAT formal parameters", 2);
 
   for (unsigned int i = 1; i
-      <= parallelLoop.getNumberOf_OP_DAT_ArgumentGroups (); ++i)
+      <= parallelLoop->getNumberOf_OP_DAT_ArgumentGroups (); ++i)
   {
-    if (parallelLoop.isDuplicate_OP_DAT (i) == false)
+    if (parallelLoop->isDuplicate_OP_DAT (i) == false)
     {
       /*
        * ======================================================
@@ -753,7 +749,7 @@ KernelSubroutineOfDirectLoop::create_OP_DAT_FormalParameters (
        * ======================================================
        */
 
-      SgType * opDatBaseType = parallelLoop.get_OP_DAT_Type (i);
+      SgType * opDatBaseType = parallelLoop->get_OP_DAT_Type (i);
 
       SgArrayType * isArrayType = isSgArrayType (opDatBaseType);
 
@@ -821,13 +817,11 @@ KernelSubroutineOfDirectLoop::create_OP_DAT_FormalParameters (
 }
 
 void
-KernelSubroutineOfDirectLoop::createAndAppendFormalParameters (
-    DataSizesDeclarationOfDirectLoop & dataSizesDeclarationOfDirectLoop,
-    ParallelLoop & parallelLoop)
+KernelSubroutineOfDirectLoop::createFormalParameterDeclarations ()
 {
   createArgsSizesFormalParameter (dataSizesDeclarationOfDirectLoop);
 
-  create_OP_DAT_FormalParameters (parallelLoop);
+  create_OP_DAT_FormalParameters ();
 
   /*
    * ======================================================
@@ -868,7 +862,7 @@ KernelSubroutineOfDirectLoop::createAndAppendFormalParameters (
           FortranTypesBuilder::getFourByteInteger (), subroutineScope,
           formalParameters, 1, VALUE);
 
-  if (parallelLoop.isReductionRequired () == true)
+  if (parallelLoop->isReductionRequired () == true)
   {
     createAndAppendSharedMemoryOffesetForReduction ();
   }
@@ -882,16 +876,18 @@ KernelSubroutineOfDirectLoop::createAndAppendFormalParameters (
 
 KernelSubroutineOfDirectLoop::KernelSubroutineOfDirectLoop (
     std::string const & subroutineName,
-    UserDeviceSubroutine & userDeviceSubroutine,
-    DataSizesDeclarationOfDirectLoop & dataSizesDeclarationOfDirectLoop,
-    ParallelLoop & parallelLoop, SgScopeStatement * moduleScope) :
-  KernelSubroutine (subroutineName)
+    UserDeviceSubroutine * userDeviceSubroutine,
+    DataSizesDeclarationOfDirectLoop * dataSizesDeclarationOfDirectLoop,
+    ParallelLoop * parallelLoop, SgScopeStatement * moduleScope) :
+  KernelSubroutine (subroutineName, userDeviceSubroutine, parallelLoop)
 {
   using SageBuilder::buildProcedureHeaderStatement;
   using SageBuilder::buildVoidType;
   using SageBuilder::buildFunctionParameterList;
   using SageInterface::appendStatement;
   using SageInterface::addTextForUnparser;
+
+  this->dataSizesDeclarationOfDirectLoop = dataSizesDeclarationOfDirectLoop;
 
   formalParameters = buildFunctionParameterList ();
 
@@ -906,14 +902,9 @@ KernelSubroutineOfDirectLoop::KernelSubroutineOfDirectLoop (
 
   subroutineScope = subroutineHeaderStatement->get_definition ()->get_body ();
 
-  createAndAppendFormalParameters (dataSizesDeclarationOfDirectLoop,
-      parallelLoop);
+  createFormalParameterDeclarations ();
 
-  createLocalVariables (parallelLoop);
+  createLocalVariableDeclarations ();
 
-  createLocalThreadVariables (parallelLoop);
-
-  createAutosharedVariable (parallelLoop);
-
-  createStatements (userDeviceSubroutine, parallelLoop);
+  createStatements ();
 }

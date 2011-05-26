@@ -27,9 +27,11 @@ DataSizesDeclaration::getFieldDeclaration (std::string fieldName)
 }
 
 DataSizesDeclaration::DataSizesDeclaration (std::string const & subroutineName,
-    SgScopeStatement * moduleScope)
+    ParallelLoop * parallelLoop, SgScopeStatement * moduleScope)
 {
   using SageInterface::appendStatement;
+
+  this->parallelLoop = parallelLoop;
 
   this->moduleScope = moduleScope;
 

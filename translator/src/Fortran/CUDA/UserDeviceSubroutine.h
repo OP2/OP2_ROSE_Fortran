@@ -9,12 +9,20 @@ class UserDeviceSubroutine: public Subroutine
 {
   private:
 
+    InitialiseConstantsSubroutine * initialiseConstantsSubroutine;
+
+    Declarations * declarations;
+
+    ParallelLoop * parallelLoop;
+
+    SgScopeStatement * moduleScope;
+
     /*
      * ======================================================
      * The name of the user subroutine on the host
      * ======================================================
      */
-    std::string userHostSubroutineName;
+    std::string hostSubroutineName;
 
   private:
 
@@ -26,16 +34,18 @@ class UserDeviceSubroutine: public Subroutine
      * ======================================================
      */
     void
-    copyAndModifySubroutine (SgScopeStatement * moduleScope,
-        InitialiseConstantsSubroutine * initialiseConstantsSubroutine,
-        Declarations & declarations, ParallelLoop & parallelLoop);
+    copyAndModifySubroutine ();
+
+    void
+    createFormalParameterDeclarations ();
+
+    void
+    createLocalVariableDeclarations ();
+
+    void
+    createStatements ();
 
   public:
-
-    UserDeviceSubroutine (std::string const & subroutineName,
-        SgScopeStatement * moduleScope,
-        InitialiseConstantsSubroutine * initialiseConstantsSubroutine,
-        Declarations & declarations, ParallelLoop & parallelLoop);
 
     /*
      * ======================================================
@@ -43,10 +53,12 @@ class UserDeviceSubroutine: public Subroutine
      * ======================================================
      */
     std::string const &
-    getUserHostSubroutineName ()
-    {
-      return userHostSubroutineName;
-    }
+    getHostSubroutineName ();
+
+    UserDeviceSubroutine (std::string const & subroutineName,
+        InitialiseConstantsSubroutine * initialiseConstantsSubroutine,
+        Declarations * declarations, ParallelLoop * parallelLoop,
+        SgScopeStatement * moduleScope);
 };
 
 #endif

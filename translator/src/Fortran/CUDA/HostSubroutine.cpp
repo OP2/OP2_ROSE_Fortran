@@ -11,105 +11,95 @@
  * ======================================================
  */
 
-     std::string
-    HostSubroutine::getUserSubroutineFormalParameterName ()
-    {
-      return "subroutineName";
-    }
-
-
-     std::string
-    HostSubroutine::get_OP_SET_FormalParameterName ()
-    {
-      return "set";
-    }
-
-
-     std::string
-    HostSubroutine::get_OP_INDIRECTION_FormalParameterName (unsigned int OP_DAT_ArgumentGroup)
-    {
-      using boost::lexical_cast;
-      using std::string;
-
-      return IndirectAndDirectLoop::Fortran::VariablePrefixes::OP_INDIRECTION
-          + lexical_cast <string> (OP_DAT_ArgumentGroup);
-    }
-
-
-     std::string
-    HostSubroutine::get_OP_MAP_FormalParameterName (unsigned int OP_DAT_ArgumentGroup)
-    {
-      using boost::lexical_cast;
-      using std::string;
-
-      return IndirectAndDirectLoop::Fortran::VariablePrefixes::OP_MAP
-          + lexical_cast <string> (OP_DAT_ArgumentGroup);
-    }
-
-
-     std::string
-    HostSubroutine::get_OP_ACCESS_FormalParameterName (unsigned int OP_DAT_ArgumentGroup)
-    {
-      using boost::lexical_cast;
-      using std::string;
-
-      return IndirectAndDirectLoop::Fortran::VariablePrefixes::OP_ACCESS
-          + lexical_cast <string> (OP_DAT_ArgumentGroup);
-    }
+std::string
+HostSubroutine::getUserSubroutineFormalParameterName ()
+{
+  return "subroutineName";
+}
 
 std::string
-    HostSubroutine::get_OP_DAT_FormalParameterName (unsigned int OP_DAT_ArgumentGroup)
-    {
-      using boost::lexical_cast;
-      using std::string;
+HostSubroutine::get_OP_SET_FormalParameterName ()
+{
+  return "set";
+}
 
-      return IndirectAndDirectLoop::Fortran::VariablePrefixes::OP_DAT
-          + lexical_cast <string> (OP_DAT_ArgumentGroup);
-    }
+std::string
+HostSubroutine::get_OP_INDIRECTION_FormalParameterName (
+    unsigned int OP_DAT_ArgumentGroup)
+{
+  using boost::lexical_cast;
+  using std::string;
 
+  return IndirectAndDirectLoop::Fortran::VariablePrefixes::OP_INDIRECTION
+      + lexical_cast <string> (OP_DAT_ArgumentGroup);
+}
 
-     std::string
-    HostSubroutine::get_OP_DAT_SizeVariableName (unsigned int OP_DAT_ArgumentGroup)
-    {
-      using boost::lexical_cast;
-      using std::string;
+std::string
+HostSubroutine::get_OP_MAP_FormalParameterName (
+    unsigned int OP_DAT_ArgumentGroup)
+{
+  using boost::lexical_cast;
+  using std::string;
 
-      return IndirectAndDirectLoop::Fortran::VariablePrefixes::OP_DAT
-          + lexical_cast <string> (OP_DAT_ArgumentGroup)
-          + IndirectAndDirectLoop::Fortran::VariableSuffixes::Size;
-    }
+  return IndirectAndDirectLoop::Fortran::VariablePrefixes::OP_MAP
+      + lexical_cast <string> (OP_DAT_ArgumentGroup);
+}
 
+std::string
+HostSubroutine::get_OP_ACCESS_FormalParameterName (
+    unsigned int OP_DAT_ArgumentGroup)
+{
+  using boost::lexical_cast;
+  using std::string;
 
-     std::string
-    HostSubroutine::get_OP_DAT_DeviceVariableName (unsigned int OP_DAT_ArgumentGroup)
-    {
-      using boost::lexical_cast;
-      using std::string;
+  return IndirectAndDirectLoop::Fortran::VariablePrefixes::OP_ACCESS
+      + lexical_cast <string> (OP_DAT_ArgumentGroup);
+}
 
-      return IndirectAndDirectLoop::Fortran::VariablePrefixes::OP_DAT
-          + lexical_cast <string> (OP_DAT_ArgumentGroup) + "Device";
-    }
+std::string
+HostSubroutine::get_OP_DAT_FormalParameterName (
+    unsigned int OP_DAT_ArgumentGroup)
+{
+  using boost::lexical_cast;
+  using std::string;
 
+  return IndirectAndDirectLoop::Fortran::VariablePrefixes::OP_DAT
+      + lexical_cast <string> (OP_DAT_ArgumentGroup);
+}
 
-     std::string
-    HostSubroutine::getCToFortranVariableName (unsigned int OP_DAT_ArgumentGroup)
-    {
-      using boost::lexical_cast;
-      using std::string;
+std::string
+HostSubroutine::get_OP_DAT_SizeVariableName (unsigned int OP_DAT_ArgumentGroup)
+{
+  using boost::lexical_cast;
+  using std::string;
 
-      return "cFortranPointer" + lexical_cast <string> (OP_DAT_ArgumentGroup);
-    }
+  return IndirectAndDirectLoop::Fortran::VariablePrefixes::OP_DAT
+      + lexical_cast <string> (OP_DAT_ArgumentGroup)
+      + IndirectAndDirectLoop::Fortran::VariableSuffixes::Size;
+}
 
+std::string
+HostSubroutine::get_OP_DAT_DeviceVariableName (
+    unsigned int OP_DAT_ArgumentGroup)
+{
+  using boost::lexical_cast;
+  using std::string;
 
+  return IndirectAndDirectLoop::Fortran::VariablePrefixes::OP_DAT
+      + lexical_cast <string> (OP_DAT_ArgumentGroup) + "Device";
+}
 
+std::string
+HostSubroutine::getCToFortranVariableName (unsigned int OP_DAT_ArgumentGroup)
+{
+  using boost::lexical_cast;
+  using std::string;
 
-
-
-
+  return "cFortranPointer" + lexical_cast <string> (OP_DAT_ArgumentGroup);
+}
 
 void
-HostSubroutine::copyDataBackFromDeviceAndDeallocate (
-    ParallelLoop & parallelLoop)
+HostSubroutine::copyDataBackFromDeviceAndDeallocate ()
 {
   using SageBuilder::buildExprListExp;
   using SageBuilder::buildVarRefExp;
@@ -130,10 +120,10 @@ HostSubroutine::copyDataBackFromDeviceAndDeallocate (
    */
 
   for (unsigned int i = 1; i
-      <= parallelLoop.getNumberOf_OP_DAT_ArgumentGroups (); ++i)
+      <= parallelLoop->getNumberOf_OP_DAT_ArgumentGroups (); ++i)
   {
-    if (parallelLoop.isDuplicate_OP_DAT (i) == false
-        && parallelLoop.isReductionRequired (i) == false)
+    if (parallelLoop->isDuplicate_OP_DAT (i) == false
+        && parallelLoop->isReductionRequired (i) == false)
     {
       SgVarRefExp * opDatDeviceReference = buildVarRefExp (
           localVariableDeclarations[get_OP_DAT_DeviceVariableName (i)]);
@@ -152,10 +142,10 @@ HostSubroutine::copyDataBackFromDeviceAndDeallocate (
   }
 
   for (unsigned int i = 1; i
-      <= parallelLoop.getNumberOf_OP_DAT_ArgumentGroups (); ++i)
+      <= parallelLoop->getNumberOf_OP_DAT_ArgumentGroups (); ++i)
   {
-    if (parallelLoop.isDuplicate_OP_DAT (i) == false
-        && parallelLoop.isReductionRequired (i) == false)
+    if (parallelLoop->isDuplicate_OP_DAT (i) == false
+        && parallelLoop->isReductionRequired (i) == false)
     {
       SgVarRefExp * opDatDeviceReference = buildVarRefExp (
           localVariableDeclarations[get_OP_DAT_DeviceVariableName (i)]);
@@ -170,8 +160,7 @@ HostSubroutine::copyDataBackFromDeviceAndDeallocate (
 }
 
 void
-HostSubroutine::initialiseDataMarshallingLocalVariables (
-    ParallelLoop & parallelLoop)
+HostSubroutine::initialiseDataMarshallingLocalVariables ()
 {
   using SageBuilder::buildVoidType;
   using SageBuilder::buildIntType;
@@ -194,9 +183,9 @@ HostSubroutine::initialiseDataMarshallingLocalVariables (
   map <string, OP_DAT_Declaration *>::const_iterator OP_DAT_iterator;
 
   for (unsigned int i = 1; i
-      <= parallelLoop.getNumberOf_OP_DAT_ArgumentGroups (); ++i)
+      <= parallelLoop->getNumberOf_OP_DAT_ArgumentGroups (); ++i)
   {
-    if (parallelLoop.isDuplicate_OP_DAT (i) == false)
+    if (parallelLoop->isDuplicate_OP_DAT (i) == false)
     {
       SgVarRefExp * opDatFormalArgumentReference = buildVarRefExp (
           formalParameterDeclarations[get_OP_DAT_FormalParameterName (i)]);
@@ -227,9 +216,9 @@ HostSubroutine::initialiseDataMarshallingLocalVariables (
   }
 
   for (unsigned int i = 1; i
-      <= parallelLoop.getNumberOf_OP_DAT_ArgumentGroups (); ++i)
+      <= parallelLoop->getNumberOf_OP_DAT_ArgumentGroups (); ++i)
   {
-    if (parallelLoop.isDuplicate_OP_DAT (i) == false)
+    if (parallelLoop->isDuplicate_OP_DAT (i) == false)
     {
       SgVarRefExp * opDatFormalArgumentReference = buildVarRefExp (
           formalParameterDeclarations[get_OP_DAT_FormalParameterName (i)]);
@@ -260,10 +249,10 @@ HostSubroutine::initialiseDataMarshallingLocalVariables (
    */
 
   for (unsigned int i = 1; i
-      <= parallelLoop.getNumberOf_OP_DAT_ArgumentGroups (); ++i)
+      <= parallelLoop->getNumberOf_OP_DAT_ArgumentGroups (); ++i)
   {
-    if (parallelLoop.isDuplicate_OP_DAT (i) == false
-        && parallelLoop.isReductionRequired (i) == false)
+    if (parallelLoop->isDuplicate_OP_DAT (i) == false
+        && parallelLoop->isReductionRequired (i) == false)
     {
       SgVarRefExp * opDatSizeReference = buildVarRefExp (
           localVariableDeclarations[get_OP_DAT_SizeVariableName (i)]);
@@ -283,10 +272,10 @@ HostSubroutine::initialiseDataMarshallingLocalVariables (
   }
 
   for (unsigned int i = 1; i
-      <= parallelLoop.getNumberOf_OP_DAT_ArgumentGroups (); ++i)
+      <= parallelLoop->getNumberOf_OP_DAT_ArgumentGroups (); ++i)
   {
-    if (parallelLoop.isDuplicate_OP_DAT (i) == false
-        && parallelLoop.isReductionRequired (i) == false)
+    if (parallelLoop->isDuplicate_OP_DAT (i) == false
+        && parallelLoop->isReductionRequired (i) == false)
     {
       SgVarRefExp * opDatDeviceReference = buildVarRefExp (
           localVariableDeclarations[get_OP_DAT_DeviceVariableName (i)]);
@@ -306,8 +295,7 @@ HostSubroutine::initialiseDataMarshallingLocalVariables (
 }
 
 void
-HostSubroutine::createDataMarshallingLocalVariables (
-    ParallelLoop & parallelLoop)
+HostSubroutine::createDataMarshallingLocalVariables ()
 {
   using boost::lexical_cast;
   using SageBuilder::buildVariableDeclaration;
@@ -321,9 +309,9 @@ HostSubroutine::createDataMarshallingLocalVariables (
       2);
 
   for (unsigned int i = 1; i
-      <= parallelLoop.getNumberOf_OP_DAT_ArgumentGroups (); ++i)
+      <= parallelLoop->getNumberOf_OP_DAT_ArgumentGroups (); ++i)
   {
-    if (parallelLoop.isDuplicate_OP_DAT (i) == false)
+    if (parallelLoop->isDuplicate_OP_DAT (i) == false)
     {
       string const & variableName = get_OP_DAT_SizeVariableName (i);
 
@@ -335,13 +323,13 @@ HostSubroutine::createDataMarshallingLocalVariables (
   }
 
   for (unsigned int i = 1; i
-      <= parallelLoop.getNumberOf_OP_DAT_ArgumentGroups (); ++i)
+      <= parallelLoop->getNumberOf_OP_DAT_ArgumentGroups (); ++i)
   {
-    if (parallelLoop.isDuplicate_OP_DAT (i) == false)
+    if (parallelLoop->isDuplicate_OP_DAT (i) == false)
     {
       string const & variableName = getCToFortranVariableName (i);
 
-      SgArrayType * isArrayType = isSgArrayType (parallelLoop.get_OP_DAT_Type (
+      SgArrayType * isArrayType = isSgArrayType (parallelLoop->get_OP_DAT_Type (
           i));
 
       localVariableDeclarations[variableName]
@@ -357,14 +345,14 @@ HostSubroutine::createDataMarshallingLocalVariables (
    * ======================================================
    */
   for (unsigned int i = 1; i
-      <= parallelLoop.getNumberOf_OP_DAT_ArgumentGroups (); ++i)
+      <= parallelLoop->getNumberOf_OP_DAT_ArgumentGroups (); ++i)
   {
-    if (parallelLoop.isDuplicate_OP_DAT (i) == false
-        && parallelLoop.isReductionRequired (i) == false)
+    if (parallelLoop->isDuplicate_OP_DAT (i) == false
+        && parallelLoop->isReductionRequired (i) == false)
     {
       string const & variableName = get_OP_DAT_DeviceVariableName (i);
 
-      SgArrayType * isArrayType = isSgArrayType (parallelLoop.get_OP_DAT_Type (
+      SgArrayType * isArrayType = isSgArrayType (parallelLoop->get_OP_DAT_Type (
           i));
 
       localVariableDeclarations[variableName]
@@ -400,8 +388,7 @@ HostSubroutine::createCUDAKernelVariables ()
 }
 
 void
-HostSubroutine::createFormalParameters (
-    UserDeviceSubroutine & userDeviceSubroutine, ParallelLoop & parallelLoop)
+HostSubroutine::createFormalParameters ()
 {
   using boost::iequals;
   using boost::lexical_cast;
@@ -423,8 +410,8 @@ HostSubroutine::createFormalParameters (
   int OP_DAT_ArgumentGroup = 0;
 
   for (vector <SgExpression *>::const_iterator it =
-      parallelLoop.getActualArguments ().begin (); it
-      != parallelLoop.getActualArguments ().end (); ++it)
+      parallelLoop->getActualArguments ().begin (); it
+      != parallelLoop->getActualArguments ().end (); ++it)
   {
     Debug::getInstance ()->debugMessage ("Argument type: "
         + (*it)->class_name (), 8);
@@ -443,7 +430,7 @@ HostSubroutine::createFormalParameters (
         formalParameterDeclarations[variableName]
             = FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
                 variableName, FortranTypesBuilder::getString (
-                    userDeviceSubroutine.getSubroutineName ().length ()),
+                    userDeviceSubroutine->getSubroutineName ().length ()),
                 subroutineScope, formalParameters, 1, INTENT_IN);
 
         break;
@@ -601,8 +588,7 @@ HostSubroutine::createCallToC_F_POINTER (SgExpression * parameter1,
 }
 
 SgStatement *
-HostSubroutine::buildThreadSynchroniseFunctionCall (
-    SgScopeStatement * subroutineScope)
+HostSubroutine::buildThreadSynchroniseFunctionCall ()
 {
   using SageBuilder::buildVarRefExp;
   using SageBuilder::buildExprListExp;
@@ -629,7 +615,7 @@ HostSubroutine::buildThreadSynchroniseFunctionCall (
 }
 
 void
-HostSubroutine::createReductionVariables (ParallelLoop & parallelLoop)
+HostSubroutine::createReductionVariables ()
 {
   using SageBuilder::buildIntVal;
   using SageBuilder::buildIntType;
@@ -637,12 +623,12 @@ HostSubroutine::createReductionVariables (ParallelLoop & parallelLoop)
   using SageBuilder::buildVariableDeclaration;
   using SageInterface::appendStatement;
 
-  if (parallelLoop.isReductionRequired () == true)
+  if (parallelLoop->isReductionRequired () == true)
   {
     for (unsigned int i = 1; i
-        <= parallelLoop.getNumberOf_OP_DAT_ArgumentGroups (); ++i)
+        <= parallelLoop->getNumberOf_OP_DAT_ArgumentGroups (); ++i)
     {
-      if (parallelLoop.isReductionRequired (i) == true)
+      if (parallelLoop->isReductionRequired (i) == true)
       {
         localVariableDeclarations[IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::sharedMemoryStartOffset]
             = buildVariableDeclaration (
@@ -699,7 +685,7 @@ HostSubroutine::createReductionVariables (ParallelLoop & parallelLoop)
         localVariableDeclarations[IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::reductionArrayHost]
             = buildVariableDeclaration (
                 IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::reductionArrayHost,
-                parallelLoop.get_OP_DAT_Type (i), NULL, subroutineScope);
+                parallelLoop->get_OP_DAT_Type (i), NULL, subroutineScope);
 
         localVariableDeclarations[IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::reductionArrayHost]-> get_declarationModifier ().get_accessModifier ().setUndefined ();
         localVariableDeclarations[IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::reductionArrayHost]-> get_declarationModifier ().get_typeModifier ().setAllocatable ();
@@ -711,7 +697,7 @@ HostSubroutine::createReductionVariables (ParallelLoop & parallelLoop)
         localVariableDeclarations[IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::reductionArrayDevice]
             = buildVariableDeclaration (
                 IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::reductionArrayDevice,
-                parallelLoop.get_OP_DAT_Type (i), NULL, subroutineScope);
+                parallelLoop->get_OP_DAT_Type (i), NULL, subroutineScope);
 
         localVariableDeclarations[IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::reductionArrayDevice]-> get_declarationModifier ().get_accessModifier ().setUndefined ();
         localVariableDeclarations[IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::reductionArrayDevice]-> get_declarationModifier ().get_typeModifier ().setAllocatable ();
@@ -736,15 +722,11 @@ HostSubroutine::createAndAppendThreadSynchCall ()
    * ======================================================
    */
 
-  SgStatement * threadSynchCallStmt = buildThreadSynchroniseFunctionCall (
-      subroutineScope);
-
-  appendStatement (threadSynchCallStmt, subroutineScope);
+  appendStatement (buildThreadSynchroniseFunctionCall (), subroutineScope);
 }
 
 void
-HostSubroutine::createSupportForReductionVariablesBeforeKernel (
-    ParallelLoop & parallelLoop)
+HostSubroutine::createSupportForReductionVariablesBeforeKernel ()
 {
   using SageBuilder::buildVarRefExp;
   using SageBuilder::buildAssignOp;
@@ -766,7 +748,7 @@ HostSubroutine::createSupportForReductionVariablesBeforeKernel (
    * ======================================================
    */
 
-  if (parallelLoop.isReductionRequired () == false)
+  if (parallelLoop->isReductionRequired () == false)
     return;
 
   /*
@@ -781,11 +763,11 @@ HostSubroutine::createSupportForReductionVariablesBeforeKernel (
   int dim = -1;
 
   for (unsigned int i = 1; i
-      <= parallelLoop.getNumberOf_OP_DAT_ArgumentGroups (); ++i)
+      <= parallelLoop->getNumberOf_OP_DAT_ArgumentGroups (); ++i)
   {
-    if (parallelLoop.isReductionRequired (i) == true)
+    if (parallelLoop->isReductionRequired (i) == true)
     {
-      int currentDim = parallelLoop.get_OP_DAT_Dimension (i);
+      int currentDim = parallelLoop->get_OP_DAT_Dimension (i);
 
       if (currentDim > dim)
       {
@@ -794,7 +776,7 @@ HostSubroutine::createSupportForReductionVariablesBeforeKernel (
 
       SgExpression * fortranKind =
           FortranStatementsAndExpressionsBuilder::getFortranKindOf_OP_DAT (
-              parallelLoop.get_OP_DAT_Type (i));
+              parallelLoop->get_OP_DAT_Type (i));
 
       SgIntVal * kindVal = isSgIntVal (fortranKind);
 
@@ -922,8 +904,7 @@ HostSubroutine::createSupportForReductionVariablesBeforeKernel (
 }
 
 void
-HostSubroutine::createSupportForReductionVariablesAfterKernel (
-    ParallelLoop & parallelLoop)
+HostSubroutine::createSupportForReductionVariablesAfterKernel ()
 {
   using SageBuilder::buildAssignOp;
   using SageBuilder::buildExprStatement;
@@ -942,7 +923,7 @@ HostSubroutine::createSupportForReductionVariablesAfterKernel (
    * ======================================================
    */
 
-  if (parallelLoop.isReductionRequired () == false)
+  if (parallelLoop->isReductionRequired () == false)
     return;
 
   SgExpression
@@ -978,11 +959,11 @@ HostSubroutine::createSupportForReductionVariablesAfterKernel (
   int positionInOPDatsArray = -1;
 
   for (unsigned int i = 1; i
-      <= parallelLoop.getNumberOf_OP_DAT_ArgumentGroups (); ++i)
+      <= parallelLoop->getNumberOf_OP_DAT_ArgumentGroups (); ++i)
   {
-    if (parallelLoop.isReductionRequired (i) == true)
+    if (parallelLoop->isReductionRequired (i) == true)
     {
-      dim = parallelLoop.get_OP_DAT_Dimension (i);
+      dim = parallelLoop->get_OP_DAT_Dimension (i);
       positionInOPDatsArray = i;
     }
   }
@@ -1033,8 +1014,7 @@ HostSubroutine::createSupportForReductionVariablesAfterKernel (
 }
 
 void
-HostSubroutine::createAndAppendIterationVariablesForReduction (
-    ParallelLoop & parallelLoop)
+HostSubroutine::createAndAppendIterationVariablesForReduction ()
 {
   using SageBuilder::buildIntVal;
   using SageBuilder::buildIntType;
@@ -1043,7 +1023,7 @@ HostSubroutine::createAndAppendIterationVariablesForReduction (
   using SageInterface::appendStatement;
   using std::string;
 
-  if (parallelLoop.isReductionRequired () == true)
+  if (parallelLoop->isReductionRequired () == true)
   {
     localVariableDeclarations[IndirectAndDirectLoop::Fortran::HostSubroutine::reductionIterationCounter1]
         = buildVariableDeclaration (
@@ -1072,6 +1052,8 @@ HostSubroutine::createAndAppendIterationVariablesForReduction (
 }
 
 HostSubroutine::HostSubroutine (std::string const & subroutineName,
+    UserDeviceSubroutine * userDeviceSubroutine,
+    KernelSubroutine * kernelSubroutine, ParallelLoop * parallelLoop,
     SgScopeStatement * moduleScope) :
   Subroutine (subroutineName + SubroutineNameSuffixes::hostSuffix)
 {
@@ -1080,6 +1062,10 @@ HostSubroutine::HostSubroutine (std::string const & subroutineName,
   using SageBuilder::buildProcedureHeaderStatement;
   using SageInterface::appendStatement;
   using SageInterface::addTextForUnparser;
+
+  this->userDeviceSubroutine = userDeviceSubroutine;
+  this->kernelSubroutine = kernelSubroutine;
+  this->parallelLoop = parallelLoop;
 
   formalParameters = buildFunctionParameterList ();
 

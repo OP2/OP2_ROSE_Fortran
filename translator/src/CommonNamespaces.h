@@ -3,13 +3,13 @@
  *  
  * Various public namespaces used in the compiler to declare and reference
  * variable names. Each namespace is generally split between Fortran-specific
- * and C++-specific names.
+ * and C++-specific names
  */
 
 #ifndef COMMON_NAMESPACES_H
 #define COMMON_NAMESPACES_H
 
-#include <boost/lexical_cast.hpp>
+#include <string>
 
 namespace OP2
 {
@@ -170,8 +170,10 @@ namespace IndirectLoop
   {
     namespace VariablePrefixes
     {
+      std::string const numberOfBytes = "nBytes";
       std::string const pindMaps = "pindMaps";
       std::string const pMaps = "pMaps";
+      std::string const roundUp = "roundUp";
     }
 
     namespace ConstantSuffixes

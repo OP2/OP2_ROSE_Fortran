@@ -9,7 +9,6 @@
 #define SUBROUTINES_H
 
 #include <rose.h>
-#include <Declarations.h>
 
 class Subroutine
 {
@@ -63,7 +62,36 @@ class Subroutine
     std::map <std::string, SgVariableDeclaration *> localVariableDeclarations;
 
   protected:
+    /*
+     * ======================================================
+     * Every created subroutine has a number of statements
+     * ======================================================
+     */
+    virtual void
+    createStatements () = 0;
 
+    /*
+     * ======================================================
+     * Every created subroutine has local variable declarations
+     * ======================================================
+     */
+    virtual void
+    createLocalVariableDeclarations () = 0;
+
+    /*
+     * ======================================================
+     * Every created subroutine has formal parameters
+     * ======================================================
+     */
+    virtual void
+    createFormalParameterDeclarations () = 0;
+
+    /*
+     * ======================================================
+     * Subroutine constructor with name of the subroutine to
+     * create
+     * ======================================================
+     */
     Subroutine (std::string const & subroutineName);
 
   public:

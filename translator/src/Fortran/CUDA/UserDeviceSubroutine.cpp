@@ -12,9 +12,7 @@
  */
 
 void
-UserDeviceSubroutine::copyAndModifySubroutine (SgScopeStatement * moduleScope,
-    InitialiseConstantsSubroutine * initialiseConstantsSubroutine,
-    Declarations & declarations, ParallelLoop & parallelLoop)
+UserDeviceSubroutine::copyAndModifySubroutine ()
 {
   using boost::iequals;
   using SageBuilder::buildProcedureHeaderStatement;
@@ -44,12 +42,12 @@ UserDeviceSubroutine::copyAndModifySubroutine (SgScopeStatement * moduleScope,
    */
 
   for (vector <SgProcedureHeaderStatement *>::const_iterator it =
-      declarations.first_SubroutineInSourceCode (); it
-      != declarations.last_SubroutineInSourceCode (); ++it)
+      declarations->first_SubroutineInSourceCode (); it
+      != declarations->last_SubroutineInSourceCode (); ++it)
   {
     SgProcedureHeaderStatement * subroutine = *it;
 
-    if (iequals (userHostSubroutineName, subroutine->get_name ().getString ()))
+    if (iequals (hostSubroutineName, subroutine->get_name ().getString ()))
     {
       /*
        * ======================================================
@@ -150,8 +148,8 @@ UserDeviceSubroutine::copyAndModifySubroutine (SgScopeStatement * moduleScope,
            * ======================================================
            */
 
-          if (parallelLoop.get_OP_MAP_Value (parLoopArgCounter) == INDIRECT
-              && parallelLoop.get_OP_Access_Value (parLoopArgCounter)
+          if (parallelLoop->get_OP_MAP_Value (parLoopArgCounter) == INDIRECT
+              && parallelLoop->get_OP_Access_Value (parLoopArgCounter)
                   == READ_ACCESS)
           {
             SgVariableDeclaration
@@ -273,20 +271,51 @@ UserDeviceSubroutine::copyAndModifySubroutine (SgScopeStatement * moduleScope,
       preorder);
 }
 
+void
+UserDeviceSubroutine::createFormalParameterDeclarations ()
+{
+
+}
+
+void
+UserDeviceSubroutine::createLocalVariableDeclarations ()
+{
+
+}
+
+void
+UserDeviceSubroutine::createStatements ()
+{
+
+}
+
 /*
  * ======================================================
  * Public functions
  * ======================================================
  */
 
+std::string const &
+UserDeviceSubroutine::getHostSubroutineName ()
+{
+  return hostSubroutineName;
+}
+
 UserDeviceSubroutine::UserDeviceSubroutine (std::string const & subroutineName,
-    SgScopeStatement * moduleScope,
     InitialiseConstantsSubroutine * initialiseConstantsSubroutine,
-    Declarations & declarations, ParallelLoop & parallelLoop) :
+    Declarations * declarations, ParallelLoop * parallelLoop,
+    SgScopeStatement * moduleScope) :
   Subroutine (subroutineName + SubroutineNameSuffixes::deviceSuffix)
 {
-  userHostSubroutineName = subroutineName;
+  hostSubroutineName = subroutineName;
 
-  copyAndModifySubroutine (moduleScope, initialiseConstantsSubroutine,
-      declarations, parallelLoop);
+  this->initialiseConstantsSubroutine = initialiseConstantsSubroutine;
+
+  this->declarations = declarations;
+
+  this->parallelLoop = parallelLoop;
+
+  this->moduleScope = moduleScope;
+
+  copyAndModifySubroutine ();
 }

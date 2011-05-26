@@ -8,15 +8,15 @@
  */
 
 void
-DataSizesDeclarationOfDirectLoop::addFields (ParallelLoop & parallelLoop)
+DataSizesDeclarationOfDirectLoop::addFields ()
 {
   using SageBuilder::buildVariableDeclaration;
   using std::string;
 
   for (unsigned int i = 1; i
-      <= parallelLoop.getNumberOf_OP_DAT_ArgumentGroups (); ++i)
+      <= parallelLoop->getNumberOf_OP_DAT_ArgumentGroups (); ++i)
   {
-    if (parallelLoop.isDuplicate_OP_DAT (i) == false)
+    if (parallelLoop->isDuplicate_OP_DAT (i) == false)
     {
       string const & variableName = get_OP_DAT_SizeFieldName (i);
 
@@ -41,9 +41,9 @@ DataSizesDeclarationOfDirectLoop::addFields (ParallelLoop & parallelLoop)
  */
 
 DataSizesDeclarationOfDirectLoop::DataSizesDeclarationOfDirectLoop (
-    ParallelLoop & parallelLoop, std::string const & subroutineName,
+    std::string const & subroutineName, ParallelLoop * parallelLoop,
     SgScopeStatement * moduleScope) :
-  DataSizesDeclaration (subroutineName, moduleScope)
+  DataSizesDeclaration (subroutineName, parallelLoop, moduleScope)
 {
-  addFields (parallelLoop);
+  addFields ();
 }

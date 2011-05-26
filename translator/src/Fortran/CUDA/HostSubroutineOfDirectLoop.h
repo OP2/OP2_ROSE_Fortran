@@ -26,14 +26,17 @@ class HostSubroutineOfDirectLoop: public HostSubroutine
 {
   private:
 
+    DataSizesDeclarationOfDirectLoop * dataSizesDeclarationOfDirectLoop;
+
+  private:
+
     /*
      * ======================================================
      * Creates the kernel call
      * ======================================================
      */
     void
-    createKernelCall (KernelSubroutine & kernelSubroutine,
-        ParallelLoop & parallelLoop);
+    createKernelCall ();
 
     /*
      * ======================================================
@@ -42,7 +45,7 @@ class HostSubroutineOfDirectLoop: public HostSubroutine
      * ======================================================
      */
     void
-    createCUDAVariablesDirectLoops (ParallelLoop & parallelLoop);
+    createCUDAVariablesDirectLoops ();
 
     /*
      * ======================================================
@@ -51,8 +54,7 @@ class HostSubroutineOfDirectLoop: public HostSubroutine
      * ======================================================
      */
     void
-    createDeviceVariablesSizesVariable (
-        DataSizesDeclarationOfDirectLoop & dataSizesDeclarationOfDirectLoop);
+    createDeviceVariablesSizesVariable ();
 
     /*
      * ======================================================
@@ -61,7 +63,7 @@ class HostSubroutineOfDirectLoop: public HostSubroutine
      * ======================================================
      */
     void
-    initialiseDeviceVariablesSizesVariable (ParallelLoop & parallelLoop);
+    initialiseDeviceVariablesSizesVariable ();
 
     /*
      * ======================================================
@@ -69,15 +71,24 @@ class HostSubroutineOfDirectLoop: public HostSubroutine
      * ======================================================
      */
     void
-    initialiseAllCUDAVariables (ParallelLoop & parallelLoop);
+    initialiseAllCUDAVariables ();
+
+    virtual void
+    createStatements ();
+
+    virtual void
+    createLocalVariableDeclarations ();
+
+    virtual void
+    createFormalParameterDeclarations ();
 
   public:
 
     HostSubroutineOfDirectLoop (std::string const & subroutineName,
-        UserDeviceSubroutine & userDeviceSubroutine,
-        KernelSubroutine & kernelSubroutine,
-        DataSizesDeclarationOfDirectLoop & dataSizesDeclarationOfDirectLoop,
-        ParallelLoop & parallelLoop, SgScopeStatement * moduleScope);
+        UserDeviceSubroutine * userDeviceSubroutine,
+        KernelSubroutine * kernelSubroutine,
+        DataSizesDeclarationOfDirectLoop * dataSizesDeclarationOfDirectLoop,
+        ParallelLoop * parallelLoop, SgScopeStatement * moduleScope);
 };
 
 #endif

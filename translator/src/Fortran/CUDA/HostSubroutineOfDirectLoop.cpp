@@ -12,8 +12,7 @@
  */
 
 void
-HostSubroutineOfDirectLoop::createKernelCall (
-    KernelSubroutine & kernelSubroutine, ParallelLoop & parallelLoop)
+HostSubroutineOfDirectLoop::createKernelCall ()
 {
   using SageBuilder::buildDotExp;
   using SageBuilder::buildOpaqueVarRefExp;
@@ -44,9 +43,9 @@ HostSubroutineOfDirectLoop::createKernelCall (
    * ======================================================
    */
   for (unsigned int i = 1; i
-      <= parallelLoop.getNumberOf_OP_DAT_ArgumentGroups (); ++i)
+      <= parallelLoop->getNumberOf_OP_DAT_ArgumentGroups (); ++i)
   {
-    if (parallelLoop.isDuplicate_OP_DAT (i) == false)
+    if (parallelLoop->isDuplicate_OP_DAT (i) == false)
     {
 
       /*
@@ -54,7 +53,7 @@ HostSubroutineOfDirectLoop::createKernelCall (
        * check if it is a reduction variable
        * ======================================================
        */
-      if (parallelLoop.isReductionRequired (i) == false)
+      if (parallelLoop->isReductionRequired (i) == false)
       {
         SgVarRefExp * opDatDeviceReference = buildVarRefExp (
             localVariableDeclarations[get_OP_DAT_DeviceVariableName (i)]);
@@ -112,7 +111,7 @@ HostSubroutineOfDirectLoop::createKernelCall (
    * offset in shared memory for reductions (if needed)
    * ======================================================
    */
-  if (parallelLoop.isReductionRequired () == true)
+  if (parallelLoop->isReductionRequired () == true)
   {
     kernelParameters->append_expression (
         buildVarRefExp (
@@ -122,7 +121,7 @@ HostSubroutineOfDirectLoop::createKernelCall (
   SgExprStatement
       * kernelCall =
           buildFunctionCallStmt (
-              kernelSubroutine.getSubroutineName () + "<<<"
+              kernelSubroutine->getSubroutineName () + "<<<"
                   + ROSEHelper::getFirstVariableName (
                       localVariableDeclarations[CUDA::Fortran::VariableNames::blocksPerGrid])
                   + ", "
@@ -137,8 +136,7 @@ HostSubroutineOfDirectLoop::createKernelCall (
 }
 
 void
-HostSubroutineOfDirectLoop::createCUDAVariablesDirectLoops (
-    ParallelLoop & parallelLoop)
+HostSubroutineOfDirectLoop::createCUDAVariablesDirectLoops ()
 {
   using SageBuilder::buildVariableDeclaration;
   using SageBuilder::buildIntVal;
@@ -175,19 +173,17 @@ HostSubroutineOfDirectLoop::createCUDAVariablesDirectLoops (
 }
 
 void
-HostSubroutineOfDirectLoop::createDeviceVariablesSizesVariable (
-    DataSizesDeclarationOfDirectLoop & dataSizesDeclarationOfDirectLoop)
+HostSubroutineOfDirectLoop::createDeviceVariablesSizesVariable ()
 {
   localVariableDeclarations[IndirectAndDirectLoop::Fortran::VariableNames::argsSizes]
       = FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
           IndirectAndDirectLoop::Fortran::VariableNames::argsSizes,
-          dataSizesDeclarationOfDirectLoop.getType (), subroutineScope, 1,
+          dataSizesDeclarationOfDirectLoop->getType (), subroutineScope, 1,
           DEVICE);
 }
 
 void
-HostSubroutineOfDirectLoop::initialiseDeviceVariablesSizesVariable (
-    ParallelLoop & parallelLoop)
+HostSubroutineOfDirectLoop::initialiseDeviceVariablesSizesVariable ()
 {
   using std::string;
   using boost::lexical_cast;
@@ -206,9 +202,9 @@ HostSubroutineOfDirectLoop::initialiseDeviceVariablesSizesVariable (
    */
 
   for (unsigned int i = 1; i
-      <= parallelLoop.getNumberOf_OP_DAT_ArgumentGroups (); ++i)
+      <= parallelLoop->getNumberOf_OP_DAT_ArgumentGroups (); ++i)
   {
-    if (parallelLoop.isDuplicate_OP_DAT (i) == false)
+    if (parallelLoop->isDuplicate_OP_DAT (i) == false)
     {
 
       string const & variableName =
@@ -233,7 +229,7 @@ HostSubroutineOfDirectLoop::initialiseDeviceVariablesSizesVariable (
        * ======================================================
        */
 
-      if (parallelLoop.isReductionRequired (i) == false)
+      if (parallelLoop->isReductionRequired (i) == false)
       {
         varRefExpression = buildVarRefExp (
             localVariableDeclarations[get_OP_DAT_SizeVariableName (i)]);
@@ -254,9 +250,7 @@ HostSubroutineOfDirectLoop::initialiseDeviceVariablesSizesVariable (
 }
 
 void
-HostSubroutineOfDirectLoop::initialiseAllCUDAVariables (
-    ParallelLoop & parallelLoop)
-
+HostSubroutineOfDirectLoop::initialiseAllCUDAVariables ()
 {
   using SageBuilder::buildOpaqueVarRefExp;
   using SageBuilder::buildVarRefExp;
@@ -326,12 +320,12 @@ HostSubroutineOfDirectLoop::initialiseAllCUDAVariables (
    * ======================================================
    */
   for (unsigned int i = 1; i
-      <= parallelLoop.getNumberOf_OP_DAT_ArgumentGroups (); ++i)
+      <= parallelLoop->getNumberOf_OP_DAT_ArgumentGroups (); ++i)
   {
-    if (parallelLoop.isDuplicate_OP_DAT (i) == false)
+    if (parallelLoop->isDuplicate_OP_DAT (i) == false)
     {
-      int dim = parallelLoop.get_OP_DAT_Dimension (i);
-      if (dim > 1 && parallelLoop.get_OP_MAP_Value (i) != GLOBAL)
+      int dim = parallelLoop->get_OP_DAT_Dimension (i);
+      if (dim > 1 && parallelLoop->get_OP_MAP_Value (i) != GLOBAL)
       {
 
         /*
@@ -352,7 +346,7 @@ HostSubroutineOfDirectLoop::initialiseAllCUDAVariables (
          */
         SgExpression * opDatKindSize =
             FortranStatementsAndExpressionsBuilder::getFortranKindOf_OP_DAT (
-                parallelLoop.get_OP_DAT_Type (i));
+                parallelLoop->get_OP_DAT_Type (i));
 
         SgExpression * secondParameterMaxCall = buildMultiplyOp (buildIntVal (
             dim), opDatKindSize);
@@ -408,6 +402,24 @@ HostSubroutineOfDirectLoop::initialiseAllCUDAVariables (
       multiplyNsharedPerNthreads, subroutineScope);
 }
 
+void
+HostSubroutineOfDirectLoop::createStatements ()
+{
+
+}
+
+void
+HostSubroutineOfDirectLoop::createLocalVariableDeclarations ()
+{
+
+}
+
+void
+HostSubroutineOfDirectLoop::createFormalParameterDeclarations ()
+{
+
+}
+
 /*
  * ======================================================
  * Public functions
@@ -416,42 +428,45 @@ HostSubroutineOfDirectLoop::initialiseAllCUDAVariables (
 
 HostSubroutineOfDirectLoop::HostSubroutineOfDirectLoop (
     std::string const & subroutineName,
-    UserDeviceSubroutine & userDeviceSubroutine,
-    KernelSubroutine & kernelSubroutine,
-    DataSizesDeclarationOfDirectLoop & dataSizesDeclarationOfDirectLoop,
-    ParallelLoop & parallelLoop, SgScopeStatement * moduleScope) :
-  HostSubroutine (subroutineName, moduleScope)
+    UserDeviceSubroutine * userDeviceSubroutine,
+    KernelSubroutine * kernelSubroutine,
+    DataSizesDeclarationOfDirectLoop * dataSizesDeclarationOfDirectLoop,
+    ParallelLoop * parallelLoop, SgScopeStatement * moduleScope) :
+  HostSubroutine (subroutineName, userDeviceSubroutine, kernelSubroutine,
+      parallelLoop, moduleScope)
 {
   Debug::getInstance ()->debugMessage (
       "Creating host subroutine of direct loop", 2);
 
-  createFormalParameters (userDeviceSubroutine, parallelLoop);
+  this->dataSizesDeclarationOfDirectLoop = dataSizesDeclarationOfDirectLoop;
 
-  createDeviceVariablesSizesVariable (dataSizesDeclarationOfDirectLoop);
+  createFormalParameters ();
 
-  createDataMarshallingLocalVariables (parallelLoop);
+  createDeviceVariablesSizesVariable ();
 
-  createAndAppendIterationVariablesForReduction (parallelLoop);
+  createDataMarshallingLocalVariables ();
+
+  createAndAppendIterationVariablesForReduction ();
 
   createCUDAKernelVariables ();
 
-  createCUDAVariablesDirectLoops (parallelLoop);
+  createCUDAVariablesDirectLoops ();
 
-  createReductionVariables (parallelLoop);
+  createReductionVariables ();
 
-  initialiseAllCUDAVariables (parallelLoop);
+  initialiseAllCUDAVariables ();
 
-  initialiseDataMarshallingLocalVariables (parallelLoop);
+  initialiseDataMarshallingLocalVariables ();
 
-  createSupportForReductionVariablesBeforeKernel (parallelLoop);
+  createSupportForReductionVariablesBeforeKernel ();
 
-  initialiseDeviceVariablesSizesVariable (parallelLoop);
+  initialiseDeviceVariablesSizesVariable ();
 
-  createKernelCall (kernelSubroutine, parallelLoop);
+  createKernelCall ();
 
   createAndAppendThreadSynchCall ();
 
-  createSupportForReductionVariablesAfterKernel (parallelLoop);
+  createSupportForReductionVariablesAfterKernel ();
 
-  copyDataBackFromDeviceAndDeallocate (parallelLoop);
+  copyDataBackFromDeviceAndDeallocate ();
 }

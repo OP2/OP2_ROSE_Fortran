@@ -17,6 +17,12 @@ class HostSubroutineOfIndirectLoop: public HostSubroutine
 {
   private:
 
+    InitialiseConstantsSubroutine * initialiseConstantsSubroutine;
+
+    DataSizesDeclarationOfIndirectLoop * dataSizesDeclarationOfIndirectLoop;
+
+  private:
+
     /*
      * ======================================================
      * Returns the name of the local variable which models
@@ -46,45 +52,47 @@ class HostSubroutineOfIndirectLoop: public HostSubroutine
     getGlobalToLocalMappingSizeVariableName (unsigned int OP_DAT_ArgumentGroup);
 
     void
-        initialiseDeviceVariablesSizesVariable (
-            ParallelLoop & parallelLoop,
-            DataSizesDeclarationOfIndirectLoop & dataSizesDeclarationOfIndirectLoop);
+    initialiseDeviceVariablesSizesVariable ();
 
     void
-    createExecutionPlanExecutionStatements (
-        KernelSubroutine & kernelSubroutine, ParallelLoop & parallelLoop);
+    createExecutionPlanExecutionStatements ();
 
     void
-    initialiseVariablesAndConstants (
-        InitialiseConstantsSubroutine & initialiseConstantsSubroutine);
+    initialiseVariablesAndConstants ();
 
     void
-    createPlanCToForttranPointerConversionStatements (
-        ParallelLoop & parallelLoop);
+    createPlanCToForttranPointerConversionStatements ();
 
     void
     createPlanFunctionCallStatement ();
 
     void
-    createDoLoopToCorrectIndexing (ParallelLoop & parallelLoop);
+    createDoLoopToCorrectIndexing ();
 
     void
-    createExecutionPlanStatements (ParallelLoop & parallelLoop);
+    createExecutionPlanStatements ();
 
     void
-        createExecutionPlanLocalVariables (
-            DataSizesDeclarationOfIndirectLoop & dataSizesDeclarationOfIndirectLoop,
-            ParallelLoop & parallelLoop);
+    createExecutionPlanLocalVariables ();
+
+    virtual void
+    createStatements ();
+
+    virtual void
+    createLocalVariableDeclarations ();
+
+    virtual void
+    createFormalParameterDeclarations ();
 
   public:
 
         HostSubroutineOfIndirectLoop (
             std::string const & subroutineName,
-            UserDeviceSubroutine & userDeviceSubroutine,
-            KernelSubroutine & kernelSubroutine,
-            InitialiseConstantsSubroutine & initialiseConstantsSubroutine,
-            DataSizesDeclarationOfIndirectLoop & dataSizesDeclarationOfIndirectLoop,
-            ParallelLoop & parallelLoop, SgScopeStatement * moduleScope);
+            UserDeviceSubroutine * userDeviceSubroutine,
+            KernelSubroutine * kernelSubroutine,
+            InitialiseConstantsSubroutine * initialiseConstantsSubroutine,
+            DataSizesDeclarationOfIndirectLoop * dataSizesDeclarationOfIndirectLoop,
+            ParallelLoop * parallelLoop, SgScopeStatement * moduleScope);
 };
 
 #endif

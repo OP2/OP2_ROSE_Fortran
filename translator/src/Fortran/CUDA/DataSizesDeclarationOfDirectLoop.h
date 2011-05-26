@@ -15,12 +15,12 @@ class DataSizesDeclarationOfDirectLoop: public DataSizesDeclaration
   private:
 
     virtual void
-    addFields (ParallelLoop & parallelLoop);
+    addFields ();
 
   public:
 
-    DataSizesDeclarationOfDirectLoop (ParallelLoop & parallelLoop,
-        std::string const & subroutineName, SgScopeStatement * moduleScope);
+    DataSizesDeclarationOfDirectLoop (std::string const & subroutineName,
+        ParallelLoop * parallelLoop, SgScopeStatement * moduleScope);
 };
 
 #endif

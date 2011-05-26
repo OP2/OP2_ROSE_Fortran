@@ -35,7 +35,7 @@ DataSizesDeclarationOfIndirectLoop::getGlobalToLocalRenumberingSizeFieldName (
 }
 
 void
-DataSizesDeclarationOfIndirectLoop::addFields (ParallelLoop & parallelLoop)
+DataSizesDeclarationOfIndirectLoop::addFields ()
 {
   using boost::lexical_cast;
   using SageBuilder::buildVariableDeclaration;
@@ -43,10 +43,10 @@ DataSizesDeclarationOfIndirectLoop::addFields (ParallelLoop & parallelLoop)
   using std::vector;
 
   for (unsigned int i = 1; i
-      <= parallelLoop.getNumberOf_OP_DAT_ArgumentGroups (); ++i)
+      <= parallelLoop->getNumberOf_OP_DAT_ArgumentGroups (); ++i)
   {
-    if (parallelLoop.isDuplicate_OP_DAT (i) == false
-        && parallelLoop.get_OP_MAP_Value (i) == INDIRECT)
+    if (parallelLoop->isDuplicate_OP_DAT (i) == false
+        && parallelLoop->get_OP_MAP_Value (i) == INDIRECT)
     {
       string const variableName = get_OP_DAT_SizeFieldName (i);
 
@@ -64,10 +64,10 @@ DataSizesDeclarationOfIndirectLoop::addFields (ParallelLoop & parallelLoop)
   }
 
   for (unsigned int i = 1; i
-      <= parallelLoop.getNumberOf_OP_DAT_ArgumentGroups (); ++i)
+      <= parallelLoop->getNumberOf_OP_DAT_ArgumentGroups (); ++i)
   {
-    if (parallelLoop.isDuplicate_OP_DAT (i) == false
-        && parallelLoop.get_OP_MAP_Value (i) == INDIRECT)
+    if (parallelLoop->isDuplicate_OP_DAT (i) == false
+        && parallelLoop->get_OP_MAP_Value (i) == INDIRECT)
     {
       string const variableName = getLocalToGlobalRenumberingSizeFieldName (i);
 
@@ -85,9 +85,9 @@ DataSizesDeclarationOfIndirectLoop::addFields (ParallelLoop & parallelLoop)
   }
 
   for (unsigned int i = 1; i
-      <= parallelLoop.getNumberOf_OP_DAT_ArgumentGroups (); ++i)
+      <= parallelLoop->getNumberOf_OP_DAT_ArgumentGroups (); ++i)
   {
-    if (parallelLoop.get_OP_MAP_Value (i) == INDIRECT)
+    if (parallelLoop->get_OP_MAP_Value (i) == INDIRECT)
     {
       string const variableName = getGlobalToLocalRenumberingSizeFieldName (i);
 
@@ -105,10 +105,10 @@ DataSizesDeclarationOfIndirectLoop::addFields (ParallelLoop & parallelLoop)
   }
 
   for (unsigned int i = 1; i
-      <= parallelLoop.getNumberOf_OP_DAT_ArgumentGroups (); ++i)
+      <= parallelLoop->getNumberOf_OP_DAT_ArgumentGroups (); ++i)
   {
-    if (parallelLoop.isDuplicate_OP_DAT (i) == false
-        && parallelLoop.get_OP_MAP_Value (i) == DIRECT)
+    if (parallelLoop->isDuplicate_OP_DAT (i) == false
+        && parallelLoop->get_OP_MAP_Value (i) == DIRECT)
     {
       string const variableName = get_OP_DAT_SizeFieldName (i);
 
@@ -163,9 +163,9 @@ DataSizesDeclarationOfIndirectLoop::addFields (ParallelLoop & parallelLoop)
 }
 
 DataSizesDeclarationOfIndirectLoop::DataSizesDeclarationOfIndirectLoop (
-    ParallelLoop & parallelLoop, std::string const & subroutineName,
+    std::string const & subroutineName, ParallelLoop * parallelLoop,
     SgScopeStatement * moduleScope) :
-  DataSizesDeclaration (subroutineName, moduleScope)
+  DataSizesDeclaration (subroutineName, parallelLoop, moduleScope)
 {
-  addFields (parallelLoop);
+  addFields ();
 }

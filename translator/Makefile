@@ -1,10 +1,10 @@
 CXX       := g++
-INCDIR		:= include
+INCDIR	  := include
 BINDIR    := bin
 OBJDIR    := obj
 SRCDIR    := src
-LDFLAGS   := -L$(OP2_ROSE_INST_DIR)/lib -lrose
-INCLUDES  := -Iinclude -I$(OP2_ROSE_INST_DIR)/include -I$(OP2_BOOST_INST_DIR)/include
+LDFLAGS   := -L/usr/lib/jvm/java-6-sun/jre/lib/i386/server -ljvm -L$(BOOST_HOME)/lib -lboost_date_time -lboost_filesystem -lboost_regex -lboost_system -lboost_thread -lboost_wave -lboost_program_options  -L$(ROSE_HOME)/lib -lrose
+INCLUDES  := -Iinclude -I$(ROSE_HOME)/include -I$(BOOST_HOME)/include
 CXXFLAGS  := $(INCLUDES) -Wall #-O2 commented out for debugging
 
 SRCS  := $(wildcard $(SRCDIR)/*.cpp)
@@ -26,3 +26,4 @@ $(OBJDIR)/%.o: $(SRCDIR)/%.cpp # $(INCDIR)/%.h commented out because it requires
 $(OUT): $(OBJS) 
 	@echo "\n===== LINKING $@ ====="
 	$(CXX) $(LDFLAGS) $(OBJS) -o $(OUT) 
+
