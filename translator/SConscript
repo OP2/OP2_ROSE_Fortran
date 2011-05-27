@@ -52,6 +52,8 @@ target = 'translator'
 
 # Compile command with library dependencies and library paths
 
+env['ENV']['LD_LIBRARY_PATH'] = os.environ['LD_LIBRARY_PATH']
+
 env.Program(binDir + os.sep + target,
 	    	source  = sourceFiles,
 	    	LIBPATH = [ROSE_LIB],
