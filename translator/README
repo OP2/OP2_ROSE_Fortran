@@ -1,0 +1,12 @@
+Compilation of the source-to-source translator now depends on SCons.
+
+The following 3 environment variables must be set:
+1) ROSE_HOME: the base directory of your ROSE installation.
+2) BOOST_HOME: the base directory of the Boost libraries.
+3) JAVA_HOME: the base directory of your Java installation.
+
+To compile, run:
+'scons'
+
+To clean, run:
+'scons -c'
