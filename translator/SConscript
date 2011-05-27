@@ -1,0 +1,50 @@
+import os
+from os import environ
+
+# Make sure that the environment variables exist
+JAVA_HOME = 'JAVA_HOME'
+ROSE_HOME = 'ROSE_HOME'
+BOOST_HOME = 'BOOST_HOME'
+
+for var in [JAVA_HOME, ROSE_HOME, BOOST_HOME]:
+	try:
+		environ[var]
+	except KeyError:
+		print ("The environment variable '" + var + "' is needed to compile and link but cannot be found.")
+		Exit(1)
+
+JAVA_LIB      = environ[JAVA_HOME] + os.sep + 'jre' + os.sep + 'lib' + os.sep + 'i386' + os.sep + 'server'
+ROSE_LIB      = environ[ROSE_HOME] + os.sep + 'lib'
+ROSE_INCLUDE  = environ[ROSE_HOME] + os.sep + 'include'
+BOOST_LIB     = environ[BOOST_HOME] + os.sep + 'lib'
+BOOST_INCLUDE = environ[BOOST_HOME] + os.sep + 'include'
+
+for var in [JAVA_LIB, ROSE_LIB, ROSE_INCLUDE, BOOST_LIB, BOOST_INCLUDE]:
+	if not os.path.isdir(var):
+        	print ("The directory '" + var + "' is needed to compile and link but cannot be found.")
+        	Exit(1)
+
+# Source files to compile and paths to the include directories on which they depend
+sourceFiles        = []
+includeDirectories = [ROSE_INCLUDE, BOOST_INCLUDE]
+
+for path, dirs, files in os.walk(os.path.abspath(os.curdir + '/src')):
+	for file in files:
+		fileBasename, fileExtension = os.path.splitext(file)
+		fullPath = os.path.join(path, file)
+		dirBasename = os.path.dirname(fullPath)
+		
+		if fileExtension == '.cpp' and fullPath not in sourceFiles:
+			sourceFiles.append(fullPath)
+		elif fileExtension == '.h' and dirBasename not in includeDirectories:
+			includeDirectories.append(dirBasename)
+
+env = Environment (CPPPATH=includeDirectories,
+		   		   CPPFLAGS=['-Wall', '-O2'])
+
+env.Program('bin/translator',
+	    source=sourceFiles,
+	    LIBPATH=[JAVA_LIB, BOOST_LIB, ROSE_LIB],
+	    LIBS=['jvm', 'boost_date_time', 'boost_filesystem' ,
+				'boost_regex', 'boost_system', 'boost_thread',
+				'boost_wave', 'boost_program_options', 'rose'])
