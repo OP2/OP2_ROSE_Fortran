@@ -1,0 +1,2 @@
+translator=/home/abetts/SILOET/OP2_ROSE_Fortran/translator/bin/translator
+files=output.F95 input.F95 iso_c_binding.F95 op_fake.F95 constvars.F95 airfoil_seqfun.F95 airfoil.F95

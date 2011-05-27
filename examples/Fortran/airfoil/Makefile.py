@@ -1,3 +1,5 @@
+#!/usr/bin/python
+
 import os
 import glob
 from optparse import OptionParser
@@ -7,19 +9,23 @@ from sys import argv
 # The command-line parser and its options
 parser = OptionParser(add_help_option=False)
 
+cudaFlag   = "--cuda"
+openmpFlag = "--openmp"
+
 parser.add_option("--clean",
                   action="store_true",
                   dest="clean",
-                  help="Remove generated files.",
+                  help="Remove generated files. Use this flag in conjunction with %s or %s to remove files 				generated for that particular backend." % (cudaFlag, openmpFlag),
                   default=False)
 
-parser.add_option("--compile",
+parser.add_option("-C",
+		  "--compile",
                   action="store_true",
                   dest="compile",
                   help="Runs the source-to-source compiler.",
                   default=False)
 
-parser.add_option("--cuda",
+parser.add_option(cudaFlag,
                   action="store_true",
                   dest="cuda",
                   help="Generate code for CUDA backend.",
@@ -34,7 +40,7 @@ parser.add_option("-d",
                   default=0,
 		  metavar="<INT>")
 
-parser.add_option("--openmp",
+parser.add_option(openmpFlag,
                   action="store_true",
                   dest="openmp",
                   help="Generate code for OpenMP backend.",
@@ -58,33 +64,71 @@ parser.add_option("-v",
 def clean ():
 	filesToRemove = []
 	filesToRemove.extend(glob.glob('BLANK*.[fF?]95'))
-	filesToRemove.extend(glob.glob("rose_*.[fF?]95"))
-	filesToRemove.extend(glob.glob("[!^BLANK]*_postprocessed.[fF?]95"))
-	filesToRemove.extend(glob.glob("*.rmod"))
-	filesToRemove.extend(glob.glob("*.mod"))
-	filesToRemove.extend(glob.glob("hs_err_pid*.log"))
-	filesToRemove.extend(glob.glob("~*"))
+	filesToRemove.extend(glob.glob('rose_*.[fF?]95'))
+	filesToRemove.extend(glob.glob('[!^BLANK]*_postprocessed.[fF?]95'))
+	filesToRemove.extend(glob.glob('*.rmod'))
+	filesToRemove.extend(glob.glob('*.mod'))
+	filesToRemove.extend(glob.glob('hs_err_pid*.log'))
+	filesToRemove.extend(glob.glob('~*'))
+
+	if opts.cuda:
+		filesToRemove.extend(glob.glob('[!^BLANK]*_cudafor.[fF?]95'))
+	
+	if opts.openmp:			
+		filesToRemove.extend(glob.glob('[!^BLANK]*_openmp.[fF?]95'))
 
 	for file in filesToRemove:
 		if opts.verbose:
 			print("Removing file: '" + file + "'") 
 		os.remove(file)
 
+def exitMessage (str):
+	print(str)
+	exit(1)
+
 # Runs the compiler
 def compile ():
 	if not opts.cuda and not opts.openmp:
-		print("You must specify either --cuda or --openmp on the command line.")
-		exit(1)
+		exitMessage("You must specify either %s or %s on the command line." % (cudaFlag, openmpFlag))
+	elif opts.cuda and opts.openmp:
+		exitMessage("You specified both %s and %s on the command line. Please only specify one of these." % 			(cudaFlag, openmpFlag))
 
-	cmd = '/home/abetts/SILOET/OP2_ROSE_Fortran/translator/bin/translator -d '
-	cmd += str(opts.debug) + ' '
+	configFile = 'config'
+	if not os.path.isfile(configFile):
+		exitMessage("Unable to find configuration file '%s' with the path to source-to-source translator and files to translate." % (configFile))
+
+	translatorPath = None
+	filesToCompile = []
+
+	for line in open(configFile, 'r'):
+		words = line.split('=')
+		if line.startswith('translator'):
+			translatorPath = words[1].strip()
+			if not os.path.isfile(translatorPath):
+				exitMessage("'" + translatorPath + "' does not exist.")
+		elif line.startswith('files'):
+			files = words[1].split(' ')
+			for f in files:
+				f = f.strip()
+				filesToCompile.append(f)
+				if not os.path.isfile(f):
+					exitMessage("'" + f + "' does not exist.")
+
+	if translatorPath is None:
+		exitMessage("You did not specify a path to the translator. Use 'translator=<path/to/translator>' in the configuration file.")
+
+	if not filesToCompile:
+		exitMessage("You did not specify which files need to compiled. Use files=<list/of/files> in the configuration file.")
+
+	cmd = translatorPath + ' -d ' + str(opts.debug) + ' '
 
 	if opts.cuda:
-		cmd += '--cuda '
+		cmd += cudaFlag + ' '
 	elif opts.openmp:
-		cmd+= '--openmp '
+		cmd+= openmpFlag + ' '
 
-	cmd += 'output.F95 input.F95 iso_c_binding.F95 op_fake.F95 constvars.F95 airfoil_seqfun.F95 airfoil.F95'
+	for f in filesToCompile:
+		cmd += f + ' '
 
 	if opts.verbose:
 		print("Running: '" + cmd + "'")

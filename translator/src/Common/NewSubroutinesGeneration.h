@@ -150,20 +150,6 @@ class NewSubroutinesGeneration: public AstSimpleProcessing
 
     /*
      * ======================================================
-     * Constructor requires the Fortran/C++/C source files
-     * (contained in the SgProject) to detect OP_PAR_LOOPs and
-     * the declaration of OP2 variables (contained in
-     * Declarations)
-     * ======================================================
-     */
-    NewSubroutinesGeneration (SgProject * project, Declarations * declarations)
-    {
-      this->project = project;
-      this->declarations = declarations;
-    }
-
-    /*
-     * ======================================================
      * Over-riding implementation of the AST vertex traversal
      * function
      * ======================================================
@@ -178,6 +164,13 @@ class NewSubroutinesGeneration: public AstSimpleProcessing
      */
     void
     unparse ();
+
+    /*
+     * ======================================================
+     * Generates the new subroutines
+     * ======================================================
+     */
+    NewSubroutinesGeneration (SgProject * project, Declarations * declarations);
 };
 
 #endif

@@ -632,3 +632,10 @@ NewSubroutinesGeneration::unparse ()
     project->unparse ();
   }
 }
+
+NewSubroutinesGeneration::NewSubroutinesGeneration (SgProject * project,
+    Declarations * declarations)
+{
+  this->project = project;
+  this->declarations = declarations;
+}

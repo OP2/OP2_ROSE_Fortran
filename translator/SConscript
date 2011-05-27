@@ -1,25 +1,23 @@
 import os
 from os import environ
 
-# Make sure that the environment variables exist
-JAVA_HOME = 'JAVA_HOME'
+# Make sure that these environment variables exist
 ROSE_HOME = 'ROSE_HOME'
 BOOST_HOME = 'BOOST_HOME'
 
-for var in [JAVA_HOME, ROSE_HOME, BOOST_HOME]:
+for var in [ROSE_HOME, BOOST_HOME]:
 	try:
 		environ[var]
 	except KeyError:
 		print ("The environment variable '" + var + "' is needed to compile and link but cannot be found.")
 		Exit(1)
 
-JAVA_LIB      = environ[JAVA_HOME] + os.sep + 'jre' + os.sep + 'lib' + os.sep + 'i386' + os.sep + 'server'
+# Libraries and includes needed to compile
 ROSE_LIB      = environ[ROSE_HOME] + os.sep + 'lib'
 ROSE_INCLUDE  = environ[ROSE_HOME] + os.sep + 'include'
-BOOST_LIB     = environ[BOOST_HOME] + os.sep + 'lib'
 BOOST_INCLUDE = environ[BOOST_HOME] + os.sep + 'include'
 
-for var in [JAVA_LIB, ROSE_LIB, ROSE_INCLUDE, BOOST_LIB, BOOST_INCLUDE]:
+for var in [ROSE_LIB, ROSE_INCLUDE, BOOST_INCLUDE]:
 	if not os.path.isdir(var):
         	print ("The directory '" + var + "' is needed to compile and link but cannot be found.")
         	Exit(1)
@@ -28,23 +26,33 @@ for var in [JAVA_LIB, ROSE_LIB, ROSE_INCLUDE, BOOST_LIB, BOOST_INCLUDE]:
 sourceFiles        = []
 includeDirectories = [ROSE_INCLUDE, BOOST_INCLUDE]
 
-for path, dirs, files in os.walk(os.path.abspath(os.curdir + '/src')):
+# Walk every directory rooted with 'src' to find the source files and include directories
+for path, dirs, files in os.walk(os.path.abspath(os.curdir + os.sep + 'src')):
 	for file in files:
 		fileBasename, fileExtension = os.path.splitext(file)
 		fullPath = os.path.join(path, file)
 		dirBasename = os.path.dirname(fullPath)
 		
+		# Append all C++ source files found
 		if fileExtension == '.cpp' and fullPath not in sourceFiles:
 			sourceFiles.append(fullPath)
+		
+		# If header files are found then the directory in which they are included needs to be passed 
+		# on the g++ command line 
 		elif fileExtension == '.h' and dirBasename not in includeDirectories:
 			includeDirectories.append(dirBasename)
 
+# Include directories and flags for g++
 env = Environment (CPPPATH=includeDirectories,
 		   		   CPPFLAGS=['-Wall', '-O2'])
 
-env.Program('bin/translator',
-	    source=sourceFiles,
-	    LIBPATH=[JAVA_LIB, BOOST_LIB, ROSE_LIB],
-	    LIBS=['jvm', 'boost_date_time', 'boost_filesystem' ,
-				'boost_regex', 'boost_system', 'boost_thread',
-				'boost_wave', 'boost_program_options', 'rose'])
+# The target binary directory and name
+binDir = 'bin'
+target = 'translator'
+
+# Compile command with library dependencies and library paths
+
+env.Program(binDir + os.sep + target,
+	    	source  = sourceFiles,
+	    	LIBPATH = [ROSE_LIB],
+	    	LIBS    = ['rose'])
