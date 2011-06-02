@@ -20,14 +20,15 @@
  * made to OP_PAR_LOOP calls.
  */
 
+#include <boost/algorithm/string.hpp>
 #include <rose.h>
 #include <CommandLine.h>
+#include <CommonNamespaces.h>
 #include <Debug.h>
-#include <NewSubroutinesGeneration.h>
 #include <Declarations.h>
 #include <Globals.h>
-#include <CommonNamespaces.h>
-#include <boost/algorithm/string.hpp>
+#include <ModifyOP2Calls.h>
+#include <NewSubroutinesGeneration.h>
 
 int
 main (int argc, char ** argv)
@@ -67,51 +68,55 @@ main (int argc, char ** argv)
   if (project->get_Cxx_only () == true)
   {
     Debug::getInstance ()->verboseMessage ("C++ project detected");
+
+    ModifyOP2Calls * modifyOP2Calls = new ModifyOP2Calls (project);
+
+    modifyOP2Calls->traverseInputFiles (project, preorder);
   }
   else
   {
     Debug::getInstance ()->verboseMessage ("Fortran project detected");
+
+    /*
+     * ======================================================
+     * Obtain all OP2 declarations
+     * ======================================================
+     */
+    Debug::getInstance ()->verboseMessage (
+        "Retrieving declarations in source files");
+
+    Declarations * declarations = new Declarations (project);
+
+    declarations->traverseInputFiles (project, preorder);
+
+    /*
+     * ======================================================
+     * Create the subroutines implementing an OP_PAR_LOOP
+     * ======================================================
+     */
+    Debug::getInstance ()->verboseMessage (
+        "Creating subroutines for OP_PAR_LOOPs");
+
+    NewSubroutinesGeneration * newSubroutines = new NewSubroutinesGeneration (
+        project, declarations);
+
+    newSubroutines->traverseInputFiles (project, preorder);
+
+    /*
+     * ======================================================
+     * Output the generated subroutines to respective files
+     * ======================================================
+     */
+    newSubroutines->unparse ();
+
+    /*
+     * ======================================================
+     * Unparse input source files as calls to OP_PAR_LOOPs
+     * will now have changed
+     * ======================================================
+     */
+    project->unparse ();
   }
-
-  /*
-   * ======================================================
-   * Obtain all OP2 declarations
-   * ======================================================
-   */
-  Debug::getInstance ()->verboseMessage (
-      "Retrieving declarations in source files");
-
-  Declarations * declarations = new Declarations (project);
-
-  declarations->traverseInputFiles (project, preorder);
-
-  /*
-   * ======================================================
-   * Create the subroutines implementing an OP_PAR_LOOP
-   * ======================================================
-   */
-  Debug::getInstance ()->verboseMessage (
-      "Creating subroutines for OP_PAR_LOOPs");
-
-  NewSubroutinesGeneration * newSubroutines = new NewSubroutinesGeneration (
-      project, declarations);
-
-  newSubroutines->traverseInputFiles (project, preorder);
-
-  /*
-   * ======================================================
-   * Output the generated subroutines to respective files
-   * ======================================================
-   */
-  newSubroutines->unparse ();
-
-  /*
-   * ======================================================
-   * Unparse input source files as calls to OP_PAR_LOOPs
-   * will now have changed
-   * ======================================================
-   */
-  project->unparse ();
 
   Debug::getInstance ()->verboseMessage ("Translation completed");
 

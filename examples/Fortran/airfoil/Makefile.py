@@ -164,3 +164,6 @@ if opts.clean:
 
 if opts.compile:
 	compile()
+
+if not opts.clean and not opts.compile:
+	exitMessage("No actions selected. Use -h for options.")

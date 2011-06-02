@@ -3,9 +3,9 @@
 #include <algorithm>
 #include <Debug.h>
 #include <ParallelLoop.h>
-#include <HostSubroutineOfDirectLoop.h>
-#include <HostSubroutineOfIndirectLoop.h>
-#include <ReductionSubroutine.h>
+#include <FortranCUDAHostSubroutineDirectLoop.h>
+#include <FortranCUDAHostSubroutineIndirectLoop.h>
+#include <FortranCUDAReductionSubroutine.h>
 #include <FortranStatementsAndExpressionsBuilder.h>
 #include <Globals.h>
 
@@ -309,7 +309,7 @@ ParallelLoop::generateReductionSubroutines (SgScopeStatement * moduleScope)
                 + lexical_cast <string> (i) + SubroutineNameSuffixes::reductionSuffix
                 + typeName + lexical_cast <string> (isKindIntVal->get_value ());
 
-        ReductionSubroutine * reductionSubroutine = new ReductionSubroutine (
+        FortranCUDAReductionSubroutine * reductionSubroutine = new FortranCUDAReductionSubroutine (
             reductionSubroutineName, moduleScope, isArrayType);
 
         /*

@@ -62,6 +62,16 @@ class Subroutine
     std::map <std::string, SgVariableDeclaration *> localVariableDeclarations;
 
   protected:
+
+    /*
+     * ======================================================
+     * Returns the name of the OP_DAT formal parameter
+     * in this OP_DAT argument group
+     * ======================================================
+     */
+    static std::string
+    get_OP_DAT_FormalParameterName (unsigned int OP_DAT_ArgumentGroup);
+
     /*
      * ======================================================
      * Every created subroutine has a number of statements

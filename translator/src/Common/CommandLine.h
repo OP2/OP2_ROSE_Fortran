@@ -1,5 +1,5 @@
 /*
- * Written by Adam Betts
+ * Written by Adam Betts and Carlo Bertolli
  *
  * Allows debug and verbose options to be passed on ROSE command line.
  * Could be extended to include others

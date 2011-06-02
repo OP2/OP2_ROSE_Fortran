@@ -23,9 +23,9 @@
 #include <CommonNamespaces.h>
 #include <Declarations.h>
 #include <ParallelLoop.h>
-#include <HostSubroutine.h>
-#include <UserDeviceSubroutine.h>
-#include <KernelSubroutine.h>
+#include <FortranCUDAHostSubroutine.h>
+#include <FortranCUDAUserDeviceSubroutine.h>
+#include <FortranCUDAKernelSubroutine.h>
 
 class NewSubroutinesGeneration: public AstSimpleProcessing
 {
@@ -74,8 +74,8 @@ class NewSubroutinesGeneration: public AstSimpleProcessing
      */
     void
     patchCallsToParallelLoops (ParallelLoop & parallelLoop,
-        UserDeviceSubroutine & userDeviceSubroutine,
-        HostSubroutine & hostSubroutine, SgScopeStatement * scope,
+        FortranCUDAUserDeviceSubroutine & userDeviceSubroutine,
+        FortranCUDAHostSubroutine & hostSubroutine, SgScopeStatement * scope,
         SgFunctionCallExp * functionCallExp);
 
     /*
