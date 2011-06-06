@@ -131,6 +131,18 @@ FortranOpenMPHostSubroutineDirectLoop::createKernelDoLoop ()
 }
 
 void
+FortranOpenMPHostSubroutineDirectLoop::createReductionEpilogueStatements ()
+{
+
+}
+
+void
+FortranOpenMPHostSubroutineDirectLoop::createReductionPrologueStatements ()
+{
+
+}
+
+void
 FortranOpenMPHostSubroutineDirectLoop::createCToFortranPointerConversionStatements ()
 {
   using SageBuilder::buildBasicBlock;
@@ -160,11 +172,24 @@ FortranOpenMPHostSubroutineDirectLoop::createCToFortranPointerConversionStatemen
               IndirectAndDirectLoop::Fortran::HostSubroutine::dat,
               subroutineScope));
 
-      SgDotExp * dotExpression2 = buildDotExp (buildVarRefExp (
-          formalParameterDeclarations[get_OP_SET_FormalParameterName ()]),
-          buildOpaqueVarRefExp (
-              IndirectAndDirectLoop::Fortran::HostSubroutine::size,
-              subroutineScope));
+      SgDotExp * dotExpression2;
+
+      if (parallelLoop->isReductionRequired (i) == false)
+      {
+        dotExpression2 = buildDotExp (buildVarRefExp (
+            formalParameterDeclarations[get_OP_SET_FormalParameterName ()]),
+            buildOpaqueVarRefExp (
+                IndirectAndDirectLoop::Fortran::HostSubroutine::size,
+                subroutineScope));
+      }
+      else
+      {
+        dotExpression2 = buildDotExp (buildVarRefExp (
+            formalParameterDeclarations[get_OP_DAT_FormalParameterName (i)]),
+            buildOpaqueVarRefExp (
+                IndirectAndDirectLoop::Fortran::HostSubroutine::dim,
+                subroutineScope));
+      }
 
       SgStatement * cToFortranCallStatement = createCToFortranPointerCall (
           dotExpression1, buildVarRefExp (
@@ -250,6 +275,20 @@ FortranOpenMPHostSubroutineDirectLoop::initialiseThreadVariables ()
 }
 
 void
+FortranOpenMPHostSubroutineDirectLoop::createReductionLocalVariableDeclarations ()
+{
+  localVariableDeclarations[IndirectAndDirectLoop::Fortran::HostSubroutine::reductionIterationCounter1]
+      = FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
+          IndirectAndDirectLoop::Fortran::HostSubroutine::reductionIterationCounter1,
+          FortranTypesBuilder::getFourByteInteger (), subroutineScope);
+
+  localVariableDeclarations[IndirectAndDirectLoop::Fortran::HostSubroutine::reductionIterationCounter2]
+      = FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
+          IndirectAndDirectLoop::Fortran::HostSubroutine::reductionIterationCounter2,
+          FortranTypesBuilder::getFourByteInteger (), subroutineScope);
+}
+
+void
 FortranOpenMPHostSubroutineDirectLoop::createStatements ()
 {
   initialiseThreadVariables ();
@@ -281,6 +320,11 @@ FortranOpenMPHostSubroutineDirectLoop::createLocalVariableDeclarations ()
       = FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
           OpenMP::sliceEnd, FortranTypesBuilder::getFourByteInteger (),
           subroutineScope);
+
+  if (parallelLoop->isReductionRequired ())
+  {
+    createReductionLocalVariableDeclarations ();
+  }
 }
 
 /*

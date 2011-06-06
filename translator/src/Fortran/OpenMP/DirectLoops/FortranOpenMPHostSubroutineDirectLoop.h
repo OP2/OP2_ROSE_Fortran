@@ -19,10 +19,19 @@ class FortranOpenMPHostSubroutineDirectLoop: public FortranOpenMPHostSubroutine
     createKernelDoLoop ();
 
     void
+    createReductionEpilogueStatements ();
+
+    void
+    createReductionPrologueStatements ();
+
+    void
     createCToFortranPointerConversionStatements ();
 
     void
     initialiseThreadVariables ();
+
+    void
+    createReductionLocalVariableDeclarations ();
 
     virtual void
     createStatements ();
