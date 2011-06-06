@@ -13,9 +13,12 @@
 #include <FortranCUDADataSizesDeclarationDirectLoop.h>
 #include <FortranCUDADataSizesDeclarationIndirectLoop.h>
 #include <FortranCUDAReductionSubroutine.h>
-#include <FortranOpenMPModuleDeclarations.h>
+#include <FortranOpenMPModuleDeclarationsDirectLoop.h>
+#include <FortranOpenMPModuleDeclarationsIndirectLoop.h>
 #include <FortranOpenMPHostSubroutineDirectLoop.h>
+#include <FortranOpenMPHostSubroutineIndirectLoop.h>
 #include <FortranOpenMPKernelSubroutineDirectLoop.h>
+#include <FortranOpenMPKernelSubroutineIndirectLoop.h>
 
 /*
  * ======================================================
@@ -25,9 +28,8 @@
 
 void
 FortranSubroutinesGeneration::patchCallsToParallelLoops (
-    ParallelLoop & parallelLoop,
-    FortranCUDAUserDeviceSubroutine & userDeviceSubroutine,
-    FortranCUDAHostSubroutine & hostSubroutine, SgScopeStatement * scope,
+    ParallelLoop & parallelLoop, std::string const & userSubroutineName,
+    Subroutine & hostSubroutine, SgScopeStatement * scope,
     SgFunctionCallExp * functionCallExp)
 {
   using SageBuilder::buildAssignInitializer;
@@ -95,7 +97,7 @@ FortranSubroutinesGeneration::patchCallsToParallelLoops (
    * Add a new 'use' statement for CUDA module
    * ======================================================
    */
-  SgUseStatement* newUseStatement =
+  SgUseStatement * newUseStatement =
       new SgUseStatement (
           getEnclosingFileNode (lastUseStatement)->get_file_info (),
           parallelLoop.getModuleName (), false);
@@ -113,20 +115,21 @@ FortranSubroutinesGeneration::patchCallsToParallelLoops (
   /*
    * ======================================================
    * The character array contains exactly the number of
-   * characters as the kernel name
+   * characters as the user subroutine name
    * ======================================================
    */
   SgTypeString * characterArray = FortranTypesBuilder::getString (
-      userDeviceSubroutine.getSubroutineName ().size ());
+      userSubroutineName.size ());
 
   SgAssignInitializer * initializer = buildAssignInitializer (buildStringVal (
-      userDeviceSubroutine.getSubroutineName ()), characterArray);
+      userSubroutineName), characterArray);
 
-  SgVariableDeclaration * kernelStringVariable = buildVariableDeclaration (
-      userDeviceSubroutine.getSubroutineName () + "_host", characterArray,
-      initializer, getScope (lastDeclarationStatement));
+  SgVariableDeclaration * userSubroutineNameStringVariable =
+      buildVariableDeclaration (userSubroutineName + "_user", characterArray,
+          initializer, getScope (lastDeclarationStatement));
 
-  insertStatementAfter (lastDeclarationStatement, kernelStringVariable);
+  insertStatementAfter (lastDeclarationStatement,
+      userSubroutineNameStringVariable);
 
   /*
    * ======================================================
@@ -150,7 +153,8 @@ FortranSubroutinesGeneration::patchCallsToParallelLoops (
 
   arguments.erase (arguments.begin ());
 
-  arguments.insert (arguments.begin (), buildVarRefExp (kernelStringVariable));
+  arguments.insert (arguments.begin (), buildVarRefExp (
+      userSubroutineNameStringVariable));
 
   /*
    * ======================================================
@@ -173,6 +177,10 @@ FortranSubroutinesGeneration::createOpenMPSubroutines (
 
   SgScopeStatement * moduleScope = moduleStatement->get_definition ();
 
+  FortranOpenMPKernelSubroutine * kernelSubroutine;
+
+  FortranOpenMPHostSubroutine * hostSubroutine;
+
   if (parallelLoop->isDirectLoop ())
   {
     /*
@@ -181,20 +189,19 @@ FortranSubroutinesGeneration::createOpenMPSubroutines (
      * ======================================================
      */
 
-    FortranOpenMPModuleDeclarations * moduleDeclarations =
-        new FortranOpenMPModuleDeclarations (userSubroutineName, parallelLoop,
-            moduleScope);
+    FortranOpenMPModuleDeclarationsDirectLoop * moduleDeclarations =
+        new FortranOpenMPModuleDeclarationsDirectLoop (userSubroutineName,
+            parallelLoop, moduleScope);
 
     addContains (moduleStatement);
 
-    FortranOpenMPKernelSubroutineDirectLoop * kernelSubroutine =
-        new FortranOpenMPKernelSubroutineDirectLoop (userSubroutineName,
-            userSubroutineName, parallelLoop, moduleScope);
+    kernelSubroutine = new FortranOpenMPKernelSubroutineDirectLoop (
+        userSubroutineName, userSubroutineName, parallelLoop, moduleScope);
 
-    FortranOpenMPHostSubroutineDirectLoop * hostSubroutine =
-        new FortranOpenMPHostSubroutineDirectLoop (userSubroutineName,
-            userSubroutineName, kernelSubroutine->getSubroutineName (),
-            parallelLoop, moduleScope, moduleDeclarations);
+    hostSubroutine = new FortranOpenMPHostSubroutineDirectLoop (
+        userSubroutineName, userSubroutineName,
+        kernelSubroutine->getSubroutineName (), parallelLoop, moduleScope,
+        moduleDeclarations);
   }
   else
   {
@@ -204,8 +211,32 @@ FortranSubroutinesGeneration::createOpenMPSubroutines (
      * ======================================================
      */
 
+    FortranOpenMPModuleDeclarationsIndirectLoop * moduleDeclarations =
+        new FortranOpenMPModuleDeclarationsIndirectLoop (userSubroutineName,
+            parallelLoop, moduleScope);
+
     addContains (moduleStatement);
+
+    kernelSubroutine = new FortranOpenMPKernelSubroutineIndirectLoop (
+        userSubroutineName, userSubroutineName, parallelLoop, moduleScope);
+
+    hostSubroutine = new FortranOpenMPHostSubroutineIndirectLoop (
+        userSubroutineName, userSubroutineName,
+        kernelSubroutine->getSubroutineName (), parallelLoop, moduleScope,
+        moduleDeclarations);
   }
+
+  /*
+   * ======================================================
+   * Get the scope of the AST node representing the entire
+   * call statement
+   * ======================================================
+   */
+  SgScopeStatement * scope =
+      isSgExprStatement (node->get_parent ())->get_scope ();
+
+  patchCallsToParallelLoops (*parallelLoop, userSubroutineName,
+      *hostSubroutine, scope, functionCallExp);
 }
 
 void
@@ -304,8 +335,9 @@ FortranSubroutinesGeneration::createCUDASubroutines (
   SgScopeStatement * scope =
       isSgExprStatement (node->get_parent ())->get_scope ();
 
-  patchCallsToParallelLoops (*parallelLoop, *userDeviceSubroutine,
-      *hostSubroutine, scope, functionCallExp);
+  patchCallsToParallelLoops (*parallelLoop,
+      userDeviceSubroutine->getSubroutineName (), *hostSubroutine, scope,
+      functionCallExp);
 }
 
 void

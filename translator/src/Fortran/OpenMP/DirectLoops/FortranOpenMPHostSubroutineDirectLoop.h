@@ -2,10 +2,14 @@
 #define FORTRAN_OPENMP_HOST_SUBROUTINE_DIRECT_LOOP_H
 
 #include <FortranOpenMPHostSubroutine.h>
-#include <FortranOpenMPModuleDeclarations.h>
+#include <FortranOpenMPModuleDeclarationsDirectLoop.h>
 
 class FortranOpenMPHostSubroutineDirectLoop: public FortranOpenMPHostSubroutine
 {
+  private:
+
+    FortranOpenMPModuleDeclarationsDirectLoop * moduleDeclarations;
+
   private:
 
     SgStatement *
@@ -32,7 +36,7 @@ class FortranOpenMPHostSubroutineDirectLoop: public FortranOpenMPHostSubroutine
         std::string const & userSubroutineName,
         std::string const & kernelSubroutineName, ParallelLoop * parallelLoop,
         SgScopeStatement * moduleScope,
-        FortranOpenMPModuleDeclarations * moduleDeclarations);
+        FortranOpenMPModuleDeclarationsDirectLoop * moduleDeclarations);
 };
 
 #endif

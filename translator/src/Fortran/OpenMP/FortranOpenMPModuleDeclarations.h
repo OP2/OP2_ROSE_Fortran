@@ -38,7 +38,7 @@ class FortranOpenMPModuleDeclarations
      */
     SgScopeStatement * moduleScope;
 
-  private:
+  protected:
 
     static std::string
     getGlobalOPDATName (unsigned int OP_DAT_ArgumentGroup);
@@ -52,6 +52,9 @@ class FortranOpenMPModuleDeclarations
     std::string
     getFirstExecutionBooleanVariableName ();
 
+    FortranOpenMPModuleDeclarations (std::string const & userSubroutineName,
+        ParallelLoop * parallelLoop, SgScopeStatement * moduleScope);
+
   public:
 
     SgVariableDeclaration *
@@ -59,10 +62,6 @@ class FortranOpenMPModuleDeclarations
 
     SgVariableDeclaration *
     getFirstExecutionBooleanDeclaration ();
-
-    FortranOpenMPModuleDeclarations (std::string const & userSubroutineName,
-        ParallelLoop * parallelLoop, SgScopeStatement * moduleScope);
-
 };
 
 #endif

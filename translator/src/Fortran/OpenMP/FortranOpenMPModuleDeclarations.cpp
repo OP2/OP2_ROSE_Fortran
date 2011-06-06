@@ -72,6 +72,19 @@ FortranOpenMPModuleDeclarations::getFirstExecutionBooleanVariableName ()
   return "isFirstTime_" + userSubroutineName;
 }
 
+FortranOpenMPModuleDeclarations::FortranOpenMPModuleDeclarations (
+    std::string const & userSubroutineName, ParallelLoop * parallelLoop,
+    SgScopeStatement * moduleScope)
+{
+  this->userSubroutineName = userSubroutineName;
+
+  this->parallelLoop = parallelLoop;
+
+  this->moduleScope = moduleScope;
+
+  createFirstExecutionBooleanDeclaration ();
+}
+
 /*
  * ======================================================
  * Public functions
@@ -89,19 +102,4 @@ SgVariableDeclaration *
 FortranOpenMPModuleDeclarations::getFirstExecutionBooleanDeclaration ()
 {
   return moduleDeclarations[getFirstExecutionBooleanVariableName ()];
-}
-
-FortranOpenMPModuleDeclarations::FortranOpenMPModuleDeclarations (
-    std::string const & userSubroutineName, ParallelLoop * parallelLoop,
-    SgScopeStatement * moduleScope)
-{
-  this->userSubroutineName = userSubroutineName;
-
-  this->parallelLoop = parallelLoop;
-
-  this->moduleScope = moduleScope;
-
-  createOPDATDeclarations ();
-
-  createFirstExecutionBooleanDeclaration ();
 }

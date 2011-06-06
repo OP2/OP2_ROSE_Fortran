@@ -74,9 +74,8 @@ class FortranSubroutinesGeneration: public AstSimpleProcessing
      */
     void
     patchCallsToParallelLoops (ParallelLoop & parallelLoop,
-        FortranCUDAUserDeviceSubroutine & userDeviceSubroutine,
-        FortranCUDAHostSubroutine & hostSubroutine, SgScopeStatement * scope,
-        SgFunctionCallExp * functionCallExp);
+        std::string const & userSubroutineName, Subroutine & hostSubroutine,
+        SgScopeStatement * scope, SgFunctionCallExp * functionCallExp);
 
     /*
      * ======================================================

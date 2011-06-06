@@ -293,10 +293,12 @@ FortranOpenMPHostSubroutineDirectLoop::FortranOpenMPHostSubroutineDirectLoop (
     std::string const & subroutineName, std::string const & userSubroutineName,
     std::string const & kernelSubroutineName, ParallelLoop * parallelLoop,
     SgScopeStatement * moduleScope,
-    FortranOpenMPModuleDeclarations * moduleDeclarations) :
+    FortranOpenMPModuleDeclarationsDirectLoop * moduleDeclarations) :
   FortranOpenMPHostSubroutine (subroutineName, userSubroutineName,
-      kernelSubroutineName, parallelLoop, moduleScope, moduleDeclarations)
+      kernelSubroutineName, parallelLoop, moduleScope)
 {
+  this->moduleDeclarations = moduleDeclarations;
+
   createFormalParameterDeclarations ();
 
   createLocalVariableDeclarations ();

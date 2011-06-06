@@ -10,8 +10,7 @@
 FortranOpenMPHostSubroutine::FortranOpenMPHostSubroutine (
     std::string const & subroutineName, std::string const & userSubroutineName,
     std::string const & kernelSubroutineName, ParallelLoop * parallelLoop,
-    SgScopeStatement * moduleScope,
-    FortranOpenMPModuleDeclarations * moduleDeclarations) :
+    SgScopeStatement * moduleScope) :
   FortranHostSubroutine (subroutineName, userSubroutineName,
       kernelSubroutineName, parallelLoop)
 {
@@ -19,9 +18,6 @@ FortranOpenMPHostSubroutine::FortranOpenMPHostSubroutine (
   using SageBuilder::buildVoidType;
   using SageBuilder::buildProcedureHeaderStatement;
   using SageInterface::appendStatement;
-  using SageInterface::addTextForUnparser;
-
-  this-> moduleDeclarations = moduleDeclarations;
 
   formalParameters = buildFunctionParameterList ();
 
@@ -30,9 +26,6 @@ FortranOpenMPHostSubroutine::FortranOpenMPHostSubroutine (
       SgProcedureHeaderStatement::e_subroutine_subprogram_kind, moduleScope);
 
   appendStatement (subroutineHeaderStatement, moduleScope);
-
-  addTextForUnparser (subroutineHeaderStatement, "attributes(host) ",
-      AstUnparseAttribute::e_before);
 
   subroutineScope = subroutineHeaderStatement->get_definition ()->get_body ();
 }
