@@ -128,7 +128,7 @@ FortranCUDAKernelSubroutineIndirectLoop::createUserSubroutineCall ()
         arraySubscriptExpression->setOutputInCodeGeneration ();
 
         parameterExpression = buildPntrArrRefExp (buildVarRefExp (
-            formalParameterDeclarations[get_OP_DAT_VariableName (i)]),
+            formalParameterDeclarations[get_OP_DAT_FormalParameterName (i)]),
             arraySubscriptExpression);
       }
       else
@@ -240,7 +240,7 @@ FortranCUDAKernelSubroutineIndirectLoop::createUserSubroutineCall ()
         arraySubscriptExpression->setOutputInCodeGeneration ();
 
         parameterExpression = buildPntrArrRefExp (buildVarRefExp (
-            formalParameterDeclarations[get_OP_DAT_VariableName (i)]),
+            formalParameterDeclarations[get_OP_DAT_FormalParameterName (i)]),
             arraySubscriptExpression);
       }
       else if (dim == 1)
@@ -262,7 +262,7 @@ FortranCUDAKernelSubroutineIndirectLoop::createUserSubroutineCall ()
         arraySubscriptExpression->setOutputInCodeGeneration ();
 
         parameterExpression = buildPntrArrRefExp (buildVarRefExp (
-            formalParameterDeclarations[get_OP_DAT_VariableName (i)]),
+            formalParameterDeclarations[get_OP_DAT_FormalParameterName (i)]),
             arraySubscriptExpression);
       }
       else
@@ -275,8 +275,8 @@ FortranCUDAKernelSubroutineIndirectLoop::createUserSubroutineCall ()
     userDeviceSubroutineParameters->append_expression (parameterExpression);
   }
 
-  return buildFunctionCallStmt (userDeviceSubroutine->getSubroutineName (),
-      buildVoidType (), userDeviceSubroutineParameters, subroutineScope);
+  return buildFunctionCallStmt (userSubroutineName, buildVoidType (),
+      userDeviceSubroutineParameters, subroutineScope);
 }
 
 void
@@ -438,7 +438,7 @@ FortranCUDAKernelSubroutineIndirectLoop::applyPointeredIncrementsOrWrites ()
             multiplyExpression4_b);
 
         SgVarRefExp * OP_DAT_Reference4 = buildVarRefExp (
-            formalParameterDeclarations[get_OP_DAT_VariableName (i)]);
+            formalParameterDeclarations[get_OP_DAT_FormalParameterName (i)]);
 
         SgPntrArrRefExp * deviceVarField = buildPntrArrRefExp (
             OP_DAT_Reference4, addExpression4_d);
@@ -1092,7 +1092,7 @@ FortranCUDAKernelSubroutineIndirectLoop::createAutosharedWhileLoops ()
             multiplyExpression4_b);
 
         SgVarRefExp * OP_DAT_Reference4 = buildVarRefExp (
-            formalParameterDeclarations[get_OP_DAT_VariableName (i)]);
+            formalParameterDeclarations[get_OP_DAT_FormalParameterName (i)]);
 
         SgPntrArrRefExp * arrayIndexExpression4_c = buildPntrArrRefExp (
             OP_DAT_Reference4, addExpression4_d);
@@ -1624,7 +1624,7 @@ FortranCUDAKernelSubroutineIndirectLoop::createPlanFormalParameterDeclarations (
                 formalParameterDeclarations[IndirectAndDirectLoop::Fortran::VariableNames::argsSizes]);
 
     SgVarRefExp * fieldReference = buildVarRefExp (
-        dataSizesDeclarationOfIndirectLoop->getFieldDeclaration (*it + "Size"));
+        dataSizesDeclaration->getFieldDeclaration (*it + "Size"));
 
     SgDotExp * fieldSelectionExpression = buildDotExp (argsSizesReference,
         fieldReference);
@@ -1682,11 +1682,9 @@ FortranCUDAKernelSubroutineIndirectLoop::create_OP_DAT_FormalParameterDeclaratio
               buildVarRefExp (
                   formalParameterDeclarations[IndirectAndDirectLoop::Fortran::VariableNames::argsSizes]);
 
-      SgVarRefExp * fieldReference =
-          buildVarRefExp (
-              dataSizesDeclarationOfIndirectLoop->getFieldDeclaration (
-                  dataSizesDeclarationOfIndirectLoop->get_OP_DAT_SizeFieldName (
-                      i)));
+      SgVarRefExp * fieldReference = buildVarRefExp (
+          dataSizesDeclaration->getFieldDeclaration (
+              dataSizesDeclaration->get_OP_DAT_SizeFieldName (i)));
 
       SgDotExp * fieldSelectionExpression = buildDotExp (argsSizesReference,
           fieldReference);
@@ -1706,9 +1704,9 @@ FortranCUDAKernelSubroutineIndirectLoop::create_OP_DAT_FormalParameterDeclaratio
 
       ROSE_ASSERT ( baseArrayType != NULL );
 
-      formalParameterDeclarations[get_OP_DAT_VariableName (i)]
+      formalParameterDeclarations[get_OP_DAT_FormalParameterName (i)]
           = FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
-              get_OP_DAT_VariableName (i),
+              get_OP_DAT_FormalParameterName (i),
               FortranTypesBuilder::getArray_RankOne_WithLowerAndUpperBounds (
                   baseArrayType->get_base_type (), lowerBoundExpression,
                   upperBoundExpression), subroutineScope, formalParameters, 1,
@@ -1724,8 +1722,8 @@ FortranCUDAKernelSubroutineIndirectLoop::create_OP_DAT_FormalParameterDeclaratio
       SgVarRefExp
           * fieldReference2 =
               buildVarRefExp (
-                  dataSizesDeclarationOfIndirectLoop->getFieldDeclaration (
-                      dataSizesDeclarationOfIndirectLoop->getLocalToGlobalRenumberingSizeFieldName (
+                  dataSizesDeclaration->getFieldDeclaration (
+                      dataSizesDeclaration->getLocalToGlobalRenumberingSizeFieldName (
                           i)));
 
       SgDotExp * fieldSelectionExpression2 = buildDotExp (argsSizesReference2,
@@ -1763,8 +1761,8 @@ FortranCUDAKernelSubroutineIndirectLoop::create_OP_DAT_FormalParameterDeclaratio
       SgVarRefExp
           * fieldReference =
               buildVarRefExp (
-                  dataSizesDeclarationOfIndirectLoop->getFieldDeclaration (
-                      dataSizesDeclarationOfIndirectLoop->getGlobalToLocalRenumberingSizeFieldName (
+                  dataSizesDeclaration->getFieldDeclaration (
+                      dataSizesDeclaration->getGlobalToLocalRenumberingSizeFieldName (
                           i)));
 
       SgDotExp * fieldSelectionExpression = buildDotExp (argsSizesReference,
@@ -1800,11 +1798,9 @@ FortranCUDAKernelSubroutineIndirectLoop::create_OP_DAT_FormalParameterDeclaratio
               buildVarRefExp (
                   formalParameterDeclarations[IndirectAndDirectLoop::Fortran::VariableNames::argsSizes]);
 
-      SgVarRefExp * fieldReference =
-          buildVarRefExp (
-              dataSizesDeclarationOfIndirectLoop->getFieldDeclaration (
-                  dataSizesDeclarationOfIndirectLoop->get_OP_DAT_SizeFieldName (
-                      i)));
+      SgVarRefExp * fieldReference = buildVarRefExp (
+          dataSizesDeclaration->getFieldDeclaration (
+              dataSizesDeclaration->get_OP_DAT_SizeFieldName (i)));
 
       SgDotExp * fieldSelectionExpression = buildDotExp (argsSizesReference,
           fieldReference);
@@ -1812,9 +1808,9 @@ FortranCUDAKernelSubroutineIndirectLoop::create_OP_DAT_FormalParameterDeclaratio
       SgSubtractOp * upperBoundExpression = buildSubtractOp (
           fieldSelectionExpression, buildIntVal (1));
 
-      formalParameterDeclarations[get_OP_DAT_VariableName (i)]
+      formalParameterDeclarations[get_OP_DAT_FormalParameterName (i)]
           = FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
-              get_OP_DAT_VariableName (i),
+              get_OP_DAT_FormalParameterName (i),
               FortranTypesBuilder::getArray_RankOne_WithLowerAndUpperBounds (
                   parallelLoop->get_OP_DAT_Type (i), lowerBoundExpression,
                   upperBoundExpression), subroutineScope, formalParameters, 1,
@@ -1849,142 +1845,142 @@ FortranCUDAKernelSubroutineIndirectLoop::createLocalVariableDeclarations ()
   createLocalThreadDeclarations ();
 
   for (unsigned int i = 1; i
-        <= parallelLoop->getNumberOf_OP_DAT_ArgumentGroups (); ++i)
+      <= parallelLoop->getNumberOf_OP_DAT_ArgumentGroups (); ++i)
+  {
+    string const & variableName = getNumberOfBytesVariableName (i);
+
+    if (parallelLoop->isDuplicate_OP_DAT (i) == false)
     {
-      string const & variableName = getNumberOfBytesVariableName (i);
-
-      if (parallelLoop->isDuplicate_OP_DAT (i) == false)
-      {
-        localVariableDeclarations[variableName]
-            = FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
-                variableName, FortranTypesBuilder::getFourByteInteger (),
-                subroutineScope);
-
-        positionOf_nbytes[parallelLoop->get_OP_DAT_VariableName (i)] = i;
-      }
-      else
-      {
-        localVariableDeclarations[variableName]
-            = localVariableDeclarations[getNumberOfBytesVariableName (
-                positionOf_nbytes[parallelLoop->get_OP_DAT_VariableName (i)])];
-      }
-    }
-
-    for (unsigned int i = 1; i
-        <= parallelLoop->getNumberOf_OP_DAT_ArgumentGroups (); ++i)
-    {
-      if (parallelLoop->isDuplicate_OP_DAT (i) == false)
-      {
-        string const & variableName = getRoundUpVariableName (i);
-
-        localVariableDeclarations[variableName]
-            = FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
-                variableName, FortranTypesBuilder::getFourByteInteger (),
-                subroutineScope);
-      }
-    }
-
-    for (unsigned int i = 1; i
-        <= parallelLoop->getNumberOf_OP_DAT_ArgumentGroups (); ++i)
-    {
-      if (parallelLoop->get_OP_Access_Value (i) == INC_ACCESS)
-      {
-        string const variableName =
-            IndirectAndDirectLoop::Fortran::VariablePrefixes::OP_DAT
-                + lexical_cast <string> (i) + "_map";
-
-        localVariables_incrementAccessMaps[i]
-            = FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
-                variableName, FortranTypesBuilder::getFourByteInteger (),
-                subroutineScope);
-      }
-    }
-
-    for (unsigned int i = 1; i
-        <= parallelLoop->getNumberOf_OP_DAT_ArgumentGroups (); ++i)
-    {
-      if (parallelLoop->isDuplicate_OP_DAT (i) == false
-          && parallelLoop->get_OP_MAP_Value (i) == INDIRECT)
-      {
-        string const variableName = "ind_arg" + lexical_cast <string> (i)
-            + "_size";
-
-        localVariables_indArgSizes[i]
-            = FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
-                variableName, FortranTypesBuilder::getFourByteInteger (),
-                subroutineScope, 1, SHARED);
-      }
-    }
-
-    vector <string> sharedFourByteIntegerVariables;
-
-    sharedFourByteIntegerVariables.push_back (
-        IndirectLoop::Fortran::KernelSubroutine::VariableNames::blockID);
-
-    sharedFourByteIntegerVariables.push_back (
-        IndirectLoop::Fortran::KernelSubroutine::VariableNames::ncolor);
-
-    sharedFourByteIntegerVariables.push_back (
-        IndirectLoop::Fortran::KernelSubroutine::VariableNames::nelem);
-
-    sharedFourByteIntegerVariables.push_back (
-        IndirectLoop::Fortran::KernelSubroutine::VariableNames::nelems2);
-
-    sharedFourByteIntegerVariables.push_back (
-        IndirectLoop::Fortran::KernelSubroutine::VariableNames::offset_b);
-
-    for (vector <string>::const_iterator it =
-        sharedFourByteIntegerVariables.begin (); it
-        != sharedFourByteIntegerVariables.end (); ++it)
-    {
-      localVariableDeclarations[*it]
+      localVariableDeclarations[variableName]
           = FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
-              *it, FortranTypesBuilder::getFourByteInteger (), subroutineScope,
-              1, SHARED);
+              variableName, FortranTypesBuilder::getFourByteInteger (),
+              subroutineScope);
+
+      positionOf_nbytes[parallelLoop->get_OP_DAT_VariableName (i)] = i;
     }
+    else
+    {
+      localVariableDeclarations[variableName]
+          = localVariableDeclarations[getNumberOfBytesVariableName (
+              positionOf_nbytes[parallelLoop->get_OP_DAT_VariableName (i)])];
+    }
+  }
 
-    SgExpression * upperBoundExpression = new SgAsteriskShapeExp (
-        ROSEHelper::getFileInfo ());
+  for (unsigned int i = 1; i
+      <= parallelLoop->getNumberOf_OP_DAT_ArgumentGroups (); ++i)
+  {
+    if (parallelLoop->isDuplicate_OP_DAT (i) == false)
+    {
+      string const & variableName = getRoundUpVariableName (i);
 
-    localVariableDeclarations[IndirectAndDirectLoop::Fortran::VariableNames::autoshared]
+      localVariableDeclarations[variableName]
+          = FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
+              variableName, FortranTypesBuilder::getFourByteInteger (),
+              subroutineScope);
+    }
+  }
+
+  for (unsigned int i = 1; i
+      <= parallelLoop->getNumberOf_OP_DAT_ArgumentGroups (); ++i)
+  {
+    if (parallelLoop->get_OP_Access_Value (i) == INC_ACCESS)
+    {
+      string const variableName =
+          IndirectAndDirectLoop::Fortran::VariablePrefixes::OP_DAT
+              + lexical_cast <string> (i) + "_map";
+
+      localVariables_incrementAccessMaps[i]
+          = FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
+              variableName, FortranTypesBuilder::getFourByteInteger (),
+              subroutineScope);
+    }
+  }
+
+  for (unsigned int i = 1; i
+      <= parallelLoop->getNumberOf_OP_DAT_ArgumentGroups (); ++i)
+  {
+    if (parallelLoop->isDuplicate_OP_DAT (i) == false
+        && parallelLoop->get_OP_MAP_Value (i) == INDIRECT)
+    {
+      string const variableName = "ind_arg" + lexical_cast <string> (i)
+          + "_size";
+
+      localVariables_indArgSizes[i]
+          = FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
+              variableName, FortranTypesBuilder::getFourByteInteger (),
+              subroutineScope, 1, SHARED);
+    }
+  }
+
+  vector <string> sharedFourByteIntegerVariables;
+
+  sharedFourByteIntegerVariables.push_back (
+      IndirectLoop::Fortran::KernelSubroutine::VariableNames::blockID);
+
+  sharedFourByteIntegerVariables.push_back (
+      IndirectLoop::Fortran::KernelSubroutine::VariableNames::ncolor);
+
+  sharedFourByteIntegerVariables.push_back (
+      IndirectLoop::Fortran::KernelSubroutine::VariableNames::nelem);
+
+  sharedFourByteIntegerVariables.push_back (
+      IndirectLoop::Fortran::KernelSubroutine::VariableNames::nelems2);
+
+  sharedFourByteIntegerVariables.push_back (
+      IndirectLoop::Fortran::KernelSubroutine::VariableNames::offset_b);
+
+  for (vector <string>::const_iterator it =
+      sharedFourByteIntegerVariables.begin (); it
+      != sharedFourByteIntegerVariables.end (); ++it)
+  {
+    localVariableDeclarations[*it]
         = FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
-            IndirectAndDirectLoop::Fortran::VariableNames::autoshared,
-            FortranTypesBuilder::getArray_RankOne (
-                FortranTypesBuilder::getDoublePrecisionFloat (), 0,
-                upperBoundExpression), subroutineScope, 1, SHARED);
+            *it, FortranTypesBuilder::getFourByteInteger (), subroutineScope,
+            1, SHARED);
+  }
 
-    vector <string> fourByteIntegerVariables;
-    fourByteIntegerVariables.push_back (
-        IndirectLoop::Fortran::KernelSubroutine::VariableNames::col);
+  SgExpression * upperBoundExpression = new SgAsteriskShapeExp (
+      ROSEHelper::getFileInfo ());
 
-    fourByteIntegerVariables.push_back (
-        IndirectLoop::Fortran::KernelSubroutine::VariableNames::col2);
+  localVariableDeclarations[IndirectAndDirectLoop::Fortran::VariableNames::autoshared]
+      = FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
+          IndirectAndDirectLoop::Fortran::VariableNames::autoshared,
+          FortranTypesBuilder::getArray_RankOne (
+              FortranTypesBuilder::getDoublePrecisionFloat (), 0,
+              upperBoundExpression), subroutineScope, 1, SHARED);
 
-    fourByteIntegerVariables.push_back (
-        IndirectLoop::Fortran::KernelSubroutine::VariableNames::iterationCounter);
+  vector <string> fourByteIntegerVariables;
+  fourByteIntegerVariables.push_back (
+      IndirectLoop::Fortran::KernelSubroutine::VariableNames::col);
 
-    fourByteIntegerVariables.push_back (
-        IndirectLoop::Fortran::KernelSubroutine::VariableNames::iterationCounter2);
+  fourByteIntegerVariables.push_back (
+      IndirectLoop::Fortran::KernelSubroutine::VariableNames::col2);
 
-    fourByteIntegerVariables.push_back (
-        IndirectLoop::Fortran::KernelSubroutine::VariableNames::moduloResult);
+  fourByteIntegerVariables.push_back (
+      IndirectLoop::Fortran::KernelSubroutine::VariableNames::iterationCounter);
 
-    fourByteIntegerVariables.push_back (
-        IndirectLoop::Fortran::KernelSubroutine::VariableNames::moduled);
+  fourByteIntegerVariables.push_back (
+      IndirectLoop::Fortran::KernelSubroutine::VariableNames::iterationCounter2);
 
-    fourByteIntegerVariables.push_back (
-        IndirectLoop::Fortran::KernelSubroutine::VariableNames::nbytes);
+  fourByteIntegerVariables.push_back (
+      IndirectLoop::Fortran::KernelSubroutine::VariableNames::moduloResult);
 
-    fourByteIntegerVariables.push_back (
-        IndirectLoop::Fortran::KernelSubroutine::VariableNames::whileLoopBound);
+  fourByteIntegerVariables.push_back (
+      IndirectLoop::Fortran::KernelSubroutine::VariableNames::moduled);
 
-    for (vector <string>::const_iterator it = fourByteIntegerVariables.begin (); it
-        != fourByteIntegerVariables.end (); ++it)
-    {
-      localVariableDeclarations[*it]
-          = FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
-              *it, FortranTypesBuilder::getFourByteInteger (), subroutineScope);
-    }
+  fourByteIntegerVariables.push_back (
+      IndirectLoop::Fortran::KernelSubroutine::VariableNames::nbytes);
+
+  fourByteIntegerVariables.push_back (
+      IndirectLoop::Fortran::KernelSubroutine::VariableNames::whileLoopBound);
+
+  for (vector <string>::const_iterator it = fourByteIntegerVariables.begin (); it
+      != fourByteIntegerVariables.end (); ++it)
+  {
+    localVariableDeclarations[*it]
+        = FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
+            *it, FortranTypesBuilder::getFourByteInteger (), subroutineScope);
+  }
 }
 
 void
@@ -1993,8 +1989,8 @@ FortranCUDAKernelSubroutineIndirectLoop::createFormalParameterDeclarations ()
   formalParameterDeclarations[IndirectAndDirectLoop::Fortran::VariableNames::argsSizes]
       = FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
           IndirectAndDirectLoop::Fortran::VariableNames::argsSizes,
-          dataSizesDeclarationOfIndirectLoop->getType (), subroutineScope,
-          formalParameters, 1, DEVICE);
+          dataSizesDeclaration->getType (), subroutineScope, formalParameters,
+          1, DEVICE);
 
   create_OP_DAT_FormalParameterDeclarations ();
 
@@ -2002,35 +1998,13 @@ FortranCUDAKernelSubroutineIndirectLoop::createFormalParameterDeclarations ()
 }
 
 FortranCUDAKernelSubroutineIndirectLoop::FortranCUDAKernelSubroutineIndirectLoop (
-    std::string const & subroutineName,
-    FortranCUDAUserDeviceSubroutine * userDeviceSubroutine,
-    FortranCUDADataSizesDeclarationIndirectLoop * dataSizesDeclarationOfIndirectLoop,
-    ParallelLoop * parallelLoop, SgScopeStatement * moduleScope) :
-  FortranCUDAKernelSubroutine (subroutineName, userDeviceSubroutine, parallelLoop)
+    std::string const & subroutineName, std::string const & userSubroutineName,
+    ParallelLoop * parallelLoop, SgScopeStatement * moduleScope,
+    FortranCUDADataSizesDeclarationIndirectLoop * dataSizesDeclaration) :
+  FortranCUDAKernelSubroutine (subroutineName, userSubroutineName,
+      parallelLoop, moduleScope)
 {
-  using SageBuilder::buildVariableDeclaration;
-  using SageBuilder::buildProcedureHeaderStatement;
-  using SageBuilder::buildVoidType;
-  using SageBuilder::buildFunctionParameterList;
-  using SageInterface::appendStatement;
-  using SageInterface::addTextForUnparser;
-  using std::string;
-  using std::vector;
-
-  this->dataSizesDeclarationOfIndirectLoop = dataSizesDeclarationOfIndirectLoop;
-
-  formalParameters = buildFunctionParameterList ();
-
-  subroutineHeaderStatement = buildProcedureHeaderStatement (
-      this->subroutineName.c_str (), buildVoidType (), formalParameters,
-      SgProcedureHeaderStatement::e_subroutine_subprogram_kind, moduleScope);
-
-  addTextForUnparser (subroutineHeaderStatement, "attributes(global) ",
-      AstUnparseAttribute::e_before);
-
-  appendStatement (subroutineHeaderStatement, moduleScope);
-
-  subroutineScope = subroutineHeaderStatement->get_definition ()->get_body ();
+  this->dataSizesDeclaration = dataSizesDeclaration;
 
   createFormalParameterDeclarations ();
 

@@ -466,6 +466,8 @@ namespace OpenMP
   std::string const threadIndex = "threadIndex";
   std::string const sliceStart = "sliceStart";
   std::string const sliceEnd = "sliceEnd";
+  std::string const threadID = "threadID";
+  std::string const sliceIterator = "sliceIterator";
 }
 
 #endif

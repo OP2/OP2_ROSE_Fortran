@@ -15,6 +15,7 @@
 #include <FortranCUDAReductionSubroutine.h>
 #include <FortranOpenMPModuleDeclarations.h>
 #include <FortranOpenMPHostSubroutineDirectLoop.h>
+#include <FortranOpenMPKernelSubroutineDirectLoop.h>
 
 /*
  * ======================================================
@@ -186,10 +187,14 @@ FortranSubroutinesGeneration::createOpenMPSubroutines (
 
     addContains (moduleStatement);
 
+    FortranOpenMPKernelSubroutineDirectLoop * kernelSubroutine =
+        new FortranOpenMPKernelSubroutineDirectLoop (userSubroutineName,
+            userSubroutineName, parallelLoop, moduleScope);
+
     FortranOpenMPHostSubroutineDirectLoop * hostSubroutine =
         new FortranOpenMPHostSubroutineDirectLoop (userSubroutineName,
-            userSubroutineName, userSubroutineName, parallelLoop, moduleScope,
-            moduleDeclarations);
+            userSubroutineName, kernelSubroutine->getSubroutineName (),
+            parallelLoop, moduleScope, moduleDeclarations);
   }
   else
   {
@@ -248,8 +253,8 @@ FortranSubroutinesGeneration::createCUDASubroutines (
         parallelLoop, moduleScope);
 
     kernelSubroutine = new FortranCUDAKernelSubroutineDirectLoop (
-        userSubroutineName, userDeviceSubroutine, dataSizesDeclaration,
-        parallelLoop, moduleScope);
+        userSubroutineName, userDeviceSubroutine->getSubroutineName (),
+        parallelLoop, moduleScope, dataSizesDeclaration);
 
     hostSubroutine = new FortranCUDAHostSubroutineDirectLoop (
         userSubroutineName, userDeviceSubroutine->getSubroutineName (),
@@ -281,8 +286,8 @@ FortranSubroutinesGeneration::createCUDASubroutines (
         parallelLoop, moduleScope);
 
     kernelSubroutine = new FortranCUDAKernelSubroutineIndirectLoop (
-        userSubroutineName, userDeviceSubroutine, dataSizesDeclaration,
-        parallelLoop, moduleScope);
+        userSubroutineName, userDeviceSubroutine->getSubroutineName (),
+        parallelLoop, moduleScope, dataSizesDeclaration);
 
     hostSubroutine = new FortranCUDAHostSubroutineIndirectLoop (
         userSubroutineName, userDeviceSubroutine->getSubroutineName (),

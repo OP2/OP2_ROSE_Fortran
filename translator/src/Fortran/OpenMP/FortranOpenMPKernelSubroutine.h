@@ -1,21 +1,16 @@
 #ifndef FORTRAN_OPENMP_KERNEL_SUBROUTINE_H
 #define FORTRAN_OPENMP_KERNEL_SUBROUTINE_H
 
-#include <Subroutine.h>
+#include <FortranKernelSubroutine.h>
 #include <ParallelLoop.h>
 
-class FortranOpenMPKernelSubroutine: public Subroutine
+class FortranOpenMPKernelSubroutine: public FortranKernelSubroutine
 {
   protected:
 
-    Subroutine * userSubroutine;
-
-    ParallelLoop * parallelLoop;
-
-  protected:
-
     FortranOpenMPKernelSubroutine (std::string const & subroutineName,
-        Subroutine * userSubroutine, ParallelLoop * parallelLoop);
+        std::string const & userSubroutineName, ParallelLoop * parallelLoop,
+        SgScopeStatement * moduleScope);
 };
 
 #endif

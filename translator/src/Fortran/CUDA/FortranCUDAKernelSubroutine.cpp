@@ -13,16 +13,6 @@
  */
 
 std::string
-FortranCUDAKernelSubroutine::get_OP_DAT_VariableName (unsigned int OP_DAT_ArgumentGroup)
-{
-  using boost::lexical_cast;
-  using std::string;
-
-  return IndirectAndDirectLoop::Fortran::VariablePrefixes::OP_DAT
-      + lexical_cast <string> (OP_DAT_ArgumentGroup);
-}
-
-std::string
 FortranCUDAKernelSubroutine::get_OP_DAT_SizeVariableName (
     unsigned int OP_DAT_ArgumentGroup)
 {
@@ -269,9 +259,10 @@ FortranCUDAKernelSubroutine::createReductionSubroutineCall ()
             deviceVarAccess->setCompilerGenerated ();
             deviceVarAccess->setOutputInCodeGeneration ();
 
-            SgExpression * deviceVar = buildPntrArrRefExp (buildVarRefExp (
-                formalParameterDeclarations[get_OP_DAT_VariableName (i)]),
-                deviceVarAccess);
+            SgExpression * deviceVar = buildPntrArrRefExp (
+                buildVarRefExp (
+                    formalParameterDeclarations[get_OP_DAT_FormalParameterName (
+                        i)]), deviceVarAccess);
 
             SgExpression
                 * localThreadVar =
@@ -425,11 +416,27 @@ FortranCUDAKernelSubroutine::createAutosharedDeclaration ()
   }
 }
 
-FortranCUDAKernelSubroutine::FortranCUDAKernelSubroutine (std::string const & subroutineName,
-    FortranCUDAUserDeviceSubroutine * userDeviceSubroutine, ParallelLoop * parallelLoop) :
-  Subroutine (subroutineName + SubroutineNameSuffixes::kernelSuffix)
+FortranCUDAKernelSubroutine::FortranCUDAKernelSubroutine (
+    std::string const & subroutineName, std::string const & userSubroutineName,
+    ParallelLoop * parallelLoop, SgScopeStatement * moduleScope) :
+  FortranKernelSubroutine (subroutineName, userSubroutineName, parallelLoop)
 {
-  this->userDeviceSubroutine = userDeviceSubroutine;
+  using SageBuilder::buildFunctionParameterList;
+  using SageBuilder::buildVoidType;
+  using SageBuilder::buildProcedureHeaderStatement;
+  using SageInterface::appendStatement;
+  using SageInterface::addTextForUnparser;
 
-  this->parallelLoop = parallelLoop;
+  formalParameters = buildFunctionParameterList ();
+
+  subroutineHeaderStatement = buildProcedureHeaderStatement (
+      this->subroutineName.c_str (), buildVoidType (), formalParameters,
+      SgProcedureHeaderStatement::e_subroutine_subprogram_kind, moduleScope);
+
+  appendStatement (subroutineHeaderStatement, moduleScope);
+
+  addTextForUnparser (subroutineHeaderStatement, "attributes(host) ",
+      AstUnparseAttribute::e_before);
+
+  subroutineScope = subroutineHeaderStatement->get_definition ()->get_body ();
 }

@@ -75,7 +75,7 @@ FortranCUDAKernelSubroutineDirectLoop::createUserSubroutineCall ()
         arraySubscriptExpression->setOutputInCodeGeneration ();
 
         parameterExpression = buildPntrArrRefExp (buildVarRefExp (
-            formalParameterDeclarations[get_OP_DAT_VariableName (i)]),
+            formalParameterDeclarations[get_OP_DAT_FormalParameterName (i)]),
             arraySubscriptExpression);
       }
       else
@@ -119,7 +119,7 @@ FortranCUDAKernelSubroutineDirectLoop::createUserSubroutineCall ()
         arraySubscriptExpression->setOutputInCodeGeneration ();
 
         parameterExpression = buildPntrArrRefExp (buildVarRefExp (
-            formalParameterDeclarations[get_OP_DAT_VariableName (i)]),
+            formalParameterDeclarations[get_OP_DAT_FormalParameterName (i)]),
             arraySubscriptExpression);
       }
       else if (dim == 1)
@@ -141,7 +141,7 @@ FortranCUDAKernelSubroutineDirectLoop::createUserSubroutineCall ()
         arraySubscriptExpression->setOutputInCodeGeneration ();
 
         parameterExpression = buildPntrArrRefExp (buildVarRefExp (
-            formalParameterDeclarations[get_OP_DAT_VariableName (i)]),
+            formalParameterDeclarations[get_OP_DAT_FormalParameterName (i)]),
             arraySubscriptExpression);
       }
       else
@@ -154,8 +154,8 @@ FortranCUDAKernelSubroutineDirectLoop::createUserSubroutineCall ()
     userDeviceSubroutineParameters->append_expression (parameterExpression);
   }
 
-  return buildFunctionCallStmt (userDeviceSubroutine->getSubroutineName (),
-      buildVoidType (), userDeviceSubroutineParameters, subroutineScope);
+  return buildFunctionCallStmt (userSubroutineName, buildVoidType (),
+      userDeviceSubroutineParameters, subroutineScope);
 }
 
 SgBasicBlock *
@@ -231,8 +231,9 @@ FortranCUDAKernelSubroutineDirectLoop::stageInFromDeviceMemoryToLocalThreadVaria
 
       SgExpression * assignAutosharedInit = buildAssignOp (buildPntrArrRefExp (
           autoSharedVarRef, autosharedAccessFirst), buildPntrArrRefExp (
-          buildVarRefExp (formalParameterDeclarations[get_OP_DAT_VariableName (
-              i)]), opdatArgAccess));
+          buildVarRefExp (
+              formalParameterDeclarations[get_OP_DAT_FormalParameterName (i)]),
+          opdatArgAccess));
 
       SgBasicBlock * firstLoopBody = buildBasicBlock (buildExprStatement (
           assignAutosharedInit));
@@ -375,9 +376,10 @@ FortranCUDAKernelSubroutineDirectLoop::stageOutFromLocalThreadVariablesToDeviceM
           buildAddOp (tidVarRef, buildMultiplyOp (mVarRef, nelemsVarRef)));
 
       SgExpression * assignDeviceVar = buildAssignOp (buildPntrArrRefExp (
-          buildVarRefExp (formalParameterDeclarations[get_OP_DAT_VariableName (
-              i)]), deviceVarAccessSecond), buildPntrArrRefExp (
-          autoSharedVarRef, autosharedAccessSecond));
+          buildVarRefExp (
+              formalParameterDeclarations[get_OP_DAT_FormalParameterName (i)]),
+          deviceVarAccessSecond), buildPntrArrRefExp (autoSharedVarRef,
+          autosharedAccessSecond));
 
       SgBasicBlock * secondLoopBody = buildBasicBlock (buildExprStatement (
           assignDeviceVar));
@@ -808,9 +810,9 @@ FortranCUDAKernelSubroutineDirectLoop::create_OP_DAT_FormalParameters ()
        * ======================================================
        */
 
-      formalParameterDeclarations[get_OP_DAT_VariableName (i)]
+      formalParameterDeclarations[get_OP_DAT_FormalParameterName (i)]
           = FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
-              get_OP_DAT_VariableName (i), arrayType, subroutineScope,
+              get_OP_DAT_FormalParameterName(i), arrayType, subroutineScope,
               formalParameters, 1, DEVICE);
     }
   }
@@ -822,7 +824,7 @@ FortranCUDAKernelSubroutineDirectLoop::createFormalParameterDeclarations ()
   formalParameterDeclarations[IndirectAndDirectLoop::Fortran::VariableNames::argsSizes]
       = FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
           IndirectAndDirectLoop::Fortran::VariableNames::argsSizes,
-          dataSizesDeclarationOfDirectLoop->getType (), subroutineScope,
+          dataSizesDeclaration->getType (), subroutineScope,
           formalParameters, 1, DEVICE);
 
   create_OP_DAT_FormalParameters ();
@@ -884,31 +886,14 @@ FortranCUDAKernelSubroutineDirectLoop::createFormalParameterDeclarations ()
 
 FortranCUDAKernelSubroutineDirectLoop::FortranCUDAKernelSubroutineDirectLoop (
     std::string const & subroutineName,
-    FortranCUDAUserDeviceSubroutine * userDeviceSubroutine,
-    FortranCUDADataSizesDeclarationDirectLoop * dataSizesDeclarationOfDirectLoop,
-    ParallelLoop * parallelLoop, SgScopeStatement * moduleScope) :
-  FortranCUDAKernelSubroutine (subroutineName, userDeviceSubroutine, parallelLoop)
+    std::string const & userSubroutineName,
+    ParallelLoop * parallelLoop,
+    SgScopeStatement * moduleScope,
+    FortranCUDADataSizesDeclarationDirectLoop * dataSizesDeclaration) :
+  FortranCUDAKernelSubroutine (subroutineName, userSubroutineName,
+      parallelLoop, moduleScope)
 {
-  using SageBuilder::buildProcedureHeaderStatement;
-  using SageBuilder::buildVoidType;
-  using SageBuilder::buildFunctionParameterList;
-  using SageInterface::appendStatement;
-  using SageInterface::addTextForUnparser;
-
-  this->dataSizesDeclarationOfDirectLoop = dataSizesDeclarationOfDirectLoop;
-
-  formalParameters = buildFunctionParameterList ();
-
-  subroutineHeaderStatement = buildProcedureHeaderStatement (
-      this->subroutineName.c_str (), buildVoidType (), formalParameters,
-      SgProcedureHeaderStatement::e_subroutine_subprogram_kind, moduleScope);
-
-  addTextForUnparser (subroutineHeaderStatement, "attributes(global) ",
-      AstUnparseAttribute::e_before);
-
-  appendStatement (subroutineHeaderStatement, moduleScope);
-
-  subroutineScope = subroutineHeaderStatement->get_definition ()->get_body ();
+  this->dataSizesDeclaration = dataSizesDeclaration;
 
   createFormalParameterDeclarations ();
 

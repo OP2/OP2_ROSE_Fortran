@@ -1,29 +1,13 @@
 #ifndef FORTRAN_CUDA_KERNEL_SUBROUTINE_H
 #define FORTRAN_CUDA_KERNEL_SUBROUTINE_H
 
-#include <Subroutine.h>
-#include <FortranCUDAUserDeviceSubroutine.h>
+#include <FortranKernelSubroutine.h>
 #include <ParallelLoop.h>
 #include <FortranCUDADataSizesDeclaration.h>
 
-class FortranCUDAKernelSubroutine: public Subroutine
+class FortranCUDAKernelSubroutine: public FortranKernelSubroutine
 {
   protected:
-
-    FortranCUDAUserDeviceSubroutine * userDeviceSubroutine;
-
-    ParallelLoop * parallelLoop;
-
-  protected:
-
-    /*
-     * ======================================================
-     * Returns the name of the OP_DAT variable in this OP_DAT
-     * argument group
-     * ======================================================
-     */
-    static std::string
-    get_OP_DAT_VariableName (unsigned int OP_DAT_ArgumentGroup);
 
     /*
      * ======================================================
@@ -49,12 +33,6 @@ class FortranCUDAKernelSubroutine: public Subroutine
     void
     createReductionSubroutineCall ();
 
-    SgStatement *
-    createUserSubroutineCall (FortranCUDAUserDeviceSubroutine * userDeviceSubroutine,
-        SgVariableDeclaration * variable_setElementCounter,
-        SgVariableDeclaration * variable_offsetInThreadBlock,
-        ParallelLoop * parallelLoop);
-
     void
     createLocalThreadDeclarations ();
 
@@ -62,8 +40,8 @@ class FortranCUDAKernelSubroutine: public Subroutine
     createAutosharedDeclaration ();
 
     FortranCUDAKernelSubroutine (std::string const & subroutineName,
-        FortranCUDAUserDeviceSubroutine * userDeviceSubroutine,
-        ParallelLoop * parallelLoop);
+        std::string const & userSubroutineName, ParallelLoop * parallelLoop,
+        SgScopeStatement * moduleScope);
 };
 
 #endif
