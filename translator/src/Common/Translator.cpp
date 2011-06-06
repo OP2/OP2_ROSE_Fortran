@@ -28,7 +28,7 @@
 #include <Declarations.h>
 #include <Globals.h>
 #include <ModifyOP2Calls.h>
-#include <NewSubroutinesGeneration.h>
+#include <FortranSubroutinesGeneration.h>
 
 int
 main (int argc, char ** argv)
@@ -97,7 +97,7 @@ main (int argc, char ** argv)
     Debug::getInstance ()->verboseMessage (
         "Creating subroutines for OP_PAR_LOOPs");
 
-    NewSubroutinesGeneration * newSubroutines = new NewSubroutinesGeneration (
+    FortranSubroutinesGeneration * newSubroutines = new FortranSubroutinesGeneration (
         project, declarations);
 
     newSubroutines->traverseInputFiles (project, preorder);

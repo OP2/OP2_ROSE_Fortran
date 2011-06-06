@@ -1,7 +1,7 @@
 #include <boost/algorithm/string/predicate.hpp>
 #include <Debug.h>
 #include <Globals.h>
-#include <NewSubroutinesGeneration.h>
+#include <FortranSubroutinesGeneration.h>
 #include <FortranTypesBuilder.h>
 #include <ROSEHelper.h>
 #include <FortranCUDAUserDeviceSubroutine.h>
@@ -14,6 +14,7 @@
 #include <FortranCUDADataSizesDeclarationIndirectLoop.h>
 #include <FortranCUDAReductionSubroutine.h>
 #include <FortranOpenMPModuleDeclarations.h>
+#include <FortranOpenMPHostSubroutineDirectLoop.h>
 
 /*
  * ======================================================
@@ -22,7 +23,7 @@
  */
 
 void
-NewSubroutinesGeneration::patchCallsToParallelLoops (
+FortranSubroutinesGeneration::patchCallsToParallelLoops (
     ParallelLoop & parallelLoop,
     FortranCUDAUserDeviceSubroutine & userDeviceSubroutine,
     FortranCUDAHostSubroutine & hostSubroutine, SgScopeStatement * scope,
@@ -162,23 +163,14 @@ NewSubroutinesGeneration::patchCallsToParallelLoops (
 }
 
 void
-NewSubroutinesGeneration::createOpenMPSubroutines (ParallelLoop * parallelLoop,
-    std::string const & userSubroutineName,
+FortranSubroutinesGeneration::createOpenMPSubroutines (
+    ParallelLoop * parallelLoop, std::string const & userSubroutineName,
     SgModuleStatement * moduleStatement, SgNode * node,
     SgFunctionCallExp * functionCallExp)
 {
   addOpenMPLibraries (moduleStatement);
 
   SgScopeStatement * moduleScope = moduleStatement->get_definition ();
-
-  /*
-   * ======================================================
-   * Create the reduction subroutines.
-   * Do we need these in OpenMP?????????????????????????
-   * Commented out for now...
-   * ======================================================
-   */
-  //parallelLoop.generateReductionSubroutines (moduleScope);
 
   if (parallelLoop->isDirectLoop ())
   {
@@ -188,11 +180,16 @@ NewSubroutinesGeneration::createOpenMPSubroutines (ParallelLoop * parallelLoop,
      * ======================================================
      */
 
-    FortranOpenMPModuleDeclarations * openMPModuleDeclarations =
+    FortranOpenMPModuleDeclarations * moduleDeclarations =
         new FortranOpenMPModuleDeclarations (userSubroutineName, parallelLoop,
             moduleScope);
 
     addContains (moduleStatement);
+
+    FortranOpenMPHostSubroutineDirectLoop * hostSubroutine =
+        new FortranOpenMPHostSubroutineDirectLoop (userSubroutineName,
+            userSubroutineName, userSubroutineName, parallelLoop, moduleScope,
+            moduleDeclarations);
   }
   else
   {
@@ -207,8 +204,8 @@ NewSubroutinesGeneration::createOpenMPSubroutines (ParallelLoop * parallelLoop,
 }
 
 void
-NewSubroutinesGeneration::createCUDASubroutines (ParallelLoop * parallelLoop,
-    std::string const & userSubroutineName,
+FortranSubroutinesGeneration::createCUDASubroutines (
+    ParallelLoop * parallelLoop, std::string const & userSubroutineName,
     SgModuleStatement * moduleStatement, SgNode * node,
     SgFunctionCallExp * functionCallExp)
 {
@@ -255,8 +252,9 @@ NewSubroutinesGeneration::createCUDASubroutines (ParallelLoop * parallelLoop,
         parallelLoop, moduleScope);
 
     hostSubroutine = new FortranCUDAHostSubroutineDirectLoop (
-        userSubroutineName, userDeviceSubroutine, kernelSubroutine,
-        dataSizesDeclaration, parallelLoop, moduleScope);
+        userSubroutineName, userDeviceSubroutine->getSubroutineName (),
+        kernelSubroutine->getSubroutineName (), dataSizesDeclaration,
+        parallelLoop, moduleScope);
   }
   else
   {
@@ -287,9 +285,9 @@ NewSubroutinesGeneration::createCUDASubroutines (ParallelLoop * parallelLoop,
         parallelLoop, moduleScope);
 
     hostSubroutine = new FortranCUDAHostSubroutineIndirectLoop (
-        userSubroutineName, userDeviceSubroutine, kernelSubroutine,
-        initialiseConstantsSubroutine, dataSizesDeclaration, parallelLoop,
-        moduleScope);
+        userSubroutineName, userDeviceSubroutine->getSubroutineName (),
+        kernelSubroutine->getSubroutineName (), initialiseConstantsSubroutine,
+        dataSizesDeclaration, parallelLoop, moduleScope);
   }
 
   /*
@@ -306,12 +304,14 @@ NewSubroutinesGeneration::createCUDASubroutines (ParallelLoop * parallelLoop,
 }
 
 void
-NewSubroutinesGeneration::addOpenMPLibraries (
+FortranSubroutinesGeneration::addOpenMPLibraries (
     SgModuleStatement * moduleStatement)
 {
+  using boost::iequals;
   using std::string;
   using std::vector;
   using SageInterface::appendStatement;
+  using SageInterface::addTextForUnparser;
 
   Debug::getInstance ()->debugMessage (
       "Adding 'use' statements to OpenMP module", 2);
@@ -330,11 +330,21 @@ NewSubroutinesGeneration::addOpenMPLibraries (
     useStatement->set_definingDeclaration (moduleStatement);
 
     appendStatement (useStatement, moduleStatement->get_definition ());
+
+    if (iequals (*it, IndirectAndDirectLoop::Fortran::Libraries::OMP_LIB))
+    {
+      addTextForUnparser (useStatement, "#ifdef _OPENMP\n",
+          AstUnparseAttribute::e_before);
+
+      addTextForUnparser (useStatement, "#endif\n",
+          AstUnparseAttribute::e_after);
+    }
   }
 }
 
 void
-NewSubroutinesGeneration::addCUDALibraries (SgModuleStatement * moduleStatement)
+FortranSubroutinesGeneration::addCUDALibraries (
+    SgModuleStatement * moduleStatement)
 {
   using std::string;
   using std::vector;
@@ -366,7 +376,7 @@ NewSubroutinesGeneration::addCUDALibraries (SgModuleStatement * moduleStatement)
 }
 
 void
-NewSubroutinesGeneration::addContains (SgModuleStatement * moduleStatement)
+FortranSubroutinesGeneration::addContains (SgModuleStatement * moduleStatement)
 {
   using SageInterface::appendStatement;
 
@@ -379,7 +389,7 @@ NewSubroutinesGeneration::addContains (SgModuleStatement * moduleStatement)
 }
 
 SgModuleStatement *
-NewSubroutinesGeneration::createFortranModule (SgSourceFile & sourceFile,
+FortranSubroutinesGeneration::createFortranModule (SgSourceFile & sourceFile,
     ParallelLoop & parallelLoop)
 {
   using std::string;
@@ -402,7 +412,7 @@ NewSubroutinesGeneration::createFortranModule (SgSourceFile & sourceFile,
 }
 
 SgSourceFile &
-NewSubroutinesGeneration::createSourceFile (ParallelLoop & parallelLoop)
+FortranSubroutinesGeneration::createSourceFile (ParallelLoop & parallelLoop)
 {
   using SageBuilder::buildFile;
   using std::string;
@@ -483,7 +493,7 @@ NewSubroutinesGeneration::createSourceFile (ParallelLoop & parallelLoop)
  */
 
 void
-NewSubroutinesGeneration::visit (SgNode * node)
+FortranSubroutinesGeneration::visit (SgNode * node)
 {
   using boost::iequals;
   using boost::starts_with;
@@ -616,7 +626,7 @@ NewSubroutinesGeneration::visit (SgNode * node)
 }
 
 void
-NewSubroutinesGeneration::unparse ()
+FortranSubroutinesGeneration::unparse ()
 {
   using std::vector;
 
@@ -642,8 +652,8 @@ NewSubroutinesGeneration::unparse ()
   }
 }
 
-NewSubroutinesGeneration::NewSubroutinesGeneration (SgProject * project,
-    Declarations * declarations)
+FortranSubroutinesGeneration::FortranSubroutinesGeneration (
+    SgProject * project, Declarations * declarations)
 {
   this->project = project;
   this->declarations = declarations;

@@ -9,14 +9,14 @@
  */
 
 std::string
-FortranOpenMPModuleDeclarations::getOPDATName (
+FortranOpenMPModuleDeclarations::getGlobalOPDATName (
     unsigned int OP_DAT_ArgumentGroup)
 {
   using boost::lexical_cast;
   using std::string;
 
   return IndirectAndDirectLoop::Fortran::VariablePrefixes::OP_DAT
-      + lexical_cast <string> (OP_DAT_ArgumentGroup);
+      + lexical_cast <string> (OP_DAT_ArgumentGroup) + "Global";
 }
 
 void
@@ -32,7 +32,7 @@ FortranOpenMPModuleDeclarations::createOPDATDeclarations ()
   {
     if (parallelLoop->isDuplicate_OP_DAT (i) == false)
     {
-      string const & variableName = getOPDATName (i);
+      string const & variableName = getGlobalOPDATName (i);
 
       moduleDeclarations[variableName] = buildVariableDeclaration (
           variableName, buildPointerType (parallelLoop->get_OP_DAT_Type (i)),
@@ -78,13 +78,17 @@ FortranOpenMPModuleDeclarations::getFirstExecutionBooleanVariableName ()
  * ======================================================
  */
 
-SgVarRefExp *
-FortranOpenMPModuleDeclarations::getReferenceToFirstExecutionBoolean ()
+SgVariableDeclaration *
+FortranOpenMPModuleDeclarations::getGlobalOPDATDeclaration (
+    unsigned int OP_DAT_ArgumentGroup)
 {
-  using SageBuilder::buildVarRefExp;
+  return moduleDeclarations[getGlobalOPDATName (OP_DAT_ArgumentGroup)];
+}
 
-  return buildVarRefExp (
-      moduleDeclarations[getFirstExecutionBooleanVariableName ()]);
+SgVariableDeclaration *
+FortranOpenMPModuleDeclarations::getFirstExecutionBooleanDeclaration ()
+{
+  return moduleDeclarations[getFirstExecutionBooleanVariableName ()];
 }
 
 FortranOpenMPModuleDeclarations::FortranOpenMPModuleDeclarations (

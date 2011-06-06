@@ -26,7 +26,8 @@ class FortranCUDAHostSubroutineDirectLoop: public FortranCUDAHostSubroutine
 {
   private:
 
-    FortranCUDADataSizesDeclarationDirectLoop * dataSizesDeclarationOfDirectLoop;
+    FortranCUDADataSizesDeclarationDirectLoop
+        * dataSizesDeclarationOfDirectLoop;
 
   private:
 
@@ -72,11 +73,12 @@ class FortranCUDAHostSubroutineDirectLoop: public FortranCUDAHostSubroutine
 
   public:
 
-    FortranCUDAHostSubroutineDirectLoop (std::string const & subroutineName,
-        FortranCUDAUserDeviceSubroutine * userDeviceSubroutine,
-        FortranCUDAKernelSubroutine * kernelSubroutine,
-        FortranCUDADataSizesDeclarationDirectLoop * dataSizesDeclarationOfDirectLoop,
-        ParallelLoop * parallelLoop, SgScopeStatement * moduleScope);
+        FortranCUDAHostSubroutineDirectLoop (
+            std::string const & subroutineName,
+            std::string const & userSubroutineName,
+            std::string const & kernelSubroutineName,
+            FortranCUDADataSizesDeclarationDirectLoop * dataSizesDeclarationOfDirectLoop,
+            ParallelLoop * parallelLoop, SgScopeStatement * moduleScope);
 };
 
 #endif

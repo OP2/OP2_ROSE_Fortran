@@ -1,12 +1,19 @@
 #include <FortranOpenMPHostSubroutine.h>
 #include <CommonNamespaces.h>
 
+/*
+ * ======================================================
+ * Protected functions
+ * ======================================================
+ */
+
 FortranOpenMPHostSubroutine::FortranOpenMPHostSubroutine (
-    std::string const & subroutineName, Subroutine * userSubroutine,
-    Subroutine * kernelSubroutine, ParallelLoop * parallelLoop,
-    SgScopeStatement * moduleScope) :
-  FortranHostSubroutine (subroutineName + SubroutineNameSuffixes::hostSuffix,
-      userSubroutine, parallelLoop)
+    std::string const & subroutineName, std::string const & userSubroutineName,
+    std::string const & kernelSubroutineName, ParallelLoop * parallelLoop,
+    SgScopeStatement * moduleScope,
+    FortranOpenMPModuleDeclarations * moduleDeclarations) :
+  FortranHostSubroutine (subroutineName, userSubroutineName,
+      kernelSubroutineName, parallelLoop)
 {
   using SageBuilder::buildFunctionParameterList;
   using SageBuilder::buildVoidType;
@@ -14,7 +21,7 @@ FortranOpenMPHostSubroutine::FortranOpenMPHostSubroutine (
   using SageInterface::appendStatement;
   using SageInterface::addTextForUnparser;
 
-  this->kernelSubroutine = kernelSubroutine;
+  this-> moduleDeclarations = moduleDeclarations;
 
   formalParameters = buildFunctionParameterList ();
 

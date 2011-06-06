@@ -292,7 +292,7 @@ FortranCUDAHostSubroutineIndirectLoop::createExecutionPlanExecutionStatements ()
   SgExprStatement
       * statement4 =
           buildFunctionCallStmt (
-              kernelSubroutine->getSubroutineName () + "<<<"
+              kernelSubroutineName + "<<<"
                   + ROSEHelper::getFirstVariableName (
                       localVariableDeclarations[CUDA::Fortran::VariableNames::blocksPerGrid])
                   + ", "
@@ -566,8 +566,9 @@ FortranCUDAHostSubroutineIndirectLoop::createPlanCToForttranPointerConversionSta
    * ======================================================
    */
 
-  callStatement = createCToFortranPointerCall (buildDotExp (actualPlanReference,
-      nindirect_Reference), pnindirectReference, indsNumberShapeExpression);
+  callStatement = createCToFortranPointerCall (buildDotExp (
+      actualPlanReference, nindirect_Reference), pnindirectReference,
+      indsNumberShapeExpression);
 
   appendStatement (callStatement, subroutineScope);
 
@@ -577,8 +578,9 @@ FortranCUDAHostSubroutineIndirectLoop::createPlanCToForttranPointerConversionSta
    * ======================================================
    */
 
-  callStatement = createCToFortranPointerCall (buildDotExp (actualPlanReference,
-      ind_maps_Reference), pindMapsReference, indsNumberShapeExpression);
+  callStatement = createCToFortranPointerCall (buildDotExp (
+      actualPlanReference, ind_maps_Reference), pindMapsReference,
+      indsNumberShapeExpression);
 
   appendStatement (callStatement, subroutineScope);
 
@@ -588,8 +590,8 @@ FortranCUDAHostSubroutineIndirectLoop::createPlanCToForttranPointerConversionSta
    * ======================================================
    */
 
-  callStatement = createCToFortranPointerCall (buildDotExp (actualPlanReference,
-      buildOpaqueVarRefExp (
+  callStatement = createCToFortranPointerCall (buildDotExp (
+      actualPlanReference, buildOpaqueVarRefExp (
           IndirectLoop::Fortran::HostSubroutine::FieldNames::maps,
           subroutineScope)), pmapsReference, argsNumberShapeExpression);
 
@@ -601,8 +603,8 @@ FortranCUDAHostSubroutineIndirectLoop::createPlanCToForttranPointerConversionSta
    * ======================================================
    */
 
-  callStatement = createCToFortranPointerCall (buildDotExp (actualPlanReference,
-      buildOpaqueVarRefExp (
+  callStatement = createCToFortranPointerCall (buildDotExp (
+      actualPlanReference, buildOpaqueVarRefExp (
           IndirectLoop::Fortran::HostSubroutine::FieldNames::maps,
           subroutineScope)), pmapsReference, argsNumberShapeExpression);
 
@@ -707,8 +709,8 @@ FortranCUDAHostSubroutineIndirectLoop::createPlanCToForttranPointerConversionSta
                   localVariableDeclarations[getGlobalToLocalMappingVariableName (
                       i)], subroutineScope);
 
-      SgStatement * statement2 = createCToFortranPointerCall (arrayIndexExpression,
-          executionPlanMapReference, shapeExpression);
+      SgStatement * statement2 = createCToFortranPointerCall (
+          arrayIndexExpression, executionPlanMapReference, shapeExpression);
 
       /*
        * ======================================================
@@ -733,8 +735,8 @@ FortranCUDAHostSubroutineIndirectLoop::createPlanCToForttranPointerConversionSta
    * ======================================================
    */
 
-  callStatement = createCToFortranPointerCall (buildDotExp (actualPlanReference,
-      ncolblkReference), ncolblkReference, buildDotExp (
+  callStatement = createCToFortranPointerCall (buildDotExp (
+      actualPlanReference, ncolblkReference), ncolblkReference, buildDotExp (
       opSetFormalArgumentReference, size_Reference));
 
   appendStatement (callStatement, subroutineScope);
@@ -1828,13 +1830,13 @@ FortranCUDAHostSubroutineIndirectLoop::createLocalVariableDeclarations ()
 
 FortranCUDAHostSubroutineIndirectLoop::FortranCUDAHostSubroutineIndirectLoop (
     std::string const & subroutineName,
-    FortranCUDAUserDeviceSubroutine * userDeviceSubroutine,
-    FortranCUDAKernelSubroutine * kernelSubroutine,
+    std::string const & userSubroutineName,
+    std::string const & kernelSubroutineName,
     FortranCUDAInitialiseConstantsSubroutine * initialiseConstantsSubroutine,
     FortranCUDADataSizesDeclarationIndirectLoop * dataSizesDeclarationOfIndirectLoop,
     ParallelLoop * parallelLoop, SgScopeStatement * moduleScope) :
-  FortranCUDAHostSubroutine (subroutineName, userDeviceSubroutine, kernelSubroutine,
-      parallelLoop, moduleScope)
+  FortranCUDAHostSubroutine (subroutineName, userSubroutineName,
+      kernelSubroutineName, parallelLoop, moduleScope)
 {
   Debug::getInstance ()->debugMessage (
       "Creating host subroutine of indirect loop", 2);

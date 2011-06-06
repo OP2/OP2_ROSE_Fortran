@@ -11,29 +11,6 @@
  */
 
 SgStatement *
-FortranCUDAHostSubroutine::createCToFortranPointerCall (
-    SgExpression * parameter1, SgExpression * parameter2,
-    SgExpression * parameter3)
-{
-  using SageBuilder::buildFunctionCallExp;
-  using SageBuilder::buildExprListExp;
-  using SageBuilder::buildExprStatement;
-  using SageInterface::appendStatement;
-
-  SgFunctionSymbol * functionSymbol =
-      FortranTypesBuilder::buildNewFortranSubroutine ("c_f_pointer",
-          subroutineScope);
-
-  SgExprListExp * actualParameters = buildExprListExp (parameter1, parameter2,
-      parameter3);
-
-  SgFunctionCallExp * subroutineCall = buildFunctionCallExp (functionSymbol,
-      actualParameters);
-
-  return buildExprStatement (subroutineCall);
-}
-
-SgStatement *
 FortranCUDAHostSubroutine::createThreadSynchroniseCall ()
 {
   using SageBuilder::buildVarRefExp;
@@ -750,20 +727,17 @@ FortranCUDAHostSubroutine::createReductionIterationVariableDeclarations ()
 }
 
 FortranCUDAHostSubroutine::FortranCUDAHostSubroutine (
-    std::string const & subroutineName,
-    FortranCUDAUserDeviceSubroutine * userDeviceSubroutine,
-    FortranCUDAKernelSubroutine * kernelSubroutine,
-    ParallelLoop * parallelLoop, SgScopeStatement * moduleScope) :
-  FortranHostSubroutine (subroutineName + SubroutineNameSuffixes::hostSuffix,
-      userDeviceSubroutine, parallelLoop)
+    std::string const & subroutineName, std::string const & userSubroutineName,
+    std::string const & kernelSubroutineName, ParallelLoop * parallelLoop,
+    SgScopeStatement * moduleScope) :
+  FortranHostSubroutine (subroutineName, userSubroutineName,
+      kernelSubroutineName, parallelLoop)
 {
   using SageBuilder::buildFunctionParameterList;
   using SageBuilder::buildVoidType;
   using SageBuilder::buildProcedureHeaderStatement;
   using SageInterface::appendStatement;
   using SageInterface::addTextForUnparser;
-
-  this->kernelSubroutine = kernelSubroutine;
 
   formalParameters = buildFunctionParameterList ();
 

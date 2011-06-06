@@ -460,4 +460,12 @@ namespace TargetBackends
   std::string const Unknown = "Unknown";
 }
 
+namespace OpenMP
+{
+  std::string const numberOfThreads = "nThreads";
+  std::string const threadIndex = "threadIndex";
+  std::string const sliceStart = "sliceStart";
+  std::string const sliceEnd = "sliceEnd";
+}
+
 #endif

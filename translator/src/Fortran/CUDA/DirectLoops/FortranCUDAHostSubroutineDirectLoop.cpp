@@ -121,7 +121,7 @@ FortranCUDAHostSubroutineDirectLoop::createKernelCall ()
   SgExprStatement
       * kernelCall =
           buildFunctionCallStmt (
-              kernelSubroutine->getSubroutineName () + "<<<"
+              kernelSubroutineName + "<<<"
                   + ROSEHelper::getFirstVariableName (
                       localVariableDeclarations[CUDA::Fortran::VariableNames::blocksPerGrid])
                   + ", "
@@ -449,12 +449,12 @@ FortranCUDAHostSubroutineDirectLoop::createLocalVariableDeclarations ()
 
 FortranCUDAHostSubroutineDirectLoop::FortranCUDAHostSubroutineDirectLoop (
     std::string const & subroutineName,
-    FortranCUDAUserDeviceSubroutine * userDeviceSubroutine,
-    FortranCUDAKernelSubroutine * kernelSubroutine,
+    std::string const & userSubroutineName,
+    std::string const & kernelSubroutineName,
     FortranCUDADataSizesDeclarationDirectLoop * dataSizesDeclarationOfDirectLoop,
     ParallelLoop * parallelLoop, SgScopeStatement * moduleScope) :
-  FortranCUDAHostSubroutine (subroutineName, userDeviceSubroutine, kernelSubroutine,
-      parallelLoop, moduleScope)
+  FortranCUDAHostSubroutine (subroutineName, userSubroutineName,
+      kernelSubroutineName, parallelLoop, moduleScope)
 {
   Debug::getInstance ()->debugMessage (
       "Creating host subroutine of direct loop", 2);

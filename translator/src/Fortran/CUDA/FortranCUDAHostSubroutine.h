@@ -10,20 +10,6 @@ class FortranCUDAHostSubroutine: public FortranHostSubroutine
 {
   protected:
 
-    FortranCUDAKernelSubroutine * kernelSubroutine;
-
-  protected:
-
-    /*
-     * ======================================================
-     * Returns a statement which represents a C-to-Fortran
-     * pointer conversion
-     * ======================================================
-     */
-    SgStatement *
-    createCToFortranPointerCall (SgExpression * parameter1,
-        SgExpression * parameter2, SgExpression * parameter3 = NULL);
-
     /*
      * ======================================================
      * Returns a statement which represents a CUDA thread
@@ -58,9 +44,9 @@ class FortranCUDAHostSubroutine: public FortranHostSubroutine
     createReductionVariableDeclarations ();
 
     FortranCUDAHostSubroutine (std::string const & subroutineName,
-        FortranCUDAUserDeviceSubroutine * userDeviceSubroutine,
-        FortranCUDAKernelSubroutine * kernelSubroutine,
-        ParallelLoop * parallelLoop, SgScopeStatement * moduleScope);
+        std::string const & userSubroutineName,
+        std::string const & kernelSubroutineName, ParallelLoop * parallelLoop,
+        SgScopeStatement * moduleScope);
 };
 
 #endif

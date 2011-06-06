@@ -27,7 +27,7 @@
 #include <FortranCUDAUserDeviceSubroutine.h>
 #include <FortranCUDAKernelSubroutine.h>
 
-class NewSubroutinesGeneration: public AstSimpleProcessing
+class FortranSubroutinesGeneration: public AstSimpleProcessing
 {
   private:
 
@@ -170,7 +170,8 @@ class NewSubroutinesGeneration: public AstSimpleProcessing
      * Generates the new subroutines
      * ======================================================
      */
-    NewSubroutinesGeneration (SgProject * project, Declarations * declarations);
+    FortranSubroutinesGeneration (SgProject * project,
+        Declarations * declarations);
 };
 
 #endif
