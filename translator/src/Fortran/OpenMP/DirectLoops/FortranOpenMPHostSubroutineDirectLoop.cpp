@@ -1,7 +1,9 @@
+#include <boost/lexical_cast.hpp>
 #include <FortranOpenMPHostSubroutineDirectLoop.h>
 #include <CommonNamespaces.h>
 #include <FortranStatementsAndExpressionsBuilder.h>
 #include <FortranTypesBuilder.h>
+#include <ROSEHelper.h>
 
 /*
  * ======================================================
@@ -9,13 +11,29 @@
  * ======================================================
  */
 
+std::string
+FortranOpenMPHostSubroutineDirectLoop::getLocalOPDATVariableName (
+    unsigned int OP_DAT_ArgumentGroup)
+{
+  using boost::lexical_cast;
+  using std::string;
+
+  return IndirectAndDirectLoop::Fortran::VariablePrefixes::OP_DAT
+      + lexical_cast <string> (OP_DAT_ArgumentGroup)
+      + IndirectAndDirectLoop::Fortran::VariableSuffixes::local;
+}
+
 SgStatement *
 FortranOpenMPHostSubroutineDirectLoop::createKernelCall ()
 {
+  using SageBuilder::buildIntVal;
+  using SageBuilder::buildMultiplyOp;
   using SageBuilder::buildExprListExp;
   using SageBuilder::buildVarRefExp;
   using SageBuilder::buildFunctionCallExp;
   using SageBuilder::buildExprStatement;
+  using SageBuilder::buildPntrArrRefExp;
+  using SageBuilder::buildNullExpression;
 
   SgExprListExp * actualParameters = buildExprListExp ();
 
@@ -24,8 +42,30 @@ FortranOpenMPHostSubroutineDirectLoop::createKernelCall ()
   {
     if (parallelLoop->isDuplicate_OP_DAT (i) == false)
     {
-      actualParameters->append_expression (buildVarRefExp (
-          moduleDeclarations->getGlobalOPDATDeclaration (i)));
+      if (parallelLoop->isReductionRequired (i) == false)
+      {
+        actualParameters->append_expression (buildVarRefExp (
+            moduleDeclarations->getGlobalOPDATDeclaration (i)));
+      }
+      else
+      {
+        SgMultiplyOp * multiplyExpression = buildMultiplyOp (buildVarRefExp (
+            localVariableDeclarations[OpenMP::threadIndex]), buildIntVal (64));
+
+        SgSubscriptExpression * arraySubscriptExpression =
+            new SgSubscriptExpression (ROSEHelper::getFileInfo (),
+                multiplyExpression, buildNullExpression (), buildIntVal (1));
+
+        arraySubscriptExpression->set_endOfConstruct (
+            ROSEHelper::getFileInfo ());
+
+        SgPntrArrRefExp * parameterExpression = buildPntrArrRefExp (
+            buildVarRefExp (
+                localVariableDeclarations[getLocalOPDATVariableName (i)]),
+            buildExprListExp (arraySubscriptExpression));
+
+        actualParameters->append_expression (parameterExpression);
+      }
     }
   }
 
@@ -67,8 +107,6 @@ FortranOpenMPHostSubroutineDirectLoop::createKernelDoLoop ()
 
   SgSubtractOp * upperBoundExpression = buildSubtractOp (buildVarRefExp (
       localVariableDeclarations[OpenMP::numberOfThreads]), buildIntVal (1));
-
-  SgIntVal * strideExpression = buildIntVal (1);
 
   SgBasicBlock * loopBody = buildBasicBlock ();
 
@@ -117,7 +155,7 @@ FortranOpenMPHostSubroutineDirectLoop::createKernelDoLoop ()
 
   SgFortranDo * doStatement =
       FortranStatementsAndExpressionsBuilder::buildFortranDoStatement (
-          initializationExpression, upperBoundExpression, strideExpression,
+          initializationExpression, upperBoundExpression, buildIntVal (1),
           loopBody);
 
   appendStatement (doStatement, subroutineScope);
@@ -133,13 +171,222 @@ FortranOpenMPHostSubroutineDirectLoop::createKernelDoLoop ()
 void
 FortranOpenMPHostSubroutineDirectLoop::createReductionEpilogueStatements ()
 {
+  using SageBuilder::buildIntVal;
+  using SageBuilder::buildBasicBlock;
+  using SageBuilder::buildAssignOp;
+  using SageBuilder::buildAssignStatement;
+  using SageBuilder::buildAddOp;
+  using SageBuilder::buildMultiplyOp;
+  using SageBuilder::buildSubtractOp;
+  using SageBuilder::buildVarRefExp;
+  using SageBuilder::buildPntrArrRefExp;
+  using SageInterface::appendStatement;
 
+  /*
+   * ======================================================
+   * Create the inner loop
+   * ======================================================
+   */
+
+  SgBasicBlock * outerLoopBody = buildBasicBlock ();
+
+  for (unsigned int i = 1; i
+      <= parallelLoop->getNumberOf_OP_DAT_ArgumentGroups (); ++i)
+  {
+    if (parallelLoop->isDuplicate_OP_DAT (i) == false
+        && parallelLoop->isReductionRequired (i))
+    {
+      SgAssignOp
+          * innerLoopInitializationExpression =
+              buildAssignOp (
+                  buildVarRefExp (
+                      localVariableDeclarations[IndirectAndDirectLoop::Fortran::HostSubroutine::reductionIterationCounter2]),
+                  buildIntVal (0));
+
+      SgSubtractOp * innerLoopUpperBoundExpression =
+          buildSubtractOp (
+              buildIntVal (parallelLoop->get_OP_DAT_Dimension (i)),
+              buildIntVal (1));
+
+      SgBasicBlock * innerLoopBody = buildBasicBlock ();
+
+      SgMultiplyOp
+          * multiplyExpression1 =
+              buildMultiplyOp (
+                  buildVarRefExp (
+                      localVariableDeclarations[IndirectAndDirectLoop::Fortran::HostSubroutine::reductionIterationCounter1]),
+                  buildIntVal (64));
+
+      SgAddOp
+          * addExpression1 =
+              buildAddOp (
+                  buildVarRefExp (
+                      localVariableDeclarations[IndirectAndDirectLoop::Fortran::HostSubroutine::reductionIterationCounter2]),
+                  multiplyExpression1);
+
+      SgPntrArrRefExp * arrayIndexExpression1 = buildPntrArrRefExp (
+          buildVarRefExp (localVariableDeclarations[getLocalOPDATVariableName (
+              i)]), addExpression1);
+
+      SgAddOp
+          * addExpression2 =
+              buildAddOp (
+                  buildIntVal (parallelLoop->get_OP_DAT_Dimension (i)),
+                  buildVarRefExp (
+                      localVariableDeclarations[IndirectAndDirectLoop::Fortran::HostSubroutine::reductionIterationCounter2]));
+
+      SgPntrArrRefExp * arrayIndexExpression2 = buildPntrArrRefExp (
+          buildVarRefExp (moduleDeclarations->getGlobalOPDATDeclaration (i)),
+          addExpression2);
+
+      SgAddOp
+          * addExpression3 =
+              buildAddOp (
+                  buildIntVal (parallelLoop->get_OP_DAT_Dimension (i)),
+                  buildVarRefExp (
+                      localVariableDeclarations[IndirectAndDirectLoop::Fortran::HostSubroutine::reductionIterationCounter2]));
+
+      SgPntrArrRefExp * arrayIndexExpression3 = buildPntrArrRefExp (
+          buildVarRefExp (moduleDeclarations->getGlobalOPDATDeclaration (i)),
+          addExpression3);
+
+      SgExprStatement * assignmentStatement = buildAssignStatement (
+          arrayIndexExpression3, buildAddOp (arrayIndexExpression1,
+              arrayIndexExpression2));
+
+      innerLoopBody->append_statement (assignmentStatement);
+
+      SgFortranDo * innerLoopStatement =
+          FortranStatementsAndExpressionsBuilder::buildFortranDoStatement (
+              innerLoopInitializationExpression, innerLoopUpperBoundExpression,
+              buildIntVal (1), innerLoopBody);
+
+      outerLoopBody->append_statement (innerLoopStatement);
+    }
+  }
+
+  /*
+   * ======================================================
+   * Create the outer loop
+   * ======================================================
+   */
+
+  SgAssignOp
+      * outerLoopInitializationExpression =
+          buildAssignOp (
+              buildVarRefExp (
+                  localVariableDeclarations[IndirectAndDirectLoop::Fortran::HostSubroutine::reductionIterationCounter1]),
+              buildIntVal (0));
+
+  SgSubtractOp * outerLoopUpperBoundExpression = buildSubtractOp (
+      buildVarRefExp (localVariableDeclarations[OpenMP::numberOfThreads]),
+      buildIntVal (1));
+
+  SgFortranDo * outerLoopStatement =
+      FortranStatementsAndExpressionsBuilder::buildFortranDoStatement (
+          outerLoopInitializationExpression, outerLoopUpperBoundExpression,
+          buildIntVal (1), outerLoopBody);
+
+  appendStatement (outerLoopStatement, subroutineScope);
 }
 
 void
 FortranOpenMPHostSubroutineDirectLoop::createReductionPrologueStatements ()
 {
+  using SageBuilder::buildIntVal;
+  using SageBuilder::buildBasicBlock;
+  using SageBuilder::buildAssignOp;
+  using SageBuilder::buildAssignStatement;
+  using SageBuilder::buildAddOp;
+  using SageBuilder::buildMultiplyOp;
+  using SageBuilder::buildSubtractOp;
+  using SageBuilder::buildVarRefExp;
+  using SageBuilder::buildPntrArrRefExp;
+  using SageInterface::appendStatement;
 
+  /*
+   * ======================================================
+   * Create the inner loop
+   * ======================================================
+   */
+
+  SgBasicBlock * outerLoopBody = buildBasicBlock ();
+
+  for (unsigned int i = 1; i
+      <= parallelLoop->getNumberOf_OP_DAT_ArgumentGroups (); ++i)
+  {
+    if (parallelLoop->isDuplicate_OP_DAT (i) == false
+        && parallelLoop->isReductionRequired (i))
+    {
+      SgAssignOp
+          * innerLoopInitializationExpression =
+              buildAssignOp (
+                  buildVarRefExp (
+                      localVariableDeclarations[IndirectAndDirectLoop::Fortran::HostSubroutine::reductionIterationCounter2]),
+                  buildIntVal (0));
+
+      SgSubtractOp * innerLoopUpperBoundExpression =
+          buildSubtractOp (
+              buildIntVal (parallelLoop->get_OP_DAT_Dimension (i)),
+              buildIntVal (1));
+
+      SgBasicBlock * innerLoopBody = buildBasicBlock ();
+
+      SgMultiplyOp
+          * multiplyExpression =
+              buildMultiplyOp (
+                  buildVarRefExp (
+                      localVariableDeclarations[IndirectAndDirectLoop::Fortran::HostSubroutine::reductionIterationCounter1]),
+                  buildIntVal (64));
+
+      SgAddOp
+          * addExpression =
+              buildAddOp (
+                  buildVarRefExp (
+                      localVariableDeclarations[IndirectAndDirectLoop::Fortran::HostSubroutine::reductionIterationCounter2]),
+                  multiplyExpression);
+
+      SgPntrArrRefExp * arrayIndexExpression = buildPntrArrRefExp (
+          buildVarRefExp (localVariableDeclarations[getLocalOPDATVariableName (
+              i)]), addExpression);
+
+      SgExprStatement * assignmentStatement = buildAssignStatement (
+          arrayIndexExpression, buildIntVal (0));
+
+      innerLoopBody->append_statement (assignmentStatement);
+
+      SgFortranDo * innerLoopStatement =
+          FortranStatementsAndExpressionsBuilder::buildFortranDoStatement (
+              innerLoopInitializationExpression, innerLoopUpperBoundExpression,
+              buildIntVal (1), innerLoopBody);
+
+      outerLoopBody->append_statement (innerLoopStatement);
+    }
+  }
+
+  /*
+   * ======================================================
+   * Create the outer loop
+   * ======================================================
+   */
+
+  SgAssignOp
+      * outerLoopInitializationExpression =
+          buildAssignOp (
+              buildVarRefExp (
+                  localVariableDeclarations[IndirectAndDirectLoop::Fortran::HostSubroutine::reductionIterationCounter1]),
+              buildIntVal (0));
+
+  SgSubtractOp * outerLoopUpperBoundExpression = buildSubtractOp (
+      buildVarRefExp (localVariableDeclarations[OpenMP::numberOfThreads]),
+      buildIntVal (1));
+
+  SgFortranDo * outerLoopStatement =
+      FortranStatementsAndExpressionsBuilder::buildFortranDoStatement (
+          outerLoopInitializationExpression, outerLoopUpperBoundExpression,
+          buildIntVal (1), outerLoopBody);
+
+  appendStatement (outerLoopStatement, subroutineScope);
 }
 
 void
@@ -277,6 +524,39 @@ FortranOpenMPHostSubroutineDirectLoop::initialiseThreadVariables ()
 void
 FortranOpenMPHostSubroutineDirectLoop::createReductionLocalVariableDeclarations ()
 {
+  using SageBuilder::buildMultiplyOp;
+  using SageBuilder::buildAddOp;
+  using SageBuilder::buildSubtractOp;
+  using SageBuilder::buildIntVal;
+
+  for (unsigned int i = 1; i
+      <= parallelLoop->getNumberOf_OP_DAT_ArgumentGroups (); ++i)
+  {
+    if (parallelLoop->isDuplicate_OP_DAT (i) == false
+        && parallelLoop->isReductionRequired (i))
+    {
+      SgArrayType * arrayType = isSgArrayType (
+          parallelLoop->get_OP_DAT_Type (i));
+
+      SgMultiplyOp * multiplyExpression = buildMultiplyOp (buildIntVal (64),
+          buildIntVal (64));
+
+      SgAddOp * addExpression = buildAddOp (buildIntVal (
+          parallelLoop->get_OP_DAT_Dimension (i)), multiplyExpression);
+
+      SgSubtractOp * subtractExpression = buildSubtractOp (addExpression,
+          buildIntVal (parallelLoop->get_OP_DAT_Dimension (i)));
+
+      SgType * newArrayType =
+          FortranTypesBuilder::getArray_RankOne_WithLowerAndUpperBounds (
+              arrayType->get_base_type (), buildIntVal (0), subtractExpression);
+
+      localVariableDeclarations[getLocalOPDATVariableName (i)]
+          = FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
+              getLocalOPDATVariableName (i), newArrayType, subroutineScope);
+    }
+  }
+
   localVariableDeclarations[IndirectAndDirectLoop::Fortran::HostSubroutine::reductionIterationCounter1]
       = FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
           IndirectAndDirectLoop::Fortran::HostSubroutine::reductionIterationCounter1,
@@ -295,7 +575,17 @@ FortranOpenMPHostSubroutineDirectLoop::createStatements ()
 
   createCToFortranPointerConversionStatements ();
 
+  if (parallelLoop->isReductionRequired ())
+  {
+    createReductionPrologueStatements ();
+  }
+
   createKernelDoLoop ();
+
+  if (parallelLoop->isReductionRequired ())
+  {
+    createReductionEpilogueStatements ();
+  }
 }
 
 void

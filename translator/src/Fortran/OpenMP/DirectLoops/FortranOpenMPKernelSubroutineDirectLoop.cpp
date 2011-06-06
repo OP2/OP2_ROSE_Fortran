@@ -29,34 +29,43 @@ FortranOpenMPKernelSubroutineDirectLoop::createUserSubroutineCall ()
   {
     if (parallelLoop->isDuplicate_OP_DAT (i) == false)
     {
-      SgMultiplyOp * multiplyExpression1 = buildMultiplyOp (buildVarRefExp (
-          localVariableDeclarations[OpenMP::sliceIterator]), buildIntVal (
-          parallelLoop->get_OP_DAT_Dimension (i)));
 
-      SgMultiplyOp * multiplyExpression2 = buildMultiplyOp (buildVarRefExp (
-          localVariableDeclarations[OpenMP::sliceIterator]), buildIntVal (
-          parallelLoop->get_OP_DAT_Dimension (i)));
+      if (parallelLoop->isReductionRequired (i) == false)
+      {
+        SgMultiplyOp * multiplyExpression1 = buildMultiplyOp (buildVarRefExp (
+            localVariableDeclarations[OpenMP::sliceIterator]), buildIntVal (
+            parallelLoop->get_OP_DAT_Dimension (i)));
 
-      SgAddOp * addExpression2 = buildAddOp (multiplyExpression2, buildIntVal (
-          parallelLoop->get_OP_DAT_Dimension (i)));
+        SgMultiplyOp * multiplyExpression2 = buildMultiplyOp (buildVarRefExp (
+            localVariableDeclarations[OpenMP::sliceIterator]), buildIntVal (
+            parallelLoop->get_OP_DAT_Dimension (i)));
 
-      SgSubtractOp * subtractExpression2 = buildSubtractOp (addExpression2,
-          buildIntVal (1));
+        SgAddOp * addExpression2 = buildAddOp (multiplyExpression2,
+            buildIntVal (parallelLoop->get_OP_DAT_Dimension (i)));
 
-      SgSubscriptExpression * arraySubscriptExpression =
-          new SgSubscriptExpression (ROSEHelper::getFileInfo (),
-              multiplyExpression1, subtractExpression2, buildIntVal (1));
+        SgSubtractOp * subtractExpression2 = buildSubtractOp (addExpression2,
+            buildIntVal (1));
 
-      arraySubscriptExpression->set_endOfConstruct (ROSEHelper::getFileInfo ());
-    //  arraySubscriptExpression->setCompilerGenerated ();
-//      arraySubscriptExpression->setOutputInCodeGeneration ();
+        SgSubscriptExpression * arraySubscriptExpression =
+            new SgSubscriptExpression (ROSEHelper::getFileInfo (),
+                multiplyExpression1, subtractExpression2, buildIntVal (1));
 
-      SgPntrArrRefExp * parameterExpression = buildPntrArrRefExp (
-          buildVarRefExp (
-              formalParameterDeclarations[get_OP_DAT_FormalParameterName (i)]),
-          buildExprListExp (arraySubscriptExpression));
+        arraySubscriptExpression->set_endOfConstruct (
+            ROSEHelper::getFileInfo ());
 
-      actualParameters->append_expression (parameterExpression);
+        SgPntrArrRefExp * parameterExpression =
+            buildPntrArrRefExp (
+                buildVarRefExp (
+                    formalParameterDeclarations[get_OP_DAT_FormalParameterName (
+                        i)]), buildExprListExp (arraySubscriptExpression));
+
+        actualParameters->append_expression (parameterExpression);
+      }
+      else
+      {
+        actualParameters->append_expression (buildVarRefExp (
+            formalParameterDeclarations[get_OP_DAT_FormalParameterName (i)]));
+      }
     }
   }
 

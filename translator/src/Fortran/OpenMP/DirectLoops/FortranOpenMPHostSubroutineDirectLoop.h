@@ -12,6 +12,9 @@ class FortranOpenMPHostSubroutineDirectLoop: public FortranOpenMPHostSubroutine
 
   private:
 
+    static std::string
+    getLocalOPDATVariableName (unsigned int OP_DAT_ArgumentGroup);
+
     SgStatement *
     createKernelCall ();
 
