@@ -28,7 +28,7 @@ for path, dirs, files in os.walk(os.path.abspath(os.curdir + os.sep + 'src')):
 		fullPath = os.path.join(path, file)
 
 		if fileExtension == '.cpp' or fileExtension == '.h':
-			cmd = 'git ls_files ' + fullPath
+			cmd = 'git ls-files ' + fullPath
 
 			proc = Popen(cmd,
 				     shell=True,
@@ -38,7 +38,10 @@ for path, dirs, files in os.walk(os.path.abspath(os.curdir + os.sep + 'src')):
 
 			stdout, stderr = proc.communicate()
 
-			if stdout == None:
+			print(stderr)
+			print(stdout)
+
+			if len(stdout) == 0:
 				if opts.verbose:
 					print("'" + fullPath + "' not in repository")
 				
