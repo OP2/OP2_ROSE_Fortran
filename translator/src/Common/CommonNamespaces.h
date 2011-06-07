@@ -71,7 +71,7 @@ namespace OP2
     unsigned int const NUMBER_OF_NON_OP_DAT_ARGUMENTS = 2;
   }
 
-  namespace CPlusPlus
+  namespace CPP
   {
     std::string const OP_PTR = "op_ptr";
   }
@@ -287,7 +287,7 @@ namespace IndirectLoop
     }
   }
 
-  namespace CPlusPlus
+  namespace CPP
   {
     namespace PlanFunction
     {
@@ -401,7 +401,7 @@ namespace CUDA
     }
   }
 
-  namespace CPlusPlus
+  namespace CPP
   {
     namespace VariableNames
     {
@@ -429,6 +429,17 @@ namespace FortranVariableDefaultKinds
   int const DEFAULT_KIND_REAL = 4;
 }
 
+namespace OpenMP
+{
+  std::string const numberOfThreads = "nThreads";
+  std::string const threadIndex = "threadIndex";
+  std::string const sliceStart = "sliceStart";
+  std::string const sliceEnd = "sliceEnd";
+  std::string const threadID = "threadID";
+  std::string const sliceIterator = "sliceIterator";
+  std::string const blockID = "blockID";
+}
+
 namespace TargetBackends
 {
   /*
@@ -444,17 +455,6 @@ namespace TargetBackends
   std::string const CUDA = "CUDA";
   std::string const OpenMP = "OpenMP";
   std::string const Unknown = "Unknown";
-}
-
-namespace OpenMP
-{
-  std::string const numberOfThreads = "nThreads";
-  std::string const threadIndex = "threadIndex";
-  std::string const sliceStart = "sliceStart";
-  std::string const sliceEnd = "sliceEnd";
-  std::string const threadID = "threadID";
-  std::string const sliceIterator = "sliceIterator";
-  std::string const blockID = "blockID";
 }
 
 namespace VariableNames

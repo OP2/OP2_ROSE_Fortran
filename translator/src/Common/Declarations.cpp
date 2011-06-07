@@ -8,8 +8,9 @@ Declarations::get_OP_SET_Declaration (std::string const & opSETName)
     throw (std::string const &)
 {
   using boost::iequals;
+  using std::vector;
 
-  for (std::vector <OP_SET_Declaration *>::iterator it =
+  for (vector <OP_SET_Declaration *>::iterator it =
       OP_SET_Declarations.begin (); it != OP_SET_Declarations.end (); ++it)
   {
     if (iequals ((*it)->getVariableName (), opSETName))
@@ -26,8 +27,9 @@ Declarations::get_OP_MAP_Declaration (std::string const & opMAPName)
     throw (std::string const &)
 {
   using boost::iequals;
+  using std::vector;
 
-  for (std::vector <OP_MAP_Declaration *>::iterator it =
+  for (vector <OP_MAP_Declaration *>::iterator it =
       OP_MAP_Declarations.begin (); it != OP_MAP_Declarations.end (); ++it)
   {
     if (iequals ((*it)->getVariableName (), opMAPName))
@@ -44,8 +46,9 @@ Declarations::get_OP_DAT_Declaration (std::string const & opDATName)
     throw (std::string const &)
 {
   using boost::iequals;
+  using std::vector;
 
-  for (std::vector <OP_DAT_Declaration *>::iterator it =
+  for (vector <OP_DAT_Declaration *>::iterator it =
       OP_DAT_Declarations.begin (); it != OP_DAT_Declarations.end (); ++it)
   {
     if (iequals ((*it)->getVariableName (), opDATName))
@@ -62,8 +65,9 @@ Declarations::get_OP_GBL_Declaration (std::string const & opGBLName)
     throw (std::string const &)
 {
   using boost::iequals;
+  using std::vector;
 
-  for (std::vector <OP_GBL_Declaration *>::iterator it =
+  for (vector <OP_GBL_Declaration *>::iterator it =
       OP_GBL_Declarations.begin (); it != OP_GBL_Declarations.end (); ++it)
   {
     if (iequals ((*it)->getVariableName (), opGBLName))
