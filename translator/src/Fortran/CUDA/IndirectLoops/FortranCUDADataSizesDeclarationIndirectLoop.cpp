@@ -1,4 +1,3 @@
-#include <boost/lexical_cast.hpp>
 #include <FortranCUDADataSizesDeclarationIndirectLoop.h>
 #include <FortranStatementsAndExpressionsBuilder.h>
 #include <FortranTypesBuilder.h>
@@ -10,34 +9,9 @@
  * ======================================================
  */
 
-std::string
-FortranCUDADataSizesDeclarationIndirectLoop::getLocalToGlobalRenumberingSizeFieldName (
-    unsigned int OP_DAT_ArgumentGroup)
-{
-  using boost::lexical_cast;
-  using std::string;
-
-  return IndirectLoop::Fortran::VariablePrefixes::pindMaps + lexical_cast <
-      string> (OP_DAT_ArgumentGroup)
-      + IndirectAndDirectLoop::Fortran::VariableSuffixes::Size;
-}
-
-std::string
-FortranCUDADataSizesDeclarationIndirectLoop::getGlobalToLocalRenumberingSizeFieldName (
-    unsigned int OP_DAT_ArgumentGroup)
-{
-  using boost::lexical_cast;
-  using std::string;
-
-  return IndirectLoop::Fortran::VariablePrefixes::pMaps
-      + lexical_cast <string> (OP_DAT_ArgumentGroup)
-      + IndirectAndDirectLoop::Fortran::VariableSuffixes::Size;
-}
-
 void
 FortranCUDADataSizesDeclarationIndirectLoop::addFields ()
 {
-  using boost::lexical_cast;
   using SageBuilder::buildVariableDeclaration;
   using std::string;
   using std::vector;
@@ -48,7 +22,7 @@ FortranCUDADataSizesDeclarationIndirectLoop::addFields ()
     if (parallelLoop->isDuplicate_OP_DAT (i) == false
         && parallelLoop->get_OP_MAP_Value (i) == INDIRECT)
     {
-      string const variableName = get_OP_DAT_SizeFieldName (i);
+      string const variableName = VariableNames::getOpDatSizeName (i);
 
       SgVariableDeclaration * fieldDeclaration = buildVariableDeclaration (
           variableName, FortranTypesBuilder::getFourByteInteger (), NULL,
@@ -69,7 +43,8 @@ FortranCUDADataSizesDeclarationIndirectLoop::addFields ()
     if (parallelLoop->isDuplicate_OP_DAT (i) == false
         && parallelLoop->get_OP_MAP_Value (i) == INDIRECT)
     {
-      string const variableName = getLocalToGlobalRenumberingSizeFieldName (i);
+      string const variableName =
+          VariableNames::getLocalToGlobalMappingSizeName (i);
 
       SgVariableDeclaration * fieldDeclaration = buildVariableDeclaration (
           variableName, FortranTypesBuilder::getFourByteInteger (), NULL,
@@ -89,7 +64,8 @@ FortranCUDADataSizesDeclarationIndirectLoop::addFields ()
   {
     if (parallelLoop->get_OP_MAP_Value (i) == INDIRECT)
     {
-      string const variableName = getGlobalToLocalRenumberingSizeFieldName (i);
+      string const variableName =
+          VariableNames::getGlobalToLocalMappingSizeName (i);
 
       SgVariableDeclaration * fieldDeclaration = buildVariableDeclaration (
           variableName, FortranTypesBuilder::getFourByteInteger (), NULL,
@@ -110,7 +86,7 @@ FortranCUDADataSizesDeclarationIndirectLoop::addFields ()
     if (parallelLoop->isDuplicate_OP_DAT (i) == false
         && parallelLoop->get_OP_MAP_Value (i) == DIRECT)
     {
-      string const variableName = get_OP_DAT_SizeFieldName (i);
+      string const variableName = VariableNames::getOpDatSizeName (i);
 
       SgVariableDeclaration * fieldDeclaration = buildVariableDeclaration (
           variableName, FortranTypesBuilder::getFourByteInteger (), NULL,

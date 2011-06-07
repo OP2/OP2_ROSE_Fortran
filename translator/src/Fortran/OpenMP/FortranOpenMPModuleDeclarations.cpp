@@ -1,4 +1,3 @@
-#include <boost/lexical_cast.hpp>
 #include <FortranOpenMPModuleDeclarations.h>
 #include <CommonNamespaces.h>
 
@@ -7,17 +6,6 @@
  * Private functions
  * ======================================================
  */
-
-std::string
-FortranOpenMPModuleDeclarations::getGlobalOPDATName (
-    unsigned int OP_DAT_ArgumentGroup)
-{
-  using boost::lexical_cast;
-  using std::string;
-
-  return IndirectAndDirectLoop::Fortran::VariablePrefixes::OP_DAT
-      + lexical_cast <string> (OP_DAT_ArgumentGroup) + "Global";
-}
 
 void
 FortranOpenMPModuleDeclarations::createOPDATDeclarations ()
@@ -32,7 +20,7 @@ FortranOpenMPModuleDeclarations::createOPDATDeclarations ()
   {
     if (parallelLoop->isDuplicate_OP_DAT (i) == false)
     {
-      string const & variableName = getGlobalOPDATName (i);
+      string const & variableName = VariableNames::getOpDatGlobalName (i);
 
       moduleDeclarations[variableName] = buildVariableDeclaration (
           variableName, buildPointerType (parallelLoop->get_OP_DAT_Type (i)),
@@ -95,7 +83,8 @@ SgVariableDeclaration *
 FortranOpenMPModuleDeclarations::getGlobalOPDATDeclaration (
     unsigned int OP_DAT_ArgumentGroup)
 {
-  return moduleDeclarations[getGlobalOPDATName (OP_DAT_ArgumentGroup)];
+  return moduleDeclarations[VariableNames::getOpDatGlobalName (
+      OP_DAT_ArgumentGroup)];
 }
 
 SgVariableDeclaration *

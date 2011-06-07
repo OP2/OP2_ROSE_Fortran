@@ -1,11 +1,11 @@
 #ifndef FORTRAN_CUDA_USER_DEVICE_SUBROUTINE_H
 #define FORTRAN_CUDA_USER_DEVICE_SUBROUTINE_H
 
-#include <Subroutine.h>
+#include <FortranSubroutine.h>
 #include <FortranCUDAInitialiseConstantsSubroutine.h>
 #include <ParallelLoop.h>
 
-class FortranCUDAUserDeviceSubroutine: public Subroutine
+class FortranCUDAUserDeviceSubroutine: public FortranSubroutine
 {
   private:
 
@@ -35,7 +35,7 @@ class FortranCUDAUserDeviceSubroutine: public Subroutine
     copyAndModifySubroutine ();
 
     void
-    createFormalParameterDeclarations ();
+    createlocalVariableDeclarations ();
 
     void
     createLocalVariableDeclarations ();

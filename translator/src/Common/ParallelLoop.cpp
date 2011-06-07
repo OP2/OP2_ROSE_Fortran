@@ -304,13 +304,14 @@ ParallelLoop::generateReductionSubroutines (SgScopeStatement * moduleScope)
          * Eventually, the factorisation will solve this problem
          * ======================================================
          */
-        string const reductionSubroutineName =
-            IndirectAndDirectLoop::Fortran::VariablePrefixes::OP_DAT
-                + lexical_cast <string> (i) + SubroutineNameSuffixes::reductionSuffix
-                + typeName + lexical_cast <string> (isKindIntVal->get_value ());
+        string const reductionSubroutineName = "arg"
+            + lexical_cast <string> (i)
+            + SubroutineNameSuffixes::reductionSuffix + typeName
+            + lexical_cast <string> (isKindIntVal->get_value ());
 
-        FortranCUDAReductionSubroutine * reductionSubroutine = new FortranCUDAReductionSubroutine (
-            reductionSubroutineName, moduleScope, isArrayType);
+        FortranCUDAReductionSubroutine * reductionSubroutine =
+            new FortranCUDAReductionSubroutine (reductionSubroutineName,
+                moduleScope, isArrayType);
 
         /*
          * ======================================================
@@ -319,7 +320,7 @@ ParallelLoop::generateReductionSubroutines (SgScopeStatement * moduleScope)
          * ======================================================
          */
         reductionSubroutines[i]
-            = reductionSubroutine->getSubroutineHeaderStatement ();
+            = reductionSubroutine->getProcedureHeaderStatement ();
       }
     }
   }

@@ -8,10 +8,10 @@
 #ifndef FORTRAN_CUDA_REDUCTION_SUBROUTINE_H
 #define FORTRAN_CUDA_REDUCTION_SUBROUTINE_H
 
-#include <Subroutine.h>
+#include <FortranSubroutine.h>
 #include <ParallelLoop.h>
 
-class FortranCUDAReductionSubroutine: public Subroutine
+class FortranCUDAReductionSubroutine: public FortranSubroutine
 {
   private:
 
@@ -24,11 +24,6 @@ class FortranCUDAReductionSubroutine: public Subroutine
 
   private:
 
-    /*
-     * ======================================================
-     * Generates a call statement to synchthreads
-     * ======================================================
-     */
     SgStatement *
     createCallToSynchThreads ();
 
@@ -39,11 +34,12 @@ class FortranCUDAReductionSubroutine: public Subroutine
     createLocalVariableDeclarations ();
 
     virtual void
-    createFormalParameterDeclarations ();
+    createlocalVariableDeclarations ();
 
   public:
 
-    FortranCUDAReductionSubroutine (std::string const & subroutineAndVariableName,
+    FortranCUDAReductionSubroutine (
+        std::string const & subroutineAndVariableName,
         SgScopeStatement * moduleScope, SgArrayType * reductionVariableType);
 };
 

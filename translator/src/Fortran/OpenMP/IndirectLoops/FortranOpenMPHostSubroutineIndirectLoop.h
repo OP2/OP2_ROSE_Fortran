@@ -13,6 +13,15 @@ class FortranOpenMPHostSubroutineIndirectLoop: public FortranOpenMPHostSubroutin
   private:
 
     virtual void
+    createFirstTimeExecutionStatements ();
+
+    void
+    createExecutionPlanDeclarations ();
+
+    virtual void
+    createOpenMPVariableDeclarations ();
+
+    virtual void
     createStatements ();
 
     virtual void

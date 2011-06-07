@@ -24,48 +24,11 @@ class FortranCUDAHostSubroutineIndirectLoop: public FortranCUDAHostSubroutine
 
   private:
 
-    /*
-     * ======================================================
-     * Returns the name of the local variable which models
-     * the mappings from local indices to global indices in
-     * shared memory
-     * ======================================================
-     */
-    static std::string
-    getLocalToGlobalMappingVariableName (unsigned int OP_DAT_ArgumentGroup);
-
-    /*
-     * ======================================================
-     * Returns the name of the local variable which models
-     * the indirect mappings to local indices in shared memory
-     * ======================================================
-     */
-    static std::string
-    getGlobalToLocalMappingVariableName (unsigned int OP_DAT_ArgumentGroup);
-
-    /*
-     * ======================================================
-     * Returns the name of the local variable which models
-     * the number of indirect elements in each block
-     * ======================================================
-     */
-    static std::string
-    getGlobalToLocalMappingSizeVariableName (unsigned int OP_DAT_ArgumentGroup);
-
-    void
-    createExecutionPlanExecutionStatements ();
-
     void
     createPlanCToForttranPointerConversionStatements ();
 
     void
-    createPlanFunctionCallStatement ();
-
-    void
-    createDoLoopToCorrectIndexing ();
-
-    void
-    createExecutionPlanStatements ();
+    createExecutionPlanExecutionStatements ();
 
     void
     initialiseDeviceVariablesSizesVariable ();

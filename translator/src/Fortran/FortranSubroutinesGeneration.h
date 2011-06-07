@@ -23,6 +23,7 @@
 #include <CommonNamespaces.h>
 #include <Declarations.h>
 #include <ParallelLoop.h>
+#include <FortranSubroutine.h>
 #include <FortranCUDAHostSubroutine.h>
 #include <FortranCUDAUserDeviceSubroutine.h>
 #include <FortranCUDAKernelSubroutine.h>
@@ -74,7 +75,7 @@ class FortranSubroutinesGeneration: public AstSimpleProcessing
      */
     void
     patchCallsToParallelLoops (ParallelLoop & parallelLoop,
-        std::string const & userSubroutineName, Subroutine & hostSubroutine,
+        std::string const & userSubroutineName, FortranSubroutine & hostSubroutine,
         SgScopeStatement * scope, SgFunctionCallExp * functionCallExp);
 
     /*

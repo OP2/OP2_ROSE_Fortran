@@ -9,6 +9,15 @@ class FortranOpenMPHostSubroutine: public FortranHostSubroutine
 
   protected:
 
+    virtual void
+    createFirstTimeExecutionStatements () = 0;
+
+    void
+    initialiseNumberOfThreads ();
+
+    virtual void
+    createOpenMPVariableDeclarations () = 0;
+
     FortranOpenMPHostSubroutine (std::string const & subroutineName,
         std::string const & userSubroutineName,
         std::string const & kernelSubroutineName, ParallelLoop * parallelLoop,

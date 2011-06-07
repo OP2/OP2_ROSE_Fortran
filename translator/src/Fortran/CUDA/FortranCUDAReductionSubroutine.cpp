@@ -68,7 +68,7 @@ FortranCUDAReductionSubroutine::createStatements ()
       * tidInitialAssignExpression =
           buildAssignOp (
               buildVarRefExp (
-                  localVariableDeclarations[IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::threadID]),
+                  variableDeclarations[IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::threadID]),
               subtractExpression1);
 
   appendStatement (buildExprStatement (tidInitialAssignExpression),
@@ -94,7 +94,7 @@ FortranCUDAReductionSubroutine::createStatements ()
       * initIterationCounter =
           buildAssignOp (
               buildVarRefExp (
-                  localVariableDeclarations[IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::iterationCounter]),
+                  variableDeclarations[IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::iterationCounter]),
               shiftFunctionCall);
 
   appendStatement (buildExprStatement (initIterationCounter), subroutineScope);
@@ -123,19 +123,19 @@ FortranCUDAReductionSubroutine::createStatements ()
     if (isSgTypeInt (reductionVariableType->get_base_type ()) != NULL)
     {
       autosharedKindSize = buildIntVal (
-          FortranVariableDeafultKinds::DEFAULT_KIND_INT);
+          FortranVariableDefaultKinds::DEFAULT_KIND_INT);
     }
     else
     {
       autosharedKindSize = buildIntVal (
-          FortranVariableDeafultKinds::DEFAULT_KIND_REAL);
+          FortranVariableDefaultKinds::DEFAULT_KIND_REAL);
     }
   }
 
   SgVarRefExp
       * autosharedOffsetReference =
           buildVarRefExp (
-              formalParameterDeclarations[IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::sharedMemoryStartOffset]);
+              variableDeclarations[IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::sharedMemoryStartOffset]);
 
   SgAssignOp * initStartOffset = buildAssignOp (autosharedOffsetReference,
       buildDivideOp (autosharedOffsetReference, autosharedKindSize));
@@ -154,15 +154,15 @@ FortranCUDAReductionSubroutine::createStatements ()
       * arrayIndexExpression =
           buildAddOp (
               buildVarRefExp (
-                  formalParameterDeclarations[IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::sharedMemoryStartOffset]),
+                  variableDeclarations[IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::sharedMemoryStartOffset]),
               buildVarRefExp (
-                  localVariableDeclarations[IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::threadID]));
+                  variableDeclarations[IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::threadID]));
 
   SgPntrArrRefExp
       * autosharedSubscriptExpression =
           buildPntrArrRefExp (
               buildVarRefExp (
-                  localVariableDeclarations[IndirectAndDirectLoop::Fortran::VariableNames::autoshared]),
+                  variableDeclarations[IndirectAndDirectLoop::Fortran::VariableNames::autoshared]),
               arrayIndexExpression);
 
   SgAssignOp
@@ -170,7 +170,7 @@ FortranCUDAReductionSubroutine::createStatements ()
           buildAssignOp (
               autosharedSubscriptExpression,
               buildVarRefExp (
-                  formalParameterDeclarations[IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::inputValue]));
+                  variableDeclarations[IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::inputValue]));
 
   appendStatement (buildExprStatement (initAutoshared), subroutineScope);
 
@@ -178,16 +178,16 @@ FortranCUDAReductionSubroutine::createStatements ()
       * mainLoopCondition =
           buildGreaterThanOp (
               buildVarRefExp (
-                  localVariableDeclarations[IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::iterationCounter]),
+                  variableDeclarations[IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::iterationCounter]),
               buildIntVal (0));
 
   SgExpression
       * ifGuardExpression =
           buildLessThanOp (
               buildVarRefExp (
-                  localVariableDeclarations[IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::threadID]),
+                  variableDeclarations[IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::threadID]),
               buildVarRefExp (
-                  localVariableDeclarations[IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::iterationCounter]));
+                  variableDeclarations[IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::iterationCounter]));
 
   // same expression as above
   SgPntrArrRefExp * autosharedMyThreadPosition = autosharedSubscriptExpression;
@@ -198,13 +198,13 @@ FortranCUDAReductionSubroutine::createStatements ()
           buildAddOp (
               arrayIndexExpression,
               buildVarRefExp (
-                  localVariableDeclarations[IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::iterationCounter]));
+                  variableDeclarations[IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::iterationCounter]));
 
   SgPntrArrRefExp
       * autosharedOtherThreadPosition =
           buildPntrArrRefExp (
               buildVarRefExp (
-                  localVariableDeclarations[IndirectAndDirectLoop::Fortran::VariableNames::autoshared]),
+                  variableDeclarations[IndirectAndDirectLoop::Fortran::VariableNames::autoshared]),
               autosharedOtherThreadPositionExpr);
 
   SgExpression * reductionPartialComputation = buildAssignOp (
@@ -222,7 +222,7 @@ FortranCUDAReductionSubroutine::createStatements ()
       * actualParametersItCountReassign =
           buildExprListExp (
               buildVarRefExp (
-                  localVariableDeclarations[IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::iterationCounter]),
+                  variableDeclarations[IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::iterationCounter]),
               buildIntVal (-1));
 
   SgFunctionCallExp * shiftFunctionCallInsideMailLoop = buildFunctionCallExp (
@@ -232,7 +232,7 @@ FortranCUDAReductionSubroutine::createStatements ()
       * reassignIterationCounter =
           buildAssignOp (
               buildVarRefExp (
-                  localVariableDeclarations[IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::iterationCounter]),
+                  variableDeclarations[IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::iterationCounter]),
               shiftFunctionCallInsideMailLoop);
 
   SgStatement * mainLoopBody = buildBasicBlock (createCallToSynchThreads (),
@@ -256,23 +256,23 @@ FortranCUDAReductionSubroutine::createStatements ()
       * ifThreadIdGreaterZero =
           buildEqualityOp (
               buildVarRefExp (
-                  localVariableDeclarations[IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::threadID]),
+                  variableDeclarations[IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::threadID]),
               buildIntVal (0));
 
   SgPntrArrRefExp
       * deviceVariableUniquePosition =
           buildPntrArrRefExp (
               buildVarRefExp (
-                  formalParameterDeclarations[IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::reductionResultOnDevice]),
+                  variableDeclarations[IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::reductionResultOnDevice]),
               buildIntVal (1));
 
   SgPntrArrRefExp
       * autosharedFinalReductionResultPosition =
           buildPntrArrRefExp (
               buildVarRefExp (
-                  localVariableDeclarations[IndirectAndDirectLoop::Fortran::VariableNames::autoshared]),
+                  variableDeclarations[IndirectAndDirectLoop::Fortran::VariableNames::autoshared]),
               buildVarRefExp (
-                  formalParameterDeclarations[IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::sharedMemoryStartOffset]));
+                  variableDeclarations[IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::sharedMemoryStartOffset]));
 
   SgExpression * reductionFinalComputation = buildAssignOp (
       deviceVariableUniquePosition, buildAddOp (deviceVariableUniquePosition,
@@ -304,14 +304,14 @@ FortranCUDAReductionSubroutine::createLocalVariableDeclarations ()
   SgExpression * upperBound = new SgAsteriskShapeExp (
       ROSEHelper::getFileInfo ());
 
-  localVariableDeclarations[IndirectAndDirectLoop::Fortran::VariableNames::autoshared]
+  variableDeclarations[IndirectAndDirectLoop::Fortran::VariableNames::autoshared]
       = FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
           IndirectAndDirectLoop::Fortran::VariableNames::autoshared,
           FortranTypesBuilder::getArray_RankOne (
               reductionVariableType->get_base_type (), 0, upperBound),
           subroutineScope);
 
-  localVariableDeclarations[IndirectAndDirectLoop::Fortran::VariableNames::autoshared]->get_declarationModifier ().get_typeModifier ().setShared ();
+  variableDeclarations[IndirectAndDirectLoop::Fortran::VariableNames::autoshared]->get_declarationModifier ().get_typeModifier ().setShared ();
 
   /*
    * ======================================================
@@ -328,14 +328,14 @@ FortranCUDAReductionSubroutine::createLocalVariableDeclarations ()
   for (vector <string>::iterator it = fourByteIntegers.begin (); it
       != fourByteIntegers.end (); ++it)
   {
-    localVariableDeclarations[*it]
+    variableDeclarations[*it]
         = FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
             *it, FortranTypesBuilder::getFourByteInteger (), subroutineScope);
   }
 }
 
 void
-FortranCUDAReductionSubroutine::createFormalParameterDeclarations ()
+FortranCUDAReductionSubroutine::createlocalVariableDeclarations ()
 {
   Debug::getInstance ()->debugMessage (
       "Creating reduction procedure formal parameter", 2);
@@ -346,7 +346,7 @@ FortranCUDAReductionSubroutine::createFormalParameterDeclarations ()
    * reductions is stored by the first thread in the block
    * ======================================================
    */
-  formalParameterDeclarations[IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::reductionResultOnDevice]
+  variableDeclarations[IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::reductionResultOnDevice]
       = FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
           IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::reductionResultOnDevice,
           reductionVariableType, subroutineScope, formalParameters, 1, DEVICE);
@@ -360,7 +360,7 @@ FortranCUDAReductionSubroutine::createFormalParameterDeclarations ()
    * ======================================================
    */
 
-  formalParameterDeclarations[IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::inputValue]
+  variableDeclarations[IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::inputValue]
       = FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
           IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::inputValue,
           reductionVariableType->get_base_type (), subroutineScope,
@@ -374,7 +374,7 @@ FortranCUDAReductionSubroutine::createFormalParameterDeclarations ()
    * ======================================================
    */
 
-  formalParameterDeclarations[IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::warpSize]
+  variableDeclarations[IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::warpSize]
       = FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
           IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::warpSize,
           FortranTypesBuilder::getFourByteInteger (), subroutineScope,
@@ -388,7 +388,7 @@ FortranCUDAReductionSubroutine::createFormalParameterDeclarations ()
    * ======================================================
    */
 
-  formalParameterDeclarations[IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::sharedMemoryStartOffset]
+  variableDeclarations[IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::sharedMemoryStartOffset]
       = FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
           IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::sharedMemoryStartOffset,
           FortranTypesBuilder::getFourByteInteger (), subroutineScope,
@@ -416,7 +416,7 @@ FortranCUDAReductionSubroutine::createFormalParameterDeclarations ()
 FortranCUDAReductionSubroutine::FortranCUDAReductionSubroutine (
     std::string const & subroutineAndVariableName,
     SgScopeStatement * moduleScope, SgArrayType * reductionVariableType) :
-  Subroutine (subroutineAndVariableName)
+  FortranSubroutine (subroutineAndVariableName)
 {
   using SageBuilder::buildProcedureHeaderStatement;
   using SageBuilder::buildVoidType;
@@ -439,7 +439,7 @@ FortranCUDAReductionSubroutine::FortranCUDAReductionSubroutine (
 
   subroutineScope = subroutineHeaderStatement->get_definition ()->get_body ();
 
-  createFormalParameterDeclarations ();
+  createlocalVariableDeclarations ();
 
   createLocalVariableDeclarations ();
 

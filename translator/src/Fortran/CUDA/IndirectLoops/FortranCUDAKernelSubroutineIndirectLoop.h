@@ -37,18 +37,6 @@ class FortranCUDAKernelSubroutineIndirectLoop: public FortranCUDAKernelSubroutin
 
   private:
 
-    static std::string
-    getLocalToGlobalMappingVariableName (unsigned int OP_DAT_ArgumentGroup);
-
-    static std::string
-    getGlobalToLocalMappingVariableName (unsigned int OP_DAT_ArgumentGroup);
-
-    static std::string
-    getNumberOfBytesVariableName (unsigned int OP_DAT_ArgumentGroup);
-
-    static std::string
-    getRoundUpVariableName (unsigned int OP_DAT_ArgumentGroup);
-
     SgStatement *
     createUserSubroutineCall ();
 
@@ -68,10 +56,10 @@ class FortranCUDAKernelSubroutineIndirectLoop: public FortranCUDAKernelSubroutin
     createThreadZeroStatements ();
 
     void
-    createPlanFormalParameterDeclarations ();
+    createPlanlocalVariableDeclarations ();
 
     void
-    create_OP_DAT_FormalParameterDeclarations ();
+    create_OP_DAT_localVariableDeclarations ();
 
     virtual void
     createStatements ();
@@ -80,7 +68,7 @@ class FortranCUDAKernelSubroutineIndirectLoop: public FortranCUDAKernelSubroutin
     createLocalVariableDeclarations ();
 
     virtual void
-    createFormalParameterDeclarations ();
+    createlocalVariableDeclarations ();
 
   public:
 

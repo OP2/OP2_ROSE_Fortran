@@ -319,12 +319,12 @@ FortranStatementsAndExpressionsBuilder::getFortranKindOf_OP_DAT (
     if (isSgTypeInt (arrayBaseType) != NULL)
     {
       sizeOf_OP_DAT_Kind = buildIntVal (
-          FortranVariableDeafultKinds::DEFAULT_KIND_INT);
+          FortranVariableDefaultKinds::DEFAULT_KIND_INT);
     }
     else
     {
       sizeOf_OP_DAT_Kind = buildIntVal (
-          FortranVariableDeafultKinds::DEFAULT_KIND_REAL);
+          FortranVariableDefaultKinds::DEFAULT_KIND_REAL);
     }
   }
 

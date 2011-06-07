@@ -199,7 +199,7 @@ FortranCUDAUserDeviceSubroutine::copyAndModifySubroutine ()
                 oldVarRefExp->get_symbol ()->get_name ().getString ()))
             {
               SgVarRefExp * newVarRefExp = buildVarRefExp (
-                  initialiseConstantsSubroutine->getLocalVariableDeclaration (
+                  initialiseConstantsSubroutine->getVariableDeclaration (
                       it->second));
 
               oldVarRefExp->set_symbol (newVarRefExp->get_symbol ());
@@ -235,7 +235,7 @@ FortranCUDAUserDeviceSubroutine::copyAndModifySubroutine ()
 }
 
 void
-FortranCUDAUserDeviceSubroutine::createFormalParameterDeclarations ()
+FortranCUDAUserDeviceSubroutine::createlocalVariableDeclarations ()
 {
 
 }
@@ -264,11 +264,12 @@ FortranCUDAUserDeviceSubroutine::getHostSubroutineName ()
   return hostSubroutineName;
 }
 
-FortranCUDAUserDeviceSubroutine::FortranCUDAUserDeviceSubroutine (std::string const & subroutineName,
+FortranCUDAUserDeviceSubroutine::FortranCUDAUserDeviceSubroutine (
+    std::string const & subroutineName,
     FortranCUDAInitialiseConstantsSubroutine * initialiseConstantsSubroutine,
     Declarations * declarations, ParallelLoop * parallelLoop,
     SgScopeStatement * moduleScope) :
-  Subroutine (subroutineName + SubroutineNameSuffixes::deviceSuffix)
+  FortranSubroutine (subroutineName + SubroutineNameSuffixes::deviceSuffix)
 {
   using SageBuilder::buildProcedureHeaderStatement;
   using SageBuilder::buildFunctionParameterList;

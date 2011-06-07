@@ -1,15 +1,157 @@
 #include <FortranOpenMPHostSubroutineIndirectLoop.h>
+#include <CommonNamespaces.h>
+#include <FortranStatementsAndExpressionsBuilder.h>
+#include <FortranTypesBuilder.h>
+
+void
+FortranOpenMPHostSubroutineIndirectLoop::createFirstTimeExecutionStatements ()
+{
+  using SageBuilder::buildBasicBlock;
+  using SageBuilder::buildDotExp;
+  using SageBuilder::buildVarRefExp;
+  using SageBuilder::buildOpaqueVarRefExp;
+  using SageBuilder::buildBoolValExp;
+  using SageBuilder::buildAssignOp;
+  using SageBuilder::buildEqualityOp;
+  using SageBuilder::buildAssignStatement;
+  using SageInterface::appendStatement;
+  using std::vector;
+
+  SgEqualityOp * ifGuardExpression = buildEqualityOp (buildVarRefExp (
+      moduleDeclarations->getFirstExecutionBooleanDeclaration ()),
+      buildBoolValExp (true));
+
+  SgBasicBlock * ifBody = buildBasicBlock ();
+
+  SgExprStatement * assignmentStatement = buildAssignStatement (
+      buildVarRefExp (
+          moduleDeclarations->getFirstExecutionBooleanDeclaration ()),
+      buildBoolValExp (false));
+
+  ifBody->append_statement (assignmentStatement);
+
+  vector <SgStatement *>  statements;
+
+  createInitialiseExecutionPlanStatements (statements);
+
+  for (std::vector <SgStatement *>::iterator it = statements.begin (); it
+      != statements.end (); ++it)
+  {
+    ifBody->append_statement (*it);
+  }
+
+  SgIfStmt * ifStatement =
+      FortranStatementsAndExpressionsBuilder::buildIfStatementWithEmptyElse (
+          ifGuardExpression, ifBody);
+
+  appendStatement (ifStatement, subroutineScope);
+}
+
+void
+FortranOpenMPHostSubroutineIndirectLoop::createExecutionPlanDeclarations ()
+{
+  using std::string;
+  using std::vector;
+
+  /*
+   * ======================================================
+   * Create arrays for OP_DAT, OP_INDIRECTION,
+   * OP_MAP, OP_ACCESS arguments. These arrays are filled up
+   * with the actual values of the OP_DAT, OP_INDIRECTION,
+   * OP_MAP, OP_ACCESS that are passed to the OP_PAR_LOOP;
+   * these arrays are then given to the plan function.
+   * Note, therefore, that the size of the arrays is exactly
+   * the number of OP_DAT argument groups.
+   * There is an additional array 'inds' storing which
+   * OP_DAT arguments are accessed through an indirection
+   * ======================================================
+   */
+
+  vector <string> fourByteIntegerArrays;
+
+  fourByteIntegerArrays.push_back (
+      IndirectLoop::Fortran::HostSubroutine::VariableNames::args);
+
+  fourByteIntegerArrays.push_back (
+      IndirectLoop::Fortran::HostSubroutine::VariableNames::idxs);
+
+  fourByteIntegerArrays.push_back (
+      IndirectLoop::Fortran::HostSubroutine::VariableNames::maps);
+
+  fourByteIntegerArrays.push_back (
+      IndirectLoop::Fortran::HostSubroutine::VariableNames::accesses);
+
+  fourByteIntegerArrays.push_back (
+      IndirectLoop::Fortran::HostSubroutine::VariableNames::inds);
+
+  for (vector <string>::iterator it = fourByteIntegerArrays.begin (); it
+      != fourByteIntegerArrays.end (); ++it)
+  {
+    variableDeclarations[*it]
+        = FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
+            *it, FortranTypesBuilder::getArray_RankOne (
+                FortranTypesBuilder::getFourByteInteger (), 1,
+                parallelLoop->getNumberOf_OP_DAT_ArgumentGroups ()),
+            subroutineScope);
+  }
+
+  /*
+   * ======================================================
+   * The plan function fills up a 'struct' which has a
+   * number of integer fields. These fields need to be accessed
+   * on the Fortran side, so create local variables that
+   * enable the data to be transferred accordingly
+   * ======================================================
+   */
+
+  vector <string> fourByteIntegerVariables;
+
+  fourByteIntegerVariables.push_back (
+      IndirectLoop::Fortran::HostSubroutine::VariableNames::argsNumber);
+
+  fourByteIntegerVariables.push_back (
+      IndirectLoop::Fortran::HostSubroutine::VariableNames::indsNumber);
+
+  fourByteIntegerVariables.push_back (
+      IndirectLoop::Fortran::HostSubroutine::VariableNames::iterationCounter);
+
+  for (vector <string>::iterator it = fourByteIntegerVariables.begin (); it
+      != fourByteIntegerVariables.end (); ++it)
+  {
+    variableDeclarations[*it]
+        = FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
+            *it, FortranTypesBuilder::getFourByteInteger (), subroutineScope);
+  }
+}
+
+void
+FortranOpenMPHostSubroutineIndirectLoop::createOpenMPVariableDeclarations ()
+{
+  variableDeclarations[OpenMP::numberOfThreads]
+      = FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
+          OpenMP::numberOfThreads, FortranTypesBuilder::getFourByteInteger (),
+          subroutineScope);
+
+  variableDeclarations[OpenMP::blockID]
+      = FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
+          OpenMP::blockID, FortranTypesBuilder::getFourByteInteger (),
+          subroutineScope);
+}
 
 void
 FortranOpenMPHostSubroutineIndirectLoop::createStatements ()
 {
+  initialiseNumberOfThreads ();
 
+  createFirstTimeExecutionStatements ();
 }
 
 void
 FortranOpenMPHostSubroutineIndirectLoop::createLocalVariableDeclarations ()
 {
+  createOpenMPVariableDeclarations ();
 
+  createExecutionPlanDeclarations ();
 }
 
 FortranOpenMPHostSubroutineIndirectLoop::FortranOpenMPHostSubroutineIndirectLoop (
@@ -22,7 +164,7 @@ FortranOpenMPHostSubroutineIndirectLoop::FortranOpenMPHostSubroutineIndirectLoop
 {
   this->moduleDeclarations = moduleDeclarations;
 
-  createFormalParameterDeclarations ();
+  createlocalVariableDeclarations ();
 
   createLocalVariableDeclarations ();
 

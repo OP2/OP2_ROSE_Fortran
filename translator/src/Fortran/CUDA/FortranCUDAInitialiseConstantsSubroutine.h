@@ -1,9 +1,9 @@
 #ifndef FORTRAN_CUDA_INITIALISE_CONSTANTS_SUBROUTINE_H
 #define FORTRAN_CUDA_INITIALISE_CONSTANTS_SUBROUTINE_H
 
-#include <Subroutine.h>
+#include <FortranSubroutine.h>
 
-class FortranCUDAInitialiseConstantsSubroutine: public Subroutine
+class FortranCUDAInitialiseConstantsSubroutine: public FortranSubroutine
 {
   private:
 
@@ -35,7 +35,7 @@ class FortranCUDAInitialiseConstantsSubroutine: public Subroutine
     createLocalVariableDeclarations ();
 
     virtual void
-    createFormalParameterDeclarations ();
+    createlocalVariableDeclarations ();
 
   public:
 
@@ -67,8 +67,8 @@ class FortranCUDAInitialiseConstantsSubroutine: public Subroutine
     std::map <std::string, std::string>::const_iterator
     getLastConstantName ();
 
-    FortranCUDAInitialiseConstantsSubroutine (std::string const & subroutineName,
-        SgScopeStatement * moduleScope);
+    FortranCUDAInitialiseConstantsSubroutine (
+        std::string const & subroutineName, SgScopeStatement * moduleScope);
 };
 
 #endif

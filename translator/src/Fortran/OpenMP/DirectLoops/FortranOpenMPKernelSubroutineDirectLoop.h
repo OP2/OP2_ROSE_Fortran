@@ -24,7 +24,7 @@ class FortranOpenMPKernelSubroutineDirectLoop: public FortranOpenMPKernelSubrout
     createLocalVariableDeclarations ();
 
     virtual void
-    createFormalParameterDeclarations ();
+    createlocalVariableDeclarations ();
 
   public:
 

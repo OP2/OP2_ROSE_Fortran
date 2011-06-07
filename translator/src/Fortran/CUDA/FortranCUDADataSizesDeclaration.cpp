@@ -2,17 +2,6 @@
 #include <FortranCUDADataSizesDeclaration.h>
 #include <FortranStatementsAndExpressionsBuilder.h>
 
-std::string
-FortranCUDADataSizesDeclaration::get_OP_DAT_SizeFieldName (
-    unsigned int OP_DAT_ArgumentGroup)
-{
-  using boost::lexical_cast;
-  using std::string;
-
-  return IndirectAndDirectLoop::Fortran::VariablePrefixes::OP_DAT
-      + lexical_cast <string> (OP_DAT_ArgumentGroup)
-      + IndirectAndDirectLoop::Fortran::VariableSuffixes::Size;
-}
 
 SgClassType *
 FortranCUDADataSizesDeclaration::getType ()

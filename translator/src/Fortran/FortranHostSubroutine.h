@@ -1,10 +1,10 @@
 #ifndef FORTRAN_HOST_SUBROUTINE_H
 #define FORTRAN_HOST_SUBROUTINE_H
 
-#include <Subroutine.h>
+#include <FortranSubroutine.h>
 #include <ParallelLoop.h>
 
-class FortranHostSubroutine: public Subroutine
+class FortranHostSubroutine: public FortranSubroutine
 {
   protected:
 
@@ -18,84 +18,22 @@ class FortranHostSubroutine: public Subroutine
 
     /*
      * ======================================================
-     * Returns the name of the formal parameter which models the
-     * name of the user subroutine
+     * Creates the function call which converts a C execution
+     * plan onto the Fortran side
      * ======================================================
      */
-    static std::string
-    getUserSubroutineFormalParameterName ();
+    void
+    createPlanFunctionCallStatement ();
 
     /*
      * ======================================================
-     * Returns the name of the formal parameter which models the
-     * OP_SET
+     * Returns the sequence of statements which initialise
+     * variables used in the execution plan
      * ======================================================
      */
-    static std::string
-    get_OP_SET_FormalParameterName ();
-
-    /*
-     * ======================================================
-     * Returns the name of the indirection formal parameter
-     * in this OP_DAT argument group
-     * ======================================================
-     */
-    static std::string
-    get_OP_INDIRECTION_FormalParameterName (unsigned int OP_DAT_ArgumentGroup);
-
-    /*
-     * ======================================================
-     * Returns the name of the mapping formal parameter
-     * in this OP_DAT argument group
-     * ======================================================
-     */
-    static std::string
-    get_OP_MAP_FormalParameterName (unsigned int OP_DAT_ArgumentGroup);
-
-    /*
-     * ======================================================
-     * Returns the name of the access formal parameter
-     * in this OP_DAT argument group
-     * ======================================================
-     */
-    static std::string
-    get_OP_ACCESS_FormalParameterName (unsigned int OP_DAT_ArgumentGroup);
-
-    /*
-     * ======================================================
-     * Returns the name of the OP_DAT formal parameter
-     * in this OP_DAT argument group
-     * ======================================================
-     */
-    static std::string
-    get_OP_DAT_FormalParameterName (unsigned int OP_DAT_ArgumentGroup);
-
-    /*
-     * ======================================================
-     * Returns the name of the variable modelling the size of
-     * an OP_DAT in this OP_DAT argument group
-     * ======================================================
-     */
-    static std::string
-    get_OP_DAT_SizeVariableName (unsigned int OP_DAT_ArgumentGroup);
-
-    /*
-     * ======================================================
-     * Returns the name of the OP_DAT device variable
-     * in this OP_DAT argument group
-     * ======================================================
-     */
-    static std::string
-    get_OP_DAT_DeviceVariableName (unsigned int OP_DAT_ArgumentGroup);
-
-    /*
-     * ======================================================
-     * Returns the name of the C to Fortran variable
-     * in this OP_DAT argument group
-     * ======================================================
-     */
-    static std::string
-    getCToFortranVariableName (unsigned int OP_DAT_ArgumentGroup);
+    void
+    createInitialiseExecutionPlanStatements (
+        std::vector <SgStatement *> & statements);
 
     /*
      * ======================================================
@@ -108,7 +46,7 @@ class FortranHostSubroutine: public Subroutine
         SgExpression * parameter2, SgExpression * parameter3 = NULL);
 
     virtual void
-    createFormalParameterDeclarations ();
+    createlocalVariableDeclarations ();
 
     FortranHostSubroutine (std::string const & subroutineName,
         std::string const & userSubroutineName,

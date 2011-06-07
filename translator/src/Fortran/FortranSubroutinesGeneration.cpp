@@ -29,7 +29,7 @@
 void
 FortranSubroutinesGeneration::patchCallsToParallelLoops (
     ParallelLoop & parallelLoop, std::string const & userSubroutineName,
-    Subroutine & hostSubroutine, SgScopeStatement * scope,
+    FortranSubroutine & hostSubroutine, SgScopeStatement * scope,
     SgFunctionCallExp * functionCallExp)
 {
   using SageBuilder::buildAssignInitializer;
@@ -138,7 +138,7 @@ FortranSubroutinesGeneration::patchCallsToParallelLoops (
    * ======================================================
    */
   SgFunctionRefExp * hostSubroutineReference = buildFunctionRefExp (
-      hostSubroutine.getSubroutineHeaderStatement ());
+      hostSubroutine.getProcedureHeaderStatement ());
 
   functionCallExp->set_function (hostSubroutineReference);
 

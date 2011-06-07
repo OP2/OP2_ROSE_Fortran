@@ -133,20 +133,6 @@ namespace IndirectAndDirectLoop
       std::string const autoshared = "autoshared";
     }
 
-    namespace VariablePrefixes
-    {
-      std::string const OP_DAT = "opDat";
-      std::string const OP_MAP = "opMap";
-      std::string const OP_ACCESS = "opAccess";
-      std::string const OP_INDIRECTION = "opIndirection";
-    }
-
-    namespace VariableSuffixes
-    {
-      std::string const Size = "Size";
-      std::string const local = "Local";
-    }
-
     namespace Libraries
     {
       std::string const ISO_C_BINDING = "ISO_C_BINDING";
@@ -437,7 +423,7 @@ namespace SubroutineNameSuffixes
   std::string const floatSuffix = "_float";
 }
 
-namespace FortranVariableDeafultKinds
+namespace FortranVariableDefaultKinds
 {
   int const DEFAULT_KIND_INT = 4;
   int const DEFAULT_KIND_REAL = 4;
@@ -468,6 +454,149 @@ namespace OpenMP
   std::string const sliceEnd = "sliceEnd";
   std::string const threadID = "threadID";
   std::string const sliceIterator = "sliceIterator";
+  std::string const blockID = "blockID";
+}
+
+namespace VariableNames
+{
+  /*
+   * ======================================================
+   * Returns the name of the formal parameter which models the
+   * name of the user subroutine
+   * ======================================================
+   */
+  std::string
+  getUserSubroutineName ();
+
+  /*
+   * ======================================================
+   * Returns the name of the formal parameter which models the
+   * OP_SET
+   * ======================================================
+   */
+  std::string
+  getOpSetName ();
+
+  /*
+   * ======================================================
+   * Returns the name of an OP_DAT variable in this OP_DAT
+   * argument group
+   * ======================================================
+   */
+  std::string
+  getOpDatName (unsigned int OP_DAT_ArgumentGroup);
+
+  /*
+   * ======================================================
+   * Returns the name of a local OP_DAT variable in this
+   * OP_DAT argument group
+   * ======================================================
+   */
+  std::string
+  getOpDatLocalName (unsigned int OP_DAT_ArgumentGroup);
+
+  /*
+   * ======================================================
+   * Returns the name of a global OP_DAT variable in this
+   * OP_DAT argument group
+   * ======================================================
+   */
+  std::string
+  getOpDatGlobalName (unsigned int OP_DAT_ArgumentGroup);
+
+  /*
+   * ======================================================
+   * Returns the name of the variable modelling the size of
+   * an OP_DAT in this OP_DAT argument group
+   * ======================================================
+   */
+  std::string
+  getOpDatSizeName (unsigned int OP_DAT_ArgumentGroup);
+
+  /*
+   * ======================================================
+   * Returns the name of the OP_DAT device variable
+   * in this OP_DAT argument group
+   * ======================================================
+   */
+  std::string
+  getOpDatDeviceName (unsigned int OP_DAT_ArgumentGroup);
+
+  /*
+   * ======================================================
+   * Returns the name of the indirection variable in this
+   * OP_DAT argument group
+   * ======================================================
+   */
+  std::string
+  getOpIndirectionName (unsigned int OP_DAT_ArgumentGroup);
+
+  /*
+   * ======================================================
+   * Returns the name of the mapping variable in this OP_DAT
+   * argument group
+   * ======================================================
+   */
+  std::string
+  getOpMapName (unsigned int OP_DAT_ArgumentGroup);
+
+  /*
+   * ======================================================
+   * Returns the name of the access variable in this OP_DAT
+   * argument group
+   * ======================================================
+   */
+  std::string
+  getOpAccessName (unsigned int OP_DAT_ArgumentGroup);
+
+  /*
+   * ======================================================
+   * Returns the name of the C to Fortran variable
+   * in this OP_DAT argument group
+   * ======================================================
+   */
+  std::string
+  getCToFortranVariableName (unsigned int OP_DAT_ArgumentGroup);
+
+  /*
+   * ======================================================
+   * Name of the field which represents the size of a
+   * local to global renumbering (i.e. from local memory
+   * into global device memory in the CUDA architecture)
+   * argument used for an indirect OP_DAT.
+   *
+   * These are the 'ind_maps' variable sizes in the plan
+   * function according to Mike Giles documentation
+   * ======================================================
+   */
+  std::string
+  getLocalToGlobalMappingName (unsigned int OP_DAT_ArgumentGroup);
+
+  std::string
+  getLocalToGlobalMappingSizeName (unsigned int OP_DAT_ArgumentGroup);
+
+  /*
+   * ======================================================
+   * Name of the field which represents the size of a
+   * global to local renumbering (i.e. from global device memory
+   * to local memory in the CUDA architecture)
+   * argument used for an indirect OP_DAT.
+   *
+   * These are the 'maps' variable sizes in the plan function
+   * according to Mike Giles documentation
+   * ======================================================
+   */
+  std::string
+  getGlobalToLocalMappingName (unsigned int OP_DAT_ArgumentGroup);
+
+  std::string
+  getGlobalToLocalMappingSizeName (unsigned int OP_DAT_ArgumentGroup);
+
+  std::string
+  getNumberOfBytesVariableName (unsigned int OP_DAT_ArgumentGroup);
+
+  std::string
+  getRoundUpVariableName (unsigned int OP_DAT_ArgumentGroup);
 }
 
 #endif

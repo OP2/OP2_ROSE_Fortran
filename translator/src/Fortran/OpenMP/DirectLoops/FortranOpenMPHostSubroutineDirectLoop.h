@@ -12,9 +12,6 @@ class FortranOpenMPHostSubroutineDirectLoop: public FortranOpenMPHostSubroutine
 
   private:
 
-    static std::string
-    getLocalOPDATVariableName (unsigned int OP_DAT_ArgumentGroup);
-
     SgStatement *
     createKernelCall ();
 
@@ -27,14 +24,17 @@ class FortranOpenMPHostSubroutineDirectLoop: public FortranOpenMPHostSubroutine
     void
     createReductionPrologueStatements ();
 
-    void
-    createCToFortranPointerConversionStatements ();
+    virtual void
+    createFirstTimeExecutionStatements ();
 
     void
     initialiseThreadVariables ();
 
     void
     createReductionLocalVariableDeclarations ();
+
+    virtual void
+    createOpenMPVariableDeclarations ();
 
     virtual void
     createStatements ();

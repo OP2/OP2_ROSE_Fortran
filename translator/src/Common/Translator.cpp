@@ -27,7 +27,6 @@
 #include <Debug.h>
 #include <Declarations.h>
 #include <Globals.h>
-#include <ModifyOP2Calls.h>
 #include <FortranSubroutinesGeneration.h>
 
 int
@@ -68,10 +67,6 @@ main (int argc, char ** argv)
   if (project->get_Cxx_only () == true)
   {
     Debug::getInstance ()->verboseMessage ("C++ project detected");
-
-    ModifyOP2Calls * modifyOP2Calls = new ModifyOP2Calls (project);
-
-    modifyOP2Calls->traverseInputFiles (project, preorder);
   }
   else
   {
@@ -97,8 +92,8 @@ main (int argc, char ** argv)
     Debug::getInstance ()->verboseMessage (
         "Creating subroutines for OP_PAR_LOOPs");
 
-    FortranSubroutinesGeneration * newSubroutines = new FortranSubroutinesGeneration (
-        project, declarations);
+    FortranSubroutinesGeneration * newSubroutines =
+        new FortranSubroutinesGeneration (project, declarations);
 
     newSubroutines->traverseInputFiles (project, preorder);
 

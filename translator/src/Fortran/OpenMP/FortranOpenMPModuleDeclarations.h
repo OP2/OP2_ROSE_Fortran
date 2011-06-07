@@ -40,9 +40,6 @@ class FortranOpenMPModuleDeclarations
 
   protected:
 
-    static std::string
-    getGlobalOPDATName (unsigned int OP_DAT_ArgumentGroup);
-
     void
     createOPDATDeclarations ();
 

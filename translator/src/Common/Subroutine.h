@@ -23,16 +23,6 @@ class Subroutine
 
     /*
      * ======================================================
-     * Access to this statement allows ROSE to build function
-     * call expressions to the generated subroutine. This
-     * is needed, for example, when patching the user-supplied
-     * code
-     * ======================================================
-     */
-    SgProcedureHeaderStatement * subroutineHeaderStatement;
-
-    /*
-     * ======================================================
      * The parameters of the newly created subroutine
      * ======================================================
      */
@@ -47,30 +37,13 @@ class Subroutine
 
     /*
      * ======================================================
-     * Formal parameter declarations in the newly created
-     * subroutine
+     * Formal parameter and local variable declarations in the
+     * newly created subroutine
      * ======================================================
      */
-    std::map <std::string, SgVariableDeclaration *> formalParameterDeclarations;
-
-    /*
-     * ======================================================
-     * Local variable declarations in the newly created
-     * subroutine
-     * ======================================================
-     */
-    std::map <std::string, SgVariableDeclaration *> localVariableDeclarations;
+    std::map <std::string, SgVariableDeclaration *> variableDeclarations;
 
   protected:
-
-    /*
-     * ======================================================
-     * Returns the name of the OP_DAT formal parameter
-     * in this OP_DAT argument group
-     * ======================================================
-     */
-    static std::string
-    get_OP_DAT_FormalParameterName (unsigned int OP_DAT_ArgumentGroup);
 
     /*
      * ======================================================
@@ -94,7 +67,7 @@ class Subroutine
      * ======================================================
      */
     virtual void
-    createFormalParameterDeclarations () = 0;
+    createlocalVariableDeclarations () = 0;
 
     /*
      * ======================================================
@@ -116,30 +89,11 @@ class Subroutine
 
     /*
      * ======================================================
-     * Returns the procedure header statement used internally
-     * by ROSE in its abstract syntax tree
-     * ======================================================
-     */
-    SgProcedureHeaderStatement *
-    getSubroutineHeaderStatement ();
-
-    /*
-     * ======================================================
-     * Returns the variable declaration for the given formal
-     * parameter
+     * Returns the variable declaration with this name
      * ======================================================
      */
     SgVariableDeclaration *
-    getFormalParameterDeclaration (std::string const & variableName);
-
-    /*
-     * ======================================================
-     * Returns the variable declaration for the given local
-     * variable
-     * ======================================================
-     */
-    SgVariableDeclaration *
-    getLocalVariableDeclaration (std::string const & variableName);
+    getVariableDeclaration (std::string const & variableName);
 };
 
 #endif

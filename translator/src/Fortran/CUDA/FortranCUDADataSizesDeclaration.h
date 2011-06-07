@@ -64,15 +64,6 @@ class FortranCUDADataSizesDeclaration
 
     /*
      * ======================================================
-     * Name of the field which represents the size of an
-     * OP_DAT argument
-     * ======================================================
-     */
-    std::string
-    get_OP_DAT_SizeFieldName (unsigned int OP_DAT_ArgumentGroup);
-
-    /*
-     * ======================================================
      * What is the type of the data sizes declaration?
      * ======================================================
      */
