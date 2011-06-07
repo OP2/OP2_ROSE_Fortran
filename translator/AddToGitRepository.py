@@ -13,6 +13,11 @@ parser.add_option("-v",
                  help="Be verbose.",
                  default=False)
 
+parser.add_option("-h",
+                  "--help",
+                  action="help",
+                  help="Display this help message.")
+
 (opts, args) = parser.parse_args(argv[1:])
 
 for path, dirs, files in os.walk(os.path.abspath(os.curdir + os.sep + 'src')):
@@ -21,10 +26,7 @@ for path, dirs, files in os.walk(os.path.abspath(os.curdir + os.sep + 'src')):
 		fullPath = os.path.join(path, file)
 
 		if fileExtension == '.cpp' or fileExtension == '.h':
-			if opts.verbose:
-				print('Adding %s to Git repository' % (fullPath))
-		
-			cmd = 'git add ' + fullPath
+			cmd = 'git ls_files ' + fullPath
 
 			proc = Popen(cmd,
 				     shell=True,
@@ -32,4 +34,21 @@ for path, dirs, files in os.walk(os.path.abspath(os.curdir + os.sep + 'src')):
                                      stderr=PIPE,
                                      stdout=PIPE)
 
-			proc.communicate()
+			stdout, stderr = proc.communicate()
+
+			if stdout == None:
+				if opts.verbose:
+					print("'" + fullPath + "' not in repository")
+				
+				cmd = 'git add ' + fullPath
+
+				proc = Popen(cmd,
+				             shell=True,
+                                             executable='/bin/bash',
+                                             stderr=PIPE,
+                                             stdout=PIPE)
+
+				proc.communicate()
+                
+			elif opts.verbose:
+				print("'" + fullPath + "' in repository")
