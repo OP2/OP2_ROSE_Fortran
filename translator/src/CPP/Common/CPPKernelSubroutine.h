@@ -1,16 +1,12 @@
 #ifndef CPP_KERNEL_SUBROUTINE_H
 #define CPP_KERNEL_SUBROUTINE_H
 
+#include <KernelSubroutine.h>
 #include <CPPSubroutine.h>
 #include <ParallelLoop.h>
 
-class CPPKernelSubroutine: public CPPSubroutine
+class CPPKernelSubroutine: public CPPSubroutine, public KernelSubroutine
 {
-  protected:
-
-    std::string userSubroutineName;
-
-    ParallelLoop * parallelLoop;
 
   protected:
 

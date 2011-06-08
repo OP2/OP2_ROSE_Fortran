@@ -1,9 +1,9 @@
 #ifndef CPP_SUBROUTINE_H
 #define CPP_SUBROUTINE_H
 
-#include <Subroutine.h>
+#include <rose.h>
 
-class CPPSubroutine: public Subroutine
+class CPPSubroutine
 {
   protected:
 
@@ -21,11 +21,10 @@ class CPPSubroutine: public Subroutine
 
     /*
      * ======================================================
-     * C++ subroutine constructor with name of the
-     * subroutine to create
+     * C++ subroutine constructor
      * ======================================================
      */
-    CPPSubroutine (std::string const & subroutineName);
+    CPPSubroutine ();
 
   public:
 

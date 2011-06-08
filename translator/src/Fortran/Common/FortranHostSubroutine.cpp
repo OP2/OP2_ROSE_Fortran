@@ -569,12 +569,20 @@ FortranHostSubroutine::createlocalVariableDeclarations ()
 
 FortranHostSubroutine::FortranHostSubroutine (
     std::string const & subroutineName, std::string const & userSubroutineName,
-    std::string const & kernelSubroutineName, ParallelLoop * parallelLoop) :
-  FortranSubroutine (subroutineName + SubroutineNameSuffixes::hostSuffix)
+    std::string const & kernelSubroutineName, ParallelLoop * parallelLoop,
+    SgScopeStatement * moduleScope) :
+  FortranSubroutine (), HostSubroutine (subroutineName, userSubroutineName,
+      kernelSubroutineName, parallelLoop)
 {
-  this->userSubroutineName = userSubroutineName;
+  using SageBuilder::buildVoidType;
+  using SageBuilder::buildProcedureHeaderStatement;
+  using SageInterface::appendStatement;
 
-  this->kernelSubroutineName = kernelSubroutineName;
+  subroutineHeaderStatement = buildProcedureHeaderStatement (
+      this->subroutineName.c_str (), buildVoidType (), formalParameters,
+      SgProcedureHeaderStatement::e_subroutine_subprogram_kind, moduleScope);
 
-  this->parallelLoop = parallelLoop;
+  subroutineScope = subroutineHeaderStatement->get_definition ()->get_body ();
+
+  appendStatement (subroutineHeaderStatement, moduleScope);
 }

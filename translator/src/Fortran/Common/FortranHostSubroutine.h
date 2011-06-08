@@ -1,19 +1,12 @@
 #ifndef FORTRAN_HOST_SUBROUTINE_H
 #define FORTRAN_HOST_SUBROUTINE_H
 
+#include <HostSubroutine.h>
 #include <FortranSubroutine.h>
 #include <ParallelLoop.h>
 
-class FortranHostSubroutine: public FortranSubroutine
+class FortranHostSubroutine: public FortranSubroutine, public HostSubroutine
 {
-  protected:
-
-    std::string userSubroutineName;
-
-    std::string kernelSubroutineName;
-
-    ParallelLoop * parallelLoop;
-
   protected:
 
     /*
@@ -50,7 +43,8 @@ class FortranHostSubroutine: public FortranSubroutine
 
     FortranHostSubroutine (std::string const & subroutineName,
         std::string const & userSubroutineName,
-        std::string const & kernelSubroutineName, ParallelLoop * parallelLoop);
+        std::string const & kernelSubroutineName, ParallelLoop * parallelLoop,
+        SgScopeStatement * moduleScope);
 };
 
 #endif

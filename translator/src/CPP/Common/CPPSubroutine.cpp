@@ -5,8 +5,8 @@
  * Protected functions
  * ======================================================
  */
-CPPSubroutine::CPPSubroutine (std::string const & subroutineName) :
-  Subroutine (subroutineName)
+
+CPPSubroutine::CPPSubroutine ()
 {
 
 }

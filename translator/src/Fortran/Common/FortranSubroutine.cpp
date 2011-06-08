@@ -5,8 +5,8 @@
  * Protected functions
  * ======================================================
  */
-FortranSubroutine::FortranSubroutine (std::string const & subroutineName) :
-  Subroutine (subroutineName)
+
+FortranSubroutine::FortranSubroutine ()
 {
 
 }

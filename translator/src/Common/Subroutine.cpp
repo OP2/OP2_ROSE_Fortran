@@ -8,7 +8,11 @@
 
 Subroutine::Subroutine (std::string const & subroutineName)
 {
+  using SageBuilder::buildFunctionParameterList;
+
   this->subroutineName = subroutineName;
+
+  formalParameters = buildFunctionParameterList ();
 }
 
 /*

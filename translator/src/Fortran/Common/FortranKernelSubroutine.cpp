@@ -1,4 +1,3 @@
-#include <boost/lexical_cast.hpp>
 #include <FortranKernelSubroutine.h>
 
 /*
@@ -9,10 +8,19 @@
 
 FortranKernelSubroutine::FortranKernelSubroutine (
     std::string const & subroutineName, std::string const & userSubroutineName,
-    ParallelLoop * parallelLoop) :
-  FortranSubroutine (subroutineName + SubroutineNameSuffixes::kernelSuffix)
+    ParallelLoop * parallelLoop, SgScopeStatement * moduleScope) :
+  FortranSubroutine (), KernelSubroutine (subroutineName, userSubroutineName,
+      parallelLoop)
 {
-  this->userSubroutineName = userSubroutineName;
+  using SageBuilder::buildVoidType;
+  using SageBuilder::buildProcedureHeaderStatement;
+  using SageInterface::appendStatement;
 
-  this->parallelLoop = parallelLoop;
+  subroutineHeaderStatement = buildProcedureHeaderStatement (
+      this->subroutineName.c_str (), buildVoidType (), formalParameters,
+      SgProcedureHeaderStatement::e_subroutine_subprogram_kind, moduleScope);
+
+  subroutineScope = subroutineHeaderStatement->get_definition ()->get_body ();
+
+  appendStatement (subroutineHeaderStatement, moduleScope);
 }

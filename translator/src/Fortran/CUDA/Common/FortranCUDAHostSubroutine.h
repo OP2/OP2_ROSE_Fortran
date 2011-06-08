@@ -3,7 +3,6 @@
 
 #include <FortranHostSubroutine.h>
 #include <FortranCUDAKernelSubroutine.h>
-#include <FortranCUDAUserDeviceSubroutine.h>
 #include <ParallelLoop.h>
 
 class FortranCUDAHostSubroutine: public FortranHostSubroutine

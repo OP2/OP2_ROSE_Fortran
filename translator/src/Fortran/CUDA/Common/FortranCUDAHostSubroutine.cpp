@@ -724,24 +724,10 @@ FortranCUDAHostSubroutine::FortranCUDAHostSubroutine (
     std::string const & kernelSubroutineName, ParallelLoop * parallelLoop,
     SgScopeStatement * moduleScope) :
   FortranHostSubroutine (subroutineName, userSubroutineName,
-      kernelSubroutineName, parallelLoop)
+      kernelSubroutineName, parallelLoop, moduleScope)
 {
-  using SageBuilder::buildFunctionParameterList;
-  using SageBuilder::buildVoidType;
-  using SageBuilder::buildProcedureHeaderStatement;
-  using SageInterface::appendStatement;
   using SageInterface::addTextForUnparser;
-
-  formalParameters = buildFunctionParameterList ();
-
-  subroutineHeaderStatement = buildProcedureHeaderStatement (
-      this->subroutineName.c_str (), buildVoidType (), formalParameters,
-      SgProcedureHeaderStatement::e_subroutine_subprogram_kind, moduleScope);
-
-  appendStatement (subroutineHeaderStatement, moduleScope);
 
   addTextForUnparser (subroutineHeaderStatement, "attributes(host) ",
       AstUnparseAttribute::e_before);
-
-  subroutineScope = subroutineHeaderStatement->get_definition ()->get_body ();
 }

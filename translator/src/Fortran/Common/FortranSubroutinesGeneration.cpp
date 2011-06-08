@@ -4,7 +4,6 @@
 #include <FortranSubroutinesGeneration.h>
 #include <FortranTypesBuilder.h>
 #include <ROSEHelper.h>
-#include <FortranCUDAUserDeviceSubroutine.h>
 #include <FortranCUDAKernelSubroutineDirectLoop.h>
 #include <FortranCUDAKernelSubroutineIndirectLoop.h>
 #include <FortranCUDAHostSubroutineDirectLoop.h>
@@ -256,7 +255,7 @@ FortranSubroutinesGeneration::createCUDASubroutines (
    */
   parallelLoop->generateReductionSubroutines (moduleScope);
 
-  FortranCUDAUserDeviceSubroutine * userDeviceSubroutine;
+  FortranCUDAUserSubroutine * userDeviceSubroutine;
 
   FortranCUDAKernelSubroutine * kernelSubroutine;
 
@@ -279,7 +278,7 @@ FortranSubroutinesGeneration::createCUDASubroutines (
 
     addContains (moduleStatement);
 
-    userDeviceSubroutine = new FortranCUDAUserDeviceSubroutine (
+    userDeviceSubroutine = new FortranCUDAUserSubroutine (
         userSubroutineName, initialiseConstantsSubroutine, declarations,
         parallelLoop, moduleScope);
 
@@ -312,7 +311,7 @@ FortranSubroutinesGeneration::createCUDASubroutines (
 
     initialiseConstantsSubroutine->generateSubroutine (moduleScope);
 
-    userDeviceSubroutine = new FortranCUDAUserDeviceSubroutine (
+    userDeviceSubroutine = new FortranCUDAUserSubroutine (
         userSubroutineName, initialiseConstantsSubroutine, declarations,
         parallelLoop, moduleScope);
 

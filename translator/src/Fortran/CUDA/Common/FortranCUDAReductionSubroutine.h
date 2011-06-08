@@ -8,10 +8,12 @@
 #ifndef FORTRAN_CUDA_REDUCTION_SUBROUTINE_H
 #define FORTRAN_CUDA_REDUCTION_SUBROUTINE_H
 
+#include <Subroutine.h>
 #include <FortranSubroutine.h>
 #include <ParallelLoop.h>
 
-class FortranCUDAReductionSubroutine: public FortranSubroutine
+class FortranCUDAReductionSubroutine: public Subroutine,
+    public FortranSubroutine
 {
   private:
 

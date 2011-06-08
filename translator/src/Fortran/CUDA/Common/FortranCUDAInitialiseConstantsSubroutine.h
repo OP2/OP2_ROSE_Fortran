@@ -1,9 +1,10 @@
 #ifndef FORTRAN_CUDA_INITIALISE_CONSTANTS_SUBROUTINE_H
 #define FORTRAN_CUDA_INITIALISE_CONSTANTS_SUBROUTINE_H
 
+#include <Subroutine.h>
 #include <FortranSubroutine.h>
 
-class FortranCUDAInitialiseConstantsSubroutine: public FortranSubroutine
+class FortranCUDAInitialiseConstantsSubroutine: public Subroutine, public FortranSubroutine
 {
   private:
 

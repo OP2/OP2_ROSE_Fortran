@@ -25,7 +25,7 @@
 #include <ParallelLoop.h>
 #include <FortranSubroutine.h>
 #include <FortranCUDAHostSubroutine.h>
-#include <FortranCUDAUserDeviceSubroutine.h>
+#include <FortranCUDAUserSubroutine.h>
 #include <FortranCUDAKernelSubroutine.h>
 
 class FortranSubroutinesGeneration: public AstSimpleProcessing

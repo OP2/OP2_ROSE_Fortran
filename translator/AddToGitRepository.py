@@ -38,12 +38,9 @@ for path, dirs, files in os.walk(os.path.abspath(os.curdir + os.sep + 'src')):
 
 			stdout, stderr = proc.communicate()
 
-			print(stderr)
-			print(stdout)
-
 			if len(stdout) == 0:
 				if opts.verbose:
-					print("'" + fullPath + "' not in repository")
+					print("'" + fullPath + "' not in repository. Adding...")
 				
 				cmd = 'git add ' + fullPath
 

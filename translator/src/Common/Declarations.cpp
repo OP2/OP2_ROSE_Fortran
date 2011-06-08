@@ -215,7 +215,7 @@ Declarations::visit (SgNode * node)
 
           }
           else if (iequals (typedefType->get_name ().getString (),
-              OP2::CPlusPlus::OP_PTR))
+              OP2::CPP::OP_PTR))
           {
 
           }

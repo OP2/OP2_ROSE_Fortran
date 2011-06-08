@@ -302,7 +302,7 @@ FortranCUDAInitialiseConstantsSubroutine::getLastConstantName ()
 
 FortranCUDAInitialiseConstantsSubroutine::FortranCUDAInitialiseConstantsSubroutine (
     std::string const & subroutineName, SgScopeStatement * moduleScope) :
-  FortranSubroutine (subroutineName + "_initialiseConstants")
+  Subroutine (subroutineName + "_initialiseConstants"), FortranSubroutine ()
 {
   variableNamePrefix = subroutineName;
 

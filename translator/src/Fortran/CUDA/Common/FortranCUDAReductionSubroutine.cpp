@@ -416,7 +416,7 @@ FortranCUDAReductionSubroutine::createlocalVariableDeclarations ()
 FortranCUDAReductionSubroutine::FortranCUDAReductionSubroutine (
     std::string const & subroutineAndVariableName,
     SgScopeStatement * moduleScope, SgArrayType * reductionVariableType) :
-  FortranSubroutine (subroutineAndVariableName)
+  Subroutine (subroutineAndVariableName), FortranSubroutine ()
 {
   using SageBuilder::buildProcedureHeaderStatement;
   using SageBuilder::buildVoidType;
@@ -425,8 +425,6 @@ FortranCUDAReductionSubroutine::FortranCUDAReductionSubroutine (
   using SageInterface::addTextForUnparser;
 
   this->reductionVariableType = reductionVariableType;
-
-  formalParameters = buildFunctionParameterList ();
 
   subroutineHeaderStatement = buildProcedureHeaderStatement (
       this->subroutineName.c_str (), buildVoidType (), formalParameters,
@@ -440,8 +438,6 @@ FortranCUDAReductionSubroutine::FortranCUDAReductionSubroutine (
   subroutineScope = subroutineHeaderStatement->get_definition ()->get_body ();
 
   createlocalVariableDeclarations ();
-
-  createLocalVariableDeclarations ();
 
   createStatements ();
 }

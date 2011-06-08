@@ -4,6 +4,12 @@
 
 Globals * Globals::globalsInstance = NULL;
 
+/*
+ * ======================================================
+ * Private functions
+ * ======================================================
+ */
+
 Globals::Globals ()
 {
   /*
@@ -13,6 +19,12 @@ Globals::Globals ()
    */
   backend = TargetBackends::Unknown;
 }
+
+/*
+ * ======================================================
+ * Public functions
+ * ======================================================
+ */
 
 Globals *
 Globals::getInstance ()

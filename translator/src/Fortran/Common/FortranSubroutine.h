@@ -1,9 +1,9 @@
 #ifndef FORTRAN_SUBROUTINE_H
 #define FORTRAN_SUBROUTINE_H
 
-#include <Subroutine.h>
+#include <rose.h>
 
-class FortranSubroutine: public Subroutine
+class FortranSubroutine
 {
   protected:
 
@@ -21,11 +21,10 @@ class FortranSubroutine: public Subroutine
 
     /*
      * ======================================================
-     * Fortran subroutine constructor with name of the
-     * subroutine to create
+     * Fortran subroutine constructor
      * ======================================================
      */
-    FortranSubroutine (std::string const & subroutineName);
+    FortranSubroutine ();
 
   public:
 
