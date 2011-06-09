@@ -39,7 +39,7 @@ class FortranHostSubroutine: public FortranSubroutine, public HostSubroutine
         SgExpression * parameter2, SgExpression * parameter3 = NULL);
 
     virtual void
-    createlocalVariableDeclarations ();
+    createFormalParameterDeclarations ();
 
     FortranHostSubroutine (std::string const & subroutineName,
         std::string const & userSubroutineName,

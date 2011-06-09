@@ -67,7 +67,7 @@ class Subroutine
      * ======================================================
      */
     virtual void
-    createlocalVariableDeclarations () = 0;
+    createFormalParameterDeclarations () = 0;
 
     /*
      * ======================================================

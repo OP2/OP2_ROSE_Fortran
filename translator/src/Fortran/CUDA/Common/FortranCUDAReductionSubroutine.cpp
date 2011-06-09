@@ -1,13 +1,10 @@
+#include <boost/lexical_cast.hpp>
 #include <FortranCUDAReductionSubroutine.h>
 #include <ROSEHelper.h>
 #include <Debug.h>
-#include <FortranTypesBuilder.h>
 #include <CommonNamespaces.h>
 #include <FortranStatementsAndExpressionsBuilder.h>
 #include <FortranTypesBuilder.h>
-#include <boost/lexical_cast.hpp>
-
-//TODO: generate code for OP_MIN and OP_MAX as well
 
 SgStatement *
 FortranCUDAReductionSubroutine::createCallToSynchThreads ()
@@ -301,17 +298,14 @@ FortranCUDAReductionSubroutine::createLocalVariableDeclarations ()
    * ======================================================
    */
 
-  SgExpression * upperBound = new SgAsteriskShapeExp (
-      ROSEHelper::getFileInfo ());
+  SgArrayType * arrayType = FortranTypesBuilder::getArray_RankOne (
+      reductionVariableType->get_base_type (), 0, new SgAsteriskShapeExp (
+          ROSEHelper::getFileInfo ()));
 
   variableDeclarations[IndirectAndDirectLoop::Fortran::VariableNames::autoshared]
       = FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
-          IndirectAndDirectLoop::Fortran::VariableNames::autoshared,
-          FortranTypesBuilder::getArray_RankOne (
-              reductionVariableType->get_base_type (), 0, upperBound),
-          subroutineScope);
-
-  variableDeclarations[IndirectAndDirectLoop::Fortran::VariableNames::autoshared]->get_declarationModifier ().get_typeModifier ().setShared ();
+          IndirectAndDirectLoop::Fortran::VariableNames::autoshared, arrayType,
+          subroutineScope, 1, SHARED);
 
   /*
    * ======================================================
@@ -320,8 +314,10 @@ FortranCUDAReductionSubroutine::createLocalVariableDeclarations ()
    */
 
   vector <string> fourByteIntegers;
+
   fourByteIntegers.push_back (
       IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::iterationCounter);
+
   fourByteIntegers.push_back (
       IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::threadID);
 
@@ -335,7 +331,7 @@ FortranCUDAReductionSubroutine::createLocalVariableDeclarations ()
 }
 
 void
-FortranCUDAReductionSubroutine::createlocalVariableDeclarations ()
+FortranCUDAReductionSubroutine::createFormalParameterDeclarations ()
 {
   Debug::getInstance ()->debugMessage (
       "Creating reduction procedure formal parameter", 2);
@@ -437,7 +433,9 @@ FortranCUDAReductionSubroutine::FortranCUDAReductionSubroutine (
 
   subroutineScope = subroutineHeaderStatement->get_definition ()->get_body ();
 
-  createlocalVariableDeclarations ();
+  createFormalParameterDeclarations ();
+
+  createLocalVariableDeclarations ();
 
   createStatements ();
 }

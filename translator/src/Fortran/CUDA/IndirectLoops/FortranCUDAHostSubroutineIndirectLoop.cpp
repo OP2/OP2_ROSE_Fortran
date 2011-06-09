@@ -1416,7 +1416,7 @@ FortranCUDAHostSubroutineIndirectLoop::FortranCUDAHostSubroutineIndirectLoop (
 
   this->dataSizesDeclarationOfIndirectLoop = dataSizesDeclarationOfIndirectLoop;
 
-  createlocalVariableDeclarations ();
+  createFormalParameterDeclarations ();
 
   createLocalVariableDeclarations ();
 

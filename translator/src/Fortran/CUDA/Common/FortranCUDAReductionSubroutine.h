@@ -36,7 +36,7 @@ class FortranCUDAReductionSubroutine: public Subroutine,
     createLocalVariableDeclarations ();
 
     virtual void
-    createlocalVariableDeclarations ();
+    createFormalParameterDeclarations ();
 
   public:
 

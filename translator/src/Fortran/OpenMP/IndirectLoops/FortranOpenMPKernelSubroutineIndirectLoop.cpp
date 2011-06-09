@@ -13,7 +13,7 @@ FortranOpenMPKernelSubroutineIndirectLoop::createLocalVariableDeclarations ()
 }
 
 void
-FortranOpenMPKernelSubroutineIndirectLoop::createlocalVariableDeclarations ()
+FortranOpenMPKernelSubroutineIndirectLoop::createFormalParameterDeclarations ()
 {
 
 }
@@ -24,9 +24,9 @@ FortranOpenMPKernelSubroutineIndirectLoop::FortranOpenMPKernelSubroutineIndirect
   FortranOpenMPKernelSubroutine (subroutineName, userSubroutineName,
       parallelLoop, moduleScope)
 {
-  createlocalVariableDeclarations();
+  createFormalParameterDeclarations ();
 
-  createLocalVariableDeclarations();
+  createLocalVariableDeclarations ();
 
-  createStatements();
+  createStatements ();
 }

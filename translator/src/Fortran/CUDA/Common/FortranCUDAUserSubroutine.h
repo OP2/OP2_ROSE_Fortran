@@ -28,10 +28,10 @@ class FortranCUDAUserSubroutine: public UserSubroutine,
     copyAndModifySubroutine ();
 
     void
-    createlocalVariableDeclarations ();
+    createLocalVariableDeclarations ();
 
     void
-    createLocalVariableDeclarations ();
+    createFormalParameterDeclarations ();
 
     void
     createStatements ();

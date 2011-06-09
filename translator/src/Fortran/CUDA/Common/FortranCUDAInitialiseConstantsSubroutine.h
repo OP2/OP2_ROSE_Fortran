@@ -36,7 +36,7 @@ class FortranCUDAInitialiseConstantsSubroutine: public Subroutine, public Fortra
     createLocalVariableDeclarations ();
 
     virtual void
-    createlocalVariableDeclarations ();
+    createFormalParameterDeclarations ();
 
   public:
 

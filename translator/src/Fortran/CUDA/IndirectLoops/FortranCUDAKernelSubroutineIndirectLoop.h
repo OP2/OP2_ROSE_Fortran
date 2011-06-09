@@ -68,7 +68,7 @@ class FortranCUDAKernelSubroutineIndirectLoop: public FortranCUDAKernelSubroutin
     createLocalVariableDeclarations ();
 
     virtual void
-    createlocalVariableDeclarations ();
+    createFormalParameterDeclarations ();
 
   public:
 

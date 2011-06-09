@@ -1936,7 +1936,7 @@ FortranCUDAKernelSubroutineIndirectLoop::createLocalVariableDeclarations ()
 }
 
 void
-FortranCUDAKernelSubroutineIndirectLoop::createlocalVariableDeclarations ()
+FortranCUDAKernelSubroutineIndirectLoop::createFormalParameterDeclarations ()
 {
   variableDeclarations[IndirectAndDirectLoop::Fortran::VariableNames::argsSizes]
       = FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
@@ -1958,7 +1958,7 @@ FortranCUDAKernelSubroutineIndirectLoop::FortranCUDAKernelSubroutineIndirectLoop
 {
   this->dataSizesDeclaration = dataSizesDeclaration;
 
-  createlocalVariableDeclarations ();
+  createFormalParameterDeclarations ();
 
   createLocalVariableDeclarations ();
 

@@ -154,7 +154,7 @@ FortranOpenMPKernelSubroutineDirectLoop::createLocalVariableDeclarations ()
 }
 
 void
-FortranOpenMPKernelSubroutineDirectLoop::createlocalVariableDeclarations ()
+FortranOpenMPKernelSubroutineDirectLoop::createFormalParameterDeclarations ()
 {
   using SageBuilder::buildIntVal;
 
@@ -201,7 +201,7 @@ FortranOpenMPKernelSubroutineDirectLoop::FortranOpenMPKernelSubroutineDirectLoop
   FortranOpenMPKernelSubroutine (subroutineName, userSubroutineName,
       parallelLoop, moduleScope)
 {
-  createlocalVariableDeclarations ();
+  createFormalParameterDeclarations ();
 
   createLocalVariableDeclarations ();
 

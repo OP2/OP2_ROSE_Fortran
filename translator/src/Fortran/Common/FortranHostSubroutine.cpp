@@ -384,7 +384,7 @@ FortranHostSubroutine::createCToFortranPointerCall (SgExpression * parameter1,
 }
 
 void
-FortranHostSubroutine::createlocalVariableDeclarations ()
+FortranHostSubroutine::createFormalParameterDeclarations ()
 {
   using boost::iequals;
   using SageBuilder::buildVariableDeclaration;

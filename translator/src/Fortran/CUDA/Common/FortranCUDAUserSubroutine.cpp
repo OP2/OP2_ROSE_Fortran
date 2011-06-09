@@ -235,13 +235,13 @@ FortranCUDAUserSubroutine::copyAndModifySubroutine ()
 }
 
 void
-FortranCUDAUserSubroutine::createlocalVariableDeclarations ()
+FortranCUDAUserSubroutine::createLocalVariableDeclarations ()
 {
 
 }
 
 void
-FortranCUDAUserSubroutine::createLocalVariableDeclarations ()
+FortranCUDAUserSubroutine::createFormalParameterDeclarations ()
 {
 
 }

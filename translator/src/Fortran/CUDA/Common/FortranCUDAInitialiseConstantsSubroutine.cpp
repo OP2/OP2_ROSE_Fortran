@@ -71,7 +71,7 @@ FortranCUDAInitialiseConstantsSubroutine::createLocalVariableDeclarations ()
 }
 
 void
-FortranCUDAInitialiseConstantsSubroutine::createlocalVariableDeclarations ()
+FortranCUDAInitialiseConstantsSubroutine::createFormalParameterDeclarations ()
 {
 
 }

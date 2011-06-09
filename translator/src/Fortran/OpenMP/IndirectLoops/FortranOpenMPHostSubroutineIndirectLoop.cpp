@@ -23,14 +23,13 @@ FortranOpenMPHostSubroutineIndirectLoop::createFirstTimeExecutionStatements ()
 
   SgBasicBlock * ifBody = buildBasicBlock ();
 
-  SgExprStatement * assignmentStatement = buildAssignStatement (
-      buildVarRefExp (
-          moduleDeclarations->getFirstExecutionBooleanDeclaration ()),
+  SgExprStatement * assignmentStatement = buildAssignStatement (buildVarRefExp (
+      moduleDeclarations->getFirstExecutionBooleanDeclaration ()),
       buildBoolValExp (false));
 
   ifBody->append_statement (assignmentStatement);
 
-  vector <SgStatement *>  statements;
+  vector <SgStatement *> statements;
 
   createInitialiseExecutionPlanStatements (statements);
 
@@ -164,7 +163,7 @@ FortranOpenMPHostSubroutineIndirectLoop::FortranOpenMPHostSubroutineIndirectLoop
 {
   this->moduleDeclarations = moduleDeclarations;
 
-  createlocalVariableDeclarations ();
+  createFormalParameterDeclarations ();
 
   createLocalVariableDeclarations ();
 

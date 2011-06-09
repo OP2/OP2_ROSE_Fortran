@@ -711,7 +711,7 @@ FortranCUDAKernelSubroutineDirectLoop::createLocalVariableDeclarations ()
 }
 
 void
-FortranCUDAKernelSubroutineDirectLoop::create_OP_DAT_FormalParameters ()
+FortranCUDAKernelSubroutineDirectLoop::createOPDATFormalParameterDeclarations ()
 {
   using SageBuilder::buildVariableDeclaration;
   using SageBuilder::buildOpaqueVarRefExp;
@@ -802,7 +802,7 @@ FortranCUDAKernelSubroutineDirectLoop::create_OP_DAT_FormalParameters ()
 }
 
 void
-FortranCUDAKernelSubroutineDirectLoop::createlocalVariableDeclarations ()
+FortranCUDAKernelSubroutineDirectLoop::createFormalParameterDeclarations ()
 {
   variableDeclarations[IndirectAndDirectLoop::Fortran::VariableNames::argsSizes]
       = FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
@@ -810,7 +810,7 @@ FortranCUDAKernelSubroutineDirectLoop::createlocalVariableDeclarations ()
           dataSizesDeclaration->getType (), subroutineScope, formalParameters,
           1, DEVICE);
 
-  create_OP_DAT_FormalParameters ();
+  createOPDATFormalParameterDeclarations ();
 
   /*
    * ======================================================
@@ -876,7 +876,7 @@ FortranCUDAKernelSubroutineDirectLoop::FortranCUDAKernelSubroutineDirectLoop (
 {
   this->dataSizesDeclaration = dataSizesDeclaration;
 
-  createlocalVariableDeclarations ();
+  createFormalParameterDeclarations ();
 
   createLocalVariableDeclarations ();
 

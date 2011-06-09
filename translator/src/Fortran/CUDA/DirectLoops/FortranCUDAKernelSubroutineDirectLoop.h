@@ -22,7 +22,7 @@ class FortranCUDAKernelSubroutineDirectLoop: public FortranCUDAKernelSubroutine
     createUserSubroutineCall ();
 
     void
-    create_OP_DAT_FormalParameters ();
+    createOPDATFormalParameterDeclarations ();
 
     /*
      * ======================================================
@@ -58,7 +58,7 @@ class FortranCUDAKernelSubroutineDirectLoop: public FortranCUDAKernelSubroutine
     createLocalVariableDeclarations ();
 
     virtual void
-    createlocalVariableDeclarations ();
+    createFormalParameterDeclarations ();
 
   public:
 
