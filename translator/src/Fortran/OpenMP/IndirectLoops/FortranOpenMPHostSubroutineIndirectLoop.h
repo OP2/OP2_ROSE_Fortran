@@ -3,6 +3,7 @@
 
 #include <FortranOpenMPHostSubroutine.h>
 #include <FortranOpenMPModuleDeclarationsIndirectLoop.h>
+#include <FortranPlan.h>
 
 class FortranOpenMPHostSubroutineIndirectLoop: public FortranOpenMPHostSubroutine
 {
@@ -17,6 +18,13 @@ class FortranOpenMPHostSubroutineIndirectLoop: public FortranOpenMPHostSubroutin
 
     void
     createExecutionPlanDeclarations ();
+
+    virtual SgStatement *
+    createStatementToCallKernelFunction ();
+
+    virtual void
+    createStatementsToConvertCPointers (
+        std::vector <SgStatement *> & statements);
 
     virtual void
     createOpenMPVariableDeclarations ();

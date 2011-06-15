@@ -31,10 +31,10 @@ for path, dirs, files in os.walk(os.path.abspath(os.curdir + os.sep + 'src')):
 			cmd = 'git ls-files ' + fullPath
 
 			proc = Popen(cmd,
-				     shell=True,
-                                     executable='/bin/bash',
-                                     stderr=PIPE,
-                                     stdout=PIPE)
+                         shell=True,
+                         executable='/bin/bash',
+                         stderr=PIPE,
+                         stdout=PIPE)
 
 			stdout, stderr = proc.communicate()
 
@@ -45,10 +45,10 @@ for path, dirs, files in os.walk(os.path.abspath(os.curdir + os.sep + 'src')):
 				cmd = 'git add ' + fullPath
 
 				proc = Popen(cmd,
-				             shell=True,
-                                             executable='/bin/bash',
-                                             stderr=PIPE,
-                                             stdout=PIPE)
+                             shell=True,
+                             executable='/bin/bash',
+                             stderr=PIPE,
+                             stdout=PIPE)
 
 				proc.communicate()
                 

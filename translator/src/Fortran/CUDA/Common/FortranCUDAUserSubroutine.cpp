@@ -111,8 +111,8 @@ FortranCUDAUserSubroutine::copyAndModifySubroutine ()
            * ======================================================
            */
 
-          if (parallelLoop->get_OP_MAP_Value (parLoopArgCounter) == INDIRECT
-              && parallelLoop->get_OP_Access_Value (parLoopArgCounter)
+          if (parallelLoop->getOpMapValue (parLoopArgCounter) == INDIRECT
+              && parallelLoop->getOpAccessValue (parLoopArgCounter)
                   == READ_ACCESS)
           {
             SgVariableDeclaration
@@ -266,7 +266,6 @@ FortranCUDAUserSubroutine::FortranCUDAUserSubroutine (
   UserSubroutine (subroutineName, parallelLoop)
 {
   using SageBuilder::buildProcedureHeaderStatement;
-  using SageBuilder::buildFunctionParameterList;
   using SageBuilder::buildVoidType;
   using SageInterface::appendStatement;
   using SageInterface::addTextForUnparser;

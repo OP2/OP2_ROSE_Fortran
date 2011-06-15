@@ -3,6 +3,17 @@
 #include <FortranStatementsAndExpressionsBuilder.h>
 #include <FortranTypesBuilder.h>
 
+SgStatement *
+FortranOpenMPHostSubroutineIndirectLoop::createStatementToCallKernelFunction ()
+{
+}
+
+void
+FortranOpenMPHostSubroutineIndirectLoop::createStatementsToConvertCPointers (
+    std::vector <SgStatement *> & statements)
+{
+}
+
 void
 FortranOpenMPHostSubroutineIndirectLoop::createFirstTimeExecutionStatements ()
 {
@@ -31,7 +42,7 @@ FortranOpenMPHostSubroutineIndirectLoop::createFirstTimeExecutionStatements ()
 
   vector <SgStatement *> statements;
 
-  createInitialiseExecutionPlanStatements (statements);
+  createStatementsToPreparePlanFunctionParameters (statements);
 
   for (std::vector <SgStatement *>::iterator it = statements.begin (); it
       != statements.end (); ++it)
@@ -90,7 +101,7 @@ FortranOpenMPHostSubroutineIndirectLoop::createExecutionPlanDeclarations ()
         = FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
             *it, FortranTypesBuilder::getArray_RankOne (
                 FortranTypesBuilder::getFourByteInteger (), 1,
-                parallelLoop->getNumberOf_OP_DAT_ArgumentGroups ()),
+                parallelLoop->getNumberOfOpDatArgumentGroups ()),
             subroutineScope);
   }
 

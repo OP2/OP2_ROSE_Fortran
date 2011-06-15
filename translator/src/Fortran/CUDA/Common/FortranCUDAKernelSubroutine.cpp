@@ -35,12 +35,12 @@ FortranCUDAKernelSubroutine::initialiseLocalThreadVariables ()
    */
 
   for (unsigned int i = 1; i
-      <= parallelLoop->getNumberOf_OP_DAT_ArgumentGroups (); ++i)
+      <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
-    int dim = parallelLoop->get_OP_DAT_Dimension (i);
+    int dim = parallelLoop->getOpDatDimension (i);
 
-    if (parallelLoop->get_OP_MAP_Value (i) == GLOBAL
-        && parallelLoop->get_OP_Access_Value (i) != READ_ACCESS)
+    if (parallelLoop->getOpMapValue (i) == GLOBAL
+        && parallelLoop->getOpAccessValue (i) != READ_ACCESS)
     {
       /*
        * ======================================================
@@ -64,7 +64,7 @@ FortranCUDAKernelSubroutine::initialiseLocalThreadVariables ()
                   buildVarRefExp (
                       variableDeclarations[DirectLoop::Fortran::KernelSubroutine::setElementCounter]));
 
-      if (parallelLoop->get_OP_Access_Value (i) == INC_ACCESS)
+      if (parallelLoop->getOpAccessValue (i) == INC_ACCESS)
       {
         // for (int d=0; d<DIM; d++) ARG_l[d]=ZERO_TYP;
         SgExpression * assignArgToZero = buildAssignOp (accessToIPosition,
@@ -159,13 +159,13 @@ FortranCUDAKernelSubroutine::createReductionSubroutineCall ()
   if (parallelLoop->isReductionRequired () == true)
   {
     for (unsigned int i = 1; i
-        <= parallelLoop->getNumberOf_OP_DAT_ArgumentGroups (); ++i)
+        <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
     {
       if (parallelLoop->isReductionRequired (i) == true)
       {
-        int dim = parallelLoop->get_OP_DAT_Dimension (i);
+        int dim = parallelLoop->getOpDatDimension (i);
 
-        switch (parallelLoop->get_OP_Access_Value (i))
+        switch (parallelLoop->getOpAccessValue (i))
         {
           case INC_ACCESS:
           {
@@ -308,17 +308,17 @@ FortranCUDAKernelSubroutine::createLocalThreadDeclarations ()
   Debug::getInstance ()->debugMessage ("Creating local thread variables", 2);
 
   for (unsigned int i = 1; i
-      <= parallelLoop->getNumberOf_OP_DAT_ArgumentGroups (); ++i)
+      <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
     if ((parallelLoop->isDirectLoop () == true
-        && parallelLoop->get_OP_DAT_Dimension (i) > 1
-        && parallelLoop->get_OP_MAP_Value (i) == DIRECT)
-        || (parallelLoop->get_OP_MAP_Value (i) == GLOBAL
-            && parallelLoop->get_OP_Access_Value (i) != READ_ACCESS)
-        || (parallelLoop->get_OP_MAP_Value (i) == INDIRECT
-            && parallelLoop->get_OP_Access_Value (i) == INC_ACCESS))
+        && parallelLoop->getOpDatDimension (i) > 1
+        && parallelLoop->getOpMapValue (i) == DIRECT)
+        || (parallelLoop->getOpMapValue (i) == GLOBAL
+            && parallelLoop->getOpAccessValue (i) != READ_ACCESS)
+        || (parallelLoop->getOpMapValue (i) == INDIRECT
+            && parallelLoop->getOpAccessValue (i) == INC_ACCESS))
     {
-      SgType * opDatType = parallelLoop->get_OP_DAT_Type (i);
+      SgType * opDatType = parallelLoop->getOpDatType (i);
 
       SgArrayType * arrayType = isSgArrayType (opDatType);
 
@@ -330,7 +330,7 @@ FortranCUDAKernelSubroutine::createLocalThreadDeclarations ()
           = FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
               variableName,
               FortranTypesBuilder::getArray_RankOne (opDatBaseType, 0,
-                  parallelLoop->get_OP_DAT_Dimension (i) - 1), subroutineScope);
+                  parallelLoop->getOpDatDimension (i) - 1), subroutineScope);
     }
   }
 }
@@ -341,11 +341,11 @@ FortranCUDAKernelSubroutine::createAutosharedDeclaration ()
   SgType * autosharedType = NULL;
 
   for (unsigned int i = 1; i
-      <= parallelLoop->getNumberOf_OP_DAT_ArgumentGroups (); ++i)
+      <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
-    if (parallelLoop->isDuplicate_OP_DAT (i) == false)
+    if (parallelLoop->isDuplicateOpDat (i) == false)
     {
-      SgType * opDatArrayType = parallelLoop->get_OP_DAT_Type (i);
+      SgType * opDatArrayType = parallelLoop->getOpDatType (i);
 
       SgArrayType * isArrayType = isSgArrayType (opDatArrayType);
 

@@ -65,6 +65,9 @@ class FortranCUDAHostSubroutineDirectLoop: public FortranCUDAHostSubroutine
     void
     createAdditionalCUDAKernelVariableDeclarations ();
 
+    virtual SgStatement *
+    createStatementToCallKernelFunction ();
+
     virtual void
     createStatements ();
 

@@ -48,7 +48,7 @@ class ParallelLoop
      * unique OP_DATs
      * ======================================================
      */
-    std::vector <std::string> unique_OP_DATs;
+    std::vector <std::string> uniqueOpDats;
 
     /*
      * ======================================================
@@ -56,7 +56,7 @@ class ParallelLoop
      * the argument group number
      * ======================================================
      */
-    std::map <unsigned int, SgType *> OP_DAT_Types;
+    std::map <unsigned int, SgType *> OpDatTypes;
 
     /*
      * ======================================================
@@ -64,7 +64,7 @@ class ParallelLoop
      * the argument group number
      * ======================================================
      */
-    std::map <unsigned int, unsigned int> OP_DAT_Dimensions;
+    std::map <unsigned int, unsigned int> OpDatDimensions;
 
     /*
      * ======================================================
@@ -74,7 +74,7 @@ class ParallelLoop
      * of a previous OP_DAT argument
      * ======================================================
      */
-    std::map <unsigned int, bool> OP_DAT_Duplicates;
+    std::map <unsigned int, bool> OpDatDuplicates;
 
     /*
      * ======================================================
@@ -83,7 +83,7 @@ class ParallelLoop
      * a mapping or directly or as a global variable?
      * ======================================================
      */
-    std::map <unsigned int, MAPPING_VALUE> OP_DAT_MappingDescriptors;
+    std::map <unsigned int, MAPPING_VALUE> OpDatMappingDescriptors;
 
     /*
      * ======================================================
@@ -91,7 +91,7 @@ class ParallelLoop
      * (in the actual arguments) accessed: read, written, etc.
      * ======================================================
      */
-    std::map <unsigned int, ACCESS_CODE_VALUE> OP_DAT_AccessDescriptors;
+    std::map <unsigned int, ACCESS_CODE_VALUE> OpDatAccessDescriptors;
 
     /*
      * ======================================================
@@ -99,7 +99,7 @@ class ParallelLoop
      * (in the actual arguments)?
      * ======================================================
      */
-    std::map <unsigned int, std::string> OP_DAT_VariableNames;
+    std::map <unsigned int, std::string> OpDatVariableNames;
 
     /*
      * ======================================================
@@ -107,7 +107,7 @@ class ParallelLoop
      * is real(4) or real(8), so respectively 4 or 8
      * ======================================================
      */
-    unsigned int sizeOf_OP_DAT;
+    unsigned int sizeOfOpDat;
 
     /*
      * ======================================================
@@ -127,7 +127,7 @@ class ParallelLoop
      * ======================================================
      */
     void
-    retrieveOP_DATDeclarations (Declarations * declarations);
+    retrieveOpDatDeclarations (Declarations * declarations);
 
   public:
 
@@ -144,7 +144,7 @@ class ParallelLoop
     isDirectLoop () const;
 
     unsigned int
-    getNumberOfDistinctIndirect_OP_DAT_Arguments ();
+    getNumberOfDistinctIndirectOpDatArguments ();
 
     std::string
     getModuleName () const;
@@ -153,22 +153,22 @@ class ParallelLoop
     getActualArguments ();
 
     unsigned int
-    getNumberOf_OP_DAT_ArgumentGroups () const;
+    getNumberOfOpDatArgumentGroups () const;
 
     SgType *
-    get_OP_DAT_Type (unsigned int OP_DAT_ArgumentGroup);
+    getOpDatType (unsigned int OP_DAT_ArgumentGroup);
 
     unsigned int
-    get_OP_DAT_Dimension (unsigned int OP_DAT_ArgumentGroup);
+    getOpDatDimension (unsigned int OP_DAT_ArgumentGroup);
 
     bool
-    isDuplicate_OP_DAT (unsigned int OP_DAT_ArgumentGroup);
+    isDuplicateOpDat (unsigned int OP_DAT_ArgumentGroup);
 
     MAPPING_VALUE
-    get_OP_MAP_Value (unsigned int OP_DAT_ArgumentGroup);
+    getOpMapValue (unsigned int OP_DAT_ArgumentGroup);
 
     ACCESS_CODE_VALUE
-    get_OP_Access_Value (unsigned int OP_DAT_ArgumentGroup);
+    getOpAccessValue (unsigned int OP_DAT_ArgumentGroup);
 
     unsigned int
     getNumberOfIndirectDataSets ();
@@ -183,10 +183,10 @@ class ParallelLoop
     isReductionRequired (int OP_DAT_ArgumentGroup);
 
     std::string
-    get_OP_DAT_VariableName (unsigned int OP_DAT_ArgumentGroup);
+    getOpDatVariableName (unsigned int OP_DAT_ArgumentGroup);
 
     unsigned int
-    getSizeOf_OP_DAT () const;
+    getSizeOfOpDat () const;
 
     SgProcedureHeaderStatement *
     getReductionSubroutineHeader (unsigned int OP_DAT_ArgumentGroup);

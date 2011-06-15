@@ -4,29 +4,13 @@
 #include <HostSubroutine.h>
 #include <FortranSubroutine.h>
 #include <ParallelLoop.h>
+#include <Plan.h>
 
-class FortranHostSubroutine: public FortranSubroutine, public HostSubroutine
+class FortranHostSubroutine: public FortranSubroutine,
+    public HostSubroutine,
+    public Plan
 {
   protected:
-
-    /*
-     * ======================================================
-     * Creates the function call which converts a C execution
-     * plan onto the Fortran side
-     * ======================================================
-     */
-    void
-    createPlanFunctionCallStatement ();
-
-    /*
-     * ======================================================
-     * Returns the sequence of statements which initialise
-     * variables used in the execution plan
-     * ======================================================
-     */
-    void
-    createInitialiseExecutionPlanStatements (
-        std::vector <SgStatement *> & statements);
 
     /*
      * ======================================================
@@ -37,6 +21,17 @@ class FortranHostSubroutine: public FortranSubroutine, public HostSubroutine
     SgStatement *
     createCToFortranPointerCall (SgExpression * parameter1,
         SgExpression * parameter2, SgExpression * parameter3 = NULL);
+
+    virtual void
+    createStatementsToPreparePlanFunctionParameters (
+        std::vector <SgStatement *> & statements);
+
+    virtual SgStatement *
+    createStatementToCallPlanFunction ();
+
+    virtual void
+    createStatementsToExecutePlanFunction (
+        std::vector <SgStatement *> & statements);
 
     virtual void
     createFormalParameterDeclarations ();

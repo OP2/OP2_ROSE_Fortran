@@ -4,9 +4,12 @@
 #include <Subroutine.h>
 #include <FortranSubroutine.h>
 
-class FortranCUDAInitialiseConstantsSubroutine: public Subroutine, public FortranSubroutine
+class FortranCUDAInitialiseConstantsSubroutine: public Subroutine,
+    public FortranSubroutine
 {
   private:
+
+    SgScopeStatement * moduleScope;
 
     std::string variableNamePrefix;
 
@@ -27,7 +30,7 @@ class FortranCUDAInitialiseConstantsSubroutine: public Subroutine, public Fortra
      * ======================================================
      */
     void
-    declareConstants (SgScopeStatement * moduleScope);
+    declareConstants ();
 
     virtual void
     createStatements ();
@@ -40,13 +43,8 @@ class FortranCUDAInitialiseConstantsSubroutine: public Subroutine, public Fortra
 
   public:
 
-    /*
-     * ======================================================
-     * Generate the subroutine which initialises the constants
-     * ======================================================
-     */
     void
-    generateSubroutine (SgScopeStatement * moduleScope);
+    generateSubroutine ();
 
     /*
      * ======================================================

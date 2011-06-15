@@ -413,22 +413,6 @@ namespace CUDA
   }
 }
 
-namespace SubroutineNameSuffixes
-{
-  std::string const hostSuffix = "_host";
-  std::string const kernelSuffix = "_kernel";
-  std::string const deviceSuffix = "_device";
-  std::string const reductionSuffix = "_reduction";
-  std::string const integerSuffix = "_integer";
-  std::string const floatSuffix = "_float";
-}
-
-namespace FortranVariableDefaultKinds
-{
-  int const DEFAULT_KIND_INT = 4;
-  int const DEFAULT_KIND_REAL = 4;
-}
-
 namespace OpenMP
 {
   std::string const numberOfThreads = "nThreads";

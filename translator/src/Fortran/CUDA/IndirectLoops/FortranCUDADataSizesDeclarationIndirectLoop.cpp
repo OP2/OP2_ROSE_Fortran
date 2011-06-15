@@ -17,10 +17,10 @@ FortranCUDADataSizesDeclarationIndirectLoop::addFields ()
   using std::vector;
 
   for (unsigned int i = 1; i
-      <= parallelLoop->getNumberOf_OP_DAT_ArgumentGroups (); ++i)
+      <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
-    if (parallelLoop->isDuplicate_OP_DAT (i) == false
-        && parallelLoop->get_OP_MAP_Value (i) == INDIRECT)
+    if (parallelLoop->isDuplicateOpDat (i) == false
+        && parallelLoop->getOpMapValue (i) == INDIRECT)
     {
       string const variableName = VariableNames::getOpDatSizeName (i);
 
@@ -38,10 +38,10 @@ FortranCUDADataSizesDeclarationIndirectLoop::addFields ()
   }
 
   for (unsigned int i = 1; i
-      <= parallelLoop->getNumberOf_OP_DAT_ArgumentGroups (); ++i)
+      <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
-    if (parallelLoop->isDuplicate_OP_DAT (i) == false
-        && parallelLoop->get_OP_MAP_Value (i) == INDIRECT)
+    if (parallelLoop->isDuplicateOpDat (i) == false
+        && parallelLoop->getOpMapValue (i) == INDIRECT)
     {
       string const variableName =
           VariableNames::getLocalToGlobalMappingSizeName (i);
@@ -60,9 +60,9 @@ FortranCUDADataSizesDeclarationIndirectLoop::addFields ()
   }
 
   for (unsigned int i = 1; i
-      <= parallelLoop->getNumberOf_OP_DAT_ArgumentGroups (); ++i)
+      <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
-    if (parallelLoop->get_OP_MAP_Value (i) == INDIRECT)
+    if (parallelLoop->getOpMapValue (i) == INDIRECT)
     {
       string const variableName =
           VariableNames::getGlobalToLocalMappingSizeName (i);
@@ -81,10 +81,10 @@ FortranCUDADataSizesDeclarationIndirectLoop::addFields ()
   }
 
   for (unsigned int i = 1; i
-      <= parallelLoop->getNumberOf_OP_DAT_ArgumentGroups (); ++i)
+      <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
-    if (parallelLoop->isDuplicate_OP_DAT (i) == false
-        && parallelLoop->get_OP_MAP_Value (i) == DIRECT)
+    if (parallelLoop->isDuplicateOpDat (i) == false
+        && parallelLoop->getOpMapValue (i) == DIRECT)
     {
       string const variableName = VariableNames::getOpDatSizeName (i);
 

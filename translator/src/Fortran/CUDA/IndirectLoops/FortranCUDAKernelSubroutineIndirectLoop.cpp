@@ -35,15 +35,15 @@ FortranCUDAKernelSubroutineIndirectLoop::createUserSubroutineCall ()
   SgExprListExp * userDeviceSubroutineParameters = buildExprListExp ();
 
   for (unsigned int i = 1; i
-      <= parallelLoop->getNumberOf_OP_DAT_ArgumentGroups (); ++i)
+      <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
-    int dim = parallelLoop->get_OP_DAT_Dimension (i);
+    int dim = parallelLoop->getOpDatDimension (i);
 
     SgExpression * parameterExpression = buildIntVal (1);
 
-    if (parallelLoop->get_OP_MAP_Value (i) == GLOBAL)
+    if (parallelLoop->getOpMapValue (i) == GLOBAL)
     {
-      if (parallelLoop->get_OP_Access_Value (i) == READ_ACCESS)
+      if (parallelLoop->getOpAccessValue (i) == READ_ACCESS)
       {
 
         /*
@@ -94,13 +94,13 @@ FortranCUDAKernelSubroutineIndirectLoop::createUserSubroutineCall ()
             variableDeclarations[VariableNames::getOpDatLocalName (i)]);
       }
     }
-    else if (parallelLoop->get_OP_MAP_Value (i) == INDIRECT
-        && parallelLoop->get_OP_Access_Value (i) == INC_ACCESS)
+    else if (parallelLoop->getOpMapValue (i) == INDIRECT
+        && parallelLoop->getOpAccessValue (i) == INC_ACCESS)
     {
       parameterExpression = buildVarRefExp (
           variableDeclarations[VariableNames::getOpDatLocalName (i)]);
     }
-    else if (parallelLoop->get_OP_MAP_Value (i) == INDIRECT)
+    else if (parallelLoop->getOpMapValue (i) == INDIRECT)
     {
       SgVarRefExp
           * autoshared_Reference =
@@ -128,7 +128,7 @@ FortranCUDAKernelSubroutineIndirectLoop::createUserSubroutineCall ()
 
       SgMultiplyOp * lowerBound_multiplyExpression = buildMultiplyOp (
           lowerBound_arrayExpression, buildIntVal (
-              parallelLoop->get_OP_DAT_Dimension (i)));
+              parallelLoop->getOpDatDimension (i)));
 
       SgAddOp * lowerBound_addExpression2 = buildAddOp (nbytes_Reference,
           lowerBound_multiplyExpression);
@@ -146,14 +146,14 @@ FortranCUDAKernelSubroutineIndirectLoop::createUserSubroutineCall ()
 
       SgMultiplyOp * upperBound_multiplyExpression = buildMultiplyOp (
           upperBound_arrayExpression, buildIntVal (
-              parallelLoop->get_OP_DAT_Dimension (i)));
+              parallelLoop->getOpDatDimension (i)));
 
       SgAddOp * upperBound_addExpression2 = buildAddOp (nbytes_Reference,
           upperBound_multiplyExpression);
 
       SgAddOp * upperBound_addExpression3 = buildAddOp (
           upperBound_addExpression2, buildIntVal (
-              parallelLoop->get_OP_DAT_Dimension (i)));
+              parallelLoop->getOpDatDimension (i)));
 
       SgSubscriptExpression * subscriptExpression = new SgSubscriptExpression (
           ROSEHelper::getFileInfo (), lowerBound_addExpression2,
@@ -164,7 +164,7 @@ FortranCUDAKernelSubroutineIndirectLoop::createUserSubroutineCall ()
           buildExprListExp (subscriptExpression));
 
     }
-    else if (parallelLoop->get_OP_MAP_Value (i) == DIRECT)
+    else if (parallelLoop->getOpMapValue (i) == DIRECT)
     {
       if (parallelLoop->getNumberOfIndirectDataSets () > 0)
       {
@@ -264,14 +264,14 @@ FortranCUDAKernelSubroutineIndirectLoop::applyPointeredIncrementsOrWrites ()
   unsigned int pindOffsOffset = 0;
 
   for (unsigned int i = 1; i
-      <= parallelLoop->getNumberOf_OP_DAT_ArgumentGroups (); ++i)
+      <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
-    if (parallelLoop->isDuplicate_OP_DAT (i) == false
-        && parallelLoop->get_OP_MAP_Value (i) == INDIRECT)
+    if (parallelLoop->isDuplicateOpDat (i) == false
+        && parallelLoop->getOpMapValue (i) == INDIRECT)
     {
-      if (parallelLoop->get_OP_Access_Value (i) == WRITE_ACCESS
-          || parallelLoop->get_OP_Access_Value (i) == RW_ACCESS
-          || parallelLoop->get_OP_Access_Value (i) == INC_ACCESS)
+      if (parallelLoop->getOpAccessValue (i) == WRITE_ACCESS
+          || parallelLoop->getOpAccessValue (i) == RW_ACCESS
+          || parallelLoop->getOpAccessValue (i) == INC_ACCESS)
       {
 
         /*
@@ -290,7 +290,7 @@ FortranCUDAKernelSubroutineIndirectLoop::applyPointeredIncrementsOrWrites ()
 
         SgMultiplyOp * upperBoundUpdateIncWrVars = buildMultiplyOp (
             indArgSize_Reference2, buildIntVal (
-                parallelLoop->get_OP_DAT_Dimension (i)));
+                parallelLoop->getOpDatDimension (i)));
 
         SgExpression * upperBoundUpdateIncWrVarsGuard = buildLessThanOp (
             iterationVarIncWrVarsRef, upperBoundUpdateIncWrVars);
@@ -319,7 +319,7 @@ FortranCUDAKernelSubroutineIndirectLoop::applyPointeredIncrementsOrWrites ()
 
         SgExprListExp * modActualParameters = buildExprListExp (
             iterationVarIncWrVarsRef, buildIntVal (
-                parallelLoop->get_OP_DAT_Dimension (i)));
+                parallelLoop->getOpDatDimension (i)));
 
         SgFunctionCallExp * modFunctionCall = buildFunctionCallExp (
             modFunctionSymbol, modActualParameters);
@@ -360,7 +360,7 @@ FortranCUDAKernelSubroutineIndirectLoop::applyPointeredIncrementsOrWrites ()
 
         SgDivideOp * divideExpression4 = buildDivideOp (
             iterationCounter_Reference4_a, buildIntVal (
-                parallelLoop->get_OP_DAT_Dimension (i)));
+                parallelLoop->getOpDatDimension (i)));
 
         SgAddOp * addExpression4_b = buildAddOp (arrayIndexExpression4_a,
             divideExpression4);
@@ -379,7 +379,7 @@ FortranCUDAKernelSubroutineIndirectLoop::applyPointeredIncrementsOrWrites ()
 
         SgMultiplyOp * multiplyExpression4_b = buildMultiplyOp (
             arrayIndexExpression4_b, buildIntVal (
-                parallelLoop->get_OP_DAT_Dimension (i)));
+                parallelLoop->getOpDatDimension (i)));
 
         SgVarRefExp
             * moduled_Reference =
@@ -425,7 +425,7 @@ FortranCUDAKernelSubroutineIndirectLoop::applyPointeredIncrementsOrWrites ()
 
         SgAssignOp * actualUpdate = NULL;
 
-        if (parallelLoop->get_OP_Access_Value (i) == INC_ACCESS)
+        if (parallelLoop->getOpAccessValue (i) == INC_ACCESS)
         {
           /*
            * ======================================================
@@ -437,8 +437,8 @@ FortranCUDAKernelSubroutineIndirectLoop::applyPointeredIncrementsOrWrites ()
               deviceVarField, autosharedVarField));
         }
 
-        if (parallelLoop->get_OP_Access_Value (i) == WRITE_ACCESS
-            || parallelLoop->get_OP_Access_Value (i) == RW_ACCESS)
+        if (parallelLoop->getOpAccessValue (i) == WRITE_ACCESS
+            || parallelLoop->getOpAccessValue (i) == RW_ACCESS)
         {
           /*
            * ======================================================
@@ -554,9 +554,9 @@ FortranCUDAKernelSubroutineIndirectLoop::createPlanWhileLoop ()
   SgBasicBlock * ifBodyNestingLevel1 = buildBasicBlock ();
 
   for (unsigned int i = 1; i
-      <= parallelLoop->getNumberOf_OP_DAT_ArgumentGroups (); ++i)
+      <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
-    if (parallelLoop->get_OP_Access_Value (i) == INC_ACCESS)
+    if (parallelLoop->getOpAccessValue (i) == INC_ACCESS)
     {
       SgAssignOp
           * loopLowerBoundNestingLevel2 =
@@ -566,7 +566,7 @@ FortranCUDAKernelSubroutineIndirectLoop::createPlanWhileLoop ()
                   buildIntVal (0));
 
       SgIntVal * loopUpperBoundNestingLevel2 = buildIntVal (
-          parallelLoop->get_OP_DAT_Dimension (i) - 1);
+          parallelLoop->getOpDatDimension (i) - 1);
 
       SgBasicBlock * loopBodyNestingLevel2 = buildBasicBlock ();
 
@@ -634,10 +634,10 @@ FortranCUDAKernelSubroutineIndirectLoop::createPlanWhileLoop ()
    * ======================================================
    */
   for (unsigned int i = 1; i
-      <= parallelLoop->getNumberOf_OP_DAT_ArgumentGroups (); ++i)
+      <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
-    if (parallelLoop->get_OP_MAP_Value (i) == INDIRECT
-        && parallelLoop->get_OP_Access_Value (i) == INC_ACCESS)
+    if (parallelLoop->getOpMapValue (i) == INDIRECT
+        && parallelLoop->getOpAccessValue (i) == INC_ACCESS)
     {
       SgVarRefExp * incrementAccessMap_Reference = buildVarRefExp (
           localVariables_incrementAccessMaps[i]);
@@ -683,10 +683,10 @@ FortranCUDAKernelSubroutineIndirectLoop::createPlanWhileLoop ()
                   variableDeclarations[IndirectLoop::Fortran::KernelSubroutine::VariableNames::col]));
 
   for (unsigned int i = 1; i
-      <= parallelLoop->getNumberOf_OP_DAT_ArgumentGroups (); ++i)
+      <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
-    if (parallelLoop->get_OP_MAP_Value (i) == INDIRECT
-        && parallelLoop->get_OP_Access_Value (i) == INC_ACCESS)
+    if (parallelLoop->getOpMapValue (i) == INDIRECT
+        && parallelLoop->getOpAccessValue (i) == INC_ACCESS)
     {
       SgBasicBlock * loopBodyNestingLevel3 = buildBasicBlock ();
 
@@ -715,7 +715,7 @@ FortranCUDAKernelSubroutineIndirectLoop::createPlanWhileLoop ()
 
       SgMultiplyOp * multiplyExpression = buildMultiplyOp (
           incrementAccessMap_Reference, buildIntVal (
-              parallelLoop->get_OP_DAT_Dimension (i)));
+              parallelLoop->getOpDatDimension (i)));
 
       SgAddOp
           * addExpression1 =
@@ -749,7 +749,7 @@ FortranCUDAKernelSubroutineIndirectLoop::createPlanWhileLoop ()
                   buildIntVal (0));
 
       SgIntVal * loopUpperBoundNestingLevel3 = buildIntVal (
-          parallelLoop->get_OP_DAT_Dimension (i) - 1);
+          parallelLoop->getOpDatDimension (i) - 1);
 
       SgFortranDo * loopStatementNestingLevel3 =
           FortranStatementsAndExpressionsBuilder::buildFortranDoStatement (
@@ -864,10 +864,10 @@ FortranCUDAKernelSubroutineIndirectLoop::createAutosharedWhileLoops ()
   unsigned int pindOffsOffset = 0;
 
   for (unsigned int i = 1; i
-      <= parallelLoop->getNumberOf_OP_DAT_ArgumentGroups (); ++i)
+      <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
-    if (parallelLoop->isDuplicate_OP_DAT (i) == false
-        && parallelLoop->get_OP_MAP_Value (i) == INDIRECT)
+    if (parallelLoop->isDuplicateOpDat (i) == false
+        && parallelLoop->getOpMapValue (i) == INDIRECT)
     {
       /*
        * ======================================================
@@ -914,7 +914,7 @@ FortranCUDAKernelSubroutineIndirectLoop::createAutosharedWhileLoops ()
 
       SgMultiplyOp * multiplyExpression2 = buildMultiplyOp (
           indArgSize_Reference2, buildIntVal (
-              parallelLoop->get_OP_DAT_Dimension (i)));
+              parallelLoop->getOpDatDimension (i)));
 
       SgAssignOp * assignmentExpression2 = buildAssignOp (
           whileLoopBound_Reference2, multiplyExpression2);
@@ -936,7 +936,7 @@ FortranCUDAKernelSubroutineIndirectLoop::createAutosharedWhileLoops ()
        * ======================================================
        */
 
-      if (parallelLoop->get_OP_Access_Value (i) != INC_ACCESS)
+      if (parallelLoop->getOpAccessValue (i) != INC_ACCESS)
       {
         SgVarRefExp
             * iterationCounter_Reference3 =
@@ -954,7 +954,7 @@ FortranCUDAKernelSubroutineIndirectLoop::createAutosharedWhileLoops ()
 
         SgExprListExp * modActualParameters = buildExprListExp (
             iterationCounter_Reference3, buildIntVal (
-                parallelLoop->get_OP_DAT_Dimension (i)));
+                parallelLoop->getOpDatDimension (i)));
 
         SgFunctionCallExp * modFunctionCall = buildFunctionCallExp (
             modFunctionSymbol, modActualParameters);
@@ -1019,7 +1019,7 @@ FortranCUDAKernelSubroutineIndirectLoop::createAutosharedWhileLoops ()
 
         SgDivideOp * divideExpression4 = buildDivideOp (
             iterationCounter_Reference4_a, buildIntVal (
-                parallelLoop->get_OP_DAT_Dimension (i)));
+                parallelLoop->getOpDatDimension (i)));
 
         SgAddOp * addExpression4_b = buildAddOp (arrayIndexExpression4_a,
             divideExpression4);
@@ -1038,7 +1038,7 @@ FortranCUDAKernelSubroutineIndirectLoop::createAutosharedWhileLoops ()
 
         SgMultiplyOp * multiplyExpression4_b = buildMultiplyOp (
             arrayIndexExpression4_b, buildIntVal (
-                parallelLoop->get_OP_DAT_Dimension (i)));
+                parallelLoop->getOpDatDimension (i)));
 
         SgVarRefExp
             * moduled_Reference =
@@ -1193,10 +1193,10 @@ FortranCUDAKernelSubroutineIndirectLoop::initialiseLocalVariables ()
    */
 
   for (unsigned int i = 1; i
-      <= parallelLoop->getNumberOf_OP_DAT_ArgumentGroups (); ++i)
+      <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
-    if (parallelLoop->isDuplicate_OP_DAT (i) == false
-        && parallelLoop->get_OP_MAP_Value (i) == INDIRECT)
+    if (parallelLoop->isDuplicateOpDat (i) == false
+        && parallelLoop->getOpMapValue (i) == INDIRECT)
     {
       SgVarRefExp * inRoundUp_Reference = buildVarRefExp (
           variableDeclarations[VariableNames::getRoundUpVariableName (i)]);
@@ -1206,7 +1206,7 @@ FortranCUDAKernelSubroutineIndirectLoop::initialiseLocalVariables ()
 
       SgMultiplyOp * multiplyExpression = buildMultiplyOp (
           indArgSize_Reference, buildIntVal (
-              parallelLoop->get_OP_DAT_Dimension (i)));
+              parallelLoop->getOpDatDimension (i)));
 
       SgAssignOp * assignmentExpression = buildAssignOp (inRoundUp_Reference,
           multiplyExpression);
@@ -1226,10 +1226,10 @@ FortranCUDAKernelSubroutineIndirectLoop::initialiseLocalVariables ()
   unsigned int previous_OP_DAT_Location;
 
   for (unsigned int i = 1; i
-      <= parallelLoop->getNumberOf_OP_DAT_ArgumentGroups (); ++i)
+      <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
-    if (parallelLoop->isDuplicate_OP_DAT (i) == false
-        && parallelLoop->get_OP_MAP_Value (i) == INDIRECT)
+    if (parallelLoop->isDuplicateOpDat (i) == false
+        && parallelLoop->getOpMapValue (i) == INDIRECT)
     {
       if (firstInitialization)
       {
@@ -1477,10 +1477,10 @@ FortranCUDAKernelSubroutineIndirectLoop::createThreadZeroStatements ()
   unsigned int pindSizesArrayOffset = 0;
 
   for (unsigned int i = 1; i
-      <= parallelLoop->getNumberOf_OP_DAT_ArgumentGroups (); ++i)
+      <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
-    if (parallelLoop->isDuplicate_OP_DAT (i) == false
-        && parallelLoop->get_OP_MAP_Value (i) == INDIRECT)
+    if (parallelLoop->isDuplicateOpDat (i) == false
+        && parallelLoop->getOpMapValue (i) == INDIRECT)
     {
       SgVarRefExp * ind_argSize_Reference = buildVarRefExp (
           localVariables_indArgSizes[i]);
@@ -1498,7 +1498,7 @@ FortranCUDAKernelSubroutineIndirectLoop::createThreadZeroStatements ()
       SgAddOp * arrayIndexExpression = buildAddOp (buildIntVal (
           pindSizesArrayOffset), buildMultiplyOp (blockID_Reference4,
           buildIntVal (
-              parallelLoop->getNumberOfDistinctIndirect_OP_DAT_Arguments ())));
+              parallelLoop->getNumberOfDistinctIndirectOpDatArguments ())));
 
       SgPntrArrRefExp * arrayExpression4 = buildPntrArrRefExp (
           pindSizes_Reference4, arrayIndexExpression);
@@ -1635,10 +1635,10 @@ FortranCUDAKernelSubroutineIndirectLoop::create_OP_DAT_localVariableDeclarations
   Debug::getInstance ()->debugMessage ("Creating OP_DAT formal parameters", 2);
 
   for (unsigned int i = 1; i
-      <= parallelLoop->getNumberOf_OP_DAT_ArgumentGroups (); ++i)
+      <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
-    if (parallelLoop->isDuplicate_OP_DAT (i) == false
-        && parallelLoop->get_OP_MAP_Value (i) == INDIRECT)
+    if (parallelLoop->isDuplicateOpDat (i) == false
+        && parallelLoop->getOpMapValue (i) == INDIRECT)
     {
       SgIntVal * lowerBoundExpression = buildIntVal (0);
 
@@ -1663,7 +1663,7 @@ FortranCUDAKernelSubroutineIndirectLoop::create_OP_DAT_localVariableDeclarations
        * ======================================================
        */
 
-      SgType * opdatType = parallelLoop->get_OP_DAT_Type (i);
+      SgType * opdatType = parallelLoop->getOpDatType (i);
 
       SgArrayType * baseArrayType = isSgArrayType (opdatType);
 
@@ -1705,9 +1705,9 @@ FortranCUDAKernelSubroutineIndirectLoop::create_OP_DAT_localVariableDeclarations
   }
 
   for (unsigned int i = 1; i
-      <= parallelLoop->getNumberOf_OP_DAT_ArgumentGroups (); ++i)
+      <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
-    if (parallelLoop->get_OP_MAP_Value (i) == INDIRECT)
+    if (parallelLoop->getOpMapValue (i) == INDIRECT)
     {
       SgIntVal * lowerBoundExpression = buildIntVal (0);
 
@@ -1737,10 +1737,10 @@ FortranCUDAKernelSubroutineIndirectLoop::create_OP_DAT_localVariableDeclarations
   }
 
   for (unsigned int i = 1; i
-      <= parallelLoop->getNumberOf_OP_DAT_ArgumentGroups (); ++i)
+      <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
-    if (parallelLoop->isDuplicate_OP_DAT (i) == false
-        && parallelLoop->get_OP_MAP_Value (i) == DIRECT)
+    if (parallelLoop->isDuplicateOpDat (i) == false
+        && parallelLoop->getOpMapValue (i) == DIRECT)
     {
       string const variableName = VariableNames::getOpDatName (i);
 
@@ -1765,7 +1765,7 @@ FortranCUDAKernelSubroutineIndirectLoop::create_OP_DAT_localVariableDeclarations
           = FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
               VariableNames::getOpDatName (i),
               FortranTypesBuilder::getArray_RankOne_WithLowerAndUpperBounds (
-                  parallelLoop->get_OP_DAT_Type (i), lowerBoundExpression,
+                  parallelLoop->getOpDatType (i), lowerBoundExpression,
                   upperBoundExpression), subroutineScope, formalParameters, 1,
               DEVICE);
     }
@@ -1798,32 +1798,32 @@ FortranCUDAKernelSubroutineIndirectLoop::createLocalVariableDeclarations ()
   createLocalThreadDeclarations ();
 
   for (unsigned int i = 1; i
-      <= parallelLoop->getNumberOf_OP_DAT_ArgumentGroups (); ++i)
+      <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
     string const & variableName = VariableNames::getNumberOfBytesVariableName (
         i);
 
-    if (parallelLoop->isDuplicate_OP_DAT (i) == false)
+    if (parallelLoop->isDuplicateOpDat (i) == false)
     {
       variableDeclarations[variableName]
           = FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
               variableName, FortranTypesBuilder::getFourByteInteger (),
               subroutineScope);
 
-      positionOf_nbytes[parallelLoop->get_OP_DAT_VariableName (i)] = i;
+      positionOf_nbytes[parallelLoop->getOpDatVariableName (i)] = i;
     }
     else
     {
       variableDeclarations[variableName]
           = variableDeclarations[VariableNames::getNumberOfBytesVariableName (
-              positionOf_nbytes[parallelLoop->get_OP_DAT_VariableName (i)])];
+              positionOf_nbytes[parallelLoop->getOpDatVariableName (i)])];
     }
   }
 
   for (unsigned int i = 1; i
-      <= parallelLoop->getNumberOf_OP_DAT_ArgumentGroups (); ++i)
+      <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
-    if (parallelLoop->isDuplicate_OP_DAT (i) == false)
+    if (parallelLoop->isDuplicateOpDat (i) == false)
     {
       string const & variableName = VariableNames::getRoundUpVariableName (i);
 
@@ -1835,9 +1835,9 @@ FortranCUDAKernelSubroutineIndirectLoop::createLocalVariableDeclarations ()
   }
 
   for (unsigned int i = 1; i
-      <= parallelLoop->getNumberOf_OP_DAT_ArgumentGroups (); ++i)
+      <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
-    if (parallelLoop->get_OP_Access_Value (i) == INC_ACCESS)
+    if (parallelLoop->getOpAccessValue (i) == INC_ACCESS)
     {
       string const variableName = "arg" + lexical_cast <string> (i) + "_map";
 
@@ -1849,10 +1849,10 @@ FortranCUDAKernelSubroutineIndirectLoop::createLocalVariableDeclarations ()
   }
 
   for (unsigned int i = 1; i
-      <= parallelLoop->getNumberOf_OP_DAT_ArgumentGroups (); ++i)
+      <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
-    if (parallelLoop->isDuplicate_OP_DAT (i) == false
-        && parallelLoop->get_OP_MAP_Value (i) == INDIRECT)
+    if (parallelLoop->isDuplicateOpDat (i) == false
+        && parallelLoop->getOpMapValue (i) == INDIRECT)
     {
       string const variableName = "ind_arg" + lexical_cast <string> (i)
           + "_size";

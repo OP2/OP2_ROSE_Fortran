@@ -58,9 +58,9 @@ FortranCUDAHostSubroutine::copyDataBackFromDeviceAndDeallocate ()
    */
 
   for (unsigned int i = 1; i
-      <= parallelLoop->getNumberOf_OP_DAT_ArgumentGroups (); ++i)
+      <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
-    if (parallelLoop->isDuplicate_OP_DAT (i) == false
+    if (parallelLoop->isDuplicateOpDat (i) == false
         && parallelLoop->isReductionRequired (i) == false)
     {
       SgVarRefExp * opDatDeviceReference = buildVarRefExp (
@@ -80,9 +80,9 @@ FortranCUDAHostSubroutine::copyDataBackFromDeviceAndDeallocate ()
   }
 
   for (unsigned int i = 1; i
-      <= parallelLoop->getNumberOf_OP_DAT_ArgumentGroups (); ++i)
+      <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
-    if (parallelLoop->isDuplicate_OP_DAT (i) == false
+    if (parallelLoop->isDuplicateOpDat (i) == false
         && parallelLoop->isReductionRequired (i) == false)
     {
       SgVarRefExp * opDatDeviceReference = buildVarRefExp (
@@ -125,11 +125,11 @@ FortranCUDAHostSubroutine::createSupportForReductionVariablesBeforeKernel ()
   int dim = -1;
 
   for (unsigned int i = 1; i
-      <= parallelLoop->getNumberOf_OP_DAT_ArgumentGroups (); ++i)
+      <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
     if (parallelLoop->isReductionRequired (i) == true)
     {
-      int currentDim = parallelLoop->get_OP_DAT_Dimension (i);
+      int currentDim = parallelLoop->getOpDatDimension (i);
 
       if (currentDim > dim)
       {
@@ -138,7 +138,7 @@ FortranCUDAHostSubroutine::createSupportForReductionVariablesBeforeKernel ()
 
       SgExpression * fortranKind =
           FortranStatementsAndExpressionsBuilder::getFortranKindOf_OP_DAT (
-              parallelLoop->get_OP_DAT_Type (i));
+              parallelLoop->getOpDatType (i));
 
       SgIntVal * kindVal = isSgIntVal (fortranKind);
 
@@ -305,11 +305,11 @@ FortranCUDAHostSubroutine::createSupportForReductionVariablesAfterKernel ()
   int positionInOPDatsArray = -1;
 
   for (unsigned int i = 1; i
-      <= parallelLoop->getNumberOf_OP_DAT_ArgumentGroups (); ++i)
+      <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
     if (parallelLoop->isReductionRequired (i) == true)
     {
-      dim = parallelLoop->get_OP_DAT_Dimension (i);
+      dim = parallelLoop->getOpDatDimension (i);
       positionInOPDatsArray = i;
     }
   }
@@ -383,9 +383,9 @@ FortranCUDAHostSubroutine::initialiseDataMarshallingVariables ()
   map <string, OP_DAT_Declaration *>::const_iterator OP_DAT_iterator;
 
   for (unsigned int i = 1; i
-      <= parallelLoop->getNumberOf_OP_DAT_ArgumentGroups (); ++i)
+      <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
-    if (parallelLoop->isDuplicate_OP_DAT (i) == false)
+    if (parallelLoop->isDuplicateOpDat (i) == false)
     {
       SgVarRefExp * opDatFormalArgumentReference = buildVarRefExp (
           variableDeclarations[VariableNames::getOpDatName (i)]);
@@ -416,9 +416,9 @@ FortranCUDAHostSubroutine::initialiseDataMarshallingVariables ()
   }
 
   for (unsigned int i = 1; i
-      <= parallelLoop->getNumberOf_OP_DAT_ArgumentGroups (); ++i)
+      <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
-    if (parallelLoop->isDuplicate_OP_DAT (i) == false)
+    if (parallelLoop->isDuplicateOpDat (i) == false)
     {
       SgVarRefExp * opDatFormalArgumentReference = buildVarRefExp (
           variableDeclarations[VariableNames::getOpDatName (i)]);
@@ -449,9 +449,9 @@ FortranCUDAHostSubroutine::initialiseDataMarshallingVariables ()
    */
 
   for (unsigned int i = 1; i
-      <= parallelLoop->getNumberOf_OP_DAT_ArgumentGroups (); ++i)
+      <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
-    if (parallelLoop->isDuplicate_OP_DAT (i) == false
+    if (parallelLoop->isDuplicateOpDat (i) == false
         && parallelLoop->isReductionRequired (i) == false)
     {
       SgVarRefExp * opDatSizeReference = buildVarRefExp (
@@ -472,9 +472,9 @@ FortranCUDAHostSubroutine::initialiseDataMarshallingVariables ()
   }
 
   for (unsigned int i = 1; i
-      <= parallelLoop->getNumberOf_OP_DAT_ArgumentGroups (); ++i)
+      <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
-    if (parallelLoop->isDuplicate_OP_DAT (i) == false
+    if (parallelLoop->isDuplicateOpDat (i) == false
         && parallelLoop->isReductionRequired (i) == false)
     {
       SgVarRefExp * opDatDeviceReference = buildVarRefExp (
@@ -508,9 +508,9 @@ FortranCUDAHostSubroutine::createDataMarshallingDeclarations ()
       2);
 
   for (unsigned int i = 1; i
-      <= parallelLoop->getNumberOf_OP_DAT_ArgumentGroups (); ++i)
+      <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
-    if (parallelLoop->isDuplicate_OP_DAT (i) == false)
+    if (parallelLoop->isDuplicateOpDat (i) == false)
     {
       string const & variableName = VariableNames::getOpDatSizeName (i);
 
@@ -522,14 +522,14 @@ FortranCUDAHostSubroutine::createDataMarshallingDeclarations ()
   }
 
   for (unsigned int i = 1; i
-      <= parallelLoop->getNumberOf_OP_DAT_ArgumentGroups (); ++i)
+      <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
-    if (parallelLoop->isDuplicate_OP_DAT (i) == false)
+    if (parallelLoop->isDuplicateOpDat (i) == false)
     {
       string const & variableName =
           VariableNames::getCToFortranVariableName (i);
 
-      SgArrayType * isArrayType = isSgArrayType (parallelLoop->get_OP_DAT_Type (
+      SgArrayType * isArrayType = isSgArrayType (parallelLoop->getOpDatType (
           i));
 
       variableDeclarations[variableName]
@@ -545,14 +545,14 @@ FortranCUDAHostSubroutine::createDataMarshallingDeclarations ()
    * ======================================================
    */
   for (unsigned int i = 1; i
-      <= parallelLoop->getNumberOf_OP_DAT_ArgumentGroups (); ++i)
+      <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
-    if (parallelLoop->isDuplicate_OP_DAT (i) == false
+    if (parallelLoop->isDuplicateOpDat (i) == false
         && parallelLoop->isReductionRequired (i) == false)
     {
       string const & variableName = VariableNames::getOpDatDeviceName (i);
 
-      SgArrayType * isArrayType = isSgArrayType (parallelLoop->get_OP_DAT_Type (
+      SgArrayType * isArrayType = isSgArrayType (parallelLoop->getOpDatType (
           i));
 
       variableDeclarations[variableName]
@@ -599,7 +599,7 @@ FortranCUDAHostSubroutine::createReductionVariableDeclarations ()
   if (parallelLoop->isReductionRequired () == true)
   {
     for (unsigned int i = 1; i
-        <= parallelLoop->getNumberOf_OP_DAT_ArgumentGroups (); ++i)
+        <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
     {
       if (parallelLoop->isReductionRequired (i) == true)
       {
@@ -658,7 +658,7 @@ FortranCUDAHostSubroutine::createReductionVariableDeclarations ()
         variableDeclarations[IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::reductionArrayHost]
             = buildVariableDeclaration (
                 IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::reductionArrayHost,
-                parallelLoop->get_OP_DAT_Type (i), NULL, subroutineScope);
+                parallelLoop->getOpDatType (i), NULL, subroutineScope);
 
         variableDeclarations[IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::reductionArrayHost]-> get_declarationModifier ().get_accessModifier ().setUndefined ();
         variableDeclarations[IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::reductionArrayHost]-> get_declarationModifier ().get_typeModifier ().setAllocatable ();
@@ -670,7 +670,7 @@ FortranCUDAHostSubroutine::createReductionVariableDeclarations ()
         variableDeclarations[IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::reductionArrayDevice]
             = buildVariableDeclaration (
                 IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::reductionArrayDevice,
-                parallelLoop->get_OP_DAT_Type (i), NULL, subroutineScope);
+                parallelLoop->getOpDatType (i), NULL, subroutineScope);
 
         variableDeclarations[IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::reductionArrayDevice]-> get_declarationModifier ().get_accessModifier ().setUndefined ();
         variableDeclarations[IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::reductionArrayDevice]-> get_declarationModifier ().get_typeModifier ().setAllocatable ();

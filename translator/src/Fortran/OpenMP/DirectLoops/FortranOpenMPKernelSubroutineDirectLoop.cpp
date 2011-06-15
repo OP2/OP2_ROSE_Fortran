@@ -25,23 +25,23 @@ FortranOpenMPKernelSubroutineDirectLoop::createUserSubroutineCall ()
   SgExprListExp * actualParameters = buildExprListExp ();
 
   for (unsigned int i = 1; i
-      <= parallelLoop->getNumberOf_OP_DAT_ArgumentGroups (); ++i)
+      <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
-    if (parallelLoop->isDuplicate_OP_DAT (i) == false)
+    if (parallelLoop->isDuplicateOpDat (i) == false)
     {
 
       if (parallelLoop->isReductionRequired (i) == false)
       {
         SgMultiplyOp * multiplyExpression1 = buildMultiplyOp (buildVarRefExp (
             variableDeclarations[OpenMP::sliceIterator]), buildIntVal (
-            parallelLoop->get_OP_DAT_Dimension (i)));
+            parallelLoop->getOpDatDimension (i)));
 
         SgMultiplyOp * multiplyExpression2 = buildMultiplyOp (buildVarRefExp (
             variableDeclarations[OpenMP::sliceIterator]), buildIntVal (
-            parallelLoop->get_OP_DAT_Dimension (i)));
+            parallelLoop->getOpDatDimension (i)));
 
         SgAddOp * addExpression2 = buildAddOp (multiplyExpression2,
-            buildIntVal (parallelLoop->get_OP_DAT_Dimension (i)));
+            buildIntVal (parallelLoop->getOpDatDimension (i)));
 
         SgSubtractOp * subtractExpression2 = buildSubtractOp (addExpression2,
             buildIntVal (1));
@@ -159,12 +159,12 @@ FortranOpenMPKernelSubroutineDirectLoop::createFormalParameterDeclarations ()
   using SageBuilder::buildIntVal;
 
   for (unsigned int i = 1; i
-      <= parallelLoop->getNumberOf_OP_DAT_ArgumentGroups (); ++i)
+      <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
-    if (parallelLoop->isDuplicate_OP_DAT (i) == false)
+    if (parallelLoop->isDuplicateOpDat (i) == false)
     {
       SgArrayType * arrayType = isSgArrayType (
-          parallelLoop->get_OP_DAT_Type (i));
+          parallelLoop->getOpDatType (i));
 
       SgArrayType * newArrayType =
           FortranTypesBuilder::getArray_RankOne_WithLowerAndUpperBounds (

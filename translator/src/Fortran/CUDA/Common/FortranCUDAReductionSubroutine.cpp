@@ -109,24 +109,15 @@ FortranCUDAReductionSubroutine::createStatements ()
 
   /*
    * ======================================================
-   * if the user hasn't specified a fortran kind, we have
+   * If the user hasn't specified a Fortran kind, we have
    * assume standard ones: integer(4) and real(4)
    * ======================================================
    */
 
-  if (autosharedKindSize == NULL)
+  if (autosharedKindSize == NULL && isSgTypeInt (
+      reductionVariableType->get_base_type ()) != NULL)
   {
-
-    if (isSgTypeInt (reductionVariableType->get_base_type ()) != NULL)
-    {
-      autosharedKindSize = buildIntVal (
-          FortranVariableDefaultKinds::DEFAULT_KIND_INT);
-    }
-    else
-    {
-      autosharedKindSize = buildIntVal (
-          FortranVariableDefaultKinds::DEFAULT_KIND_REAL);
-    }
+    autosharedKindSize = buildIntVal (4);
   }
 
   SgVarRefExp

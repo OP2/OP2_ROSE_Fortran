@@ -62,15 +62,6 @@ class FortranStatementsAndExpressionsBuilder
 
     /*
      * ======================================================
-     * Appends an assignment statement to the given scope
-     * ======================================================
-     */
-    static void
-    appendAssignmentStatement (SgVariableDeclaration * variableDeclaration,
-        SgExpression * rhs, SgScopeStatement * scope);
-
-    /*
-     * ======================================================
      * Appends a local variable declaration to the given scope.
      * Various Fortran attributes of the variable declaration
      * can be also be set by appending them to the end of the

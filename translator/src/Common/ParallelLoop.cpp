@@ -16,7 +16,7 @@
  */
 
 void
-ParallelLoop::retrieveOP_DATDeclarations (Declarations * declarations)
+ParallelLoop::retrieveOpDatDeclarations (Declarations * declarations)
 {
   using boost::iequals;
   using boost::lexical_cast;
@@ -82,20 +82,20 @@ ParallelLoop::retrieveOP_DATDeclarations (Declarations * declarations)
                 OP_DAT_Declaration * opDatDeclaration =
                     declarations->get_OP_DAT_Declaration (variableName);
 
-                OP_DAT_Types[OP_DATCounter]
+                OpDatTypes[OP_DATCounter]
                     = opDatDeclaration->getActualType ();
 
-                OP_DAT_Dimensions[OP_DATCounter]
+                OpDatDimensions[OP_DATCounter]
                     = opDatDeclaration->getDimension ();
 
-                OP_DAT_VariableNames[OP_DATCounter] = variableName;
+                OpDatVariableNames[OP_DATCounter] = variableName;
 
-                if (find (unique_OP_DATs.begin (), unique_OP_DATs.end (),
-                    variableName) == unique_OP_DATs.end ())
+                if (find (uniqueOpDats.begin (), uniqueOpDats.end (),
+                    variableName) == uniqueOpDats.end ())
                 {
-                  unique_OP_DATs.push_back (variableName);
+                  uniqueOpDats.push_back (variableName);
 
-                  OP_DAT_Duplicates[OP_DATCounter] = false;
+                  OpDatDuplicates[OP_DATCounter] = false;
 
                   SgArrayType * isArrayType = isSgArrayType (
                       opDatDeclaration->getActualType ());
@@ -127,13 +127,13 @@ ParallelLoop::retrieveOP_DATDeclarations (Declarations * declarations)
                               + lexical_cast <string> (
                                   sizeOfRealType->get_value ()), 7);
 
-                      sizeOf_OP_DAT = sizeOfRealType->get_value ();
+                      sizeOfOpDat = sizeOfRealType->get_value ();
                     }
                   }
                 }
                 else
                 {
-                  OP_DAT_Duplicates[OP_DATCounter] = true;
+                  OpDatDuplicates[OP_DATCounter] = true;
                 }
               }
               catch (const std::string &)
@@ -146,17 +146,17 @@ ParallelLoop::retrieveOP_DATDeclarations (Declarations * declarations)
                 OP_GBL_Declaration * opGBLDeclaration =
                     declarations->get_OP_GBL_Declaration (variableName);
 
-                OP_DAT_Types[OP_DATCounter]
+                OpDatTypes[OP_DATCounter]
                     = opGBLDeclaration->getActualType ();
 
-                OP_DAT_Dimensions[OP_DATCounter]
+                OpDatDimensions[OP_DATCounter]
                     = opGBLDeclaration->getDimension ();
 
-                OP_DAT_VariableNames[OP_DATCounter] = variableName;
+                OpDatVariableNames[OP_DATCounter] = variableName;
 
-                unique_OP_DATs.push_back (variableName);
+                uniqueOpDats.push_back (variableName);
 
-                OP_DAT_Duplicates[OP_DATCounter] = false;
+                OpDatDuplicates[OP_DATCounter] = false;
               }
             }
 
@@ -170,7 +170,7 @@ ParallelLoop::retrieveOP_DATDeclarations (Declarations * declarations)
                  * access to the data
                  * ======================================================
                  */
-                OP_DAT_MappingDescriptors[OP_DATCounter] = DIRECT;
+                OpDatMappingDescriptors[OP_DATCounter] = DIRECT;
               }
               else
               {
@@ -182,12 +182,12 @@ ParallelLoop::retrieveOP_DATDeclarations (Declarations * declarations)
                    * ======================================================
                    */
 
-                  OP_DAT_MappingDescriptors[OP_DATCounter] = GLOBAL;
+                  OpDatMappingDescriptors[OP_DATCounter] = GLOBAL;
                 }
 
                 else
                 {
-                  OP_DAT_MappingDescriptors[OP_DATCounter] = INDIRECT;
+                  OpDatMappingDescriptors[OP_DATCounter] = INDIRECT;
                 }
               }
             }
@@ -202,22 +202,22 @@ ParallelLoop::retrieveOP_DATDeclarations (Declarations * declarations)
 
             if (iequals (variableName, OP2::OP_READ))
             {
-              OP_DAT_AccessDescriptors[OP_DATCounter] = READ_ACCESS;
+              OpDatAccessDescriptors[OP_DATCounter] = READ_ACCESS;
             }
 
             else if (iequals (variableName, OP2::OP_WRITE))
             {
-              OP_DAT_AccessDescriptors[OP_DATCounter] = WRITE_ACCESS;
+              OpDatAccessDescriptors[OP_DATCounter] = WRITE_ACCESS;
             }
 
             else if (iequals (variableName, OP2::OP_INC))
             {
-              OP_DAT_AccessDescriptors[OP_DATCounter] = INC_ACCESS;
+              OpDatAccessDescriptors[OP_DATCounter] = INC_ACCESS;
             }
 
             else if (iequals (variableName, OP2::OP_RW))
             {
-              OP_DAT_AccessDescriptors[OP_DATCounter] = RW_ACCESS;
+              OpDatAccessDescriptors[OP_DATCounter] = RW_ACCESS;
             }
 
             else
@@ -263,19 +263,15 @@ ParallelLoop::generateReductionSubroutines (SgScopeStatement * moduleScope)
 
   if (isReductionRequired () == true)
   {
-    for (unsigned int i = 1; i <= getNumberOf_OP_DAT_ArgumentGroups (); ++i)
+    for (unsigned int i = 1; i <= getNumberOfOpDatArgumentGroups (); ++i)
     {
       if (isReductionRequired (i) == true)
       {
-        SgType * opDatType = get_OP_DAT_Type (i);
-
-        SgArrayType * isArrayType = isSgArrayType (opDatType);
-
-        ROSE_ASSERT ( isArrayType != NULL );
+        SgArrayType * arrayType = isSgArrayType (getOpDatType (i));
 
         SgExpression * opDatKindSize =
             FortranStatementsAndExpressionsBuilder::getFortranKindOf_OP_DAT (
-                isArrayType);
+                arrayType);
 
         SgIntVal * isKindIntVal = isSgIntVal (opDatKindSize);
 
@@ -283,13 +279,13 @@ ParallelLoop::generateReductionSubroutines (SgScopeStatement * moduleScope)
 
         string typeName;
 
-        if (isSgTypeInt (isArrayType->get_base_type ()) != NULL)
+        if (isSgTypeInt (arrayType->get_base_type ()) != NULL)
         {
-          typeName = SubroutineNameSuffixes::integerSuffix;
+          typeName = "_integer";
         }
-        else if (isSgTypeFloat (isArrayType->get_base_type ()) != NULL)
+        else if (isSgTypeFloat (arrayType->get_base_type ()) != NULL)
         {
-          typeName = SubroutineNameSuffixes::floatSuffix;
+          typeName = "_float";
         }
         else
         {
@@ -305,13 +301,12 @@ ParallelLoop::generateReductionSubroutines (SgScopeStatement * moduleScope)
          * ======================================================
          */
         string const reductionSubroutineName = "arg"
-            + lexical_cast <string> (i)
-            + SubroutineNameSuffixes::reductionSuffix + typeName
+            + lexical_cast <string> (i) + "_reduction" + typeName
             + lexical_cast <string> (isKindIntVal->get_value ());
 
         FortranCUDAReductionSubroutine * reductionSubroutine =
             new FortranCUDAReductionSubroutine (reductionSubroutineName,
-                moduleScope, isArrayType);
+                moduleScope, arrayType);
 
         /*
          * ======================================================
@@ -332,8 +327,8 @@ ParallelLoop::isDirectLoop () const
   using std::map;
 
   for (map <unsigned int, MAPPING_VALUE>::const_iterator it =
-      OP_DAT_MappingDescriptors.begin (); it
-      != OP_DAT_MappingDescriptors.end (); ++it)
+      OpDatMappingDescriptors.begin (); it
+      != OpDatMappingDescriptors.end (); ++it)
   {
     if (it->second == INDIRECT)
     {
@@ -345,17 +340,17 @@ ParallelLoop::isDirectLoop () const
 }
 
 unsigned int
-ParallelLoop::getNumberOfDistinctIndirect_OP_DAT_Arguments ()
+ParallelLoop::getNumberOfDistinctIndirectOpDatArguments ()
 {
   using std::map;
 
   unsigned int count = 0;
 
-  for (unsigned int i = 1; i <= getNumberOf_OP_DAT_ArgumentGroups (); ++i)
+  for (unsigned int i = 1; i <= getNumberOfOpDatArgumentGroups (); ++i)
   {
-    if (OP_DAT_Duplicates[i] == false)
+    if (OpDatDuplicates[i] == false)
     {
-      if (OP_DAT_MappingDescriptors[i] == INDIRECT)
+      if (OpDatMappingDescriptors[i] == INDIRECT)
       {
         count++;
       }
@@ -378,7 +373,7 @@ ParallelLoop::getActualArguments ()
 }
 
 unsigned int
-ParallelLoop::getNumberOf_OP_DAT_ArgumentGroups () const
+ParallelLoop::getNumberOfOpDatArgumentGroups () const
 {
   return (actualArguments.size ()
       - OP2::Fortran::NUMBER_OF_NON_OP_DAT_ARGUMENTS)
@@ -386,33 +381,33 @@ ParallelLoop::getNumberOf_OP_DAT_ArgumentGroups () const
 }
 
 SgType *
-ParallelLoop::get_OP_DAT_Type (unsigned int OP_DAT_ArgumentGroup)
+ParallelLoop::getOpDatType (unsigned int OP_DAT_ArgumentGroup)
 {
-  return OP_DAT_Types[OP_DAT_ArgumentGroup];
+  return OpDatTypes[OP_DAT_ArgumentGroup];
 }
 
 unsigned int
-ParallelLoop::get_OP_DAT_Dimension (unsigned int OP_DAT_ArgumentGroup)
+ParallelLoop::getOpDatDimension (unsigned int OP_DAT_ArgumentGroup)
 {
-  return OP_DAT_Dimensions[OP_DAT_ArgumentGroup];
+  return OpDatDimensions[OP_DAT_ArgumentGroup];
 }
 
 bool
-ParallelLoop::isDuplicate_OP_DAT (unsigned int OP_DAT_ArgumentGroup)
+ParallelLoop::isDuplicateOpDat (unsigned int OP_DAT_ArgumentGroup)
 {
-  return OP_DAT_Duplicates[OP_DAT_ArgumentGroup];
+  return OpDatDuplicates[OP_DAT_ArgumentGroup];
 }
 
 MAPPING_VALUE
-ParallelLoop::get_OP_MAP_Value (unsigned int OP_DAT_ArgumentGroup)
+ParallelLoop::getOpMapValue (unsigned int OP_DAT_ArgumentGroup)
 {
-  return OP_DAT_MappingDescriptors[OP_DAT_ArgumentGroup];
+  return OpDatMappingDescriptors[OP_DAT_ArgumentGroup];
 }
 
 ACCESS_CODE_VALUE
-ParallelLoop::get_OP_Access_Value (unsigned int OP_DAT_ArgumentGroup)
+ParallelLoop::getOpAccessValue (unsigned int OP_DAT_ArgumentGroup)
 {
-  return OP_DAT_AccessDescriptors[OP_DAT_ArgumentGroup];
+  return OpDatAccessDescriptors[OP_DAT_ArgumentGroup];
 }
 
 unsigned int
@@ -420,9 +415,9 @@ ParallelLoop::getNumberOfIndirectDataSets ()
 {
   int count = 0;
 
-  for (unsigned int i = 1; i <= getNumberOf_OP_DAT_ArgumentGroups (); ++i)
+  for (unsigned int i = 1; i <= getNumberOfOpDatArgumentGroups (); ++i)
   {
-    if (OP_DAT_MappingDescriptors[i] == INDIRECT)
+    if (OpDatMappingDescriptors[i] == INDIRECT)
     {
       count++;
     }
@@ -436,9 +431,9 @@ ParallelLoop::getNumberOfDifferentIndirectDataSets ()
 {
   int count = 0;
 
-  for (unsigned int i = 1; i <= getNumberOf_OP_DAT_ArgumentGroups (); ++i)
+  for (unsigned int i = 1; i <= getNumberOfOpDatArgumentGroups (); ++i)
   {
-    if (OP_DAT_MappingDescriptors[i] == INDIRECT && isDuplicate_OP_DAT (i)
+    if (OpDatMappingDescriptors[i] == INDIRECT && isDuplicateOpDat (i)
         == false)
     {
       count++;
@@ -451,9 +446,9 @@ ParallelLoop::getNumberOfDifferentIndirectDataSets ()
 bool
 ParallelLoop::isReductionRequired ()
 {
-  for (unsigned int i = 1; i <= getNumberOf_OP_DAT_ArgumentGroups (); ++i)
+  for (unsigned int i = 1; i <= getNumberOfOpDatArgumentGroups (); ++i)
   {
-    if (OP_DAT_MappingDescriptors[i] == GLOBAL && OP_DAT_AccessDescriptors[i]
+    if (OpDatMappingDescriptors[i] == GLOBAL && OpDatAccessDescriptors[i]
         != READ_ACCESS)
     {
       return true;
@@ -465,20 +460,20 @@ ParallelLoop::isReductionRequired ()
 bool
 ParallelLoop::isReductionRequired (int OP_DAT_ArgumentGroup)
 {
-  return OP_DAT_MappingDescriptors[OP_DAT_ArgumentGroup] == GLOBAL
-      && OP_DAT_AccessDescriptors[OP_DAT_ArgumentGroup] != READ_ACCESS;
+  return OpDatMappingDescriptors[OP_DAT_ArgumentGroup] == GLOBAL
+      && OpDatAccessDescriptors[OP_DAT_ArgumentGroup] != READ_ACCESS;
 }
 
 std::string
-ParallelLoop::get_OP_DAT_VariableName (unsigned int OP_DAT_ArgumentGroup)
+ParallelLoop::getOpDatVariableName (unsigned int OP_DAT_ArgumentGroup)
 {
-  return OP_DAT_VariableNames[OP_DAT_ArgumentGroup];
+  return OpDatVariableNames[OP_DAT_ArgumentGroup];
 }
 
 unsigned int
-ParallelLoop::getSizeOf_OP_DAT () const
+ParallelLoop::getSizeOfOpDat () const
 {
-  return sizeOf_OP_DAT;
+  return sizeOfOpDat;
 }
 
 SgProcedureHeaderStatement *
@@ -505,7 +500,7 @@ ParallelLoop::ParallelLoop (std::string userSubroutineName,
     moduleName = userSubroutineName + "_openmp";
   }
 
-  retrieveOP_DATDeclarations (declarations);
+  retrieveOpDatDeclarations (declarations);
 
   if (isDirectLoop ())
   {

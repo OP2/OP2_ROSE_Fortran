@@ -11,7 +11,7 @@
  */
 
 SgStatement *
-FortranOpenMPHostSubroutineDirectLoop::createKernelCall ()
+FortranOpenMPHostSubroutineDirectLoop::createStatementToCallKernelFunction ()
 {
   using SageBuilder::buildIntVal;
   using SageBuilder::buildMultiplyOp;
@@ -24,10 +24,9 @@ FortranOpenMPHostSubroutineDirectLoop::createKernelCall ()
 
   SgExprListExp * actualParameters = buildExprListExp ();
 
-  for (unsigned int i = 1; i
-      <= parallelLoop->getNumberOf_OP_DAT_ArgumentGroups (); ++i)
+  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
-    if (parallelLoop->isDuplicate_OP_DAT (i) == false)
+    if (parallelLoop->isDuplicateOpDat (i) == false)
     {
       if (parallelLoop->isReductionRequired (i) == false)
       {
@@ -138,7 +137,7 @@ FortranOpenMPHostSubroutineDirectLoop::createKernelDoLoop ()
 
   loopBody->append_statement (assignmentStatement2);
 
-  loopBody->append_statement (createKernelCall ());
+  loopBody->append_statement (createStatementToCallKernelFunction ());
 
   SgFortranDo * doStatement =
       FortranStatementsAndExpressionsBuilder::buildFortranDoStatement (
@@ -177,10 +176,9 @@ FortranOpenMPHostSubroutineDirectLoop::createReductionEpilogueStatements ()
 
   SgBasicBlock * outerLoopBody = buildBasicBlock ();
 
-  for (unsigned int i = 1; i
-      <= parallelLoop->getNumberOf_OP_DAT_ArgumentGroups (); ++i)
+  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
-    if (parallelLoop->isDuplicate_OP_DAT (i) == false
+    if (parallelLoop->isDuplicateOpDat (i) == false
         && parallelLoop->isReductionRequired (i))
     {
       SgAssignOp
@@ -190,10 +188,8 @@ FortranOpenMPHostSubroutineDirectLoop::createReductionEpilogueStatements ()
                       variableDeclarations[IndirectAndDirectLoop::Fortran::HostSubroutine::reductionIterationCounter2]),
                   buildIntVal (0));
 
-      SgSubtractOp * innerLoopUpperBoundExpression =
-          buildSubtractOp (
-              buildIntVal (parallelLoop->get_OP_DAT_Dimension (i)),
-              buildIntVal (1));
+      SgSubtractOp * innerLoopUpperBoundExpression = buildSubtractOp (
+          buildIntVal (parallelLoop->getOpDatDimension (i)), buildIntVal (1));
 
       SgBasicBlock * innerLoopBody = buildBasicBlock ();
 
@@ -219,7 +215,7 @@ FortranOpenMPHostSubroutineDirectLoop::createReductionEpilogueStatements ()
       SgAddOp
           * addExpression2 =
               buildAddOp (
-                  buildIntVal (parallelLoop->get_OP_DAT_Dimension (i)),
+                  buildIntVal (parallelLoop->getOpDatDimension (i)),
                   buildVarRefExp (
                       variableDeclarations[IndirectAndDirectLoop::Fortran::HostSubroutine::reductionIterationCounter2]));
 
@@ -230,7 +226,7 @@ FortranOpenMPHostSubroutineDirectLoop::createReductionEpilogueStatements ()
       SgAddOp
           * addExpression3 =
               buildAddOp (
-                  buildIntVal (parallelLoop->get_OP_DAT_Dimension (i)),
+                  buildIntVal (parallelLoop->getOpDatDimension (i)),
                   buildVarRefExp (
                       variableDeclarations[IndirectAndDirectLoop::Fortran::HostSubroutine::reductionIterationCounter2]));
 
@@ -300,10 +296,9 @@ FortranOpenMPHostSubroutineDirectLoop::createReductionPrologueStatements ()
 
   SgBasicBlock * outerLoopBody = buildBasicBlock ();
 
-  for (unsigned int i = 1; i
-      <= parallelLoop->getNumberOf_OP_DAT_ArgumentGroups (); ++i)
+  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
-    if (parallelLoop->isDuplicate_OP_DAT (i) == false
+    if (parallelLoop->isDuplicateOpDat (i) == false
         && parallelLoop->isReductionRequired (i))
     {
       SgAssignOp
@@ -313,10 +308,8 @@ FortranOpenMPHostSubroutineDirectLoop::createReductionPrologueStatements ()
                       variableDeclarations[IndirectAndDirectLoop::Fortran::HostSubroutine::reductionIterationCounter2]),
                   buildIntVal (0));
 
-      SgSubtractOp * innerLoopUpperBoundExpression =
-          buildSubtractOp (
-              buildIntVal (parallelLoop->get_OP_DAT_Dimension (i)),
-              buildIntVal (1));
+      SgSubtractOp * innerLoopUpperBoundExpression = buildSubtractOp (
+          buildIntVal (parallelLoop->getOpDatDimension (i)), buildIntVal (1));
 
       SgBasicBlock * innerLoopBody = buildBasicBlock ();
 
@@ -403,10 +396,9 @@ FortranOpenMPHostSubroutineDirectLoop::createFirstTimeExecutionStatements ()
 
   ifBody->append_statement (assignmentStatement);
 
-  for (unsigned int i = 1; i
-      <= parallelLoop->getNumberOf_OP_DAT_ArgumentGroups (); ++i)
+  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
-    if (parallelLoop->isDuplicate_OP_DAT (i) == false)
+    if (parallelLoop->isDuplicateOpDat (i) == false)
     {
       SgDotExp * dotExpression1 = buildDotExp (buildVarRefExp (
           variableDeclarations[VariableNames::getOpDatName (i)]),
@@ -485,23 +477,21 @@ FortranOpenMPHostSubroutineDirectLoop::createReductionLocalVariableDeclarations 
   using SageBuilder::buildSubtractOp;
   using SageBuilder::buildIntVal;
 
-  for (unsigned int i = 1; i
-      <= parallelLoop->getNumberOf_OP_DAT_ArgumentGroups (); ++i)
+  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
-    if (parallelLoop->isDuplicate_OP_DAT (i) == false
+    if (parallelLoop->isDuplicateOpDat (i) == false
         && parallelLoop->isReductionRequired (i))
     {
-      SgArrayType * arrayType = isSgArrayType (
-          parallelLoop->get_OP_DAT_Type (i));
+      SgArrayType * arrayType = isSgArrayType (parallelLoop->getOpDatType (i));
 
       SgMultiplyOp * multiplyExpression = buildMultiplyOp (buildIntVal (64),
           buildIntVal (64));
 
       SgAddOp * addExpression = buildAddOp (buildIntVal (
-          parallelLoop->get_OP_DAT_Dimension (i)), multiplyExpression);
+          parallelLoop->getOpDatDimension (i)), multiplyExpression);
 
       SgSubtractOp * subtractExpression = buildSubtractOp (addExpression,
-          buildIntVal (parallelLoop->get_OP_DAT_Dimension (i)));
+          buildIntVal (parallelLoop->getOpDatDimension (i)));
 
       SgType * newArrayType =
           FortranTypesBuilder::getArray_RankOne_WithLowerAndUpperBounds (

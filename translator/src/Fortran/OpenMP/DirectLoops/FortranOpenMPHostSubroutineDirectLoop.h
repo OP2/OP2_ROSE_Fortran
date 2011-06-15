@@ -12,9 +12,6 @@ class FortranOpenMPHostSubroutineDirectLoop: public FortranOpenMPHostSubroutine
 
   private:
 
-    SgStatement *
-    createKernelCall ();
-
     void
     createKernelDoLoop ();
 
@@ -32,6 +29,9 @@ class FortranOpenMPHostSubroutineDirectLoop: public FortranOpenMPHostSubroutine
 
     void
     createReductionLocalVariableDeclarations ();
+
+    virtual SgStatement *
+    createStatementToCallKernelFunction ();
 
     virtual void
     createOpenMPVariableDeclarations ();

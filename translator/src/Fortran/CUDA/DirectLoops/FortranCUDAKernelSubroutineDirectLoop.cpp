@@ -33,15 +33,15 @@ FortranCUDAKernelSubroutineDirectLoop::createUserSubroutineCall ()
   SgExprListExp * userDeviceSubroutineParameters = buildExprListExp ();
 
   for (unsigned int i = 1; i
-      <= parallelLoop->getNumberOf_OP_DAT_ArgumentGroups (); ++i)
+      <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
-    int dim = parallelLoop->get_OP_DAT_Dimension (i);
+    int dim = parallelLoop->getOpDatDimension (i);
 
     SgExpression * parameterExpression = buildIntVal (1);
 
-    if (parallelLoop->get_OP_MAP_Value (i) == GLOBAL)
+    if (parallelLoop->getOpMapValue (i) == GLOBAL)
     {
-      if (parallelLoop->get_OP_Access_Value (i) == READ_ACCESS)
+      if (parallelLoop->getOpAccessValue (i) == READ_ACCESS)
       {
         /*
          * ======================================================
@@ -89,7 +89,7 @@ FortranCUDAKernelSubroutineDirectLoop::createUserSubroutineCall ()
             variableDeclarations[VariableNames::getOpDatLocalName (i)]);
       }
     }
-    else if (parallelLoop->get_OP_MAP_Value (i) == DIRECT)
+    else if (parallelLoop->getOpMapValue (i) == DIRECT)
     {
       if (parallelLoop->getNumberOfIndirectDataSets () > 0)
       {
@@ -172,11 +172,11 @@ FortranCUDAKernelSubroutineDirectLoop::stageInFromDeviceMemoryToLocalThreadVaria
   SgBasicBlock * outerBlock = buildBasicBlock ();
 
   for (unsigned int i = 1; i
-      <= parallelLoop->getNumberOf_OP_DAT_ArgumentGroups (); ++i)
+      <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
-    if (parallelLoop->get_OP_MAP_Value (i) != GLOBAL
-        && parallelLoop->get_OP_Access_Value (i) != WRITE_ACCESS
-        && parallelLoop->get_OP_DAT_Dimension (i) != 1)
+    if (parallelLoop->getOpMapValue (i) != GLOBAL
+        && parallelLoop->getOpAccessValue (i) != WRITE_ACCESS
+        && parallelLoop->getOpDatDimension (i) != 1)
     {
       SgVarRefExp
           * displVarRef =
@@ -217,7 +217,7 @@ FortranCUDAKernelSubroutineDirectLoop::stageInFromDeviceMemoryToLocalThreadVaria
       SgExpression * initLoop = buildAssignOp (mVarRef, buildIntVal (0));
 
       SgExpression * upperBoundExpression = buildIntVal (
-          parallelLoop->get_OP_DAT_Dimension (i));
+          parallelLoop->getOpDatDimension (i));
 
       SgExpression * autosharedAccessFirst = buildAddOp (displVarRef,
           buildAddOp (tidVarRef, buildMultiplyOp (mVarRef, nelemsVarRef)));
@@ -225,7 +225,7 @@ FortranCUDAKernelSubroutineDirectLoop::stageInFromDeviceMemoryToLocalThreadVaria
       SgExpression * opdatArgAccess = buildAddOp (tidVarRef, buildAddOp (
           buildMultiplyOp (mVarRef, nelemsVarRef), buildMultiplyOp (
               offsetVarRef,
-              buildIntVal (parallelLoop->get_OP_DAT_Dimension (i)))));
+              buildIntVal (parallelLoop->getOpDatDimension (i)))));
 
       SgExpression * assignAutosharedInit = buildAssignOp (buildPntrArrRefExp (
           autoSharedVarRef, autosharedAccessFirst),
@@ -251,7 +251,7 @@ FortranCUDAKernelSubroutineDirectLoop::stageInFromDeviceMemoryToLocalThreadVaria
 
       SgExpression * autoSharedAccessSecond = buildAddOp (displVarRef,
           buildAddOp (mVarRef, buildMultiplyOp (tidVarRef, buildIntVal (
-              parallelLoop->get_OP_DAT_Dimension (i)))));
+              parallelLoop->getOpDatDimension (i)))));
 
       SgExpression * assignLocalThreadVarInit = buildAssignOp (
           buildPntrArrRefExp (buildVarRefExp (
@@ -289,11 +289,11 @@ FortranCUDAKernelSubroutineDirectLoop::stageOutFromLocalThreadVariablesToDeviceM
   SgBasicBlock * outerBlock = buildBasicBlock ();
 
   for (unsigned int i = 1; i
-      <= parallelLoop->getNumberOf_OP_DAT_ArgumentGroups (); ++i)
+      <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
-    if (parallelLoop->get_OP_MAP_Value (i) != GLOBAL
-        && parallelLoop->get_OP_Access_Value (i) != READ_ACCESS
-        && parallelLoop->get_OP_DAT_Dimension (i) != 1)
+    if (parallelLoop->getOpMapValue (i) != GLOBAL
+        && parallelLoop->getOpAccessValue (i) != READ_ACCESS
+        && parallelLoop->getOpDatDimension (i) != 1)
     {
       SgVarRefExp
           * displVarRef =
@@ -328,7 +328,7 @@ FortranCUDAKernelSubroutineDirectLoop::stageOutFromLocalThreadVariablesToDeviceM
       SgExpression * initLoop = buildAssignOp (mVarRef, buildIntVal (0));
 
       SgExpression * upperBoundExpression = buildIntVal (
-          parallelLoop->get_OP_DAT_Dimension (i) - 1);
+          parallelLoop->getOpDatDimension (i) - 1);
 
       /*
        * ======================================================
@@ -339,7 +339,7 @@ FortranCUDAKernelSubroutineDirectLoop::stageOutFromLocalThreadVariablesToDeviceM
 
       SgExpression * autoSharedAccessFirst = buildAddOp (displVarRef,
           buildAddOp (mVarRef, buildMultiplyOp (tidVarRef, buildIntVal (
-              parallelLoop->get_OP_DAT_Dimension (i)))));
+              parallelLoop->getOpDatDimension (i)))));
 
       SgExpression * assignSharedMemOut = buildAssignOp (buildPntrArrRefExp (
           autoSharedVarRef, autoSharedAccessFirst), buildPntrArrRefExp (
@@ -366,7 +366,7 @@ FortranCUDAKernelSubroutineDirectLoop::stageOutFromLocalThreadVariablesToDeviceM
       SgExpression * deviceVarAccessSecond = buildAddOp (tidVarRef, buildAddOp (
           buildMultiplyOp (mVarRef, nelemsVarRef), buildMultiplyOp (
               offsetVarRef,
-              buildIntVal (parallelLoop->get_OP_DAT_Dimension (i)))));
+              buildIntVal (parallelLoop->getOpDatDimension (i)))));
 
       SgExpression * autosharedAccessSecond = buildAddOp (displVarRef,
           buildAddOp (tidVarRef, buildMultiplyOp (mVarRef, nelemsVarRef)));
@@ -566,7 +566,7 @@ FortranCUDAKernelSubroutineDirectLoop::createStatements ()
 
   SgExpression * divisionExprForArgSDispl;
 
-  if (parallelLoop->getSizeOf_OP_DAT () == 8)
+  if (parallelLoop->getSizeOfOpDat () == 8)
   {
     divisionExprForArgSDispl = buildDivideOp (
         argSDisplacementInitExprWithoutSize, buildIntVal (8));
@@ -728,9 +728,9 @@ FortranCUDAKernelSubroutineDirectLoop::createOPDATFormalParameterDeclarations ()
   Debug::getInstance ()->debugMessage ("Creating OP_DAT formal parameters", 2);
 
   for (unsigned int i = 1; i
-      <= parallelLoop->getNumberOf_OP_DAT_ArgumentGroups (); ++i)
+      <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
-    if (parallelLoop->isDuplicate_OP_DAT (i) == false)
+    if (parallelLoop->isDuplicateOpDat (i) == false)
     {
       /*
        * ======================================================
@@ -739,7 +739,7 @@ FortranCUDAKernelSubroutineDirectLoop::createOPDATFormalParameterDeclarations ()
        * ======================================================
        */
 
-      SgType * opDatBaseType = parallelLoop->get_OP_DAT_Type (i);
+      SgType * opDatBaseType = parallelLoop->getOpDatType (i);
 
       SgArrayType * isArrayType = isSgArrayType (opDatBaseType);
 

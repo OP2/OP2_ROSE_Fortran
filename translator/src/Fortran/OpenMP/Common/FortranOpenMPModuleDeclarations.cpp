@@ -16,14 +16,14 @@ FortranOpenMPModuleDeclarations::createOPDATDeclarations ()
   using std::string;
 
   for (unsigned int i = 1; i
-      <= parallelLoop->getNumberOf_OP_DAT_ArgumentGroups (); ++i)
+      <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
-    if (parallelLoop->isDuplicate_OP_DAT (i) == false)
+    if (parallelLoop->isDuplicateOpDat (i) == false)
     {
       string const & variableName = VariableNames::getOpDatGlobalName (i);
 
       moduleDeclarations[variableName] = buildVariableDeclaration (
-          variableName, buildPointerType (parallelLoop->get_OP_DAT_Type (i)),
+          variableName, buildPointerType (parallelLoop->getOpDatType (i)),
           NULL, moduleScope);
 
       moduleDeclarations[variableName]->get_declarationModifier ().get_accessModifier ().setUndefined ();

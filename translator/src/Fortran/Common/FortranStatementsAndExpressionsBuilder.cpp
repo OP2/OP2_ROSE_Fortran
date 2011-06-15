@@ -194,25 +194,6 @@ FortranStatementsAndExpressionsBuilder::buildShapeExpression (
   return shapeExpression;
 }
 
-void
-FortranStatementsAndExpressionsBuilder::appendAssignmentStatement (
-    SgVariableDeclaration * variableDeclaration, SgExpression * rhs,
-    SgScopeStatement * scope)
-{
-  using SageBuilder::buildVarRefExp;
-  using SageBuilder::buildAssignOp;
-  using SageBuilder::buildExprStatement;
-  using SageInterface::appendStatement;
-
-  SgVarRefExp * variableReference = buildVarRefExp (variableDeclaration);
-
-  SgExpression * assignmentExpression = buildAssignOp (variableReference, rhs);
-
-  SgStatement * assignmentStatement = buildExprStatement (assignmentExpression);
-
-  appendStatement (assignmentStatement, scope);
-}
-
 SgVariableDeclaration *
 FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
     std::string const & variableName, SgType * type, SgScopeStatement * scope,
@@ -316,16 +297,7 @@ FortranStatementsAndExpressionsBuilder::getFortranKindOf_OP_DAT (
    */
   if (sizeOf_OP_DAT_Kind == NULL)
   {
-    if (isSgTypeInt (arrayBaseType) != NULL)
-    {
-      sizeOf_OP_DAT_Kind = buildIntVal (
-          FortranVariableDefaultKinds::DEFAULT_KIND_INT);
-    }
-    else
-    {
-      sizeOf_OP_DAT_Kind = buildIntVal (
-          FortranVariableDefaultKinds::DEFAULT_KIND_REAL);
-    }
+    sizeOf_OP_DAT_Kind = buildIntVal (4);
   }
 
   return sizeOf_OP_DAT_Kind;

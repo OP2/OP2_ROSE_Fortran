@@ -11,8 +11,8 @@
  * ======================================================
  */
 
-void
-FortranCUDAHostSubroutineDirectLoop::createKernelCall ()
+SgStatement *
+FortranCUDAHostSubroutineDirectLoop::createStatementToCallKernelFunction ()
 {
   using SageBuilder::buildDotExp;
   using SageBuilder::buildOpaqueVarRefExp;
@@ -21,112 +21,64 @@ FortranCUDAHostSubroutineDirectLoop::createKernelCall ()
   using SageBuilder::buildExprListExp;
   using SageBuilder::buildVoidType;
   using SageInterface::appendStatement;
-  using std::map;
-  using std::string;
 
-  Debug::getInstance ()->debugMessage ("Creating kernel call", 2);
+  SgExprListExp * actualParameters = buildExprListExp ();
 
-  SgExprListExp * kernelParameters = buildExprListExp ();
-
-  /*
-   * ======================================================
-   * argSizes
-   * ======================================================
-   */
-  kernelParameters->append_expression (
+  actualParameters->append_expression (
       buildVarRefExp (
           variableDeclarations[IndirectAndDirectLoop::Fortran::VariableNames::argsSizes]));
 
-  /*
-   * ======================================================
-   * op_dat content arguments on device
-   * ======================================================
-   */
-  for (unsigned int i = 1; i
-      <= parallelLoop->getNumberOf_OP_DAT_ArgumentGroups (); ++i)
+  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
-    if (parallelLoop->isDuplicate_OP_DAT (i) == false)
+    if (parallelLoop->isDuplicateOpDat (i) == false)
     {
-
-      /*
-       * ======================================================
-       * check if it is a reduction variable
-       * ======================================================
-       */
       if (parallelLoop->isReductionRequired (i) == false)
       {
-        SgVarRefExp * opDatDeviceReference = buildVarRefExp (
-            variableDeclarations[VariableNames::getOpDatDeviceName (i)]);
-
-        kernelParameters->append_expression (opDatDeviceReference);
+        actualParameters->append_expression (buildVarRefExp (
+            variableDeclarations[VariableNames::getOpDatDeviceName (i)]));
       }
       else
       {
-        SgVarRefExp
-            * redArrayOnDeviceRef =
-                buildVarRefExp (
-                    variableDeclarations[IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::reductionArrayDevice]);
-
-        kernelParameters->append_expression (redArrayOnDeviceRef);
+        actualParameters->append_expression (
+            buildVarRefExp (
+                variableDeclarations[IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::reductionArrayDevice]));
       }
     }
   }
 
-  /*
-   * ======================================================
-   * offsetS
-   * ======================================================
-   */
-  kernelParameters->append_expression (
+  actualParameters->append_expression (
       buildVarRefExp (
           variableDeclarations[DirectLoop::Fortran::KernelSubroutine::offsetInThreadBlock]));
 
-  /*
-   * ======================================================
-   * set%size
-   * ======================================================
-   */
-  SgExpression * opSetFormalArgumentReference = buildVarRefExp (
-      variableDeclarations[VariableNames::getOpSetName ()]);
-
-  SgExpression * sizeFieldExpression =
-      buildDotExp (opSetFormalArgumentReference,
+  SgExpression * dotExpression =
+      buildDotExp (buildVarRefExp (
+          variableDeclarations[VariableNames::getOpSetName ()]),
           buildOpaqueVarRefExp (
               IndirectAndDirectLoop::Fortran::HostSubroutine::size,
               subroutineScope));
 
-  kernelParameters->append_expression (sizeFieldExpression);
+  actualParameters->append_expression (dotExpression);
 
-  /*
-   * ======================================================
-   * warpSizeOP2
-   * ======================================================
-   */
-  kernelParameters->append_expression (buildVarRefExp (
+  actualParameters->append_expression (buildVarRefExp (
       variableDeclarations[DirectLoop::Fortran::KernelSubroutine::warpSize]));
 
-  /*
-   * ======================================================
-   * offset in shared memory for reductions (if needed)
-   * ======================================================
-   */
   if (parallelLoop->isReductionRequired () == true)
   {
-    kernelParameters->append_expression (
+    actualParameters->append_expression (
         buildVarRefExp (
             variableDeclarations[IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::sharedMemoryStartOffset]));
   }
 
-  SgExprStatement * kernelCall = buildFunctionCallStmt (kernelSubroutineName
+  SgExprStatement * callStatement = buildFunctionCallStmt (kernelSubroutineName
       + "<<<" + ROSEHelper::getFirstVariableName (
       variableDeclarations[CUDA::Fortran::VariableNames::blocksPerGrid]) + ", "
       + ROSEHelper::getFirstVariableName (
           variableDeclarations[CUDA::Fortran::VariableNames::threadsPerBlock])
       + ", " + ROSEHelper::getFirstVariableName (
       variableDeclarations[CUDA::Fortran::VariableNames::sharedMemorySize])
-      + ">>>", buildVoidType (), kernelParameters, subroutineScope);
+      + ">>>", buildVoidType (), actualParameters, subroutineScope);
 
-  appendStatement (kernelCall, subroutineScope);
+  return callStatement;
 }
 
 void
@@ -147,10 +99,9 @@ FortranCUDAHostSubroutineDirectLoop::initialiseDeviceVariablesSizesVariable ()
    * ======================================================
    */
 
-  for (unsigned int i = 1; i
-      <= parallelLoop->getNumberOf_OP_DAT_ArgumentGroups (); ++i)
+  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
-    if (parallelLoop->isDuplicate_OP_DAT (i) == false)
+    if (parallelLoop->isDuplicateOpDat (i) == false)
     {
       string const & variableName = VariableNames::getOpDatSizeName (i);
 
@@ -194,53 +145,47 @@ FortranCUDAHostSubroutineDirectLoop::initialiseAllCUDAVariables ()
   using SageBuilder::buildOpaqueVarRefExp;
   using SageBuilder::buildVarRefExp;
   using SageBuilder::buildIntVal;
-  using SageBuilder::buildExprStatement;
-  using SageBuilder::buildAssignOp;
+  using SageBuilder::buildAssignStatement;
   using SageBuilder::buildMultiplyOp;
   using SageBuilder::buildExprListExp;
   using SageBuilder::buildFunctionCallExp;
   using SageInterface::appendStatement;
+  using std::string;
 
-  SgVarRefExp * variable_OP_WARP_SIZE = buildOpaqueVarRefExp ("OP_WARP_SIZE",
-      subroutineScope);
+  string const OPWarpSizeVariableName = "OP_WARP_SIZE";
+  string const maxFunctionName = "max";
 
-  /*
-   * ======================================================
-   * initialising fixed value variables nblocks, nthreads
-   * and warpSizeOP2
-   * ======================================================
-   */
-
-  SgExpression * assignExpressionNblocks = buildAssignOp (buildVarRefExp (
-      variableDeclarations[CUDA::Fortran::VariableNames::blocksPerGrid]),
+  SgExprStatement * assignmentStatement1 = buildAssignStatement (
+      buildVarRefExp (
+          variableDeclarations[CUDA::Fortran::VariableNames::blocksPerGrid]),
       buildIntVal (CUDA::Fortran::DirectLoop::nblocks));
 
-  SgExpression * assignExpressionNthreads = buildAssignOp (buildVarRefExp (
-      variableDeclarations[CUDA::Fortran::VariableNames::threadsPerBlock]),
+  appendStatement (assignmentStatement1, subroutineScope);
+
+  SgExprStatement * assignmentStatement2 = buildAssignStatement (
+      buildVarRefExp (
+          variableDeclarations[CUDA::Fortran::VariableNames::threadsPerBlock]),
       buildIntVal (CUDA::Fortran::DirectLoop::nthreads));
 
-  SgExpression * assignExpressionWarpSizeOP2 = buildAssignOp (buildVarRefExp (
-      variableDeclarations[DirectLoop::Fortran::KernelSubroutine::warpSize]),
-      variable_OP_WARP_SIZE);
+  appendStatement (assignmentStatement2, subroutineScope);
 
-  SgExpression
-      * assignExpressionSharedMemorySize =
-          buildAssignOp (
+  SgExprStatement
+      * assignmentStatement3 =
+          buildAssignStatement (
+              buildVarRefExp (
+                  variableDeclarations[DirectLoop::Fortran::KernelSubroutine::warpSize]),
+              buildOpaqueVarRefExp (OPWarpSizeVariableName, subroutineScope));
+
+  appendStatement (assignmentStatement3, subroutineScope);
+
+  SgExprStatement
+      * assignmentStatement4 =
+          buildAssignStatement (
               buildVarRefExp (
                   variableDeclarations[CUDA::Fortran::VariableNames::sharedMemorySize]),
               buildIntVal (0));
 
-  appendStatement (buildExprStatement (assignExpressionNblocks),
-      subroutineScope);
-
-  appendStatement (buildExprStatement (assignExpressionNthreads),
-      subroutineScope);
-
-  appendStatement (buildExprStatement (assignExpressionWarpSizeOP2),
-      subroutineScope);
-
-  appendStatement (buildExprStatement (assignExpressionSharedMemorySize),
-      subroutineScope);
+  appendStatement (assignmentStatement4, subroutineScope);
 
   /*
    * ======================================================
@@ -252,81 +197,88 @@ FortranCUDAHostSubroutineDirectLoop::initialiseAllCUDAVariables ()
    * shared memory, multiplied by the number of threads
    * ======================================================
    */
-  for (unsigned int i = 1; i
-      <= parallelLoop->getNumberOf_OP_DAT_ArgumentGroups (); ++i)
+  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
-    if (parallelLoop->isDuplicate_OP_DAT (i) == false)
+    if (parallelLoop->isDuplicateOpDat (i) == false)
     {
-      int dim = parallelLoop->get_OP_DAT_Dimension (i);
-      if (dim > 1 && parallelLoop->get_OP_MAP_Value (i) != GLOBAL)
+      if (parallelLoop->getOpDatDimension (i) > 1
+          && parallelLoop->getOpMapValue (i) != GLOBAL)
       {
-
         /*
          * ======================================================
-         * nshared = max ( nshared, size * dim )
+         * nshared = max (nshared, size * dim)
          * ======================================================
          */
 
-        SgFunctionSymbol * shiftFunctionSymbol =
-            FortranTypesBuilder::buildNewFortranFunction ("max",
+        SgVarRefExp
+            * parameterExpression1 =
+                buildVarRefExp (
+                    variableDeclarations[CUDA::Fortran::VariableNames::sharedMemorySize]);
+
+        SgExpression * parameterExpression2 = buildMultiplyOp (buildIntVal (
+            parallelLoop->getOpDatDimension (i)),
+            FortranStatementsAndExpressionsBuilder::getFortranKindOf_OP_DAT (
+                parallelLoop->getOpDatType (i)));
+
+        SgExprListExp * actualParameters = buildExprListExp (
+            parameterExpression1, parameterExpression2);
+
+        SgFunctionSymbol * maxFunctionSymbol =
+            FortranTypesBuilder::buildNewFortranFunction (maxFunctionName,
                 subroutineScope);
 
-        /*
-         * ======================================================
-         * Retrieving size from type of corresponding OP_DAT
-         * declaration
-         * ======================================================
-         */
-        SgExpression * opDatKindSize =
-            FortranStatementsAndExpressionsBuilder::getFortranKindOf_OP_DAT (
-                parallelLoop->get_OP_DAT_Type (i));
+        SgFunctionCallExp * maxFunctionCall = buildFunctionCallExp (
+            maxFunctionSymbol, actualParameters);
 
-        SgExpression * secondParameterMaxCall = buildMultiplyOp (buildIntVal (
-            dim), opDatKindSize);
-
-        SgExprListExp
-            * actualParameters =
-                buildExprListExp (
+        SgExprStatement
+            * assignmentStatement =
+                buildAssignStatement (
                     buildVarRefExp (
                         variableDeclarations[CUDA::Fortran::VariableNames::sharedMemorySize]),
-                    secondParameterMaxCall);
+                    maxFunctionCall);
 
-        SgFunctionCallExp * maxFunctionCall = buildFunctionCallExp (
-            shiftFunctionSymbol, actualParameters);
-
-        FortranStatementsAndExpressionsBuilder::appendAssignmentStatement (
-            variableDeclarations[CUDA::Fortran::VariableNames::sharedMemorySize],
-            maxFunctionCall, subroutineScope);
+        appendStatement (assignmentStatement, subroutineScope);
       }
     }
   }
 
   /*
    * ======================================================
-   * 	offsetS = nshared * OP_WARP_SIZE
+   * offsetS = nshared * OP_WARP_SIZE
    * ======================================================
    */
-  SgExpression * multiplyNsharedPerWarpSize = buildMultiplyOp (buildVarRefExp (
-      variableDeclarations[CUDA::Fortran::VariableNames::sharedMemorySize]),
-      variable_OP_WARP_SIZE);
 
-  FortranStatementsAndExpressionsBuilder::appendAssignmentStatement (
-      variableDeclarations[DirectLoop::Fortran::KernelSubroutine::offsetInThreadBlock],
-      multiplyNsharedPerWarpSize, subroutineScope);
+  SgMultiplyOp * multiplyExpression5 = buildMultiplyOp (buildVarRefExp (
+      variableDeclarations[CUDA::Fortran::VariableNames::sharedMemorySize]),
+      buildOpaqueVarRefExp (OPWarpSizeVariableName, subroutineScope));
+
+  SgExprStatement
+      * assignmentStatement5 =
+          buildAssignStatement (
+              buildVarRefExp (
+                  variableDeclarations[DirectLoop::Fortran::KernelSubroutine::offsetInThreadBlock]),
+              multiplyExpression5);
+
+  appendStatement (assignmentStatement5, subroutineScope);
 
   /*
    * ======================================================
    * nshared = nshared * nthreads
    * ======================================================
    */
-  SgExpression * multiplyNsharedPerNthreads = buildMultiplyOp (buildVarRefExp (
+  SgExpression * multiplyExpression6 = buildMultiplyOp (buildVarRefExp (
       variableDeclarations[CUDA::Fortran::VariableNames::sharedMemorySize]),
       buildVarRefExp (
           variableDeclarations[CUDA::Fortran::VariableNames::threadsPerBlock]));
 
-  FortranStatementsAndExpressionsBuilder::appendAssignmentStatement (
-      variableDeclarations[CUDA::Fortran::VariableNames::sharedMemorySize],
-      multiplyNsharedPerNthreads, subroutineScope);
+  SgExprStatement
+      * assignmentStatement6 =
+          buildAssignStatement (
+              buildVarRefExp (
+                  variableDeclarations[CUDA::Fortran::VariableNames::sharedMemorySize]),
+              multiplyExpression6);
+
+  appendStatement (assignmentStatement6, subroutineScope);
 }
 
 void
