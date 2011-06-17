@@ -13,6 +13,8 @@ Subroutine::Subroutine (std::string const & subroutineName)
   this->subroutineName = subroutineName;
 
   formalParameters = buildFunctionParameterList ();
+
+  variableDeclarations = new VariableDeclarations ();
 }
 
 /*

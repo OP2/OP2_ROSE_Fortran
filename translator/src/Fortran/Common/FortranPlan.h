@@ -30,7 +30,7 @@ class FortranPlan: public Plan
         ParallelLoop * parallelLoop, SgScopeStatement * scope,
         VariableDeclarations * variableDeclarations);
 
-    virtual SgStatement *
+    virtual void
     createPlanFunctionCallStatement (SgScopeStatement * scope,
         VariableDeclarations * variableDeclarations);
 

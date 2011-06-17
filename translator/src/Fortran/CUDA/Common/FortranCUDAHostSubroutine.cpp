@@ -60,19 +60,17 @@ FortranCUDAHostSubroutine::createReductionEpilogueStatements ()
    * of reduction variables
    * ======================================================
    */
-  int maxUsedFortranKind = -1;
+  unsigned int maxUsedFortranKind = -1;
 
-  int dim = -1;
+  unsigned int dim = -1;
 
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
     if (parallelLoop->isReductionRequired (i) == true)
     {
-      int currentDim = parallelLoop->getOpDatDimension (i);
-
-      if (currentDim > dim)
+      if (parallelLoop->getOpDatDimension (i) > dim)
       {
-        dim = currentDim;
+        dim = parallelLoop->getOpDatDimension (i);
       }
 
       SgExpression * fortranKind =
@@ -81,11 +79,11 @@ FortranCUDAHostSubroutine::createReductionEpilogueStatements ()
 
       SgIntVal * kindVal = isSgIntVal (fortranKind);
 
-      ROSE_ASSERT ( kindVal != NULL );
+      ROSE_ASSERT (kindVal != NULL);
 
-      int actualValue = -1;
+      int actualValue = kindVal->get_value ();
 
-      if (maxUsedFortranKind < (actualValue = kindVal->get_value ()))
+      if (maxUsedFortranKind < actualValue)
       {
         maxUsedFortranKind = actualValue;
       }
@@ -611,6 +609,14 @@ FortranCUDAHostSubroutine::createReductionLocalVariableDeclarations ()
               buildAssignInitializer (buildIntVal (0), buildIntType ()),
               subroutineScope);
 
+  variableDeclaration1-> get_declarationModifier ().get_accessModifier ().setUndefined ();
+
+  variableDeclarations->add (
+      IndirectAndDirectLoop::Fortran::HostSubroutine::reductionIterationCounter1,
+      variableDeclaration1);
+
+  appendStatement (variableDeclaration1, subroutineScope);
+
   SgVariableDeclaration
       * variableDeclaration2 =
           buildVariableDeclaration (
@@ -619,11 +625,11 @@ FortranCUDAHostSubroutine::createReductionLocalVariableDeclarations ()
               buildAssignInitializer (buildIntVal (0), buildIntType ()),
               subroutineScope);
 
-  variableDeclaration1-> get_declarationModifier ().get_accessModifier ().setUndefined ();
-
   variableDeclaration2-> get_declarationModifier ().get_accessModifier ().setUndefined ();
 
-  appendStatement (variableDeclaration1, subroutineScope);
+  variableDeclarations->add (
+      IndirectAndDirectLoop::Fortran::HostSubroutine::reductionIterationCounter2,
+      variableDeclaration2);
 
   appendStatement (variableDeclaration2, subroutineScope);
 

@@ -1,6 +1,7 @@
 #include <FortranPlan.h>
 #include <FortranStatementsAndExpressionsBuilder.h>
 #include <FortranTypesBuilder.h>
+#include <Debug.h>
 
 void
 FortranPlan::createPlanFunctionParametersPreparationStatements (
@@ -21,6 +22,9 @@ FortranPlan::createPlanFunctionParametersPreparationStatements (
   using SageInterface::appendStatement;
   using std::map;
   using std::string;
+
+  Debug::getInstance ()->debugMessage (
+      "Creating statements to prepare plan function parameters", 5);
 
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
@@ -251,7 +255,7 @@ FortranPlan::createPlanFunctionParametersPreparationStatements (
   appendStatement (assignmentStatement3, scope);
 }
 
-SgStatement *
+void
 FortranPlan::createPlanFunctionCallStatement (SgScopeStatement * scope,
     VariableDeclarations * variableDeclarations)
 {
@@ -262,6 +266,9 @@ FortranPlan::createPlanFunctionCallStatement (SgScopeStatement * scope,
   using SageBuilder::buildOpaqueVarRefExp;
   using SageBuilder::buildDotExp;
   using SageInterface::appendStatement;
+
+  Debug::getInstance ()->debugMessage ("Creating plan function call statement",
+      5);
 
   SgVarRefExp * parameter1 = buildVarRefExp (variableDeclarations->get (
       VariableNames::getUserSubroutineName ()));
@@ -308,7 +315,7 @@ FortranPlan::createPlanFunctionCallStatement (SgScopeStatement * scope,
   SgExprStatement * assignmentStatement = buildAssignStatement (
       cplanFunctionReturnReference, cplanFunctionCall);
 
-  return assignmentStatement;
+  appendStatement (assignmentStatement, scope);
 }
 
 void

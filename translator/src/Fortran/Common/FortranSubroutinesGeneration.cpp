@@ -188,6 +188,9 @@ FortranSubroutinesGeneration::createOpenMPSubroutines (
      * ======================================================
      */
 
+    Debug::getInstance ()->debugMessage (
+        "Generating subroutines for direct loop", 5);
+
     FortranOpenMPModuleDeclarationsDirectLoop * moduleDeclarations =
         new FortranOpenMPModuleDeclarationsDirectLoop (userSubroutineName,
             parallelLoop, moduleScope);
@@ -209,6 +212,9 @@ FortranSubroutinesGeneration::createOpenMPSubroutines (
      * Indirect loop
      * ======================================================
      */
+
+    Debug::getInstance ()->debugMessage (
+        "Generating subroutines for indirect loop", 5);
 
     FortranOpenMPModuleDeclarationsIndirectLoop * moduleDeclarations =
         new FortranOpenMPModuleDeclarationsIndirectLoop (userSubroutineName,

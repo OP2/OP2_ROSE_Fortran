@@ -1,5 +1,6 @@
 #include <FortranOpenMPModuleDeclarations.h>
 #include <CommonNamespaces.h>
+#include <Debug.h>
 
 /*
  * ======================================================
@@ -14,6 +15,9 @@ FortranOpenMPModuleDeclarations::createOpDatDeclarations ()
   using SageBuilder::buildPointerType;
   using SageInterface::appendStatement;
   using std::string;
+
+  Debug::getInstance ()->debugMessage (
+      "Generating OP_DAT declarations at module scope", 5);
 
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
@@ -44,6 +48,9 @@ FortranOpenMPModuleDeclarations::createFirstExecutionBooleanDeclaration ()
   using SageInterface::appendStatement;
   using std::string;
 
+  Debug::getInstance ()->debugMessage (
+      "Creating first time execution boolean at module scope", 5);
+
   string const & variableName = getFirstExecutionBooleanVariableName ();
 
   SgVariableDeclaration * variableDeclaration = buildVariableDeclaration (
@@ -65,13 +72,11 @@ FortranOpenMPModuleDeclarations::getFirstExecutionBooleanVariableName ()
 
 FortranOpenMPModuleDeclarations::FortranOpenMPModuleDeclarations (
     std::string const & userSubroutineName, ParallelLoop * parallelLoop,
-    SgScopeStatement * moduleScope)
+    SgScopeStatement * moduleScope) :
+  userSubroutineName (userSubroutineName), parallelLoop (parallelLoop),
+      moduleScope (moduleScope)
 {
-  this->userSubroutineName = userSubroutineName;
-
-  this->parallelLoop = parallelLoop;
-
-  this->moduleScope = moduleScope;
+  moduleDeclarations = new VariableDeclarations ();
 
   createFirstExecutionBooleanDeclaration ();
 }

@@ -2,6 +2,7 @@
 #include <CommonNamespaces.h>
 #include <FortranStatementsAndExpressionsBuilder.h>
 #include <FortranTypesBuilder.h>
+#include <Debug.h>
 
 SgStatement *
 FortranOpenMPHostSubroutineIndirectLoop::createKernelFunctionCallStatement ()
@@ -39,8 +40,8 @@ FortranOpenMPHostSubroutineIndirectLoop::createFirstTimeExecutionStatements ()
 
   ifBody->append_statement (assignmentStatement);
 
-  createPlanFunctionParametersPreparationStatements (parallelLoop,
-      ifBody->get_scope (), variableDeclarations);
+  createPlanFunctionParametersPreparationStatements (parallelLoop, ifBody,
+      variableDeclarations);
 
   SgIfStmt * ifStatement =
       FortranStatementsAndExpressionsBuilder::buildIfStatementWithEmptyElse (
@@ -165,6 +166,9 @@ FortranOpenMPHostSubroutineIndirectLoop::FortranOpenMPHostSubroutineIndirectLoop
       kernelSubroutineName, parallelLoop, moduleScope), moduleDeclarations (
       moduleDeclarations)
 {
+  Debug::getInstance ()->debugMessage (
+      "Creating OpenMP host subroutine for indirect loop", 2);
+
   createFormalParameterDeclarations ();
 
   createLocalVariableDeclarations ();

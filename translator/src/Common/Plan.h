@@ -39,7 +39,7 @@ class Plan
      * attaches it to the supplied scope
      * ======================================================
      */
-    virtual SgStatement *
+    virtual void
     createPlanFunctionCallStatement (SgScopeStatement * scope,
         VariableDeclarations * variableDeclarations) = 0;
 

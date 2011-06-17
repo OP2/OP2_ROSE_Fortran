@@ -21,6 +21,8 @@ FortranCUDADataSizesDeclaration::FortranCUDADataSizesDeclaration (
 {
   using SageInterface::appendStatement;
 
+  fieldDeclarations = new VariableDeclarations ();
+
   deviceDatatypeStatement
       = FortranStatementsAndExpressionsBuilder::buildTypeDeclaration (
           subroutineName + "_variableSizes", moduleScope);

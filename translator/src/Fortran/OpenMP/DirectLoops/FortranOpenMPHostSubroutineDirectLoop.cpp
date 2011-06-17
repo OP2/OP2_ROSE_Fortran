@@ -3,6 +3,7 @@
 #include <FortranStatementsAndExpressionsBuilder.h>
 #include <FortranTypesBuilder.h>
 #include <ROSEHelper.h>
+#include <Debug.h>
 
 /*
  * ======================================================
@@ -597,6 +598,9 @@ FortranOpenMPHostSubroutineDirectLoop::FortranOpenMPHostSubroutineDirectLoop (
       kernelSubroutineName, parallelLoop, moduleScope), moduleDeclarations (
       moduleDeclarations)
 {
+  Debug::getInstance ()->debugMessage (
+      "Creating OpenMP host subroutine for direct loop", 2);
+
   createFormalParameterDeclarations ();
 
   createLocalVariableDeclarations ();
