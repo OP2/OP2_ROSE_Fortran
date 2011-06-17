@@ -16,24 +16,9 @@ class FortranCUDAKernelSubroutineIndirectLoop: public FortranCUDAKernelSubroutin
 {
   private:
 
-    FortranCUDADataSizesDeclarationIndirectLoop
-        * dataSizesDeclaration;
+    FortranCUDADataSizesDeclarationIndirectLoop * dataSizesDeclaration;
 
     std::map <std::string, unsigned int> positionOf_nbytes;
-
-    /*
-     * ======================================================
-     * Remaining local variables
-     * ======================================================
-     */
-
-    std::map <unsigned int, SgVariableDeclaration *> localVariables_indArgSizes;
-
-    std::map <unsigned int, SgVariableDeclaration *>
-        localVariables_incrementAccessMaps;
-
-    std::map <unsigned int, SgVariableDeclaration *>
-        localVariables_incrementAccessArrays;
 
   private:
 
@@ -59,7 +44,7 @@ class FortranCUDAKernelSubroutineIndirectLoop: public FortranCUDAKernelSubroutin
     createPlanlocalVariableDeclarations ();
 
     void
-    create_OP_DAT_localVariableDeclarations ();
+    createOpDatLocalVariableDeclarations ();
 
     virtual void
     createStatements ();

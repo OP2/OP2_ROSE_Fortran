@@ -13,8 +13,7 @@ FortranCUDADataSizesDeclarationDirectLoop::addFields ()
   using SageBuilder::buildVariableDeclaration;
   using std::string;
 
-  for (unsigned int i = 1; i
-      <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
+  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
     if (parallelLoop->isDuplicateOpDat (i) == false)
     {
@@ -29,7 +28,7 @@ FortranCUDADataSizesDeclarationDirectLoop::addFields ()
       deviceDatatypeStatement->get_definition ()->append_member (
           fieldDeclaration);
 
-      fieldDeclarations[variableName] = fieldDeclaration;
+      fieldDeclarations->add (variableName, fieldDeclaration);
     }
   }
 }

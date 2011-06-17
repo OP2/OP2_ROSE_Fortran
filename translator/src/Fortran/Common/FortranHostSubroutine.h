@@ -4,11 +4,8 @@
 #include <HostSubroutine.h>
 #include <FortranSubroutine.h>
 #include <ParallelLoop.h>
-#include <Plan.h>
 
-class FortranHostSubroutine: public FortranSubroutine,
-    public HostSubroutine,
-    public Plan
+class FortranHostSubroutine: public FortranSubroutine, public HostSubroutine
 {
   protected:
 
@@ -19,19 +16,8 @@ class FortranHostSubroutine: public FortranSubroutine,
      * ======================================================
      */
     SgStatement *
-    createCToFortranPointerCall (SgExpression * parameter1,
+    createCToFortranPointerCallStatement (SgExpression * parameter1,
         SgExpression * parameter2, SgExpression * parameter3 = NULL);
-
-    virtual void
-    createStatementsToPreparePlanFunctionParameters (
-        std::vector <SgStatement *> & statements);
-
-    virtual SgStatement *
-    createStatementToCallPlanFunction ();
-
-    virtual void
-    createStatementsToExecutePlanFunction (
-        std::vector <SgStatement *> & statements);
 
     virtual void
     createFormalParameterDeclarations ();

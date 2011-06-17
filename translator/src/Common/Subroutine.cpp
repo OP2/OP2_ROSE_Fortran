@@ -27,8 +27,8 @@ Subroutine::getSubroutineName () const
   return subroutineName;
 }
 
-SgVariableDeclaration *
-Subroutine::getVariableDeclaration (std::string const & variableName)
+VariableDeclarations *
+Subroutine::getVariableDeclarations ()
 {
-  return variableDeclarations[variableName];
+  return variableDeclarations;
 }

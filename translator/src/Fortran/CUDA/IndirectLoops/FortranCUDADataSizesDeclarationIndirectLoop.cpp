@@ -16,8 +16,7 @@ FortranCUDADataSizesDeclarationIndirectLoop::addFields ()
   using std::string;
   using std::vector;
 
-  for (unsigned int i = 1; i
-      <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
+  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
     if (parallelLoop->isDuplicateOpDat (i) == false
         && parallelLoop->getOpMapValue (i) == INDIRECT)
@@ -33,12 +32,11 @@ FortranCUDADataSizesDeclarationIndirectLoop::addFields ()
       deviceDatatypeStatement->get_definition ()->append_member (
           fieldDeclaration);
 
-      fieldDeclarations[variableName] = fieldDeclaration;
+      fieldDeclarations->add (variableName, fieldDeclaration);
     }
   }
 
-  for (unsigned int i = 1; i
-      <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
+  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
     if (parallelLoop->isDuplicateOpDat (i) == false
         && parallelLoop->getOpMapValue (i) == INDIRECT)
@@ -55,12 +53,11 @@ FortranCUDADataSizesDeclarationIndirectLoop::addFields ()
       deviceDatatypeStatement->get_definition ()->append_member (
           fieldDeclaration);
 
-      fieldDeclarations[variableName] = fieldDeclaration;
+      fieldDeclarations->add (variableName, fieldDeclaration);
     }
   }
 
-  for (unsigned int i = 1; i
-      <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
+  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
     if (parallelLoop->getOpMapValue (i) == INDIRECT)
     {
@@ -76,12 +73,11 @@ FortranCUDADataSizesDeclarationIndirectLoop::addFields ()
       deviceDatatypeStatement->get_definition ()->append_member (
           fieldDeclaration);
 
-      fieldDeclarations[variableName] = fieldDeclaration;
+      fieldDeclarations->add (variableName, fieldDeclaration);
     }
   }
 
-  for (unsigned int i = 1; i
-      <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
+  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
     if (parallelLoop->isDuplicateOpDat (i) == false
         && parallelLoop->getOpMapValue (i) == DIRECT)
@@ -97,7 +93,7 @@ FortranCUDADataSizesDeclarationIndirectLoop::addFields ()
       deviceDatatypeStatement->get_definition ()->append_member (
           fieldDeclaration);
 
-      fieldDeclarations[variableName] = fieldDeclaration;
+      fieldDeclarations->add (variableName, fieldDeclaration);
     }
   }
 
@@ -134,7 +130,7 @@ FortranCUDADataSizesDeclarationIndirectLoop::addFields ()
 
     deviceDatatypeStatement->get_definition ()->append_member (fieldDeclaration);
 
-    fieldDeclarations[*it] = fieldDeclaration;
+    fieldDeclarations->add (*it, fieldDeclaration);
   }
 }
 

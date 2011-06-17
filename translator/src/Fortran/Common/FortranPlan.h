@@ -8,7 +8,9 @@
 #ifndef FORTRAN_PLAN_H
 #define FORTRAN_PLAN_H
 
-class FortranPlan
+#include <Plan.h>
+
+class FortranPlan: public Plan
 {
   protected:
 
@@ -16,13 +18,25 @@ class FortranPlan
      * ======================================================
      * All the data returned by the plan function is contained
      * in a C interface. This function creates statements to
-     * convert that data onto the Fortran side and places
-     * the statements into the supplied vector
+     * convert that data onto the Fortran side and attaches
+     * the statements to the supplied scope
      * ======================================================
      */
     virtual void
-    createStatementsToConvertCPointers (
-        std::vector <SgStatement *> & statements) = 0;
+    createConvertCPointersStatements () = 0;
+
+    virtual void
+    createPlanFunctionParametersPreparationStatements (
+        ParallelLoop * parallelLoop, SgScopeStatement * scope,
+        VariableDeclarations * variableDeclarations);
+
+    virtual SgStatement *
+    createPlanFunctionCallStatement (SgScopeStatement * scope,
+        VariableDeclarations * variableDeclarations);
+
+    virtual void
+    createPlanFunctionExecutionStatements (ParallelLoop * parallelLoop,
+        SgScopeStatement * scope, VariableDeclarations * variableDeclarations);
 };
 
 #endif

@@ -2,27 +2,24 @@
 #include <FortranCUDADataSizesDeclaration.h>
 #include <FortranStatementsAndExpressionsBuilder.h>
 
-
 SgClassType *
 FortranCUDADataSizesDeclaration::getType ()
 {
   return deviceDatatypeStatement->get_type ();
 }
 
-SgVariableDeclaration *
-FortranCUDADataSizesDeclaration::getFieldDeclaration (std::string fieldName)
+VariableDeclarations *
+FortranCUDADataSizesDeclaration::getFieldDeclarations ()
 {
-  return fieldDeclarations[fieldName];
+  return fieldDeclarations;
 }
 
-FortranCUDADataSizesDeclaration::FortranCUDADataSizesDeclaration (std::string const & subroutineName,
-    ParallelLoop * parallelLoop, SgScopeStatement * moduleScope)
+FortranCUDADataSizesDeclaration::FortranCUDADataSizesDeclaration (
+    std::string const & subroutineName, ParallelLoop * parallelLoop,
+    SgScopeStatement * moduleScope) :
+  parallelLoop (parallelLoop), moduleScope (moduleScope)
 {
   using SageInterface::appendStatement;
-
-  this->parallelLoop = parallelLoop;
-
-  this->moduleScope = moduleScope;
 
   deviceDatatypeStatement
       = FortranStatementsAndExpressionsBuilder::buildTypeDeclaration (

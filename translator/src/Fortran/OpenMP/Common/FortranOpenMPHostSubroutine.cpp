@@ -10,7 +10,7 @@
  */
 
 void
-FortranOpenMPHostSubroutine::initialiseNumberOfThreads ()
+FortranOpenMPHostSubroutine::initialiseNumberOfThreadsStatements ()
 {
   using SageBuilder::buildFunctionCallExp;
   using SageBuilder::buildExprListExp;
@@ -29,14 +29,14 @@ FortranOpenMPHostSubroutine::initialiseNumberOfThreads ()
       buildExprListExp ());
 
   SgExprStatement * assignmentStatement1 = buildAssignStatement (
-      buildVarRefExp (variableDeclarations[OpenMP::numberOfThreads]),
-      functionCall);
+      buildVarRefExp (variableDeclarations->getDeclaration (
+          OpenMP::numberOfThreads)), functionCall);
 
   appendStatement (assignmentStatement1, subroutineScope);
 
   SgExprStatement * assignmentStatement2 = buildAssignStatement (
-      buildVarRefExp (variableDeclarations[OpenMP::numberOfThreads]),
-      buildIntVal (1));
+      buildVarRefExp (variableDeclarations->getDeclaration (
+          OpenMP::numberOfThreads)), buildIntVal (1));
 
   appendStatement (assignmentStatement2, subroutineScope);
 

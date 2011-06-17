@@ -1,5 +1,5 @@
 /*
- * Written by Carlo Bertolli and Adam Betts
+ * Written by Adam Betts and Carlo Bertolli
  *
  * This class stores all OP2 declared variables and
  * subroutines encountered while parsing the user-supplied
@@ -18,8 +18,8 @@ class Declarations: public AstSimpleProcessing
 
     /*
      * ======================================================
-     * The project which the source-to-source translator operates
-     * upon
+     * The project which the source-to-source translator
+     * operates upon
      * ======================================================
      */
     SgProject * project;
@@ -66,11 +66,6 @@ class Declarations: public AstSimpleProcessing
 
   public:
 
-    Declarations (SgProject * project)
-    {
-      this->project = project;
-    }
-
     OP_SET_Declaration *
     get_OP_SET_Declaration (std::string const & opSETName)
         throw (std::string const &);
@@ -88,16 +83,10 @@ class Declarations: public AstSimpleProcessing
         throw (std::string const &);
 
     std::vector <SgProcedureHeaderStatement *>::const_iterator
-    first_SubroutineInSourceCode ()
-    {
-      return subroutinesInSourceCode.begin ();
-    }
+    first_SubroutineInSourceCode ();
 
     std::vector <SgProcedureHeaderStatement *>::const_iterator
-    last_SubroutineInSourceCode ()
-    {
-      return subroutinesInSourceCode.end ();
-    }
+    last_SubroutineInSourceCode ();
 
     /*
      * ======================================================
@@ -108,6 +97,8 @@ class Declarations: public AstSimpleProcessing
      */
     void
     visit (SgNode * node);
+
+    Declarations (SgProject * project);
 };
 
 #endif

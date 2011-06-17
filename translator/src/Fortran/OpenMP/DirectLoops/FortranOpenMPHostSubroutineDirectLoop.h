@@ -25,13 +25,13 @@ class FortranOpenMPHostSubroutineDirectLoop: public FortranOpenMPHostSubroutine
     createFirstTimeExecutionStatements ();
 
     void
-    initialiseThreadVariables ();
+    initialiseThreadVariablesStatements ();
 
     void
     createReductionLocalVariableDeclarations ();
 
     virtual SgStatement *
-    createStatementToCallKernelFunction ();
+    createKernelFunctionCallStatement ();
 
     virtual void
     createOpenMPVariableDeclarations ();

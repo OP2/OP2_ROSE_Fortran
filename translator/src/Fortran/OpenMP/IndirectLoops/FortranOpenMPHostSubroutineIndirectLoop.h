@@ -5,7 +5,8 @@
 #include <FortranOpenMPModuleDeclarationsIndirectLoop.h>
 #include <FortranPlan.h>
 
-class FortranOpenMPHostSubroutineIndirectLoop: public FortranOpenMPHostSubroutine
+class FortranOpenMPHostSubroutineIndirectLoop: public FortranOpenMPHostSubroutine,
+    public FortranPlan
 {
   private:
 
@@ -13,18 +14,17 @@ class FortranOpenMPHostSubroutineIndirectLoop: public FortranOpenMPHostSubroutin
 
   private:
 
-    virtual void
-    createFirstTimeExecutionStatements ();
-
     void
     createExecutionPlanDeclarations ();
 
+    virtual void
+    createFirstTimeExecutionStatements ();
+
     virtual SgStatement *
-    createStatementToCallKernelFunction ();
+    createKernelFunctionCallStatement ();
 
     virtual void
-    createStatementsToConvertCPointers (
-        std::vector <SgStatement *> & statements);
+    createConvertCPointersStatements ();
 
     virtual void
     createOpenMPVariableDeclarations ();

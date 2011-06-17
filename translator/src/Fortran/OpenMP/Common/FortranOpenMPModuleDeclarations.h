@@ -4,6 +4,7 @@
 #include <string>
 #include <rose.h>
 #include <ParallelLoop.h>
+#include <VariableDeclarations.h>
 
 class FortranOpenMPModuleDeclarations
 {
@@ -22,7 +23,7 @@ class FortranOpenMPModuleDeclarations
      * Variables declared at module scope level
      * ======================================================
      */
-    std::map <std::string, SgVariableDeclaration *> moduleDeclarations;
+    VariableDeclarations * moduleDeclarations;
 
     /*
      * ======================================================

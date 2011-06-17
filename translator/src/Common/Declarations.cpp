@@ -3,6 +3,12 @@
 #include <CommonNamespaces.h>
 #include <Debug.h>
 
+/*
+ * ======================================================
+ * Public functions
+ * ======================================================
+ */
+
 OP_SET_Declaration *
 Declarations::get_OP_SET_Declaration (std::string const & opSETName)
     throw (std::string const &)
@@ -237,4 +243,21 @@ Declarations::visit (SgNode * node)
       break;
     }
   }
+}
+
+std::vector <SgProcedureHeaderStatement *>::const_iterator
+Declarations::first_SubroutineInSourceCode ()
+{
+  return subroutinesInSourceCode.begin ();
+}
+
+std::vector <SgProcedureHeaderStatement *>::const_iterator
+Declarations::last_SubroutineInSourceCode ()
+{
+  return subroutinesInSourceCode.end ();
+}
+
+Declarations::Declarations (SgProject * project) :
+  project (project)
+{
 }

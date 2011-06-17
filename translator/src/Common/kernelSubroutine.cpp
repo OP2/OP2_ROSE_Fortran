@@ -8,9 +8,7 @@
 
 KernelSubroutine::KernelSubroutine (std::string const & subroutineName,
     std::string const & userSubroutineName, ParallelLoop * parallelLoop) :
-  Subroutine (subroutineName + "_kernel")
+  Subroutine (subroutineName + "_kernel"), userSubroutineName (
+      userSubroutineName), parallelLoop (parallelLoop)
 {
-  this->userSubroutineName = userSubroutineName;
-
-  this->parallelLoop = parallelLoop;
 }

@@ -581,6 +581,15 @@ namespace VariableNames
 
   std::string
   getRoundUpVariableName (unsigned int OP_DAT_ArgumentGroup);
+
+  std::string
+  getIncrementAccessMapName (unsigned int OP_DAT_ArgumentGroup);
+
+  std::string
+  getIncrementAccessMapName (unsigned int OP_DAT_ArgumentGroup);
+
+  std::string
+  getIndirectionArgumentSizeName (unsigned int OP_DAT_ArgumentGroup);
 }
 
 #endif

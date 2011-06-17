@@ -46,7 +46,7 @@ class FortranCUDAHostSubroutineDirectLoop: public FortranCUDAHostSubroutine
      * ======================================================
      */
     void
-    initialiseDeviceVariablesSizesVariable ();
+    createVariableSizesInitialisationStatements ();
 
     /*
      * ======================================================
@@ -54,7 +54,7 @@ class FortranCUDAHostSubroutineDirectLoop: public FortranCUDAHostSubroutine
      * ======================================================
      */
     void
-    initialiseAllCUDAVariables ();
+    createCUDAKernelInitialisationStatements ();
 
     /*
      * ======================================================
@@ -63,10 +63,10 @@ class FortranCUDAHostSubroutineDirectLoop: public FortranCUDAHostSubroutine
      * ======================================================
      */
     void
-    createAdditionalCUDAKernelVariableDeclarations ();
+    createCUDAKernelLocalVariableDeclarationsForDirectLoop ();
 
     virtual SgStatement *
-    createStatementToCallKernelFunction ();
+    createKernelFunctionCallStatement ();
 
     virtual void
     createStatements ();

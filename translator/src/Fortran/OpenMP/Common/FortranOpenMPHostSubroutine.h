@@ -12,11 +12,11 @@ class FortranOpenMPHostSubroutine: public FortranHostSubroutine
     virtual void
     createFirstTimeExecutionStatements () = 0;
 
-    void
-    initialiseNumberOfThreads ();
-
     virtual void
     createOpenMPVariableDeclarations () = 0;
+
+    void
+    initialiseNumberOfThreadsStatements ();
 
     FortranOpenMPHostSubroutine (std::string const & subroutineName,
         std::string const & userSubroutineName,

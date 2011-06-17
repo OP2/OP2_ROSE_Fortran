@@ -5,10 +5,11 @@
  * compiler
  */
 
-#ifndef SUBROUTINES_H
-#define SUBROUTINES_H
+#ifndef SUBROUTINE_H
+#define SUBROUTINE_H
 
 #include <rose.h>
+#include <VariableDeclarations.h>
 
 class Subroutine
 {
@@ -41,7 +42,7 @@ class Subroutine
      * newly created subroutine
      * ======================================================
      */
-    std::map <std::string, SgVariableDeclaration *> variableDeclarations;
+    VariableDeclarations * variableDeclarations;
 
   protected:
 
@@ -89,11 +90,11 @@ class Subroutine
 
     /*
      * ======================================================
-     * Returns the variable declaration with this name
+     * Returns the variable declarations in this subroutine
      * ======================================================
      */
-    SgVariableDeclaration *
-    getVariableDeclaration (std::string const & variableName);
+    VariableDeclarations *
+    getVariableDeclarations ();
 };
 
 #endif

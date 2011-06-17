@@ -19,28 +19,25 @@ class FortranCUDAHostSubroutine: public FortranHostSubroutine
     createThreadSynchroniseCall ();
 
     void
-    copyDataBackFromDeviceAndDeallocate ();
+    createReductionEpilogueStatements ();
 
     void
-    createSupportForReductionVariablesBeforeKernel ();
+    createReductionPrologueStatements ();
 
     void
-    createSupportForReductionVariablesAfterKernel ();
+    createCUDAKernelEpilogueStatements ();
 
     void
-    initialiseDataMarshallingVariables ();
+    createCUDAKernelPrologueStatements ();
 
     void
-    createReductionIterationVariableDeclarations ();
+    createCUDAKernelLocalVariableDeclarations ();
 
     void
-    createDataMarshallingDeclarations ();
+    createReductionLocalVariableDeclarations ();
 
     void
-    createCUDAKernelVariableDeclarations ();
-
-    void
-    createReductionVariableDeclarations ();
+    createDataMarshallingLocalVariableDeclarations ();
 
     FortranCUDAHostSubroutine (std::string const & subroutineName,
         std::string const & userSubroutineName,

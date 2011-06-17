@@ -12,8 +12,9 @@
  */
 
 SgStatement *
-FortranHostSubroutine::createCToFortranPointerCall (SgExpression * parameter1,
-    SgExpression * parameter2, SgExpression * parameter3)
+FortranHostSubroutine::createCToFortranPointerCallStatement (
+    SgExpression * parameter1, SgExpression * parameter2,
+    SgExpression * parameter3)
 {
   using SageBuilder::buildFunctionCallExp;
   using SageBuilder::buildExprListExp;
@@ -31,354 +32,6 @@ FortranHostSubroutine::createCToFortranPointerCall (SgExpression * parameter1,
       actualParameters);
 
   return buildExprStatement (subroutineCall);
-}
-
-void
-FortranHostSubroutine::createStatementsToPreparePlanFunctionParameters (
-    std::vector <SgStatement *> & statements)
-{
-  using SageBuilder::buildVarRefExp;
-  using SageBuilder::buildDotExp;
-  using SageBuilder::buildOpaqueVarRefExp;
-  using SageBuilder::buildIntVal;
-  using SageBuilder::buildPntrArrRefExp;
-  using SageBuilder::buildAssignOp;
-  using SageBuilder::buildAssignStatement;
-  using SageBuilder::buildNotEqualOp;
-  using SageBuilder::buildBasicBlock;
-  using SageBuilder::buildSubtractOp;
-  using SageBuilder::buildExprStatement;
-  using std::string;
-  using std::vector;
-
-  for (unsigned int i = 1; i
-      <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
-  {
-    SgVarRefExp * opDatFormalArgumentReference = buildVarRefExp (
-        variableDeclarations[VariableNames::getOpDatName (i)]);
-
-    SgExpression * indexField = buildDotExp (opDatFormalArgumentReference,
-        buildOpaqueVarRefExp ("index", subroutineScope));
-
-    SgVarRefExp
-        * opDatArrayReference =
-            buildVarRefExp (
-                variableDeclarations[IndirectLoop::Fortran::HostSubroutine::VariableNames::args]);
-
-    SgExpression * indexExpression = buildIntVal (i);
-
-    SgExpression * arrayIndexExpression = buildPntrArrRefExp (
-        opDatArrayReference, indexExpression);
-
-    SgExprStatement * assignmentStatement = buildAssignStatement (
-        arrayIndexExpression, indexField);
-
-    statements.push_back (assignmentStatement);
-  }
-
-  for (unsigned int i = 1; i
-      <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
-  {
-    SgVarRefExp * opIndexFormalArgumentReference = buildVarRefExp (
-        variableDeclarations[VariableNames::getOpIndirectionName (i)]);
-
-    SgVarRefExp
-        * opIndirectionArrayReference =
-            buildVarRefExp (
-                variableDeclarations[IndirectLoop::Fortran::HostSubroutine::VariableNames::idxs]);
-
-    SgExpression * indexExpression = buildIntVal (i);
-
-    SgExpression * arrayIndexExpression = buildPntrArrRefExp (
-        opIndirectionArrayReference, indexExpression);
-
-    SgExprStatement * assignmentStatement = buildAssignStatement (
-        arrayIndexExpression, opIndexFormalArgumentReference);
-
-    statements.push_back (assignmentStatement);
-  }
-
-  /*
-   * ======================================================
-   * The loop starts counting from 1
-   * ======================================================
-   */
-  SgExpression
-      * initializationExpression =
-          buildAssignOp (
-              buildVarRefExp (
-                  variableDeclarations[IndirectLoop::Fortran::HostSubroutine::VariableNames::iterationCounter]),
-              buildIntVal (1));
-
-  /*
-   * ======================================================
-   * The loop stops counting at the number of OP_DAT argument
-   * groups
-   * ======================================================
-   */
-  SgExpression * upperBoundExpression = buildIntVal (
-      parallelLoop->getNumberOfOpDatArgumentGroups ());
-
-  /*
-   * ======================================================
-   * The stride of the loop counter is 1
-   * ======================================================
-   */
-  SgExpression * strideExpression = buildIntVal (1);
-
-  /*
-   * ======================================================
-   * Build the body of the do-loop
-   * ======================================================
-   */
-  SgExpression
-      * arrayIndexExpression1 =
-          buildPntrArrRefExp (
-              buildVarRefExp (
-                  variableDeclarations[IndirectLoop::Fortran::HostSubroutine::VariableNames::idxs]),
-              buildVarRefExp (
-                  variableDeclarations[IndirectLoop::Fortran::HostSubroutine::VariableNames::iterationCounter]));
-
-  SgSubtractOp * subtractExpression1 = buildSubtractOp (arrayIndexExpression1,
-      buildIntVal (1));
-
-  SgExprStatement * assignmentStatement1 = buildAssignStatement (
-      arrayIndexExpression1, subtractExpression1);
-
-  SgBasicBlock * ifBody = buildBasicBlock (assignmentStatement1);
-
-  SgExpression * ifGuardExpression = buildNotEqualOp (arrayIndexExpression1,
-      buildIntVal (-1));
-
-  SgIfStmt * ifStatement =
-      FortranStatementsAndExpressionsBuilder::buildIfStatementWithEmptyElse (
-          ifGuardExpression, ifBody);
-
-  SgBasicBlock * loopBody = buildBasicBlock (ifStatement);
-
-  SgFortranDo * fortranDoStatement =
-      FortranStatementsAndExpressionsBuilder::buildFortranDoStatement (
-          initializationExpression, upperBoundExpression, strideExpression,
-          loopBody);
-
-  statements.push_back (fortranDoStatement);
-
-  for (unsigned int i = 1; i
-      <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
-  {
-    SgVarRefExp * opMapFormalArgumentReference = buildVarRefExp (
-        variableDeclarations[VariableNames::getOpMapName (i)]);
-
-    SgExpression * indexField = buildDotExp (opMapFormalArgumentReference,
-        buildOpaqueVarRefExp ("index", subroutineScope));
-
-    SgVarRefExp
-        * opMapArrayReference =
-            buildVarRefExp (
-                variableDeclarations[IndirectLoop::Fortran::HostSubroutine::VariableNames::maps]);
-
-    SgExpression * indexExpression = buildIntVal (i);
-
-    SgExpression * arrayIndexExpression = buildPntrArrRefExp (
-        opMapArrayReference, indexExpression);
-
-    SgExprStatement * assignmentStatement = buildAssignStatement (
-        arrayIndexExpression, indexField);
-
-    statements.push_back (assignmentStatement);
-  }
-
-  for (unsigned int i = 1; i
-      <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
-  {
-    SgVarRefExp * opAccessFormalArgumentReference = buildVarRefExp (
-        variableDeclarations[VariableNames::getOpAccessName (i)]);
-
-    SgVarRefExp
-        * opAccessArrayReference =
-            buildVarRefExp (
-                variableDeclarations[IndirectLoop::Fortran::HostSubroutine::VariableNames::accesses]);
-
-    SgExpression * indexExpression = buildIntVal (i);
-
-    SgExpression * arrayIndexExpression = buildPntrArrRefExp (
-        opAccessArrayReference, indexExpression);
-
-    SgExprStatement * assignmentStatement = buildAssignStatement (
-        arrayIndexExpression, opAccessFormalArgumentReference);
-
-    statements.push_back (assignmentStatement);
-  }
-
-  /*
-   * ======================================================
-   * Set up a mapping between OP_DATs and indirection
-   * values. At the beginning everything is set to undefined
-   * ======================================================
-   */
-  int const undefinedIndex = -2;
-
-  std::map <string, int> indexValues;
-
-  for (unsigned int i = 1; i
-      <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
-  {
-    if (parallelLoop->getOpMapValue (i) == INDIRECT)
-    {
-      indexValues[parallelLoop->getOpDatVariableName (i)] = undefinedIndex;
-    }
-  }
-
-  /*
-   * ======================================================
-   * Start at the value defined by Mike Giles in his
-   * implementation
-   * ======================================================
-   */
-  unsigned int nextIndex = 0;
-
-  for (unsigned int i = 1; i
-      <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
-  {
-    SgExpression
-        * arrayIndexExpression =
-            buildPntrArrRefExp (
-                buildVarRefExp (
-                    variableDeclarations[IndirectLoop::Fortran::HostSubroutine::VariableNames::inds]),
-                buildIntVal (i));
-
-    SgExprStatement * assignmentStatement;
-
-    if (parallelLoop->getOpMapValue (i) == INDIRECT)
-    {
-      if (indexValues[parallelLoop->getOpDatVariableName (i)]
-          == undefinedIndex)
-      {
-        assignmentStatement = buildAssignStatement (arrayIndexExpression,
-            buildIntVal (nextIndex));
-
-        indexValues[parallelLoop->getOpDatVariableName (i)] = nextIndex;
-
-        nextIndex++;
-      }
-      else
-      {
-        assignmentStatement
-            = buildAssignStatement (arrayIndexExpression, buildIntVal (
-                indexValues[parallelLoop->getOpDatVariableName (i)]));
-      }
-    }
-    else
-    {
-      assignmentStatement = buildAssignStatement (arrayIndexExpression,
-          buildIntVal (-1));
-    }
-
-    statements.push_back (assignmentStatement);
-  }
-
-  SgExprStatement
-      * assignmentStatement2 =
-          buildAssignStatement (
-              buildVarRefExp (
-                  variableDeclarations[IndirectLoop::Fortran::HostSubroutine::VariableNames::argsNumber]),
-              buildIntVal (parallelLoop->getNumberOfOpDatArgumentGroups ()));
-
-  statements.push_back (assignmentStatement2);
-
-  SgExprStatement
-      * assignmentStatement3 =
-          buildAssignStatement (
-              buildVarRefExp (
-                  variableDeclarations[IndirectLoop::Fortran::HostSubroutine::VariableNames::indsNumber]),
-              buildIntVal (
-                  parallelLoop->getNumberOfDistinctIndirectOpDatArguments ()));
-
-  statements.push_back (assignmentStatement3);
-}
-
-SgStatement *
-FortranHostSubroutine::createStatementToCallPlanFunction ()
-{
-  using SageBuilder::buildExprListExp;
-  using SageBuilder::buildVarRefExp;
-  using SageBuilder::buildFunctionCallExp;
-  using SageBuilder::buildAssignStatement;
-  using SageBuilder::buildExprStatement;
-  using SageBuilder::buildOpaqueVarRefExp;
-  using SageBuilder::buildDotExp;
-  using SageInterface::appendStatement;
-  using std::map;
-  using std::string;
-
-  SgVarRefExp * parameter1 = buildVarRefExp (
-      variableDeclarations[VariableNames::getUserSubroutineName ()]);
-
-  SgVarRefExp * indexField = buildOpaqueVarRefExp ("index", subroutineScope);
-
-  SgExpression * parameter2 = buildDotExp (buildVarRefExp (
-      variableDeclarations[VariableNames::getOpSetName ()]), indexField);
-
-  SgVarRefExp
-      * parameter3 =
-          buildVarRefExp (
-              variableDeclarations[IndirectLoop::Fortran::HostSubroutine::VariableNames::argsNumber]);
-
-  SgVarRefExp
-      * parameter4 =
-          buildVarRefExp (
-              variableDeclarations[IndirectLoop::Fortran::HostSubroutine::VariableNames::args]);
-
-  SgVarRefExp
-      * parameter5 =
-          buildVarRefExp (
-              variableDeclarations[IndirectLoop::Fortran::HostSubroutine::VariableNames::idxs]);
-
-  SgVarRefExp
-      * parameter6 =
-          buildVarRefExp (
-              variableDeclarations[IndirectLoop::Fortran::HostSubroutine::VariableNames::maps]);
-
-  SgVarRefExp
-      * parameter7 =
-          buildVarRefExp (
-              variableDeclarations[IndirectLoop::Fortran::HostSubroutine::VariableNames::accesses]);
-
-  SgVarRefExp
-      * parameter8 =
-          buildVarRefExp (
-              variableDeclarations[IndirectLoop::Fortran::HostSubroutine::VariableNames::indsNumber]);
-
-  SgVarRefExp
-      * parameter9 =
-          buildVarRefExp (
-              variableDeclarations[IndirectLoop::Fortran::HostSubroutine::VariableNames::inds]);
-
-  SgExprListExp * actualParameters = buildExprListExp (parameter1, parameter2,
-      parameter3, parameter4, parameter5, parameter6, parameter7, parameter8,
-      parameter9);
-
-  SgFunctionSymbol * cplanFunctionSymbol =
-      FortranTypesBuilder::buildNewFortranFunction ("cplan", subroutineScope);
-
-  SgFunctionCallExp * cplanFunctionCall = buildFunctionCallExp (
-      cplanFunctionSymbol, actualParameters);
-
-  SgVarRefExp
-      * cplanFunctionReturnReference =
-          buildVarRefExp (
-              variableDeclarations[IndirectLoop::Fortran::HostSubroutine::VariableNames::planRet]);
-
-  SgExprStatement * assignmentStatement = buildAssignStatement (
-      cplanFunctionReturnReference, cplanFunctionCall);
-
-  return assignmentStatement;
-}
-
-void
-FortranHostSubroutine::createStatementsToExecutePlanFunction (std::vector <
-    SgStatement *> & statements)
-{
 }
 
 void
@@ -423,12 +76,13 @@ FortranHostSubroutine::createFormalParameterDeclarations ()
 
         string const & variableName = VariableNames::getUserSubroutineName ();
 
-        variableDeclarations[variableName]
-            = FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
+        variableDeclarations->add (
+            variableName,
+            FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
                 variableName, FortranTypesBuilder::getString (
                     userSubroutineName.length ()),
 
-                subroutineScope, formalParameters, 1, INTENT_IN);
+                subroutineScope, formalParameters, 1, INTENT_IN));
 
         break;
       }
@@ -456,10 +110,11 @@ FortranHostSubroutine::createFormalParameterDeclarations ()
                */
               string const & variableName = VariableNames::getOpSetName ();
 
-              variableDeclarations[variableName]
-                  = FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
+              variableDeclarations->add (
+                  variableName,
+                  FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
                       variableName, classReference, subroutineScope,
-                      formalParameters, 1, INTENT_IN);
+                      formalParameters, 1, INTENT_IN));
             }
 
             else if (iequals (className, OP2::OP_MAP))
@@ -473,10 +128,11 @@ FortranHostSubroutine::createFormalParameterDeclarations ()
               string const & variableName = VariableNames::getOpMapName (
                   OP_DAT_ArgumentGroup);
 
-              variableDeclarations[variableName]
-                  = FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
+              variableDeclarations->add (
+                  variableName,
+                  FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
                       variableName, classReference, subroutineScope,
-                      formalParameters, 1, INTENT_IN);
+                      formalParameters, 1, INTENT_IN));
             }
 
             else if (iequals (className, OP2::OP_DAT))
@@ -492,10 +148,11 @@ FortranHostSubroutine::createFormalParameterDeclarations ()
               string const & variableName = VariableNames::getOpDatName (
                   OP_DAT_ArgumentGroup);
 
-              variableDeclarations[variableName]
-                  = FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
+              variableDeclarations->add (
+                  variableName,
+                  FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
                       variableName, classReference, subroutineScope,
-                      formalParameters, 1, INTENT_IN);
+                      formalParameters, 1, INTENT_IN));
             }
 
             else
@@ -520,10 +177,11 @@ FortranHostSubroutine::createFormalParameterDeclarations ()
             string const & variableName = VariableNames::getOpAccessName (
                 OP_DAT_ArgumentGroup);
 
-            variableDeclarations[variableName]
-                = FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
+            variableDeclarations->add (
+                variableName,
+                FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
                     variableName, FortranTypesBuilder::getFourByteInteger (),
-                    subroutineScope, formalParameters, 1, INTENT_IN);
+                    subroutineScope, formalParameters, 1, INTENT_IN));
 
             break;
           }
@@ -549,10 +207,11 @@ FortranHostSubroutine::createFormalParameterDeclarations ()
         string const & variableName = VariableNames::getOpIndirectionName (
             OP_DAT_ArgumentGroup);
 
-        variableDeclarations[variableName]
-            = FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
+        variableDeclarations->add (
+            variableName,
+            FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
                 variableName, FortranTypesBuilder::getFourByteInteger (),
-                subroutineScope, formalParameters, 1, INTENT_IN);
+                subroutineScope, formalParameters, 1, INTENT_IN));
 
         break;
       }

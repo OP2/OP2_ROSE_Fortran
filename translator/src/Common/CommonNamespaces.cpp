@@ -181,3 +181,22 @@ VariableNames::getRoundUpVariableName (unsigned int OP_DAT_ArgumentGroup)
   return IndirectLoop::Fortran::VariablePrefixes::roundUp + lexical_cast <
       string> (OP_DAT_ArgumentGroup);
 }
+
+std::string
+VariableNames::getIncrementAccessMapName (unsigned int OP_DAT_ArgumentGroup)
+{
+  using boost::lexical_cast;
+  using std::string;
+
+  return "argMap" + lexical_cast <string> (OP_DAT_ArgumentGroup);
+}
+
+std::string
+VariableNames::getIndirectionArgumentSizeName (
+    unsigned int OP_DAT_ArgumentGroup)
+{
+  using boost::lexical_cast;
+  using std::string;
+
+  return "ind_arg" + lexical_cast <string> (OP_DAT_ArgumentGroup);
+}

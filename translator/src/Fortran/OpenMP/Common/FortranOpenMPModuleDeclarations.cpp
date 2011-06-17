@@ -15,20 +15,21 @@ FortranOpenMPModuleDeclarations::createOPDATDeclarations ()
   using SageInterface::appendStatement;
   using std::string;
 
-  for (unsigned int i = 1; i
-      <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
+  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
     if (parallelLoop->isDuplicateOpDat (i) == false)
     {
       string const & variableName = VariableNames::getOpDatGlobalName (i);
 
-      moduleDeclarations[variableName] = buildVariableDeclaration (
+      SgVariableDeclaration * variableDeclaration = buildVariableDeclaration (
           variableName, buildPointerType (parallelLoop->getOpDatType (i)),
           NULL, moduleScope);
 
-      moduleDeclarations[variableName]->get_declarationModifier ().get_accessModifier ().setUndefined ();
+      moduleDeclarations->add (variableName, variableDeclaration);
 
-      appendStatement (moduleDeclarations[variableName], moduleScope);
+      variableDeclaration->get_declarationModifier ().get_accessModifier ().setUndefined ();
+
+      appendStatement (variableDeclaration, moduleScope);
     }
   }
 }
@@ -45,13 +46,15 @@ FortranOpenMPModuleDeclarations::createFirstExecutionBooleanDeclaration ()
 
   string const & variableName = getFirstExecutionBooleanVariableName ();
 
-  moduleDeclarations[variableName] = buildVariableDeclaration (variableName,
-      buildBoolType (), buildAssignInitializer (buildBoolValExp (true),
-          buildBoolType ()), moduleScope);
+  SgVariableDeclaration * variableDeclaration = buildVariableDeclaration (
+      variableName, buildBoolType (), buildAssignInitializer (buildBoolValExp (
+          true), buildBoolType ()), moduleScope);
 
-  moduleDeclarations[variableName]->get_declarationModifier ().get_accessModifier ().setUndefined ();
+  moduleDeclarations->add (variableName, variableDeclaration);
 
-  appendStatement (moduleDeclarations[variableName], moduleScope);
+  variableDeclaration->get_declarationModifier ().get_accessModifier ().setUndefined ();
+
+  appendStatement (variableDeclaration, moduleScope);
 }
 
 std::string
@@ -83,12 +86,13 @@ SgVariableDeclaration *
 FortranOpenMPModuleDeclarations::getGlobalOPDATDeclaration (
     unsigned int OP_DAT_ArgumentGroup)
 {
-  return moduleDeclarations[VariableNames::getOpDatGlobalName (
-      OP_DAT_ArgumentGroup)];
+  return moduleDeclarations->getDeclaration (VariableNames::getOpDatGlobalName (
+      OP_DAT_ArgumentGroup));
 }
 
 SgVariableDeclaration *
 FortranOpenMPModuleDeclarations::getFirstExecutionBooleanDeclaration ()
 {
-  return moduleDeclarations[getFirstExecutionBooleanVariableName ()];
+  return moduleDeclarations->getDeclaration (
+      getFirstExecutionBooleanVariableName ());
 }

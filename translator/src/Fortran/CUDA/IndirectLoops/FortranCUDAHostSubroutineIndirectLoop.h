@@ -27,7 +27,7 @@ class FortranCUDAHostSubroutineIndirectLoop: public FortranCUDAHostSubroutine,
   private:
 
     void
-    createPlanCToForttranPointerConversionStatements ();
+    createCToFortranPointerConversionStatements ();
 
     void
     createExecutionPlanExecutionStatements ();
@@ -42,11 +42,10 @@ class FortranCUDAHostSubroutineIndirectLoop: public FortranCUDAHostSubroutine,
     createExecutionPlanDeclarations ();
 
     virtual SgStatement *
-    createStatementToCallKernelFunction ();
+    createKernelFunctionCallStatement ();
 
     virtual void
-    createStatementsToConvertCPointers (
-        std::vector <SgStatement *> & statements);
+    createConvertCPointersStatements ();
 
     virtual void
     createStatements ();

@@ -13,6 +13,8 @@
 #define PLAN_H
 
 #include <rose.h>
+#include <VariableDeclarations.h>
+#include <ParallelLoop.h>
 
 class Plan
 {
@@ -22,41 +24,37 @@ class Plan
      * ======================================================
      * The plan function has a number of arguments which
      * must be initialised before obtaining the plan. This
-     * function creates those statements and puts them into
-     * the supplied vector
+     * function creates those statements and attaches them
+     * to the supplied scope
      * ======================================================
      */
     virtual void
-    createStatementsToPreparePlanFunctionParameters (
-        std::vector <SgStatement *> & statements) = 0;
+    createPlanFunctionParametersPreparationStatements (
+        ParallelLoop * parallelLoop, SgScopeStatement * scope,
+        VariableDeclarations * variableDeclarations) = 0;
 
     /*
      * ======================================================
-     * Create the statement which calls the plan function
+     * Create the statement which calls the plan function and
+     * attaches it to the supplied scope
      * ======================================================
      */
     virtual SgStatement *
-    createStatementToCallPlanFunction () = 0;
+    createPlanFunctionCallStatement (SgScopeStatement * scope,
+        VariableDeclarations * variableDeclarations) = 0;
 
     /*
      * ======================================================
      * The plan function returns a number of fields dictating
      * how to execute over a particular set. This function
-     * creates statements to execute that plan and puts them
-     * into the supplied vector
+     * creates statements to execute that plan and attaches them
+     * to the supplied scope
      * ======================================================
      */
     virtual void
-    createStatementsToExecutePlanFunction (
-        std::vector <SgStatement *> & statements) = 0;
-
-    /*
-     * ======================================================
-     * Create the statement which calls the kernel function
-     * ======================================================
-     */
-    virtual SgStatement *
-    createStatementToCallKernelFunction () = 0;
+        createPlanFunctionExecutionStatements (ParallelLoop * parallelLoop,
+            SgScopeStatement * scope,
+            VariableDeclarations * variableDeclarations) = 0;
 };
 
 #endif

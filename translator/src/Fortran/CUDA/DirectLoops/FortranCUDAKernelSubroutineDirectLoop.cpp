@@ -32,8 +32,7 @@ FortranCUDAKernelSubroutineDirectLoop::createUserSubroutineCall ()
 
   SgExprListExp * userDeviceSubroutineParameters = buildExprListExp ();
 
-  for (unsigned int i = 1; i
-      <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
+  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
     int dim = parallelLoop->getOpDatDimension (i);
 
@@ -52,13 +51,11 @@ FortranCUDAKernelSubroutineDirectLoop::createUserSubroutineCall ()
          * ======================================================
          */
 
-        SgExpression
-            * argSizeField =
-                buildDotExp (
-                    buildVarRefExp (
-                        variableDeclarations[IndirectAndDirectLoop::Fortran::VariableNames::argsSizes]),
-                    buildOpaqueVarRefExp (VariableNames::getOpDatSizeName (i),
-                        subroutineScope));
+        SgExpression * argSizeField = buildDotExp (buildVarRefExp (
+            variableDeclarations->getDeclaration (
+                IndirectAndDirectLoop::Fortran::VariableNames::argsSizes)),
+            buildOpaqueVarRefExp (VariableNames::getOpDatSizeName (i),
+                subroutineScope));
 
         SgExpression * minusOneExpression = buildSubtractOp (argSizeField,
             buildIntVal (1));
@@ -73,8 +70,8 @@ FortranCUDAKernelSubroutineDirectLoop::createUserSubroutineCall ()
         arraySubscriptExpression->setOutputInCodeGeneration ();
 
         parameterExpression = buildPntrArrRefExp (buildVarRefExp (
-            variableDeclarations[VariableNames::getOpDatName (i)]),
-            arraySubscriptExpression);
+            variableDeclarations->getDeclaration (VariableNames::getOpDatName (
+                i))), arraySubscriptExpression);
       }
       else
       {
@@ -86,7 +83,8 @@ FortranCUDAKernelSubroutineDirectLoop::createUserSubroutineCall ()
          */
 
         parameterExpression = buildVarRefExp (
-            variableDeclarations[VariableNames::getOpDatLocalName (i)]);
+            variableDeclarations->getDeclaration (
+                VariableNames::getOpDatLocalName (i)));
       }
     }
     else if (parallelLoop->getOpMapValue (i) == DIRECT)
@@ -98,9 +96,11 @@ FortranCUDAKernelSubroutineDirectLoop::createUserSubroutineCall ()
                 buildMultiplyOp (
                     buildAddOp (
                         buildVarRefExp (
-                            variableDeclarations[DirectLoop::Fortran::KernelSubroutine::setElementCounter]),
+                            variableDeclarations->getDeclaration (
+                                DirectLoop::Fortran::KernelSubroutine::setElementCounter)),
                         buildVarRefExp (
-                            variableDeclarations[DirectLoop::Fortran::KernelSubroutine::offsetInThreadBlock])),
+                            variableDeclarations->getDeclaration (
+                                DirectLoop::Fortran::KernelSubroutine::offsetInThreadBlock))),
                     buildIntVal (dim));
 
         SgExpression * deviceVarAccessDirectEnd = buildAddOp (
@@ -117,15 +117,14 @@ FortranCUDAKernelSubroutineDirectLoop::createUserSubroutineCall ()
         arraySubscriptExpression->setOutputInCodeGeneration ();
 
         parameterExpression = buildPntrArrRefExp (buildVarRefExp (
-            variableDeclarations[VariableNames::getOpDatName (i)]),
-            arraySubscriptExpression);
+            variableDeclarations->getDeclaration (VariableNames::getOpDatName (
+                i))), arraySubscriptExpression);
       }
       else if (dim == 1)
       {
-        SgExpression
-            * nVarRef =
-                buildVarRefExp (
-                    variableDeclarations[DirectLoop::Fortran::KernelSubroutine::setElementCounter]);
+        SgExpression * nVarRef = buildVarRefExp (
+            variableDeclarations->getDeclaration (
+                DirectLoop::Fortran::KernelSubroutine::setElementCounter));
         SgExpression * nPlusDimMinusOneExpr = buildAddOp (nVarRef, buildIntVal (
             dim - 1));
 
@@ -139,13 +138,14 @@ FortranCUDAKernelSubroutineDirectLoop::createUserSubroutineCall ()
         arraySubscriptExpression->setOutputInCodeGeneration ();
 
         parameterExpression = buildPntrArrRefExp (buildVarRefExp (
-            variableDeclarations[VariableNames::getOpDatName (i)]),
-            arraySubscriptExpression);
+            variableDeclarations->getDeclaration (VariableNames::getOpDatName (
+                i))), arraySubscriptExpression);
       }
       else
       {
         parameterExpression = buildVarRefExp (
-            variableDeclarations[VariableNames::getOpDatLocalName (i)]);
+            variableDeclarations->getDeclaration (
+                VariableNames::getOpDatLocalName (i)));
       }
     }
 
@@ -171,42 +171,35 @@ FortranCUDAKernelSubroutineDirectLoop::stageInFromDeviceMemoryToLocalThreadVaria
 
   SgBasicBlock * outerBlock = buildBasicBlock ();
 
-  for (unsigned int i = 1; i
-      <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
+  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
     if (parallelLoop->getOpMapValue (i) != GLOBAL
         && parallelLoop->getOpAccessValue (i) != WRITE_ACCESS
         && parallelLoop->getOpDatDimension (i) != 1)
     {
-      SgVarRefExp
-          * displVarRef =
-              buildVarRefExp (
-                  variableDeclarations[DirectLoop::Fortran::KernelSubroutine::autosharedDisplacement]);
+      SgVarRefExp * displVarRef = buildVarRefExp (
+          variableDeclarations->getDeclaration (
+              DirectLoop::Fortran::KernelSubroutine::autosharedDisplacement));
 
-      SgVarRefExp
-          * tidVarRef =
-              buildVarRefExp (
-                  variableDeclarations[DirectLoop::Fortran::KernelSubroutine::threadIDModulus]);
+      SgVarRefExp * tidVarRef = buildVarRefExp (
+          variableDeclarations->getDeclaration (
+              DirectLoop::Fortran::KernelSubroutine::threadIDModulus));
 
-      SgVarRefExp
-          * mVarRef =
-              buildVarRefExp (
-                  variableDeclarations[DirectLoop::Fortran::KernelSubroutine::dataPerElementCounter]);
+      SgVarRefExp * mVarRef = buildVarRefExp (
+          variableDeclarations->getDeclaration (
+              DirectLoop::Fortran::KernelSubroutine::dataPerElementCounter));
 
-      SgVarRefExp
-          * nelemsVarRef =
-              buildVarRefExp (
-                  variableDeclarations[DirectLoop::Fortran::KernelSubroutine::remainingElements]);
+      SgVarRefExp * nelemsVarRef = buildVarRefExp (
+          variableDeclarations->getDeclaration (
+              DirectLoop::Fortran::KernelSubroutine::remainingElements));
 
-      SgVarRefExp
-          * offsetVarRef =
-              buildVarRefExp (
-                  variableDeclarations[DirectLoop::Fortran::KernelSubroutine::offsetInThreadBlock]);
+      SgVarRefExp * offsetVarRef = buildVarRefExp (
+          variableDeclarations->getDeclaration (
+              DirectLoop::Fortran::KernelSubroutine::offsetInThreadBlock));
 
-      SgVarRefExp
-          * autoSharedVarRef =
-              buildVarRefExp (
-                  variableDeclarations[IndirectAndDirectLoop::Fortran::VariableNames::autoshared]);
+      SgVarRefExp * autoSharedVarRef = buildVarRefExp (
+          variableDeclarations->getDeclaration (
+              IndirectAndDirectLoop::Fortran::VariableNames::autoshared));
 
       /*
        * ======================================================
@@ -222,16 +215,15 @@ FortranCUDAKernelSubroutineDirectLoop::stageInFromDeviceMemoryToLocalThreadVaria
       SgExpression * autosharedAccessFirst = buildAddOp (displVarRef,
           buildAddOp (tidVarRef, buildMultiplyOp (mVarRef, nelemsVarRef)));
 
-      SgExpression * opdatArgAccess = buildAddOp (tidVarRef, buildAddOp (
-          buildMultiplyOp (mVarRef, nelemsVarRef), buildMultiplyOp (
-              offsetVarRef,
-              buildIntVal (parallelLoop->getOpDatDimension (i)))));
+      SgExpression * opdatArgAccess =
+          buildAddOp (tidVarRef, buildAddOp (buildMultiplyOp (mVarRef,
+              nelemsVarRef), buildMultiplyOp (offsetVarRef, buildIntVal (
+              parallelLoop->getOpDatDimension (i)))));
 
       SgExpression * assignAutosharedInit = buildAssignOp (buildPntrArrRefExp (
-          autoSharedVarRef, autosharedAccessFirst),
-          buildPntrArrRefExp (buildVarRefExp (
-              variableDeclarations[VariableNames::getOpDatName (i)]),
-              opdatArgAccess));
+          autoSharedVarRef, autosharedAccessFirst), buildPntrArrRefExp (
+          buildVarRefExp (variableDeclarations->getDeclaration (
+              VariableNames::getOpDatName (i))), opdatArgAccess));
 
       SgBasicBlock * firstLoopBody = buildBasicBlock (buildExprStatement (
           assignAutosharedInit));
@@ -255,9 +247,9 @@ FortranCUDAKernelSubroutineDirectLoop::stageInFromDeviceMemoryToLocalThreadVaria
 
       SgExpression * assignLocalThreadVarInit = buildAssignOp (
           buildPntrArrRefExp (buildVarRefExp (
-              variableDeclarations[VariableNames::getOpDatLocalName (i)]),
-              mVarRef), buildPntrArrRefExp (autoSharedVarRef,
-              autoSharedAccessSecond));
+              variableDeclarations->getDeclaration (
+                  VariableNames::getOpDatLocalName (i))), mVarRef),
+          buildPntrArrRefExp (autoSharedVarRef, autoSharedAccessSecond));
 
       SgBasicBlock * secondLoopBody = buildBasicBlock (buildExprStatement (
           assignLocalThreadVarInit));
@@ -288,42 +280,35 @@ FortranCUDAKernelSubroutineDirectLoop::stageOutFromLocalThreadVariablesToDeviceM
 
   SgBasicBlock * outerBlock = buildBasicBlock ();
 
-  for (unsigned int i = 1; i
-      <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
+  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
     if (parallelLoop->getOpMapValue (i) != GLOBAL
         && parallelLoop->getOpAccessValue (i) != READ_ACCESS
         && parallelLoop->getOpDatDimension (i) != 1)
     {
-      SgVarRefExp
-          * displVarRef =
-              buildVarRefExp (
-                  variableDeclarations[DirectLoop::Fortran::KernelSubroutine::autosharedDisplacement]);
+      SgVarRefExp * displVarRef = buildVarRefExp (
+          variableDeclarations->getDeclaration (
+              DirectLoop::Fortran::KernelSubroutine::autosharedDisplacement));
 
-      SgVarRefExp
-          * tidVarRef =
-              buildVarRefExp (
-                  variableDeclarations[DirectLoop::Fortran::KernelSubroutine::threadIDModulus]);
+      SgVarRefExp * tidVarRef = buildVarRefExp (
+          variableDeclarations->getDeclaration (
+              DirectLoop::Fortran::KernelSubroutine::threadIDModulus));
 
-      SgVarRefExp
-          * mVarRef =
-              buildVarRefExp (
-                  variableDeclarations[DirectLoop::Fortran::KernelSubroutine::dataPerElementCounter]);
+      SgVarRefExp * mVarRef = buildVarRefExp (
+          variableDeclarations->getDeclaration (
+              DirectLoop::Fortran::KernelSubroutine::dataPerElementCounter));
 
-      SgVarRefExp
-          * nelemsVarRef =
-              buildVarRefExp (
-                  variableDeclarations[DirectLoop::Fortran::KernelSubroutine::remainingElements]);
+      SgVarRefExp * nelemsVarRef = buildVarRefExp (
+          variableDeclarations->getDeclaration (
+              DirectLoop::Fortran::KernelSubroutine::remainingElements));
 
-      SgVarRefExp
-          * offsetVarRef =
-              buildVarRefExp (
-                  variableDeclarations[DirectLoop::Fortran::KernelSubroutine::offsetInThreadBlock]);
+      SgVarRefExp * offsetVarRef = buildVarRefExp (
+          variableDeclarations->getDeclaration (
+              DirectLoop::Fortran::KernelSubroutine::offsetInThreadBlock));
 
-      SgVarRefExp
-          * autoSharedVarRef =
-              buildVarRefExp (
-                  variableDeclarations[IndirectAndDirectLoop::Fortran::VariableNames::autoshared]);
+      SgVarRefExp * autoSharedVarRef = buildVarRefExp (
+          variableDeclarations->getDeclaration (
+              IndirectAndDirectLoop::Fortran::VariableNames::autoshared));
 
       SgExpression * initLoop = buildAssignOp (mVarRef, buildIntVal (0));
 
@@ -343,9 +328,8 @@ FortranCUDAKernelSubroutineDirectLoop::stageOutFromLocalThreadVariablesToDeviceM
 
       SgExpression * assignSharedMemOut = buildAssignOp (buildPntrArrRefExp (
           autoSharedVarRef, autoSharedAccessFirst), buildPntrArrRefExp (
-          buildVarRefExp (
-              variableDeclarations[VariableNames::getOpDatLocalName (i)]),
-          mVarRef));
+          buildVarRefExp (variableDeclarations->getDeclaration (
+              VariableNames::getOpDatLocalName (i))), mVarRef));
 
       SgBasicBlock * firstLoopBody = buildBasicBlock (buildExprStatement (
           assignSharedMemOut));
@@ -363,19 +347,18 @@ FortranCUDAKernelSubroutineDirectLoop::stageOutFromLocalThreadVariablesToDeviceM
        * ======================================================
        */
 
-      SgExpression * deviceVarAccessSecond = buildAddOp (tidVarRef, buildAddOp (
-          buildMultiplyOp (mVarRef, nelemsVarRef), buildMultiplyOp (
-              offsetVarRef,
-              buildIntVal (parallelLoop->getOpDatDimension (i)))));
+      SgExpression * deviceVarAccessSecond =
+          buildAddOp (tidVarRef, buildAddOp (buildMultiplyOp (mVarRef,
+              nelemsVarRef), buildMultiplyOp (offsetVarRef, buildIntVal (
+              parallelLoop->getOpDatDimension (i)))));
 
       SgExpression * autosharedAccessSecond = buildAddOp (displVarRef,
           buildAddOp (tidVarRef, buildMultiplyOp (mVarRef, nelemsVarRef)));
 
-      SgExpression * assignDeviceVar = buildAssignOp (
-          buildPntrArrRefExp (buildVarRefExp (
-              variableDeclarations[VariableNames::getOpDatName (i)]),
-              deviceVarAccessSecond), buildPntrArrRefExp (autoSharedVarRef,
-              autosharedAccessSecond));
+      SgExpression * assignDeviceVar = buildAssignOp (buildPntrArrRefExp (
+          buildVarRefExp (variableDeclarations->getDeclaration (
+              VariableNames::getOpDatName (i))), deviceVarAccessSecond),
+          buildPntrArrRefExp (autoSharedVarRef, autosharedAccessSecond));
 
       SgBasicBlock * secondLoopBody = buildBasicBlock (buildExprStatement (
           assignDeviceVar));
@@ -407,16 +390,13 @@ FortranCUDAKernelSubroutineDirectLoop::buildMainLoopStatements ()
    * Update offset variable value
    * ======================================================
    */
-  SgExpression
-      * initOffsetVariable =
-          buildAssignOp (
-              buildVarRefExp (
-                  variableDeclarations[DirectLoop::Fortran::KernelSubroutine::offsetInThreadBlock]),
-              buildSubtractOp (
-                  buildVarRefExp (
-                      variableDeclarations[DirectLoop::Fortran::KernelSubroutine::setElementCounter]),
-                  buildVarRefExp (
-                      variableDeclarations[DirectLoop::Fortran::KernelSubroutine::threadIDModulus])));
+  SgExpression * initOffsetVariable = buildAssignOp (buildVarRefExp (
+      variableDeclarations->getDeclaration (
+          DirectLoop::Fortran::KernelSubroutine::offsetInThreadBlock)),
+      buildSubtractOp (buildVarRefExp (variableDeclarations->getDeclaration (
+          DirectLoop::Fortran::KernelSubroutine::setElementCounter)),
+          buildVarRefExp (variableDeclarations->getDeclaration (
+              DirectLoop::Fortran::KernelSubroutine::threadIDModulus))));
 
   /*
    * ======================================================
@@ -428,27 +408,25 @@ FortranCUDAKernelSubroutineDirectLoop::buildMainLoopStatements ()
   SgFunctionSymbol * minFunctionSymbol =
       FortranTypesBuilder::buildNewFortranFunction ("min", subroutineScope);
 
-  SgExpression
-      * setSizeMinusOffset =
-          buildSubtractOp (
-              buildVarRefExp (
-                  variableDeclarations[DirectLoop::Fortran::KernelSubroutine::setSize]),
-              buildVarRefExp (
-                  variableDeclarations[DirectLoop::Fortran::KernelSubroutine::offsetInThreadBlock]));
+  SgExpression * setSizeMinusOffset = buildSubtractOp (buildVarRefExp (
+      variableDeclarations->getDeclaration (
+          DirectLoop::Fortran::KernelSubroutine::setSize)), buildVarRefExp (
+      variableDeclarations->getDeclaration (
+          DirectLoop::Fortran::KernelSubroutine::offsetInThreadBlock)));
 
-  SgExprListExp * minActualParameters = buildExprListExp (buildVarRefExp (
-      variableDeclarations[DirectLoop::Fortran::KernelSubroutine::warpSize]),
-      setSizeMinusOffset);
+  SgExprListExp
+      * minActualParameters = buildExprListExp (buildVarRefExp (
+          variableDeclarations->getDeclaration (
+              DirectLoop::Fortran::KernelSubroutine::warpSize)),
+          setSizeMinusOffset);
 
   SgFunctionCallExp * minFunctionCall = buildFunctionCallExp (
       minFunctionSymbol, minActualParameters);
 
-  SgAssignOp
-      * assignNelems =
-          buildAssignOp (
-              buildVarRefExp (
-                  variableDeclarations[DirectLoop::Fortran::KernelSubroutine::remainingElements]),
-              minFunctionCall);
+  SgAssignOp * assignNelems = buildAssignOp (buildVarRefExp (
+      variableDeclarations->getDeclaration (
+          DirectLoop::Fortran::KernelSubroutine::remainingElements)),
+      minFunctionCall);
 
   SgBasicBlock * preAssignments =
       stageInFromDeviceMemoryToLocalThreadVariables ();
@@ -525,22 +503,17 @@ FortranCUDAKernelSubroutineDirectLoop::createStatements ()
   SgFunctionSymbol * modFunctionSymbol =
       FortranTypesBuilder::buildNewFortranFunction ("mod", subroutineScope);
 
-  SgExprListExp
-      * modActualParameters =
-          buildExprListExp (
-              threadidxMinusOne,
-              buildVarRefExp (
-                  variableDeclarations[DirectLoop::Fortran::KernelSubroutine::warpSize]));
+  SgExprListExp * modActualParameters = buildExprListExp (threadidxMinusOne,
+      buildVarRefExp (variableDeclarations->getDeclaration (
+          DirectLoop::Fortran::KernelSubroutine::warpSize)));
 
   SgFunctionCallExp * modFunctionCall = buildFunctionCallExp (
       modFunctionSymbol, modActualParameters);
 
-  SgAssignOp
-      * assignTid =
-          buildAssignOp (
-              buildVarRefExp (
-                  variableDeclarations[DirectLoop::Fortran::KernelSubroutine::threadIDModulus]),
-              modFunctionCall);
+  SgAssignOp * assignTid = buildAssignOp (buildVarRefExp (
+      variableDeclarations->getDeclaration (
+          DirectLoop::Fortran::KernelSubroutine::threadIDModulus)),
+      modFunctionCall);
 
   appendStatement (buildExprStatement (assignTid), subroutineScope);
 
@@ -550,19 +523,14 @@ FortranCUDAKernelSubroutineDirectLoop::createStatements ()
    * ======================================================
    */
 
-  SgExpression
-      * threadidxMinusOneDivWarpSize =
-          buildDivideOp (
-              threadidxMinusOne,
-              buildVarRefExp (
-                  variableDeclarations[DirectLoop::Fortran::KernelSubroutine::warpSize]));
+  SgExpression * threadidxMinusOneDivWarpSize = buildDivideOp (
+      threadidxMinusOne, buildVarRefExp (variableDeclarations->getDeclaration (
+          DirectLoop::Fortran::KernelSubroutine::warpSize)));
 
-  SgExpression
-      * argSDisplacementInitExprWithoutSize =
-          buildMultiplyOp (
-              buildVarRefExp (
-                  variableDeclarations[DirectLoop::Fortran::KernelSubroutine::warpScratchpadSize]),
-              threadidxMinusOneDivWarpSize);
+  SgExpression * argSDisplacementInitExprWithoutSize = buildMultiplyOp (
+      buildVarRefExp (variableDeclarations->getDeclaration (
+          DirectLoop::Fortran::KernelSubroutine::warpScratchpadSize)),
+      threadidxMinusOneDivWarpSize);
 
   SgExpression * divisionExprForArgSDispl;
 
@@ -577,12 +545,10 @@ FortranCUDAKernelSubroutineDirectLoop::createStatements ()
         argSDisplacementInitExprWithoutSize, buildIntVal (4));
   }
 
-  SgAssignOp
-      * assignArgSDispl =
-          buildAssignOp (
-              buildVarRefExp (
-                  variableDeclarations[DirectLoop::Fortran::KernelSubroutine::autosharedDisplacement]),
-              divisionExprForArgSDispl);
+  SgAssignOp * assignArgSDispl = buildAssignOp (buildVarRefExp (
+      variableDeclarations->getDeclaration (
+          DirectLoop::Fortran::KernelSubroutine::autosharedDisplacement)),
+      divisionExprForArgSDispl);
 
   appendStatement (buildExprStatement (assignArgSDispl), subroutineScope);
 
@@ -611,10 +577,9 @@ FortranCUDAKernelSubroutineDirectLoop::createStatements ()
   SgMultiplyOp * multiplyExpression = buildMultiplyOp (subtractExpression1,
       blockDimX);
 
-  SgVarRefExp
-      * iterationCounterReference =
-          buildVarRefExp (
-              variableDeclarations[DirectLoop::Fortran::KernelSubroutine::setElementCounter]);
+  SgVarRefExp * iterationCounterReference = buildVarRefExp (
+      variableDeclarations->getDeclaration (
+          DirectLoop::Fortran::KernelSubroutine::setElementCounter));
 
   SgExpression * mainLoopInitExpr = buildAssignOp (iterationCounterReference,
       buildAddOp (subtractExpression2, multiplyExpression));
@@ -638,8 +603,8 @@ FortranCUDAKernelSubroutineDirectLoop::createStatements ()
    */
 
   SgExpression * upperBoundExpression = buildSubtractOp (buildVarRefExp (
-      variableDeclarations[DirectLoop::Fortran::KernelSubroutine::setSize]),
-      buildIntVal (1));
+      variableDeclarations->getDeclaration (
+          DirectLoop::Fortran::KernelSubroutine::setSize)), buildIntVal (1));
 
   /*
    * ======================================================
@@ -700,9 +665,9 @@ FortranCUDAKernelSubroutineDirectLoop::createLocalVariableDeclarations ()
   for (vector <string>::iterator it = fourByteIntegers.begin (); it
       != fourByteIntegers.end (); ++it)
   {
-    variableDeclarations[*it]
-        = FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
-            *it, FortranTypesBuilder::getFourByteInteger (), subroutineScope);
+    variableDeclarations->add (*it,
+        FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (*it,
+            FortranTypesBuilder::getFourByteInteger (), subroutineScope));
   }
 
   createLocalThreadDeclarations ();
@@ -727,8 +692,7 @@ FortranCUDAKernelSubroutineDirectLoop::createOPDATFormalParameterDeclarations ()
 
   Debug::getInstance ()->debugMessage ("Creating OP_DAT formal parameters", 2);
 
-  for (unsigned int i = 1; i
-      <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
+  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
     if (parallelLoop->isDuplicateOpDat (i) == false)
     {
@@ -753,15 +717,11 @@ FortranCUDAKernelSubroutineDirectLoop::createOPDATFormalParameterDeclarations ()
        * is stored in the argSizes variable
        * ======================================================
        */
-
-      string const & variableName = VariableNames::getOpDatSizeName (i);
-
-      SgExpression
-          * argSizeField =
-              buildDotExp (
-                  buildVarRefExp (
-                      variableDeclarations[IndirectAndDirectLoop::Fortran::VariableNames::argsSizes]),
-                  buildOpaqueVarRefExp (variableName, subroutineScope));
+      SgExpression * argSizeField = buildDotExp (buildVarRefExp (
+          variableDeclarations->getDeclaration (
+              IndirectAndDirectLoop::Fortran::VariableNames::argsSizes)),
+          buildOpaqueVarRefExp (VariableNames::getOpDatSizeName (i),
+              subroutineScope));
 
       SgExpression * minusOneExpression = buildSubtractOp (argSizeField,
           buildIntVal (1));
@@ -793,10 +753,13 @@ FortranCUDAKernelSubroutineDirectLoop::createOPDATFormalParameterDeclarations ()
        * ======================================================
        */
 
-      variableDeclarations[VariableNames::getOpDatName (i)]
-          = FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
-              VariableNames::getOpDatName (i), arrayType, subroutineScope,
-              formalParameters, 1, DEVICE);
+      string const & variableName = VariableNames::getOpDatName (i);
+
+      variableDeclarations->add (
+          variableName,
+          FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
+              variableName, arrayType, subroutineScope, formalParameters, 1,
+              DEVICE));
     }
   }
 }
@@ -804,11 +767,12 @@ FortranCUDAKernelSubroutineDirectLoop::createOPDATFormalParameterDeclarations ()
 void
 FortranCUDAKernelSubroutineDirectLoop::createFormalParameterDeclarations ()
 {
-  variableDeclarations[IndirectAndDirectLoop::Fortran::VariableNames::argsSizes]
-      = FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
+  variableDeclarations->addDeclaration (
+      IndirectAndDirectLoop::Fortran::VariableNames::argsSizes,
+      FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
           IndirectAndDirectLoop::Fortran::VariableNames::argsSizes,
           dataSizesDeclaration->getType (), subroutineScope, formalParameters,
-          1, DEVICE);
+          1, DEVICE));
 
   createOPDATFormalParameterDeclarations ();
 
@@ -821,11 +785,12 @@ FortranCUDAKernelSubroutineDirectLoop::createFormalParameterDeclarations ()
    * ======================================================
    */
 
-  variableDeclarations[DirectLoop::Fortran::KernelSubroutine::warpScratchpadSize]
-      = FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
+  variableDeclarations->addDeclaration (
+      DirectLoop::Fortran::KernelSubroutine::warpScratchpadSize,
+      FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
           DirectLoop::Fortran::KernelSubroutine::warpScratchpadSize,
           FortranTypesBuilder::getFourByteInteger (), subroutineScope,
-          formalParameters, 1, VALUE);
+          formalParameters, 1, VALUE));
 
   /*
    * ======================================================
@@ -833,11 +798,12 @@ FortranCUDAKernelSubroutineDirectLoop::createFormalParameterDeclarations ()
    * ======================================================
    */
 
-  variableDeclarations[DirectLoop::Fortran::KernelSubroutine::setSize]
-      = FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
+  variableDeclarations->addDeclaration (
+      DirectLoop::Fortran::KernelSubroutine::setSize,
+      FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
           DirectLoop::Fortran::KernelSubroutine::setSize,
           FortranTypesBuilder::getFourByteInteger (), subroutineScope,
-          formalParameters, 1, VALUE);
+          formalParameters, 1, VALUE));
 
   /*
    * ======================================================
@@ -845,19 +811,21 @@ FortranCUDAKernelSubroutineDirectLoop::createFormalParameterDeclarations ()
    * ======================================================
    */
 
-  variableDeclarations[DirectLoop::Fortran::KernelSubroutine::warpSize]
-      = FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
+  variableDeclarations->addDeclaration (
+      DirectLoop::Fortran::KernelSubroutine::warpSize,
+      FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
           DirectLoop::Fortran::KernelSubroutine::warpSize,
           FortranTypesBuilder::getFourByteInteger (), subroutineScope,
-          formalParameters, 1, VALUE);
+          formalParameters, 1, VALUE));
 
   if (parallelLoop->isReductionRequired () == true)
   {
-    variableDeclarations[IndirectAndDirectLoop::Fortran::KernelSubroutine::offsetForReduction]
-        = FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
+    variableDeclarations->addDeclaration (
+        IndirectAndDirectLoop::Fortran::KernelSubroutine::offsetForReduction,
+        FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
             IndirectAndDirectLoop::Fortran::KernelSubroutine::offsetForReduction,
             FortranTypesBuilder::getFourByteInteger (), subroutineScope,
-            formalParameters, 1, VALUE);
+            formalParameters, 1, VALUE));
   }
 }
 
@@ -872,10 +840,8 @@ FortranCUDAKernelSubroutineDirectLoop::FortranCUDAKernelSubroutineDirectLoop (
     ParallelLoop * parallelLoop, SgScopeStatement * moduleScope,
     FortranCUDADataSizesDeclarationDirectLoop * dataSizesDeclaration) :
   FortranCUDAKernelSubroutine (subroutineName, userSubroutineName,
-      parallelLoop, moduleScope)
+      parallelLoop, moduleScope), dataSizesDeclaration (dataSizesDeclaration)
 {
-  this->dataSizesDeclaration = dataSizesDeclaration;
-
   createFormalParameterDeclarations ();
 
   createLocalVariableDeclarations ();

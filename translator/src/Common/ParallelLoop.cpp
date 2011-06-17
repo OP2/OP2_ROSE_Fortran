@@ -82,8 +82,7 @@ ParallelLoop::retrieveOpDatDeclarations (Declarations * declarations)
                 OP_DAT_Declaration * opDatDeclaration =
                     declarations->get_OP_DAT_Declaration (variableName);
 
-                OpDatTypes[OP_DATCounter]
-                    = opDatDeclaration->getActualType ();
+                OpDatTypes[OP_DATCounter] = opDatDeclaration->getActualType ();
 
                 OpDatDimensions[OP_DATCounter]
                     = opDatDeclaration->getDimension ();
@@ -146,8 +145,7 @@ ParallelLoop::retrieveOpDatDeclarations (Declarations * declarations)
                 OP_GBL_Declaration * opGBLDeclaration =
                     declarations->get_OP_GBL_Declaration (variableName);
 
-                OpDatTypes[OP_DATCounter]
-                    = opGBLDeclaration->getActualType ();
+                OpDatTypes[OP_DATCounter] = opGBLDeclaration->getActualType ();
 
                 OpDatDimensions[OP_DATCounter]
                     = opGBLDeclaration->getDimension ();
@@ -327,8 +325,7 @@ ParallelLoop::isDirectLoop () const
   using std::map;
 
   for (map <unsigned int, MAPPING_VALUE>::const_iterator it =
-      OpDatMappingDescriptors.begin (); it
-      != OpDatMappingDescriptors.end (); ++it)
+      OpDatMappingDescriptors.begin (); it != OpDatMappingDescriptors.end (); ++it)
   {
     if (it->second == INDIRECT)
     {
@@ -433,8 +430,7 @@ ParallelLoop::getNumberOfDifferentIndirectDataSets ()
 
   for (unsigned int i = 1; i <= getNumberOfOpDatArgumentGroups (); ++i)
   {
-    if (OpDatMappingDescriptors[i] == INDIRECT && isDuplicateOpDat (i)
-        == false)
+    if (OpDatMappingDescriptors[i] == INDIRECT && isDuplicateOpDat (i) == false)
     {
       count++;
     }
@@ -483,11 +479,10 @@ ParallelLoop::getReductionSubroutineHeader (unsigned int OP_DAT_ArgumentGroup)
 }
 
 ParallelLoop::ParallelLoop (std::string userSubroutineName,
-    SgExpressionPtrList & actualArguments, Declarations * declarations)
+    SgExpressionPtrList & actualArguments, Declarations * declarations) :
+  actualArguments (actualArguments)
 {
   using boost::iequals;
-
-  this->actualArguments = actualArguments;
 
   if (iequals (Globals::getInstance ()->getTargetBackend (),
       TargetBackends::CUDA))

@@ -17,7 +17,8 @@
 #ifndef FORTRAN_CUDA_DATA_SIZES_DECLARATION_H
 #define FORTRAN_CUDA_DATA_SIZES_DECLARATION_H
 
-#include<ParallelLoop.h>
+#include <ParallelLoop.h>
+#include <VariableDeclarations.h>
 
 class FortranCUDADataSizesDeclaration
 {
@@ -46,11 +47,11 @@ class FortranCUDADataSizesDeclaration
 
     /*
      * ======================================================
-     * A mapping to the other fields inside the above type
+     * Field variable declarations inside the above type
      * definition declaration statement
      * ======================================================
      */
-    std::map <std::string, SgVariableDeclaration *> fieldDeclarations;
+    VariableDeclarations * fieldDeclarations;
 
   protected:
 
@@ -72,11 +73,11 @@ class FortranCUDADataSizesDeclaration
 
     /*
      * ======================================================
-     * Get the declaration corresponding to this field name
+     * Get the field declarations
      * ======================================================
      */
-    SgVariableDeclaration *
-    getFieldDeclaration (std::string fieldName);
+    VariableDeclarations *
+    getFieldDeclarations ();
 };
 
 #endif

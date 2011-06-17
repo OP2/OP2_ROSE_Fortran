@@ -4,13 +4,12 @@
 #include <FortranTypesBuilder.h>
 
 SgStatement *
-FortranOpenMPHostSubroutineIndirectLoop::createStatementToCallKernelFunction ()
+FortranOpenMPHostSubroutineIndirectLoop::createKernelFunctionCallStatement ()
 {
 }
 
 void
-FortranOpenMPHostSubroutineIndirectLoop::createStatementsToConvertCPointers (
-    std::vector <SgStatement *> & statements)
+FortranOpenMPHostSubroutineIndirectLoop::createConvertCPointersStatements ()
 {
 }
 
@@ -40,15 +39,8 @@ FortranOpenMPHostSubroutineIndirectLoop::createFirstTimeExecutionStatements ()
 
   ifBody->append_statement (assignmentStatement);
 
-  vector <SgStatement *> statements;
-
-  createStatementsToPreparePlanFunctionParameters (statements);
-
-  for (std::vector <SgStatement *>::iterator it = statements.begin (); it
-      != statements.end (); ++it)
-  {
-    ifBody->append_statement (*it);
-  }
+  createPlanFunctionParametersPreparationStatements (parallelLoop,
+      ifBody->get_scope (), variableDeclarations);
 
   SgIfStmt * ifStatement =
       FortranStatementsAndExpressionsBuilder::buildIfStatementWithEmptyElse (
@@ -97,12 +89,12 @@ FortranOpenMPHostSubroutineIndirectLoop::createExecutionPlanDeclarations ()
   for (vector <string>::iterator it = fourByteIntegerArrays.begin (); it
       != fourByteIntegerArrays.end (); ++it)
   {
-    variableDeclarations[*it]
-        = FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
-            *it, FortranTypesBuilder::getArray_RankOne (
+    variableDeclarations->add (*it,
+        FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (*it,
+            FortranTypesBuilder::getArray_RankOne (
                 FortranTypesBuilder::getFourByteInteger (), 1,
                 parallelLoop->getNumberOfOpDatArgumentGroups ()),
-            subroutineScope);
+            subroutineScope));
   }
 
   /*
@@ -128,30 +120,30 @@ FortranOpenMPHostSubroutineIndirectLoop::createExecutionPlanDeclarations ()
   for (vector <string>::iterator it = fourByteIntegerVariables.begin (); it
       != fourByteIntegerVariables.end (); ++it)
   {
-    variableDeclarations[*it]
-        = FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
-            *it, FortranTypesBuilder::getFourByteInteger (), subroutineScope);
+    variableDeclarations->add (*it,
+        FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (*it,
+            FortranTypesBuilder::getFourByteInteger (), subroutineScope));
   }
 }
 
 void
 FortranOpenMPHostSubroutineIndirectLoop::createOpenMPVariableDeclarations ()
 {
-  variableDeclarations[OpenMP::numberOfThreads]
-      = FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
+  variableDeclarations->addDeclaration (OpenMP::numberOfThreads,
+      FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
           OpenMP::numberOfThreads, FortranTypesBuilder::getFourByteInteger (),
-          subroutineScope);
+          subroutineScope));
 
-  variableDeclarations[OpenMP::blockID]
-      = FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
+  variableDeclarations->addDeclaration (OpenMP::blockID,
+      FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
           OpenMP::blockID, FortranTypesBuilder::getFourByteInteger (),
-          subroutineScope);
+          subroutineScope));
 }
 
 void
 FortranOpenMPHostSubroutineIndirectLoop::createStatements ()
 {
-  initialiseNumberOfThreads ();
+  initialiseNumberOfThreadsStatements ();
 
   createFirstTimeExecutionStatements ();
 }
@@ -170,10 +162,9 @@ FortranOpenMPHostSubroutineIndirectLoop::FortranOpenMPHostSubroutineIndirectLoop
     SgScopeStatement * moduleScope,
     FortranOpenMPModuleDeclarationsIndirectLoop * moduleDeclarations) :
   FortranOpenMPHostSubroutine (subroutineName, userSubroutineName,
-      kernelSubroutineName, parallelLoop, moduleScope)
+      kernelSubroutineName, parallelLoop, moduleScope), moduleDeclarations (
+      moduleDeclarations)
 {
-  this->moduleDeclarations = moduleDeclarations;
-
   createFormalParameterDeclarations ();
 
   createLocalVariableDeclarations ();

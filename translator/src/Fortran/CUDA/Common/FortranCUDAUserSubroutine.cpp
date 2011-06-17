@@ -198,9 +198,11 @@ FortranCUDAUserSubroutine::copyAndModifySubroutine ()
             if (iequals (it->first,
                 oldVarRefExp->get_symbol ()->get_name ().getString ()))
             {
-              SgVarRefExp * newVarRefExp = buildVarRefExp (
-                  initialiseConstantsSubroutine->getVariableDeclaration (
-                      it->second));
+              SgVarRefExp
+                  * newVarRefExp =
+                      buildVarRefExp (
+                          initialiseConstantsSubroutine->getVariableDeclarations ()->get (
+                              it->second));
 
               oldVarRefExp->set_symbol (newVarRefExp->get_symbol ());
             }
