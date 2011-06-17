@@ -29,13 +29,13 @@ FortranOpenMPHostSubroutine::initialiseNumberOfThreadsStatements ()
       buildExprListExp ());
 
   SgExprStatement * assignmentStatement1 = buildAssignStatement (
-      buildVarRefExp (variableDeclarations->getDeclaration (
+      buildVarRefExp (variableDeclarations->get (
           OpenMP::numberOfThreads)), functionCall);
 
   appendStatement (assignmentStatement1, subroutineScope);
 
   SgExprStatement * assignmentStatement2 = buildAssignStatement (
-      buildVarRefExp (variableDeclarations->getDeclaration (
+      buildVarRefExp (variableDeclarations->get (
           OpenMP::numberOfThreads)), buildIntVal (1));
 
   appendStatement (assignmentStatement2, subroutineScope);

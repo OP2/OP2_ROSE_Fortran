@@ -122,7 +122,7 @@ FortranCUDAInitialiseConstantsSubroutine::createStatements ()
 
   SgExprStatement * assignmentStatement1 =
       buildAssignStatement (buildVarRefExp (
-          variableDeclarations->getDeclaration (variableNamePrefix
+          variableDeclarations->get (variableNamePrefix
               + IndirectLoop::Fortran::ConstantSuffixes::constantsSeparator
               + IndirectLoop::Fortran::ConstantSuffixes::gam)), buildFloatVal (
           1.4));
@@ -137,7 +137,7 @@ FortranCUDAInitialiseConstantsSubroutine::createStatements ()
 
   SgExprStatement * assignmentStatement2 =
       buildAssignStatement (buildVarRefExp (
-          variableDeclarations->getDeclaration (variableNamePrefix
+          variableDeclarations->get (variableNamePrefix
               + IndirectLoop::Fortran::ConstantSuffixes::constantsSeparator
               + IndirectLoop::Fortran::ConstantSuffixes::gm1)), buildFloatVal (
           0.4));
@@ -152,7 +152,7 @@ FortranCUDAInitialiseConstantsSubroutine::createStatements ()
 
   SgExprStatement * assignmentStatement3 =
       buildAssignStatement (buildVarRefExp (
-          variableDeclarations->getDeclaration (variableNamePrefix
+          variableDeclarations->get (variableNamePrefix
               + IndirectLoop::Fortran::ConstantSuffixes::constantsSeparator
               + IndirectLoop::Fortran::ConstantSuffixes::cfl)), buildFloatVal (
           0.9));
@@ -166,7 +166,7 @@ FortranCUDAInitialiseConstantsSubroutine::createStatements ()
    */
 
   SgExprStatement * assignmentStatement4 = buildAssignStatement (
-      buildVarRefExp (variableDeclarations->getDeclaration (variableNamePrefix
+      buildVarRefExp (variableDeclarations->get (variableNamePrefix
           + IndirectLoop::Fortran::ConstantSuffixes::constantsSeparator
           + IndirectLoop::Fortran::ConstantSuffixes::eps)),
       buildFloatVal (0.05));
@@ -180,7 +180,7 @@ FortranCUDAInitialiseConstantsSubroutine::createStatements ()
    */
 
   SgExprStatement * assignmentStatement5 = buildAssignStatement (
-      buildVarRefExp (variableDeclarations->getDeclaration (variableNamePrefix
+      buildVarRefExp (variableDeclarations->get (variableNamePrefix
           + IndirectLoop::Fortran::ConstantSuffixes::constantsSeparator
           + IndirectLoop::Fortran::ConstantSuffixes::mach)),
       buildFloatVal (0.4));
@@ -194,7 +194,7 @@ FortranCUDAInitialiseConstantsSubroutine::createStatements ()
    */
 
   SgExprStatement * assignmentStatement6 = buildAssignStatement (
-      buildVarRefExp (variableDeclarations->getDeclaration (variableNamePrefix
+      buildVarRefExp (variableDeclarations->get (variableNamePrefix
           + IndirectLoop::Fortran::ConstantSuffixes::constantsSeparator
           + IndirectLoop::Fortran::ConstantSuffixes::alpha)), buildFloatVal (
           0.052360));
@@ -208,7 +208,7 @@ FortranCUDAInitialiseConstantsSubroutine::createStatements ()
    */
 
   SgPntrArrRefExp * arrayExpression7 = buildPntrArrRefExp (buildVarRefExp (
-      variableDeclarations->getDeclaration (variableNamePrefix
+      variableDeclarations->get (variableNamePrefix
           + IndirectLoop::Fortran::ConstantSuffixes::constantsSeparator
           + IndirectLoop::Fortran::ConstantSuffixes::qinf)), buildIntVal (1));
 
@@ -224,7 +224,7 @@ FortranCUDAInitialiseConstantsSubroutine::createStatements ()
    */
 
   SgPntrArrRefExp * arrayExpression8 = buildPntrArrRefExp (buildVarRefExp (
-      variableDeclarations->getDeclaration (variableNamePrefix
+      variableDeclarations->get (variableNamePrefix
           + IndirectLoop::Fortran::ConstantSuffixes::constantsSeparator
           + IndirectLoop::Fortran::ConstantSuffixes::qinf)), buildIntVal (2));
 
@@ -240,7 +240,7 @@ FortranCUDAInitialiseConstantsSubroutine::createStatements ()
    */
 
   SgPntrArrRefExp * arrayExpression9 = buildPntrArrRefExp (buildVarRefExp (
-      variableDeclarations->getDeclaration (variableNamePrefix
+      variableDeclarations->get (variableNamePrefix
           + IndirectLoop::Fortran::ConstantSuffixes::constantsSeparator
           + IndirectLoop::Fortran::ConstantSuffixes::qinf)), buildIntVal (3));
 
@@ -256,7 +256,7 @@ FortranCUDAInitialiseConstantsSubroutine::createStatements ()
    */
 
   SgPntrArrRefExp * arrayExpression10 = buildPntrArrRefExp (buildVarRefExp (
-      variableDeclarations->getDeclaration (variableNamePrefix
+      variableDeclarations->get (variableNamePrefix
           + IndirectLoop::Fortran::ConstantSuffixes::constantsSeparator
           + IndirectLoop::Fortran::ConstantSuffixes::qinf)), buildIntVal (4));
 

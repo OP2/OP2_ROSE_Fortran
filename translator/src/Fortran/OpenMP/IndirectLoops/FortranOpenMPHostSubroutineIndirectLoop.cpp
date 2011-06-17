@@ -129,12 +129,12 @@ FortranOpenMPHostSubroutineIndirectLoop::createExecutionPlanDeclarations ()
 void
 FortranOpenMPHostSubroutineIndirectLoop::createOpenMPVariableDeclarations ()
 {
-  variableDeclarations->addDeclaration (OpenMP::numberOfThreads,
+  variableDeclarations->add (OpenMP::numberOfThreads,
       FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
           OpenMP::numberOfThreads, FortranTypesBuilder::getFourByteInteger (),
           subroutineScope));
 
-  variableDeclarations->addDeclaration (OpenMP::blockID,
+  variableDeclarations->add (OpenMP::blockID,
       FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
           OpenMP::blockID, FortranTypesBuilder::getFourByteInteger (),
           subroutineScope));

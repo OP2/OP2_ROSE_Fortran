@@ -8,7 +8,7 @@
  */
 
 void
-FortranOpenMPModuleDeclarations::createOPDATDeclarations ()
+FortranOpenMPModuleDeclarations::createOpDatDeclarations ()
 {
   using SageBuilder::buildVariableDeclaration;
   using SageBuilder::buildPointerType;
@@ -83,16 +83,15 @@ FortranOpenMPModuleDeclarations::FortranOpenMPModuleDeclarations (
  */
 
 SgVariableDeclaration *
-FortranOpenMPModuleDeclarations::getGlobalOPDATDeclaration (
+FortranOpenMPModuleDeclarations::getGlobalOpDatDeclaration (
     unsigned int OP_DAT_ArgumentGroup)
 {
-  return moduleDeclarations->getDeclaration (VariableNames::getOpDatGlobalName (
+  return moduleDeclarations->get (VariableNames::getOpDatGlobalName (
       OP_DAT_ArgumentGroup));
 }
 
 SgVariableDeclaration *
 FortranOpenMPModuleDeclarations::getFirstExecutionBooleanDeclaration ()
 {
-  return moduleDeclarations->getDeclaration (
-      getFirstExecutionBooleanVariableName ());
+  return moduleDeclarations->get (getFirstExecutionBooleanVariableName ());
 }

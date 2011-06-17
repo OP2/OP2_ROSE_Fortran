@@ -56,9 +56,8 @@ FortranCUDAKernelSubroutine::initialiseLocalThreadVariables ()
       SgBasicBlock * loopBodyBlock;
 
       SgExpression * accessToIPosition = buildPntrArrRefExp (buildVarRefExp (
-          variableDeclarations->getDeclaration (
-              VariableNames::getOpDatLocalName (i))), buildVarRefExp (
-          variableDeclarations->getDeclaration (
+          variableDeclarations->get (VariableNames::getOpDatLocalName (i))),
+          buildVarRefExp (variableDeclarations->get (
               DirectLoop::Fortran::KernelSubroutine::setElementCounter)));
 
       if (parallelLoop->getOpAccessValue (i) == INC_ACCESS)
@@ -76,13 +75,13 @@ FortranCUDAKernelSubroutine::initialiseLocalThreadVariables ()
             variable_Blockidx, variable_X), buildIntVal (dim));
 
         SgExpression * arrayAccessComplexExpr = buildAddOp (buildVarRefExp (
-            variableDeclarations->getDeclaration (
+            variableDeclarations->get (
                 DirectLoop::Fortran::KernelSubroutine::setElementCounter)),
             blockIdxPerDim);
 
         SgExpression * complexAccessToArg = buildPntrArrRefExp (buildVarRefExp (
-            variableDeclarations->getDeclaration (
-                VariableNames::getOpDatLocalName (i))), arrayAccessComplexExpr);
+            variableDeclarations->get (VariableNames::getOpDatLocalName (i))),
+            arrayAccessComplexExpr);
 
         SgExpression * assignArgToComplexAccess = buildAssignOp (
             accessToIPosition, complexAccessToArg);
@@ -99,7 +98,7 @@ FortranCUDAKernelSubroutine::initialiseLocalThreadVariables ()
        */
 
       SgExpression * initializationExpression = buildAssignOp (buildVarRefExp (
-          variableDeclarations->getDeclaration (
+          variableDeclarations->get (
               DirectLoop::Fortran::KernelSubroutine::setElementCounter)),
           buildIntVal (0));
 
@@ -163,7 +162,7 @@ FortranCUDAKernelSubroutine::createReductionSubroutineCall ()
           case INC_ACCESS:
           {
             SgExpression * reductInitLoop = buildAssignOp (buildVarRefExp (
-                variableDeclarations->getDeclaration (
+                variableDeclarations->get (
                     DirectLoop::Fortran::KernelSubroutine::setElementCounter)),
                 buildIntVal (0));
 
@@ -205,7 +204,7 @@ FortranCUDAKernelSubroutine::createReductionSubroutineCall ()
                 buildIntVal (1));
 
             SgExpression * baseIndexDevVar = buildAddOp (buildVarRefExp (
-                variableDeclarations->getDeclaration (
+                variableDeclarations->get (
                     DirectLoop::Fortran::KernelSubroutine::setElementCounter)),
                 buildMultiplyOp (blockidXDotXMinus1, buildIntVal (1)));
 
@@ -221,13 +220,13 @@ FortranCUDAKernelSubroutine::createReductionSubroutineCall ()
             deviceVarAccess->setOutputInCodeGeneration ();
 
             SgExpression * deviceVar = buildPntrArrRefExp (buildVarRefExp (
-                variableDeclarations->getDeclaration (
-                    VariableNames::getOpDatName (i))), deviceVarAccess);
+                variableDeclarations->get (VariableNames::getOpDatName (i))),
+                deviceVarAccess);
 
-            SgExpression * localThreadVar = buildPntrArrRefExp (buildVarRefExp (
-                variableDeclarations->getDeclaration (
-                    VariableNames::getOpDatLocalName (i))), buildVarRefExp (
-                variableDeclarations->getDeclaration (
+            SgExpression * localThreadVar = buildPntrArrRefExp (
+                buildVarRefExp (variableDeclarations->get (
+                    VariableNames::getOpDatLocalName (i))),
+                buildVarRefExp (variableDeclarations->get (
                     DirectLoop::Fortran::KernelSubroutine::setElementCounter)));
 
             SgExprListExp
@@ -235,10 +234,10 @@ FortranCUDAKernelSubroutine::createReductionSubroutineCall ()
                     buildExprListExp (
                         deviceVar,
                         localThreadVar,
-                        buildVarRefExp (variableDeclarations->getDeclaration (
+                        buildVarRefExp (variableDeclarations->get (
                             DirectLoop::Fortran::KernelSubroutine::warpSize)),
                         buildVarRefExp (
-                            variableDeclarations->getDeclaration (
+                            variableDeclarations->get (
                                 IndirectAndDirectLoop::Fortran::KernelSubroutine::offsetForReduction)));
 
             SgFunctionCallExp * reductionFunctionCall = buildFunctionCallExp (
@@ -369,7 +368,7 @@ FortranCUDAKernelSubroutine::createAutosharedDeclaration ()
             FortranTypesBuilder::getArray_RankOne (autosharedType, 0,
                 upperBound), subroutineScope);
 
-    variableDeclarations->addDeclaration (
+    variableDeclarations->add (
         IndirectAndDirectLoop::Fortran::VariableNames::autoshared,
         variableDeclaration);
 

@@ -32,12 +32,12 @@ FortranOpenMPKernelSubroutineDirectLoop::createUserSubroutineCall ()
       if (parallelLoop->isReductionRequired (i) == false)
       {
         SgMultiplyOp * multiplyExpression1 = buildMultiplyOp (buildVarRefExp (
-            variableDeclarations->getDeclaration (OpenMP::sliceIterator)),
-            buildIntVal (parallelLoop->getOpDatDimension (i)));
+            variableDeclarations->get (OpenMP::sliceIterator)), buildIntVal (
+            parallelLoop->getOpDatDimension (i)));
 
         SgMultiplyOp * multiplyExpression2 = buildMultiplyOp (buildVarRefExp (
-            variableDeclarations->getDeclaration (OpenMP::sliceIterator)),
-            buildIntVal (parallelLoop->getOpDatDimension (i)));
+            variableDeclarations->get (OpenMP::sliceIterator)), buildIntVal (
+            parallelLoop->getOpDatDimension (i)));
 
         SgAddOp * addExpression2 = buildAddOp (multiplyExpression2,
             buildIntVal (parallelLoop->getOpDatDimension (i)));
@@ -53,7 +53,7 @@ FortranOpenMPKernelSubroutineDirectLoop::createUserSubroutineCall ()
             ROSEHelper::getFileInfo ());
 
         SgPntrArrRefExp * parameterExpression = buildPntrArrRefExp (
-            buildVarRefExp (variableDeclarations->getDeclaration (
+            buildVarRefExp (variableDeclarations->get (
                 VariableNames::getOpDatName (i))), buildExprListExp (
                 arraySubscriptExpression));
 
@@ -62,8 +62,7 @@ FortranOpenMPKernelSubroutineDirectLoop::createUserSubroutineCall ()
       else
       {
         actualParameters->append_expression (buildVarRefExp (
-            variableDeclarations->getDeclaration (VariableNames::getOpDatName (
-                i))));
+            variableDeclarations->get (VariableNames::getOpDatName (i))));
       }
     }
   }
@@ -88,14 +87,12 @@ FortranOpenMPKernelSubroutineDirectLoop::createUserSubroutineDoLoop ()
   using SageBuilder::buildIntVal;
   using SageInterface::appendStatement;
 
-  SgAssignOp * initializationExpression =
-      buildAssignOp (buildVarRefExp (variableDeclarations->getDeclaration (
-          OpenMP::sliceIterator)), buildVarRefExp (
-          variableDeclarations->getDeclaration (OpenMP::sliceStart)));
+  SgAssignOp * initializationExpression = buildAssignOp (buildVarRefExp (
+      variableDeclarations->get (OpenMP::sliceIterator)), buildVarRefExp (
+      variableDeclarations->get (OpenMP::sliceStart)));
 
-  SgSubtractOp * upperBoundExpression =
-      buildSubtractOp (buildVarRefExp (variableDeclarations->getDeclaration (
-          OpenMP::sliceEnd)), buildIntVal (1));
+  SgSubtractOp * upperBoundExpression = buildSubtractOp (buildVarRefExp (
+      variableDeclarations->get (OpenMP::sliceEnd)), buildIntVal (1));
 
   SgIntVal * strideExpression = buildIntVal (1);
 
@@ -128,7 +125,7 @@ FortranOpenMPKernelSubroutineDirectLoop::initialiseThreadID ()
       buildExprListExp ());
 
   SgExprStatement * assignmentStatement = buildAssignStatement (buildVarRefExp (
-      variableDeclarations->getDeclaration (OpenMP::threadID)), functionCall);
+      variableDeclarations->get (OpenMP::threadID)), functionCall);
 
   appendStatement (assignmentStatement, subroutineScope);
 }
@@ -144,12 +141,12 @@ FortranOpenMPKernelSubroutineDirectLoop::createStatements ()
 void
 FortranOpenMPKernelSubroutineDirectLoop::createLocalVariableDeclarations ()
 {
-  variableDeclarations->addDeclaration (OpenMP::sliceIterator,
+  variableDeclarations->add (OpenMP::sliceIterator,
       FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
           OpenMP::sliceIterator, FortranTypesBuilder::getFourByteInteger (),
           subroutineScope));
 
-  variableDeclarations->addDeclaration (OpenMP::threadID,
+  variableDeclarations->add (OpenMP::threadID,
       FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
           OpenMP::threadID, FortranTypesBuilder::getFourByteInteger (),
           subroutineScope));
@@ -171,7 +168,7 @@ FortranOpenMPKernelSubroutineDirectLoop::createFormalParameterDeclarations ()
               arrayType->get_base_type (), buildIntVal (0),
               new SgAsteriskShapeExp (ROSEHelper::getFileInfo ()));
 
-      variableDeclarations->addDeclaration (
+      variableDeclarations->add (
           VariableNames::getOpDatName (i),
           FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
               VariableNames::getOpDatName (i), newArrayType, subroutineScope,
@@ -179,13 +176,13 @@ FortranOpenMPKernelSubroutineDirectLoop::createFormalParameterDeclarations ()
     }
   }
 
-  variableDeclarations->addDeclaration (
+  variableDeclarations->add (
       OpenMP::sliceStart,
       FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
           OpenMP::sliceStart, FortranTypesBuilder::getFourByteInteger (),
           subroutineScope, formalParameters));
 
-  variableDeclarations->addDeclaration (
+  variableDeclarations->add (
       OpenMP::sliceEnd,
       FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
           OpenMP::sliceEnd, FortranTypesBuilder::getFourByteInteger (),

@@ -42,7 +42,7 @@ class FortranOpenMPModuleDeclarations
   protected:
 
     void
-    createOPDATDeclarations ();
+    createOpDatDeclarations ();
 
     void
     createFirstExecutionBooleanDeclaration ();
@@ -56,7 +56,7 @@ class FortranOpenMPModuleDeclarations
   public:
 
     SgVariableDeclaration *
-    getGlobalOPDATDeclaration (unsigned int OP_DAT_ArgumentGroup);
+    getGlobalOpDatDeclaration (unsigned int OP_DAT_ArgumentGroup);
 
     SgVariableDeclaration *
     getFirstExecutionBooleanDeclaration ();

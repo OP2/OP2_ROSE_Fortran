@@ -689,8 +689,7 @@ FortranSubroutinesGeneration::unparse ()
 }
 
 FortranSubroutinesGeneration::FortranSubroutinesGeneration (
-    SgProject * project, Declarations * declarations)
+    SgProject * project, Declarations * declarations) :
+  project (project), declarations (declarations)
 {
-  this->project = project;
-  this->declarations = declarations;
 }

@@ -25,7 +25,7 @@ FortranCUDAHostSubroutine::createThreadSynchroniseCall ()
   SgVarRefExp
       * threadSynchRetReference =
           buildVarRefExp (
-              variableDeclarations->getDeclaration (
+              variableDeclarations->get (
                   IndirectAndDirectLoop::Fortran::HostSubroutine::threadSynchronizeReturnVariableName));
 
   SgFunctionCallExp * threadSynchRetFunctionCall = buildFunctionCallExp (
@@ -95,12 +95,11 @@ FortranCUDAHostSubroutine::createReductionEpilogueStatements ()
   SgVarRefExp
       * maxBlockVarRef =
           buildVarRefExp (
-              variableDeclarations->getDeclaration (
+              variableDeclarations->get (
                   IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::maximumNumberOfThreadBlocks));
 
   SgExpression * initMaxBlocks = buildAssignOp (maxBlockVarRef, buildVarRefExp (
-      variableDeclarations->getDeclaration (
-          CUDA::Fortran::VariableNames::blocksPerGrid)));
+      variableDeclarations->get (CUDA::Fortran::VariableNames::blocksPerGrid)));
 
   appendStatement (buildExprStatement (initMaxBlocks), subroutineScope);
 
@@ -108,7 +107,7 @@ FortranCUDAHostSubroutine::createReductionEpilogueStatements ()
       * assignReductItems =
           buildAssignOp (
               buildVarRefExp (
-                  variableDeclarations->getDeclaration (
+                  variableDeclarations->get (
                       IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::numberOfThreadItems)),
               buildMultiplyOp (maxBlockVarRef, buildIntVal (dim)));
 
@@ -117,13 +116,13 @@ FortranCUDAHostSubroutine::createReductionEpilogueStatements ()
   SgVarRefExp
       * reductItemsVarRef =
           buildVarRefExp (
-              variableDeclarations->getDeclaration (
+              variableDeclarations->get (
                   IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::numberOfThreadItems));
 
   SgVarRefExp
       * redArrayHost =
           buildVarRefExp (
-              variableDeclarations->getDeclaration (
+              variableDeclarations->get (
                   IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::reductionArrayHost));
 
   SgPntrArrRefExp * allocateHostRedVarParams = buildPntrArrRefExp (
@@ -135,7 +134,7 @@ FortranCUDAHostSubroutine::createReductionEpilogueStatements ()
   SgVarRefExp
       * redArrayDev =
           buildVarRefExp (
-              variableDeclarations->getDeclaration (
+              variableDeclarations->get (
                   IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::reductionArrayDevice));
 
   SgPntrArrRefExp * allocateDeviceRedVarParams = buildPntrArrRefExp (
@@ -147,7 +146,7 @@ FortranCUDAHostSubroutine::createReductionEpilogueStatements ()
   SgVarRefExp
       * itVar1VarRef =
           buildVarRefExp (
-              variableDeclarations->getDeclaration (
+              variableDeclarations->get (
                   IndirectAndDirectLoop::Fortran::HostSubroutine::reductionIterationCounter1));
 
   SgExpression * initLoop = buildAssignOp (itVar1VarRef, buildIntVal (0));
@@ -175,15 +174,14 @@ FortranCUDAHostSubroutine::createReductionEpilogueStatements ()
 
   appendStatement (buildExprStatement (copyHostToDeviceArray), subroutineScope);
 
-  SgVarRefExp * nSharedVarRef = buildVarRefExp (
-      variableDeclarations->getDeclaration (
-          CUDA::Fortran::VariableNames::sharedMemorySize));
+  SgVarRefExp * nSharedVarRef = buildVarRefExp (variableDeclarations->get (
+      CUDA::Fortran::VariableNames::sharedMemorySize));
 
   SgExpression
       * assignReductionOffset =
           buildAssignOp (
               buildVarRefExp (
-                  variableDeclarations->getDeclaration (
+                  variableDeclarations->get (
                       IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::sharedMemoryStartOffset)),
               nSharedVarRef);
 
@@ -192,11 +190,11 @@ FortranCUDAHostSubroutine::createReductionEpilogueStatements ()
   SgVarRefExp
       * maxRedSizeVarRef =
           buildVarRefExp (
-              variableDeclarations->getDeclaration (
+              variableDeclarations->get (
                   IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::maximumBytesInSharedMemory));
 
   SgExpression * initMaxShared = buildAssignOp (maxRedSizeVarRef,
-      buildMultiplyOp (buildVarRefExp (variableDeclarations->getDeclaration (
+      buildMultiplyOp (buildVarRefExp (variableDeclarations->get (
           CUDA::Fortran::VariableNames::threadsPerBlock)), buildIntVal (
           maxUsedFortranKind)));
 
@@ -224,7 +222,7 @@ FortranCUDAHostSubroutine::createReductionPrologueStatements ()
   SgExpression
       * redArrayHostVarRef =
           buildVarRefExp (
-              variableDeclarations->getDeclaration (
+              variableDeclarations->get (
                   IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::reductionArrayHost));
 
   SgExpression
@@ -232,7 +230,7 @@ FortranCUDAHostSubroutine::createReductionPrologueStatements ()
           buildAssignOp (
               redArrayHostVarRef,
               buildVarRefExp (
-                  variableDeclarations->getDeclaration (
+                  variableDeclarations->get (
                       IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::reductionArrayDevice)));
 
   appendStatement (buildExprStatement (copyDeviceTohostArray), subroutineScope);
@@ -267,20 +265,19 @@ FortranCUDAHostSubroutine::createReductionPrologueStatements ()
   SgVarRefExp
       * itVar2VarRef =
           buildVarRefExp (
-              variableDeclarations->getDeclaration (
+              variableDeclarations->get (
                   IndirectAndDirectLoop::Fortran::HostSubroutine::reductionIterationCounter2));
 
   SgExpression * initInnerLoop = buildAssignOp (itVar2VarRef, buildIntVal (0));
 
   SgExpression * c2fPtrAccess = buildPntrArrRefExp (buildVarRefExp (
-      variableDeclarations->getDeclaration (
-          VariableNames::getCToFortranVariableName (positionInOPDatsArray))),
-      buildAddOp (itVar2VarRef, buildIntVal (1)));
+      variableDeclarations->get (VariableNames::getCToFortranVariableName (
+          positionInOPDatsArray))), buildAddOp (itVar2VarRef, buildIntVal (1)));
 
   SgVarRefExp
       * itVar1VarRef =
           buildVarRefExp (
-              variableDeclarations->getDeclaration (
+              variableDeclarations->get (
                   IndirectAndDirectLoop::Fortran::HostSubroutine::reductionIterationCounter1));
 
   SgExpression * assignExpInHostReduction = buildAddOp (c2fPtrAccess,
@@ -306,7 +303,7 @@ FortranCUDAHostSubroutine::createReductionPrologueStatements ()
           FortranStatementsAndExpressionsBuilder::buildFortranDoStatement (
               initOuterLoop,
               buildVarRefExp (
-                  variableDeclarations->getDeclaration (
+                  variableDeclarations->get (
                       IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::numberOfThreadItems)),
               buildIntVal (1), outerLoopBody);
 
@@ -340,12 +337,11 @@ FortranCUDAHostSubroutine::createCUDAKernelEpilogueStatements ()
         && parallelLoop->isReductionRequired (i) == false)
     {
       SgVarRefExp * opDatDeviceReference = buildVarRefExp (
-          variableDeclarations->getDeclaration (
-              VariableNames::getOpDatDeviceName (i)));
+          variableDeclarations->get (VariableNames::getOpDatDeviceName (i)));
 
       SgVarRefExp * c2FortranPointerReference = buildVarRefExp (
-          variableDeclarations->getDeclaration (
-              VariableNames::getCToFortranVariableName (i)));
+          variableDeclarations->get (VariableNames::getCToFortranVariableName (
+              i)));
 
       SgExpression * assignmentExpression = buildAssignOp (
           c2FortranPointerReference, opDatDeviceReference);
@@ -363,8 +359,7 @@ FortranCUDAHostSubroutine::createCUDAKernelEpilogueStatements ()
         && parallelLoop->isReductionRequired (i) == false)
     {
       SgVarRefExp * opDatDeviceReference = buildVarRefExp (
-          variableDeclarations->getDeclaration (
-              VariableNames::getOpDatDeviceName (i)));
+          variableDeclarations->get (VariableNames::getOpDatDeviceName (i)));
 
       SgExprListExp * deallocateParameters = buildExprListExp (
           opDatDeviceReference);
@@ -402,13 +397,11 @@ FortranCUDAHostSubroutine::createCUDAKernelPrologueStatements ()
   {
     if (parallelLoop->isDuplicateOpDat (i) == false)
     {
-      SgVarRefExp * opDatFormalArgumentReference =
-          buildVarRefExp (variableDeclarations->getDeclaration (
-              VariableNames::getOpDatName (i)));
+      SgVarRefExp * opDatFormalArgumentReference = buildVarRefExp (
+          variableDeclarations->get (VariableNames::getOpDatName (i)));
 
       SgVarRefExp * opDatSizeReference = buildVarRefExp (
-          variableDeclarations->getDeclaration (
-              VariableNames::getOpDatSizeName (i)));
+          variableDeclarations->get (VariableNames::getOpDatSizeName (i)));
 
       SgExpression * setField = buildDotExp (opDatFormalArgumentReference,
           buildOpaqueVarRefExp ("set", subroutineScope));
@@ -436,20 +429,20 @@ FortranCUDAHostSubroutine::createCUDAKernelPrologueStatements ()
   {
     if (parallelLoop->isDuplicateOpDat (i) == false)
     {
-      SgDotExp * parameter1Expression = buildDotExp (
-          buildVarRefExp (variableDeclarations->getDeclaration (
-              VariableNames::getOpDatName (i))), buildOpaqueVarRefExp (
+      SgDotExp * parameter1Expression = buildDotExp (buildVarRefExp (
+          variableDeclarations->get (VariableNames::getOpDatName (i))),
+          buildOpaqueVarRefExp (
               IndirectAndDirectLoop::Fortran::HostSubroutine::dat,
               subroutineScope));
 
       SgVarRefExp * parameter2Expression = buildVarRefExp (
-          variableDeclarations->getDeclaration (
-              VariableNames::getCToFortranVariableName (i)));
+          variableDeclarations->get (VariableNames::getCToFortranVariableName (
+              i)));
 
       SgExpression * parameter3Expression =
           FortranStatementsAndExpressionsBuilder::buildShapeExpression (
-              variableDeclarations->getDeclaration (
-                  VariableNames::getOpDatSizeName (i)), subroutineScope);
+              variableDeclarations->get (VariableNames::getOpDatSizeName (i)),
+              subroutineScope);
 
       SgStatement * callStatement = createCToFortranPointerCallStatement (
           parameter1Expression, parameter2Expression, parameter3Expression);
@@ -471,12 +464,10 @@ FortranCUDAHostSubroutine::createCUDAKernelPrologueStatements ()
         && parallelLoop->isReductionRequired (i) == false)
     {
       SgVarRefExp * opDatSizeReference = buildVarRefExp (
-          variableDeclarations->getDeclaration (
-              VariableNames::getOpDatSizeName (i)));
+          variableDeclarations->get (VariableNames::getOpDatSizeName (i)));
 
       SgVarRefExp * opDatDeviceReference = buildVarRefExp (
-          variableDeclarations->getDeclaration (
-              VariableNames::getOpDatDeviceName (i)));
+          variableDeclarations->get (VariableNames::getOpDatDeviceName (i)));
 
       SgExprListExp * arrayIndexExpression = buildExprListExp (
           opDatSizeReference);
@@ -495,12 +486,11 @@ FortranCUDAHostSubroutine::createCUDAKernelPrologueStatements ()
         && parallelLoop->isReductionRequired (i) == false)
     {
       SgVarRefExp * opDatDeviceReference = buildVarRefExp (
-          variableDeclarations->getDeclaration (
-              VariableNames::getOpDatDeviceName (i)));
+          variableDeclarations->get (VariableNames::getOpDatDeviceName (i)));
 
       SgVarRefExp * c2FortranPointerReference = buildVarRefExp (
-          variableDeclarations->getDeclaration (
-              VariableNames::getCToFortranVariableName (i)));
+          variableDeclarations->get (VariableNames::getCToFortranVariableName (
+              i)));
 
       SgExpression * assignmentExpression = buildAssignOp (
           opDatDeviceReference, c2FortranPointerReference);
@@ -582,25 +572,22 @@ FortranCUDAHostSubroutine::createDataMarshallingLocalVariableDeclarations ()
 void
 FortranCUDAHostSubroutine::createCUDAKernelLocalVariableDeclarations ()
 {
-  variableDeclarations->addDeclaration (
-      CUDA::Fortran::VariableNames::blocksPerGrid,
+  variableDeclarations->add (CUDA::Fortran::VariableNames::blocksPerGrid,
       FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
           CUDA::Fortran::VariableNames::blocksPerGrid,
           FortranTypesBuilder::getFourByteInteger (), subroutineScope));
 
-  variableDeclarations->addDeclaration (
-      CUDA::Fortran::VariableNames::threadsPerBlock,
+  variableDeclarations->add (CUDA::Fortran::VariableNames::threadsPerBlock,
       FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
           CUDA::Fortran::VariableNames::threadsPerBlock,
           FortranTypesBuilder::getFourByteInteger (), subroutineScope));
 
-  variableDeclarations->addDeclaration (
-      CUDA::Fortran::VariableNames::sharedMemorySize,
+  variableDeclarations->add (CUDA::Fortran::VariableNames::sharedMemorySize,
       FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
           CUDA::Fortran::VariableNames::sharedMemorySize,
           FortranTypesBuilder::getFourByteInteger (), subroutineScope));
 
-  variableDeclarations->addDeclaration (
+  variableDeclarations->add (
       IndirectAndDirectLoop::Fortran::HostSubroutine::threadSynchronizeReturnVariableName,
       FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
           IndirectAndDirectLoop::Fortran::HostSubroutine::threadSynchronizeReturnVariableName,
@@ -653,7 +640,7 @@ FortranCUDAHostSubroutine::createReductionLocalVariableDeclarations ()
                   buildAssignInitializer (buildIntVal (0), buildIntType ()),
                   subroutineScope);
 
-      variableDeclarations->addDeclaration (
+      variableDeclarations->add (
           IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::sharedMemoryStartOffset,
           variableDeclaration3);
 
@@ -669,7 +656,7 @@ FortranCUDAHostSubroutine::createReductionLocalVariableDeclarations ()
                   buildAssignInitializer (buildIntVal (0), buildIntType ()),
                   subroutineScope);
 
-      variableDeclarations->addDeclaration (
+      variableDeclarations->add (
           IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::maximumBytesInSharedMemory,
           variableDeclaration4);
 
@@ -685,7 +672,7 @@ FortranCUDAHostSubroutine::createReductionLocalVariableDeclarations ()
                   buildAssignInitializer (buildIntVal (0), buildIntType ()),
                   subroutineScope);
 
-      variableDeclarations->addDeclaration (
+      variableDeclarations->add (
           IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::numberOfThreadItems,
           variableDeclaration5);
 
@@ -701,7 +688,7 @@ FortranCUDAHostSubroutine::createReductionLocalVariableDeclarations ()
                   buildAssignInitializer (buildIntVal (0), buildIntType ()),
                   subroutineScope);
 
-      variableDeclarations->addDeclaration (
+      variableDeclarations->add (
           IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::maximumNumberOfThreadBlocks,
           variableDeclaration6);
 
@@ -715,7 +702,7 @@ FortranCUDAHostSubroutine::createReductionLocalVariableDeclarations ()
                   IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::reductionArrayHost,
                   parallelLoop->getOpDatType (i), NULL, subroutineScope);
 
-      variableDeclarations->addDeclaration (
+      variableDeclarations->add (
           IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::reductionArrayHost,
           variableDeclaration7);
 
@@ -730,7 +717,7 @@ FortranCUDAHostSubroutine::createReductionLocalVariableDeclarations ()
                   IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::reductionArrayDevice,
                   parallelLoop->getOpDatType (i), NULL, subroutineScope);
 
-      variableDeclarations->addDeclaration (
+      variableDeclarations->add (
           IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::reductionArrayDevice,
           variableDeclaration8);
 

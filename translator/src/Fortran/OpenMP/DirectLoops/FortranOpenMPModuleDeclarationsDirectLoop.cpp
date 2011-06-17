@@ -6,5 +6,5 @@ FortranOpenMPModuleDeclarationsDirectLoop::FortranOpenMPModuleDeclarationsDirect
   FortranOpenMPModuleDeclarations (userSubroutineName, parallelLoop,
       moduleScope)
 {
-  createOPDATDeclarations ();
+  createOpDatDeclarations ();
 }

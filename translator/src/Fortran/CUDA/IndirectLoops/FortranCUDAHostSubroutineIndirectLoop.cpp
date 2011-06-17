@@ -24,7 +24,7 @@ FortranCUDAHostSubroutineIndirectLoop::createKernelFunctionCallStatement ()
   SgExprListExp * actualParameters = buildExprListExp ();
 
   actualParameters->append_expression (buildVarRefExp (
-      variableDeclarations->getDeclaration (
+      variableDeclarations->get (
           IndirectAndDirectLoop::Fortran::VariableNames::argsSizes)));
 
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
@@ -33,11 +33,10 @@ FortranCUDAHostSubroutineIndirectLoop::createKernelFunctionCallStatement ()
         && parallelLoop->getOpMapValue (i) == INDIRECT)
     {
       actualParameters->append_expression (buildVarRefExp (
-          variableDeclarations->getDeclaration (
-              VariableNames::getOpDatDeviceName (i))));
+          variableDeclarations->get (VariableNames::getOpDatDeviceName (i))));
 
       actualParameters->append_expression (buildVarRefExp (
-          variableDeclarations->getDeclaration (
+          variableDeclarations->get (
               VariableNames::getLocalToGlobalMappingName (i))));
     }
   }
@@ -47,7 +46,7 @@ FortranCUDAHostSubroutineIndirectLoop::createKernelFunctionCallStatement ()
     if (parallelLoop->getOpMapValue (i) == INDIRECT)
     {
       actualParameters->append_expression (buildVarRefExp (
-          variableDeclarations->getDeclaration (
+          variableDeclarations->get (
               VariableNames::getGlobalToLocalMappingName (i))));
     }
   }
@@ -58,50 +57,48 @@ FortranCUDAHostSubroutineIndirectLoop::createKernelFunctionCallStatement ()
         && parallelLoop->getOpMapValue (i) == DIRECT)
     {
       actualParameters->append_expression (buildVarRefExp (
-          variableDeclarations->getDeclaration (
-              VariableNames::getOpDatDeviceName (i))));
+          variableDeclarations->get (VariableNames::getOpDatDeviceName (i))));
     }
   }
 
   actualParameters->append_expression (buildVarRefExp (
-      variableDeclarations->getDeclaration (
+      variableDeclarations->get (
           IndirectLoop::Fortran::PlanFunction::VariableNames::pindSizes)));
 
   actualParameters->append_expression (buildVarRefExp (
-      variableDeclarations->getDeclaration (
+      variableDeclarations->get (
           IndirectLoop::Fortran::PlanFunction::VariableNames::pindOffs)));
 
   actualParameters->append_expression (buildVarRefExp (
-      variableDeclarations->getDeclaration (
+      variableDeclarations->get (
           IndirectLoop::Fortran::PlanFunction::VariableNames::pblkMap)));
 
   actualParameters->append_expression (buildVarRefExp (
-      variableDeclarations->getDeclaration (
+      variableDeclarations->get (
           IndirectLoop::Fortran::PlanFunction::VariableNames::poffset)));
 
   actualParameters->append_expression (buildVarRefExp (
-      variableDeclarations->getDeclaration (
+      variableDeclarations->get (
           IndirectLoop::Fortran::PlanFunction::VariableNames::pnelems)));
 
   actualParameters->append_expression (buildVarRefExp (
-      variableDeclarations->getDeclaration (
+      variableDeclarations->get (
           IndirectLoop::Fortran::PlanFunction::VariableNames::pnthrcol)));
 
   actualParameters->append_expression (buildVarRefExp (
-      variableDeclarations->getDeclaration (
+      variableDeclarations->get (
           IndirectLoop::Fortran::PlanFunction::VariableNames::pthrcol)));
 
   actualParameters->append_expression (buildVarRefExp (
-      variableDeclarations->getDeclaration (
+      variableDeclarations->get (
           IndirectLoop::Fortran::HostSubroutine::VariableNames::blockOffset)));
 
   SgExprStatement * callStatement = buildFunctionCallStmt (kernelSubroutineName
-      + "<<<" + ROSEHelper::getFirstVariableName (
-      variableDeclarations->getDeclaration (
-          CUDA::Fortran::VariableNames::blocksPerGrid)) + ", "
-      + ROSEHelper::getFirstVariableName (variableDeclarations->getDeclaration (
+      + "<<<" + ROSEHelper::getFirstVariableName (variableDeclarations->get (
+      CUDA::Fortran::VariableNames::blocksPerGrid)) + ", "
+      + ROSEHelper::getFirstVariableName (variableDeclarations->get (
           CUDA::Fortran::VariableNames::threadsPerBlock)) + ", "
-      + ROSEHelper::getFirstVariableName (variableDeclarations->getDeclaration (
+      + ROSEHelper::getFirstVariableName (variableDeclarations->get (
           CUDA::Fortran::VariableNames::sharedMemorySize)) + ">>>",
       buildVoidType (), actualParameters, subroutineScope);
 
@@ -146,18 +143,18 @@ FortranCUDAHostSubroutineIndirectLoop::createExecutionPlanExecutionStatements ()
    */
 
   SgExpression * arrayIndexExpression1 = buildAddOp (buildVarRefExp (
-      variableDeclarations->getDeclaration (
+      variableDeclarations->get (
           IndirectLoop::Fortran::HostSubroutine::VariableNames::col)),
       buildIntVal (1));
 
   SgPntrArrRefExp * arrayExpression1 = buildPntrArrRefExp (buildVarRefExp (
-      variableDeclarations->getDeclaration (
+      variableDeclarations->get (
           IndirectLoop::Fortran::HostSubroutine::VariableNames::ncolblk)),
       arrayIndexExpression1);
 
   SgExprStatement * statement1 = buildAssignStatement (buildVarRefExp (
-      variableDeclarations->getDeclaration (
-          CUDA::Fortran::VariableNames::blocksPerGrid)), arrayExpression1);
+      variableDeclarations->get (CUDA::Fortran::VariableNames::blocksPerGrid)),
+      arrayExpression1);
 
   loopBody->append_statement (statement1);
 
@@ -168,8 +165,8 @@ FortranCUDAHostSubroutineIndirectLoop::createExecutionPlanExecutionStatements ()
    * ======================================================
    */
 
-  SgExprStatement * statement2 = buildAssignStatement (buildVarRefExp (
-      variableDeclarations->getDeclaration (
+  SgExprStatement * statement2 = buildAssignStatement (
+      buildVarRefExp (variableDeclarations->get (
           CUDA::Fortran::VariableNames::threadsPerBlock)),
       buildOpaqueVarRefExp ("FOP_BLOCK_SIZE", subroutineScope));
 
@@ -183,14 +180,14 @@ FortranCUDAHostSubroutineIndirectLoop::createExecutionPlanExecutionStatements ()
    */
 
   SgDotExp * dotExpression3 = buildDotExp (buildVarRefExp (
-      variableDeclarations->getDeclaration (
+      variableDeclarations->get (
           IndirectLoop::Fortran::HostSubroutine::VariableNames::actualPlan)),
       buildOpaqueVarRefExp (
           IndirectLoop::Fortran::HostSubroutine::FieldNames::nshared,
           subroutineScope));
 
-  SgExprStatement * statement3 = buildAssignStatement (buildVarRefExp (
-      variableDeclarations->getDeclaration (
+  SgExprStatement * statement3 = buildAssignStatement (
+      buildVarRefExp (variableDeclarations->get (
           CUDA::Fortran::VariableNames::sharedMemorySize)), dotExpression3);
 
   loopBody->append_statement (statement3);
@@ -218,13 +215,13 @@ FortranCUDAHostSubroutineIndirectLoop::createExecutionPlanExecutionStatements ()
    */
 
   SgAddOp * addExpression4 = buildAddOp (buildVarRefExp (
-      variableDeclarations->getDeclaration (
+      variableDeclarations->get (
           IndirectLoop::Fortran::HostSubroutine::VariableNames::blockOffset)),
-      buildVarRefExp (variableDeclarations->getDeclaration (
+      buildVarRefExp (variableDeclarations->get (
           CUDA::Fortran::VariableNames::blocksPerGrid)));
 
   SgStatement * statement4 = buildAssignStatement (buildVarRefExp (
-      variableDeclarations->getDeclaration (
+      variableDeclarations->get (
           IndirectLoop::Fortran::HostSubroutine::VariableNames::blockOffset)),
       addExpression4);
 
@@ -243,7 +240,7 @@ FortranCUDAHostSubroutineIndirectLoop::createExecutionPlanExecutionStatements ()
    */
 
   SgAssignOp * initializationExpression = buildAssignOp (buildVarRefExp (
-      variableDeclarations->getDeclaration (
+      variableDeclarations->get (
           IndirectLoop::Fortran::HostSubroutine::VariableNames::col)),
       buildIntVal (0));
 
@@ -255,7 +252,7 @@ FortranCUDAHostSubroutineIndirectLoop::createExecutionPlanExecutionStatements ()
    */
 
   SgDotExp * dotExpression = buildDotExp (buildVarRefExp (
-      variableDeclarations->getDeclaration (
+      variableDeclarations->get (
           IndirectLoop::Fortran::HostSubroutine::VariableNames::actualPlan)),
       buildOpaqueVarRefExp (
           IndirectLoop::Fortran::HostSubroutine::FieldNames::ncolors,
@@ -300,94 +297,82 @@ FortranCUDAHostSubroutineIndirectLoop::createCToFortranPointerConversionStatemen
    */
 
   SgVarRefExp * actualPlanReference = buildVarRefExp (
-      variableDeclarations->getDeclaration (
+      variableDeclarations->get (
           IndirectLoop::Fortran::HostSubroutine::VariableNames::actualPlan));
 
-  SgVarRefExp * indsReference = buildVarRefExp (
-      variableDeclarations->getDeclaration (
-          IndirectLoop::Fortran::HostSubroutine::VariableNames::inds));
+  SgVarRefExp * indsReference = buildVarRefExp (variableDeclarations->get (
+      IndirectLoop::Fortran::HostSubroutine::VariableNames::inds));
 
   SgVarRefExp * indsNumberReference = buildVarRefExp (
-      variableDeclarations->getDeclaration (
+      variableDeclarations->get (
           IndirectLoop::Fortran::HostSubroutine::VariableNames::indsNumber));
 
-  SgVarRefExp * ncolblkReference = buildVarRefExp (
-      variableDeclarations->getDeclaration (
-          IndirectLoop::Fortran::HostSubroutine::VariableNames::ncolblk));
+  SgVarRefExp * ncolblkReference = buildVarRefExp (variableDeclarations->get (
+      IndirectLoop::Fortran::HostSubroutine::VariableNames::ncolblk));
 
   SgVarRefExp * opSetFormalArgumentReference = buildVarRefExp (
-      variableDeclarations->getDeclaration (VariableNames::getOpSetName ()));
+      variableDeclarations->get (VariableNames::getOpSetName ()));
 
-  SgVarRefExp * pblkMapReference = buildVarRefExp (
-      variableDeclarations->getDeclaration (
-          IndirectLoop::Fortran::PlanFunction::VariableNames::pblkMap));
+  SgVarRefExp * pblkMapReference = buildVarRefExp (variableDeclarations->get (
+      IndirectLoop::Fortran::PlanFunction::VariableNames::pblkMap));
 
   SgVarRefExp * pblkMapSizeReference = buildVarRefExp (
-      variableDeclarations->getDeclaration (
+      variableDeclarations->get (
           IndirectLoop::Fortran::PlanFunction::VariableNames::pblkMapSize));
 
-  SgVarRefExp * planRetReference = buildVarRefExp (
-      variableDeclarations->getDeclaration (
-          IndirectLoop::Fortran::HostSubroutine::VariableNames::planRet));
+  SgVarRefExp * planRetReference = buildVarRefExp (variableDeclarations->get (
+      IndirectLoop::Fortran::HostSubroutine::VariableNames::planRet));
 
-  SgVarRefExp * pmapsReference = buildVarRefExp (
-      variableDeclarations->getDeclaration (
-          IndirectLoop::Fortran::PlanFunction::VariableNames::pmaps));
+  SgVarRefExp * pmapsReference = buildVarRefExp (variableDeclarations->get (
+      IndirectLoop::Fortran::PlanFunction::VariableNames::pmaps));
 
   SgVarRefExp * pnindirectReference = buildVarRefExp (
-      variableDeclarations->getDeclaration (
+      variableDeclarations->get (
           IndirectLoop::Fortran::PlanFunction::VariableNames::pnindirect));
 
-  SgVarRefExp * pindMapsReference = buildVarRefExp (
-      variableDeclarations->getDeclaration (
-          IndirectLoop::Fortran::PlanFunction::VariableNames::pindMaps));
+  SgVarRefExp * pindMapsReference = buildVarRefExp (variableDeclarations->get (
+      IndirectLoop::Fortran::PlanFunction::VariableNames::pindMaps));
 
-  SgVarRefExp * pindSizesReference = buildVarRefExp (
-      variableDeclarations->getDeclaration (
-          IndirectLoop::Fortran::PlanFunction::VariableNames::pindSizes));
+  SgVarRefExp * pindSizesReference = buildVarRefExp (variableDeclarations->get (
+      IndirectLoop::Fortran::PlanFunction::VariableNames::pindSizes));
 
   SgVarRefExp * pindSizesSizeReference = buildVarRefExp (
-      variableDeclarations->getDeclaration (
+      variableDeclarations->get (
           IndirectLoop::Fortran::PlanFunction::VariableNames::pindSizesSize));
 
-  SgVarRefExp * pindOffsReference = buildVarRefExp (
-      variableDeclarations->getDeclaration (
-          IndirectLoop::Fortran::PlanFunction::VariableNames::pindOffs));
+  SgVarRefExp * pindOffsReference = buildVarRefExp (variableDeclarations->get (
+      IndirectLoop::Fortran::PlanFunction::VariableNames::pindOffs));
 
   SgVarRefExp * pindOffsSizeReference = buildVarRefExp (
-      variableDeclarations->getDeclaration (
+      variableDeclarations->get (
           IndirectLoop::Fortran::PlanFunction::VariableNames::pindOffsSize));
 
-  SgVarRefExp * pnelemsReference = buildVarRefExp (
-      variableDeclarations->getDeclaration (
-          IndirectLoop::Fortran::PlanFunction::VariableNames::pnelems));
+  SgVarRefExp * pnelemsReference = buildVarRefExp (variableDeclarations->get (
+      IndirectLoop::Fortran::PlanFunction::VariableNames::pnelems));
 
   SgVarRefExp * pnelemsSizeReference = buildVarRefExp (
-      variableDeclarations->getDeclaration (
+      variableDeclarations->get (
           IndirectLoop::Fortran::PlanFunction::VariableNames::pnelemsSize));
 
-  SgVarRefExp * pnthrcolReference = buildVarRefExp (
-      variableDeclarations->getDeclaration (
-          IndirectLoop::Fortran::PlanFunction::VariableNames::pnthrcol));
+  SgVarRefExp * pnthrcolReference = buildVarRefExp (variableDeclarations->get (
+      IndirectLoop::Fortran::PlanFunction::VariableNames::pnthrcol));
 
   SgVarRefExp * pnthrcolSizeReference = buildVarRefExp (
-      variableDeclarations->getDeclaration (
+      variableDeclarations->get (
           IndirectLoop::Fortran::PlanFunction::VariableNames::pnthrcolSize));
 
-  SgVarRefExp * poffsetReference = buildVarRefExp (
-      variableDeclarations->getDeclaration (
-          IndirectLoop::Fortran::PlanFunction::VariableNames::poffset));
+  SgVarRefExp * poffsetReference = buildVarRefExp (variableDeclarations->get (
+      IndirectLoop::Fortran::PlanFunction::VariableNames::poffset));
 
   SgVarRefExp * poffsetSizeReference = buildVarRefExp (
-      variableDeclarations->getDeclaration (
+      variableDeclarations->get (
           IndirectLoop::Fortran::PlanFunction::VariableNames::poffsetSize));
 
-  SgVarRefExp * pthrcolReference = buildVarRefExp (
-      variableDeclarations->getDeclaration (
-          IndirectLoop::Fortran::PlanFunction::VariableNames::pthrcol));
+  SgVarRefExp * pthrcolReference = buildVarRefExp (variableDeclarations->get (
+      IndirectLoop::Fortran::PlanFunction::VariableNames::pthrcol));
 
   SgVarRefExp * pthrcolSizeReference = buildVarRefExp (
-      variableDeclarations->getDeclaration (
+      variableDeclarations->get (
           IndirectLoop::Fortran::PlanFunction::VariableNames::pthrcolSize));
 
   /*
@@ -450,14 +435,14 @@ FortranCUDAHostSubroutineIndirectLoop::createCToFortranPointerConversionStatemen
   SgExpression
       * indsNumberShapeExpression =
           FortranStatementsAndExpressionsBuilder::buildShapeExpression (
-              variableDeclarations->getDeclaration (
+              variableDeclarations->get (
                   IndirectLoop::Fortran::HostSubroutine::VariableNames::indsNumber),
               subroutineScope);
 
   SgExpression
       * argsNumberShapeExpression =
           FortranStatementsAndExpressionsBuilder::buildShapeExpression (
-              variableDeclarations->getDeclaration (
+              variableDeclarations->get (
                   IndirectLoop::Fortran::HostSubroutine::VariableNames::argsNumber),
               subroutineScope);
 
@@ -544,7 +529,7 @@ FortranCUDAHostSubroutineIndirectLoop::createCToFortranPointerConversionStatemen
 
       callStatement = createCToFortranPointerCallStatement (
           pindMapsArraySubscriptReference, buildVarRefExp (
-              variableDeclarations->getDeclaration (
+              variableDeclarations->get (
                   VariableNames::getLocalToGlobalMappingName (i))),
           pnindirectArraySubscriptReference);
 
@@ -589,7 +574,7 @@ FortranCUDAHostSubroutineIndirectLoop::createCToFortranPointerConversionStatemen
        */
 
       SgExpression * expression1 = buildAssignOp (buildVarRefExp (
-          variableDeclarations->getDeclaration (
+          variableDeclarations->get (
               VariableNames::getGlobalToLocalMappingName (i))), buildDotExp (
           opSetFormalArgumentReference, size_Reference));
 
@@ -607,12 +592,12 @@ FortranCUDAHostSubroutineIndirectLoop::createCToFortranPointerConversionStatemen
           indexExpression);
 
       SgVarRefExp * executionPlanMapReference = buildVarRefExp (
-          variableDeclarations->getDeclaration (
+          variableDeclarations->get (
               VariableNames::getGlobalToLocalMappingName (i)));
 
       SgExpression * shapeExpression =
           FortranStatementsAndExpressionsBuilder::buildShapeExpression (
-              variableDeclarations->getDeclaration (
+              variableDeclarations->get (
                   VariableNames::getGlobalToLocalMappingName (i)),
               subroutineScope);
 
@@ -667,7 +652,7 @@ FortranCUDAHostSubroutineIndirectLoop::createCToFortranPointerConversionStatemen
           buildDotExp (actualPlanReference, ind_sizes_Reference),
           pindSizesReference,
           FortranStatementsAndExpressionsBuilder::buildShapeExpression (
-              variableDeclarations->getDeclaration (
+              variableDeclarations->get (
                   IndirectLoop::Fortran::PlanFunction::VariableNames::pindSizesSize),
               subroutineScope));
 
@@ -680,7 +665,7 @@ FortranCUDAHostSubroutineIndirectLoop::createCToFortranPointerConversionStatemen
    */
 
   assignmentExpression = buildAssignOp (pindOffsSizeReference, buildVarRefExp (
-      variableDeclarations->getDeclaration (
+      variableDeclarations->get (
           IndirectLoop::Fortran::PlanFunction::VariableNames::pindSizesSize)));
 
   appendStatement (buildExprStatement (assignmentExpression), subroutineScope);
@@ -690,7 +675,7 @@ FortranCUDAHostSubroutineIndirectLoop::createCToFortranPointerConversionStatemen
           buildDotExp (actualPlanReference, ind_offs_Reference),
           pindOffsReference,
           FortranStatementsAndExpressionsBuilder::buildShapeExpression (
-              variableDeclarations->getDeclaration (
+              variableDeclarations->get (
                   IndirectLoop::Fortran::PlanFunction::VariableNames::pindOffsSize),
               subroutineScope));
 
@@ -710,7 +695,7 @@ FortranCUDAHostSubroutineIndirectLoop::createCToFortranPointerConversionStatemen
   callStatement = createCToFortranPointerCallStatement (buildDotExp (
       actualPlanReference, blkmap_Reference), pblkMapReference,
       FortranStatementsAndExpressionsBuilder::buildShapeExpression (
-          variableDeclarations->getDeclaration (
+          variableDeclarations->get (
               IndirectLoop::Fortran::PlanFunction::VariableNames::pblkMapSize),
           subroutineScope));
 
@@ -730,7 +715,7 @@ FortranCUDAHostSubroutineIndirectLoop::createCToFortranPointerConversionStatemen
   callStatement = createCToFortranPointerCallStatement (buildDotExp (
       actualPlanReference, offset_Reference), poffsetReference,
       FortranStatementsAndExpressionsBuilder::buildShapeExpression (
-          variableDeclarations->getDeclaration (
+          variableDeclarations->get (
               IndirectLoop::Fortran::PlanFunction::VariableNames::poffsetSize),
           subroutineScope));
 
@@ -750,7 +735,7 @@ FortranCUDAHostSubroutineIndirectLoop::createCToFortranPointerConversionStatemen
   callStatement = createCToFortranPointerCallStatement (buildDotExp (
       actualPlanReference, nelems_Reference), pnelemsReference,
       FortranStatementsAndExpressionsBuilder::buildShapeExpression (
-          variableDeclarations->getDeclaration (
+          variableDeclarations->get (
               IndirectLoop::Fortran::PlanFunction::VariableNames::pnelemsSize),
           subroutineScope));
 
@@ -772,7 +757,7 @@ FortranCUDAHostSubroutineIndirectLoop::createCToFortranPointerConversionStatemen
           buildDotExp (actualPlanReference, nthrcol_Reference),
           pnthrcolReference,
           FortranStatementsAndExpressionsBuilder::buildShapeExpression (
-              variableDeclarations->getDeclaration (
+              variableDeclarations->get (
                   IndirectLoop::Fortran::PlanFunction::VariableNames::pnthrcolSize),
               subroutineScope));
 
@@ -792,7 +777,7 @@ FortranCUDAHostSubroutineIndirectLoop::createCToFortranPointerConversionStatemen
   callStatement = createCToFortranPointerCallStatement (buildDotExp (
       actualPlanReference, thrcol_Reference), pthrcolReference,
       FortranStatementsAndExpressionsBuilder::buildShapeExpression (
-          variableDeclarations->getDeclaration (
+          variableDeclarations->get (
               IndirectLoop::Fortran::PlanFunction::VariableNames::pthrcolSize),
           subroutineScope));
 
@@ -818,22 +803,19 @@ FortranCUDAHostSubroutineIndirectLoop::initialiseDeviceVariablesSizesVariable ()
         && parallelLoop->getOpMapValue (i) == INDIRECT)
     {
       SgVarRefExp * dataSizesReferences = buildVarRefExp (
-          variableDeclarations->getDeclaration (
+          variableDeclarations->get (
               IndirectAndDirectLoop::Fortran::VariableNames::argsSizes));
 
-      SgVarRefExp
-          * fieldReference =
-              buildVarRefExp (
-                  dataSizesDeclarationOfIndirectLoop->getFieldDeclarations ()->getDeclaration (
-                      VariableNames::getOpDatSizeName (i)));
+      SgVarRefExp * fieldReference = buildVarRefExp (
+          dataSizesDeclarationOfIndirectLoop->getFieldDeclarations ()->get (
+              VariableNames::getOpDatSizeName (i)));
 
       SgDotExp * fieldSelectionExpression = buildDotExp (dataSizesReferences,
           fieldReference);
 
       SgAssignOp * assignmentExpression = buildAssignOp (
-          fieldSelectionExpression, buildVarRefExp (
-              variableDeclarations->getDeclaration (
-                  VariableNames::getOpDatSizeName (i))));
+          fieldSelectionExpression, buildVarRefExp (variableDeclarations->get (
+              VariableNames::getOpDatSizeName (i))));
 
       appendStatement (buildExprStatement (assignmentExpression),
           subroutineScope);
@@ -847,20 +829,18 @@ FortranCUDAHostSubroutineIndirectLoop::initialiseDeviceVariablesSizesVariable ()
         && parallelLoop->getOpMapValue (i) == INDIRECT)
     {
       SgVarRefExp * dataSizesReferences = buildVarRefExp (
-          variableDeclarations->getDeclaration (
+          variableDeclarations->get (
               IndirectAndDirectLoop::Fortran::VariableNames::argsSizes));
 
-      SgVarRefExp
-          * fieldReference =
-              buildVarRefExp (
-                  dataSizesDeclarationOfIndirectLoop->getFieldDeclarations ()->getDeclaration (
-                      VariableNames::getLocalToGlobalMappingSizeName (i)));
+      SgVarRefExp * fieldReference = buildVarRefExp (
+          dataSizesDeclarationOfIndirectLoop->getFieldDeclarations ()->get (
+              VariableNames::getLocalToGlobalMappingSizeName (i)));
 
       SgDotExp * fieldSelectionExpression = buildDotExp (dataSizesReferences,
           fieldReference);
 
       SgVarRefExp * pnindirect_Reference = buildVarRefExp (
-          variableDeclarations->getDeclaration (
+          variableDeclarations->get (
               IndirectLoop::Fortran::PlanFunction::VariableNames::pnindirect));
 
       SgPntrArrRefExp * arrayIndexExpression = buildPntrArrRefExp (
@@ -881,22 +861,19 @@ FortranCUDAHostSubroutineIndirectLoop::initialiseDeviceVariablesSizesVariable ()
     if (parallelLoop->getOpMapValue (i) == INDIRECT)
     {
       SgVarRefExp * dataSizesReferences = buildVarRefExp (
-          variableDeclarations->getDeclaration (
+          variableDeclarations->get (
               IndirectAndDirectLoop::Fortran::VariableNames::argsSizes));
 
-      SgVarRefExp
-          * fieldReference =
-              buildVarRefExp (
-                  dataSizesDeclarationOfIndirectLoop->getFieldDeclarations ()->getDeclaration (
-                      VariableNames::getGlobalToLocalMappingSizeName (i)));
+      SgVarRefExp * fieldReference = buildVarRefExp (
+          dataSizesDeclarationOfIndirectLoop->getFieldDeclarations ()->get (
+              VariableNames::getGlobalToLocalMappingSizeName (i)));
 
       SgDotExp * fieldSelectionExpression = buildDotExp (dataSizesReferences,
           fieldReference);
 
       SgAssignOp * assignmentExpression = buildAssignOp (
-          fieldSelectionExpression, buildVarRefExp (
-              variableDeclarations->getDeclaration (
-                  VariableNames::getGlobalToLocalMappingSizeName (i))));
+          fieldSelectionExpression, buildVarRefExp (variableDeclarations->get (
+              VariableNames::getGlobalToLocalMappingSizeName (i))));
 
       appendStatement (buildExprStatement (assignmentExpression),
           subroutineScope);
@@ -909,22 +886,19 @@ FortranCUDAHostSubroutineIndirectLoop::initialiseDeviceVariablesSizesVariable ()
         && parallelLoop->getOpMapValue (i) == DIRECT)
     {
       SgVarRefExp * dataSizesReferences = buildVarRefExp (
-          variableDeclarations->getDeclaration (
+          variableDeclarations->get (
               IndirectAndDirectLoop::Fortran::VariableNames::argsSizes));
 
-      SgVarRefExp
-          * fieldReference =
-              buildVarRefExp (
-                  dataSizesDeclarationOfIndirectLoop->getFieldDeclarations ()->getDeclaration (
-                      VariableNames::getOpDatSizeName (i)));
+      SgVarRefExp * fieldReference = buildVarRefExp (
+          dataSizesDeclarationOfIndirectLoop->getFieldDeclarations ()->get (
+              VariableNames::getOpDatSizeName (i)));
 
       SgDotExp * fieldSelectionExpression = buildDotExp (dataSizesReferences,
           fieldReference);
 
       SgAssignOp * assignmentExpression = buildAssignOp (
-          fieldSelectionExpression, buildVarRefExp (
-              variableDeclarations->getDeclaration (
-                  VariableNames::getOpDatSizeName (i))));
+          fieldSelectionExpression, buildVarRefExp (variableDeclarations->get (
+              VariableNames::getOpDatSizeName (i))));
 
       appendStatement (buildExprStatement (assignmentExpression),
           subroutineScope);
@@ -958,21 +932,18 @@ FortranCUDAHostSubroutineIndirectLoop::initialiseDeviceVariablesSizesVariable ()
       != planFunctionSizeVariables.end (); ++it)
   {
     SgVarRefExp * dataSizesReferences = buildVarRefExp (
-        variableDeclarations->getDeclaration (
+        variableDeclarations->get (
             IndirectAndDirectLoop::Fortran::VariableNames::argsSizes));
 
-    SgVarRefExp
-        * fieldReference =
-            buildVarRefExp (
-                dataSizesDeclarationOfIndirectLoop->getFieldDeclarations ()->get (
-                    *it));
+    SgVarRefExp * fieldReference = buildVarRefExp (
+        dataSizesDeclarationOfIndirectLoop->getFieldDeclarations ()->get (*it));
 
     SgDotExp * fieldSelectionExpression = buildDotExp (dataSizesReferences,
         fieldReference);
 
     SgAssignOp * assignmentExpression = buildAssignOp (
-        fieldSelectionExpression, buildVarRefExp (
-            variableDeclarations->get (*it)));
+        fieldSelectionExpression, buildVarRefExp (variableDeclarations->get (
+            *it)));
 
     appendStatement (buildExprStatement (assignmentExpression), subroutineScope);
   }
@@ -990,7 +961,7 @@ FortranCUDAHostSubroutineIndirectLoop::initialiseVariablesAndConstants ()
   using SageInterface::appendStatement;
 
   SgExprStatement * assignmentStatement = buildAssignStatement (buildVarRefExp (
-      variableDeclarations->getDeclaration (
+      variableDeclarations->get (
           IndirectLoop::Fortran::HostSubroutine::VariableNames::blockOffset)),
       buildIntVal (0));
 
@@ -1024,7 +995,7 @@ FortranCUDAHostSubroutineIndirectLoop::createExecutionPlanDeclarations ()
    * ======================================================
    */
 
-  variableDeclarations->addDeclaration (
+  variableDeclarations->add (
       IndirectAndDirectLoop::Fortran::VariableNames::argsSizes,
       FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
           IndirectAndDirectLoop::Fortran::VariableNames::argsSizes,
@@ -1041,7 +1012,7 @@ FortranCUDAHostSubroutineIndirectLoop::createExecutionPlanDeclarations ()
   SgType * c_ptrType = FortranTypesBuilder::buildNewTypeDeclaration ("c_ptr",
       subroutineScope)->get_type ();
 
-  variableDeclarations->addDeclaration (
+  variableDeclarations->add (
       IndirectLoop::Fortran::HostSubroutine::VariableNames::planRet,
       FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
           IndirectLoop::Fortran::HostSubroutine::VariableNames::planRet,
@@ -1050,7 +1021,7 @@ FortranCUDAHostSubroutineIndirectLoop::createExecutionPlanDeclarations ()
   SgType * op_planType = FortranTypesBuilder::buildNewTypeDeclaration (
       "op_plan", subroutineScope)->get_type ();
 
-  variableDeclarations->addDeclaration (
+  variableDeclarations->add (
       IndirectLoop::Fortran::HostSubroutine::VariableNames::actualPlan,
       FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
           IndirectLoop::Fortran::HostSubroutine::VariableNames::actualPlan,
@@ -1065,7 +1036,7 @@ FortranCUDAHostSubroutineIndirectLoop::createExecutionPlanDeclarations ()
   SgType * c_devptrType = FortranTypesBuilder::buildNewTypeDeclaration (
       "c_devptr", subroutineScope)->get_type ();
 
-  variableDeclarations->addDeclaration (
+  variableDeclarations->add (
       IndirectLoop::Fortran::PlanFunction::VariableNames::pindMaps,
       FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
           IndirectLoop::Fortran::PlanFunction::VariableNames::pindMaps,
@@ -1073,7 +1044,7 @@ FortranCUDAHostSubroutineIndirectLoop::createExecutionPlanDeclarations ()
               FortranTypesBuilder::getArray_RankOne (c_devptrType)),
           subroutineScope));
 
-  variableDeclarations->addDeclaration (
+  variableDeclarations->add (
       IndirectLoop::Fortran::PlanFunction::VariableNames::pmaps,
       FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
           IndirectLoop::Fortran::PlanFunction::VariableNames::pmaps,
@@ -1081,7 +1052,7 @@ FortranCUDAHostSubroutineIndirectLoop::createExecutionPlanDeclarations ()
               FortranTypesBuilder::getArray_RankOne (c_devptrType)),
           subroutineScope));
 
-  variableDeclarations->addDeclaration (
+  variableDeclarations->add (
       IndirectLoop::Fortran::PlanFunction::VariableNames::pindMapsSize,
       FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
           IndirectLoop::Fortran::PlanFunction::VariableNames::pindMapsSize,
