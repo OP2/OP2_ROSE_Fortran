@@ -107,7 +107,7 @@ FortranCUDAHostSubroutineDirectLoop::createVariableSizesInitialisationStatements
     {
       string const & variableName = VariableNames::getOpDatSizeName (i);
 
-      SgExpression * sizeVariableField = buildDotExp (buildVarRefExp (
+      SgDotExp * dotExpression = buildDotExp (buildVarRefExp (
           variableDeclarations->get (
               IndirectAndDirectLoop::Fortran::VariableNames::argsSizes)),
           buildOpaqueVarRefExp (variableName, subroutineScope));
@@ -121,7 +121,7 @@ FortranCUDAHostSubroutineDirectLoop::createVariableSizesInitialisationStatements
       if (parallelLoop->isReductionRequired (i) == false)
       {
         SgExprStatement * assignmentStatement = buildAssignStatement (
-            sizeVariableField, buildVarRefExp (variableDeclarations->get (
+            dotExpression, buildVarRefExp (variableDeclarations->get (
                 variableName)));
 
         appendStatement (assignmentStatement, subroutineScope);
@@ -131,7 +131,7 @@ FortranCUDAHostSubroutineDirectLoop::createVariableSizesInitialisationStatements
         SgExprStatement
             * assignmentStatement =
                 buildAssignStatement (
-                    sizeVariableField,
+                    dotExpression,
                     buildVarRefExp (
                         variableDeclarations->get (
                             IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::numberOfThreadItems)));
@@ -329,7 +329,7 @@ FortranCUDAHostSubroutineDirectLoop::createStatements ()
 
   createVariableSizesInitialisationStatements ();
 
-  appendStatement (createThreadSynchroniseCall (), subroutineScope);
+  appendStatement (createThreadSynchroniseCallStatement (), subroutineScope);
 
   if (parallelLoop->isReductionRequired () == true)
   {

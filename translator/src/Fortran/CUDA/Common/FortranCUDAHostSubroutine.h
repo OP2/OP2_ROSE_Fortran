@@ -16,7 +16,7 @@ class FortranCUDAHostSubroutine: public FortranHostSubroutine
      * ======================================================
      */
     SgStatement *
-    createThreadSynchroniseCall ();
+    createThreadSynchroniseCallStatement ();
 
     void
     createReductionEpilogueStatements ();

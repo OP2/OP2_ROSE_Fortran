@@ -206,7 +206,7 @@ FortranCUDAHostSubroutineIndirectLoop::createExecutionPlanExecutionStatements ()
    * ======================================================
    */
 
-  loopBody->append_statement (createThreadSynchroniseCall ());
+  loopBody->append_statement (createThreadSynchroniseCallStatement ());
 
   /*
    * ======================================================
