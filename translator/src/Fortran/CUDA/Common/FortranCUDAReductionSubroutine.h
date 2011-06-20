@@ -27,7 +27,7 @@ class FortranCUDAReductionSubroutine: public Subroutine,
   private:
 
     SgStatement *
-    createCallToSynchThreads ();
+    createSynchThreadsCallStatement ();
 
     virtual void
     createStatements ();

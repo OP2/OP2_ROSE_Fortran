@@ -76,13 +76,14 @@ FortranHostSubroutine::createFormalParameterDeclarations ()
 
         string const & variableName = VariableNames::getUserSubroutineName ();
 
-        variableDeclarations->add (
-            variableName,
-            FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
-                variableName, FortranTypesBuilder::getString (
-                    userSubroutineName.length ()),
+        SgVariableDeclaration
+            * variableDeclaration =
+                FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
+                    variableName, FortranTypesBuilder::getString (
+                        userSubroutineName.length ()), subroutineScope,
+                    formalParameters, 1, INTENT_IN);
 
-                subroutineScope, formalParameters, 1, INTENT_IN));
+        variableDeclarations->add (variableName, variableDeclaration);
 
         break;
       }
@@ -110,11 +111,13 @@ FortranHostSubroutine::createFormalParameterDeclarations ()
                */
               string const & variableName = VariableNames::getOpSetName ();
 
-              variableDeclarations->add (
-                  variableName,
-                  FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
-                      variableName, classReference, subroutineScope,
-                      formalParameters, 1, INTENT_IN));
+              SgVariableDeclaration
+                  * variableDeclaration =
+                      FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
+                          variableName, classReference, subroutineScope,
+                          formalParameters, 1, INTENT_IN);
+
+              variableDeclarations->add (variableName, variableDeclaration);
             }
 
             else if (iequals (className, OP2::OP_MAP))
@@ -128,11 +131,13 @@ FortranHostSubroutine::createFormalParameterDeclarations ()
               string const & variableName = VariableNames::getOpMapName (
                   OP_DAT_ArgumentGroup);
 
-              variableDeclarations->add (
-                  variableName,
-                  FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
-                      variableName, classReference, subroutineScope,
-                      formalParameters, 1, INTENT_IN));
+              SgVariableDeclaration
+                  * variableDeclaration =
+                      FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
+                          variableName, classReference, subroutineScope,
+                          formalParameters, 1, INTENT_IN);
+
+              variableDeclarations->add (variableName, variableDeclaration);
             }
 
             else if (iequals (className, OP2::OP_DAT))
@@ -148,11 +153,13 @@ FortranHostSubroutine::createFormalParameterDeclarations ()
               string const & variableName = VariableNames::getOpDatName (
                   OP_DAT_ArgumentGroup);
 
-              variableDeclarations->add (
-                  variableName,
-                  FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
-                      variableName, classReference, subroutineScope,
-                      formalParameters, 1, INTENT_IN));
+              SgVariableDeclaration
+                  * variableDeclaration =
+                      FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
+                          variableName, classReference, subroutineScope,
+                          formalParameters, 1, INTENT_IN);
+
+              variableDeclarations->add (variableName, variableDeclaration);
             }
 
             else
@@ -177,11 +184,14 @@ FortranHostSubroutine::createFormalParameterDeclarations ()
             string const & variableName = VariableNames::getOpAccessName (
                 OP_DAT_ArgumentGroup);
 
-            variableDeclarations->add (
-                variableName,
-                FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
-                    variableName, FortranTypesBuilder::getFourByteInteger (),
-                    subroutineScope, formalParameters, 1, INTENT_IN));
+            SgVariableDeclaration
+                * variableDeclaration =
+                    FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
+                        variableName,
+                        FortranTypesBuilder::getFourByteInteger (),
+                        subroutineScope, formalParameters, 1, INTENT_IN);
+
+            variableDeclarations->add (variableName, variableDeclaration);
 
             break;
           }
@@ -207,11 +217,13 @@ FortranHostSubroutine::createFormalParameterDeclarations ()
         string const & variableName = VariableNames::getOpIndirectionName (
             OP_DAT_ArgumentGroup);
 
-        variableDeclarations->add (
-            variableName,
-            FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
-                variableName, FortranTypesBuilder::getFourByteInteger (),
-                subroutineScope, formalParameters, 1, INTENT_IN));
+        SgVariableDeclaration
+            * variableDeclaration =
+                FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
+                    variableName, FortranTypesBuilder::getFourByteInteger (),
+                    subroutineScope, formalParameters, 1, INTENT_IN);
+
+        variableDeclarations->add (variableName, variableDeclaration);
 
         break;
       }

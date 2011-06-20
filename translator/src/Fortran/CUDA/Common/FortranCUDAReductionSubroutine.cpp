@@ -7,7 +7,7 @@
 #include <FortranTypesBuilder.h>
 
 SgStatement *
-FortranCUDAReductionSubroutine::createCallToSynchThreads ()
+FortranCUDAReductionSubroutine::createSynchThreadsCallStatement ()
 {
   using SageBuilder::buildFunctionCallExp;
   using SageBuilder::buildExprListExp;
@@ -133,7 +133,7 @@ FortranCUDAReductionSubroutine::createStatements ()
 
   appendStatement (buildExprStatement (initStartOffset), subroutineScope);
 
-  appendStatement (createCallToSynchThreads (), subroutineScope);
+  appendStatement (createSynchThreadsCallStatement (), subroutineScope);
 
   /*
    * ======================================================
@@ -231,7 +231,7 @@ FortranCUDAReductionSubroutine::createStatements ()
                       IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::iterationCounter)),
               shiftFunctionCallInsideMailLoop);
 
-  SgStatement * mainLoopBody = buildBasicBlock (createCallToSynchThreads (),
+  SgStatement * mainLoopBody = buildBasicBlock (createSynchThreadsCallStatement (),
       ifStatement, buildExprStatement (reassignIterationCounter));
 
   SgWhileStmt * reductionImplementation = buildWhileStmt (buildExprStatement (
@@ -246,7 +246,7 @@ FortranCUDAReductionSubroutine::createStatements ()
    * Finalisation: synchronisation plus final sum
    * ======================================================
    */
-  appendStatement (createCallToSynchThreads (), subroutineScope);
+  appendStatement (createSynchThreadsCallStatement (), subroutineScope);
 
   SgExpression
       * ifThreadIdGreaterZero =

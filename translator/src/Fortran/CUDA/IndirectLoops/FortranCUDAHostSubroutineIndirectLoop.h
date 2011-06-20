@@ -27,9 +27,6 @@ class FortranCUDAHostSubroutineIndirectLoop: public FortranCUDAHostSubroutine,
   private:
 
     void
-    createCToFortranPointerConversionStatements ();
-
-    void
     createExecutionPlanExecutionStatements ();
 
     void
@@ -62,7 +59,8 @@ class FortranCUDAHostSubroutineIndirectLoop: public FortranCUDAHostSubroutine,
             ParallelLoop * parallelLoop,
             SgScopeStatement * moduleScope,
             FortranCUDAInitialiseConstantsSubroutine * initialiseConstantsSubroutine,
-            FortranCUDADataSizesDeclarationIndirectLoop * dataSizesDeclarationOfIndirectLoop);
+            FortranCUDADataSizesDeclarationIndirectLoop * dataSizesDeclarationOfIndirectLoop,
+            FortranOpDatDimensionsDeclaration * opDatDimensionsDeclaration);
 };
 
 #endif

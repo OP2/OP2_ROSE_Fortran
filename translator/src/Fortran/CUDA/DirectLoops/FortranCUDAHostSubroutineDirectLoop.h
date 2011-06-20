@@ -19,7 +19,6 @@
 #define FORTRAN_CUDA_HOST_SUBROUTINE_DIRECT_LOOP_H
 
 #include <FortranCUDAHostSubroutine.h>
-#include <FortranCUDAKernelSubroutine.h>
 #include <FortranCUDADataSizesDeclarationDirectLoop.h>
 
 class FortranCUDAHostSubroutineDirectLoop: public FortranCUDAHostSubroutine
@@ -81,7 +80,8 @@ class FortranCUDAHostSubroutineDirectLoop: public FortranCUDAHostSubroutine
             std::string const & userSubroutineName,
             std::string const & kernelSubroutineName,
             FortranCUDADataSizesDeclarationDirectLoop * dataSizesDeclarationOfDirectLoop,
-            ParallelLoop * parallelLoop, SgScopeStatement * moduleScope);
+            ParallelLoop * parallelLoop, SgScopeStatement * moduleScope,
+            FortranOpDatDimensionsDeclaration * opDatDimensionsDeclaration);
 };
 
 #endif

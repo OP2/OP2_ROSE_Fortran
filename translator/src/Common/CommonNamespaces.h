@@ -508,6 +508,15 @@ namespace VariableNames
 
   /*
    * ======================================================
+   * Returns the name of the OP_DAT dimension variable
+   * in this OP_DAT argument group
+   * ======================================================
+   */
+  std::string
+  getOpDatDimensionName (unsigned int OP_DAT_ArgumentGroup);
+
+  /*
+   * ======================================================
    * Returns the name of the indirection variable in this
    * OP_DAT argument group
    * ======================================================

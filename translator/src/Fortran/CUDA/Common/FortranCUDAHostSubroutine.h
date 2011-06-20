@@ -3,10 +3,15 @@
 
 #include <FortranHostSubroutine.h>
 #include <FortranCUDAKernelSubroutine.h>
+#include <FortranOpDatDimensionsDeclaration.h>
 #include <ParallelLoop.h>
 
 class FortranCUDAHostSubroutine: public FortranHostSubroutine
 {
+  protected:
+
+    FortranOpDatDimensionsDeclaration * opDatDimensionsDeclaration;
+
   protected:
 
     /*
@@ -31,6 +36,9 @@ class FortranCUDAHostSubroutine: public FortranHostSubroutine
     createCUDAKernelPrologueStatements ();
 
     void
+    createOpDatDimensionInitialisationStatements ();
+
+    void
     createCUDAKernelLocalVariableDeclarations ();
 
     void
@@ -42,7 +50,7 @@ class FortranCUDAHostSubroutine: public FortranHostSubroutine
     FortranCUDAHostSubroutine (std::string const & subroutineName,
         std::string const & userSubroutineName,
         std::string const & kernelSubroutineName, ParallelLoop * parallelLoop,
-        SgScopeStatement * moduleScope);
+        SgScopeStatement * moduleScope,     FortranOpDatDimensionsDeclaration * opDatDimensionsDeclaration);
 };
 
 #endif

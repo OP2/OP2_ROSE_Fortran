@@ -1,0 +1,85 @@
+/*
+ * Written by Adam Betts and Carlo Bertolli
+ *
+ * This class models a variable declaration: it includes
+ * fields for the sizes of each OP_DAT dimension.
+ * These size fields allow OP_DAT dimensions to be passed
+ * as variables as opposed to constants
+ */
+
+#ifndef FORTRAN_OP_DAT_DIMENSIONS_DECLARATION_H
+#define FORTRAN_OP_DAT_DIMENSIONS_DECLARATION_H
+
+#include <ParallelLoop.h>
+#include <VariableDeclarations.h>
+
+class FortranOpDatDimensionsDeclaration
+{
+  private:
+    /*
+     * ======================================================
+     * The subroutine name
+     * ======================================================
+     */
+    std::string subroutineName;
+
+    /*
+     * ======================================================
+     * The parallel loop
+     * ======================================================
+     */
+    ParallelLoop * parallelLoop;
+
+    /*
+     * ======================================================
+     * The scope of the declaration
+     * ======================================================
+     */
+    SgScopeStatement * moduleScope;
+
+    /*
+     * ======================================================
+     * The type definition declaration statement
+     * ======================================================
+     */
+    SgDerivedTypeStatement * typeStatement;
+
+    /*
+     * ======================================================
+     * Field variable declarations inside the above type
+     * definition declaration statement
+     * ======================================================
+     */
+    VariableDeclarations * fieldDeclarations;
+
+  private:
+
+    void
+    addFields ();
+
+    void
+    addTypeDeclaration ();
+
+  public:
+
+    /*
+     * ======================================================
+     * What is the type of the data sizes declaration?
+     * ======================================================
+     */
+    SgClassType *
+    getType ();
+
+    /*
+     * ======================================================
+     * Get the field declarations
+     * ======================================================
+     */
+    VariableDeclarations *
+    getFieldDeclarations ();
+
+    FortranOpDatDimensionsDeclaration (std::string const & subroutineName,
+        ParallelLoop * parallelLoop, SgScopeStatement * moduleScope);
+};
+
+#endif

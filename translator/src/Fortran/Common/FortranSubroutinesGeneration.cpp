@@ -4,6 +4,7 @@
 #include <FortranSubroutinesGeneration.h>
 #include <FortranTypesBuilder.h>
 #include <ROSEHelper.h>
+#include <FortranOpDatDimensionsDeclaration.h>
 #include <FortranCUDAKernelSubroutineDirectLoop.h>
 #include <FortranCUDAKernelSubroutineIndirectLoop.h>
 #include <FortranCUDAHostSubroutineDirectLoop.h>
@@ -256,6 +257,17 @@ FortranSubroutinesGeneration::createCUDASubroutines (
 
   /*
    * ======================================================
+   * Create the type representing the dimensions of each
+   * OP_DAT
+   * ======================================================
+   */
+
+  FortranOpDatDimensionsDeclaration * opDatDimensionsDeclaration =
+      new FortranOpDatDimensionsDeclaration (userSubroutineName, parallelLoop,
+          moduleScope);
+
+  /*
+   * ======================================================
    * Create the reduction subroutines
    * ======================================================
    */
@@ -296,7 +308,7 @@ FortranSubroutinesGeneration::createCUDASubroutines (
     hostSubroutine = new FortranCUDAHostSubroutineDirectLoop (
         userSubroutineName, userDeviceSubroutine->getSubroutineName (),
         kernelSubroutine->getSubroutineName (), dataSizesDeclaration,
-        parallelLoop, moduleScope);
+        parallelLoop, moduleScope, opDatDimensionsDeclaration);
   }
   else
   {
@@ -328,7 +340,8 @@ FortranSubroutinesGeneration::createCUDASubroutines (
     hostSubroutine = new FortranCUDAHostSubroutineIndirectLoop (
         userSubroutineName, userDeviceSubroutine->getSubroutineName (),
         kernelSubroutine->getSubroutineName (), parallelLoop, moduleScope,
-        initialiseConstantsSubroutine, dataSizesDeclaration);
+        initialiseConstantsSubroutine, dataSizesDeclaration,
+        opDatDimensionsDeclaration);
   }
 
   /*

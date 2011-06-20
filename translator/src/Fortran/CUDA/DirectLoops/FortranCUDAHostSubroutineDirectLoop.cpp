@@ -324,7 +324,7 @@ FortranCUDAHostSubroutineDirectLoop::createStatements ()
 
   if (parallelLoop->isReductionRequired () == true)
   {
-    createReductionEpilogueStatements ();
+    createReductionPrologueStatements ();
   }
 
   createVariableSizesInitialisationStatements ();
@@ -333,7 +333,7 @@ FortranCUDAHostSubroutineDirectLoop::createStatements ()
 
   if (parallelLoop->isReductionRequired () == true)
   {
-    createReductionPrologueStatements ();
+    createReductionEpilogueStatements ();
   }
 
   createCUDAKernelEpilogueStatements ();
@@ -372,9 +372,10 @@ FortranCUDAHostSubroutineDirectLoop::FortranCUDAHostSubroutineDirectLoop (
     std::string const & userSubroutineName,
     std::string const & kernelSubroutineName,
     FortranCUDADataSizesDeclarationDirectLoop * dataSizesDeclarationOfDirectLoop,
-    ParallelLoop * parallelLoop, SgScopeStatement * moduleScope) :
+    ParallelLoop * parallelLoop, SgScopeStatement * moduleScope,
+    FortranOpDatDimensionsDeclaration * opDatDimensionsDeclaration) :
   FortranCUDAHostSubroutine (subroutineName, userSubroutineName,
-      kernelSubroutineName, parallelLoop, moduleScope),
+      kernelSubroutineName, parallelLoop, moduleScope, opDatDimensionsDeclaration),
       dataSizesDeclarationOfDirectLoop (dataSizesDeclarationOfDirectLoop)
 {
   Debug::getInstance ()->debugMessage (

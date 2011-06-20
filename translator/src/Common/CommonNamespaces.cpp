@@ -16,6 +16,7 @@ namespace VariableSuffixes
   std::string const Local = "Local";
   std::string const Global = "Global";
   std::string const Device = "Device";
+  std::string const Dimension = "Dimension";
 }
 
 std::string
@@ -78,6 +79,17 @@ VariableNames::getOpDatDeviceName (unsigned int OP_DAT_ArgumentGroup)
 
   return VariablePrefixes::OP_DAT
       + lexical_cast <string> (OP_DAT_ArgumentGroup) + VariableSuffixes::Device;
+}
+
+std::string
+VariableNames::getOpDatDimensionName (unsigned int OP_DAT_ArgumentGroup)
+{
+  using boost::lexical_cast;
+  using std::string;
+
+  return VariablePrefixes::OP_DAT
+      + lexical_cast <string> (OP_DAT_ArgumentGroup)
+      + VariableSuffixes::Dimension;
 }
 
 std::string
