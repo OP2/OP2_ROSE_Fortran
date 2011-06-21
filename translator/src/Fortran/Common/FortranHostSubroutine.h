@@ -19,6 +19,12 @@ class FortranHostSubroutine: public FortranSubroutine, public HostSubroutine
     createCToFortranPointerCallStatement (SgExpression * parameter1,
         SgExpression * parameter2, SgExpression * parameter3 = NULL);
 
+    void
+    createOpDatDimensionsDeclaration (SgType * type);
+
+    void
+    createOpDatSizesDeclaration (SgType * type);
+
     virtual void
     createFormalParameterDeclarations ();
 

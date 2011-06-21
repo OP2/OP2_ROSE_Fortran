@@ -35,6 +35,26 @@ FortranHostSubroutine::createCToFortranPointerCallStatement (
 }
 
 void
+FortranHostSubroutine::createOpDatDimensionsDeclaration (SgType * type)
+{
+  variableDeclarations->add (
+      IndirectAndDirectLoop::Fortran::VariableNames::opDatDimensions,
+      FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
+          IndirectAndDirectLoop::Fortran::VariableNames::opDatDimensions, type,
+          subroutineScope, 1, DEVICE));
+}
+
+void
+FortranHostSubroutine::createOpDatSizesDeclaration (SgType * type)
+{
+  variableDeclarations->add (
+      IndirectAndDirectLoop::Fortran::VariableNames::argsSizes,
+      FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
+          IndirectAndDirectLoop::Fortran::VariableNames::argsSizes, type,
+          subroutineScope, 1, DEVICE));
+}
+
+void
 FortranHostSubroutine::createFormalParameterDeclarations ()
 {
   using boost::iequals;

@@ -515,6 +515,8 @@ FortranCUDAHostSubroutine::createOpDatDimensionInitialisationStatements ()
   using SageBuilder::buildAssignStatement;
   using SageBuilder::buildVarRefExp;
   using SageInterface::appendStatement;
+
+
 }
 
 void

@@ -131,6 +131,7 @@ namespace IndirectAndDirectLoop
     {
       std::string const argsSizes = "argsSizes";
       std::string const autoshared = "autoshared";
+      std::string const opDatDimensions = "opDatDimensions";
     }
 
     namespace Libraries

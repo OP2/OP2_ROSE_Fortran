@@ -384,6 +384,6 @@ FortranCUDAKernelSubroutine::FortranCUDAKernelSubroutine (
 {
   using SageInterface::addTextForUnparser;
 
-  addTextForUnparser (subroutineHeaderStatement, "attributes(host) ",
+  addTextForUnparser (subroutineHeaderStatement, "attributes(global) ",
       AstUnparseAttribute::e_before);
 }

@@ -318,6 +318,8 @@ FortranCUDAHostSubroutineDirectLoop::createStatements ()
 {
   using SageInterface::appendStatement;
 
+  createOpDatDimensionInitialisationStatements ();
+
   createCUDAKernelInitialisationStatements ();
 
   createCUDAKernelPrologueStatements ();
@@ -328,6 +330,8 @@ FortranCUDAHostSubroutineDirectLoop::createStatements ()
   }
 
   createVariableSizesInitialisationStatements ();
+
+  appendStatement (createKernelFunctionCallStatement (), subroutineScope);
 
   appendStatement (createThreadSynchroniseCallStatement (), subroutineScope);
 
@@ -342,23 +346,21 @@ FortranCUDAHostSubroutineDirectLoop::createStatements ()
 void
 FortranCUDAHostSubroutineDirectLoop::createLocalVariableDeclarations ()
 {
-  variableDeclarations->add (
-      IndirectAndDirectLoop::Fortran::VariableNames::argsSizes,
-      FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
-          IndirectAndDirectLoop::Fortran::VariableNames::argsSizes,
-          dataSizesDeclarationOfDirectLoop->getType (), subroutineScope, 1,
-          DEVICE));
+  createOpDatSizesDeclaration (dataSizesDeclarationOfDirectLoop->getType ());
+
+  createOpDatDimensionsDeclaration (opDatDimensionsDeclaration->getType ());
 
   createDataMarshallingLocalVariableDeclarations ();
+
+  createCUDAKernelLocalVariableDeclarations ();
+
+  createCUDAKernelLocalVariableDeclarationsForDirectLoop ();
 
   if (parallelLoop->isReductionRequired () == true)
   {
     createReductionLocalVariableDeclarations ();
   }
 
-  createCUDAKernelLocalVariableDeclarations ();
-
-  createCUDAKernelLocalVariableDeclarationsForDirectLoop ();
 }
 
 /*
@@ -375,8 +377,9 @@ FortranCUDAHostSubroutineDirectLoop::FortranCUDAHostSubroutineDirectLoop (
     ParallelLoop * parallelLoop, SgScopeStatement * moduleScope,
     FortranOpDatDimensionsDeclaration * opDatDimensionsDeclaration) :
   FortranCUDAHostSubroutine (subroutineName, userSubroutineName,
-      kernelSubroutineName, parallelLoop, moduleScope, opDatDimensionsDeclaration),
-      dataSizesDeclarationOfDirectLoop (dataSizesDeclarationOfDirectLoop)
+      kernelSubroutineName, parallelLoop, moduleScope,
+      opDatDimensionsDeclaration), dataSizesDeclarationOfDirectLoop (
+      dataSizesDeclarationOfDirectLoop)
 {
   Debug::getInstance ()->debugMessage (
       "Creating host subroutine of direct loop", 2);

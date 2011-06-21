@@ -984,20 +984,6 @@ FortranCUDAHostSubroutineIndirectLoop::createExecutionPlanDeclarations ()
 
   /*
    * ======================================================
-   * Create the variable which passes the sizes of arguments
-   * to the kernel
-   * ======================================================
-   */
-
-  variableDeclarations->add (
-      IndirectAndDirectLoop::Fortran::VariableNames::argsSizes,
-      FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
-          IndirectAndDirectLoop::Fortran::VariableNames::argsSizes,
-          dataSizesDeclarationOfIndirectLoop->getType (), subroutineScope, 1,
-          DEVICE));
-
-  /*
-   * ======================================================
    * Create pointers to the execution plan on the C and
    * Fortran side
    * ======================================================
@@ -1279,6 +1265,8 @@ FortranCUDAHostSubroutineIndirectLoop::createExecutionPlanDeclarations ()
 void
 FortranCUDAHostSubroutineIndirectLoop::createStatements ()
 {
+  createOpDatDimensionInitialisationStatements ();
+
   createCUDAKernelPrologueStatements ();
 
   createPlanFunctionParametersPreparationStatements (parallelLoop,
@@ -1300,11 +1288,15 @@ FortranCUDAHostSubroutineIndirectLoop::createStatements ()
 void
 FortranCUDAHostSubroutineIndirectLoop::createLocalVariableDeclarations ()
 {
+  createOpDatSizesDeclaration (dataSizesDeclarationOfIndirectLoop->getType ());
+
+  createOpDatDimensionsDeclaration (opDatDimensionsDeclaration->getType ());
+
   createDataMarshallingLocalVariableDeclarations ();
 
-  createExecutionPlanDeclarations ();
-
   createCUDAKernelLocalVariableDeclarations ();
+
+  createExecutionPlanDeclarations ();
 }
 
 /*
