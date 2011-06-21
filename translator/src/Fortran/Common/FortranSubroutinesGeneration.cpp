@@ -307,8 +307,9 @@ FortranSubroutinesGeneration::createCUDASubroutines (
 
     hostSubroutine = new FortranCUDAHostSubroutineDirectLoop (
         userSubroutineName, userDeviceSubroutine->getSubroutineName (),
-        kernelSubroutine->getSubroutineName (), dataSizesDeclaration,
-        parallelLoop, moduleScope, opDatDimensionsDeclaration);
+        kernelSubroutine->getSubroutineName (), parallelLoop, moduleScope,
+        initialiseConstantsSubroutine, dataSizesDeclaration,
+        opDatDimensionsDeclaration);
   }
   else
   {

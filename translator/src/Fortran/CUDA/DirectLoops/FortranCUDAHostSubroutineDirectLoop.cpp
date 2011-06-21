@@ -331,6 +331,8 @@ FortranCUDAHostSubroutineDirectLoop::createStatements ()
 
   createVariableSizesInitialisationStatements ();
 
+  appendStatement (createInitialiseConstantsCallStatement (), subroutineScope);
+
   appendStatement (createKernelFunctionCallStatement (), subroutineScope);
 
   appendStatement (createThreadSynchroniseCallStatement (), subroutineScope);
@@ -360,7 +362,6 @@ FortranCUDAHostSubroutineDirectLoop::createLocalVariableDeclarations ()
   {
     createReductionLocalVariableDeclarations ();
   }
-
 }
 
 /*
@@ -373,13 +374,15 @@ FortranCUDAHostSubroutineDirectLoop::FortranCUDAHostSubroutineDirectLoop (
     std::string const & subroutineName,
     std::string const & userSubroutineName,
     std::string const & kernelSubroutineName,
+    ParallelLoop * parallelLoop,
+    SgScopeStatement * moduleScope,
+    FortranCUDAInitialiseConstantsSubroutine * initialiseConstantsSubroutine,
     FortranCUDADataSizesDeclarationDirectLoop * dataSizesDeclarationOfDirectLoop,
-    ParallelLoop * parallelLoop, SgScopeStatement * moduleScope,
     FortranOpDatDimensionsDeclaration * opDatDimensionsDeclaration) :
   FortranCUDAHostSubroutine (subroutineName, userSubroutineName,
       kernelSubroutineName, parallelLoop, moduleScope,
-      opDatDimensionsDeclaration), dataSizesDeclarationOfDirectLoop (
-      dataSizesDeclarationOfDirectLoop)
+      initialiseConstantsSubroutine, opDatDimensionsDeclaration),
+      dataSizesDeclarationOfDirectLoop (dataSizesDeclarationOfDirectLoop)
 {
   Debug::getInstance ()->debugMessage (
       "Creating host subroutine of direct loop", 2);

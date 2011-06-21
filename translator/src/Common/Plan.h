@@ -16,6 +16,37 @@
 #include <VariableDeclarations.h>
 #include <ParallelLoop.h>
 
+namespace PlanFunction
+{
+  /*
+   * ======================================================
+   * Following are variable names used in the plan function
+   * ======================================================
+   */
+  namespace Fortran
+  {
+    std::string const blockOffset = "blockOffset";
+    std::string const pblkMap = "pblkMap";
+    std::string const pindMaps = "pindMaps";
+    std::string const pindOffs = "pindOffs";
+    std::string const pindSizes = "pindSizes";
+    std::string const poffset = "poffset";
+    std::string const pmaps = "pmaps";
+    std::string const pnelems = "pnelems";
+    std::string const pnindirect = "pnindirect";
+    std::string const pnthrcol = "pnthrcol";
+    std::string const pthrcol = "pthrcol";
+    std::string const pblkMapSize = "pblkMapSize";
+    std::string const pindMapsSize = "pindMapsSize";
+    std::string const pindOffsSize = "pindOffsSize";
+    std::string const pindSizesSize = "pindSizesSize";
+    std::string const poffsetSize = "poffsetSize";
+    std::string const pnelemsSize = "pnelemsSize";
+    std::string const pnthrcolSize = "pnthrcolSize";
+    std::string const pthrcolSize = "pthrcolSize";
+  }
+}
+
 class Plan
 {
   protected:

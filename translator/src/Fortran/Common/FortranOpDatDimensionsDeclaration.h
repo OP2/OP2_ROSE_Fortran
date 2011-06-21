@@ -64,7 +64,7 @@ class FortranOpDatDimensionsDeclaration
 
     /*
      * ======================================================
-     * What is the type of the data sizes declaration?
+     * What is the type of the declaration?
      * ======================================================
      */
     SgClassType *
@@ -72,11 +72,12 @@ class FortranOpDatDimensionsDeclaration
 
     /*
      * ======================================================
-     * Get the field declarations
+     * Get the field declaration representing the dimension
+     * of an OP_DAT
      * ======================================================
      */
-    VariableDeclarations *
-    getFieldDeclarations ();
+    SgVariableDeclaration *
+    getOpDatDimensionField (unsigned int OP_DAT_ArgumentGroup);
 
     FortranOpDatDimensionsDeclaration (std::string const & subroutineName,
         ParallelLoop * parallelLoop, SgScopeStatement * moduleScope);

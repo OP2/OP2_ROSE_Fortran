@@ -131,7 +131,7 @@ namespace IndirectAndDirectLoop
     {
       std::string const argsSizes = "argsSizes";
       std::string const autoshared = "autoshared";
-      std::string const opDatDimensions = "opDatDimensions";
+      std::string const opDatDimensions = "dimensions";
     }
 
     namespace Libraries
@@ -161,71 +161,6 @@ namespace IndirectLoop
       std::string const pindMaps = "pindMaps";
       std::string const pMaps = "pMaps";
       std::string const roundUp = "roundUp";
-    }
-
-    namespace ConstantSuffixes
-    {
-      /*
-       * ======================================================
-       * Following are suffixes of symbolic constants needed
-       * in each indirect loop. They are suffixes because
-       * Fortran does not have a namespace concept, so we
-       * prepend the name of the user device subroutine to make
-       * them unique.
-       *
-       * Although these constants are used across all modules
-       * implementing an OP_PAR_LOOP (for each indirect loop),
-       * we cannot have a single module in which they are
-       * included and initialised. This is because currently
-       * the compilers generating the final binaries (e.g.
-       * PGI) do not support calling functions/subroutines
-       * outside of a single Fortran module.
-       * ======================================================
-       */
-
-      std::string const constantsSeparator = "_";
-
-      std::string const air_const = "air_const";
-      std::string const alpha = "alpha";
-      std::string const cfl = "cfl";
-      std::string const eps = "eps";
-      std::string const gam = "gam";
-      std::string const gm1 = "gm1";
-      std::string const mach = "mach";
-      std::string const qinf = "qinf";
-    }
-
-    namespace PlanFunction
-    {
-      /*
-       * ======================================================
-       * Following are variable names used in the plan function
-       * returned for an indirect loop.
-       * ======================================================
-       */
-
-      namespace VariableNames
-      {
-        std::string const blockOffset = "blockOffset";
-        std::string const pblkMap = "pblkMap";
-        std::string const pindMaps = "pindMaps";
-        std::string const pindOffs = "pindOffs";
-        std::string const pindSizes = "pindSizes";
-        std::string const poffset = "poffset";
-        std::string const pmaps = "pmaps";
-        std::string const pnelems = "pnelems";
-        std::string const pnindirect = "pnindirect";
-        std::string const pnthrcol = "pnthrcol";
-        std::string const pthrcol = "pthrcol";
-        std::string const pblkMapSize = "pblkMapSize";
-        std::string const pindMapsSize = "pindMapsSize";
-        std::string const pindOffsSize = "pindOffsSize";
-        std::string const pindSizesSize = "pindSizesSize";
-        std::string const poffsetSize = "poffsetSize";
-        std::string const pnelemsSize = "pnelemsSize";
-        std::string const pnthrcolSize = "pnthrcolSize";
-        std::string const pthrcolSize = "pthrcolSize";
-      }
     }
 
     namespace HostSubroutine
@@ -290,10 +225,6 @@ namespace IndirectLoop
 
   namespace CPP
   {
-    namespace PlanFunction
-    {
-    }
-
     namespace HostSubroutine
     {
 
@@ -316,10 +247,6 @@ namespace DirectLoop
 
   namespace Fortran
   {
-    namespace PlanFunction
-    {
-    }
-
     namespace HostSubroutine
     {
       std::string const threadSynchRet = "threadSynchRet";
@@ -341,9 +268,6 @@ namespace DirectLoop
 
   namespace CPlusPlus
   {
-    namespace PlanFunction
-    {
-    }
 
     namespace HostSubroutine
     {
@@ -416,7 +340,7 @@ namespace CUDA
 
 namespace OpenMP
 {
-  std::string const numberOfThreads = "nThreads";
+  std::string const numberOfThreads = "nthreads";
   std::string const threadIndex = "threadIndex";
   std::string const sliceStart = "sliceStart";
   std::string const sliceEnd = "sliceEnd";

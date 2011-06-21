@@ -5,6 +5,7 @@
 #include <FortranCUDAKernelSubroutineIndirectLoop.h>
 #include <CommonNamespaces.h>
 #include <ROSEHelper.h>
+#include <Plan.h>
 
 /*
  * ======================================================
@@ -345,8 +346,7 @@ FortranCUDAKernelSubroutineIndirectLoop::applyPointeredIncrementsOrWrites ()
                         IndirectLoop::Fortran::KernelSubroutine::VariableNames::blockID));
 
         SgVarRefExp * pindOffs_Reference4 = buildVarRefExp (
-            variableDeclarations->get (
-                IndirectLoop::Fortran::PlanFunction::VariableNames::pindOffs));
+            variableDeclarations->get (PlanFunction::Fortran::pindOffs));
 
         SgMultiplyOp * multiplyExpression4_a = buildMultiplyOp (
             blockId_Reference4, buildIntVal (
@@ -613,8 +613,7 @@ FortranCUDAKernelSubroutineIndirectLoop::createPlanWhileLoop ()
                       IndirectLoop::Fortran::KernelSubroutine::VariableNames::offset_b)));
 
   SgPntrArrRefExp * arrayExpression2 = buildPntrArrRefExp (buildVarRefExp (
-      variableDeclarations->get (
-          IndirectLoop::Fortran::PlanFunction::VariableNames::pthrcol)),
+      variableDeclarations->get (PlanFunction::Fortran::pthrcol)),
       addExpression2);
 
   SgAssignOp * assignmentExpression2 = buildAssignOp (buildVarRefExp (
@@ -1006,8 +1005,7 @@ FortranCUDAKernelSubroutineIndirectLoop::createAutosharedWhileLoops ()
                         IndirectLoop::Fortran::KernelSubroutine::VariableNames::blockID));
 
         SgVarRefExp * pindOffs_Reference4 = buildVarRefExp (
-            variableDeclarations->get (
-                IndirectLoop::Fortran::PlanFunction::VariableNames::pindOffs));
+            variableDeclarations->get (PlanFunction::Fortran::pindOffs));
 
         SgMultiplyOp * multiplyExpression4_a = buildMultiplyOp (
             blockId_Reference4, buildIntVal (
@@ -1338,11 +1336,10 @@ FortranCUDAKernelSubroutineIndirectLoop::createThreadZeroStatements ()
       IndirectLoop::Fortran::KernelSubroutine::VariableNames::blockID));
 
   SgVarRefExp * blockOffset_Reference1 = buildVarRefExp (
-      variableDeclarations->get (
-          IndirectLoop::Fortran::PlanFunction::VariableNames::blockOffset));
+      variableDeclarations->get (PlanFunction::Fortran::blockOffset));
 
   SgVarRefExp * pblkMap_Reference1 = buildVarRefExp (variableDeclarations->get (
-      IndirectLoop::Fortran::PlanFunction::VariableNames::pblkMap));
+      PlanFunction::Fortran::pblkMap));
 
   SgVarRefExp * blockidx_Reference1 = buildOpaqueVarRefExp (
       CUDA::Fortran::VariableNames::blockidx, subroutineScope);
@@ -1373,8 +1370,7 @@ FortranCUDAKernelSubroutineIndirectLoop::createThreadZeroStatements ()
    */
 
   SgVarRefExp * pnelems_Reference2 = buildOpaqueVarRefExp (
-      IndirectLoop::Fortran::PlanFunction::VariableNames::pnelems,
-      subroutineScope);
+      PlanFunction::Fortran::pnelems, subroutineScope);
 
   SgVarRefExp * nelem_Reference2 = buildOpaqueVarRefExp (
       IndirectLoop::Fortran::KernelSubroutine::VariableNames::nelem,
@@ -1398,8 +1394,7 @@ FortranCUDAKernelSubroutineIndirectLoop::createThreadZeroStatements ()
    */
 
   SgVarRefExp * poffset_Reference3 = buildOpaqueVarRefExp (
-      IndirectLoop::Fortran::PlanFunction::VariableNames::poffset,
-      subroutineScope);
+      PlanFunction::Fortran::poffset, subroutineScope);
 
   SgVarRefExp * offset_b_Reference3 = buildOpaqueVarRefExp (
       IndirectLoop::Fortran::KernelSubroutine::VariableNames::offset_b,
@@ -1454,8 +1449,7 @@ FortranCUDAKernelSubroutineIndirectLoop::createThreadZeroStatements ()
       subroutineScope);
 
   SgVarRefExp * pnthrcol_Reference = buildOpaqueVarRefExp (
-      IndirectLoop::Fortran::PlanFunction::VariableNames::pnthrcol,
-      subroutineScope);
+      PlanFunction::Fortran::pnthrcol, subroutineScope);
 
   SgPntrArrRefExp * pncolorsOfBlockid = buildPntrArrRefExp (pnthrcol_Reference,
       blockID_Reference3);
@@ -1483,8 +1477,7 @@ FortranCUDAKernelSubroutineIndirectLoop::createThreadZeroStatements ()
               VariableNames::getIndirectionArgumentSizeName (i)));
 
       SgVarRefExp * pindSizes_Reference4 = buildVarRefExp (
-          variableDeclarations->get (
-              IndirectLoop::Fortran::PlanFunction::VariableNames::pindSizes));
+          variableDeclarations->get (PlanFunction::Fortran::pindSizes));
 
       SgVarRefExp * blockID_Reference4 = buildVarRefExp (
           variableDeclarations->get (
@@ -1552,26 +1545,19 @@ FortranCUDAKernelSubroutineIndirectLoop::createPlanlocalVariableDeclarations ()
 
   vector <string> fourByteIntegerArrayVariables;
 
-  fourByteIntegerArrayVariables.push_back (
-      IndirectLoop::Fortran::PlanFunction::VariableNames::pindSizes);
+  fourByteIntegerArrayVariables.push_back (PlanFunction::Fortran::pindSizes);
 
-  fourByteIntegerArrayVariables.push_back (
-      IndirectLoop::Fortran::PlanFunction::VariableNames::pindOffs);
+  fourByteIntegerArrayVariables.push_back (PlanFunction::Fortran::pindOffs);
 
-  fourByteIntegerArrayVariables.push_back (
-      IndirectLoop::Fortran::PlanFunction::VariableNames::pblkMap);
+  fourByteIntegerArrayVariables.push_back (PlanFunction::Fortran::pblkMap);
 
-  fourByteIntegerArrayVariables.push_back (
-      IndirectLoop::Fortran::PlanFunction::VariableNames::poffset);
+  fourByteIntegerArrayVariables.push_back (PlanFunction::Fortran::poffset);
 
-  fourByteIntegerArrayVariables.push_back (
-      IndirectLoop::Fortran::PlanFunction::VariableNames::pnelems);
+  fourByteIntegerArrayVariables.push_back (PlanFunction::Fortran::pnelems);
 
-  fourByteIntegerArrayVariables.push_back (
-      IndirectLoop::Fortran::PlanFunction::VariableNames::pnthrcol);
+  fourByteIntegerArrayVariables.push_back (PlanFunction::Fortran::pnthrcol);
 
-  fourByteIntegerArrayVariables.push_back (
-      IndirectLoop::Fortran::PlanFunction::VariableNames::pthrcol);
+  fourByteIntegerArrayVariables.push_back (PlanFunction::Fortran::pthrcol);
 
   for (vector <string>::const_iterator it =
       fourByteIntegerArrayVariables.begin (); it
@@ -1603,8 +1589,7 @@ FortranCUDAKernelSubroutineIndirectLoop::createPlanlocalVariableDeclarations ()
 
   vector <string> fourByteIntegerVariables;
 
-  fourByteIntegerVariables.push_back (
-      IndirectLoop::Fortran::PlanFunction::VariableNames::blockOffset);
+  fourByteIntegerVariables.push_back (PlanFunction::Fortran::blockOffset);
 
   for (vector <string>::const_iterator it = fourByteIntegerVariables.begin (); it
       != fourByteIntegerVariables.end (); ++it)

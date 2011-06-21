@@ -2,6 +2,7 @@
 #include <FortranStatementsAndExpressionsBuilder.h>
 #include <FortranTypesBuilder.h>
 #include <CommonNamespaces.h>
+#include <Plan.h>
 
 /*
  * ======================================================
@@ -99,26 +100,19 @@ FortranCUDADataSizesDeclarationIndirectLoop::addFields ()
 
   vector <string> planFunctionSizeVariables;
 
-  planFunctionSizeVariables.push_back (
-      IndirectLoop::Fortran::PlanFunction::VariableNames::pblkMapSize);
+  planFunctionSizeVariables.push_back (PlanFunction::Fortran::pblkMapSize);
 
-  planFunctionSizeVariables.push_back (
-      IndirectLoop::Fortran::PlanFunction::VariableNames::pindOffsSize);
+  planFunctionSizeVariables.push_back (PlanFunction::Fortran::pindOffsSize);
 
-  planFunctionSizeVariables.push_back (
-      IndirectLoop::Fortran::PlanFunction::VariableNames::pindSizesSize);
+  planFunctionSizeVariables.push_back (PlanFunction::Fortran::pindSizesSize);
 
-  planFunctionSizeVariables.push_back (
-      IndirectLoop::Fortran::PlanFunction::VariableNames::pnelemsSize);
+  planFunctionSizeVariables.push_back (PlanFunction::Fortran::pnelemsSize);
 
-  planFunctionSizeVariables.push_back (
-      IndirectLoop::Fortran::PlanFunction::VariableNames::pnthrcolSize);
+  planFunctionSizeVariables.push_back (PlanFunction::Fortran::pnthrcolSize);
 
-  planFunctionSizeVariables.push_back (
-      IndirectLoop::Fortran::PlanFunction::VariableNames::poffsetSize);
+  planFunctionSizeVariables.push_back (PlanFunction::Fortran::poffsetSize);
 
-  planFunctionSizeVariables.push_back (
-      IndirectLoop::Fortran::PlanFunction::VariableNames::pthrcolSize);
+  planFunctionSizeVariables.push_back (PlanFunction::Fortran::pthrcolSize);
 
   for (vector <string>::iterator it = planFunctionSizeVariables.begin (); it
       != planFunctionSizeVariables.end (); ++it)

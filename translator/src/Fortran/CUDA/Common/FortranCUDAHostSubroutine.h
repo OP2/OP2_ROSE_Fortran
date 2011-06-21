@@ -2,6 +2,7 @@
 #define FORTRAN_CUDA_HOST_SUBROUTINE_H
 
 #include <FortranHostSubroutine.h>
+#include <FortranCUDAInitialiseConstantsSubroutine.h>
 #include <FortranCUDAKernelSubroutine.h>
 #include <FortranOpDatDimensionsDeclaration.h>
 #include <ParallelLoop.h>
@@ -9,6 +10,8 @@
 class FortranCUDAHostSubroutine: public FortranHostSubroutine
 {
   protected:
+
+    FortranCUDAInitialiseConstantsSubroutine * initialiseConstantsSubroutine;
 
     FortranOpDatDimensionsDeclaration * opDatDimensionsDeclaration;
 
@@ -23,15 +26,39 @@ class FortranCUDAHostSubroutine: public FortranHostSubroutine
     SgStatement *
     createThreadSynchroniseCallStatement ();
 
-    void
+    /*
+     * ======================================================
+     * Returns a statement which calls the initialise
+     * constants subroutine
+     * ======================================================
+     */
+    SgStatement *
+    createInitialiseConstantsCallStatement ();
+
+    virtual void
     createReductionEpilogueStatements ();
 
-    void
+    virtual void
     createReductionPrologueStatements ();
 
+    virtual void
+    createReductionLocalVariableDeclarations ();
+
+    /*
+     * ======================================================
+     * Creates the statements needed after the kernel has
+     * completed
+     * ======================================================
+     */
     void
     createCUDAKernelEpilogueStatements ();
 
+    /*
+     * ======================================================
+     * Creates the statements needed before the kernel is
+     * launched
+     * ======================================================
+     */
     void
     createCUDAKernelPrologueStatements ();
 
@@ -42,15 +69,16 @@ class FortranCUDAHostSubroutine: public FortranHostSubroutine
     createCUDAKernelLocalVariableDeclarations ();
 
     void
-    createReductionLocalVariableDeclarations ();
-
-    void
     createDataMarshallingLocalVariableDeclarations ();
 
-    FortranCUDAHostSubroutine (std::string const & subroutineName,
-        std::string const & userSubroutineName,
-        std::string const & kernelSubroutineName, ParallelLoop * parallelLoop,
-        SgScopeStatement * moduleScope,     FortranOpDatDimensionsDeclaration * opDatDimensionsDeclaration);
+        FortranCUDAHostSubroutine (
+            std::string const & subroutineName,
+            std::string const & userSubroutineName,
+            std::string const & kernelSubroutineName,
+            ParallelLoop * parallelLoop,
+            SgScopeStatement * moduleScope,
+            FortranCUDAInitialiseConstantsSubroutine * initialiseConstantsSubroutine,
+            FortranOpDatDimensionsDeclaration * opDatDimensionsDeclaration);
 };
 
 #endif

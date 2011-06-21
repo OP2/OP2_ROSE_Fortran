@@ -8,27 +8,14 @@ class FortranOpenMPHostSubroutineDirectLoop: public FortranOpenMPHostSubroutine
 {
   private:
 
-    FortranOpenMPModuleDeclarationsDirectLoop * moduleDeclarations;
-
-  private:
-
     void
     createKernelDoLoop ();
-
-    void
-    createReductionEpilogueStatements ();
-
-    void
-    createReductionPrologueStatements ();
 
     virtual void
     createFirstTimeExecutionStatements ();
 
     void
     initialiseThreadVariablesStatements ();
-
-    void
-    createReductionLocalVariableDeclarations ();
 
     virtual SgStatement *
     createKernelFunctionCallStatement ();

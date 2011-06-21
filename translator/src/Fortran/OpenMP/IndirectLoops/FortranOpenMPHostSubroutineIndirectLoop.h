@@ -10,10 +10,6 @@ class FortranOpenMPHostSubroutineIndirectLoop: public FortranOpenMPHostSubroutin
 {
   private:
 
-    FortranOpenMPModuleDeclarationsIndirectLoop * moduleDeclarations;
-
-  private:
-
     void
     createExecutionPlanDeclarations ();
 

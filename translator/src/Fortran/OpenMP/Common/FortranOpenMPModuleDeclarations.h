@@ -9,7 +9,7 @@
 class FortranOpenMPModuleDeclarations
 {
 
-  private:
+  protected:
 
     /*
      * ======================================================

@@ -19,8 +19,6 @@ class FortranCUDAHostSubroutineIndirectLoop: public FortranCUDAHostSubroutine,
 {
   private:
 
-    FortranCUDAInitialiseConstantsSubroutine * initialiseConstantsSubroutine;
-
     FortranCUDADataSizesDeclarationIndirectLoop
         * dataSizesDeclarationOfIndirectLoop;
 
@@ -30,10 +28,7 @@ class FortranCUDAHostSubroutineIndirectLoop: public FortranCUDAHostSubroutine,
     createExecutionPlanExecutionStatements ();
 
     void
-    initialiseDeviceVariablesSizesVariable ();
-
-    void
-    initialiseVariablesAndConstants ();
+    createVariablesSizesInitialisationStatements ();
 
     void
     createExecutionPlanDeclarations ();

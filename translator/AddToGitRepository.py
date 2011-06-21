@@ -22,6 +22,9 @@ parser.add_option("-h",
 
 (opts, args) = parser.parse_args(argv[1:])
 
+added  = []
+inRepo = []
+
 for path, dirs, files in os.walk(os.path.abspath(os.curdir + os.sep + 'src')):
 	for file in files:
 		fileBasename, fileExtension = os.path.splitext(file)
@@ -39,8 +42,7 @@ for path, dirs, files in os.walk(os.path.abspath(os.curdir + os.sep + 'src')):
 			stdout, stderr = proc.communicate()
 
 			if len(stdout) == 0:
-				if opts.verbose:
-					print("'" + fullPath + "' not in repository. Adding...")
+				added.append(fullPath)
 				
 				cmd = 'git add ' + fullPath
 
@@ -52,5 +54,14 @@ for path, dirs, files in os.walk(os.path.abspath(os.curdir + os.sep + 'src')):
 
 				proc.communicate()
                 
-			elif opts.verbose:
-				print("'" + fullPath + "' in repository")
+			else:
+				inRepo.append(fullPath)
+                
+if opts.verbose:
+    print("Added the following files:")
+    for f in added:
+        print(f)
+    
+    print("\nThese files already exist in repository:")
+    for f in inRepo:
+        print(f)

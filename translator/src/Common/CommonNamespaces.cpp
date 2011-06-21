@@ -160,7 +160,7 @@ VariableNames::getGlobalToLocalMappingName (unsigned int OP_DAT_ArgumentGroup)
   using std::string;
 
   return IndirectLoop::Fortran::VariablePrefixes::pMaps
-      + lexical_cast <string> (OP_DAT_ArgumentGroup) + VariableSuffixes::Size;
+      + lexical_cast <string> (OP_DAT_ArgumentGroup);
 }
 
 std::string

@@ -58,13 +58,15 @@ FortranOpDatDimensionsDeclaration::addTypeDeclaration ()
 SgClassType *
 FortranOpDatDimensionsDeclaration::getType ()
 {
-  typeStatement->get_type ();
+  return typeStatement->get_type ();
 }
 
-VariableDeclarations *
-FortranOpDatDimensionsDeclaration::getFieldDeclarations ()
+SgVariableDeclaration *
+FortranOpDatDimensionsDeclaration::getOpDatDimensionField (
+    unsigned int OP_DAT_ArgumentGroup)
 {
-  return fieldDeclarations;
+  return fieldDeclarations->get (VariableNames::getOpDatDimensionName (
+      OP_DAT_ArgumentGroup));
 }
 
 FortranOpDatDimensionsDeclaration::FortranOpDatDimensionsDeclaration (

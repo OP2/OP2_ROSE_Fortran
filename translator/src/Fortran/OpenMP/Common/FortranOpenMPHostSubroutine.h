@@ -3,9 +3,13 @@
 
 #include <FortranHostSubroutine.h>
 #include <ParallelLoop.h>
+#include <FortranOpenMPModuleDeclarations.h>
 
 class FortranOpenMPHostSubroutine: public FortranHostSubroutine
 {
+  protected:
+
+    FortranOpenMPModuleDeclarations * moduleDeclarations;
 
   protected:
 
@@ -15,13 +19,23 @@ class FortranOpenMPHostSubroutine: public FortranHostSubroutine
     virtual void
     createOpenMPVariableDeclarations () = 0;
 
+    virtual void
+    createReductionEpilogueStatements ();
+
+    virtual void
+    createReductionPrologueStatements ();
+
+    virtual void
+    createReductionLocalVariableDeclarations ();
+
     void
     initialiseNumberOfThreadsStatements ();
 
     FortranOpenMPHostSubroutine (std::string const & subroutineName,
         std::string const & userSubroutineName,
         std::string const & kernelSubroutineName, ParallelLoop * parallelLoop,
-        SgScopeStatement * moduleScope);
+        SgScopeStatement * moduleScope,
+        FortranOpenMPModuleDeclarations * moduleDeclarations);
 };
 
 #endif

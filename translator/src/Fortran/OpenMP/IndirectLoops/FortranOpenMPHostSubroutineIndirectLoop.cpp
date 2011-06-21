@@ -43,6 +43,8 @@ FortranOpenMPHostSubroutineIndirectLoop::createFirstTimeExecutionStatements ()
   createPlanFunctionParametersPreparationStatements (parallelLoop, ifBody,
       variableDeclarations);
 
+  // createPlanFunctionCallStatement (ifBody, variableDeclarations);
+
   SgIfStmt * ifStatement =
       FortranStatementsAndExpressionsBuilder::buildIfStatementWithEmptyElse (
           ifGuardExpression, ifBody);
@@ -147,6 +149,16 @@ FortranOpenMPHostSubroutineIndirectLoop::createStatements ()
   initialiseNumberOfThreadsStatements ();
 
   createFirstTimeExecutionStatements ();
+
+  if (parallelLoop->isReductionRequired ())
+  {
+    createReductionPrologueStatements ();
+  }
+
+  if (parallelLoop->isReductionRequired ())
+  {
+    createReductionEpilogueStatements ();
+  }
 }
 
 void
@@ -155,6 +167,11 @@ FortranOpenMPHostSubroutineIndirectLoop::createLocalVariableDeclarations ()
   createOpenMPVariableDeclarations ();
 
   createExecutionPlanDeclarations ();
+
+  if (parallelLoop->isReductionRequired ())
+  {
+    createReductionLocalVariableDeclarations ();
+  }
 }
 
 FortranOpenMPHostSubroutineIndirectLoop::FortranOpenMPHostSubroutineIndirectLoop (
@@ -163,8 +180,7 @@ FortranOpenMPHostSubroutineIndirectLoop::FortranOpenMPHostSubroutineIndirectLoop
     SgScopeStatement * moduleScope,
     FortranOpenMPModuleDeclarationsIndirectLoop * moduleDeclarations) :
   FortranOpenMPHostSubroutine (subroutineName, userSubroutineName,
-      kernelSubroutineName, parallelLoop, moduleScope), moduleDeclarations (
-      moduleDeclarations)
+      kernelSubroutineName, parallelLoop, moduleScope, moduleDeclarations)
 {
   Debug::getInstance ()->debugMessage (
       "Creating OpenMP host subroutine for indirect loop", 2);
