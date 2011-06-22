@@ -249,6 +249,45 @@ FortranOpenMPModuleDeclarationsIndirectLoop::getGlobalOpDatSizeDeclaration (
       OP_DAT_ArgumentGroup));
 }
 
+SgVariableDeclaration *
+FortranOpenMPModuleDeclarationsIndirectLoop::getGlobalToLocalMappingDeclaration (
+    unsigned int OP_DAT_ArgumentGroup)
+{
+  return moduleDeclarations->get (VariableNames::getGlobalToLocalMappingName (
+      OP_DAT_ArgumentGroup));
+}
+
+SgVariableDeclaration *
+FortranOpenMPModuleDeclarationsIndirectLoop::getGlobalToLocalMappingSizeDeclaration (
+    unsigned int OP_DAT_ArgumentGroup)
+{
+  return moduleDeclarations->get (
+      VariableNames::getGlobalToLocalMappingSizeName (OP_DAT_ArgumentGroup));
+}
+
+SgVariableDeclaration *
+FortranOpenMPModuleDeclarationsIndirectLoop::getLocalToGlobalMappingDeclaration (
+    unsigned int OP_DAT_ArgumentGroup)
+{
+  return moduleDeclarations->get (VariableNames::getLocalToGlobalMappingName (
+      OP_DAT_ArgumentGroup));
+}
+
+SgVariableDeclaration *
+FortranOpenMPModuleDeclarationsIndirectLoop::getLocalToGlobalMappingSizeDeclaration (
+    unsigned int OP_DAT_ArgumentGroup)
+{
+  return moduleDeclarations->get (
+      VariableNames::getLocalToGlobalMappingSizeName (OP_DAT_ArgumentGroup));
+}
+
+SgVariableDeclaration *
+FortranOpenMPModuleDeclarationsIndirectLoop::getPlanFunctionDeclaration (
+    std::string const & variableName)
+{
+  return moduleDeclarations->get (variableName);
+}
+
 VariableDeclarations *
 FortranOpenMPModuleDeclarationsIndirectLoop::getAllDeclarations ()
 {

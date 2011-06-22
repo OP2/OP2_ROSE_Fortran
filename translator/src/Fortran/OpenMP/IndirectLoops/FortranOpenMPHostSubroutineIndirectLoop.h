@@ -17,6 +17,9 @@ class FortranOpenMPHostSubroutineIndirectLoop: public FortranOpenMPHostSubroutin
     createTransferOpDatStatements (SgScopeStatement * statementScope);
 
     virtual void
+    createPlanFunctionExecutionStatements ();
+
+    virtual void
     createFirstTimeExecutionStatements ();
 
     virtual SgStatement *

@@ -18,6 +18,21 @@ class FortranOpenMPModuleDeclarationsIndirectLoop: public FortranOpenMPModuleDec
     SgVariableDeclaration *
     getGlobalOpDatSizeDeclaration (unsigned int OP_DAT_ArgumentGroup);
 
+    SgVariableDeclaration *
+    getGlobalToLocalMappingDeclaration (unsigned int OP_DAT_ArgumentGroup);
+
+    SgVariableDeclaration *
+    getGlobalToLocalMappingSizeDeclaration (unsigned int OP_DAT_ArgumentGroup);
+
+    SgVariableDeclaration *
+    getLocalToGlobalMappingDeclaration (unsigned int OP_DAT_ArgumentGroup);
+
+    SgVariableDeclaration *
+    getLocalToGlobalMappingSizeDeclaration (unsigned int OP_DAT_ArgumentGroup);
+
+    SgVariableDeclaration *
+    getPlanFunctionDeclaration (std::string const & variableName);
+
     VariableDeclarations *
     getAllDeclarations ();
 

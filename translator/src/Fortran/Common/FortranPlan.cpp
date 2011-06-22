@@ -893,10 +893,3 @@ FortranPlan::createPlanFunctionCallStatement (
 
   appendStatement (assignmentStatement, statementScope);
 }
-
-void
-FortranPlan::createPlanFunctionExecutionStatements (
-    VariableDeclarations * variableDeclarations, ParallelLoop * parallelLoop,
-    SgScopeStatement * scope)
-{
-}

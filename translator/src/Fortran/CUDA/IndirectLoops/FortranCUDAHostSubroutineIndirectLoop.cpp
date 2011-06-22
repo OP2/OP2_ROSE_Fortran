@@ -98,7 +98,7 @@ FortranCUDAHostSubroutineIndirectLoop::createKernelFunctionCallStatement ()
 }
 
 void
-FortranCUDAHostSubroutineIndirectLoop::createExecutionPlanExecutionStatements ()
+FortranCUDAHostSubroutineIndirectLoop::createPlanFunctionExecutionStatements ()
 {
   using SageBuilder::buildPntrArrRefExp;
   using SageBuilder::buildIntVal;
@@ -242,11 +242,6 @@ FortranCUDAHostSubroutineIndirectLoop::createExecutionPlanExecutionStatements ()
           loopBody);
 
   appendStatement (loopStatement, subroutineScope);
-}
-
-void
-FortranCUDAHostSubroutineIndirectLoop::createConvertCPointersStatements ()
-{
 }
 
 void
@@ -710,7 +705,7 @@ FortranCUDAHostSubroutineIndirectLoop::createStatements ()
 
   appendStatement (createInitialiseConstantsCallStatement (), subroutineScope);
 
-  createExecutionPlanExecutionStatements ();
+  createPlanFunctionExecutionStatements ();
 
   if (parallelLoop->isReductionRequired () == true)
   {

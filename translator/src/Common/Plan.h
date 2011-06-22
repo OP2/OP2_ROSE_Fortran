@@ -26,6 +26,8 @@ namespace PlanFunction
   namespace Fortran
   {
     std::string const blockOffset = "blockOffset";
+    std::string const col = "col";
+    std::string const nblocks = "nblocks";
     std::string const pblkMap = "pblkMap";
     std::string const pindMaps = "pindMaps";
     std::string const pindOffs = "pindOffs";
@@ -73,9 +75,10 @@ class Plan
      * ======================================================
      */
     virtual void
-    createPlanFunctionCallStatement (
-        VariableDeclarations * variableDeclarations,
-        SgScopeStatement * subroutineScope, SgScopeStatement * statementScope) = 0;
+        createPlanFunctionCallStatement (
+            VariableDeclarations * variableDeclarations,
+            SgScopeStatement * subroutineScope,
+            SgScopeStatement * statementScope) = 0;
 
     /*
      * ======================================================
@@ -86,9 +89,7 @@ class Plan
      * ======================================================
      */
     virtual void
-    createPlanFunctionExecutionStatements (
-        VariableDeclarations * variableDeclarations,
-        ParallelLoop * parallelLoop, SgScopeStatement * scope) = 0;
+    createPlanFunctionExecutionStatements () = 0;
 };
 
 #endif

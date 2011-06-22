@@ -35,11 +35,6 @@ class FortranPlan: public Plan
     createPlanFunctionCallStatement (
         VariableDeclarations * variableDeclarations,
         SgScopeStatement * subroutineScope, SgScopeStatement * statementScope);
-
-    virtual void
-    createPlanFunctionExecutionStatements (
-        VariableDeclarations * variableDeclarations,
-        ParallelLoop * parallelLoop, SgScopeStatement * scope);
 };
 
 #endif
