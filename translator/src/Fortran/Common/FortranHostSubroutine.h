@@ -9,15 +9,8 @@ class FortranHostSubroutine: public FortranSubroutine, public HostSubroutine
 {
   protected:
 
-    /*
-     * ======================================================
-     * Returns a statement which represents a C-to-Fortran
-     * pointer conversion
-     * ======================================================
-     */
-    SgStatement *
-    createCToFortranPointerCallStatement (SgExpression * parameter1,
-        SgExpression * parameter2, SgExpression * parameter3 = NULL);
+    virtual void
+    createTransferOpDatStatements (SgScopeStatement * statementScope) = 0;
 
     void
     createOpDatDimensionsDeclaration (SgType * type);

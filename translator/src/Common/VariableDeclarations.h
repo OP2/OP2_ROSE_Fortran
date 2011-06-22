@@ -30,6 +30,9 @@ class VariableDeclarations
     add (std::string const & variableName, SgVariableDeclaration * declaration);
 
     VariableDeclarations ();
+
+    VariableDeclarations (
+        std::vector <VariableDeclarations *> & allDeclarations);
 };
 
 #endif

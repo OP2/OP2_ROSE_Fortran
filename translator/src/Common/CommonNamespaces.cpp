@@ -1,5 +1,6 @@
 #include <boost/lexical_cast.hpp>
 #include <CommonNamespaces.h>
+#include <FortranTypesBuilder.h>
 
 namespace VariablePrefixes
 {
@@ -211,4 +212,26 @@ VariableNames::getIndirectionArgumentSizeName (
   using std::string;
 
   return "ind_arg" + lexical_cast <string> (OP_DAT_ArgumentGroup);
+}
+
+SgStatement *
+SubroutineCalls::createCToFortranPointerCallStatement (
+    SgScopeStatement * scope, SgExpression * parameter1,
+    SgExpression * parameter2, SgExpression * parameter3)
+{
+  using SageBuilder::buildFunctionCallExp;
+  using SageBuilder::buildExprListExp;
+  using SageBuilder::buildExprStatement;
+  using SageInterface::appendStatement;
+
+  SgFunctionSymbol * functionSymbol =
+      FortranTypesBuilder::buildNewFortranSubroutine ("c_f_pointer", scope);
+
+  SgExprListExp * actualParameters = buildExprListExp (parameter1, parameter2,
+      parameter3);
+
+  SgFunctionCallExp * subroutineCall = buildFunctionCallExp (functionSymbol,
+      actualParameters);
+
+  return buildExprStatement (subroutineCall);
 }

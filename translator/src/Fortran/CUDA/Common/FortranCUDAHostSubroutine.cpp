@@ -622,8 +622,10 @@ FortranCUDAHostSubroutine::createCUDAKernelPrologueStatements ()
               variableDeclarations->get (VariableNames::getOpDatSizeName (i)),
               subroutineScope);
 
-      SgStatement * callStatement = createCToFortranPointerCallStatement (
-          parameter1Expression, parameter2Expression, parameter3Expression);
+      SgStatement * callStatement =
+          SubroutineCalls::createCToFortranPointerCallStatement (
+              subroutineScope, parameter1Expression, parameter2Expression,
+              parameter3Expression);
 
       appendStatement (callStatement, subroutineScope);
     }
@@ -667,6 +669,13 @@ FortranCUDAHostSubroutine::createCUDAKernelPrologueStatements ()
       appendStatement (assignmentStatement, subroutineScope);
     }
   }
+}
+
+void
+FortranCUDAHostSubroutine::createTransferOpDatStatements (
+    SgScopeStatement * statementScope)
+{
+
 }
 
 void

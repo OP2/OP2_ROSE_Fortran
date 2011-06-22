@@ -50,6 +50,9 @@ class FortranOpenMPModuleDeclarations
     std::string
     getFirstExecutionBooleanVariableName ();
 
+    virtual
+    ~FortranOpenMPModuleDeclarations ();
+
     FortranOpenMPModuleDeclarations (std::string const & userSubroutineName,
         ParallelLoop * parallelLoop, SgScopeStatement * moduleScope);
 

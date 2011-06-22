@@ -249,11 +249,10 @@ FortranOpenMPModuleDeclarationsIndirectLoop::getGlobalOpDatSizeDeclaration (
       OP_DAT_ArgumentGroup));
 }
 
-SgVariableDeclaration *
-FortranOpenMPModuleDeclarationsIndirectLoop::getPlanFunctionVariableDeclaration (
-    std::string const & variableName)
+VariableDeclarations *
+FortranOpenMPModuleDeclarationsIndirectLoop::getAllDeclarations ()
 {
-  return moduleDeclarations->get (variableName);
+  return moduleDeclarations;
 }
 
 FortranOpenMPModuleDeclarationsIndirectLoop::FortranOpenMPModuleDeclarationsIndirectLoop (

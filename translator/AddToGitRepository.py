@@ -58,10 +58,13 @@ for path, dirs, files in os.walk(os.path.abspath(os.curdir + os.sep + 'src')):
 				inRepo.append(fullPath)
                 
 if opts.verbose:
-    print("Added the following files:")
-    for f in added:
-        print(f)
+	if inRepo:
+    		print("===== These files already exist in repository =====")
+    		for f in inRepo:
+        		print(f)
+	if added:
+    		print("===== Added the following files =====")
+    		for f in added:
+        		print(f)
     
-    print("\nThese files already exist in repository:")
-    for f in inRepo:
-        print(f)
+

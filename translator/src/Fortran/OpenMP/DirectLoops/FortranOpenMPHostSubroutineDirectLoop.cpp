@@ -156,45 +156,32 @@ FortranOpenMPHostSubroutineDirectLoop::createKernelDoLoop ()
 }
 
 void
-FortranOpenMPHostSubroutineDirectLoop::createFirstTimeExecutionStatements ()
+FortranOpenMPHostSubroutineDirectLoop::createTransferOpDatStatements (
+    SgScopeStatement * statementScope)
 {
-  using SageBuilder::buildBasicBlock;
-  using SageBuilder::buildDotExp;
   using SageBuilder::buildVarRefExp;
   using SageBuilder::buildOpaqueVarRefExp;
-  using SageBuilder::buildBoolValExp;
-  using SageBuilder::buildAssignOp;
-  using SageBuilder::buildEqualityOp;
-  using SageBuilder::buildAssignStatement;
+  using SageBuilder::buildDotExp;
   using SageInterface::appendStatement;
-
-  SgEqualityOp * ifGuardExpression = buildEqualityOp (buildVarRefExp (
-      moduleDeclarations->getFirstExecutionBooleanDeclaration ()),
-      buildBoolValExp (true));
-
-  SgBasicBlock * ifBody = buildBasicBlock ();
-
-  SgExprStatement * assignmentStatement = buildAssignStatement (buildVarRefExp (
-      moduleDeclarations->getFirstExecutionBooleanDeclaration ()),
-      buildBoolValExp (false));
-
-  ifBody->append_statement (assignmentStatement);
 
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
     if (parallelLoop->isDuplicateOpDat (i) == false)
     {
-      SgDotExp * dotExpression1 = buildDotExp (buildVarRefExp (
+      SgDotExp * parameterExpression1 = buildDotExp (buildVarRefExp (
           variableDeclarations->get (VariableNames::getOpDatName (i))),
           buildOpaqueVarRefExp (
               IndirectAndDirectLoop::Fortran::HostSubroutine::dat,
               subroutineScope));
 
-      SgDotExp * dotExpression2;
+      SgVarRefExp * parameterExpression2 = buildVarRefExp (
+          moduleDeclarations->getGlobalOpDatDeclaration (i));
+
+      SgDotExp * parameterExpression3;
 
       if (parallelLoop->isReductionRequired (i) == false)
       {
-        dotExpression2 = buildDotExp (buildVarRefExp (
+        parameterExpression3 = buildDotExp (buildVarRefExp (
             variableDeclarations->get (VariableNames::getOpSetName ())),
             buildOpaqueVarRefExp (
                 IndirectAndDirectLoop::Fortran::HostSubroutine::size,
@@ -202,22 +189,48 @@ FortranOpenMPHostSubroutineDirectLoop::createFirstTimeExecutionStatements ()
       }
       else
       {
-        dotExpression2 = buildDotExp (buildVarRefExp (
+        parameterExpression3 = buildDotExp (buildVarRefExp (
             variableDeclarations->get (VariableNames::getOpDatName (i))),
             buildOpaqueVarRefExp (
                 IndirectAndDirectLoop::Fortran::HostSubroutine::dim,
                 subroutineScope));
       }
 
-      SgStatement * cToFortranCallStatement =
-          createCToFortranPointerCallStatement (dotExpression1, buildVarRefExp (
-              moduleDeclarations->getGlobalOpDatDeclaration (i)),
-              buildOpaqueVarRefExp ("(/" + dotExpression2->unparseToString ()
-                  + "/)", subroutineScope));
+      SgStatement * callStatement =
+          SubroutineCalls::createCToFortranPointerCallStatement (
+              subroutineScope, parameterExpression1, parameterExpression2,
+              buildOpaqueVarRefExp ("(/"
+                  + parameterExpression3->unparseToString () + "/)",
+                  subroutineScope));
 
-      ifBody->append_statement (cToFortranCallStatement);
+      appendStatement (callStatement, statementScope);
     }
   }
+}
+
+void
+FortranOpenMPHostSubroutineDirectLoop::createFirstTimeExecutionStatements ()
+{
+  using SageBuilder::buildBasicBlock;
+  using SageBuilder::buildVarRefExp;
+  using SageBuilder::buildBoolValExp;
+  using SageBuilder::buildEqualityOp;
+  using SageBuilder::buildAssignStatement;
+  using SageInterface::appendStatement;
+
+  SgBasicBlock * ifBody = buildBasicBlock ();
+
+  SgExprStatement * assignmentStatement = buildAssignStatement (buildVarRefExp (
+      moduleDeclarations->getFirstExecutionBooleanDeclaration ()),
+      buildBoolValExp (false));
+
+  appendStatement (assignmentStatement, ifBody);
+
+  createTransferOpDatStatements (ifBody);
+
+  SgEqualityOp * ifGuardExpression = buildEqualityOp (buildVarRefExp (
+      moduleDeclarations->getFirstExecutionBooleanDeclaration ()),
+      buildBoolValExp (true));
 
   SgIfStmt * ifStatement =
       FortranStatementsAndExpressionsBuilder::buildIfStatementWithEmptyElse (

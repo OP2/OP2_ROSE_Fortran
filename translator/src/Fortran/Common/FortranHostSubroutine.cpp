@@ -11,29 +11,6 @@
  * ======================================================
  */
 
-SgStatement *
-FortranHostSubroutine::createCToFortranPointerCallStatement (
-    SgExpression * parameter1, SgExpression * parameter2,
-    SgExpression * parameter3)
-{
-  using SageBuilder::buildFunctionCallExp;
-  using SageBuilder::buildExprListExp;
-  using SageBuilder::buildExprStatement;
-  using SageInterface::appendStatement;
-
-  SgFunctionSymbol * functionSymbol =
-      FortranTypesBuilder::buildNewFortranSubroutine ("c_f_pointer",
-          subroutineScope);
-
-  SgExprListExp * actualParameters = buildExprListExp (parameter1, parameter2,
-      parameter3);
-
-  SgFunctionCallExp * subroutineCall = buildFunctionCallExp (functionSymbol,
-      actualParameters);
-
-  return buildExprStatement (subroutineCall);
-}
-
 void
 FortranHostSubroutine::createOpDatDimensionsDeclaration (SgType * type)
 {

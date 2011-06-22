@@ -322,6 +322,8 @@ FortranCUDAHostSubroutineDirectLoop::createStatements ()
 
   createCUDAKernelInitialisationStatements ();
 
+  createTransferOpDatStatements (subroutineScope);
+
   createCUDAKernelPrologueStatements ();
 
   if (parallelLoop->isReductionRequired () == true)

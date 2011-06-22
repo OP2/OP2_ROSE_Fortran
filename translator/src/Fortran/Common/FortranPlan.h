@@ -14,29 +14,32 @@ class FortranPlan: public Plan
 {
   protected:
 
-    /*
-     * ======================================================
-     * All the data returned by the plan function is contained
-     * in a C interface. This function creates statements to
-     * convert that data onto the Fortran side and attaches
-     * the statements to the supplied scope
-     * ======================================================
-     */
     virtual void
-    createConvertCPointersStatements () = 0;
+    createConvertPlanFunctionParametersStatements (
+        VariableDeclarations * variableDeclarations,
+        ParallelLoop * parallelLoop, SgScopeStatement * subroutineScope,
+        SgScopeStatement * statementScope);
+
+    virtual void
+    createConvertPositionInPMapsStatements (
+        VariableDeclarations * variableDeclarations,
+        ParallelLoop * parallelLoop, SgScopeStatement * subroutineScope,
+        SgScopeStatement * statementScope);
 
     virtual void
     createPlanFunctionParametersPreparationStatements (
-        ParallelLoop * parallelLoop, SgScopeStatement * scope,
-        VariableDeclarations * variableDeclarations);
+        VariableDeclarations * variableDeclarations,
+        ParallelLoop * parallelLoop, SgScopeStatement * scope);
 
     virtual void
-    createPlanFunctionCallStatement (SgScopeStatement * scope,
-        VariableDeclarations * variableDeclarations);
+    createPlanFunctionCallStatement (
+        VariableDeclarations * variableDeclarations,
+        SgScopeStatement * subroutineScope, SgScopeStatement * statementScope);
 
     virtual void
-    createPlanFunctionExecutionStatements (ParallelLoop * parallelLoop,
-        SgScopeStatement * scope, VariableDeclarations * variableDeclarations);
+    createPlanFunctionExecutionStatements (
+        VariableDeclarations * variableDeclarations,
+        ParallelLoop * parallelLoop, SgScopeStatement * scope);
 };
 
 #endif

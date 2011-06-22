@@ -24,3 +24,23 @@ VariableDeclarations::VariableDeclarations ()
 
 }
 
+VariableDeclarations::VariableDeclarations (
+    std::vector <VariableDeclarations *> & allDeclarations)
+{
+  using std::vector;
+
+  for (vector <VariableDeclarations *>::iterator it = allDeclarations.begin (); it
+      != allDeclarations.end (); ++it)
+  {
+    VariableDeclarations * declarations = *it;
+
+    theDeclarations.insert (declarations->theDeclarations.begin (),
+        declarations->theDeclarations.end ());
+  }
+
+  for (std::map <std::string, SgVariableDeclaration *>::iterator it =
+      theDeclarations.begin (); it != theDeclarations.end (); ++it)
+  {
+    std::cout << it->first << std::endl;
+  }
+}

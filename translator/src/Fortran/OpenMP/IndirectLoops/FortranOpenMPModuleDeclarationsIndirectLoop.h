@@ -18,8 +18,8 @@ class FortranOpenMPModuleDeclarationsIndirectLoop: public FortranOpenMPModuleDec
     SgVariableDeclaration *
     getGlobalOpDatSizeDeclaration (unsigned int OP_DAT_ArgumentGroup);
 
-    SgVariableDeclaration *
-    getPlanFunctionVariableDeclaration (std::string const & variableName);
+    VariableDeclarations *
+    getAllDeclarations ();
 
     FortranOpenMPModuleDeclarationsIndirectLoop (
         std::string const & userSubroutineName, ParallelLoop * parallelLoop,

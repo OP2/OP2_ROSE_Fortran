@@ -70,6 +70,10 @@ FortranOpenMPModuleDeclarations::getFirstExecutionBooleanVariableName ()
   return "isFirstTime_" + userSubroutineName;
 }
 
+FortranOpenMPModuleDeclarations::~FortranOpenMPModuleDeclarations ()
+{
+}
+
 FortranOpenMPModuleDeclarations::FortranOpenMPModuleDeclarations (
     std::string const & userSubroutineName, ParallelLoop * parallelLoop,
     SgScopeStatement * moduleScope) :

@@ -12,6 +12,9 @@ class FortranOpenMPHostSubroutineDirectLoop: public FortranOpenMPHostSubroutine
     createKernelDoLoop ();
 
     virtual void
+    createTransferOpDatStatements (SgScopeStatement * statementScope);
+
+    virtual void
     createFirstTimeExecutionStatements ();
 
     void

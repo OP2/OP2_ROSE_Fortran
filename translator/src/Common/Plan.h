@@ -61,18 +61,21 @@ class Plan
      */
     virtual void
     createPlanFunctionParametersPreparationStatements (
-        ParallelLoop * parallelLoop, SgScopeStatement * scope,
-        VariableDeclarations * variableDeclarations) = 0;
+        VariableDeclarations * variableDeclarations,
+        ParallelLoop * parallelLoop, SgScopeStatement * scope) = 0;
 
     /*
      * ======================================================
      * Create the statement which calls the plan function and
-     * attaches it to the supplied scope
+     * attaches it to the supplied scope. The scope of the
+     * enclosing subroutine is also needed to build the
+     * function call correctly
      * ======================================================
      */
     virtual void
-    createPlanFunctionCallStatement (SgScopeStatement * scope,
-        VariableDeclarations * variableDeclarations) = 0;
+    createPlanFunctionCallStatement (
+        VariableDeclarations * variableDeclarations,
+        SgScopeStatement * subroutineScope, SgScopeStatement * statementScope) = 0;
 
     /*
      * ======================================================
@@ -83,9 +86,9 @@ class Plan
      * ======================================================
      */
     virtual void
-        createPlanFunctionExecutionStatements (ParallelLoop * parallelLoop,
-            SgScopeStatement * scope,
-            VariableDeclarations * variableDeclarations) = 0;
+    createPlanFunctionExecutionStatements (
+        VariableDeclarations * variableDeclarations,
+        ParallelLoop * parallelLoop, SgScopeStatement * scope) = 0;
 };
 
 #endif

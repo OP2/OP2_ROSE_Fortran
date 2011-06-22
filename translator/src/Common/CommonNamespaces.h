@@ -10,6 +10,7 @@
 #define COMMON_NAMESPACES_H
 
 #include <string>
+#include <rose.h>
 
 namespace OP2
 {
@@ -524,6 +525,21 @@ namespace VariableNames
 
   std::string
   getIndirectionArgumentSizeName (unsigned int OP_DAT_ArgumentGroup);
+}
+
+namespace SubroutineCalls
+{
+
+  /*
+   * ======================================================
+   * Returns a statement which represents a C-to-Fortran
+   * pointer conversion
+   * ======================================================
+   */
+  SgStatement *
+  createCToFortranPointerCallStatement (SgScopeStatement * scope,
+      SgExpression * parameter1, SgExpression * parameter2,
+      SgExpression * parameter3 = NULL);
 }
 
 #endif

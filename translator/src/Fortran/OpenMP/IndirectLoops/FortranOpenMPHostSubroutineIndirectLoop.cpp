@@ -10,8 +10,56 @@ FortranOpenMPHostSubroutineIndirectLoop::createKernelFunctionCallStatement ()
 }
 
 void
-FortranOpenMPHostSubroutineIndirectLoop::createConvertCPointersStatements ()
+FortranOpenMPHostSubroutineIndirectLoop::createTransferOpDatStatements (
+    SgScopeStatement * statementScope)
 {
+  using SageBuilder::buildDotExp;
+  using SageBuilder::buildVarRefExp;
+  using SageBuilder::buildOpaqueVarRefExp;
+  using SageInterface::appendStatement;
+
+  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
+  {
+    if (parallelLoop->isDuplicateOpDat (i) == false)
+    {
+      SgDotExp * parameterExpression1 = buildDotExp (buildVarRefExp (
+          variableDeclarations->get (VariableNames::getOpDatName (i))),
+          buildOpaqueVarRefExp (
+              IndirectAndDirectLoop::Fortran::HostSubroutine::dat,
+              subroutineScope));
+
+      SgVarRefExp * parameterExpression2 = buildVarRefExp (
+          moduleDeclarations->getGlobalOpDatDeclaration (i));
+
+      SgDotExp * parameterExpression3;
+
+      if (parallelLoop->isReductionRequired (i) == false)
+      {
+        parameterExpression3 = buildDotExp (buildVarRefExp (
+            variableDeclarations->get (VariableNames::getOpSetName ())),
+            buildOpaqueVarRefExp (
+                IndirectAndDirectLoop::Fortran::HostSubroutine::size,
+                subroutineScope));
+      }
+      else
+      {
+        parameterExpression3 = buildDotExp (buildVarRefExp (
+            variableDeclarations->get (VariableNames::getOpDatName (i))),
+            buildOpaqueVarRefExp (
+                IndirectAndDirectLoop::Fortran::HostSubroutine::dim,
+                subroutineScope));
+      }
+
+      SgStatement * callStatement =
+          SubroutineCalls::createCToFortranPointerCallStatement (
+              subroutineScope, parameterExpression1, parameterExpression2,
+              buildOpaqueVarRefExp ("(/"
+                  + parameterExpression3->unparseToString () + "/)",
+                  subroutineScope));
+
+      appendStatement (callStatement, statementScope);
+    }
+  }
 }
 
 void
@@ -28,6 +76,14 @@ FortranOpenMPHostSubroutineIndirectLoop::createFirstTimeExecutionStatements ()
   using SageInterface::appendStatement;
   using std::vector;
 
+  vector <VariableDeclarations *> declarationSets;
+  declarationSets.push_back (variableDeclarations);
+  declarationSets.push_back (
+      dynamic_cast <FortranOpenMPModuleDeclarationsIndirectLoop *> (moduleDeclarations)->getAllDeclarations ());
+
+  VariableDeclarations * allDeclarations = new VariableDeclarations (
+      declarationSets);
+
   SgEqualityOp * ifGuardExpression = buildEqualityOp (buildVarRefExp (
       moduleDeclarations->getFirstExecutionBooleanDeclaration ()),
       buildBoolValExp (true));
@@ -38,12 +94,20 @@ FortranOpenMPHostSubroutineIndirectLoop::createFirstTimeExecutionStatements ()
       moduleDeclarations->getFirstExecutionBooleanDeclaration ()),
       buildBoolValExp (false));
 
-  ifBody->append_statement (assignmentStatement);
+  appendStatement (assignmentStatement, ifBody);
 
-  createPlanFunctionParametersPreparationStatements (parallelLoop, ifBody,
-      variableDeclarations);
+  createPlanFunctionParametersPreparationStatements (allDeclarations,
+      parallelLoop, ifBody);
 
-  // createPlanFunctionCallStatement (ifBody, variableDeclarations);
+  createPlanFunctionCallStatement (allDeclarations, subroutineScope, ifBody);
+
+  createTransferOpDatStatements (ifBody);
+
+  createConvertPositionInPMapsStatements (allDeclarations, parallelLoop,
+      subroutineScope, ifBody);
+
+  createConvertPlanFunctionParametersStatements (allDeclarations, parallelLoop,
+      subroutineScope, ifBody);
 
   SgIfStmt * ifStatement =
       FortranStatementsAndExpressionsBuilder::buildIfStatementWithEmptyElse (
