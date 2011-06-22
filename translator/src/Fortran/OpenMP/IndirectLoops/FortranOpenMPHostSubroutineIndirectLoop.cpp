@@ -13,6 +13,8 @@ void
 FortranOpenMPHostSubroutineIndirectLoop::createTransferOpDatStatements (
     SgScopeStatement * statementScope)
 {
+  using SageBuilder::buildMultiplyOp;
+  using SageBuilder::buildAssignStatement;
   using SageBuilder::buildDotExp;
   using SageBuilder::buildVarRefExp;
   using SageBuilder::buildOpaqueVarRefExp;
@@ -22,6 +24,39 @@ FortranOpenMPHostSubroutineIndirectLoop::createTransferOpDatStatements (
   {
     if (parallelLoop->isDuplicateOpDat (i) == false)
     {
+      SgDotExp * dotExpression1 = buildDotExp (buildVarRefExp (
+          variableDeclarations->get (VariableNames::getOpDatName (i))),
+          buildOpaqueVarRefExp (
+              IndirectAndDirectLoop::Fortran::HostSubroutine::dim,
+              statementScope));
+
+      SgDotExp * dotExpression2 = buildDotExp (buildVarRefExp (
+          variableDeclarations->get (VariableNames::getOpDatName (i))),
+          buildOpaqueVarRefExp (
+              IndirectAndDirectLoop::Fortran::HostSubroutine::set,
+              statementScope));
+
+      SgDotExp * dotExpression3 = buildDotExp (dotExpression2,
+          buildOpaqueVarRefExp (
+              IndirectAndDirectLoop::Fortran::HostSubroutine::size,
+              statementScope));
+
+      SgExpression * multiplyExpression = buildMultiplyOp (dotExpression1,
+          dotExpression3);
+
+      FortranOpenMPModuleDeclarationsIndirectLoop
+          * moduleDeclarationsIndirectLoop =
+              dynamic_cast <FortranOpenMPModuleDeclarationsIndirectLoop *> (moduleDeclarations);
+
+      SgExprStatement
+          * assignmentStatement =
+              buildAssignStatement (
+                  buildVarRefExp (
+                      moduleDeclarationsIndirectLoop->getGlobalOpDatSizeDeclaration (
+                          i)), multiplyExpression);
+
+      appendStatement (assignmentStatement, statementScope);
+
       SgDotExp * parameterExpression1 = buildDotExp (buildVarRefExp (
           variableDeclarations->get (VariableNames::getOpDatName (i))),
           buildOpaqueVarRefExp (
@@ -31,24 +66,8 @@ FortranOpenMPHostSubroutineIndirectLoop::createTransferOpDatStatements (
       SgVarRefExp * parameterExpression2 = buildVarRefExp (
           moduleDeclarations->getGlobalOpDatDeclaration (i));
 
-      SgDotExp * parameterExpression3;
-
-      if (parallelLoop->isReductionRequired (i) == false)
-      {
-        parameterExpression3 = buildDotExp (buildVarRefExp (
-            variableDeclarations->get (VariableNames::getOpSetName ())),
-            buildOpaqueVarRefExp (
-                IndirectAndDirectLoop::Fortran::HostSubroutine::size,
-                subroutineScope));
-      }
-      else
-      {
-        parameterExpression3 = buildDotExp (buildVarRefExp (
-            variableDeclarations->get (VariableNames::getOpDatName (i))),
-            buildOpaqueVarRefExp (
-                IndirectAndDirectLoop::Fortran::HostSubroutine::dim,
-                subroutineScope));
-      }
+      SgVarRefExp * parameterExpression3 = buildVarRefExp (
+          moduleDeclarationsIndirectLoop->getGlobalOpDatSizeDeclaration (i));
 
       SgStatement * callStatement =
           SubroutineCalls::createCToFortranPointerCallStatement (

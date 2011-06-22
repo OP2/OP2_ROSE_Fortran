@@ -571,66 +571,6 @@ FortranCUDAHostSubroutine::createCUDAKernelPrologueStatements ()
   using SageBuilder::buildPntrArrRefExp;
   using SageInterface::appendStatement;
 
-  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
-  {
-    if (parallelLoop->isDuplicateOpDat (i) == false)
-    {
-      SgDotExp * dotExpression1 = buildDotExp (buildVarRefExp (
-          variableDeclarations->get (VariableNames::getOpDatName (i))),
-          buildOpaqueVarRefExp (
-              IndirectAndDirectLoop::Fortran::HostSubroutine::set,
-              subroutineScope));
-
-      SgDotExp * dotExpression2 = buildDotExp (dotExpression1,
-          buildOpaqueVarRefExp (
-              IndirectAndDirectLoop::Fortran::HostSubroutine::size,
-              subroutineScope));
-
-      SgDotExp * dotExpression3 = buildDotExp (buildVarRefExp (
-          variableDeclarations->get (VariableNames::getOpDatName (i))),
-          buildOpaqueVarRefExp (
-              IndirectAndDirectLoop::Fortran::HostSubroutine::dim,
-              subroutineScope));
-
-      SgExpression * multiplyExpression = buildMultiplyOp (dotExpression3,
-          dotExpression2);
-
-      SgExprStatement * assignmentStatement = buildAssignStatement (
-          buildVarRefExp (variableDeclarations->get (
-              VariableNames::getOpDatSizeName (i))), multiplyExpression);
-
-      appendStatement (assignmentStatement, subroutineScope);
-    }
-  }
-
-  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
-  {
-    if (parallelLoop->isDuplicateOpDat (i) == false)
-    {
-      SgDotExp * parameter1Expression = buildDotExp (buildVarRefExp (
-          variableDeclarations->get (VariableNames::getOpDatName (i))),
-          buildOpaqueVarRefExp (
-              IndirectAndDirectLoop::Fortran::HostSubroutine::dat,
-              subroutineScope));
-
-      SgVarRefExp * parameter2Expression = buildVarRefExp (
-          variableDeclarations->get (VariableNames::getCToFortranVariableName (
-              i)));
-
-      SgExpression * parameter3Expression =
-          FortranStatementsAndExpressionsBuilder::buildShapeExpression (
-              variableDeclarations->get (VariableNames::getOpDatSizeName (i)),
-              subroutineScope);
-
-      SgStatement * callStatement =
-          SubroutineCalls::createCToFortranPointerCallStatement (
-              subroutineScope, parameter1Expression, parameter2Expression,
-              parameter3Expression);
-
-      appendStatement (callStatement, subroutineScope);
-    }
-  }
-
   /*
    * ======================================================
    * Allocation and copy in only used for OP_DAT which are
@@ -675,7 +615,79 @@ void
 FortranCUDAHostSubroutine::createTransferOpDatStatements (
     SgScopeStatement * statementScope)
 {
+  using SageBuilder::buildDotExp;
+  using SageBuilder::buildVarRefExp;
+  using SageBuilder::buildOpaqueVarRefExp;
+  using SageBuilder::buildMultiplyOp;
+  using SageBuilder::buildAssignStatement;
+  using SageInterface::appendStatement;
 
+  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
+  {
+    if (parallelLoop->isDuplicateOpDat (i) == false)
+    {
+      /*
+       * ======================================================
+       * Statement setting the size of the OP_DAT variable
+       * ======================================================
+       */
+
+      SgDotExp * dotExpression1 = buildDotExp (buildVarRefExp (
+          variableDeclarations->get (VariableNames::getOpDatName (i))),
+          buildOpaqueVarRefExp (
+              IndirectAndDirectLoop::Fortran::HostSubroutine::dim,
+              subroutineScope));
+
+      SgDotExp * dotExpression2 = buildDotExp (buildVarRefExp (
+          variableDeclarations->get (VariableNames::getOpDatName (i))),
+          buildOpaqueVarRefExp (
+              IndirectAndDirectLoop::Fortran::HostSubroutine::set,
+              subroutineScope));
+
+      SgDotExp * dotExpression3 = buildDotExp (dotExpression2,
+          buildOpaqueVarRefExp (
+              IndirectAndDirectLoop::Fortran::HostSubroutine::size,
+              subroutineScope));
+
+      SgExpression * multiplyExpression = buildMultiplyOp (dotExpression1,
+          dotExpression3);
+
+      SgExprStatement * assignmentStatement = buildAssignStatement (
+          buildVarRefExp (variableDeclarations->get (
+              VariableNames::getOpDatSizeName (i))), multiplyExpression);
+
+      appendStatement (assignmentStatement, subroutineScope);
+
+      /*
+       * ======================================================
+       * Statement to convert OP_DAT between C and Fortran
+       * pointers
+       * ======================================================
+       */
+
+      SgDotExp * parameterExpression1 = buildDotExp (buildVarRefExp (
+          variableDeclarations->get (VariableNames::getOpDatName (i))),
+          buildOpaqueVarRefExp (
+              IndirectAndDirectLoop::Fortran::HostSubroutine::dat,
+              subroutineScope));
+
+      SgVarRefExp * parameterExpression2 = buildVarRefExp (
+          variableDeclarations->get (VariableNames::getCToFortranVariableName (
+              i)));
+
+      SgExpression * parameterExpression3 =
+          FortranStatementsAndExpressionsBuilder::buildShapeExpression (
+              variableDeclarations->get (VariableNames::getOpDatSizeName (i)),
+              subroutineScope);
+
+      SgStatement * callStatement =
+          SubroutineCalls::createCToFortranPointerCallStatement (
+              subroutineScope, parameterExpression1, parameterExpression2,
+              parameterExpression3);
+
+      appendStatement (callStatement, subroutineScope);
+    }
+  }
 }
 
 void
