@@ -47,11 +47,11 @@ FortranCUDAKernelSubroutine::initialiseLocalThreadVariables ()
        * lower and upper bounds and stride
        * ======================================================
        */
-      SgVarRefExp * variable_X = buildOpaqueVarRefExp (
-          CUDA::Fortran::FieldNames::x, subroutineScope);
+      SgVarRefExp * variable_X = buildOpaqueVarRefExp (CUDA::Fortran::x,
+          subroutineScope);
 
       SgVarRefExp * variable_Blockidx = buildOpaqueVarRefExp (
-          CUDA::Fortran::VariableNames::blockidx, subroutineScope);
+          CUDA::Fortran::blockidx, subroutineScope);
 
       SgBasicBlock * loopBodyBlock;
 
@@ -192,10 +192,10 @@ FortranCUDAKernelSubroutine::createReductionSubroutineCall ()
              */
 
             SgVarRefExp * blockidx_Reference1 = buildOpaqueVarRefExp (
-                CUDA::Fortran::VariableNames::blockidx, subroutineScope);
+                CUDA::Fortran::blockidx, subroutineScope);
 
             SgVarRefExp * x_Reference1 = buildOpaqueVarRefExp (
-                CUDA::Fortran::FieldNames::x, subroutineScope);
+                CUDA::Fortran::x, subroutineScope);
 
             SgExpression * blockidXDotX = buildDotExp (blockidx_Reference1,
                 x_Reference1);
@@ -364,12 +364,11 @@ FortranCUDAKernelSubroutine::createAutosharedDeclaration ()
 
     SgVariableDeclaration * variableDeclaration =
         FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
-            IndirectAndDirectLoop::Fortran::VariableNames::autoshared,
+            CommonVariableNames::autoshared,
             FortranTypesBuilder::getArray_RankOne (autosharedType, 0,
                 upperBound), subroutineScope);
 
-    variableDeclarations->add (
-        IndirectAndDirectLoop::Fortran::VariableNames::autoshared,
+    variableDeclarations->add (CommonVariableNames::autoshared,
         variableDeclaration);
 
     variableDeclaration->get_declarationModifier ().get_typeModifier ().setShared ();

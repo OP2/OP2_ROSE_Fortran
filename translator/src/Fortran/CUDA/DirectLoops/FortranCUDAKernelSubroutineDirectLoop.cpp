@@ -52,8 +52,7 @@ FortranCUDAKernelSubroutineDirectLoop::createUserSubroutineCall ()
          */
 
         SgExpression * argSizeField = buildDotExp (buildVarRefExp (
-            variableDeclarations->get (
-                IndirectAndDirectLoop::Fortran::VariableNames::argsSizes)),
+            variableDeclarations->get (CommonVariableNames::argsSizes)),
             buildOpaqueVarRefExp (VariableNames::getOpDatSizeName (i),
                 subroutineScope));
 
@@ -190,8 +189,7 @@ FortranCUDAKernelSubroutineDirectLoop::stageInFromDeviceMemoryToLocalThreadVaria
           DirectLoop::Fortran::KernelSubroutine::offsetInThreadBlock));
 
       SgVarRefExp * autoSharedVarRef = buildVarRefExp (
-          variableDeclarations->get (
-              IndirectAndDirectLoop::Fortran::VariableNames::autoshared));
+          variableDeclarations->get (CommonVariableNames::autoshared));
 
       /*
        * ======================================================
@@ -293,8 +291,7 @@ FortranCUDAKernelSubroutineDirectLoop::stageOutFromLocalThreadVariablesToDeviceM
           DirectLoop::Fortran::KernelSubroutine::offsetInThreadBlock));
 
       SgVarRefExp * autoSharedVarRef = buildVarRefExp (
-          variableDeclarations->get (
-              IndirectAndDirectLoop::Fortran::VariableNames::autoshared));
+          variableDeclarations->get (CommonVariableNames::autoshared));
 
       SgExpression * initLoop = buildAssignOp (mVarRef, buildIntVal (0));
 
@@ -461,19 +458,19 @@ FortranCUDAKernelSubroutineDirectLoop::createStatements ()
    */
 
   SgVarRefExp * variable_Threadidx = buildOpaqueVarRefExp (
-      CUDA::Fortran::VariableNames::threadidx, subroutineScope);
+      CUDA::Fortran::threadidx, subroutineScope);
 
-  SgVarRefExp * variable_X = buildOpaqueVarRefExp (
-      CUDA::Fortran::FieldNames::x, subroutineScope);
+  SgVarRefExp * variable_X = buildOpaqueVarRefExp (CUDA::Fortran::x,
+      subroutineScope);
 
   SgVarRefExp * variable_Blockidx = buildOpaqueVarRefExp (
-      CUDA::Fortran::VariableNames::blockidx, subroutineScope);
+      CUDA::Fortran::blockidx, subroutineScope);
 
   SgVarRefExp * variable_Blockdim = buildOpaqueVarRefExp (
-      CUDA::Fortran::VariableNames::blockdim, subroutineScope);
+      CUDA::Fortran::blockdim, subroutineScope);
 
   SgVarRefExp * variable_GridDim = buildOpaqueVarRefExp (
-      CUDA::Fortran::VariableNames::griddim, subroutineScope);
+      CUDA::Fortran::griddim, subroutineScope);
 
   /*
    * ======================================================
@@ -704,8 +701,7 @@ FortranCUDAKernelSubroutineDirectLoop::createOPDATFormalParameterDeclarations ()
        * ======================================================
        */
       SgExpression * argSizeField = buildDotExp (buildVarRefExp (
-          variableDeclarations->get (
-              IndirectAndDirectLoop::Fortran::VariableNames::argsSizes)),
+          variableDeclarations->get (CommonVariableNames::argsSizes)),
           buildOpaqueVarRefExp (VariableNames::getOpDatSizeName (i),
               subroutineScope));
 
@@ -754,11 +750,10 @@ void
 FortranCUDAKernelSubroutineDirectLoop::createFormalParameterDeclarations ()
 {
   variableDeclarations->add (
-      IndirectAndDirectLoop::Fortran::VariableNames::argsSizes,
+      CommonVariableNames::argsSizes,
       FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
-          IndirectAndDirectLoop::Fortran::VariableNames::argsSizes,
-          dataSizesDeclaration->getType (), subroutineScope, formalParameters,
-          1, DEVICE));
+          CommonVariableNames::argsSizes, dataSizesDeclaration->getType (),
+          subroutineScope, formalParameters, 1, DEVICE));
 
   createOPDATFormalParameterDeclarations ();
 

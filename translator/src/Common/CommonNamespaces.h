@@ -71,11 +71,6 @@ namespace OP2
      */
     unsigned int const NUMBER_OF_NON_OP_DAT_ARGUMENTS = 2;
   }
-
-  namespace CPP
-  {
-    std::string const OP_PTR = "op_ptr";
-  }
 }
 
 namespace IndirectAndDirectLoop
@@ -87,7 +82,6 @@ namespace IndirectAndDirectLoop
       namespace VariableNames
       {
         std::string const inputValue = "dat_l";
-        std::string const iterationCounter = "i";
         std::string const reductionResultOnDevice = "dat_g";
         std::string const sharedMemoryStartOffset = "sharedMemoryStartOffset";
         std::string const threadID = "threadID";
@@ -98,50 +92,11 @@ namespace IndirectAndDirectLoop
         std::string const reductionArrayHost = "reductionArrayHost";
         std::string const reductionArrayDevice = "reductionArrayDevice";
       }
-
-      namespace SubroutineNames
-      {
-        std::string const shift = "ishft";
-      }
-    }
-
-    namespace HostSubroutine
-    {
-      std::string const subroutineName = "subroutineName";
-      std::string const set = "set";
-      std::string const size = "size";
-      std::string const dim = "dim";
-      std::string const dat = "dat";
-      std::string const cudaThreadSynchronizeSubroutineName =
-          "cudaThreadSynchronize";
-      std::string const c2FortranPointerFunctionName = "c_f_pointer";
-      std::string const c2FortranPointerVariablePrefix = "c2fPtrArg";
-      std::string const threadSynchronizeSubroutineName =
-          "cudaThreadSynchronize";
-      std::string const threadSynchronizeReturnVariableName = "threadSynchRet";
-      std::string const reductionIterationCounter1 = "i1Reduction";
-      std::string const reductionIterationCounter2 = "i2Reduction";
     }
 
     namespace KernelSubroutine
     {
       std::string const offsetForReduction = "offsetReduction";
-    }
-
-    namespace VariableNames
-    {
-      std::string const argsSizes = "argsSizes";
-      std::string const autoshared = "autoshared";
-      std::string const opDatDimensions = "dimensions";
-    }
-
-    namespace Libraries
-    {
-      std::string const ISO_C_BINDING = "ISO_C_BINDING";
-      std::string const OP2_C = "OP2_C";
-      std::string const CUDAFOR = "CUDAFOR";
-      std::string const OMP_LIB = "OMP_LIB";
-      std::string const cudaConfigurationParams = "cudaConfigurationParams";
     }
   }
 }
@@ -164,45 +119,6 @@ namespace IndirectLoop
       std::string const roundUp = "roundUp";
     }
 
-    namespace HostSubroutine
-    {
-      namespace VariableNames
-      {
-        std::string const accesses = "accesses";
-        std::string const actualPlan = "actualPlan";
-        std::string const args = "args";
-        std::string const argsNumber = "argsNumber";
-        std::string const blockOffset = "blockOffset";
-        std::string const col = "col";
-        std::string const iterationCounter = "i";
-        std::string const idxs = "idxs";
-        std::string const inds = "inds";
-        std::string const indsNumber = "indsNumber";
-        std::string const maps = "maps";
-        std::string const ncolblk = "ncolblk";
-        std::string const planRet = "planRet";
-      }
-
-      namespace FieldNames
-      {
-        std::string const blkmap = "blkmap";
-        std::string const ind_maps = "ind_maps";
-        std::string const ind_offs = "ind_offs";
-        std::string const ind_sizes = "ind_sizes";
-        std::string const maps = "maps";
-        std::string const nblocks = "nblocks";
-        std::string const ncolblk = "ncolblk";
-        std::string const ncolors = "ncolors";
-        std::string const nelems = "nelems";
-        std::string const nindirect = "nindirect";
-        std::string const nshared = "nshared";
-        std::string const nthrcol = "nthrcol";
-        std::string const offset = "offset";
-        std::string const size = "size";
-        std::string const thrcol = "thrcol";
-      }
-    }
-
     namespace KernelSubroutine
     {
       namespace VariableNames
@@ -210,8 +126,6 @@ namespace IndirectLoop
         std::string const blockID = "blockID";
         std::string const col = "col";
         std::string const col2 = "col2";
-        std::string const iterationCounter = "i";
-        std::string const iterationCounter2 = "i2";
         std::string const moduled = "moduled";
         std::string const moduloResult = "moduloResult";
         std::string const nbytes = "nbytes";
@@ -219,21 +133,7 @@ namespace IndirectLoop
         std::string const nelem = "nelem";
         std::string const nelems2 = "nelems2";
         std::string const offset_b = "offset_b";
-        std::string const whileLoopBound = "whileLoopBound";
       }
-    }
-  }
-
-  namespace CPP
-  {
-    namespace HostSubroutine
-    {
-
-    }
-
-    namespace KernelSubroutine
-    {
-
     }
   }
 }
@@ -248,11 +148,6 @@ namespace DirectLoop
 
   namespace Fortran
   {
-    namespace HostSubroutine
-    {
-      std::string const threadSynchRet = "threadSynchRet";
-    }
-
     namespace KernelSubroutine
     {
       std::string const setSize = "setSize";
@@ -264,20 +159,6 @@ namespace DirectLoop
       std::string const offsetInThreadBlock = "offset";
       std::string const remainingElements = "nelems";
       std::string const autosharedDisplacement = "autosharedDisplacement";
-    }
-  }
-
-  namespace CPlusPlus
-  {
-
-    namespace HostSubroutine
-    {
-
-    }
-
-    namespace KernelSubroutine
-    {
-
     }
   }
 }
@@ -292,50 +173,26 @@ namespace CUDA
 
   namespace Fortran
   {
-    namespace VariableNames
-    {
-      std::string const blocksPerGrid = "nblocks";
-      std::string const threadsPerBlock = "nthread";
-      std::string const sharedMemorySize = "nshared";
-      std::string const threadidx = "threadidx";
-      std::string const blockidx = "blockidx";
-      std::string const blockdim = "blockdim";
-      std::string const griddim = "griddim";
-    }
+    std::string const blockidx = "blockidx";
+    std::string const blockdim = "blockdim";
+    std::string const cudaThreadSynchronize = "cudaThreadSynchronize";
+    std::string const griddim = "griddim";
+    std::string const blocksPerGrid = "nblocks";
+    std::string const sharedMemorySize = "nshared";
+    std::string const threadsPerBlock = "nthread";
+    std::string const syncthreads = "syncthreads";
+    std::string const threadidx = "threadidx";
+    std::string const threadSynchRet = "threadSynchRet";
+    std::string const x = "x";
 
-    namespace FieldNames
-    {
-      std::string const x = "x";
-    }
-
-    namespace SubroutineNames
-    {
-      std::string const syncthreads = "syncthreads";
-    }
-
-    namespace DirectLoop
-    {
-      /*
-       * ======================================================
-       * Following values are copied from Mike Giles'
-       * implementation and may be subject to future changes
-       * ======================================================
-       */
-
-      int const nblocks = 200;
-      int const nthreads = 128;
-    }
-  }
-
-  namespace CPP
-  {
-    namespace VariableNames
-    {
-    }
-
-    namespace FieldNames
-    {
-    }
+    /*
+     * ======================================================
+     * The following values are copied from Mike Giles'
+     * implementation and may be subject to future changes
+     * ======================================================
+     */
+    int const nblocks = 200;
+    int const nthreads = 128;
   }
 }
 
@@ -365,6 +222,21 @@ namespace TargetBackends
   std::string const CUDA = "CUDA";
   std::string const OpenMP = "OpenMP";
   std::string const Unknown = "Unknown";
+}
+
+namespace CommonVariableNames
+{
+  std::string const argsSizes = "argsSizes";
+  std::string const autoshared = "autoshared";
+  std::string const dat = "dat";
+  std::string const dim = "dim";
+  std::string const index = "index";
+  std::string const iterationCounter1 = "i1";
+  std::string const iterationCounter2 = "i2";
+  std::string const opDatDimensions = "dimensions";
+  std::string const set = "set";
+  std::string const size = "size";
+  std::string const upperBound = "n";
 }
 
 namespace VariableNames

@@ -22,6 +22,21 @@
 
 /*
  * ======================================================
+ * Namespace
+ * ======================================================
+ */
+
+namespace Libraries
+{
+  std::string const ISO_C_BINDING = "ISO_C_BINDING";
+  std::string const OP2_C = "OP2_C";
+  std::string const CUDAFOR = "CUDAFOR";
+  std::string const OMP_LIB = "OMP_LIB";
+  std::string const cudaConfigurationParams = "cudaConfigurationParams";
+}
+
+/*
+ * ======================================================
  * Private functions
  * ======================================================
  */
@@ -373,10 +388,8 @@ FortranSubroutinesGeneration::addOpenMPLibraries (
       "Adding 'use' statements to OpenMP module", 2);
 
   vector <string> libs;
-
-  libs.push_back (IndirectAndDirectLoop::Fortran::Libraries::OP2_C);
-
-  libs.push_back (IndirectAndDirectLoop::Fortran::Libraries::OMP_LIB);
+  libs.push_back (Libraries::OP2_C);
+  libs.push_back (Libraries::OMP_LIB);
 
   for (vector <string>::const_iterator it = libs.begin (); it != libs.end (); ++it)
   {
@@ -387,7 +400,7 @@ FortranSubroutinesGeneration::addOpenMPLibraries (
 
     appendStatement (useStatement, moduleStatement->get_definition ());
 
-    if (iequals (*it, IndirectAndDirectLoop::Fortran::Libraries::OMP_LIB))
+    if (iequals (*it, Libraries::OMP_LIB))
     {
       addTextForUnparser (useStatement, "#ifdef _OPENMP\n",
           AstUnparseAttribute::e_before);
@@ -410,15 +423,10 @@ FortranSubroutinesGeneration::addCUDALibraries (
       "Adding 'use' statements to CUDA module", 2);
 
   vector <string> libs;
-
-  libs.push_back (IndirectAndDirectLoop::Fortran::Libraries::ISO_C_BINDING);
-
-  libs.push_back (IndirectAndDirectLoop::Fortran::Libraries::OP2_C);
-
-  libs.push_back (
-      IndirectAndDirectLoop::Fortran::Libraries::cudaConfigurationParams);
-
-  libs.push_back (IndirectAndDirectLoop::Fortran::Libraries::CUDAFOR);
+  libs.push_back (Libraries::ISO_C_BINDING);
+  libs.push_back (Libraries::OP2_C);
+  libs.push_back (Libraries::cudaConfigurationParams);
+  libs.push_back (Libraries::CUDAFOR);
 
   for (vector <string>::const_iterator it = libs.begin (); it != libs.end (); ++it)
   {

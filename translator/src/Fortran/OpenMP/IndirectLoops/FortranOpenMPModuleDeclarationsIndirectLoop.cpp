@@ -60,18 +60,18 @@ FortranOpenMPModuleDeclarationsIndirectLoop::createExecutionPlanDeclarations ()
       moduleScope)->get_type ();
 
   moduleDeclarations ->add (
-      IndirectLoop::Fortran::HostSubroutine::VariableNames::planRet,
+      PlanFunction::Fortran::planRet,
       FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
-          IndirectLoop::Fortran::HostSubroutine::VariableNames::planRet,
+          PlanFunction::Fortran::planRet,
           c_ptrType, moduleScope));
 
   SgType * op_planType = FortranTypesBuilder::buildNewTypeDeclaration (
       "op_plan", moduleScope)->get_type ();
 
   moduleDeclarations->add (
-      IndirectLoop::Fortran::HostSubroutine::VariableNames::actualPlan,
+      PlanFunction::Fortran::actualPlan,
       FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
-          IndirectLoop::Fortran::HostSubroutine::VariableNames::actualPlan,
+          PlanFunction::Fortran::actualPlan,
           buildPointerType (op_planType), moduleScope));
 
   /*
@@ -173,8 +173,7 @@ FortranOpenMPModuleDeclarationsIndirectLoop::createExecutionPlanDeclarations ()
 
   vector <string> planIntegerArrayVariables;
 
-  planIntegerArrayVariables.push_back (
-      IndirectLoop::Fortran::HostSubroutine::VariableNames::ncolblk);
+  planIntegerArrayVariables.push_back (PlanFunction::Fortran::ncolblk);
 
   planIntegerArrayVariables.push_back (PlanFunction::Fortran::pnindirect);
 
