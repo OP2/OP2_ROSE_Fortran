@@ -11,7 +11,7 @@
  */
 
 SgStatement *
-FortranCUDAKernelSubroutineDirectLoop::createUserSubroutineCall ()
+FortranCUDAKernelSubroutineDirectLoop::createUserSubroutineCallStatement ()
 {
   using SageBuilder::buildFunctionCallStmt;
   using SageBuilder::buildVoidType;
@@ -414,7 +414,7 @@ FortranCUDAKernelSubroutineDirectLoop::buildMainLoopStatements ()
   SgBasicBlock * preAssignments =
       stageInFromDeviceMemoryToLocalThreadVariables ();
 
-  SgStatement * userFunctionCall = createUserSubroutineCall ();
+  SgStatement * userFunctionCall = createUserSubroutineCallStatement ();
 
   SgBasicBlock * postAssignments =
       stageOutFromLocalThreadVariablesToDeviceMemory ();
@@ -655,7 +655,7 @@ FortranCUDAKernelSubroutineDirectLoop::createLocalVariableDeclarations ()
 
   createLocalThreadDeclarations ();
 
-  createAutosharedDeclaration ();
+  createAutoSharedDeclaration ();
 }
 
 void
@@ -798,16 +798,6 @@ FortranCUDAKernelSubroutineDirectLoop::createFormalParameterDeclarations ()
           DirectLoop::Fortran::KernelSubroutine::warpSize,
           FortranTypesBuilder::getFourByteInteger (), subroutineScope,
           formalParameters, 1, VALUE));
-
-  if (parallelLoop->isReductionRequired () == true)
-  {
-    variableDeclarations->add (
-        IndirectAndDirectLoop::Fortran::KernelSubroutine::offsetForReduction,
-        FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
-            IndirectAndDirectLoop::Fortran::KernelSubroutine::offsetForReduction,
-            FortranTypesBuilder::getFourByteInteger (), subroutineScope,
-            formalParameters, 1, VALUE));
-  }
 }
 
 /*

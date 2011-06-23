@@ -10,7 +10,7 @@
  */
 
 SgStatement *
-FortranOpenMPKernelSubroutineDirectLoop::createUserSubroutineCall ()
+FortranOpenMPKernelSubroutineDirectLoop::createUserSubroutineCallStatement ()
 {
   using SageBuilder::buildExprListExp;
   using SageBuilder::buildVarRefExp;
@@ -94,15 +94,13 @@ FortranOpenMPKernelSubroutineDirectLoop::createUserSubroutineDoLoop ()
   SgSubtractOp * upperBoundExpression = buildSubtractOp (buildVarRefExp (
       variableDeclarations->get (OpenMP::sliceEnd)), buildIntVal (1));
 
-  SgIntVal * strideExpression = buildIntVal (1);
-
   SgBasicBlock * loopBody = buildBasicBlock ();
 
-  loopBody->append_statement (createUserSubroutineCall ());
+  appendStatement (createUserSubroutineCallStatement (), loopBody);
 
   SgFortranDo * doStatement =
       FortranStatementsAndExpressionsBuilder::buildFortranDoStatement (
-          initializationExpression, upperBoundExpression, strideExpression,
+          initializationExpression, upperBoundExpression, buildIntVal (1),
           loopBody);
 
   appendStatement (doStatement, subroutineScope);

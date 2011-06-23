@@ -3,6 +3,7 @@
 #include <FortranStatementsAndExpressionsBuilder.h>
 #include <ROSEHelper.h>
 #include <Debug.h>
+#include <FortranCUDAReductionSubroutine.h>
 #include <CommonNamespaces.h>
 
 /*
@@ -38,10 +39,9 @@ FortranCUDAHostSubroutineDirectLoop::createKernelFunctionCallStatement ()
       }
       else
       {
-        actualParameters->append_expression (
-            buildVarRefExp (
-                variableDeclarations->get (
-                    IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::reductionArrayDevice)));
+        actualParameters->append_expression (buildVarRefExp (
+            variableDeclarations->get (
+                ReductionSubroutine::reductionArrayDevice)));
       }
     }
   }
@@ -63,9 +63,8 @@ FortranCUDAHostSubroutineDirectLoop::createKernelFunctionCallStatement ()
   if (parallelLoop->isReductionRequired () == true)
   {
     actualParameters->append_expression (
-        buildVarRefExp (
-            variableDeclarations->get (
-                IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::sharedMemoryStartOffset)));
+        buildVarRefExp (variableDeclarations->get (
+            ReductionSubroutine::sharedMemoryStartOffset)));
   }
 
   SgExprStatement * callStatement = buildFunctionCallStmt (kernelSubroutineName
@@ -122,13 +121,9 @@ FortranCUDAHostSubroutineDirectLoop::createVariableSizesInitialisationStatements
       }
       else
       {
-        SgExprStatement
-            * assignmentStatement =
-                buildAssignStatement (
-                    dotExpression,
-                    buildVarRefExp (
-                        variableDeclarations->get (
-                            IndirectAndDirectLoop::Fortran::ReductionSubroutine::VariableNames::numberOfThreadItems)));
+        SgExprStatement * assignmentStatement = buildAssignStatement (
+            dotExpression, buildVarRefExp (variableDeclarations->get (
+                ReductionSubroutine::numberOfThreadItems)));
 
         appendStatement (assignmentStatement, subroutineScope);
       }
@@ -152,16 +147,25 @@ FortranCUDAHostSubroutineDirectLoop::createCUDAKernelInitialisationStatements ()
   string const OPWarpSizeVariableName = "OP_WARP_SIZE";
   string const maxFunctionName = "max";
 
+  /*
+   * ======================================================
+   * The following values are copied from Mike Giles'
+   * implementation and may be subject to future changes
+   * ======================================================
+   */
+  int const nblocks = 200;
+  int const nthreads = 128;
+
   SgExprStatement * assignmentStatement1 =
       buildAssignStatement (buildVarRefExp (variableDeclarations->get (
-          CUDA::Fortran::blocksPerGrid)), buildIntVal (CUDA::Fortran::nblocks));
+          CUDA::Fortran::blocksPerGrid)), buildIntVal (nblocks));
 
   appendStatement (assignmentStatement1, subroutineScope);
 
   SgExprStatement * assignmentStatement2 = buildAssignStatement (
       buildVarRefExp (
           variableDeclarations->get (CUDA::Fortran::threadsPerBlock)),
-      buildIntVal (CUDA::Fortran::nthreads));
+      buildIntVal (nthreads));
 
   appendStatement (assignmentStatement2, subroutineScope);
 

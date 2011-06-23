@@ -19,7 +19,7 @@ class FortranCUDAKernelSubroutine: public FortranKernelSubroutine
     createLocalThreadDeclarations ();
 
     void
-    createAutosharedDeclaration ();
+    createAutoSharedDeclaration ();
 
     FortranCUDAKernelSubroutine (std::string const & subroutineName,
         std::string const & userSubroutineName, ParallelLoop * parallelLoop,

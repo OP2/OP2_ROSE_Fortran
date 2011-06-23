@@ -73,42 +73,8 @@ namespace OP2
   }
 }
 
-namespace IndirectAndDirectLoop
-{
-  namespace Fortran
-  {
-    namespace ReductionSubroutine
-    {
-      namespace VariableNames
-      {
-        std::string const inputValue = "dat_l";
-        std::string const reductionResultOnDevice = "dat_g";
-        std::string const sharedMemoryStartOffset = "sharedMemoryStartOffset";
-        std::string const threadID = "threadID";
-        std::string const warpSize = "warpSize";
-        std::string const maximumBytesInSharedMemory = "maxSharedMemoryBytes";
-        std::string const maximumNumberOfThreadBlocks = "maxThreadBlocks";
-        std::string const numberOfThreadItems = "threadItems";
-        std::string const reductionArrayHost = "reductionArrayHost";
-        std::string const reductionArrayDevice = "reductionArrayDevice";
-      }
-    }
-
-    namespace KernelSubroutine
-    {
-      std::string const offsetForReduction = "offsetReduction";
-    }
-  }
-}
-
 namespace IndirectLoop
 {
-  /*
-   * ======================================================
-   * The names used in the indirect loop implementation
-   * ======================================================
-   */
-
   namespace Fortran
   {
     namespace VariablePrefixes
@@ -140,12 +106,6 @@ namespace IndirectLoop
 
 namespace DirectLoop
 {
-  /*
-   * ======================================================
-   * The names used in the direct loop implementation
-   * ======================================================
-   */
-
   namespace Fortran
   {
     namespace KernelSubroutine
@@ -184,15 +144,6 @@ namespace CUDA
     std::string const threadidx = "threadidx";
     std::string const threadSynchRet = "threadSynchRet";
     std::string const x = "x";
-
-    /*
-     * ======================================================
-     * The following values are copied from Mike Giles'
-     * implementation and may be subject to future changes
-     * ======================================================
-     */
-    int const nblocks = 200;
-    int const nthreads = 128;
   }
 }
 

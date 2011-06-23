@@ -1,5 +1,11 @@
 #include <FortranOpenMPKernelSubroutineIndirectLoop.h>
 
+SgStatement *
+FortranOpenMPKernelSubroutineIndirectLoop::createUserSubroutineCallStatement ()
+{
+
+}
+
 void
 FortranOpenMPKernelSubroutineIndirectLoop::createStatements ()
 {

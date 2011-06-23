@@ -1,6 +1,7 @@
 #include <Debug.h>
 #include <FortranCUDAKernelSubroutine.h>
 #include <CommonNamespaces.h>
+#include <FortranCUDAReductionSubroutine.h>
 #include <FortranTypesBuilder.h>
 #include <FortranStatementsAndExpressionsBuilder.h>
 #include <ROSEHelper.h>
@@ -229,16 +230,12 @@ FortranCUDAKernelSubroutine::createReductionSubroutineCall ()
                 buildVarRefExp (variableDeclarations->get (
                     DirectLoop::Fortran::KernelSubroutine::setElementCounter)));
 
-            SgExprListExp
-                * reductionActualParams =
-                    buildExprListExp (
-                        deviceVar,
-                        localThreadVar,
-                        buildVarRefExp (variableDeclarations->get (
-                            DirectLoop::Fortran::KernelSubroutine::warpSize)),
-                        buildVarRefExp (
-                            variableDeclarations->get (
-                                IndirectAndDirectLoop::Fortran::KernelSubroutine::offsetForReduction)));
+            SgExprListExp * reductionActualParams = buildExprListExp (
+                deviceVar, localThreadVar, buildVarRefExp (
+                    variableDeclarations->get (
+                        DirectLoop::Fortran::KernelSubroutine::warpSize)),
+                buildVarRefExp (variableDeclarations->get (
+                    ReductionSubroutine::offsetForReduction)));
 
             SgFunctionCallExp * reductionFunctionCall = buildFunctionCallExp (
                 reductionFunctionSymbol, reductionActualParams);
@@ -321,7 +318,7 @@ FortranCUDAKernelSubroutine::createLocalThreadDeclarations ()
 }
 
 void
-FortranCUDAKernelSubroutine::createAutosharedDeclaration ()
+FortranCUDAKernelSubroutine::createAutoSharedDeclaration ()
 {
   SgType * autosharedType = NULL;
 

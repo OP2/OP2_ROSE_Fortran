@@ -14,6 +14,9 @@ class KernelSubroutine: public Subroutine
 
   protected:
 
+    virtual SgStatement *
+    createUserSubroutineCallStatement () = 0;
+
     KernelSubroutine (std::string const & subroutineName,
         std::string const & userSubroutineName, ParallelLoop * parallelLoop);
 };

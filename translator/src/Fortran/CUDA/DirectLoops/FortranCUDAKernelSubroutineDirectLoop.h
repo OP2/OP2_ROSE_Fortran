@@ -18,8 +18,8 @@ class FortranCUDAKernelSubroutineDirectLoop: public FortranCUDAKernelSubroutine
 
   private:
 
-    SgStatement *
-    createUserSubroutineCall ();
+    virtual SgStatement *
+    createUserSubroutineCallStatement ();
 
     void
     createOPDATFormalParameterDeclarations ();

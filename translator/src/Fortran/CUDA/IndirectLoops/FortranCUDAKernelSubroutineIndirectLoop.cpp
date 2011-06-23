@@ -14,7 +14,7 @@
  */
 
 SgStatement *
-FortranCUDAKernelSubroutineIndirectLoop::createUserSubroutineCall ()
+FortranCUDAKernelSubroutineIndirectLoop::createUserSubroutineCallStatement ()
 {
   using SageBuilder::buildFunctionCallStmt;
   using SageBuilder::buildVoidType;
@@ -563,7 +563,7 @@ FortranCUDAKernelSubroutineIndirectLoop::createPlanWhileLoop ()
     }
   }
 
-  SgStatement * userSubroutineCall = createUserSubroutineCall ();
+  SgStatement * userSubroutineCall = createUserSubroutineCallStatement ();
 
   ifBodyNestingLevel1->append_statement (userSubroutineCall);
 

@@ -22,8 +22,8 @@ class FortranCUDAKernelSubroutineIndirectLoop: public FortranCUDAKernelSubroutin
 
   private:
 
-    SgStatement *
-    createUserSubroutineCall ();
+    virtual SgStatement *
+    createUserSubroutineCallStatement ();
 
     void
     applyPointeredIncrementsOrWrites ();

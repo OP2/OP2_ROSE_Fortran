@@ -12,6 +12,21 @@
 #include <FortranSubroutine.h>
 #include <ParallelLoop.h>
 
+namespace ReductionSubroutine
+{
+  std::string const inputValue = "dat_l";
+  std::string const reductionResultOnDevice = "dat_g";
+  std::string const sharedMemoryStartOffset = "sharedMemoryStartOffset";
+  std::string const threadID = "threadID";
+  std::string const warpSize = "warpSize";
+  std::string const maximumBytesInSharedMemory = "maxSharedMemoryBytes";
+  std::string const maximumNumberOfThreadBlocks = "maxThreadBlocks";
+  std::string const numberOfThreadItems = "threadItems";
+  std::string const offsetForReduction = "offsetReduction";
+  std::string const reductionArrayHost = "reductionArrayHost";
+  std::string const reductionArrayDevice = "reductionArrayDevice";
+}
+
 class FortranCUDAReductionSubroutine: public Subroutine,
     public FortranSubroutine
 {
