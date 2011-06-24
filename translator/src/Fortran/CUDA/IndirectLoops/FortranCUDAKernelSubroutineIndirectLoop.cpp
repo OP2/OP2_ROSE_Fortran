@@ -117,7 +117,7 @@ FortranCUDAKernelSubroutineIndirectLoop::createUserSubroutineCallStatement ()
                       CommonVariableNames::iterationCounter1)),
                   buildVarRefExp (
                       variableDeclarations->get (
-                          IndirectLoop::Fortran::KernelSubroutine::VariableNames::offset_b)));
+                          IndirectLoop::Fortran::KernelSubroutine::VariableNames::blockOffset)));
 
       SgPntrArrRefExp * lowerBound_arrayExpression = buildPntrArrRefExp (
           globalToLocalMappingArray_Reference, lowerBound_addExpression1);
@@ -136,7 +136,7 @@ FortranCUDAKernelSubroutineIndirectLoop::createUserSubroutineCallStatement ()
                       CommonVariableNames::iterationCounter1)),
                   buildVarRefExp (
                       variableDeclarations->get (
-                          IndirectLoop::Fortran::KernelSubroutine::VariableNames::offset_b)));
+                          IndirectLoop::Fortran::KernelSubroutine::VariableNames::blockOffset)));
 
       SgPntrArrRefExp * upperBound_arrayExpression = buildPntrArrRefExp (
           globalToLocalMappingArray_Reference, upperBound_addExpression1);
@@ -155,6 +155,7 @@ FortranCUDAKernelSubroutineIndirectLoop::createUserSubroutineCallStatement ()
       SgSubscriptExpression * subscriptExpression = new SgSubscriptExpression (
           ROSEHelper::getFileInfo (), lowerBound_addExpression2,
           upperBound_addExpression3, buildIntVal (1));
+
       subscriptExpression->set_endOfConstruct (ROSEHelper::getFileInfo ());
 
       parameterExpression = buildPntrArrRefExp (autoshared_Reference,
@@ -173,7 +174,7 @@ FortranCUDAKernelSubroutineIndirectLoop::createUserSubroutineCallStatement ()
                             CommonVariableNames::iterationCounter1)),
                         buildVarRefExp (
                             variableDeclarations->get (
-                                IndirectLoop::Fortran::KernelSubroutine::VariableNames::offset_b))),
+                                IndirectLoop::Fortran::KernelSubroutine::VariableNames::blockOffset))),
                     buildIntVal (dim));
 
         SgExpression * deviceVarAccessDirectEnd = buildAddOp (
@@ -186,8 +187,6 @@ FortranCUDAKernelSubroutineIndirectLoop::createUserSubroutineCallStatement ()
 
         arraySubscriptExpression->set_endOfConstruct (
             ROSEHelper::getFileInfo ());
-        arraySubscriptExpression->setCompilerGenerated ();
-        arraySubscriptExpression->setOutputInCodeGeneration ();
 
         parameterExpression = buildPntrArrRefExp (buildVarRefExp (
             variableDeclarations->get (VariableNames::getOpDatName (i))),
@@ -206,8 +205,6 @@ FortranCUDAKernelSubroutineIndirectLoop::createUserSubroutineCallStatement ()
 
         arraySubscriptExpression->set_endOfConstruct (
             ROSEHelper::getFileInfo ());
-        arraySubscriptExpression->setCompilerGenerated ();
-        arraySubscriptExpression->setOutputInCodeGeneration ();
 
         parameterExpression = buildPntrArrRefExp (buildVarRefExp (
             variableDeclarations->get (VariableNames::getOpDatName (i))),
@@ -228,7 +225,7 @@ FortranCUDAKernelSubroutineIndirectLoop::createUserSubroutineCallStatement ()
 }
 
 void
-FortranCUDAKernelSubroutineIndirectLoop::applyPointeredIncrementsOrWrites ()
+FortranCUDAKernelSubroutineIndirectLoop::createPointeredIncrementsOrWritesStatements ()
 {
   using SageBuilder::buildOpaqueVarRefExp;
   using SageBuilder::buildDotExp;
@@ -465,7 +462,7 @@ FortranCUDAKernelSubroutineIndirectLoop::applyPointeredIncrementsOrWrites ()
 }
 
 void
-FortranCUDAKernelSubroutineIndirectLoop::createPlanWhileLoop ()
+FortranCUDAKernelSubroutineIndirectLoop::createExecutionLoopStatements ()
 {
   using SageBuilder::buildVarRefExp;
   using SageBuilder::buildOpaqueVarRefExp;
@@ -516,9 +513,7 @@ FortranCUDAKernelSubroutineIndirectLoop::createPlanWhileLoop ()
   SgBasicBlock * loopBodyNestingLevel1 = buildBasicBlock ();
 
   SgAssignOp * loopBodyExpression1 = buildAssignOp (buildVarRefExp (
-      variableDeclarations->get (
-          IndirectLoop::Fortran::KernelSubroutine::VariableNames::col2)),
-      buildIntVal (-1));
+      variableDeclarations->get (CommonVariableNames::col2)), buildIntVal (-1));
 
   loopBodyNestingLevel1->append_statement (buildExprStatement (
       loopBodyExpression1));
@@ -567,19 +562,21 @@ FortranCUDAKernelSubroutineIndirectLoop::createPlanWhileLoop ()
 
   ifBodyNestingLevel1->append_statement (userSubroutineCall);
 
-  SgAddOp * addExpression2 = buildAddOp (buildVarRefExp (
-      variableDeclarations->get (CommonVariableNames::iterationCounter1)),
-      buildVarRefExp (variableDeclarations->get (
-          IndirectLoop::Fortran::KernelSubroutine::VariableNames::offset_b)));
+  SgAddOp
+      * addExpression2 =
+          buildAddOp (
+              buildVarRefExp (variableDeclarations->get (
+                  CommonVariableNames::iterationCounter1)),
+              buildVarRefExp (
+                  variableDeclarations->get (
+                      IndirectLoop::Fortran::KernelSubroutine::VariableNames::blockOffset)));
 
   SgPntrArrRefExp * arrayExpression2 = buildPntrArrRefExp (buildVarRefExp (
       variableDeclarations->get (PlanFunction::Fortran::pthrcol)),
       addExpression2);
 
   SgAssignOp * assignmentExpression2 = buildAssignOp (buildVarRefExp (
-      variableDeclarations->get (
-          IndirectLoop::Fortran::KernelSubroutine::VariableNames::col2)),
-      arrayExpression2);
+      variableDeclarations->get (CommonVariableNames::col2)), arrayExpression2);
 
   ifBodyNestingLevel1->append_statement (buildExprStatement (
       assignmentExpression2));
@@ -615,7 +612,7 @@ FortranCUDAKernelSubroutineIndirectLoop::createPlanWhileLoop ()
                       CommonVariableNames::iterationCounter1)),
                   buildVarRefExp (
                       variableDeclarations->get (
-                          IndirectLoop::Fortran::KernelSubroutine::VariableNames::offset_b)));
+                          IndirectLoop::Fortran::KernelSubroutine::VariableNames::blockOffset)));
 
       SgPntrArrRefExp * arrayExpression = buildPntrArrRefExp (
           globalToLocalMappingArray_Reference, addExpression);
@@ -639,10 +636,8 @@ FortranCUDAKernelSubroutineIndirectLoop::createPlanWhileLoop ()
   SgBasicBlock * ifBodyNestingLevel2 = buildBasicBlock ();
 
   SgEqualityOp * ifGuardNestingLevel2 = buildEqualityOp (buildVarRefExp (
-      variableDeclarations->get (
-          IndirectLoop::Fortran::KernelSubroutine::VariableNames::col2)),
-      buildVarRefExp (variableDeclarations->get (
-          IndirectLoop::Fortran::KernelSubroutine::VariableNames::col)));
+      variableDeclarations->get (CommonVariableNames::col2)), buildVarRefExp (
+      variableDeclarations->get (CommonVariableNames::col)));
 
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
@@ -729,9 +724,7 @@ FortranCUDAKernelSubroutineIndirectLoop::createPlanWhileLoop ()
   loopBodyNestingLevel2->append_statement (buildExprStatement (subroutineCall));
 
   SgAssignOp * loopLowerBoundNestingLevel2 = buildAssignOp (buildVarRefExp (
-      variableDeclarations->get (
-          IndirectLoop::Fortran::KernelSubroutine::VariableNames::col)),
-      buildIntVal (0));
+      variableDeclarations->get (CommonVariableNames::col)), buildIntVal (0));
 
   SgSubtractOp * loopUpperBoundNestingLevel2 = buildSubtractOp (buildVarRefExp (
       variableDeclarations->get (
@@ -782,7 +775,7 @@ FortranCUDAKernelSubroutineIndirectLoop::createPlanWhileLoop ()
 }
 
 void
-FortranCUDAKernelSubroutineIndirectLoop::createAutosharedWhileLoops ()
+FortranCUDAKernelSubroutineIndirectLoop::createAutoSharedWhileLoopStatements ()
 {
   using SageBuilder::buildVarRefExp;
   using SageBuilder::buildOpaqueVarRefExp;
@@ -1088,7 +1081,7 @@ FortranCUDAKernelSubroutineIndirectLoop::createAutosharedWhileLoops ()
 }
 
 void
-FortranCUDAKernelSubroutineIndirectLoop::initialiseLocalVariables ()
+FortranCUDAKernelSubroutineIndirectLoop::createInitialiseLocalVariablesStatements ()
 {
   using SageBuilder::buildVarRefExp;
   using SageBuilder::buildAssignOp;
@@ -1302,7 +1295,7 @@ FortranCUDAKernelSubroutineIndirectLoop::createThreadZeroStatements ()
       PlanFunction::Fortran::poffset, subroutineScope);
 
   SgVarRefExp * offset_b_Reference3 = buildOpaqueVarRefExp (
-      IndirectLoop::Fortran::KernelSubroutine::VariableNames::offset_b,
+      IndirectLoop::Fortran::KernelSubroutine::VariableNames::blockOffset,
       subroutineScope);
 
   SgVarRefExp * blockID_Reference3 = buildVarRefExp (variableDeclarations->get (
@@ -1437,14 +1430,12 @@ FortranCUDAKernelSubroutineIndirectLoop::createThreadZeroStatements ()
 }
 
 void
-FortranCUDAKernelSubroutineIndirectLoop::createPlanlocalVariableDeclarations ()
+FortranCUDAKernelSubroutineIndirectLoop::createPlanFormalParameterDeclarations ()
 {
   using SageBuilder::buildSubtractOp;
   using SageBuilder::buildDotExp;
   using SageBuilder::buildVarRefExp;
-  using SageBuilder::buildVariableDeclaration;
   using SageBuilder::buildIntVal;
-  using SageInterface::appendStatement;
   using std::string;
   using std::vector;
 
@@ -1507,14 +1498,13 @@ FortranCUDAKernelSubroutineIndirectLoop::createPlanlocalVariableDeclarations ()
 }
 
 void
-FortranCUDAKernelSubroutineIndirectLoop::createOpDatLocalVariableDeclarations ()
+FortranCUDAKernelSubroutineIndirectLoop::createOpDatFormalParameterDeclarations ()
 {
   using SageBuilder::buildSubtractOp;
   using SageBuilder::buildDotExp;
   using SageBuilder::buildVarRefExp;
   using SageBuilder::buildVariableDeclaration;
   using SageBuilder::buildIntVal;
-  using SageInterface::appendStatement;
   using std::string;
 
   Debug::getInstance ()->debugMessage ("Creating OP_DAT formal parameters", 2);
@@ -1548,8 +1538,6 @@ FortranCUDAKernelSubroutineIndirectLoop::createOpDatLocalVariableDeclarations ()
       SgType * opdatType = parallelLoop->getOpDatType (i);
 
       SgArrayType * baseArrayType = isSgArrayType (opdatType);
-
-      ROSE_ASSERT ( baseArrayType != NULL );
 
       variableDeclarations->add (
           VariableNames::getOpDatName (i),
@@ -1655,21 +1643,19 @@ FortranCUDAKernelSubroutineIndirectLoop::createStatements ()
 {
   createThreadZeroStatements ();
 
-  initialiseLocalVariables ();
+  createInitialiseLocalVariablesStatements ();
 
-  createAutosharedWhileLoops ();
+  createAutoSharedWhileLoopStatements ();
 
-  createPlanWhileLoop ();
+  createExecutionLoopStatements ();
 
-  applyPointeredIncrementsOrWrites ();
+  createPointeredIncrementsOrWritesStatements ();
 }
 
 void
 FortranCUDAKernelSubroutineIndirectLoop::createLocalVariableDeclarations ()
 {
   using boost::lexical_cast;
-  using SageBuilder::buildVariableDeclaration;
-  using SageInterface::appendStatement;
   using std::string;
   using std::vector;
 
@@ -1744,6 +1730,9 @@ FortranCUDAKernelSubroutineIndirectLoop::createLocalVariableDeclarations ()
       IndirectLoop::Fortran::KernelSubroutine::VariableNames::blockID);
 
   sharedFourByteIntegerVariables.push_back (
+      IndirectLoop::Fortran::KernelSubroutine::VariableNames::blockOffset);
+
+  sharedFourByteIntegerVariables.push_back (
       IndirectLoop::Fortran::KernelSubroutine::VariableNames::ncolor);
 
   sharedFourByteIntegerVariables.push_back (
@@ -1751,9 +1740,6 @@ FortranCUDAKernelSubroutineIndirectLoop::createLocalVariableDeclarations ()
 
   sharedFourByteIntegerVariables.push_back (
       IndirectLoop::Fortran::KernelSubroutine::VariableNames::nelems2);
-
-  sharedFourByteIntegerVariables.push_back (
-      IndirectLoop::Fortran::KernelSubroutine::VariableNames::offset_b);
 
   for (vector <string>::const_iterator it =
       sharedFourByteIntegerVariables.begin (); it
@@ -1776,15 +1762,16 @@ FortranCUDAKernelSubroutineIndirectLoop::createLocalVariableDeclarations ()
               upperBoundExpression), subroutineScope, 1, SHARED));
 
   vector <string> fourByteIntegerVariables;
-  fourByteIntegerVariables.push_back (
-      IndirectLoop::Fortran::KernelSubroutine::VariableNames::col);
 
-  fourByteIntegerVariables.push_back (
-      IndirectLoop::Fortran::KernelSubroutine::VariableNames::col2);
+  fourByteIntegerVariables.push_back (CommonVariableNames::col);
+
+  fourByteIntegerVariables.push_back (CommonVariableNames::col2);
 
   fourByteIntegerVariables.push_back (CommonVariableNames::iterationCounter1);
 
   fourByteIntegerVariables.push_back (CommonVariableNames::iterationCounter2);
+
+  fourByteIntegerVariables.push_back (CommonVariableNames::upperBound);
 
   fourByteIntegerVariables.push_back (
       IndirectLoop::Fortran::KernelSubroutine::VariableNames::moduloResult);
@@ -1794,8 +1781,6 @@ FortranCUDAKernelSubroutineIndirectLoop::createLocalVariableDeclarations ()
 
   fourByteIntegerVariables.push_back (
       IndirectLoop::Fortran::KernelSubroutine::VariableNames::nbytes);
-
-  fourByteIntegerVariables.push_back (CommonVariableNames::upperBound);
 
   for (vector <string>::const_iterator it = fourByteIntegerVariables.begin (); it
       != fourByteIntegerVariables.end (); ++it)
@@ -1815,9 +1800,9 @@ FortranCUDAKernelSubroutineIndirectLoop::createFormalParameterDeclarations ()
           CommonVariableNames::argsSizes, dataSizesDeclaration->getType (),
           subroutineScope, formalParameters, 1, DEVICE));
 
-  createOpDatLocalVariableDeclarations ();
+  createOpDatFormalParameterDeclarations ();
 
-  createPlanlocalVariableDeclarations ();
+  createPlanFormalParameterDeclarations ();
 }
 
 FortranCUDAKernelSubroutineIndirectLoop::FortranCUDAKernelSubroutineIndirectLoop (

@@ -31,7 +31,6 @@ namespace PlanFunction
     std::string const argsNumber = "argsNumber";
     std::string const blkmap = "blkmap";
     std::string const blockOffset = "blockOffset";
-    std::string const col = "col";
     std::string const cplan = "cplan";
     std::string const idxs = "idxs";
     std::string const inds = "inds";

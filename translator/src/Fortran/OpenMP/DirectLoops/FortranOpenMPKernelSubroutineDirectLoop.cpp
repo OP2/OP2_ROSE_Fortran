@@ -78,7 +78,7 @@ FortranOpenMPKernelSubroutineDirectLoop::createUserSubroutineCallStatement ()
 }
 
 void
-FortranOpenMPKernelSubroutineDirectLoop::createUserSubroutineDoLoop ()
+FortranOpenMPKernelSubroutineDirectLoop::createExecutionLoopStatements ()
 {
   using SageBuilder::buildBasicBlock;
   using SageBuilder::buildSubtractOp;
@@ -107,33 +107,9 @@ FortranOpenMPKernelSubroutineDirectLoop::createUserSubroutineDoLoop ()
 }
 
 void
-FortranOpenMPKernelSubroutineDirectLoop::initialiseThreadID ()
-{
-  using SageBuilder::buildVarRefExp;
-  using SageBuilder::buildFunctionCallExp;
-  using SageBuilder::buildExprListExp;
-  using SageBuilder::buildAssignStatement;
-  using SageInterface::appendStatement;
-
-  SgFunctionSymbol * functionSymbol =
-      FortranTypesBuilder::buildNewFortranFunction ("omp_get_thread_num",
-          subroutineScope);
-
-  SgFunctionCallExp * functionCall = buildFunctionCallExp (functionSymbol,
-      buildExprListExp ());
-
-  SgExprStatement * assignmentStatement = buildAssignStatement (buildVarRefExp (
-      variableDeclarations->get (OpenMP::threadID)), functionCall);
-
-  appendStatement (assignmentStatement, subroutineScope);
-}
-
-void
 FortranOpenMPKernelSubroutineDirectLoop::createStatements ()
 {
-  initialiseThreadID ();
-
-  createUserSubroutineDoLoop ();
+  createExecutionLoopStatements ();
 }
 
 void
@@ -142,11 +118,6 @@ FortranOpenMPKernelSubroutineDirectLoop::createLocalVariableDeclarations ()
   variableDeclarations->add (OpenMP::sliceIterator,
       FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
           OpenMP::sliceIterator, FortranTypesBuilder::getFourByteInteger (),
-          subroutineScope));
-
-  variableDeclarations->add (OpenMP::threadID,
-      FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
-          OpenMP::threadID, FortranTypesBuilder::getFourByteInteger (),
           subroutineScope));
 }
 

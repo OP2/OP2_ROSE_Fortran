@@ -32,14 +32,6 @@ class FortranCUDAHostSubroutineDirectLoop: public FortranCUDAHostSubroutine
 
     /*
      * ======================================================
-     * Creates the kernel call
-     * ======================================================
-     */
-    void
-    createKernelCall ();
-
-    /*
-     * ======================================================
      * Generates the code initialising the device variable
      * sizes variable
      * ======================================================

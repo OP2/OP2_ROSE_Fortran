@@ -13,7 +13,7 @@
  */
 
 void
-FortranCUDAKernelSubroutine::initialiseLocalThreadVariables ()
+FortranCUDAKernelSubroutine::createInitialiseLocalThreadVariablesStatements ()
 {
   using SageBuilder::buildOpaqueVarRefExp;
   using SageBuilder::buildPntrArrRefExp;
@@ -109,7 +109,7 @@ FortranCUDAKernelSubroutine::initialiseLocalThreadVariables ()
 }
 
 void
-FortranCUDAKernelSubroutine::createReductionSubroutineCall ()
+FortranCUDAKernelSubroutine::createReductionLoopStatements ()
 {
   using SageBuilder::buildIntVal;
   using SageBuilder::buildAssignOp;

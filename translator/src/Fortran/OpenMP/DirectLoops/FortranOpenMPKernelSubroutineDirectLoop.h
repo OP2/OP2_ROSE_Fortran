@@ -11,11 +11,8 @@ class FortranOpenMPKernelSubroutineDirectLoop: public FortranOpenMPKernelSubrout
     virtual SgStatement *
     createUserSubroutineCallStatement ();
 
-    void
-    createUserSubroutineDoLoop ();
-
-    void
-    initialiseThreadID ();
+    virtual void
+    createExecutionLoopStatements ();
 
     virtual void
     createStatements ();

@@ -21,19 +21,13 @@ class FortranCUDAKernelSubroutineDirectLoop: public FortranCUDAKernelSubroutine
     virtual SgStatement *
     createUserSubroutineCallStatement ();
 
-    /*
-     * ======================================================
-     * Builds the statements included in the main
-     * set elements-based loop
-     * ======================================================
-     */
-    SgBasicBlock *
-    buildMainLoopStatements ();
+    virtual void
+    createExecutionLoopStatements ();
 
     /*
      * ======================================================
      * Builds the assignments of shared memory and local
-     * thread variables, if needed
+     * thread variables
      * ======================================================
      */
     SgBasicBlock *
@@ -42,11 +36,17 @@ class FortranCUDAKernelSubroutineDirectLoop: public FortranCUDAKernelSubroutine
     /*
      * ======================================================
      * Builds the assignments of shared memory and local
-     * thread variables, if needed
+     * thread variables
      * ======================================================
      */
     SgBasicBlock *
     createStageOutFromLocalThreadVariablesToDeviceMemoryStatements ();
+
+    void
+    createAutoSharedDisplacementInitialisationStatement ();
+
+    void
+    createThreadIDInitialisationStatement ();
 
     virtual void
     createStatements ();

@@ -17,6 +17,9 @@ class KernelSubroutine: public Subroutine
     virtual SgStatement *
     createUserSubroutineCallStatement () = 0;
 
+    virtual void
+    createExecutionLoopStatements () = 0;
+
     KernelSubroutine (std::string const & subroutineName,
         std::string const & userSubroutineName, ParallelLoop * parallelLoop);
 };

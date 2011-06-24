@@ -4,6 +4,12 @@
 #include <FortranTypesBuilder.h>
 #include <Debug.h>
 
+/*
+ * ======================================================
+ * Private functions
+ * ======================================================
+ */
+
 SgStatement *
 FortranOpenMPHostSubroutineIndirectLoop::createKernelFunctionCallStatement ()
 {
@@ -180,7 +186,7 @@ FortranOpenMPHostSubroutineIndirectLoop::createPlanFunctionExecutionStatements (
    */
 
   SgAddOp * addExpression2 = buildAddOp (buildVarRefExp (
-      variableDeclarations->get (PlanFunction::Fortran::col)), buildIntVal (1));
+      variableDeclarations->get (CommonVariableNames::col)), buildIntVal (1));
 
   SgPntrArrRefExp * arrayIndexExpression2 = buildPntrArrRefExp (buildVarRefExp (
       moduleDeclarationsIndirectLoop->getPlanFunctionDeclaration (
@@ -213,7 +219,7 @@ FortranOpenMPHostSubroutineIndirectLoop::createPlanFunctionExecutionStatements (
    */
 
   SgAssignOp * outerLoopInitializationExpression = buildAssignOp (
-      buildVarRefExp (variableDeclarations->get (PlanFunction::Fortran::col)),
+      buildVarRefExp (variableDeclarations->get (CommonVariableNames::col)),
       buildIntVal (0));
 
   SgDotExp * dotExpression3 = buildDotExp (buildVarRefExp (
@@ -404,6 +410,8 @@ FortranOpenMPHostSubroutineIndirectLoop::createExecutionPlanDeclarations ()
 
   vector <string> fourByteIntegerVariables;
 
+  fourByteIntegerVariables.push_back (CommonVariableNames::col);
+
   fourByteIntegerVariables.push_back (CommonVariableNames::iterationCounter1);
 
   fourByteIntegerVariables.push_back (PlanFunction::Fortran::argsNumber);
@@ -411,8 +419,6 @@ FortranOpenMPHostSubroutineIndirectLoop::createExecutionPlanDeclarations ()
   fourByteIntegerVariables.push_back (PlanFunction::Fortran::indsNumber);
 
   fourByteIntegerVariables.push_back (PlanFunction::Fortran::blockOffset);
-
-  fourByteIntegerVariables.push_back (PlanFunction::Fortran::col);
 
   fourByteIntegerVariables.push_back (PlanFunction::Fortran::nblocks);
 
@@ -471,6 +477,12 @@ FortranOpenMPHostSubroutineIndirectLoop::createLocalVariableDeclarations ()
     createReductionLocalVariableDeclarations ();
   }
 }
+
+/*
+ * ======================================================
+ * Public functions
+ * ======================================================
+ */
 
 FortranOpenMPHostSubroutineIndirectLoop::FortranOpenMPHostSubroutineIndirectLoop (
     std::string const & subroutineName, std::string const & userSubroutineName,

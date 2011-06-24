@@ -10,10 +10,10 @@ class FortranCUDAKernelSubroutine: public FortranKernelSubroutine
   protected:
 
     void
-    initialiseLocalThreadVariables ();
+    createInitialiseLocalThreadVariablesStatements ();
 
     void
-    createReductionSubroutineCall ();
+    createReductionLoopStatements ();
 
     void
     createLocalThreadDeclarations ();

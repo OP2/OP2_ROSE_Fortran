@@ -132,7 +132,7 @@ FortranCUDAHostSubroutineIndirectLoop::createPlanFunctionExecutionStatements ()
    */
 
   SgExpression * arrayIndexExpression1 = buildAddOp (buildVarRefExp (
-      variableDeclarations->get (PlanFunction::Fortran::col)), buildIntVal (1));
+      variableDeclarations->get (CommonVariableNames::col)), buildIntVal (1));
 
   SgPntrArrRefExp * arrayExpression1 = buildPntrArrRefExp (buildVarRefExp (
       variableDeclarations->get (PlanFunction::Fortran::ncolblk)),
@@ -202,7 +202,7 @@ FortranCUDAHostSubroutineIndirectLoop::createPlanFunctionExecutionStatements ()
    */
 
   SgAssignOp * initializationExpression = buildAssignOp (buildVarRefExp (
-      variableDeclarations->get (PlanFunction::Fortran::col)), buildIntVal (0));
+      variableDeclarations->get (CommonVariableNames::col)), buildIntVal (0));
 
   /*
    * ======================================================
@@ -544,6 +544,8 @@ FortranCUDAHostSubroutineIndirectLoop::createExecutionPlanDeclarations ()
 
   vector <string> fourByteIntegerVariables;
 
+  fourByteIntegerVariables.push_back (CommonVariableNames::col);
+
   fourByteIntegerVariables.push_back (CommonVariableNames::iterationCounter1);
 
   fourByteIntegerVariables.push_back (PlanFunction::Fortran::argsNumber);
@@ -551,8 +553,6 @@ FortranCUDAHostSubroutineIndirectLoop::createExecutionPlanDeclarations ()
   fourByteIntegerVariables.push_back (PlanFunction::Fortran::indsNumber);
 
   fourByteIntegerVariables.push_back (PlanFunction::Fortran::blockOffset);
-
-  fourByteIntegerVariables.push_back (PlanFunction::Fortran::col);
 
   fourByteIntegerVariables.push_back (PlanFunction::Fortran::pindSizesSize);
 

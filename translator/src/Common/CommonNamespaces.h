@@ -90,15 +90,13 @@ namespace IndirectLoop
       namespace VariableNames
       {
         std::string const blockID = "blockID";
-        std::string const col = "col";
-        std::string const col2 = "col2";
+        std::string const blockOffset = "blockOffset";
         std::string const moduled = "moduled";
         std::string const moduloResult = "moduloResult";
         std::string const nbytes = "nbytes";
         std::string const ncolor = "ncolor";
         std::string const nelem = "nelem";
         std::string const nelems2 = "nelems2";
-        std::string const offset_b = "offset_b";
       }
     }
   }
@@ -179,6 +177,8 @@ namespace CommonVariableNames
 {
   std::string const argsSizes = "argsSizes";
   std::string const autoshared = "autoshared";
+  std::string const col = "col";
+  std::string const col2 = "col2";
   std::string const dat = "dat";
   std::string const dim = "dim";
   std::string const index = "index";
