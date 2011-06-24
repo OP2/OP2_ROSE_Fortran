@@ -21,9 +21,6 @@ class FortranCUDAKernelSubroutineDirectLoop: public FortranCUDAKernelSubroutine
     virtual SgStatement *
     createUserSubroutineCallStatement ();
 
-    void
-    createOPDATFormalParameterDeclarations ();
-
     /*
      * ======================================================
      * Builds the statements included in the main
@@ -40,7 +37,7 @@ class FortranCUDAKernelSubroutineDirectLoop: public FortranCUDAKernelSubroutine
      * ======================================================
      */
     SgBasicBlock *
-    stageInFromDeviceMemoryToLocalThreadVariables ();
+    createStageInFromDeviceMemoryToLocalThreadVariablesStatements ();
 
     /*
      * ======================================================
@@ -49,7 +46,7 @@ class FortranCUDAKernelSubroutineDirectLoop: public FortranCUDAKernelSubroutine
      * ======================================================
      */
     SgBasicBlock *
-    stageOutFromLocalThreadVariablesToDeviceMemory ();
+    createStageOutFromLocalThreadVariablesToDeviceMemoryStatements ();
 
     virtual void
     createStatements ();
