@@ -19,6 +19,8 @@ class Globals
 
     std::string backend;
 
+    bool modifyAPICalls;
+
   private:
 
     /*
@@ -55,6 +57,12 @@ class Globals
      */
     std::string
     getTargetBackend () const;
+
+    void
+    setRenderOxfordAPICalls ();
+
+    bool
+    renderOxfordAPICalls () const;
 };
 
 #endif

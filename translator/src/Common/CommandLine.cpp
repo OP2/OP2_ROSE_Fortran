@@ -1,139 +1,237 @@
-#include <boost/lexical_cast.hpp>
-#include <boost/algorithm/string.hpp>
 #include <iostream>
-#include <string.h>
 #include <CommandLine.h>
 #include <Debug.h>
 #include <Globals.h>
 #include <CommonNamespaces.h>
 
-CommandLine::CommandLine (int argc, char **argv)
+CommandLine * CommandLine::globalsInstance = NULL;
+
+/*
+ * ======================================================
+ * Help option
+ * ======================================================
+ */
+
+void
+CommandLine::HelpOption::run ()
 {
-  using boost::iequals;
-  using boost::bad_lexical_cast;
-  using boost::lexical_cast;
-  using std::cout;
+  CommandLine::getInstance ()->outputOptions ();
+}
+
+CommandLine::HelpOption::HelpOption (std::string helpMessage,
+    std::string shortOption, std::string longOption) :
+  CommandLineOption (helpMessage, shortOption, longOption)
+{
+}
+
+/*
+ * ======================================================
+ * Verbose option
+ * ======================================================
+ */
+
+void
+CommandLine::VerboseOption::run ()
+{
+  Debug::getInstance ()->setVerbose ();
+}
+
+CommandLine::VerboseOption::VerboseOption (std::string helpMessage,
+    std::string shortOption, std::string longOption) :
+  CommandLineOption (helpMessage, shortOption, longOption)
+{
+}
+
+/*
+ * ======================================================
+ * Debug option
+ * ======================================================
+ */
+
+void
+CommandLine::DebugOption::run ()
+{
+  Debug::getInstance ()->setDebugLevel (getParameter ());
+}
+
+CommandLine::DebugOption::DebugOption (std::string helpMessage,
+    std::string parameterName, std::string shortOption, std::string longOption) :
+  CommandLineOptionWithParameters (helpMessage, parameterName, shortOption,
+      longOption)
+{
+}
+
+/*
+ * ======================================================
+ * Private functions
+ * ======================================================
+ */
+
+void
+CommandLine::addHelpOption ()
+{
+  HelpOption * help = new HelpOption ("Display this message", "h", "help");
+
+  addOption (help);
+}
+
+void
+CommandLine::addVerboseOption ()
+{
+  VerboseOption * verbose = new VerboseOption ("Be verbose", "v", "verbose");
+
+  addOption (verbose);
+}
+
+void
+CommandLine::addDebugOption ()
+{
+  DebugOption * debug = new DebugOption ("Set the debug level", "n", "d",
+      "debug");
+
+  addOption (debug);
+}
+
+CommandLine::CommandLine ()
+{
+  addHelpOption ();
+
+  addVerboseOption ();
+
+  addDebugOption ();
+}
+
+/*
+ * ======================================================
+ * Public functions
+ * ======================================================
+ */
+
+void
+CommandLine::outputOptions ()
+{
+  using std::map;
   using std::string;
+  using std::cout;
+  using std::endl;
 
   /*
    * ======================================================
-   * The additional options available to the user
+   * First output the usage line
    * ======================================================
    */
-  string const debugOption = "-d";
-  string const verboseOption = "-v";
-  string const cudaOption = "--cuda";
-  string const openMPOption = "--openMP";
 
-  bool debugMode = false;
-
-  for (int i = 0; i < argc; ++i)
+  if (toolName.empty () == false)
   {
-    if (debugMode)
+    cout << "Usage: " + toolName;
+  }
+  else
+  {
+    cout << "Options:";
+  }
+
+  for (map <string, CommandLineOption *>::iterator it = otherArguments.begin (); it
+      != otherArguments.end (); ++it)
+  {
+    CommandLineOption * option = it->second;
+
+    CommandLineOptionWithParameters * paramterisedOption =
+        dynamic_cast <CommandLineOptionWithParameters *> (option);\
+
+    if (option->hasShortOption ())
     {
-      /*
-       * ======================================================
-       * The string in argv[i-1] was '-d'. Therefore, this
-       * argument should represent the debug level, an integer
-       * ======================================================
-       */
-      debugMode = false;
+      cout << " [" + option->getShortOption ();
 
-      try
+      if (paramterisedOption != NULL)
       {
-        /*
-         * ======================================================
-         * Check that the character array is an integer,
-         * otherwise throw an exception
-         * ======================================================
-         */
-        int debug = lexical_cast <int> (argv[i]);
-
-        /*
-         * ======================================================
-         * Only the ordained debug levels are permissible
-         * ======================================================
-         */
-        if (debug < Debug::LOWEST_DEBUG_LEVEL || debug
-            > Debug::HIGHEST_DEBUG_LEVEL)
-        {
-          throw debug;
-        }
-        else
-        {
-          Debug::getInstance ()->setDebugLevel (debug);
-        }
+        cout << " <" + paramterisedOption->getParameterName () + ">";
       }
-      catch (bad_lexical_cast const &)
-      {
-        cout << "Error: '" << argv[i] << "' is not a valid debug level\n";
-        exit (1);
-      }
-      catch (int debug)
-      {
-        cout << "Error: debug level " << argv[i];
 
-        if (debug < Debug::LOWEST_DEBUG_LEVEL)
-        {
-          cout << " is too low.";
-        }
-        else
-        {
-          cout << " is too high";
-        }
-
-        cout << "Permissible range of debug levels = ["
-            << Debug::LOWEST_DEBUG_LEVEL << ".." << Debug::HIGHEST_DEBUG_LEVEL
-            << "].\n";
-
-        exit (1);
-      }
+      cout << "]";
     }
-    else
+
+    if (option->hasLongOption ())
     {
-      if (iequals (debugOption, argv[i]))
+      cout << " [" + option->getLongOption ();
+
+      if (paramterisedOption != NULL)
       {
-        /*
-         * ======================================================
-         * Debug flag recognised
-         * ======================================================
-         */
-        debugMode = true;
+        cout << " <" + paramterisedOption->getParameterName () + ">";
       }
-      else if (iequals (verboseOption, argv[i]))
+
+      cout << "]";
+    }
+  }
+
+  cout << endl << endl;
+
+  /*
+   * ======================================================
+   * Now detail the options
+   * ======================================================
+   */
+
+  int maxLengthOfLongOption = 0;
+
+  for (map <string, CommandLineOption *>::iterator it = otherArguments.begin (); it
+      != otherArguments.end (); ++it)
+  {
+    CommandLineOption * option = it->second;
+
+    if (option->hasLongOption ())
+    {
+      int length = option->getLongOption ().size ();
+
+      if (length > maxLengthOfLongOption)
       {
-        /*
-         * ======================================================
-         * Verbose flag recognised so set it globally
-         * ======================================================
-         */
-        Debug::getInstance ()->setVerbose (true);
-      }
-      else if (iequals (cudaOption, argv[i]))
-      {
-        Globals::getInstance ()->setTargetBackend (TargetBackends::CUDA);
-      }
-      else if (iequals (openMPOption, argv[i]))
-      {
-        Globals::getInstance ()->setTargetBackend (TargetBackends::OpenMP);
-      }
-      else
-      {
-        /*
-         * ======================================================
-         * Do not recognise it so assume it is a ROSE flag
-         * ======================================================
-         */
-        ROSE_arguments.push_back (argv[i]);
+        maxLengthOfLongOption = length;
       }
     }
   }
+
+  for (map <string, CommandLineOption *>::iterator it = otherArguments.begin (); it
+      != otherArguments.end (); ++it)
+  {
+    CommandLineOption * option = it->second;
+
+    int blanksToPrint = maxLengthOfLongOption + 1;
+
+    if (option->hasShortOption ())
+    {
+      cout << "[" + option->getShortOption () + "]";
+    }
+
+    if (option->hasLongOption ())
+    {
+      if (option->hasShortOption ())
+      {
+        cout << " ";
+      }
+      else
+      {
+        cout << "     ";
+      }
+
+      cout << "[" + option->getLongOption () + "]";
+
+      blanksToPrint -= option->getLongOption ().size ();
+    }
+
+    for (int i = 0; i < blanksToPrint; ++i)
+    {
+      cout << " ";
+    }
+
+    cout << option->getHelpMessage () + "." << endl;
+  }
+
+  exit (0);
 }
 
 unsigned int
 CommandLine::getNumberOfArguments () const
 {
-  return ROSE_arguments.size ();
+  return ROSEArguments.size ();
 }
 
 char **
@@ -148,11 +246,11 @@ CommandLine::getArguments () const
    * arguments recognised as ROSE ones
    * ======================================================
    */
-  char ** argv = new char*[ROSE_arguments.size ()];
+  char ** argv = new char*[ROSEArguments.size ()];
 
   int i = 0;
-  for (vector <string>::const_iterator it = ROSE_arguments.begin (); it
-      != ROSE_arguments.end (); ++it)
+  for (vector <string>::const_iterator it = ROSEArguments.begin (); it
+      != ROSEArguments.end (); ++it)
   {
     /*
      * ======================================================
@@ -180,4 +278,88 @@ CommandLine::getArguments () const
   }
 
   return argv;
+}
+
+void
+CommandLine::parse (int argc, char ** argv)
+{
+  using std::string;
+
+  CommandLineOptionWithParameters * paramterisedOption = NULL;
+
+  for (int i = 0; i < argc; ++i)
+  {
+    if (paramterisedOption != NULL)
+    {
+      /*
+       * ======================================================
+       * The n-1th option was a parameterised option so grab
+       * its parameter
+       * ======================================================
+       */
+
+      paramterisedOption->setParameter (argv[i]);
+
+      paramterisedOption->run ();
+
+      paramterisedOption = NULL;
+    }
+    else if (otherArguments.find (argv[i]) == otherArguments.end ())
+    {
+      /*
+       * ======================================================
+       * Do not recognise the option so assume it is a ROSE flag
+       * ======================================================
+       */
+
+      ROSEArguments.push_back (argv[i]);
+    }
+    else
+    {
+      /*
+       * ======================================================
+       * Get the option
+       * ======================================================
+       */
+
+      CommandLineOption * option = otherArguments[argv[i]];
+
+      paramterisedOption
+          = dynamic_cast <CommandLineOptionWithParameters *> (option);
+
+      if (paramterisedOption == NULL)
+      {
+        option->run ();
+      }
+    }
+  }
+}
+
+void
+CommandLine::addOption (CommandLineOption * option)
+{
+  if (option->getShortOption ().empty () == false)
+  {
+    otherArguments[option->getShortOption ()] = option;
+  }
+  else
+  {
+    otherArguments[option->getLongOption ()] = option;
+  }
+}
+
+void
+CommandLine::setToolName (std::string const & toolName)
+{
+  this->toolName = toolName;
+}
+
+CommandLine *
+CommandLine::getInstance ()
+{
+  if (globalsInstance == NULL)
+  {
+    globalsInstance = new CommandLine ();
+  }
+  return globalsInstance;
 }

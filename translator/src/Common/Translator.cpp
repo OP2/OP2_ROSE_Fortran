@@ -20,36 +20,165 @@
  * made to OP_PAR_LOOP calls.
  */
 
+#include <boost/function.hpp>
+#include <boost/bind.hpp>
 #include <boost/algorithm/string.hpp>
 #include <rose.h>
 #include <CommandLine.h>
+#include <CommandLineOption.h>
+#include <CommandLineOptionWithParameters.h>
 #include <CommonNamespaces.h>
 #include <Debug.h>
 #include <Declarations.h>
 #include <Globals.h>
 #include <FortranSubroutinesGeneration.h>
 
-int
-main (int argc, char ** argv)
+class OxfordOption: public CommandLineOption
+{
+  public:
+
+    virtual void
+    run ()
+    {
+      Globals::getInstance ()->setRenderOxfordAPICalls ();
+    }
+
+    OxfordOption (std::string helpMessage, std::string longOption) :
+      CommandLineOption (helpMessage, "", longOption)
+    {
+    }
+};
+
+class CUDAOption: public CommandLineOption
+{
+  public:
+
+    virtual void
+    run ()
+    {
+      Globals::getInstance ()->setTargetBackend (TargetBackends::CUDA);
+    }
+
+    CUDAOption (std::string helpMessage, std::string longOption) :
+      CommandLineOption (helpMessage, "", longOption)
+    {
+    }
+};
+
+class OpenMPOption: public CommandLineOption
+{
+  public:
+
+    virtual void
+    run ()
+    {
+      Globals::getInstance ()->setTargetBackend (TargetBackends::OpenMP);
+    }
+
+    OpenMPOption (std::string helpMessage, std::string longOption) :
+      CommandLineOption (helpMessage, "", longOption)
+    {
+    }
+};
+
+void
+handleCPPProject (SgProject * project)
 {
   using boost::iequals;
 
-  /*
-   * ======================================================
-   * Process the command-line arguments to separate them into
-   * ROSE arguments and arguments understood by our tool, such
-   * as debug and verbose flags
-   * ======================================================
-   */
-  CommandLine * commandLine = new CommandLine (argc, argv);
+  if (Globals::getInstance ()->renderOxfordAPICalls ())
+  {
+    if (!iequals (Globals::getInstance ()->getTargetBackend (),
+        TargetBackends::Unknown))
+    {
+      Debug::getInstance ()->errorMessage (
+          "You have selected to generate code for "
+              + Globals::getInstance ()->getTargetBackend ()
+              + " and replace all OP2 calls with the Oxford-compliant API. These options are mutually exclusive");
+    }
+  }
+  else if (iequals (Globals::getInstance ()->getTargetBackend (),
+      TargetBackends::Unknown))
+  {
+    Debug::getInstance ()->errorMessage (
+        "You have not selected a target backend on the command-line. Supported backends are: {"
+            + TargetBackends::CUDA + ", " + TargetBackends::OpenMP + "}");
+  }
+}
+
+void
+handleFortranProject (SgProject * project)
+{
+  using boost::iequals;
 
   if (iequals (Globals::getInstance ()->getTargetBackend (),
       TargetBackends::Unknown))
   {
     Debug::getInstance ()->errorMessage (
-        "You must specify a target backend on the command-line. Supported backends are: {"
+        "You have not selected a target backend on the command-line. Supported backends are: {"
             + TargetBackends::CUDA + ", " + TargetBackends::OpenMP + "}");
   }
+
+  /*
+   * ======================================================
+   * Obtain all OP2 declarations
+   * ======================================================
+   */
+  Debug::getInstance ()->verboseMessage (
+      "Retrieving declarations in source files");
+
+  Declarations * declarations = new Declarations (project);
+
+  declarations->traverseInputFiles (project, preorder);
+
+  /*
+   * ======================================================
+   * Create the subroutines implementing an OP_PAR_LOOP
+   * ======================================================
+   */
+  Debug::getInstance ()->verboseMessage (
+      "Creating subroutines for OP_PAR_LOOPs");
+
+  FortranSubroutinesGeneration * newSubroutines =
+      new FortranSubroutinesGeneration (project, declarations);
+
+  newSubroutines->traverseInputFiles (project, preorder);
+
+  /*
+   * ======================================================
+   * Output the generated subroutines to respective files
+   * ======================================================
+   */
+  newSubroutines->unparse ();
+
+  /*
+   * ======================================================
+   * Unparse input source files as calls to OP_PAR_LOOPs
+   * will now have changed
+   * ======================================================
+   */
+  project->unparse ();
+}
+
+void
+addCommandLineOptions ()
+{
+  CommandLine::getInstance ()->addOption (new CUDAOption ("Generate CUDA code",
+      "cuda"));
+
+  CommandLine::getInstance ()->addOption (new OpenMPOption (
+      "Generate OpenMP code", "openmp"));
+
+  CommandLine::getInstance ()->addOption (new OxfordOption (
+      "Refactor OP2 calls to comply with Oxford API", "oxford"));
+}
+
+int
+main (int argc, char ** argv)
+{
+  addCommandLineOptions ();
+
+  CommandLine::getInstance ()->parse (argc, argv);
 
   Debug::getInstance ()->verboseMessage ("Translation starting");
 
@@ -59,58 +188,23 @@ main (int argc, char ** argv)
    * 'argc' and 'argv', otherwise ROSE will complain
    * ======================================================
    */
-  SgProject * project = frontend (commandLine->getNumberOfArguments (),
-      commandLine->getArguments ());
+  SgProject * project = frontend (
+      CommandLine::getInstance ()->getNumberOfArguments (),
+      CommandLine::getInstance ()->getArguments ());
 
   ROSE_ASSERT (project != NULL);
 
   if (project->get_Cxx_only () == true)
   {
     Debug::getInstance ()->verboseMessage ("C++ project detected");
+
+    handleCPPProject (project);
   }
   else
   {
     Debug::getInstance ()->verboseMessage ("Fortran project detected");
 
-    /*
-     * ======================================================
-     * Obtain all OP2 declarations
-     * ======================================================
-     */
-    Debug::getInstance ()->verboseMessage (
-        "Retrieving declarations in source files");
-
-    Declarations * declarations = new Declarations (project);
-
-    declarations->traverseInputFiles (project, preorder);
-
-    /*
-     * ======================================================
-     * Create the subroutines implementing an OP_PAR_LOOP
-     * ======================================================
-     */
-    Debug::getInstance ()->verboseMessage (
-        "Creating subroutines for OP_PAR_LOOPs");
-
-    FortranSubroutinesGeneration * newSubroutines =
-        new FortranSubroutinesGeneration (project, declarations);
-
-    newSubroutines->traverseInputFiles (project, preorder);
-
-    /*
-     * ======================================================
-     * Output the generated subroutines to respective files
-     * ======================================================
-     */
-    newSubroutines->unparse ();
-
-    /*
-     * ======================================================
-     * Unparse input source files as calls to OP_PAR_LOOPs
-     * will now have changed
-     * ======================================================
-     */
-    project->unparse ();
+    handleFortranProject (project);
   }
 
   Debug::getInstance ()->verboseMessage ("Translation completed");

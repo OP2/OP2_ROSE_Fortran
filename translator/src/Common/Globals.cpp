@@ -18,6 +18,13 @@ Globals::Globals ()
    * ======================================================
    */
   backend = TargetBackends::Unknown;
+
+  /*
+   * ======================================================
+   * Assume that the OP2 API calls are not to be modified
+   * ======================================================
+   */
+  modifyAPICalls = false;
 }
 
 /*
@@ -46,4 +53,16 @@ std::string
 Globals::getTargetBackend () const
 {
   return globalsInstance->backend;
+}
+
+void
+Globals::setRenderOxfordAPICalls ()
+{
+  globalsInstance->modifyAPICalls = true;
+}
+
+bool
+Globals::renderOxfordAPICalls () const
+{
+  return globalsInstance->modifyAPICalls;
 }

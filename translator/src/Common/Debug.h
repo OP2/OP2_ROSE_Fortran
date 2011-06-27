@@ -20,6 +20,18 @@ class Debug
 
     int debugLevel;
 
+    /*
+     * ======================================================
+     * The lowest and highest debug levels. The lowest signifies
+     * all debug messages disabled. Increasing levels of severity
+     * are indicated by increasing numbers
+     * ======================================================
+     */
+    static int const LOWEST_DEBUG_LEVEL = 0;
+
+    static int const HIGHEST_DEBUG_LEVEL = 10;
+
+
   private:
 
     /*
@@ -34,17 +46,6 @@ class Debug
 
     /*
      * ======================================================
-     * The lowest and highest debug levels. The lowest signifies
-     * all debug messages disabled. Increasing levels of severity
-     * are indicated by increasing numbers
-     * ======================================================
-     */
-    static int const LOWEST_DEBUG_LEVEL = 0;
-
-    static int const HIGHEST_DEBUG_LEVEL = 10;
-
-    /*
-     * ======================================================
      * This always returns a single instance of the Debug
      * class to make it compliant with the singleton pattern
      * ======================================================
@@ -54,11 +55,11 @@ class Debug
 
     /*
      * ======================================================
-     * Set verbose mode on or off
+     * Set verbose mode on
      * ======================================================
      */
     void
-    setVerbose (bool verbose);
+    setVerbose ();
 
     /*
      * ======================================================
@@ -74,7 +75,7 @@ class Debug
      * ======================================================
      */
     void
-    setDebugLevel (int debugLevel);
+    setDebugLevel (std::string debugLevel);
 
     /*
      * ======================================================

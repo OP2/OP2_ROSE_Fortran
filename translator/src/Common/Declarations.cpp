@@ -167,6 +167,13 @@ Declarations::visit (SgNode * node)
         OP_DAT_Declaration * opDatDeclaration = new OP_DAT_Declaration (
             actualArguments);
 
+        if (isSgArrayType (opDatDeclaration->getActualType ()) == false)
+        {
+          Debug::getInstance ()->errorMessage ("OP_DAT variable '"
+              + opDatDeclaration->getVariableName ()
+              + "' is not an array type. Currently not supported.");
+        }
+
         OP_DAT_Declarations.push_back (opDatDeclaration);
       }
       else if (iequals (calleeName, OP2::OP_DECL_GBL))

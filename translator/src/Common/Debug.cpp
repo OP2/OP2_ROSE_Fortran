@@ -1,6 +1,7 @@
-#include <cstdlib>
-#include <typeinfo>
 #include <iostream>
+#include <cstdlib>
+#include <boost/lexical_cast.hpp>
+#include <boost/algorithm/string.hpp>
 #include <Debug.h>
 
 Debug * Debug::debugInstance = NULL;
@@ -28,9 +29,9 @@ Debug::getInstance ()
 }
 
 void
-Debug::setVerbose (bool verbose)
+Debug::setVerbose ()
 {
-  Debug::debugInstance->verbose = verbose;
+  Debug::debugInstance->verbose = true;
 }
 
 bool
@@ -40,19 +41,69 @@ Debug::isVerbose () const
 }
 
 void
-Debug::setDebugLevel (int debugLevel)
+Debug::setDebugLevel (std::string debugLevelString)
 {
-  debugInstance->debugLevel = debugLevel;
+  using boost::bad_lexical_cast;
+  using boost::lexical_cast;
+  using std::cout;
 
-  /*
-   * ======================================================
-   * By default turn verbose messages provided the debug
-   * level is above 0
-   * ======================================================
-   */
-  if (debugLevel > LOWEST_DEBUG_LEVEL)
+  try
   {
-    debugInstance->verbose = true;
+    /*
+     * ======================================================
+     * Check that the argument is an integer, otherwise throw
+     * an exception
+     * ======================================================
+     */
+    int level = lexical_cast <int> (debugLevelString);
+
+    /*
+     * ======================================================
+     * Only the ordained debug levels are permissible
+     * ======================================================
+     */
+    if (level < LOWEST_DEBUG_LEVEL || level > HIGHEST_DEBUG_LEVEL)
+    {
+      throw level;
+    }
+    else
+    {
+      debugInstance->debugLevel = level;
+
+      /*
+       * ======================================================
+       * By default turn verbose messages provided the debug
+       * level is above 0
+       * ======================================================
+       */
+      if (debugInstance->debugLevel > LOWEST_DEBUG_LEVEL)
+      {
+        debugInstance->verbose = true;
+      }
+    }
+  }
+  catch (bad_lexical_cast const &)
+  {
+    cout << "Error: '" << debugLevelString << "' is not a valid debug level\n";
+    exit (1);
+  }
+  catch (int debug)
+  {
+    cout << "Error: debug level " << debugLevelString;
+
+    if (debug < LOWEST_DEBUG_LEVEL)
+    {
+      cout << " is too low.";
+    }
+    else
+    {
+      cout << " is too high";
+    }
+
+    cout << "Permissible range of debug levels = [" << LOWEST_DEBUG_LEVEL
+        << ".." << HIGHEST_DEBUG_LEVEL << "].\n";
+
+    exit (1);
   }
 }
 
