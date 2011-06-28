@@ -19,7 +19,9 @@ class Globals
 
     std::string backend;
 
-    bool modifyAPICalls;
+    bool oxfordOption;
+
+    bool uDrawOption;
 
   private:
 
@@ -63,6 +65,12 @@ class Globals
 
     bool
     renderOxfordAPICalls () const;
+
+    void
+    setOutputUDrawGraphs ();
+
+    bool
+    outputUDrawGraphs () const;
 };
 
 #endif

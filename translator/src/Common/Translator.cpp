@@ -32,6 +32,7 @@
 #include <Declarations.h>
 #include <Globals.h>
 #include <FortranSubroutinesGeneration.h>
+#include <UDrawGraph.h>
 
 class OxfordOption: public CommandLineOption
 {
@@ -171,6 +172,8 @@ addCommandLineOptions ()
 
   CommandLine::getInstance ()->addOption (new OxfordOption (
       "Refactor OP2 calls to comply with Oxford API", "oxford"));
+
+  CommandLine::getInstance ()->addUDrawGraphOption ();
 }
 
 int
@@ -205,6 +208,11 @@ main (int argc, char ** argv)
     Debug::getInstance ()->verboseMessage ("Fortran project detected");
 
     handleFortranProject (project);
+  }
+
+  if (Globals::getInstance()->outputUDrawGraphs())
+  {
+    new UDrawGraph(project);
   }
 
   Debug::getInstance ()->verboseMessage ("Translation completed");

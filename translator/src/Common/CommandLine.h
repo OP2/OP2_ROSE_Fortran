@@ -17,50 +17,7 @@ class CommandLine
 {
   private:
 
-    class HelpOption: public CommandLineOption
-    {
-      public:
-
-        virtual void
-        run ();
-
-        HelpOption (std::string helpMessage, std::string shortOption,
-            std::string longOption);
-    };
-
-    class VerboseOption: public CommandLineOption
-    {
-      public:
-
-        virtual void
-        run ();
-
-        VerboseOption (std::string helpMessage, std::string shortOption,
-            std::string longOption);
-    };
-
-    class DebugOption: public CommandLineOptionWithParameters
-    {
-      public:
-
-        virtual void
-        run ();
-
-        DebugOption (std::string helpMessage, std::string parameterName,
-            std::string shortOption, std::string longOption);
-    };
-
-  private:
-
     static CommandLine * globalsInstance;
-
-    /*
-     * ======================================================
-     * The name of the tool
-     * ======================================================
-     */
-
-    std::string toolName;
 
     /*
      * ======================================================
@@ -153,12 +110,12 @@ class CommandLine
 
     /*
      * ======================================================
-     * Set the name of the tool
+     * Adds an option to the command line to generate uDraw
+     * graphs of the ASTs
      * ======================================================
      */
     void
-    setToolName (std::string const & toolName);
-
+    addUDrawGraphOption ();
 
     /*
      * ======================================================

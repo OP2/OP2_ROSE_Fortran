@@ -21,10 +21,12 @@ Globals::Globals ()
 
   /*
    * ======================================================
-   * Assume that the OP2 API calls are not to be modified
+   * Assume other options have not been set
    * ======================================================
    */
-  modifyAPICalls = false;
+  oxfordOption = false;
+
+  uDrawOption = false;
 }
 
 /*
@@ -58,11 +60,23 @@ Globals::getTargetBackend () const
 void
 Globals::setRenderOxfordAPICalls ()
 {
-  globalsInstance->modifyAPICalls = true;
+  globalsInstance->oxfordOption = true;
 }
 
 bool
 Globals::renderOxfordAPICalls () const
 {
-  return globalsInstance->modifyAPICalls;
+  return globalsInstance->oxfordOption;
+}
+
+void
+Globals::setOutputUDrawGraphs ()
+{
+  globalsInstance->uDrawOption = true;
+}
+
+bool
+Globals::outputUDrawGraphs () const
+{
+  return globalsInstance->uDrawOption;
 }

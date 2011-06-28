@@ -20,6 +20,8 @@ class Debug
 
     int debugLevel;
 
+  public:
+
     /*
      * ======================================================
      * The lowest and highest debug levels. The lowest signifies
@@ -30,7 +32,6 @@ class Debug
     static int const LOWEST_DEBUG_LEVEL = 0;
 
     static int const HIGHEST_DEBUG_LEVEL = 10;
-
 
   private:
 
