@@ -162,6 +162,7 @@ FortranCUDAKernelSubroutineDirectLoop::createStageInFromDeviceMemoryToLocalThrea
 {
   using SageBuilder::buildBasicBlock;
   using SageBuilder::buildVarRefExp;
+  using SageBuilder::buildDotExp;
   using SageBuilder::buildIntVal;
   using SageBuilder::buildAssignOp;
   using SageBuilder::buildAssignStatement;
@@ -191,8 +192,10 @@ FortranCUDAKernelSubroutineDirectLoop::createStageInFromDeviceMemoryToLocalThrea
               DirectLoop::Fortran::KernelSubroutine::dataPerElementCounter)),
           buildIntVal (0));
 
-      SgExpression * upperBoundExpression = buildIntVal (
-          parallelLoop->getOpDatDimension (i));
+      SgDotExp * dotExpression = buildDotExp (buildVarRefExp (
+          variableDeclarations->get (CommonVariableNames::opDatDimensions)),
+          buildVarRefExp (
+              opDatDimensionsDeclaration->getOpDatDimensionField (i)));
 
       SgMultiplyOp * multiplyExpression1 = buildMultiplyOp (buildVarRefExp (
           variableDeclarations->get (
@@ -219,7 +222,7 @@ FortranCUDAKernelSubroutineDirectLoop::createStageInFromDeviceMemoryToLocalThrea
       SgMultiplyOp * multiplyExpression3 = buildMultiplyOp (buildVarRefExp (
           variableDeclarations->get (
               DirectLoop::Fortran::KernelSubroutine::offsetInThreadBlock)),
-          buildIntVal (parallelLoop->getOpDatDimension (i)));\
+          dotExpression);
 
       SgAddOp * addExpression3 = buildAddOp (multiplyExpression2,
           multiplyExpression3);
@@ -244,7 +247,7 @@ FortranCUDAKernelSubroutineDirectLoop::createStageInFromDeviceMemoryToLocalThrea
 
       SgFortranDo * firstLoopStatement =
           FortranStatementsAndExpressionsBuilder::buildFortranDoStatement (
-              initialisationExpression, upperBoundExpression, buildIntVal (1),
+              initialisationExpression, dotExpression, buildIntVal (1),
               firstLoopBody);
 
       appendStatement (firstLoopStatement, outerBlock);
@@ -259,7 +262,7 @@ FortranCUDAKernelSubroutineDirectLoop::createStageInFromDeviceMemoryToLocalThrea
       SgMultiplyOp * multiplyExpression4 = buildMultiplyOp (buildVarRefExp (
           variableDeclarations->get (
               DirectLoop::Fortran::KernelSubroutine::threadIDModulus)),
-          buildIntVal (parallelLoop->getOpDatDimension (i)));
+          dotExpression);
 
       SgAddOp * addExpression5 = buildAddOp (buildVarRefExp (
           variableDeclarations->get (
@@ -287,7 +290,7 @@ FortranCUDAKernelSubroutineDirectLoop::createStageInFromDeviceMemoryToLocalThrea
 
       SgFortranDo * secondLoopStatement =
           FortranStatementsAndExpressionsBuilder::buildFortranDoStatement (
-              initialisationExpression, upperBoundExpression, buildIntVal (1),
+              initialisationExpression, dotExpression, buildIntVal (1),
               secondLoopBody);
 
       appendStatement (secondLoopStatement, outerBlock);
@@ -302,7 +305,9 @@ FortranCUDAKernelSubroutineDirectLoop::createStageOutFromLocalThreadVariablesToD
 {
   using SageBuilder::buildBasicBlock;
   using SageBuilder::buildVarRefExp;
+  using SageBuilder::buildDotExp;
   using SageBuilder::buildIntVal;
+  using SageBuilder::buildSubtractOp;
   using SageBuilder::buildAssignOp;
   using SageBuilder::buildAssignStatement;
   using SageBuilder::buildMultiplyOp;
@@ -325,8 +330,13 @@ FortranCUDAKernelSubroutineDirectLoop::createStageOutFromLocalThreadVariablesToD
               DirectLoop::Fortran::KernelSubroutine::dataPerElementCounter)),
           buildIntVal (0));
 
-      SgExpression * upperBoundExpression = buildIntVal (
-          parallelLoop->getOpDatDimension (i) - 1);
+      SgDotExp * dotExpression = buildDotExp (buildVarRefExp (
+          variableDeclarations->get (CommonVariableNames::opDatDimensions)),
+          buildVarRefExp (
+              opDatDimensionsDeclaration->getOpDatDimensionField (i)));
+
+      SgExpression * upperBoundExpression = buildSubtractOp (dotExpression,
+          buildIntVal (1));
 
       /*
        * ======================================================
@@ -338,7 +348,7 @@ FortranCUDAKernelSubroutineDirectLoop::createStageOutFromLocalThreadVariablesToD
       SgMultiplyOp * multiplyExpression1 = buildMultiplyOp (buildVarRefExp (
           variableDeclarations->get (
               DirectLoop::Fortran::KernelSubroutine::threadIDModulus)),
-          buildIntVal (parallelLoop->getOpDatDimension (i)));
+          dotExpression);
 
       SgAddOp * addExpression1 = buildAddOp (buildVarRefExp (
           variableDeclarations->get (
@@ -387,7 +397,7 @@ FortranCUDAKernelSubroutineDirectLoop::createStageOutFromLocalThreadVariablesToD
       SgMultiplyOp * multiplyExpression3 = buildMultiplyOp (buildVarRefExp (
           variableDeclarations->get (
               DirectLoop::Fortran::KernelSubroutine::offsetInThreadBlock)),
-          buildIntVal (parallelLoop->getOpDatDimension (i)));
+          dotExpression);
 
       SgAddOp * addExpression3 = buildAddOp (multiplyExpression2,
           multiplyExpression3);
