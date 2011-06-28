@@ -20,20 +20,17 @@ FortranOpDatDimensionsDeclaration::addFields ()
 
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
-    if (parallelLoop->isDuplicateOpDat (i) == false)
-    {
-      string const & variableName = VariableNames::getOpDatDimensionName (i);
+    string const & variableName = VariableNames::getOpDatDimensionName (i);
 
-      SgVariableDeclaration * fieldDeclaration = buildVariableDeclaration (
-          variableName, FortranTypesBuilder::getFourByteInteger (), NULL,
-          moduleScope);
+    SgVariableDeclaration * fieldDeclaration = buildVariableDeclaration (
+        variableName, FortranTypesBuilder::getFourByteInteger (), NULL,
+        moduleScope);
 
-      fieldDeclaration->get_declarationModifier ().get_accessModifier ().setUndefined ();
+    fieldDeclaration->get_declarationModifier ().get_accessModifier ().setUndefined ();
 
-      typeStatement->get_definition ()->append_member (fieldDeclaration);
+    typeStatement->get_definition ()->append_member (fieldDeclaration);
 
-      fieldDeclarations->add (variableName, fieldDeclaration);
-    }
+    fieldDeclarations->add (variableName, fieldDeclaration);
   }
 }
 
