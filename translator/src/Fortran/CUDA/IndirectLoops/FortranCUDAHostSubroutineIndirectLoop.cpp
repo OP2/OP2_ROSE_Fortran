@@ -23,6 +23,9 @@ FortranCUDAHostSubroutineIndirectLoop::createKernelFunctionCallStatement ()
   SgExprListExp * actualParameters = buildExprListExp ();
 
   actualParameters->append_expression (buildVarRefExp (
+      variableDeclarations->get (CommonVariableNames::opDatDimensions)));
+
+  actualParameters->append_expression (buildVarRefExp (
       variableDeclarations->get (CommonVariableNames::argsSizes)));
 
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)

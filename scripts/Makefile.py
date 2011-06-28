@@ -72,7 +72,7 @@ def clean ():
 	filesToRemove.extend(glob.glob('~*'))
 
 	if opts.cuda:
-		filesToRemove.extend(glob.glob('[!^BLANK]*_cudafor.[fF?]95'))
+		filesToRemove.extend(glob.glob('[!^BLANK]*_cudafor.CUF'))
 	
 	if opts.openmp:			
 		filesToRemove.extend(glob.glob('[!^BLANK]*_openmp.[fF?]95'))

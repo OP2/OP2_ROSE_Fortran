@@ -20,6 +20,9 @@ class KernelSubroutine: public Subroutine
     virtual void
     createExecutionLoopStatements () = 0;
 
+    virtual void
+    createOpDatFormalParameterDeclarations ()= 0;
+
     KernelSubroutine (std::string const & subroutineName,
         std::string const & userSubroutineName, ParallelLoop * parallelLoop);
 };

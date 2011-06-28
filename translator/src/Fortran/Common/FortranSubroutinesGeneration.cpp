@@ -318,7 +318,8 @@ FortranSubroutinesGeneration::createCUDASubroutines (
 
     kernelSubroutine = new FortranCUDAKernelSubroutineDirectLoop (
         userSubroutineName, userDeviceSubroutine->getSubroutineName (),
-        parallelLoop, moduleScope, dataSizesDeclaration);
+        parallelLoop, moduleScope, dataSizesDeclaration,
+        opDatDimensionsDeclaration);
 
     hostSubroutine = new FortranCUDAHostSubroutineDirectLoop (
         userSubroutineName, userDeviceSubroutine->getSubroutineName (),
@@ -351,7 +352,8 @@ FortranSubroutinesGeneration::createCUDASubroutines (
 
     kernelSubroutine = new FortranCUDAKernelSubroutineIndirectLoop (
         userSubroutineName, userDeviceSubroutine->getSubroutineName (),
-        parallelLoop, moduleScope, dataSizesDeclaration);
+        parallelLoop, moduleScope, dataSizesDeclaration,
+        opDatDimensionsDeclaration);
 
     hostSubroutine = new FortranCUDAHostSubroutineIndirectLoop (
         userSubroutineName, userDeviceSubroutine->getSubroutineName (),
@@ -478,6 +480,7 @@ FortranSubroutinesGeneration::createFortranModule (SgSourceFile & sourceFile,
 SgSourceFile &
 FortranSubroutinesGeneration::createSourceFile (ParallelLoop & parallelLoop)
 {
+  using boost::iequals;
   using SageBuilder::buildFile;
   using std::string;
 
@@ -511,10 +514,23 @@ FortranSubroutinesGeneration::createSourceFile (ParallelLoop & parallelLoop)
 
   /*
    * ======================================================
-   * Now generate the target backend file
+   * Now generate the target backend file. The suffix of the
+   * file changes according to the backend because the PGI
+   * Fortran compiler requires the ".CUF" suffix to
+   * correctly compile CUDA code
    * ======================================================
    */
-  string const outputFileName = parallelLoop.getModuleName () + ".F95";
+  string outputFileName;
+
+  if (iequals (Globals::getInstance ()->getTargetBackend (),
+      TargetBackends::CUDA))
+  {
+    outputFileName = parallelLoop.getModuleName () + ".CUF";
+  }
+  else
+  {
+    outputFileName = parallelLoop.getModuleName () + ".F95";
+  }
 
   Debug::getInstance ()->debugMessage ("Generating file '" + outputFileName
       + "'", 2);

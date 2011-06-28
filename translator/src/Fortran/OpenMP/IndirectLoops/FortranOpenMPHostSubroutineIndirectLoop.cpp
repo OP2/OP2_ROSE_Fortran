@@ -492,8 +492,7 @@ FortranOpenMPHostSubroutineIndirectLoop::FortranOpenMPHostSubroutineIndirectLoop
   FortranOpenMPHostSubroutine (subroutineName, userSubroutineName,
       kernelSubroutineName, parallelLoop, moduleScope, moduleDeclarations)
 {
-  Debug::getInstance ()->debugMessage (
-      "Creating OpenMP host subroutine for indirect loop", 2);
+  Debug::getInstance ()->debugMessage ("<Host, Indirect, OpenMP>", 5);
 
   createFormalParameterDeclarations ();
 

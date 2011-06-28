@@ -17,7 +17,7 @@ class FortranOpenMPKernelSubroutineIndirectLoop: public FortranOpenMPKernelSubro
     void
     createPlanFormalParameterDeclarations ();
 
-    void
+    virtual void
     createOpDatFormalParameterDeclarations ();
 
     virtual void

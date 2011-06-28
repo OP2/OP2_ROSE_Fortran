@@ -121,9 +121,29 @@ class ParallelLoop
 
     /*
      * ======================================================
+     * Handles the actions associated with the discovery of
+     * an OP_GBL
+     * ======================================================
+     */
+    void
+    handleOpGblDeclaration (OP_GBL_Declaration * opGblDeclaration,
+        std::string const & variableName, int opDatArgumentGroup);
+
+    /*
+     * ======================================================
+     * Handles the actions associated with the discovery of
+     * an OP_DAT
+     * ======================================================
+     */
+    void
+    handleOpDatDeclaration (OP_DAT_Declaration * opDatDeclaration,
+        std::string const & variableName, int opDatArgumentGroup);
+
+    /*
+     * ======================================================
      * Retrieves the declarations of the OP_DAT arguments
-     * so that we can later retrieve their primitive types
-     * and dimensions
+     * so that we can later retrieve their primitive types,
+     * dimensions, access values, etc.
      * ======================================================
      */
     void
@@ -140,56 +160,153 @@ class ParallelLoop
     void
     generateReductionSubroutines (SgScopeStatement * moduleScope);
 
+    /*
+     * ======================================================
+     * Is this parallel loop direct or indirect?
+     * ======================================================
+     */
     bool
     isDirectLoop () const;
 
+    /*
+     * ======================================================
+     * How many OP_DAT arguments have indirect access
+     * descriptors?
+     * ======================================================
+     */
     unsigned int
     getNumberOfDistinctIndirectOpDatArguments ();
 
-    std::string
-    getModuleName () const;
-
-    SgExpressionPtrList &
-    getActualArguments ();
-
+    /*
+     * ======================================================
+     * How many OP_DAT argument groups are there?
+     * ======================================================
+     */
     unsigned int
     getNumberOfOpDatArgumentGroups () const;
 
+    /*
+     * ======================================================
+     * What is the type which is wrapped by the OP_DAT declaration
+     * in the particular OP_DAT argument group?
+     * ======================================================
+     */
     SgType *
     getOpDatType (unsigned int OP_DAT_ArgumentGroup);
 
+    /*
+     * ======================================================
+     * What is the dimension of the OP_DAT variable in
+     * this OP_DAT argument group?
+     * ======================================================
+     */
     unsigned int
     getOpDatDimension (unsigned int OP_DAT_ArgumentGroup);
 
+    /*
+     * ======================================================
+     * Is the OP_DAT variable in this OP_DAT argument group
+     * the same as another OP_DAT in the actual arguments
+     * passed to the OP_PAR_LOOP?
+     * ======================================================
+     */
     bool
     isDuplicateOpDat (unsigned int OP_DAT_ArgumentGroup);
 
+    /*
+     * ======================================================
+     * What is the mapping value of the OP_DAT argument
+     * in this OP_DAT argument group?
+     * ======================================================
+     */
     MAPPING_VALUE
     getOpMapValue (unsigned int OP_DAT_ArgumentGroup);
 
+    /*
+     * ======================================================
+     * What is the access descriptor of the OP_DAT argument
+     * in this OP_DAT argument group?
+     * ======================================================
+     */
     ACCESS_CODE_VALUE
     getOpAccessValue (unsigned int OP_DAT_ArgumentGroup);
 
+    /*
+     * ======================================================
+     * How many OP_DATs are indirectly accessed?
+     * ======================================================
+     */
     unsigned int
-    getNumberOfIndirectDataSets ();
+    getNumberOfIndirectOpDats ();
 
+    /*
+     * ======================================================
+     * How many OP_DATs are indirectly accessed and are
+     * unique in the actual arguments passed to the OP_PAR_LOOP?
+     * ======================================================
+     */
     unsigned int
-    getNumberOfDifferentIndirectDataSets ();
+    getNumberOfDifferentIndirectOpDats ();
 
+    /*
+     * ======================================================
+     * Does this parallel loop require a reduction?
+     * ======================================================
+     */
     bool
     isReductionRequired ();
 
+    /*
+     * ======================================================
+     * Does the OP_DAT in this argument group require a reduction?
+     * ======================================================
+     */
     bool
     isReductionRequired (int OP_DAT_ArgumentGroup);
 
+    /*
+     * ======================================================
+     * What is the name of the OP_DAT variable in this OP_DAT
+     * argument group
+     * ======================================================
+     */
     std::string
     getOpDatVariableName (unsigned int OP_DAT_ArgumentGroup);
 
+    /*
+     * ======================================================
+     * What is the maximum size of an individual element of an
+     * OP_DAT in terms of bytes?
+     * ======================================================
+     */
     unsigned int
     getSizeOfOpDat () const;
 
+    /*
+     * ======================================================
+     * Returns the procedure header associated with the reduction
+     * subroutine needed for this OP_DAT argument group
+     * ======================================================
+     */
     SgProcedureHeaderStatement *
     getReductionSubroutineHeader (unsigned int OP_DAT_ArgumentGroup);
+
+    /*
+     * ======================================================
+     * What is the name of the module generated for this
+     * OP_PAR_LOOP containing the generated subroutines?
+     * ======================================================
+     */
+    std::string
+    getModuleName () const;
+
+    /*
+     * ======================================================
+     * Returns the actual arguments passed to the OP_PAR_LOOP
+     * ======================================================
+     */
+    SgExpressionPtrList &
+    getActualArguments ();
 
     ParallelLoop (std::string userSubroutineName,
         SgExpressionPtrList & actualArguments, Declarations * declarations);

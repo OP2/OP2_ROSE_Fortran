@@ -4,9 +4,14 @@
 #include <FortranKernelSubroutine.h>
 #include <ParallelLoop.h>
 #include <FortranCUDADataSizesDeclaration.h>
+#include <FortranOpDatDimensionsDeclaration.h>
 
 class FortranCUDAKernelSubroutine: public FortranKernelSubroutine
 {
+  protected:
+
+    FortranOpDatDimensionsDeclaration * opDatDimensionsDeclaration;
+
   protected:
 
     void
@@ -23,7 +28,8 @@ class FortranCUDAKernelSubroutine: public FortranKernelSubroutine
 
     FortranCUDAKernelSubroutine (std::string const & subroutineName,
         std::string const & userSubroutineName, ParallelLoop * parallelLoop,
-        SgScopeStatement * moduleScope);
+        SgScopeStatement * moduleScope,
+        FortranOpDatDimensionsDeclaration * opDatDimensionsDeclaration);
 };
 
 #endif

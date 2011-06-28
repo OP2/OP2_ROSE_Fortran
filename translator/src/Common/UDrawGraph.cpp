@@ -10,11 +10,12 @@
 
 namespace
 {
+  std::string const fileNameSuffix = ".udraw";
   std::string const beginGraph = "[\n";
   std::string const endGraph = "]\n";
-  std::string const endVertex = "])),";
+  std::string const endVertex = "])),\n";
   std::string const newEdge = "\ne(\"tEdge\",";
-  std::string const endEdge = ")";
+  std::string const endEdge = ")\n";
   std::string const beginAttributes = "[";
   std::string const endAttibutes = "],";
   std::string const setDirectionalLessEdge = "a(\"_DIR\", \"none\"),";
@@ -170,21 +171,141 @@ UDrawGraph::visit (SgNode * node)
   using boost::lexical_cast;
   using std::string;
 
-  nodes[node] = counter;
+  file << newVertex (counter) << beginAttributes;
+
+  switch (node->variantT ())
+  {
+    case V_SgInitializedName:
+    {
+      SgInitializedName * castedNode = isSgInitializedName (node);
+      file << setName (castedNode->get_name ().getString ());
+      break;
+    }
+
+    case V_SgVarRefExp:
+    {
+      SgVarRefExp * castedNode = isSgVarRefExp (node);
+      file << setName (castedNode->get_symbol ()->get_name ().getString ());
+      file << setColor (RED);
+      break;
+    }
+
+    case V_SgVariableDeclaration:
+    {
+      file << setName (node->class_name ());
+      file << setShape (RHOMBUS);
+      break;
+    }
+
+    case V_SgIntVal:
+    {
+      SgIntVal * castedNode = isSgIntVal (node);
+      file << setName (lexical_cast <string> (castedNode->get_value ()));
+      file << setColor (GREEN);
+      break;
+    }
+
+    case V_SgFloatVal:
+    {
+      SgFloatVal * castedNode = isSgFloatVal (node);
+      file << setName (lexical_cast <string> (castedNode->get_value ()));
+      file << setColor (GREEN);
+      break;
+    }
+
+    case V_SgAddOp:
+    {
+      file << setName ("+");
+      file << setColor (YELLOW);
+      break;
+    }
+
+    case V_SgMinusOp:
+    case V_SgSubtractOp:
+    {
+      file << setName ("-");
+      file << setColor (YELLOW);
+      break;
+    }
+
+    case V_SgMultiplyOp:
+    {
+      file << setName ("*");
+      file << setColor (YELLOW);
+      break;
+    }
+
+    case V_SgDivideOp:
+    {
+      file << setName ("/");
+      file << setColor (YELLOW);
+      break;
+    }
+
+    case V_SgAssignOp:
+    {
+      file << setName ("=");
+      file << setColor (YELLOW);
+      break;
+    }
+
+    case V_SgLessThanOp:
+    {
+      file << setName ("<");
+      file << setColor (YELLOW);
+      break;
+    }
+
+    case V_SgLessOrEqualOp:
+    {
+      file << setName ("<=");
+      file << setColor (YELLOW);
+      break;
+    }
+
+    case V_SgGreaterThanOp:
+    {
+      file << setName (">");
+      file << setColor (YELLOW);
+      break;
+    }
+
+    case V_SgGreaterOrEqualOp:
+    {
+      file << setName (">=");
+      file << setColor (YELLOW);
+      break;
+    }
+
+    case V_SgAddressOfOp:
+    {
+      file << setName ("&");
+      file << setColor (YELLOW);
+      break;
+    }
+
+    default:
+    {
+      file << setName (node->class_name ());
+      break;
+    }
+  }
+
+  file << endAttibutes << beginAttributes;
 
   if (counter != rootID)
   {
-    file << newVertex (counter) << beginAttributes << setName (lexical_cast <
-        string> (counter)) << setToolTip (node->class_name ()) << endAttibutes
-        << beginAttributes;
+    SgNode * parent = node->get_parent ();
 
-    unsigned int const parentID = nodes[node->get_parent ()];
+    unsigned int const parentID = nodes[parent];
 
-    file << newEdge << beginAttributes << endAttibutes << edgeLink (parentID)
-        << endEdge << "\n";
-
-    file << endVertex << "\n";
+    file << newEdge << beginAttributes << setDirectionalLessEdge
+        << endAttibutes << edgeLink (parentID) << endEdge;
   }
+
+  file << endVertex;
+
+  nodes[node] = counter;
 
   counter++;
 }
@@ -195,22 +316,19 @@ UDrawGraph::visit (SgNode * node)
  * ======================================================
  */
 
-UDrawGraph::UDrawGraph (SgProject * project)
+UDrawGraph::UDrawGraph (SgProject * project, std::string const & fileNameStem)
 {
-  using boost::lexical_cast;
   using std::string;
 
   rootID = 1;
 
   counter = rootID;
 
-  file.open ("ast.udraw");
+  string const fileName = fileNameStem + fileNameSuffix;
+
+  file.open (fileName.c_str ());
 
   file << beginGraph;
-
-  file << newVertex (rootID) << beginAttributes << setName (lexical_cast <
-      string> (rootID)) << setToolTip (project->class_name ()) << endAttibutes
-      << beginAttributes << endVertex << "\n";
 
   traverseInputFiles (project, preorder);
 

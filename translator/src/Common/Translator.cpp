@@ -179,6 +179,8 @@ addCommandLineOptions ()
 int
 main (int argc, char ** argv)
 {
+  using std::string;
+
   addCommandLineOptions ();
 
   CommandLine::getInstance ()->parse (argc, argv);
@@ -210,9 +212,9 @@ main (int argc, char ** argv)
     handleFortranProject (project);
   }
 
-  if (Globals::getInstance()->outputUDrawGraphs())
+  if (Globals::getInstance ()->outputUDrawGraphs ())
   {
-    new UDrawGraph(project);
+    new UDrawGraph (project, "ast");
   }
 
   Debug::getInstance ()->verboseMessage ("Translation completed");

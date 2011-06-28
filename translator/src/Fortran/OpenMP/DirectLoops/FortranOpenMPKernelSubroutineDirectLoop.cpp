@@ -2,6 +2,7 @@
 #include <FortranStatementsAndExpressionsBuilder.h>
 #include <FortranTypesBuilder.h>
 #include <ROSEHelper.h>
+#include <Debug.h>
 
 /*
  * ======================================================
@@ -107,22 +108,7 @@ FortranOpenMPKernelSubroutineDirectLoop::createExecutionLoopStatements ()
 }
 
 void
-FortranOpenMPKernelSubroutineDirectLoop::createStatements ()
-{
-  createExecutionLoopStatements ();
-}
-
-void
-FortranOpenMPKernelSubroutineDirectLoop::createLocalVariableDeclarations ()
-{
-  variableDeclarations->add (OpenMP::sliceIterator,
-      FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
-          OpenMP::sliceIterator, FortranTypesBuilder::getFourByteInteger (),
-          subroutineScope));
-}
-
-void
-FortranOpenMPKernelSubroutineDirectLoop::createFormalParameterDeclarations ()
+FortranOpenMPKernelSubroutineDirectLoop::createOpDatFormalParameterDeclarations ()
 {
   using SageBuilder::buildIntVal;
 
@@ -144,6 +130,27 @@ FortranOpenMPKernelSubroutineDirectLoop::createFormalParameterDeclarations ()
               formalParameters));
     }
   }
+}
+
+void
+FortranOpenMPKernelSubroutineDirectLoop::createStatements ()
+{
+  createExecutionLoopStatements ();
+}
+
+void
+FortranOpenMPKernelSubroutineDirectLoop::createLocalVariableDeclarations ()
+{
+  variableDeclarations->add (OpenMP::sliceIterator,
+      FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
+          OpenMP::sliceIterator, FortranTypesBuilder::getFourByteInteger (),
+          subroutineScope));
+}
+
+void
+FortranOpenMPKernelSubroutineDirectLoop::createFormalParameterDeclarations ()
+{
+  createOpDatFormalParameterDeclarations ();
 
   variableDeclarations->add (
       OpenMP::sliceStart,
@@ -170,6 +177,8 @@ FortranOpenMPKernelSubroutineDirectLoop::FortranOpenMPKernelSubroutineDirectLoop
   FortranOpenMPKernelSubroutine (subroutineName, userSubroutineName,
       parallelLoop, moduleScope)
 {
+  Debug::getInstance ()->debugMessage ("<Kernel, Direct, CUDA>", 5);
+
   createFormalParameterDeclarations ();
 
   createLocalVariableDeclarations ();

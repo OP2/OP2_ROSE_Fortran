@@ -73,7 +73,7 @@ class UDrawGraph: public AstSimpleProcessing
 
   public:
 
-    UDrawGraph (SgProject * project);
+    UDrawGraph (SgProject * project, std::string const & fileNameStem);
 };
 
 #endif

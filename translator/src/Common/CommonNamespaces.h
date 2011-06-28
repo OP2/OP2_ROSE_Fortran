@@ -90,7 +90,7 @@ namespace IndirectLoop
       namespace VariableNames
       {
         std::string const blockID = "blockID";
-        std::string const blockOffset = "blockOffset";
+        std::string const blockOffsetShared = "blockOffsetShared";
         std::string const moduled = "moduled";
         std::string const moduloResult = "moduloResult";
         std::string const nbytes = "nbytes";

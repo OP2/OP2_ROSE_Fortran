@@ -16,6 +16,84 @@
  */
 
 void
+ParallelLoop::handleOpGblDeclaration (OP_GBL_Declaration * opGblDeclaration,
+    std::string const & variableName, int opDatArgumentGroup)
+{
+  Debug::getInstance ()->debugMessage (
+      "'" + variableName
+          + "' has been declared through OP_DECL_GBL (and not through OP_DECL_DAT)",
+      1);
+
+  uniqueOpDats.push_back (variableName);
+
+  OpDatTypes[opDatArgumentGroup] = opGblDeclaration->getActualType ();
+
+  OpDatDimensions[opDatArgumentGroup] = opGblDeclaration->getDimension ();
+
+  OpDatVariableNames[opDatArgumentGroup] = variableName;
+
+  OpDatDuplicates[opDatArgumentGroup] = false;
+}
+
+void
+ParallelLoop::handleOpDatDeclaration (OP_DAT_Declaration * opDatDeclaration,
+    std::string const & variableName, int opDatArgumentGroup)
+{
+  using boost::lexical_cast;
+  using std::find;
+  using std::string;
+
+  OpDatTypes[opDatArgumentGroup] = opDatDeclaration->getActualType ();
+
+  OpDatDimensions[opDatArgumentGroup] = opDatDeclaration->getDimension ();
+
+  OpDatVariableNames[opDatArgumentGroup] = variableName;
+
+  if (find (uniqueOpDats.begin (), uniqueOpDats.end (), variableName)
+      == uniqueOpDats.end ())
+  {
+    uniqueOpDats.push_back (variableName);
+
+    OpDatDuplicates[opDatArgumentGroup] = false;
+
+    SgArrayType * isArrayType = isSgArrayType (
+        opDatDeclaration->getActualType ());
+
+    if (isArrayType == NULL)
+    {
+      Debug::getInstance ()->errorMessage ("OP_DAT '" + variableName
+          + "' is not an array");
+    }
+
+    SgType * baseType = isArrayType->get_base_type ();
+
+    if (isSgTypeFloat (baseType) != NULL)
+    {
+      SgIntVal * sizeOfRealType = isSgIntVal (baseType->get_type_kind ());
+
+      if (sizeOfRealType == NULL)
+      {
+        Debug::getInstance ()->errorMessage (
+            "The size of the base type of OP_DAT '" + variableName
+                + "' cannot be determined");
+      }
+      else
+      {
+        Debug::getInstance ()->debugMessage (
+            "The size of the base type of OP_DAT '" + variableName + "' is "
+                + lexical_cast <string> (sizeOfRealType->get_value ()), 7);
+
+        sizeOfOpDat = sizeOfRealType->get_value ();
+      }
+    }
+  }
+  else
+  {
+    OpDatDuplicates[opDatArgumentGroup] = true;
+  }
+}
+
+void
 ParallelLoop::retrieveOpDatDeclarations (Declarations * declarations)
 {
   using boost::iequals;
@@ -27,7 +105,7 @@ ParallelLoop::retrieveOpDatDeclarations (Declarations * declarations)
 
   Debug::getInstance ()->debugMessage ("Retrieving OP_DAT declarations", 2);
 
-  int OP_DATCounter = 0;
+  int opDatArgumentGroup = 0;
 
   /*
    * ======================================================
@@ -67,7 +145,7 @@ ParallelLoop::retrieveOpDatDeclarations (Declarations * declarations)
 
             if (iequals (className, OP2::OP_DAT))
             {
-              OP_DATCounter++;
+              opDatArgumentGroup++;
 
               /*
                * ======================================================
@@ -79,82 +157,13 @@ ParallelLoop::retrieveOpDatDeclarations (Declarations * declarations)
 
               try
               {
-                OP_DAT_Declaration * opDatDeclaration =
-                    declarations->get_OP_DAT_Declaration (variableName);
-
-                OpDatTypes[OP_DATCounter] = opDatDeclaration->getActualType ();
-
-                OpDatDimensions[OP_DATCounter]
-                    = opDatDeclaration->getDimension ();
-
-                OpDatVariableNames[OP_DATCounter] = variableName;
-
-                if (find (uniqueOpDats.begin (), uniqueOpDats.end (),
-                    variableName) == uniqueOpDats.end ())
-                {
-                  uniqueOpDats.push_back (variableName);
-
-                  OpDatDuplicates[OP_DATCounter] = false;
-
-                  SgArrayType * isArrayType = isSgArrayType (
-                      opDatDeclaration->getActualType ());
-
-                  if (isArrayType == NULL)
-                  {
-                    Debug::getInstance ()->errorMessage ("OP_DAT '"
-                        + variableName + "' is not an array");
-                  }
-
-                  SgType * baseType = isArrayType->get_base_type ();
-
-                  if (isSgTypeFloat (baseType) != NULL)
-                  {
-                    SgIntVal * sizeOfRealType = isSgIntVal (
-                        baseType->get_type_kind ());
-
-                    if (sizeOfRealType == NULL)
-                    {
-                      Debug::getInstance ()->errorMessage (
-                          "The size of the base type of OP_DAT '"
-                              + variableName + "' cannot be determined");
-                    }
-                    else
-                    {
-                      Debug::getInstance ()->debugMessage (
-                          "The size of the base type of OP_DAT '"
-                              + variableName + "' is "
-                              + lexical_cast <string> (
-                                  sizeOfRealType->get_value ()), 7);
-
-                      sizeOfOpDat = sizeOfRealType->get_value ();
-                    }
-                  }
-                }
-                else
-                {
-                  OpDatDuplicates[OP_DATCounter] = true;
-                }
+                handleOpDatDeclaration (declarations->get_OP_DAT_Declaration (
+                    variableName), variableName, opDatArgumentGroup);
               }
               catch (const std::string &)
               {
-                Debug::getInstance ()->debugMessage (
-                    "'" + variableName
-                        + "' has been declared through OP_DECL_GBL (and not through OP_DECL_DAT)",
-                    1);
-
-                OP_GBL_Declaration * opGBLDeclaration =
-                    declarations->get_OP_GBL_Declaration (variableName);
-
-                OpDatTypes[OP_DATCounter] = opGBLDeclaration->getActualType ();
-
-                OpDatDimensions[OP_DATCounter]
-                    = opGBLDeclaration->getDimension ();
-
-                OpDatVariableNames[OP_DATCounter] = variableName;
-
-                uniqueOpDats.push_back (variableName);
-
-                OpDatDuplicates[OP_DATCounter] = false;
+                handleOpGblDeclaration (declarations->get_OP_GBL_Declaration (
+                    variableName), variableName, opDatArgumentGroup);
               }
             }
 
@@ -168,7 +177,7 @@ ParallelLoop::retrieveOpDatDeclarations (Declarations * declarations)
                  * access to the data
                  * ======================================================
                  */
-                OpDatMappingDescriptors[OP_DATCounter] = DIRECT;
+                OpDatMappingDescriptors[opDatArgumentGroup] = DIRECT;
               }
               else
               {
@@ -180,12 +189,12 @@ ParallelLoop::retrieveOpDatDeclarations (Declarations * declarations)
                    * ======================================================
                    */
 
-                  OpDatMappingDescriptors[OP_DATCounter] = GLOBAL;
+                  OpDatMappingDescriptors[opDatArgumentGroup] = GLOBAL;
                 }
 
                 else
                 {
-                  OpDatMappingDescriptors[OP_DATCounter] = INDIRECT;
+                  OpDatMappingDescriptors[opDatArgumentGroup] = INDIRECT;
                 }
               }
             }
@@ -200,22 +209,22 @@ ParallelLoop::retrieveOpDatDeclarations (Declarations * declarations)
 
             if (iequals (variableName, OP2::OP_READ))
             {
-              OpDatAccessDescriptors[OP_DATCounter] = READ_ACCESS;
+              OpDatAccessDescriptors[opDatArgumentGroup] = READ_ACCESS;
             }
 
             else if (iequals (variableName, OP2::OP_WRITE))
             {
-              OpDatAccessDescriptors[OP_DATCounter] = WRITE_ACCESS;
+              OpDatAccessDescriptors[opDatArgumentGroup] = WRITE_ACCESS;
             }
 
             else if (iequals (variableName, OP2::OP_INC))
             {
-              OpDatAccessDescriptors[OP_DATCounter] = INC_ACCESS;
+              OpDatAccessDescriptors[opDatArgumentGroup] = INC_ACCESS;
             }
 
             else if (iequals (variableName, OP2::OP_RW))
             {
-              OpDatAccessDescriptors[OP_DATCounter] = RW_ACCESS;
+              OpDatAccessDescriptors[opDatArgumentGroup] = RW_ACCESS;
             }
 
             else
@@ -223,7 +232,7 @@ ParallelLoop::retrieveOpDatDeclarations (Declarations * declarations)
               Debug::getInstance ()->errorMessage (
                   "Unknown access descriptor: '" + variableName
                       + "' for OP_DAT argument #" + lexical_cast <string> (
-                      OP_DATCounter));
+                      opDatArgumentGroup));
             }
 
             break;
@@ -357,18 +366,6 @@ ParallelLoop::getNumberOfDistinctIndirectOpDatArguments ()
   return count;
 }
 
-std::string
-ParallelLoop::getModuleName () const
-{
-  return moduleName;
-}
-
-SgExpressionPtrList &
-ParallelLoop::getActualArguments ()
-{
-  return actualArguments;
-}
-
 unsigned int
 ParallelLoop::getNumberOfOpDatArgumentGroups () const
 {
@@ -408,7 +405,7 @@ ParallelLoop::getOpAccessValue (unsigned int OP_DAT_ArgumentGroup)
 }
 
 unsigned int
-ParallelLoop::getNumberOfIndirectDataSets ()
+ParallelLoop::getNumberOfIndirectOpDats ()
 {
   int count = 0;
 
@@ -424,7 +421,7 @@ ParallelLoop::getNumberOfIndirectDataSets ()
 }
 
 unsigned int
-ParallelLoop::getNumberOfDifferentIndirectDataSets ()
+ParallelLoop::getNumberOfDifferentIndirectOpDats ()
 {
   int count = 0;
 
@@ -476,6 +473,18 @@ SgProcedureHeaderStatement *
 ParallelLoop::getReductionSubroutineHeader (unsigned int OP_DAT_ArgumentGroup)
 {
   return reductionSubroutines[OP_DAT_ArgumentGroup];
+}
+
+std::string
+ParallelLoop::getModuleName () const
+{
+  return moduleName;
+}
+
+SgExpressionPtrList &
+ParallelLoop::getActualArguments ()
+{
+  return actualArguments;
 }
 
 ParallelLoop::ParallelLoop (std::string userSubroutineName,

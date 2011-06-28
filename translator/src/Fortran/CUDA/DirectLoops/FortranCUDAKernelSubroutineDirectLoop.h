@@ -49,6 +49,9 @@ class FortranCUDAKernelSubroutineDirectLoop: public FortranCUDAKernelSubroutine
     createThreadIDInitialisationStatement ();
 
     virtual void
+    createOpDatFormalParameterDeclarations ();
+
+    virtual void
     createStatements ();
 
     virtual void
@@ -62,7 +65,8 @@ class FortranCUDAKernelSubroutineDirectLoop: public FortranCUDAKernelSubroutine
     FortranCUDAKernelSubroutineDirectLoop (std::string const & subroutineName,
         std::string const & userSubroutineName, ParallelLoop * parallelLoop,
         SgScopeStatement * moduleScope,
-        FortranCUDADataSizesDeclarationDirectLoop * dataSizesDeclaration);
+        FortranCUDADataSizesDeclarationDirectLoop * dataSizesDeclaration,
+        FortranOpDatDimensionsDeclaration * opDatDimensionsDeclaration);
 };
 
 #endif

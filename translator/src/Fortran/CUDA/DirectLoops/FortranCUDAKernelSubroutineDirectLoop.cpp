@@ -86,7 +86,7 @@ FortranCUDAKernelSubroutineDirectLoop::createUserSubroutineCallStatement ()
     }
     else if (parallelLoop->getOpMapValue (i) == DIRECT)
     {
-      if (parallelLoop->getNumberOfIndirectDataSets () > 0)
+      if (parallelLoop->getNumberOfIndirectOpDats () > 0)
       {
         SgExpression
             * deviceVarAccessDirectBegin =
@@ -647,102 +647,15 @@ FortranCUDAKernelSubroutineDirectLoop::createThreadIDInitialisationStatement ()
 }
 
 void
-FortranCUDAKernelSubroutineDirectLoop::createStatements ()
+FortranCUDAKernelSubroutineDirectLoop::createOpDatFormalParameterDeclarations ()
 {
-  createThreadIDInitialisationStatement ();
-
-  createAutoSharedDisplacementInitialisationStatement ();
-
-  createInitialiseLocalThreadVariablesStatements ();
-
-  createExecutionLoopStatements ();
-
-  if (parallelLoop->isReductionRequired () == true)
-  {
-    createReductionLoopStatements ();
-  }
-}
-
-void
-FortranCUDAKernelSubroutineDirectLoop::createLocalVariableDeclarations ()
-{
-  using SageBuilder::buildVariableDeclaration;
-  using SageInterface::appendStatement;
-  using std::vector;
-  using std::string;
-
-  vector <string> fourByteIntegers;
-
-  fourByteIntegers.push_back (
-      DirectLoop::Fortran::KernelSubroutine::setElementCounter);
-
-  fourByteIntegers.push_back (
-      DirectLoop::Fortran::KernelSubroutine::dataPerElementCounter);
-
-  fourByteIntegers.push_back (
-      DirectLoop::Fortran::KernelSubroutine::threadIDModulus);
-
-  fourByteIntegers.push_back (
-      DirectLoop::Fortran::KernelSubroutine::offsetInThreadBlock);
-
-  fourByteIntegers.push_back (
-      DirectLoop::Fortran::KernelSubroutine::remainingElements);
-
-  fourByteIntegers.push_back (
-      DirectLoop::Fortran::KernelSubroutine::autosharedDisplacement);
-
-  for (vector <string>::iterator it = fourByteIntegers.begin (); it
-      != fourByteIntegers.end (); ++it)
-  {
-    variableDeclarations->add (*it,
-        FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (*it,
-            FortranTypesBuilder::getFourByteInteger (), subroutineScope));
-  }
-
-  createLocalThreadDeclarations ();
-
-  createAutoSharedDeclaration ();
-
-  if (parallelLoop->isReductionRequired () == true)
-  {
-    variableDeclarations->add (ReductionSubroutine::offsetForReduction,
-        FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
-            ReductionSubroutine::offsetForReduction,
-            FortranTypesBuilder::getFourByteInteger (), subroutineScope, 1,
-            VALUE));
-  }
-}
-
-void
-FortranCUDAKernelSubroutineDirectLoop::createFormalParameterDeclarations ()
-{
-  using SageBuilder::buildVariableDeclaration;
   using SageBuilder::buildSubtractOp;
   using SageBuilder::buildIntVal;
   using SageBuilder::buildVarRefExp;
   using SageBuilder::buildArrayType;
   using SageBuilder::buildExprListExp;
   using SageBuilder::buildDotExp;
-  using SageInterface::appendStatement;
   using std::string;
-
-  /*
-   * ======================================================
-   * Argsizes formal parameter
-   * ======================================================
-   */
-
-  variableDeclarations->add (
-      CommonVariableNames::argsSizes,
-      FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
-          CommonVariableNames::argsSizes, dataSizesDeclaration->getType (),
-          subroutineScope, formalParameters, 1, DEVICE));
-
-  /*
-   * ======================================================
-   * OP_DAT formal parameters
-   * ======================================================
-   */
 
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
@@ -802,6 +715,108 @@ FortranCUDAKernelSubroutineDirectLoop::createFormalParameterDeclarations ()
               DEVICE));
     }
   }
+}
+
+void
+FortranCUDAKernelSubroutineDirectLoop::createStatements ()
+{
+  createThreadIDInitialisationStatement ();
+
+  createAutoSharedDisplacementInitialisationStatement ();
+
+  createInitialiseLocalThreadVariablesStatements ();
+
+  createExecutionLoopStatements ();
+
+  if (parallelLoop->isReductionRequired () == true)
+  {
+    createReductionLoopStatements ();
+  }
+}
+
+void
+FortranCUDAKernelSubroutineDirectLoop::createLocalVariableDeclarations ()
+{
+  using std::vector;
+  using std::string;
+
+  vector <string> fourByteIntegers;
+
+  fourByteIntegers.push_back (
+      DirectLoop::Fortran::KernelSubroutine::setElementCounter);
+
+  fourByteIntegers.push_back (
+      DirectLoop::Fortran::KernelSubroutine::dataPerElementCounter);
+
+  fourByteIntegers.push_back (
+      DirectLoop::Fortran::KernelSubroutine::threadIDModulus);
+
+  fourByteIntegers.push_back (
+      DirectLoop::Fortran::KernelSubroutine::offsetInThreadBlock);
+
+  fourByteIntegers.push_back (
+      DirectLoop::Fortran::KernelSubroutine::remainingElements);
+
+  fourByteIntegers.push_back (
+      DirectLoop::Fortran::KernelSubroutine::autosharedDisplacement);
+
+  for (vector <string>::iterator it = fourByteIntegers.begin (); it
+      != fourByteIntegers.end (); ++it)
+  {
+    variableDeclarations->add (*it,
+        FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (*it,
+            FortranTypesBuilder::getFourByteInteger (), subroutineScope));
+  }
+
+  createLocalThreadDeclarations ();
+
+  createAutoSharedDeclaration ();
+
+  if (parallelLoop->isReductionRequired () == true)
+  {
+    variableDeclarations->add (ReductionSubroutine::offsetForReduction,
+        FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
+            ReductionSubroutine::offsetForReduction,
+            FortranTypesBuilder::getFourByteInteger (), subroutineScope, 1,
+            VALUE));
+  }
+}
+
+void
+FortranCUDAKernelSubroutineDirectLoop::createFormalParameterDeclarations ()
+{
+  /*
+   * ======================================================
+   * OP_DAT dimensions formal parameter
+   * ======================================================
+   */
+
+  variableDeclarations->add (
+      CommonVariableNames::opDatDimensions,
+      FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
+          CommonVariableNames::opDatDimensions,
+          opDatDimensionsDeclaration->getType (), subroutineScope,
+          formalParameters, 1, DEVICE));
+
+  /*
+   * ======================================================
+   * Argsizes formal parameter
+   * ======================================================
+   */
+
+  variableDeclarations->add (
+      CommonVariableNames::argsSizes,
+      FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
+          CommonVariableNames::argsSizes, dataSizesDeclaration->getType (),
+          subroutineScope, formalParameters, 1, DEVICE));
+
+  /*
+   * ======================================================
+   * OP_DAT formal parameters
+   * ======================================================
+   */
+
+  createOpDatFormalParameterDeclarations ();
 
   /*
    * ======================================================
@@ -855,10 +870,14 @@ FortranCUDAKernelSubroutineDirectLoop::createFormalParameterDeclarations ()
 FortranCUDAKernelSubroutineDirectLoop::FortranCUDAKernelSubroutineDirectLoop (
     std::string const & subroutineName, std::string const & userSubroutineName,
     ParallelLoop * parallelLoop, SgScopeStatement * moduleScope,
-    FortranCUDADataSizesDeclarationDirectLoop * dataSizesDeclaration) :
+    FortranCUDADataSizesDeclarationDirectLoop * dataSizesDeclaration,
+    FortranOpDatDimensionsDeclaration * opDatDimensionsDeclaration) :
   FortranCUDAKernelSubroutine (subroutineName, userSubroutineName,
-      parallelLoop, moduleScope), dataSizesDeclaration (dataSizesDeclaration)
+      parallelLoop, moduleScope, opDatDimensionsDeclaration),
+      dataSizesDeclaration (dataSizesDeclaration)
 {
+  Debug::getInstance ()->debugMessage ("<Kernel, Direct, CUDA>", 5);
+
   createFormalParameterDeclarations ();
 
   createLocalVariableDeclarations ();

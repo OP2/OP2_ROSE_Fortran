@@ -233,6 +233,8 @@ FortranOpenMPKernelSubroutineIndirectLoop::FortranOpenMPKernelSubroutineIndirect
   FortranOpenMPKernelSubroutine (subroutineName, userSubroutineName,
       parallelLoop, moduleScope)
 {
+  Debug::getInstance ()->debugMessage ("<Kernel, Indirect, OpenMP>", 5);
+
   createFormalParameterDeclarations ();
 
   createLocalVariableDeclarations ();

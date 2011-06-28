@@ -18,7 +18,7 @@ class FortranCUDAKernelSubroutineIndirectLoop: public FortranCUDAKernelSubroutin
 
     FortranCUDADataSizesDeclarationIndirectLoop * dataSizesDeclaration;
 
-    std::map <std::string, unsigned int> positionOf_nbytes;
+    std::map <std::string, unsigned int> positionOfNbytes;
 
   private:
 
@@ -43,7 +43,7 @@ class FortranCUDAKernelSubroutineIndirectLoop: public FortranCUDAKernelSubroutin
     void
     createPlanFormalParameterDeclarations ();
 
-    void
+    virtual void
     createOpDatFormalParameterDeclarations ();
 
     virtual void
@@ -61,7 +61,8 @@ class FortranCUDAKernelSubroutineIndirectLoop: public FortranCUDAKernelSubroutin
         std::string const & subroutineName,
         std::string const & userSubroutineName, ParallelLoop * parallelLoop,
         SgScopeStatement * moduleScope,
-        FortranCUDADataSizesDeclarationIndirectLoop * dataSizesDeclaration);
+        FortranCUDADataSizesDeclarationIndirectLoop * dataSizesDeclaration,
+        FortranOpDatDimensionsDeclaration * opDatDimensionsDeclaration);
 
 };
 

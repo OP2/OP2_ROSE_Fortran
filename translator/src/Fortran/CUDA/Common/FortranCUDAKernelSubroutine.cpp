@@ -330,9 +330,10 @@ FortranCUDAKernelSubroutine::createAutoSharedDeclaration ()
 
 FortranCUDAKernelSubroutine::FortranCUDAKernelSubroutine (
     std::string const & subroutineName, std::string const & userSubroutineName,
-    ParallelLoop * parallelLoop, SgScopeStatement * moduleScope) :
+    ParallelLoop * parallelLoop, SgScopeStatement * moduleScope,
+    FortranOpDatDimensionsDeclaration * opDatDimensionsDeclaration) :
   FortranKernelSubroutine (subroutineName, userSubroutineName, parallelLoop,
-      moduleScope)
+      moduleScope), opDatDimensionsDeclaration (opDatDimensionsDeclaration)
 {
   using SageInterface::addTextForUnparser;
 
