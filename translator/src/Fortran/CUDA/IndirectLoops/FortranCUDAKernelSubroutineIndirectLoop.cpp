@@ -118,13 +118,10 @@ FortranCUDAKernelSubroutineIndirectLoop::createUserSubroutineCallStatement ()
           variableDeclarations->get (
               VariableNames::getGlobalToLocalMappingName (i))), addExpression1);
 
-      std::cout << i << std::endl;
       SgDotExp * dotExpression1 = buildDotExp (buildVarRefExp (
           variableDeclarations->get (CommonVariableNames::opDatDimensions)),
           buildVarRefExp (
               opDatDimensionsDeclaration->getOpDatDimensionField (i)));
-
-      std::cout << i << std::endl;
 
       SgMultiplyOp * multiplyExpression1 = buildMultiplyOp (arrayExpression1,
           dotExpression1);
@@ -252,7 +249,6 @@ FortranCUDAKernelSubroutineIndirectLoop::createPointeredIncrementsOrWritesStatem
   using SageBuilder::buildVarRefExp;
   using SageBuilder::buildIntVal;
   using SageBuilder::buildMultiplyOp;
-  using SageBuilder::buildAssignOp;
   using SageBuilder::buildAssignStatement;
   using SageBuilder::buildAddOp;
   using SageBuilder::buildExprListExp;
@@ -260,7 +256,6 @@ FortranCUDAKernelSubroutineIndirectLoop::createPointeredIncrementsOrWritesStatem
   using SageBuilder::buildPntrArrRefExp;
   using SageBuilder::buildDivideOp;
   using SageBuilder::buildBasicBlock;
-  using SageBuilder::buildExprStatement;
   using SageBuilder::buildSubtractOp;
   using SageBuilder::buildLessThanOp;
   using SageBuilder::buildWhileStmt;
@@ -468,208 +463,47 @@ FortranCUDAKernelSubroutineIndirectLoop::createPointeredIncrementsOrWritesStatem
 }
 
 void
-FortranCUDAKernelSubroutineIndirectLoop::createExecutionLoopStatements ()
+FortranCUDAKernelSubroutineIndirectLoop::createInnerExecutionLoopStatements (
+    SgScopeStatement * scope)
 {
   using SageBuilder::buildVarRefExp;
-  using SageBuilder::buildOpaqueVarRefExp;
   using SageBuilder::buildPntrArrRefExp;
+  using SageBuilder::buildFunctionCallExp;
+  using SageBuilder::buildExprListExp;
   using SageBuilder::buildDotExp;
-  using SageBuilder::buildAssignOp;
-  using SageBuilder::buildExprStatement;
-  using SageBuilder::buildMultiplyOp;
-  using SageBuilder::buildDivideOp;
   using SageBuilder::buildAddOp;
   using SageBuilder::buildSubtractOp;
-  using SageBuilder::buildIntVal;
-  using SageBuilder::buildLessThanOp;
+  using SageBuilder::buildMultiplyOp;
   using SageBuilder::buildEqualityOp;
-  using SageBuilder::buildBasicBlock;
-  using SageBuilder::buildWhileStmt;
-  using SageBuilder::buildExprListExp;
-  using SageBuilder::buildFunctionCallExp;
+  using SageBuilder::buildIntVal;
+  using SageBuilder::buildAssignOp;
   using SageBuilder::buildAssignStatement;
+  using SageBuilder::buildExprStatement;
+  using SageBuilder::buildBasicBlock;
   using SageInterface::appendStatement;
 
-  SgVarRefExp * iterationCounter_Reference1 = buildVarRefExp (
-      variableDeclarations->get (CommonVariableNames::iterationCounter1));
-
-  SgVarRefExp * variable_X_Reference1 = buildOpaqueVarRefExp (CUDA::Fortran::x,
-      subroutineScope);
-
-  SgVarRefExp * variable_Threadidx_Reference1 = buildOpaqueVarRefExp (
-      CUDA::Fortran::threadidx, subroutineScope);
-
-  SgDotExp * dotExpression1 = buildDotExp (variable_Threadidx_Reference1,
-      variable_X_Reference1);
-
-  SgSubtractOp * subtractExpression1 = buildSubtractOp (dotExpression1,
-      buildIntVal (1));
-
-  SgAssignOp * assignmentExpression1 = buildAssignOp (
-      iterationCounter_Reference1, subtractExpression1);
-
-  appendStatement (buildExprStatement (assignmentExpression1), subroutineScope);
-
-  /*
-   * ======================================================
-   * While loop body
-   * ======================================================
-   */
-
-  SgBasicBlock * loopBodyNestingLevel1 = buildBasicBlock ();
-
-  SgAssignOp * loopBodyExpression1 = buildAssignOp (buildVarRefExp (
-      variableDeclarations->get (CommonVariableNames::col2)), buildIntVal (-1));
-
-  loopBodyNestingLevel1->append_statement (buildExprStatement (
-      loopBodyExpression1));
-
-  SgExpression * ifGuardNestingLevel1 = buildLessThanOp (buildVarRefExp (
-      variableDeclarations->get (CommonVariableNames::iterationCounter1)),
-      buildVarRefExp (variableDeclarations->get (
-          IndirectLoop::Fortran::KernelSubroutine::VariableNames::nelem)));
-
-  SgBasicBlock * ifBodyNestingLevel1 = buildBasicBlock ();
+  SgBasicBlock * ifBody = buildBasicBlock ();
 
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
-    if (parallelLoop->getOpAccessValue (i) == INC_ACCESS)
+    if (parallelLoop->getOpMapValue (i) == INDIRECT
+        && parallelLoop->getOpAccessValue (i) == INC_ACCESS)
     {
-      SgAssignOp * loopLowerBoundNestingLevel2 = buildAssignOp (buildVarRefExp (
-          variableDeclarations->get (CommonVariableNames::iterationCounter2)),
-          buildIntVal (0));
+      SgBasicBlock * innerLoopBody = buildBasicBlock ();
+
+      SgPntrArrRefExp * arrayExpression1 = buildPntrArrRefExp (buildVarRefExp (
+          variableDeclarations->get (VariableNames::getOpDatLocalName (i))),
+          buildVarRefExp (variableDeclarations->get (
+              CommonVariableNames::iterationCounter2)));
 
       SgDotExp * dotExpression = buildDotExp (buildVarRefExp (
           variableDeclarations->get (CommonVariableNames::opDatDimensions)),
           buildVarRefExp (
               opDatDimensionsDeclaration->getOpDatDimensionField (i)));
 
-      SgSubtractOp * subtractExpression2 = buildSubtractOp (dotExpression,
-          buildIntVal (1));
-
-      SgBasicBlock * loopBodyNestingLevel2 = buildBasicBlock ();
-
-      SgPntrArrRefExp * arrayExpression1 = buildPntrArrRefExp (buildVarRefExp (
-          variableDeclarations->get (VariableNames::getOpDatLocalName (i))),
-          buildVarRefExp (variableDeclarations->get (
-              CommonVariableNames::iterationCounter2)));
-
-      SgAssignOp * innerLoopExpression1 = buildAssignOp (arrayExpression1,
-          buildIntVal (0));
-
-      loopBodyNestingLevel2->append_statement (buildExprStatement (
-          innerLoopExpression1));
-
-      SgFortranDo * loopStatementNestingLevel2 =
-          FortranStatementsAndExpressionsBuilder::buildFortranDoStatement (
-              loopLowerBoundNestingLevel2, subtractExpression2,
-              buildIntVal (1), loopBodyNestingLevel2);
-
-      ifBodyNestingLevel1->append_statement (loopStatementNestingLevel2);
-    }
-  }
-
-  SgStatement * userSubroutineCall = createUserSubroutineCallStatement ();
-
-  ifBodyNestingLevel1->append_statement (userSubroutineCall);
-
-  SgAddOp
-      * addExpression2 =
-          buildAddOp (
-              buildVarRefExp (variableDeclarations->get (
-                  CommonVariableNames::iterationCounter1)),
-              buildVarRefExp (
-                  variableDeclarations->get (
-                      IndirectLoop::Fortran::KernelSubroutine::VariableNames::blockOffsetShared)));
-
-  SgPntrArrRefExp * arrayExpression2 = buildPntrArrRefExp (buildVarRefExp (
-      variableDeclarations->get (PlanFunction::Fortran::pthrcol)),
-      addExpression2);
-
-  SgAssignOp * assignmentExpression2 = buildAssignOp (buildVarRefExp (
-      variableDeclarations->get (CommonVariableNames::col2)), arrayExpression2);
-
-  ifBodyNestingLevel1->append_statement (buildExprStatement (
-      assignmentExpression2));
-
-  SgIfStmt * ifStatementNestingLevel1 =
-      FortranStatementsAndExpressionsBuilder::buildIfStatementWithEmptyElse (
-          ifGuardNestingLevel1, ifBodyNestingLevel1);
-
-  loopBodyNestingLevel1->append_statement (ifStatementNestingLevel1);
-
-  /*
-   * ======================================================
-   * Increment adjustment statements
-   * ======================================================
-   */
-  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
-  {
-    if (parallelLoop->getOpMapValue (i) == INDIRECT
-        && parallelLoop->getOpAccessValue (i) == INC_ACCESS)
-    {
-      SgVarRefExp * incrementAccessMap_Reference = buildVarRefExp (
-          variableDeclarations->get (VariableNames::getIncrementAccessMapName (
-              i)));
-
-      SgVarRefExp * globalToLocalMappingArray_Reference = buildVarRefExp (
-          variableDeclarations->get (
-              VariableNames::getGlobalToLocalMappingName (i)));
-
-      SgAddOp
-          * addExpression =
-              buildAddOp (
-                  buildVarRefExp (variableDeclarations->get (
-                      CommonVariableNames::iterationCounter1)),
-                  buildVarRefExp (
-                      variableDeclarations->get (
-                          IndirectLoop::Fortran::KernelSubroutine::VariableNames::blockOffsetShared)));
-
-      SgPntrArrRefExp * arrayExpression = buildPntrArrRefExp (
-          globalToLocalMappingArray_Reference, addExpression);
-
-      SgAssignOp * assignmentExpression = buildAssignOp (
-          incrementAccessMap_Reference, arrayExpression);
-
-      loopBodyNestingLevel1->append_statement (buildExprStatement (
-          assignmentExpression));
-    }
-  }
-
-  /*
-   * ======================================================
-   * Inner while loop
-   * ======================================================
-   */
-
-  SgBasicBlock * loopBodyNestingLevel2 = buildBasicBlock ();
-
-  SgBasicBlock * ifBodyNestingLevel2 = buildBasicBlock ();
-
-  SgEqualityOp * ifGuardNestingLevel2 = buildEqualityOp (buildVarRefExp (
-      variableDeclarations->get (CommonVariableNames::col2)), buildVarRefExp (
-      variableDeclarations->get (CommonVariableNames::col)));
-
-  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
-  {
-    if (parallelLoop->getOpMapValue (i) == INDIRECT
-        && parallelLoop->getOpAccessValue (i) == INC_ACCESS)
-    {
-      SgBasicBlock * loopBodyNestingLevel3 = buildBasicBlock ();
-
-      SgPntrArrRefExp * arrayExpression1 = buildPntrArrRefExp (buildVarRefExp (
-          variableDeclarations->get (VariableNames::getOpDatLocalName (i))),
-          buildVarRefExp (variableDeclarations->get (
-              CommonVariableNames::iterationCounter2)));
-
-      SgDotExp * dotExpression2 = buildDotExp (buildVarRefExp (
-          variableDeclarations->get (CommonVariableNames::opDatDimensions)),
-          buildVarRefExp (
-              opDatDimensionsDeclaration->getOpDatDimensionField (i)));
-
       SgMultiplyOp * multiplyExpression = buildMultiplyOp (buildVarRefExp (
           variableDeclarations->get (VariableNames::getIncrementAccessMapName (
-              i))), dotExpression2);
+              i))), dotExpression);
 
       SgAddOp * addExpression1 = buildAddOp (buildVarRefExp (
           variableDeclarations->get (CommonVariableNames::iterationCounter2)),
@@ -681,41 +515,49 @@ FortranCUDAKernelSubroutineIndirectLoop::createExecutionLoopStatements ()
                   VariableNames::getNumberOfBytesVariableName (i))),
               addExpression1);
 
-      SgPntrArrRefExp * rhsExpression = buildPntrArrRefExp (buildVarRefExp (
+      SgPntrArrRefExp * arrayExpression2 = buildPntrArrRefExp (buildVarRefExp (
           variableDeclarations->get (CommonVariableNames::autoshared)),
           addExpression2);
 
-      SgPntrArrRefExp * lhsExpression = buildPntrArrRefExp (buildVarRefExp (
+      SgPntrArrRefExp * arrayExpression3 = buildPntrArrRefExp (buildVarRefExp (
           variableDeclarations->get (CommonVariableNames::autoshared)),
           addExpression2);
 
-      SgAssignOp * assignmentExpression = buildAssignOp (lhsExpression,
-          buildAddOp (rhsExpression, arrayExpression1));
+      SgAddOp * addExpression3 =
+          buildAddOp (arrayExpression2, arrayExpression1);
 
-      loopBodyNestingLevel3->append_statement (buildExprStatement (
-          assignmentExpression));
+      SgExprStatement * assignmentStatement = buildAssignStatement (
+          arrayExpression3, addExpression3);
 
-      SgAssignOp * loopLowerBoundNestingLevel3 = buildAssignOp (buildVarRefExp (
-          variableDeclarations->get (CommonVariableNames::iterationCounter2)),
-          buildIntVal (0));
+      appendStatement (assignmentStatement, innerLoopBody);
 
-      SgSubtractOp * subtractExpression2 = buildSubtractOp (dotExpression2,
-          buildIntVal (1));
+      SgAssignOp * innerLoopLowerBoundExpression = buildAssignOp (
+          buildVarRefExp (variableDeclarations->get (
+              CommonVariableNames::iterationCounter2)), buildIntVal (0));
 
-      SgFortranDo * loopStatementNestingLevel3 =
+      SgSubtractOp * innerLoopUpperBoundExpression = buildSubtractOp (
+          dotExpression, buildIntVal (1));
+
+      SgFortranDo * innerLoopStatement =
           FortranStatementsAndExpressionsBuilder::buildFortranDoStatement (
-              loopLowerBoundNestingLevel3, subtractExpression2,
-              buildIntVal (1), loopBodyNestingLevel3);
+              innerLoopLowerBoundExpression, innerLoopUpperBoundExpression,
+              buildIntVal (1), innerLoopBody);
 
-      ifBodyNestingLevel2->append_statement (loopStatementNestingLevel3);
+      appendStatement (innerLoopStatement, ifBody);
     }
   }
 
-  SgIfStmt * ifStatementNestingLevel2 =
-      FortranStatementsAndExpressionsBuilder::buildIfStatementWithEmptyElse (
-          ifGuardNestingLevel2, ifBodyNestingLevel2);
+  SgEqualityOp * ifGuardExpression = buildEqualityOp (buildVarRefExp (
+      variableDeclarations->get (CommonVariableNames::col2)), buildVarRefExp (
+      variableDeclarations->get (CommonVariableNames::col)));
 
-  loopBodyNestingLevel2->append_statement (ifStatementNestingLevel2);
+  SgIfStmt * ifStatement =
+      FortranStatementsAndExpressionsBuilder::buildIfStatementWithEmptyElse (
+          ifGuardExpression, ifBody);
+
+  SgBasicBlock * loopBody = buildBasicBlock ();
+
+  appendStatement (ifStatement, loopBody);
 
   SgFunctionSymbol * functionSymbol =
       FortranTypesBuilder::buildNewFortranSubroutine ("syncthreads",
@@ -726,39 +568,224 @@ FortranCUDAKernelSubroutineIndirectLoop::createExecutionLoopStatements ()
   SgFunctionCallExp * subroutineCall = buildFunctionCallExp (functionSymbol,
       actualParameters);
 
-  loopBodyNestingLevel2->append_statement (buildExprStatement (subroutineCall));
+  appendStatement (buildExprStatement (subroutineCall), loopBody);
 
-  SgAssignOp * loopLowerBoundNestingLevel2 = buildAssignOp (buildVarRefExp (
+  SgAssignOp * lowerBoundExpression = buildAssignOp (buildVarRefExp (
       variableDeclarations->get (CommonVariableNames::col)), buildIntVal (0));
 
-  SgSubtractOp * loopUpperBoundNestingLevel2 = buildSubtractOp (buildVarRefExp (
+  SgSubtractOp * upperBoundExpression = buildSubtractOp (buildVarRefExp (
       variableDeclarations->get (
           IndirectLoop::Fortran::KernelSubroutine::VariableNames::ncolor)),
       buildIntVal (1));
 
-  SgFortranDo * loopStatementNestingLevel2 =
-      FortranStatementsAndExpressionsBuilder::buildFortranDoStatement (
-          loopLowerBoundNestingLevel2, loopUpperBoundNestingLevel2,
-          buildIntVal (1), loopBodyNestingLevel2);
+  SgFortranDo
+      * loopStatement =
+          FortranStatementsAndExpressionsBuilder::buildFortranDoStatement (
+              lowerBoundExpression, upperBoundExpression, buildIntVal (1),
+              loopBody);
 
-  loopBodyNestingLevel1->append_statement (loopStatementNestingLevel2);
+  appendStatement (loopStatement, scope);
+}
+
+void
+FortranCUDAKernelSubroutineIndirectLoop::createIncrementAdjustmentStatements (
+    SgScopeStatement * scope)
+{
+  using SageBuilder::buildVarRefExp;
+  using SageBuilder::buildAssignStatement;
+  using SageBuilder::buildPntrArrRefExp;
+  using SageBuilder::buildAddOp;
+  using SageInterface::appendStatement;
+
+  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
+  {
+    if (parallelLoop->getOpMapValue (i) == INDIRECT
+        && parallelLoop->getOpAccessValue (i) == INC_ACCESS)
+    {
+      SgAddOp
+          * addExpression =
+              buildAddOp (
+                  buildVarRefExp (variableDeclarations->get (
+                      CommonVariableNames::iterationCounter1)),
+                  buildVarRefExp (
+                      variableDeclarations->get (
+                          IndirectLoop::Fortran::KernelSubroutine::VariableNames::blockOffsetShared)));
+
+      SgPntrArrRefExp * arrayExpression = buildPntrArrRefExp (buildVarRefExp (
+          variableDeclarations->get (
+              VariableNames::getGlobalToLocalMappingName (i))), addExpression);
+
+      SgExprStatement * assignmentStatement = buildAssignStatement (
+          buildVarRefExp (variableDeclarations->get (
+              VariableNames::getIncrementAccessMapName (i))), arrayExpression);
+
+      appendStatement (assignmentStatement, scope);
+    }
+  }
+}
+
+void
+FortranCUDAKernelSubroutineIndirectLoop::createInitialiseLocalOpDatStatements (
+    SgScopeStatement * scope)
+{
+  using SageBuilder::buildAssignOp;
+  using SageBuilder::buildAssignStatement;
+  using SageBuilder::buildIntVal;
+  using SageBuilder::buildDotExp;
+  using SageBuilder::buildSubtractOp;
+  using SageBuilder::buildBasicBlock;
+  using SageBuilder::buildPntrArrRefExp;
+  using SageBuilder::buildVarRefExp;
+  using SageBuilder::buildOpaqueVarRefExp;
+  using SageInterface::appendStatement;
+
+  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
+  {
+    if (parallelLoop->getOpAccessValue (i) == INC_ACCESS)
+    {
+      SgBasicBlock * loopBody = buildBasicBlock ();
+
+      SgPntrArrRefExp * arrayExpression = buildPntrArrRefExp (buildVarRefExp (
+          variableDeclarations->get (VariableNames::getOpDatLocalName (i))),
+          buildVarRefExp (variableDeclarations->get (
+              CommonVariableNames::iterationCounter2)));
+
+      SgExprStatement * assignmentStatement = buildAssignStatement (
+          arrayExpression, buildIntVal (0));
+
+      appendStatement (assignmentStatement, loopBody);
+
+      SgAssignOp * lowerBoundExpression = buildAssignOp (buildVarRefExp (
+          variableDeclarations->get (CommonVariableNames::iterationCounter2)),
+          buildIntVal (0));
+
+      SgDotExp * dotExpression = buildDotExp (buildVarRefExp (
+          variableDeclarations->get (CommonVariableNames::opDatDimensions)),
+          buildVarRefExp (
+              opDatDimensionsDeclaration->getOpDatDimensionField (i)));
+
+      SgSubtractOp * upperBoundExpression = buildSubtractOp (dotExpression,
+          buildIntVal (1));
+
+      SgFortranDo * loopStatement =
+          FortranStatementsAndExpressionsBuilder::buildFortranDoStatement (
+              lowerBoundExpression, upperBoundExpression, buildIntVal (1),
+              loopBody);
+
+      appendStatement (loopStatement, scope);
+    }
+  }
+}
+
+void
+FortranCUDAKernelSubroutineIndirectLoop::createExecutionLoopStatements ()
+{
+  using SageBuilder::buildVarRefExp;
+  using SageBuilder::buildOpaqueVarRefExp;
+  using SageBuilder::buildPntrArrRefExp;
+  using SageBuilder::buildDotExp;
+  using SageBuilder::buildAddOp;
+  using SageBuilder::buildLessThanOp;
+  using SageBuilder::buildSubtractOp;
+  using SageBuilder::buildIntVal;
+  using SageBuilder::buildBasicBlock;
+  using SageBuilder::buildAssignOp;
+  using SageBuilder::buildAssignStatement;
+  using SageBuilder::buildWhileStmt;
+  using SageInterface::appendStatement;
 
   /*
    * ======================================================
-   * Increment of iteration variable in nesting level 1
+   * Initialise outer loop counter
    * ======================================================
    */
 
-  SgVarRefExp * iterationVarNesting1Ref = buildVarRefExp (
-      variableDeclarations->get (CommonVariableNames::iterationCounter1));
+  SgDotExp * dotExpression1 = buildDotExp (buildOpaqueVarRefExp (
+      CUDA::Fortran::threadidx, subroutineScope), buildOpaqueVarRefExp (
+      CUDA::Fortran::x, subroutineScope));
 
-  SgStatement * incrementIterationVariableNesting1 = buildAssignStatement (
-      iterationVarNesting1Ref, buildAddOp (iterationVarNesting1Ref,
-          buildDotExp (buildOpaqueVarRefExp (CUDA::Fortran::blockdim,
-              subroutineScope), buildOpaqueVarRefExp (CUDA::Fortran::x,
-              subroutineScope))));
+  SgSubtractOp * subtractExpression1 = buildSubtractOp (dotExpression1,
+      buildIntVal (1));
 
-  loopBodyNestingLevel1->append_statement (incrementIterationVariableNesting1);
+  SgExprStatement * assignmentStatement1 = buildAssignStatement (
+      buildVarRefExp (variableDeclarations->get (
+          CommonVariableNames::iterationCounter1)), subtractExpression1);
+
+  appendStatement (assignmentStatement1, subroutineScope);
+
+  /*
+   * ======================================================
+   * Create outer loop body
+   * ======================================================
+   */
+
+  SgBasicBlock * loopBody = buildBasicBlock ();
+
+  /*
+   * ======================================================
+   * Initialise inner loop counter
+   * ======================================================
+   */
+
+  SgExprStatement * assignmentStatement2 = buildAssignStatement (
+      buildVarRefExp (variableDeclarations->get (CommonVariableNames::col2)),
+      buildIntVal (-1));
+
+  appendStatement (assignmentStatement2, loopBody);
+
+  SgBasicBlock * ifBody = buildBasicBlock ();
+
+  createInitialiseLocalOpDatStatements (ifBody);
+
+  appendStatement (createUserSubroutineCallStatement (), ifBody);
+
+  SgAddOp
+      * addExpression3 =
+          buildAddOp (
+              buildVarRefExp (variableDeclarations->get (
+                  CommonVariableNames::iterationCounter1)),
+              buildVarRefExp (
+                  variableDeclarations->get (
+                      IndirectLoop::Fortran::KernelSubroutine::VariableNames::blockOffsetShared)));
+
+  SgPntrArrRefExp * arrayExpression3 = buildPntrArrRefExp (buildVarRefExp (
+      variableDeclarations->get (PlanFunction::Fortran::pthrcol)),
+      addExpression3);
+
+  SgExprStatement * assignmentStatement3 = buildAssignStatement (
+      buildVarRefExp (variableDeclarations->get (CommonVariableNames::col2)),
+      arrayExpression3);
+
+  appendStatement (assignmentStatement3, ifBody);
+
+  SgExpression * ifGuardExpression = buildLessThanOp (buildVarRefExp (
+      variableDeclarations->get (CommonVariableNames::iterationCounter1)),
+      buildVarRefExp (variableDeclarations->get (
+          IndirectLoop::Fortran::KernelSubroutine::VariableNames::nelem)));
+
+  SgIfStmt * ifStatement =
+      FortranStatementsAndExpressionsBuilder::buildIfStatementWithEmptyElse (
+          ifGuardExpression, ifBody);
+
+  appendStatement (ifStatement, loopBody);
+
+  createIncrementAdjustmentStatements (loopBody);
+
+  createInnerExecutionLoopStatements (loopBody);
+
+  SgDotExp * dotExpression4 = buildDotExp (buildOpaqueVarRefExp (
+      CUDA::Fortran::blockdim, subroutineScope), buildOpaqueVarRefExp (
+      CUDA::Fortran::x, subroutineScope));
+
+  SgAddOp * addExpresssion4 = buildAddOp (buildVarRefExp (
+      variableDeclarations->get (CommonVariableNames::iterationCounter1)),
+      dotExpression4);
+
+  SgExprStatement * assignmentStatement4 = buildAssignStatement (
+      buildVarRefExp (variableDeclarations->get (
+          CommonVariableNames::iterationCounter1)), addExpresssion4);
+
+  appendStatement (assignmentStatement4, loopBody);
 
   /*
    * ======================================================
@@ -766,17 +793,16 @@ FortranCUDAKernelSubroutineIndirectLoop::createExecutionLoopStatements ()
    * ======================================================
    */
 
-  SgExpression * loopGuardNestingLevel1 = buildLessThanOp (buildVarRefExp (
+  SgLessThanOp * loopGuardExpression = buildLessThanOp (buildVarRefExp (
       variableDeclarations->get (CommonVariableNames::iterationCounter1)),
       buildVarRefExp (variableDeclarations->get (
           IndirectLoop::Fortran::KernelSubroutine::VariableNames::nelems2)));
 
-  SgWhileStmt * loopStatementNestingLevel1 = buildWhileStmt (
-      loopGuardNestingLevel1, loopBodyNestingLevel1);
+  SgWhileStmt * loopStatement = buildWhileStmt (loopGuardExpression, loopBody);
 
-  loopStatementNestingLevel1->set_has_end_statement (true);
+  loopStatement->set_has_end_statement (true);
 
-  appendStatement (loopStatementNestingLevel1, subroutineScope);
+  appendStatement (loopStatement, subroutineScope);
 }
 
 void
@@ -833,10 +859,15 @@ FortranCUDAKernelSubroutineIndirectLoop::createAutoSharedWhileLoopStatements ()
        * ======================================================
        */
 
+      SgDotExp * dotExpression2 = buildDotExp (buildVarRefExp (
+          variableDeclarations->get (CommonVariableNames::opDatDimensions)),
+          buildVarRefExp (
+              opDatDimensionsDeclaration->getOpDatDimensionField (i)));
+
       SgMultiplyOp * multiplyExpression2 = buildMultiplyOp (buildVarRefExp (
           variableDeclarations->get (
-              VariableNames::getIndirectionArgumentSizeName (i))), buildIntVal (
-          parallelLoop->getOpDatDimension (i)));
+              VariableNames::getIndirectionArgumentSizeName (i))),
+          dotExpression2);
 
       SgExprStatement * assignmentStatement2 = buildAssignStatement (
           buildVarRefExp (variableDeclarations->get (
@@ -864,10 +895,14 @@ FortranCUDAKernelSubroutineIndirectLoop::createAutoSharedWhileLoopStatements ()
             FortranTypesBuilder::buildNewFortranFunction ("mod",
                 subroutineScope);
 
+        SgDotExp * dotExpression3 = buildDotExp (buildVarRefExp (
+            variableDeclarations->get (CommonVariableNames::opDatDimensions)),
+            buildVarRefExp (opDatDimensionsDeclaration->getOpDatDimensionField (
+                i)));
+
         SgExprListExp * modActualParameters = buildExprListExp (
             buildVarRefExp (variableDeclarations->get (
-                CommonVariableNames::iterationCounter1)), buildIntVal (
-                parallelLoop->getOpDatDimension (i)));
+                CommonVariableNames::iterationCounter1)), dotExpression3);
 
         SgFunctionCallExp * modFunctionCall = buildFunctionCallExp (
             modFunctionSymbol, modActualParameters);
@@ -913,10 +948,14 @@ FortranCUDAKernelSubroutineIndirectLoop::createAutoSharedWhileLoopStatements ()
             buildVarRefExp (variableDeclarations->get (
                 PlanFunction::Fortran::pindOffs)), addExpression4b);
 
+        SgDotExp * dotExpression4 = buildDotExp (buildVarRefExp (
+            variableDeclarations->get (CommonVariableNames::opDatDimensions)),
+            buildVarRefExp (opDatDimensionsDeclaration->getOpDatDimensionField (
+                i)));
+
         SgDivideOp * divideExpression4 = buildDivideOp (
             buildVarRefExp (variableDeclarations->get (
-                CommonVariableNames::iterationCounter1)), buildIntVal (
-                parallelLoop->getOpDatDimension (i)));
+                CommonVariableNames::iterationCounter1)), dotExpression4);
 
         SgAddOp * addExpression4c = buildAddOp (arrayIndexExpression4b,
             divideExpression4);
@@ -930,8 +969,7 @@ FortranCUDAKernelSubroutineIndirectLoop::createAutoSharedWhileLoopStatements ()
             addExpression4d);
 
         SgMultiplyOp * multiplyExpression4b = buildMultiplyOp (
-            arrayIndexExpression4c, buildIntVal (
-                parallelLoop->getOpDatDimension (i)));
+            arrayIndexExpression4c, dotExpression4);
 
         SgAddOp
             * addExpression4e =
@@ -1015,7 +1053,7 @@ FortranCUDAKernelSubroutineIndirectLoop::createAutoSharedWhileLoopStatements ()
   /*
    * ======================================================
    * All threads must synchronize before kernel execution
-   * can proceed. Add the statement
+   * can proceed
    * ======================================================
    */
 

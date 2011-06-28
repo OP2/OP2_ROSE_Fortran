@@ -29,6 +29,15 @@ class FortranCUDAKernelSubroutineIndirectLoop: public FortranCUDAKernelSubroutin
     createExecutionLoopStatements ();
 
     void
+    createInnerExecutionLoopStatements (SgScopeStatement * scope);
+
+    void
+    createIncrementAdjustmentStatements (SgScopeStatement * scope);
+
+    void
+    createInitialiseLocalOpDatStatements (SgScopeStatement * scope);
+
+    void
     createPointeredIncrementsOrWritesStatements ();
 
     void
