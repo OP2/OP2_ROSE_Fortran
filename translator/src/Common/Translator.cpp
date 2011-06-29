@@ -210,6 +210,8 @@ main (int argc, char ** argv)
     Debug::getInstance ()->verboseMessage ("Fortran project detected");
 
     handleFortranProject (project);
+
+    Debug::getInstance ()->verboseMessage ("DONE");
   }
 
   if (Globals::getInstance ()->outputUDrawGraphs ())

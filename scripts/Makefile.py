@@ -145,7 +145,7 @@ def compile ():
 	stdoutdata, stderrdata = proc.communicate()
 
 	if opts.debug > 0:
-		print('==================================== STANDARD OUTPUT ===========================================')
+		print(str(proc.returncode) +'==================================== STANDARD OUTPUT ===========================================')
 		for line in stdoutdata.splitlines():
 			print(line)
 		print('================================================================================================')

@@ -55,7 +55,8 @@ FortranCUDAHostSubroutineIndirectLoop::createKernelFunctionCallStatement ()
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
     if (parallelLoop->isDuplicateOpDat (i) == false
-        && parallelLoop->getOpMapValue (i) == DIRECT)
+        && (parallelLoop->getOpMapValue (i) == DIRECT
+            || parallelLoop->getOpMapValue (i) == GLOBAL))
     {
       actualParameters->append_expression (buildVarRefExp (
           variableDeclarations->get (VariableNames::getOpDatDeviceName (i))));
@@ -324,7 +325,8 @@ FortranCUDAHostSubroutineIndirectLoop::createVariablesSizesInitialisationStateme
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
     if (parallelLoop->isDuplicateOpDat (i) == false
-        && parallelLoop->getOpMapValue (i) == DIRECT)
+        && (parallelLoop->getOpMapValue (i) == DIRECT
+            || parallelLoop->getOpMapValue (i) == GLOBAL))
     {
       SgVarRefExp * dataSizesReferences = buildVarRefExp (
           variableDeclarations->get (CommonVariableNames::argsSizes));

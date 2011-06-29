@@ -19,10 +19,19 @@ void
 ParallelLoop::handleOpGblDeclaration (OP_GBL_Declaration * opGblDeclaration,
     std::string const & variableName, int opDatArgumentGroup)
 {
+  using boost::lexical_cast;
+  using std::string;
+
   Debug::getInstance ()->debugMessage (
       "'" + variableName
           + "' has been declared through OP_DECL_GBL (and not through OP_DECL_DAT)",
       1);
+
+  Debug::getInstance ()->debugMessage ("OP_GBL '" + variableName
+      + "' in argument group " + lexical_cast <string> (opDatArgumentGroup)
+      + " has type '" + opGblDeclaration->getActualType ()->class_name ()
+      + "' and dimension " + lexical_cast <string> (
+      opGblDeclaration->getDimension ()), 5);
 
   uniqueOpDats.push_back (variableName);
 
@@ -43,6 +52,12 @@ ParallelLoop::handleOpDatDeclaration (OP_DAT_Declaration * opDatDeclaration,
   using std::find;
   using std::string;
 
+  Debug::getInstance ()->debugMessage ("OP_DAT '" + variableName
+      + "' in argument group " + lexical_cast <string> (opDatArgumentGroup)
+      + " has type '" + opDatDeclaration->getActualType ()->class_name ()
+      + "' and dimension " + lexical_cast <string> (
+      opDatDeclaration->getDimension ()), 5);
+
   OpDatTypes[opDatArgumentGroup] = opDatDeclaration->getActualType ();
 
   OpDatDimensions[opDatArgumentGroup] = opDatDeclaration->getDimension ();
@@ -52,6 +67,8 @@ ParallelLoop::handleOpDatDeclaration (OP_DAT_Declaration * opDatDeclaration,
   if (find (uniqueOpDats.begin (), uniqueOpDats.end (), variableName)
       == uniqueOpDats.end ())
   {
+    Debug::getInstance ()->debugMessage ("...NOT a duplicate", 5);
+
     uniqueOpDats.push_back (variableName);
 
     OpDatDuplicates[opDatArgumentGroup] = false;
@@ -79,9 +96,8 @@ ParallelLoop::handleOpDatDeclaration (OP_DAT_Declaration * opDatDeclaration,
       }
       else
       {
-        Debug::getInstance ()->debugMessage (
-            "The size of the base type of OP_DAT '" + variableName + "' is "
-                + lexical_cast <string> (sizeOfRealType->get_value ()), 7);
+        Debug::getInstance ()->debugMessage ("...size of the base type is "
+            + lexical_cast <string> (sizeOfRealType->get_value ()), 5);
 
         sizeOfOpDat = sizeOfRealType->get_value ();
       }
@@ -89,6 +105,8 @@ ParallelLoop::handleOpDatDeclaration (OP_DAT_Declaration * opDatDeclaration,
   }
   else
   {
+    Debug::getInstance ()->debugMessage ("...IS a duplicate", 5);
+
     OpDatDuplicates[opDatArgumentGroup] = true;
   }
 }
@@ -177,6 +195,9 @@ ParallelLoop::retrieveOpDatDeclarations (Declarations * declarations)
                  * access to the data
                  * ======================================================
                  */
+                Debug::getInstance ()->debugMessage (
+                    "...DIRECT mapping descriptor", 5);
+
                 OpDatMappingDescriptors[opDatArgumentGroup] = DIRECT;
               }
               else
@@ -188,12 +209,17 @@ ParallelLoop::retrieveOpDatDeclarations (Declarations * declarations)
                    * OP_GBL signals that the OP_DAT is a global variable
                    * ======================================================
                    */
+                  Debug::getInstance ()->debugMessage (
+                      "...GLOBAL mapping descriptor", 5);
 
                   OpDatMappingDescriptors[opDatArgumentGroup] = GLOBAL;
                 }
 
                 else
                 {
+                  Debug::getInstance ()->debugMessage (
+                      "...INDIRECT mapping descriptor", 5);
+
                   OpDatMappingDescriptors[opDatArgumentGroup] = INDIRECT;
                 }
               }
@@ -209,21 +235,33 @@ ParallelLoop::retrieveOpDatDeclarations (Declarations * declarations)
 
             if (iequals (variableName, OP2::OP_READ))
             {
+              Debug::getInstance ()->debugMessage ("...READ access descriptor",
+                  5);
+
               OpDatAccessDescriptors[opDatArgumentGroup] = READ_ACCESS;
             }
 
             else if (iequals (variableName, OP2::OP_WRITE))
             {
+              Debug::getInstance ()->debugMessage (
+                  "...WRITE access descriptor", 5);
+
               OpDatAccessDescriptors[opDatArgumentGroup] = WRITE_ACCESS;
             }
 
             else if (iequals (variableName, OP2::OP_INC))
             {
+              Debug::getInstance ()->debugMessage (
+                  "...INCREMENT access descriptor", 5);
+
               OpDatAccessDescriptors[opDatArgumentGroup] = INC_ACCESS;
             }
 
             else if (iequals (variableName, OP2::OP_RW))
             {
+              Debug::getInstance ()->debugMessage (
+                  "...READ/WRITE access descriptor", 5);
+
               OpDatAccessDescriptors[opDatArgumentGroup] = RW_ACCESS;
             }
 

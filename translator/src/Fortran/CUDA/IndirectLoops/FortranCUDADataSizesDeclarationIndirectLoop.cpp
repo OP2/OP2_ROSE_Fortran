@@ -81,7 +81,8 @@ FortranCUDADataSizesDeclarationIndirectLoop::addFields ()
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
     if (parallelLoop->isDuplicateOpDat (i) == false
-        && parallelLoop->getOpMapValue (i) == DIRECT)
+        && (parallelLoop->getOpMapValue (i) == DIRECT
+            || parallelLoop->getOpMapValue (i) == GLOBAL))
     {
       string const variableName = VariableNames::getOpDatSizeName (i);
 
