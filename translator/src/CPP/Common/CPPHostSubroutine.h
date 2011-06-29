@@ -2,10 +2,9 @@
 #define CPP_HOST_SUBROUTINE_H
 
 #include <HostSubroutine.h>
-#include <CPPSubroutine.h>
 #include <ParallelLoop.h>
 
-class CPPHostSubroutine: public CPPSubroutine, public HostSubroutine
+class CPPHostSubroutine: public HostSubroutine <SgFunctionDeclaration>
 {
   protected:
 

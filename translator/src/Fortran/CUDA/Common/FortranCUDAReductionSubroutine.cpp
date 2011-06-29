@@ -359,7 +359,7 @@ FortranCUDAReductionSubroutine::createFormalParameterDeclarations ()
 FortranCUDAReductionSubroutine::FortranCUDAReductionSubroutine (
     std::string const & subroutineAndVariableName,
     SgScopeStatement * moduleScope, SgArrayType * reductionVariableType) :
-  Subroutine (subroutineAndVariableName), FortranSubroutine (),
+  Subroutine <SgProcedureHeaderStatement> (subroutineAndVariableName),
       reductionVariableType (reductionVariableType)
 {
   using SageBuilder::buildProcedureHeaderStatement;

@@ -8,7 +8,7 @@
 
 CPPKernelSubroutine::CPPKernelSubroutine (std::string const & subroutineName,
     std::string const & userSubroutineName, ParallelLoop * parallelLoop) :
-  CPPSubroutine (), KernelSubroutine (subroutineName, userSubroutineName,
+  KernelSubroutine <SgFunctionDeclaration> (subroutineName, userSubroutineName,
       parallelLoop)
 {
 

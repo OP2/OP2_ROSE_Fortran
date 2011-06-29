@@ -2,10 +2,9 @@
 #define CPP_KERNEL_SUBROUTINE_H
 
 #include <KernelSubroutine.h>
-#include <CPPSubroutine.h>
 #include <ParallelLoop.h>
 
-class CPPKernelSubroutine: public CPPSubroutine, public KernelSubroutine
+class CPPKernelSubroutine: public KernelSubroutine <SgFunctionDeclaration>
 {
 
   protected:

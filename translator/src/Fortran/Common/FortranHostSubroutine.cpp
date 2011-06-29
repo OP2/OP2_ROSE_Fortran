@@ -234,8 +234,8 @@ FortranHostSubroutine::FortranHostSubroutine (
     std::string const & subroutineName, std::string const & userSubroutineName,
     std::string const & kernelSubroutineName, ParallelLoop * parallelLoop,
     SgScopeStatement * moduleScope) :
-  HostSubroutine (subroutineName, userSubroutineName, kernelSubroutineName,
-      parallelLoop)
+  HostSubroutine <SgProcedureHeaderStatement> (subroutineName,
+      userSubroutineName, kernelSubroutineName, parallelLoop)
 {
   using SageBuilder::buildVoidType;
   using SageBuilder::buildProcedureHeaderStatement;

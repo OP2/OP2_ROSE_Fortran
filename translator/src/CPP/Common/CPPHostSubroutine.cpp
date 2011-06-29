@@ -9,7 +9,7 @@
 CPPHostSubroutine::CPPHostSubroutine (std::string const & subroutineName,
     std::string const & userSubroutineName,
     std::string const & kernelSubroutineName, ParallelLoop * parallelLoop) :
-  CPPSubroutine (), HostSubroutine (subroutineName, userSubroutineName,
+  HostSubroutine <SgFunctionDeclaration> (subroutineName, userSubroutineName,
       kernelSubroutineName, parallelLoop)
 {
 
