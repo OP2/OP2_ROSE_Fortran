@@ -9,7 +9,6 @@
 #define FORTRAN_CUDA_REDUCTION_SUBROUTINE_H
 
 #include <Subroutine.h>
-#include <FortranSubroutine.h>
 #include <ParallelLoop.h>
 
 namespace ReductionSubroutine
@@ -27,8 +26,8 @@ namespace ReductionSubroutine
   std::string const reductionArrayDevice = "reductionArrayDevice";
 }
 
-class FortranCUDAReductionSubroutine: public Subroutine,
-    public FortranSubroutine
+class FortranCUDAReductionSubroutine: public Subroutine <
+    SgProcedureHeaderStatement>
 {
   private:
 

@@ -4,27 +4,32 @@
 #include <Subroutine.h>
 #include <ParallelLoop.h>
 
-class KernelSubroutine: public Subroutine
-{
-  protected:
+template <typename T>
+  class KernelSubroutine: public Subroutine <T>
+  {
+    protected:
 
-    std::string userSubroutineName;
+      std::string userSubroutineName;
 
-    ParallelLoop * parallelLoop;
+      ParallelLoop * parallelLoop;
 
-  protected:
+    protected:
 
-    virtual SgStatement *
-    createUserSubroutineCallStatement () = 0;
+      virtual SgStatement *
+      createUserSubroutineCallStatement () = 0;
 
-    virtual void
-    createExecutionLoopStatements () = 0;
+      virtual void
+      createExecutionLoopStatements () = 0;
 
-    virtual void
-    createOpDatFormalParameterDeclarations ()= 0;
+      virtual void
+      createOpDatFormalParameterDeclarations ()= 0;
 
-    KernelSubroutine (std::string const & subroutineName,
-        std::string const & userSubroutineName, ParallelLoop * parallelLoop);
-};
+      KernelSubroutine (std::string const & subroutineName,
+          std::string const & userSubroutineName, ParallelLoop * parallelLoop) :
+        Subroutine <T> (subroutineName + "_kernel"), userSubroutineName (
+            userSubroutineName), parallelLoop (parallelLoop)
+      {
+      }
+  };
 
 #endif

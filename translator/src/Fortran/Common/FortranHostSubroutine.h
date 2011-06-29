@@ -2,10 +2,9 @@
 #define FORTRAN_HOST_SUBROUTINE_H
 
 #include <HostSubroutine.h>
-#include <FortranSubroutine.h>
 #include <ParallelLoop.h>
 
-class FortranHostSubroutine: public FortranSubroutine, public HostSubroutine
+class FortranHostSubroutine: public HostSubroutine <SgProcedureHeaderStatement>
 {
   protected:
 

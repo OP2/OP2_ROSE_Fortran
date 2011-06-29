@@ -34,17 +34,17 @@ class OP2Declaration
     }
 };
 
-class OP_DAT_Declaration: public OP2Declaration
+class OpDatDeclaration: public OP2Declaration
 {
     /*
      * ======================================================
      * Models an OP_DAT declaration.
      *
      * The following style in Fortran is assumed:
-     * OP_DECL_DAT (OP_SET, setCardinality, inputData, OP_DAT)
+     * OP_DECL_DAT (OpSet, setCardinality, inputData, OpDat)
      * ======================================================
      */
-		 
+
   private:
 
     static int const index_OP_SET = 0;
@@ -61,7 +61,7 @@ class OP_DAT_Declaration: public OP2Declaration
 
   public:
 
-    OP_DAT_Declaration (SgExpressionPtrList & parameters);
+    OpDatDeclaration (SgExpressionPtrList & parameters);
 
     int
     getDimension ()
@@ -76,7 +76,7 @@ class OP_DAT_Declaration: public OP2Declaration
     }
 };
 
-class OP_SET_Declaration: public OP2Declaration
+class OpSetDeclaration: public OP2Declaration
 {
     /*
      * ======================================================
@@ -95,17 +95,17 @@ class OP_SET_Declaration: public OP2Declaration
 
   public:
 
-    OP_SET_Declaration (SgExpressionPtrList & parameters);
+    OpSetDeclaration (SgExpressionPtrList & parameters);
 };
 
-class OP_MAP_Declaration: public OP2Declaration
+class OpMapDeclaration: public OP2Declaration
 {
     /*
      * ======================================================
      * Models an OP_MAP declaration.
      *
      * The following style in Fortran is assumed:
-     * OP_DECL_MAP (source_OP_SET, destination_OP_SET, setCardinality, inputData, OP_MAP)
+     * OP_DECL_MAP (source_OpSet, destination_OpSet, setCardinality, inputData, OpMap)
      * ======================================================
      */
 
@@ -123,17 +123,17 @@ class OP_MAP_Declaration: public OP2Declaration
 
   public:
 
-    OP_MAP_Declaration (SgExpressionPtrList & parameters);
+    OpMapDeclaration (SgExpressionPtrList & parameters);
 };
 
-class OP_GBL_Declaration: public OP2Declaration
+class OpGblDeclaration: public OP2Declaration
 {
     /*
      * ======================================================
      * Models an OP_GBL declaration.
      *
      * The following style in Fortran is assumed:
-     * OP_DECL_GBL (inputData, dimension, OP_DAT)
+     * OP_DECL_GBL (inputData, dimension, OpDat)
      * ======================================================
      */
 
@@ -151,7 +151,7 @@ class OP_GBL_Declaration: public OP2Declaration
 
   public:
 
-    OP_GBL_Declaration (SgExpressionPtrList & parameters);
+    OpGblDeclaration (SgExpressionPtrList & parameters);
 
     int
     getDimension ()

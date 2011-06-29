@@ -16,7 +16,7 @@
  */
 
 void
-ParallelLoop::handleOpGblDeclaration (OP_GBL_Declaration * opGblDeclaration,
+ParallelLoop::handleOpGblDeclaration (OpGblDeclaration * opGblDeclaration,
     std::string const & variableName, int opDatArgumentGroup)
 {
   using boost::lexical_cast;
@@ -45,7 +45,7 @@ ParallelLoop::handleOpGblDeclaration (OP_GBL_Declaration * opGblDeclaration,
 }
 
 void
-ParallelLoop::handleOpDatDeclaration (OP_DAT_Declaration * opDatDeclaration,
+ParallelLoop::handleOpDatDeclaration (OpDatDeclaration * opDatDeclaration,
     std::string const & variableName, int opDatArgumentGroup)
 {
   using boost::lexical_cast;
@@ -112,7 +112,8 @@ ParallelLoop::handleOpDatDeclaration (OP_DAT_Declaration * opDatDeclaration,
 }
 
 void
-ParallelLoop::retrieveOpDatDeclarations (Declarations * declarations)
+ParallelLoop::retrieveOpDatDeclarations (Declarations <
+    SgProcedureHeaderStatement *> * declarations)
 {
   using boost::iequals;
   using boost::lexical_cast;
@@ -320,7 +321,7 @@ ParallelLoop::generateReductionSubroutines (SgScopeStatement * moduleScope)
 
         SgIntVal * isKindIntVal = isSgIntVal (opDatKindSize);
 
-        ROSE_ASSERT ( isKindIntVal != NULL );
+        ROSE_ASSERT (isKindIntVal != NULL);
 
         string typeName;
 
@@ -360,7 +361,7 @@ ParallelLoop::generateReductionSubroutines (SgScopeStatement * moduleScope)
          * ======================================================
          */
         reductionSubroutines[i]
-            = reductionSubroutine->getProcedureHeaderStatement ();
+            = reductionSubroutine->getSubroutineHeaderStatement ();
       }
     }
   }
@@ -526,7 +527,8 @@ ParallelLoop::getActualArguments ()
 }
 
 ParallelLoop::ParallelLoop (std::string userSubroutineName,
-    SgExpressionPtrList & actualArguments, Declarations * declarations) :
+    SgExpressionPtrList & actualArguments, Declarations <
+        SgProcedureHeaderStatement *> * declarations) :
   actualArguments (actualArguments)
 {
   using boost::iequals;
@@ -547,11 +549,11 @@ ParallelLoop::ParallelLoop (std::string userSubroutineName,
   if (isDirectLoop ())
   {
     Debug::getInstance ()->debugMessage ("'" + userSubroutineName
-        + "' is a DIRECT loop", 5);
+        + "' is a DIRECT loop", 2);
   }
   else
   {
     Debug::getInstance ()->debugMessage ("'" + userSubroutineName
-        + "' is an INDIRECT loop", 5);
+        + "' is an INDIRECT loop", 2);
   }
 }

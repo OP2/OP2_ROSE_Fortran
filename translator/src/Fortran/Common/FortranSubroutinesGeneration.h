@@ -1,23 +1,5 @@
-/*
- * Written by Adam Betts and Carlo Bertolli
- *
- * This class scans each provided source file and looks
- * for OP_PAR_LOOP calls. When such a call is found, the
- * following occurs:
- *
- * 1) A new file is created to which generated subroutines
- * are output
- *
- * 2) The subroutines implementing the OP_PAR_LOOP on the
- * device are generated
- *
- * 3) The provided source files are modified to replace
- * calls to the OP_PAR_LOOP with the newly generated host
- * subroutine
- */
-
-#ifndef NEW_SUBROUTINES_GENERATION_H
-#define NEW_SUBROUTINES_GENERATION_H
+#ifndef FORTRAN_SUBROUTINES_GENERATION_H
+#define FORTRAN_SUBROUTINES_GENERATION_H
 
 #include <rose.h>
 #include <CommonNamespaces.h>
@@ -55,7 +37,7 @@ class FortranSubroutinesGeneration: public AstSimpleProcessing
      * processed
      * ======================================================
      */
-    Declarations * declarations;
+    Declarations <SgProcedureHeaderStatement *> * declarations;
 
     /*
      * ======================================================
@@ -75,8 +57,9 @@ class FortranSubroutinesGeneration: public AstSimpleProcessing
      */
     void
     patchCallsToParallelLoops (ParallelLoop & parallelLoop,
-        std::string const & userSubroutineName, FortranSubroutine & hostSubroutine,
-        SgScopeStatement * scope, SgFunctionCallExp * functionCallExp);
+        std::string const & userSubroutineName,
+        FortranSubroutine & hostSubroutine, SgScopeStatement * scope,
+        SgFunctionCallExp * functionCallExp);
 
     /*
      * ======================================================
@@ -170,8 +153,8 @@ class FortranSubroutinesGeneration: public AstSimpleProcessing
      * Generates the new subroutines
      * ======================================================
      */
-    FortranSubroutinesGeneration (SgProject * project,
-        Declarations * declarations);
+    FortranSubroutinesGeneration (SgProject * project, Declarations <
+        SgProcedureHeaderStatement *> * declarations);
 };
 
 #endif

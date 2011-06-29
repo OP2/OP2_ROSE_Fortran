@@ -2,7 +2,7 @@
 #include <OP2Variables.h>
 #include <Debug.h>
 
-OP_DAT_Declaration::OP_DAT_Declaration (SgExpressionPtrList & parameters)
+OpDatDeclaration::OpDatDeclaration (SgExpressionPtrList & parameters)
 {
   using boost::lexical_cast;
   using std::string;
@@ -29,7 +29,7 @@ OP_DAT_Declaration::OP_DAT_Declaration (SgExpressionPtrList & parameters)
       + " and its dimension is " + lexical_cast <string> (dimension), 8);
 }
 
-OP_SET_Declaration::OP_SET_Declaration (SgExpressionPtrList & parameters)
+OpSetDeclaration::OpSetDeclaration (SgExpressionPtrList & parameters)
 {
   variableName
       = isSgVarRefExp (parameters[index_OP_SET])->get_symbol ()->get_name ().getString ();
@@ -39,7 +39,7 @@ OP_SET_Declaration::OP_SET_Declaration (SgExpressionPtrList & parameters)
   Debug::getInstance ()->debugMessage (variableName + " is an OP_SET", 8);
 }
 
-OP_MAP_Declaration::OP_MAP_Declaration (SgExpressionPtrList & parameters)
+OpMapDeclaration::OpMapDeclaration (SgExpressionPtrList & parameters)
 {
   variableName
       = isSgVarRefExp (parameters[index_OP_MAP])->get_symbol ()->get_name ().getString ();
@@ -49,7 +49,7 @@ OP_MAP_Declaration::OP_MAP_Declaration (SgExpressionPtrList & parameters)
   Debug::getInstance ()->debugMessage (variableName + " is an OP_MAP", 8);
 }
 
-OP_GBL_Declaration::OP_GBL_Declaration (SgExpressionPtrList & parameters)
+OpGblDeclaration::OpGblDeclaration (SgExpressionPtrList & parameters)
 {
   using boost::lexical_cast;
   using std::string;

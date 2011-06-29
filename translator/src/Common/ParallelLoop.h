@@ -126,7 +126,7 @@ class ParallelLoop
      * ======================================================
      */
     void
-    handleOpGblDeclaration (OP_GBL_Declaration * opGblDeclaration,
+    handleOpGblDeclaration (OpGblDeclaration * opGblDeclaration,
         std::string const & variableName, int opDatArgumentGroup);
 
     /*
@@ -136,7 +136,7 @@ class ParallelLoop
      * ======================================================
      */
     void
-    handleOpDatDeclaration (OP_DAT_Declaration * opDatDeclaration,
+    handleOpDatDeclaration (OpDatDeclaration * opDatDeclaration,
         std::string const & variableName, int opDatArgumentGroup);
 
     /*
@@ -147,7 +147,8 @@ class ParallelLoop
      * ======================================================
      */
     void
-    retrieveOpDatDeclarations (Declarations * declarations);
+    retrieveOpDatDeclarations (
+        Declarations <SgProcedureHeaderStatement *> * declarations);
 
   public:
 
@@ -309,7 +310,8 @@ class ParallelLoop
     getActualArguments ();
 
     ParallelLoop (std::string userSubroutineName,
-        SgExpressionPtrList & actualArguments, Declarations * declarations);
+        SgExpressionPtrList & actualArguments, Declarations <
+            SgProcedureHeaderStatement *> * declarations);
 };
 
 #endif

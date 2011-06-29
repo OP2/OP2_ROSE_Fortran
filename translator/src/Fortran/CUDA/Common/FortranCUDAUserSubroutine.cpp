@@ -38,8 +38,8 @@ FortranCUDAUserSubroutine::copyAndModifySubroutine ()
    */
 
   for (vector <SgProcedureHeaderStatement *>::const_iterator it =
-      declarations->first_SubroutineInSourceCode (); it
-      != declarations->last_SubroutineInSourceCode (); ++it)
+      declarations->firstSubroutineInSourceCode (); it
+      != declarations->lastSubroutineInSourceCode (); ++it)
   {
     SgProcedureHeaderStatement * subroutine = *it;
 
@@ -263,8 +263,8 @@ FortranCUDAUserSubroutine::createStatements ()
 FortranCUDAUserSubroutine::FortranCUDAUserSubroutine (
     std::string const & subroutineName,
     FortranCUDAInitialiseConstantsSubroutine * initialiseConstantsSubroutine,
-    Declarations * declarations, ParallelLoop * parallelLoop,
-    SgScopeStatement * moduleScope) :
+    Declarations <SgProcedureHeaderStatement *> * declarations,
+    ParallelLoop * parallelLoop, SgScopeStatement * moduleScope) :
   FortranSubroutine (), UserSubroutine (subroutineName, parallelLoop)
 {
   using SageBuilder::buildProcedureHeaderStatement;

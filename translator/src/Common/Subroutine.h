@@ -11,90 +11,128 @@
 #include <rose.h>
 #include <VariableDeclarations.h>
 
-class Subroutine
-{
-  protected:
+template <typename T>
+  class Subroutine
+  {
+    protected:
 
-    /*
-     * ======================================================
-     * The name of the generated subroutine
-     * ======================================================
-     */
-    std::string subroutineName;
+      /*
+       * ======================================================
+       * Access to this statement allows ROSE to build function
+       * call expressions to the generated subroutine. This
+       * is needed, for example, when patching the user-supplied
+       * code
+       * ======================================================
+       */
+      T * subroutineHeaderStatement;
 
-    /*
-     * ======================================================
-     * The parameters of the newly created subroutine
-     * ======================================================
-     */
-    SgFunctionParameterList * formalParameters;
+      /*
+       * ======================================================
+       * The name of the generated subroutine
+       * ======================================================
+       */
+      std::string subroutineName;
 
-    /*
-     * ======================================================
-     * The scope of the newly created subroutine
-     * ======================================================
-     */
-    SgScopeStatement * subroutineScope;
+      /*
+       * ======================================================
+       * The parameters of the newly created subroutine
+       * ======================================================
+       */
+      SgFunctionParameterList * formalParameters;
 
-    /*
-     * ======================================================
-     * Formal parameter and local variable declarations in the
-     * newly created subroutine
-     * ======================================================
-     */
-    VariableDeclarations * variableDeclarations;
+      /*
+       * ======================================================
+       * The scope of the newly created subroutine
+       * ======================================================
+       */
+      SgScopeStatement * subroutineScope;
 
-  protected:
+      /*
+       * ======================================================
+       * Formal parameter and local variable declarations in the
+       * newly created subroutine
+       * ======================================================
+       */
+      VariableDeclarations * variableDeclarations;
 
-    /*
-     * ======================================================
-     * Every created subroutine has a number of statements
-     * ======================================================
-     */
-    virtual void
-    createStatements () = 0;
+    protected:
 
-    /*
-     * ======================================================
-     * Every created subroutine has local variable declarations
-     * ======================================================
-     */
-    virtual void
-    createLocalVariableDeclarations () = 0;
+      /*
+       * ======================================================
+       * Every created subroutine has a number of statements
+       * ======================================================
+       */
+      virtual void
+      createStatements () = 0;
 
-    /*
-     * ======================================================
-     * Every created subroutine has formal parameters
-     * ======================================================
-     */
-    virtual void
-    createFormalParameterDeclarations () = 0;
+      /*
+       * ======================================================
+       * Every created subroutine has local variable declarations
+       * ======================================================
+       */
+      virtual void
+      createLocalVariableDeclarations () = 0;
 
-    /*
-     * ======================================================
-     * Subroutine constructor with name of the subroutine to
-     * create
-     * ======================================================
-     */
-    Subroutine (std::string const & subroutineName);
+      /*
+       * ======================================================
+       * Every created subroutine has formal parameters
+       * ======================================================
+       */
+      virtual void
+      createFormalParameterDeclarations () = 0;
 
-  public:
+      /*
+       * ======================================================
+       * Subroutine constructor with name of the subroutine to
+       * create
+       * ======================================================
+       */
+      Subroutine (std::string const & subroutineName)
+      {
+        using SageBuilder::buildFunctionParameterList;
 
-    /*
-     * ======================================================
-     * What is the name of the subroutine?
-     * ======================================================
-     */
-    std::string const &
-    getSubroutineName () const;
+        this->subroutineName = subroutineName;
 
-    /*
-     * ======================================================
-     * Returns the variable declarations in this subroutine
-     * ======================================================
-     */
-    VariableDeclarations *
-    getVariableDeclarations ();
-};
+        formalParameters = buildFunctionParameterList ();
+
+        variableDeclarations = new VariableDeclarations ();
+      }
+
+    public:
+
+      /*
+       * ======================================================
+       * Returns the header statement of the subroutine used
+       * internally by ROSE in its abstract syntax tree
+       * ======================================================
+       */
+      T *
+      getSubroutineHeaderStatement ()
+      {
+        return subroutineHeaderStatement;
+      }
+
+      /*
+       * ======================================================
+       * What is the name of the subroutine?
+       * ======================================================
+       */
+      std::string const &
+      getSubroutineName () const
+      {
+        return subroutineName;
+      }
+
+      /*
+       * ======================================================
+       * Returns the variable declarations in this subroutine
+       * ======================================================
+       */
+      VariableDeclarations *
+      getVariableDeclarations ()
+      {
+        return variableDeclarations;
+      }
+  };
 
 #endif

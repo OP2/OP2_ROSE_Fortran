@@ -4,34 +4,42 @@
 #include <Subroutine.h>
 #include <ParallelLoop.h>
 
-class UserSubroutine: public Subroutine
-{
-  protected:
+template <typename T>
+  class UserSubroutine: public Subroutine <T>
+  {
+    protected:
 
-    /*
-     * ======================================================
-     * The name of the user subroutine on the host
-     * ======================================================
-     */
+      /*
+       * ======================================================
+       * The name of the user subroutine on the host
+       * ======================================================
+       */
 
-    std::string hostSubroutineName;
+      std::string hostSubroutineName;
 
-    ParallelLoop * parallelLoop;
+      ParallelLoop * parallelLoop;
 
-  protected:
+    protected:
 
-    UserSubroutine (std::string const & subroutineName,
-        ParallelLoop * parallelLoop);
+      UserSubroutine (std::string const & subroutineName,
+          ParallelLoop * parallelLoop) :
+        Subroutine <T> (subroutineName + "_device"), hostSubroutineName (
+            subroutineName), parallelLoop (parallelLoop)
+      {
+      }
 
-  public:
+    public:
 
-    /*
-     * ======================================================
-     * The name of the user subroutine on the host
-     * ======================================================
-     */
-    std::string const &
-    getHostSubroutineName ();
-};
+      /*
+       * ======================================================
+       * The name of the user subroutine on the host
+       * ======================================================
+       */
+      std::string const &
+      getHostSubroutineName ()
+      {
+        return hostSubroutineName;
+      }
+  };
 
 #endif

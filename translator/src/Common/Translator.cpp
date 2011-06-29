@@ -97,6 +97,9 @@ handleCPPProject (SgProject * project)
               + Globals::getInstance ()->getTargetBackend ()
               + " and replace all OP2 calls with the Oxford-compliant API. These options are mutually exclusive");
     }
+
+    Debug::getInstance ()->verboseMessage (
+        "Retrieving declarations in source files");
   }
   else if (iequals (Globals::getInstance ()->getTargetBackend (),
       TargetBackends::Unknown))
@@ -128,9 +131,8 @@ handleFortranProject (SgProject * project)
   Debug::getInstance ()->verboseMessage (
       "Retrieving declarations in source files");
 
-  Declarations * declarations = new Declarations (project);
-
-  declarations->traverseInputFiles (project, preorder);
+  Declarations <SgProcedureHeaderStatement *> * declarations =
+      new Declarations <SgProcedureHeaderStatement *> (project);
 
   /*
    * ======================================================
@@ -210,8 +212,6 @@ main (int argc, char ** argv)
     Debug::getInstance ()->verboseMessage ("Fortran project detected");
 
     handleFortranProject (project);
-
-    Debug::getInstance ()->verboseMessage ("DONE");
   }
 
   if (Globals::getInstance ()->outputUDrawGraphs ())
