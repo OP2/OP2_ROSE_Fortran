@@ -22,7 +22,7 @@ enum ACCESS_CODE_VALUE
   READ_ACCESS, WRITE_ACCESS, RW_ACCESS, INC_ACCESS, MAX_ACCESS, MIN_ACCESS
 };
 
-template <typename T1, typename T2>
+template <typename TSubroutineHeader, typename TDeclarations>
   class ParallelLoop
   {
     protected:
@@ -116,7 +116,7 @@ template <typename T1, typename T2>
        * its respective reduction subroutine
        * ======================================================
        */
-      std::map <unsigned int, T1 *> reductionSubroutines;
+      std::map <unsigned int, TSubroutineHeader *> reductionSubroutines;
 
     protected:
 
@@ -148,7 +148,7 @@ template <typename T1, typename T2>
        * ======================================================
        */
       virtual void
-      retrieveOpDatDeclarations (T2 * declarations) = 0;
+      retrieveOpDatDeclarations (TDeclarations * declarations) = 0;
 
       ParallelLoop (SgExpressionPtrList & actualArguments) :
         actualArguments (actualArguments)
