@@ -168,6 +168,14 @@ template <typename TSubroutineHeader, typename TDeclarations>
 
       /*
        * ======================================================
+       * How many OP_DAT argument groups are there?
+       * ======================================================
+       */
+      virtual unsigned int
+      getNumberOfOpDatArgumentGroups () const = 0;
+
+      /*
+       * ======================================================
        * Is this parallel loop direct or indirect?
        * ======================================================
        */
@@ -205,19 +213,6 @@ template <typename TSubroutineHeader, typename TDeclarations>
           }
         }
         return count;
-      }
-
-      /*
-       * ======================================================
-       * How many OP_DAT argument groups are there?
-       * ======================================================
-       */
-      unsigned int
-      getNumberOfOpDatArgumentGroups () const
-      {
-        return (actualArguments.size ()
-            - OP2::Fortran::NUMBER_OF_NON_OP_DAT_ARGUMENTS)
-            / OP2::Fortran::NUMBER_OF_ARGUMENTS_PER_OP_DAT;
       }
 
       /*

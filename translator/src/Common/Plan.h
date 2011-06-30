@@ -70,7 +70,7 @@ namespace PlanFunction
   }
 }
 
-template <typename T>
+template <typename TParallelLoop>
   class Plan
   {
     protected:
@@ -86,7 +86,7 @@ template <typename T>
       virtual void
       createPlanFunctionParametersPreparationStatements (
           VariableDeclarations * variableDeclarations,
-          T * parallelLoop, SgScopeStatement * scope) = 0;
+          TParallelLoop * parallelLoop, SgScopeStatement * scope) = 0;
 
       /*
        * ======================================================

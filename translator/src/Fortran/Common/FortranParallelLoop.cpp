@@ -133,8 +133,7 @@ FortranParallelLoop::retrieveOpDatDeclarations (
    */
 
   for (vector <SgExpression *>::iterator it = actualArguments.begin ()
-      + OP2::Fortran::NUMBER_OF_NON_OP_DAT_ARGUMENTS; it
-      != actualArguments.end (); ++it)
+      + NUMBER_OF_NON_OP_DAT_ARGUMENTS; it != actualArguments.end (); ++it)
   {
     switch ((*it)->variantT ())
     {
@@ -362,6 +361,13 @@ FortranParallelLoop::generateReductionSubroutines (
           = reductionSubroutine->getSubroutineHeaderStatement ();
     }
   }
+}
+
+unsigned int
+FortranParallelLoop::getNumberOfOpDatArgumentGroups () const
+{
+  return (actualArguments.size () - NUMBER_OF_NON_OP_DAT_ARGUMENTS)
+      / NUMBER_OF_ARGUMENTS_PER_OP_DAT;
 }
 
 FortranParallelLoop::FortranParallelLoop (

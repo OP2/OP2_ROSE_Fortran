@@ -40,6 +40,12 @@ CPPParallelLoop::generateReductionSubroutines (SgScopeStatement * moduleScope)
 {
 }
 
+unsigned int
+CPPParallelLoop::getNumberOfOpDatArgumentGroups () const
+{
+  return 0;
+}
+
 CPPParallelLoop::CPPParallelLoop (SgExpressionPtrList & actualArguments,
     std::string userSubroutineName, CPPDeclarations * declarations) :
   ParallelLoop <SgFunctionDeclaration, CPPDeclarations> (actualArguments)
