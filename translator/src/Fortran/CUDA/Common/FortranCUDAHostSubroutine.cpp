@@ -694,8 +694,8 @@ FortranCUDAHostSubroutine::createCUDAKernelLocalVariableDeclarations ()
 
 FortranCUDAHostSubroutine::FortranCUDAHostSubroutine (
     std::string const & subroutineName, std::string const & userSubroutineName,
-    std::string const & kernelSubroutineName, ParallelLoop * parallelLoop,
-    SgScopeStatement * moduleScope,
+    std::string const & kernelSubroutineName,
+    FortranParallelLoop * parallelLoop, SgScopeStatement * moduleScope,
     FortranCUDAInitialiseConstantsSubroutine * initialiseConstantsSubroutine,
     FortranOpDatDimensionsDeclaration * opDatDimensionsDeclaration) :
   FortranHostSubroutine (subroutineName, userSubroutineName,

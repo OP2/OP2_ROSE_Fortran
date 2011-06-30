@@ -40,7 +40,7 @@ FortranCUDADataSizesDeclarationDirectLoop::addFields ()
  */
 
 FortranCUDADataSizesDeclarationDirectLoop::FortranCUDADataSizesDeclarationDirectLoop (
-    std::string const & subroutineName, ParallelLoop * parallelLoop,
+    std::string const & subroutineName, FortranParallelLoop * parallelLoop,
     SgScopeStatement * moduleScope) :
   FortranCUDADataSizesDeclaration (subroutineName, parallelLoop, moduleScope)
 {

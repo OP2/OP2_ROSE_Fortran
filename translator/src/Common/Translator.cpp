@@ -131,8 +131,7 @@ handleFortranProject (SgProject * project)
   Debug::getInstance ()->verboseMessage (
       "Retrieving declarations in source files");
 
-  Declarations <SgProcedureHeaderStatement *> * declarations =
-      new Declarations <SgProcedureHeaderStatement *> (project);
+  FortranDeclarations * declarations = new FortranDeclarations (project);
 
   /*
    * ======================================================

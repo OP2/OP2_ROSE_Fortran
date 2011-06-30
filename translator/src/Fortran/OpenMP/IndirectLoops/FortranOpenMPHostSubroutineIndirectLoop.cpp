@@ -337,17 +337,17 @@ FortranOpenMPHostSubroutineIndirectLoop::createFirstTimeExecutionStatements ()
   appendStatement (assignmentStatement, ifBody);
 
   createPlanFunctionParametersPreparationStatements (allDeclarations,
-      parallelLoop, ifBody);
+      (FortranParallelLoop *) parallelLoop, ifBody);
 
   createPlanFunctionCallStatement (allDeclarations, subroutineScope, ifBody);
 
   createTransferOpDatStatements (ifBody);
 
-  createConvertPositionInPMapsStatements (allDeclarations, parallelLoop,
-      subroutineScope, ifBody);
+  createConvertPositionInPMapsStatements (allDeclarations,
+      (FortranParallelLoop *) parallelLoop, subroutineScope, ifBody);
 
-  createConvertPlanFunctionParametersStatements (allDeclarations, parallelLoop,
-      subroutineScope, ifBody);
+  createConvertPlanFunctionParametersStatements (allDeclarations,
+      (FortranParallelLoop *) parallelLoop, subroutineScope, ifBody);
 
   SgIfStmt * ifStatement =
       FortranStatementsAndExpressionsBuilder::buildIfStatementWithEmptyElse (
@@ -486,8 +486,8 @@ FortranOpenMPHostSubroutineIndirectLoop::createLocalVariableDeclarations ()
 
 FortranOpenMPHostSubroutineIndirectLoop::FortranOpenMPHostSubroutineIndirectLoop (
     std::string const & subroutineName, std::string const & userSubroutineName,
-    std::string const & kernelSubroutineName, ParallelLoop * parallelLoop,
-    SgScopeStatement * moduleScope,
+    std::string const & kernelSubroutineName,
+    FortranParallelLoop * parallelLoop, SgScopeStatement * moduleScope,
     FortranOpenMPModuleDeclarationsIndirectLoop * moduleDeclarations) :
   FortranOpenMPHostSubroutine (subroutineName, userSubroutineName,
       kernelSubroutineName, parallelLoop, moduleScope, moduleDeclarations)

@@ -4,8 +4,8 @@
 #include <Subroutine.h>
 #include <ParallelLoop.h>
 
-template <typename T>
-  class HostSubroutine: public Subroutine <T>
+template <typename T1, typename T2>
+  class HostSubroutine: public Subroutine <T1>
   {
     protected:
 
@@ -13,7 +13,7 @@ template <typename T>
 
       std::string kernelSubroutineName;
 
-      ParallelLoop * parallelLoop;
+      ParallelLoop <T1, T2> * parallelLoop;
 
     protected:
 
@@ -53,8 +53,9 @@ template <typename T>
 
       HostSubroutine (std::string const & subroutineName,
           std::string const & userSubroutineName,
-          std::string const & kernelSubroutineName, ParallelLoop * parallelLoop) :
-        Subroutine <T> (subroutineName + "_host"), userSubroutineName (
+          std::string const & kernelSubroutineName,
+          ParallelLoop <T1, T2> * parallelLoop) :
+        Subroutine <T1> (subroutineName + "_host"), userSubroutineName (
             userSubroutineName), kernelSubroutineName (kernelSubroutineName),
             parallelLoop (parallelLoop)
       {

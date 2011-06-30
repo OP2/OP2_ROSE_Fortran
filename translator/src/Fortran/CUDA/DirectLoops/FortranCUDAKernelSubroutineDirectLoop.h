@@ -63,8 +63,8 @@ class FortranCUDAKernelSubroutineDirectLoop: public FortranCUDAKernelSubroutine
   public:
 
     FortranCUDAKernelSubroutineDirectLoop (std::string const & subroutineName,
-        std::string const & userSubroutineName, ParallelLoop * parallelLoop,
-        SgScopeStatement * moduleScope,
+        std::string const & userSubroutineName,
+        FortranParallelLoop * parallelLoop, SgScopeStatement * moduleScope,
         FortranCUDADataSizesDeclarationDirectLoop * dataSizesDeclaration,
         FortranOpDatDimensionsDeclaration * opDatDimensionsDeclaration);
 };

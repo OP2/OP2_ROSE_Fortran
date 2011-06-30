@@ -19,8 +19,9 @@ class FortranCUDADataSizesDeclarationDirectLoop: public FortranCUDADataSizesDecl
 
   public:
 
-    FortranCUDADataSizesDeclarationDirectLoop (std::string const & subroutineName,
-        ParallelLoop * parallelLoop, SgScopeStatement * moduleScope);
+    FortranCUDADataSizesDeclarationDirectLoop (
+        std::string const & subroutineName, FortranParallelLoop * parallelLoop,
+        SgScopeStatement * moduleScope);
 };
 
 #endif

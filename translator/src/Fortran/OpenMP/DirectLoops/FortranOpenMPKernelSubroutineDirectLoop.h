@@ -2,7 +2,7 @@
 #define FORTRAN_OPENMP_KERNEL_SUBROUTINE_DIRECT_LOOP_H
 
 #include <FortranOpenMPKernelSubroutine.h>
-#include <ParallelLoop.h>
+#include <FortranParallelLoop.h>
 
 class FortranOpenMPKernelSubroutineDirectLoop: public FortranOpenMPKernelSubroutine
 {
@@ -30,8 +30,8 @@ class FortranOpenMPKernelSubroutineDirectLoop: public FortranOpenMPKernelSubrout
 
     FortranOpenMPKernelSubroutineDirectLoop (
         std::string const & subroutineName,
-        std::string const & userSubroutineName, ParallelLoop * parallelLoop,
-        SgScopeStatement * moduleScope);
+        std::string const & userSubroutineName,
+        FortranParallelLoop * parallelLoop, SgScopeStatement * moduleScope);
 };
 
 #endif

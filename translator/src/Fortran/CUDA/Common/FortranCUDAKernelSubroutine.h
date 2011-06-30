@@ -2,7 +2,7 @@
 #define FORTRAN_CUDA_KERNEL_SUBROUTINE_H
 
 #include <FortranKernelSubroutine.h>
-#include <ParallelLoop.h>
+#include <FortranParallelLoop.h>
 #include <FortranCUDADataSizesDeclaration.h>
 #include <FortranOpDatDimensionsDeclaration.h>
 
@@ -27,8 +27,8 @@ class FortranCUDAKernelSubroutine: public FortranKernelSubroutine
     createAutoSharedDeclaration ();
 
     FortranCUDAKernelSubroutine (std::string const & subroutineName,
-        std::string const & userSubroutineName, ParallelLoop * parallelLoop,
-        SgScopeStatement * moduleScope,
+        std::string const & userSubroutineName,
+        FortranParallelLoop * parallelLoop, SgScopeStatement * moduleScope,
         FortranOpDatDimensionsDeclaration * opDatDimensionsDeclaration);
 };
 

@@ -2,7 +2,7 @@
 #define FORTRAN_OPENMP_HOST_SUBROUTINE_H
 
 #include <FortranHostSubroutine.h>
-#include <ParallelLoop.h>
+#include <FortranParallelLoop.h>
 #include <FortranOpenMPModuleDeclarations.h>
 
 class FortranOpenMPHostSubroutine: public FortranHostSubroutine
@@ -33,8 +33,8 @@ class FortranOpenMPHostSubroutine: public FortranHostSubroutine
 
     FortranOpenMPHostSubroutine (std::string const & subroutineName,
         std::string const & userSubroutineName,
-        std::string const & kernelSubroutineName, ParallelLoop * parallelLoop,
-        SgScopeStatement * moduleScope,
+        std::string const & kernelSubroutineName,
+        FortranParallelLoop * parallelLoop, SgScopeStatement * moduleScope,
         FortranOpenMPModuleDeclarations * moduleDeclarations);
 };
 

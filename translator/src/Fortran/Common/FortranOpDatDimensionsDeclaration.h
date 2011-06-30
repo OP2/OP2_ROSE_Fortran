@@ -10,7 +10,7 @@
 #ifndef FORTRAN_OP_DAT_DIMENSIONS_DECLARATION_H
 #define FORTRAN_OP_DAT_DIMENSIONS_DECLARATION_H
 
-#include <ParallelLoop.h>
+#include <FortranParallelLoop.h>
 #include <VariableDeclarations.h>
 
 class FortranOpDatDimensionsDeclaration
@@ -28,7 +28,7 @@ class FortranOpDatDimensionsDeclaration
      * The parallel loop
      * ======================================================
      */
-    ParallelLoop * parallelLoop;
+    FortranParallelLoop * parallelLoop;
 
     /*
      * ======================================================
@@ -80,7 +80,7 @@ class FortranOpDatDimensionsDeclaration
     getOpDatDimensionField (unsigned int OP_DAT_ArgumentGroup);
 
     FortranOpDatDimensionsDeclaration (std::string const & subroutineName,
-        ParallelLoop * parallelLoop, SgScopeStatement * moduleScope);
+        FortranParallelLoop * parallelLoop, SgScopeStatement * moduleScope);
 };
 
 #endif

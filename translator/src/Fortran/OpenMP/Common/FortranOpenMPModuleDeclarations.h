@@ -3,7 +3,7 @@
 
 #include <string>
 #include <rose.h>
-#include <ParallelLoop.h>
+#include <FortranParallelLoop.h>
 #include <VariableDeclarations.h>
 
 class FortranOpenMPModuleDeclarations
@@ -30,7 +30,7 @@ class FortranOpenMPModuleDeclarations
      * The parallel loop
      * ======================================================
      */
-    ParallelLoop * parallelLoop;
+    FortranParallelLoop * parallelLoop;
 
     /*
      * ======================================================
@@ -54,7 +54,7 @@ class FortranOpenMPModuleDeclarations
     ~FortranOpenMPModuleDeclarations ();
 
     FortranOpenMPModuleDeclarations (std::string const & userSubroutineName,
-        ParallelLoop * parallelLoop, SgScopeStatement * moduleScope);
+        FortranParallelLoop * parallelLoop, SgScopeStatement * moduleScope);
 
   public:
 

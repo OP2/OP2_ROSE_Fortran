@@ -4,7 +4,7 @@
 #include <rose.h>
 #include <CommonNamespaces.h>
 #include <Declarations.h>
-#include <ParallelLoop.h>
+#include <FortranParallelLoop.h>
 #include <FortranCUDAHostSubroutine.h>
 #include <FortranCUDAUserSubroutine.h>
 #include <FortranCUDAKernelSubroutine.h>
@@ -36,7 +36,7 @@ class FortranSubroutinesGeneration: public AstSimpleProcessing
      * processed
      * ======================================================
      */
-    Declarations <SgProcedureHeaderStatement *> * declarations;
+    FortranDeclarations * declarations;
 
     /*
      * ======================================================
@@ -44,7 +44,7 @@ class FortranSubroutinesGeneration: public AstSimpleProcessing
      * representation of an OP_PAR_LOOP
      * ======================================================
      */
-    std::map <std::string, ParallelLoop *> parallelLoops;
+    std::map <std::string, FortranParallelLoop *> parallelLoops;
 
   private:
 
@@ -55,7 +55,7 @@ class FortranSubroutinesGeneration: public AstSimpleProcessing
      * ======================================================
      */
     void
-    patchCallsToParallelLoops (ParallelLoop & parallelLoop,
+    patchCallsToParallelLoops (FortranParallelLoop & parallelLoop,
         std::string const & userSubroutineName,
         FortranHostSubroutine & hostSubroutine, SgScopeStatement * scope,
         SgFunctionCallExp * functionCallExp);
@@ -66,7 +66,7 @@ class FortranSubroutinesGeneration: public AstSimpleProcessing
      * ======================================================
      */
     void
-    createOpenMPSubroutines (ParallelLoop * parallelLoop,
+    createOpenMPSubroutines (FortranParallelLoop * parallelLoop,
         std::string const & userSubroutineName,
         SgModuleStatement * moduleStatement, SgNode * node,
         SgFunctionCallExp * functionCallExp);
@@ -77,7 +77,7 @@ class FortranSubroutinesGeneration: public AstSimpleProcessing
      * ======================================================
      */
     void
-    createCUDASubroutines (ParallelLoop * parallelLoop,
+    createCUDASubroutines (FortranParallelLoop * parallelLoop,
         std::string const & userSubroutineName,
         SgModuleStatement * moduleStatement, SgNode * node,
         SgFunctionCallExp * functionCallExp);
@@ -115,9 +115,9 @@ class FortranSubroutinesGeneration: public AstSimpleProcessing
      * ======================================================
      */
     SgModuleStatement
-        *
-        createFortranModule (SgSourceFile & sourceFile,
-            ParallelLoop & parallelLoop);
+    *
+    createFortranModule (SgSourceFile & sourceFile,
+        FortranParallelLoop & parallelLoop);
 
     /*
      * ======================================================
@@ -126,7 +126,7 @@ class FortranSubroutinesGeneration: public AstSimpleProcessing
      * ======================================================
      */
     SgSourceFile &
-    createSourceFile (ParallelLoop & parallelLoop);
+    createSourceFile (FortranParallelLoop & parallelLoop);
 
   public:
 
@@ -152,8 +152,8 @@ class FortranSubroutinesGeneration: public AstSimpleProcessing
      * Generates the new subroutines
      * ======================================================
      */
-    FortranSubroutinesGeneration (SgProject * project, Declarations <
-        SgProcedureHeaderStatement *> * declarations);
+    FortranSubroutinesGeneration (SgProject * project,
+        FortranDeclarations * declarations);
 };
 
 #endif

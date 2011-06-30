@@ -658,16 +658,16 @@ FortranCUDAHostSubroutineIndirectLoop::createStatements ()
   }
 
   createPlanFunctionParametersPreparationStatements (variableDeclarations,
-      parallelLoop, subroutineScope);
+      (FortranParallelLoop *) parallelLoop, subroutineScope);
 
   createPlanFunctionCallStatement (variableDeclarations, subroutineScope,
       subroutineScope);
 
-  createConvertPositionInPMapsStatements (variableDeclarations, parallelLoop,
-      subroutineScope, subroutineScope);
+  createConvertPositionInPMapsStatements (variableDeclarations,
+      (FortranParallelLoop *) parallelLoop, subroutineScope, subroutineScope);
 
   createConvertPlanFunctionParametersStatements (variableDeclarations,
-      parallelLoop, subroutineScope, subroutineScope);
+      (FortranParallelLoop *) parallelLoop, subroutineScope, subroutineScope);
 
   createVariablesSizesInitialisationStatements ();
 
@@ -712,7 +712,7 @@ FortranCUDAHostSubroutineIndirectLoop::FortranCUDAHostSubroutineIndirectLoop (
     std::string const & subroutineName,
     std::string const & userSubroutineName,
     std::string const & kernelSubroutineName,
-    ParallelLoop * parallelLoop,
+    FortranParallelLoop * parallelLoop,
     SgScopeStatement * moduleScope,
     FortranCUDAInitialiseConstantsSubroutine * initialiseConstantsSubroutine,
     FortranCUDADataSizesDeclarationIndirectLoop * dataSizesDeclarationOfIndirectLoop,

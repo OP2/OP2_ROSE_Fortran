@@ -1,7 +1,8 @@
 #include <boost/lexical_cast.hpp>
-#include <FortranCUDAReductionSubroutine.h>
 #include <ROSEHelper.h>
 #include <Debug.h>
+#include <CommonNamespaces.h>
+#include <FortranCUDAReductionSubroutine.h>
 #include <FortranStatementsAndExpressionsBuilder.h>
 #include <FortranTypesBuilder.h>
 

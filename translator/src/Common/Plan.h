@@ -70,47 +70,48 @@ namespace PlanFunction
   }
 }
 
-class Plan
-{
-  protected:
+template <typename T>
+  class Plan
+  {
+    protected:
 
-    /*
-     * ======================================================
-     * The plan function has a number of arguments which
-     * must be initialised before obtaining the plan. This
-     * function creates those statements and attaches them
-     * to the supplied scope
-     * ======================================================
-     */
-    virtual void
-    createPlanFunctionParametersPreparationStatements (
-        VariableDeclarations * variableDeclarations,
-        ParallelLoop * parallelLoop, SgScopeStatement * scope) = 0;
+      /*
+       * ======================================================
+       * The plan function has a number of arguments which
+       * must be initialised before obtaining the plan. This
+       * function creates those statements and attaches them
+       * to the supplied scope
+       * ======================================================
+       */
+      virtual void
+      createPlanFunctionParametersPreparationStatements (
+          VariableDeclarations * variableDeclarations,
+          T * parallelLoop, SgScopeStatement * scope) = 0;
 
-    /*
-     * ======================================================
-     * Create the statement which calls the plan function and
-     * attaches it to the supplied scope. The scope of the
-     * enclosing subroutine is also needed to build the
-     * function call correctly
-     * ======================================================
-     */
-    virtual void
-        createPlanFunctionCallStatement (
-            VariableDeclarations * variableDeclarations,
-            SgScopeStatement * subroutineScope,
-            SgScopeStatement * statementScope) = 0;
+      /*
+       * ======================================================
+       * Create the statement which calls the plan function and
+       * attaches it to the supplied scope. The scope of the
+       * enclosing subroutine is also needed to build the
+       * function call correctly
+       * ======================================================
+       */
+      virtual void
+          createPlanFunctionCallStatement (
+              VariableDeclarations * variableDeclarations,
+              SgScopeStatement * subroutineScope,
+              SgScopeStatement * statementScope) = 0;
 
-    /*
-     * ======================================================
-     * The plan function returns a number of fields dictating
-     * how to execute over a particular set. This function
-     * creates statements to execute that plan and attaches them
-     * to the supplied scope
-     * ======================================================
-     */
-    virtual void
-    createPlanFunctionExecutionStatements () = 0;
-};
+      /*
+       * ======================================================
+       * The plan function returns a number of fields dictating
+       * how to execute over a particular set. This function
+       * creates statements to execute that plan and attaches them
+       * to the supplied scope
+       * ======================================================
+       */
+      virtual void
+      createPlanFunctionExecutionStatements () = 0;
+  };
 
 #endif

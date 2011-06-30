@@ -2,9 +2,10 @@
 #define FORTRAN_HOST_SUBROUTINE_H
 
 #include <HostSubroutine.h>
-#include <ParallelLoop.h>
+#include <FortranParallelLoop.h>
 
-class FortranHostSubroutine: public HostSubroutine <SgProcedureHeaderStatement>
+class FortranHostSubroutine: public HostSubroutine <SgProcedureHeaderStatement,
+    FortranDeclarations>
 {
   protected:
 
@@ -22,8 +23,27 @@ class FortranHostSubroutine: public HostSubroutine <SgProcedureHeaderStatement>
 
     FortranHostSubroutine (std::string const & subroutineName,
         std::string const & userSubroutineName,
-        std::string const & kernelSubroutineName, ParallelLoop * parallelLoop,
-        SgScopeStatement * moduleScope);
+        std::string const & kernelSubroutineName,
+        FortranParallelLoop * parallelLoop, SgScopeStatement * moduleScope) :
+      HostSubroutine <SgProcedureHeaderStatement, FortranDeclarations> (
+          subroutineName, userSubroutineName, kernelSubroutineName,
+          parallelLoop)
+    {
+      using SageBuilder::buildVoidType;
+      using SageBuilder::buildProcedureHeaderStatement;
+      using SageInterface::appendStatement;
+
+      subroutineHeaderStatement
+          = buildProcedureHeaderStatement (this->subroutineName.c_str (),
+              buildVoidType (), formalParameters,
+              SgProcedureHeaderStatement::e_subroutine_subprogram_kind,
+              moduleScope);
+
+      subroutineScope
+          = subroutineHeaderStatement->get_definition ()->get_body ();
+
+      appendStatement (subroutineHeaderStatement, moduleScope);
+    }
 };
 
 #endif

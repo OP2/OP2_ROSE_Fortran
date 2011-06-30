@@ -3,16 +3,14 @@
 
 #include <UserSubroutine.h>
 #include <FortranCUDAInitialiseConstantsSubroutine.h>
-#include <ParallelLoop.h>
+#include <FortranParallelLoop.h>
 
 class FortranCUDAUserSubroutine: public UserSubroutine <
-    SgProcedureHeaderStatement>
+    SgProcedureHeaderStatement, FortranDeclarations>
 {
   private:
 
     FortranCUDAInitialiseConstantsSubroutine * initialiseConstantsSubroutine;
-
-    Declarations <SgProcedureHeaderStatement *> * declarations;
 
   private:
 
@@ -40,8 +38,8 @@ class FortranCUDAUserSubroutine: public UserSubroutine <
         FortranCUDAUserSubroutine (
             std::string const & subroutineName,
             FortranCUDAInitialiseConstantsSubroutine * initialiseConstantsSubroutine,
-            Declarations <SgProcedureHeaderStatement *> * declarations,
-            ParallelLoop * parallelLoop, SgScopeStatement * moduleScope);
+            FortranDeclarations * declarations,
+            FortranParallelLoop * parallelLoop, SgScopeStatement * moduleScope);
 };
 
 #endif

@@ -17,7 +17,7 @@
 #ifndef FORTRAN_CUDA_DATA_SIZES_DECLARATION_H
 #define FORTRAN_CUDA_DATA_SIZES_DECLARATION_H
 
-#include <ParallelLoop.h>
+#include <FortranParallelLoop.h>
 #include <VariableDeclarations.h>
 
 class FortranCUDADataSizesDeclaration
@@ -29,7 +29,7 @@ class FortranCUDADataSizesDeclaration
      * The parallel loop
      * ======================================================
      */
-    ParallelLoop * parallelLoop;
+    FortranParallelLoop * parallelLoop;
 
     /*
      * ======================================================
@@ -59,7 +59,7 @@ class FortranCUDADataSizesDeclaration
     addFields () = 0;
 
     FortranCUDADataSizesDeclaration (std::string const & subroutineName,
-        ParallelLoop * parallelLoop, SgScopeStatement * moduleScope);
+        FortranParallelLoop * parallelLoop, SgScopeStatement * moduleScope);
 
   public:
 

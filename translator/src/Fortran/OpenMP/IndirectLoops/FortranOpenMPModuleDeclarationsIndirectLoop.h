@@ -37,8 +37,8 @@ class FortranOpenMPModuleDeclarationsIndirectLoop: public FortranOpenMPModuleDec
     getAllDeclarations ();
 
     FortranOpenMPModuleDeclarationsIndirectLoop (
-        std::string const & userSubroutineName, ParallelLoop * parallelLoop,
-        SgScopeStatement * moduleScope);
+        std::string const & userSubroutineName,
+        FortranParallelLoop * parallelLoop, SgScopeStatement * moduleScope);
 
 };
 

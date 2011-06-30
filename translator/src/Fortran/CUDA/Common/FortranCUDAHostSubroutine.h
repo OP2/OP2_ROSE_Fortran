@@ -5,7 +5,7 @@
 #include <FortranCUDAInitialiseConstantsSubroutine.h>
 #include <FortranCUDAKernelSubroutine.h>
 #include <FortranOpDatDimensionsDeclaration.h>
-#include <ParallelLoop.h>
+#include <FortranParallelLoop.h>
 
 class FortranCUDAHostSubroutine: public FortranHostSubroutine
 {
@@ -78,7 +78,7 @@ class FortranCUDAHostSubroutine: public FortranHostSubroutine
             std::string const & subroutineName,
             std::string const & userSubroutineName,
             std::string const & kernelSubroutineName,
-            ParallelLoop * parallelLoop,
+            FortranParallelLoop * parallelLoop,
             SgScopeStatement * moduleScope,
             FortranCUDAInitialiseConstantsSubroutine * initialiseConstantsSubroutine,
             FortranOpDatDimensionsDeclaration * opDatDimensionsDeclaration);

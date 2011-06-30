@@ -59,20 +59,17 @@ FortranOpenMPModuleDeclarationsIndirectLoop::createExecutionPlanDeclarations ()
   SgType * c_ptrType = FortranTypesBuilder::buildNewTypeDeclaration ("c_ptr",
       moduleScope)->get_type ();
 
-  moduleDeclarations ->add (
-      PlanFunction::Fortran::planRet,
+  moduleDeclarations ->add (PlanFunction::Fortran::planRet,
       FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
-          PlanFunction::Fortran::planRet,
-          c_ptrType, moduleScope));
+          PlanFunction::Fortran::planRet, c_ptrType, moduleScope));
 
   SgType * op_planType = FortranTypesBuilder::buildNewTypeDeclaration (
       "op_plan", moduleScope)->get_type ();
 
-  moduleDeclarations->add (
-      PlanFunction::Fortran::actualPlan,
+  moduleDeclarations->add (PlanFunction::Fortran::actualPlan,
       FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
-          PlanFunction::Fortran::actualPlan,
-          buildPointerType (op_planType), moduleScope));
+          PlanFunction::Fortran::actualPlan, buildPointerType (op_planType),
+          moduleScope));
 
   /*
    * ======================================================
@@ -294,7 +291,7 @@ FortranOpenMPModuleDeclarationsIndirectLoop::getAllDeclarations ()
 }
 
 FortranOpenMPModuleDeclarationsIndirectLoop::FortranOpenMPModuleDeclarationsIndirectLoop (
-    std::string const & userSubroutineName, ParallelLoop * parallelLoop,
+    std::string const & userSubroutineName, FortranParallelLoop * parallelLoop,
     SgScopeStatement * moduleScope) :
   FortranOpenMPModuleDeclarations (userSubroutineName, parallelLoop,
       moduleScope)

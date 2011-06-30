@@ -9,27 +9,28 @@
 #define FORTRAN_PLAN_H
 
 #include <Plan.h>
+#include <FortranParallelLoop.h>
 
-class FortranPlan: public Plan
+class FortranPlan: public Plan <FortranParallelLoop>
 {
   protected:
 
     virtual void
     createConvertPlanFunctionParametersStatements (
         VariableDeclarations * variableDeclarations,
-        ParallelLoop * parallelLoop, SgScopeStatement * subroutineScope,
+        FortranParallelLoop * parallelLoop, SgScopeStatement * subroutineScope,
         SgScopeStatement * statementScope);
 
     virtual void
     createConvertPositionInPMapsStatements (
         VariableDeclarations * variableDeclarations,
-        ParallelLoop * parallelLoop, SgScopeStatement * subroutineScope,
+        FortranParallelLoop * parallelLoop, SgScopeStatement * subroutineScope,
         SgScopeStatement * statementScope);
 
     virtual void
     createPlanFunctionParametersPreparationStatements (
         VariableDeclarations * variableDeclarations,
-        ParallelLoop * parallelLoop, SgScopeStatement * scope);
+        FortranParallelLoop * parallelLoop, SgScopeStatement * scope);
 
     virtual void
     createPlanFunctionCallStatement (

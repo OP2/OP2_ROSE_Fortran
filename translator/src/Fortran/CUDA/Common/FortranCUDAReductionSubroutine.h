@@ -9,7 +9,6 @@
 #define FORTRAN_CUDA_REDUCTION_SUBROUTINE_H
 
 #include <Subroutine.h>
-#include <ParallelLoop.h>
 
 namespace ReductionSubroutine
 {

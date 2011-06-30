@@ -67,7 +67,7 @@ FortranOpDatDimensionsDeclaration::getOpDatDimensionField (
 }
 
 FortranOpDatDimensionsDeclaration::FortranOpDatDimensionsDeclaration (
-    std::string const & subroutineName, ParallelLoop * parallelLoop,
+    std::string const & subroutineName, FortranParallelLoop * parallelLoop,
     SgScopeStatement * moduleScope) :
   subroutineName (subroutineName), parallelLoop (parallelLoop), moduleScope (
       moduleScope)

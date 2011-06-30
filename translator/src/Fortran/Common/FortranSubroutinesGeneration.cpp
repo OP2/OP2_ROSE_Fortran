@@ -43,7 +43,7 @@ namespace Libraries
 
 void
 FortranSubroutinesGeneration::patchCallsToParallelLoops (
-    ParallelLoop & parallelLoop, std::string const & userSubroutineName,
+    FortranParallelLoop & parallelLoop, std::string const & userSubroutineName,
     FortranHostSubroutine & hostSubroutine, SgScopeStatement * scope,
     SgFunctionCallExp * functionCallExp)
 {
@@ -184,7 +184,7 @@ FortranSubroutinesGeneration::patchCallsToParallelLoops (
 
 void
 FortranSubroutinesGeneration::createOpenMPSubroutines (
-    ParallelLoop * parallelLoop, std::string const & userSubroutineName,
+    FortranParallelLoop * parallelLoop, std::string const & userSubroutineName,
     SgModuleStatement * moduleStatement, SgNode * node,
     SgFunctionCallExp * functionCallExp)
 {
@@ -262,7 +262,7 @@ FortranSubroutinesGeneration::createOpenMPSubroutines (
 
 void
 FortranSubroutinesGeneration::createCUDASubroutines (
-    ParallelLoop * parallelLoop, std::string const & userSubroutineName,
+    FortranParallelLoop * parallelLoop, std::string const & userSubroutineName,
     SgModuleStatement * moduleStatement, SgNode * node,
     SgFunctionCallExp * functionCallExp)
 {
@@ -456,7 +456,7 @@ FortranSubroutinesGeneration::addContains (SgModuleStatement * moduleStatement)
 
 SgModuleStatement *
 FortranSubroutinesGeneration::createFortranModule (SgSourceFile & sourceFile,
-    ParallelLoop & parallelLoop)
+    FortranParallelLoop & parallelLoop)
 {
   using std::string;
   using std::vector;
@@ -478,7 +478,8 @@ FortranSubroutinesGeneration::createFortranModule (SgSourceFile & sourceFile,
 }
 
 SgSourceFile &
-FortranSubroutinesGeneration::createSourceFile (ParallelLoop & parallelLoop)
+FortranSubroutinesGeneration::createSourceFile (
+    FortranParallelLoop & parallelLoop)
 {
   using boost::iequals;
   using SageBuilder::buildFile;
@@ -639,8 +640,8 @@ FortranSubroutinesGeneration::visit (SgNode * node)
                * Fortran source code
                * ======================================================
                */
-              ParallelLoop * parallelLoop = new ParallelLoop (
-                  userSubroutineName, actualArguments, declarations);
+              FortranParallelLoop * parallelLoop = new FortranParallelLoop (
+                  actualArguments, userSubroutineName, declarations);
 
               parallelLoops[userSubroutineName] = parallelLoop;
 
@@ -733,8 +734,7 @@ FortranSubroutinesGeneration::unparse ()
 }
 
 FortranSubroutinesGeneration::FortranSubroutinesGeneration (
-    SgProject * project,
-    Declarations <SgProcedureHeaderStatement *> * declarations) :
+    SgProject * project, FortranDeclarations * declarations) :
   project (project), declarations (declarations)
 {
 }

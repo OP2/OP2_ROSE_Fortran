@@ -173,7 +173,7 @@ FortranOpenMPKernelSubroutineDirectLoop::createFormalParameterDeclarations ()
 
 FortranOpenMPKernelSubroutineDirectLoop::FortranOpenMPKernelSubroutineDirectLoop (
     std::string const & subroutineName, std::string const & userSubroutineName,
-    ParallelLoop * parallelLoop, SgScopeStatement * moduleScope) :
+    FortranParallelLoop * parallelLoop, SgScopeStatement * moduleScope) :
   FortranOpenMPKernelSubroutine (subroutineName, userSubroutineName,
       parallelLoop, moduleScope)
 {

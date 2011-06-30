@@ -75,7 +75,7 @@ FortranOpenMPModuleDeclarations::~FortranOpenMPModuleDeclarations ()
 }
 
 FortranOpenMPModuleDeclarations::FortranOpenMPModuleDeclarations (
-    std::string const & userSubroutineName, ParallelLoop * parallelLoop,
+    std::string const & userSubroutineName, FortranParallelLoop * parallelLoop,
     SgScopeStatement * moduleScope) :
   userSubroutineName (userSubroutineName), parallelLoop (parallelLoop),
       moduleScope (moduleScope)

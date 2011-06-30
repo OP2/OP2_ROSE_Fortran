@@ -879,7 +879,7 @@ FortranCUDAKernelSubroutineDirectLoop::createFormalParameterDeclarations ()
 
 FortranCUDAKernelSubroutineDirectLoop::FortranCUDAKernelSubroutineDirectLoop (
     std::string const & subroutineName, std::string const & userSubroutineName,
-    ParallelLoop * parallelLoop, SgScopeStatement * moduleScope,
+    FortranParallelLoop * parallelLoop, SgScopeStatement * moduleScope,
     FortranCUDADataSizesDeclarationDirectLoop * dataSizesDeclaration,
     FortranOpDatDimensionsDeclaration * opDatDimensionsDeclaration) :
   FortranCUDAKernelSubroutine (subroutineName, userSubroutineName,

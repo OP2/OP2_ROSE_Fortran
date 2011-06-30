@@ -330,7 +330,7 @@ FortranCUDAKernelSubroutine::createAutoSharedDeclaration ()
 
 FortranCUDAKernelSubroutine::FortranCUDAKernelSubroutine (
     std::string const & subroutineName, std::string const & userSubroutineName,
-    ParallelLoop * parallelLoop, SgScopeStatement * moduleScope,
+    FortranParallelLoop * parallelLoop, SgScopeStatement * moduleScope,
     FortranOpDatDimensionsDeclaration * opDatDimensionsDeclaration) :
   FortranKernelSubroutine (subroutineName, userSubroutineName, parallelLoop,
       moduleScope), opDatDimensionsDeclaration (opDatDimensionsDeclaration)

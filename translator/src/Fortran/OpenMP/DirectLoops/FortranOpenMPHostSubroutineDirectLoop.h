@@ -36,8 +36,8 @@ class FortranOpenMPHostSubroutineDirectLoop: public FortranOpenMPHostSubroutine
 
     FortranOpenMPHostSubroutineDirectLoop (std::string const & subroutineName,
         std::string const & userSubroutineName,
-        std::string const & kernelSubroutineName, ParallelLoop * parallelLoop,
-        SgScopeStatement * moduleScope,
+        std::string const & kernelSubroutineName,
+        FortranParallelLoop * parallelLoop, SgScopeStatement * moduleScope,
         FortranOpenMPModuleDeclarationsDirectLoop * moduleDeclarations);
 };
 

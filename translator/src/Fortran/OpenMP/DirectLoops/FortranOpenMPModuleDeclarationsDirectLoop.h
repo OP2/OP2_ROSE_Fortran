@@ -8,8 +8,8 @@ class FortranOpenMPModuleDeclarationsDirectLoop: public FortranOpenMPModuleDecla
   public:
 
     FortranOpenMPModuleDeclarationsDirectLoop (
-        std::string const & userSubroutineName, ParallelLoop * parallelLoop,
-        SgScopeStatement * moduleScope);
+        std::string const & userSubroutineName,
+        FortranParallelLoop * parallelLoop, SgScopeStatement * moduleScope);
 
 };
 

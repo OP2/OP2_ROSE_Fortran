@@ -8,7 +8,7 @@
 
 FortranOpenMPKernelSubroutine::FortranOpenMPKernelSubroutine (
     std::string const & subroutineName, std::string const & userSubroutineName,
-    ParallelLoop * parallelLoop, SgScopeStatement * moduleScope) :
+    FortranParallelLoop * parallelLoop, SgScopeStatement * moduleScope) :
   FortranKernelSubroutine (subroutineName, userSubroutineName, parallelLoop,
       moduleScope)
 {
