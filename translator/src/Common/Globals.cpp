@@ -17,7 +17,7 @@ Globals::Globals ()
    * Assume that the target backend is unknown
    * ======================================================
    */
-  backend = TargetBackends::Unknown;
+  backend = TargetBackends::UNKNOWN;
 
   /*
    * ======================================================
@@ -46,12 +46,12 @@ Globals::getInstance ()
 }
 
 void
-Globals::setTargetBackend (std::string const & backend)
+Globals::setTargetBackend (TargetBackends::BACKEND_VALUE backend)
 {
   globalsInstance->backend = backend;
 }
 
-std::string
+TargetBackends::BACKEND_VALUE
 Globals::getTargetBackend () const
 {
   return globalsInstance->backend;

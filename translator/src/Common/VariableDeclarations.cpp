@@ -37,10 +37,4 @@ VariableDeclarations::VariableDeclarations (
     theDeclarations.insert (declarations->theDeclarations.begin (),
         declarations->theDeclarations.end ());
   }
-
-  for (std::map <std::string, SgVariableDeclaration *>::iterator it =
-      theDeclarations.begin (); it != theDeclarations.end (); ++it)
-  {
-    std::cout << it->first << std::endl;
-  }
 }

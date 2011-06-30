@@ -378,15 +378,26 @@ FortranParallelLoop::FortranParallelLoop (
 {
   using boost::iequals;
 
-  if (iequals (Globals::getInstance ()->getTargetBackend (),
-      TargetBackends::CUDA))
+  switch (Globals::getInstance ()->getTargetBackend ())
   {
-    moduleName = userSubroutineName + "_cudafor";
-  }
-  else if (iequals (Globals::getInstance ()->getTargetBackend (),
-      TargetBackends::OpenMP))
-  {
-    moduleName = userSubroutineName + "_openmp";
+    case TargetBackends::CUDA:
+    {
+      moduleName = userSubroutineName + "_cudafor";
+
+      break;
+    }
+
+    case TargetBackends::OPENMP:
+    {
+      moduleName = userSubroutineName + "_openmp";
+
+      break;
+    }
+
+    default:
+    {
+      break;
+    }
   }
 
   retrieveOpDatDeclarations (declarations);

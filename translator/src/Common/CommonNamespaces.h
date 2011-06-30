@@ -2,8 +2,7 @@
  * Written by Adam Betts and Carlo Bertolli
  *  
  * Various public namespaces used in the compiler to declare and reference
- * variable names. Each namespace is generally split between Fortran-specific
- * and C++-specific names
+ * variable names
  */
 
 #ifndef COMMON_NAMESPACES_H
@@ -11,6 +10,7 @@
 
 #include <string>
 #include <rose.h>
+#include <Debug.h>
 
 namespace OP2
 {
@@ -38,6 +38,27 @@ namespace OP2
   std::string const OP_DECL_DAT = "op_decl_dat";
   std::string const OP_DECL_GBL = "op_decl_gbl";
   std::string const OP_DECL_CONST = "op_decl_const";
+}
+
+namespace TargetBackends
+{
+  /*
+   * ======================================================
+   * The different backends supported:
+   * 1) Unknown: primarily for debugging reasons
+   * 2) CUDA
+   * 3) OpenMP
+   * 4) OpenCL
+   * ======================================================
+   */
+
+  enum BACKEND_VALUE
+  {
+    UNKNOWN, CUDA, OPENMP, OPENCL
+  };
+
+  std::string
+  toString (BACKEND_VALUE backend);
 }
 
 namespace IndirectLoop
@@ -121,23 +142,6 @@ namespace OpenMP
   std::string const threadID = "threadID";
   std::string const sliceIterator = "sliceIterator";
   std::string const blockID = "blockID";
-}
-
-namespace TargetBackends
-{
-  /*
-   * ======================================================
-   * The different backends supported:
-   * 1) CUDA
-   * 2) OpenMP
-   * 3) Unknown: primarily for debug reasons, to ensure the user
-   *    is forced to select one of the above
-   * ======================================================
-   */
-
-  std::string const CUDA = "CUDA";
-  std::string const OpenMP = "OpenMP";
-  std::string const Unknown = "Unknown";
 }
 
 namespace CommonVariableNames

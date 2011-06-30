@@ -1,6 +1,9 @@
 import os
 from os import environ
 
+# Set the number of jobs spawned to compile
+SetOption('num_jobs', 4)
+
 # Make sure that these environment variables exist
 ROSE_HOME = 'ROSE_HOME'
 BOOST_HOME = 'BOOST_HOME'

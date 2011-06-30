@@ -2,6 +2,33 @@
 #include <CommonNamespaces.h>
 #include <FortranTypesBuilder.h>
 
+std::string
+TargetBackends::toString (BACKEND_VALUE backend)
+{
+  switch (backend)
+  {
+    case CUDA:
+    {
+      return "CUDA";
+    }
+
+    case OPENMP:
+    {
+      return "OpenMP";
+    }
+
+    case OPENCL:
+    {
+      return "OpenCL";
+    }
+
+    default:
+    {
+      Debug::getInstance ()->errorMessage ("Unknown backend selected");
+    }
+  }
+}
+
 namespace VariablePrefixes
 {
   std::string const OP_DAT = "opDat";

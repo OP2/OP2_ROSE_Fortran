@@ -141,9 +141,9 @@ Debug::debugMessage (std::string const & message, int const debugLevel) const
 void
 Debug::errorMessage (std::string const & message) const
 {
-  using std::cout;
+  using std::cerr;
   using std::endl;
 
-  cout << message + "." << endl;
+  cerr << message + "." << endl;
   exit (1);
 }

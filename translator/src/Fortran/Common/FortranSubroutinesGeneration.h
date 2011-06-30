@@ -2,24 +2,22 @@
 #define FORTRAN_SUBROUTINES_GENERATION_H
 
 #include <rose.h>
-#include <CommonNamespaces.h>
 #include <Declarations.h>
 #include <FortranParallelLoop.h>
-#include <FortranCUDAHostSubroutine.h>
-#include <FortranCUDAUserSubroutine.h>
-#include <FortranCUDAKernelSubroutine.h>
+#include <FortranHostSubroutine.h>
+
+namespace Libraries
+{
+  std::string const ISO_C_BINDING = "ISO_C_BINDING";
+  std::string const OP2_C = "OP2_C";
+  std::string const CUDAFOR = "CUDAFOR";
+  std::string const OMP_LIB = "OMP_LIB";
+  std::string const cudaConfigurationParams = "cudaConfigurationParams";
+}
 
 class FortranSubroutinesGeneration: public AstSimpleProcessing
 {
-  private:
-
-    /*
-     * ======================================================
-     * The project which the source-to-source translator
-     * operates upon
-     * ======================================================
-     */
-    SgProject * project;
+  protected:
 
     /*
      * ======================================================
@@ -40,18 +38,37 @@ class FortranSubroutinesGeneration: public AstSimpleProcessing
 
     /*
      * ======================================================
-     * A mapping from a user kernel name to our internal
+     * A mapping from a user subroutine name to our internal
      * representation of an OP_PAR_LOOP
      * ======================================================
      */
     std::map <std::string, FortranParallelLoop *> parallelLoops;
 
-  private:
+  protected:
 
     /*
      * ======================================================
-     * Patches the calls to OP_PAR_LOOPs with the new
-     * subroutine call
+     * Creates the subroutines
+     * ======================================================
+     */
+    virtual FortranHostSubroutine *
+    createSubroutines (FortranParallelLoop * parallelLoop,
+        std::string const & userSubroutineName,
+        SgModuleStatement * moduleStatement) = 0;
+
+    /*
+     * ======================================================
+     * Adds the relevant library 'use' statements to the
+     * generated module
+     * ======================================================
+     */
+    virtual void
+    addLibraries (SgModuleStatement * moduleStatement) = 0;
+
+    /*
+     * ======================================================
+     * Patches the calls to OP_PAR_LOOPs with a call to the
+     * new host subroutine
      * ======================================================
      */
     void
@@ -59,46 +76,6 @@ class FortranSubroutinesGeneration: public AstSimpleProcessing
         std::string const & userSubroutineName,
         FortranHostSubroutine & hostSubroutine, SgScopeStatement * scope,
         SgFunctionCallExp * functionCallExp);
-
-    /*
-     * ======================================================
-     * Creates subroutines targeting OpenMP
-     * ======================================================
-     */
-    void
-    createOpenMPSubroutines (FortranParallelLoop * parallelLoop,
-        std::string const & userSubroutineName,
-        SgModuleStatement * moduleStatement, SgNode * node,
-        SgFunctionCallExp * functionCallExp);
-
-    /*
-     * ======================================================
-     * Creates subroutines targeting CUDA
-     * ======================================================
-     */
-    void
-    createCUDASubroutines (FortranParallelLoop * parallelLoop,
-        std::string const & userSubroutineName,
-        SgModuleStatement * moduleStatement, SgNode * node,
-        SgFunctionCallExp * functionCallExp);
-
-    /*
-     * ======================================================
-     * Adds the relevant library 'use' statements to the
-     * generated OpenMP module
-     * ======================================================
-     */
-    void
-    addOpenMPLibraries (SgModuleStatement * moduleStatement);
-
-    /*
-     * ======================================================
-     * Adds the relevant library 'use' statements to the
-     * generated CUDA module
-     * ======================================================
-     */
-    void
-    addCUDALibraries (SgModuleStatement * moduleStatement);
 
     /*
      * ======================================================
@@ -114,8 +91,7 @@ class FortranSubroutinesGeneration: public AstSimpleProcessing
      * Creates the Fortran module
      * ======================================================
      */
-    SgModuleStatement
-    *
+    SgModuleStatement *
     createFortranModule (SgSourceFile & sourceFile,
         FortranParallelLoop & parallelLoop);
 
@@ -127,6 +103,11 @@ class FortranSubroutinesGeneration: public AstSimpleProcessing
      */
     SgSourceFile &
     createSourceFile (FortranParallelLoop & parallelLoop);
+
+    FortranSubroutinesGeneration (FortranDeclarations * declarations) :
+      declarations (declarations)
+    {
+    }
 
   public:
 
@@ -146,14 +127,6 @@ class FortranSubroutinesGeneration: public AstSimpleProcessing
      */
     void
     unparse ();
-
-    /*
-     * ======================================================
-     * Generates the new subroutines
-     * ======================================================
-     */
-    FortranSubroutinesGeneration (SgProject * project,
-        FortranDeclarations * declarations);
 };
 
 #endif

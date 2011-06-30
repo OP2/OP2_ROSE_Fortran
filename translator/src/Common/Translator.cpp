@@ -20,8 +20,6 @@
  * made to OP_PAR_LOOP calls.
  */
 
-#include <boost/function.hpp>
-#include <boost/bind.hpp>
 #include <boost/algorithm/string.hpp>
 #include <rose.h>
 #include <CommandLine.h>
@@ -31,8 +29,10 @@
 #include <Debug.h>
 #include <Declarations.h>
 #include <Globals.h>
-#include <FortranSubroutinesGeneration.h>
 #include <UDrawGraph.h>
+#include <FortranSubroutinesGeneration.h>
+#include <FortranCUDASubroutinesGeneration.h>
+#include <FortranOpenMPSubroutinesGeneration.h>
 
 class OxfordOption: public CommandLineOption
 {
@@ -73,7 +73,7 @@ class OpenMPOption: public CommandLineOption
     virtual void
     run ()
     {
-      Globals::getInstance ()->setTargetBackend (TargetBackends::OpenMP);
+      Globals::getInstance ()->setTargetBackend (TargetBackends::OPENMP);
     }
 
     OpenMPOption (std::string helpMessage, std::string longOption) :
@@ -82,47 +82,30 @@ class OpenMPOption: public CommandLineOption
     }
 };
 
+class OpenCLOption: public CommandLineOption
+{
+  public:
+
+    virtual void
+    run ()
+    {
+      Debug::getInstance ()->errorMessage ("Sorry: OpenCL backend not yet supported");
+    }
+
+    OpenCLOption (std::string helpMessage, std::string longOption) :
+      CommandLineOption (helpMessage, "", longOption)
+    {
+    }
+};
+
 void
 handleCPPProject (SgProject * project)
 {
-  using boost::iequals;
-
-  if (Globals::getInstance ()->renderOxfordAPICalls ())
-  {
-    if (!iequals (Globals::getInstance ()->getTargetBackend (),
-        TargetBackends::Unknown))
-    {
-      Debug::getInstance ()->errorMessage (
-          "You have selected to generate code for "
-              + Globals::getInstance ()->getTargetBackend ()
-              + " and replace all OP2 calls with the Oxford-compliant API. These options are mutually exclusive");
-    }
-
-    Debug::getInstance ()->verboseMessage (
-        "Retrieving declarations in source files");
-  }
-  else if (iequals (Globals::getInstance ()->getTargetBackend (),
-      TargetBackends::Unknown))
-  {
-    Debug::getInstance ()->errorMessage (
-        "You have not selected a target backend on the command-line. Supported backends are: {"
-            + TargetBackends::CUDA + ", " + TargetBackends::OpenMP + "}");
-  }
 }
 
 void
 handleFortranProject (SgProject * project)
 {
-  using boost::iequals;
-
-  if (iequals (Globals::getInstance ()->getTargetBackend (),
-      TargetBackends::Unknown))
-  {
-    Debug::getInstance ()->errorMessage (
-        "You have not selected a target backend on the command-line. Supported backends are: {"
-            + TargetBackends::CUDA + ", " + TargetBackends::OpenMP + "}");
-  }
-
   /*
    * ======================================================
    * Obtain all OP2 declarations
@@ -135,23 +118,44 @@ handleFortranProject (SgProject * project)
 
   /*
    * ======================================================
-   * Create the subroutines implementing an OP_PAR_LOOP
+   * Create and output the subroutines implementing an
+   * OP_PAR_LOOP
    * ======================================================
    */
   Debug::getInstance ()->verboseMessage (
       "Creating subroutines for OP_PAR_LOOPs");
 
-  FortranSubroutinesGeneration * newSubroutines =
-      new FortranSubroutinesGeneration (project, declarations);
+  switch (Globals::getInstance ()->getTargetBackend ())
+  {
+    case TargetBackends::CUDA:
+    {
+      FortranCUDASubroutinesGeneration * newSubroutines =
+          new FortranCUDASubroutinesGeneration (declarations);
 
-  newSubroutines->traverseInputFiles (project, preorder);
+      newSubroutines->traverseInputFiles (project, preorder);
 
-  /*
-   * ======================================================
-   * Output the generated subroutines to respective files
-   * ======================================================
-   */
-  newSubroutines->unparse ();
+      newSubroutines->unparse ();
+
+      break;
+    }
+
+    case TargetBackends::OPENMP:
+    {
+      FortranOpenMPSubroutinesGeneration * newSubroutines =
+          new FortranOpenMPSubroutinesGeneration (declarations);
+
+      newSubroutines->traverseInputFiles (project, preorder);
+
+      newSubroutines->unparse ();
+
+      break;
+    }
+
+    default:
+    {
+      break;
+    }
+  }
 
   /*
    * ======================================================
@@ -163,13 +167,50 @@ handleFortranProject (SgProject * project)
 }
 
 void
+checkBackendOption ()
+{
+  using std::vector;
+  using std::string;
+
+  if (Globals::getInstance ()->getTargetBackend () == TargetBackends::UNKNOWN)
+  {
+    vector <TargetBackends::BACKEND_VALUE> values;
+    values.push_back (TargetBackends::CUDA);
+    values.push_back (TargetBackends::OPENMP);
+
+    string backendsString;
+
+    int i = 0;
+    for (vector <TargetBackends::BACKEND_VALUE>::iterator it = values.begin (); it
+        != values.end (); ++it, ++i)
+    {
+      backendsString += TargetBackends::toString (*it);
+
+      if (i < values.size ())
+      {
+        backendsString += ", ";
+      }
+    }
+
+    Debug::getInstance ()->errorMessage (
+        "You have not selected a target backend on the command-line. Supported backends are: "
+            + backendsString);
+  }
+}
+
+void
 addCommandLineOptions ()
 {
   CommandLine::getInstance ()->addOption (new CUDAOption ("Generate CUDA code",
-      "cuda"));
+      TargetBackends::toString (TargetBackends::CUDA)));
 
-  CommandLine::getInstance ()->addOption (new OpenMPOption (
-      "Generate OpenMP code", "openmp"));
+  CommandLine::getInstance ()->addOption (
+      new OpenMPOption ("Generate OpenMP code", TargetBackends::toString (
+          TargetBackends::OPENMP)));
+
+  CommandLine::getInstance ()->addOption (
+      new OpenCLOption ("Generate OpenCL code", TargetBackends::toString (
+          TargetBackends::OPENCL)));
 
   CommandLine::getInstance ()->addOption (new OxfordOption (
       "Refactor OP2 calls to comply with Oxford API", "oxford"));
@@ -204,11 +245,29 @@ main (int argc, char ** argv)
   {
     Debug::getInstance ()->verboseMessage ("C++ project detected");
 
+    if (Globals::getInstance ()->renderOxfordAPICalls ())
+    {
+      if (Globals::getInstance ()->getTargetBackend ()
+          != TargetBackends::UNKNOWN)
+      {
+        Debug::getInstance ()->errorMessage (
+            "You have selected to generate code for " + toString (
+                Globals::getInstance ()->getTargetBackend ())
+                + " and replace all OP2 calls with the Oxford-compliant API. These options are mutually exclusive");
+      }
+    }
+    else
+    {
+      checkBackendOption ();
+    }
+
     handleCPPProject (project);
   }
   else
   {
     Debug::getInstance ()->verboseMessage ("Fortran project detected");
+
+    checkBackendOption ();
 
     handleFortranProject (project);
   }

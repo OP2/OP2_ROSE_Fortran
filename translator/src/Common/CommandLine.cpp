@@ -1,4 +1,5 @@
 #include <iostream>
+#include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
 #include <CommandLine.h>
 #include <Debug.h>
@@ -308,6 +309,7 @@ CommandLine::getArguments () const
 void
 CommandLine::parse (int argc, char ** argv)
 {
+  using boost::to_lower_copy;
   using std::string;
 
   CommandLineOptionWithParameters * paramterisedOption = NULL;
@@ -329,32 +331,37 @@ CommandLine::parse (int argc, char ** argv)
 
       paramterisedOption = NULL;
     }
-    else if (otherArguments.find (argv[i]) == otherArguments.end ())
-    {
-      /*
-       * ======================================================
-       * Do not recognise the option so assume it is a ROSE flag
-       * ======================================================
-       */
-
-      ROSEArguments.push_back (argv[i]);
-    }
     else
     {
-      /*
-       * ======================================================
-       * Get the option
-       * ======================================================
-       */
+      string const & arg = to_lower_copy (string (argv[i]));
 
-      CommandLineOption * option = otherArguments[argv[i]];
-
-      paramterisedOption
-          = dynamic_cast <CommandLineOptionWithParameters *> (option);
-
-      if (paramterisedOption == NULL)
+      if (otherArguments.find (arg) == otherArguments.end ())
       {
-        option->run ();
+        /*
+         * ======================================================
+         * Do not recognise the option so assume it is a ROSE flag
+         * ======================================================
+         */
+
+        ROSEArguments.push_back (argv[i]);
+      }
+      else
+      {
+        /*
+         * ======================================================
+         * Get the option
+         * ======================================================
+         */
+
+        CommandLineOption * option = otherArguments[arg];
+
+        paramterisedOption
+            = dynamic_cast <CommandLineOptionWithParameters *> (option);
+
+        if (paramterisedOption == NULL)
+        {
+          option->run ();
+        }
       }
     }
   }
@@ -363,13 +370,20 @@ CommandLine::parse (int argc, char ** argv)
 void
 CommandLine::addOption (CommandLineOption * option)
 {
+  using boost::to_lower_copy;
+  using std::string;
+
   if (option->getShortOption ().empty () == false)
   {
-    otherArguments[option->getShortOption ()] = option;
+    string const opt = to_lower_copy (option->getShortOption ());
+
+    otherArguments[opt] = option;
   }
   else
   {
-    otherArguments[option->getLongOption ()] = option;
+    string const opt = to_lower_copy (option->getLongOption ());
+
+    otherArguments[opt] = option;
   }
 }
 
