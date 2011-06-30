@@ -213,7 +213,7 @@ FortranCUDAHostSubroutineDirectLoop::createCUDAKernelInitialisationStatements ()
 
         SgExpression * parameterExpression2 = buildMultiplyOp (buildIntVal (
             parallelLoop->getOpDatDimension (i)),
-            FortranStatementsAndExpressionsBuilder::getFortranKindOf_OP_DAT (
+            FortranStatementsAndExpressionsBuilder::getFortranKindOfOpDat (
                 parallelLoop->getOpDatType (i)));
 
         SgExprListExp * actualParameters = buildExprListExp (

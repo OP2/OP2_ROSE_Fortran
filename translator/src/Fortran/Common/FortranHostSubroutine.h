@@ -3,6 +3,7 @@
 
 #include <HostSubroutine.h>
 #include <FortranParallelLoop.h>
+#include <FortranStatementsAndExpressionsBuilder.h>
 
 class FortranHostSubroutine: public HostSubroutine <SgProcedureHeaderStatement,
     FortranDeclarations>
@@ -43,6 +44,10 @@ class FortranHostSubroutine: public HostSubroutine <SgProcedureHeaderStatement,
           = subroutineHeaderStatement->get_definition ()->get_body ();
 
       appendStatement (subroutineHeaderStatement, moduleScope);
+
+      appendStatement (
+          FortranStatementsAndExpressionsBuilder::buildImplicitNoneStatement (),
+          subroutineScope);
     }
 };
 

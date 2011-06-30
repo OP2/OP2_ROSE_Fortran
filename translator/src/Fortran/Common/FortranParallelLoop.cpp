@@ -313,7 +313,7 @@ FortranParallelLoop::generateReductionSubroutines (
       SgArrayType * arrayType = isSgArrayType (getOpDatType (i));
 
       SgExpression * opDatKindSize =
-          FortranStatementsAndExpressionsBuilder::getFortranKindOf_OP_DAT (
+          FortranStatementsAndExpressionsBuilder::getFortranKindOfOpDat (
               arrayType);
 
       SgIntVal * isKindIntVal = isSgIntVal (opDatKindSize);

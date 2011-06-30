@@ -84,7 +84,7 @@ FortranCUDAHostSubroutine::createReductionPrologueStatements ()
       }
 
       SgExpression * fortranKind =
-          FortranStatementsAndExpressionsBuilder::getFortranKindOf_OP_DAT (
+          FortranStatementsAndExpressionsBuilder::getFortranKindOfOpDat (
               parallelLoop->getOpDatType (i));
 
       SgIntVal * kindVal = isSgIntVal (fortranKind);

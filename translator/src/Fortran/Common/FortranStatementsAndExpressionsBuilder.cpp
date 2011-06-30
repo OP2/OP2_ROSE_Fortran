@@ -276,18 +276,18 @@ FortranStatementsAndExpressionsBuilder::appendDeallocateStatement (
 }
 
 SgExpression *
-FortranStatementsAndExpressionsBuilder::getFortranKindOf_OP_DAT (
-    SgType * OP_DAT_baseType)
+FortranStatementsAndExpressionsBuilder::getFortranKindOfOpDat (
+    SgType * OpDatBaseType)
 {
   using SageBuilder::buildIntVal;
 
-  SgArrayType * isArrayType = isSgArrayType (OP_DAT_baseType);
+  SgArrayType * isArrayType = isSgArrayType (OpDatBaseType);
 
-  ROSE_ASSERT ( isArrayType != NULL );
+  ROSE_ASSERT (isArrayType != NULL);
 
   SgType * arrayBaseType = isArrayType->get_base_type ();
 
-  SgExpression * sizeOf_OP_DAT_Kind = arrayBaseType->get_type_kind ();
+  SgExpression * sizeOfOpDatKind = arrayBaseType->get_type_kind ();
 
   /*
    * ======================================================
@@ -295,10 +295,22 @@ FortranStatementsAndExpressionsBuilder::getFortranKindOf_OP_DAT (
    * have to assume standard ones: integer(4) and real(4)
    * ======================================================
    */
-  if (sizeOf_OP_DAT_Kind == NULL)
+  if (sizeOfOpDatKind == NULL)
   {
-    sizeOf_OP_DAT_Kind = buildIntVal (4);
+    sizeOfOpDatKind = buildIntVal (4);
   }
 
-  return sizeOf_OP_DAT_Kind;
+  return sizeOfOpDatKind;
+}
+
+SgImplicitStatement *
+FortranStatementsAndExpressionsBuilder::buildImplicitNoneStatement ()
+{
+  SgImplicitStatement * implicitStatement = new SgImplicitStatement (
+      ROSEHelper::getFileInfo (), true);
+
+  implicitStatement->set_endOfConstruct (ROSEHelper::getFileInfo ());
+  implicitStatement->set_definingDeclaration (implicitStatement);
+
+  return implicitStatement;
 }

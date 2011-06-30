@@ -3,6 +3,7 @@
 
 #include <KernelSubroutine.h>
 #include <FortranParallelLoop.h>
+#include <FortranStatementsAndExpressionsBuilder.h>
 
 class FortranKernelSubroutine: public KernelSubroutine <
     SgProcedureHeaderStatement, FortranDeclarations>
@@ -29,7 +30,11 @@ class FortranKernelSubroutine: public KernelSubroutine <
           = subroutineHeaderStatement->get_definition ()->get_body ();
 
       appendStatement (subroutineHeaderStatement, moduleScope);
+
+      appendStatement (
+          FortranStatementsAndExpressionsBuilder::buildImplicitNoneStatement (),
+          subroutineScope);
     }
 };
-
 #endif
+
