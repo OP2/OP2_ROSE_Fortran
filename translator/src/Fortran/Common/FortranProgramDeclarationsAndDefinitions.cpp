@@ -31,7 +31,7 @@ FortranProgramDeclarationsAndDefinitions::visit (SgNode * node)
       subroutinesInSourceCode.push_back (procedureHeaderStatement);
 
       Debug::getInstance ()->debugMessage ("Found procedure header statement '"
-          + procedureHeaderStatement->get_name ().getString () + "'", 8);
+          + procedureHeaderStatement->get_name ().getString () + "'", 5);
 
       break;
     }
@@ -90,7 +90,7 @@ FortranProgramDeclarationsAndDefinitions::visit (SgNode * node)
         FortranOpDatDefinition * opDatDeclaration = new FortranOpDatDefinition (
             actualArguments);
 
-        if (isSgArrayType (opDatDeclaration->getActualType ()) == false)
+        if (isSgArrayType (opDatDeclaration->getActualType ()) == NULL)
         {
           Debug::getInstance ()->errorMessage ("OP_DAT variable '"
               + opDatDeclaration->getVariableName ()

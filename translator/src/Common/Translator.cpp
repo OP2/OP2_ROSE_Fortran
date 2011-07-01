@@ -31,9 +31,10 @@
 #include <Globals.h>
 #include <UDrawGraph.h>
 #include <FortranProgramDeclarationsAndDefinitions.h>
-#include <FortranSubroutinesGeneration.h>
 #include <FortranCUDASubroutinesGeneration.h>
 #include <FortranOpenMPSubroutinesGeneration.h>
+#include <CPPProgramDeclarationsAndDefinitions.h>
+#include <CPPSubroutinesGeneration.h>
 
 class OxfordOption: public CommandLineOption
 {
@@ -183,7 +184,7 @@ checkBackendOption ()
 
     string backendsString;
 
-    int i = 0;
+    unsigned int i = 1;
     for (vector <TargetBackends::BACKEND_VALUE>::iterator it = values.begin (); it
         != values.end (); ++it, ++i)
     {
@@ -258,6 +259,9 @@ main (int argc, char ** argv)
                 Globals::getInstance ()->getTargetBackend ())
                 + " and replace all OP2 calls with the Oxford-compliant API. These options are mutually exclusive");
       }
+
+      CPPProgramDeclarationsAndDefinitions * declarations =
+          new CPPProgramDeclarationsAndDefinitions (project);
     }
     else
     {

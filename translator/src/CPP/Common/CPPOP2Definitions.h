@@ -80,14 +80,14 @@ class CPPImperialOpMapDefinition: public OpMapDefinition
         std::string const & variableName);
 };
 
-class CPPImperialOpConstDefinition: public OpGblDefinition
+class CPPImperialOpConstDefinition: public OpConstDefinition
 {
     /*
      * ======================================================
      * Models a constant definition in C++ (Imperial API).
      *
      * The following style is assumed:
-     * OP_DECL_CONST (dimension, data)
+     * OP_DECL_CONST (dimension, OpDatName)
      * ======================================================
      */
 
@@ -95,12 +95,11 @@ class CPPImperialOpConstDefinition: public OpGblDefinition
 
     static int const index_dimension = 0;
 
-    static int const index_data = 1;
+    static int const index_OpDatName = 1;
 
   public:
 
-    CPPImperialOpConstDefinition (SgExpressionPtrList & parameters,
-        std::string const & variableName);
+    CPPImperialOpConstDefinition (SgExpressionPtrList & parameters);
 };
 
 #endif

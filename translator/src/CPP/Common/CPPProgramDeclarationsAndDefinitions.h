@@ -8,9 +8,20 @@
 #include <ProgramDeclarationsAndDefinitions.h>
 
 class CPPProgramDeclarationsAndDefinitions: public ProgramDeclarationsAndDefinitions <
-    SgFunctionDeclaration> , public AstSimpleProcessing
+    SgFunctionDeclaration> ,
+    public AstSimpleProcessing
 {
   private:
+
+    std::vector <SgVariableDeclaration *> integerDeclarations;
+
+    std::vector <SgVariableDeclaration *> floatDeclarations;
+
+  private:
+
+    void
+    detectAndHandleOP2Definition (SgVariableDeclaration * variableDeclaration,
+        std::string const variableName, SgTypedefType * typeDefinition);
 
     virtual void
     visit (SgNode * node);

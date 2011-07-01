@@ -58,10 +58,14 @@ CommandLineOption::CommandLineOption (std::string helpMessage,
   }
   else
   {
-    if (shortOption.find (" ") != string::npos)
+    int blank = shortOption.find (" ");
+
+    if (blank != string::npos)
     {
       cerr << "Error: the short option '" + shortOption
-          + "' has a blank space inside it.\n";
+          + "' has a blank space at position " + lexical_cast <string> (blank)
+          + ".\n";
+
       exit (1);
     }
 
@@ -69,13 +73,18 @@ CommandLineOption::CommandLineOption (std::string helpMessage,
     {
       cerr << "Error: the short option '" + shortOption
           + "' starts with trailing '-' characters.\n";
+
       exit (1);
     }
 
-    if (longOption.find (" ") != string::npos)
+    blank = longOption.find (" ");
+
+    if (blank != string::npos)
     {
       cerr << "Error: the long option '" + longOption
-          + "' has a blank space inside it.\n";
+          + "' has a blank space at position " + lexical_cast <string> (blank)
+          + ".\n";
+
       exit (1);
     }
 
@@ -83,6 +92,7 @@ CommandLineOption::CommandLineOption (std::string helpMessage,
     {
       cerr << "Error: the long option '" + longOption
           + "' starts with trailing '-' characters.\n";
+
       exit (1);
     }
   }

@@ -76,22 +76,35 @@ CPPImperialOpMapDefinition::CPPImperialOpMapDefinition (
 }
 
 CPPImperialOpConstDefinition::CPPImperialOpConstDefinition (
-    SgExpressionPtrList & parameters, std::string const & variableName)
+    SgExpressionPtrList & parameters)
 {
   using boost::lexical_cast;
   using std::string;
 
-  this->variableName = variableName;
-
   dimension = isSgIntVal (parameters[index_dimension])->get_value ();
 
-  actualType = isSgVarRefExp (parameters[index_data])->get_type ();
+  SgAddressOfOp * addressOfOperator = isSgAddressOfOp (
+      parameters[index_OpDatName]);
+
+  if (addressOfOperator != NULL)
+  {
+    SgVarRefExp * operandExpression = isSgVarRefExp (
+        addressOfOperator->get_operand ());
+
+    ROSE_ASSERT (operandExpression != NULL);
+
+    variableName = operandExpression->get_symbol ()->get_name ().getString ();
+  }
+  else
+  {
+    variableName
+        = isSgVarRefExp (parameters[index_OpDatName])->get_symbol ()->get_name ().getString ();
+  }
 
   ROSE_ASSERT (dimension > 0);
-  ROSE_ASSERT (actualType != NULL);
   ROSE_ASSERT (variableName.empty () == false);
 
-  Debug::getInstance ()->debugMessage ("Found an OP_GBL declaration: '"
-      + variableName + "'. Its actual type is " + actualType->class_name ()
-      + " and its dimension is " + lexical_cast <string> (dimension), 5);
+  Debug::getInstance ()->debugMessage ("Found an OP_CONST declaration: '"
+      + variableName + "' Its dimension is "
+      + lexical_cast <string> (dimension), 5);
 }
