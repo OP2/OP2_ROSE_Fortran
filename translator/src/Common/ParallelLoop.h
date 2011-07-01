@@ -127,7 +127,7 @@ template <typename TSubroutineHeader, typename TDeclarations>
        * ======================================================
        */
       virtual void
-      handleOpGblDeclaration (OpGblDeclaration * opGblDeclaration,
+      handleOpGblDeclaration (OpGblDefinition * opGblDeclaration,
           std::string const & variableName, int opDatArgumentGroup) = 0;
 
       /*
@@ -137,7 +137,7 @@ template <typename TSubroutineHeader, typename TDeclarations>
        * ======================================================
        */
       virtual void
-      handleOpDatDeclaration (OpDatDeclaration * opDatDeclaration,
+      handleOpDatDeclaration (OpDatDefinition * opDatDeclaration,
           std::string const & variableName, int opDatArgumentGroup) = 0;
 
       /*

@@ -7,15 +7,18 @@
 
 #include <rose.h>
 
-class CPPModifyCallsToOxfordAPI
+class CPPModifyCallsToOxfordAPI: public AstSimpleProcessing
 {
   private:
 
-    SgProject * project;
+    virtual void
+    visit (SgNode * node);
 
   public:
 
-    CPPModifyCallsToOxfordAPI (SgProject * project);
+    CPPModifyCallsToOxfordAPI ()
+    {
+    }
 };
 
 #endif

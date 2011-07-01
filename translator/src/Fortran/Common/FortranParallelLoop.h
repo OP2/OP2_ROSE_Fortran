@@ -46,11 +46,11 @@ class FortranParallelLoop: public ParallelLoop <SgProcedureHeaderStatement,
   private:
 
     virtual void
-    handleOpGblDeclaration (OpGblDeclaration * opGblDeclaration,
+    handleOpGblDeclaration (OpGblDefinition * opGblDeclaration,
         std::string const & variableName, int opDatArgumentGroup);
 
     virtual void
-    handleOpDatDeclaration (OpDatDeclaration * opDatDeclaration,
+    handleOpDatDeclaration (OpDatDefinition * opDatDeclaration,
         std::string const & variableName, int opDatArgumentGroup);
 
     virtual void

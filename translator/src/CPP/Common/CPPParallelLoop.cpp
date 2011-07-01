@@ -13,13 +13,13 @@
  */
 
 void
-CPPParallelLoop::handleOpGblDeclaration (OpGblDeclaration * opGblDeclaration,
+CPPParallelLoop::handleOpGblDeclaration (OpGblDefinition * opGblDeclaration,
     std::string const & variableName, int opDatArgumentGroup)
 {
 }
 
 void
-CPPParallelLoop::handleOpDatDeclaration (OpDatDeclaration * opDatDeclaration,
+CPPParallelLoop::handleOpDatDeclaration (OpDatDefinition * opDatDeclaration,
     std::string const & variableName, int opDatArgumentGroup)
 {
 }

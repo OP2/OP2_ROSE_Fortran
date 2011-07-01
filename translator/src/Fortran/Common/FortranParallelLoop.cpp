@@ -14,7 +14,7 @@
 
 void
 FortranParallelLoop::handleOpGblDeclaration (
-    OpGblDeclaration * opGblDeclaration, std::string const & variableName,
+    OpGblDefinition * opGblDeclaration, std::string const & variableName,
     int opDatArgumentGroup)
 {
   using boost::lexical_cast;
@@ -44,7 +44,7 @@ FortranParallelLoop::handleOpGblDeclaration (
 
 void
 FortranParallelLoop::handleOpDatDeclaration (
-    OpDatDeclaration * opDatDeclaration, std::string const & variableName,
+    OpDatDefinition * opDatDeclaration, std::string const & variableName,
     int opDatArgumentGroup)
 {
   using boost::lexical_cast;

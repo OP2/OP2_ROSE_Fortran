@@ -1,7 +1,12 @@
 #include <CPPModifyCallsToOxfordAPI.h>
 
-CPPModifyCallsToOxfordAPI::CPPModifyCallsToOxfordAPI (SgProject * project) :
-  project (project)
-{
+/*
+ * ======================================================
+ * Private functions
+ * ======================================================
+ */
 
+void
+visit (SgNode * node)
+{
 }

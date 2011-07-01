@@ -1,19 +1,17 @@
 /*
  * Written by Adam Betts and Carlo Bertolli
- *
- * These classes model OP2 variable declarations
  */
 
-#ifndef OP2VARIABLES_H
-#define OP2VARIABLES_H
+#ifndef OP2_VARIABLES_H
+#define OP2_VARIABLES_H
 
 #include <rose.h>
 
-class OP2Declaration
+class OP2Definition
 {
     /*
      * ======================================================
-     * Base class to model an OP2 variable declaration
+     * Base class to model an OP2 variable definition
      * ======================================================
      */
 
@@ -21,7 +19,7 @@ class OP2Declaration
 
     std::string variableName;
 
-    OP2Declaration ()
+    OP2Definition ()
     {
     }
 
@@ -34,37 +32,32 @@ class OP2Declaration
     }
 };
 
-class OpDatDeclaration: public OP2Declaration
+class OpDatDefinition: public OP2Definition
 {
     /*
      * ======================================================
-     * Models an OP_DAT declaration.
-     *
-     * The following style in Fortran is assumed:
-     * OP_DECL_DAT (OpSet, setCardinality, inputData, OpDat)
+     * Models an OP_DAT variable definition
      * ======================================================
      */
 
-  private:
+  protected:
 
-    static int const index_OP_SET = 0;
+    std::string opSetName;
 
-    static int const index_dimension = 1;
-
-    static int const index_inputData = 2;
-
-    static int const index_OP_DAT = 3;
-
-    int dimension;
+    unsigned int dimension;
 
     SgType * actualType;
 
   public:
 
-    OpDatDeclaration (SgExpressionPtrList & parameters);
+    std::string const &
+    getOpSetName () const
+    {
+      return opSetName;
+    }
 
-    int
-    getDimension ()
+    unsigned int
+    getDimension () const
     {
       return dimension;
     }
@@ -76,85 +69,90 @@ class OpDatDeclaration: public OP2Declaration
     }
 };
 
-class OpSetDeclaration: public OP2Declaration
+class OpSetDefinition: public OP2Definition
 {
     /*
      * ======================================================
-     * Models an OP_SET declaration.
-     *
-     * The following style in Fortran is assumed:
-     * OP_DECL_SET (setCardinality, OP_SET)
+     * Models an OP_SET variable definition
      * ======================================================
      */
 
-  private:
+  protected:
 
-    static int const index_setCardinality = 0;
-
-    static int const index_OP_SET = 1;
+    std::string dimensionName;
 
   public:
 
-    OpSetDeclaration (SgExpressionPtrList & parameters);
+    std::string const &
+    getDimensionName () const
+    {
+      return dimensionName;
+    }
 };
 
-class OpMapDeclaration: public OP2Declaration
+class OpMapDefinition: public OP2Definition
 {
     /*
      * ======================================================
-     * Models an OP_MAP declaration.
-     *
-     * The following style in Fortran is assumed:
-     * OP_DECL_MAP (source_OpSet, destination_OpSet, setCardinality, inputData, OpMap)
+     * Models an OP_MAP variable definition
      * ======================================================
      */
 
-  private:
+  protected:
 
-    static int const index_Source_OP_SET = 0;
+    std::string sourceOpSetName;
 
-    static int const index_Destination_OP_SET = 1;
+    std::string destinationOpSetName;
 
-    static int const index_setCardinality = 2;
+    unsigned int dimension;
 
-    static int const index_inputData = 3;
-
-    static int const index_OP_MAP = 4;
+    std::string mappingName;
 
   public:
 
-    OpMapDeclaration (SgExpressionPtrList & parameters);
+    std::string const &
+    getSourceOpSetName () const
+    {
+      return sourceOpSetName;
+    }
+
+    std::string const &
+    getDestinationOpSetName () const
+    {
+      return destinationOpSetName;
+    }
+
+    unsigned int
+    getDimension () const
+    {
+      return dimension;
+    }
+
+    std::string const &
+    getMappingName () const
+    {
+      return mappingName;
+    }
 };
 
-class OpGblDeclaration: public OP2Declaration
+class OpGblDefinition: public OP2Definition
 {
     /*
      * ======================================================
-     * Models an OP_GBL declaration.
-     *
-     * The following style in Fortran is assumed:
-     * OP_DECL_GBL (inputData, dimension, OpDat)
+     * Models an OP_GBL variable definition
      * ======================================================
      */
 
-  private:
+  protected:
 
-    static int const index_inputData = 0;
-
-    static int const index_dimension = 1;
-
-    static int const index_OP_DAT = 2;
-
-    int dimension;
+    unsigned int dimension;
 
     SgType * actualType;
 
   public:
 
-    OpGblDeclaration (SgExpressionPtrList & parameters);
-
-    int
-    getDimension ()
+    unsigned int
+    getDimension () const
     {
       return dimension;
     }
@@ -163,6 +161,27 @@ class OpGblDeclaration: public OP2Declaration
     getActualType ()
     {
       return actualType;
+    }
+};
+
+class OpConstDefinition: public OP2Definition
+{
+    /*
+     * ======================================================
+     * Models an OP_CONST variable definition
+     * ======================================================
+     */
+
+  protected:
+
+    unsigned int dimension;
+
+  public:
+
+    unsigned int
+    getDimension () const
+    {
+      return dimension;
     }
 };
 

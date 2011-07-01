@@ -1,5 +1,6 @@
 #include <FortranDeclarations.h>
 #include <CommonNamespaces.h>
+#include <FortranOP2Variables.h>
 
 /*
  * ======================================================
@@ -60,8 +61,8 @@ FortranDeclarations::visit (SgNode * node)
          * ======================================================
          */
 
-        OpSetDeclaration * opSetDeclaration = new OpSetDeclaration (
-            actualArguments);
+        FortranOpSetDefinition * opSetDeclaration =
+            new FortranOpSetDefinition (actualArguments);
 
         OpSetDeclarations.push_back (opSetDeclaration);
       }
@@ -73,8 +74,8 @@ FortranDeclarations::visit (SgNode * node)
          * ======================================================
          */
 
-        OpMapDeclaration * opMapDeclaration = new OpMapDeclaration (
-            actualArguments);
+        FortranOpMapDefinition * opMapDeclaration =
+            new FortranOpMapDefinition (actualArguments);
 
         OpMapDeclarations.push_back (opMapDeclaration);
       }
@@ -86,8 +87,8 @@ FortranDeclarations::visit (SgNode * node)
          * ======================================================
          */
 
-        OpDatDeclaration * opDatDeclaration = new OpDatDeclaration (
-            actualArguments);
+        FortranOpDatDefinition * opDatDeclaration =
+            new FortranOpDatDefinition (actualArguments);
 
         if (isSgArrayType (opDatDeclaration->getActualType ()) == false)
         {
@@ -106,8 +107,8 @@ FortranDeclarations::visit (SgNode * node)
          * ======================================================
          */
 
-        OpGblDeclaration * opGblDeclaration = new OpGblDeclaration (
-            actualArguments);
+        FortranOpGblDefinition * opGblDeclaration =
+            new FortranOpGblDefinition (actualArguments);
 
         OpGblDeclarations.push_back (opGblDeclaration);
       }
@@ -130,5 +131,5 @@ FortranDeclarations::visit (SgNode * node)
 
 FortranDeclarations::FortranDeclarations (SgProject * project)
 {
-  traverseInputFiles(project, preorder);
+  traverseInputFiles (project, preorder);
 }

@@ -28,47 +28,49 @@ template <typename TSubroutineHeader>
 
       /*
        * ======================================================
-       * Actual arguments passed to every OP_DECL_SETSubroutineHeader in the
-       * program
+       * OP_DECL_SET declarations
        * ======================================================
        */
-      std::vector <OpSetDeclaration *> OpSetDeclarations;
+      std::vector <OpSetDefinition *> OpSetDeclarations;
 
       /*
        * ======================================================
-       * Actual arguments passed to every OP_DECL_MAP in the
-       * program
+       * OP_DECL_MAP declarations
        * ======================================================
        */
-      std::vector <OpMapDeclaration *> OpMapDeclarations;
+      std::vector <OpMapDefinition *> OpMapDeclarations;
 
       /*
        * ======================================================
-       * Actual arguments passed to every OP_DECL_DATSubroutineHeader in the
-       * program
+       * OP_DECL_DAT declarations
        * ======================================================
        */
-      std::vector <OpDatDeclaration *> OpDatDeclarations;
+      std::vector <OpDatDefinition *> OpDatDeclarations;
 
       /*
        * ======================================================
-       * Actual arguments passed to every OP_DECL_GBL in the
-       * program
+       * OP_DECL_GBL declarations
        * ======================================================
        */
-      std::vector <OpGblDeclaration *> OpGblDeclarations;
+      std::vector <OpGblDefinition *> OpGblDeclarations;
+
+      /*
+       * ======================================================
+       * OP_DECL_CONST declarations
+       * ======================================================
+       */
+      std::vector <OpConstDefinition *> OpConstDeclarations;
 
     public:
 
-      OpSetDeclaration *
-      getOpSetDeclaration (
-          std::string const & opSETSubroutineHeaderName)
+      OpSetDefinition *
+      getOpSetDeclaration (std::string const & opSETSubroutineHeaderName)
           throw (std::string const &)
       {
         using boost::iequals;
         using std::vector;
 
-        for (vector <OpSetDeclaration *>::iterator it =
+        for (vector <OpSetDefinition *>::iterator it =
             OpSetDeclarations.begin (); it != OpSetDeclarations.end (); ++it)
         {
           if (iequals ((*it)->getVariableName (), opSETSubroutineHeaderName))
@@ -80,14 +82,14 @@ template <typename TSubroutineHeader>
         throw opSETSubroutineHeaderName;
       }
 
-      OpMapDeclaration *
+      OpMapDefinition *
       getOpMapDeclaration (std::string const & opMAPName)
           throw (std::string const &)
       {
         using boost::iequals;
         using std::vector;
 
-        for (vector <OpMapDeclaration *>::iterator it =
+        for (vector <OpMapDefinition *>::iterator it =
             OpMapDeclarations.begin (); it != OpMapDeclarations.end (); ++it)
         {
           if (iequals ((*it)->getVariableName (), opMAPName))
@@ -99,15 +101,14 @@ template <typename TSubroutineHeader>
         throw opMAPName;
       }
 
-      OpDatDeclaration *
-      getOpDatDeclaration (
-          std::string const & opDATSubroutineHeaderName)
+      OpDatDefinition *
+      getOpDatDeclaration (std::string const & opDATSubroutineHeaderName)
           throw (std::string const &)
       {
         using boost::iequals;
         using std::vector;
 
-        for (vector <OpDatDeclaration *>::iterator it =
+        for (vector <OpDatDefinition *>::iterator it =
             OpDatDeclarations.begin (); it != OpDatDeclarations.end (); ++it)
         {
           if (iequals ((*it)->getVariableName (), opDATSubroutineHeaderName))
@@ -119,14 +120,14 @@ template <typename TSubroutineHeader>
         throw opDATSubroutineHeaderName;
       }
 
-      OpGblDeclaration *
+      OpGblDefinition *
       getOpGblDeclaration (std::string const & opGBLName)
           throw (std::string const &)
       {
         using boost::iequals;
         using std::vector;
 
-        for (vector <OpGblDeclaration *>::iterator it =
+        for (vector <OpGblDefinition *>::iterator it =
             OpGblDeclarations.begin (); it != OpGblDeclarations.end (); ++it)
         {
           if (iequals ((*it)->getVariableName (), opGBLName))
