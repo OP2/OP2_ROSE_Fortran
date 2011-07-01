@@ -6,7 +6,7 @@
 #include <FortranStatementsAndExpressionsBuilder.h>
 
 class FortranHostSubroutine: public HostSubroutine <SgProcedureHeaderStatement,
-    FortranDeclarations>
+    FortranProgramDeclarationsAndDefinitions>
 {
   protected:
 
@@ -26,7 +26,7 @@ class FortranHostSubroutine: public HostSubroutine <SgProcedureHeaderStatement,
         std::string const & userSubroutineName,
         std::string const & kernelSubroutineName,
         FortranParallelLoop * parallelLoop, SgScopeStatement * moduleScope) :
-      HostSubroutine <SgProcedureHeaderStatement, FortranDeclarations> (
+      HostSubroutine <SgProcedureHeaderStatement, FortranProgramDeclarationsAndDefinitions> (
           subroutineName, userSubroutineName, kernelSubroutineName,
           parallelLoop)
     {

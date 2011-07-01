@@ -23,7 +23,7 @@ class FortranCUDASubroutinesGeneration: public FortranSubroutinesGeneration
 
   public:
 
-    FortranCUDASubroutinesGeneration (FortranDeclarations * declarations) :
+    FortranCUDASubroutinesGeneration (FortranProgramDeclarationsAndDefinitions * declarations) :
       FortranSubroutinesGeneration (declarations)
     {
     }

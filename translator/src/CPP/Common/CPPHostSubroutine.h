@@ -6,7 +6,7 @@
 #include <CPPDeclarations.h>
 
 class CPPHostSubroutine: public HostSubroutine <SgFunctionDeclaration,
-    CPPDeclarations>
+    CPPProgramDeclarationsAndDefinitions>
 {
   protected:
 
@@ -14,7 +14,7 @@ class CPPHostSubroutine: public HostSubroutine <SgFunctionDeclaration,
         std::string const & userSubroutineName,
         std::string const & kernelSubroutineName,
         CPPParallelLoop * parallelLoop) :
-      HostSubroutine <SgFunctionDeclaration, CPPDeclarations> (subroutineName,
+      HostSubroutine <SgFunctionDeclaration, CPPProgramDeclarationsAndDefinitions> (subroutineName,
           userSubroutineName, kernelSubroutineName, parallelLoop)
     {
     }

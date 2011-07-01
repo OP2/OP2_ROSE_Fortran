@@ -6,10 +6,10 @@
 #define CPP_PARALLEL_LOOP_H
 
 #include <ParallelLoop.h>
-#include <CPPDeclarations.h>
+#include <CPPProgramDeclarationsAndDefinitions.h>
 
 class CPPParallelLoop: public ParallelLoop <SgFunctionDeclaration,
-    CPPDeclarations>
+    CPPProgramDeclarationsAndDefinitions>
 {
   private:
 
@@ -22,7 +22,8 @@ class CPPParallelLoop: public ParallelLoop <SgFunctionDeclaration,
         std::string const & variableName, int opDatArgumentGroup);
 
     virtual void
-    retrieveOpDatDeclarations (CPPDeclarations * declarations);
+    retrieveOpDatDeclarations (
+        CPPProgramDeclarationsAndDefinitions * declarations);
 
   public:
 
@@ -33,7 +34,8 @@ class CPPParallelLoop: public ParallelLoop <SgFunctionDeclaration,
     getNumberOfOpDatArgumentGroups () const;
 
     CPPParallelLoop (SgExpressionPtrList & actualArguments,
-        std::string userSubroutineName, CPPDeclarations * declarations);
+        std::string userSubroutineName,
+        CPPProgramDeclarationsAndDefinitions * declarations);
 };
 
 #endif

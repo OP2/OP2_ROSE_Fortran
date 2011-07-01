@@ -17,24 +17,24 @@ class FortranPlan: public Plan <FortranParallelLoop>
 
     virtual void
     createConvertPlanFunctionParametersStatements (
-        VariableDeclarations * variableDeclarations,
+        SubroutineVariableDeclarations * variableDeclarations,
         FortranParallelLoop * parallelLoop, SgScopeStatement * subroutineScope,
         SgScopeStatement * statementScope);
 
     virtual void
     createConvertPositionInPMapsStatements (
-        VariableDeclarations * variableDeclarations,
+        SubroutineVariableDeclarations * variableDeclarations,
         FortranParallelLoop * parallelLoop, SgScopeStatement * subroutineScope,
         SgScopeStatement * statementScope);
 
     virtual void
     createPlanFunctionParametersPreparationStatements (
-        VariableDeclarations * variableDeclarations,
+        SubroutineVariableDeclarations * variableDeclarations,
         FortranParallelLoop * parallelLoop, SgScopeStatement * scope);
 
     virtual void
     createPlanFunctionCallStatement (
-        VariableDeclarations * variableDeclarations,
+        SubroutineVariableDeclarations * variableDeclarations,
         SgScopeStatement * subroutineScope, SgScopeStatement * statementScope);
 };
 

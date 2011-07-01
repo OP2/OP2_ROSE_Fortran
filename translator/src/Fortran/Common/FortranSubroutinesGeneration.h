@@ -2,7 +2,7 @@
 #define FORTRAN_SUBROUTINES_GENERATION_H
 
 #include <rose.h>
-#include <Declarations.h>
+#include <FortranProgramDeclarationsAndDefinitions.h>
 #include <FortranParallelLoop.h>
 #include <FortranHostSubroutine.h>
 
@@ -34,7 +34,7 @@ class FortranSubroutinesGeneration: public AstSimpleProcessing
      * processed
      * ======================================================
      */
-    FortranDeclarations * declarations;
+    FortranProgramDeclarationsAndDefinitions * declarations;
 
     /*
      * ======================================================
@@ -104,7 +104,8 @@ class FortranSubroutinesGeneration: public AstSimpleProcessing
     SgSourceFile &
     createSourceFile (FortranParallelLoop & parallelLoop);
 
-    FortranSubroutinesGeneration (FortranDeclarations * declarations) :
+    FortranSubroutinesGeneration (
+        FortranProgramDeclarationsAndDefinitions * declarations) :
       declarations (declarations)
     {
     }

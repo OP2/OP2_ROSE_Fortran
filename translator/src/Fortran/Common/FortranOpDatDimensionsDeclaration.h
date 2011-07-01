@@ -11,7 +11,7 @@
 #define FORTRAN_OP_DAT_DIMENSIONS_DECLARATION_H
 
 #include <FortranParallelLoop.h>
-#include <VariableDeclarations.h>
+#include <SubroutineVariableDeclarations.h>
 
 class FortranOpDatDimensionsDeclaration
 {
@@ -50,7 +50,7 @@ class FortranOpDatDimensionsDeclaration
      * definition declaration statement
      * ======================================================
      */
-    VariableDeclarations * fieldDeclarations;
+    SubroutineVariableDeclarations * fieldDeclarations;
 
   private:
 

@@ -9,8 +9,8 @@
 #define PARALLEL_LOOP_H
 
 #include <CommonNamespaces.h>
-#include <Declarations.h>
-#include <OP2Variables.h>
+#include <ProgramDeclarationsAndDefinitions.h>
+#include <OP2Definitions.h>
 
 enum MAPPING_VALUE
 {

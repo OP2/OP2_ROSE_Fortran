@@ -5,7 +5,7 @@
 #include <CPPParallelLoop.h>
 
 class CPPKernelSubroutine: public KernelSubroutine <SgFunctionDeclaration,
-    CPPDeclarations>
+    CPPProgramDeclarationsAndDefinitions>
 {
 
   protected:
@@ -13,7 +13,7 @@ class CPPKernelSubroutine: public KernelSubroutine <SgFunctionDeclaration,
     CPPKernelSubroutine::CPPKernelSubroutine (
         std::string const & subroutineName,
         std::string const & userSubroutineName, CPPParallelLoop * parallelLoop) :
-      KernelSubroutine <SgFunctionDeclaration, CPPDeclarations> (
+      KernelSubroutine <SgFunctionDeclaration, CPPProgramDeclarationsAndDefinitions> (
           subroutineName, userSubroutineName, parallelLoop)
     {
     }

@@ -5,11 +5,11 @@
  * compiler
  */
 
-#ifndef SUBROUTSubroutineHeaderINE_H
-#define SUBROUTSubroutineHeaderINE_H
+#ifndef SUBROUTINE_H
+#define SUBROUTINE_H
 
 #include <rose.h>
-#include <VariableDeclarations.h>
+#include <SubroutineVariableDeclarations.h>
 
 template <typename TSubroutineHeader>
   class Subroutine
@@ -53,7 +53,7 @@ template <typename TSubroutineHeader>
        * newly created subroutine
        * ======================================================
        */
-      VariableDeclarations * variableDeclarations;
+      SubroutineVariableDeclarations * variableDeclarations;
 
     protected:
 
@@ -95,7 +95,7 @@ template <typename TSubroutineHeader>
 
         formalParameters = buildFunctionParameterList ();
 
-        variableDeclarations = new VariableDeclarations ();
+        variableDeclarations = new SubroutineVariableDeclarations ();
       }
 
     public:
@@ -128,7 +128,7 @@ template <typename TSubroutineHeader>
        * Returns the variable declarations in this subroutine
        * ======================================================
        */
-      VariableDeclarations *
+      SubroutineVariableDeclarations *
       getVariableDeclarations ()
       {
         return variableDeclarations;

@@ -6,7 +6,7 @@
 
 void
 FortranPlan::createConvertPlanFunctionParametersStatements (
-    VariableDeclarations * variableDeclarations,
+    SubroutineVariableDeclarations * variableDeclarations,
     FortranParallelLoop * parallelLoop, SgScopeStatement * subroutineScope,
     SgScopeStatement * statementScope)
 {
@@ -345,7 +345,7 @@ FortranPlan::createConvertPlanFunctionParametersStatements (
 
 void
 FortranPlan::createConvertPositionInPMapsStatements (
-    VariableDeclarations * variableDeclarations,
+    SubroutineVariableDeclarations * variableDeclarations,
     FortranParallelLoop * parallelLoop, SgScopeStatement * subroutineScope,
     SgScopeStatement * statementScope)
 {
@@ -499,7 +499,7 @@ FortranPlan::createConvertPositionInPMapsStatements (
 
 void
 FortranPlan::createPlanFunctionParametersPreparationStatements (
-    VariableDeclarations * variableDeclarations,
+    SubroutineVariableDeclarations * variableDeclarations,
     FortranParallelLoop * parallelLoop, SgScopeStatement * scope)
 {
   using SageBuilder::buildVarRefExp;
@@ -737,7 +737,7 @@ FortranPlan::createPlanFunctionParametersPreparationStatements (
 
 void
 FortranPlan::createPlanFunctionCallStatement (
-    VariableDeclarations * variableDeclarations,
+    SubroutineVariableDeclarations * variableDeclarations,
     SgScopeStatement * subroutineScope, SgScopeStatement * statementScope)
 {
   using SageBuilder::buildExprListExp;

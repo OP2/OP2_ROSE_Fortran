@@ -25,7 +25,7 @@ CPPParallelLoop::handleOpDatDeclaration (OpDatDefinition * opDatDeclaration,
 }
 
 void
-CPPParallelLoop::retrieveOpDatDeclarations (CPPDeclarations * declarations)
+CPPParallelLoop::retrieveOpDatDeclarations (CPPProgramDeclarationsAndDefinitions * declarations)
 {
 }
 
@@ -47,7 +47,7 @@ CPPParallelLoop::getNumberOfOpDatArgumentGroups () const
 }
 
 CPPParallelLoop::CPPParallelLoop (SgExpressionPtrList & actualArguments,
-    std::string userSubroutineName, CPPDeclarations * declarations) :
-  ParallelLoop <SgFunctionDeclaration, CPPDeclarations> (actualArguments)
+    std::string userSubroutineName, CPPProgramDeclarationsAndDefinitions * declarations) :
+  ParallelLoop <SgFunctionDeclaration, CPPProgramDeclarationsAndDefinitions> (actualArguments)
 {
 }

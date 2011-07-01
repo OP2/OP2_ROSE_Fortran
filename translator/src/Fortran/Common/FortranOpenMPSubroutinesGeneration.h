@@ -21,7 +21,7 @@ class FortranOpenMPSubroutinesGeneration: public FortranSubroutinesGeneration
 
   public:
 
-    FortranOpenMPSubroutinesGeneration (FortranDeclarations * declarations) :
+    FortranOpenMPSubroutinesGeneration (FortranProgramDeclarationsAndDefinitions * declarations) :
       FortranSubroutinesGeneration (declarations)
     {
     }

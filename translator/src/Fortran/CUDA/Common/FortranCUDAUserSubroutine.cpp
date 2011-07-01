@@ -263,9 +263,9 @@ FortranCUDAUserSubroutine::createStatements ()
 FortranCUDAUserSubroutine::FortranCUDAUserSubroutine (
     std::string const & subroutineName,
     FortranCUDAInitialiseConstantsSubroutine * initialiseConstantsSubroutine,
-    FortranDeclarations * declarations, FortranParallelLoop * parallelLoop,
+    FortranProgramDeclarationsAndDefinitions * declarations, FortranParallelLoop * parallelLoop,
     SgScopeStatement * moduleScope) :
-  UserSubroutine <SgProcedureHeaderStatement, FortranDeclarations> (
+  UserSubroutine <SgProcedureHeaderStatement, FortranProgramDeclarationsAndDefinitions> (
       subroutineName, parallelLoop)
 {
   using SageBuilder::buildProcedureHeaderStatement;

@@ -80,7 +80,7 @@ FortranOpenMPModuleDeclarations::FortranOpenMPModuleDeclarations (
   userSubroutineName (userSubroutineName), parallelLoop (parallelLoop),
       moduleScope (moduleScope)
 {
-  moduleDeclarations = new VariableDeclarations ();
+  moduleDeclarations = new SubroutineVariableDeclarations ();
 
   createFirstExecutionBooleanDeclaration ();
 }

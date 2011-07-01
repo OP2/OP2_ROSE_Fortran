@@ -4,20 +4,21 @@
  * Contains the entry point (i.e. 'main') of the translator.
  * It does the following:
  *
- * 1) Divides the command-line arguments into two sets: those
- * recognised by our translator and those recognised by ROSE.
+ * 1) Adds viable options to the command line and parses them.
+ * This process divides the command-line arguments into two sets:
+ * those recognised by our translator and those recognised by ROSE
  *
- * 2) Obtains the declarations of OP2 variables (i.e. sets, maps,
+ * 2) Obtains the definitions of OP2 variables (i.e. sets, maps,
  * data, etc.) and subroutines found in the source files to be
- * processed.
+ * processed
  *
- * 3) Creates the subroutines which implement an OP_PAR_LOOP.
+ * 3) Creates the subroutines which implement an OP_PAR_LOOP
  *
  * 4) Unparses the generated subroutines to files; there is one
- * file per unique OP_PAR_LOOP call.
+ * file per unique OP_PAR_LOOP call
  *
  * 5) Unparses the original source files to reflect the changes
- * made to OP_PAR_LOOP calls.
+ * made to OP_PAR_LOOP calls
  */
 
 #include <boost/algorithm/string.hpp>
@@ -27,9 +28,9 @@
 #include <CommandLineOptionWithParameters.h>
 #include <CommonNamespaces.h>
 #include <Debug.h>
-#include <Declarations.h>
 #include <Globals.h>
 #include <UDrawGraph.h>
+#include <FortranProgramDeclarationsAndDefinitions.h>
 #include <FortranSubroutinesGeneration.h>
 #include <FortranCUDASubroutinesGeneration.h>
 #include <FortranOpenMPSubroutinesGeneration.h>
@@ -89,7 +90,8 @@ class OpenCLOption: public CommandLineOption
     virtual void
     run ()
     {
-      Debug::getInstance ()->errorMessage ("Sorry: OpenCL backend not yet supported");
+      Debug::getInstance ()->errorMessage (
+          "Sorry: OpenCL backend not yet supported");
     }
 
     OpenCLOption (std::string helpMessage, std::string longOption) :
@@ -114,7 +116,8 @@ handleFortranProject (SgProject * project)
   Debug::getInstance ()->verboseMessage (
       "Retrieving declarations in source files");
 
-  FortranDeclarations * declarations = new FortranDeclarations (project);
+  FortranProgramDeclarationsAndDefinitions * declarations =
+      new FortranProgramDeclarationsAndDefinitions (project);
 
   /*
    * ======================================================

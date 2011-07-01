@@ -284,7 +284,7 @@ FortranOpenMPModuleDeclarationsIndirectLoop::getPlanFunctionDeclaration (
   return moduleDeclarations->get (variableName);
 }
 
-VariableDeclarations *
+SubroutineVariableDeclarations *
 FortranOpenMPModuleDeclarationsIndirectLoop::getAllDeclarations ()
 {
   return moduleDeclarations;

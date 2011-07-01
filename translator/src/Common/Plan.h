@@ -13,7 +13,7 @@
 #define PLAN_H
 
 #include <rose.h>
-#include <VariableDeclarations.h>
+#include <SubroutineVariableDeclarations.h>
 #include <ParallelLoop.h>
 
 namespace PlanFunction
@@ -85,7 +85,7 @@ template <typename TParallelLoop>
        */
       virtual void
       createPlanFunctionParametersPreparationStatements (
-          VariableDeclarations * variableDeclarations,
+          SubroutineVariableDeclarations * variableDeclarations,
           TParallelLoop * parallelLoop, SgScopeStatement * scope) = 0;
 
       /*
@@ -98,7 +98,7 @@ template <typename TParallelLoop>
        */
       virtual void
           createPlanFunctionCallStatement (
-              VariableDeclarations * variableDeclarations,
+              SubroutineVariableDeclarations * variableDeclarations,
               SgScopeStatement * subroutineScope,
               SgScopeStatement * statementScope) = 0;
 

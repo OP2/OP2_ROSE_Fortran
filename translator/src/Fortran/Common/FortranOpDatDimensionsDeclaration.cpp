@@ -16,7 +16,7 @@ FortranOpDatDimensionsDeclaration::addFields ()
   using SageBuilder::buildVariableDeclaration;
   using std::string;
 
-  fieldDeclarations = new VariableDeclarations ();
+  fieldDeclarations = new SubroutineVariableDeclarations ();
 
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {

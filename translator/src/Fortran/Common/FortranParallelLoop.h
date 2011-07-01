@@ -6,10 +6,10 @@
 #define FORTRAN_PARALLEL_LOOP_H
 
 #include <ParallelLoop.h>
-#include <FortranDeclarations.h>
+#include <FortranProgramDeclarationsAndDefinitions.h>
 
 class FortranParallelLoop: public ParallelLoop <SgProcedureHeaderStatement,
-    FortranDeclarations>
+    FortranProgramDeclarationsAndDefinitions>
 {
   private:
 
@@ -54,7 +54,8 @@ class FortranParallelLoop: public ParallelLoop <SgProcedureHeaderStatement,
         std::string const & variableName, int opDatArgumentGroup);
 
     virtual void
-    retrieveOpDatDeclarations (FortranDeclarations * declarations);
+    retrieveOpDatDeclarations (
+        FortranProgramDeclarationsAndDefinitions * declarations);
 
   public:
 
@@ -65,7 +66,8 @@ class FortranParallelLoop: public ParallelLoop <SgProcedureHeaderStatement,
     getNumberOfOpDatArgumentGroups () const;
 
     FortranParallelLoop (SgExpressionPtrList & actualArguments,
-        std::string userSubroutineName, FortranDeclarations * declarations);
+        std::string userSubroutineName,
+        FortranProgramDeclarationsAndDefinitions * declarations);
 };
 
 #endif

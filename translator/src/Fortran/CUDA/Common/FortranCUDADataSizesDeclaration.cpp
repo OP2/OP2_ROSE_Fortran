@@ -8,7 +8,7 @@ FortranCUDADataSizesDeclaration::getType ()
   return deviceDatatypeStatement->get_type ();
 }
 
-VariableDeclarations *
+SubroutineVariableDeclarations *
 FortranCUDADataSizesDeclaration::getFieldDeclarations ()
 {
   return fieldDeclarations;
@@ -21,7 +21,7 @@ FortranCUDADataSizesDeclaration::FortranCUDADataSizesDeclaration (
 {
   using SageInterface::appendStatement;
 
-  fieldDeclarations = new VariableDeclarations ();
+  fieldDeclarations = new SubroutineVariableDeclarations ();
 
   deviceDatatypeStatement
       = FortranStatementsAndExpressionsBuilder::buildTypeDeclaration (

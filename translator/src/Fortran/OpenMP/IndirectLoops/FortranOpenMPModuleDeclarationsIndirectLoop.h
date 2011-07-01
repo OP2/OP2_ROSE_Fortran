@@ -33,7 +33,7 @@ class FortranOpenMPModuleDeclarationsIndirectLoop: public FortranOpenMPModuleDec
     SgVariableDeclaration *
     getPlanFunctionDeclaration (std::string const & variableName);
 
-    VariableDeclarations *
+    SubroutineVariableDeclarations *
     getAllDeclarations ();
 
     FortranOpenMPModuleDeclarationsIndirectLoop (

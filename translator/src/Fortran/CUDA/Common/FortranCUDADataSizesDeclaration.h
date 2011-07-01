@@ -18,7 +18,7 @@
 #define FORTRAN_CUDA_DATA_SIZES_DECLARATION_H
 
 #include <FortranParallelLoop.h>
-#include <VariableDeclarations.h>
+#include <SubroutineVariableDeclarations.h>
 
 class FortranCUDADataSizesDeclaration
 {
@@ -51,7 +51,7 @@ class FortranCUDADataSizesDeclaration
      * definition declaration statement
      * ======================================================
      */
-    VariableDeclarations * fieldDeclarations;
+    SubroutineVariableDeclarations * fieldDeclarations;
 
   protected:
 
@@ -76,7 +76,7 @@ class FortranCUDADataSizesDeclaration
      * Get the field declarations
      * ======================================================
      */
-    VariableDeclarations *
+    SubroutineVariableDeclarations *
     getFieldDeclarations ();
 };
 

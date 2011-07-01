@@ -112,7 +112,7 @@ FortranParallelLoop::handleOpDatDeclaration (
 
 void
 FortranParallelLoop::retrieveOpDatDeclarations (
-    FortranDeclarations * declarations)
+    FortranProgramDeclarationsAndDefinitions * declarations)
 {
   using boost::iequals;
   using boost::lexical_cast;
@@ -174,12 +174,12 @@ FortranParallelLoop::retrieveOpDatDeclarations (
 
               try
               {
-                handleOpDatDeclaration (declarations->getOpDatDeclaration (
+                handleOpDatDeclaration (declarations->getOpDatDefinition (
                     variableName), variableName, opDatArgumentGroup);
               }
               catch (const std::string &)
               {
-                handleOpGblDeclaration (declarations->getOpGblDeclaration (
+                handleOpGblDeclaration (declarations->getOpGblDefinition (
                     variableName), variableName, opDatArgumentGroup);
               }
             }
@@ -372,9 +372,9 @@ FortranParallelLoop::getNumberOfOpDatArgumentGroups () const
 
 FortranParallelLoop::FortranParallelLoop (
     SgExpressionPtrList & actualArguments, std::string userSubroutineName,
-    FortranDeclarations * declarations) :
-  ParallelLoop <SgProcedureHeaderStatement, FortranDeclarations> (
-      actualArguments)
+    FortranProgramDeclarationsAndDefinitions * declarations) :
+  ParallelLoop <SgProcedureHeaderStatement,
+      FortranProgramDeclarationsAndDefinitions> (actualArguments)
 {
   using boost::iequals;
 

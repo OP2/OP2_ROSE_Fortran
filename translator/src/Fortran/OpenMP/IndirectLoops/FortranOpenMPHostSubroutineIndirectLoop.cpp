@@ -316,12 +316,12 @@ FortranOpenMPHostSubroutineIndirectLoop::createFirstTimeExecutionStatements ()
   using SageInterface::appendStatement;
   using std::vector;
 
-  vector <VariableDeclarations *> declarationSets;
+  vector <SubroutineVariableDeclarations *> declarationSets;
   declarationSets.push_back (variableDeclarations);
   declarationSets.push_back (
       dynamic_cast <FortranOpenMPModuleDeclarationsIndirectLoop *> (moduleDeclarations)->getAllDeclarations ());
 
-  VariableDeclarations * allDeclarations = new VariableDeclarations (
+  SubroutineVariableDeclarations * allDeclarations = new SubroutineVariableDeclarations (
       declarationSets);
 
   SgEqualityOp * ifGuardExpression = buildEqualityOp (buildVarRefExp (

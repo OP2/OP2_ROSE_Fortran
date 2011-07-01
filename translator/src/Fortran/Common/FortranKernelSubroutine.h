@@ -6,14 +6,14 @@
 #include <FortranStatementsAndExpressionsBuilder.h>
 
 class FortranKernelSubroutine: public KernelSubroutine <
-    SgProcedureHeaderStatement, FortranDeclarations>
+    SgProcedureHeaderStatement, FortranProgramDeclarationsAndDefinitions>
 {
   protected:
 
     FortranKernelSubroutine (std::string const & subroutineName,
         std::string const & userSubroutineName,
         FortranParallelLoop * parallelLoop, SgScopeStatement * moduleScope) :
-      KernelSubroutine <SgProcedureHeaderStatement, FortranDeclarations> (
+      KernelSubroutine <SgProcedureHeaderStatement, FortranProgramDeclarationsAndDefinitions> (
           subroutineName, userSubroutineName, parallelLoop)
     {
       using SageBuilder::buildVoidType;

@@ -6,7 +6,7 @@
 #include <FortranParallelLoop.h>
 
 class FortranCUDAUserSubroutine: public UserSubroutine <
-    SgProcedureHeaderStatement, FortranDeclarations>
+    SgProcedureHeaderStatement, FortranProgramDeclarationsAndDefinitions>
 {
   private:
 
@@ -38,7 +38,7 @@ class FortranCUDAUserSubroutine: public UserSubroutine <
         FortranCUDAUserSubroutine (
             std::string const & subroutineName,
             FortranCUDAInitialiseConstantsSubroutine * initialiseConstantsSubroutine,
-            FortranDeclarations * declarations,
+            FortranProgramDeclarationsAndDefinitions * declarations,
             FortranParallelLoop * parallelLoop, SgScopeStatement * moduleScope);
 };
 
