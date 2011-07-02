@@ -10,6 +10,326 @@
  */
 
 void
+CPPModifyOP2CallsToComplyWithOxfordAPI::patchOpArgGblCall (
+    SgExpressionPtrList & actualArguments)
+{
+  using SageBuilder::buildStringVal;
+  using SageBuilder::buildIntVal;
+  using std::string;
+  using std::vector;
+
+  Debug::getInstance ()->debugMessage ("Patching call to OP_ARG_GBL", 5);
+
+  SgAddressOfOp * addressOfOperator = isSgAddressOfOp (
+      actualArguments[CPPImperialOpArgGblCall::index_OpDatName]);
+
+  string opConstVariableName;
+
+  if (addressOfOperator != NULL)
+  {
+    SgVarRefExp * operandExpression = isSgVarRefExp (
+        addressOfOperator->get_operand ());
+
+    ROSE_ASSERT (operandExpression != NULL);
+
+    opConstVariableName
+        = operandExpression->get_symbol ()->get_name ().getString ();
+  }
+  else
+  {
+    opConstVariableName
+        = isSgVarRefExp (
+            actualArguments[CPPImperialOpArgGblCall::index_OpDatName])->get_symbol ()->get_name ().getString ();
+  }
+
+  if (declarations->isTypeShort (opConstVariableName))
+  {
+    /*
+     * ======================================================
+     * Put the dimension of the OP_CONST after the OP_DAT
+     * reference
+     * ======================================================
+     */
+
+    vector <SgExpression *>::iterator positionOfDimension =
+        actualArguments.begin () + 1;
+
+    actualArguments.insert (positionOfDimension, buildIntVal (1));
+
+    /*
+     * ======================================================
+     * Put the type of the OP_DAT after the dimension of the
+     * OP_DAT
+     * ======================================================
+     */
+
+    vector <SgExpression *>::iterator positionOfTypeName =
+        actualArguments.begin () + 2;
+
+    actualArguments.insert (positionOfTypeName, buildStringVal ("short"));
+  }
+  else if (declarations->isTypeInteger (opConstVariableName))
+  {
+    /*
+     * ======================================================
+     * Put the dimension of the OP_CONST after the OP_DAT
+     * reference
+     * ======================================================
+     */
+
+    vector <SgExpression *>::iterator positionOfDimension =
+        actualArguments.begin () + 1;
+
+    actualArguments.insert (positionOfDimension, buildIntVal (1));
+
+    /*
+     * ======================================================
+     * Put the type of the OP_DAT after the dimension of the
+     * OP_DAT
+     * ======================================================
+     */
+
+    vector <SgExpression *>::iterator positionOfTypeName =
+        actualArguments.begin () + 2;
+
+    actualArguments.insert (positionOfTypeName, buildStringVal ("int"));
+  }
+  else if (declarations->isTypeLong (opConstVariableName))
+  {
+    /*
+     * ======================================================
+     * Put the dimension of the OP_CONST after the OP_DAT
+     * reference
+     * ======================================================
+     */
+
+    vector <SgExpression *>::iterator positionOfDimension =
+        actualArguments.begin () + 1;
+
+    actualArguments.insert (positionOfDimension, buildIntVal (1));
+
+    /*
+     * ======================================================
+     * Put the type of the OP_DAT after the dimension of the
+     * OP_DAT
+     * ======================================================
+     */
+
+    vector <SgExpression *>::iterator positionOfTypeName =
+        actualArguments.begin () + 2;
+
+    actualArguments.insert (positionOfTypeName, buildStringVal ("long"));
+  }
+  else if (declarations->isTypeFloat (opConstVariableName))
+  {
+    /*
+     * ======================================================
+     * Put the dimension of the OP_CONST after the OP_DAT
+     * reference
+     * ======================================================
+     */
+
+    vector <SgExpression *>::iterator positionOfDimension =
+        actualArguments.begin () + 1;
+
+    actualArguments.insert (positionOfDimension, buildIntVal (1));
+
+    /*
+     * ======================================================
+     * Put the type of the OP_DAT after the dimension of the
+     * OP_DAT
+     * ======================================================
+     */
+
+    vector <SgExpression *>::iterator positionOfTypeName =
+        actualArguments.begin () + 2;
+
+    actualArguments.insert (positionOfTypeName, buildStringVal ("float"));
+  }
+  else if (declarations->isTypeDouble (opConstVariableName))
+  {
+    /*
+     * ======================================================
+     * Put the dimension of the OP_CONST after the OP_DAT
+     * reference
+     * ======================================================
+     */
+
+    vector <SgExpression *>::iterator positionOfDimension =
+        actualArguments.begin () + 1;
+
+    actualArguments.insert (positionOfDimension, buildIntVal (1));
+
+    /*
+     * ======================================================
+     * Put the type of the OP_DAT after the dimension of the
+     * OP_DAT
+     * ======================================================
+     */
+
+    vector <SgExpression *>::iterator positionOfTypeName =
+        actualArguments.begin () + 2;
+
+    actualArguments.insert (positionOfTypeName, buildStringVal ("double"));
+  }
+  else
+  {
+    Debug::getInstance ()->errorMessage ("Cannot ascertain type of OP_CONST '"
+        + opConstVariableName + "'");
+  }
+}
+
+void
+CPPModifyOP2CallsToComplyWithOxfordAPI::patchOpArgDatCall (
+    SgExpressionPtrList & actualArguments)
+{
+  using boost::iequals;
+  using SageBuilder::buildStringVal;
+  using SageBuilder::buildIntVal;
+  using std::string;
+  using std::vector;
+
+  Debug::getInstance ()->debugMessage ("Patching call to OP_ARG_DAT", 5);
+
+  SgVarRefExp * opDatReference = isSgVarRefExp (
+      actualArguments[CPPImperialOpArgDatCall::index_OpDatName]);
+
+  ROSE_ASSERT (opDatReference != NULL);
+
+  string const opDatVariableName =
+      opDatReference ->get_symbol ()->get_name ().getString ();
+
+  CPPImperialOpDatDefinition
+      * opDatDefinition =
+          static_cast <CPPImperialOpDatDefinition *> (declarations->getOpDatDefinition (
+              opDatVariableName));
+
+  /*
+   * ======================================================
+   * Put the dimension of the OP_DAT after the OP_MAP
+   * reference
+   * ======================================================
+   */
+
+  vector <SgExpression *>::iterator positionOfDimension =
+      actualArguments.begin () + 3;
+
+  unsigned int dimension = opDatDefinition->getDimension ();
+
+  actualArguments.insert (positionOfDimension, buildIntVal (dimension));
+
+  /*
+   * ======================================================
+   * Put the type of the OP_DAT after the dimension of the
+   * OP_DAT
+   * ======================================================
+   */
+
+  vector <SgExpression *>::iterator positionOfTypeName =
+      actualArguments.begin () + 4;
+
+  SgPointerType * pointerType = isSgPointerType (
+      opDatDefinition->getPrimitiveType ());
+
+  ROSE_ASSERT (pointerType != NULL);
+
+  if (isSgTypeShort (pointerType->get_base_type ()) != NULL)
+  {
+    actualArguments.insert (positionOfTypeName, buildStringVal ("short"));
+  }
+  else if (isSgTypeInt (pointerType->get_base_type ()) != NULL)
+  {
+    actualArguments.insert (positionOfTypeName, buildStringVal ("int"));
+  }
+  else if (isSgTypeLong (pointerType->get_base_type ()) != NULL)
+  {
+    actualArguments.insert (positionOfTypeName, buildStringVal ("long"));
+  }
+  else if (isSgTypeFloat (pointerType->get_base_type ()) != NULL)
+  {
+    actualArguments.insert (positionOfTypeName, buildStringVal ("float"));
+  }
+  else if (isSgTypeDouble (pointerType->get_base_type ()) != NULL)
+  {
+    actualArguments.insert (positionOfTypeName, buildStringVal ("double"));
+  }
+  else
+  {
+    Debug::getInstance ()->errorMessage (
+        "Cannot ascertain base type of OP_DAT '" + opDatVariableName + "'");
+  }
+
+  std::cout << pointerType->get_base_type ()->class_name () << std::endl;
+}
+
+void
+CPPModifyOP2CallsToComplyWithOxfordAPI::patchOpParLoopCall (
+    SgExpressionPtrList & actualArguments)
+{
+  using boost::iequals;
+  using SageBuilder::buildStringVal;
+  using std::string;
+  using std::vector;
+
+  Debug::getInstance ()->debugMessage ("Patching call to OP_PAR_LOOP", 5);
+
+  SgFunctionRefExp * userSubroutineExpression = isSgFunctionRefExp (
+      actualArguments.front ());
+
+  /*
+   * ======================================================
+   * Put the name of the user subroutine  after the reference
+   * to the subroutine
+   * ======================================================
+   */
+
+  vector <SgExpression *>::iterator positionOfFunctionName =
+      actualArguments.begin () + 1;
+
+  std::string const
+      userSubroutineName =
+          userSubroutineExpression->getAssociatedFunctionDeclaration ()->get_name ().getString ();
+
+  actualArguments.insert (positionOfFunctionName, buildStringVal (
+      userSubroutineName));
+
+  /*
+   * ======================================================
+   * Now modify OP_ARG_DAT arguments
+   * ======================================================
+   */
+
+  for (vector <SgExpression *>::iterator it = actualArguments.begin (); it
+      != actualArguments.end (); ++it)
+  {
+    SgFunctionCallExp * functionCallExpression = isSgFunctionCallExp (*it);
+
+    if (functionCallExpression != NULL)
+    {
+      std::string const
+          functionCallName =
+              functionCallExpression->getAssociatedFunctionDeclaration ()->get_name ().getString ();
+
+      if (iequals (functionCallName, OP2::OP_ARG_DAT))
+      {
+        patchOpArgDatCall (
+            functionCallExpression->get_args ()->get_expressions ());
+      }
+      else if (iequals (functionCallName, OP2::OP_ARG_GBL))
+      {
+        patchOpArgGblCall (
+            functionCallExpression->get_args ()->get_expressions ());
+      }
+      else
+      {
+        Debug::getInstance ()->errorMessage ("Unknown function call '"
+            + functionCallName + "' in OP_PAR_LOOP");
+      }
+    }
+  }
+}
+
+void
 CPPModifyOP2CallsToComplyWithOxfordAPI::patchOpDeclareConstCall (
     SgExpressionPtrList & actualArguments)
 {
@@ -42,8 +362,8 @@ CPPModifyOP2CallsToComplyWithOxfordAPI::patchOpDeclareConstCall (
 
   /*
    * ======================================================
-   * Sandwich the name of the type in the 2nd position of
-   * the argument list
+   * Sandwich the name of the type in between the constant
+   * value and the last argument
    * ======================================================
    */
   vector <SgExpression *>::iterator position = actualArguments.begin () + 1;
@@ -286,6 +606,10 @@ CPPModifyOP2CallsToComplyWithOxfordAPI::visit (SgNode * node)
 
         patchOpDeclareConstCall (
             functionCallExp->get_args ()->get_expressions ());
+      }
+      else if (iequals (calleeName, OP2::OP_PAR_LOOP))
+      {
+        patchOpParLoopCall (functionCallExp->get_args ()->get_expressions ());
       }
 
       break;

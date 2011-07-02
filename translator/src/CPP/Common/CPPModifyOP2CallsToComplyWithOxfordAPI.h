@@ -17,6 +17,15 @@ class CPPModifyOP2CallsToComplyWithOxfordAPI: public AstSimpleProcessing
   private:
 
     void
+    patchOpArgGblCall (SgExpressionPtrList & actualArguments);
+
+    void
+    patchOpArgDatCall (SgExpressionPtrList & actualArguments);
+
+    void
+    patchOpParLoopCall (SgExpressionPtrList & actualArguments);
+
+    void
     patchOpDeclareConstCall (SgExpressionPtrList & actualArguments);
 
     void

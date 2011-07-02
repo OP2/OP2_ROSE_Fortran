@@ -90,7 +90,7 @@ FortranProgramDeclarationsAndDefinitions::visit (SgNode * node)
         FortranOpDatDefinition * opDatDeclaration = new FortranOpDatDefinition (
             actualArguments);
 
-        if (isSgArrayType (opDatDeclaration->getActualType ()) == NULL)
+        if (isSgArrayType (opDatDeclaration->getPrimitiveType ()) == NULL)
         {
           Debug::getInstance ()->errorMessage ("OP_DAT variable '"
               + opDatDeclaration->getVariableName ()

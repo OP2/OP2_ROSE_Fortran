@@ -27,13 +27,13 @@ FortranParallelLoop::handleOpGblDeclaration (
 
   Debug::getInstance ()->debugMessage ("OP_GBL '" + variableName
       + "' in argument group " + lexical_cast <string> (opDatArgumentGroup)
-      + " has type '" + opGblDeclaration->getActualType ()->class_name ()
+      + " has type '" + opGblDeclaration->getPrimitiveType ()->class_name ()
       + "' and dimension " + lexical_cast <string> (
       opGblDeclaration->getDimension ()), 5);
 
   uniqueOpDats.push_back (variableName);
 
-  OpDatTypes[opDatArgumentGroup] = opGblDeclaration->getActualType ();
+  OpDatTypes[opDatArgumentGroup] = opGblDeclaration->getPrimitiveType ();
 
   OpDatDimensions[opDatArgumentGroup] = opGblDeclaration->getDimension ();
 
@@ -53,11 +53,11 @@ FortranParallelLoop::handleOpDatDeclaration (
 
   Debug::getInstance ()->debugMessage ("OP_DAT '" + variableName
       + "' in argument group " + lexical_cast <string> (opDatArgumentGroup)
-      + " has type '" + opDatDeclaration->getActualType ()->class_name ()
+      + " has type '" + opDatDeclaration->getPrimitiveType ()->class_name ()
       + "' and dimension " + lexical_cast <string> (
       opDatDeclaration->getDimension ()), 5);
 
-  OpDatTypes[opDatArgumentGroup] = opDatDeclaration->getActualType ();
+  OpDatTypes[opDatArgumentGroup] = opDatDeclaration->getPrimitiveType ();
 
   OpDatDimensions[opDatArgumentGroup] = opDatDeclaration->getDimension ();
 
@@ -73,7 +73,7 @@ FortranParallelLoop::handleOpDatDeclaration (
     OpDatDuplicates[opDatArgumentGroup] = false;
 
     SgArrayType * isArrayType = isSgArrayType (
-        opDatDeclaration->getActualType ());
+        opDatDeclaration->getPrimitiveType ());
 
     if (isArrayType == NULL)
     {

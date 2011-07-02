@@ -46,7 +46,7 @@ class OpDatDefinition: public OP2Definition
 
     unsigned int dimension;
 
-    SgType * actualType;
+    SgType * primitiveType;
 
   public:
 
@@ -63,9 +63,9 @@ class OpDatDefinition: public OP2Definition
     }
 
     SgType *
-    getActualType ()
+    getPrimitiveType ()
     {
-      return actualType;
+      return primitiveType;
     }
 };
 
@@ -147,7 +147,7 @@ class OpGblDefinition: public OP2Definition
 
     unsigned int dimension;
 
-    SgType * actualType;
+    SgType * primitiveType;
 
   public:
 
@@ -158,9 +158,9 @@ class OpGblDefinition: public OP2Definition
     }
 
     SgType *
-    getActualType ()
+    getPrimitiveType ()
     {
-      return actualType;
+      return primitiveType;
     }
 };
 

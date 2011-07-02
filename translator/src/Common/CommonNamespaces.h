@@ -38,6 +38,8 @@ namespace OP2
   std::string const OP_DECL_DAT = "op_decl_dat";
   std::string const OP_DECL_GBL = "op_decl_gbl";
   std::string const OP_DECL_CONST = "op_decl_const";
+  std::string const OP_ARG_DAT = "op_arg_dat";
+  std::string const OP_ARG_GBL = "op_arg_gbl";
 }
 
 namespace TargetBackends

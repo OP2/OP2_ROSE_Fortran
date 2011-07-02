@@ -102,4 +102,26 @@ class CPPImperialOpConstDefinition: public OpConstDefinition
     CPPImperialOpConstDefinition (SgExpressionPtrList & parameters);
 };
 
+class CPPImperialOpArgDatCall
+{
+  public:
+
+    static int const index_OpDatName = 0;
+
+    static int const index_OpIndex = 1;
+
+    static int const index_OpMapName = 2;
+
+    static int const index_OpAccess = 3;
+};
+
+class CPPImperialOpArgGblCall
+{
+  public:
+
+    static int const index_OpDatName = 0;
+
+    static int const index_OpAccess = 1;
+};
+
 #endif

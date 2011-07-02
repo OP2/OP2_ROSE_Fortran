@@ -338,6 +338,7 @@ FortranSubroutinesGeneration::visit (SgNode * node)
 
         SgFunctionRefExp * functionRefExp = isSgFunctionRefExp (
             actualArguments.front ());
+
         try
         {
           if (functionRefExp != NULL)

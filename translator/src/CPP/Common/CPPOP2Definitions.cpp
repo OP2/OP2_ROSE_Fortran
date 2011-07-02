@@ -15,16 +15,16 @@ CPPImperialOpDatDefinition::CPPImperialOpDatDefinition (
 
   dimension = isSgIntVal (parameters[index_dimension])->get_value ();
 
-  actualType = isSgVarRefExp (parameters[index_data])->get_type ();
+  primitiveType = isSgVarRefExp (parameters[index_data])->get_type ();
 
   ROSE_ASSERT (opSetName.empty () == false);
   ROSE_ASSERT (dimension > 0);
-  ROSE_ASSERT (actualType != NULL);
+  ROSE_ASSERT (primitiveType != NULL);
   ROSE_ASSERT (variableName.empty () == false);
 
   Debug::getInstance ()->debugMessage ("Found an OP_DAT declaration: '"
       + variableName + "'. The data pertains to the set '" + opSetName
-      + "'. Its actual type is " + actualType->class_name ()
+      + "'. Its actual type is " + primitiveType->class_name ()
       + " and its dimension is " + lexical_cast <string> (dimension), 5);
 }
 

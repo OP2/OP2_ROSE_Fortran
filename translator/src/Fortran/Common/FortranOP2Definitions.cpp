@@ -13,19 +13,19 @@ FortranOpDatDefinition::FortranOpDatDefinition (
 
   dimension = isSgIntVal (parameters[index_dimension])->get_value ();
 
-  actualType = isSgVarRefExp (parameters[index_data])->get_type ();
+  primitiveType = isSgVarRefExp (parameters[index_data])->get_type ();
 
   variableName
       = isSgVarRefExp (parameters[index_OpDatName])->get_symbol ()->get_name ().getString ();
 
   ROSE_ASSERT (opSetName.empty () == false);
   ROSE_ASSERT (dimension > 0);
-  ROSE_ASSERT (actualType != NULL);
+  ROSE_ASSERT (primitiveType != NULL);
   ROSE_ASSERT (variableName.empty () == false);
 
   Debug::getInstance ()->debugMessage ("Found an OP_DAT definition: '"
       + variableName + "'. The data pertains to the set '" + opSetName
-      + "'. Its actual type is " + actualType->class_name ()
+      + "'. Its actual type is " + primitiveType->class_name ()
       + " and its dimension is " + lexical_cast <string> (dimension), 5);
 }
 
@@ -90,7 +90,7 @@ FortranOpGblDefinition::FortranOpGblDefinition (
   using boost::lexical_cast;
   using std::string;
 
-  actualType = isSgVarRefExp (parameters[index_data])->get_type ();
+  primitiveType = isSgVarRefExp (parameters[index_data])->get_type ();
 
   dimension = isSgIntVal (parameters[index_dimension])->get_value ();
 
@@ -98,10 +98,10 @@ FortranOpGblDefinition::FortranOpGblDefinition (
       = isSgVarRefExp (parameters[index_OpDatName])->get_symbol ()->get_name ().getString ();
 
   ROSE_ASSERT (dimension > 0);
-  ROSE_ASSERT (actualType != NULL);
+  ROSE_ASSERT (primitiveType != NULL);
   ROSE_ASSERT (variableName.empty () == false);
 
   Debug::getInstance ()->debugMessage ("Found an OP_GBL definition: '"
-      + variableName + "'. Its actual type is " + actualType->class_name ()
+      + variableName + "'. Its actual type is " + primitiveType->class_name ()
       + " and its dimension is " + lexical_cast <string> (dimension), 5);
 }
