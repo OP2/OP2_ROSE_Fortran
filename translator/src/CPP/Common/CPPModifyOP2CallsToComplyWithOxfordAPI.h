@@ -1,0 +1,43 @@
+/*
+ * Written by Adam Betts and Carlo Bertolli
+ */
+
+#ifndef CPP_MODIFY_OP2_CALLS_TO_COMPLY_WITH_OXFORD_API_H
+#define CPP_MODIFY_OP2_CALLS_TO_COMPLY_WITH_OXFORD_API_H
+
+#include <rose.h>
+#include <CPPProgramDeclarationsAndDefinitions.h>
+
+class CPPModifyOP2CallsToComplyWithOxfordAPI: public AstSimpleProcessing
+{
+  private:
+
+    CPPProgramDeclarationsAndDefinitions * declarations;
+
+  private:
+
+    void
+    patchOpDeclareConstCall (SgExpressionPtrList & actualArguments);
+
+    void
+    patchOpDeclareDatCall (SgVariableDeclaration * variableDeclaration,
+        std::string const variableName);
+
+    void
+    patchOpDeclareMapCall (SgVariableDeclaration * variableDeclaration,
+        std::string const variableName);
+
+    void
+    patchOpDeclareSetCall (SgVariableDeclaration * variableDeclaration,
+        std::string const variableName);
+
+    virtual void
+    visit (SgNode * node);
+
+  public:
+
+    CPPModifyOP2CallsToComplyWithOxfordAPI (SgProject * project,
+        CPPProgramDeclarationsAndDefinitions * declarations);
+};
+
+#endif
