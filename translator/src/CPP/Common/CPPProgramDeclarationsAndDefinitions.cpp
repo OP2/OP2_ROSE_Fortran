@@ -81,6 +81,44 @@ CPPProgramDeclarationsAndDefinitions::detectAndHandleOP2Definition (
 }
 
 void
+CPPProgramDeclarationsAndDefinitions::handleBaseTypeDeclaration (SgType * type,
+    std::string const & variableName)
+{
+  if (isSgTypeShort (type) != NULL)
+  {
+    Debug::getInstance ()->debugMessage ("'" + variableName + "' is a short", 8);
+
+    shortDeclarations.push_back (variableName);
+  }
+  else if (isSgTypeInt (type) != NULL)
+  {
+    Debug::getInstance ()->debugMessage (
+        "'" + variableName + "' is an integer", 8);
+
+    integerDeclarations.push_back (variableName);
+  }
+  else if (isSgTypeLong (type) != NULL)
+  {
+    Debug::getInstance ()->debugMessage ("'" + variableName + "' is a long", 8);
+
+    longDeclarations.push_back (variableName);
+  }
+  else if (isSgTypeFloat (type) != NULL)
+  {
+    Debug::getInstance ()->debugMessage ("'" + variableName + "' is a float", 8);
+
+    floatDeclarations.push_back (variableName);
+  }
+  else if (isSgTypeDouble (type) != NULL)
+  {
+    Debug::getInstance ()->debugMessage ("'" + variableName + "' is a double",
+        8);
+
+    doubleDeclarations.push_back (variableName);
+  }
+}
+
+void
 CPPProgramDeclarationsAndDefinitions::visit (SgNode * node)
 {
   using boost::iequals;
@@ -105,9 +143,25 @@ CPPProgramDeclarationsAndDefinitions::visit (SgNode * node)
         detectAndHandleOP2Definition (variableDeclaration, variableName,
             isSgTypedefType (type));
       }
-      else if (isSgTypeInt (type) != NULL)
+      else if (isSgPointerType (type) != NULL)
       {
+        Debug::getInstance ()->debugMessage ("'" + variableName
+            + "' is a pointer", 8);
 
+        handleBaseTypeDeclaration (isSgPointerType (type)->get_base_type (),
+            variableName);
+      }
+      else if (isSgArrayType (type) != NULL)
+      {
+        Debug::getInstance ()->debugMessage ("'" + variableName
+            + "' is a array", 8);
+
+        handleBaseTypeDeclaration (isSgArrayType (type)->get_base_type (),
+            variableName);
+      }
+      else
+      {
+        handleBaseTypeDeclaration (type, variableName);
       }
 
       break;
@@ -122,9 +176,6 @@ CPPProgramDeclarationsAndDefinitions::visit (SgNode * node)
        * ======================================================
        */
       SgFunctionCallExp * functionCallExp = isSgFunctionCallExp (node);
-
-      SgExpressionPtrList & actualArguments =
-          functionCallExp->get_args ()->get_expressions ();
 
       string const
           calleeName =
@@ -142,7 +193,8 @@ CPPProgramDeclarationsAndDefinitions::visit (SgNode * node)
          */
 
         CPPImperialOpConstDefinition * opConstDeclaration =
-            new CPPImperialOpConstDefinition (actualArguments);
+            new CPPImperialOpConstDefinition (
+                functionCallExp->get_args ()->get_expressions ());
 
         OpConstDefinitions.push_back (opConstDeclaration);
       }

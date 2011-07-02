@@ -153,6 +153,8 @@ FortranSubroutinesGeneration::patchCallsToParallelLoops (
    */
   SgLocatedNode * functionCallLocation = isSgLocatedNode (functionCallExp);
 
+  ROSE_ASSERT (functionCallLocation != NULL);
+
   functionCallLocation->get_file_info ()->setTransformation ();
 }
 

@@ -18,7 +18,7 @@ class CPPImperialOpDatDefinition: public OpDatDefinition
      * ======================================================
      */
 
-  private:
+  public:
 
     static int const index_OpSetName = 0;
 
@@ -43,7 +43,7 @@ class CPPImperialOpSetDefinition: public OpSetDefinition
      * ======================================================
      */
 
-  private:
+  public:
 
     static int const index_setCardinalityName = 0;
 
@@ -64,7 +64,7 @@ class CPPImperialOpMapDefinition: public OpMapDefinition
      * ======================================================
      */
 
-  private:
+  public:
 
     static int const index_sourceOpSetName = 0;
 
@@ -91,7 +91,7 @@ class CPPImperialOpConstDefinition: public OpConstDefinition
      * ======================================================
      */
 
-  private:
+  public:
 
     static int const index_dimension = 0;
 

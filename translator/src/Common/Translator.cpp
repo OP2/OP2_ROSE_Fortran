@@ -33,6 +33,7 @@
 #include <FortranProgramDeclarationsAndDefinitions.h>
 #include <FortranCUDASubroutinesGeneration.h>
 #include <FortranOpenMPSubroutinesGeneration.h>
+#include <CPPModifyOP2CallsToComplyWithOxfordAPI.h>
 #include <CPPProgramDeclarationsAndDefinitions.h>
 #include <CPPSubroutinesGeneration.h>
 
@@ -225,8 +226,6 @@ addCommandLineOptions ()
 int
 main (int argc, char ** argv)
 {
-  using std::string;
-
   addCommandLineOptions ();
 
   CommandLine::getInstance ()->parse (argc, argv);
@@ -262,13 +261,18 @@ main (int argc, char ** argv)
 
       CPPProgramDeclarationsAndDefinitions * declarations =
           new CPPProgramDeclarationsAndDefinitions (project);
+
+      CPPModifyOP2CallsToComplyWithOxfordAPI * modifyCalls =
+          new CPPModifyOP2CallsToComplyWithOxfordAPI (project, declarations);
+
+      project->unparse ();
     }
     else
     {
       checkBackendOption ();
-    }
 
-    handleCPPProject (project);
+      handleCPPProject (project);
+    }
   }
   else
   {
