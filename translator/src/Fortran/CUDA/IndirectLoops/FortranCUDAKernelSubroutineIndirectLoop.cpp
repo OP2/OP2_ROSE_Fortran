@@ -31,7 +31,8 @@ FortranCUDAKernelSubroutineIndirectLoop::createUserSubroutineCallStatement ()
   using std::vector;
 
   Debug::getInstance ()->debugMessage (
-      "Creating call to user device subroutine", 2);
+      "Creating call to user device subroutine", Debug::FUNCTION_LEVEL,
+      __FILE__, __LINE__);
 
   SgExprListExp * userDeviceSubroutineParameters = buildExprListExp ();
 
@@ -45,7 +46,8 @@ FortranCUDAKernelSubroutineIndirectLoop::createUserSubroutineCallStatement ()
     {
       if (parallelLoop->getOpAccessValue (i) == READ_ACCESS)
       {
-        Debug::getInstance ()->debugMessage ("OP_GBL with read access", 7);
+        Debug::getInstance ()->debugMessage ("OP_GBL with read access",
+            Debug::OUTER_LOOP_LEVEL, __FILE__, __LINE__);
 
         /*
          * ======================================================
@@ -78,7 +80,8 @@ FortranCUDAKernelSubroutineIndirectLoop::createUserSubroutineCallStatement ()
       }
       else
       {
-        Debug::getInstance ()->debugMessage ("OP_GBL with write access", 7);
+        Debug::getInstance ()->debugMessage ("OP_GBL with write access",
+            Debug::OUTER_LOOP_LEVEL, __FILE__, __LINE__);
 
         /*
          * ======================================================
@@ -95,7 +98,8 @@ FortranCUDAKernelSubroutineIndirectLoop::createUserSubroutineCallStatement ()
         && parallelLoop->getOpAccessValue (i) == INC_ACCESS)
     {
       Debug::getInstance ()->debugMessage (
-          "Indirect OP_DAT with increment access", 7);
+          "Indirect OP_DAT with increment access", Debug::OUTER_LOOP_LEVEL,
+          __FILE__, __LINE__);
 
       parameterExpression = buildVarRefExp (variableDeclarations->get (
           VariableNames::getOpDatLocalName (i)));
@@ -103,7 +107,8 @@ FortranCUDAKernelSubroutineIndirectLoop::createUserSubroutineCallStatement ()
     else if (parallelLoop->getOpMapValue (i) == INDIRECT)
     {
       Debug::getInstance ()->debugMessage (
-          "Indirect OP_DAT with read/write access", 7);
+          "Indirect OP_DAT with read/write access", Debug::OUTER_LOOP_LEVEL,
+          __FILE__, __LINE__);
 
       SgAddOp
           * addExpression1 =
@@ -166,7 +171,8 @@ FortranCUDAKernelSubroutineIndirectLoop::createUserSubroutineCallStatement ()
     }
     else if (parallelLoop->getOpMapValue (i) == DIRECT)
     {
-      Debug::getInstance ()->debugMessage ("Direct OP_DAT", 7);
+      Debug::getInstance ()->debugMessage ("Direct OP_DAT",
+          Debug::OUTER_LOOP_LEVEL, __FILE__, __LINE__);
 
       if (parallelLoop->getNumberOfIndirectOpDats () > 0)
       {
@@ -1499,7 +1505,8 @@ FortranCUDAKernelSubroutineIndirectLoop::createOpDatFormalParameterDeclarations 
   using SageBuilder::buildIntVal;
   using std::string;
 
-  Debug::getInstance ()->debugMessage ("Creating OP_DAT formal parameters", 2);
+  Debug::getInstance ()->debugMessage ("Creating OP_DAT formal parameters",
+      Debug::INNER_LOOP_LEVEL, __FILE__, __LINE__);
 
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
@@ -1814,7 +1821,8 @@ FortranCUDAKernelSubroutineIndirectLoop::FortranCUDAKernelSubroutineIndirectLoop
       parallelLoop, moduleScope, opDatDimensionsDeclaration),
       dataSizesDeclaration (dataSizesDeclaration)
 {
-  Debug::getInstance ()->debugMessage ("<Kernel, Indirect, CUDA>", 5);
+  Debug::getInstance ()->debugMessage ("<Kernel, Indirect, CUDA>",
+      Debug::CONSTRUCTOR_LEVEL, __FILE__, __LINE__);
 
   createFormalParameterDeclarations ();
 

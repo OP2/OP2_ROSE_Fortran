@@ -325,7 +325,8 @@ FortranOpenMPHostSubroutineDirectLoop::FortranOpenMPHostSubroutineDirectLoop (
   FortranOpenMPHostSubroutine (subroutineName, userSubroutineName,
       kernelSubroutineName, parallelLoop, moduleScope, moduleDeclarations)
 {
-  Debug::getInstance ()->debugMessage ("<Host, Direct, OpenMP>", 5);
+  Debug::getInstance ()->debugMessage ("<Host, Direct, OpenMP>",
+      Debug::CONSTRUCTOR_LEVEL, __FILE__, __LINE__);
 
   createFormalParameterDeclarations ();
 

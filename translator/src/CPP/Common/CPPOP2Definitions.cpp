@@ -25,7 +25,8 @@ CPPImperialOpDatDefinition::CPPImperialOpDatDefinition (
   Debug::getInstance ()->debugMessage ("Found an OP_DAT declaration: '"
       + variableName + "'. The data pertains to the set '" + opSetName
       + "'. Its actual type is " + primitiveType->class_name ()
-      + " and its dimension is " + lexical_cast <string> (dimension), 5);
+      + " and its dimension is " + lexical_cast <string> (dimension),
+      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 }
 
 CPPImperialOpSetDefinition::CPPImperialOpSetDefinition (
@@ -41,7 +42,7 @@ CPPImperialOpSetDefinition::CPPImperialOpSetDefinition (
 
   Debug::getInstance ()->debugMessage ("Found an OP_SET declaration: '"
       + variableName + "'. Its dimension is contained in '" + dimensionName
-      + "'", 5);
+      + "'", Debug::FUNCTION_LEVEL, __FILE__, __LINE__ );
 }
 
 CPPImperialOpMapDefinition::CPPImperialOpMapDefinition (
@@ -72,7 +73,8 @@ CPPImperialOpMapDefinition::CPPImperialOpMapDefinition (
   Debug::getInstance ()->debugMessage ("Found an OP_MAP declaration: '"
       + variableName + "'. Mapping from '" + sourceOpSetName + "' to '"
       + destinationOpSetName + "' through '" + mappingName + "' with "
-      + lexical_cast <string> (dimension) + " mappings per element", 5);
+      + lexical_cast <string> (dimension) + " mappings per element",
+      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 }
 
 CPPImperialOpConstDefinition::CPPImperialOpConstDefinition (
@@ -106,5 +108,6 @@ CPPImperialOpConstDefinition::CPPImperialOpConstDefinition (
 
   Debug::getInstance ()->debugMessage ("Found an OP_CONST declaration: '"
       + variableName + "' Its dimension is "
-      + lexical_cast <string> (dimension), 5);
+      + lexical_cast <string> (dimension), Debug::FUNCTION_LEVEL, __FILE__,
+      __LINE__);
 }

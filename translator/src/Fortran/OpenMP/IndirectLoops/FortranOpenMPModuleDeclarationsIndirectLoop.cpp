@@ -20,7 +20,8 @@ FortranOpenMPModuleDeclarationsIndirectLoop::createOpDatSizeDeclarations ()
   using std::string;
 
   Debug::getInstance ()->debugMessage (
-      "Generating OP_DAT size declarations at module scope", 5);
+      "Generating OP_DAT size declarations at module scope",
+      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
@@ -47,7 +48,8 @@ FortranOpenMPModuleDeclarationsIndirectLoop::createExecutionPlanDeclarations ()
   using std::vector;
 
   Debug::getInstance ()->debugMessage (
-      "Creating execution plan variables at module scope", 5);
+      "Creating execution plan variables at module scope",
+      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
   /*
    * ======================================================

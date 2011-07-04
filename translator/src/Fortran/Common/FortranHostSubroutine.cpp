@@ -40,7 +40,8 @@ FortranHostSubroutine::createFormalParameterDeclarations ()
   using std::map;
 
   Debug::getInstance ()->debugMessage (
-      "Creating host subroutine formal parameters", 2);
+      "Creating host subroutine formal parameters", Debug::FUNCTION_LEVEL,
+      __FILE__, __LINE__);
 
   /*
    * ======================================================
@@ -54,9 +55,8 @@ FortranHostSubroutine::createFormalParameterDeclarations ()
       parallelLoop->getActualArguments ().begin (); it
       != parallelLoop->getActualArguments ().end (); ++it)
   {
-
     Debug::getInstance ()->debugMessage ("Argument type: "
-        + (*it)->class_name (), 8);
+        + (*it)->class_name (), Debug::INNER_LOOP_LEVEL, __FILE__, __LINE__);
 
     switch ((*it)->variantT ())
     {
@@ -173,7 +173,8 @@ FortranHostSubroutine::createFormalParameterDeclarations ()
              * ======================================================
              */
 
-            Debug::getInstance ()->debugMessage ("Access descriptor found", 10);
+            Debug::getInstance ()->debugMessage ("Access descriptor found",
+                Debug::INNER_LOOP_LEVEL, __FILE__, __LINE__);
 
             string const & variableName = VariableNames::getOpAccessName (
                 OP_DAT_ArgumentGroup);

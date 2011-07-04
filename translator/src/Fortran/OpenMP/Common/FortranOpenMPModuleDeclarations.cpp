@@ -17,7 +17,8 @@ FortranOpenMPModuleDeclarations::createOpDatDeclarations ()
   using std::string;
 
   Debug::getInstance ()->debugMessage (
-      "Generating OP_DAT declarations at module scope", 5);
+      "Generating OP_DAT declarations at module scope", Debug::FUNCTION_LEVEL,
+      __FILE__, __LINE__);
 
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
@@ -49,7 +50,8 @@ FortranOpenMPModuleDeclarations::createFirstExecutionBooleanDeclaration ()
   using std::string;
 
   Debug::getInstance ()->debugMessage (
-      "Creating first time execution boolean at module scope", 5);
+      "Creating first time execution boolean at module scope",
+      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
   string const & variableName = getFirstExecutionBooleanVariableName ();
 

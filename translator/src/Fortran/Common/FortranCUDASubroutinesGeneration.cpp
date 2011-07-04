@@ -121,7 +121,7 @@ FortranCUDASubroutinesGeneration::addLibraries (
   using SageInterface::appendStatement;
 
   Debug::getInstance ()->debugMessage (
-      "Adding 'use' statements to CUDA module", 2);
+      "Adding 'use' statements to CUDA module", Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
   vector <string> libs;
   libs.push_back (Libraries::ISO_C_BINDING);

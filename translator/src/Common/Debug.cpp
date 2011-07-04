@@ -6,17 +6,28 @@
 
 Debug * Debug::debugInstance = NULL;
 
+/*
+ * ======================================================
+ * Private functions
+ * ======================================================
+ */
+
+std::string
+Debug::getFileName (std::string const & filePath)
+{
+  return filePath.substr (filePath.find_last_of ('/') + 1);
+}
+
 Debug::Debug ()
 {
-  /*
-   * ======================================================
-   * Assume that there is no verbose and no debug information
-   * to be output
-   * ======================================================
-   */
-  verbose = false;
   debugLevel = 0;
 }
+
+/*
+ * ======================================================
+ * Public functions
+ * ======================================================
+ */
 
 Debug *
 Debug::getInstance ()
@@ -26,18 +37,6 @@ Debug::getInstance ()
     debugInstance = new Debug ();
   }
   return debugInstance;
-}
-
-void
-Debug::setVerbose ()
-{
-  Debug::debugInstance->verbose = true;
-}
-
-bool
-Debug::isVerbose () const
-{
-  return debugInstance->verbose;
 }
 
 void
@@ -69,17 +68,6 @@ Debug::setDebugLevel (std::string debugLevelString)
     else
     {
       debugInstance->debugLevel = level;
-
-      /*
-       * ======================================================
-       * By default turn verbose messages provided the debug
-       * level is above 0
-       * ======================================================
-       */
-      if (debugInstance->debugLevel > LOWEST_DEBUG_LEVEL)
-      {
-        debugInstance->verbose = true;
-      }
     }
   }
   catch (bad_lexical_cast const &)
@@ -107,34 +95,22 @@ Debug::setDebugLevel (std::string debugLevelString)
   }
 }
 
-int
-Debug::getDebugLevel () const
-{
-  return debugInstance->debugLevel;
-}
-
 void
-Debug::verboseMessage (std::string const & message) const
+Debug::debugMessage (std::string const & message, int const debugLevel,
+    std::string const & filePath, int const lineNumber) const
 {
+  using boost::lexical_cast;
   using std::cout;
   using std::endl;
+  using std::string;
 
-  if (debugInstance->verbose)
-  {
-    cout << message + "." << endl;
-  }
-}
-
-void
-Debug::debugMessage (std::string const & message, int const debugLevel) const
-{
-  using std::cout;
-  using std::endl;
+  string const debugPrefix = "[" + debugInstance->getFileName (filePath) + ":"
+      + lexical_cast <string> (lineNumber) + "] ";
 
   if (debugLevel <= debugInstance->debugLevel && debugInstance->debugLevel
       > LOWEST_DEBUG_LEVEL)
   {
-    cout << message + "." << endl;
+    cout << debugPrefix + message + "." << endl;
   }
 }
 

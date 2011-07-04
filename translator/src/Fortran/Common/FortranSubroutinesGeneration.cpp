@@ -27,7 +27,8 @@ FortranSubroutinesGeneration::patchCallsToParallelLoops (
   using SageInterface::getPreviousStatement;
   using SageInterface::findLastDeclarationStatement;
 
-  Debug::getInstance ()->debugMessage ("Patching call to OP_PAR_LOOP", 2);
+  Debug::getInstance ()->debugMessage ("Patching call to OP_PAR_LOOP",
+      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
   /*
    * ======================================================
@@ -126,6 +127,7 @@ FortranSubroutinesGeneration::patchCallsToParallelLoops (
    * built host subroutine
    * ======================================================
    */
+
   SgFunctionRefExp * hostSubroutineReference = buildFunctionRefExp (
       hostSubroutine.getSubroutineHeaderStatement ());
 
@@ -137,6 +139,7 @@ FortranSubroutinesGeneration::patchCallsToParallelLoops (
    * a kernel name
    * ======================================================
    */
+
   SgExpressionPtrList & arguments =
       functionCallExp->get_args ()->get_expressions ();
 
@@ -179,7 +182,8 @@ FortranSubroutinesGeneration::createFortranModule (SgSourceFile & sourceFile,
   using std::vector;
   using SageInterface::appendStatement;
 
-  Debug::getInstance ()->debugMessage ("Creating Fortran module", 2);
+  Debug::getInstance ()->debugMessage ("Creating Fortran module",
+      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
   SgGlobal * globalScope = sourceFile.get_globalScope ();
 
@@ -219,7 +223,7 @@ FortranSubroutinesGeneration::createSourceFile (
   if (inputFile != NULL)
   {
     Debug::getInstance ()->debugMessage ("Creating dummy source file '"
-        + inputFileName + "'", 2);
+        + inputFileName + "'", Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
     fclose (inputFile);
   }
@@ -254,7 +258,7 @@ FortranSubroutinesGeneration::createSourceFile (
   }
 
   Debug::getInstance ()->debugMessage ("Generating file '" + outputFileName
-      + "'", 2);
+      + "'", Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
   SgSourceFile * sourceFile = isSgSourceFile (buildFile (inputFileName,
       outputFileName, NULL));
@@ -286,12 +290,6 @@ FortranSubroutinesGeneration::createSourceFile (
 
   return *sourceFile;
 }
-
-/*
- * ======================================================
- * Public functions
- * ======================================================
- */
 
 void
 FortranSubroutinesGeneration::visit (SgNode * node)
@@ -333,6 +331,7 @@ FortranSubroutinesGeneration::visit (SgNode * node)
          * otherwise throw an exception
          * ======================================================
          */
+
         SgExpressionPtrList & actualArguments =
             functionCallExp->get_args ()->get_expressions ();
 
@@ -349,7 +348,7 @@ FortranSubroutinesGeneration::visit (SgNode * node)
 
             Debug::getInstance ()->debugMessage ("Found '" + calleeName
                 + "' with (host) user subroutine '" + userSubroutineName + "'",
-                1);
+                Debug::OUTER_LOOP_LEVEL, __FILE__, __LINE__);
 
             if (parallelLoops.find (userSubroutineName) == parallelLoops.end ())
             {
@@ -429,7 +428,8 @@ FortranSubroutinesGeneration::visit (SgNode * node)
       SgSourceFile * sourceFile = isSgSourceFile (node);
 
       Debug::getInstance ()->debugMessage ("Found file "
-          + sourceFile->getFileName (), 8);
+          + sourceFile->getFileName (), Debug::OUTER_LOOP_LEVEL, __FILE__,
+          __LINE__);
       break;
     }
 
@@ -440,29 +440,13 @@ FortranSubroutinesGeneration::visit (SgNode * node)
   }
 }
 
-void
-FortranSubroutinesGeneration::unparse ()
+FortranSubroutinesGeneration::FortranSubroutinesGeneration (
+    SgProject * project,
+    FortranProgramDeclarationsAndDefinitions * declarations) :
+  SubroutinesGeneration <FortranProgramDeclarationsAndDefinitions,
+      FortranParallelLoop, FortranHostSubroutine> (declarations)
 {
-  using std::vector;
+  traverseInputFiles (project, preorder);
 
-  Debug::getInstance ()->verboseMessage ("Generating files");
-
-  for (vector <SgSourceFile *>::const_iterator it = generatedFiles.begin (); it
-      != generatedFiles.end (); ++it)
-  {
-    Debug::getInstance ()->debugMessage ("Unparsing to '"
-        + (*it)->getFileName () + "'", 1);
-
-    /*
-     * ======================================================
-     * Unparse the created files after checking consistency
-     * of ASTs
-     * ======================================================
-     */
-    SgProject * project = (*it)->get_project ();
-
-    AstTests::runAllTests (project);
-
-    project->unparse ();
-  }
+  unparse ();
 }

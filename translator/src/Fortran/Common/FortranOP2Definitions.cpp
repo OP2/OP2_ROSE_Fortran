@@ -26,7 +26,8 @@ FortranOpDatDefinition::FortranOpDatDefinition (
   Debug::getInstance ()->debugMessage ("Found an OP_DAT definition: '"
       + variableName + "'. The data pertains to the set '" + opSetName
       + "'. Its actual type is " + primitiveType->class_name ()
-      + " and its dimension is " + lexical_cast <string> (dimension), 5);
+      + " and its dimension is " + lexical_cast <string> (dimension),
+      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 }
 
 FortranOpSetDefinition::FortranOpSetDefinition (
@@ -43,7 +44,7 @@ FortranOpSetDefinition::FortranOpSetDefinition (
 
   Debug::getInstance ()->debugMessage ("Found an OP_SET definition: '"
       + variableName + "'. Its dimension is contained in '" + dimensionName
-      + "'", 5);
+      + "'", Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 }
 
 FortranOpMapDefinition::FortranOpMapDefinition (
@@ -81,7 +82,7 @@ FortranOpMapDefinition::FortranOpMapDefinition (
       + destinationOpSetName + "' through '" + mappingName
       + "' (whose cardinality is set in '" + mappingCardinalityName
       + "') with " + lexical_cast <string> (dimension)
-      + " mappings per element", 5);
+      + " mappings per element", Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 }
 
 FortranOpGblDefinition::FortranOpGblDefinition (
@@ -103,5 +104,6 @@ FortranOpGblDefinition::FortranOpGblDefinition (
 
   Debug::getInstance ()->debugMessage ("Found an OP_GBL definition: '"
       + variableName + "'. Its actual type is " + primitiveType->class_name ()
-      + " and its dimension is " + lexical_cast <string> (dimension), 5);
+      + " and its dimension is " + lexical_cast <string> (dimension),
+      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 }

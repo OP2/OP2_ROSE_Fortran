@@ -518,7 +518,8 @@ FortranPlan::createPlanFunctionParametersPreparationStatements (
   using std::string;
 
   Debug::getInstance ()->debugMessage (
-      "Creating statements to prepare plan function parameters", 5);
+      "Creating statements to prepare plan function parameters",
+      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
@@ -749,7 +750,7 @@ FortranPlan::createPlanFunctionCallStatement (
   using SageInterface::appendStatement;
 
   Debug::getInstance ()->debugMessage ("Creating plan function call statement",
-      5);
+      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
   SgVarRefExp * parameter1 = buildVarRefExp (variableDeclarations->get (
       VariableNames::getUserSubroutineName ()));

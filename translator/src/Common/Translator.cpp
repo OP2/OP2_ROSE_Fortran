@@ -115,8 +115,9 @@ handleFortranProject (SgProject * project)
    * Obtain all OP2 declarations
    * ======================================================
    */
-  Debug::getInstance ()->verboseMessage (
-      "Retrieving declarations in source files");
+  Debug::getInstance ()->debugMessage (
+      "Retrieving declarations in source files", Debug::FUNCTION_LEVEL,
+      __FILE__, __LINE__);
 
   FortranProgramDeclarationsAndDefinitions * declarations =
       new FortranProgramDeclarationsAndDefinitions (project);
@@ -127,31 +128,21 @@ handleFortranProject (SgProject * project)
    * OP_PAR_LOOP
    * ======================================================
    */
-  Debug::getInstance ()->verboseMessage (
-      "Creating subroutines for OP_PAR_LOOPs");
+  Debug::getInstance ()->debugMessage ("Creating subroutines for OP_PAR_LOOPs",
+      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
   switch (Globals::getInstance ()->getTargetBackend ())
   {
     case TargetBackends::CUDA:
     {
-      FortranCUDASubroutinesGeneration * newSubroutines =
-          new FortranCUDASubroutinesGeneration (declarations);
-
-      newSubroutines->traverseInputFiles (project, preorder);
-
-      newSubroutines->unparse ();
+      new FortranCUDASubroutinesGeneration (project, declarations);
 
       break;
     }
 
     case TargetBackends::OPENMP:
     {
-      FortranOpenMPSubroutinesGeneration * newSubroutines =
-          new FortranOpenMPSubroutinesGeneration (declarations);
-
-      newSubroutines->traverseInputFiles (project, preorder);
-
-      newSubroutines->unparse ();
+      new FortranOpenMPSubroutinesGeneration (project, declarations);
 
       break;
     }
@@ -230,7 +221,8 @@ main (int argc, char ** argv)
 
   CommandLine::getInstance ()->parse (argc, argv);
 
-  Debug::getInstance ()->verboseMessage ("Translation starting");
+  Debug::getInstance ()->debugMessage ("Translation starting", 1, __FILE__,
+      __LINE__);
 
   /*
    * ======================================================
@@ -246,7 +238,8 @@ main (int argc, char ** argv)
 
   if (project->get_Cxx_only () == true)
   {
-    Debug::getInstance ()->verboseMessage ("C++ project detected");
+    Debug::getInstance ()->debugMessage ("C++ project detected", 1, __FILE__,
+        __LINE__);
 
     if (Globals::getInstance ()->renderOxfordAPICalls ())
     {
@@ -276,7 +269,8 @@ main (int argc, char ** argv)
   }
   else
   {
-    Debug::getInstance ()->verboseMessage ("Fortran project detected");
+    Debug::getInstance ()->debugMessage ("Fortran project detected", 1,
+        __FILE__, __LINE__);
 
     checkBackendOption ();
 
@@ -288,7 +282,8 @@ main (int argc, char ** argv)
     new UDrawGraph (project, "ast");
   }
 
-  Debug::getInstance ()->verboseMessage ("Translation completed");
+  Debug::getInstance ()->debugMessage ("Translation completed", 1, __FILE__,
+      __LINE__);
 
   return 0;
 }

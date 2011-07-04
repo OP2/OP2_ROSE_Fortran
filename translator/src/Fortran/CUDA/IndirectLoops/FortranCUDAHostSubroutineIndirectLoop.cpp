@@ -393,7 +393,8 @@ FortranCUDAHostSubroutineIndirectLoop::createExecutionPlanDeclarations ()
   using std::string;
   using std::vector;
 
-  Debug::getInstance ()->debugMessage ("Creating execution plan variables", 2);
+  Debug::getInstance ()->debugMessage ("Creating execution plan variables",
+      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
   /*
    * ======================================================
@@ -723,7 +724,8 @@ FortranCUDAHostSubroutineIndirectLoop::FortranCUDAHostSubroutineIndirectLoop (
       dataSizesDeclarationOfIndirectLoop (dataSizesDeclarationOfIndirectLoop)
 {
   Debug::getInstance ()->debugMessage (
-      "Creating host subroutine of indirect loop", 2);
+      "Creating host subroutine of indirect loop", Debug::CONSTRUCTOR_LEVEL,
+      __FILE__, __LINE__);
 
   createFormalParameterDeclarations ();
 

@@ -23,13 +23,14 @@ FortranParallelLoop::handleOpGblDeclaration (
   Debug::getInstance ()->debugMessage (
       "'" + variableName
           + "' has been declared through OP_DECL_GBL (and not through OP_DECL_DAT)",
-      1);
+      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
   Debug::getInstance ()->debugMessage ("OP_GBL '" + variableName
       + "' in argument group " + lexical_cast <string> (opDatArgumentGroup)
       + " has type '" + opGblDeclaration->getPrimitiveType ()->class_name ()
       + "' and dimension " + lexical_cast <string> (
-      opGblDeclaration->getDimension ()), 5);
+      opGblDeclaration->getDimension ()), Debug::FUNCTION_LEVEL, __FILE__,
+      __LINE__);
 
   uniqueOpDats.push_back (variableName);
 
@@ -55,7 +56,8 @@ FortranParallelLoop::handleOpDatDeclaration (
       + "' in argument group " + lexical_cast <string> (opDatArgumentGroup)
       + " has type '" + opDatDeclaration->getPrimitiveType ()->class_name ()
       + "' and dimension " + lexical_cast <string> (
-      opDatDeclaration->getDimension ()), 5);
+      opDatDeclaration->getDimension ()), Debug::FUNCTION_LEVEL, __FILE__,
+      __LINE__);
 
   OpDatTypes[opDatArgumentGroup] = opDatDeclaration->getPrimitiveType ();
 
@@ -66,8 +68,6 @@ FortranParallelLoop::handleOpDatDeclaration (
   if (find (uniqueOpDats.begin (), uniqueOpDats.end (), variableName)
       == uniqueOpDats.end ())
   {
-    Debug::getInstance ()->debugMessage ("...NOT a duplicate", 5);
-
     uniqueOpDats.push_back (variableName);
 
     OpDatDuplicates[opDatArgumentGroup] = false;
@@ -96,7 +96,8 @@ FortranParallelLoop::handleOpDatDeclaration (
       else
       {
         Debug::getInstance ()->debugMessage ("...size of the base type is "
-            + lexical_cast <string> (sizeOfRealType->get_value ()), 5);
+            + lexical_cast <string> (sizeOfRealType->get_value ()),
+            Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
         sizeOfOpDat = sizeOfRealType->get_value ();
       }
@@ -104,8 +105,6 @@ FortranParallelLoop::handleOpDatDeclaration (
   }
   else
   {
-    Debug::getInstance ()->debugMessage ("...IS a duplicate", 5);
-
     OpDatDuplicates[opDatArgumentGroup] = true;
   }
 }
@@ -121,7 +120,8 @@ FortranParallelLoop::retrieveOpDatDeclarations (
   using std::vector;
   using std::map;
 
-  Debug::getInstance ()->debugMessage ("Retrieving OP_DAT declarations", 2);
+  Debug::getInstance ()->debugMessage ("Retrieving OP_DAT declarations",
+      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
   int opDatArgumentGroup = 0;
 
@@ -195,7 +195,8 @@ FortranParallelLoop::retrieveOpDatDeclarations (
                  * ======================================================
                  */
                 Debug::getInstance ()->debugMessage (
-                    "...DIRECT mapping descriptor", 5);
+                    "...DIRECT mapping descriptor", Debug::OUTER_LOOP_LEVEL,
+                    __FILE__, __LINE__);
 
                 OpDatMappingDescriptors[opDatArgumentGroup] = DIRECT;
               }
@@ -209,7 +210,8 @@ FortranParallelLoop::retrieveOpDatDeclarations (
                    * ======================================================
                    */
                   Debug::getInstance ()->debugMessage (
-                      "...GLOBAL mapping descriptor", 5);
+                      "...GLOBAL mapping descriptor", Debug::OUTER_LOOP_LEVEL,
+                      __FILE__, __LINE__);
 
                   OpDatMappingDescriptors[opDatArgumentGroup] = GLOBAL;
                 }
@@ -217,7 +219,8 @@ FortranParallelLoop::retrieveOpDatDeclarations (
                 else
                 {
                   Debug::getInstance ()->debugMessage (
-                      "...INDIRECT mapping descriptor", 5);
+                      "...INDIRECT mapping descriptor",
+                      Debug::OUTER_LOOP_LEVEL, __FILE__, __LINE__);
 
                   OpDatMappingDescriptors[opDatArgumentGroup] = INDIRECT;
                 }
@@ -235,7 +238,7 @@ FortranParallelLoop::retrieveOpDatDeclarations (
             if (iequals (variableName, OP2::OP_READ))
             {
               Debug::getInstance ()->debugMessage ("...READ access descriptor",
-                  5);
+                  Debug::OUTER_LOOP_LEVEL, __FILE__, __LINE__);
 
               OpDatAccessDescriptors[opDatArgumentGroup] = READ_ACCESS;
             }
@@ -243,7 +246,8 @@ FortranParallelLoop::retrieveOpDatDeclarations (
             else if (iequals (variableName, OP2::OP_WRITE))
             {
               Debug::getInstance ()->debugMessage (
-                  "...WRITE access descriptor", 5);
+                  "...WRITE access descriptor", Debug::OUTER_LOOP_LEVEL,
+                  __FILE__, __LINE__);
 
               OpDatAccessDescriptors[opDatArgumentGroup] = WRITE_ACCESS;
             }
@@ -251,7 +255,8 @@ FortranParallelLoop::retrieveOpDatDeclarations (
             else if (iequals (variableName, OP2::OP_INC))
             {
               Debug::getInstance ()->debugMessage (
-                  "...INCREMENT access descriptor", 5);
+                  "...INCREMENT access descriptor", Debug::OUTER_LOOP_LEVEL,
+                  __FILE__, __LINE__);
 
               OpDatAccessDescriptors[opDatArgumentGroup] = INC_ACCESS;
             }
@@ -259,7 +264,8 @@ FortranParallelLoop::retrieveOpDatDeclarations (
             else if (iequals (variableName, OP2::OP_RW))
             {
               Debug::getInstance ()->debugMessage (
-                  "...READ/WRITE access descriptor", 5);
+                  "...READ/WRITE access descriptor", Debug::OUTER_LOOP_LEVEL,
+                  __FILE__, __LINE__);
 
               OpDatAccessDescriptors[opDatArgumentGroup] = RW_ACCESS;
             }
@@ -405,11 +411,11 @@ FortranParallelLoop::FortranParallelLoop (
   if (isDirectLoop ())
   {
     Debug::getInstance ()->debugMessage ("'" + userSubroutineName
-        + "' is a DIRECT loop", 2);
+        + "' is a DIRECT loop", Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
   }
   else
   {
     Debug::getInstance ()->debugMessage ("'" + userSubroutineName
-        + "' is an INDIRECT loop", 2);
+        + "' is an INDIRECT loop", Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
   }
 }

@@ -127,7 +127,8 @@ FortranCUDAKernelSubroutine::createReductionLoopStatements ()
   using SageInterface::appendStatement;
   using std::string;
 
-  Debug::getInstance ()->debugMessage ("Adding reduction subroutine call", 2);
+  Debug::getInstance ()->debugMessage ("Adding reduction subroutine call",
+      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
@@ -257,7 +258,8 @@ FortranCUDAKernelSubroutine::createLocalThreadDeclarations ()
   using SageInterface::appendStatement;
   using std::string;
 
-  Debug::getInstance ()->debugMessage ("Creating local thread variables", 2);
+  Debug::getInstance ()->debugMessage ("Creating local thread variables",
+      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {

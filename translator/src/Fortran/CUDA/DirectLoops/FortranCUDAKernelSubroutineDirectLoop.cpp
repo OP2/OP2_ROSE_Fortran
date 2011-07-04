@@ -29,7 +29,8 @@ FortranCUDAKernelSubroutineDirectLoop::createUserSubroutineCallStatement ()
   using std::vector;
 
   Debug::getInstance ()->debugMessage (
-      "Creating call to user device subroutine", 2);
+      "Creating call to user device subroutine", Debug::FUNCTION_LEVEL,
+      __FILE__, __LINE__);
 
   SgExprListExp * actualParameters = buildExprListExp ();
 
@@ -886,7 +887,8 @@ FortranCUDAKernelSubroutineDirectLoop::FortranCUDAKernelSubroutineDirectLoop (
       parallelLoop, moduleScope, opDatDimensionsDeclaration),
       dataSizesDeclaration (dataSizesDeclaration)
 {
-  Debug::getInstance ()->debugMessage ("<Kernel, Direct, CUDA>", 5);
+  Debug::getInstance ()->debugMessage ("<Kernel, Direct, CUDA>",
+      Debug::CONSTRUCTOR_LEVEL, __FILE__, __LINE__);
 
   createFormalParameterDeclarations ();
 

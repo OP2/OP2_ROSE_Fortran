@@ -76,7 +76,8 @@ FortranOpenMPKernelSubroutineIndirectLoop::createOpDatFormalParameterDeclaration
   using SageBuilder::buildIntVal;
   using std::string;
 
-  Debug::getInstance ()->debugMessage ("Creating OP_DAT formal parameters", 2);
+  Debug::getInstance ()->debugMessage ("Creating OP_DAT formal parameters",
+      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
@@ -233,7 +234,8 @@ FortranOpenMPKernelSubroutineIndirectLoop::FortranOpenMPKernelSubroutineIndirect
   FortranOpenMPKernelSubroutine (subroutineName, userSubroutineName,
       parallelLoop, moduleScope)
 {
-  Debug::getInstance ()->debugMessage ("<Kernel, Indirect, OpenMP>", 5);
+  Debug::getInstance ()->debugMessage ("<Kernel, Indirect, OpenMP>",
+      Debug::CONSTRUCTOR_LEVEL, __FILE__, __LINE__);
 
   createFormalParameterDeclarations ();
 

@@ -279,7 +279,8 @@ FortranCUDAHostSubroutineDirectLoop::createCUDAKernelLocalVariableDeclarationsFo
   using SageInterface::appendStatement;
 
   Debug::getInstance ()->debugMessage (
-      "Creating CUDA configuration parameters", 2);
+      "Creating CUDA configuration parameters", Debug::FUNCTION_LEVEL,
+      __FILE__, __LINE__);
 
   SgVariableDeclaration * variableDeclaration1 = buildVariableDeclaration (
       DirectLoop::Fortran::KernelSubroutine::offsetInThreadBlock,
@@ -381,7 +382,8 @@ FortranCUDAHostSubroutineDirectLoop::FortranCUDAHostSubroutineDirectLoop (
       dataSizesDeclarationOfDirectLoop (dataSizesDeclarationOfDirectLoop)
 {
   Debug::getInstance ()->debugMessage (
-      "Creating host subroutine of direct loop", 2);
+      "Creating host subroutine of direct loop", Debug::CONSTRUCTOR_LEVEL,
+      __FILE__, __LINE__);
 
   createFormalParameterDeclarations ();
 

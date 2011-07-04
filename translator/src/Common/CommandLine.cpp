@@ -40,31 +40,6 @@ CommandLine::addHelpOption ()
 }
 
 void
-CommandLine::addVerboseOption ()
-{
-  class VerboseOption: public CommandLineOption
-  {
-    public:
-
-      virtual void
-      run ()
-      {
-        Debug::getInstance ()->setVerbose ();
-      }
-
-      VerboseOption (std::string helpMessage, std::string shortOption,
-          std::string longOption) :
-        CommandLineOption (helpMessage, shortOption, longOption)
-      {
-      }
-  };
-
-  VerboseOption * verbose = new VerboseOption ("Be verbose", "v", "verbose");
-
-  addOption (verbose);
-}
-
-void
 CommandLine::addDebugOption ()
 {
   using boost::lexical_cast;
@@ -104,8 +79,6 @@ CommandLine::addDebugOption ()
 CommandLine::CommandLine ()
 {
   addHelpOption ();
-
-  addVerboseOption ();
 
   addDebugOption ();
 }

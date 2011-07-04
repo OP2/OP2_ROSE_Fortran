@@ -18,7 +18,8 @@ CPPModifyOP2CallsToComplyWithOxfordAPI::patchOpArgGblCall (
   using std::string;
   using std::vector;
 
-  Debug::getInstance ()->debugMessage ("Patching call to OP_ARG_GBL", 5);
+  Debug::getInstance ()->debugMessage ("Patching call to OP_ARG_GBL",
+      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
   SgAddressOfOp * addressOfOperator = isSgAddressOfOp (
       actualArguments[CPPImperialOpArgGblCall::index_OpDatName]);
@@ -189,7 +190,8 @@ CPPModifyOP2CallsToComplyWithOxfordAPI::patchOpArgDatCall (
   using std::string;
   using std::vector;
 
-  Debug::getInstance ()->debugMessage ("Patching call to OP_ARG_DAT", 5);
+  Debug::getInstance ()->debugMessage ("Patching call to OP_ARG_DAT",
+      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
   SgVarRefExp * opDatReference = isSgVarRefExp (
       actualArguments[CPPImperialOpArgDatCall::index_OpDatName]);
@@ -258,8 +260,6 @@ CPPModifyOP2CallsToComplyWithOxfordAPI::patchOpArgDatCall (
     Debug::getInstance ()->errorMessage (
         "Cannot ascertain base type of OP_DAT '" + opDatVariableName + "'");
   }
-
-  std::cout << pointerType->get_base_type ()->class_name () << std::endl;
 }
 
 void
@@ -271,7 +271,8 @@ CPPModifyOP2CallsToComplyWithOxfordAPI::patchOpParLoopCall (
   using std::string;
   using std::vector;
 
-  Debug::getInstance ()->debugMessage ("Patching call to OP_PAR_LOOP", 5);
+  Debug::getInstance ()->debugMessage ("Patching call to OP_PAR_LOOP",
+      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
   SgFunctionRefExp * userSubroutineExpression = isSgFunctionRefExp (
       actualArguments.front ());
@@ -337,7 +338,8 @@ CPPModifyOP2CallsToComplyWithOxfordAPI::patchOpDeclareConstCall (
   using std::string;
   using std::vector;
 
-  Debug::getInstance ()->debugMessage ("Patching call to OP_DECL_CONST", 5);
+  Debug::getInstance ()->debugMessage ("Patching call to OP_DECL_CONST",
+      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
   SgAddressOfOp * addressOfOperator = isSgAddressOfOp (
       actualArguments[CPPImperialOpConstDefinition::index_OpDatName]);
@@ -403,7 +405,8 @@ CPPModifyOP2CallsToComplyWithOxfordAPI::patchOpDeclareDatCall (
   using std::vector;
   using std::string;
 
-  Debug::getInstance ()->debugMessage ("Patching call to OP_DECL_DAT", 5);
+  Debug::getInstance ()->debugMessage ("Patching call to OP_DECL_DAT",
+      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
   SgAssignInitializer * assignmentInitializer = isSgAssignInitializer (
       variableDeclaration->get_decl_item (variableName)->get_initializer ());
@@ -479,7 +482,8 @@ CPPModifyOP2CallsToComplyWithOxfordAPI::patchOpDeclareMapCall (
   using SageBuilder::buildStringVal;
   using std::vector;
 
-  Debug::getInstance ()->debugMessage ("Patching call to OP_DECL_MAP", 5);
+  Debug::getInstance ()->debugMessage ("Patching call to OP_DECL_MAP",
+      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
   SgAssignInitializer * assignmentInitializer = isSgAssignInitializer (
       variableDeclaration->get_decl_item (variableName)->get_initializer ());
@@ -513,7 +517,8 @@ CPPModifyOP2CallsToComplyWithOxfordAPI::patchOpDeclareSetCall (
   using SageBuilder::buildStringVal;
   using std::vector;
 
-  Debug::getInstance ()->debugMessage ("Patching call to OP_DECL_SET", 5);
+  Debug::getInstance ()->debugMessage ("Patching call to OP_DECL_SET",
+      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
   SgAssignInitializer * assignmentInitializer = isSgAssignInitializer (
       variableDeclaration->get_decl_item (variableName)->get_initializer ());

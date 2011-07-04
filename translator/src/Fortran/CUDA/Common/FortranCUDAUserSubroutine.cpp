@@ -24,7 +24,8 @@ FortranCUDAUserSubroutine::copyAndModifySubroutine ()
   using std::vector;
 
   Debug::getInstance ()->debugMessage (
-      "Modifying and outputting user subroutine to file", 2);
+      "Modifying and outputting user subroutine to file",
+      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
   SgProcedureHeaderStatement * originalSubroutine = NULL;
 
@@ -263,10 +264,10 @@ FortranCUDAUserSubroutine::createStatements ()
 FortranCUDAUserSubroutine::FortranCUDAUserSubroutine (
     std::string const & subroutineName,
     FortranCUDAInitialiseConstantsSubroutine * initialiseConstantsSubroutine,
-    FortranProgramDeclarationsAndDefinitions * declarations, FortranParallelLoop * parallelLoop,
-    SgScopeStatement * moduleScope) :
-  UserSubroutine <SgProcedureHeaderStatement, FortranProgramDeclarationsAndDefinitions> (
-      subroutineName, parallelLoop)
+    FortranProgramDeclarationsAndDefinitions * declarations,
+    FortranParallelLoop * parallelLoop, SgScopeStatement * moduleScope) :
+  UserSubroutine <SgProcedureHeaderStatement,
+      FortranProgramDeclarationsAndDefinitions> (subroutineName, parallelLoop)
 {
   using SageBuilder::buildProcedureHeaderStatement;
   using SageBuilder::buildVoidType;

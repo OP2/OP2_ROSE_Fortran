@@ -16,8 +16,6 @@ class Debug
 
     static Debug * debugInstance;
 
-    bool verbose;
-
     int debugLevel;
 
   public:
@@ -31,9 +29,27 @@ class Debug
      */
     static int const LOWEST_DEBUG_LEVEL = 0;
 
-    static int const HIGHEST_DEBUG_LEVEL = 10;
+    static int const HIGHEST_DEBUG_LEVEL = 5;
+
+    static int const VERBOSE_LEVEL = 1;
+
+    static int const CONSTRUCTOR_LEVEL = 2;
+
+    static int const FUNCTION_LEVEL = 3;
+
+    static int const OUTER_LOOP_LEVEL = 4;
+
+    static int const INNER_LOOP_LEVEL = 4;
 
   private:
+
+    /*
+     * ======================================================
+     * Strips the file name from an absolute directory path
+     * ======================================================
+     */
+    std::string
+    getFileName (std::string const & filePath);
 
     /*
      * ======================================================
@@ -56,43 +72,11 @@ class Debug
 
     /*
      * ======================================================
-     * Set verbose mode on
-     * ======================================================
-     */
-    void
-    setVerbose ();
-
-    /*
-     * ======================================================
-     * Is verbose enabled?
-     * ======================================================
-     */
-    bool
-    isVerbose () const;
-
-    /*
-     * ======================================================
      * Set the debug level
      * ======================================================
      */
     void
     setDebugLevel (std::string debugLevel);
-
-    /*
-     * ======================================================
-     * What is the debug level?
-     * ======================================================
-     */
-    int
-    getDebugLevel () const;
-
-    /*
-     * ======================================================
-     * Print this message if verbose mode enabled
-     * ======================================================
-     */
-    void
-    verboseMessage (std::string const & message) const;
 
     /*
      * ======================================================
@@ -103,7 +87,8 @@ class Debug
      * ======================================================
      */
     void
-    debugMessage (std::string const & message, int const debugLevel) const;
+    debugMessage (std::string const & message, int const debugLevel,
+        std::string const & filePath, int const lineNumber) const;
 
     /*
      * ======================================================

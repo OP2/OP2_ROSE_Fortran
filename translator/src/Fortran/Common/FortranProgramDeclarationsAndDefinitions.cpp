@@ -31,7 +31,8 @@ FortranProgramDeclarationsAndDefinitions::visit (SgNode * node)
       subroutinesInSourceCode.push_back (procedureHeaderStatement);
 
       Debug::getInstance ()->debugMessage ("Found procedure header statement '"
-          + procedureHeaderStatement->get_name ().getString () + "'", 5);
+          + procedureHeaderStatement->get_name ().getString () + "'",
+          Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
       break;
     }

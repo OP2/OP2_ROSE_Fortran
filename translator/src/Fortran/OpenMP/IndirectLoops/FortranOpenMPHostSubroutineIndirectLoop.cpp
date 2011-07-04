@@ -321,8 +321,8 @@ FortranOpenMPHostSubroutineIndirectLoop::createFirstTimeExecutionStatements ()
   declarationSets.push_back (
       dynamic_cast <FortranOpenMPModuleDeclarationsIndirectLoop *> (moduleDeclarations)->getAllDeclarations ());
 
-  SubroutineVariableDeclarations * allDeclarations = new SubroutineVariableDeclarations (
-      declarationSets);
+  SubroutineVariableDeclarations * allDeclarations =
+      new SubroutineVariableDeclarations (declarationSets);
 
   SgEqualityOp * ifGuardExpression = buildEqualityOp (buildVarRefExp (
       moduleDeclarations->getFirstExecutionBooleanDeclaration ()),
@@ -492,7 +492,8 @@ FortranOpenMPHostSubroutineIndirectLoop::FortranOpenMPHostSubroutineIndirectLoop
   FortranOpenMPHostSubroutine (subroutineName, userSubroutineName,
       kernelSubroutineName, parallelLoop, moduleScope, moduleDeclarations)
 {
-  Debug::getInstance ()->debugMessage ("<Host, Indirect, OpenMP>", 5);
+  Debug::getInstance ()->debugMessage ("<Host, Indirect, OpenMP>",
+      Debug::CONSTRUCTOR_LEVEL, __FILE__, __LINE__);
 
   createFormalParameterDeclarations ();
 

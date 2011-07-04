@@ -405,7 +405,8 @@ FortranCUDAHostSubroutine::createCUDAKernelEpilogueStatements ()
   using std::string;
 
   Debug::getInstance ()->debugMessage (
-      "Creating statements to copy data back from device and deallocate", 2);
+      "Creating statements to copy data back from device and deallocate",
+      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
   /*
    * ======================================================
@@ -613,7 +614,7 @@ FortranCUDAHostSubroutine::createDataMarshallingLocalVariableDeclarations ()
 
   Debug::getInstance ()->debugMessage (
       "Creating local variables to allow data marshalling between host and device",
-      2);
+      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {

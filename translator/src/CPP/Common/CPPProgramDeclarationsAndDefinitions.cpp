@@ -86,33 +86,37 @@ CPPProgramDeclarationsAndDefinitions::handleBaseTypeDeclaration (SgType * type,
 {
   if (isSgTypeShort (type) != NULL)
   {
-    Debug::getInstance ()->debugMessage ("'" + variableName + "' is a short", 8);
+    Debug::getInstance ()->debugMessage ("'" + variableName + "' is a short",
+        Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
     shortDeclarations.push_back (variableName);
   }
   else if (isSgTypeInt (type) != NULL)
   {
     Debug::getInstance ()->debugMessage (
-        "'" + variableName + "' is an integer", 8);
+        "'" + variableName + "' is an integer", Debug::FUNCTION_LEVEL,
+        __FILE__, __LINE__);
 
     integerDeclarations.push_back (variableName);
   }
   else if (isSgTypeLong (type) != NULL)
   {
-    Debug::getInstance ()->debugMessage ("'" + variableName + "' is a long", 8);
+    Debug::getInstance ()->debugMessage ("'" + variableName + "' is a long",
+        Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
     longDeclarations.push_back (variableName);
   }
   else if (isSgTypeFloat (type) != NULL)
   {
-    Debug::getInstance ()->debugMessage ("'" + variableName + "' is a float", 8);
+    Debug::getInstance ()->debugMessage ("'" + variableName + "' is a float",
+        Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
     floatDeclarations.push_back (variableName);
   }
   else if (isSgTypeDouble (type) != NULL)
   {
     Debug::getInstance ()->debugMessage ("'" + variableName + "' is a double",
-        8);
+        Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
     doubleDeclarations.push_back (variableName);
   }
@@ -146,7 +150,7 @@ CPPProgramDeclarationsAndDefinitions::visit (SgNode * node)
       else if (isSgPointerType (type) != NULL)
       {
         Debug::getInstance ()->debugMessage ("'" + variableName
-            + "' is a pointer", 8);
+            + "' is a pointer", Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
         handleBaseTypeDeclaration (isSgPointerType (type)->get_base_type (),
             variableName);
@@ -154,7 +158,7 @@ CPPProgramDeclarationsAndDefinitions::visit (SgNode * node)
       else if (isSgArrayType (type) != NULL)
       {
         Debug::getInstance ()->debugMessage ("'" + variableName
-            + "' is a array", 8);
+            + "' is a array", Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
         handleBaseTypeDeclaration (isSgArrayType (type)->get_base_type (),
             variableName);
@@ -182,7 +186,7 @@ CPPProgramDeclarationsAndDefinitions::visit (SgNode * node)
               functionCallExp->getAssociatedFunctionSymbol ()->get_name ().getString ();
 
       Debug::getInstance ()->debugMessage ("Found function call to '"
-          + calleeName + "'", 5);
+          + calleeName + "'", Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
       if (iequals (calleeName, OP2::OP_DECL_CONST))
       {

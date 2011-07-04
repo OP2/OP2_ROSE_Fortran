@@ -278,7 +278,8 @@ void
 FortranCUDAReductionSubroutine::createFormalParameterDeclarations ()
 {
   Debug::getInstance ()->debugMessage (
-      "Creating reduction procedure formal parameter", 2);
+      "Creating reduction procedure formal parameter", Debug::FUNCTION_LEVEL,
+      __FILE__, __LINE__);
 
   /*
    * ======================================================

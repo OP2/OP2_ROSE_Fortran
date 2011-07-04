@@ -27,7 +27,8 @@ FortranOpenMPSubroutinesGeneration::createSubroutines (
      */
 
     Debug::getInstance ()->debugMessage (
-        "Generating subroutines for direct loop", 5);
+        "Generating subroutines for direct loop", Debug::FUNCTION_LEVEL,
+        __FILE__, __LINE__);
 
     FortranOpenMPModuleDeclarationsDirectLoop * moduleDeclarations =
         new FortranOpenMPModuleDeclarationsDirectLoop (userSubroutineName,
@@ -52,7 +53,8 @@ FortranOpenMPSubroutinesGeneration::createSubroutines (
      */
 
     Debug::getInstance ()->debugMessage (
-        "Generating subroutines for indirect loop", 5);
+        "Generating subroutines for indirect loop", Debug::FUNCTION_LEVEL,
+        __FILE__, __LINE__);
 
     FortranOpenMPModuleDeclarationsIndirectLoop * moduleDeclarations =
         new FortranOpenMPModuleDeclarationsIndirectLoop (userSubroutineName,
@@ -83,7 +85,8 @@ FortranOpenMPSubroutinesGeneration::addLibraries (
   using SageInterface::addTextForUnparser;
 
   Debug::getInstance ()->debugMessage (
-      "Adding 'use' statements to OpenMP module", 2);
+      "Adding 'use' statements to OpenMP module", Debug::FUNCTION_LEVEL,
+      __FILE__, __LINE__);
 
   vector <string> libs;
   libs.push_back (Libraries::OP2_C);

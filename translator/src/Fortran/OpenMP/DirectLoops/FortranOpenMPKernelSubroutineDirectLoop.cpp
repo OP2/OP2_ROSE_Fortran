@@ -177,7 +177,8 @@ FortranOpenMPKernelSubroutineDirectLoop::FortranOpenMPKernelSubroutineDirectLoop
   FortranOpenMPKernelSubroutine (subroutineName, userSubroutineName,
       parallelLoop, moduleScope)
 {
-  Debug::getInstance ()->debugMessage ("<Kernel, Direct, CUDA>", 5);
+  Debug::getInstance ()->debugMessage ("<Kernel, Direct, CUDA>",
+      Debug::CONSTRUCTOR_LEVEL, __FILE__, __LINE__);
 
   createFormalParameterDeclarations ();
 
