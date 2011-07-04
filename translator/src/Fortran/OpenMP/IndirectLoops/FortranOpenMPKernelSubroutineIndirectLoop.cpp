@@ -2,7 +2,7 @@
 #include <FortranStatementsAndExpressionsBuilder.h>
 #include <FortranTypesBuilder.h>
 #include <CommonNamespaces.h>
-#include <ROSEHelper.h>
+#include <RoseHelper.h>
 #include <Debug.h>
 #include <Plan.h>
 
@@ -52,7 +52,7 @@ FortranOpenMPKernelSubroutineIndirectLoop::createPlanFormalParameterDeclarations
       != fourByteIntegerArrayVariables.end (); ++it)
   {
     SgAsteriskShapeExp * upperBoundExpression = new SgAsteriskShapeExp (
-        ROSEHelper::getFileInfo ());
+        RoseHelper::getFileInfo ());
 
     variableDeclarations->add (
         *it,
@@ -85,7 +85,7 @@ FortranOpenMPKernelSubroutineIndirectLoop::createOpDatFormalParameterDeclaration
         && parallelLoop->getOpMapValue (i) == INDIRECT)
     {
       SgAsteriskShapeExp * upperBoundExpression1 = new SgAsteriskShapeExp (
-          ROSEHelper::getFileInfo ());
+          RoseHelper::getFileInfo ());
 
       SgType * opdatType = parallelLoop->getOpDatType (i);
 
@@ -100,7 +100,7 @@ FortranOpenMPKernelSubroutineIndirectLoop::createOpDatFormalParameterDeclaration
                   upperBoundExpression1), subroutineScope, formalParameters));
 
       SgAsteriskShapeExp * upperBoundExpression2 = new SgAsteriskShapeExp (
-          ROSEHelper::getFileInfo ());
+          RoseHelper::getFileInfo ());
 
       variableDeclarations->add (
           VariableNames::getLocalToGlobalMappingName (i),
@@ -117,7 +117,7 @@ FortranOpenMPKernelSubroutineIndirectLoop::createOpDatFormalParameterDeclaration
     if (parallelLoop->getOpMapValue (i) == INDIRECT)
     {
       SgAsteriskShapeExp * upperBoundExpression = new SgAsteriskShapeExp (
-          ROSEHelper::getFileInfo ());
+          RoseHelper::getFileInfo ());
 
       variableDeclarations->add (
           VariableNames::getGlobalToLocalMappingName (i),
@@ -135,7 +135,7 @@ FortranOpenMPKernelSubroutineIndirectLoop::createOpDatFormalParameterDeclaration
         && parallelLoop->getOpMapValue (i) == DIRECT)
     {
       SgAsteriskShapeExp * upperBoundExpression = new SgAsteriskShapeExp (
-          ROSEHelper::getFileInfo ());
+          RoseHelper::getFileInfo ());
 
       SgType * opdatType = parallelLoop->getOpDatType (i);
 

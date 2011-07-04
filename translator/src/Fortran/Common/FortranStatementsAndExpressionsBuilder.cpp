@@ -1,7 +1,7 @@
 #include <FortranStatementsAndExpressionsBuilder.h>
 #include <FortranTypesBuilder.h>
 #include <CommonNamespaces.h>
-#include <ROSEHelper.h>
+#include <RoseHelper.h>
 #include <Debug.h>
 
 /*
@@ -112,76 +112,6 @@ FortranStatementsAndExpressionsBuilder::buildFortranDoStatement (
   return fortranDoStatement;
 }
 
-SgIfStmt *
-FortranStatementsAndExpressionsBuilder::buildIfStatementWithEmptyElse (
-    SgExpression * ifGuard, SgBasicBlock * thenBlock)
-{
-  using SageBuilder::buildExprStatement;
-  using SageInterface::setOneSourcePositionForTransformation;
-
-  SgStatement * ifGuardStatement = buildExprStatement (ifGuard);
-
-  SgIfStmt * ifStatement = new SgIfStmt (ifGuardStatement, thenBlock, NULL);
-  ifStatement->setCaseInsensitive (true);
-  ifStatement->set_use_then_keyword (true);
-  ifStatement->set_has_end_statement (true);
-
-  setOneSourcePositionForTransformation (ifStatement);
-
-  ifGuardStatement->set_parent (ifStatement);
-  thenBlock->set_parent (ifStatement);
-
-  return ifStatement;
-}
-
-SgDerivedTypeStatement *
-FortranStatementsAndExpressionsBuilder::buildTypeDeclaration (
-    std::string const & typeName, SgScopeStatement * scope)
-{
-  SgClassDefinition * classDefinition = new SgClassDefinition (
-      ROSEHelper::getFileInfo ());
-  classDefinition->set_endOfConstruct (ROSEHelper::getFileInfo ());
-  classDefinition->setCaseInsensitive (true);
-
-  SgDerivedTypeStatement* classDeclaration = new SgDerivedTypeStatement (
-      ROSEHelper::getFileInfo (), typeName, SgClassDeclaration::e_struct, NULL,
-      classDefinition);
-  classDeclaration->set_endOfConstruct (ROSEHelper::getFileInfo ());
-  classDeclaration->set_definingDeclaration (classDeclaration);
-
-  SgDerivedTypeStatement* nondefiningClassDeclaration =
-      new SgDerivedTypeStatement (ROSEHelper::getFileInfo (), typeName,
-          SgClassDeclaration::e_struct, NULL, NULL);
-  nondefiningClassDeclaration->set_endOfConstruct (ROSEHelper::getFileInfo ());
-  nondefiningClassDeclaration->set_parent (scope);
-
-  nondefiningClassDeclaration->set_type (SgClassType::createType (
-      nondefiningClassDeclaration));
-  classDeclaration->set_type (nondefiningClassDeclaration->get_type ());
-
-  classDeclaration->set_firstNondefiningDeclaration (
-      nondefiningClassDeclaration);
-
-  nondefiningClassDeclaration->set_firstNondefiningDeclaration (
-      nondefiningClassDeclaration);
-  nondefiningClassDeclaration->set_definingDeclaration (classDeclaration);
-
-  nondefiningClassDeclaration->setForward ();
-
-  classDefinition->set_declaration (classDeclaration);
-
-  classDeclaration->set_scope (scope);
-  nondefiningClassDeclaration->set_scope (scope);
-
-  classDeclaration->set_parent (scope);
-
-  SgClassSymbol * classSymbol = new SgClassSymbol (nondefiningClassDeclaration);
-
-  scope->insert_symbol (typeName, classSymbol);
-
-  return classDeclaration;
-}
-
 SgExpression *
 FortranStatementsAndExpressionsBuilder::buildShapeExpression (
     SgVariableDeclaration * variableDeclaration, SgScopeStatement * scope)
@@ -189,7 +119,7 @@ FortranStatementsAndExpressionsBuilder::buildShapeExpression (
   using SageBuilder::buildOpaqueVarRefExp;
 
   SgExpression * shapeExpression = buildOpaqueVarRefExp ("(/"
-      + ROSEHelper::getFirstVariableName (variableDeclaration) + "/)", scope);
+      + RoseHelper::getFirstVariableName (variableDeclaration) + "/)", scope);
 
   return shapeExpression;
 }
@@ -254,8 +184,8 @@ FortranStatementsAndExpressionsBuilder::appendAllocateStatement (
   using SageInterface::appendStatement;
 
   SgAllocateStatement * allocateStatement = new SgAllocateStatement (
-      ROSEHelper::getFileInfo ());
-  allocateStatement->set_endOfConstruct (ROSEHelper::getFileInfo ());
+      RoseHelper::getFileInfo ());
+  allocateStatement->set_endOfConstruct (RoseHelper::getFileInfo ());
   allocateStatement->set_expr_list (allocateParameters);
 
   appendStatement (allocateStatement, scope);
@@ -268,8 +198,8 @@ FortranStatementsAndExpressionsBuilder::appendDeallocateStatement (
   using SageInterface::appendStatement;
 
   SgDeallocateStatement * deallocateStatement = new SgDeallocateStatement (
-      ROSEHelper::getFileInfo ());
-  deallocateStatement->set_endOfConstruct (ROSEHelper::getFileInfo ());
+      RoseHelper::getFileInfo ());
+  deallocateStatement->set_endOfConstruct (RoseHelper::getFileInfo ());
   deallocateStatement->set_expr_list (deallocateParameters);
 
   appendStatement (deallocateStatement, scope);
@@ -307,9 +237,9 @@ SgImplicitStatement *
 FortranStatementsAndExpressionsBuilder::buildImplicitNoneStatement ()
 {
   SgImplicitStatement * implicitStatement = new SgImplicitStatement (
-      ROSEHelper::getFileInfo (), true);
+      RoseHelper::getFileInfo (), true);
 
-  implicitStatement->set_endOfConstruct (ROSEHelper::getFileInfo ());
+  implicitStatement->set_endOfConstruct (RoseHelper::getFileInfo ());
   implicitStatement->set_definingDeclaration (implicitStatement);
 
   return implicitStatement;

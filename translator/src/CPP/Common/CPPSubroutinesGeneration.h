@@ -12,25 +12,17 @@ class CPPSubroutinesGeneration: public SubroutinesGeneration <
 {
   protected:
 
-    virtual CPPHostSubroutine *
-    createSubroutines (CPPParallelLoop * parallelLoop,
-        std::string const & userSubroutineName,
-        SgModuleStatement * moduleStatement) = 0;
+    virtual CPPHostSubroutine
+        *
+        createSubroutines (CPPParallelLoop * parallelLoop,
+            std::string const & userSubroutineName,
+            SgScopeStatement * moduleScope) = 0;
 
     void
     patchCallsToParallelLoops (CPPParallelLoop & parallelLoop,
         std::string const & userSubroutineName,
         CPPHostSubroutine & hostSubroutine, SgScopeStatement * scope,
         SgFunctionCallExp * functionCallExp);
-
-    /*
-     * ======================================================
-     * Creates the Fortran module
-     * ======================================================
-     */
-    SgModuleStatement *
-    createFortranModule (SgSourceFile & sourceFile,
-        CPPParallelLoop & parallelLoop);
 
     /*
      * ======================================================

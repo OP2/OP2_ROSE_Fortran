@@ -4,7 +4,7 @@
 #include <FortranStatementsAndExpressionsBuilder.h>
 #include <FortranCUDAKernelSubroutineIndirectLoop.h>
 #include <CommonNamespaces.h>
-#include <ROSEHelper.h>
+#include <RoseHelper.h>
 #include <Plan.h>
 
 /*
@@ -69,10 +69,10 @@ FortranCUDAKernelSubroutineIndirectLoop::createUserSubroutineCallStatement ()
             buildIntVal (1));
 
         SgSubscriptExpression * subscriptExpression =
-            new SgSubscriptExpression (ROSEHelper::getFileInfo (), buildIntVal (
+            new SgSubscriptExpression (RoseHelper::getFileInfo (), buildIntVal (
                 0), subtractExpression, buildIntVal (1));
 
-        subscriptExpression->set_endOfConstruct (ROSEHelper::getFileInfo ());
+        subscriptExpression->set_endOfConstruct (RoseHelper::getFileInfo ());
 
         parameterExpression = buildPntrArrRefExp (buildVarRefExp (
             variableDeclarations->get (VariableNames::getOpDatName (i))),
@@ -160,10 +160,10 @@ FortranCUDAKernelSubroutineIndirectLoop::createUserSubroutineCallStatement ()
       SgAddOp * addExpression5 = buildAddOp (addExpression4, dotExpression1);
 
       SgSubscriptExpression * subscriptExpression = new SgSubscriptExpression (
-          ROSEHelper::getFileInfo (), addExpression2, addExpression5,
+          RoseHelper::getFileInfo (), addExpression2, addExpression5,
           buildIntVal (1));
 
-      subscriptExpression->set_endOfConstruct (ROSEHelper::getFileInfo ());
+      subscriptExpression->set_endOfConstruct (RoseHelper::getFileInfo ());
 
       parameterExpression = buildPntrArrRefExp (buildVarRefExp (
           variableDeclarations->get (CommonVariableNames::autoshared)),
@@ -197,11 +197,11 @@ FortranCUDAKernelSubroutineIndirectLoop::createUserSubroutineCallStatement ()
             dotExpression);
 
         SgSubscriptExpression * arraySubscriptExpression =
-            new SgSubscriptExpression (ROSEHelper::getFileInfo (),
+            new SgSubscriptExpression (RoseHelper::getFileInfo (),
                 multiplyExpression, addExpression2, buildIntVal (1));
 
         arraySubscriptExpression->set_endOfConstruct (
-            ROSEHelper::getFileInfo ());
+            RoseHelper::getFileInfo ());
 
         parameterExpression = buildPntrArrRefExp (buildVarRefExp (
             variableDeclarations->get (VariableNames::getOpDatName (i))),
@@ -222,12 +222,12 @@ FortranCUDAKernelSubroutineIndirectLoop::createUserSubroutineCallStatement ()
                 CommonVariableNames::iterationCounter1)), subtractExpression);
 
         SgSubscriptExpression * subscriptExpression =
-            new SgSubscriptExpression (ROSEHelper::getFileInfo (),
+            new SgSubscriptExpression (RoseHelper::getFileInfo (),
                 buildVarRefExp (variableDeclarations->get (
                     CommonVariableNames::iterationCounter1)), addExpression,
                 buildIntVal (1));
 
-        subscriptExpression->set_endOfConstruct (ROSEHelper::getFileInfo ());
+        subscriptExpression->set_endOfConstruct (RoseHelper::getFileInfo ());
 
         parameterExpression = buildPntrArrRefExp (buildVarRefExp (
             variableDeclarations->get (VariableNames::getOpDatName (i))),
@@ -1752,7 +1752,7 @@ FortranCUDAKernelSubroutineIndirectLoop::createLocalVariableDeclarations ()
   }
 
   SgExpression * upperBoundExpression = new SgAsteriskShapeExp (
-      ROSEHelper::getFileInfo ());
+      RoseHelper::getFileInfo ());
 
   variableDeclarations->add (CommonVariableNames::autoshared,
       FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (

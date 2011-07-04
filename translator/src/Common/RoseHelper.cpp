@@ -1,4 +1,4 @@
-#include <ROSEHelper.h>
+#include <RoseHelper.h>
 
 /*
  * ======================================================
@@ -6,7 +6,7 @@
  * ======================================================
  */
 
-Sg_File_Info * ROSEHelper::fileInfo;
+Sg_File_Info * RoseHelper::fileInfo;
 
 /*
  * ======================================================
@@ -15,7 +15,7 @@ Sg_File_Info * ROSEHelper::fileInfo;
  */
 
 Sg_File_Info *
-ROSEHelper::getFileInfo ()
+RoseHelper::getFileInfo ()
 {
   if (fileInfo == NULL)
   {
@@ -26,7 +26,7 @@ ROSEHelper::getFileInfo ()
 }
 
 std::string const
-ROSEHelper::getFirstVariableName (SgVariableDeclaration * variableDeclaration)
+RoseHelper::getFirstVariableName (SgVariableDeclaration * variableDeclaration)
 {
   SgInitializedNamePtrList & variables = variableDeclaration->get_variables ();
 

@@ -67,9 +67,10 @@ class FortranTypesBuilder
     /*
      * ======================================================
      * Returns a Fortran integer with 2-byte storage.
-     * Effectively a 'short int'
+     * Effectively a 'short'
      * ======================================================
      */
+
     static SgTypeInt *
     getTwoByteInteger ();
 
@@ -79,15 +80,17 @@ class FortranTypesBuilder
      * Effectively an 'int'
      * ======================================================
      */
+
     static SgTypeInt *
     getFourByteInteger ();
 
     /*
      * ======================================================
      * Returns a Fortran integer with 8-byte storage.
-     * Effectively a 'long int'
+     * Effectively a 'long'
      * ======================================================
      */
+
     static SgTypeInt *
     getEightByteInteger ();
 
@@ -96,6 +99,7 @@ class FortranTypesBuilder
      * Returns a single-precision Fortran floating-point number
      * ======================================================
      */
+
     static SgTypeFloat *
     getSinglePrecisionFloat ();
 
@@ -104,6 +108,7 @@ class FortranTypesBuilder
      * Returns a double-precision Fortran floating-point number
      * ======================================================
      */
+
     static SgTypeFloat *
     getDoublePrecisionFloat ();
 
@@ -128,6 +133,7 @@ class FortranTypesBuilder
      * of the given type with this specific lower bound
      * ======================================================
      */
+
     static SgArrayType *
     getArray_RankOne_WithLowerBound (SgType * baseType,
         SgExpression * lowerBoundExpression);
@@ -139,6 +145,7 @@ class FortranTypesBuilder
      * elements
      * ======================================================
      */
+
     static SgArrayType *
     getArrayTypePlainDimension (SgType * baseType, int dimension);
 
@@ -148,6 +155,7 @@ class FortranTypesBuilder
      * of the given type with this specific upper bound
      * ======================================================
      */
+
     static SgArrayType *
     getArray_RankOne_WithUpperBound (SgType * baseType,
         SgExpression * upperBoundExpression);
@@ -159,6 +167,7 @@ class FortranTypesBuilder
      * bounds
      * ======================================================
      */
+
     static SgArrayType *
     getArray_RankOne_WithLowerAndUpperBounds (SgType * baseType,
         SgExpression * lowerBoundExpression,
@@ -196,7 +205,7 @@ class FortranTypesBuilder
      * ======================================================
      */
     static SgModuleStatement *
-    buildNewFortranModuleDeclaration (std::string const & moduleName,
+    buildModuleDeclaration (std::string const & moduleName,
         SgScopeStatement * scope);
 
     /*
@@ -205,8 +214,9 @@ class FortranTypesBuilder
      * given scope with the given name
      * ======================================================
      */
+
     static SgClassDeclaration *
-    buildNewTypeDeclaration (std::string const & typeName,
+    buildClassDeclaration (std::string const & typeName,
         SgScopeStatement * scope);
 
     /*
@@ -215,6 +225,7 @@ class FortranTypesBuilder
      * the given name
      * ======================================================
      */
+
     static SgFunctionSymbol *
     buildNewFortranFunction (std::string const & functionName,
         SgScopeStatement * scope);
@@ -225,6 +236,7 @@ class FortranTypesBuilder
      * the given name
      * ======================================================
      */
+
     static SgFunctionSymbol *
     buildNewFortranSubroutine (std::string const & functionName,
         SgScopeStatement * scope);

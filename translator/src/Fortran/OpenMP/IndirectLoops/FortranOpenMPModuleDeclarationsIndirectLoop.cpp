@@ -58,14 +58,14 @@ FortranOpenMPModuleDeclarationsIndirectLoop::createExecutionPlanDeclarations ()
    * ======================================================
    */
 
-  SgType * c_ptrType = FortranTypesBuilder::buildNewTypeDeclaration ("c_ptr",
+  SgType * c_ptrType = FortranTypesBuilder::buildClassDeclaration ("c_ptr",
       moduleScope)->get_type ();
 
   moduleDeclarations ->add (PlanFunction::Fortran::planRet,
       FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
           PlanFunction::Fortran::planRet, c_ptrType, moduleScope));
 
-  SgType * op_planType = FortranTypesBuilder::buildNewTypeDeclaration (
+  SgType * op_planType = FortranTypesBuilder::buildClassDeclaration (
       "op_plan", moduleScope)->get_type ();
 
   moduleDeclarations->add (PlanFunction::Fortran::actualPlan,

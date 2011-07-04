@@ -1,7 +1,7 @@
 #include <FortranCUDAHostSubroutineDirectLoop.h>
 #include <FortranTypesBuilder.h>
 #include <FortranStatementsAndExpressionsBuilder.h>
-#include <ROSEHelper.h>
+#include <RoseHelper.h>
 #include <Debug.h>
 #include <FortranCUDAReductionSubroutine.h>
 #include <CommonNamespaces.h>
@@ -71,10 +71,10 @@ FortranCUDAHostSubroutineDirectLoop::createKernelFunctionCallStatement ()
   }
 
   SgExprStatement * callStatement = buildFunctionCallStmt (kernelSubroutineName
-      + "<<<" + ROSEHelper::getFirstVariableName (variableDeclarations->get (
-      CUDA::Fortran::blocksPerGrid)) + ", " + ROSEHelper::getFirstVariableName (
+      + "<<<" + RoseHelper::getFirstVariableName (variableDeclarations->get (
+      CUDA::Fortran::blocksPerGrid)) + ", " + RoseHelper::getFirstVariableName (
       variableDeclarations->get (CUDA::Fortran::threadsPerBlock)) + ", "
-      + ROSEHelper::getFirstVariableName (variableDeclarations->get (
+      + RoseHelper::getFirstVariableName (variableDeclarations->get (
           CUDA::Fortran::sharedMemorySize)) + ">>>", buildVoidType (),
       actualParameters, subroutineScope);
 

@@ -13,8 +13,7 @@ class FortranOpenMPSubroutinesGeneration: public FortranSubroutinesGeneration
 
     virtual FortranHostSubroutine *
     createSubroutines (FortranParallelLoop * parallelLoop,
-        std::string const & userSubroutineName,
-        SgModuleStatement * moduleStatement);
+        std::string const & userSubroutineName, SgScopeStatement * moduleScope);
 
     virtual void
     addLibraries (SgModuleStatement * moduleStatement);

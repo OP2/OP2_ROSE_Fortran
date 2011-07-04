@@ -4,7 +4,7 @@
 #include <FortranCUDAReductionSubroutine.h>
 #include <FortranTypesBuilder.h>
 #include <FortranStatementsAndExpressionsBuilder.h>
-#include <ROSEHelper.h>
+#include <RoseHelper.h>
 
 /*
  * ======================================================
@@ -180,10 +180,10 @@ FortranCUDAKernelSubroutine::createReductionLoopStatements ()
               parallelLoop->getOpDatDimension (i) - 1));
 
           SgSubscriptExpression * subscriptExpression =
-              new SgSubscriptExpression (ROSEHelper::getFileInfo (),
+              new SgSubscriptExpression (RoseHelper::getFileInfo (),
                   addExpression1, addExpression2, buildIntVal (1));
 
-          subscriptExpression->set_endOfConstruct (ROSEHelper::getFileInfo ());
+          subscriptExpression->set_endOfConstruct (RoseHelper::getFileInfo ());
 
           SgPntrArrRefExp * arrayIndexExpression1 = buildPntrArrRefExp (
               buildVarRefExp (variableDeclarations->get (
@@ -308,7 +308,7 @@ FortranCUDAKernelSubroutine::createAutoSharedDeclaration ()
       if (opDatBaseType->variantT () == V_SgTypeFloat)
       {
         SgExpression * upperBound = new SgAsteriskShapeExp (
-            ROSEHelper::getFileInfo ());
+            RoseHelper::getFileInfo ());
 
         variableDeclarations->add (CommonVariableNames::autoshared,
             FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (

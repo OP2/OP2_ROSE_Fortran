@@ -22,10 +22,11 @@ class FortranSubroutinesGeneration: public SubroutinesGeneration <
 {
   protected:
 
-    virtual FortranHostSubroutine *
-    createSubroutines (FortranParallelLoop * parallelLoop,
-        std::string const & userSubroutineName,
-        SgModuleStatement * moduleStatement) = 0;
+    virtual FortranHostSubroutine
+        *
+        createSubroutines (FortranParallelLoop * parallelLoop,
+            std::string const & userSubroutineName,
+            SgScopeStatement * moduleScope) = 0;
 
     /*
      * ======================================================
@@ -33,6 +34,7 @@ class FortranSubroutinesGeneration: public SubroutinesGeneration <
      * generated module
      * ======================================================
      */
+
     virtual void
     addLibraries (SgModuleStatement * moduleStatement) = 0;
 
@@ -48,14 +50,16 @@ class FortranSubroutinesGeneration: public SubroutinesGeneration <
      * which must precede all subroutine declarations
      * ======================================================
      */
+
     void
-    addContains (SgModuleStatement * moduleStatement);
+    addContains (SgScopeStatement * moduleScope);
 
     /*
      * ======================================================
      * Creates the Fortran module
      * ======================================================
      */
+
     SgModuleStatement *
     createFortranModule (SgSourceFile & sourceFile,
         FortranParallelLoop & parallelLoop);
@@ -66,6 +70,7 @@ class FortranSubroutinesGeneration: public SubroutinesGeneration <
      * that contains the generated subroutines and declarations
      * ======================================================
      */
+
     SgSourceFile &
     createSourceFile (FortranParallelLoop & parallelLoop);
 

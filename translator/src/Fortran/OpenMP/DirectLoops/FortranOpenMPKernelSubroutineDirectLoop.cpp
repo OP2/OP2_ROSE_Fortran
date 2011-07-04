@@ -1,7 +1,7 @@
 #include <FortranOpenMPKernelSubroutineDirectLoop.h>
 #include <FortranStatementsAndExpressionsBuilder.h>
 #include <FortranTypesBuilder.h>
-#include <ROSEHelper.h>
+#include <RoseHelper.h>
 #include <Debug.h>
 
 /*
@@ -47,11 +47,11 @@ FortranOpenMPKernelSubroutineDirectLoop::createUserSubroutineCallStatement ()
             buildIntVal (1));
 
         SgSubscriptExpression * arraySubscriptExpression =
-            new SgSubscriptExpression (ROSEHelper::getFileInfo (),
+            new SgSubscriptExpression (RoseHelper::getFileInfo (),
                 multiplyExpression1, subtractExpression2, buildIntVal (1));
 
         arraySubscriptExpression->set_endOfConstruct (
-            ROSEHelper::getFileInfo ());
+            RoseHelper::getFileInfo ());
 
         SgPntrArrRefExp * parameterExpression = buildPntrArrRefExp (
             buildVarRefExp (variableDeclarations->get (
@@ -121,7 +121,7 @@ FortranOpenMPKernelSubroutineDirectLoop::createOpDatFormalParameterDeclarations 
       SgArrayType * newArrayType =
           FortranTypesBuilder::getArray_RankOne_WithLowerAndUpperBounds (
               arrayType->get_base_type (), buildIntVal (0),
-              new SgAsteriskShapeExp (ROSEHelper::getFileInfo ()));
+              new SgAsteriskShapeExp (RoseHelper::getFileInfo ()));
 
       variableDeclarations->add (
           VariableNames::getOpDatName (i),

@@ -2,7 +2,7 @@
 #include <FortranTypesBuilder.h>
 #include <FortranStatementsAndExpressionsBuilder.h>
 #include <FortranCUDAReductionSubroutine.h>
-#include <ROSEHelper.h>
+#include <RoseHelper.h>
 #include <Debug.h>
 
 /*
@@ -60,11 +60,11 @@ FortranCUDAKernelSubroutineDirectLoop::createUserSubroutineCallStatement ()
             buildIntVal (1));
 
         SgSubscriptExpression * arraySubscriptExpression =
-            new SgSubscriptExpression (ROSEHelper::getFileInfo (), buildIntVal (
+            new SgSubscriptExpression (RoseHelper::getFileInfo (), buildIntVal (
                 0), subtractExpression, buildIntVal (1));
 
         arraySubscriptExpression->set_endOfConstruct (
-            ROSEHelper::getFileInfo ());
+            RoseHelper::getFileInfo ());
 
         SgPntrArrRefExp * parameterExpression = buildPntrArrRefExp (
             buildVarRefExp (variableDeclarations->get (
@@ -105,12 +105,12 @@ FortranCUDAKernelSubroutineDirectLoop::createUserSubroutineCallStatement ()
             deviceVarAccessDirectBegin, buildIntVal (dim));
 
         SgSubscriptExpression * arraySubscriptExpression =
-            new SgSubscriptExpression (ROSEHelper::getFileInfo (),
+            new SgSubscriptExpression (RoseHelper::getFileInfo (),
                 deviceVarAccessDirectBegin, deviceVarAccessDirectEnd,
                 buildIntVal (1));
 
         arraySubscriptExpression->set_endOfConstruct (
-            ROSEHelper::getFileInfo ());
+            RoseHelper::getFileInfo ());
 
         SgPntrArrRefExp * parameterExpression = buildPntrArrRefExp (
             buildVarRefExp (variableDeclarations->get (
@@ -126,13 +126,13 @@ FortranCUDAKernelSubroutineDirectLoop::createUserSubroutineCallStatement ()
             buildIntVal (dim - 1));
 
         SgSubscriptExpression * arraySubscriptExpression =
-            new SgSubscriptExpression (ROSEHelper::getFileInfo (),
+            new SgSubscriptExpression (RoseHelper::getFileInfo (),
                 buildVarRefExp (variableDeclarations->get (
                     DirectLoop::Fortran::KernelSubroutine::setElementCounter)),
                 addExpression, buildIntVal (1));
 
         arraySubscriptExpression->set_endOfConstruct (
-            ROSEHelper::getFileInfo ());
+            RoseHelper::getFileInfo ());
 
         SgPntrArrRefExp * parameterExpression = buildPntrArrRefExp (
             buildVarRefExp (variableDeclarations->get (
@@ -699,10 +699,10 @@ FortranCUDAKernelSubroutineDirectLoop::createOpDatFormalParameterDeclarations ()
           buildIntVal (1));
 
       SgSubscriptExpression * arraySubscriptExpression =
-          new SgSubscriptExpression (ROSEHelper::getFileInfo (),
+          new SgSubscriptExpression (RoseHelper::getFileInfo (),
               buildIntVal (0), subtractExpression, buildIntVal (1));
 
-      arraySubscriptExpression->set_endOfConstruct (ROSEHelper::getFileInfo ());
+      arraySubscriptExpression->set_endOfConstruct (RoseHelper::getFileInfo ());
 
       /*
        * ======================================================

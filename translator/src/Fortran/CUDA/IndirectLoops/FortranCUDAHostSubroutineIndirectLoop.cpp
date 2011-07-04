@@ -3,7 +3,7 @@
 #include <FortranTypesBuilder.h>
 #include <FortranStatementsAndExpressionsBuilder.h>
 #include <CommonNamespaces.h>
-#include <ROSEHelper.h>
+#include <RoseHelper.h>
 
 /*
  * ======================================================
@@ -88,10 +88,10 @@ FortranCUDAHostSubroutineIndirectLoop::createKernelFunctionCallStatement ()
       variableDeclarations->get (PlanFunction::Fortran::blockOffset)));
 
   SgExprStatement * callStatement = buildFunctionCallStmt (kernelSubroutineName
-      + "<<<" + ROSEHelper::getFirstVariableName (variableDeclarations->get (
-      CUDA::Fortran::blocksPerGrid)) + ", " + ROSEHelper::getFirstVariableName (
+      + "<<<" + RoseHelper::getFirstVariableName (variableDeclarations->get (
+      CUDA::Fortran::blocksPerGrid)) + ", " + RoseHelper::getFirstVariableName (
       variableDeclarations->get (CUDA::Fortran::threadsPerBlock)) + ", "
-      + ROSEHelper::getFirstVariableName (variableDeclarations->get (
+      + RoseHelper::getFirstVariableName (variableDeclarations->get (
           CUDA::Fortran::sharedMemorySize)) + ">>>", buildVoidType (),
       actualParameters, subroutineScope);
 
@@ -403,14 +403,14 @@ FortranCUDAHostSubroutineIndirectLoop::createExecutionPlanDeclarations ()
    * ======================================================
    */
 
-  SgType * c_ptrType = FortranTypesBuilder::buildNewTypeDeclaration ("c_ptr",
+  SgType * c_ptrType = FortranTypesBuilder::buildClassDeclaration ("c_ptr",
       subroutineScope)->get_type ();
 
   variableDeclarations->add (PlanFunction::Fortran::planRet,
       FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
           PlanFunction::Fortran::planRet, c_ptrType, subroutineScope));
 
-  SgType * op_planType = FortranTypesBuilder::buildNewTypeDeclaration (
+  SgType * op_planType = FortranTypesBuilder::buildClassDeclaration (
       "op_plan", subroutineScope)->get_type ();
 
   variableDeclarations->add (PlanFunction::Fortran::actualPlan,
@@ -424,7 +424,7 @@ FortranCUDAHostSubroutineIndirectLoop::createExecutionPlanDeclarations ()
    * ======================================================
    */
 
-  SgType * c_devptrType = FortranTypesBuilder::buildNewTypeDeclaration (
+  SgType * c_devptrType = FortranTypesBuilder::buildClassDeclaration (
       "c_devptr", subroutineScope)->get_type ();
 
   variableDeclarations->add (PlanFunction::Fortran::pindMaps,

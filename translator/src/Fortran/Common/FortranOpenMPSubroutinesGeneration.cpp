@@ -5,7 +5,7 @@
 #include <FortranOpenMPKernelSubroutineIndirectLoop.h>
 #include <FortranOpenMPHostSubroutineDirectLoop.h>
 #include <FortranOpenMPHostSubroutineIndirectLoop.h>
-#include <ROSEHelper.h>
+#include <RoseHelper.h>
 
 /*
  * ======================================================
@@ -16,10 +16,8 @@
 FortranHostSubroutine *
 FortranOpenMPSubroutinesGeneration::createSubroutines (
     FortranParallelLoop * parallelLoop, std::string const & userSubroutineName,
-    SgModuleStatement * moduleStatement)
+    SgScopeStatement * moduleScope)
 {
-  SgScopeStatement * moduleScope = moduleStatement->get_definition ();
-
   FortranOpenMPKernelSubroutine * kernelSubroutine;
 
   FortranOpenMPHostSubroutine * hostSubroutine;
@@ -40,7 +38,7 @@ FortranOpenMPSubroutinesGeneration::createSubroutines (
         new FortranOpenMPModuleDeclarationsDirectLoop (userSubroutineName,
             parallelLoop, moduleScope);
 
-    addContains (moduleStatement);
+    addContains (moduleScope);
 
     kernelSubroutine = new FortranOpenMPKernelSubroutineDirectLoop (
         userSubroutineName, userSubroutineName, parallelLoop, moduleScope);
@@ -66,7 +64,7 @@ FortranOpenMPSubroutinesGeneration::createSubroutines (
         new FortranOpenMPModuleDeclarationsIndirectLoop (userSubroutineName,
             parallelLoop, moduleScope);
 
-    addContains (moduleStatement);
+    addContains (moduleScope);
 
     kernelSubroutine = new FortranOpenMPKernelSubroutineIndirectLoop (
         userSubroutineName, userSubroutineName, parallelLoop, moduleScope);
@@ -101,7 +99,7 @@ FortranOpenMPSubroutinesGeneration::addLibraries (
   for (vector <string>::const_iterator it = libs.begin (); it != libs.end (); ++it)
   {
     SgUseStatement* useStatement = new SgUseStatement (
-        ROSEHelper::getFileInfo (), *it, false);
+        RoseHelper::getFileInfo (), *it, false);
 
     useStatement->set_definingDeclaration (moduleStatement);
 

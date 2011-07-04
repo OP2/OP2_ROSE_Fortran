@@ -1,4 +1,5 @@
 #include <CPPSubroutinesGeneration.h>
+#include <FortranTypesBuilder.h>
 
 /*
  * ======================================================
@@ -7,53 +8,15 @@
  */
 
 void
-FortranSubroutinesGeneration::patchCallsToParallelLoops (
+CPPSubroutinesGeneration::patchCallsToParallelLoops (
     CPPParallelLoop & parallelLoop, std::string const & userSubroutineName,
     CPPHostSubroutine & hostSubroutine, SgScopeStatement * scope,
     SgFunctionCallExp * functionCallExp)
 {
 }
 
-void
-FortranSubroutinesGeneration::addContains (SgModuleStatement * moduleStatement)
-{
-  using SageInterface::appendStatement;
-
-  SgContainsStatement * containsStatement = new SgContainsStatement (
-      ROSEHelper::getFileInfo ());
-
-  containsStatement->set_definingDeclaration (containsStatement);
-
-  appendStatement (containsStatement, moduleStatement->get_definition ());
-}
-
-SgModuleStatement *
-FortranSubroutinesGeneration::createFortranModule (SgSourceFile & sourceFile,
-    FortranParallelLoop & parallelLoop)
-{
-  using std::string;
-  using std::vector;
-  using SageInterface::appendStatement;
-
-  Debug::getInstance ()->debugMessage ("Creating Fortran module",
-      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
-
-  SgGlobal * globalScope = sourceFile.get_globalScope ();
-
-  SgModuleStatement * moduleStatement =
-      FortranTypesBuilder::buildNewFortranModuleDeclaration (
-          parallelLoop.getModuleName (), globalScope);
-
-  moduleStatement->get_definition ()->setCaseInsensitive (true);
-
-  appendStatement (moduleStatement, globalScope);
-
-  return moduleStatement;
-}
-
 SgSourceFile &
-FortranSubroutinesGeneration::createSourceFile (
-    FortranParallelLoop & parallelLoop)
+CPPSubroutinesGeneration::createSourceFile (CPPParallelLoop & parallelLoop)
 {
   using SageBuilder::buildFile;
   using std::string;
@@ -132,7 +95,7 @@ FortranSubroutinesGeneration::createSourceFile (
 }
 
 void
-FortranSubroutinesGeneration::visit (SgNode * node)
+CPPSubroutinesGeneration::visit (SgNode * node)
 {
   using boost::starts_with;
   using std::pair;
@@ -198,7 +161,7 @@ FortranSubroutinesGeneration::visit (SgNode * node)
            * ======================================================
            */
 
-          FortranParallelLoop * parallelLoop = new FortranParallelLoop (
+          CPPParallelLoop * parallelLoop = new CPPParallelLoop (
               actualArguments, userSubroutineName, declarations);
 
           parallelLoops[userSubroutineName] = parallelLoop;
@@ -213,29 +176,12 @@ FortranSubroutinesGeneration::visit (SgNode * node)
 
           /*
            * ======================================================
-           * Create the Fortran module
-           * ======================================================
-           */
-
-          SgModuleStatement * moduleStatement = createFortranModule (
-              sourceFile, *parallelLoop);
-
-          /*
-           * ======================================================
-           * Add the library 'use' statements
-           * ======================================================
-           */
-
-          addLibraries (moduleStatement);
-
-          /*
-           * ======================================================
            * Create the subroutines
            * ======================================================
            */
 
-          FortranHostSubroutine * hostSubroutine = createSubroutines (
-              parallelLoop, userSubroutineName, moduleStatement);
+          CPPHostSubroutine * hostSubroutine = createSubroutines (parallelLoop,
+              userSubroutineName, sourceFile.get_globalScope());
 
           /*
            * ======================================================

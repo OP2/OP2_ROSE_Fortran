@@ -53,7 +53,7 @@ template <typename TDeclarations, typename TParallelLoop,
       virtual THostSubroutine *
       createSubroutines (TParallelLoop * parallelLoop,
           std::string const & userSubroutineName,
-          SgModuleStatement * moduleStatement) = 0;
+          SgScopeStatement * moduleScope) = 0;
 
       /*
        * ======================================================

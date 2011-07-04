@@ -1,5 +1,5 @@
 #include <boost/lexical_cast.hpp>
-#include <ROSEHelper.h>
+#include <RoseHelper.h>
 #include <Debug.h>
 #include <CommonNamespaces.h>
 #include <FortranCUDAReductionSubroutine.h>
@@ -246,7 +246,7 @@ FortranCUDAReductionSubroutine::createLocalVariableDeclarations ()
 
   SgArrayType * arrayType = FortranTypesBuilder::getArray_RankOne (
       reductionVariableType->get_base_type (), 0, new SgAsteriskShapeExp (
-          ROSEHelper::getFileInfo ()));
+          RoseHelper::getFileInfo ()));
 
   variableDeclarations->add (CommonVariableNames::autoshared,
       FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (

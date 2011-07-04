@@ -6,7 +6,7 @@
 #include <FortranCUDAHostSubroutineDirectLoop.h>
 #include <FortranCUDAHostSubroutineIndirectLoop.h>
 #include <FortranCUDAUserSubroutine.h>
-#include <ROSEHelper.h>
+#include <RoseHelper.h>
 
 /*
  * ======================================================
@@ -17,10 +17,8 @@
 FortranHostSubroutine *
 FortranCUDASubroutinesGeneration::createSubroutines (
     FortranParallelLoop * parallelLoop, std::string const & userSubroutineName,
-    SgModuleStatement * moduleStatement)
+    SgScopeStatement * moduleScope)
 {
-  SgScopeStatement * moduleScope = moduleStatement->get_definition ();
-
   /*
    * ======================================================
    * Create the type representing the dimensions of each
@@ -58,7 +56,7 @@ FortranCUDASubroutinesGeneration::createSubroutines (
         new FortranCUDAInitialiseConstantsSubroutine (userSubroutineName,
             moduleScope);
 
-    addContains (moduleStatement);
+    addContains (moduleScope);
 
     initialiseConstantsSubroutine->generateSubroutine ();
 
@@ -92,7 +90,7 @@ FortranCUDASubroutinesGeneration::createSubroutines (
         new FortranCUDAInitialiseConstantsSubroutine (userSubroutineName,
             moduleScope);
 
-    addContains (moduleStatement);
+    addContains (moduleScope);
 
     initialiseConstantsSubroutine->generateSubroutine ();
 
@@ -135,7 +133,7 @@ FortranCUDASubroutinesGeneration::addLibraries (
   for (vector <string>::const_iterator it = libs.begin (); it != libs.end (); ++it)
   {
     SgUseStatement* useStatement = new SgUseStatement (
-        ROSEHelper::getFileInfo (), *it, false);
+        RoseHelper::getFileInfo (), *it, false);
 
     useStatement->set_definingDeclaration (moduleStatement);
 

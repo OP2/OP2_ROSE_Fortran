@@ -9,7 +9,7 @@
 
 #include <rose.h>
 
-class ROSEHelper
+class RoseHelper
 {
   private:
 

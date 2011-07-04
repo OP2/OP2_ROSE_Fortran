@@ -2,7 +2,7 @@
 #include <CommonNamespaces.h>
 #include <FortranStatementsAndExpressionsBuilder.h>
 #include <FortranTypesBuilder.h>
-#include <ROSEHelper.h>
+#include <RoseHelper.h>
 #include <Debug.h>
 
 /*
@@ -40,11 +40,11 @@ FortranOpenMPHostSubroutineDirectLoop::createKernelFunctionCallStatement ()
             variableDeclarations->get (OpenMP::threadIndex)), buildIntVal (64));
 
         SgSubscriptExpression * arraySubscriptExpression =
-            new SgSubscriptExpression (ROSEHelper::getFileInfo (),
+            new SgSubscriptExpression (RoseHelper::getFileInfo (),
                 multiplyExpression, buildNullExpression (), buildIntVal (1));
 
         arraySubscriptExpression->set_endOfConstruct (
-            ROSEHelper::getFileInfo ());
+            RoseHelper::getFileInfo ());
 
         SgPntrArrRefExp * parameterExpression = buildPntrArrRefExp (
             buildVarRefExp (variableDeclarations->get (

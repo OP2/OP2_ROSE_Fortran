@@ -1,5 +1,5 @@
 #include <FortranTypesBuilder.h>
-#include <ROSEHelper.h>
+#include <RoseHelper.h>
 
 /*
  * ======================================================
@@ -41,10 +41,10 @@ FortranTypesBuilder::completeNewDeclaration (
     SgClassDefinition * classDefinition, SgClassDeclaration * classDeclaration,
     SgClassDeclaration * nonDefiningClassDeclaration, SgScopeStatement * scope)
 {
-  classDefinition->set_endOfConstruct (ROSEHelper::getFileInfo ());
+  classDefinition->set_endOfConstruct (RoseHelper::getFileInfo ());
   classDefinition->set_declaration (classDeclaration);
 
-  nonDefiningClassDeclaration->set_endOfConstruct (ROSEHelper::getFileInfo ());
+  nonDefiningClassDeclaration->set_endOfConstruct (RoseHelper::getFileInfo ());
   nonDefiningClassDeclaration->set_definingDeclaration (classDeclaration);
   nonDefiningClassDeclaration->set_firstNondefiningDeclaration (
       nonDefiningClassDeclaration);
@@ -54,7 +54,7 @@ FortranTypesBuilder::completeNewDeclaration (
       nonDefiningClassDeclaration));
   nonDefiningClassDeclaration->setForward ();
 
-  classDeclaration->set_endOfConstruct (ROSEHelper::getFileInfo ());
+  classDeclaration->set_endOfConstruct (RoseHelper::getFileInfo ());
   classDeclaration->set_definingDeclaration (classDeclaration);
   classDeclaration->set_firstNondefiningDeclaration (
       nonDefiningClassDeclaration);
@@ -78,8 +78,8 @@ FortranTypesBuilder::getTwoByteInteger ()
   if (twoByteInteger == NULL)
   {
     twoByteInteger = new SgTypeInt ();
-    SgIntVal * bytesPerInt = new SgIntVal (ROSEHelper::getFileInfo (), 2);
-    bytesPerInt->set_endOfConstruct (ROSEHelper::getFileInfo ());
+    SgIntVal * bytesPerInt = new SgIntVal (RoseHelper::getFileInfo (), 2);
+    bytesPerInt->set_endOfConstruct (RoseHelper::getFileInfo ());
     twoByteInteger->set_type_kind (bytesPerInt);
   }
   return twoByteInteger;
@@ -91,8 +91,8 @@ FortranTypesBuilder::getFourByteInteger ()
   if (fourByteInteger == NULL)
   {
     fourByteInteger = new SgTypeInt ();
-    SgIntVal * bytesPerInt = new SgIntVal (ROSEHelper::getFileInfo (), 4);
-    bytesPerInt->set_endOfConstruct (ROSEHelper::getFileInfo ());
+    SgIntVal * bytesPerInt = new SgIntVal (RoseHelper::getFileInfo (), 4);
+    bytesPerInt->set_endOfConstruct (RoseHelper::getFileInfo ());
     fourByteInteger->set_type_kind (bytesPerInt);
   }
   return fourByteInteger;
@@ -104,8 +104,8 @@ FortranTypesBuilder::getEightByteInteger ()
   if (eightByteInteger == NULL)
   {
     eightByteInteger = new SgTypeInt ();
-    SgIntVal * bytesPerInt = new SgIntVal (ROSEHelper::getFileInfo (), 8);
-    bytesPerInt->set_endOfConstruct (ROSEHelper::getFileInfo ());
+    SgIntVal * bytesPerInt = new SgIntVal (RoseHelper::getFileInfo (), 8);
+    bytesPerInt->set_endOfConstruct (RoseHelper::getFileInfo ());
     eightByteInteger->set_type_kind (bytesPerInt);
   }
   return eightByteInteger;
@@ -117,8 +117,8 @@ FortranTypesBuilder::getSinglePrecisionFloat ()
   if (singlePrecisionFloat == NULL)
   {
     singlePrecisionFloat = new SgTypeFloat ();
-    SgIntVal * bytesPerFloat = new SgIntVal (ROSEHelper::getFileInfo (), 4);
-    bytesPerFloat->set_endOfConstruct (ROSEHelper::getFileInfo ());
+    SgIntVal * bytesPerFloat = new SgIntVal (RoseHelper::getFileInfo (), 4);
+    bytesPerFloat->set_endOfConstruct (RoseHelper::getFileInfo ());
     singlePrecisionFloat->set_type_kind (bytesPerFloat);
   }
   return singlePrecisionFloat;
@@ -130,8 +130,8 @@ FortranTypesBuilder::getDoublePrecisionFloat ()
   if (doublePrecisionFloat == NULL)
   {
     doublePrecisionFloat = new SgTypeFloat ();
-    SgIntVal * bytesPerFloat = new SgIntVal (ROSEHelper::getFileInfo (), 8);
-    bytesPerFloat->set_endOfConstruct (ROSEHelper::getFileInfo ());
+    SgIntVal * bytesPerFloat = new SgIntVal (RoseHelper::getFileInfo (), 8);
+    bytesPerFloat->set_endOfConstruct (RoseHelper::getFileInfo ());
     doublePrecisionFloat->set_type_kind (bytesPerFloat);
   }
   return doublePrecisionFloat;
@@ -148,33 +148,33 @@ FortranTypesBuilder::getArray_RankOne (SgType * baseType, int lowerBound,
 
   if (lowerBound == -1)
   {
-    lowerBoundExpression = new SgNullExpression (ROSEHelper::getFileInfo ());
+    lowerBoundExpression = new SgNullExpression (RoseHelper::getFileInfo ());
   }
   else
   {
     lowerBoundExpression
-        = new SgIntVal (ROSEHelper::getFileInfo (), lowerBound);
+        = new SgIntVal (RoseHelper::getFileInfo (), lowerBound);
   }
-  lowerBoundExpression->set_endOfConstruct (ROSEHelper::getFileInfo ());
+  lowerBoundExpression->set_endOfConstruct (RoseHelper::getFileInfo ());
 
   if (upperBound == -1)
   {
-    upperBoundExpression = new SgNullExpression (ROSEHelper::getFileInfo ());
+    upperBoundExpression = new SgNullExpression (RoseHelper::getFileInfo ());
   }
   else
   {
     upperBoundExpression
-        = new SgIntVal (ROSEHelper::getFileInfo (), upperBound);
+        = new SgIntVal (RoseHelper::getFileInfo (), upperBound);
   }
-  upperBoundExpression->set_endOfConstruct (ROSEHelper::getFileInfo ());
+  upperBoundExpression->set_endOfConstruct (RoseHelper::getFileInfo ());
 
-  SgIntVal * strideExpression = new SgIntVal (ROSEHelper::getFileInfo (), 1);
-  strideExpression->set_endOfConstruct (ROSEHelper::getFileInfo ());
+  SgIntVal * strideExpression = new SgIntVal (RoseHelper::getFileInfo (), 1);
+  strideExpression->set_endOfConstruct (RoseHelper::getFileInfo ());
 
   SgSubscriptExpression * arrayDimensionExpression = new SgSubscriptExpression (
-      ROSEHelper::getFileInfo (), lowerBoundExpression, upperBoundExpression,
+      RoseHelper::getFileInfo (), lowerBoundExpression, upperBoundExpression,
       strideExpression);
-  arrayDimensionExpression->set_endOfConstruct (ROSEHelper::getFileInfo ());
+  arrayDimensionExpression->set_endOfConstruct (RoseHelper::getFileInfo ());
 
   SgArrayType * array = new SgArrayType (baseType, arrayDimensionExpression);
   arrayDimensionExpression->set_parent (baseType);
@@ -211,29 +211,29 @@ FortranTypesBuilder::getArray_RankOne (SgType * baseType, int lowerBound,
 
   if (lowerBound == -1)
   {
-    lowerBoundExpression = new SgNullExpression (ROSEHelper::getFileInfo ());
+    lowerBoundExpression = new SgNullExpression (RoseHelper::getFileInfo ());
   }
   else
   {
     lowerBoundExpression
-        = new SgIntVal (ROSEHelper::getFileInfo (), lowerBound);
+        = new SgIntVal (RoseHelper::getFileInfo (), lowerBound);
   }
-  lowerBoundExpression->set_endOfConstruct (ROSEHelper::getFileInfo ());
+  lowerBoundExpression->set_endOfConstruct (RoseHelper::getFileInfo ());
 
   if (upperBoundExpression == NULL)
   {
-    upperBoundExpression = new SgNullExpression (ROSEHelper::getFileInfo ());
+    upperBoundExpression = new SgNullExpression (RoseHelper::getFileInfo ());
   }
 
-  upperBoundExpression->set_endOfConstruct (ROSEHelper::getFileInfo ());
+  upperBoundExpression->set_endOfConstruct (RoseHelper::getFileInfo ());
 
-  SgIntVal * strideExpression = new SgIntVal (ROSEHelper::getFileInfo (), 1);
-  strideExpression->set_endOfConstruct (ROSEHelper::getFileInfo ());
+  SgIntVal * strideExpression = new SgIntVal (RoseHelper::getFileInfo (), 1);
+  strideExpression->set_endOfConstruct (RoseHelper::getFileInfo ());
 
   SgSubscriptExpression * arrayDimensionExpression = new SgSubscriptExpression (
-      ROSEHelper::getFileInfo (), lowerBoundExpression, upperBoundExpression,
+      RoseHelper::getFileInfo (), lowerBoundExpression, upperBoundExpression,
       strideExpression);
-  arrayDimensionExpression->set_endOfConstruct (ROSEHelper::getFileInfo ());
+  arrayDimensionExpression->set_endOfConstruct (RoseHelper::getFileInfo ());
 
   SgArrayType * array = new SgArrayType (baseType, arrayDimensionExpression);
   arrayDimensionExpression->set_parent (baseType);
@@ -250,18 +250,18 @@ FortranTypesBuilder::getArray_RankOne_WithLowerBound (SgType * baseType,
 {
   using SageBuilder::buildExprListExp;
 
-  lowerBoundExpression->set_endOfConstruct (ROSEHelper::getFileInfo ());
+  lowerBoundExpression->set_endOfConstruct (RoseHelper::getFileInfo ());
 
   SgExpression * upperBoundExpression = new SgNullExpression ();
-  upperBoundExpression->set_endOfConstruct (ROSEHelper::getFileInfo ());
+  upperBoundExpression->set_endOfConstruct (RoseHelper::getFileInfo ());
 
-  SgIntVal * strideExpression = new SgIntVal (ROSEHelper::getFileInfo (), 1);
-  strideExpression->set_endOfConstruct (ROSEHelper::getFileInfo ());
+  SgIntVal * strideExpression = new SgIntVal (RoseHelper::getFileInfo (), 1);
+  strideExpression->set_endOfConstruct (RoseHelper::getFileInfo ());
 
   SgSubscriptExpression * arrayDimensionExpression = new SgSubscriptExpression (
-      ROSEHelper::getFileInfo (), lowerBoundExpression, upperBoundExpression,
+      RoseHelper::getFileInfo (), lowerBoundExpression, upperBoundExpression,
       strideExpression);
-  arrayDimensionExpression->set_endOfConstruct (ROSEHelper::getFileInfo ());
+  arrayDimensionExpression->set_endOfConstruct (RoseHelper::getFileInfo ());
 
   SgArrayType * array = new SgArrayType (baseType, arrayDimensionExpression);
   arrayDimensionExpression->set_parent (baseType);
@@ -278,18 +278,18 @@ FortranTypesBuilder::getArray_RankOne_WithUpperBound (SgType * baseType,
 {
   using SageBuilder::buildExprListExp;
 
-  upperBoundExpression->set_endOfConstruct (ROSEHelper::getFileInfo ());
+  upperBoundExpression->set_endOfConstruct (RoseHelper::getFileInfo ());
 
   SgExpression * lowerBoundExpression = new SgNullExpression ();
-  lowerBoundExpression->set_endOfConstruct (ROSEHelper::getFileInfo ());
+  lowerBoundExpression->set_endOfConstruct (RoseHelper::getFileInfo ());
 
-  SgIntVal * strideExpression = new SgIntVal (ROSEHelper::getFileInfo (), 1);
-  strideExpression->set_endOfConstruct (ROSEHelper::getFileInfo ());
+  SgIntVal * strideExpression = new SgIntVal (RoseHelper::getFileInfo (), 1);
+  strideExpression->set_endOfConstruct (RoseHelper::getFileInfo ());
 
   SgSubscriptExpression * arrayDimensionExpression = new SgSubscriptExpression (
-      ROSEHelper::getFileInfo (), lowerBoundExpression, upperBoundExpression,
+      RoseHelper::getFileInfo (), lowerBoundExpression, upperBoundExpression,
       strideExpression);
-  arrayDimensionExpression->set_endOfConstruct (ROSEHelper::getFileInfo ());
+  arrayDimensionExpression->set_endOfConstruct (RoseHelper::getFileInfo ());
 
   SgArrayType * array = new SgArrayType (baseType, arrayDimensionExpression);
   arrayDimensionExpression->set_parent (baseType);
@@ -307,17 +307,17 @@ FortranTypesBuilder::getArray_RankOne_WithLowerAndUpperBounds (
 {
   using SageBuilder::buildExprListExp;
 
-  lowerBoundExpression->set_endOfConstruct (ROSEHelper::getFileInfo ());
+  lowerBoundExpression->set_endOfConstruct (RoseHelper::getFileInfo ());
 
-  upperBoundExpression->set_endOfConstruct (ROSEHelper::getFileInfo ());
+  upperBoundExpression->set_endOfConstruct (RoseHelper::getFileInfo ());
 
-  SgIntVal * strideExpression = new SgIntVal (ROSEHelper::getFileInfo (), 1);
-  strideExpression->set_endOfConstruct (ROSEHelper::getFileInfo ());
+  SgIntVal * strideExpression = new SgIntVal (RoseHelper::getFileInfo (), 1);
+  strideExpression->set_endOfConstruct (RoseHelper::getFileInfo ());
 
   SgSubscriptExpression * arrayDimensionExpression = new SgSubscriptExpression (
-      ROSEHelper::getFileInfo (), lowerBoundExpression, upperBoundExpression,
+      RoseHelper::getFileInfo (), lowerBoundExpression, upperBoundExpression,
       strideExpression);
-  arrayDimensionExpression->set_endOfConstruct (ROSEHelper::getFileInfo ());
+  arrayDimensionExpression->set_endOfConstruct (RoseHelper::getFileInfo ());
 
   SgArrayType * array = new SgArrayType (baseType, arrayDimensionExpression);
   arrayDimensionExpression->set_parent (baseType);
@@ -331,26 +331,26 @@ FortranTypesBuilder::getArray_RankOne_WithLowerAndUpperBounds (
 SgTypeString *
 FortranTypesBuilder::getString (int length)
 {
-  SgIntVal * numberOfCharacters = new SgIntVal (ROSEHelper::getFileInfo (),
+  SgIntVal * numberOfCharacters = new SgIntVal (RoseHelper::getFileInfo (),
       length);
-  numberOfCharacters->set_endOfConstruct (ROSEHelper::getFileInfo ());
+  numberOfCharacters->set_endOfConstruct (RoseHelper::getFileInfo ());
   SgTypeString * string = new SgTypeString (numberOfCharacters);
   return string;
 }
 
 SgModuleStatement *
-FortranTypesBuilder::buildNewFortranModuleDeclaration (
-    std::string const & moduleName, SgScopeStatement * scope)
+FortranTypesBuilder::buildModuleDeclaration (std::string const & moduleName,
+    SgScopeStatement * scope)
 {
   SgClassDefinition * classDefinition = new SgClassDefinition (
-      ROSEHelper::getFileInfo ());
+      RoseHelper::getFileInfo ());
 
   SgModuleStatement * classDeclaration = new SgModuleStatement (
-      ROSEHelper::getFileInfo (), moduleName, SgClassDeclaration::e_class,
+      RoseHelper::getFileInfo (), moduleName, SgClassDeclaration::e_class,
       NULL, classDefinition);
 
   SgClassDeclaration * nonDefiningClassDeclaration = new SgClassDeclaration (
-      ROSEHelper::getFileInfo (), moduleName, SgClassDeclaration::e_class,
+      RoseHelper::getFileInfo (), moduleName, SgClassDeclaration::e_class,
       NULL, NULL);
 
   completeNewDeclaration (classDefinition, classDeclaration,
@@ -360,18 +360,18 @@ FortranTypesBuilder::buildNewFortranModuleDeclaration (
 }
 
 SgClassDeclaration *
-FortranTypesBuilder::buildNewTypeDeclaration (std::string const & typeName,
+FortranTypesBuilder::buildClassDeclaration (std::string const & typeName,
     SgScopeStatement * scope)
 {
   SgClassDefinition * classDefinition = new SgClassDefinition (
-      ROSEHelper::getFileInfo ());
+      RoseHelper::getFileInfo ());
 
   SgClassDeclaration * classDeclaration = new SgClassDeclaration (
-      ROSEHelper::getFileInfo (), typeName, SgClassDeclaration::e_class, NULL,
+      RoseHelper::getFileInfo (), typeName, SgClassDeclaration::e_class, NULL,
       classDefinition);
 
   SgClassDeclaration * nonDefiningClassDeclaration = new SgClassDeclaration (
-      ROSEHelper::getFileInfo (), typeName, SgClassDeclaration::e_class, NULL,
+      RoseHelper::getFileInfo (), typeName, SgClassDeclaration::e_class, NULL,
       NULL);
 
   completeNewDeclaration (classDefinition, classDeclaration,

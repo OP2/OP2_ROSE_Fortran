@@ -1,7 +1,7 @@
 #include <FortranSubroutinesGeneration.h>
 #include <boost/algorithm/string/predicate.hpp>
 #include <FortranTypesBuilder.h>
-#include <ROSEHelper.h>
+#include <RoseHelper.h>
 
 /*
  * ======================================================
@@ -157,16 +157,16 @@ FortranSubroutinesGeneration::patchCallsToParallelLoops (
 }
 
 void
-FortranSubroutinesGeneration::addContains (SgModuleStatement * moduleStatement)
+FortranSubroutinesGeneration::addContains (SgScopeStatement * moduleScope)
 {
   using SageInterface::appendStatement;
 
   SgContainsStatement * containsStatement = new SgContainsStatement (
-      ROSEHelper::getFileInfo ());
+      RoseHelper::getFileInfo ());
 
   containsStatement->set_definingDeclaration (containsStatement);
 
-  appendStatement (containsStatement, moduleStatement->get_definition ());
+  appendStatement (containsStatement, moduleScope);
 }
 
 SgModuleStatement *
@@ -183,7 +183,7 @@ FortranSubroutinesGeneration::createFortranModule (SgSourceFile & sourceFile,
   SgGlobal * globalScope = sourceFile.get_globalScope ();
 
   SgModuleStatement * moduleStatement =
-      FortranTypesBuilder::buildNewFortranModuleDeclaration (
+      FortranTypesBuilder::buildModuleDeclaration (
           parallelLoop.getModuleName (), globalScope);
 
   moduleStatement->get_definition ()->setCaseInsensitive (true);
@@ -377,7 +377,8 @@ FortranSubroutinesGeneration::visit (SgNode * node)
            */
 
           FortranHostSubroutine * hostSubroutine = createSubroutines (
-              parallelLoop, userSubroutineName, moduleStatement);
+              parallelLoop, userSubroutineName,
+              moduleStatement->get_definition ());
 
           /*
            * ======================================================

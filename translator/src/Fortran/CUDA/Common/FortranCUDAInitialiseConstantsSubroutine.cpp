@@ -2,7 +2,7 @@
 #include <FortranCUDAInitialiseConstantsSubroutine.h>
 #include <FortranStatementsAndExpressionsBuilder.h>
 #include <FortranTypesBuilder.h>
-#include <ROSEHelper.h>
+#include <RoseHelper.h>
 #include <CommonNamespaces.h>
 
 /*
