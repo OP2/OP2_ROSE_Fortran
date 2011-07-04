@@ -1,7 +1,3 @@
-/*
- * Written by Adam Betts and Carlo Bertolli
- */
-
 #include <FortranCUDASubroutinesGeneration.h>
 #include <FortranOpDatDimensionsDeclaration.h>
 #include <FortranCUDAInitialiseConstantsSubroutine.h>
@@ -11,6 +7,12 @@
 #include <FortranCUDAHostSubroutineIndirectLoop.h>
 #include <FortranCUDAUserSubroutine.h>
 #include <ROSEHelper.h>
+
+/*
+ * ======================================================
+ * Private functions
+ * ======================================================
+ */
 
 FortranHostSubroutine *
 FortranCUDASubroutinesGeneration::createSubroutines (
@@ -121,7 +123,8 @@ FortranCUDASubroutinesGeneration::addLibraries (
   using SageInterface::appendStatement;
 
   Debug::getInstance ()->debugMessage (
-      "Adding 'use' statements to CUDA module", Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+      "Adding 'use' statements to CUDA module", Debug::FUNCTION_LEVEL,
+      __FILE__, __LINE__);
 
   vector <string> libs;
   libs.push_back (Libraries::ISO_C_BINDING);
@@ -138,4 +141,20 @@ FortranCUDASubroutinesGeneration::addLibraries (
 
     appendStatement (useStatement, moduleStatement->get_definition ());
   }
+}
+
+/*
+ * ======================================================
+ * Public functions
+ * ======================================================
+ */
+
+FortranCUDASubroutinesGeneration::FortranCUDASubroutinesGeneration (
+    SgProject * project,
+    FortranProgramDeclarationsAndDefinitions * declarations) :
+  FortranSubroutinesGeneration (declarations, ".CUF")
+{
+  traverseInputFiles (project, preorder);
+
+  unparse ();
 }

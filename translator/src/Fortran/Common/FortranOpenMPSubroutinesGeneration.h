@@ -22,10 +22,7 @@ class FortranOpenMPSubroutinesGeneration: public FortranSubroutinesGeneration
   public:
 
     FortranOpenMPSubroutinesGeneration (SgProject * project,
-        FortranProgramDeclarationsAndDefinitions * declarations) :
-      FortranSubroutinesGeneration (project, declarations)
-    {
-    }
+        FortranProgramDeclarationsAndDefinitions * declarations);
 };
 
 #endif

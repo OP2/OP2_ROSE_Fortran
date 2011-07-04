@@ -2,7 +2,6 @@
 #include <boost/algorithm/string/predicate.hpp>
 #include <FortranTypesBuilder.h>
 #include <ROSEHelper.h>
-#include <Globals.h>
 
 /*
  * ======================================================
@@ -65,6 +64,7 @@ FortranSubroutinesGeneration::patchCallsToParallelLoops (
    * Now find the last 'use' statement
    * ======================================================
    */
+
   SgStatement * previousStatement = lastDeclarationStatement;
 
   SgUseStatement * lastUseStatement;
@@ -84,9 +84,10 @@ FortranSubroutinesGeneration::patchCallsToParallelLoops (
 
   /*
    * ======================================================
-   * Add a new 'use' statement for CUDA module
+   * Add a new 'use' statement for the newly created module
    * ======================================================
    */
+
   SgUseStatement * newUseStatement =
       new SgUseStatement (
           getEnclosingFileNode (lastUseStatement)->get_file_info (),
@@ -96,18 +97,11 @@ FortranSubroutinesGeneration::patchCallsToParallelLoops (
 
   /*
    * ======================================================
-   * Build a string variable which contains the name of the
-   * kernel. This variable is passed to the host code in
-   * setting up and tearing down the relevant device code
-   * ======================================================
-   */
-
-  /*
-   * ======================================================
    * The character array contains exactly the number of
    * characters as the user subroutine name
    * ======================================================
    */
+
   SgTypeString * characterArray = FortranTypesBuilder::getString (
       userSubroutineName.size ());
 
@@ -154,6 +148,7 @@ FortranSubroutinesGeneration::patchCallsToParallelLoops (
    * in the unparser
    * ======================================================
    */
+
   SgLocatedNode * functionCallLocation = isSgLocatedNode (functionCallExp);
 
   ROSE_ASSERT (functionCallLocation != NULL);
@@ -241,21 +236,8 @@ FortranSubroutinesGeneration::createSourceFile (
    * correctly compile CUDA code
    * ======================================================
    */
-  string outputFileName;
 
-  switch (Globals::getInstance ()->getTargetBackend ())
-  {
-    case TargetBackends::CUDA:
-    {
-      outputFileName = parallelLoop.getModuleName () + ".CUF";
-      break;
-    }
-    default:
-    {
-      outputFileName = parallelLoop.getModuleName () + ".F95";
-      break;
-    }
-  }
+  string outputFileName = parallelLoop.getModuleName () + fileExtension;
 
   Debug::getInstance ()->debugMessage ("Generating file '" + outputFileName
       + "'", Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
@@ -335,88 +317,80 @@ FortranSubroutinesGeneration::visit (SgNode * node)
         SgExpressionPtrList & actualArguments =
             functionCallExp->get_args ()->get_expressions ();
 
-        SgFunctionRefExp * functionRefExp = isSgFunctionRefExp (
+        SgFunctionRefExp * functionRefExpression = isSgFunctionRefExp (
             actualArguments.front ());
 
-        try
+        ROSE_ASSERT (functionRefExpression != NULL);
+
+        string const
+            userSubroutineName =
+                functionRefExpression->getAssociatedFunctionDeclaration ()->get_name ().getString ();
+
+        Debug::getInstance ()->debugMessage ("Found '" + calleeName
+            + "' with (host) user subroutine '" + userSubroutineName + "'",
+            Debug::OUTER_LOOP_LEVEL, __FILE__, __LINE__);
+
+        if (parallelLoops.find (userSubroutineName) == parallelLoops.end ())
         {
-          if (functionRefExp != NULL)
-          {
-            string const
-                userSubroutineName =
-                    functionRefExp->getAssociatedFunctionDeclaration ()->get_name ().getString ();
+          /*
+           * ======================================================
+           * If this kernel has not been previously encountered then
+           * build the target code and modify the calls in the original
+           * Fortran source code
+           * ======================================================
+           */
 
-            Debug::getInstance ()->debugMessage ("Found '" + calleeName
-                + "' with (host) user subroutine '" + userSubroutineName + "'",
-                Debug::OUTER_LOOP_LEVEL, __FILE__, __LINE__);
+          FortranParallelLoop * parallelLoop = new FortranParallelLoop (
+              actualArguments, userSubroutineName, declarations);
 
-            if (parallelLoops.find (userSubroutineName) == parallelLoops.end ())
-            {
-              /*
-               * ======================================================
-               * If this kernel has not been previously encountered then
-               * build the target code and modify the calls in the original
-               * Fortran source code
-               * ======================================================
-               */
-              FortranParallelLoop * parallelLoop = new FortranParallelLoop (
-                  actualArguments, userSubroutineName, declarations);
+          parallelLoops[userSubroutineName] = parallelLoop;
 
-              parallelLoops[userSubroutineName] = parallelLoop;
+          /*
+           * ======================================================
+           * Generate an additional source file for this OP_PAR_LOOP
+           * ======================================================
+           */
 
-              /*
-               * ======================================================
-               * Generate an additional source file for this OP_PAR_LOOP
-               * ======================================================
-               */
-              SgSourceFile & sourceFile = createSourceFile (*parallelLoop);
+          SgSourceFile & sourceFile = createSourceFile (*parallelLoop);
 
-              /*
-               * ======================================================
-               * Create the Fortran module
-               * ======================================================
-               */
-              SgModuleStatement * moduleStatement = createFortranModule (
-                  sourceFile, *parallelLoop);
+          /*
+           * ======================================================
+           * Create the Fortran module
+           * ======================================================
+           */
 
-              /*
-               * ======================================================
-               * Add the library 'use' statements
-               * ======================================================
-               */
-              addLibraries (moduleStatement);
+          SgModuleStatement * moduleStatement = createFortranModule (
+              sourceFile, *parallelLoop);
 
-              /*
-               * ======================================================
-               * Create the subroutines
-               * ======================================================
-               */
-              FortranHostSubroutine * hostSubroutine = createSubroutines (
-                  parallelLoop, userSubroutineName, moduleStatement);
+          /*
+           * ======================================================
+           * Add the library 'use' statements
+           * ======================================================
+           */
 
-              /*
-               * ======================================================
-               * Get the scope of the AST node representing the entire
-               * call statement
-               * ======================================================
-               */
-              SgScopeStatement * scope =
-                  isSgExprStatement (node->get_parent ())->get_scope ();
+          addLibraries (moduleStatement);
 
-              patchCallsToParallelLoops (*parallelLoop, userSubroutineName,
-                  *hostSubroutine, scope, functionCallExp);
-            }
-          }
-          else
-          {
-            throw actualArguments.front ();
-          }
-        }
-        catch (SgNode * exceptionNode)
-        {
-          Debug::getInstance ()->errorMessage (
-              "First argument to 'OP_PAR_LOOP' is not a function. The argument has type '"
-                  + exceptionNode->class_name () + "'");
+          /*
+           * ======================================================
+           * Create the subroutines
+           * ======================================================
+           */
+
+          FortranHostSubroutine * hostSubroutine = createSubroutines (
+              parallelLoop, userSubroutineName, moduleStatement);
+
+          /*
+           * ======================================================
+           * Get the scope of the AST node representing the entire
+           * call statement
+           * ======================================================
+           */
+
+          SgScopeStatement * scope =
+              isSgExprStatement (node->get_parent ())->get_scope ();
+
+          patchCallsToParallelLoops (*parallelLoop, userSubroutineName,
+              *hostSubroutine, scope, functionCallExp);
         }
       }
 
@@ -430,6 +404,7 @@ FortranSubroutinesGeneration::visit (SgNode * node)
       Debug::getInstance ()->debugMessage ("Found file "
           + sourceFile->getFileName (), Debug::OUTER_LOOP_LEVEL, __FILE__,
           __LINE__);
+
       break;
     }
 
@@ -438,15 +413,4 @@ FortranSubroutinesGeneration::visit (SgNode * node)
       break;
     }
   }
-}
-
-FortranSubroutinesGeneration::FortranSubroutinesGeneration (
-    SgProject * project,
-    FortranProgramDeclarationsAndDefinitions * declarations) :
-  SubroutinesGeneration <FortranProgramDeclarationsAndDefinitions,
-      FortranParallelLoop, FortranHostSubroutine> (declarations)
-{
-  traverseInputFiles (project, preorder);
-
-  unparse ();
 }

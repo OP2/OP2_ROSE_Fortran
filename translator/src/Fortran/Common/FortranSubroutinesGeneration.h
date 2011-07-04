@@ -74,8 +74,14 @@ class FortranSubroutinesGeneration: public SubroutinesGeneration <
 
   public:
 
-    FortranSubroutinesGeneration (SgProject * project,
-        FortranProgramDeclarationsAndDefinitions * declarations);
+    FortranSubroutinesGeneration (
+        FortranProgramDeclarationsAndDefinitions * declarations,
+        std::string const & fileExtension) :
+      SubroutinesGeneration <FortranProgramDeclarationsAndDefinitions,
+          FortranParallelLoop, FortranHostSubroutine> (declarations,
+          fileExtension)
+    {
+    }
 };
 
 #endif

@@ -7,6 +7,12 @@
 #include <FortranOpenMPHostSubroutineIndirectLoop.h>
 #include <ROSEHelper.h>
 
+/*
+ * ======================================================
+ * Private functions
+ * ======================================================
+ */
+
 FortranHostSubroutine *
 FortranOpenMPSubroutinesGeneration::createSubroutines (
     FortranParallelLoop * parallelLoop, std::string const & userSubroutineName,
@@ -110,4 +116,20 @@ FortranOpenMPSubroutinesGeneration::addLibraries (
           AstUnparseAttribute::e_after);
     }
   }
+}
+
+/*
+ * ======================================================
+ * Public functions
+ * ======================================================
+ */
+
+FortranOpenMPSubroutinesGeneration::FortranOpenMPSubroutinesGeneration (
+    SgProject * project,
+    FortranProgramDeclarationsAndDefinitions * declarations) :
+  FortranSubroutinesGeneration (declarations, ".F95")
+{
+  traverseInputFiles (project, preorder);
+
+  unparse ();
 }

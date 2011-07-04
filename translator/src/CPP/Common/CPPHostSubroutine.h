@@ -3,7 +3,7 @@
 
 #include <HostSubroutine.h>
 #include <CPPParallelLoop.h>
-#include <CPPDeclarations.h>
+#include <CPPProgramDeclarationsAndDefinitions.h>
 
 class CPPHostSubroutine: public HostSubroutine <SgFunctionDeclaration,
     CPPProgramDeclarationsAndDefinitions>
@@ -14,7 +14,8 @@ class CPPHostSubroutine: public HostSubroutine <SgFunctionDeclaration,
         std::string const & userSubroutineName,
         std::string const & kernelSubroutineName,
         CPPParallelLoop * parallelLoop) :
-      HostSubroutine <SgFunctionDeclaration, CPPProgramDeclarationsAndDefinitions> (subroutineName,
+      HostSubroutine <SgFunctionDeclaration,
+          CPPProgramDeclarationsAndDefinitions> (subroutineName,
           userSubroutineName, kernelSubroutineName, parallelLoop)
     {
     }

@@ -110,26 +110,8 @@ handleCPPProject (SgProject * project)
 void
 handleFortranProject (SgProject * project)
 {
-  /*
-   * ======================================================
-   * Obtain all OP2 declarations
-   * ======================================================
-   */
-  Debug::getInstance ()->debugMessage (
-      "Retrieving declarations in source files", Debug::FUNCTION_LEVEL,
-      __FILE__, __LINE__);
-
   FortranProgramDeclarationsAndDefinitions * declarations =
       new FortranProgramDeclarationsAndDefinitions (project);
-
-  /*
-   * ======================================================
-   * Create and output the subroutines implementing an
-   * OP_PAR_LOOP
-   * ======================================================
-   */
-  Debug::getInstance ()->debugMessage ("Creating subroutines for OP_PAR_LOOPs",
-      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
   switch (Globals::getInstance ()->getTargetBackend ())
   {
@@ -230,6 +212,7 @@ main (int argc, char ** argv)
    * 'argc' and 'argv', otherwise ROSE will complain
    * ======================================================
    */
+
   SgProject * project = frontend (
       CommandLine::getInstance ()->getNumberOfArguments (),
       CommandLine::getInstance ()->getArguments ());
