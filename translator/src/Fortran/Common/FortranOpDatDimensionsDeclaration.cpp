@@ -1,5 +1,6 @@
 #include <FortranOpDatDimensionsDeclaration.h>
 #include <FortranTypesBuilder.h>
+#include <RoseStatementsAndExpressionsBuilder.h>
 #include <FortranStatementsAndExpressionsBuilder.h>
 #include <CommonNamespaces.h>
 
@@ -39,7 +40,7 @@ FortranOpDatDimensionsDeclaration::addTypeDeclaration ()
 {
   using SageInterface::appendStatement;
 
-  typeStatement = FortranStatementsAndExpressionsBuilder::buildTypeDeclaration (
+  typeStatement = RoseStatementsAndExpressionsBuilder::buildTypeDeclaration (
       subroutineName + "_opDatDimensions", moduleScope);
 
   typeStatement->get_declarationModifier ().get_accessModifier ().setUndefined ();

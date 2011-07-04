@@ -1,6 +1,6 @@
 #include <FortranOpenMPHostSubroutineDirectLoop.h>
 #include <CommonNamespaces.h>
-#include <FortranStatementsAndExpressionsBuilder.h>
+#include <RoseStatementsAndExpressionsBuilder.h>
 #include <FortranTypesBuilder.h>
 #include <RoseHelper.h>
 #include <Debug.h>
@@ -221,7 +221,7 @@ FortranOpenMPHostSubroutineDirectLoop::createFirstTimeExecutionStatements ()
       buildBoolValExp (true));
 
   SgIfStmt * ifStatement =
-      FortranStatementsAndExpressionsBuilder::buildIfStatementWithEmptyElse (
+      RoseStatementsAndExpressionsBuilder::buildIfStatementWithEmptyElse (
           ifGuardExpression, ifBody);
 
   appendStatement (ifStatement, subroutineScope);

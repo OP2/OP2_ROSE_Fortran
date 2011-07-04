@@ -1,6 +1,6 @@
 #include <boost/lexical_cast.hpp>
 #include <FortranCUDADataSizesDeclaration.h>
-#include <FortranStatementsAndExpressionsBuilder.h>
+#include <RoseStatementsAndExpressionsBuilder.h>
 
 SgClassType *
 FortranCUDADataSizesDeclaration::getType ()
@@ -24,7 +24,7 @@ FortranCUDADataSizesDeclaration::FortranCUDADataSizesDeclaration (
   fieldDeclarations = new SubroutineVariableDeclarations ();
 
   deviceDatatypeStatement
-      = FortranStatementsAndExpressionsBuilder::buildTypeDeclaration (
+      = RoseStatementsAndExpressionsBuilder::buildTypeDeclaration (
           subroutineName + "_variableSizes", moduleScope);
 
   deviceDatatypeStatement->get_declarationModifier ().get_accessModifier ().setUndefined ();

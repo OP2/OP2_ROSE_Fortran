@@ -1,6 +1,7 @@
 #include <boost/lexical_cast.hpp>
 #include <Debug.h>
 #include <FortranTypesBuilder.h>
+#include <RoseStatementsAndExpressionsBuilder.h>
 #include <FortranStatementsAndExpressionsBuilder.h>
 #include <FortranCUDAKernelSubroutineIndirectLoop.h>
 #include <CommonNamespaces.h>
@@ -558,7 +559,7 @@ FortranCUDAKernelSubroutineIndirectLoop::createInnerExecutionLoopStatements (
       variableDeclarations->get (CommonVariableNames::col)));
 
   SgIfStmt * ifStatement =
-      FortranStatementsAndExpressionsBuilder::buildIfStatementWithEmptyElse (
+      RoseStatementsAndExpressionsBuilder::buildIfStatementWithEmptyElse (
           ifGuardExpression, ifBody);
 
   SgBasicBlock * loopBody = buildBasicBlock ();
@@ -770,7 +771,7 @@ FortranCUDAKernelSubroutineIndirectLoop::createExecutionLoopStatements ()
           IndirectLoop::Fortran::KernelSubroutine::VariableNames::nelem)));
 
   SgIfStmt * ifStatement =
-      FortranStatementsAndExpressionsBuilder::buildIfStatementWithEmptyElse (
+      RoseStatementsAndExpressionsBuilder::buildIfStatementWithEmptyElse (
           ifGuardExpression, ifBody);
 
   appendStatement (ifStatement, loopBody);
@@ -1403,7 +1404,7 @@ FortranCUDAKernelSubroutineIndirectLoop::createThreadZeroStatements ()
    */
 
   SgIfStmt * ifStatement =
-      FortranStatementsAndExpressionsBuilder::buildIfStatementWithEmptyElse (
+      RoseStatementsAndExpressionsBuilder::buildIfStatementWithEmptyElse (
           ifGuardExpression, ifBlock);
 
   appendStatement (ifStatement, subroutineScope);

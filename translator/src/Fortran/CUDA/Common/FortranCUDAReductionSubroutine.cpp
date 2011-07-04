@@ -3,6 +3,7 @@
 #include <Debug.h>
 #include <CommonNamespaces.h>
 #include <FortranCUDAReductionSubroutine.h>
+#include <RoseStatementsAndExpressionsBuilder.h>
 #include <FortranStatementsAndExpressionsBuilder.h>
 #include <FortranTypesBuilder.h>
 
@@ -151,10 +152,8 @@ FortranCUDAReductionSubroutine::createStatements ()
       buildVarRefExp (variableDeclarations->get (
           CommonVariableNames::iterationCounter1)));
 
-  // same expression as above
   SgPntrArrRefExp * autosharedMyThreadPosition = autosharedSubscriptExpression;
 
-  // same expression as above plus the iteration counter
   SgExpression * autosharedOtherThreadPositionExpr = buildAddOp (
       arrayIndexExpression, buildVarRefExp (variableDeclarations->get (
           CommonVariableNames::iterationCounter1)));
@@ -171,7 +170,7 @@ FortranCUDAReductionSubroutine::createStatements ()
       reductionPartialComputation));
 
   SgIfStmt * ifStatement =
-      FortranStatementsAndExpressionsBuilder::buildIfStatementWithEmptyElse (
+      RoseStatementsAndExpressionsBuilder::buildIfStatementWithEmptyElse (
           ifGuardExpression, ifBlock);
 
   SgExprListExp * actualParametersItCountReassign = buildExprListExp (
@@ -225,7 +224,7 @@ FortranCUDAReductionSubroutine::createStatements ()
       reductionFinalComputation));
 
   SgIfStmt * finalIfStatement =
-      FortranStatementsAndExpressionsBuilder::buildIfStatementWithEmptyElse (
+      RoseStatementsAndExpressionsBuilder::buildIfStatementWithEmptyElse (
           ifThreadIdGreaterZero, finalIfBlock);
 
   appendStatement (finalIfStatement, subroutineScope);
@@ -369,6 +368,9 @@ FortranCUDAReductionSubroutine::FortranCUDAReductionSubroutine (
   using SageBuilder::buildFunctionParameterList;
   using SageInterface::appendStatement;
   using SageInterface::addTextForUnparser;
+
+  Debug::getInstance ()->debugMessage ("Creating reduction subroutine",
+      Debug::CONSTRUCTOR_LEVEL, __FILE__, __LINE__);
 
   subroutineHeaderStatement = buildProcedureHeaderStatement (
       this->subroutineName.c_str (), buildVoidType (), formalParameters,

@@ -1,6 +1,6 @@
 #include <FortranOpenMPHostSubroutineIndirectLoop.h>
 #include <CommonNamespaces.h>
-#include <FortranStatementsAndExpressionsBuilder.h>
+#include <RoseStatementsAndExpressionsBuilder.h>
 #include <FortranTypesBuilder.h>
 #include <Debug.h>
 
@@ -319,7 +319,7 @@ FortranOpenMPHostSubroutineIndirectLoop::createFirstTimeExecutionStatements ()
   vector <SubroutineVariableDeclarations *> declarationSets;
   declarationSets.push_back (variableDeclarations);
   declarationSets.push_back (
-      dynamic_cast <FortranOpenMPModuleDeclarationsIndirectLoop *> (moduleDeclarations)->getAllDeclarations ());
+      static_cast <FortranOpenMPModuleDeclarationsIndirectLoop *> (moduleDeclarations)->getAllDeclarations ());
 
   SubroutineVariableDeclarations * allDeclarations =
       new SubroutineVariableDeclarations (declarationSets);
@@ -350,7 +350,7 @@ FortranOpenMPHostSubroutineIndirectLoop::createFirstTimeExecutionStatements ()
       (FortranParallelLoop *) parallelLoop, subroutineScope, ifBody);
 
   SgIfStmt * ifStatement =
-      FortranStatementsAndExpressionsBuilder::buildIfStatementWithEmptyElse (
+      RoseStatementsAndExpressionsBuilder::buildIfStatementWithEmptyElse (
           ifGuardExpression, ifBody);
 
   appendStatement (ifStatement, subroutineScope);

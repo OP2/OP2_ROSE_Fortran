@@ -1,4 +1,5 @@
 #include <FortranPlan.h>
+#include <RoseStatementsAndExpressionsBuilder.h>
 #include <FortranStatementsAndExpressionsBuilder.h>
 #include <FortranTypesBuilder.h>
 #include <CommonNamespaces.h>
@@ -487,10 +488,9 @@ FortranPlan::createConvertPositionInPMapsStatements (
       SgExpression * ifGuardExpression = buildGreaterOrEqualOp (
           arrayIndexExpression, buildIntVal (0));
 
-      SgIfStmt
-          * ifStatement =
-              FortranStatementsAndExpressionsBuilder::buildIfStatementWithEmptyElse (
-                  ifGuardExpression, ifBody);
+      SgIfStmt * ifStatement =
+          RoseStatementsAndExpressionsBuilder::buildIfStatementWithEmptyElse (
+              ifGuardExpression, ifBody);
 
       appendStatement (ifStatement, statementScope);
     }
@@ -608,7 +608,7 @@ FortranPlan::createPlanFunctionParametersPreparationStatements (
       buildIntVal (-1));
 
   SgIfStmt * ifStatement =
-      FortranStatementsAndExpressionsBuilder::buildIfStatementWithEmptyElse (
+      RoseStatementsAndExpressionsBuilder::buildIfStatementWithEmptyElse (
           ifGuardExpression, ifBody);
 
   SgBasicBlock * loopBody = buildBasicBlock (ifStatement);

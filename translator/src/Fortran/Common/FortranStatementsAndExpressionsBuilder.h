@@ -34,24 +34,6 @@ class FortranStatementsAndExpressionsBuilder
 
     /*
      * ======================================================
-     * Builds an 'if' construct which has an empty 'else'
-     * ======================================================
-     */
-    static SgIfStmt *
-    buildIfStatementWithEmptyElse (SgExpression * ifGuard,
-        SgBasicBlock * thenBlock);
-
-    /*
-     * ======================================================
-     * Builds a type declaration
-     * ======================================================
-     */
-    static SgDerivedTypeStatement *
-    buildTypeDeclaration (std::string const & typeName,
-        SgScopeStatement * scope);
-
-    /*
-     * ======================================================
      * Builds a Fortran shape expression for a call to
      * 'c_f_pointer'
      * ======================================================
