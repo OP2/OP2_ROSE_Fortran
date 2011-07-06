@@ -26,15 +26,17 @@ class FortranTypesBuilder
 {
   private:
 
-    static SgTypeInt * twoByteInteger;
+    static SgTypeBool * booleanType;
 
-    static SgTypeInt * fourByteInteger;
+    static SgTypeInt * twoByteIntegerType;
 
-    static SgTypeInt * eightByteInteger;
+    static SgTypeInt * fourByteIntegerType;
 
-    static SgTypeFloat * singlePrecisionFloat;
+    static SgTypeInt * eightByteIntegerType;
 
-    static SgTypeFloat * doublePrecisionFloat;
+    static SgTypeFloat * singlePrecisionFloatType;
+
+    static SgTypeFloat * doublePrecisionFloatType;
 
     static std::vector <SgArrayType *> arrays;
 
@@ -63,6 +65,14 @@ class FortranTypesBuilder
         SgScopeStatement * scope);
 
   public:
+
+    /*
+     * ======================================================
+     * Returns a Fortran logical.
+     * ======================================================
+     */
+    static SgTypeBool *
+    getLogical ();
 
     /*
      * ======================================================

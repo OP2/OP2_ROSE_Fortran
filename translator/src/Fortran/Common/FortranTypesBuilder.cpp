@@ -7,11 +7,12 @@
  * ======================================================
  */
 
-SgTypeInt * FortranTypesBuilder::twoByteInteger;
-SgTypeInt * FortranTypesBuilder::fourByteInteger;
-SgTypeInt * FortranTypesBuilder::eightByteInteger;
-SgTypeFloat * FortranTypesBuilder::singlePrecisionFloat;
-SgTypeFloat * FortranTypesBuilder::doublePrecisionFloat;
+SgTypeBool * FortranTypesBuilder::booleanType;
+SgTypeInt * FortranTypesBuilder::twoByteIntegerType;
+SgTypeInt * FortranTypesBuilder::fourByteIntegerType;
+SgTypeInt * FortranTypesBuilder::eightByteIntegerType;
+SgTypeFloat * FortranTypesBuilder::singlePrecisionFloatType;
+SgTypeFloat * FortranTypesBuilder::doublePrecisionFloatType;
 
 /*
  * ======================================================
@@ -72,69 +73,79 @@ FortranTypesBuilder::completeNewDeclaration (
  * ======================================================
  */
 
+SgTypeBool *
+FortranTypesBuilder::getLogical ()
+{
+  if (booleanType == NULL)
+  {
+    booleanType = new SgTypeBool ();
+  }
+  return booleanType;
+}
+
 SgTypeInt *
 FortranTypesBuilder::getTwoByteInteger ()
 {
-  if (twoByteInteger == NULL)
+  if (twoByteIntegerType == NULL)
   {
-    twoByteInteger = new SgTypeInt ();
+    twoByteIntegerType = new SgTypeInt ();
     SgIntVal * bytesPerInt = new SgIntVal (RoseHelper::getFileInfo (), 2);
     bytesPerInt->set_endOfConstruct (RoseHelper::getFileInfo ());
-    twoByteInteger->set_type_kind (bytesPerInt);
+    twoByteIntegerType->set_type_kind (bytesPerInt);
   }
-  return twoByteInteger;
+  return twoByteIntegerType;
 }
 
 SgTypeInt *
 FortranTypesBuilder::getFourByteInteger ()
 {
-  if (fourByteInteger == NULL)
+  if (fourByteIntegerType == NULL)
   {
-    fourByteInteger = new SgTypeInt ();
+    fourByteIntegerType = new SgTypeInt ();
     SgIntVal * bytesPerInt = new SgIntVal (RoseHelper::getFileInfo (), 4);
     bytesPerInt->set_endOfConstruct (RoseHelper::getFileInfo ());
-    fourByteInteger->set_type_kind (bytesPerInt);
+    fourByteIntegerType->set_type_kind (bytesPerInt);
   }
-  return fourByteInteger;
+  return fourByteIntegerType;
 }
 
 SgTypeInt *
 FortranTypesBuilder::getEightByteInteger ()
 {
-  if (eightByteInteger == NULL)
+  if (eightByteIntegerType == NULL)
   {
-    eightByteInteger = new SgTypeInt ();
+    eightByteIntegerType = new SgTypeInt ();
     SgIntVal * bytesPerInt = new SgIntVal (RoseHelper::getFileInfo (), 8);
     bytesPerInt->set_endOfConstruct (RoseHelper::getFileInfo ());
-    eightByteInteger->set_type_kind (bytesPerInt);
+    eightByteIntegerType->set_type_kind (bytesPerInt);
   }
-  return eightByteInteger;
+  return eightByteIntegerType;
 }
 
 SgTypeFloat *
 FortranTypesBuilder::getSinglePrecisionFloat ()
 {
-  if (singlePrecisionFloat == NULL)
+  if (singlePrecisionFloatType == NULL)
   {
-    singlePrecisionFloat = new SgTypeFloat ();
+    singlePrecisionFloatType = new SgTypeFloat ();
     SgIntVal * bytesPerFloat = new SgIntVal (RoseHelper::getFileInfo (), 4);
     bytesPerFloat->set_endOfConstruct (RoseHelper::getFileInfo ());
-    singlePrecisionFloat->set_type_kind (bytesPerFloat);
+    singlePrecisionFloatType->set_type_kind (bytesPerFloat);
   }
-  return singlePrecisionFloat;
+  return singlePrecisionFloatType;
 }
 
 SgTypeFloat *
 FortranTypesBuilder::getDoublePrecisionFloat ()
 {
-  if (doublePrecisionFloat == NULL)
+  if (doublePrecisionFloatType == NULL)
   {
-    doublePrecisionFloat = new SgTypeFloat ();
+    doublePrecisionFloatType = new SgTypeFloat ();
     SgIntVal * bytesPerFloat = new SgIntVal (RoseHelper::getFileInfo (), 8);
     bytesPerFloat->set_endOfConstruct (RoseHelper::getFileInfo ());
-    doublePrecisionFloat->set_type_kind (bytesPerFloat);
+    doublePrecisionFloatType->set_type_kind (bytesPerFloat);
   }
-  return doublePrecisionFloat;
+  return doublePrecisionFloatType;
 }
 
 SgArrayType *

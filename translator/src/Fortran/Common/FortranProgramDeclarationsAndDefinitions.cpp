@@ -37,6 +37,32 @@ FortranProgramDeclarationsAndDefinitions::visit (SgNode * node)
       break;
     }
 
+    case V_SgVariableDeclaration:
+    {
+      SgVariableDeclaration * variableDeclaration = isSgVariableDeclaration (
+          node);
+
+      string const
+          variableName =
+              variableDeclaration->get_variables ().front ()->get_name ().getString ();
+
+      SgType * type =
+          variableDeclaration->get_decl_item (variableName)->get_type ();
+
+      handleBaseTypeDeclaration (type, variableName);
+
+      SgAssignInitializer * assignmentInitializer =
+          isSgAssignInitializer (variableDeclaration->get_decl_item (
+              variableName)->get_initializer ());
+
+      if (assignmentInitializer != NULL)
+      {
+        initializers[variableName] = assignmentInitializer;
+      }
+
+      break;
+    }
+
     case V_SgFunctionCallExp:
     {
       /*
@@ -112,6 +138,19 @@ FortranProgramDeclarationsAndDefinitions::visit (SgNode * node)
             actualArguments);
 
         OpGblDefinitions.push_back (opGblDeclaration);
+      }
+      else if (iequals (calleeName, OP2::OP_DECL_CONST))
+      {
+        /*
+         * ======================================================
+         * A constant declared through an OP_DECL_CONST call
+         * ======================================================
+         */
+
+        FortranOpConstDefinition * opConstDeclaration =
+            new FortranOpConstDefinition (actualArguments);
+
+        OpConstDefinitions.push_back (opConstDeclaration);
       }
 
       break;

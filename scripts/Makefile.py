@@ -65,7 +65,10 @@ def clean ():
 	filesToRemove = []
 	filesToRemove.extend(glob.glob('BLANK*.[fF?]95'))
 	filesToRemove.extend(glob.glob('rose_*.[fF?]95'))
+    	filesToRemove.extend(glob.glob('BLANK*.[fF?]90'))
+    	filesToRemove.extend(glob.glob('rose_*.[fF?]90'))
 	filesToRemove.extend(glob.glob('[!^BLANK]*_postprocessed.[fF?]95'))
+    	filesToRemove.extend(glob.glob('[!^BLANK]*_postprocessed.[fF?]90'))
 	filesToRemove.extend(glob.glob('*.rmod'))
 	filesToRemove.extend(glob.glob('*.mod'))
 	filesToRemove.extend(glob.glob('hs_err_pid*.log'))

@@ -2,15 +2,18 @@
 #define FORTRAN_CUDA_INITIALISE_CONSTANTS_SUBROUTINE_H
 
 #include <Subroutine.h>
+#include <FortranProgramDeclarationsAndDefinitions.h>
 
 class FortranCUDAInitialiseConstantsSubroutine: public Subroutine <
     SgProcedureHeaderStatement>
 {
   private:
 
+    std::string variableNamePrefix;
+
     SgScopeStatement * moduleScope;
 
-    std::string variableNamePrefix;
+    FortranProgramDeclarationsAndDefinitions * declarations;
 
     /*
      * ======================================================
@@ -66,7 +69,8 @@ class FortranCUDAInitialiseConstantsSubroutine: public Subroutine <
     getLastConstantName ();
 
     FortranCUDAInitialiseConstantsSubroutine (
-        std::string const & subroutineName, SgScopeStatement * moduleScope);
+        std::string const & subroutineName, SgScopeStatement * moduleScope,
+        FortranProgramDeclarationsAndDefinitions * declarations);
 };
 
 #endif

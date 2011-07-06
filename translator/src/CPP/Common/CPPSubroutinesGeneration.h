@@ -38,8 +38,13 @@ class CPPSubroutinesGeneration: public SubroutinesGeneration <
 
   public:
 
-    CPPSubroutinesGeneration (SgProject * project,
-        CPPProgramDeclarationsAndDefinitions * declarations);
+    CPPSubroutinesGeneration (
+        CPPProgramDeclarationsAndDefinitions * declarations,
+        std::string const & fileExtension) :
+      SubroutinesGeneration <CPPProgramDeclarationsAndDefinitions,
+          CPPParallelLoop, CPPHostSubroutine> (declarations, fileExtension)
+    {
+    }
 };
 
 #endif

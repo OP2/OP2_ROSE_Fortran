@@ -35,7 +35,7 @@
 #include <FortranOpenMPSubroutinesGeneration.h>
 #include <CPPModifyOP2CallsToComplyWithOxfordAPI.h>
 #include <CPPProgramDeclarationsAndDefinitions.h>
-#include <CPPSubroutinesGeneration.h>
+#include <CPPCUDASubroutinesGeneration.h>
 
 class OxfordOption: public CommandLineOption
 {
@@ -105,6 +105,23 @@ class OpenCLOption: public CommandLineOption
 void
 handleCPPProject (SgProject * project)
 {
+  CPPProgramDeclarationsAndDefinitions * declarations =
+      new CPPProgramDeclarationsAndDefinitions (project);
+
+  switch (Globals::getInstance ()->getTargetBackend ())
+  {
+    case TargetBackends::CUDA:
+    {
+      new CPPCUDASubroutinesGeneration (project, declarations);
+
+      break;
+    }
+
+    default:
+    {
+      break;
+    }
+  }
 }
 
 void
@@ -134,14 +151,6 @@ handleFortranProject (SgProject * project)
       break;
     }
   }
-
-  /*
-   * ======================================================
-   * Unparse input source files as calls to OP_PAR_LOOPs
-   * will now have changed
-   * ======================================================
-   */
-  project->unparse ();
 }
 
 void
@@ -248,6 +257,8 @@ main (int argc, char ** argv)
       checkBackendOption ();
 
       handleCPPProject (project);
+
+      project->unparse ();
     }
   }
   else
@@ -258,6 +269,8 @@ main (int argc, char ** argv)
     checkBackendOption ();
 
     handleFortranProject (project);
+
+    project->unparse ();
   }
 
   if (Globals::getInstance ()->outputUDrawGraphs ())

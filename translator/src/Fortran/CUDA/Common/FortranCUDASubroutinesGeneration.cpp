@@ -54,7 +54,7 @@ FortranCUDASubroutinesGeneration::createSubroutines (
 
     FortranCUDAInitialiseConstantsSubroutine * initialiseConstantsSubroutine =
         new FortranCUDAInitialiseConstantsSubroutine (userSubroutineName,
-            moduleScope);
+            moduleScope, declarations);
 
     addContains (moduleScope);
 
@@ -88,7 +88,7 @@ FortranCUDASubroutinesGeneration::createSubroutines (
 
     FortranCUDAInitialiseConstantsSubroutine * initialiseConstantsSubroutine =
         new FortranCUDAInitialiseConstantsSubroutine (userSubroutineName,
-            moduleScope);
+            moduleScope, declarations);
 
     addContains (moduleScope);
 

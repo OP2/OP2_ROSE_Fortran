@@ -25,8 +25,69 @@ CPPParallelLoop::handleOpDatDeclaration (OpDatDefinition * opDatDeclaration,
 }
 
 void
-CPPParallelLoop::retrieveOpDatDeclarations (CPPProgramDeclarationsAndDefinitions * declarations)
+CPPParallelLoop::retrieveOpDatDeclarations (
+    CPPProgramDeclarationsAndDefinitions * declarations)
 {
+  using boost::iequals;
+  using boost::lexical_cast;
+  using std::find;
+  using std::string;
+  using std::vector;
+  using std::map;
+
+  Debug::getInstance ()->debugMessage ("Retrieving OP_DAT declarations",
+      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+
+  int opDatArgumentGroup = 0;
+
+  /*
+   * ======================================================
+   * The iterator starts from position NUMBER_OF_NON_OP_DAT_ARGUMENTS
+   * to avoid the user subroutine name and the OP_SET
+   * ======================================================
+   */
+
+  for (vector <SgExpression *>::iterator it = actualArguments.begin ()
+      + NUMBER_OF_NON_OP_DAT_ARGUMENTS; it != actualArguments.end (); ++it)
+  {
+    std::cout << (*it)->class_name () << std::endl;
+
+    switch ((*it)->variantT ())
+    {
+      case V_SgFunctionCallExp:
+      {
+        /*
+         * ======================================================
+         * The argument of the OP_PAR_LOOP is a variable
+         * reference (expression)
+         * ======================================================
+         */
+
+        SgFunctionCallExp * callExpression = isSgFunctionCallExp (*it);
+
+        string const
+            calleeName =
+                callExpression->getAssociatedFunctionSymbol ()->get_name ().getString ();
+
+        Debug::getInstance ()->debugMessage ("Found function call to '"
+            + calleeName + "'", Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+
+        if (iequals (calleeName, OP2::OP_ARG_DAT))
+        {
+        }
+        else if (iequals (calleeName, OP2::OP_ARG_GBL))
+        {
+        }
+
+        break;
+      }
+
+      default:
+      {
+        break;
+      }
+    }
+  }
 }
 
 /*
@@ -43,11 +104,49 @@ CPPParallelLoop::generateReductionSubroutines (SgScopeStatement * moduleScope)
 unsigned int
 CPPParallelLoop::getNumberOfOpDatArgumentGroups () const
 {
-  return 0;
+  return actualArguments.size () - NUMBER_OF_NON_OP_DAT_ARGUMENTS;
 }
 
 CPPParallelLoop::CPPParallelLoop (SgExpressionPtrList & actualArguments,
-    std::string userSubroutineName, CPPProgramDeclarationsAndDefinitions * declarations) :
-  ParallelLoop <SgFunctionDeclaration, CPPProgramDeclarationsAndDefinitions> (actualArguments)
+    std::string userSubroutineName,
+    CPPProgramDeclarationsAndDefinitions * declarations) :
+  ParallelLoop <SgFunctionDeclaration, CPPProgramDeclarationsAndDefinitions> (
+      actualArguments)
 {
+  using boost::iequals;
+
+  switch (Globals::getInstance ()->getTargetBackend ())
+  {
+    case TargetBackends::CUDA:
+    {
+      moduleName = userSubroutineName + "_cudafor";
+
+      break;
+    }
+
+    case TargetBackends::OPENMP:
+    {
+      moduleName = userSubroutineName + "_openmp";
+
+      break;
+    }
+
+    default:
+    {
+      break;
+    }
+  }
+
+  retrieveOpDatDeclarations (declarations);
+
+  if (isDirectLoop ())
+  {
+    Debug::getInstance ()->debugMessage ("'" + userSubroutineName
+        + "' is a DIRECT loop", Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+  }
+  else
+  {
+    Debug::getInstance ()->debugMessage ("'" + userSubroutineName
+        + "' is an INDIRECT loop", Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+  }
 }

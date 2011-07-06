@@ -115,4 +115,26 @@ class FortranOpGblDefinition: public OpGblDefinition
     FortranOpGblDefinition (SgExpressionPtrList & parameters);
 };
 
+class FortranOpConstDefinition: public OpConstDefinition
+{
+    /*
+     * ======================================================
+     * Models an OP_CONST definition in Fortran.
+     *
+     * The following style is assumed:
+     * OP_DECL_CONST (dimension, OpConstName)
+     * ======================================================
+     */
+
+  private:
+
+    static int const index_dimension = 0;
+
+    static int const index_OpConstName = 1;
+
+  public:
+
+    FortranOpConstDefinition (SgExpressionPtrList & parameters);
+};
+
 #endif

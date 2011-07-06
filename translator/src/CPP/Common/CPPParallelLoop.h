@@ -13,6 +13,30 @@ class CPPParallelLoop: public ParallelLoop <SgFunctionDeclaration,
 {
   private:
 
+    /*
+     * ======================================================
+     * The following constants assume that each call to an
+     * OP_PAR_LOOP in C++ is constructed as follows:
+     *
+     * OP_PAR_LOOP_<N>
+     *   (nameOfUserSubroutine,
+     *    OP_SET,
+     *    OP_DAT,
+     *    ...
+     *    OP_DAT_N)
+     * ======================================================
+     */
+
+    /*
+     * ======================================================
+     * There are 2 non-OP_DAT arguments, namely
+     * 'nameOfUserSubroutine' and 'OP_SET'
+     * ======================================================
+     */
+    static unsigned int const NUMBER_OF_NON_OP_DAT_ARGUMENTS = 2;
+
+  private:
+
     virtual void
     handleOpGblDeclaration (OpGblDefinition * opGblDeclaration,
         std::string const & variableName, int opDatArgumentGroup);

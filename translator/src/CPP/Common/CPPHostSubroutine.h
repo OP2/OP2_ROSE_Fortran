@@ -43,14 +43,12 @@ class CPPHostSubroutine: public HostSubroutine <SgFunctionDeclaration,
           userSubroutineName, kernelSubroutineName, parallelLoop)
     {
       using SageBuilder::buildVoidType;
-      using SageBuilder::buildProcedureHeaderStatement;
+      using SageBuilder::buildDefiningFunctionDeclaration;
       using SageInterface::appendStatement;
 
-      subroutineHeaderStatement
-          = buildProcedureHeaderStatement (this->subroutineName.c_str (),
-              buildVoidType (), formalParameters,
-              SgProcedureHeaderStatement::e_subroutine_subprogram_kind,
-              moduleScope);
+      subroutineHeaderStatement = buildDefiningFunctionDeclaration (
+          this->subroutineName.c_str (), buildVoidType (), formalParameters,
+          moduleScope);
 
       subroutineScope
           = subroutineHeaderStatement->get_definition ()->get_body ();

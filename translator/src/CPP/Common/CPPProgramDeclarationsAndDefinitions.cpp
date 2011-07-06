@@ -81,48 +81,6 @@ CPPProgramDeclarationsAndDefinitions::detectAndHandleOP2Definition (
 }
 
 void
-CPPProgramDeclarationsAndDefinitions::handleBaseTypeDeclaration (SgType * type,
-    std::string const & variableName)
-{
-  if (isSgTypeShort (type) != NULL)
-  {
-    Debug::getInstance ()->debugMessage ("'" + variableName + "' is a short",
-        Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
-
-    shortDeclarations.push_back (variableName);
-  }
-  else if (isSgTypeInt (type) != NULL)
-  {
-    Debug::getInstance ()->debugMessage (
-        "'" + variableName + "' is an integer", Debug::FUNCTION_LEVEL,
-        __FILE__, __LINE__);
-
-    integerDeclarations.push_back (variableName);
-  }
-  else if (isSgTypeLong (type) != NULL)
-  {
-    Debug::getInstance ()->debugMessage ("'" + variableName + "' is a long",
-        Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
-
-    longDeclarations.push_back (variableName);
-  }
-  else if (isSgTypeFloat (type) != NULL)
-  {
-    Debug::getInstance ()->debugMessage ("'" + variableName + "' is a float",
-        Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
-
-    floatDeclarations.push_back (variableName);
-  }
-  else if (isSgTypeDouble (type) != NULL)
-  {
-    Debug::getInstance ()->debugMessage ("'" + variableName + "' is a double",
-        Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
-
-    doubleDeclarations.push_back (variableName);
-  }
-}
-
-void
 CPPProgramDeclarationsAndDefinitions::visit (SgNode * node)
 {
   using boost::iequals;

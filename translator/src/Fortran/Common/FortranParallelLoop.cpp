@@ -25,13 +25,6 @@ FortranParallelLoop::handleOpGblDeclaration (
           + "' has been declared through OP_DECL_GBL (and not through OP_DECL_DAT)",
       Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
-  Debug::getInstance ()->debugMessage ("OP_GBL '" + variableName
-      + "' in argument group " + lexical_cast <string> (opDatArgumentGroup)
-      + " has type '" + opGblDeclaration->getPrimitiveType ()->class_name ()
-      + "' and dimension " + lexical_cast <string> (
-      opGblDeclaration->getDimension ()), Debug::FUNCTION_LEVEL, __FILE__,
-      __LINE__);
-
   uniqueOpDats.push_back (variableName);
 
   OpDatTypes[opDatArgumentGroup] = opGblDeclaration->getPrimitiveType ();
@@ -51,13 +44,6 @@ FortranParallelLoop::handleOpDatDeclaration (
   using boost::lexical_cast;
   using std::find;
   using std::string;
-
-  Debug::getInstance ()->debugMessage ("OP_DAT '" + variableName
-      + "' in argument group " + lexical_cast <string> (opDatArgumentGroup)
-      + " has type '" + opDatDeclaration->getPrimitiveType ()->class_name ()
-      + "' and dimension " + lexical_cast <string> (
-      opDatDeclaration->getDimension ()), Debug::FUNCTION_LEVEL, __FILE__,
-      __LINE__);
 
   OpDatTypes[opDatArgumentGroup] = opDatDeclaration->getPrimitiveType ();
 
