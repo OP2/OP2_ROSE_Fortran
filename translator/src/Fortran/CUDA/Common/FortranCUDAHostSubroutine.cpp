@@ -581,26 +581,23 @@ FortranCUDAHostSubroutine::createOpDatDimensionInitialisationStatements ()
 
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
-    if (parallelLoop->isDuplicateOpDat (i) == false)
-    {
-      SgVarRefExp * opDatDimensionsReference = buildVarRefExp (
-          variableDeclarations->get (CommonVariableNames::opDatDimensions));
+    SgVarRefExp * opDatDimensionsReference = buildVarRefExp (
+        variableDeclarations->get (CommonVariableNames::opDatDimensions));
 
-      SgVarRefExp * fieldReference = buildVarRefExp (
-          opDatDimensionsDeclaration->getOpDatDimensionField (i));
+    SgVarRefExp * fieldReference = buildVarRefExp (
+        opDatDimensionsDeclaration->getOpDatDimensionField (i));
 
-      SgDotExp * dotExpression1 = buildDotExp (opDatDimensionsReference,
-          fieldReference);
+    SgDotExp * dotExpression1 = buildDotExp (opDatDimensionsReference,
+        fieldReference);
 
-      SgDotExp * dotExpression2 = buildDotExp (buildVarRefExp (
-          variableDeclarations->get (VariableNames::getOpDatName (i))),
-          buildOpaqueVarRefExp (CommonVariableNames::dim, subroutineScope));
+    SgDotExp * dotExpression2 = buildDotExp (buildVarRefExp (
+        variableDeclarations->get (VariableNames::getOpDatName (i))),
+        buildOpaqueVarRefExp (CommonVariableNames::dim, subroutineScope));
 
-      SgExprStatement * assignmentStatement = buildAssignStatement (
-          dotExpression1, dotExpression2);
+    SgExprStatement * assignmentStatement = buildAssignStatement (
+        dotExpression1, dotExpression2);
 
-      appendStatement (assignmentStatement, subroutineScope);
-    }
+    appendStatement (assignmentStatement, subroutineScope);
   }
 }
 
