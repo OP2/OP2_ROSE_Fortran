@@ -1,11 +1,11 @@
 
 module save_soln_cuda_module
 
-	use OP2_C
-	use cudaConfigurationParams
-	use constantVarsCuda
-	use OP2Profiling
-	use cudafor
+use OP2_C
+use cudaConfigurationParams
+use OP2Profiling
+use cudafor
+
 
 	type varSizes_save_soln
 
@@ -21,6 +21,9 @@ module save_soln_cuda_module
 	! sizes of input arguments to CUDA kernel
 	type(varSizes_save_soln), device :: argSizes
 
+!	real(8), dimension(:), allocatable, device :: argument0
+!	real(8), dimension(:), allocatable, device :: argument1
+
 
 	! input data to CUDA kernel
 	! declared here to make them static variables (i.e. state that survives successive op_par_loop function calls)
@@ -34,8 +37,8 @@ module save_soln_cuda_module
 			implicit none
 
 			! declaration of formal parameters
-			real(8), device :: q(4)
-			real(8), device :: qold(4)
+			real(8) :: q(4)
+			real(8) :: qold(4)
 			
 			! iteration variable
 			integer(4) :: i
@@ -206,7 +209,6 @@ module save_soln_cuda_module
 !			integer(4) :: data0Size, data1Size
 			
 			! define and compute grid and block sizes and other variables (unused in this case)
-
 			real(8), dimension(:), allocatable, device :: argument0
 			real(8), dimension(:), allocatable, device :: argument1
 
@@ -220,6 +222,7 @@ module save_soln_cuda_module
 			integer(4) :: warpSizeOP2
 
 			integer(4) :: threadSynchRet
+
 
 			! profiling
 			integer :: istat
@@ -256,8 +259,6 @@ module save_soln_cuda_module
 				data0Size = ( arg0%dim * arg0%set%size)
 				data1Size = ( arg1%dim * arg1%set%size)
 
-				call c_f_pointer ( arg0%dat_d, argument0, (/data0Size/) )
-				call c_f_pointer ( arg1%dat_d, argument1, (/data1Size/) )
 				
 				argSizes%parg0Size = data0Size
 				argSizes%parg1Size = data1Size
@@ -265,6 +266,10 @@ module save_soln_cuda_module
 				isKernelInputDataGenerated = .true.
 
 			end if
+			
+			call c_f_pointer ( arg0%dat_d, argument0, (/data0Size/) )
+			call c_f_pointer ( arg1%dat_d, argument1, (/data1Size/) )
+				
 			
 			istat = cudaEventRecord ( stopHostTime, 0 )
 			istat = cudaEventSynchronize ( stopHostTime )

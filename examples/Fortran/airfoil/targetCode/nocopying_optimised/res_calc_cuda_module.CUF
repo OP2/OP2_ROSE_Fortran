@@ -50,30 +50,30 @@ module res_calc_cuda_module
 
 	! input data to kernel and associated variables
 	integer(4) :: arg0Size, arg2Size, arg4Size, arg6Size
+	type(varSizes_res_calc), device :: argSizes
+	type(c_ptr) :: planRet		
+
 
 !	real(8), dimension(:), allocatable, device :: argument0
 !	real(8), dimension(:), allocatable, device :: argument2
 !	real(8), dimension(:), allocatable, device :: argument4
 !	real(8), dimension(:), allocatable, device :: argument6
-	type(varSizes_res_calc), device :: argSizes
-
-	type(c_ptr) :: planRet		
-	type(op_plan), pointer :: actualPlan
-	integer, pointer, dimension(:) :: ncolblk		
-	integer, pointer, dimension(:) :: pnindirect
-	type(c_devptr), pointer, dimension(:) :: pindMaps
-	integer(4), dimension(1) :: pindMapsSize
+!	type(op_plan), pointer :: actualPlan
+!	integer, pointer, dimension(:) :: ncolblk		
+!	integer, pointer, dimension(:) :: pnindirect
+!	type(c_devptr), pointer, dimension(:) :: pindMaps
+!	integer(4), dimension(1) :: pindMapsSize
 !	integer, allocatable, device, dimension(:) :: pindMaps1
-	integer(4) :: pindMaps1Size
+!	integer(4) :: pindMaps1Size
 !	integer, allocatable, device, dimension(:) :: pindMaps2
-	integer(4) :: pindMaps2Size
+!	integer(4) :: pindMaps2Size
 !	integer, allocatable, device, dimension(:) :: pindMaps3
-	integer(4) :: pindMaps3Size
+!	integer(4) :: pindMaps3Size
 !	integer, allocatable, device, dimension(:) :: pindMaps4
-	integer(4) :: pindMaps4Size
-	type(c_devptr), pointer, dimension(:) :: pmaps
-	integer(4), dimension(6) :: pmapsSize ! dimension = argsNumber (= 6, see below)
-!	integer(2), allocatable, device, dimension(:) :: pMaps1
+!	integer(4) :: pindMaps4Size
+!	type(c_devptr), pointer, dimension(:) :: pmaps
+!	integer(4), dimension(6) :: pmapsSize ! dimension = argsNumber (= 6, see below)
+!!	integer(2), allocatable, device, dimension(:) :: pMaps1
 !	integer(2), allocatable, device, dimension(:) :: pMaps2
 !	integer(2), allocatable, device, dimension(:) :: pMaps3
 !	integer(2), allocatable, device, dimension(:) :: pMaps4
@@ -81,21 +81,21 @@ module res_calc_cuda_module
 !	integer(2), allocatable, device, dimension(:) :: pMaps6
 !	integer(2), allocatable, device, dimension(:) :: pMaps7
 !	integer(2), allocatable, device, dimension(:) :: pMaps8
-	integer(4) :: pmaps1Size, pmaps2Size, pmaps3Size, pmaps4Size, pmaps5Size, pmaps6Size, pmaps7Size, pmaps8Size
+!	integer(4) :: pmaps1Size, pmaps2Size, pmaps3Size, pmaps4Size, pmaps5Size, pmaps6Size, pmaps7Size, pmaps8Size
 !	integer, device, allocatable, dimension(:) :: pindSizes
-	integer(4) :: pindSizesSize
+!	integer(4) :: pindSizesSize
 !	integer, device, allocatable, dimension(:) :: pindOffs
-	integer(4) :: pindOffsSize
+!	integer(4) :: pindOffsSize
 !	integer, device, allocatable, dimension(:) :: pblkMap
-	integer(4) :: pblkMapSize
+!	integer(4) :: pblkMapSize
 !	integer, device, allocatable, dimension(:) :: poffset
-	integer(4) :: poffsetSize
+!	integer(4) :: poffsetSize
 !	integer, device, allocatable, dimension(:) :: pnelems
-	integer(4) :: pnelemsSize
+!	integer(4) :: pnelemsSize
 !	integer, device, allocatable, dimension(:) :: pnthrcol
-	integer(4) :: pnthrcolSize
+!	integer(4) :: pnthrcolSize
 !	integer, device, allocatable, dimension(:) :: pthrcol
-	integer(4) :: pthrcolSize
+!	integer(4) :: pthrcolSize
 
 
 	contains
@@ -568,7 +568,7 @@ module res_calc_cuda_module
 !		type(c_ptr) :: planRet
 !		
 !		! variable for storing the actual OP Plan
-!		type(op_plan), pointer :: actualPlan
+		type(op_plan), pointer :: actualPlan
 			
 		! iteration and offset variables to implement plan execution
 		integer(4) :: blockOffset, col
@@ -583,34 +583,31 @@ module res_calc_cuda_module
 		integer(4) :: threadsynchret
 		
 		! Fortran variable for Host variable
-!		integer, pointer, dimension(:) :: ncolblk
+		integer, pointer, dimension(:) :: ncolblk
 !		
-!		integer, pointer, dimension(:) :: pnindirect
+		integer, pointer, dimension(:) :: pnindirect
 !		
-!		! Fortran variables allocated on device passed to the main kernel (with sizes)
-!!		real(8), device, allocatable, dimension(:) :: parg0DatD ! real is obtained from op_dat arg type
-!!		integer(4) :: parg0DatDSize
 !		
 !		! ind_maps is an array of device pointers allocated on the host memory
-!		type(c_devptr), pointer, dimension(:) :: pindMaps
-!		integer(4), dimension(1) :: pindMapsSize
+		type(c_devptr), pointer, dimension(:) :: pindMaps
+		integer(4), dimension(1) :: pindMapsSize
 !								
 !		! as many pindMapsI as the positions of pindMaps (4 in this case = indsNumber )
 		integer, allocatable, device, dimension(:) :: pindMaps1
-!		integer(4) :: pindMaps1Size
+		integer(4) :: pindMaps1Size
 !
 		integer, allocatable, device, dimension(:) :: pindMaps2
-!		integer(4) :: pindMaps2Size
+		integer(4) :: pindMaps2Size
 !
 		integer, allocatable, device, dimension(:) :: pindMaps3
-!		integer(4) :: pindMaps3Size
+		integer(4) :: pindMaps3Size
 !
 		integer, allocatable, device, dimension(:) :: pindMaps4
-!		integer(4) :: pindMaps4Size
+		integer(4) :: pindMaps4Size
 !
 !		! maps is an array of device pointers allocated on the host memory
-!		type(c_devptr), pointer, dimension(:) :: pmaps
-!		integer(4), dimension(6) :: pmapsSize ! dimension = argsNumber (= 6, see below)
+		type(c_devptr), pointer, dimension(:) :: pmaps
+		integer(4), dimension(6) :: pmapsSize ! dimension = argsNumber (= 6, see below)
 !
 !		! as many pMapsI as the positions of pmaps (8 for this case) (they are short integers)
 		integer(2), allocatable, device, dimension(:) :: pMaps1
@@ -622,28 +619,28 @@ module res_calc_cuda_module
 		integer(2), allocatable, device, dimension(:) :: pMaps7
 		integer(2), allocatable, device, dimension(:) :: pMaps8
 !
-!		integer(4) :: pmaps1Size, pmaps2Size, pmaps3Size, pmaps4Size, pmaps5Size, pmaps6Size, pmaps7Size, pmaps8Size
+		integer(4) :: pmaps1Size, pmaps2Size, pmaps3Size, pmaps4Size, pmaps5Size, pmaps6Size, pmaps7Size, pmaps8Size
 !
 		integer, device, allocatable, dimension(:) :: pindSizes
-!		integer(4) :: pindSizesSize
+		integer(4) :: pindSizesSize
 !		
 		integer, device, allocatable, dimension(:) :: pindOffs
-!		integer(4) :: pindOffsSize
+		integer(4) :: pindOffsSize
 !		
 		integer, device, allocatable, dimension(:) :: pblkMap
-!		integer(4) :: pblkMapSize
+		integer(4) :: pblkMapSize
 !		
 		integer, device, allocatable, dimension(:) :: poffset
-!		integer(4) :: poffsetSize
+		integer(4) :: poffsetSize
 !		
 		integer, device, allocatable, dimension(:) :: pnelems
-!		integer(4) :: pnelemsSize
+		integer(4) :: pnelemsSize
 !		
 		integer, device, allocatable, dimension(:) :: pnthrcol
-!		integer(4) :: pnthrcolSize
+		integer(4) :: pnthrcolSize
 !		
 		integer, device, allocatable, dimension(:) :: pthrcol
-!		integer(4) :: pthrcolSize
+		integer(4) :: pthrcolSize
 
 		! variables for marshalling data from host to device memory and back
 !		integer(4) :: arg0Size, arg2Size, arg4Size, arg6Size
@@ -655,10 +652,6 @@ module res_calc_cuda_module
 !		
 !		! sizes of variables passed to kernel are all encapsulated inside a single struct
 !		type(varSizes_res_calc), device :: argSizes
-		
-		! debug (not used right now, can delete them eventually)
-!		integer(4), dimension(:), allocatable, device :: printOutDev
-!		integer(4), dimension(:), pointer :: printOutHost
 		
 		! profiling
 		integer :: istat
@@ -678,7 +671,7 @@ module res_calc_cuda_module
 		
 		if ( isKernelInputDataGenerated .eq. .false. ) then 
 		
-			isKernelInputDataGenerated = .true.
+!			isKernelInputDataGenerated = .true.
 		
 			! filling up variables for building the plan
 			args(1) = arg0%index
@@ -737,6 +730,12 @@ module res_calc_cuda_module
 			inds(7) = 3
 			inds(8) = 3
 
+			! get the plan
+			planRet = cplan ( subroutineName, set%index, argsNumber, args, idxs, maps, accs, indsNumber, inds )  		
+
+			call res_calc_initialiseConstants()
+
+		end if
 
 			! 1. transfer C pointers to Fortran pointers
 			arg0Size = arg0%dim * arg0%set%size
@@ -752,8 +751,6 @@ module res_calc_cuda_module
 			arg6Size = arg6%dim * arg6%set%size
 			call c_f_pointer ( arg6%dat_d, argument6, (/arg6Size/) )
 
-			! get the plan
-			planRet = cplan ( subroutineName, set%index, argsNumber, args, idxs, maps, accs, indsNumber, inds )  		
 
 			! convert arguments and plan data to Fortran pointers (not a copy!)
 			! Typically, first compute size, then transform pointer
@@ -852,7 +849,12 @@ module res_calc_cuda_module
 			call c_f_pointer ( actualPlan%thrcol, pthrcol, (/pthrcolSize/) )
 
 			blockOffset = 0
-			
+
+		if ( isKernelInputDataGenerated .eq. .false. ) then 
+		
+			isKernelInputDataGenerated = .true.
+
+
 			! sizes are compacted in a single struct, to save parameter space
 			argSizes%pindArg0Size = arg0Size
 			argSizes%pindArg0MapsSize = pnindirect(1)
@@ -877,8 +879,6 @@ module res_calc_cuda_module
 			argSizes%pNelemsSize = pnelemsSize
 			argSizes%pNcolorsSize = pnthrcolSize
 			argSizes%pColorsSize = pthrcolSize
-			
-			call res_calc_initialiseConstants()
 
 		end if
 
