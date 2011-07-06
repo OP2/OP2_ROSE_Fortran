@@ -12,15 +12,69 @@
  */
 
 void
-FortranCUDAUserSubroutine::copyAndModifySubroutine ()
+FortranCUDAUserSubroutine::patchReferencesToConstants ()
 {
   using boost::iequals;
-  using SageBuilder::buildVariableDeclaration;
   using SageBuilder::buildVarRefExp;
-  using SageInterface::appendStatement;
   using std::map;
   using std::string;
-  using std::iterator;
+
+  class ModifyReferencesToConstantVariables: public AstSimpleProcessing
+  {
+    public:
+
+      FortranCUDAInitialiseConstantsSubroutine * initialiseConstantsSubroutine;
+
+      ModifyReferencesToConstantVariables (
+          FortranCUDAInitialiseConstantsSubroutine * initialiseConstantsSubroutine)
+      {
+        this->initialiseConstantsSubroutine = initialiseConstantsSubroutine;
+      }
+
+      virtual void
+      visit (SgNode * node)
+      {
+        SgVarRefExp * oldVarRefExp = isSgVarRefExp (node);
+
+        if (oldVarRefExp != NULL)
+        {
+          for (map <string, string>::const_iterator it =
+              initialiseConstantsSubroutine->getFirstConstantName (); it
+              != initialiseConstantsSubroutine->getLastConstantName (); ++it)
+          {
+
+            if (iequals (it->first,
+                oldVarRefExp->get_symbol ()->get_name ().getString ()))
+            {
+              SgVarRefExp
+                  * newVarRefExp =
+                      buildVarRefExp (
+                          initialiseConstantsSubroutine->getVariableDeclarations ()->get (
+                              it->second));
+
+              oldVarRefExp->set_symbol (newVarRefExp->get_symbol ());
+            }
+          }
+        }
+
+        SgLocatedNode * locatedNode = isSgLocatedNode (node);
+        if (locatedNode != NULL)
+        {
+          locatedNode->setOutputInCodeGeneration ();
+        }
+      }
+  };
+
+  (new ModifyReferencesToConstantVariables (initialiseConstantsSubroutine))->traverse (
+      subroutineHeaderStatement, preorder);
+}
+
+void
+FortranCUDAUserSubroutine::createStatements ()
+{
+  using boost::iequals;
+  using SageInterface::appendStatement;
+  using std::string;
   using std::vector;
 
   Debug::getInstance ()->debugMessage (
@@ -164,95 +218,16 @@ FortranCUDAUserSubroutine::copyAndModifySubroutine ()
       }
     }
   }
-
-  /*
-   * ======================================================
-   * The following class updates every reference to a
-   * constant variable in the following way:
-   * (constant_name -> subroutineName_constantName)
-   * ======================================================
-   */
-  class ModifyReferencesToConstantVariables: public AstSimpleProcessing
-  {
-    public:
-
-      FortranCUDAInitialiseConstantsSubroutine * initialiseConstantsSubroutine;
-
-      ModifyReferencesToConstantVariables (
-          FortranCUDAInitialiseConstantsSubroutine * initialiseConstantsSubroutine)
-      {
-        this->initialiseConstantsSubroutine = initialiseConstantsSubroutine;
-      }
-
-      virtual void
-      visit (SgNode * node)
-      {
-        SgVarRefExp * oldVarRefExp = isSgVarRefExp (node);
-
-        if (oldVarRefExp != NULL)
-        {
-          for (map <string, string>::const_iterator it =
-              initialiseConstantsSubroutine->getFirstConstantName (); it
-              != initialiseConstantsSubroutine->getLastConstantName (); ++it)
-          {
-
-            if (iequals (it->first,
-                oldVarRefExp->get_symbol ()->get_name ().getString ()))
-            {
-              SgVarRefExp
-                  * newVarRefExp =
-                      buildVarRefExp (
-                          initialiseConstantsSubroutine->getVariableDeclarations ()->get (
-                              it->second));
-
-              oldVarRefExp->set_symbol (newVarRefExp->get_symbol ());
-            }
-          }
-        }
-      }
-  };
-  (new ModifyReferencesToConstantVariables (initialiseConstantsSubroutine))->traverse (
-      subroutineHeaderStatement, preorder);
-
-  /*
-   * ======================================================
-   * The following class visits every created node for the
-   * subroutine and ensures that it is generated during
-   * unparsing
-   * ======================================================
-   */
-  class GenerateAllNodesInUnparser: public AstSimpleProcessing
-  {
-      virtual void
-      visit (SgNode * node)
-      {
-        SgLocatedNode * locatedNode = isSgLocatedNode (node);
-        if (locatedNode != NULL)
-        {
-          locatedNode->setOutputInCodeGeneration ();
-        }
-      }
-  };
-  (new GenerateAllNodesInUnparser ())->traverse (subroutineHeaderStatement,
-      preorder);
 }
 
 void
 FortranCUDAUserSubroutine::createLocalVariableDeclarations ()
 {
-
 }
 
 void
 FortranCUDAUserSubroutine::createFormalParameterDeclarations ()
 {
-
-}
-
-void
-FortranCUDAUserSubroutine::createStatements ()
-{
-
 }
 
 /*
@@ -262,21 +237,19 @@ FortranCUDAUserSubroutine::createStatements ()
  */
 
 FortranCUDAUserSubroutine::FortranCUDAUserSubroutine (
-    std::string const & subroutineName,
+    std::string const & subroutineName, SgScopeStatement * moduleScope,
     FortranCUDAInitialiseConstantsSubroutine * initialiseConstantsSubroutine,
     FortranProgramDeclarationsAndDefinitions * declarations,
-    FortranParallelLoop * parallelLoop, SgScopeStatement * moduleScope) :
+    FortranParallelLoop * parallelLoop) :
   UserSubroutine <SgProcedureHeaderStatement,
-      FortranProgramDeclarationsAndDefinitions> (subroutineName, parallelLoop)
+      FortranProgramDeclarationsAndDefinitions> (subroutineName, declarations,
+      parallelLoop), initialiseConstantsSubroutine (
+      initialiseConstantsSubroutine)
 {
   using SageBuilder::buildProcedureHeaderStatement;
   using SageBuilder::buildVoidType;
   using SageInterface::appendStatement;
   using SageInterface::addTextForUnparser;
-
-  this->initialiseConstantsSubroutine = initialiseConstantsSubroutine;
-
-  this->declarations = declarations;
 
   subroutineHeaderStatement = buildProcedureHeaderStatement (
       this->subroutineName.c_str (), buildVoidType (), formalParameters,
@@ -289,5 +262,7 @@ FortranCUDAUserSubroutine::FortranCUDAUserSubroutine (
 
   subroutineScope = subroutineHeaderStatement->get_definition ()->get_body ();
 
-  copyAndModifySubroutine ();
+  createStatements ();
+
+  patchReferencesToConstants ();
 }

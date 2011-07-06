@@ -450,7 +450,8 @@ FortranPlan::createConvertPositionInPMapsStatements (
 
       SgExprStatement * statement1 = buildAssignStatement (buildVarRefExp (
           variableDeclarations->get (
-              VariableNames::getGlobalToLocalMappingName (i))), dotExpression1);
+              VariableNames::getGlobalToLocalMappingSizeName (i))),
+          dotExpression1);
 
       appendStatement (statement1, ifBody);
 

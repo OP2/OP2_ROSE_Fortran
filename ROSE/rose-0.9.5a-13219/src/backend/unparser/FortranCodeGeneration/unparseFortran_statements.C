@@ -5107,7 +5107,10 @@ FortranCodeGeneration_locatedNode::unparseFunctionArgs(SgFunctionDeclaration* fu
        // Check if this is the last argument (output a "," separator if not)
           if (p != funcdecl_stmt->get_args().end())
              {
-               curprint( ",");
+            // Adam Betts: added ampersands to break onto new line
+               curprint( ", &");
+               unp->cur.insert_newline(1);
+               curprint( "& ");
              }
         }
    }

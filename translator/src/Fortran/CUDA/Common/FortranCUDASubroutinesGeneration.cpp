@@ -61,7 +61,7 @@ FortranCUDASubroutinesGeneration::createSubroutines (
     initialiseConstantsSubroutine->generateSubroutine ();
 
     userDeviceSubroutine = new FortranCUDAUserSubroutine (userSubroutineName,
-        initialiseConstantsSubroutine, declarations, parallelLoop, moduleScope);
+        moduleScope, initialiseConstantsSubroutine, declarations, parallelLoop);
 
     kernelSubroutine = new FortranCUDAKernelSubroutineDirectLoop (
         userSubroutineName, userDeviceSubroutine->getSubroutineName (),
@@ -95,7 +95,7 @@ FortranCUDASubroutinesGeneration::createSubroutines (
     initialiseConstantsSubroutine->generateSubroutine ();
 
     userDeviceSubroutine = new FortranCUDAUserSubroutine (userSubroutineName,
-        initialiseConstantsSubroutine, declarations, parallelLoop, moduleScope);
+        moduleScope, initialiseConstantsSubroutine, declarations, parallelLoop);
 
     kernelSubroutine = new FortranCUDAKernelSubroutineIndirectLoop (
         userSubroutineName, userDeviceSubroutine->getSubroutineName (),
