@@ -21,7 +21,7 @@ FortranOpenMPHostSubroutineIndirectLoop::createKernelFunctionCallStatement ()
 
   FortranOpenMPModuleDeclarationsIndirectLoop
       * moduleDeclarationsIndirectLoop =
-          dynamic_cast <FortranOpenMPModuleDeclarationsIndirectLoop *> (moduleDeclarations);
+          static_cast <FortranOpenMPModuleDeclarationsIndirectLoop *> (moduleDeclarations);
 
   SgExprListExp * actualParameters = buildExprListExp ();
 
@@ -120,7 +120,7 @@ FortranOpenMPHostSubroutineIndirectLoop::createPlanFunctionExecutionStatements (
 
   FortranOpenMPModuleDeclarationsIndirectLoop
       * moduleDeclarationsIndirectLoop =
-          dynamic_cast <FortranOpenMPModuleDeclarationsIndirectLoop *> (moduleDeclarations);
+          static_cast <FortranOpenMPModuleDeclarationsIndirectLoop *> (moduleDeclarations);
 
   /*
    * ======================================================
@@ -269,7 +269,7 @@ FortranOpenMPHostSubroutineIndirectLoop::createTransferOpDatStatements (
 
       FortranOpenMPModuleDeclarationsIndirectLoop
           * moduleDeclarationsIndirectLoop =
-              dynamic_cast <FortranOpenMPModuleDeclarationsIndirectLoop *> (moduleDeclarations);
+              static_cast <FortranOpenMPModuleDeclarationsIndirectLoop *> (moduleDeclarations);
 
       SgExprStatement
           * assignmentStatement =

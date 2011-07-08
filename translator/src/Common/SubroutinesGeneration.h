@@ -78,15 +78,6 @@ template <typename TDeclarations, typename TParallelLoop,
 
       /*
        * ======================================================
-       * Over-riding implementation of the AST vertex traversal
-       * function
-       * ======================================================
-       */
-      virtual void
-      visit (SgNode * node) = 0;
-
-      /*
-       * ======================================================
        * Generates output files for each OP_PAR_LOOP
        * ======================================================
        */

@@ -57,15 +57,22 @@ for f in set(files):
     	fileExtensionCharacter = f.rfind('.')
 	newFile.write("MODULE " + f[lastDirectorySeparator+1:fileExtensionCharacter] + "\n\n")
 	newFile.write("use HydraConstants\n\n")
+	newFile.write("contains\n\n")
 
 	passedFile = open(f, "r")
+	lastLine = None
 	for line in passedFile:		
 		if line[0] == 'c':
 			newFile.write("!" + line[1:])
-		elif not include_regex.search(line):
-			newFile.write(line)
+		elif include_regex.search(line):
+			newFile.write("\n")			
+		elif "&" in line:
+			newFile.write(lastLine[:-1] + " &\n")
+			lastLine = line
 		else:
-			newFile.write("\n")
+			if lastLine:
+				newFile.write(lastLine)
+			lastLine = line
 	passedFile.close()
 
 	newFile.write("END MODULE" + "\n")

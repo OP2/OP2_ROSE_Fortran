@@ -148,11 +148,11 @@ FortranCUDAUserSubroutine::createStatements ()
          * ======================================================
          */
 
-        unsigned int parLoopArgCounter = 1;
+        unsigned int opDatCounter = 1;
 
         for (SgInitializedNamePtrList::iterator paramIt =
             originalParameters->get_args ().begin (); paramIt
-            != originalParameters->get_args ().end (); ++parLoopArgCounter, ++paramIt)
+            != originalParameters->get_args ().end (); ++paramIt)
         {
           std::string const variableName = (*paramIt)->get_name ().getString ();
 
@@ -166,9 +166,8 @@ FortranCUDAUserSubroutine::createStatements ()
            * ======================================================
            */
 
-          if (parallelLoop->getOpMapValue (parLoopArgCounter) == INDIRECT
-              && parallelLoop->getOpAccessValue (parLoopArgCounter)
-                  == READ_ACCESS)
+          if (parallelLoop->getOpMapValue (opDatCounter) == INDIRECT
+              && parallelLoop->getOpAccessValue (opDatCounter) == READ_ACCESS)
           {
             SgVariableDeclaration
                 * variableDeclaration =
@@ -183,6 +182,8 @@ FortranCUDAUserSubroutine::createStatements ()
                     FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
                         variableName, type, subroutineScope, formalParameters);
           }
+
+          ++opDatCounter;
         }
       }
     }

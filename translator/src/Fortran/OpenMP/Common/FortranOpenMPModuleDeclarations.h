@@ -7,7 +7,7 @@ class FortranOpenMPModuleDeclarations: public FortranModuleDeclarations
 {
   protected:
 
-    virtual void
+    void
     createOpDatDeclarations ();
 
     FortranOpenMPModuleDeclarations (std::string const & userSubroutineName,

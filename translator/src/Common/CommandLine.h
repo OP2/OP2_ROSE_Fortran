@@ -73,16 +73,17 @@ class CommandLine
      * ======================================================
      */
     unsigned int
-    getNumberOfArguments () const;
+    getNumberOfRoseArguments () const;
 
     /*
      * ======================================================
-     * Effectively returns 'argv' after we have stripped
-     * out the extra command-line options our tool accepts
+     * Effectively puts 'argv' into the supplied vector after
+     * we have stripped out the extra command-line options
+     * our tool accepts
      * ======================================================
      */
-    char **
-    getArguments () const;
+    void
+    getRoseArguments (std::vector<std::string> & argv);
 
     /*
      * ======================================================

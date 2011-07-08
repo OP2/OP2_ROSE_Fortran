@@ -282,6 +282,7 @@ FortranSubroutinesGeneration::visit (SgNode * node)
 
   switch (node->variantT ())
   {
+
     case V_SgFunctionCallExp:
     {
       /*
@@ -294,6 +295,9 @@ FortranSubroutinesGeneration::visit (SgNode * node)
       string const
           calleeName =
               functionCallExp->getAssociatedFunctionDeclaration ()->get_name ().getString ();
+
+      Debug::getInstance ()->debugMessage ("Found function call '" + calleeName
+          + "'", Debug::INNER_LOOP_LEVEL, __FILE__, __LINE__);
 
       /*
        * ======================================================

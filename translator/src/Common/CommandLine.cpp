@@ -228,55 +228,15 @@ CommandLine::outputOptions ()
 }
 
 unsigned int
-CommandLine::getNumberOfArguments () const
+CommandLine::getNumberOfRoseArguments () const
 {
   return ROSEArguments.size ();
 }
 
-char **
-CommandLine::getArguments () const
+void
+CommandLine::getRoseArguments (std::vector <std::string> & argv)
 {
-  using std::string;
-  using std::vector;
-
-  /*
-   * ======================================================
-   * Allocate enough space for all the command-line
-   * arguments recognised as ROSE ones
-   * ======================================================
-   */
-  char ** argv = new char*[ROSEArguments.size ()];
-
-  int i = 0;
-  for (vector <string>::const_iterator it = ROSEArguments.begin (); it
-      != ROSEArguments.end (); ++it)
-  {
-    /*
-     * ======================================================
-     * Allocate space for the character array which represents
-     * a command-line argument
-     * ======================================================
-     */
-    argv[i] = new char[it->size ()];
-
-    /*
-     * ======================================================
-     * Have to do a 'strcpy' because 'c_str' returns a pointer
-     * to a constant character array and we need a modifiable
-     * character array
-     * ======================================================
-     */
-    strcpy (argv[i], (*it).c_str ());
-
-    /*
-     * ======================================================
-     * Advance the index into argv
-     * ======================================================
-     */
-    ++i;
-  }
-
-  return argv;
+  argv.assign (ROSEArguments.begin (), ROSEArguments.end ());
 }
 
 void
@@ -315,6 +275,9 @@ CommandLine::parse (int argc, char ** argv)
          * Do not recognise the option so assume it is a ROSE flag
          * ======================================================
          */
+
+        Debug::getInstance ()->debugMessage (argv[i] + " is a ROSE option",
+            Debug::VERBOSE_LEVEL, __FILE__, __LINE__);
 
         ROSEArguments.push_back (argv[i]);
       }

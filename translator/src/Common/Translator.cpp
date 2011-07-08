@@ -134,6 +134,9 @@ handleFortranProject (SgProject * project)
   {
     case TargetBackends::CUDA:
     {
+      Debug::getInstance ()->debugMessage ("CUDA code generation selected",
+          Debug::VERBOSE_LEVEL, __FILE__, __LINE__);
+
       new FortranCUDASubroutinesGeneration (project, declarations);
 
       break;
@@ -141,6 +144,9 @@ handleFortranProject (SgProject * project)
 
     case TargetBackends::OPENMP:
     {
+      Debug::getInstance ()->debugMessage ("OpenMP code generation selected",
+          Debug::VERBOSE_LEVEL, __FILE__, __LINE__);
+
       new FortranOpenMPSubroutinesGeneration (project, declarations);
 
       break;
@@ -205,33 +211,13 @@ addCommandLineOptions ()
   CommandLine::getInstance ()->addUDrawGraphOption ();
 }
 
-int
-main (int argc, char ** argv)
+void
+processUserSelections (SgProject * project)
 {
-  addCommandLineOptions ();
-
-  CommandLine::getInstance ()->parse (argc, argv);
-
-  Debug::getInstance ()->debugMessage ("Translation starting", 1, __FILE__,
-      __LINE__);
-
-  /*
-   * ======================================================
-   * Pass the pre-processed command-line arguments and NOT
-   * 'argc' and 'argv', otherwise ROSE will complain
-   * ======================================================
-   */
-
-  SgProject * project = frontend (
-      CommandLine::getInstance ()->getNumberOfArguments (),
-      CommandLine::getInstance ()->getArguments ());
-
-  ROSE_ASSERT (project != NULL);
-
   if (project->get_Cxx_only () == true)
   {
-    Debug::getInstance ()->debugMessage ("C++ project detected", 1, __FILE__,
-        __LINE__);
+    Debug::getInstance ()->debugMessage ("C++ project detected",
+        Debug::VERBOSE_LEVEL, __FILE__, __LINE__);
 
     if (Globals::getInstance ()->renderOxfordAPICalls ())
     {
@@ -261,10 +247,10 @@ main (int argc, char ** argv)
       project->unparse ();
     }
   }
-  else
+  else if (project->get_Fortran_only () == true)
   {
-    Debug::getInstance ()->debugMessage ("Fortran project detected", 1,
-        __FILE__, __LINE__);
+    Debug::getInstance ()->debugMessage ("Fortran project detected",
+        Debug::VERBOSE_LEVEL, __FILE__, __LINE__);
 
     checkBackendOption ();
 
@@ -272,14 +258,43 @@ main (int argc, char ** argv)
 
     project->unparse ();
   }
-
-  if (Globals::getInstance ()->outputUDrawGraphs ())
+  else
   {
-    new UDrawGraph (project, "ast");
+    Debug::getInstance ()->errorMessage (
+        "The translator does not supported the programming language of the given files");
   }
+}
 
-  Debug::getInstance ()->debugMessage ("Translation completed", 1, __FILE__,
-      __LINE__);
+int
+main (int argc, char ** argv)
+{
+  addCommandLineOptions ();
+
+  CommandLine::getInstance ()->parse (argc, argv);
+
+  /*
+   * ======================================================
+   * Pass the pre-processed command-line arguments and NOT
+   * 'argc' and 'argv', otherwise ROSE will complain it does
+   * not recognise particular options
+   * ======================================================
+   */
+
+  std::vector <std::string> args;
+
+  CommandLine::getInstance ()->getRoseArguments (args);
+
+  SgProject * project = frontend (args);
+
+  ROSE_ASSERT (project != NULL);
+
+  Debug::getInstance ()->debugMessage ("Translation starting",
+      Debug::VERBOSE_LEVEL, __FILE__, __LINE__);
+
+  processUserSelections (project);
+
+  Debug::getInstance ()->debugMessage ("Translation completed",
+      Debug::VERBOSE_LEVEL, __FILE__, __LINE__);
 
   return 0;
 }

@@ -2594,9 +2594,6 @@ FortranCodeGeneration_locatedNode::unparseIfStmt(SgStatement* stmt, SgUnparse_In
 
      ROSE_ASSERT(unp != NULL);
 
-     // Adam Betts : output a new line
-     unp->cur.insert_newline(1);
-
      unp->cur.insert_newline(1); 
    }
 
@@ -2789,9 +2786,6 @@ FortranCodeGeneration_locatedNode::unparseDoStmt(SgStatement* stmt, SgUnparse_In
 
      ROSE_ASSERT(unp != NULL);
      unp->cur.insert_newline(1); 
-
-     // Adam Betts : output a new line
-     unp->cur.insert_newline(1);
    }
 
 void 
@@ -2879,9 +2873,6 @@ FortranCodeGeneration_locatedNode::unparseWhileStmt(SgStatement* stmt, SgUnparse
 
      ROSE_ASSERT(unp != NULL);
      unp->cur.insert_newline(1); 
-
-     // Adam Betts : output a new line
-     unp->cur.insert_newline(1);
    }
 
 void
@@ -4533,9 +4524,6 @@ FortranCodeGeneration_locatedNode::unparseProcHdrStmt(SgStatement* stmt, SgUnpar
                curprint("(");
                unparseFunctionArgs(procedureHeader,ninfo2);     
                curprint(")");
-
-               // Adam Betts : output a new line
-               unp->cur.insert_newline(1);
              }
 
 #if 1

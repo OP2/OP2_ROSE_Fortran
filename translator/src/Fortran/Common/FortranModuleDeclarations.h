@@ -46,9 +46,6 @@ class FortranModuleDeclarations
 
   protected:
 
-    virtual void
-    createOpDatDeclarations () = 0;
-
     void
     createFirstExecutionBooleanDeclaration ();
 
