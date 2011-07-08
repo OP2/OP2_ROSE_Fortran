@@ -276,8 +276,8 @@ CommandLine::parse (int argc, char ** argv)
          * ======================================================
          */
 
-        Debug::getInstance ()->debugMessage (argv[i] + " is a ROSE option",
-            Debug::VERBOSE_LEVEL, __FILE__, __LINE__);
+        Debug::getInstance ()->debugMessage (string (argv[i])
+            + " is a ROSE option", Debug::VERBOSE_LEVEL, __FILE__, __LINE__);
 
         ROSEArguments.push_back (argv[i]);
       }

@@ -70,6 +70,10 @@ FortranHostSubroutine::createFormalParameterDeclarations ()
 
         string const & variableName = VariableNames::getUserSubroutineName ();
 
+        Debug::getInstance ()->debugMessage ("User subroutine '"
+            + userSubroutineName + "'", Debug::OUTER_LOOP_LEVEL, __FILE__,
+            __LINE__);
+
         SgVariableDeclaration
             * variableDeclaration =
                 FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (

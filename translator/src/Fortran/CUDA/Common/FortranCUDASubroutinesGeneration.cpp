@@ -70,7 +70,7 @@ FortranCUDASubroutinesGeneration::createSubroutines (
         opDatDimensionsDeclaration);
 
     hostSubroutine = new FortranCUDAHostSubroutineDirectLoop (
-        userSubroutineName, userDeviceSubroutine->getSubroutineName (),
+        userSubroutineName, userSubroutineName,
         kernelSubroutine->getSubroutineName (), parallelLoop, moduleScope,
         initialiseConstantsSubroutine, dataSizesDeclaration,
         opDatDimensionsDeclaration);
@@ -104,7 +104,7 @@ FortranCUDASubroutinesGeneration::createSubroutines (
         opDatDimensionsDeclaration);
 
     hostSubroutine = new FortranCUDAHostSubroutineIndirectLoop (
-        userSubroutineName, userDeviceSubroutine->getSubroutineName (),
+        userSubroutineName, userSubroutineName,
         kernelSubroutine->getSubroutineName (), parallelLoop, moduleScope,
         initialiseConstantsSubroutine, dataSizesDeclaration,
         opDatDimensionsDeclaration);

@@ -68,7 +68,10 @@ for f in set(files):
 		elif include_regex.search(line):
 			newFile.write("\n")			
 		elif "&" in line:
-			newFile.write(lastLine[:-1] + " &\n")
+			if "#" in lastLine:
+				newFile.write(lastLine)
+			else:
+				newFile.write(lastLine[:-1] + " &\n")
 			lastLine = line
 		else:
 			if lastLine:
