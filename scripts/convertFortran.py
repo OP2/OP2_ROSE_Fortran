@@ -50,6 +50,7 @@ for f in args:
 		files.append(f)
 
 include_regex = re.compile("\s*#include \"const.inc\"")
+end_regex     = re.compile("\s*end\s")
 
 for f in set(files):
 	newFile = open("transformed_" + f, "w")
@@ -71,7 +72,10 @@ for f in set(files):
 			lastLine = line
 		else:
 			if lastLine:
-				newFile.write(lastLine)
+				if end_regex.search(lastLine):
+					newFile.write(lastLine[:-1] + " subroutine\n")
+				else:
+					newFile.write(lastLine)
 			lastLine = line
 	passedFile.close()
 
