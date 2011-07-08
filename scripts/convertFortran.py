@@ -53,6 +53,26 @@ include_regex = re.compile("\s*#include \"const.inc\"")
 end_regex     = re.compile("\s*end\s")
 
 for f in set(files):
+	# First work out which lines need the continuation symbol "&" appended
+
+	previousLines   = {}
+	appendAmpersand = {}
+	index           = 0
+	passedFile      = open(f, "r")
+	for line in passedFile:
+		appendAmpersand[index] = False
+		if "&" in line:
+			if "#" in previousLines[index-1]:
+				appendAmpersand[index-2] = True
+				appendAmpersand[index-4] = True
+			else:
+				appendAmpersand[index-1] = True
+		previousLines[index] = line
+		index += 1
+	passedFile.close()
+
+	# Now output the lines to the file
+
 	newFile = open("transformed_" + f, "w")
 	lastDirectorySeparator = f.rfind(os.sep) 
     	fileExtensionCharacter = f.rfind('.')
@@ -60,27 +80,17 @@ for f in set(files):
 	newFile.write("use HydraConstants\n\n")
 	newFile.write("contains\n\n")
 
-	passedFile = open(f, "r")
-	lastLine = None
-	for line in passedFile:		
+	for index, line in previousLines.items():	
 		if line[0] == 'c':
 			newFile.write("!" + line[1:])
 		elif include_regex.search(line):
-			newFile.write("\n")			
-		elif "&" in line:
-			if "#" in lastLine:
-				newFile.write(lastLine)
-			else:
-				newFile.write(lastLine[:-1] + " &\n")
-			lastLine = line
+			newFile.write("\n")
+		elif end_regex.search(line):
+			newFile.write(line[:-1] + " subroutine\n")			
+		elif appendAmpersand[index]:
+			newFile.write(line[:-1] + " &\n")
 		else:
-			if lastLine:
-				if end_regex.search(lastLine):
-					newFile.write(lastLine[:-1] + " subroutine\n")
-				else:
-					newFile.write(lastLine)
-			lastLine = line
-	passedFile.close()
+			newFile.write(line)
 
 	newFile.write("END MODULE" + "\n")
 	newFile.close()
