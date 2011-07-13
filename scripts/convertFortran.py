@@ -80,8 +80,7 @@ def modifyFiles (constantsModuleName):
 		passedFile.close()
 
 		# Now output the lines to the file
-
-		newFile = open("transformed_" + f, "w")
+		newFile = open("transformed_" + os.path.basename(f), "w")
 		lastDirectorySeparator = f.rfind(os.sep) 
 	    	fileExtensionCharacter = f.rfind('.')
 		newFile.write("MODULE " + f[lastDirectorySeparator+1:fileExtensionCharacter] + "\n\n")
@@ -328,7 +327,7 @@ class TypeDeclarations:
 		return finished
 
 def outputConstantsFile (integerDecl, realDecl, logicalDecl, charDecl, parameterDecl, commonDecl):
-	newFile = open("transformed_" + opts.constants, "w")
+	newFile = open("transformed_" + os.path.basename(opts.constants), "w")
 	newFile.write("MODULE %s\n\n" % constantsModuleName)
 
 	for key, value in integerDecl.variableNameToSize.items():
@@ -437,6 +436,7 @@ def modifyConstantsFile (constantsModuleName):
 	
 	for line in passedFile:
 		if line[0] == 'c':
+			# Ignore Fortran comments
 			pass
 		else:	
 			if commonBlock:
