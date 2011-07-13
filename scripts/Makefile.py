@@ -15,7 +15,7 @@ openmpFlag = "--openmp"
 parser.add_option("--clean",
                   action="store_true",
                   dest="clean",
-                  help="Remove generated files. Use this flag in conjunction with %s or %s to remove files 				generated for that particular backend." % (cudaFlag, openmpFlag),
+                  help="Remove generated files. Use this flag in conjunction with %s or %s to remove files generated for that particular backend." % (cudaFlag, openmpFlag),
                   default=False)
 
 parser.add_option("-C",
@@ -147,12 +147,6 @@ def compile ():
 	# Grab both standard output and standard error streams from the process
 	stdoutdata, stderrdata = proc.communicate()
 
-	if opts.debug > 0:
-		print(str(proc.returncode) +'==================================== STANDARD OUTPUT ===========================================')
-		for line in stdoutdata.splitlines():
-			print(line)
-		print('================================================================================================')
-
 	# If a non-zero return code is detected then the compiler choked
 	if proc.returncode != 0:
 		print('Problem running compiler.')
@@ -161,6 +155,12 @@ def compile ():
 			print(line)
 		print('================================================================================================') 
         	exit(1)
+
+	if opts.debug > 0:
+		print(str(proc.returncode) +'==================================== STANDARD OUTPUT ===========================================')
+		for line in stdoutdata.splitlines():
+			print(line)
+		print('================================================================================================')
 
 if opts.clean:
 	clean()
