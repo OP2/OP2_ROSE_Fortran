@@ -3,7 +3,7 @@
 #include <FortranTypesBuilder.h>
 
 void
-FortranCUDAModuleDeclarations::createOpDatSizesDeclarations ()
+FortranCUDAModuleDeclarations::createDataSizesDeclaration ()
 {
   using std::string;
 
@@ -11,22 +11,27 @@ FortranCUDAModuleDeclarations::createOpDatSizesDeclarations ()
       "Generating OP_DAT size declarations at module scope",
       Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
-  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
-  {
-    if (parallelLoop->isDuplicateOpDat (i) == false)
-    {
-      string const & variableName = VariableNames::getOpDatSizeName (i);
+  string const & variableName = CommonVariableNames::argsSizes + "Global";
 
+  SgVariableDeclaration * variableDeclaration =
       FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
-          variableName, FortranTypesBuilder::getFourByteInteger (), moduleScope);
-    }
-  }
+          variableName, dataSizesDeclaration->getType (), moduleScope);
+
+  moduleDeclarations->add (variableName, variableDeclaration);
 }
 
 FortranCUDAModuleDeclarations::FortranCUDAModuleDeclarations (
     std::string const & userSubroutineName, FortranParallelLoop * parallelLoop,
-    SgScopeStatement * moduleScope) :
-  FortranModuleDeclarations (userSubroutineName, parallelLoop, moduleScope)
+    SgScopeStatement * moduleScope,
+    FortranCUDADataSizesDeclaration * dataSizesDeclaration) :
+  FortranModuleDeclarations (userSubroutineName, parallelLoop, moduleScope),
+      dataSizesDeclaration (dataSizesDeclaration)
 {
-  createOpDatSizesDeclarations ();
+  createDataSizesDeclaration ();
+}
+
+FortranCUDADataSizesDeclaration *
+FortranCUDAModuleDeclarations::getDataSizesDeclaration ()
+{
+  return dataSizesDeclaration;
 }

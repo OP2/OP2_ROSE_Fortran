@@ -2,7 +2,9 @@
 
 FortranCUDAModuleDeclarationsIndirectLoop::FortranCUDAModuleDeclarationsIndirectLoop (
     std::string const & userSubroutineName, FortranParallelLoop * parallelLoop,
-    SgScopeStatement * moduleScope) :
-  FortranCUDAModuleDeclarations (userSubroutineName, parallelLoop, moduleScope)
+    SgScopeStatement * moduleScope,
+    FortranCUDADataSizesDeclarationIndirectLoop * dataSizesDeclaration) :
+  FortranCUDAModuleDeclarations (userSubroutineName, parallelLoop, moduleScope,
+      dataSizesDeclaration)
 {
 }

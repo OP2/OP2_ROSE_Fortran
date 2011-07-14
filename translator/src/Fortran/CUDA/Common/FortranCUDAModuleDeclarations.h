@@ -6,16 +6,27 @@
 #define FORTRAN_CUDA_MODULE_DECLARATIONS_H
 
 #include <FortranModuleDeclarations.h>
+#include <FortranCUDADataSizesDeclaration.h>
 
 class FortranCUDAModuleDeclarations: public FortranModuleDeclarations
 {
   protected:
 
+    FortranCUDADataSizesDeclaration * dataSizesDeclaration;
+
+  protected:
+
     void
-    createOpDatSizesDeclarations ();
+    createDataSizesDeclaration ();
 
     FortranCUDAModuleDeclarations (std::string const & userSubroutineName,
-        FortranParallelLoop * parallelLoop, SgScopeStatement * moduleScope);
+        FortranParallelLoop * parallelLoop, SgScopeStatement * moduleScope,
+        FortranCUDADataSizesDeclaration * dataSizesDeclaration);
+
+  public:
+
+    FortranCUDADataSizesDeclaration *
+    getDataSizesDeclaration ();
 };
 
 #endif

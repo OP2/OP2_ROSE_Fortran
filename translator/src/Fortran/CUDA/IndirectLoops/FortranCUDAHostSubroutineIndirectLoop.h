@@ -11,20 +11,12 @@
 #include <FortranCUDAHostSubroutine.h>
 #include <FortranCUDAKernelSubroutine.h>
 #include <FortranCUDAInitialiseConstantsSubroutine.h>
-#include <FortranCUDADataSizesDeclarationIndirectLoop.h>
 #include <FortranCUDAModuleDeclarationsIndirectLoop.h>
 #include <FortranPlan.h>
 
 class FortranCUDAHostSubroutineIndirectLoop: public FortranCUDAHostSubroutine,
     public FortranPlan
 {
-  private:
-
-    FortranCUDADataSizesDeclarationIndirectLoop
-        * dataSizesDeclarationOfIndirectLoop;
-
-    FortranCUDAModuleDeclarationsIndirectLoop * moduleDeclarations;
-
   private:
 
     virtual SgStatement *
@@ -35,6 +27,9 @@ class FortranCUDAHostSubroutineIndirectLoop: public FortranCUDAHostSubroutine,
 
     void
     createVariablesSizesInitialisationStatements ();
+
+    virtual void
+    createFirstTimeExecutionStatements ();
 
     void
     createExecutionPlanDeclarations ();
@@ -54,9 +49,8 @@ class FortranCUDAHostSubroutineIndirectLoop: public FortranCUDAHostSubroutine,
             FortranParallelLoop * parallelLoop,
             SgScopeStatement * moduleScope,
             FortranCUDAInitialiseConstantsSubroutine * initialiseConstantsSubroutine,
-            FortranCUDADataSizesDeclarationIndirectLoop * dataSizesDeclarationOfIndirectLoop,
             FortranOpDatDimensionsDeclaration * opDatDimensionsDeclaration,
-             FortranCUDAModuleDeclarationsIndirectLoop * moduleDeclarations);
+            FortranCUDAModuleDeclarationsIndirectLoop * moduleDeclarations);
 };
 
 #endif

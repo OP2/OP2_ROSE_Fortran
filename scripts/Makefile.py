@@ -9,8 +9,9 @@ from sys import argv
 # The command-line parser and its options
 parser = OptionParser(add_help_option=False)
 
-cudaFlag   = "--cuda"
-openmpFlag = "--openmp"
+cudaFlag      = "--cuda"
+openmpFlag    = "--openmp"
+helpShortFlag = "-h"
 
 parser.add_option("--clean",
                   action="store_true",
@@ -46,7 +47,7 @@ parser.add_option(openmpFlag,
                   help="Generate code for OpenMP backend.",
                   default=False)
 
-parser.add_option("-h",
+parser.add_option(helpShortFlag,
                   "--help",
                   action="help",
                   help="Display this help message.")
@@ -88,6 +89,12 @@ def clean ():
 def exitMessage (str):
 	print(str)
 	exit(1)
+
+def outputStdout (stdoutLines):
+	print('==================================== STANDARD OUTPUT ===========================================')
+	for line in stdoutLines.splitlines():
+		print(line)
+	print('================================================================================================')
 
 # Runs the compiler
 def compile ():
@@ -145,22 +152,22 @@ def compile ():
              	     stdout=PIPE)
 
 	# Grab both standard output and standard error streams from the process
-	stdoutdata, stderrdata = proc.communicate()
+	stdoutLines, stderrLines = proc.communicate()
 
 	# If a non-zero return code is detected then the compiler choked
 	if proc.returncode != 0:
 		print('Problem running compiler.')
+
+		outputStdout (stdoutLines)
+		
 		print('==================================== STANDARD ERROR ============================================')
-		for line in stderrdata.splitlines():
+		for line in stderrLines.splitlines():
 			print(line)
 		print('================================================================================================') 
         	exit(1)
 
 	if opts.debug > 0:
-		print(str(proc.returncode) +'==================================== STANDARD OUTPUT ===========================================')
-		for line in stdoutdata.splitlines():
-			print(line)
-		print('================================================================================================')
+		outputStdout (stdoutLines)
 
 if opts.clean:
 	clean()
@@ -169,4 +176,4 @@ if opts.compile:
 	compile()
 
 if not opts.clean and not opts.compile:
-	exitMessage("No actions selected. Use -h for options.")
+	exitMessage("No actions selected. Use %s for options." % helpShortFlag)

@@ -617,19 +617,6 @@ FortranCUDAHostSubroutine::createDataMarshallingLocalVariableDeclarations ()
   {
     if (parallelLoop->isDuplicateOpDat (i) == false)
     {
-      string const & variableName = VariableNames::getOpDatSizeName (i);
-
-      variableDeclarations->add (variableName,
-          FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
-              variableName, FortranTypesBuilder::getFourByteInteger (),
-              subroutineScope));
-    }
-  }
-
-  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
-  {
-    if (parallelLoop->isDuplicateOpDat (i) == false)
-    {
       string const & variableName =
           VariableNames::getCToFortranVariableName (i);
 
@@ -695,11 +682,13 @@ FortranCUDAHostSubroutine::FortranCUDAHostSubroutine (
     std::string const & kernelSubroutineName,
     FortranParallelLoop * parallelLoop, SgScopeStatement * moduleScope,
     FortranCUDAInitialiseConstantsSubroutine * initialiseConstantsSubroutine,
-    FortranOpDatDimensionsDeclaration * opDatDimensionsDeclaration) :
+    FortranOpDatDimensionsDeclaration * opDatDimensionsDeclaration,
+    FortranCUDAModuleDeclarations * moduleDeclarations) :
   FortranHostSubroutine (subroutineName, userSubroutineName,
       kernelSubroutineName, parallelLoop, moduleScope),
       initialiseConstantsSubroutine (initialiseConstantsSubroutine),
-      opDatDimensionsDeclaration (opDatDimensionsDeclaration)
+       opDatDimensionsDeclaration (
+          opDatDimensionsDeclaration), moduleDeclarations (moduleDeclarations)
 {
   using SageInterface::addTextForUnparser;
 

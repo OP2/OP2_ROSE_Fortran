@@ -309,6 +309,11 @@ FortranCUDAHostSubroutineDirectLoop::createCUDAKernelLocalVariableDeclarationsFo
 }
 
 void
+FortranCUDAHostSubroutineDirectLoop::createFirstTimeExecutionStatements ()
+{
+}
+
+void
 FortranCUDAHostSubroutineDirectLoop::createStatements ()
 {
   using SageInterface::appendStatement;
@@ -345,8 +350,6 @@ FortranCUDAHostSubroutineDirectLoop::createStatements ()
 void
 FortranCUDAHostSubroutineDirectLoop::createLocalVariableDeclarations ()
 {
-  createOpDatSizesDeclaration (dataSizesDeclarationOfDirectLoop->getType ());
-
   createOpDatDimensionsDeclaration (opDatDimensionsDeclaration->getType ());
 
   createDataMarshallingLocalVariableDeclarations ();
@@ -368,18 +371,16 @@ FortranCUDAHostSubroutineDirectLoop::createLocalVariableDeclarations ()
  */
 
 FortranCUDAHostSubroutineDirectLoop::FortranCUDAHostSubroutineDirectLoop (
-    std::string const & subroutineName,
-    std::string const & userSubroutineName,
+    std::string const & subroutineName, std::string const & userSubroutineName,
     std::string const & kernelSubroutineName,
-    FortranParallelLoop * parallelLoop,
-    SgScopeStatement * moduleScope,
+    FortranParallelLoop * parallelLoop, SgScopeStatement * moduleScope,
     FortranCUDAInitialiseConstantsSubroutine * initialiseConstantsSubroutine,
-    FortranCUDADataSizesDeclarationDirectLoop * dataSizesDeclarationOfDirectLoop,
-    FortranOpDatDimensionsDeclaration * opDatDimensionsDeclaration) :
+    FortranOpDatDimensionsDeclaration * opDatDimensionsDeclaration,
+    FortranCUDAModuleDeclarationsDirectLoop * moduleDeclarations) :
   FortranCUDAHostSubroutine (subroutineName, userSubroutineName,
       kernelSubroutineName, parallelLoop, moduleScope,
-      initialiseConstantsSubroutine, opDatDimensionsDeclaration),
-      dataSizesDeclarationOfDirectLoop (dataSizesDeclarationOfDirectLoop)
+      initialiseConstantsSubroutine, opDatDimensionsDeclaration,
+      moduleDeclarations)
 {
   Debug::getInstance ()->debugMessage (
       "Creating host subroutine of direct loop", Debug::CONSTRUCTOR_LEVEL,

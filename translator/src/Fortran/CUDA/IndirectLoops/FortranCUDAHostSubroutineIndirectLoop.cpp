@@ -251,9 +251,11 @@ FortranCUDAHostSubroutineIndirectLoop::createVariablesSizesInitialisationStateme
       SgVarRefExp * dataSizesReferences = buildVarRefExp (
           variableDeclarations->get (CommonVariableNames::argsSizes));
 
-      SgVarRefExp * fieldReference = buildVarRefExp (
-          dataSizesDeclarationOfIndirectLoop->getFieldDeclarations ()->get (
-              VariableNames::getOpDatSizeName (i)));
+      SgVarRefExp
+          * fieldReference =
+              buildVarRefExp (
+                  moduleDeclarations->getDataSizesDeclaration ()->getFieldDeclarations ()->get (
+                      VariableNames::getOpDatSizeName (i)));
 
       SgDotExp * fieldSelectionExpression = buildDotExp (dataSizesReferences,
           fieldReference);
@@ -276,9 +278,11 @@ FortranCUDAHostSubroutineIndirectLoop::createVariablesSizesInitialisationStateme
       SgVarRefExp * dataSizesReferences = buildVarRefExp (
           variableDeclarations->get (CommonVariableNames::argsSizes));
 
-      SgVarRefExp * fieldReference = buildVarRefExp (
-          dataSizesDeclarationOfIndirectLoop->getFieldDeclarations ()->get (
-              VariableNames::getLocalToGlobalMappingSizeName (i)));
+      SgVarRefExp
+          * fieldReference =
+              buildVarRefExp (
+                  moduleDeclarations->getDataSizesDeclaration ()->getFieldDeclarations ()->get (
+                      VariableNames::getLocalToGlobalMappingSizeName (i)));
 
       SgDotExp * fieldSelectionExpression = buildDotExp (dataSizesReferences,
           fieldReference);
@@ -306,9 +310,11 @@ FortranCUDAHostSubroutineIndirectLoop::createVariablesSizesInitialisationStateme
       SgVarRefExp * dataSizesReferences = buildVarRefExp (
           variableDeclarations->get (CommonVariableNames::argsSizes));
 
-      SgVarRefExp * fieldReference = buildVarRefExp (
-          dataSizesDeclarationOfIndirectLoop->getFieldDeclarations ()->get (
-              VariableNames::getGlobalToLocalMappingSizeName (i)));
+      SgVarRefExp
+          * fieldReference =
+              buildVarRefExp (
+                  moduleDeclarations->getDataSizesDeclaration ()->getFieldDeclarations ()->get (
+                      VariableNames::getGlobalToLocalMappingSizeName (i)));
 
       SgDotExp * fieldSelectionExpression = buildDotExp (dataSizesReferences,
           fieldReference);
@@ -331,9 +337,11 @@ FortranCUDAHostSubroutineIndirectLoop::createVariablesSizesInitialisationStateme
       SgVarRefExp * dataSizesReferences = buildVarRefExp (
           variableDeclarations->get (CommonVariableNames::argsSizes));
 
-      SgVarRefExp * fieldReference = buildVarRefExp (
-          dataSizesDeclarationOfIndirectLoop->getFieldDeclarations ()->get (
-              VariableNames::getOpDatSizeName (i)));
+      SgVarRefExp
+          * fieldReference =
+              buildVarRefExp (
+                  moduleDeclarations->getDataSizesDeclaration ()->getFieldDeclarations ()->get (
+                      VariableNames::getOpDatSizeName (i)));
 
       SgDotExp * fieldSelectionExpression = buildDotExp (dataSizesReferences,
           fieldReference);
@@ -369,8 +377,11 @@ FortranCUDAHostSubroutineIndirectLoop::createVariablesSizesInitialisationStateme
     SgVarRefExp * dataSizesReferences = buildVarRefExp (
         variableDeclarations->get (CommonVariableNames::argsSizes));
 
-    SgVarRefExp * fieldReference = buildVarRefExp (
-        dataSizesDeclarationOfIndirectLoop->getFieldDeclarations ()->get (*it));
+    SgVarRefExp
+        * fieldReference =
+            buildVarRefExp (
+                moduleDeclarations->getDataSizesDeclaration ()->getFieldDeclarations ()->get (
+                    *it));
 
     SgDotExp * fieldSelectionExpression = buildDotExp (dataSizesReferences,
         fieldReference);
@@ -381,6 +392,11 @@ FortranCUDAHostSubroutineIndirectLoop::createVariablesSizesInitialisationStateme
 
     appendStatement (buildExprStatement (assignmentExpression), subroutineScope);
   }
+}
+
+void
+FortranCUDAHostSubroutineIndirectLoop::createFirstTimeExecutionStatements ()
+{
 }
 
 void
@@ -687,8 +703,6 @@ FortranCUDAHostSubroutineIndirectLoop::createStatements ()
 void
 FortranCUDAHostSubroutineIndirectLoop::createLocalVariableDeclarations ()
 {
-  createOpDatSizesDeclaration (dataSizesDeclarationOfIndirectLoop->getType ());
-
   createOpDatDimensionsDeclaration (opDatDimensionsDeclaration->getType ());
 
   createDataMarshallingLocalVariableDeclarations ();
@@ -710,20 +724,16 @@ FortranCUDAHostSubroutineIndirectLoop::createLocalVariableDeclarations ()
  */
 
 FortranCUDAHostSubroutineIndirectLoop::FortranCUDAHostSubroutineIndirectLoop (
-    std::string const & subroutineName,
-    std::string const & userSubroutineName,
+    std::string const & subroutineName, std::string const & userSubroutineName,
     std::string const & kernelSubroutineName,
-    FortranParallelLoop * parallelLoop,
-    SgScopeStatement * moduleScope,
+    FortranParallelLoop * parallelLoop, SgScopeStatement * moduleScope,
     FortranCUDAInitialiseConstantsSubroutine * initialiseConstantsSubroutine,
-    FortranCUDADataSizesDeclarationIndirectLoop * dataSizesDeclarationOfIndirectLoop,
     FortranOpDatDimensionsDeclaration * opDatDimensionsDeclaration,
     FortranCUDAModuleDeclarationsIndirectLoop * moduleDeclarations) :
   FortranCUDAHostSubroutine (subroutineName, userSubroutineName,
       kernelSubroutineName, parallelLoop, moduleScope,
-      initialiseConstantsSubroutine, opDatDimensionsDeclaration),
-      dataSizesDeclarationOfIndirectLoop (dataSizesDeclarationOfIndirectLoop),
-      moduleDeclarations (moduleDeclarations)
+      initialiseConstantsSubroutine, opDatDimensionsDeclaration,
+      moduleDeclarations)
 {
   Debug::getInstance ()->debugMessage (
       "Creating host subroutine of indirect loop", Debug::CONSTRUCTOR_LEVEL,

@@ -6,6 +6,7 @@
 #define FORTRAN_CUDA_MODULE_DECLARATIONS_INDIRECT_LOOP_H
 
 #include <FortranCUDAModuleDeclarations.h>
+#include <FortranCUDADataSizesDeclarationIndirectLoop.h>
 
 class FortranCUDAModuleDeclarationsIndirectLoop: public FortranCUDAModuleDeclarations
 {
@@ -15,7 +16,8 @@ class FortranCUDAModuleDeclarationsIndirectLoop: public FortranCUDAModuleDeclara
 
     FortranCUDAModuleDeclarationsIndirectLoop (
         std::string const & userSubroutineName,
-        FortranParallelLoop * parallelLoop, SgScopeStatement * moduleScope);
+        FortranParallelLoop * parallelLoop, SgScopeStatement * moduleScope,
+        FortranCUDADataSizesDeclarationIndirectLoop * dataSizesDeclaration);
 };
 
 #endif

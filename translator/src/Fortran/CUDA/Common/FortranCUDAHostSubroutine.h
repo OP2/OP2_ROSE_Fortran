@@ -6,6 +6,7 @@
 #include <FortranCUDAKernelSubroutine.h>
 #include <FortranOpDatDimensionsDeclaration.h>
 #include <FortranParallelLoop.h>
+#include <FortranCUDAModuleDeclarations.h>
 
 class FortranCUDAHostSubroutine: public FortranHostSubroutine
 {
@@ -14,6 +15,8 @@ class FortranCUDAHostSubroutine: public FortranHostSubroutine
     FortranCUDAInitialiseConstantsSubroutine * initialiseConstantsSubroutine;
 
     FortranOpDatDimensionsDeclaration * opDatDimensionsDeclaration;
+
+    FortranCUDAModuleDeclarations * moduleDeclarations;
 
   protected:
 
@@ -68,6 +71,15 @@ class FortranCUDAHostSubroutine: public FortranHostSubroutine
     void
     createOpDatDimensionInitialisationStatements ();
 
+    /*
+     * ======================================================
+     * Creates the statements which are executed when the
+     * host subroutine is executed for the first time
+     * ======================================================
+     */
+    virtual void
+    createFirstTimeExecutionStatements () = 0;
+
     void
     createCUDAKernelLocalVariableDeclarations ();
 
@@ -81,7 +93,8 @@ class FortranCUDAHostSubroutine: public FortranHostSubroutine
             FortranParallelLoop * parallelLoop,
             SgScopeStatement * moduleScope,
             FortranCUDAInitialiseConstantsSubroutine * initialiseConstantsSubroutine,
-            FortranOpDatDimensionsDeclaration * opDatDimensionsDeclaration);
+            FortranOpDatDimensionsDeclaration * opDatDimensionsDeclaration,
+            FortranCUDAModuleDeclarations * moduleDeclarations);
 };
 
 #endif
