@@ -363,10 +363,10 @@ FortranParallelLoop::getNumberOfOpDatArgumentGroups () const
 }
 
 FortranParallelLoop::FortranParallelLoop (
-    SgExpressionPtrList & actualArguments, std::string userSubroutineName,
+    SgFunctionCallExp * functionCallExpression, std::string userSubroutineName,
     FortranProgramDeclarationsAndDefinitions * declarations) :
   ParallelLoop <SgProcedureHeaderStatement,
-      FortranProgramDeclarationsAndDefinitions> (actualArguments)
+      FortranProgramDeclarationsAndDefinitions> (functionCallExpression)
 {
   using boost::iequals;
 

@@ -65,7 +65,7 @@ class FortranParallelLoop: public ParallelLoop <SgProcedureHeaderStatement,
     virtual unsigned int
     getNumberOfOpDatArgumentGroups () const;
 
-    FortranParallelLoop (SgExpressionPtrList & actualArguments,
+    FortranParallelLoop (SgFunctionCallExp * functionCallExpression,
         std::string userSubroutineName,
         FortranProgramDeclarationsAndDefinitions * declarations);
 };

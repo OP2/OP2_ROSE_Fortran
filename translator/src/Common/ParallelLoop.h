@@ -44,6 +44,14 @@ template <typename TSubroutineHeader, typename TDeclarations>
 
       /*
        * ======================================================
+       * The function call expression where the call to the
+       * OP_PAR_LOOP occurs
+       * ======================================================
+       */
+      SgFunctionCallExp * functionCallExpression;
+
+      /*
+       * ======================================================
        * The same OP_DAT variable can be passed as an argument
        * to OP_PAR_LOOP. This vector records the names of the
        * unique OP_DATs
@@ -150,8 +158,9 @@ template <typename TSubroutineHeader, typename TDeclarations>
       virtual void
       retrieveOpDatDeclarations (TDeclarations * declarations) = 0;
 
-      ParallelLoop (SgExpressionPtrList & actualArguments) :
-        actualArguments (actualArguments)
+      ParallelLoop (SgFunctionCallExp * functionCallExpression) :
+        functionCallExpression (functionCallExpression), actualArguments (
+            functionCallExpression->get_args ()->get_expressions ())
       {
       }
 
@@ -404,6 +413,18 @@ template <typename TSubroutineHeader, typename TDeclarations>
       getActualArguments ()
       {
         return actualArguments;
+      }
+
+      /*
+       * ======================================================
+       * Returns the function call node in the AST corresponding
+       * to this OP_PAR_LOOP
+       * ======================================================
+       */
+      SgFunctionCallExp *
+      getFunctionCall ()
+      {
+        return functionCallExpression;
       }
   };
 

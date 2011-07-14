@@ -1,5 +1,7 @@
 #include <FortranCUDASubroutinesGeneration.h>
 #include <FortranCUDAModuleDeclarations.h>
+#include <FortranCUDAModuleDeclarationsDirectLoop.h>
+#include <FortranCUDAModuleDeclarationsIndirectLoop.h>
 #include <FortranOpDatDimensionsDeclaration.h>
 #include <FortranCUDAInitialiseConstantsSubroutine.h>
 #include <FortranCUDAKernelSubroutineDirectLoop.h>
@@ -91,7 +93,7 @@ FortranCUDASubroutinesGeneration::createSubroutines (
         new FortranCUDAInitialiseConstantsSubroutine (userSubroutineName,
             moduleScope, declarations);
 
-    FortranCUDAModuleDeclarations * moduleDeclarations =
+    FortranCUDAModuleDeclarationsIndirectLoop * moduleDeclarations =
         new FortranCUDAModuleDeclarationsIndirectLoop (userSubroutineName,
             parallelLoop, moduleScope);
 
@@ -158,6 +160,8 @@ FortranCUDASubroutinesGeneration::FortranCUDASubroutinesGeneration (
   FortranSubroutinesGeneration (declarations, ".CUF")
 {
   traverseInputFiles (project, preorder);
+
+  patchCallsToParallelLoops ();
 
   unparse ();
 }

@@ -19,10 +19,7 @@ class CPPSubroutinesGeneration: public SubroutinesGeneration <
             SgScopeStatement * moduleScope) = 0;
 
     void
-    patchCallsToParallelLoops (CPPParallelLoop & parallelLoop,
-        std::string const & userSubroutineName,
-        CPPHostSubroutine & hostSubroutine, SgScopeStatement * scope,
-        SgFunctionCallExp * functionCallExp);
+    patchCallsToParallelLoops ();
 
     /*
      * ======================================================

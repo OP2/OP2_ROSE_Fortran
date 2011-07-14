@@ -129,5 +129,7 @@ FortranOpenMPSubroutinesGeneration::FortranOpenMPSubroutinesGeneration (
 {
   traverseInputFiles (project, preorder);
 
+  patchCallsToParallelLoops ();
+
   unparse ();
 }

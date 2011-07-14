@@ -37,6 +37,14 @@ template <typename TDeclarations, typename TParallelLoop,
 
       /*
        * ======================================================
+       * A mapping from a user subroutine name to its
+       * generated host subroutine
+       * ======================================================
+       */
+      std::map <std::string, THostSubroutine *> hostSubroutines;
+
+      /*
+       * ======================================================
        * The file extension for the file in which the new
        * subroutines are output
        * ======================================================
@@ -57,15 +65,12 @@ template <typename TDeclarations, typename TParallelLoop,
 
       /*
        * ======================================================
-       * Patches the calls to OP_PAR_LOOPs with a call to the
-       * new host subroutine
+       * Patches the calls to OP_PAR_LOOPs with call to the
+       * new host subroutines
        * ======================================================
        */
       virtual void
-      patchCallsToParallelLoops (TParallelLoop & parallelLoop,
-          std::string const & userSubroutineName,
-          THostSubroutine & hostSubroutine, SgScopeStatement * scope,
-          SgFunctionCallExp * functionCallExp) = 0;
+      patchCallsToParallelLoops () = 0;
 
       /*
        * ======================================================

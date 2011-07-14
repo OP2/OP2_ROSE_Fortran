@@ -57,7 +57,7 @@ class CPPParallelLoop: public ParallelLoop <SgFunctionDeclaration,
     virtual unsigned int
     getNumberOfOpDatArgumentGroups () const;
 
-    CPPParallelLoop (SgExpressionPtrList & actualArguments,
+    CPPParallelLoop (SgFunctionCallExp * functionCallExpression,
         std::string userSubroutineName,
         CPPProgramDeclarationsAndDefinitions * declarations);
 };

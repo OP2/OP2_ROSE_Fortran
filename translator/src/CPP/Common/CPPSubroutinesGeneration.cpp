@@ -8,10 +8,7 @@
  */
 
 void
-CPPSubroutinesGeneration::patchCallsToParallelLoops (
-    CPPParallelLoop & parallelLoop, std::string const & userSubroutineName,
-    CPPHostSubroutine & hostSubroutine, SgScopeStatement * scope,
-    SgFunctionCallExp * functionCallExp)
+CPPSubroutinesGeneration::patchCallsToParallelLoops ()
 {
 }
 
@@ -162,7 +159,7 @@ CPPSubroutinesGeneration::visit (SgNode * node)
            */
 
           CPPParallelLoop * parallelLoop = new CPPParallelLoop (
-              actualArguments, userSubroutineName, declarations);
+              functionCallExp, userSubroutineName, declarations);
 
           parallelLoops[userSubroutineName] = parallelLoop;
 
@@ -181,20 +178,9 @@ CPPSubroutinesGeneration::visit (SgNode * node)
            */
 
           CPPHostSubroutine * hostSubroutine = createSubroutines (parallelLoop,
-              userSubroutineName, sourceFile.get_globalScope());
+              userSubroutineName, sourceFile.get_globalScope ());
 
-          /*
-           * ======================================================
-           * Get the scope of the AST node representing the entire
-           * call statement
-           * ======================================================
-           */
-
-          SgScopeStatement * scope =
-              isSgExprStatement (node->get_parent ())->get_scope ();
-
-          patchCallsToParallelLoops (*parallelLoop, userSubroutineName,
-              *hostSubroutine, scope, functionCallExp);
+          hostSubroutines[userSubroutineName] = hostSubroutine;
         }
       }
 

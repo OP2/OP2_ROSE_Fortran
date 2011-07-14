@@ -39,10 +39,7 @@ class FortranSubroutinesGeneration: public SubroutinesGeneration <
     addLibraries (SgModuleStatement * moduleStatement) = 0;
 
     void
-    patchCallsToParallelLoops (FortranParallelLoop & parallelLoop,
-        std::string const & userSubroutineName,
-        FortranHostSubroutine & hostSubroutine, SgScopeStatement * scope,
-        SgFunctionCallExp * functionCallExp);
+    patchCallsToParallelLoops ();
 
     /*
      * ======================================================

@@ -410,8 +410,8 @@ FortranCUDAHostSubroutineIndirectLoop::createExecutionPlanDeclarations ()
       FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
           PlanFunction::Fortran::planRet, c_ptrType, subroutineScope));
 
-  SgType * op_planType = FortranTypesBuilder::buildClassDeclaration (
-      "op_plan", subroutineScope)->get_type ();
+  SgType * op_planType = FortranTypesBuilder::buildClassDeclaration ("op_plan",
+      subroutineScope)->get_type ();
 
   variableDeclarations->add (PlanFunction::Fortran::actualPlan,
       FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
@@ -717,11 +717,13 @@ FortranCUDAHostSubroutineIndirectLoop::FortranCUDAHostSubroutineIndirectLoop (
     SgScopeStatement * moduleScope,
     FortranCUDAInitialiseConstantsSubroutine * initialiseConstantsSubroutine,
     FortranCUDADataSizesDeclarationIndirectLoop * dataSizesDeclarationOfIndirectLoop,
-    FortranOpDatDimensionsDeclaration * opDatDimensionsDeclaration) :
+    FortranOpDatDimensionsDeclaration * opDatDimensionsDeclaration,
+    FortranCUDAModuleDeclarationsIndirectLoop * moduleDeclarations) :
   FortranCUDAHostSubroutine (subroutineName, userSubroutineName,
       kernelSubroutineName, parallelLoop, moduleScope,
       initialiseConstantsSubroutine, opDatDimensionsDeclaration),
-      dataSizesDeclarationOfIndirectLoop (dataSizesDeclarationOfIndirectLoop)
+      dataSizesDeclarationOfIndirectLoop (dataSizesDeclarationOfIndirectLoop),
+      moduleDeclarations (moduleDeclarations)
 {
   Debug::getInstance ()->debugMessage (
       "Creating host subroutine of indirect loop", Debug::CONSTRUCTOR_LEVEL,

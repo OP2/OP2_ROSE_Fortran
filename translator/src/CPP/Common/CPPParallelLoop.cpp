@@ -107,11 +107,11 @@ CPPParallelLoop::getNumberOfOpDatArgumentGroups () const
   return actualArguments.size () - NUMBER_OF_NON_OP_DAT_ARGUMENTS;
 }
 
-CPPParallelLoop::CPPParallelLoop (SgExpressionPtrList & actualArguments,
+CPPParallelLoop::CPPParallelLoop (SgFunctionCallExp * functionCallExpression,
     std::string userSubroutineName,
     CPPProgramDeclarationsAndDefinitions * declarations) :
   ParallelLoop <SgFunctionDeclaration, CPPProgramDeclarationsAndDefinitions> (
-      actualArguments)
+      functionCallExpression)
 {
   using boost::iequals;
 
