@@ -18,6 +18,10 @@ FortranCUDAHostSubroutine::createThreadSynchroniseCallStatement ()
   using SageBuilder::buildFunctionCallExp;
   using SageBuilder::buildAssignStatement;
 
+  Debug::getInstance ()->debugMessage (
+      "Creating statement to synchronize CUDA threads", Debug::FUNCTION_LEVEL,
+      __FILE__, __LINE__);
+
   SgFunctionSymbol * functionSymbol =
       FortranTypesBuilder::buildNewFortranFunction (
           CUDA::Fortran::cudaThreadSynchronize, subroutineScope);
@@ -37,6 +41,10 @@ FortranCUDAHostSubroutine::createInitialiseConstantsCallStatement ()
   using SageBuilder::buildExprListExp;
   using SageBuilder::buildVoidType;
   using SageBuilder::buildFunctionCallStmt;
+
+  Debug::getInstance ()->debugMessage (
+      "Creating statement to call initialise constant subroutine",
+      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
   SgExprListExp * actualParameters = buildExprListExp ();
 
@@ -62,6 +70,10 @@ FortranCUDAHostSubroutine::createReductionPrologueStatements ()
   using SageBuilder::buildBasicBlock;
   using SageBuilder::buildAddOp;
   using SageInterface::appendStatement;
+
+  Debug::getInstance ()->debugMessage (
+      "Creating reduction prologue statements", Debug::FUNCTION_LEVEL,
+      __FILE__, __LINE__);
 
   /*
    * ======================================================
@@ -207,6 +219,10 @@ FortranCUDAHostSubroutine::createReductionEpilogueStatements ()
   using SageBuilder::buildBasicBlock;
   using SageInterface::appendStatement;
 
+  Debug::getInstance ()->debugMessage (
+      "Creating reduction epilogue statements", Debug::FUNCTION_LEVEL,
+      __FILE__, __LINE__);
+
   SgExprStatement * assignmentStatement1 = buildAssignStatement (
       buildVarRefExp (variableDeclarations->get (
           ReductionSubroutine::reductionArrayHost)),
@@ -287,6 +303,10 @@ FortranCUDAHostSubroutine::createReductionLocalVariableDeclarations ()
   using SageBuilder::buildAssignInitializer;
   using SageBuilder::buildVariableDeclaration;
   using SageInterface::appendStatement;
+
+  Debug::getInstance ()->debugMessage (
+      "Creating local variable declarations needed for reduction",
+      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
   SgVariableDeclaration * variableDeclaration1 = buildVariableDeclaration (
       CommonVariableNames::iterationCounter1,
@@ -405,8 +425,8 @@ FortranCUDAHostSubroutine::createCUDAKernelEpilogueStatements ()
   using std::string;
 
   Debug::getInstance ()->debugMessage (
-      "Creating statements to copy data back from device and deallocate",
-      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+      "Creating CUDA kernel epilogue statements", Debug::FUNCTION_LEVEL,
+      __FILE__, __LINE__);
 
   /*
    * ======================================================
@@ -459,6 +479,10 @@ FortranCUDAHostSubroutine::createCUDAKernelPrologueStatements ()
   using SageBuilder::buildPntrArrRefExp;
   using SageInterface::appendStatement;
 
+  Debug::getInstance ()->debugMessage (
+      "Creating CUDA kernel prologue statements", Debug::FUNCTION_LEVEL,
+      __FILE__, __LINE__);
+
   /*
    * ======================================================
    * Allocation and copy in only used for OP_DAT which are
@@ -471,8 +495,13 @@ FortranCUDAHostSubroutine::createCUDAKernelPrologueStatements ()
     if (parallelLoop->isDuplicateOpDat (i) == false
         && parallelLoop->isReductionRequired (i) == false)
     {
+      SgVariableDeclaration
+          * opDatSizeFieldDeclaration =
+              moduleDeclarations->getDataSizesDeclaration ()->getFieldDeclarations ()->get (
+                  VariableNames::getOpDatSizeName (i));
+
       SgExprListExp * arrayIndexExpression = buildExprListExp (buildVarRefExp (
-          variableDeclarations->get (VariableNames::getOpDatSizeName (i))));
+          opDatSizeFieldDeclaration));
 
       SgPntrArrRefExp * subscriptExpression = buildPntrArrRefExp (
           buildVarRefExp (variableDeclarations->get (
@@ -510,6 +539,10 @@ FortranCUDAHostSubroutine::createTransferOpDatStatements (
   using SageBuilder::buildAssignStatement;
   using SageInterface::appendStatement;
 
+  Debug::getInstance ()->debugMessage (
+      "Creating statements to transfer OP_DATs onto device",
+      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
     if (parallelLoop->isDuplicateOpDat (i) == false)
@@ -534,9 +567,13 @@ FortranCUDAHostSubroutine::createTransferOpDatStatements (
       SgExpression * multiplyExpression = buildMultiplyOp (dotExpression1,
           dotExpression3);
 
-      SgExprStatement * assignmentStatement = buildAssignStatement (
-          buildVarRefExp (variableDeclarations->get (
-              VariableNames::getOpDatSizeName (i))), multiplyExpression);
+      SgExprStatement
+          * assignmentStatement =
+              buildAssignStatement (
+                  buildVarRefExp (
+                      moduleDeclarations->getDataSizesDeclaration ()->getFieldDeclarations ()-> get (
+                          VariableNames::getOpDatSizeName (i))),
+                  multiplyExpression);
 
       appendStatement (assignmentStatement, subroutineScope);
 
@@ -555,10 +592,11 @@ FortranCUDAHostSubroutine::createTransferOpDatStatements (
           variableDeclarations->get (VariableNames::getCToFortranVariableName (
               i)));
 
-      SgExpression * parameterExpression3 =
-          FortranStatementsAndExpressionsBuilder::buildShapeExpression (
-              variableDeclarations->get (VariableNames::getOpDatSizeName (i)),
-              subroutineScope);
+      SgExpression
+          * parameterExpression3 =
+              FortranStatementsAndExpressionsBuilder::buildShapeExpression (
+                  moduleDeclarations->getDataSizesDeclaration ()->getFieldDeclarations ()->get (
+                      VariableNames::getOpDatSizeName (i)), subroutineScope);
 
       SgStatement * callStatement =
           SubroutineCalls::createCToFortranPointerCallStatement (
@@ -578,6 +616,10 @@ FortranCUDAHostSubroutine::createOpDatDimensionInitialisationStatements ()
   using SageBuilder::buildOpaqueVarRefExp;
   using SageBuilder::buildDotExp;
   using SageInterface::appendStatement;
+
+  Debug::getInstance ()->debugMessage (
+      "Creating statements to initialise OP_DAT dimensions",
+      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
@@ -656,6 +698,10 @@ FortranCUDAHostSubroutine::createDataMarshallingLocalVariableDeclarations ()
 void
 FortranCUDAHostSubroutine::createCUDAKernelLocalVariableDeclarations ()
 {
+  Debug::getInstance ()->debugMessage (
+      "Creating CUDA kernel local variable declarations",
+      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+
   variableDeclarations->add (CUDA::Fortran::blocksPerGrid,
       FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
           CUDA::Fortran::blocksPerGrid,
@@ -687,8 +733,8 @@ FortranCUDAHostSubroutine::FortranCUDAHostSubroutine (
   FortranHostSubroutine (subroutineName, userSubroutineName,
       kernelSubroutineName, parallelLoop, moduleScope),
       initialiseConstantsSubroutine (initialiseConstantsSubroutine),
-       opDatDimensionsDeclaration (
-          opDatDimensionsDeclaration), moduleDeclarations (moduleDeclarations)
+      opDatDimensionsDeclaration (opDatDimensionsDeclaration),
+      moduleDeclarations (moduleDeclarations)
 {
   using SageInterface::addTextForUnparser;
 

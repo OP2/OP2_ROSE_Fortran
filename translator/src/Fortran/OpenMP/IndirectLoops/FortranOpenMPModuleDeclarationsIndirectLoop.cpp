@@ -29,7 +29,7 @@ FortranOpenMPModuleDeclarationsIndirectLoop::createOpDatSizeDeclarations ()
     {
       string const & variableName = VariableNames::getOpDatSizeName (i);
 
-      moduleDeclarations->add (variableName,
+      variableDeclarations->add (variableName,
           FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
               variableName, FortranTypesBuilder::getFourByteInteger (),
               moduleScope));
@@ -61,14 +61,14 @@ FortranOpenMPModuleDeclarationsIndirectLoop::createExecutionPlanDeclarations ()
   SgType * c_ptrType = FortranTypesBuilder::buildClassDeclaration ("c_ptr",
       moduleScope)->get_type ();
 
-  moduleDeclarations ->add (PlanFunction::Fortran::planRet,
+  variableDeclarations ->add (PlanFunction::Fortran::planRet,
       FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
           PlanFunction::Fortran::planRet, c_ptrType, moduleScope));
 
   SgType * op_planType = FortranTypesBuilder::buildClassDeclaration (
       "op_plan", moduleScope)->get_type ();
 
-  moduleDeclarations->add (PlanFunction::Fortran::actualPlan,
+  variableDeclarations->add (PlanFunction::Fortran::actualPlan,
       FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
           PlanFunction::Fortran::actualPlan, buildPointerType (op_planType),
           moduleScope));
@@ -79,12 +79,12 @@ FortranOpenMPModuleDeclarationsIndirectLoop::createExecutionPlanDeclarations ()
    * ======================================================
    */
 
-  moduleDeclarations->add (PlanFunction::Fortran::pindMaps,
+  variableDeclarations->add (PlanFunction::Fortran::pindMaps,
       FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
           PlanFunction::Fortran::pindMaps, buildPointerType (
               FortranTypesBuilder::getArray_RankOne (c_ptrType)), moduleScope));
 
-  moduleDeclarations->add (PlanFunction::Fortran::pindMapsSize,
+  variableDeclarations->add (PlanFunction::Fortran::pindMapsSize,
       FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
           PlanFunction::Fortran::pindMapsSize,
           FortranTypesBuilder::getArray_RankOne (
@@ -92,12 +92,12 @@ FortranOpenMPModuleDeclarationsIndirectLoop::createExecutionPlanDeclarations ()
               parallelLoop->getNumberOfDistinctIndirectOpDatArguments ()),
           moduleScope));
 
-  moduleDeclarations->add (PlanFunction::Fortran::pmaps,
+  variableDeclarations->add (PlanFunction::Fortran::pmaps,
       FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
           PlanFunction::Fortran::pmaps, buildPointerType (
               FortranTypesBuilder::getArray_RankOne (c_ptrType)), moduleScope));
 
-  moduleDeclarations->add (PlanFunction::Fortran::pindMapsSize,
+  variableDeclarations->add (PlanFunction::Fortran::pindMapsSize,
       FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
           PlanFunction::Fortran::pindMapsSize,
           FortranTypesBuilder::getFourByteInteger (), moduleScope));
@@ -110,7 +110,7 @@ FortranOpenMPModuleDeclarationsIndirectLoop::createExecutionPlanDeclarations ()
       string const variableName =
           VariableNames::getLocalToGlobalMappingName (i);
 
-      moduleDeclarations->add (variableName,
+      variableDeclarations->add (variableName,
           FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
               variableName, FortranTypesBuilder::getArray_RankOne (
                   FortranTypesBuilder::getFourByteInteger ()), moduleScope, 1,
@@ -132,7 +132,7 @@ FortranOpenMPModuleDeclarationsIndirectLoop::createExecutionPlanDeclarations ()
       string const variableName =
           VariableNames::getGlobalToLocalMappingName (i);
 
-      moduleDeclarations->add (variableName,
+      variableDeclarations->add (variableName,
           FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
               variableName, buildPointerType (
                   FortranTypesBuilder::getArray_RankOne (
@@ -154,7 +154,7 @@ FortranOpenMPModuleDeclarationsIndirectLoop::createExecutionPlanDeclarations ()
       string const variableName =
           VariableNames::getGlobalToLocalMappingSizeName (i);
 
-      moduleDeclarations->add (variableName,
+      variableDeclarations->add (variableName,
           FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
               variableName, FortranTypesBuilder::getFourByteInteger (),
               moduleScope));
@@ -193,7 +193,7 @@ FortranOpenMPModuleDeclarationsIndirectLoop::createExecutionPlanDeclarations ()
   for (vector <string>::iterator it = planIntegerArrayVariables.begin (); it
       != planIntegerArrayVariables.end (); ++it)
   {
-    moduleDeclarations->add (*it,
+    variableDeclarations->add (*it,
         FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (*it,
             buildPointerType (FortranTypesBuilder::getArray_RankOne (
                 FortranTypesBuilder::getFourByteInteger ())), moduleScope));
@@ -227,7 +227,7 @@ FortranOpenMPModuleDeclarationsIndirectLoop::createExecutionPlanDeclarations ()
   for (vector <string>::iterator it = planSizeVariables.begin (); it
       != planSizeVariables.end (); ++it)
   {
-    moduleDeclarations->add (*it,
+    variableDeclarations->add (*it,
         FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (*it,
             FortranTypesBuilder::getFourByteInteger (), moduleScope));
   }
@@ -243,7 +243,7 @@ SgVariableDeclaration *
 FortranOpenMPModuleDeclarationsIndirectLoop::getGlobalOpDatSizeDeclaration (
     unsigned int OP_DAT_ArgumentGroup)
 {
-  return moduleDeclarations->get (VariableNames::getOpDatSizeName (
+  return variableDeclarations->get (VariableNames::getOpDatSizeName (
       OP_DAT_ArgumentGroup));
 }
 
@@ -251,7 +251,7 @@ SgVariableDeclaration *
 FortranOpenMPModuleDeclarationsIndirectLoop::getGlobalToLocalMappingDeclaration (
     unsigned int OP_DAT_ArgumentGroup)
 {
-  return moduleDeclarations->get (VariableNames::getGlobalToLocalMappingName (
+  return variableDeclarations->get (VariableNames::getGlobalToLocalMappingName (
       OP_DAT_ArgumentGroup));
 }
 
@@ -259,7 +259,7 @@ SgVariableDeclaration *
 FortranOpenMPModuleDeclarationsIndirectLoop::getGlobalToLocalMappingSizeDeclaration (
     unsigned int OP_DAT_ArgumentGroup)
 {
-  return moduleDeclarations->get (
+  return variableDeclarations->get (
       VariableNames::getGlobalToLocalMappingSizeName (OP_DAT_ArgumentGroup));
 }
 
@@ -267,7 +267,7 @@ SgVariableDeclaration *
 FortranOpenMPModuleDeclarationsIndirectLoop::getLocalToGlobalMappingDeclaration (
     unsigned int OP_DAT_ArgumentGroup)
 {
-  return moduleDeclarations->get (VariableNames::getLocalToGlobalMappingName (
+  return variableDeclarations->get (VariableNames::getLocalToGlobalMappingName (
       OP_DAT_ArgumentGroup));
 }
 
@@ -275,7 +275,7 @@ SgVariableDeclaration *
 FortranOpenMPModuleDeclarationsIndirectLoop::getLocalToGlobalMappingSizeDeclaration (
     unsigned int OP_DAT_ArgumentGroup)
 {
-  return moduleDeclarations->get (
+  return variableDeclarations->get (
       VariableNames::getLocalToGlobalMappingSizeName (OP_DAT_ArgumentGroup));
 }
 
@@ -283,13 +283,13 @@ SgVariableDeclaration *
 FortranOpenMPModuleDeclarationsIndirectLoop::getPlanFunctionDeclaration (
     std::string const & variableName)
 {
-  return moduleDeclarations->get (variableName);
+  return variableDeclarations->get (variableName);
 }
 
 SubroutineVariableDeclarations *
 FortranOpenMPModuleDeclarationsIndirectLoop::getAllDeclarations ()
 {
-  return moduleDeclarations;
+  return variableDeclarations;
 }
 
 FortranOpenMPModuleDeclarationsIndirectLoop::FortranOpenMPModuleDeclarationsIndirectLoop (

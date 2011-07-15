@@ -17,7 +17,7 @@ FortranCUDAModuleDeclarations::createDataSizesDeclaration ()
       FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
           variableName, dataSizesDeclaration->getType (), moduleScope);
 
-  moduleDeclarations->add (variableName, variableDeclaration);
+  variableDeclarations->add (variableName, variableDeclaration);
 }
 
 FortranCUDAModuleDeclarations::FortranCUDAModuleDeclarations (
@@ -28,6 +28,12 @@ FortranCUDAModuleDeclarations::FortranCUDAModuleDeclarations (
       dataSizesDeclaration (dataSizesDeclaration)
 {
   createDataSizesDeclaration ();
+}
+
+SgVariableDeclaration *
+FortranCUDAModuleDeclarations::getDataSizesVariableDeclaration ()
+{
+  return variableDeclarations->get (CommonVariableNames::argsSizes + "Global");
 }
 
 FortranCUDADataSizesDeclaration *

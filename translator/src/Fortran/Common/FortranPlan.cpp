@@ -20,6 +20,10 @@ FortranPlan::createConvertPlanFunctionParametersStatements (
   using SageBuilder::buildIntVal;
   using SageInterface::appendStatement;
 
+  Debug::getInstance ()->debugMessage (
+      "Creating statements to convert plan function parameters",
+      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+
   /*
    * ======================================================
    * New C-To-Fortran pointer conversion call
@@ -359,6 +363,10 @@ FortranPlan::createConvertPositionInPMapsStatements (
   using SageBuilder::buildAssignStatement;
   using SageBuilder::buildDotExp;
   using SageInterface::appendStatement;
+
+  Debug::getInstance ()->debugMessage (
+      "Creating statements in Fortran plan to convert positions in PMaps",
+      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
   /*
    * ======================================================

@@ -123,3 +123,12 @@ Debug::errorMessage (std::string const & message) const
   cerr << message + "." << endl;
   exit (1);
 }
+
+void
+Debug::hereMessage (unsigned int i) const
+{
+  using boost::lexical_cast;
+  using std::string;
+
+  std::cout << "HERE " + lexical_cast <string> (i) << std::endl;
+}

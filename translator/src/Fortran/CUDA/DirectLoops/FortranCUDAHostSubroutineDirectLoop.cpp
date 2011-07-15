@@ -29,7 +29,7 @@ FortranCUDAHostSubroutineDirectLoop::createKernelFunctionCallStatement ()
       variableDeclarations->get (CommonVariableNames::opDatDimensions)));
 
   actualParameters->append_expression (buildVarRefExp (
-      variableDeclarations->get (CommonVariableNames::argsSizes)));
+      moduleDeclarations->getDataSizesVariableDeclaration ()));
 
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
@@ -91,6 +91,10 @@ FortranCUDAHostSubroutineDirectLoop::createVariableSizesInitialisationStatements
   using SageInterface::appendStatement;
   using std::string;
 
+  Debug::getInstance ()->debugMessage (
+      "Creating CUDA kernel prologue statements", Debug::FUNCTION_LEVEL,
+      __FILE__, __LINE__);
+
   /*
    * ======================================================
    * In direct loops, sizes are only related to OP_DAT
@@ -105,7 +109,7 @@ FortranCUDAHostSubroutineDirectLoop::createVariableSizesInitialisationStatements
       string const & variableName = VariableNames::getOpDatSizeName (i);
 
       SgDotExp * dotExpression = buildDotExp (buildVarRefExp (
-          variableDeclarations->get (CommonVariableNames::argsSizes)),
+          moduleDeclarations->getDataSizesVariableDeclaration ()),
           buildOpaqueVarRefExp (variableName, subroutineScope));
 
       /*
@@ -116,9 +120,13 @@ FortranCUDAHostSubroutineDirectLoop::createVariableSizesInitialisationStatements
 
       if (parallelLoop->isReductionRequired (i) == false)
       {
-        SgExprStatement * assignmentStatement = buildAssignStatement (
-            dotExpression, buildVarRefExp (variableDeclarations->get (
-                variableName)));
+        SgExprStatement
+            * assignmentStatement =
+                buildAssignStatement (
+                    dotExpression,
+                    buildVarRefExp (
+                        moduleDeclarations->getDataSizesDeclaration ()->getFieldDeclarations ()->get (
+                            variableName)));
 
         appendStatement (assignmentStatement, subroutineScope);
       }

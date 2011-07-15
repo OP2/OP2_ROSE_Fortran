@@ -28,7 +28,7 @@ class FortranModuleDeclarations
      * Variables declared at module scope level
      * ======================================================
      */
-    SubroutineVariableDeclarations * moduleDeclarations;
+    SubroutineVariableDeclarations * variableDeclarations;
 
     /*
      * ======================================================

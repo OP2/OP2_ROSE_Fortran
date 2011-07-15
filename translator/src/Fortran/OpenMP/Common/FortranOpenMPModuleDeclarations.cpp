@@ -30,7 +30,7 @@ FortranOpenMPModuleDeclarations::createOpDatDeclarations ()
           variableName, buildPointerType (parallelLoop->getOpDatType (i)),
           NULL, moduleScope);
 
-      moduleDeclarations->add (variableName, variableDeclaration);
+      variableDeclarations->add (variableName, variableDeclaration);
 
       variableDeclaration->get_declarationModifier ().get_accessModifier ().setUndefined ();
 

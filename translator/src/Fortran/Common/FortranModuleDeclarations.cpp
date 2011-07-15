@@ -28,7 +28,7 @@ FortranModuleDeclarations::createFirstExecutionBooleanDeclaration ()
       variableName, buildBoolType (), buildAssignInitializer (buildBoolValExp (
           true), buildBoolType ()), moduleScope);
 
-  moduleDeclarations->add (variableName, variableDeclaration);
+  variableDeclarations->add (variableName, variableDeclaration);
 
   variableDeclaration->get_declarationModifier ().get_accessModifier ().setUndefined ();
 
@@ -47,7 +47,7 @@ FortranModuleDeclarations::FortranModuleDeclarations (
   userSubroutineName (userSubroutineName), parallelLoop (parallelLoop),
       moduleScope (moduleScope)
 {
-  moduleDeclarations = new SubroutineVariableDeclarations ();
+  variableDeclarations = new SubroutineVariableDeclarations ();
 
   createFirstExecutionBooleanDeclaration ();
 }
@@ -61,13 +61,13 @@ FortranModuleDeclarations::FortranModuleDeclarations (
 SgVariableDeclaration *
 FortranModuleDeclarations::getFirstExecutionBooleanDeclaration ()
 {
-  return moduleDeclarations->get (getFirstExecutionBooleanVariableName ());
+  return variableDeclarations->get (getFirstExecutionBooleanVariableName ());
 }
 
 SgVariableDeclaration *
 FortranModuleDeclarations::getGlobalOpDatDeclaration (
     unsigned int OP_DAT_ArgumentGroup)
 {
-  return moduleDeclarations->get (VariableNames::getOpDatGlobalName (
+  return variableDeclarations->get (VariableNames::getOpDatGlobalName (
       OP_DAT_ArgumentGroup));
 }

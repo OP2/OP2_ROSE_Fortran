@@ -161,8 +161,8 @@ def compile ():
 		outputStdout (stdoutLines)
 		
 		print('==================================== STANDARD ERROR ============================================')
-		for line in stderrLines.splitlines():
-			print(line)
+		lines = stderrLines.splitlines()
+		print(lines[len(lines)-1])
 		print('================================================================================================') 
         	exit(1)
 

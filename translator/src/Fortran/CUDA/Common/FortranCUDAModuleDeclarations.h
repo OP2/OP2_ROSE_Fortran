@@ -25,6 +25,9 @@ class FortranCUDAModuleDeclarations: public FortranModuleDeclarations
 
   public:
 
+    SgVariableDeclaration *
+    getDataSizesVariableDeclaration ();
+
     FortranCUDADataSizesDeclaration *
     getDataSizesDeclaration ();
 };

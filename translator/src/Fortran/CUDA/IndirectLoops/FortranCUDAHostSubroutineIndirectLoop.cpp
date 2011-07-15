@@ -26,7 +26,7 @@ FortranCUDAHostSubroutineIndirectLoop::createKernelFunctionCallStatement ()
       variableDeclarations->get (CommonVariableNames::opDatDimensions)));
 
   actualParameters->append_expression (buildVarRefExp (
-      variableDeclarations->get (CommonVariableNames::argsSizes)));
+      moduleDeclarations->getDataSizesVariableDeclaration ()));
 
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
@@ -113,6 +113,10 @@ FortranCUDAHostSubroutineIndirectLoop::createPlanFunctionExecutionStatements ()
   using SageBuilder::buildBasicBlock;
   using SageInterface::appendStatement;
   using std::string;
+
+  Debug::getInstance ()->debugMessage (
+      "Creating plan function execution statements", Debug::FUNCTION_LEVEL,
+      __FILE__, __LINE__);
 
   SgBasicBlock * loopBody = buildBasicBlock ();
 
@@ -243,13 +247,17 @@ FortranCUDAHostSubroutineIndirectLoop::createVariablesSizesInitialisationStateme
   using std::string;
   using std::vector;
 
+  Debug::getInstance ()->debugMessage (
+      "Creating statements to initialise variable sizes",
+      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
     if (parallelLoop->isDuplicateOpDat (i) == false
         && parallelLoop->getOpMapValue (i) == INDIRECT)
     {
       SgVarRefExp * dataSizesReferences = buildVarRefExp (
-          variableDeclarations->get (CommonVariableNames::argsSizes));
+          moduleDeclarations->getDataSizesVariableDeclaration ());
 
       SgVarRefExp
           * fieldReference =
@@ -260,9 +268,13 @@ FortranCUDAHostSubroutineIndirectLoop::createVariablesSizesInitialisationStateme
       SgDotExp * fieldSelectionExpression = buildDotExp (dataSizesReferences,
           fieldReference);
 
-      SgAssignOp * assignmentExpression = buildAssignOp (
-          fieldSelectionExpression, buildVarRefExp (variableDeclarations->get (
-              VariableNames::getOpDatSizeName (i))));
+      SgAssignOp
+          * assignmentExpression =
+              buildAssignOp (
+                  fieldSelectionExpression,
+                  buildVarRefExp (
+                      moduleDeclarations->getDataSizesDeclaration ()->getFieldDeclarations ()->get (
+                          VariableNames::getOpDatSizeName (i))));
 
       appendStatement (buildExprStatement (assignmentExpression),
           subroutineScope);
@@ -276,7 +288,7 @@ FortranCUDAHostSubroutineIndirectLoop::createVariablesSizesInitialisationStateme
         && parallelLoop->getOpMapValue (i) == INDIRECT)
     {
       SgVarRefExp * dataSizesReferences = buildVarRefExp (
-          variableDeclarations->get (CommonVariableNames::argsSizes));
+          moduleDeclarations->getDataSizesVariableDeclaration ());
 
       SgVarRefExp
           * fieldReference =
@@ -308,7 +320,7 @@ FortranCUDAHostSubroutineIndirectLoop::createVariablesSizesInitialisationStateme
     if (parallelLoop->getOpMapValue (i) == INDIRECT)
     {
       SgVarRefExp * dataSizesReferences = buildVarRefExp (
-          variableDeclarations->get (CommonVariableNames::argsSizes));
+          moduleDeclarations->getDataSizesVariableDeclaration ());
 
       SgVarRefExp
           * fieldReference =
@@ -335,7 +347,7 @@ FortranCUDAHostSubroutineIndirectLoop::createVariablesSizesInitialisationStateme
             || parallelLoop->getOpMapValue (i) == GLOBAL))
     {
       SgVarRefExp * dataSizesReferences = buildVarRefExp (
-          variableDeclarations->get (CommonVariableNames::argsSizes));
+          moduleDeclarations->getDataSizesVariableDeclaration ());
 
       SgVarRefExp
           * fieldReference =
@@ -346,9 +358,13 @@ FortranCUDAHostSubroutineIndirectLoop::createVariablesSizesInitialisationStateme
       SgDotExp * fieldSelectionExpression = buildDotExp (dataSizesReferences,
           fieldReference);
 
-      SgAssignOp * assignmentExpression = buildAssignOp (
-          fieldSelectionExpression, buildVarRefExp (variableDeclarations->get (
-              VariableNames::getOpDatSizeName (i))));
+      SgAssignOp
+          * assignmentExpression =
+              buildAssignOp (
+                  fieldSelectionExpression,
+                  buildVarRefExp (
+                      moduleDeclarations->getDataSizesDeclaration ()->getFieldDeclarations ()->get (
+                          VariableNames::getOpDatSizeName (i))));
 
       appendStatement (buildExprStatement (assignmentExpression),
           subroutineScope);
@@ -375,7 +391,7 @@ FortranCUDAHostSubroutineIndirectLoop::createVariablesSizesInitialisationStateme
       != planFunctionSizeVariables.end (); ++it)
   {
     SgVarRefExp * dataSizesReferences = buildVarRefExp (
-        variableDeclarations->get (CommonVariableNames::argsSizes));
+        moduleDeclarations->getDataSizesVariableDeclaration ());
 
     SgVarRefExp
         * fieldReference =

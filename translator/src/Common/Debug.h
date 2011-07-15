@@ -97,6 +97,14 @@ class Debug
      */
     void
     errorMessage (std::string const & message) const;
+
+    /*
+     * ======================================================
+     * Print a "HERE i" message
+     * ======================================================
+     */
+    void
+    hereMessage (unsigned int i) const;
 };
 
 #endif
