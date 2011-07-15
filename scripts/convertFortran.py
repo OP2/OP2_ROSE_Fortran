@@ -57,7 +57,7 @@ def modifyFiles (constantsModuleName):
 		else:
 			files.append(f)
 
-	include_regex = re.compile("\s*#include \"%s\"" % opts.constants)
+	include_regex = re.compile("\s*#include\s*\"%s\"\s*\n" % opts.constants)
 	end_regex     = re.compile("\s*end\s")
 
 	for f in set(files):
