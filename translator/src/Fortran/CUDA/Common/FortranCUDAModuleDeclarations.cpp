@@ -5,39 +5,69 @@
 void
 FortranCUDAModuleDeclarations::createDataSizesDeclaration ()
 {
-  using std::string;
-
   Debug::getInstance ()->debugMessage (
-      "Generating OP_DAT size declarations at module scope",
+      "Generating data sizes declaration at module scope",
       Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
-
-  string const & variableName = CommonVariableNames::argsSizes + "Global";
 
   SgVariableDeclaration * variableDeclaration =
       FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
-          variableName, dataSizesDeclaration->getType (), moduleScope);
+          CommonVariableNames::argsSizes, dataSizesDeclaration->getType (),
+          moduleScope);
 
-  variableDeclarations->add (variableName, variableDeclaration);
+  variableDeclarations->add (CommonVariableNames::argsSizes,
+      variableDeclaration);
+}
+
+void
+FortranCUDAModuleDeclarations::createDimensionsDeclaration ()
+{
+  Debug::getInstance ()->debugMessage (
+      "Generating OP_DAT dimensions declaration at module scope",
+      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+
+  SgVariableDeclaration * variableDeclaration =
+      FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
+          CommonVariableNames::opDatDimensions,
+          dimensionsDeclaration->getType (), moduleScope);
+
+  variableDeclarations->add (CommonVariableNames::opDatDimensions,
+      variableDeclaration);
 }
 
 FortranCUDAModuleDeclarations::FortranCUDAModuleDeclarations (
     std::string const & userSubroutineName, FortranParallelLoop * parallelLoop,
     SgScopeStatement * moduleScope,
-    FortranCUDADataSizesDeclaration * dataSizesDeclaration) :
+    FortranCUDADataSizesDeclaration * dataSizesDeclaration,
+    FortranOpDatDimensionsDeclaration * dimensionsDeclaration) :
   FortranModuleDeclarations (userSubroutineName, parallelLoop, moduleScope),
-      dataSizesDeclaration (dataSizesDeclaration)
+      dataSizesDeclaration (dataSizesDeclaration), dimensionsDeclaration (
+          dimensionsDeclaration)
 {
   createDataSizesDeclaration ();
+
+  createDimensionsDeclaration ();
 }
 
 SgVariableDeclaration *
 FortranCUDAModuleDeclarations::getDataSizesVariableDeclaration ()
 {
-  return variableDeclarations->get (CommonVariableNames::argsSizes + "Global");
+  return variableDeclarations->get (CommonVariableNames::argsSizes);
 }
 
 FortranCUDADataSizesDeclaration *
-FortranCUDAModuleDeclarations::getDataSizesDeclaration ()
+FortranCUDAModuleDeclarations::getDataSizesTypeDeclaration ()
 {
   return dataSizesDeclaration;
+}
+
+SgVariableDeclaration *
+FortranCUDAModuleDeclarations::getDimensionsVariableDeclaration ()
+{
+  return variableDeclarations->get (CommonVariableNames::opDatDimensions);
+}
+
+FortranOpDatDimensionsDeclaration *
+FortranCUDAModuleDeclarations::getDimensionsTypeDeclaration ()
+{
+  return dimensionsDeclaration;
 }

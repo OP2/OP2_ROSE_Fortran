@@ -125,7 +125,7 @@ FortranCUDAHostSubroutineDirectLoop::createVariableSizesInitialisationStatements
                 buildAssignStatement (
                     dotExpression,
                     buildVarRefExp (
-                        moduleDeclarations->getDataSizesDeclaration ()->getFieldDeclarations ()->get (
+                        moduleDeclarations->getDataSizesTypeDeclaration ()->getFieldDeclarations ()->get (
                             variableName)));
 
         appendStatement (assignmentStatement, subroutineScope);
