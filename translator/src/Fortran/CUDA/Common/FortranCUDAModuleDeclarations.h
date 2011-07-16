@@ -7,6 +7,7 @@
 
 #include <FortranModuleDeclarations.h>
 #include <FortranCUDADataSizesDeclaration.h>
+#include <FortranOpDatDimensionsDeclaration.h>
 
 class FortranCUDAModuleDeclarations: public FortranModuleDeclarations
 {
