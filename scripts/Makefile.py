@@ -192,7 +192,7 @@ def writeLine (f, line, indent):
 		if ampersandNeeded:
 			f.write("&")				
 		f.write(line[baseIndex:baseIndex+maxLineLength])
-		tempLine = line.strip()
+		tempLine = line[baseIndex:baseIndex+maxLineLength].strip()
 		if tempLine.strip()[len(tempLine)-1] is not '&':
 			f.write("&")
 		f.write("\n")

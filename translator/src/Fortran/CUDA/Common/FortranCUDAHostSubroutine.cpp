@@ -555,7 +555,7 @@ FortranCUDAHostSubroutine::createTransferOpDatStatements ()
 
       SgDotExp * parameterExpression1 = buildDotExp (buildVarRefExp (
           variableDeclarations->get (VariableNames::getOpDatName (i))),
-          buildOpaqueVarRefExp (CommonVariableNames::dat, block));
+          buildOpaqueVarRefExp (CommonVariableNames::dat_d, block));
 
       SgVarRefExp * parameterExpression2 = buildVarRefExp (
           variableDeclarations->get (VariableNames::getOpDatDeviceName (i)));

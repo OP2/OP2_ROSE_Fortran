@@ -13,16 +13,16 @@
 void
 FortranCUDAInitialiseConstantsSubroutine::declareConstants ()
 {
-  using std::vector;
+  using std::map;
   using std::string;
 
   string const separator = "_";
 
-  for (vector <OpConstDefinition *>::const_iterator it =
+  for (map <string, OpConstDefinition *>::const_iterator it =
       declarations->firstOpConstDefinition (); it
       != declarations->lastOpConstDefinition (); ++it)
   {
-    string const variableName = (*it)->getVariableName ();
+    string const variableName = it->first;
 
     string const moduleVariableName = variableNamePrefix + separator
         + variableName;
@@ -95,24 +95,23 @@ FortranCUDAInitialiseConstantsSubroutine::createStatements ()
   using SageBuilder::buildAssignStatement;
   using SageInterface::appendStatement;
   using std::string;
-  using std::vector;
+  using std::map;
 
-  for (vector <OpConstDefinition *>::const_iterator it =
+  for (map <string, OpConstDefinition *>::const_iterator it =
       declarations->firstOpConstDefinition (); it
       != declarations->lastOpConstDefinition (); ++it)
   {
-    string const variableName = (*it)->getVariableName ();
+    string const variableName = it->first;
 
     string const moduleVariableName = constantVariableNames[variableName];
 
-    SgAssignInitializer * assignInitializer = declarations->getInitializer (
-        variableName);
+    SgExpression * initializer = declarations->getInitializer (variableName);
 
-    ROSE_ASSERT (assignInitializer != NULL);
+    ROSE_ASSERT (initializer != NULL);
 
     SgExprStatement * assignmentStatement = buildAssignStatement (
         buildVarRefExp (variableDeclarations->get (moduleVariableName)),
-        assignInitializer->get_operand ());
+        initializer);
 
     appendStatement (assignmentStatement, subroutineScope);
   }

@@ -57,7 +57,39 @@ FortranProgramDeclarationsAndDefinitions::visit (SgNode * node)
 
       if (assignmentInitializer != NULL)
       {
-        initializers[variableName] = assignmentInitializer;
+        initializers[variableName] = assignmentInitializer->get_operand ();
+      }
+
+      break;
+    }
+
+    case V_SgAssignOp:
+    {
+      SgAssignOp * assignExpression = isSgAssignOp (node);
+
+      SgExpression * lhs = assignExpression->get_lhs_operand ();
+
+      SgExpression * rhs = assignExpression->get_rhs_operand ();
+
+      if (isSgVarRefExp (lhs) != NULL)
+      {
+        SgVarRefExp * lhsReference = isSgVarRefExp (lhs);
+
+        string const variableName =
+            lhsReference->get_symbol ()->get_name ().getString ();
+
+        Debug::getInstance ()->debugMessage ("Storing '"
+            + rhs->unparseToString () + "' as assignment expression for '"
+            + variableName + "'", Debug::OUTER_LOOP_LEVEL, __FILE__, __LINE__);
+
+        initializers[variableName] = rhs;
+      }
+      else if (isSgPntrArrRefExp (lhs))
+      {
+        SgPntrArrRefExp * lhsReference = isSgPntrArrRefExp (lhs);
+
+        std::cout << lhsReference->get_lhs_operand ()->unparseToString ()
+            << std::endl;
       }
 
       break;
@@ -91,7 +123,8 @@ FortranProgramDeclarationsAndDefinitions::visit (SgNode * node)
         FortranOpSetDefinition * opSetDeclaration = new FortranOpSetDefinition (
             actualArguments);
 
-        OpSetDefinitions.push_back (opSetDeclaration);
+        OpSetDefinitions[opSetDeclaration->getVariableName ()]
+            = opSetDeclaration;
       }
       else if (iequals (calleeName, OP2::OP_DECL_MAP))
       {
@@ -104,7 +137,8 @@ FortranProgramDeclarationsAndDefinitions::visit (SgNode * node)
         FortranOpMapDefinition * opMapDeclaration = new FortranOpMapDefinition (
             actualArguments);
 
-        OpMapDefinitions.push_back (opMapDeclaration);
+        OpMapDefinitions[opMapDeclaration->getVariableName ()]
+            = opMapDeclaration;
       }
       else if (iequals (calleeName, OP2::OP_DECL_DAT))
       {
@@ -124,7 +158,8 @@ FortranProgramDeclarationsAndDefinitions::visit (SgNode * node)
               + "' is not an array type. Currently not supported.");
         }
 
-        OpDatDefinitions.push_back (opDatDeclaration);
+        OpDatDefinitions[opDatDeclaration->getVariableName ()]
+            = opDatDeclaration;
       }
       else if (iequals (calleeName, OP2::OP_DECL_GBL))
       {
@@ -137,7 +172,8 @@ FortranProgramDeclarationsAndDefinitions::visit (SgNode * node)
         FortranOpGblDefinition * opGblDeclaration = new FortranOpGblDefinition (
             actualArguments);
 
-        OpGblDefinitions.push_back (opGblDeclaration);
+        OpGblDefinitions[opGblDeclaration->getVariableName ()]
+            = opGblDeclaration;
       }
       else if (iequals (calleeName, OP2::OP_DECL_CONST))
       {
@@ -150,7 +186,8 @@ FortranProgramDeclarationsAndDefinitions::visit (SgNode * node)
         FortranOpConstDefinition * opConstDeclaration =
             new FortranOpConstDefinition (actualArguments);
 
-        OpConstDefinitions.push_back (opConstDeclaration);
+        OpConstDefinitions[opConstDeclaration->getVariableName ()]
+            = opConstDeclaration;
       }
 
       break;

@@ -12,7 +12,7 @@ FortranCUDAModuleDeclarations::createDataSizesDeclaration ()
   SgVariableDeclaration * variableDeclaration =
       FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
           CommonVariableNames::argsSizes, dataSizesDeclaration->getType (),
-          moduleScope);
+          moduleScope, 1, DEVICE);
 
   variableDeclarations->add (CommonVariableNames::argsSizes,
       variableDeclaration);
@@ -28,7 +28,7 @@ FortranCUDAModuleDeclarations::createDimensionsDeclaration ()
   SgVariableDeclaration * variableDeclaration =
       FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
           CommonVariableNames::opDatDimensions,
-          dimensionsDeclaration->getType (), moduleScope);
+          dimensionsDeclaration->getType (), moduleScope, 1, DEVICE);
 
   variableDeclarations->add (CommonVariableNames::opDatDimensions,
       variableDeclaration);

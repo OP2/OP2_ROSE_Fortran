@@ -30,35 +30,35 @@ template <typename TSubroutineHeader>
        * OP_DECL_SET declarations
        * ======================================================
        */
-      std::vector <OpSetDefinition *> OpSetDefinitions;
+      std::map <std::string, OpSetDefinition *> OpSetDefinitions;
 
       /*
        * ======================================================
        * OP_DECL_MAP declarations
        * ======================================================
        */
-      std::vector <OpMapDefinition *> OpMapDefinitions;
+      std::map <std::string, OpMapDefinition *> OpMapDefinitions;
 
       /*
        * ======================================================
        * OP_DECL_DAT declarations
        * ======================================================
        */
-      std::vector <OpDatDefinition *> OpDatDefinitions;
+      std::map <std::string, OpDatDefinition *> OpDatDefinitions;
 
       /*
        * ======================================================
        * OP_DECL_GBL declarations
        * ======================================================
        */
-      std::vector <OpGblDefinition *> OpGblDefinitions;
+      std::map <std::string, OpGblDefinition *> OpGblDefinitions;
 
       /*
        * ======================================================
        * OP_DECL_CONST declarations
        * ======================================================
        */
-      std::vector <OpConstDefinition *> OpConstDefinitions;
+      std::map <std::string, OpConstDefinition *> OpConstDefinitions;
 
       /*
        * ======================================================
@@ -80,11 +80,11 @@ template <typename TSubroutineHeader>
 
       /*
        * ======================================================
-       * Mapping from variable name to its initializer
+       * Mapping from variable name to its initializer expression
        * ======================================================
        */
 
-      std::map <std::string, SgAssignInitializer *> initializers;
+      std::map <std::string, SgExpression *> initializers;
 
     protected:
 
@@ -136,105 +136,146 @@ template <typename TSubroutineHeader>
         }
       }
 
+      bool
+      isOpSet (std::string const & variableName) const
+      {
+        return OpSetDefinitions.find (variableName) != OpSetDefinitions.end ();
+      }
+
+      bool
+      isOpMap (std::string const & variableName) const
+      {
+        return OpMapDefinitions.find (variableName) != OpMapDefinitions.end ();
+      }
+
+      bool
+      isOpDat (std::string const & variableName) const
+      {
+        return OpDatDefinitions.find (variableName) != OpDatDefinitions.end ();
+      }
+
+      bool
+      isOpGbl (std::string const & variableName) const
+      {
+        return OpGblDefinitions.find (variableName) != OpGblDefinitions.end ();
+      }
+
+      bool
+      isOpConst (std::string const & variableName) const
+      {
+        return OpConstDefinitions.find (variableName)
+            != OpConstDefinitions.end ();
+      }
+
     public:
 
       OpSetDefinition *
       getOpSetDefinition (std::string const & opSetName)
           throw (std::string const &)
       {
-        using boost::iequals;
-        using std::vector;
+        using std::map;
+        using std::string;
 
-        for (vector <OpSetDefinition *>::iterator it =
-            OpSetDefinitions.begin (); it != OpSetDefinitions.end (); ++it)
+        map <string, OpSetDefinition *>::const_iterator it =
+            OpSetDefinitions.find (opSetName);
+
+        if (it == OpSetDefinitions.end ())
         {
-          if (iequals ((*it)->getVariableName (), opSetName))
-          {
-            return *it;
-          }
+          throw opSetName;
         }
-        throw opSetName;
+        else
+        {
+          return it->second;
+        }
       }
 
       OpMapDefinition *
       getOpMapDefinition (std::string const & opMapName)
           throw (std::string const &)
       {
-        using boost::iequals;
-        using std::vector;
+        using std::map;
+        using std::string;
 
-        for (vector <OpMapDefinition *>::iterator it =
-            OpMapDefinitions.begin (); it != OpMapDefinitions.end (); ++it)
+        map <string, OpMapDefinition *>::const_iterator it =
+            OpMapDefinitions.find (opMapName);
+
+        if (it == OpMapDefinitions.end ())
         {
-          if (iequals ((*it)->getVariableName (), opMapName))
-          {
-            return *it;
-          }
+          throw opMapName;
         }
-        throw opMapName;
+        else
+        {
+          return it->second;
+        }
       }
 
       OpDatDefinition *
       getOpDatDefinition (std::string const & opDatName)
           throw (std::string const &)
       {
-        using boost::iequals;
-        using std::vector;
+        using std::map;
+        using std::string;
 
-        for (vector <OpDatDefinition *>::iterator it =
-            OpDatDefinitions.begin (); it != OpDatDefinitions.end (); ++it)
+        map <string, OpDatDefinition *>::const_iterator it =
+            OpDatDefinitions.find (opDatName);
+
+        if (it == OpDatDefinitions.end ())
         {
-          if (iequals ((*it)->getVariableName (), opDatName))
-          {
-            return *it;
-          }
+          throw opDatName;
         }
-        throw opDatName;
+        else
+        {
+          return it->second;
+        }
       }
 
       OpGblDefinition *
       getOpGblDefinition (std::string const & opGblName)
           throw (std::string const &)
       {
-        using boost::iequals;
-        using std::vector;
+        using std::map;
+        using std::string;
 
-        for (vector <OpGblDefinition *>::iterator it =
-            OpGblDefinitions.begin (); it != OpGblDefinitions.end (); ++it)
+        map <string, OpGblDefinition *>::const_iterator it =
+            OpGblDefinitions.find (opGblName);
+
+        if (it == OpGblDefinitions.end ())
         {
-          if (iequals ((*it)->getVariableName (), opGblName))
-          {
-            return *it;
-          }
+          throw opGblName;
         }
-        throw opGblName;
+        else
+        {
+          return it->second;
+        }
       }
 
       OpConstDefinition *
       getOpConstDefinition (std::string const & opConstName)
           throw (std::string const &)
       {
-        using boost::iequals;
-        using std::vector;
+        using std::map;
+        using std::string;
 
-        for (vector <OpConstDefinition *>::iterator it =
-            OpConstDefinitions.begin (); it != OpConstDefinitions.end (); ++it)
+        map <string, OpConstDefinition *>::const_iterator it =
+            OpConstDefinitions.find (opConstName);
+
+        if (it == OpConstDefinitions.end ())
         {
-          if (iequals ((*it)->getVariableName (), opConstName))
-          {
-            return *it;
-          }
+          throw opConstName;
         }
-        throw opConstName;
+        else
+        {
+          return it->second;
+        }
       }
 
-      std::vector <OpConstDefinition *>::const_iterator
+      std::map <std::string, OpConstDefinition *>::const_iterator
       firstOpConstDefinition ()
       {
         return OpConstDefinitions.begin ();
       }
 
-      std::vector <OpConstDefinition *>::const_iterator
+      std::map <std::string, OpConstDefinition *>::const_iterator
       lastOpConstDefinition ()
       {
         return OpConstDefinitions.end ();
@@ -294,7 +335,7 @@ template <typename TSubroutineHeader>
             variableName) != doubleDeclarations.end ();
       }
 
-      SgAssignInitializer *
+      SgExpression *
       getInitializer (std::string const & variableName)
       {
         return initializers[variableName];

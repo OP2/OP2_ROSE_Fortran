@@ -37,6 +37,16 @@ use, intrinsic :: ISO_C_BINDING
      module procedure op_decl_gbl_real_8 !, op_decl_gbl_integer_4 ! not needed for now
   end interface op_decl_gbl     
 
+ interface op_decl_const
+     module procedure op_decl_const_scalar_logical, &
+                    & op_decl_const_scalar_real_4, &
+                    & op_decl_const_scalar_real_8, &
+                    op_decl_const_scalar_integer_4, &
+                    op_decl_const_logical, &
+                    & op_decl_const_real_4, &
+                    & op_decl_const_real_8, &
+                    op_decl_const_integer_4
+  end interface op_decl_const
 
 contains
 
@@ -83,6 +93,66 @@ contains
     integer :: dim
     type(op_dat) :: data    
   end subroutine op_decl_gbl_real_8
+
+  subroutine op_decl_const_scalar_logical ( dim, data )
+    
+    integer(4) :: dim
+    logical :: data
+  
+  end subroutine op_decl_const_scalar_logical
+
+  subroutine op_decl_const_scalar_real_4 ( dim, data )
+    
+    integer(4) :: dim
+    real(4) :: data
+  
+  end subroutine op_decl_const_scalar_real_4
+
+  subroutine op_decl_const_scalar_real_8 ( dim, data )
+    
+    integer(4) :: dim
+    real(8) :: data
+  
+  end subroutine op_decl_const_scalar_real_8
+
+  subroutine op_decl_const_scalar_integer_4 ( dim, data )
+    
+    integer(4) :: dim
+    integer(4) :: data
+  
+  end subroutine op_decl_const_scalar_integer_4
+
+
+
+  subroutine op_decl_const_logical ( dim, data )
+    
+    integer(4) :: dim
+    logical, dimension(:) :: data
+  
+  end subroutine op_decl_const_logical
+
+  subroutine op_decl_const_real_4 ( dim, data )
+    
+    integer(4) :: dim
+    real(4), dimension(:) :: data
+  
+  end subroutine op_decl_const_real_4
+
+  subroutine op_decl_const_real_8 ( dim, data )
+    
+    integer(4) :: dim
+    real(8), dimension(:) :: data
+  
+  end subroutine op_decl_const_real_8
+
+  subroutine op_decl_const_integer_4 ( dim, data )
+    
+    integer(4) :: dim
+    integer(4), dimension(:) :: data
+  
+  end subroutine op_decl_const_integer_4
+
+
   
   subroutine op_par_loop_2 ( subroutineName, set, &
                            & data0, itemSel0, map0, access0, &

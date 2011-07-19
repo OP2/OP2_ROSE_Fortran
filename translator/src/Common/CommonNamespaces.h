@@ -153,6 +153,7 @@ namespace CommonVariableNames
   std::string const col = "col";
   std::string const col2 = "col2";
   std::string const dat = "dat";
+  std::string const dat_d = "dat_d";
   std::string const dim = "dim";
   std::string const index = "index";
   std::string const iterationCounter1 = "i1";

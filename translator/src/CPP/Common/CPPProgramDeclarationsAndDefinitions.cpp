@@ -36,7 +36,7 @@ CPPProgramDeclarationsAndDefinitions::detectAndHandleOP2Definition (
     CPPImperialOpSetDefinition * opSetDeclaration =
         new CPPImperialOpSetDefinition (actualArguments, variableName);
 
-    OpSetDefinitions.push_back (opSetDeclaration);
+    OpSetDefinitions[opSetDeclaration->getVariableName ()] = opSetDeclaration;
   }
   else if (iequals (typeName, OP2::OP_MAP))
   {
@@ -56,7 +56,7 @@ CPPProgramDeclarationsAndDefinitions::detectAndHandleOP2Definition (
     CPPImperialOpMapDefinition * opMapDeclaration =
         new CPPImperialOpMapDefinition (actualArguments, variableName);
 
-    OpMapDefinitions.push_back (opMapDeclaration);
+    OpMapDefinitions[opMapDeclaration->getVariableName ()] = opMapDeclaration;
   }
   else if (iequals (typeName, OP2::OP_DAT))
   {
@@ -76,7 +76,7 @@ CPPProgramDeclarationsAndDefinitions::detectAndHandleOP2Definition (
     CPPImperialOpDatDefinition * opDatDeclaration =
         new CPPImperialOpDatDefinition (actualArguments, variableName);
 
-    OpDatDefinitions.push_back (opDatDeclaration);
+    OpDatDefinitions[opDatDeclaration->getVariableName ()] = opDatDeclaration;
   }
 }
 
@@ -158,7 +158,8 @@ CPPProgramDeclarationsAndDefinitions::visit (SgNode * node)
             new CPPImperialOpConstDefinition (
                 functionCallExp->get_args ()->get_expressions ());
 
-        OpConstDefinitions.push_back (opConstDeclaration);
+        OpConstDefinitions[opConstDeclaration->getVariableName ()]
+            = opConstDeclaration;
       }
 
       break;
