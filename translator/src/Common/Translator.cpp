@@ -36,6 +36,7 @@
 #include <CPPModifyOP2CallsToComplyWithOxfordAPI.h>
 #include <CPPProgramDeclarationsAndDefinitions.h>
 #include <CPPCUDASubroutinesGeneration.h>
+#include <CPPOpenCLSubroutinesGeneration.h>
 
 class OxfordOption: public CommandLineOption
 {
@@ -92,8 +93,7 @@ class OpenCLOption: public CommandLineOption
     virtual void
     run ()
     {
-      Debug::getInstance ()->errorMessage (
-          "Sorry: OpenCL backend not yet supported");
+      Globals::getInstance ()->setTargetBackend (TargetBackends::OPENCL);
     }
 
     OpenCLOption (std::string helpMessage, std::string longOption) :
@@ -117,8 +117,28 @@ handleCPPProject (SgProject * project)
       break;
     }
 
+    case TargetBackends::OPENMP:
+    {
+      Debug::getInstance ()->errorMessage (
+          "OpenMP code generation not yet supported in C++");
+
+      break;
+    }
+
+    case TargetBackends::OPENCL:
+    {
+      Debug::getInstance ()->debugMessage ("OpenCL code generation selected",
+          Debug::VERBOSE_LEVEL, __FILE__, __LINE__);
+
+      new CPPOpenCLSubroutinesGeneration (project, declarations);
+
+      break;
+    }
+
     default:
     {
+      Debug::getInstance ()->errorMessage ("Unknown backend selected");
+
       break;
     }
   }
@@ -152,8 +172,18 @@ handleFortranProject (SgProject * project)
       break;
     }
 
+    case TargetBackends::OPENCL:
+    {
+      Debug::getInstance ()->errorMessage (
+          "OpenCL code generation not yet supported in Fortran");
+
+      break;
+    }
+
     default:
     {
+      Debug::getInstance ()->errorMessage ("Unknown backend selected");
+
       break;
     }
   }
@@ -233,8 +263,7 @@ processUserSelections (SgProject * project)
       CPPProgramDeclarationsAndDefinitions * declarations =
           new CPPProgramDeclarationsAndDefinitions (project);
 
-      CPPModifyOP2CallsToComplyWithOxfordAPI * modifyCalls =
-          new CPPModifyOP2CallsToComplyWithOxfordAPI (project, declarations);
+      new CPPModifyOP2CallsToComplyWithOxfordAPI (project, declarations);
 
       project->unparse ();
     }

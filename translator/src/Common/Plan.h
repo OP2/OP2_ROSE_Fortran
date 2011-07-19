@@ -83,10 +83,10 @@ template <typename TParallelLoop>
        * to the supplied scope
        * ======================================================
        */
-      virtual void
+      virtual SgBasicBlock *
       createPlanFunctionParametersPreparationStatements (
           SubroutineVariableDeclarations * variableDeclarations,
-          TParallelLoop * parallelLoop, SgScopeStatement * scope) = 0;
+          TParallelLoop * parallelLoop) = 0;
 
       /*
        * ======================================================
@@ -96,11 +96,10 @@ template <typename TParallelLoop>
        * function call correctly
        * ======================================================
        */
-      virtual void
-          createPlanFunctionCallStatement (
-              SubroutineVariableDeclarations * variableDeclarations,
-              SgScopeStatement * subroutineScope,
-              SgScopeStatement * statementScope) = 0;
+      virtual SgBasicBlock *
+      createPlanFunctionCallStatement (
+          SubroutineVariableDeclarations * variableDeclarations,
+          SgScopeStatement * subroutineScope) = 0;
 
       /*
        * ======================================================

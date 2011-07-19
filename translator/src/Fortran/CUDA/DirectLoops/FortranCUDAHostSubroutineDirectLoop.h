@@ -19,7 +19,7 @@
 #define FORTRAN_CUDA_HOST_SUBROUTINE_DIRECT_LOOP_H
 
 #include <FortranCUDAHostSubroutine.h>
-#include <FortranCUDAModuleDeclarationsDirectLoop.h>
+#include <FortranCUDADataSizesDeclarationDirectLoop.h>
 
 class FortranCUDAHostSubroutineDirectLoop: public FortranCUDAHostSubroutine
 {
@@ -55,9 +55,6 @@ class FortranCUDAHostSubroutineDirectLoop: public FortranCUDAHostSubroutine
     createKernelFunctionCallStatement ();
 
     virtual void
-    createFirstTimeExecutionStatements ();
-
-    virtual void
     createStatements ();
 
     virtual void
@@ -72,8 +69,9 @@ class FortranCUDAHostSubroutineDirectLoop: public FortranCUDAHostSubroutine
             FortranParallelLoop * parallelLoop,
             SgScopeStatement * moduleScope,
             FortranCUDAInitialiseConstantsSubroutine * initialiseConstantsSubroutine,
+            FortranCUDADataSizesDeclarationDirectLoop * dataSizesDeclaration,
             FortranOpDatDimensionsDeclaration * opDatDimensionsDeclaration,
-            FortranCUDAModuleDeclarationsDirectLoop * moduleDeclarations);
+            FortranCUDAModuleDeclarations * moduleDeclarations);
 };
 
 #endif

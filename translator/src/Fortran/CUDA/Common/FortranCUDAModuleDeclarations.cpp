@@ -34,6 +34,18 @@ FortranCUDAModuleDeclarations::createDimensionsDeclaration ()
       variableDeclaration);
 }
 
+SgVariableDeclaration *
+FortranCUDAModuleDeclarations::getDataSizesVariableDeclaration ()
+{
+  return variableDeclarations->get (CommonVariableNames::argsSizes);
+}
+
+SgVariableDeclaration *
+FortranCUDAModuleDeclarations::getDimensionsVariableDeclaration ()
+{
+  return variableDeclarations->get (CommonVariableNames::opDatDimensions);
+}
+
 FortranCUDAModuleDeclarations::FortranCUDAModuleDeclarations (
     std::string const & userSubroutineName, FortranParallelLoop * parallelLoop,
     SgScopeStatement * moduleScope,
@@ -46,28 +58,4 @@ FortranCUDAModuleDeclarations::FortranCUDAModuleDeclarations (
   createDataSizesDeclaration ();
 
   createDimensionsDeclaration ();
-}
-
-SgVariableDeclaration *
-FortranCUDAModuleDeclarations::getDataSizesVariableDeclaration ()
-{
-  return variableDeclarations->get (CommonVariableNames::argsSizes);
-}
-
-FortranCUDADataSizesDeclaration *
-FortranCUDAModuleDeclarations::getDataSizesTypeDeclaration ()
-{
-  return dataSizesDeclaration;
-}
-
-SgVariableDeclaration *
-FortranCUDAModuleDeclarations::getDimensionsVariableDeclaration ()
-{
-  return variableDeclarations->get (CommonVariableNames::opDatDimensions);
-}
-
-FortranOpDatDimensionsDeclaration *
-FortranCUDAModuleDeclarations::getDimensionsTypeDeclaration ()
-{
-  return dimensionsDeclaration;
 }

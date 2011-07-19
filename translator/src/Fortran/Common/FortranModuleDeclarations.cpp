@@ -71,3 +71,9 @@ FortranModuleDeclarations::getGlobalOpDatDeclaration (
   return variableDeclarations->get (VariableNames::getOpDatGlobalName (
       OP_DAT_ArgumentGroup));
 }
+
+SubroutineVariableDeclarations *
+FortranModuleDeclarations::getAllDeclarations ()
+{
+  return variableDeclarations;
+}

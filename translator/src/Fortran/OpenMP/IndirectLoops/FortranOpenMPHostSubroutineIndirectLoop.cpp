@@ -336,18 +336,20 @@ FortranOpenMPHostSubroutineIndirectLoop::createFirstTimeExecutionStatements ()
 
   appendStatement (assignmentStatement, ifBody);
 
-  createPlanFunctionParametersPreparationStatements (allDeclarations,
-      (FortranParallelLoop *) parallelLoop, ifBody);
+  appendStatement (createPlanFunctionParametersPreparationStatements (
+      allDeclarations, (FortranParallelLoop *) parallelLoop), ifBody);
 
-  createPlanFunctionCallStatement (allDeclarations, subroutineScope, ifBody);
+  appendStatement (createPlanFunctionCallStatement (allDeclarations,
+      subroutineScope), ifBody);
 
   createTransferOpDatStatements (ifBody);
 
-  createConvertPositionInPMapsStatements (allDeclarations,
-      (FortranParallelLoop *) parallelLoop, subroutineScope, ifBody);
+  appendStatement (createConvertPositionInPMapsStatements (allDeclarations,
+      (FortranParallelLoop *) parallelLoop, subroutineScope), ifBody);
 
-  createConvertPlanFunctionParametersStatements (allDeclarations,
-      (FortranParallelLoop *) parallelLoop, subroutineScope, ifBody);
+  appendStatement (createConvertPlanFunctionParametersStatements (
+      allDeclarations, (FortranParallelLoop *) parallelLoop, subroutineScope),
+      ifBody);
 
   SgIfStmt * ifStatement =
       RoseStatementsAndExpressionsBuilder::buildIfStatementWithEmptyElse (

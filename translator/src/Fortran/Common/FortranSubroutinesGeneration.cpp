@@ -257,7 +257,8 @@ FortranSubroutinesGeneration::createSourceFile (
    * ======================================================
    */
 
-  string outputFileName = parallelLoop.getModuleName () + fileExtension;
+  string outputFileName = "rose_" + parallelLoop.getModuleName ()
+      + fileExtension;
 
   Debug::getInstance ()->debugMessage ("Generating file '" + outputFileName
       + "'", Debug::FUNCTION_LEVEL, __FILE__, __LINE__);

@@ -62,6 +62,9 @@ class FortranModuleDeclarations
 
     SgVariableDeclaration *
     getGlobalOpDatDeclaration (unsigned int OP_DAT_ArgumentGroup);
+
+    SubroutineVariableDeclarations *
+    getAllDeclarations ();
 };
 
 #endif

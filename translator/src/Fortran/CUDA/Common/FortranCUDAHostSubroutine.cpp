@@ -495,10 +495,9 @@ FortranCUDAHostSubroutine::createCUDAKernelPrologueStatements ()
     if (parallelLoop->isDuplicateOpDat (i) == false
         && parallelLoop->isReductionRequired (i) == false)
     {
-      SgVariableDeclaration
-          * opDatSizeFieldDeclaration =
-              moduleDeclarations->getDataSizesDeclaration ()->getFieldDeclarations ()->get (
-                  VariableNames::getOpDatSizeName (i));
+      SgVariableDeclaration * opDatSizeFieldDeclaration =
+          dataSizesDeclaration->getFieldDeclarations ()->get (
+              VariableNames::getOpDatSizeName (i));
 
       SgExprListExp * arrayIndexExpression = buildExprListExp (buildVarRefExp (
           opDatSizeFieldDeclaration));
@@ -535,8 +534,6 @@ FortranCUDAHostSubroutine::createTransferOpDatStatements (
   using SageBuilder::buildDotExp;
   using SageBuilder::buildVarRefExp;
   using SageBuilder::buildOpaqueVarRefExp;
-  using SageBuilder::buildMultiplyOp;
-  using SageBuilder::buildAssignStatement;
   using SageInterface::appendStatement;
 
   Debug::getInstance ()->debugMessage (
@@ -547,36 +544,6 @@ FortranCUDAHostSubroutine::createTransferOpDatStatements (
   {
     if (parallelLoop->isDuplicateOpDat (i) == false)
     {
-      /*
-       * ======================================================
-       * Statement setting the size of the OP_DAT variable
-       * ======================================================
-       */
-
-      SgDotExp * dotExpression1 = buildDotExp (buildVarRefExp (
-          variableDeclarations->get (VariableNames::getOpDatName (i))),
-          buildOpaqueVarRefExp (CommonVariableNames::dim, subroutineScope));
-
-      SgDotExp * dotExpression2 = buildDotExp (buildVarRefExp (
-          variableDeclarations->get (VariableNames::getOpDatName (i))),
-          buildOpaqueVarRefExp (CommonVariableNames::set, subroutineScope));
-
-      SgDotExp * dotExpression3 = buildDotExp (dotExpression2,
-          buildOpaqueVarRefExp (CommonVariableNames::size, subroutineScope));
-
-      SgExpression * multiplyExpression = buildMultiplyOp (dotExpression1,
-          dotExpression3);
-
-      SgExprStatement
-          * assignmentStatement =
-              buildAssignStatement (
-                  buildVarRefExp (
-                      moduleDeclarations->getDataSizesDeclaration ()->getFieldDeclarations ()-> get (
-                          VariableNames::getOpDatSizeName (i))),
-                  multiplyExpression);
-
-      appendStatement (assignmentStatement, subroutineScope);
-
       /*
        * ======================================================
        * Statement to convert OP_DAT between C and Fortran
@@ -592,11 +559,10 @@ FortranCUDAHostSubroutine::createTransferOpDatStatements (
           variableDeclarations->get (VariableNames::getCToFortranVariableName (
               i)));
 
-      SgExpression
-          * parameterExpression3 =
-              FortranStatementsAndExpressionsBuilder::buildShapeExpression (
-                  moduleDeclarations->getDataSizesDeclaration ()->getFieldDeclarations ()->get (
-                      VariableNames::getOpDatSizeName (i)), subroutineScope);
+      SgExpression * parameterExpression3 =
+          FortranStatementsAndExpressionsBuilder::buildShapeExpression (
+              dataSizesDeclaration->getFieldDeclarations ()->get (
+                  VariableNames::getOpDatSizeName (i)), subroutineScope);
 
       SgStatement * callStatement =
           SubroutineCalls::createCToFortranPointerCallStatement (
@@ -608,14 +574,25 @@ FortranCUDAHostSubroutine::createTransferOpDatStatements (
   }
 }
 
-void
-FortranCUDAHostSubroutine::createOpDatDimensionInitialisationStatements ()
+SgBasicBlock *
+FortranCUDAHostSubroutine::createFirstTimeExecutionStatements ()
 {
+  using SageBuilder::buildBasicBlock;
   using SageBuilder::buildAssignStatement;
   using SageBuilder::buildVarRefExp;
+  using SageBuilder::buildBoolValExp;
   using SageBuilder::buildOpaqueVarRefExp;
   using SageBuilder::buildDotExp;
+  using SageBuilder::buildMultiplyOp;
   using SageInterface::appendStatement;
+
+  SgBasicBlock * block = buildBasicBlock ();
+
+  SgExprStatement * assignmentStatement = buildAssignStatement (buildVarRefExp (
+      moduleDeclarations->getFirstExecutionBooleanDeclaration ()),
+      buildBoolValExp (false));
+
+  appendStatement (assignmentStatement, block);
 
   Debug::getInstance ()->debugMessage (
       "Creating statements to initialise OP_DAT dimensions",
@@ -624,7 +601,7 @@ FortranCUDAHostSubroutine::createOpDatDimensionInitialisationStatements ()
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
     SgVarRefExp * opDatDimensionsReference = buildVarRefExp (
-        variableDeclarations->get (CommonVariableNames::opDatDimensions));
+        moduleDeclarations->getDimensionsVariableDeclaration ());
 
     SgVarRefExp * fieldReference = buildVarRefExp (
         opDatDimensionsDeclaration->getOpDatDimensionField (i));
@@ -634,13 +611,54 @@ FortranCUDAHostSubroutine::createOpDatDimensionInitialisationStatements ()
 
     SgDotExp * dotExpression2 = buildDotExp (buildVarRefExp (
         variableDeclarations->get (VariableNames::getOpDatName (i))),
-        buildOpaqueVarRefExp (CommonVariableNames::dim, subroutineScope));
+        buildOpaqueVarRefExp (CommonVariableNames::dim, block));
 
     SgExprStatement * assignmentStatement = buildAssignStatement (
         dotExpression1, dotExpression2);
 
-    appendStatement (assignmentStatement, subroutineScope);
+    appendStatement (assignmentStatement, block);
   }
+
+  Debug::getInstance ()->debugMessage (
+      "Creating statements to initialise OP_DAT sizes", Debug::FUNCTION_LEVEL,
+      __FILE__, __LINE__);
+
+  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
+  {
+    if (parallelLoop->isDuplicateOpDat (i) == false)
+    {
+      SgVarRefExp * dataSizesReference = buildVarRefExp (
+          moduleDeclarations->getDataSizesVariableDeclaration ());
+
+      SgVarRefExp * fieldReference = buildVarRefExp (
+          dataSizesDeclaration->getFieldDeclarations ()->get (
+              VariableNames::getOpDatSizeName (i)));
+
+      SgDotExp * dotExpression1 = buildDotExp (buildVarRefExp (
+          variableDeclarations->get (VariableNames::getOpDatName (i))),
+          buildOpaqueVarRefExp (CommonVariableNames::dim, block));
+
+      SgDotExp * dotExpression2 = buildDotExp (buildVarRefExp (
+          variableDeclarations->get (VariableNames::getOpDatName (i))),
+          buildOpaqueVarRefExp (CommonVariableNames::set, block));
+
+      SgDotExp * dotExpression3 = buildDotExp (dotExpression2,
+          buildOpaqueVarRefExp (CommonVariableNames::size, block));
+
+      SgExpression * multiplyExpression = buildMultiplyOp (dotExpression1,
+          dotExpression3);
+
+      SgDotExp * dotExpression4 = buildDotExp (dataSizesReference,
+          fieldReference);
+
+      SgExprStatement * assignmentStatement = buildAssignStatement (
+          dotExpression4, multiplyExpression);
+
+      appendStatement (assignmentStatement, block);
+    }
+  }
+
+  return block;
 }
 
 void
@@ -728,13 +746,14 @@ FortranCUDAHostSubroutine::FortranCUDAHostSubroutine (
     std::string const & kernelSubroutineName,
     FortranParallelLoop * parallelLoop, SgScopeStatement * moduleScope,
     FortranCUDAInitialiseConstantsSubroutine * initialiseConstantsSubroutine,
+    FortranCUDADataSizesDeclaration * dataSizesDeclaration,
     FortranOpDatDimensionsDeclaration * opDatDimensionsDeclaration,
     FortranCUDAModuleDeclarations * moduleDeclarations) :
   FortranHostSubroutine (subroutineName, userSubroutineName,
       kernelSubroutineName, parallelLoop, moduleScope),
       initialiseConstantsSubroutine (initialiseConstantsSubroutine),
-      opDatDimensionsDeclaration (opDatDimensionsDeclaration),
-      moduleDeclarations (moduleDeclarations)
+      dataSizesDeclaration (dataSizesDeclaration), opDatDimensionsDeclaration (
+          opDatDimensionsDeclaration), moduleDeclarations (moduleDeclarations)
 {
   using SageInterface::addTextForUnparser;
 

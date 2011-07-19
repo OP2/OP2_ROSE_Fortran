@@ -15,27 +15,25 @@ class FortranPlan: public Plan <FortranParallelLoop>
 {
   protected:
 
-    virtual void
+    virtual SgBasicBlock *
     createConvertPlanFunctionParametersStatements (
         SubroutineVariableDeclarations * variableDeclarations,
-        FortranParallelLoop * parallelLoop, SgScopeStatement * subroutineScope,
-        SgScopeStatement * statementScope);
+        FortranParallelLoop * parallelLoop, SgScopeStatement * subroutineScope);
 
-    virtual void
+    virtual SgBasicBlock *
     createConvertPositionInPMapsStatements (
         SubroutineVariableDeclarations * variableDeclarations,
-        FortranParallelLoop * parallelLoop, SgScopeStatement * subroutineScope,
-        SgScopeStatement * statementScope);
+        FortranParallelLoop * parallelLoop, SgScopeStatement * subroutineScope);
 
-    virtual void
+    virtual SgBasicBlock *
     createPlanFunctionParametersPreparationStatements (
         SubroutineVariableDeclarations * variableDeclarations,
-        FortranParallelLoop * parallelLoop, SgScopeStatement * scope);
+        FortranParallelLoop * parallelLoop);
 
-    virtual void
+    virtual SgBasicBlock *
     createPlanFunctionCallStatement (
         SubroutineVariableDeclarations * variableDeclarations,
-        SgScopeStatement * subroutineScope, SgScopeStatement * statementScope);
+        SgScopeStatement * subroutineScope);
 };
 
 #endif

@@ -1,6 +1,7 @@
 #!/usr/bin/python
 
 import os
+import re
 import glob
 from optparse import OptionParser
 from subprocess import Popen, PIPE
@@ -59,6 +60,15 @@ parser.add_option("-v",
                  help="Be verbose.",
                  default=False)
 
+parser.add_option("-f",
+                 "--format",
+                 action="store",
+		 type="int",
+                 dest="format",
+		 metavar="<INT>",
+                 help="Format the generated code. [Default is %default].",
+                 default=80)
+
 (opts, args) = parser.parse_args(argv[1:])
 
 # Cleans out files generated during the compilation process
@@ -90,6 +100,10 @@ def exitMessage (str):
 	print(str)
 	exit(1)
 
+def verboseMessage (str):
+	if opts.verbose:
+		print(str)
+
 def outputStdout (stdoutLines):
 	print('==================================== STANDARD OUTPUT ===========================================')
 	for line in stdoutLines.splitlines():
@@ -101,7 +115,7 @@ def compile ():
 	if not opts.cuda and not opts.openmp:
 		exitMessage("You must specify either %s or %s on the command line." % (cudaFlag, openmpFlag))
 	elif opts.cuda and opts.openmp:
-		exitMessage("You specified both %s and %s on the command line. Please only specify one of these." % 			(cudaFlag, openmpFlag))
+		exitMessage("You specified both %s and %s on the command line. Please only specify one of these." % (cudaFlag, openmpFlag))
 
 	configFile = 'config'
 	if not os.path.isfile(configFile):
@@ -140,8 +154,7 @@ def compile ():
 	for f in filesToCompile:
 		cmd += f + ' '
 
-	if opts.verbose:
-		print("Running: '" + cmd + "'")
+	verboseMessage("Running: '" + cmd + "'")
 
 	# Run the compiler in a bash shell as it needs the environment variables such as
 	# LD_LIBRARY_PATH
@@ -169,11 +182,95 @@ def compile ():
 	if opts.debug > 0:
 		outputStdout (stdoutLines)
 
+def writeLine (f, line, indent):
+	baseIndex       = 0
+	maxLineLength   = opts.format
+	ampersandNeeded = False
+
+	while len(line) - baseIndex > maxLineLength:		
+		f.write(" " * indent)						
+		if ampersandNeeded:
+			f.write("&")				
+		f.write(line[baseIndex:baseIndex+maxLineLength])
+		tempLine = line.strip()
+		if tempLine.strip()[len(tempLine)-1] is not '&':
+			f.write("&")
+		f.write("\n")
+		baseIndex = baseIndex + maxLineLength		
+		ampersandNeeded = True
+	
+	f.write(" " * indent)
+	if ampersandNeeded:
+			f.write("&")
+	f.write(line[baseIndex:])
+	
+
+def formatCode ():
+	end_regex        = re.compile("\s*end\s", re.IGNORECASE)
+	subroutine_regex = re.compile("\ssubroutine\s", re.IGNORECASE)	
+	do_regex         = re.compile("\s*do\s", re.IGNORECASE)
+	module_regex     = re.compile("\s*module\s", re.IGNORECASE)
+	if_regex         = re.compile("\s*if\s", re.IGNORECASE)
+	type_regex       = re.compile("\s*type\s", re.IGNORECASE)
+	call_regex       = re.compile("\s*call\s", re.IGNORECASE)
+	implicit_regex   = re.compile("\s*implicit none\s", re.IGNORECASE)
+
+	files = glob.glob(os.getcwd() + os.sep + "*.CUF")
+	
+	for fileName in files:
+		verboseMessage("Formatting '" + fileName + "'")
+
+		newLineNeeded = False
+		callFound     = False
+		indent        = 0
+		f2            = open("_" + os.path.basename(fileName), "w")
+		f             = open(fileName, "r")
+
+		for line in f:
+			if end_regex.match(line):
+				if not type_regex.search(line):
+					indent = indent - 2
+				writeLine(f2, line, indent)
+				f2.write("\n")
+				newLineNeeded = False
+	
+			elif subroutine_regex.search(line) or module_regex.match(line) or do_regex.match(line) or if_regex.match(line):	
+				if newLineNeeded:
+					f2.write("\n")		
+				writeLine(f2, line, indent)
+				indent = indent + 2	
+				newLineNeeded = True
+
+			elif not re.compile("\n").match(line):
+				if implicit_regex.match(line):
+					f2.write("\n")
+					writeLine(f2, line, indent)
+					f2.write("\n")
+				else:
+					writeLine(f2, line, indent)	
+					newLineNeeded = True	
+				
+				if callFound and line.endswith(")\n"):
+					f2.write("\n")
+					callFound = False
+				elif call_regex.match(line):
+					if not line.endswith("&\n"):
+						f2.write("\n")
+					else:
+						callFound = True			
+
+		f.close()
+		f2.close()
+		os.rename(f2.name,f.name)
+
 if opts.clean:
 	clean()
 
 if opts.compile:
 	compile()
+	
+	if opts.format:
+		formatCode ()
 
 if not opts.clean and not opts.compile:
 	exitMessage("No actions selected. Use %s for options." % helpShortFlag)

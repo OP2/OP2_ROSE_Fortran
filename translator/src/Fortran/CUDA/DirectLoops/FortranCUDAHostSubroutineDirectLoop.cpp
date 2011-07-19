@@ -1,6 +1,6 @@
 #include <FortranCUDAHostSubroutineDirectLoop.h>
 #include <FortranTypesBuilder.h>
-#include <FortranStatementsAndExpressionsBuilder.h>
+#include <RoseStatementsAndExpressionsBuilder.h>
 #include <RoseHelper.h>
 #include <Debug.h>
 #include <FortranCUDAReductionSubroutine.h>
@@ -26,7 +26,7 @@ FortranCUDAHostSubroutineDirectLoop::createKernelFunctionCallStatement ()
   SgExprListExp * actualParameters = buildExprListExp ();
 
   actualParameters->append_expression (buildVarRefExp (
-      variableDeclarations->get (CommonVariableNames::opDatDimensions)));
+      moduleDeclarations->getDimensionsVariableDeclaration ()));
 
   actualParameters->append_expression (buildVarRefExp (
       moduleDeclarations->getDataSizesVariableDeclaration ()));
@@ -120,13 +120,10 @@ FortranCUDAHostSubroutineDirectLoop::createVariableSizesInitialisationStatements
 
       if (parallelLoop->isReductionRequired (i) == false)
       {
-        SgExprStatement
-            * assignmentStatement =
-                buildAssignStatement (
-                    dotExpression,
-                    buildVarRefExp (
-                        moduleDeclarations->getDataSizesTypeDeclaration ()->getFieldDeclarations ()->get (
-                            variableName)));
+        SgExprStatement * assignmentStatement = buildAssignStatement (
+            dotExpression, buildVarRefExp (
+                dataSizesDeclaration->getFieldDeclarations ()->get (
+                    variableName)));
 
         appendStatement (assignmentStatement, subroutineScope);
       }
@@ -317,16 +314,24 @@ FortranCUDAHostSubroutineDirectLoop::createCUDAKernelLocalVariableDeclarationsFo
 }
 
 void
-FortranCUDAHostSubroutineDirectLoop::createFirstTimeExecutionStatements ()
-{
-}
-
-void
 FortranCUDAHostSubroutineDirectLoop::createStatements ()
 {
+  using SageBuilder::buildVarRefExp;
+  using SageBuilder::buildBoolValExp;
+  using SageBuilder::buildEqualityOp;
   using SageInterface::appendStatement;
 
-  createOpDatDimensionInitialisationStatements ();
+  SgEqualityOp * ifGuardExpression = buildEqualityOp (buildVarRefExp (
+      moduleDeclarations->getFirstExecutionBooleanDeclaration ()),
+      buildBoolValExp (true));
+
+  SgBasicBlock * ifBody = createFirstTimeExecutionStatements ();
+
+  SgIfStmt * ifStatement =
+      RoseStatementsAndExpressionsBuilder::buildIfStatementWithEmptyElse (
+          ifGuardExpression, ifBody);
+
+  appendStatement (ifStatement, subroutineScope);
 
   createCUDAKernelInitialisationStatements ();
 
@@ -358,8 +363,6 @@ FortranCUDAHostSubroutineDirectLoop::createStatements ()
 void
 FortranCUDAHostSubroutineDirectLoop::createLocalVariableDeclarations ()
 {
-  createOpDatDimensionsDeclaration (opDatDimensionsDeclaration->getType ());
-
   createDataMarshallingLocalVariableDeclarations ();
 
   createCUDAKernelLocalVariableDeclarations ();
@@ -383,12 +386,13 @@ FortranCUDAHostSubroutineDirectLoop::FortranCUDAHostSubroutineDirectLoop (
     std::string const & kernelSubroutineName,
     FortranParallelLoop * parallelLoop, SgScopeStatement * moduleScope,
     FortranCUDAInitialiseConstantsSubroutine * initialiseConstantsSubroutine,
+    FortranCUDADataSizesDeclarationDirectLoop * dataSizesDeclaration,
     FortranOpDatDimensionsDeclaration * opDatDimensionsDeclaration,
-    FortranCUDAModuleDeclarationsDirectLoop * moduleDeclarations) :
+    FortranCUDAModuleDeclarations * moduleDeclarations) :
   FortranCUDAHostSubroutine (subroutineName, userSubroutineName,
       kernelSubroutineName, parallelLoop, moduleScope,
-      initialiseConstantsSubroutine, opDatDimensionsDeclaration,
-      moduleDeclarations)
+      initialiseConstantsSubroutine, dataSizesDeclaration,
+      opDatDimensionsDeclaration, moduleDeclarations)
 {
   Debug::getInstance ()->debugMessage (
       "Creating host subroutine of direct loop", Debug::CONSTRUCTOR_LEVEL,

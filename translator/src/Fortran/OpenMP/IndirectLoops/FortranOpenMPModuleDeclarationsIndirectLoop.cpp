@@ -65,8 +65,8 @@ FortranOpenMPModuleDeclarationsIndirectLoop::createExecutionPlanDeclarations ()
       FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
           PlanFunction::Fortran::planRet, c_ptrType, moduleScope));
 
-  SgType * op_planType = FortranTypesBuilder::buildClassDeclaration (
-      "op_plan", moduleScope)->get_type ();
+  SgType * op_planType = FortranTypesBuilder::buildClassDeclaration ("op_plan",
+      moduleScope)->get_type ();
 
   variableDeclarations->add (PlanFunction::Fortran::actualPlan,
       FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
@@ -284,12 +284,6 @@ FortranOpenMPModuleDeclarationsIndirectLoop::getPlanFunctionDeclaration (
     std::string const & variableName)
 {
   return variableDeclarations->get (variableName);
-}
-
-SubroutineVariableDeclarations *
-FortranOpenMPModuleDeclarationsIndirectLoop::getAllDeclarations ()
-{
-  return variableDeclarations;
 }
 
 FortranOpenMPModuleDeclarationsIndirectLoop::FortranOpenMPModuleDeclarationsIndirectLoop (

@@ -12,12 +12,19 @@ class FortranCUDAModuleDeclarationsIndirectLoop: public FortranCUDAModuleDeclara
 {
   private:
 
+    void
+    createCPlanDeclaration ();
+
   public:
+
+    SgVariableDeclaration *
+    getCPlanDeclaration ();
 
     FortranCUDAModuleDeclarationsIndirectLoop (
         std::string const & userSubroutineName,
         FortranParallelLoop * parallelLoop, SgScopeStatement * moduleScope,
-        FortranCUDADataSizesDeclarationIndirectLoop * dataSizesDeclaration);
+        FortranCUDADataSizesDeclarationIndirectLoop * dataSizesDeclaration,
+        FortranOpDatDimensionsDeclaration * dimensionsDeclaration);
 };
 
 #endif

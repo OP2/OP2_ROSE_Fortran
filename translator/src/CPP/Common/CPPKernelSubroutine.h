@@ -10,8 +10,7 @@ class CPPKernelSubroutine: public KernelSubroutine <SgFunctionDeclaration,
 
   protected:
 
-    CPPKernelSubroutine::CPPKernelSubroutine (
-        std::string const & subroutineName,
+    CPPKernelSubroutine (std::string const & subroutineName,
         std::string const & userSubroutineName, SgScopeStatement * moduleScope,
         CPPParallelLoop * parallelLoop) :
       KernelSubroutine <SgFunctionDeclaration,
@@ -30,10 +29,6 @@ class CPPKernelSubroutine: public KernelSubroutine <SgFunctionDeclaration,
           = subroutineHeaderStatement->get_definition ()->get_body ();
 
       appendStatement (subroutineHeaderStatement, moduleScope);
-
-      appendStatement (
-          FortranStatementsAndExpressionsBuilder::buildImplicitNoneStatement (),
-          subroutineScope);
     }
 
 };
