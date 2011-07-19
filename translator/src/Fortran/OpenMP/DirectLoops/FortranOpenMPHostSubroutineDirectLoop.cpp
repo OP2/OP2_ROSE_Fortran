@@ -149,14 +149,16 @@ FortranOpenMPHostSubroutineDirectLoop::createKernelDoLoop ()
       AstUnparseAttribute::e_after);
 }
 
-void
-FortranOpenMPHostSubroutineDirectLoop::createTransferOpDatStatements (
-    SgScopeStatement * statementScope)
+SgBasicBlock *
+FortranOpenMPHostSubroutineDirectLoop::createTransferOpDatStatements ()
 {
+  using SageBuilder::buildBasicBlock;
   using SageBuilder::buildVarRefExp;
   using SageBuilder::buildOpaqueVarRefExp;
   using SageBuilder::buildDotExp;
   using SageInterface::appendStatement;
+
+  SgBasicBlock * block = buildBasicBlock ();
 
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
@@ -164,7 +166,7 @@ FortranOpenMPHostSubroutineDirectLoop::createTransferOpDatStatements (
     {
       SgDotExp * parameterExpression1 = buildDotExp (buildVarRefExp (
           variableDeclarations->get (VariableNames::getOpDatName (i))),
-          buildOpaqueVarRefExp (CommonVariableNames::dat, subroutineScope));
+          buildOpaqueVarRefExp (CommonVariableNames::dat, block));
 
       SgVarRefExp * parameterExpression2 = buildVarRefExp (
           moduleDeclarations->getGlobalOpDatDeclaration (i));
@@ -175,25 +177,26 @@ FortranOpenMPHostSubroutineDirectLoop::createTransferOpDatStatements (
       {
         parameterExpression3 = buildDotExp (buildVarRefExp (
             variableDeclarations->get (VariableNames::getOpSetName ())),
-            buildOpaqueVarRefExp (CommonVariableNames::size, subroutineScope));
+            buildOpaqueVarRefExp (CommonVariableNames::size, block));
       }
       else
       {
         parameterExpression3 = buildDotExp (buildVarRefExp (
             variableDeclarations->get (VariableNames::getOpDatName (i))),
-            buildOpaqueVarRefExp (CommonVariableNames::dim, subroutineScope));
+            buildOpaqueVarRefExp (CommonVariableNames::dim, block));
       }
 
       SgStatement * callStatement =
-          SubroutineCalls::createCToFortranPointerCallStatement (
-              subroutineScope, parameterExpression1, parameterExpression2,
+          SubroutineCalls::createCToFortranPointerCallStatement (block,
+              parameterExpression1, parameterExpression2,
               buildOpaqueVarRefExp ("(/"
-                  + parameterExpression3->unparseToString () + "/)",
-                  subroutineScope));
+                  + parameterExpression3->unparseToString () + "/)", block));
 
-      appendStatement (callStatement, statementScope);
+      appendStatement (callStatement, block);
     }
   }
+
+  return block;
 }
 
 void
@@ -214,7 +217,7 @@ FortranOpenMPHostSubroutineDirectLoop::createFirstTimeExecutionStatements ()
 
   appendStatement (assignmentStatement, ifBody);
 
-  createTransferOpDatStatements (ifBody);
+  appendStatement (createTransferOpDatStatements (), ifBody);
 
   SgEqualityOp * ifGuardExpression = buildEqualityOp (buildVarRefExp (
       moduleDeclarations->getFirstExecutionBooleanDeclaration ()),

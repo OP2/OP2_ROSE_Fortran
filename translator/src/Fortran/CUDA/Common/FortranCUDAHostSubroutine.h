@@ -68,8 +68,8 @@ class FortranCUDAHostSubroutine: public FortranHostSubroutine
     void
     createCUDAKernelPrologueStatements ();
 
-    virtual void
-    createTransferOpDatStatements (SgScopeStatement * statementScope);
+    virtual SgBasicBlock *
+    createTransferOpDatStatements ();
 
     /*
      * ======================================================

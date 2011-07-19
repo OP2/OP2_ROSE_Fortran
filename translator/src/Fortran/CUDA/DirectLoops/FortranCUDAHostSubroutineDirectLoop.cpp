@@ -319,6 +319,7 @@ FortranCUDAHostSubroutineDirectLoop::createStatements ()
   using SageBuilder::buildVarRefExp;
   using SageBuilder::buildBoolValExp;
   using SageBuilder::buildEqualityOp;
+  using SageBuilder::buildAssignStatement;
   using SageInterface::appendStatement;
 
   SgEqualityOp * ifGuardExpression = buildEqualityOp (buildVarRefExp (
@@ -326,6 +327,13 @@ FortranCUDAHostSubroutineDirectLoop::createStatements ()
       buildBoolValExp (true));
 
   SgBasicBlock * ifBody = createFirstTimeExecutionStatements ();
+
+  SgExprStatement * assignmentStatement1 = buildAssignStatement (
+      buildVarRefExp (
+          moduleDeclarations->getFirstExecutionBooleanDeclaration ()),
+      buildBoolValExp (false));
+
+  appendStatement (assignmentStatement1, ifBody);
 
   SgIfStmt * ifStatement =
       RoseStatementsAndExpressionsBuilder::buildIfStatementWithEmptyElse (
@@ -335,9 +343,7 @@ FortranCUDAHostSubroutineDirectLoop::createStatements ()
 
   createCUDAKernelInitialisationStatements ();
 
-  createTransferOpDatStatements (subroutineScope);
-
-  createCUDAKernelPrologueStatements ();
+  appendStatement (createTransferOpDatStatements (), subroutineScope);
 
   if (parallelLoop->isReductionRequired () == true)
   {
@@ -356,8 +362,6 @@ FortranCUDAHostSubroutineDirectLoop::createStatements ()
   {
     createReductionEpilogueStatements ();
   }
-
-  createCUDAKernelEpilogueStatements ();
 }
 
 void

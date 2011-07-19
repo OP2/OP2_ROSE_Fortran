@@ -10,8 +10,8 @@ class FortranHostSubroutine: public HostSubroutine <SgProcedureHeaderStatement,
 {
   protected:
 
-    virtual void
-    createTransferOpDatStatements (SgScopeStatement * statementScope) = 0;
+    virtual SgBasicBlock *
+    createTransferOpDatStatements () = 0;
 
     void
     createOpDatDimensionsDeclaration (SgType * type);

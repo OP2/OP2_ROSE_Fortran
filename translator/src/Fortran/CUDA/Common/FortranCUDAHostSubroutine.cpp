@@ -248,7 +248,7 @@ FortranCUDAHostSubroutine::createReductionEpilogueStatements ()
       buildIntVal (1));
 
   SgPntrArrRefExp * arrayIndexExpression2 = buildPntrArrRefExp (buildVarRefExp (
-      variableDeclarations->get (VariableNames::getCToFortranVariableName (
+      variableDeclarations->get (VariableNames::getOpDatDeviceName (
           positionInOPDatsArray))), addExpression2);
 
   SgMultiplyOp * mutliplyExpression2 = buildMultiplyOp (buildVarRefExp (
@@ -527,10 +527,10 @@ FortranCUDAHostSubroutine::createCUDAKernelPrologueStatements ()
   }
 }
 
-void
-FortranCUDAHostSubroutine::createTransferOpDatStatements (
-    SgScopeStatement * statementScope)
+SgBasicBlock *
+FortranCUDAHostSubroutine::createTransferOpDatStatements ()
 {
+  using SageBuilder::buildBasicBlock;
   using SageBuilder::buildDotExp;
   using SageBuilder::buildVarRefExp;
   using SageBuilder::buildOpaqueVarRefExp;
@@ -539,6 +539,8 @@ FortranCUDAHostSubroutine::createTransferOpDatStatements (
   Debug::getInstance ()->debugMessage (
       "Creating statements to transfer OP_DATs onto device",
       Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+
+  SgBasicBlock * block = buildBasicBlock ();
 
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
@@ -553,25 +555,29 @@ FortranCUDAHostSubroutine::createTransferOpDatStatements (
 
       SgDotExp * parameterExpression1 = buildDotExp (buildVarRefExp (
           variableDeclarations->get (VariableNames::getOpDatName (i))),
-          buildOpaqueVarRefExp (CommonVariableNames::dat, subroutineScope));
+          buildOpaqueVarRefExp (CommonVariableNames::dat, block));
 
       SgVarRefExp * parameterExpression2 = buildVarRefExp (
-          variableDeclarations->get (VariableNames::getCToFortranVariableName (
-              i)));
+          variableDeclarations->get (VariableNames::getOpDatDeviceName (i)));
 
-      SgExpression * parameterExpression3 =
-          FortranStatementsAndExpressionsBuilder::buildShapeExpression (
-              dataSizesDeclaration->getFieldDeclarations ()->get (
-                  VariableNames::getOpDatSizeName (i)), subroutineScope);
+      SgDotExp * dotExpression3 = buildDotExp (buildVarRefExp (
+          moduleDeclarations->getDataSizesVariableDeclaration ()),
+          buildVarRefExp (dataSizesDeclaration->getFieldDeclarations ()->get (
+              VariableNames::getOpDatSizeName (i))));
+
+      SgExpression * parameterExpression3 = buildOpaqueVarRefExp ("(/"
+          + dotExpression3->unparseToString () + "/)", block);
 
       SgStatement * callStatement =
           SubroutineCalls::createCToFortranPointerCallStatement (
               subroutineScope, parameterExpression1, parameterExpression2,
               parameterExpression3);
 
-      appendStatement (callStatement, subroutineScope);
+      appendStatement (callStatement, block);
     }
   }
+
+  return block;
 }
 
 SgBasicBlock *
@@ -587,12 +593,6 @@ FortranCUDAHostSubroutine::createFirstTimeExecutionStatements ()
   using SageInterface::appendStatement;
 
   SgBasicBlock * block = buildBasicBlock ();
-
-  SgExprStatement * assignmentStatement = buildAssignStatement (buildVarRefExp (
-      moduleDeclarations->getFirstExecutionBooleanDeclaration ()),
-      buildBoolValExp (false));
-
-  appendStatement (assignmentStatement, block);
 
   Debug::getInstance ()->debugMessage (
       "Creating statements to initialise OP_DAT dimensions",
@@ -669,36 +669,9 @@ FortranCUDAHostSubroutine::createDataMarshallingLocalVariableDeclarations ()
   using SageInterface::appendStatement;
   using std::string;
 
-  Debug::getInstance ()->debugMessage (
-      "Creating local variables to allow data marshalling between host and device",
-      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
-
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
     if (parallelLoop->isDuplicateOpDat (i) == false)
-    {
-      string const & variableName =
-          VariableNames::getCToFortranVariableName (i);
-
-      SgArrayType * isArrayType =
-          isSgArrayType (parallelLoop->getOpDatType (i));
-
-      variableDeclarations->add (variableName,
-          FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
-              variableName, buildPointerType (isArrayType), subroutineScope));
-    }
-  }
-
-  /*
-   * ======================================================
-   * OP_DAT variable on device only needed if it is NOT a
-   * reduction variable
-   * ======================================================
-   */
-  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
-  {
-    if (parallelLoop->isDuplicateOpDat (i) == false
-        && parallelLoop->isReductionRequired (i) == false)
     {
       string const & variableName = VariableNames::getOpDatDeviceName (i);
 
