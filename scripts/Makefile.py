@@ -2,22 +2,26 @@
 
 import os
 import re
+import sys	
 import glob
+import tarfile
 from optparse import OptionParser
 from subprocess import Popen, PIPE
-from sys import argv
 
 # The command-line parser and its options
 parser = OptionParser(add_help_option=False)
 
-cudaFlag      = "--cuda"
-openmpFlag    = "--openmp"
+openclFlag        = "--opencl"
+cudaFlag          = "--cuda"
+openmpFlag        = "--openmp"
+allBackendOptions = [openclFlag, cudaFlag, openmpFlag]
+
 helpShortFlag = "-h"
 
 parser.add_option("--clean",
                   action="store_true",
                   dest="clean",
-                  help="Remove generated files. Use this flag in conjunction with %s or %s to remove files generated for that particular backend." % (cudaFlag, openmpFlag),
+                  help="Remove generated files. Use this flag in conjunction with one of %s to remove files generated for that particular backend." % allBackendOptions,
                   default=False)
 
 parser.add_option("-C",
@@ -31,6 +35,12 @@ parser.add_option(cudaFlag,
                   action="store_true",
                   dest="cuda",
                   help="Generate code for CUDA backend.",
+                  default=False)
+
+parser.add_option(openclFlag,
+                  action="store_true",
+                  dest="opencl",
+                  help="Generate code for OpenCL backend.",
                   default=False)
 
 parser.add_option("-d",
@@ -69,7 +79,21 @@ parser.add_option("-f",
                  help="Format the generated code. [Default is %default].",
                  default=80)
 
-(opts, args) = parser.parse_args(argv[1:])
+parser.add_option("-M",
+                 "--makefile",
+                 action="store_true",
+                 dest="makefile",
+                 help="Generate a Makefile for the target backend.",
+                 default=False)
+
+parser.add_option("-T",
+                 "--tarball",
+                 action="store_true",
+                 dest="tarball",
+                 help="Generate a tarball of the generated files (and Makefile if selected).",
+                 default=False)
+
+(opts, args) = parser.parse_args(sys.argv[1:])
 
 # Cleans out files generated during the compilation process
 def clean ():
@@ -112,10 +136,17 @@ def outputStdout (stdoutLines):
 
 # Runs the compiler
 def compile ():
-	if not opts.cuda and not opts.openmp:
-		exitMessage("You must specify either %s or %s on the command line." % (cudaFlag, openmpFlag))
-	elif opts.cuda and opts.openmp:
-		exitMessage("You specified both %s and %s on the command line. Please only specify one of these." % (cudaFlag, openmpFlag))
+	allBackends       = (opts.cuda, opts.openmp, opts.opencl)
+	backendsSelected  = [] 
+
+	for backend in allBackends:
+		if backend:
+			backendsSelected.append(backend)
+
+	if len(backendsSelected) == 0:
+		exitMessage("You must specify one of %s on the command line." % allBackendOptions)
+	elif len(backendsSelected) > 1:
+		exitMessage("You specified multiple backends on the command line. Please only specify one of these." % backendsSelected)
 
 	configFile = 'config'
 	if not os.path.isfile(configFile):
@@ -149,7 +180,9 @@ def compile ():
 	if opts.cuda:
 		cmd += cudaFlag + ' '
 	elif opts.openmp:
-		cmd+= openmpFlag + ' '
+		cmd += openmpFlag + ' '
+	elif opts.opencl:
+		cmd += openclFlag + ' '
 
 	for f in filesToCompile:
 		cmd += f + ' '
@@ -204,8 +237,7 @@ def writeLine (f, line, indent):
 			f.write("&")
 	f.write(line[baseIndex:])
 	
-
-def formatCode ():
+def formatCode (files):
 	end_regex        = re.compile("\s*end\s", re.IGNORECASE)
 	subroutine_regex = re.compile("\ssubroutine\s", re.IGNORECASE)	
 	do_regex         = re.compile("\s*do\s", re.IGNORECASE)
@@ -214,8 +246,6 @@ def formatCode ():
 	type_regex       = re.compile("\s*type\s", re.IGNORECASE)
 	call_regex       = re.compile("\s*call\s", re.IGNORECASE)
 	implicit_regex   = re.compile("\s*implicit none\s", re.IGNORECASE)
-
-	files = glob.glob(os.getcwd() + os.sep + "*.CUF")
 	
 	for fileName in files:
 		verboseMessage("Formatting '" + fileName + "'")
@@ -253,9 +283,11 @@ def formatCode ():
 				if callFound and line.endswith(")\n"):
 					f2.write("\n")
 					callFound = False
+					newLineNeeded = False
 				elif call_regex.match(line):
 					if not line.endswith("&\n"):
 						f2.write("\n")
+						newLineNeeded = False
 					else:
 						callFound = True			
 
@@ -263,14 +295,119 @@ def formatCode ():
 		f2.close()
 		os.rename(f2.name,f.name)
 
+def generateBackendMakefile (files):
+	verboseMessage("Generating Makefile for backend")
+
+	# Add the 'src' directory to the module search and PYTHONPATH
+	sys.path.append(sys.path[0] + os.sep + "src")
+
+	from FileDependencies import getBaseFileName, determineModuleDependencies
+	from Graph import Graph
+
+	# Work out the dependencies between modules 
+	g = determineModuleDependencies(files)
+
+	# Create the Makefile  
+	CUDAMakefile = open("Makefile.CUDA", "w")
+	   
+	# Makefile variables
+	CUDAMakefile.write("CC      = pgcc\n")
+	CUDAMakefile.write("FC      = pgfortran\n")
+	CUDAMakefile.write("LD      = $(FC)\n")
+	CUDAMakefile.write("DEBUG   = -g\n")
+	CUDAMakefile.write("LDFLAGS = -Mcuda=cuda3.1 -g\n")
+	CUDAMakefile.write("OUT     = airfoil_cuda\n\n")
+
+	# PHONY targets
+	CUDAMakefile.write("# Phony targets\n")
+	CUDAMakefile.write(".PHONY: all clean\n\n")
+	CUDAMakefile.write("all: $(OUT)\n\n")
+	CUDAMakefile.write("clean:\n\t")
+	CUDAMakefile.write("rm -f *.o *.mod *.MOD $(OUT)\n\n")
+
+	# Object files to be created
+	CUDAMakefile.write("# C, Fortran, and CUDA Fortran object files\n")
+	CUDAMakefile.write("C_OBJS       := $(patsubst %.c,%.o,$(wildcard *.c))\n")
+	CUDAMakefile.write("FORTRAN_OBJS := $(patsubst %.F95,%.o,$(wildcard *.F95))\n")
+	CUDAMakefile.write("CUDA_OBJS    := $(patsubst %.CUF,%.o,$(wildcard *.CUF))\n\n")
+
+	# File suffixes to recognise
+	CUDAMakefile.write("# Clear out all suffixes\n")
+	CUDAMakefile.write(".SUFFIXES:\n")
+	CUDAMakefile.write("# List only suffixes we use\n")
+	CUDAMakefile.write(".SUFFIXES: .o .c .F95 .CUF\n\n")
+
+	# New suffix rules to generate object files from .F95, .CUF, .c files
+	CUDAMakefile.write("# Suffix rules\n")
+	CUDAMakefile.write(".c.o:\n\t")
+	CUDAMakefile.write("@echo \"\\n===== BUILDING OBJECT FILE $@ =====\"\n\t")
+	CUDAMakefile.write("$(CC) $(DEBUG) -c $< -o $@\n\n")
+
+	CUDAMakefile.write(".F95.o:\n\t")
+	CUDAMakefile.write("@echo \"\\n===== BUILDING OBJECT FILE $@ =====\"\n\t")
+	CUDAMakefile.write("$(FC) $(DEBUG) -c $< -o $@\n\n")
+
+	CUDAMakefile.write(".CUF.o:\n\t")
+	CUDAMakefile.write("@echo \"\\n===== BUILDING OBJECT FILE $@ =====\"\n\t")
+	CUDAMakefile.write("$(FC) $(DEBUG) -c $< -o $@\n\n")
+
+	# How to link object files together
+	CUDAMakefile.write("# Link target\n")
+	CUDAMakefile.write("$(OUT): $(C_OBJS) $(FORTRAN_OBJS) $(CUDA_OBJS)\n\t")
+	CUDAMakefile.write("@echo \"\\n===== LINKING $(OUT) =====\"\n\t")
+	CUDAMakefile.write("$(FC) $(LDFLAGS) $(DEBUG) $(C_OBJS) $(FORTRAN_OBJS) $(CUDA_OBJS) -o $(OUT)\n\n")
+
+	# The Fortran and CUDA object files depend on the C object files
+	CUDAMakefile.write("# Dependencies\n")
+	CUDAMakefile.write("$(FORTRAN_OBJS) $(CUDA_OBJS): $(C_OBJS)\n\n")
+
+	CUDAMakefile.write("# Per-file dependencies\n")
+	# Loop through each vertex in the graph
+	for v in g.getVertices():
+	    dependencies = []
+	    # Discover non-dummy dependencies in the graph. This is 
+	    # because we currently add a dummy start vertex to the graph
+	    # and connect it to every vertex without predecessors.
+	    # (This is needed for the topological sort.)
+	    for p in v.getPredecessors():
+		if p != Graph.dummyFileName:
+		    dependencies.append(p)
+		            
+	    if len(dependencies) > 0:
+		CUDAMakefile.write(getBaseFileName(v.getFileName()) + ".o: ")
+		for d in dependencies:
+		    CUDAMakefile.write(getBaseFileName(d) + ".o ")
+		CUDAMakefile.write("\n\n")
+
+	CUDAMakefile.close()
+
+	return CUDAMakefile.name
+
+def generateTarball (files):
+	tar = tarfile.open("backend.tar.gz", "w:gz")
+
+	for f in files:
+		tar.add(os.path.basename(f))
+
+	tar.close()
+
 if opts.clean:
 	clean()
 
 if opts.compile:
 	compile()
+
+	# The files generated by our compiler
+	files = glob.glob(os.getcwd() + os.sep + "rose_*")
 	
 	if opts.format:
-		formatCode ()
+		formatCode (files)
+	
+	if opts.makefile:
+		files.append (generateBackendMakefile (files))
+
+	if opts.tarball:
+		generateTarball (files)
 
 if not opts.clean and not opts.compile:
 	exitMessage("No actions selected. Use %s for options." % helpShortFlag)

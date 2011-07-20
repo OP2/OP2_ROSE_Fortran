@@ -84,7 +84,7 @@ template <typename TSubroutineHeader>
        * ======================================================
        */
 
-      std::map <std::string, SgExpression *> initializers;
+      std::map <std::string, std::vector <SgExpression *> > initializers;
 
     protected:
 
@@ -165,6 +165,13 @@ template <typename TSubroutineHeader>
       {
         return OpConstDefinitions.find (variableName)
             != OpConstDefinitions.end ();
+      }
+
+      void
+      addInitializer (std::string const & variableName,
+          SgExpression * expression)
+      {
+        initializers[variableName].push_back (expression);
       }
 
     public:
@@ -335,8 +342,8 @@ template <typename TSubroutineHeader>
             variableName) != doubleDeclarations.end ();
       }
 
-      SgExpression *
-      getInitializer (std::string const & variableName)
+      std::vector <SgExpression *>
+      getInitializers (std::string const & variableName)
       {
         return initializers[variableName];
       }

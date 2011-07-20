@@ -42,22 +42,25 @@ FortranProgramDeclarationsAndDefinitions::visit (SgNode * node)
       SgVariableDeclaration * variableDeclaration = isSgVariableDeclaration (
           node);
 
-      string const
-          variableName =
-              variableDeclaration->get_variables ().front ()->get_name ().getString ();
-
-      SgType * type =
-          variableDeclaration->get_decl_item (variableName)->get_type ();
-
-      handleBaseTypeDeclaration (type, variableName);
-
-      SgAssignInitializer * assignmentInitializer =
-          isSgAssignInitializer (variableDeclaration->get_decl_item (
-              variableName)->get_initializer ());
-
-      if (assignmentInitializer != NULL)
+      for (SgInitializedNamePtrList::iterator it =
+          variableDeclaration->get_variables ().begin (); it
+          != variableDeclaration->get_variables ().end (); it++)
       {
-        initializers[variableName] = assignmentInitializer->get_operand ();
+        string const variableName = (*it)->get_name ().getString ();
+
+        SgType * type =
+            variableDeclaration->get_decl_item (variableName)->get_type ();
+
+        handleBaseTypeDeclaration (type, variableName);
+
+        SgAssignInitializer * assignmentInitializer =
+            isSgAssignInitializer (variableDeclaration->get_decl_item (
+                variableName)->get_initializer ());
+
+        if (assignmentInitializer != NULL)
+        {
+          addInitializer (variableName, assignmentInitializer->get_operand ());
+        }
       }
 
       break;
@@ -82,7 +85,7 @@ FortranProgramDeclarationsAndDefinitions::visit (SgNode * node)
             + rhs->unparseToString () + "' as assignment expression for '"
             + variableName + "'", Debug::OUTER_LOOP_LEVEL, __FILE__, __LINE__);
 
-        initializers[variableName] = rhs;
+        addInitializer (variableName, rhs);
       }
       else if (isSgPntrArrRefExp (lhs))
       {

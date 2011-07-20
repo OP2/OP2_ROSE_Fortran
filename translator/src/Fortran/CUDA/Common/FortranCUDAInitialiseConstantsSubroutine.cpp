@@ -96,6 +96,11 @@ FortranCUDAInitialiseConstantsSubroutine::createStatements ()
   using SageInterface::appendStatement;
   using std::string;
   using std::map;
+  using std::vector;
+
+  Debug::getInstance ()->debugMessage (
+      "Creating statements in initialise constants subroutine",
+      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
   for (map <string, OpConstDefinition *>::const_iterator it =
       declarations->firstOpConstDefinition (); it
@@ -103,17 +108,31 @@ FortranCUDAInitialiseConstantsSubroutine::createStatements ()
   {
     string const variableName = it->first;
 
+    Debug::getInstance ()->debugMessage ("Analysing constant '" + variableName
+        + "'", Debug::OUTER_LOOP_LEVEL, __FILE__, __LINE__);
+
     string const moduleVariableName = constantVariableNames[variableName];
 
-    SgExpression * initializer = declarations->getInitializer (variableName);
+    vector <SgExpression *> initializers = declarations->getInitializers (
+        variableName);
 
-    ROSE_ASSERT (initializer != NULL);
+    ROSE_ASSERT (initializers.empty() == false);
 
-    SgExprStatement * assignmentStatement = buildAssignStatement (
-        buildVarRefExp (variableDeclarations->get (moduleVariableName)),
-        initializer);
+    if (initializers.size () > 1)
+    {
+      Debug::getInstance ()->errorMessage (
+          "Too many initializers found for the OP_CONST '" + variableName + "'");
+    }
+    else
+    {
+      SgExpression * initializer = *(initializers.begin ());
 
-    appendStatement (assignmentStatement, subroutineScope);
+      SgExprStatement * assignmentStatement = buildAssignStatement (
+          buildVarRefExp (variableDeclarations->get (moduleVariableName)),
+          initializer);
+
+      appendStatement (assignmentStatement, subroutineScope);
+    }
   }
 }
 

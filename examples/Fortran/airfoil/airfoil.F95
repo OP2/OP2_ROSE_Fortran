@@ -124,10 +124,15 @@ use, intrinsic :: ISO_C_BINDING
   call op_decl_dat ( cells, 1, adt, p_adt, adtName )
   call op_decl_dat ( cells, 4, res, p_res, resName )
 	
-	call op_decl_gbl ( rms, 1, p_rms )
+   call op_decl_gbl ( rms, 1, p_rms )
 
    call op_decl_const (1, gam)
-	
+   call op_decl_const (1, gm1)
+   call op_decl_const (1, cfl)
+   call op_decl_const (1, eps)
+   call op_decl_const (1, mach)
+   call op_decl_const (1, alpha)
+
 	! main time-marching loop
 	
   do niter = 1, iterationNumber

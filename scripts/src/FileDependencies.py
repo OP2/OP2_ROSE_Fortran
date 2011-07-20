@@ -8,22 +8,17 @@ def getBaseFileName (fileName):
     fileExtensionCharacter = fileName.rfind('.')
     return fileName[lastDirectorySeparator+1:fileExtensionCharacter]
 
-def determineModuleDependencies (fileExtensions):
+def determineModuleDependencies (fileList):
     # The graph models the dependencies and is returned by this function
     g = Graph()
     
     # Mapping from a module name to its file name
     moduleNameToFileName = {}
     
-    # Get all files in this directory matching the given fileExtension
-    fileList = []
-    for ext in fileExtensions:   
-        fileList += glob.glob(os.getcwd() + os.sep + "*." + ext)
-    
-    for fileName in fileList:        
+    for fileName in fileList:      
         g.addVertex(fileName)
         file = open(fileName)
-        module_line_regex = re.compile("^\s*module\s+(\S+)\s*$")
+        module_line_regex = re.compile("^\s*module\s+(\S+)\s*$", re.IGNORECASE)
         
         for line in file:
             if module_line_regex.search(line):
@@ -33,7 +28,7 @@ def determineModuleDependencies (fileExtensions):
         
     for fileName in fileList:    
         file = open(fileName)
-        use_line_regex = re.compile("^\s*use")        
+        use_line_regex = re.compile("^\s*use", re.IGNORECASE)        
         
         for line in file:
             if use_line_regex.search(line):

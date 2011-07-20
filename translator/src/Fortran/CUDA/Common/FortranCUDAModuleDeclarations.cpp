@@ -55,6 +55,10 @@ FortranCUDAModuleDeclarations::FortranCUDAModuleDeclarations (
       dataSizesDeclaration (dataSizesDeclaration), dimensionsDeclaration (
           dimensionsDeclaration)
 {
+  Debug::getInstance ()->debugMessage (
+      "Generating CUDA module scope declarations",
+      Debug::CONSTRUCTOR_LEVEL, __FILE__, __LINE__);
+
   createDataSizesDeclaration ();
 
   createDimensionsDeclaration ();
