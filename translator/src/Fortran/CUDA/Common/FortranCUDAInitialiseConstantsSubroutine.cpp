@@ -120,6 +120,12 @@ FortranCUDAInitialiseConstantsSubroutine::createStatements ()
 
     if (initializers.size () > 1)
     {
+      for (vector <SgExpression *>::iterator it = initializers.begin (); it
+          != initializers.end (); ++it)
+      {
+        std::cout << (*it)->unparseToString ();
+      }
+
       Debug::getInstance ()->errorMessage (
           "Too many initializers found for the OP_CONST '" + variableName + "'");
     }

@@ -1,6 +1,34 @@
 #include <FortranCUDAModuleDeclarations.h>
 #include <FortranStatementsAndExpressionsBuilder.h>
 #include <FortranTypesBuilder.h>
+#include <FortranCUDAReductionSubroutine.h>
+
+/*
+ * ======================================================
+ * Protected functions
+ * ======================================================
+ */
+
+void
+FortranCUDAModuleDeclarations::createReductionDeclarations ()
+{
+  SgVariableDeclaration * variableDeclaration1 =
+      FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
+          ReductionSubroutine::reductionArrayHost,
+          parallelLoop->getReductionType (), moduleScope, 1, ALLOCATABLE);
+
+  variableDeclarations->add (ReductionSubroutine::reductionArrayHost,
+      variableDeclaration1);
+
+  SgVariableDeclaration * variableDeclaration2 =
+      FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
+          ReductionSubroutine::reductionArrayDevice,
+          parallelLoop->getReductionType (), moduleScope, 2, ALLOCATABLE,
+          DEVICE);
+
+  variableDeclarations->add (ReductionSubroutine::reductionArrayDevice,
+      variableDeclaration2);
+}
 
 void
 FortranCUDAModuleDeclarations::createDataSizesDeclaration ()
@@ -34,6 +62,24 @@ FortranCUDAModuleDeclarations::createDimensionsDeclaration ()
       variableDeclaration);
 }
 
+/*
+ * ======================================================
+ * Public functions
+ * ======================================================
+ */
+
+SgVariableDeclaration *
+FortranCUDAModuleDeclarations::getReductionArrayHostVariableDeclaration ()
+{
+  return variableDeclarations->get (ReductionSubroutine::reductionArrayHost);
+}
+
+SgVariableDeclaration *
+FortranCUDAModuleDeclarations::getReductionArrayDeviceVariableDeclaration ()
+{
+  return variableDeclarations->get (ReductionSubroutine::reductionArrayDevice);
+}
+
 SgVariableDeclaration *
 FortranCUDAModuleDeclarations::getDataSizesVariableDeclaration ()
 {
@@ -56,10 +102,15 @@ FortranCUDAModuleDeclarations::FortranCUDAModuleDeclarations (
           dimensionsDeclaration)
 {
   Debug::getInstance ()->debugMessage (
-      "Generating CUDA module scope declarations",
-      Debug::CONSTRUCTOR_LEVEL, __FILE__, __LINE__);
+      "Generating CUDA module scope declarations", Debug::CONSTRUCTOR_LEVEL,
+      __FILE__, __LINE__);
 
   createDataSizesDeclaration ();
 
   createDimensionsDeclaration ();
+
+  if (parallelLoop->isReductionRequired ())
+  {
+    createReductionDeclarations ();
+  }
 }

@@ -1,6 +1,7 @@
 #include <iostream>
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
+#include <boost/filesystem.hpp>
 #include <CommandLine.h>
 #include <Debug.h>
 #include <Globals.h>
@@ -243,6 +244,8 @@ void
 CommandLine::parse (int argc, char ** argv)
 {
   using boost::to_lower_copy;
+  using boost::filesystem::path;
+  using boost::filesystem::system_complete;
   using std::string;
 
   CommandLineOptionWithParameters * paramterisedOption = NULL;
@@ -279,7 +282,13 @@ CommandLine::parse (int argc, char ** argv)
         Debug::getInstance ()->debugMessage (string (argv[i])
             + " is a ROSE option", Debug::VERBOSE_LEVEL, __FILE__, __LINE__);
 
+        path p = system_complete (path (argv[i]));
+
+        std::cout << p.file_string() << std::endl;
+
         ROSEArguments.push_back (argv[i]);
+
+        Globals::getInstance ()->addInputFile (p.file_string ());
       }
       else
       {

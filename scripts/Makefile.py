@@ -257,7 +257,9 @@ def formatCode (files):
 		f             = open(fileName, "r")
 
 		for line in f:
-			if end_regex.match(line):
+			if line.strip() and (line.strip()[0] == '#' or line.strip()[0] == '!'):
+				f2.write(line)
+			elif end_regex.match(line):
 				if not type_regex.search(line):
 					indent = indent - 2
 				writeLine(f2, line, indent)

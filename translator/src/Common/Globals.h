@@ -23,6 +23,8 @@ class Globals
 
     bool uDrawOption;
 
+    std::vector<std::string> inputFiles;
+
   private:
 
     /*
@@ -71,6 +73,12 @@ class Globals
 
     bool
     outputUDrawGraphs () const;
+
+    void
+    addInputFile (std::string const & fileName);
+
+    bool
+    isInputFile (std::string const & fileName) const;
 };
 
 #endif

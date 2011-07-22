@@ -358,6 +358,42 @@ template <typename TSubroutineHeader, typename TDeclarations>
 
       /*
        * ======================================================
+       * Get the reduction type for this OP_PAR_LOOP.
+       * WARNING: This assumes that there is ONLY ONE OP_DAT
+       * which needs a reduction
+       * ======================================================
+       */
+      SgType *
+      getReductionType ()
+      {
+        SgType * type;
+        int count = 0;
+
+        for (unsigned int i = 1; i <= getNumberOfOpDatArgumentGroups (); ++i)
+        {
+          if (OpDatMappingDescriptors[i] == GLOBAL && OpDatAccessDescriptors[i]
+              != READ_ACCESS)
+          {
+            count++;
+            type = OpDatTypes[i];
+          }
+        }
+
+        if (count > 1)
+        {
+          Debug::getInstance ()->errorMessage (
+              "Compiler cannot currently handle parallel loop with multiple reduction arguments");
+        }
+        else if (count == 0)
+        {
+          Debug::getInstance ()->errorMessage ("No reduction argument found");
+        }
+
+        return type;
+      }
+
+      /*
+       * ======================================================
        * What is the name of the OP_DAT variable in this OP_DAT
        * argument group
        * ======================================================

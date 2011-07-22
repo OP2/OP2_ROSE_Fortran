@@ -23,6 +23,10 @@ FortranCUDAHostSubroutineDirectLoop::createKernelFunctionCallStatement ()
   using SageBuilder::buildVoidType;
   using SageInterface::appendStatement;
 
+  Debug::getInstance ()->debugMessage (
+      "Creating statement to call CUDA kernel", Debug::FUNCTION_LEVEL,
+      __FILE__, __LINE__);
+
   SgExprListExp * actualParameters = buildExprListExp ();
 
   actualParameters->append_expression (buildVarRefExp (
@@ -43,8 +47,7 @@ FortranCUDAHostSubroutineDirectLoop::createKernelFunctionCallStatement ()
       else
       {
         actualParameters->append_expression (buildVarRefExp (
-            variableDeclarations->get (
-                ReductionSubroutine::reductionArrayDevice)));
+            moduleDeclarations->getReductionArrayDeviceVariableDeclaration ()));
       }
     }
   }

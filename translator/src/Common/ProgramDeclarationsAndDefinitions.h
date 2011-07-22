@@ -83,8 +83,14 @@ template <typename TSubroutineHeader>
        * Mapping from variable name to its initializer expression
        * ======================================================
        */
-
       std::map <std::string, std::vector <SgExpression *> > initializers;
+
+      /*
+       * ======================================================
+       * The source file AST currently being scanned
+       * ======================================================
+       */
+      std::string currentSourceFile;
 
     protected:
 
@@ -171,6 +177,10 @@ template <typename TSubroutineHeader>
       addInitializer (std::string const & variableName,
           SgExpression * expression)
       {
+        Debug::getInstance ()->debugMessage ("Adding "
+            + expression->unparseToString () + " for variable '" + variableName
+            + "'", Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+
         initializers[variableName].push_back (expression);
       }
 
