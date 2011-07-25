@@ -4,7 +4,6 @@ import os
 import re
 import sys	
 import glob
-import tarfile
 from optparse import OptionParser
 from subprocess import Popen, PIPE
 
@@ -84,13 +83,6 @@ parser.add_option("-M",
                  action="store_true",
                  dest="makefile",
                  help="Generate a Makefile for the target backend.",
-                 default=False)
-
-parser.add_option("-T",
-                 "--tarball",
-                 action="store_true",
-                 dest="tarball",
-                 help="Generate a tarball of the generated files (and Makefile if selected).",
                  default=False)
 
 (opts, args) = parser.parse_args(sys.argv[1:])
@@ -385,14 +377,6 @@ def generateBackendMakefile (files):
 
 	return CUDAMakefile.name
 
-def generateTarball (files):
-	tar = tarfile.open("backend.tar.gz", "w:gz")
-
-	for f in files:
-		tar.add(os.path.basename(f))
-
-	tar.close()
-
 if opts.clean:
 	clean()
 
@@ -407,9 +391,6 @@ if opts.compile:
 	
 	if opts.makefile:
 		files.append (generateBackendMakefile (files))
-
-	if opts.tarball:
-		generateTarball (files)
 
 if not opts.clean and not opts.compile:
 	exitMessage("No actions selected. Use %s for options." % helpShortFlag)

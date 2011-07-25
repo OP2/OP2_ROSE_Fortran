@@ -45,11 +45,19 @@ template <typename TDeclarations, typename TParallelLoop,
 
       /*
        * ======================================================
-       * The file extension for the file in which the new
+       * The suffix of the file in which the new
        * subroutines are output
        * ======================================================
        */
-      std::string fileExtension;
+      std::string fileSuffix;
+
+      /*
+       * ======================================================
+       * The scope of the module into which the generated code
+       * is output
+       * ======================================================
+       */
+      SgScopeStatement * moduleScope;
 
     protected:
 
@@ -60,8 +68,7 @@ template <typename TDeclarations, typename TParallelLoop,
        */
       virtual THostSubroutine *
       createSubroutines (TParallelLoop * parallelLoop,
-          std::string const & userSubroutineName,
-          SgScopeStatement * moduleScope) = 0;
+          std::string const & userSubroutineName) = 0;
 
       /*
        * ======================================================
@@ -79,7 +86,7 @@ template <typename TDeclarations, typename TParallelLoop,
        * ======================================================
        */
       virtual SgSourceFile &
-      createSourceFile (TParallelLoop & parallelLoop) = 0;
+      createSourceFile () = 0;
 
       /*
        * ======================================================
@@ -116,8 +123,8 @@ template <typename TDeclarations, typename TParallelLoop,
       }
 
       SubroutinesGeneration (TDeclarations * declarations,
-          std::string const & fileExtension) :
-        declarations (declarations), fileExtension (fileExtension)
+          std::string const & fileSuffix) :
+        declarations (declarations), fileSuffix (fileSuffix)
       {
       }
   };

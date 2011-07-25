@@ -118,8 +118,8 @@ FortranParallelLoop::retrieveOpDatDeclarations (
    * ======================================================
    */
 
-  for (vector <SgExpression *>::iterator it = actualArguments.begin ()
-      + NUMBER_OF_NON_OP_DAT_ARGUMENTS; it != actualArguments.end (); ++it)
+  for (vector <SgExpression *>::iterator it = getActualArguments ().begin ()
+      + NUMBER_OF_NON_OP_DAT_ARGUMENTS; it != getActualArguments ().end (); ++it)
   {
     switch ((*it)->variantT ())
     {
@@ -356,9 +356,9 @@ FortranParallelLoop::generateReductionSubroutines (
 }
 
 unsigned int
-FortranParallelLoop::getNumberOfOpDatArgumentGroups () const
+FortranParallelLoop::getNumberOfOpDatArgumentGroups ()
 {
-  return (actualArguments.size () - NUMBER_OF_NON_OP_DAT_ARGUMENTS)
+  return (getActualArguments().size () - NUMBER_OF_NON_OP_DAT_ARGUMENTS)
       / NUMBER_OF_ARGUMENTS_PER_OP_DAT;
 }
 
@@ -369,28 +369,6 @@ FortranParallelLoop::FortranParallelLoop (
       FortranProgramDeclarationsAndDefinitions> (functionCallExpression)
 {
   using boost::iequals;
-
-  switch (Globals::getInstance ()->getTargetBackend ())
-  {
-    case TargetBackends::CUDA:
-    {
-      moduleName = userSubroutineName + "_cudafor";
-
-      break;
-    }
-
-    case TargetBackends::OPENMP:
-    {
-      moduleName = userSubroutineName + "_openmp";
-
-      break;
-    }
-
-    default:
-    {
-      break;
-    }
-  }
 
   retrieveOpDatDeclarations (declarations);
 

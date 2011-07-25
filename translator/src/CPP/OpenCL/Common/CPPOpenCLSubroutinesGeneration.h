@@ -15,7 +15,7 @@ class CPPOpenCLSubroutinesGeneration: public CPPSubroutinesGeneration
 
     virtual CPPHostSubroutine *
     createSubroutines (CPPParallelLoop * parallelLoop,
-        std::string const & userSubroutineName, SgScopeStatement * moduleScope);
+        std::string const & userSubroutineName);
 
     virtual void
     addLibraries (SgModuleStatement * moduleStatement);

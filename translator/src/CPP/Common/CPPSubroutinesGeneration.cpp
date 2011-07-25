@@ -13,7 +13,7 @@ CPPSubroutinesGeneration::patchCallsToParallelLoops ()
 }
 
 SgSourceFile &
-CPPSubroutinesGeneration::createSourceFile (CPPParallelLoop & parallelLoop)
+CPPSubroutinesGeneration::createSourceFile ()
 {
   using SageBuilder::buildFile;
   using std::string;
@@ -29,8 +29,7 @@ CPPSubroutinesGeneration::createSourceFile (CPPParallelLoop & parallelLoop)
    * suitably be ignored
    * ======================================================
    */
-  string const inputFileName = "BLANK_" + parallelLoop.getModuleName ()
-      + ".F95";
+  string const inputFileName = "BLANK.cpp";
 
   FILE * inputFile = fopen (inputFileName.c_str (), "w+");
   if (inputFile != NULL)
@@ -42,8 +41,8 @@ CPPSubroutinesGeneration::createSourceFile (CPPParallelLoop & parallelLoop)
   }
   else
   {
-    Debug::getInstance ()->errorMessage (
-        "Could not create dummy Fortran file '" + inputFileName + "'");
+    Debug::getInstance ()->errorMessage ("Could not create dummy C++ file '"
+        + inputFileName + "'");
   }
 
   /*
@@ -55,7 +54,7 @@ CPPSubroutinesGeneration::createSourceFile (CPPParallelLoop & parallelLoop)
    * ======================================================
    */
 
-  string outputFileName = parallelLoop.getModuleName () + fileExtension;
+  string outputFileName = "rose_" + fileSuffix;
 
   Debug::getInstance ()->debugMessage ("Generating file '" + outputFileName
       + "'", Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
@@ -65,20 +64,10 @@ CPPSubroutinesGeneration::createSourceFile (CPPParallelLoop & parallelLoop)
 
   /*
    * ======================================================
-   * Later unparse according to the Fortran 95 standard
+   * Later unparse C++ code
    * ======================================================
    */
-  sourceFile->set_F95_only (true);
-
-  /*
-   * ======================================================
-   * No implicit symbols shall be allowed in the generated
-   * Fortran file
-   * ======================================================
-   */
-  sourceFile->set_fortran_implicit_none (true);
-
-  sourceFile->set_outputFormat (SgFile::e_free_form_output_format);
+  sourceFile->set_Cxx_only (true);
 
   /*
    * ======================================================
@@ -165,20 +154,12 @@ CPPSubroutinesGeneration::visit (SgNode * node)
 
           /*
            * ======================================================
-           * Generate an additional source file for this OP_PAR_LOOP
-           * ======================================================
-           */
-
-          SgSourceFile & sourceFile = createSourceFile (*parallelLoop);
-
-          /*
-           * ======================================================
            * Create the subroutines
            * ======================================================
            */
 
           CPPHostSubroutine * hostSubroutine = createSubroutines (parallelLoop,
-              userSubroutineName, sourceFile.get_globalScope ());
+              userSubroutineName);
 
           hostSubroutines[userSubroutineName] = hostSubroutine;
         }
@@ -203,4 +184,15 @@ CPPSubroutinesGeneration::visit (SgNode * node)
       break;
     }
   }
+}
+
+CPPSubroutinesGeneration::CPPSubroutinesGeneration (
+    CPPProgramDeclarationsAndDefinitions * declarations,
+    std::string const & fileSuffix) :
+  SubroutinesGeneration <CPPProgramDeclarationsAndDefinitions, CPPParallelLoop,
+      CPPHostSubroutine> (declarations, fileSuffix)
+{
+  SgSourceFile & sourceFile = createSourceFile ();
+
+  moduleScope = sourceFile.get_globalScope ();
 }

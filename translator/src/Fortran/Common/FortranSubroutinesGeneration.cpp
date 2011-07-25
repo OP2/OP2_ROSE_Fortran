@@ -109,7 +109,7 @@ FortranSubroutinesGeneration::patchCallsToParallelLoops ()
 
     SgUseStatement * newUseStatement = new SgUseStatement (
         getEnclosingFileNode (lastUseStatement)->get_file_info (),
-        parallelLoop->getModuleName (), false);
+        "MODULE_NAME", false);
 
     insertStatementAfter (lastUseStatement, newUseStatement);
 
@@ -177,7 +177,7 @@ FortranSubroutinesGeneration::patchCallsToParallelLoops ()
 }
 
 void
-FortranSubroutinesGeneration::addContains (SgScopeStatement * moduleScope)
+FortranSubroutinesGeneration::addContains ()
 {
   using SageInterface::appendStatement;
 
@@ -190,8 +190,7 @@ FortranSubroutinesGeneration::addContains (SgScopeStatement * moduleScope)
 }
 
 SgModuleStatement *
-FortranSubroutinesGeneration::createFortranModule (SgSourceFile & sourceFile,
-    FortranParallelLoop & parallelLoop)
+FortranSubroutinesGeneration::createFortranModule (SgSourceFile & sourceFile)
 {
   using std::string;
   using std::vector;
@@ -203,8 +202,8 @@ FortranSubroutinesGeneration::createFortranModule (SgSourceFile & sourceFile,
   SgGlobal * globalScope = sourceFile.get_globalScope ();
 
   SgModuleStatement * moduleStatement =
-      FortranTypesBuilder::buildModuleDeclaration (
-          parallelLoop.getModuleName (), globalScope);
+      FortranTypesBuilder::buildModuleDeclaration ("GENERATED_MODULE",
+          globalScope);
 
   moduleStatement->get_definition ()->setCaseInsensitive (true);
 
@@ -214,8 +213,7 @@ FortranSubroutinesGeneration::createFortranModule (SgSourceFile & sourceFile,
 }
 
 SgSourceFile &
-FortranSubroutinesGeneration::createSourceFile (
-    FortranParallelLoop & parallelLoop)
+FortranSubroutinesGeneration::createSourceFile ()
 {
   using SageBuilder::buildFile;
   using std::string;
@@ -231,8 +229,7 @@ FortranSubroutinesGeneration::createSourceFile (
    * suitably be ignored
    * ======================================================
    */
-  string const inputFileName = "BLANK_" + parallelLoop.getModuleName ()
-      + ".F95";
+  string const inputFileName = "BLANK.F95";
 
   FILE * inputFile = fopen (inputFileName.c_str (), "w+");
   if (inputFile != NULL)
@@ -257,8 +254,7 @@ FortranSubroutinesGeneration::createSourceFile (
    * ======================================================
    */
 
-  string outputFileName = "rose_" + parallelLoop.getModuleName ()
-      + fileExtension;
+  string outputFileName = "rose_" + fileSuffix;
 
   Debug::getInstance ()->debugMessage ("Generating file '" + outputFileName
       + "'", Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
@@ -372,38 +368,12 @@ FortranSubroutinesGeneration::visit (SgNode * node)
 
           /*
            * ======================================================
-           * Generate an additional source file for this OP_PAR_LOOP
-           * ======================================================
-           */
-
-          SgSourceFile & sourceFile = createSourceFile (*parallelLoop);
-
-          /*
-           * ======================================================
-           * Create the Fortran module
-           * ======================================================
-           */
-
-          SgModuleStatement * moduleStatement = createFortranModule (
-              sourceFile, *parallelLoop);
-
-          /*
-           * ======================================================
-           * Add the library 'use' statements
-           * ======================================================
-           */
-
-          addLibraries (moduleStatement);
-
-          /*
-           * ======================================================
            * Create the subroutines
            * ======================================================
            */
 
           FortranHostSubroutine * hostSubroutine = createSubroutines (
-              parallelLoop, userSubroutineName,
-              moduleStatement->get_definition ());
+              parallelLoop, userSubroutineName);
 
           hostSubroutines[userSubroutineName] = hostSubroutine;
         }
@@ -434,4 +404,17 @@ FortranSubroutinesGeneration::visit (SgNode * node)
       break;
     }
   }
+}
+
+FortranSubroutinesGeneration::FortranSubroutinesGeneration (
+    FortranProgramDeclarationsAndDefinitions * declarations,
+    std::string const & fileSuffix) :
+  SubroutinesGeneration <FortranProgramDeclarationsAndDefinitions,
+      FortranParallelLoop, FortranHostSubroutine> (declarations, fileSuffix)
+{
+  SgSourceFile & sourceFile = createSourceFile ();
+
+  SgModuleStatement * moduleStatement = createFortranModule (sourceFile);
+
+  moduleScope = moduleStatement->get_definition ();
 }

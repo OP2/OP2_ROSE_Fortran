@@ -15,8 +15,7 @@
 
 FortranHostSubroutine *
 FortranOpenMPSubroutinesGeneration::createSubroutines (
-    FortranParallelLoop * parallelLoop, std::string const & userSubroutineName,
-    SgScopeStatement * moduleScope)
+    FortranParallelLoop * parallelLoop, std::string const & userSubroutineName)
 {
   FortranOpenMPKernelSubroutine * kernelSubroutine;
 
@@ -37,8 +36,6 @@ FortranOpenMPSubroutinesGeneration::createSubroutines (
     FortranOpenMPModuleDeclarationsDirectLoop * moduleDeclarations =
         new FortranOpenMPModuleDeclarationsDirectLoop (userSubroutineName,
             parallelLoop, moduleScope);
-
-    addContains (moduleScope);
 
     kernelSubroutine = new FortranOpenMPKernelSubroutineDirectLoop (
         userSubroutineName, userSubroutineName, parallelLoop, moduleScope);
@@ -64,8 +61,6 @@ FortranOpenMPSubroutinesGeneration::createSubroutines (
         new FortranOpenMPModuleDeclarationsIndirectLoop (userSubroutineName,
             parallelLoop, moduleScope);
 
-    addContains (moduleScope);
-
     kernelSubroutine = new FortranOpenMPKernelSubroutineIndirectLoop (
         userSubroutineName, userSubroutineName, parallelLoop, moduleScope);
 
@@ -79,8 +74,7 @@ FortranOpenMPSubroutinesGeneration::createSubroutines (
 }
 
 void
-FortranOpenMPSubroutinesGeneration::addLibraries (
-    SgModuleStatement * moduleStatement)
+FortranOpenMPSubroutinesGeneration::addLibraries ()
 {
   using boost::iequals;
   using std::string;
@@ -101,9 +95,9 @@ FortranOpenMPSubroutinesGeneration::addLibraries (
     SgUseStatement* useStatement = new SgUseStatement (
         RoseHelper::getFileInfo (), *it, false);
 
-    useStatement->set_definingDeclaration (moduleStatement);
+    useStatement->set_definingDeclaration (useStatement);
 
-    appendStatement (useStatement, moduleStatement->get_definition ());
+    appendStatement (useStatement, moduleScope);
 
     if (iequals (*it, Libraries::OMP_LIB))
     {
@@ -125,8 +119,10 @@ FortranOpenMPSubroutinesGeneration::addLibraries (
 FortranOpenMPSubroutinesGeneration::FortranOpenMPSubroutinesGeneration (
     SgProject * project,
     FortranProgramDeclarationsAndDefinitions * declarations) :
-  FortranSubroutinesGeneration (declarations, ".F95")
+  FortranSubroutinesGeneration (declarations, "openmp_subroutines.F95")
 {
+  addLibraries ();
+
   traverseInputFiles (project, preorder);
 
   patchCallsToParallelLoops ();

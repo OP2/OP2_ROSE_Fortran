@@ -18,8 +18,7 @@
 
 FortranHostSubroutine *
 FortranCUDASubroutinesGeneration::createSubroutines (
-    FortranParallelLoop * parallelLoop, std::string const & userSubroutineName,
-    SgScopeStatement * moduleScope)
+    FortranParallelLoop * parallelLoop, std::string const & userSubroutineName)
 {
   /*
    * ======================================================
@@ -62,8 +61,6 @@ FortranCUDASubroutinesGeneration::createSubroutines (
         new FortranCUDAModuleDeclarations (userSubroutineName, parallelLoop,
             moduleScope, dataSizesDeclaration, dimensionsDeclaration);
 
-    addContains (moduleScope);
-
     initialiseConstantsSubroutine->generateSubroutine ();
 
     userDeviceSubroutine = new FortranCUDAUserSubroutine (userSubroutineName,
@@ -71,8 +68,7 @@ FortranCUDASubroutinesGeneration::createSubroutines (
 
     kernelSubroutine = new FortranCUDAKernelSubroutineDirectLoop (
         userSubroutineName, userDeviceSubroutine->getSubroutineName (),
-        parallelLoop, moduleScope, dataSizesDeclaration,
-        dimensionsDeclaration);
+        parallelLoop, moduleScope, dataSizesDeclaration, dimensionsDeclaration);
 
     hostSubroutine = new FortranCUDAHostSubroutineDirectLoop (
         userSubroutineName, userSubroutineName,
@@ -101,8 +97,6 @@ FortranCUDASubroutinesGeneration::createSubroutines (
             parallelLoop, moduleScope, dataSizesDeclaration,
             dimensionsDeclaration);
 
-    addContains (moduleScope);
-
     initialiseConstantsSubroutine->generateSubroutine ();
 
     userDeviceSubroutine = new FortranCUDAUserSubroutine (userSubroutineName,
@@ -110,8 +104,7 @@ FortranCUDASubroutinesGeneration::createSubroutines (
 
     kernelSubroutine = new FortranCUDAKernelSubroutineIndirectLoop (
         userSubroutineName, userDeviceSubroutine->getSubroutineName (),
-        parallelLoop, moduleScope, dataSizesDeclaration,
-        dimensionsDeclaration);
+        parallelLoop, moduleScope, dataSizesDeclaration, dimensionsDeclaration);
 
     hostSubroutine = new FortranCUDAHostSubroutineIndirectLoop (
         userSubroutineName, userSubroutineName,
@@ -124,8 +117,7 @@ FortranCUDASubroutinesGeneration::createSubroutines (
 }
 
 void
-FortranCUDASubroutinesGeneration::addLibraries (
-    SgModuleStatement * moduleStatement)
+FortranCUDASubroutinesGeneration::addLibraries ()
 {
   using std::string;
   using std::vector;
@@ -146,9 +138,9 @@ FortranCUDASubroutinesGeneration::addLibraries (
     SgUseStatement* useStatement = new SgUseStatement (
         RoseHelper::getFileInfo (), *it, false);
 
-    useStatement->set_definingDeclaration (moduleStatement);
+    useStatement->set_definingDeclaration (useStatement);
 
-    appendStatement (useStatement, moduleStatement->get_definition ());
+    appendStatement (useStatement, moduleScope);
   }
 }
 
@@ -161,8 +153,10 @@ FortranCUDASubroutinesGeneration::addLibraries (
 FortranCUDASubroutinesGeneration::FortranCUDASubroutinesGeneration (
     SgProject * project,
     FortranProgramDeclarationsAndDefinitions * declarations) :
-  FortranSubroutinesGeneration (declarations, ".CUF")
+  FortranSubroutinesGeneration (declarations, "cuda_code.CUF")
 {
+  addLibraries ();
+
   traverseInputFiles (project, preorder);
 
   patchCallsToParallelLoops ();

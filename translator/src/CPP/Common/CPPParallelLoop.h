@@ -55,7 +55,7 @@ class CPPParallelLoop: public ParallelLoop <SgFunctionDeclaration,
     generateReductionSubroutines (SgScopeStatement * moduleScope);
 
     virtual unsigned int
-    getNumberOfOpDatArgumentGroups () const;
+    getNumberOfOpDatArgumentGroups ();
 
     CPPParallelLoop (SgFunctionCallExp * functionCallExpression,
         std::string userSubroutineName,

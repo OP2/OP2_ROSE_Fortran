@@ -29,21 +29,6 @@ template <typename TSubroutineHeader, typename TDeclarations>
 
       /*
        * ======================================================
-       * The name of the generated Fortran/C++ module for this
-       * OP_PAR_LOOP
-       * ======================================================
-       */
-      std::string moduleName;
-
-      /*
-       * ======================================================
-       * The actual arguments passed to the OP_PAR_LOOP
-       * ======================================================
-       */
-      SgExpressionPtrList actualArguments;
-
-      /*
-       * ======================================================
        * The function call expression where the call to the
        * OP_PAR_LOOP occurs
        * ======================================================
@@ -159,8 +144,7 @@ template <typename TSubroutineHeader, typename TDeclarations>
       retrieveOpDatDeclarations (TDeclarations * declarations) = 0;
 
       ParallelLoop (SgFunctionCallExp * functionCallExpression) :
-        functionCallExpression (functionCallExpression), actualArguments (
-            functionCallExpression->get_args ()->get_expressions ())
+        functionCallExpression (functionCallExpression)
       {
       }
 
@@ -181,7 +165,7 @@ template <typename TSubroutineHeader, typename TDeclarations>
        * ======================================================
        */
       virtual unsigned int
-      getNumberOfOpDatArgumentGroups () const = 0;
+      getNumberOfOpDatArgumentGroups () = 0;
 
       /*
        * ======================================================
@@ -430,25 +414,13 @@ template <typename TSubroutineHeader, typename TDeclarations>
 
       /*
        * ======================================================
-       * What is the name of the module generated for this
-       * OP_PAR_LOOP containing the generated subroutines?
-       * ======================================================
-       */
-      std::string const &
-      getModuleName () const
-      {
-        return moduleName;
-      }
-
-      /*
-       * ======================================================
        * Returns the actual arguments passed to the OP_PAR_LOOP
        * ======================================================
        */
       SgExpressionPtrList &
       getActualArguments ()
       {
-        return actualArguments;
+        return functionCallExpression->get_args ()->get_expressions ();
       }
 
       /*

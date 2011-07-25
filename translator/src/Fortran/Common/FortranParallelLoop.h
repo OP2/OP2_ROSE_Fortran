@@ -63,7 +63,7 @@ class FortranParallelLoop: public ParallelLoop <SgProcedureHeaderStatement,
     generateReductionSubroutines (SgScopeStatement * moduleScope);
 
     virtual unsigned int
-    getNumberOfOpDatArgumentGroups () const;
+    getNumberOfOpDatArgumentGroups ();
 
     FortranParallelLoop (SgFunctionCallExp * functionCallExpression,
         std::string userSubroutineName,

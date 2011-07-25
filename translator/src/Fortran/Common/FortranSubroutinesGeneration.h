@@ -22,11 +22,11 @@ class FortranSubroutinesGeneration: public SubroutinesGeneration <
 {
   protected:
 
-    virtual FortranHostSubroutine
-        *
-        createSubroutines (FortranParallelLoop * parallelLoop,
-            std::string const & userSubroutineName,
-            SgScopeStatement * moduleScope) = 0;
+  protected:
+
+    virtual FortranHostSubroutine *
+    createSubroutines (FortranParallelLoop * parallelLoop,
+        std::string const & userSubroutineName) = 0;
 
     /*
      * ======================================================
@@ -36,7 +36,7 @@ class FortranSubroutinesGeneration: public SubroutinesGeneration <
      */
 
     virtual void
-    addLibraries (SgModuleStatement * moduleStatement) = 0;
+    addLibraries () = 0;
 
     void
     patchCallsToParallelLoops ();
@@ -49,7 +49,7 @@ class FortranSubroutinesGeneration: public SubroutinesGeneration <
      */
 
     void
-    addContains (SgScopeStatement * moduleScope);
+    addContains ();
 
     /*
      * ======================================================
@@ -58,8 +58,7 @@ class FortranSubroutinesGeneration: public SubroutinesGeneration <
      */
 
     SgModuleStatement *
-    createFortranModule (SgSourceFile & sourceFile,
-        FortranParallelLoop & parallelLoop);
+    createFortranModule (SgSourceFile & sourceFile);
 
     /*
      * ======================================================
@@ -69,7 +68,7 @@ class FortranSubroutinesGeneration: public SubroutinesGeneration <
      */
 
     SgSourceFile &
-    createSourceFile (FortranParallelLoop & parallelLoop);
+    createSourceFile ();
 
     virtual void
     visit (SgNode * node);
@@ -78,12 +77,7 @@ class FortranSubroutinesGeneration: public SubroutinesGeneration <
 
     FortranSubroutinesGeneration (
         FortranProgramDeclarationsAndDefinitions * declarations,
-        std::string const & fileExtension) :
-      SubroutinesGeneration <FortranProgramDeclarationsAndDefinitions,
-          FortranParallelLoop, FortranHostSubroutine> (declarations,
-          fileExtension)
-    {
-    }
+        std::string const & fileSuffix);
 };
 
 #endif

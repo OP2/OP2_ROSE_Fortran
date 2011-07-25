@@ -47,8 +47,8 @@ CPPParallelLoop::retrieveOpDatDeclarations (
    * ======================================================
    */
 
-  for (vector <SgExpression *>::iterator it = actualArguments.begin ()
-      + NUMBER_OF_NON_OP_DAT_ARGUMENTS; it != actualArguments.end (); ++it)
+  for (vector <SgExpression *>::iterator it = getActualArguments ().begin ()
+      + NUMBER_OF_NON_OP_DAT_ARGUMENTS; it != getActualArguments ().end (); ++it)
   {
     std::cout << (*it)->class_name () << std::endl;
 
@@ -102,9 +102,9 @@ CPPParallelLoop::generateReductionSubroutines (SgScopeStatement * moduleScope)
 }
 
 unsigned int
-CPPParallelLoop::getNumberOfOpDatArgumentGroups () const
+CPPParallelLoop::getNumberOfOpDatArgumentGroups ()
 {
-  return actualArguments.size () - NUMBER_OF_NON_OP_DAT_ARGUMENTS;
+  return getActualArguments ().size () - NUMBER_OF_NON_OP_DAT_ARGUMENTS;
 }
 
 CPPParallelLoop::CPPParallelLoop (SgFunctionCallExp * functionCallExpression,
@@ -113,30 +113,6 @@ CPPParallelLoop::CPPParallelLoop (SgFunctionCallExp * functionCallExpression,
   ParallelLoop <SgFunctionDeclaration, CPPProgramDeclarationsAndDefinitions> (
       functionCallExpression)
 {
-  using boost::iequals;
-
-  switch (Globals::getInstance ()->getTargetBackend ())
-  {
-    case TargetBackends::CUDA:
-    {
-      moduleName = userSubroutineName + "_cudafor";
-
-      break;
-    }
-
-    case TargetBackends::OPENMP:
-    {
-      moduleName = userSubroutineName + "_openmp";
-
-      break;
-    }
-
-    default:
-    {
-      break;
-    }
-  }
-
   retrieveOpDatDeclarations (declarations);
 
   if (isDirectLoop ())

@@ -15,10 +15,10 @@ class FortranCUDASubroutinesGeneration: public FortranSubroutinesGeneration
 
     virtual FortranHostSubroutine *
     createSubroutines (FortranParallelLoop * parallelLoop,
-        std::string const & userSubroutineName, SgScopeStatement * moduleScope);
+        std::string const & userSubroutineName);
 
     virtual void
-    addLibraries (SgModuleStatement * moduleStatement);
+    addLibraries ();
 
   public:
 

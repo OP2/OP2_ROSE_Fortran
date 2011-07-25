@@ -12,11 +12,9 @@ class CPPSubroutinesGeneration: public SubroutinesGeneration <
 {
   protected:
 
-    virtual CPPHostSubroutine
-        *
-        createSubroutines (CPPParallelLoop * parallelLoop,
-            std::string const & userSubroutineName,
-            SgScopeStatement * moduleScope) = 0;
+    virtual CPPHostSubroutine *
+    createSubroutines (CPPParallelLoop * parallelLoop,
+        std::string const & userSubroutineName) = 0;
 
     void
     patchCallsToParallelLoops ();
@@ -28,7 +26,7 @@ class CPPSubroutinesGeneration: public SubroutinesGeneration <
      * ======================================================
      */
     SgSourceFile &
-    createSourceFile (CPPParallelLoop & parallelLoop);
+    createSourceFile ();
 
     virtual void
     visit (SgNode * node);
@@ -37,11 +35,7 @@ class CPPSubroutinesGeneration: public SubroutinesGeneration <
 
     CPPSubroutinesGeneration (
         CPPProgramDeclarationsAndDefinitions * declarations,
-        std::string const & fileExtension) :
-      SubroutinesGeneration <CPPProgramDeclarationsAndDefinitions,
-          CPPParallelLoop, CPPHostSubroutine> (declarations, fileExtension)
-    {
-    }
+        std::string const & fileSuffix);
 };
 
 #endif
