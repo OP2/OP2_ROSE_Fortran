@@ -5,19 +5,12 @@
 #include <FortranParallelLoop.h>
 #include <FortranStatementsAndExpressionsBuilder.h>
 
-class FortranHostSubroutine: public HostSubroutine <SgProcedureHeaderStatement,
-    FortranProgramDeclarationsAndDefinitions>
+class FortranHostSubroutine: public HostSubroutine <SgProcedureHeaderStatement>
 {
   protected:
 
     virtual SgBasicBlock *
     createTransferOpDatStatements () = 0;
-
-    void
-    createOpDatDimensionsDeclaration (SgType * type);
-
-    void
-    createOpDatSizesDeclaration (SgType * type);
 
     virtual void
     createFormalParameterDeclarations ();
@@ -26,8 +19,7 @@ class FortranHostSubroutine: public HostSubroutine <SgProcedureHeaderStatement,
         std::string const & userSubroutineName,
         std::string const & kernelSubroutineName,
         FortranParallelLoop * parallelLoop, SgScopeStatement * moduleScope) :
-      HostSubroutine <SgProcedureHeaderStatement,
-          FortranProgramDeclarationsAndDefinitions> (subroutineName,
+      HostSubroutine <SgProcedureHeaderStatement> (subroutineName,
           userSubroutineName, kernelSubroutineName, parallelLoop)
     {
       using SageBuilder::buildVoidType;

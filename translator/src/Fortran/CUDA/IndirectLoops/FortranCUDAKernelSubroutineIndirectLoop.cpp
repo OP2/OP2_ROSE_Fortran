@@ -63,8 +63,10 @@ FortranCUDAKernelSubroutineIndirectLoop::createUserSubroutineCallStatement ()
         string const variableName = VariableNames::getOpDatSizeName (i);
 
         SgDotExp * dotExpression = buildDotExp (buildVarRefExp (
-            variableDeclarations->get (CommonVariableNames::argsSizes)),
-            buildOpaqueVarRefExp (variableName, subroutineScope));
+            variableDeclarations->get (
+                VariableNames::getDataSizesVariableDeclarationName (
+                    userSubroutineName))), buildOpaqueVarRefExp (variableName,
+            subroutineScope));
 
         SgSubtractOp * subtractExpression = buildSubtractOp (dotExpression,
             buildIntVal (1));
@@ -125,9 +127,10 @@ FortranCUDAKernelSubroutineIndirectLoop::createUserSubroutineCallStatement ()
               VariableNames::getGlobalToLocalMappingName (i))), addExpression1);
 
       SgDotExp * dotExpression1 = buildDotExp (buildVarRefExp (
-          variableDeclarations->get (CommonVariableNames::opDatDimensions)),
-          buildVarRefExp (
-              opDatDimensionsDeclaration->getOpDatDimensionField (i)));
+          variableDeclarations->get (
+              VariableNames::getDimensionsVariableDeclarationName (
+                  userSubroutineName))), buildVarRefExp (
+          opDatDimensionsDeclaration->getOpDatDimensionField (i)));
 
       SgMultiplyOp * multiplyExpression1 = buildMultiplyOp (arrayExpression1,
           dotExpression1);
@@ -187,9 +190,10 @@ FortranCUDAKernelSubroutineIndirectLoop::createUserSubroutineCallStatement ()
                             IndirectLoop::Fortran::KernelSubroutine::VariableNames::blockOffsetShared)));
 
         SgDotExp * dotExpression = buildDotExp (buildVarRefExp (
-            variableDeclarations->get (CommonVariableNames::opDatDimensions)),
-            buildVarRefExp (opDatDimensionsDeclaration->getOpDatDimensionField (
-                i)));
+            variableDeclarations->get (
+                VariableNames::getDimensionsVariableDeclarationName (
+                    userSubroutineName))), buildVarRefExp (
+            opDatDimensionsDeclaration->getOpDatDimensionField (i)));
 
         SgMultiplyOp * multiplyExpression = buildMultiplyOp (addExpression1,
             dotExpression);
@@ -211,9 +215,10 @@ FortranCUDAKernelSubroutineIndirectLoop::createUserSubroutineCallStatement ()
       else if (dim == 1)
       {
         SgDotExp * dotExpression = buildDotExp (buildVarRefExp (
-            variableDeclarations->get (CommonVariableNames::opDatDimensions)),
-            buildVarRefExp (opDatDimensionsDeclaration->getOpDatDimensionField (
-                i)));
+            variableDeclarations->get (
+                VariableNames::getDimensionsVariableDeclarationName (
+                    userSubroutineName))), buildVarRefExp (
+            opDatDimensionsDeclaration->getOpDatDimensionField (i)));
 
         SgSubtractOp * subtractExpression = buildSubtractOp (dotExpression,
             buildIntVal (1));
@@ -290,9 +295,10 @@ FortranCUDAKernelSubroutineIndirectLoop::createPointeredIncrementsOrWritesStatem
          */
 
         SgDotExp * dotExpression2 = buildDotExp (buildVarRefExp (
-            variableDeclarations->get (CommonVariableNames::opDatDimensions)),
-            buildVarRefExp (opDatDimensionsDeclaration->getOpDatDimensionField (
-                i)));
+            variableDeclarations->get (
+                VariableNames::getDimensionsVariableDeclarationName (
+                    userSubroutineName))), buildVarRefExp (
+            opDatDimensionsDeclaration->getOpDatDimensionField (i)));
 
         SgMultiplyOp * multiplyExpression1 = buildMultiplyOp (buildVarRefExp (
             variableDeclarations->get (
@@ -504,9 +510,10 @@ FortranCUDAKernelSubroutineIndirectLoop::createInnerExecutionLoopStatements (
               CommonVariableNames::iterationCounter2)));
 
       SgDotExp * dotExpression = buildDotExp (buildVarRefExp (
-          variableDeclarations->get (CommonVariableNames::opDatDimensions)),
-          buildVarRefExp (
-              opDatDimensionsDeclaration->getOpDatDimensionField (i)));
+          variableDeclarations->get (
+              VariableNames::getDimensionsVariableDeclarationName (
+                  userSubroutineName))), buildVarRefExp (
+          opDatDimensionsDeclaration->getOpDatDimensionField (i)));
 
       SgMultiplyOp * multiplyExpression = buildMultiplyOp (buildVarRefExp (
           variableDeclarations->get (VariableNames::getIncrementAccessMapName (
@@ -667,9 +674,10 @@ FortranCUDAKernelSubroutineIndirectLoop::createInitialiseLocalOpDatStatements (
           buildIntVal (0));
 
       SgDotExp * dotExpression = buildDotExp (buildVarRefExp (
-          variableDeclarations->get (CommonVariableNames::opDatDimensions)),
-          buildVarRefExp (
-              opDatDimensionsDeclaration->getOpDatDimensionField (i)));
+          variableDeclarations->get (
+              VariableNames::getDimensionsVariableDeclarationName (
+                  userSubroutineName))), buildVarRefExp (
+          opDatDimensionsDeclaration->getOpDatDimensionField (i)));
 
       SgSubtractOp * upperBoundExpression = buildSubtractOp (dotExpression,
           buildIntVal (1));
@@ -867,9 +875,10 @@ FortranCUDAKernelSubroutineIndirectLoop::createAutoSharedWhileLoopStatements ()
        */
 
       SgDotExp * dotExpression2 = buildDotExp (buildVarRefExp (
-          variableDeclarations->get (CommonVariableNames::opDatDimensions)),
-          buildVarRefExp (
-              opDatDimensionsDeclaration->getOpDatDimensionField (i)));
+          variableDeclarations->get (
+              VariableNames::getDimensionsVariableDeclarationName (
+                  userSubroutineName))), buildVarRefExp (
+          opDatDimensionsDeclaration->getOpDatDimensionField (i)));
 
       SgMultiplyOp * multiplyExpression2 = buildMultiplyOp (buildVarRefExp (
           variableDeclarations->get (
@@ -903,9 +912,10 @@ FortranCUDAKernelSubroutineIndirectLoop::createAutoSharedWhileLoopStatements ()
                 subroutineScope);
 
         SgDotExp * dotExpression3 = buildDotExp (buildVarRefExp (
-            variableDeclarations->get (CommonVariableNames::opDatDimensions)),
-            buildVarRefExp (opDatDimensionsDeclaration->getOpDatDimensionField (
-                i)));
+            variableDeclarations->get (
+                VariableNames::getDimensionsVariableDeclarationName (
+                    userSubroutineName))), buildVarRefExp (
+            opDatDimensionsDeclaration->getOpDatDimensionField (i)));
 
         SgExprListExp * modActualParameters = buildExprListExp (
             buildVarRefExp (variableDeclarations->get (
@@ -956,9 +966,10 @@ FortranCUDAKernelSubroutineIndirectLoop::createAutoSharedWhileLoopStatements ()
                 PlanFunction::Fortran::pindOffs)), addExpression4b);
 
         SgDotExp * dotExpression4 = buildDotExp (buildVarRefExp (
-            variableDeclarations->get (CommonVariableNames::opDatDimensions)),
-            buildVarRefExp (opDatDimensionsDeclaration->getOpDatDimensionField (
-                i)));
+            variableDeclarations->get (
+                VariableNames::getDimensionsVariableDeclarationName (
+                    userSubroutineName))), buildVarRefExp (
+            opDatDimensionsDeclaration->getOpDatDimensionField (i)));
 
         SgDivideOp * divideExpression4 = buildDivideOp (
             buildVarRefExp (variableDeclarations->get (
@@ -1100,7 +1111,9 @@ FortranCUDAKernelSubroutineIndirectLoop::createInitialiseLocalVariablesStatement
         && parallelLoop->getOpMapValue (i) == INDIRECT)
     {
       SgVarRefExp * opDatDimensionsReference = buildVarRefExp (
-          variableDeclarations->get (CommonVariableNames::opDatDimensions));
+          variableDeclarations->get (
+              VariableNames::getDimensionsVariableDeclarationName (
+                  userSubroutineName)));
 
       SgVarRefExp * fieldReference = buildVarRefExp (
           opDatDimensionsDeclaration->getOpDatDimensionField (i));
@@ -1461,7 +1474,9 @@ FortranCUDAKernelSubroutineIndirectLoop::createPlanFormalParameterDeclarations (
     SgIntVal * lowerBoundExpression = buildIntVal (0);
 
     SgVarRefExp * argsSizesReference = buildVarRefExp (
-        variableDeclarations->get (CommonVariableNames::argsSizes));
+        variableDeclarations->get (
+            VariableNames::getDataSizesVariableDeclarationName (
+                userSubroutineName)));
 
     SgVarRefExp * fieldReference = buildVarRefExp (
         dataSizesDeclaration->getFieldDeclarations ()->get (*it + "Size"));
@@ -1517,7 +1532,9 @@ FortranCUDAKernelSubroutineIndirectLoop::createOpDatFormalParameterDeclarations 
       SgIntVal * lowerBoundExpression = buildIntVal (0);
 
       SgVarRefExp * argsSizesReference = buildVarRefExp (
-          variableDeclarations->get (CommonVariableNames::argsSizes));
+          variableDeclarations->get (
+              VariableNames::getDataSizesVariableDeclarationName (
+                  userSubroutineName)));
 
       SgVarRefExp * fieldReference = buildVarRefExp (
           dataSizesDeclaration->getFieldDeclarations ()->get (
@@ -1551,7 +1568,9 @@ FortranCUDAKernelSubroutineIndirectLoop::createOpDatFormalParameterDeclarations 
       SgIntVal * lowerBoundExpression2 = buildIntVal (0);
 
       SgVarRefExp * argsSizesReference2 = buildVarRefExp (
-          variableDeclarations->get (CommonVariableNames::argsSizes));
+          variableDeclarations->get (
+              VariableNames::getDataSizesVariableDeclarationName (
+                  userSubroutineName)));
 
       SgVarRefExp * fieldReference2 = buildVarRefExp (
           dataSizesDeclaration->getFieldDeclarations ()->get (
@@ -1581,7 +1600,9 @@ FortranCUDAKernelSubroutineIndirectLoop::createOpDatFormalParameterDeclarations 
       SgIntVal * lowerBoundExpression = buildIntVal (0);
 
       SgVarRefExp * argsSizesReference = buildVarRefExp (
-          variableDeclarations->get (CommonVariableNames::argsSizes));
+          variableDeclarations->get (
+              VariableNames::getDataSizesVariableDeclarationName (
+                  userSubroutineName)));
 
       SgVarRefExp * fieldReference = buildVarRefExp (
           dataSizesDeclaration->getFieldDeclarations ()->get (
@@ -1615,7 +1636,9 @@ FortranCUDAKernelSubroutineIndirectLoop::createOpDatFormalParameterDeclarations 
       SgIntVal * lowerBoundExpression = buildIntVal (0);
 
       SgVarRefExp * argsSizesReference = buildVarRefExp (
-          variableDeclarations->get (CommonVariableNames::argsSizes));
+          variableDeclarations->get (
+              VariableNames::getDataSizesVariableDeclarationName (
+                  userSubroutineName)));
 
       SgVarRefExp * fieldReference = buildVarRefExp (
           dataSizesDeclaration->getFieldDeclarations ()->get (
@@ -1796,16 +1819,17 @@ void
 FortranCUDAKernelSubroutineIndirectLoop::createFormalParameterDeclarations ()
 {
   variableDeclarations->add (
-      CommonVariableNames::opDatDimensions,
+      VariableNames::getDimensionsVariableDeclarationName (userSubroutineName),
       FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
-          CommonVariableNames::opDatDimensions,
-          opDatDimensionsDeclaration->getType (), subroutineScope,
-          formalParameters, 1, DEVICE));
+          VariableNames::getDimensionsVariableDeclarationName (
+              userSubroutineName), opDatDimensionsDeclaration->getType (),
+          subroutineScope, formalParameters, 1, DEVICE));
 
   variableDeclarations->add (
-      CommonVariableNames::argsSizes,
+      VariableNames::getDataSizesVariableDeclarationName (userSubroutineName),
       FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
-          CommonVariableNames::argsSizes, dataSizesDeclaration->getType (),
+          VariableNames::getDataSizesVariableDeclarationName (
+              userSubroutineName), dataSizesDeclaration->getType (),
           subroutineScope, formalParameters, 1, DEVICE));
 
   createOpDatFormalParameterDeclarations ();

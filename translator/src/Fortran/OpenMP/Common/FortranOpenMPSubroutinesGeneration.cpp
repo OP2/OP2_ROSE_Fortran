@@ -74,6 +74,11 @@ FortranOpenMPSubroutinesGeneration::createSubroutines (
 }
 
 void
+FortranOpenMPSubroutinesGeneration::createModuleDeclarations ()
+{
+}
+
+void
 FortranOpenMPSubroutinesGeneration::addLibraries ()
 {
   using boost::iequals;
@@ -122,10 +127,6 @@ FortranOpenMPSubroutinesGeneration::FortranOpenMPSubroutinesGeneration (
   FortranSubroutinesGeneration (declarations, "openmp_subroutines.F95")
 {
   addLibraries ();
-
-  traverseInputFiles (project, preorder);
-
-  patchCallsToParallelLoops ();
 
   unparse ();
 }

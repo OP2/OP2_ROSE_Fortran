@@ -6,9 +6,10 @@
 #define CPP_PROGRAM_DECLARATIONS_AND_DEFINITIONS_H
 
 #include <ProgramDeclarationsAndDefinitions.h>
+#include <CPPParallelLoop.h>
 
 class CPPProgramDeclarationsAndDefinitions: public ProgramDeclarationsAndDefinitions <
-    SgFunctionDeclaration> ,
+    CPPParallelLoop, SgFunctionDeclaration> ,
     public AstSimpleProcessing
 {
   private:

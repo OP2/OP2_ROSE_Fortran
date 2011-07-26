@@ -4,14 +4,14 @@
 #include <Subroutine.h>
 #include <ParallelLoop.h>
 
-template <typename TSubroutineHeader, typename TDeclarations>
+template <typename TSubroutineHeader>
   class KernelSubroutine: public Subroutine <TSubroutineHeader>
   {
     protected:
 
       std::string userSubroutineName;
 
-      ParallelLoop <TSubroutineHeader, TDeclarations> * parallelLoop;
+      ParallelLoop <TSubroutineHeader> * parallelLoop;
 
     protected:
 
@@ -26,7 +26,7 @@ template <typename TSubroutineHeader, typename TDeclarations>
 
       KernelSubroutine (std::string const & subroutineName,
           std::string const & userSubroutineName, ParallelLoop <
-              TSubroutineHeader, TDeclarations> * parallelLoop) :
+              TSubroutineHeader> * parallelLoop) :
         Subroutine <TSubroutineHeader> (subroutineName + "_kernel"),
             userSubroutineName (userSubroutineName),
             parallelLoop (parallelLoop)

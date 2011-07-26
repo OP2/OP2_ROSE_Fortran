@@ -4,8 +4,7 @@
 #include <KernelSubroutine.h>
 #include <CPPParallelLoop.h>
 
-class CPPKernelSubroutine: public KernelSubroutine <SgFunctionDeclaration,
-    CPPProgramDeclarationsAndDefinitions>
+class CPPKernelSubroutine: public KernelSubroutine <SgFunctionDeclaration>
 {
 
   protected:
@@ -13,8 +12,7 @@ class CPPKernelSubroutine: public KernelSubroutine <SgFunctionDeclaration,
     CPPKernelSubroutine (std::string const & subroutineName,
         std::string const & userSubroutineName, SgScopeStatement * moduleScope,
         CPPParallelLoop * parallelLoop) :
-      KernelSubroutine <SgFunctionDeclaration,
-          CPPProgramDeclarationsAndDefinitions> (subroutineName,
+      KernelSubroutine <SgFunctionDeclaration> (subroutineName,
           userSubroutineName, parallelLoop)
     {
       using SageBuilder::buildVoidType;

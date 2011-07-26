@@ -12,23 +12,6 @@
  */
 
 void
-FortranHostSubroutine::createOpDatDimensionsDeclaration (SgType * type)
-{
-  variableDeclarations->add (CommonVariableNames::opDatDimensions,
-      FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
-          CommonVariableNames::opDatDimensions, type, subroutineScope, 1,
-          DEVICE));
-}
-
-void
-FortranHostSubroutine::createOpDatSizesDeclaration (SgType * type)
-{
-  variableDeclarations->add (CommonVariableNames::argsSizes,
-      FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
-          CommonVariableNames::argsSizes, type, subroutineScope, 1, DEVICE));
-}
-
-void
 FortranHostSubroutine::createFormalParameterDeclarations ()
 {
   using boost::iequals;

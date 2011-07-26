@@ -148,7 +148,6 @@ namespace OpenMP
 
 namespace CommonVariableNames
 {
-  std::string const argsSizes = "argsSizes";
   std::string const autoshared = "autoshared";
   std::string const col = "col";
   std::string const col2 = "col2";
@@ -158,7 +157,6 @@ namespace CommonVariableNames
   std::string const index = "index";
   std::string const iterationCounter1 = "i1";
   std::string const iterationCounter2 = "i2";
-  std::string const opDatDimensions = "dimensions";
   std::string const set = "set";
   std::string const size = "size";
   std::string const upperBound = "n";
@@ -322,6 +320,18 @@ namespace VariableNames
 
   std::string
   getIndirectionArgumentSizeName (unsigned int OP_DAT_ArgumentGroup);
+
+  std::string
+  getDataSizesVariableDeclarationName (std::string const & suffix);
+
+  std::string
+  getDimensionsVariableDeclarationName (std::string const & suffix);
+
+  std::string
+  getPlanReturnVariableDeclarationName (std::string const & suffix);
+
+  std::string
+  getFirstTimeExecutionVariableDeclarationName (std::string const & suffix);
 }
 
 namespace SubroutineCalls

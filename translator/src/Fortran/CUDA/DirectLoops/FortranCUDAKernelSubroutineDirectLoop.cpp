@@ -52,9 +52,10 @@ FortranCUDAKernelSubroutineDirectLoop::createUserSubroutineCallStatement ()
          */
 
         SgDotExp * dotExpression = buildDotExp (buildVarRefExp (
-            variableDeclarations->get (CommonVariableNames::argsSizes)),
-            buildOpaqueVarRefExp (VariableNames::getOpDatSizeName (i),
-                subroutineScope));
+            variableDeclarations->get (
+                VariableNames::getDataSizesVariableDeclarationName (
+                    userSubroutineName))), buildOpaqueVarRefExp (
+            VariableNames::getOpDatSizeName (i), subroutineScope));
 
         SgSubtractOp * subtractExpression = buildSubtractOp (dotExpression,
             buildIntVal (1));
@@ -194,9 +195,10 @@ FortranCUDAKernelSubroutineDirectLoop::createStageInFromDeviceMemoryToLocalThrea
           buildIntVal (0));
 
       SgDotExp * dotExpression = buildDotExp (buildVarRefExp (
-          variableDeclarations->get (CommonVariableNames::opDatDimensions)),
-          buildVarRefExp (
-              opDatDimensionsDeclaration->getOpDatDimensionField (i)));
+          variableDeclarations->get (
+              VariableNames::getDimensionsVariableDeclarationName (
+                  userSubroutineName))), buildVarRefExp (
+          opDatDimensionsDeclaration->getOpDatDimensionField (i)));
 
       SgMultiplyOp * multiplyExpression1 = buildMultiplyOp (buildVarRefExp (
           variableDeclarations->get (
@@ -332,9 +334,10 @@ FortranCUDAKernelSubroutineDirectLoop::createStageOutFromLocalThreadVariablesToD
           buildIntVal (0));
 
       SgDotExp * dotExpression = buildDotExp (buildVarRefExp (
-          variableDeclarations->get (CommonVariableNames::opDatDimensions)),
-          buildVarRefExp (
-              opDatDimensionsDeclaration->getOpDatDimensionField (i)));
+          variableDeclarations->get (
+              VariableNames::getDimensionsVariableDeclarationName (
+                  userSubroutineName))), buildVarRefExp (
+          opDatDimensionsDeclaration->getOpDatDimensionField (i)));
 
       SgExpression * upperBoundExpression = buildSubtractOp (dotExpression,
           buildIntVal (1));
@@ -691,8 +694,10 @@ FortranCUDAKernelSubroutineDirectLoop::createOpDatFormalParameterDeclarations ()
        * ======================================================
        */
       SgDotExp * dotExpression = buildDotExp (buildVarRefExp (
-          variableDeclarations->get (CommonVariableNames::argsSizes)),
-          buildVarRefExp (dataSizesDeclaration->getFieldDeclarations ()->get (
+          variableDeclarations->get (
+              VariableNames::getDataSizesVariableDeclarationName (
+                  userSubroutineName))), buildVarRefExp (
+          dataSizesDeclaration->getFieldDeclarations ()->get (
               VariableNames::getOpDatSizeName (i))));
 
       SgSubtractOp * subtractExpression = buildSubtractOp (dotExpression,
@@ -803,11 +808,11 @@ FortranCUDAKernelSubroutineDirectLoop::createFormalParameterDeclarations ()
    */
 
   variableDeclarations->add (
-      CommonVariableNames::opDatDimensions,
+      VariableNames::getDimensionsVariableDeclarationName (userSubroutineName),
       FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
-          CommonVariableNames::opDatDimensions,
-          opDatDimensionsDeclaration->getType (), subroutineScope,
-          formalParameters, 1, DEVICE));
+          VariableNames::getDimensionsVariableDeclarationName (
+              userSubroutineName), opDatDimensionsDeclaration->getType (),
+          subroutineScope, formalParameters, 1, DEVICE));
 
   /*
    * ======================================================
@@ -816,9 +821,10 @@ FortranCUDAKernelSubroutineDirectLoop::createFormalParameterDeclarations ()
    */
 
   variableDeclarations->add (
-      CommonVariableNames::argsSizes,
+      VariableNames::getDataSizesVariableDeclarationName (userSubroutineName),
       FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
-          CommonVariableNames::argsSizes, dataSizesDeclaration->getType (),
+          VariableNames::getDataSizesVariableDeclarationName (
+              userSubroutineName), dataSizesDeclaration->getType (),
           subroutineScope, formalParameters, 1, DEVICE));
 
   /*

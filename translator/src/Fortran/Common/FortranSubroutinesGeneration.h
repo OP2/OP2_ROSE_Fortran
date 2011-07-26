@@ -17,10 +17,8 @@ namespace Libraries
 }
 
 class FortranSubroutinesGeneration: public SubroutinesGeneration <
-    FortranProgramDeclarationsAndDefinitions, FortranParallelLoop,
-    FortranHostSubroutine>
+    FortranProgramDeclarationsAndDefinitions, FortranHostSubroutine>
 {
-  protected:
 
   protected:
 
@@ -28,13 +26,15 @@ class FortranSubroutinesGeneration: public SubroutinesGeneration <
     createSubroutines (FortranParallelLoop * parallelLoop,
         std::string const & userSubroutineName) = 0;
 
+    virtual void
+    createModuleDeclarations () = 0;
+
     /*
      * ======================================================
      * Adds the relevant library 'use' statements to the
      * generated module
      * ======================================================
      */
-
     virtual void
     addLibraries () = 0;
 
@@ -47,7 +47,6 @@ class FortranSubroutinesGeneration: public SubroutinesGeneration <
      * which must precede all subroutine declarations
      * ======================================================
      */
-
     void
     addContains ();
 
@@ -56,22 +55,17 @@ class FortranSubroutinesGeneration: public SubroutinesGeneration <
      * Creates the Fortran module
      * ======================================================
      */
-
     SgModuleStatement *
     createFortranModule (SgSourceFile & sourceFile);
 
     /*
      * ======================================================
-     * Creates the Fortran/C/C++ source file to be unparsed
+     * Creates the Fortran source file to be unparsed
      * that contains the generated subroutines and declarations
      * ======================================================
      */
-
     SgSourceFile &
     createSourceFile ();
-
-    virtual void
-    visit (SgNode * node);
 
   public:
 

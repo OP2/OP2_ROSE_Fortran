@@ -17,15 +17,15 @@ template <typename TSubroutineHeader, typename TDeclarations>
 
       std::string hostSubroutineName;
 
-      ParallelLoop <TSubroutineHeader, TDeclarations> * parallelLoop;
+      ParallelLoop <TSubroutineHeader> * parallelLoop;
 
       TDeclarations * declarations;
 
     protected:
 
       UserSubroutine (std::string const & subroutineName,
-          TDeclarations * declarations, ParallelLoop <TSubroutineHeader,
-              TDeclarations> * parallelLoop) :
+          TDeclarations * declarations,
+          ParallelLoop <TSubroutineHeader> * parallelLoop) :
         Subroutine <TSubroutineHeader> (subroutineName + "_device"),
             hostSubroutineName (subroutineName), declarations (declarations),
             parallelLoop (parallelLoop)

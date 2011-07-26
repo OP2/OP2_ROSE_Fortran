@@ -3,6 +3,11 @@
 #include <FortranTypesBuilder.h>
 #include <RoseHelper.h>
 
+namespace
+{
+  std::string const & moduleName = "GENERATED_MODULE";
+}
+
 /*
  * ======================================================
  * Private functions
@@ -24,12 +29,17 @@ FortranSubroutinesGeneration::patchCallsToParallelLoops ()
   using SageInterface::findLastDeclarationStatement;
   using std::map;
   using std::string;
+  using std::vector;
+  using std::find;
 
   Debug::getInstance ()->debugMessage ("Patching calls to OP_PAR_LOOPs",
       Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
-  for (map <string, FortranParallelLoop *>::iterator it =
-      parallelLoops.begin (); it != parallelLoops.end (); ++it)
+  vector <string> processedFiles;
+
+  for (map <string, FortranParallelLoop *>::const_iterator it =
+      declarations->firstParallelLoop (); it
+      != declarations->lastParallelLoop (); ++it)
   {
     string const userSubroutineName = it->first;
 
@@ -101,17 +111,24 @@ FortranSubroutinesGeneration::patchCallsToParallelLoops ()
           "Could not find last 'use' statement");
     }
 
-    /*
-     * ======================================================
-     * Add a new 'use' statement for the newly created module
-     * ======================================================
-     */
+    if (find (processedFiles.begin (), processedFiles.end (),
+        parallelLoop->getFileName ()) == processedFiles.end ())
+    {
+      processedFiles.push_back (parallelLoop->getFileName ());
 
-    SgUseStatement * newUseStatement = new SgUseStatement (
-        getEnclosingFileNode (lastUseStatement)->get_file_info (),
-        "MODULE_NAME", false);
+      /*
+       * ======================================================
+       * Add a new 'use' statement for the newly created module
+       * only if we have not previously added it to this file
+       * ======================================================
+       */
 
-    insertStatementAfter (lastUseStatement, newUseStatement);
+      SgUseStatement * newUseStatement = new SgUseStatement (
+          getEnclosingFileNode (lastUseStatement)->get_file_info (),
+          moduleName, false);
+
+      insertStatementAfter (lastUseStatement, newUseStatement);
+    }
 
     /*
      * ======================================================
@@ -202,8 +219,7 @@ FortranSubroutinesGeneration::createFortranModule (SgSourceFile & sourceFile)
   SgGlobal * globalScope = sourceFile.get_globalScope ();
 
   SgModuleStatement * moduleStatement =
-      FortranTypesBuilder::buildModuleDeclaration ("GENERATED_MODULE",
-          globalScope);
+      FortranTypesBuilder::buildModuleDeclaration (moduleName, globalScope);
 
   moduleStatement->get_definition ()->setCaseInsensitive (true);
 
@@ -290,127 +306,11 @@ FortranSubroutinesGeneration::createSourceFile ()
   return *sourceFile;
 }
 
-void
-FortranSubroutinesGeneration::visit (SgNode * node)
-{
-  using boost::starts_with;
-  using std::pair;
-  using std::string;
-
-  switch (node->variantT ())
-  {
-
-    case V_SgFunctionCallExp:
-    {
-      /*
-       * ======================================================
-       * Function call found in AST
-       * ======================================================
-       */
-      SgFunctionCallExp * functionCallExp = isSgFunctionCallExp (node);
-
-      string const
-          calleeName =
-              functionCallExp->getAssociatedFunctionDeclaration ()->get_name ().getString ();
-
-      Debug::getInstance ()->debugMessage ("Found function call '" + calleeName
-          + "'", Debug::INNER_LOOP_LEVEL, __FILE__, __LINE__);
-
-      /*
-       * ======================================================
-       * The prefix of all parallel loop calls in Fortran contains
-       * 'OP_PAR_LOOP'. The suffix of the call, however, changes
-       * depending on the number of expected parameters. Therefore,
-       * any match of this prefix indicates a call of interest
-       * to the translator
-       * ======================================================
-       */
-      if (starts_with (calleeName, OP2::OP_PAR_LOOP))
-      {
-        /*
-         * ======================================================
-         * The first argument to an 'OP_PAR_LOOP' call should be
-         * a reference to the kernel function. Cast it and proceed,
-         * otherwise throw an exception
-         * ======================================================
-         */
-
-        SgExpressionPtrList & actualArguments =
-            functionCallExp->get_args ()->get_expressions ();
-
-        SgFunctionRefExp * functionRefExpression = isSgFunctionRefExp (
-            actualArguments.front ());
-
-        ROSE_ASSERT (functionRefExpression != NULL);
-
-        string const
-            userSubroutineName =
-                functionRefExpression->getAssociatedFunctionDeclaration ()->get_name ().getString ();
-
-        Debug::getInstance ()->debugMessage ("Found '" + calleeName
-            + "' with (host) user subroutine '" + userSubroutineName + "'",
-            Debug::OUTER_LOOP_LEVEL, __FILE__, __LINE__);
-
-        if (parallelLoops.find (userSubroutineName) == parallelLoops.end ())
-        {
-          /*
-           * ======================================================
-           * If this kernel has not been previously encountered then
-           * build the target code and modify the calls in the original
-           * Fortran source code
-           * ======================================================
-           */
-
-          FortranParallelLoop * parallelLoop = new FortranParallelLoop (
-              functionCallExp, userSubroutineName, declarations);
-
-          parallelLoops[userSubroutineName] = parallelLoop;
-
-          /*
-           * ======================================================
-           * Create the subroutines
-           * ======================================================
-           */
-
-          FortranHostSubroutine * hostSubroutine = createSubroutines (
-              parallelLoop, userSubroutineName);
-
-          hostSubroutines[userSubroutineName] = hostSubroutine;
-        }
-        else
-        {
-          Debug::getInstance ()->debugMessage ("Parallel loop for '"
-              + userSubroutineName + "' already created",
-              Debug::OUTER_LOOP_LEVEL, __FILE__, __LINE__);
-        }
-      }
-
-      break;
-    }
-
-    case V_SgSourceFile:
-    {
-      SgSourceFile * sourceFile = isSgSourceFile (node);
-
-      Debug::getInstance ()->debugMessage ("Found file "
-          + sourceFile->getFileName (), Debug::OUTER_LOOP_LEVEL, __FILE__,
-          __LINE__);
-
-      break;
-    }
-
-    default:
-    {
-      break;
-    }
-  }
-}
-
 FortranSubroutinesGeneration::FortranSubroutinesGeneration (
     FortranProgramDeclarationsAndDefinitions * declarations,
     std::string const & fileSuffix) :
   SubroutinesGeneration <FortranProgramDeclarationsAndDefinitions,
-      FortranParallelLoop, FortranHostSubroutine> (declarations, fileSuffix)
+      FortranHostSubroutine> (declarations, fileSuffix)
 {
   SgSourceFile & sourceFile = createSourceFile ();
 

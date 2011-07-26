@@ -31,11 +31,15 @@ TargetBackends::toString (BACKEND_VALUE backend)
 
 namespace VariablePrefixes
 {
+  std::string const argsSizes = "argsSizes";
+  std::string const dimensions = "dimensions";
+  std::string const isFirstTime = "isFirstTime";
+  std::string const planRet = "planRet";
   std::string const OP_DAT = "opDat";
   std::string const OP_MAP = "opMap";
   std::string const OP_ACCESS = "opAccess";
   std::string const OP_INDIRECTION = "opIndirection";
-  std::string const CFortranPointer = "cFortranPointer";
+  std::string const cFortranPointer = "cFortranPointer";
 }
 
 namespace VariableSuffixes
@@ -156,7 +160,7 @@ VariableNames::getCToFortranVariableName (unsigned int OP_DAT_ArgumentGroup)
   using boost::lexical_cast;
   using std::string;
 
-  return VariablePrefixes::CFortranPointer + lexical_cast <string> (
+  return VariablePrefixes::cFortranPointer + lexical_cast <string> (
       OP_DAT_ArgumentGroup);
 }
 
@@ -239,6 +243,31 @@ VariableNames::getIndirectionArgumentSizeName (
   using std::string;
 
   return "ind_arg" + lexical_cast <string> (OP_DAT_ArgumentGroup);
+}
+
+std::string
+VariableNames::getDataSizesVariableDeclarationName (std::string const & suffix)
+{
+  return VariablePrefixes::argsSizes + "_" + suffix;
+}
+
+std::string
+VariableNames::getDimensionsVariableDeclarationName (std::string const & suffix)
+{
+  return VariablePrefixes::dimensions + "_" + suffix;
+}
+
+std::string
+VariableNames::getPlanReturnVariableDeclarationName (std::string const & suffix)
+{
+  return VariablePrefixes::planRet + "_" + suffix;
+}
+
+std::string
+VariableNames::getFirstTimeExecutionVariableDeclarationName (
+    std::string const & suffix)
+{
+  return VariablePrefixes::isFirstTime + "_" + suffix;
 }
 
 SgStatement *

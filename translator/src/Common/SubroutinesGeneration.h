@@ -1,12 +1,10 @@
 #ifndef SUBROUTINES_GENERATION_H
 #define SUBROUTINES_GENERATION_H
 
-#include <rose.h>
 #include <Debug.h>
 
-template <typename TDeclarations, typename TParallelLoop,
-    typename THostSubroutine>
-  class SubroutinesGeneration: public AstSimpleProcessing
+template <typename TDeclarations, typename THostSubroutine>
+  class SubroutinesGeneration
   {
     protected:
 
@@ -26,14 +24,6 @@ template <typename TDeclarations, typename TParallelLoop,
        * ======================================================
        */
       TDeclarations * declarations;
-
-      /*
-       * ======================================================
-       * A mapping from a user subroutine name to our internal
-       * representation of an OP_PAR_LOOP
-       * ======================================================
-       */
-      std::map <std::string, TParallelLoop *> parallelLoops;
 
       /*
        * ======================================================
@@ -60,33 +50,6 @@ template <typename TDeclarations, typename TParallelLoop,
       SgScopeStatement * moduleScope;
 
     protected:
-
-      /*
-       * ======================================================
-       * Creates the subroutines
-       * ======================================================
-       */
-      virtual THostSubroutine *
-      createSubroutines (TParallelLoop * parallelLoop,
-          std::string const & userSubroutineName) = 0;
-
-      /*
-       * ======================================================
-       * Patches the calls to OP_PAR_LOOPs with call to the
-       * new host subroutines
-       * ======================================================
-       */
-      virtual void
-      patchCallsToParallelLoops () = 0;
-
-      /*
-       * ======================================================
-       * Creates the Fortran/C/C++ source file to be unparsed
-       * that contains the generated subroutines and declarations
-       * ======================================================
-       */
-      virtual SgSourceFile &
-      createSourceFile () = 0;
 
       /*
        * ======================================================

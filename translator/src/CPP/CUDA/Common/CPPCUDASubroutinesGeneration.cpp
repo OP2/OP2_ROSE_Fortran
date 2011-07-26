@@ -22,7 +22,5 @@ CPPCUDASubroutinesGeneration::CPPCUDASubroutinesGeneration (
     SgProject * project, CPPProgramDeclarationsAndDefinitions * declarations) :
   CPPSubroutinesGeneration (declarations, ".CUF")
 {
-  traverseInputFiles (project, preorder);
-
   unparse ();
 }

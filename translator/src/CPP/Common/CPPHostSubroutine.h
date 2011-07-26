@@ -3,10 +3,8 @@
 
 #include <HostSubroutine.h>
 #include <CPPParallelLoop.h>
-#include <CPPProgramDeclarationsAndDefinitions.h>
 
-class CPPHostSubroutine: public HostSubroutine <SgFunctionDeclaration,
-    CPPProgramDeclarationsAndDefinitions>
+class CPPHostSubroutine: public HostSubroutine <SgFunctionDeclaration>
 {
 
   private:
@@ -38,8 +36,7 @@ class CPPHostSubroutine: public HostSubroutine <SgFunctionDeclaration,
         std::string const & userSubroutineName,
         std::string const & kernelSubroutineName,
         SgScopeStatement * moduleScope, CPPParallelLoop * parallelLoop) :
-      HostSubroutine <SgFunctionDeclaration,
-          CPPProgramDeclarationsAndDefinitions> (subroutineName,
+      HostSubroutine <SgFunctionDeclaration> (subroutineName,
           userSubroutineName, kernelSubroutineName, parallelLoop)
     {
       using SageBuilder::buildVoidType;

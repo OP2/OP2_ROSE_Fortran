@@ -12,7 +12,7 @@
 #include <boost/algorithm/string.hpp>
 #include <Debug.h>
 
-template <typename TSubroutineHeader>
+template <typename TParallelLoop, typename TSubroutineHeader>
   class ProgramDeclarationsAndDefinitions
   {
     protected:
@@ -59,6 +59,14 @@ template <typename TSubroutineHeader>
        * ======================================================
        */
       std::map <std::string, OpConstDefinition *> OpConstDefinitions;
+
+      /*
+       * ======================================================
+       * A mapping from a user subroutine name to our internal
+       * representation of an OP_PAR_LOOP
+       * ======================================================
+       */
+      std::map <std::string, TParallelLoop *> parallelLoops;
 
       /*
        * ======================================================
@@ -368,6 +376,18 @@ template <typename TSubroutineHeader>
       lastSubroutineInSourceCode ()
       {
         return subroutinesInSourceCode.end ();
+      }
+
+      typename std::map <std::string, TParallelLoop *>::const_iterator
+      firstParallelLoop ()
+      {
+        return parallelLoops.begin ();
+      }
+
+      typename std::map <std::string, TParallelLoop *>::const_iterator
+      lastParallelLoop ()
+      {
+        return parallelLoops.end ();
       }
   };
 

@@ -37,13 +37,15 @@ FortranCUDAModuleDeclarations::createDataSizesDeclaration ()
       "Generating data sizes declaration at module scope",
       Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
+  std::string const & variableName =
+      VariableNames::getDataSizesVariableDeclarationName (userSubroutineName);
+
   SgVariableDeclaration * variableDeclaration =
       FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
-          CommonVariableNames::argsSizes, dataSizesDeclaration->getType (),
-          moduleScope, 1, DEVICE);
+          variableName, dataSizesDeclaration->getType (), moduleScope, 1,
+          DEVICE);
 
-  variableDeclarations->add (CommonVariableNames::argsSizes,
-      variableDeclaration);
+  variableDeclarations->add (variableName, variableDeclaration);
 }
 
 void
@@ -53,13 +55,15 @@ FortranCUDAModuleDeclarations::createDimensionsDeclaration ()
       "Generating OP_DAT dimensions declaration at module scope",
       Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
+  std::string const & variableName =
+      VariableNames::getDimensionsVariableDeclarationName (userSubroutineName);
+
   SgVariableDeclaration * variableDeclaration =
       FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
-          CommonVariableNames::opDatDimensions,
-          dimensionsDeclaration->getType (), moduleScope, 1, DEVICE);
+          variableName, dimensionsDeclaration->getType (), moduleScope, 1,
+          DEVICE);
 
-  variableDeclarations->add (CommonVariableNames::opDatDimensions,
-      variableDeclaration);
+  variableDeclarations->add (variableName, variableDeclaration);
 }
 
 /*
@@ -83,13 +87,19 @@ FortranCUDAModuleDeclarations::getReductionArrayDeviceVariableDeclaration ()
 SgVariableDeclaration *
 FortranCUDAModuleDeclarations::getDataSizesVariableDeclaration ()
 {
-  return variableDeclarations->get (CommonVariableNames::argsSizes);
+  std::string const & variableName =
+      VariableNames::getDataSizesVariableDeclarationName (userSubroutineName);
+
+  return variableDeclarations->get (variableName);
 }
 
 SgVariableDeclaration *
 FortranCUDAModuleDeclarations::getDimensionsVariableDeclaration ()
 {
-  return variableDeclarations->get (CommonVariableNames::opDatDimensions);
+  std::string const & variableName =
+      VariableNames::getDimensionsVariableDeclarationName (userSubroutineName);
+
+  return variableDeclarations->get (variableName);
 }
 
 FortranCUDAModuleDeclarations::FortranCUDAModuleDeclarations (

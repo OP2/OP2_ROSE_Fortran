@@ -8,7 +8,7 @@
 #include <CPPHostSubroutine.h>
 
 class CPPSubroutinesGeneration: public SubroutinesGeneration <
-    CPPProgramDeclarationsAndDefinitions, CPPParallelLoop, CPPHostSubroutine>
+    CPPProgramDeclarationsAndDefinitions, CPPHostSubroutine>
 {
   protected:
 
@@ -17,19 +17,10 @@ class CPPSubroutinesGeneration: public SubroutinesGeneration <
         std::string const & userSubroutineName) = 0;
 
     void
-    patchCallsToParallelLoops ();
+    patchCallsToParallelLoops (std::string const & moduleName);
 
-    /*
-     * ======================================================
-     * Creates the Fortran/C/C++ source file to be unparsed
-     * that contains the generated subroutines and declarations
-     * ======================================================
-     */
     SgSourceFile &
     createSourceFile ();
-
-    virtual void
-    visit (SgNode * node);
 
   public:
 

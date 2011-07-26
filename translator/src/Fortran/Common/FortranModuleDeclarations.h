@@ -49,9 +49,6 @@ class FortranModuleDeclarations
     void
     createFirstExecutionBooleanDeclaration ();
 
-    std::string
-    getFirstExecutionBooleanVariableName ();
-
     FortranModuleDeclarations (std::string const & userSubroutineName,
         FortranParallelLoop * parallelLoop, SgScopeStatement * moduleScope);
 

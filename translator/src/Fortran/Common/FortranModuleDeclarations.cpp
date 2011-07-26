@@ -22,7 +22,9 @@ FortranModuleDeclarations::createFirstExecutionBooleanDeclaration ()
       "Creating first time execution boolean at module scope",
       Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
-  string const & variableName = getFirstExecutionBooleanVariableName ();
+  std::string const & variableName =
+      VariableNames::getFirstTimeExecutionVariableDeclarationName (
+          userSubroutineName);
 
   SgVariableDeclaration * variableDeclaration = buildVariableDeclaration (
       variableName, buildBoolType (), buildAssignInitializer (buildBoolValExp (
@@ -33,12 +35,6 @@ FortranModuleDeclarations::createFirstExecutionBooleanDeclaration ()
   variableDeclaration->get_declarationModifier ().get_accessModifier ().setUndefined ();
 
   appendStatement (variableDeclaration, moduleScope);
-}
-
-std::string
-FortranModuleDeclarations::getFirstExecutionBooleanVariableName ()
-{
-  return "isFirstTime_" + userSubroutineName;
 }
 
 FortranModuleDeclarations::FortranModuleDeclarations (
@@ -61,7 +57,11 @@ FortranModuleDeclarations::FortranModuleDeclarations (
 SgVariableDeclaration *
 FortranModuleDeclarations::getFirstExecutionBooleanDeclaration ()
 {
-  return variableDeclarations->get (getFirstExecutionBooleanVariableName ());
+  std::string const & variableName =
+      VariableNames::getFirstTimeExecutionVariableDeclarationName (
+          userSubroutineName);
+
+  return variableDeclarations->get (variableName);
 }
 
 SgVariableDeclaration *

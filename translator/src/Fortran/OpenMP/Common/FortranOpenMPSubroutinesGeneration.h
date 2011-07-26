@@ -16,6 +16,9 @@ class FortranOpenMPSubroutinesGeneration: public FortranSubroutinesGeneration
         std::string const & userSubroutineName);
 
     virtual void
+    createModuleDeclarations ();
+
+    virtual void
     addLibraries ();
 
   public:

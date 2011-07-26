@@ -30,9 +30,5 @@ CPPOpenCLSubroutinesGeneration::CPPOpenCLSubroutinesGeneration (
     SgProject * project, CPPProgramDeclarationsAndDefinitions * declarations) :
   CPPSubroutinesGeneration (declarations, ".cpp")
 {
-  traverseInputFiles (project, preorder);
-
-  patchCallsToParallelLoops ();
-
   unparse ();
 }

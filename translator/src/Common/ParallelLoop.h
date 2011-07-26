@@ -22,7 +22,7 @@ enum ACCESS_CODE_VALUE
   READ_ACCESS, WRITE_ACCESS, RW_ACCESS, INC_ACCESS, MAX_ACCESS, MIN_ACCESS
 };
 
-template <typename TSubroutineHeader, typename TDeclarations>
+template <typename TSubroutineHeader>
   class ParallelLoop
   {
     protected:
@@ -113,36 +113,6 @@ template <typename TSubroutineHeader, typename TDeclarations>
 
     protected:
 
-      /*
-       * ======================================================
-       * Handles the actions associated with the discovery of
-       * an OP_GBL
-       * ======================================================
-       */
-      virtual void
-      handleOpGblDeclaration (OpGblDefinition * opGblDeclaration,
-          std::string const & variableName, int opDatArgumentGroup) = 0;
-
-      /*
-       * ======================================================
-       * Handles the actions associated with the discovery of
-       * an OP_DAT
-       * ======================================================
-       */
-      virtual void
-      handleOpDatDeclaration (OpDatDefinition * opDatDeclaration,
-          std::string const & variableName, int opDatArgumentGroup) = 0;
-
-      /*
-       * ======================================================
-       * Retrieves the declarations of the OP_DAT arguments
-       * so that we can later retrieve their primitive types,
-       * dimensions, access values, etc.
-       * ======================================================
-       */
-      virtual void
-      retrieveOpDatDeclarations (TDeclarations * declarations) = 0;
-
       ParallelLoop (SgFunctionCallExp * functionCallExpression) :
         functionCallExpression (functionCallExpression)
       {
@@ -208,6 +178,12 @@ template <typename TSubroutineHeader, typename TDeclarations>
         return count;
       }
 
+      void
+      setOpDatType (unsigned int OP_DAT_ArgumentGroup, SgType * type)
+      {
+        OpDatTypes[OP_DAT_ArgumentGroup] = type;
+      }
+
       /*
        * ======================================================
        * What is the type which is wrapped by the OP_DAT declaration
@@ -220,6 +196,13 @@ template <typename TSubroutineHeader, typename TDeclarations>
         return OpDatTypes[OP_DAT_ArgumentGroup];
       }
 
+      void
+      setOpDatDimension (unsigned int OP_DAT_ArgumentGroup,
+          unsigned int dimension)
+      {
+        OpDatDimensions[OP_DAT_ArgumentGroup] = dimension;
+      }
+
       /*
        * ======================================================
        * What is the dimension of the OP_DAT variable in
@@ -230,6 +213,12 @@ template <typename TSubroutineHeader, typename TDeclarations>
       getOpDatDimension (unsigned int OP_DAT_ArgumentGroup)
       {
         return OpDatDimensions[OP_DAT_ArgumentGroup];
+      }
+
+      void
+      setDuplicateOpDat (unsigned int OP_DAT_ArgumentGroup, bool value)
+      {
+        OpDatDuplicates[OP_DAT_ArgumentGroup] = value;
       }
 
       /*
@@ -245,6 +234,12 @@ template <typename TSubroutineHeader, typename TDeclarations>
         return OpDatDuplicates[OP_DAT_ArgumentGroup];
       }
 
+      void
+      setOpMapValue (unsigned int OP_DAT_ArgumentGroup, MAPPING_VALUE value)
+      {
+        OpDatMappingDescriptors[OP_DAT_ArgumentGroup] = value;
+      }
+
       /*
        * ======================================================
        * What is the mapping value of the OP_DAT argument
@@ -255,6 +250,13 @@ template <typename TSubroutineHeader, typename TDeclarations>
       getOpMapValue (unsigned int OP_DAT_ArgumentGroup)
       {
         return OpDatMappingDescriptors[OP_DAT_ArgumentGroup];
+      }
+
+      void
+      setOpAccessValue (unsigned int OP_DAT_ArgumentGroup,
+          ACCESS_CODE_VALUE value)
+      {
+        OpDatAccessDescriptors[OP_DAT_ArgumentGroup] = value;
       }
 
       /*
@@ -376,6 +378,13 @@ template <typename TSubroutineHeader, typename TDeclarations>
         return type;
       }
 
+      void
+      setOpDatVariableName (unsigned int OP_DAT_ArgumentGroup,
+          std::string const variableName)
+      {
+        OpDatVariableNames[OP_DAT_ArgumentGroup] = variableName;
+      }
+
       /*
        * ======================================================
        * What is the name of the OP_DAT variable in this OP_DAT
@@ -388,6 +397,12 @@ template <typename TSubroutineHeader, typename TDeclarations>
         return OpDatVariableNames[OP_DAT_ArgumentGroup];
       }
 
+      void
+      setSizeOfOpDat (unsigned int size)
+      {
+        sizeOfOpDat = size;
+      }
+
       /*
        * ======================================================
        * What is the maximum size of an individual element of an
@@ -398,6 +413,19 @@ template <typename TSubroutineHeader, typename TDeclarations>
       getSizeOfOpDat () const
       {
         return sizeOfOpDat;
+      }
+
+      bool
+      isUniqueOpDat (std::string const & variableName)
+      {
+        return find (uniqueOpDats.begin (), uniqueOpDats.end (), variableName)
+            == uniqueOpDats.end ();
+      }
+
+      void
+      setUniqueOpDat (std::string const & variableName)
+      {
+        uniqueOpDats.push_back (variableName);
       }
 
       /*
@@ -433,6 +461,18 @@ template <typename TSubroutineHeader, typename TDeclarations>
       getFunctionCall ()
       {
         return functionCallExpression;
+      }
+
+      /*
+       * ======================================================
+       * Returns the name of the file in which the OP_PAR_LOOP
+       * call is contained
+       * ======================================================
+       */
+      std::string const &
+      getFileName () const
+      {
+        return functionCallExpression->getFilenameString ();
       }
   };
 
