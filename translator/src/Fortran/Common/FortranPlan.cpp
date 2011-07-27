@@ -259,7 +259,7 @@ FortranPlan::createConvertPlanFunctionParametersStatements (
 
   SgExprStatement * assignmentStatementL = buildAssignStatement (
       buildVarRefExp (variableDeclarations->get (
-          PlanFunction::Fortran::pthrcolSize)), dotExpressionL);
+          PlanFunction::Fortran::pnthrcolSize)), dotExpressionL);
 
   appendStatement (assignmentStatementL, block);
 

@@ -35,6 +35,10 @@ class FortranSubroutinesGeneration: public SubroutinesGeneration <
   private:
 
     void
+    fixUseStatement (SgUseStatement * lastUseStatement,
+        std::string const & userSubroutineName);
+
+    void
     patchCallsToParallelLoops ();
 
     /*

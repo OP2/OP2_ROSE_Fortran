@@ -1,6 +1,5 @@
 #include <FortranCUDASubroutinesGeneration.h>
 #include <FortranCUDAModuleDeclarationsIndirectLoop.h>
-#include <FortranCUDAInitialiseConstantsSubroutine.h>
 #include <FortranCUDAKernelSubroutineDirectLoop.h>
 #include <FortranCUDAKernelSubroutineIndirectLoop.h>
 #include <FortranCUDAHostSubroutineDirectLoop.h>

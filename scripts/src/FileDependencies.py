@@ -17,25 +17,25 @@ def determineModuleDependencies (fileList):
     
     for fileName in fileList:      
         g.addVertex(fileName)
-        file = open(fileName)
+        f = open(fileName)
         module_line_regex = re.compile("^\s*module\s+(\S+)\s*$", re.IGNORECASE)
         
-        for line in file:
+        for line in f:
             if module_line_regex.search(line):
                 lexemes = line.split()
                 moduleNameToFileName[lexemes[len(lexemes) - 1]] = fileName
-        file.close()
+        f.close()
         
     for fileName in fileList:    
-        file = open(fileName)
+        f = open(fileName)
         use_line_regex = re.compile("^\s*use", re.IGNORECASE)        
         
-        for line in file:
+        for line in f:
             if use_line_regex.search(line):
                 lexemes = line.split()
                 moduleName = lexemes[len(lexemes) - 1]
                 if moduleName in moduleNameToFileName:
                     g.addEdge(moduleNameToFileName[moduleName], fileName)            
-        file.close()
+        f.close()
     
     return g

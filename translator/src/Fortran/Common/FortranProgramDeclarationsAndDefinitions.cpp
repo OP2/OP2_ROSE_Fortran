@@ -306,6 +306,21 @@ FortranProgramDeclarationsAndDefinitions::visit (SgNode * node)
   {
     switch (node->variantT ())
     {
+      case V_SgModuleStatement:
+      {
+        SgModuleStatement * moduleStatement = isSgModuleStatement (node);
+
+        fileNameToModuleName[currentSourceFile]
+            = moduleStatement->get_name ().getString ();
+
+        Debug::getInstance ()->debugMessage ("Module '"
+            + moduleStatement->get_name ().getString () + "' in file '"
+            + currentSourceFile + "'", Debug::OUTER_LOOP_LEVEL, __FILE__,
+            __LINE__ );
+
+        break;
+      }
+
       case V_SgProcedureHeaderStatement:
       {
         /*
@@ -319,9 +334,13 @@ FortranProgramDeclarationsAndDefinitions::visit (SgNode * node)
 
         subroutinesInSourceCode.push_back (procedureHeaderStatement);
 
+        subroutineToFileName[procedureHeaderStatement->get_name ().getString ()]
+            = currentSourceFile;
+
         Debug::getInstance ()->debugMessage (
             "Found procedure header statement '"
-                + procedureHeaderStatement->get_name ().getString () + "'",
+                + procedureHeaderStatement->get_name ().getString ()
+                + "' in file '" + currentSourceFile + "'",
             Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
         break;

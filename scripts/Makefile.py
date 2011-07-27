@@ -234,6 +234,7 @@ def formatCode (files):
 	subroutine_regex = re.compile("\ssubroutine\s", re.IGNORECASE)	
 	do_regex         = re.compile("\s*do\s", re.IGNORECASE)
 	module_regex     = re.compile("\s*module\s", re.IGNORECASE)
+	program_regex    = re.compile("\s*program\s", re.IGNORECASE)
 	if_regex         = re.compile("\s*if\s", re.IGNORECASE)
 	type_regex       = re.compile("\s*type\s", re.IGNORECASE)
 	call_regex       = re.compile("\s*call\s", re.IGNORECASE)
@@ -258,7 +259,8 @@ def formatCode (files):
 				f2.write("\n")
 				newLineNeeded = False
 	
-			elif subroutine_regex.search(line) or module_regex.match(line) or do_regex.match(line) or if_regex.match(line):	
+			elif module_regex.match(line) or program_regex.match(line) or subroutine_regex.search(line) or \
+				do_regex.match(line) or if_regex.match(line):	
 				if newLineNeeded:
 					f2.write("\n")		
 				writeLine(f2, line, indent)
@@ -290,13 +292,37 @@ def formatCode (files):
 		os.rename(f2.name,f.name)
 
 def generateBackendMakefile (files):
-	verboseMessage("Generating Makefile for backend")
-
 	# Add the 'src' directory to the module search and PYTHONPATH
 	sys.path.append(sys.path[0] + os.sep + "src")
 
 	from FileDependencies import getBaseFileName, determineModuleDependencies
 	from Graph import Graph
+
+	iso_line_regex         = re.compile("^\s*module\s+ISO_C_BINDING\s*$", re.IGNORECASE)
+	op2_line_regex         = re.compile("^\s*module\s+OP2_C\s*$", re.IGNORECASE)
+	iso_c_binding_fileName = None
+	op2_fileName           = None
+	
+	for fileName in files:      
+        	f = open(fileName, "r")
+		for line in f:
+            		if iso_line_regex.search(line):
+				iso_c_binding_fileName = fileName
+				break
+			if op2_line_regex.search(line):
+				op2_fileName = fileName
+				break
+		f.close()
+	
+	if iso_c_binding_fileName is None:
+		exitMessage("Unable to find dummy module for ISO_C_BINDING")
+	elif op2_fileName is None:
+		exitMessage("Unable to find dummy module for OP2")
+	else:			
+		files.remove(iso_c_binding_fileName)
+		files.remove(op2_fileName)
+
+	verboseMessage("Generating Makefile for backend")
 
 	# Work out the dependencies between modules 
 	g = determineModuleDependencies(files)

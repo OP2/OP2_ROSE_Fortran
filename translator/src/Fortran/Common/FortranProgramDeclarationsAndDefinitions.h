@@ -14,6 +14,12 @@ class FortranProgramDeclarationsAndDefinitions: public ProgramDeclarationsAndDef
 {
   private:
 
+    std::map <std::string, std::string> subroutineToFileName;
+
+    std::map <std::string, std::string> fileNameToModuleName;
+
+  private:
+
     void
     handleOpGblDeclaration (FortranParallelLoop * parallelLoop,
         std::string const & variableName, int opDatArgumentGroup);
@@ -29,6 +35,18 @@ class FortranProgramDeclarationsAndDefinitions: public ProgramDeclarationsAndDef
     visit (SgNode * node);
 
   public:
+
+    std::string const &
+    getModuleNameForFile (std::string fileName)
+    {
+      return fileNameToModuleName[fileName];
+    }
+
+    std::string const &
+    getFileNameForSubroutine (std::string subroutineName)
+    {
+      return subroutineToFileName[subroutineName];
+    }
 
     FortranProgramDeclarationsAndDefinitions (SgProject * project);
 };

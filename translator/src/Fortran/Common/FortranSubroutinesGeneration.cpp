@@ -15,6 +15,36 @@ namespace
  */
 
 void
+FortranSubroutinesGeneration::fixUseStatement (SgUseStatement * useStatement,
+    std::string const & userSubroutineName)
+{
+  using boost::iequals;
+  using SageInterface::getPreviousStatement;
+
+  std::string const & moduleNameToRemove = declarations->getModuleNameForFile (
+      declarations->getFileNameForSubroutine (userSubroutineName));
+
+  Debug::getInstance ()->debugMessage ("'" + userSubroutineName
+      + "' is in Fortran module '" + moduleNameToRemove + "'",
+      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+
+  SgUseStatement * lastUseStatement = useStatement;
+
+  do
+  {
+    if (iequals (lastUseStatement->get_name ().getString (), moduleNameToRemove))
+    {
+      SageInterface::removeStatement (lastUseStatement);
+      break;
+    }
+
+    lastUseStatement = isSgUseStatement (
+        getPreviousStatement (lastUseStatement));
+  }
+  while (lastUseStatement != NULL);
+}
+
+void
 FortranSubroutinesGeneration::patchCallsToParallelLoops ()
 {
   using SageBuilder::buildAssignInitializer;
@@ -95,9 +125,7 @@ FortranSubroutinesGeneration::patchCallsToParallelLoops ()
      */
 
     SgStatement * previousStatement = lastDeclarationStatement;
-
     SgUseStatement * lastUseStatement;
-
     do
     {
       previousStatement = getPreviousStatement (previousStatement);
@@ -110,6 +138,8 @@ FortranSubroutinesGeneration::patchCallsToParallelLoops ()
       Debug::getInstance ()->errorMessage (
           "Could not find last 'use' statement");
     }
+
+    fixUseStatement (lastUseStatement, userSubroutineName);
 
     if (find (processedFiles.begin (), processedFiles.end (),
         parallelLoop->getFileName ()) == processedFiles.end ())
