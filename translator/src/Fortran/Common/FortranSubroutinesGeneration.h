@@ -6,6 +6,9 @@
 #include <FortranProgramDeclarationsAndDefinitions.h>
 #include <FortranParallelLoop.h>
 #include <FortranHostSubroutine.h>
+#include <FortranInitialiseConstantsSubroutine.h>
+#include <FortranOpDatDimensionsDeclaration.h>
+#include <FortranModuleDeclarations.h>
 
 namespace Libraries
 {
@@ -22,21 +25,14 @@ class FortranSubroutinesGeneration: public SubroutinesGeneration <
 
   protected:
 
-    virtual FortranHostSubroutine *
-    createSubroutines (FortranParallelLoop * parallelLoop,
-        std::string const & userSubroutineName) = 0;
+    FortranInitialiseConstantsSubroutine * initialiseConstantsSubroutine;
 
-    virtual void
-    createModuleDeclarations () = 0;
+    std::map <std::string, FortranOpDatDimensionsDeclaration *>
+        dimensionsDeclarations;
 
-    /*
-     * ======================================================
-     * Adds the relevant library 'use' statements to the
-     * generated module
-     * ======================================================
-     */
-    virtual void
-    addLibraries () = 0;
+    std::map <std::string, FortranModuleDeclarations *> moduleDeclarations;
+
+  private:
 
     void
     patchCallsToParallelLoops ();
@@ -67,11 +63,54 @@ class FortranSubroutinesGeneration: public SubroutinesGeneration <
     SgSourceFile &
     createSourceFile ();
 
+  protected:
+
+    /*
+     * ======================================================
+     * Creates the new subroutines. This function is pure virtual
+     * so the target backend has to implement it
+     * ======================================================
+     */
+    virtual void
+    createSubroutines () = 0;
+
+    /*
+     * ======================================================
+     * Creates the module type and variable declarations. This
+     * function is pure virtual so the target backend has to
+     * implement it
+     * ======================================================
+     */
+    virtual void
+    createModuleDeclarations () = 0;
+
+    /*
+     * ======================================================
+     * Adds the relevant library 'use' statements to the
+     * generated module. This function is pure virtual as the
+     * needed libraries are backend specific
+     * ======================================================
+     */
+    virtual void
+    addLibraries () = 0;
+
+    /*
+     * ======================================================
+     * Do the generation
+     * ======================================================
+     */
+    void
+    generate ();
+
   public:
 
     FortranSubroutinesGeneration (
         FortranProgramDeclarationsAndDefinitions * declarations,
-        std::string const & fileSuffix);
+        std::string const & fileSuffix) :
+      SubroutinesGeneration <FortranProgramDeclarationsAndDefinitions,
+          FortranHostSubroutine> (declarations, fileSuffix)
+    {
+    }
 };
 
 #endif

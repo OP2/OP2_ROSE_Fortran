@@ -13,64 +13,9 @@
  * ======================================================
  */
 
-FortranHostSubroutine *
-FortranOpenMPSubroutinesGeneration::createSubroutines (
-    FortranParallelLoop * parallelLoop, std::string const & userSubroutineName)
+void
+FortranOpenMPSubroutinesGeneration::createSubroutines ()
 {
-  FortranOpenMPKernelSubroutine * kernelSubroutine;
-
-  FortranOpenMPHostSubroutine * hostSubroutine;
-
-  if (parallelLoop->isDirectLoop ())
-  {
-    /*
-     * ======================================================
-     * Direct loop
-     * ======================================================
-     */
-
-    Debug::getInstance ()->debugMessage (
-        "Generating subroutines for direct loop", Debug::FUNCTION_LEVEL,
-        __FILE__, __LINE__);
-
-    FortranOpenMPModuleDeclarationsDirectLoop * moduleDeclarations =
-        new FortranOpenMPModuleDeclarationsDirectLoop (userSubroutineName,
-            parallelLoop, moduleScope);
-
-    kernelSubroutine = new FortranOpenMPKernelSubroutineDirectLoop (
-        userSubroutineName, userSubroutineName, parallelLoop, moduleScope);
-
-    hostSubroutine = new FortranOpenMPHostSubroutineDirectLoop (
-        userSubroutineName, userSubroutineName,
-        kernelSubroutine->getSubroutineName (), parallelLoop, moduleScope,
-        moduleDeclarations);
-  }
-  else
-  {
-    /*
-     * ======================================================
-     * Indirect loop
-     * ======================================================
-     */
-
-    Debug::getInstance ()->debugMessage (
-        "Generating subroutines for indirect loop", Debug::FUNCTION_LEVEL,
-        __FILE__, __LINE__);
-
-    FortranOpenMPModuleDeclarationsIndirectLoop * moduleDeclarations =
-        new FortranOpenMPModuleDeclarationsIndirectLoop (userSubroutineName,
-            parallelLoop, moduleScope);
-
-    kernelSubroutine = new FortranOpenMPKernelSubroutineIndirectLoop (
-        userSubroutineName, userSubroutineName, parallelLoop, moduleScope);
-
-    hostSubroutine = new FortranOpenMPHostSubroutineIndirectLoop (
-        userSubroutineName, userSubroutineName,
-        kernelSubroutine->getSubroutineName (), parallelLoop, moduleScope,
-        moduleDeclarations);
-  }
-
-  return hostSubroutine;
 }
 
 void
@@ -113,20 +58,4 @@ FortranOpenMPSubroutinesGeneration::addLibraries ()
           AstUnparseAttribute::e_after);
     }
   }
-}
-
-/*
- * ======================================================
- * Public functions
- * ======================================================
- */
-
-FortranOpenMPSubroutinesGeneration::FortranOpenMPSubroutinesGeneration (
-    SgProject * project,
-    FortranProgramDeclarationsAndDefinitions * declarations) :
-  FortranSubroutinesGeneration (declarations, "openmp_subroutines.F95")
-{
-  addLibraries ();
-
-  unparse ();
 }

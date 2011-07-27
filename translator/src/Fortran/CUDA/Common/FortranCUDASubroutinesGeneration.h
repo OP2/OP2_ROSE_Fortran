@@ -17,19 +17,13 @@ class FortranCUDASubroutinesGeneration: public FortranSubroutinesGeneration
 
   private:
 
-    std::map <std::string, FortranOpDatDimensionsDeclaration *>
-        dimensionsDeclarations;
-
     std::map <std::string, FortranCUDADataSizesDeclaration *>
         dataSizesDeclarations;
 
-    std::map <std::string, FortranCUDAModuleDeclarations *> moduleDeclarations;
-
   private:
 
-    virtual FortranHostSubroutine *
-    createSubroutines (FortranParallelLoop * parallelLoop,
-        std::string const & userSubroutineName);
+    virtual void
+    createSubroutines ();
 
     virtual void
     createModuleDeclarations ();
@@ -40,7 +34,11 @@ class FortranCUDASubroutinesGeneration: public FortranSubroutinesGeneration
   public:
 
     FortranCUDASubroutinesGeneration (SgProject * project,
-        FortranProgramDeclarationsAndDefinitions * declarations);
+        FortranProgramDeclarationsAndDefinitions * declarations) :
+      FortranSubroutinesGeneration (declarations, "cuda_code.CUF")
+    {
+      generate ();
+    }
 };
 
 #endif

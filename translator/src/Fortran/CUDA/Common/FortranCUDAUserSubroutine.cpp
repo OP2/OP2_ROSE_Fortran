@@ -23,12 +23,12 @@ FortranCUDAUserSubroutine::patchReferencesToConstants ()
   {
     public:
 
-      FortranCUDAInitialiseConstantsSubroutine * initialiseConstantsSubroutine;
+      FortranInitialiseConstantsSubroutine * initialiseConstantsSubroutine;
 
       ModifyReferencesToConstantVariables (
-          FortranCUDAInitialiseConstantsSubroutine * initialiseConstantsSubroutine)
+          FortranInitialiseConstantsSubroutine * initialiseConstantsSubroutine) :
+        initialiseConstantsSubroutine (initialiseConstantsSubroutine)
       {
-        this->initialiseConstantsSubroutine = initialiseConstantsSubroutine;
       }
 
       virtual void
@@ -239,7 +239,7 @@ FortranCUDAUserSubroutine::createFormalParameterDeclarations ()
 
 FortranCUDAUserSubroutine::FortranCUDAUserSubroutine (
     std::string const & subroutineName, SgScopeStatement * moduleScope,
-    FortranCUDAInitialiseConstantsSubroutine * initialiseConstantsSubroutine,
+    FortranInitialiseConstantsSubroutine * initialiseConstantsSubroutine,
     FortranProgramDeclarationsAndDefinitions * declarations,
     FortranParallelLoop * parallelLoop) :
   UserSubroutine <SgProcedureHeaderStatement,

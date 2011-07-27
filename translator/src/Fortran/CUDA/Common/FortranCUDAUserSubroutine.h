@@ -2,7 +2,7 @@
 #define FORTRAN_CUDA_USER_SUBROUTINE_H
 
 #include <UserSubroutine.h>
-#include <FortranCUDAInitialiseConstantsSubroutine.h>
+#include <FortranInitialiseConstantsSubroutine.h>
 #include <FortranParallelLoop.h>
 
 class FortranCUDAUserSubroutine: public UserSubroutine <
@@ -10,7 +10,7 @@ class FortranCUDAUserSubroutine: public UserSubroutine <
 {
   private:
 
-    FortranCUDAInitialiseConstantsSubroutine * initialiseConstantsSubroutine;
+    FortranInitialiseConstantsSubroutine * initialiseConstantsSubroutine;
 
   private:
 
@@ -31,7 +31,7 @@ class FortranCUDAUserSubroutine: public UserSubroutine <
         FortranCUDAUserSubroutine (
             std::string const & subroutineName,
             SgScopeStatement * moduleScope,
-            FortranCUDAInitialiseConstantsSubroutine * initialiseConstantsSubroutine,
+            FortranInitialiseConstantsSubroutine * initialiseConstantsSubroutine,
             FortranProgramDeclarationsAndDefinitions * declarations,
             FortranParallelLoop * parallelLoop);
 };

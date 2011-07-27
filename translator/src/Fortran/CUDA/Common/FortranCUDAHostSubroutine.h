@@ -2,7 +2,7 @@
 #define FORTRAN_CUDA_HOST_SUBROUTINE_H
 
 #include <FortranHostSubroutine.h>
-#include <FortranCUDAInitialiseConstantsSubroutine.h>
+#include <FortranInitialiseConstantsSubroutine.h>
 #include <FortranCUDAKernelSubroutine.h>
 #include <FortranCUDADataSizesDeclaration.h>
 #include <FortranOpDatDimensionsDeclaration.h>
@@ -13,7 +13,7 @@ class FortranCUDAHostSubroutine: public FortranHostSubroutine
 {
   protected:
 
-    FortranCUDAInitialiseConstantsSubroutine * initialiseConstantsSubroutine;
+    FortranInitialiseConstantsSubroutine * initialiseConstantsSubroutine;
 
     FortranCUDADataSizesDeclaration * dataSizesDeclaration;
 
@@ -92,7 +92,7 @@ class FortranCUDAHostSubroutine: public FortranHostSubroutine
             std::string const & kernelSubroutineName,
             FortranParallelLoop * parallelLoop,
             SgScopeStatement * moduleScope,
-            FortranCUDAInitialiseConstantsSubroutine * initialiseConstantsSubroutine,
+            FortranInitialiseConstantsSubroutine * initialiseConstantsSubroutine,
             FortranCUDADataSizesDeclaration * dataSizesDeclaration,
             FortranOpDatDimensionsDeclaration * opDatDimensionsDeclaration,
             FortranCUDAModuleDeclarations * moduleDeclarations);

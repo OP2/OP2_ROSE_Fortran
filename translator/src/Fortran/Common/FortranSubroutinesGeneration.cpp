@@ -306,15 +306,37 @@ FortranSubroutinesGeneration::createSourceFile ()
   return *sourceFile;
 }
 
-FortranSubroutinesGeneration::FortranSubroutinesGeneration (
-    FortranProgramDeclarationsAndDefinitions * declarations,
-    std::string const & fileSuffix) :
-  SubroutinesGeneration <FortranProgramDeclarationsAndDefinitions,
-      FortranHostSubroutine> (declarations, fileSuffix)
+/*
+ * ======================================================
+ * Public functions
+ * ======================================================
+ */
+
+void
+FortranSubroutinesGeneration::generate ()
 {
   SgSourceFile & sourceFile = createSourceFile ();
 
   SgModuleStatement * moduleStatement = createFortranModule (sourceFile);
 
   moduleScope = moduleStatement->get_definition ();
+
+  addLibraries ();
+
+  createModuleDeclarations ();
+
+  initialiseConstantsSubroutine = new FortranInitialiseConstantsSubroutine (
+      moduleScope, declarations);
+
+  initialiseConstantsSubroutine->declareConstants ();
+
+  addContains ();
+
+  initialiseConstantsSubroutine->generateSubroutine ();
+
+  createSubroutines ();
+
+  patchCallsToParallelLoops ();
+
+  unparse ();
 }

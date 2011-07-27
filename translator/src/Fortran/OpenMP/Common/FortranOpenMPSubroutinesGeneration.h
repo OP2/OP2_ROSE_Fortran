@@ -11,9 +11,8 @@ class FortranOpenMPSubroutinesGeneration: public FortranSubroutinesGeneration
 {
   private:
 
-    virtual FortranHostSubroutine *
-    createSubroutines (FortranParallelLoop * parallelLoop,
-        std::string const & userSubroutineName);
+    virtual void
+    createSubroutines ();
 
     virtual void
     createModuleDeclarations ();
@@ -24,7 +23,10 @@ class FortranOpenMPSubroutinesGeneration: public FortranSubroutinesGeneration
   public:
 
     FortranOpenMPSubroutinesGeneration (SgProject * project,
-        FortranProgramDeclarationsAndDefinitions * declarations);
+        FortranProgramDeclarationsAndDefinitions * declarations) :
+      FortranSubroutinesGeneration (declarations, "openmp_subroutines.F95")
+    {
+    }
 };
 
 #endif
