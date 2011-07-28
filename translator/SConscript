@@ -62,4 +62,4 @@ env['ENV']['LD_LIBRARY_PATH'] = os.environ['LD_LIBRARY_PATH']
 env.Program(binDir + os.sep + target,
 	    	source  = sourceFiles,
 	    	LIBPATH = [ROSE_LIB, BOOST_LIB],
-	    	LIBS    = ['rose', 'boost_system'])
+	    	LIBS    = ['rose', 'boost_filesystem', 'boost_system'])
