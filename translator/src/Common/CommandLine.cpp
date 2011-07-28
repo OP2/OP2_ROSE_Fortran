@@ -284,8 +284,6 @@ CommandLine::parse (int argc, char ** argv)
 
         path p = system_complete (path (argv[i]));
 
-        std::cout << p.file_string() << std::endl;
-
         ROSEArguments.push_back (argv[i]);
 
         Globals::getInstance ()->addInputFile (p.file_string ());

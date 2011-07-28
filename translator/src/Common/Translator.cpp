@@ -38,6 +38,24 @@
 #include <CPPCUDASubroutinesGeneration.h>
 #include <CPPOpenCLSubroutinesGeneration.h>
 
+class ConstantsOption: public CommandLineOptionWithParameters
+{
+  public:
+
+    virtual void
+    run ()
+    {
+      Globals::getInstance ()->setConstantsFileName (getParameter ());
+    }
+
+    ConstantsOption (std::string helpMessage, std::string parameterName,
+        std::string longOption) :
+      CommandLineOptionWithParameters (helpMessage, parameterName, "",
+          longOption)
+    {
+    }
+};
+
 class OxfordOption: public CommandLineOption
 {
   public:
@@ -224,6 +242,9 @@ checkBackendOption ()
 void
 addCommandLineOptions ()
 {
+  CommandLine::getInstance ()->addOption (new ConstantsOption (
+      "File containing constants", "file", "constants"));
+
   CommandLine::getInstance ()->addOption (new CUDAOption ("Generate CUDA code",
       TargetBackends::toString (TargetBackends::CUDA)));
 
@@ -280,6 +301,12 @@ processUserSelections (SgProject * project)
   {
     Debug::getInstance ()->debugMessage ("Fortran project detected",
         Debug::VERBOSE_LEVEL, __FILE__, __LINE__);
+
+    if (Globals::getInstance ()->getConstantsFileName ().empty ())
+    {
+      Debug::getInstance ()->errorMessage (
+          "The Fortran compiler requires the name of the file containing constants");
+    }
 
     checkBackendOption ();
 
