@@ -321,6 +321,16 @@ FortranProgramDeclarationsAndDefinitions::visit (SgNode * node)
           SgType * type =
               variableDeclaration->get_decl_item (variableName)->get_type ();
 
+          SgAttributeSpecificationStatement* attributeSpecificationStatement = isSgAttributeSpecificationStatement(variableDeclaration);
+
+          if (attributeSpecificationStatement != NULL)
+          {
+            std::cout << "PARAMETER FOUND\n";
+            if (attributeSpecificationStatement->get_attribute_kind() == SgAttributeSpecificationStatement::e_parameterStatement)
+            {
+            }
+          }
+
           constantDeclarations[variableName] = type;
         }
 

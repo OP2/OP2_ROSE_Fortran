@@ -193,6 +193,15 @@ namespace VariableNames
 
   /*
    * ======================================================
+   * Returns the name of an OP_DAT variable in this OP_DAT
+   * argument group on the host
+   * ======================================================
+   */
+  std::string
+  getOpDatHostName (unsigned int OP_DAT_ArgumentGroup);
+
+  /*
+   * ======================================================
    * Returns the name of a local OP_DAT variable in this
    * OP_DAT argument group
    * ======================================================

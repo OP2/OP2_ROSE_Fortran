@@ -86,16 +86,14 @@ class FortranCUDAHostSubroutine: public FortranHostSubroutine
     void
     createDataMarshallingLocalVariableDeclarations ();
 
-        FortranCUDAHostSubroutine (
-            std::string const & subroutineName,
-            std::string const & userSubroutineName,
-            std::string const & kernelSubroutineName,
-            FortranParallelLoop * parallelLoop,
-            SgScopeStatement * moduleScope,
-            FortranInitialiseConstantsSubroutine * initialiseConstantsSubroutine,
-            FortranCUDADataSizesDeclaration * dataSizesDeclaration,
-            FortranOpDatDimensionsDeclaration * opDatDimensionsDeclaration,
-            FortranCUDAModuleDeclarations * moduleDeclarations);
+    FortranCUDAHostSubroutine (std::string const & subroutineName,
+        std::string const & userSubroutineName,
+        std::string const & kernelSubroutineName,
+        FortranParallelLoop * parallelLoop, SgScopeStatement * moduleScope,
+        FortranInitialiseConstantsSubroutine * initialiseConstantsSubroutine,
+        FortranCUDADataSizesDeclaration * dataSizesDeclaration,
+        FortranOpDatDimensionsDeclaration * opDatDimensionsDeclaration,
+        FortranCUDAModuleDeclarations * moduleDeclarations);
 };
 
 #endif

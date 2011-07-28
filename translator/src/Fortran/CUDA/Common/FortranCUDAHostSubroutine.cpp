@@ -480,21 +480,48 @@ FortranCUDAHostSubroutine::createTransferOpDatStatements ()
           variableDeclarations->get (VariableNames::getOpDatName (i))),
           buildOpaqueVarRefExp (CommonVariableNames::dim, block));
 
-      SgDotExp * dotExpression2 = buildDotExp (buildVarRefExp (
-          variableDeclarations->get (VariableNames::getOpDatName (i))),
-          buildOpaqueVarRefExp (CommonVariableNames::set, block));
+      if (parallelLoop->getOpMapValue (i) == GLOBAL)
+      {
+        switch (parallelLoop->getOpAccessValue (i))
+        {
+          case READ_ACCESS:
+          {
+            SgExprStatement * assignmentStatement = buildAssignStatement (
+                buildVarRefExp (variableDeclarations->get (
+                    VariableNames::getOpDatSizeName (i))), dotExpression1);
 
-      SgDotExp * dotExpression3 = buildDotExp (dotExpression2,
-          buildOpaqueVarRefExp (CommonVariableNames::size, block));
+            appendStatement (assignmentStatement, block);
 
-      SgExpression * multiplyExpression = buildMultiplyOp (dotExpression1,
-          dotExpression3);
+            break;
+          }
 
-      SgExprStatement * assignmentStatement = buildAssignStatement (
-          buildVarRefExp (variableDeclarations->get (
-              VariableNames::getOpDatSizeName (i))), multiplyExpression);
+          default:
+          {
+            Debug::getInstance ()->errorMessage (
+                "Do not currently support an OP_GBL without read access");
 
-      appendStatement (assignmentStatement, block);
+            break;
+          }
+        }
+      }
+      else
+      {
+        SgDotExp * dotExpression2 = buildDotExp (buildVarRefExp (
+            variableDeclarations->get (VariableNames::getOpDatName (i))),
+            buildOpaqueVarRefExp (CommonVariableNames::set, block));
+
+        SgDotExp * dotExpression3 = buildDotExp (dotExpression2,
+            buildOpaqueVarRefExp (CommonVariableNames::size, block));
+
+        SgExpression * multiplyExpression = buildMultiplyOp (dotExpression1,
+            dotExpression3);
+
+        SgExprStatement * assignmentStatement = buildAssignStatement (
+            buildVarRefExp (variableDeclarations->get (
+                VariableNames::getOpDatSizeName (i))), multiplyExpression);
+
+        appendStatement (assignmentStatement, block);
+      }
     }
   }
 
@@ -509,24 +536,60 @@ FortranCUDAHostSubroutine::createTransferOpDatStatements ()
        * ======================================================
        */
 
-      SgDotExp * parameterExpression1 = buildDotExp (buildVarRefExp (
+      SgDotExp * parameterExpression1A = buildDotExp (buildVarRefExp (
           variableDeclarations->get (VariableNames::getOpDatName (i))),
           buildOpaqueVarRefExp (CommonVariableNames::dat_d, block));
 
-      SgVarRefExp * parameterExpression2 = buildVarRefExp (
+      SgVarRefExp * parameterExpression2A = buildVarRefExp (
           variableDeclarations->get (VariableNames::getOpDatDeviceName (i)));
 
-      SgExpression * parameterExpression3 = buildOpaqueVarRefExp ("(/"
+      SgExpression * parameterExpression3A = buildOpaqueVarRefExp ("(/"
           + buildVarRefExp (variableDeclarations->get (
               VariableNames::getOpDatSizeName (i)))->unparseToString () + "/)",
           block);
 
-      SgStatement * callStatement =
+      SgStatement * callStatementA =
           SubroutineCalls::createCToFortranPointerCallStatement (
-              subroutineScope, parameterExpression1, parameterExpression2,
-              parameterExpression3);
+              subroutineScope, parameterExpression1A, parameterExpression2A,
+              parameterExpression3A);
 
-      appendStatement (callStatement, block);
+      appendStatement (callStatementA, block);
+
+      if (parallelLoop->getOpMapValue (i) == GLOBAL)
+      {
+        SgDotExp * parameterExpression1B = buildDotExp (buildVarRefExp (
+            variableDeclarations->get (VariableNames::getOpDatName (i))),
+            buildOpaqueVarRefExp (CommonVariableNames::dat, block));
+
+        SgVarRefExp * parameterExpression2B = buildVarRefExp (
+            variableDeclarations->get (VariableNames::getOpDatHostName (i)));
+
+        SgExpression * parameterExpression3B = buildOpaqueVarRefExp ("(/"
+            + buildVarRefExp (variableDeclarations->get (
+                VariableNames::getOpDatSizeName (i)))->unparseToString ()
+            + "/)", block);
+
+        SgStatement * callStatementB =
+            SubroutineCalls::createCToFortranPointerCallStatement (
+                subroutineScope, parameterExpression1B, parameterExpression2B,
+                parameterExpression3B);
+
+        appendStatement (callStatementB, block);
+      }
+    }
+  }
+
+  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
+  {
+    if (parallelLoop->isDuplicateOpDat (i) == false
+        && parallelLoop->getOpMapValue (i) == GLOBAL)
+    {
+      SgExprStatement * assignmentStatement = buildAssignStatement (
+          buildVarRefExp (variableDeclarations->get (
+              VariableNames::getOpDatDeviceName (i))), buildVarRefExp (
+              variableDeclarations->get (VariableNames::getOpDatHostName (i))));
+
+      appendStatement (assignmentStatement, block);
     }
   }
 
@@ -589,27 +652,53 @@ FortranCUDAHostSubroutine::createFirstTimeExecutionStatements ()
           dataSizesDeclaration->getFieldDeclarations ()->get (
               VariableNames::getOpDatSizeName (i)));
 
-      SgDotExp * dotExpression1 = buildDotExp (buildVarRefExp (
-          variableDeclarations->get (VariableNames::getOpDatName (i))),
-          buildOpaqueVarRefExp (CommonVariableNames::dim, block));
+      SgDotExp * dotExpression1 = buildDotExp (dataSizesReference,
+          fieldReference);
 
       SgDotExp * dotExpression2 = buildDotExp (buildVarRefExp (
           variableDeclarations->get (VariableNames::getOpDatName (i))),
-          buildOpaqueVarRefExp (CommonVariableNames::set, block));
+          buildOpaqueVarRefExp (CommonVariableNames::dim, block));
 
-      SgDotExp * dotExpression3 = buildDotExp (dotExpression2,
-          buildOpaqueVarRefExp (CommonVariableNames::size, block));
+      if (parallelLoop->getOpMapValue (i) == GLOBAL)
+      {
+        switch (parallelLoop->getOpAccessValue (i))
+        {
+          case READ_ACCESS:
+          {
+            SgExprStatement * assignmentStatement = buildAssignStatement (
+                dotExpression1, dotExpression2);
 
-      SgExpression * multiplyExpression = buildMultiplyOp (dotExpression1,
-          dotExpression3);
+            appendStatement (assignmentStatement, block);
 
-      SgDotExp * dotExpression4 = buildDotExp (dataSizesReference,
-          fieldReference);
+            break;
+          }
 
-      SgExprStatement * assignmentStatement = buildAssignStatement (
-          dotExpression4, multiplyExpression);
+          default:
+          {
+            Debug::getInstance ()->errorMessage (
+                "Do not currently support an OP_GBL without read access");
 
-      appendStatement (assignmentStatement, block);
+            break;
+          }
+        }
+      }
+      else
+      {
+        SgDotExp * dotExpression3 = buildDotExp (buildVarRefExp (
+            variableDeclarations->get (VariableNames::getOpDatName (i))),
+            buildOpaqueVarRefExp (CommonVariableNames::set, block));
+
+        SgDotExp * dotExpression4 = buildDotExp (dotExpression3,
+            buildOpaqueVarRefExp (CommonVariableNames::size, block));
+
+        SgExpression * multiplyExpression = buildMultiplyOp (dotExpression2,
+            dotExpression4);
+
+        SgExprStatement * assignmentStatement = buildAssignStatement (
+            dotExpression1, multiplyExpression);
+
+        appendStatement (assignmentStatement, block);
+      }
     }
   }
 
@@ -671,6 +760,17 @@ FortranCUDAHostSubroutine::createDataMarshallingLocalVariableDeclarations ()
           FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
               variableName, isArrayType, subroutineScope, 2, DEVICE,
               ALLOCATABLE));
+
+      if (parallelLoop->getOpMapValue (i) == GLOBAL)
+      {
+        string const & variableName = VariableNames::getOpDatHostName (i);
+
+        variableDeclarations->add (variableName,
+            FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
+                variableName,
+                buildPointerType (parallelLoop->getOpDatType (i)),
+                subroutineScope));
+      }
     }
   }
 }
