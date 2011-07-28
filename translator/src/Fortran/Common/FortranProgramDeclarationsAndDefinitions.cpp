@@ -293,17 +293,57 @@ FortranProgramDeclarationsAndDefinitions::visit (SgNode * node)
     Debug::getInstance ()->debugMessage ("Source file '" + currentSourceFile
         + "' detected", Debug::OUTER_LOOP_LEVEL, __FILE__, __LINE__ );
   }
-
-  /*
-   * ======================================================
-   * Only process this portion of the AST if we recognise
-   * this source file as one passed on the command line. In
-   * Fortran, .rmod files are sometimes generated whose
-   * traversal should be avoided
-   * ======================================================
-   */
-  if (Globals::getInstance ()->isInputFile (currentSourceFile))
+  else if (iequals (Globals::getInstance ()->getConstantsFileName (),
+      currentSourceFile))
   {
+    /*
+     * ======================================================
+     * Only process this portion of the AST if we recognise
+     * this source file as the constants source file
+     * ======================================================
+     */
+    switch (node->variantT ())
+    {
+      case V_SgVariableDeclaration:
+      {
+        Debug::getInstance ()->debugMessage ("Variable declaration detected",
+            Debug::OUTER_LOOP_LEVEL, __FILE__, __LINE__ );
+
+        SgVariableDeclaration * variableDeclaration = isSgVariableDeclaration (
+            node);
+
+        for (SgInitializedNamePtrList::iterator it =
+            variableDeclaration->get_variables ().begin (); it
+            != variableDeclaration->get_variables ().end (); it++)
+        {
+          string const variableName = (*it)->get_name ().getString ();
+
+          SgType * type =
+              variableDeclaration->get_decl_item (variableName)->get_type ();
+
+          constantDeclarations[variableName] = type;
+        }
+
+        break;
+      }
+
+      default:
+      {
+        break;
+      }
+    }
+  }
+  else if (Globals::getInstance ()->isInputFile (currentSourceFile))
+  {
+    /*
+     * ======================================================
+     * Only process this portion of the AST if we recognise
+     * this source file as one passed on the command line. In
+     * Fortran, .rmod files are sometimes generated whose
+     * traversal should be avoided
+     * ======================================================
+     */
+
     switch (node->variantT ())
     {
       case V_SgModuleStatement:
@@ -342,70 +382,6 @@ FortranProgramDeclarationsAndDefinitions::visit (SgNode * node)
                 + procedureHeaderStatement->get_name ().getString ()
                 + "' in file '" + currentSourceFile + "'",
             Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
-
-        break;
-      }
-
-      case V_SgVariableDeclaration:
-      {
-        Debug::getInstance ()->debugMessage ("Variable declaration detected",
-            Debug::OUTER_LOOP_LEVEL, __FILE__, __LINE__ );
-
-        SgVariableDeclaration * variableDeclaration = isSgVariableDeclaration (
-            node);
-
-        for (SgInitializedNamePtrList::iterator it =
-            variableDeclaration->get_variables ().begin (); it
-            != variableDeclaration->get_variables ().end (); it++)
-        {
-          string const variableName = (*it)->get_name ().getString ();
-
-          SgType * type =
-              variableDeclaration->get_decl_item (variableName)->get_type ();
-
-          handleBaseTypeDeclaration (type, variableName);
-
-          SgAssignInitializer * assignmentInitializer =
-              isSgAssignInitializer (variableDeclaration->get_decl_item (
-                  variableName)->get_initializer ());
-
-          if (assignmentInitializer != NULL)
-          {
-            addInitializer (variableName, assignmentInitializer->get_operand ());
-          }
-        }
-
-        break;
-      }
-
-      case V_SgAssignOp:
-      {
-        Debug::getInstance ()->debugMessage ("Assignment operation detected",
-            Debug::OUTER_LOOP_LEVEL, __FILE__, __LINE__ );
-
-        SgAssignOp * assignExpression = isSgAssignOp (node);
-
-        SgExpression * lhs = assignExpression->get_lhs_operand ();
-
-        SgExpression * rhs = assignExpression->get_rhs_operand ();
-
-        if (isSgVarRefExp (lhs) != NULL)
-        {
-          SgVarRefExp * lhsReference = isSgVarRefExp (lhs);
-
-          string const variableName =
-              lhsReference->get_symbol ()->get_name ().getString ();
-
-          Debug::getInstance ()->debugMessage ("Storing '"
-              + rhs->unparseToString () + "' as assignment expression for '"
-              + variableName + "'", Debug::OUTER_LOOP_LEVEL, __FILE__, __LINE__);
-
-          addInitializer (variableName, rhs);
-        }
-        else if (isSgPntrArrRefExp (lhs))
-        {
-          SgPntrArrRefExp * lhsReference = isSgPntrArrRefExp (lhs);
-        }
 
         break;
       }

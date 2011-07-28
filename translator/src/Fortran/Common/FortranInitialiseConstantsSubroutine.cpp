@@ -14,6 +14,7 @@ void
 FortranInitialiseConstantsSubroutine::createStatements ()
 {
   using SageBuilder::buildVarRefExp;
+  using SageBuilder::buildOpaqueVarRefExp;
   using SageBuilder::buildAssignStatement;
   using SageInterface::appendStatement;
   using std::string;
@@ -24,43 +25,19 @@ FortranInitialiseConstantsSubroutine::createStatements ()
       "Creating statements in initialise constants subroutine",
       Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
-  for (map <string, OpConstDefinition *>::const_iterator it =
-      declarations->firstOpConstDefinition (); it
-      != declarations->lastOpConstDefinition (); ++it)
+  for (map <string, SgType *>::const_iterator it =
+      declarations->firstConstantDeclaration (); it
+      != declarations->lastConstantDeclaration (); ++it)
   {
     string const variableName = it->first;
 
-    Debug::getInstance ()->debugMessage ("Analysing constant '" + variableName
-        + "'", Debug::OUTER_LOOP_LEVEL, __FILE__, __LINE__);
-
     string const moduleVariableName = constantVariableNames[variableName];
 
-    vector <SgExpression *> initializers = declarations->getInitializers (
-        variableName);
+    SgExprStatement * assignmentStatement = buildAssignStatement (
+        buildVarRefExp (variableDeclarations->get (moduleVariableName)),
+        buildOpaqueVarRefExp (variableName, subroutineScope));
 
-    ROSE_ASSERT (initializers.empty() == false);
-
-    if (initializers.size () > 1)
-    {
-      for (vector <SgExpression *>::iterator it = initializers.begin (); it
-          != initializers.end (); ++it)
-      {
-        std::cout << (*it)->unparseToString ();
-      }
-
-      Debug::getInstance ()->errorMessage (
-          "Too many initializers found for the OP_CONST '" + variableName + "'");
-    }
-    else
-    {
-      SgExpression * initializer = *(initializers.begin ());
-
-      SgExprStatement * assignmentStatement = buildAssignStatement (
-          buildVarRefExp (variableDeclarations->get (moduleVariableName)),
-          initializer);
-
-      appendStatement (assignmentStatement, subroutineScope);
-    }
+    appendStatement (assignmentStatement, subroutineScope);
   }
 }
 
@@ -108,72 +85,23 @@ FortranInitialiseConstantsSubroutine::declareConstants ()
   using std::map;
   using std::string;
 
-  for (map <string, OpConstDefinition *>::const_iterator it =
-      declarations->firstOpConstDefinition (); it
-      != declarations->lastOpConstDefinition (); ++it)
+  for (map <string, SgType *>::const_iterator it =
+      declarations->firstConstantDeclaration (); it
+      != declarations->lastConstantDeclaration (); ++it)
   {
     string const variableName = it->first;
 
-    string const moduleVariableName = "GENERATED_MODULE_" + variableName;
+    SgType * type = it->second;
+
+    string const moduleVariableName = "INTERNAL_" + variableName;
 
     constantVariableNames[variableName] = moduleVariableName;
 
-    if (declarations->isTypeBoolean (variableName))
-    {
-      SgVariableDeclaration * variableDeclaration =
-          FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
-              moduleVariableName, FortranTypesBuilder::getLogical (),
-              moduleScope, 1, CONSTANT);
+    SgVariableDeclaration * variableDeclaration =
+        FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
+            moduleVariableName, type, moduleScope);
 
-      variableDeclarations->add (moduleVariableName, variableDeclaration);
-    }
-    else if (declarations->isTypeShort (variableName))
-    {
-      SgVariableDeclaration * variableDeclaration =
-          FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
-              moduleVariableName, FortranTypesBuilder::getTwoByteInteger (),
-              moduleScope, 1, CONSTANT);
-
-      variableDeclarations->add (moduleVariableName, variableDeclaration);
-    }
-    else if (declarations->isTypeInteger (variableName))
-    {
-      SgVariableDeclaration * variableDeclaration =
-          FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
-              moduleVariableName, FortranTypesBuilder::getFourByteInteger (),
-              moduleScope, 1, CONSTANT);
-
-      variableDeclarations->add (moduleVariableName, variableDeclaration);
-    }
-    else if (declarations->isTypeLong (variableName))
-    {
-      SgVariableDeclaration * variableDeclaration =
-          FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
-              moduleVariableName, FortranTypesBuilder::getEightByteInteger (),
-              moduleScope, 1, CONSTANT);
-
-      variableDeclarations->add (moduleVariableName, variableDeclaration);
-    }
-    else if (declarations->isTypeFloat (variableName))
-    {
-      SgVariableDeclaration * variableDeclaration =
-          FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
-              moduleVariableName,
-              FortranTypesBuilder::getSinglePrecisionFloat (), moduleScope, 1,
-              CONSTANT);
-
-      variableDeclarations->add (moduleVariableName, variableDeclaration);
-    }
-    else if (declarations->isTypeDouble (variableName))
-    {
-      SgVariableDeclaration * variableDeclaration =
-          FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
-              moduleVariableName,
-              FortranTypesBuilder::getDoublePrecisionFloat (), moduleScope, 1,
-              CONSTANT);
-
-      variableDeclarations->add (moduleVariableName, variableDeclaration);
-    }
+    variableDeclarations->add (moduleVariableName, variableDeclaration);
   }
 }
 
@@ -195,9 +123,4 @@ FortranInitialiseConstantsSubroutine::FortranInitialiseConstantsSubroutine (
   Subroutine <SgProcedureHeaderStatement> ("InitialiseConstants"), moduleScope (
       moduleScope), declarations (declarations)
 {
-  Debug::getInstance ()->debugMessage (
-      "Creating initialise constants subroutine", Debug::CONSTRUCTOR_LEVEL,
-      __FILE__, __LINE__);
-
-  declareConstants ();
 }

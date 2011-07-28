@@ -1,4 +1,5 @@
 #include <cstdlib>
+#include <boost/filesystem.hpp>
 #include <Globals.h>
 #include <CommonNamespaces.h>
 
@@ -48,37 +49,37 @@ Globals::getInstance ()
 void
 Globals::setTargetBackend (TargetBackends::BACKEND_VALUE backend)
 {
-  globalsInstance->backend = backend;
+  this->backend = backend;
 }
 
 TargetBackends::BACKEND_VALUE
 Globals::getTargetBackend () const
 {
-  return globalsInstance->backend;
+  return backend;
 }
 
 void
 Globals::setRenderOxfordAPICalls ()
 {
-  globalsInstance->oxfordOption = true;
+  oxfordOption = true;
 }
 
 bool
 Globals::renderOxfordAPICalls () const
 {
-  return globalsInstance->oxfordOption;
+  return oxfordOption;
 }
 
 void
 Globals::setOutputUDrawGraphs ()
 {
-  globalsInstance->uDrawOption = true;
+  uDrawOption = true;
 }
 
 bool
 Globals::outputUDrawGraphs () const
 {
-  return globalsInstance->uDrawOption;
+  return uDrawOption;
 }
 
 void
@@ -92,4 +93,21 @@ Globals::isInputFile (std::string const & fileName) const
 {
   return std::find (inputFiles.begin (), inputFiles.end (), fileName)
       != inputFiles.end ();
+}
+
+void
+Globals::setConstantsFileName (std::string const & fileName)
+{
+  using boost::filesystem::path;
+  using boost::filesystem::system_complete;
+
+  path p = system_complete (path (fileName));
+
+  constantsFileName = p.file_string ();
+}
+
+std::string const &
+Globals::getConstantsFileName () const
+{
+  return constantsFileName;
 }

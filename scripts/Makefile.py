@@ -90,22 +90,19 @@ parser.add_option("-M",
 # Cleans out files generated during the compilation process
 def clean ():
 	filesToRemove = []
-	filesToRemove.extend(glob.glob('BLANK*.[fF?]95'))
-	filesToRemove.extend(glob.glob('rose_*.[fF?]95'))
-    	filesToRemove.extend(glob.glob('BLANK*.[fF?]90'))
-    	filesToRemove.extend(glob.glob('rose_*.[fF?]90'))
-	filesToRemove.extend(glob.glob('[!^BLANK]*_postprocessed.[fF?]95'))
-    	filesToRemove.extend(glob.glob('[!^BLANK]*_postprocessed.[fF?]90'))
+	filesToRemove.extend(glob.glob('BLANK*.[fF?]*'))
+	filesToRemove.extend(glob.glob('rose_[!^openmp]*.[fF?]*'))
+	filesToRemove.extend(glob.glob('[!^BLANK]*_postprocessed.[fF?]*'))
 	filesToRemove.extend(glob.glob('*.rmod'))
 	filesToRemove.extend(glob.glob('*.mod'))
 	filesToRemove.extend(glob.glob('hs_err_pid*.log'))
 	filesToRemove.extend(glob.glob('~*'))
 
 	if opts.cuda:
-		filesToRemove.extend(glob.glob('[!^BLANK]*_cudafor.CUF'))
+		filesToRemove.extend(glob.glob('rose*.CUF'))
 	
 	if opts.openmp:			
-		filesToRemove.extend(glob.glob('[!^BLANK]*_openmp.[fF?]95'))
+		filesToRemove.extend(glob.glob('rose*_ope.[fF?]*'))
 
 	for file in filesToRemove:
 		if opts.verbose:
@@ -146,20 +143,24 @@ def compile ():
 
 	translatorPath = None
 	filesToCompile = []
+	constantsFile  = None
 
 	for line in open(configFile, 'r'):
+		line = line.strip()
 		words = line.split('=')
 		if line.startswith('translator'):
 			translatorPath = words[1].strip()
 			if not os.path.isfile(translatorPath):
 				exitMessage("'" + translatorPath + "' does not exist.")
 		elif line.startswith('files'):
-			files = words[1].split(' ')
+			files = words[1].strip().split(' ')
 			for f in files:
 				f = f.strip()
 				filesToCompile.append(f)
 				if not os.path.isfile(f):
-					exitMessage("'" + f + "' does not exist.")
+					exitMessage("File '" + f + "' does not exist.")
+		elif line.startswith('constants'):
+			constantsFile = words[1].strip()
 
 	if translatorPath is None:
 		exitMessage("You did not specify a path to the translator. Use 'translator=<path/to/translator>' in the configuration file.")
@@ -178,6 +179,9 @@ def compile ():
 
 	for f in filesToCompile:
 		cmd += f + ' '
+
+	if constantsFile is not None:
+		cmd += "--constants " + constantsFile 
 
 	verboseMessage("Running: '" + cmd + "'")
 
@@ -297,30 +301,6 @@ def generateBackendMakefile (files):
 
 	from FileDependencies import getBaseFileName, determineModuleDependencies
 	from Graph import Graph
-
-	iso_line_regex         = re.compile("^\s*module\s+ISO_C_BINDING\s*$", re.IGNORECASE)
-	op2_line_regex         = re.compile("^\s*module\s+OP2_C\s*$", re.IGNORECASE)
-	iso_c_binding_fileName = None
-	op2_fileName           = None
-	
-	for fileName in files:      
-        	f = open(fileName, "r")
-		for line in f:
-            		if iso_line_regex.search(line):
-				iso_c_binding_fileName = fileName
-				break
-			if op2_line_regex.search(line):
-				op2_fileName = fileName
-				break
-		f.close()
-	
-	if iso_c_binding_fileName is None:
-		exitMessage("Unable to find dummy module for ISO_C_BINDING")
-	elif op2_fileName is None:
-		exitMessage("Unable to find dummy module for OP2")
-	else:			
-		files.remove(iso_c_binding_fileName)
-		files.remove(op2_fileName)
 
 	verboseMessage("Generating Makefile for backend")
 
