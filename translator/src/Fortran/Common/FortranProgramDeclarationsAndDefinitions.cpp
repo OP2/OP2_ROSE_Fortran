@@ -306,9 +306,6 @@ FortranProgramDeclarationsAndDefinitions::visit (SgNode * node)
     {
       case V_SgVariableDeclaration:
       {
-        Debug::getInstance ()->debugMessage ("Variable declaration detected",
-            Debug::OUTER_LOOP_LEVEL, __FILE__, __LINE__ );
-
         SgVariableDeclaration * variableDeclaration = isSgVariableDeclaration (
             node);
 
@@ -321,17 +318,21 @@ FortranProgramDeclarationsAndDefinitions::visit (SgNode * node)
           SgType * type =
               variableDeclaration->get_decl_item (variableName)->get_type ();
 
-          SgAttributeSpecificationStatement* attributeSpecificationStatement = isSgAttributeSpecificationStatement(variableDeclaration);
-
-          if (attributeSpecificationStatement != NULL)
+          if (variableDeclaration->get_declarationModifier ().get_typeModifier ().get_constVolatileModifier ().isConst ())
           {
-            std::cout << "PARAMETER FOUND\n";
-            if (attributeSpecificationStatement->get_attribute_kind() == SgAttributeSpecificationStatement::e_parameterStatement)
-            {
-            }
-          }
+            /*
+             * ======================================================
+             * This is the ROSE hack to shoe horn Fortran constants
+             * into C-style constants
+             * ======================================================
+             */
 
-          constantDeclarations[variableName] = type;
+            Debug::getInstance ()->debugMessage ("Variable '" + variableName
+                + "' is a constant", Debug::OUTER_LOOP_LEVEL, __FILE__,
+                __LINE__ );
+
+            constantDeclarations[variableName] = type;
+          }
         }
 
         break;

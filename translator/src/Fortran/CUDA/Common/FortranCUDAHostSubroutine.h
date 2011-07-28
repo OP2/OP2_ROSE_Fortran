@@ -32,15 +32,6 @@ class FortranCUDAHostSubroutine: public FortranHostSubroutine
     SgStatement *
     createThreadSynchroniseCallStatement ();
 
-    /*
-     * ======================================================
-     * Returns a statement which calls the initialise
-     * constants subroutine
-     * ======================================================
-     */
-    SgStatement *
-    createInitialiseConstantsCallStatement ();
-
     virtual void
     createReductionEpilogueStatements ();
 
@@ -79,6 +70,9 @@ class FortranCUDAHostSubroutine: public FortranHostSubroutine
      */
     SgBasicBlock *
     createFirstTimeExecutionStatements ();
+
+    SgBasicBlock *
+    createCallToInitialiseConstantsStatements ();
 
     void
     createCUDAKernelLocalVariableDeclarations ();

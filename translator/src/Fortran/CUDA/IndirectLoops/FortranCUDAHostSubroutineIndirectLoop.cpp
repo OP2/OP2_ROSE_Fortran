@@ -641,8 +641,6 @@ FortranCUDAHostSubroutineIndirectLoop::createStatements ()
   appendStatement (createPlanFunctionCallStatement (allDeclarations,
       subroutineScope), ifBody);
 
-  appendStatement (createInitialiseConstantsCallStatement (), ifBody);
-
   SgIfStmt * ifStatement =
       RoseStatementsAndExpressionsBuilder::buildIfStatementWithEmptyElse (
           ifGuardExpression, ifBody);
@@ -664,6 +662,9 @@ FortranCUDAHostSubroutineIndirectLoop::createStatements ()
       subroutineScope);
 
   createVariablesSizesInitialisationStatements ();
+
+  appendStatement (createCallToInitialiseConstantsStatements (),
+      subroutineScope);
 
   createPlanFunctionExecutionStatements ();
 

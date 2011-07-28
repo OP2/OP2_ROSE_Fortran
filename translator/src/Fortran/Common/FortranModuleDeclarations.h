@@ -47,12 +47,18 @@ class FortranModuleDeclarations
   protected:
 
     void
+    createInitialiseConstantsBooleanDeclaration ();
+
+    void
     createFirstExecutionBooleanDeclaration ();
 
     FortranModuleDeclarations (std::string const & userSubroutineName,
         FortranParallelLoop * parallelLoop, SgScopeStatement * moduleScope);
 
   public:
+
+    SgVariableDeclaration *
+    getInitialiseConstantsBooleanDeclaration ();
 
     SgVariableDeclaration *
     getFirstExecutionBooleanDeclaration ();

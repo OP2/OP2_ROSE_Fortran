@@ -3,6 +3,7 @@
 #include <FortranTypesBuilder.h>
 #include <FortranCUDAHostSubroutine.h>
 #include <FortranCUDAReductionSubroutine.h>
+#include <RoseStatementsAndExpressionsBuilder.h>
 
 /*
  * ======================================================
@@ -33,26 +34,6 @@ FortranCUDAHostSubroutine::createThreadSynchroniseCallStatement ()
       variableDeclarations->get (CUDA::Fortran::threadSynchRet)), functionCall);
 
   return callStatement;
-}
-
-SgStatement *
-FortranCUDAHostSubroutine::createInitialiseConstantsCallStatement ()
-{
-  using SageBuilder::buildExprListExp;
-  using SageBuilder::buildVoidType;
-  using SageBuilder::buildFunctionCallStmt;
-
-  Debug::getInstance ()->debugMessage (
-      "Creating statement to call initialise constant subroutine",
-      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
-
-  SgExprListExp * actualParameters = buildExprListExp ();
-
-  SgExprStatement * functionCallStatement = buildFunctionCallStmt (
-      initialiseConstantsSubroutine->getSubroutineName (), buildVoidType (),
-      actualParameters, subroutineScope);
-
-  return functionCallStatement;
 }
 
 void
@@ -726,6 +707,54 @@ FortranCUDAHostSubroutine::createFirstTimeExecutionStatements ()
   return block;
 }
 
+SgBasicBlock *
+FortranCUDAHostSubroutine::createCallToInitialiseConstantsStatements ()
+{
+  using SageBuilder::buildExprListExp;
+  using SageBuilder::buildFunctionCallStmt;
+  using SageBuilder::buildVoidType;
+  using SageBuilder::buildVarRefExp;
+  using SageBuilder::buildBasicBlock;
+  using SageBuilder::buildEqualityOp;
+  using SageBuilder::buildAssignStatement;
+  using SageBuilder::buildBoolValExp;
+  using SageInterface::appendStatement;
+
+  Debug::getInstance ()->debugMessage (
+      "Creating statements to call initialise constants subroutine",
+      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+
+  SgBasicBlock * block = buildBasicBlock ();
+
+  SgBasicBlock * ifBody = buildBasicBlock ();
+
+  SgEqualityOp * ifGuardExpression = buildEqualityOp (buildVarRefExp (
+      moduleDeclarations->getInitialiseConstantsBooleanDeclaration ()),
+      buildBoolValExp (true));
+
+  SgExprStatement * assignmentStatement = buildAssignStatement (buildVarRefExp (
+      moduleDeclarations->getInitialiseConstantsBooleanDeclaration ()),
+      buildBoolValExp (false));
+
+  appendStatement (assignmentStatement, ifBody);
+
+  SgExprListExp * actualParameters = buildExprListExp ();
+
+  SgExprStatement * callStatement = buildFunctionCallStmt (
+      initialiseConstantsSubroutine->getSubroutineName (), buildVoidType (),
+      actualParameters, subroutineScope);
+
+  appendStatement (callStatement, ifBody);
+
+  SgIfStmt * ifStatement =
+      RoseStatementsAndExpressionsBuilder::buildIfStatementWithEmptyElse (
+          ifGuardExpression, ifBody);
+
+  appendStatement (ifStatement, block);
+
+  return block;
+}
+
 void
 FortranCUDAHostSubroutine::createDataMarshallingLocalVariableDeclarations ()
 {
@@ -733,6 +762,10 @@ FortranCUDAHostSubroutine::createDataMarshallingLocalVariableDeclarations ()
   using SageBuilder::buildPointerType;
   using SageInterface::appendStatement;
   using std::string;
+
+  Debug::getInstance ()->debugMessage (
+      "Creating local variable declarations for data marshalling",
+      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {

@@ -355,7 +355,8 @@ FortranCUDAHostSubroutineDirectLoop::createStatements ()
 
   createVariableSizesInitialisationStatements ();
 
-  appendStatement (createInitialiseConstantsCallStatement (), subroutineScope);
+  appendStatement (createCallToInitialiseConstantsStatements (),
+      subroutineScope);
 
   appendStatement (createKernelFunctionCallStatement (), subroutineScope);
 
