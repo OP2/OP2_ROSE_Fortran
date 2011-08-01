@@ -9,6 +9,7 @@
 #define FORTRAN_CUDA_REDUCTION_SUBROUTINE_H
 
 #include <Subroutine.h>
+#include <Reduction.h>
 
 namespace ReductionSubroutine
 {
@@ -32,10 +33,10 @@ class FortranCUDAReductionSubroutine: public Subroutine <
 
     /*
      * ======================================================
-     * Type of the reduction variable (must be an array type)
+     * Information pertaining to the type of reduction
      * ======================================================
      */
-    SgArrayType * reductionVariableType;
+    Reduction * reduction;
 
   private:
 
@@ -55,7 +56,7 @@ class FortranCUDAReductionSubroutine: public Subroutine <
 
     FortranCUDAReductionSubroutine (
         std::string const & subroutineAndVariableName,
-        SgScopeStatement * moduleScope, SgArrayType * reductionVariableType);
+        SgScopeStatement * moduleScope, Reduction * reduction);
 };
 
 #endif

@@ -96,21 +96,7 @@ FortranCUDAReductionSubroutine::createStatements ()
    * ======================================================
    */
 
-  SgExpression * autosharedKindSize =
-      reductionVariableType->get_base_type ()->get_type_kind ();
-
-  /*
-   * ======================================================
-   * If the user hasn't specified a Fortran kind, we have
-   * assume standard ones: integer(4) and real(4)
-   * ======================================================
-   */
-
-  if (autosharedKindSize == NULL && isSgTypeInt (
-      reductionVariableType->get_base_type ()) != NULL)
-  {
-    autosharedKindSize = buildIntVal (4);
-  }
+  SgIntVal * autosharedKindSize = buildIntVal (reduction->getVariableSize ());
 
   SgVarRefExp * autosharedOffsetReference = buildVarRefExp (
       variableDeclarations->get (ReductionSubroutine::sharedMemoryStartOffset));
@@ -244,7 +230,7 @@ FortranCUDAReductionSubroutine::createLocalVariableDeclarations ()
    */
 
   SgArrayType * arrayType = FortranTypesBuilder::getArray_RankOne (
-      reductionVariableType->get_base_type (), 0, new SgAsteriskShapeExp (
+      reduction->getBaseType (), 0, new SgAsteriskShapeExp (
           RoseHelper::getFileInfo ()));
 
   variableDeclarations->add (CommonVariableNames::autoshared,
@@ -289,8 +275,9 @@ FortranCUDAReductionSubroutine::createFormalParameterDeclarations ()
   variableDeclarations->add (
       ReductionSubroutine::reductionResultOnDevice,
       FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
-          ReductionSubroutine::reductionResultOnDevice, reductionVariableType,
-          subroutineScope, formalParameters, 1, DEVICE));
+          ReductionSubroutine::reductionResultOnDevice,
+          reduction->getArrayType (), subroutineScope, formalParameters, 1,
+          DEVICE));
 
   /*
    * ======================================================
@@ -304,9 +291,8 @@ FortranCUDAReductionSubroutine::createFormalParameterDeclarations ()
   variableDeclarations->add (
       ReductionSubroutine::inputValue,
       FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
-          ReductionSubroutine::inputValue,
-          reductionVariableType->get_base_type (), subroutineScope,
-          formalParameters, 1, VALUE));
+          ReductionSubroutine::inputValue, reduction->getBaseType (),
+          subroutineScope, formalParameters, 1, VALUE));
 
   /*
    * ======================================================
@@ -345,23 +331,11 @@ FortranCUDAReductionSubroutine::createFormalParameterDeclarations ()
  * ======================================================
  */
 
-/*
- * ======================================================
- * WARNING:
- * We assume that the subroutineAndVariableName include both
- * the user subroutine name plus the variable name to which
- * reduction is referred.
- * We suppose that there is only one possible instance of
- * OP_GBL on which reduction is performed passed to an
- * OP_PAR_LOOP.
- * ======================================================
- */
-
 FortranCUDAReductionSubroutine::FortranCUDAReductionSubroutine (
     std::string const & subroutineAndVariableName,
-    SgScopeStatement * moduleScope, SgArrayType * reductionVariableType) :
+    SgScopeStatement * moduleScope, Reduction * reduction) :
   Subroutine <SgProcedureHeaderStatement> (subroutineAndVariableName),
-      reductionVariableType (reductionVariableType)
+      reduction (reduction)
 {
   using SageBuilder::buildProcedureHeaderStatement;
   using SageBuilder::buildVoidType;

@@ -326,30 +326,32 @@ class TypeDeclarations:
 			self.currentSize = ""
 		return finished
 
-def outputConstantsFile (integerDecl, realDecl, logicalDecl, charDecl, parameterDecl, commonDecl):
+def outputConstantsFile (integerDecl, realDecl, logicalDecl, charDecl, parameterDecl, commonDecl):	
+	indent = "  "
+
 	newFile = open("transformed_" + os.path.basename(opts.constants), "w")
 	newFile.write("MODULE %s\n\n" % constantsModuleName)
 
-	newFile.write("! CONSTANTS\n\n")
+	newFile.write(indent + "! CONSTANTS\n\n")
 	
 	for key, value in sorted(parameterDecl.variableNameToValue.items()):
 		if integerDecl.contains(key):
-			newFile.write("INTEGER (KIND=" + integerDecl.getSize(key) + ")")
+			newFile.write(indent + "INTEGER (KIND=" + integerDecl.getSize(key) + ")")
 		elif realDecl.contains(key):
-			newFile.write("REAL (KIND=" + realDecl.getSize(key) + ")")
+			newFile.write(indent + "REAL (KIND=" + realDecl.getSize(key) + ")")
 		elif charDecl.contains(key):
-			newFile.write("CHARACTER (LEN=" + charDecl.getSize(key) + ")")
+			newFile.write(indent + "CHARACTER (LEN=" + charDecl.getSize(key) + ")")
 		elif logicalDecl.contains(key):
-			newFile.write("LOGICAL")
+			newFile.write(indent + "LOGICAL")
 
 		newFile.write(", parameter :: " + key + " = " + value + "\n")
 
 	newFile.write("\n")
-	newFile.write("! GLOBALS\n\n")
+	newFile.write(indent + "! GLOBALS\n\n")
 
 	for key, value in sorted(integerDecl.variableNameToSize.items()):
 		if not parameterDecl.contains(key):
-			newFile.write("INTEGER (KIND=" + value + ") :: " + key)
+			newFile.write(indent + "INTEGER (KIND=" + value + ") :: " + key)
 
 			if commonDecl.isArray(key):
 				newFile.write(commonDecl.getDimension(key))
@@ -360,7 +362,7 @@ def outputConstantsFile (integerDecl, realDecl, logicalDecl, charDecl, parameter
 
 	for key, value in sorted(realDecl.variableNameToSize.items()):
 		if not parameterDecl.contains(key):
-			newFile.write("REAL (KIND=" + value + ") :: " + key)
+			newFile.write(indent + "REAL (KIND=" + value + ") :: " + key)
 
 			if commonDecl.isArray(key):
 				newFile.write(commonDecl.getDimension(key))
@@ -371,7 +373,7 @@ def outputConstantsFile (integerDecl, realDecl, logicalDecl, charDecl, parameter
 
 	for key, value in sorted(charDecl.variableNameToSize.items()):
 		if not parameterDecl.contains(key):
-			newFile.write("CHARACTER (LEN=" + value + ") :: " + key)
+			newFile.write(indent + "CHARACTER (LEN=" + value + ") :: " + key)
 
 			if commonDecl.isArray(key):
 				newFile.write(commonDecl.getDimension(key))
@@ -381,7 +383,7 @@ def outputConstantsFile (integerDecl, realDecl, logicalDecl, charDecl, parameter
 	newFile.write("\n")
 
 	for key, value in sorted(logicalDecl.variableNameToSize.items()):
-		newFile.write("LOGICAL ::" + key)
+		newFile.write(indent + "LOGICAL ::" + key)
 
 		if commonDecl.isArray(key):
 			newFile.write(commonDecl.getDimension(key))

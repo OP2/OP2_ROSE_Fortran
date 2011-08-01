@@ -5,13 +5,51 @@
 #include <FortranCUDAHostSubroutineDirectLoop.h>
 #include <FortranCUDAHostSubroutineIndirectLoop.h>
 #include <FortranCUDAUserSubroutine.h>
+#include <FortranCUDAReductionSubroutine.h>
 #include <RoseHelper.h>
+#include <Reduction.h>
 
 /*
  * ======================================================
  * Private functions
  * ======================================================
  */
+
+void
+FortranCUDASubroutinesGeneration::createReductionSubroutines ()
+{
+  using boost::lexical_cast;
+  using std::string;
+  using std::map;
+  using std::vector;
+
+  Debug::getInstance ()->debugMessage ("Creating reduction subroutines",
+      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+
+  vector <Reduction *> reductionsNeeded;
+
+  for (map <string, FortranParallelLoop *>::const_iterator it =
+      declarations->firstParallelLoop (); it
+      != declarations->lastParallelLoop (); ++it)
+  {
+    string const userSubroutineName = it->first;
+
+    FortranParallelLoop * parallelLoop = it->second;
+
+    parallelLoop->getReductionsNeeded (reductionsNeeded);
+  }
+
+  for (vector <Reduction *>::const_iterator it = reductionsNeeded.begin (); it
+      != reductionsNeeded.end (); ++it)
+  {
+    FortranCUDAReductionSubroutine * subroutine =
+        new FortranCUDAReductionSubroutine ((*it)->getSubroutineName (),
+            moduleScope, *it);
+
+    reductionSubroutines->addSubroutine (*it,
+        subroutine->getSubroutineHeaderStatement ());
+  }
+}
 
 void
 FortranCUDASubroutinesGeneration::createSubroutines ()
@@ -43,6 +81,7 @@ FortranCUDASubroutinesGeneration::createSubroutines ()
               userDeviceSubroutine->getSubroutineName (),
               parallelLoop,
               moduleScope,
+              reductionSubroutines,
               static_cast <FortranCUDADataSizesDeclarationDirectLoop *> (dataSizesDeclarations[userSubroutineName]),
               dimensionsDeclarations[userSubroutineName]);
 
@@ -70,6 +109,7 @@ FortranCUDASubroutinesGeneration::createSubroutines ()
               userDeviceSubroutine->getSubroutineName (),
               parallelLoop,
               moduleScope,
+              reductionSubroutines,
               static_cast <FortranCUDADataSizesDeclarationIndirectLoop *> (dataSizesDeclarations[userSubroutineName]),
               dimensionsDeclarations[userSubroutineName]);
 

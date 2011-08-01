@@ -14,6 +14,11 @@
  */
 
 void
+FortranOpenMPSubroutinesGeneration::createReductionSubroutines ()
+{
+}
+
+void
 FortranOpenMPSubroutinesGeneration::createSubroutines ()
 {
 }

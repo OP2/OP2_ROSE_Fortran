@@ -3,6 +3,7 @@
 
 #include <KernelSubroutine.h>
 #include <CPPParallelLoop.h>
+#include <CPPReductionSubroutines.h>
 
 class CPPKernelSubroutine: public KernelSubroutine <SgFunctionDeclaration>
 {
@@ -11,9 +12,10 @@ class CPPKernelSubroutine: public KernelSubroutine <SgFunctionDeclaration>
 
     CPPKernelSubroutine (std::string const & subroutineName,
         std::string const & userSubroutineName, SgScopeStatement * moduleScope,
-        CPPParallelLoop * parallelLoop) :
+        CPPParallelLoop * parallelLoop,
+        CPPReductionSubroutines * reductionSubroutines) :
       KernelSubroutine <SgFunctionDeclaration> (subroutineName,
-          userSubroutineName, parallelLoop)
+          userSubroutineName, parallelLoop, reductionSubroutines)
     {
       using SageBuilder::buildVoidType;
       using SageBuilder::buildDefiningFunctionDeclaration;

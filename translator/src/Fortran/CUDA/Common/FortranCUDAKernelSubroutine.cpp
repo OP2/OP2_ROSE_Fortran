@@ -146,9 +146,9 @@ FortranCUDAKernelSubroutine::createReductionLoopStatements ()
            * ======================================================
            */
 
-          SgSymbol
-              * reductionSymbol =
-                  parallelLoop->getReductionSubroutineHeader (i)-> search_for_symbol_from_symbol_table ();
+          SgSymbol * reductionSymbol =
+              reductionSubroutines->getHeader (parallelLoop->getReductionTuple (
+                  i))-> search_for_symbol_from_symbol_table ();
 
           SgFunctionSymbol * reductionFunctionSymbol = isSgFunctionSymbol (
               reductionSymbol);
@@ -333,9 +333,11 @@ FortranCUDAKernelSubroutine::createAutoSharedDeclaration ()
 FortranCUDAKernelSubroutine::FortranCUDAKernelSubroutine (
     std::string const & subroutineName, std::string const & userSubroutineName,
     FortranParallelLoop * parallelLoop, SgScopeStatement * moduleScope,
+    FortranReductionSubroutines * reductionSubroutines,
     FortranOpDatDimensionsDeclaration * opDatDimensionsDeclaration) :
   FortranKernelSubroutine (subroutineName, userSubroutineName, parallelLoop,
-      moduleScope), opDatDimensionsDeclaration (opDatDimensionsDeclaration)
+      moduleScope, reductionSubroutines), opDatDimensionsDeclaration (
+      opDatDimensionsDeclaration)
 {
   using SageInterface::addTextForUnparser;
 

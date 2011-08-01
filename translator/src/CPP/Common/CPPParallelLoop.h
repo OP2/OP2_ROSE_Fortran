@@ -7,7 +7,7 @@
 
 #include <ParallelLoop.h>
 
-class CPPParallelLoop: public ParallelLoop <SgFunctionDeclaration>
+class CPPParallelLoop: public ParallelLoop
 {
   private:
 
@@ -35,13 +35,16 @@ class CPPParallelLoop: public ParallelLoop <SgFunctionDeclaration>
 
   public:
 
-    virtual void
-    generateReductionSubroutines (SgScopeStatement * moduleScope);
-
     virtual unsigned int
-    getNumberOfOpDatArgumentGroups ();
+    getNumberOfOpDatArgumentGroups ()
+    {
+      return getActualArguments ().size () - NUMBER_OF_NON_OP_DAT_ARGUMENTS;
+    }
 
-    CPPParallelLoop (SgFunctionCallExp * functionCallExpression);
+    CPPParallelLoop (SgFunctionCallExp * functionCallExpression) :
+      ParallelLoop (functionCallExpression)
+    {
+    }
 };
 
 #endif

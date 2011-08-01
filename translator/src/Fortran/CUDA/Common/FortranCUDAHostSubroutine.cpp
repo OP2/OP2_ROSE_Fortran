@@ -478,9 +478,6 @@ FortranCUDAHostSubroutine::createTransferOpDatStatements ()
 
           default:
           {
-            Debug::getInstance ()->errorMessage (
-                "Do not currently support an OP_GBL without read access");
-
             break;
           }
         }
@@ -656,9 +653,6 @@ FortranCUDAHostSubroutine::createFirstTimeExecutionStatements ()
 
           default:
           {
-            Debug::getInstance ()->errorMessage (
-                "Do not currently support an OP_GBL without read access");
-
             break;
           }
         }

@@ -9,6 +9,7 @@
 #include <FortranInitialiseConstantsSubroutine.h>
 #include <FortranOpDatDimensionsDeclaration.h>
 #include <FortranModuleDeclarations.h>
+#include <FortranReductionSubroutines.h>
 
 namespace Libraries
 {
@@ -24,6 +25,8 @@ class FortranSubroutinesGeneration: public SubroutinesGeneration <
 {
 
   protected:
+
+    FortranReductionSubroutines * reductionSubroutines;
 
     FortranInitialiseConstantsSubroutine * initialiseConstantsSubroutine;
 
@@ -106,6 +109,9 @@ class FortranSubroutinesGeneration: public SubroutinesGeneration <
     void
     generate ();
 
+    virtual void
+    createReductionSubroutines () = 0;
+
   public:
 
     FortranSubroutinesGeneration (
@@ -114,6 +120,7 @@ class FortranSubroutinesGeneration: public SubroutinesGeneration <
       SubroutinesGeneration <FortranProgramDeclarationsAndDefinitions,
           FortranHostSubroutine> (declarations, fileSuffix)
     {
+      reductionSubroutines = new FortranReductionSubroutines ();
     }
 };
 
