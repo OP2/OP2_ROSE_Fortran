@@ -13,14 +13,17 @@ class CPPSubroutinesGeneration: public SubroutinesGeneration <
   protected:
 
     virtual CPPHostSubroutine *
-    createSubroutines (CPPParallelLoop * parallelLoop,
-        std::string const & userSubroutineName) = 0;
+    createSubroutines (/*CPPParallelLoop * parallelLoop,
+        std::string const & userSubroutineName*/) = 0;
 
     void
-    patchCallsToParallelLoops (std::string const & moduleName);
+    patchCallsToParallelLoops ( /* std::string const & moduleName */);
 
     SgSourceFile &
     createSourceFile ();
+
+
+    void generate ();
 
   public:
 

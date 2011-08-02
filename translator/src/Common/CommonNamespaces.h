@@ -94,6 +94,21 @@ namespace IndirectLoop
 
 namespace DirectLoop
 {
+  namespace CPP
+  {
+    namespace KernelSubroutine
+    {
+      std::string const setSize = "setSize";
+      std::string const warpScratchpadSize = "warpScratchpadSize";
+      std::string const warpSize = "OP_WARPSIZE";
+      std::string const setElementCounter = "n";
+      std::string const dataPerElementCounter = "m";
+      std::string const threadIDModulus = "tid";
+      std::string const offsetInThreadBlock = "offset";
+      std::string const remainingElements = "nelems";
+      std::string const autosharedDisplacement = "autosharedDisplacement";
+    }
+  }
   namespace Fortran
   {
     namespace KernelSubroutine
@@ -111,6 +126,29 @@ namespace DirectLoop
   }
 }
 
+namespace OpenCL
+{
+  /*
+   * ======================================================
+   * The names used in the OpenCL libraries
+   * ======================================================
+   */
+
+  namespace CPP
+  {
+    std::string const blockidx = "get_group_id";
+    std::string const blockdim = "get_local_size";
+    std::string const cudaThreadSynchronize = "cudaThreadSynchronize";
+    std::string const griddim = "get_num_groups";
+    std::string const blocksPerGrid = "nblocks";
+    std::string const sharedMemorySize = "nshared";
+    std::string const threadsPerBlock = "nthread";
+    std::string const syncthreads = "barrier( CLK_LOCAL_MEM_FENCE )";
+    std::string const threadidx = "get_local_id";
+    std::string const threadSynchRet = "threadSynchRet";
+    std::string const x = "x";
+  }
+}
 namespace CUDA
 {
   /*

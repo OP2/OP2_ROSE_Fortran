@@ -3,6 +3,7 @@
 SgStatement *
 CPPHostSubroutine::createKernelFunctionCallStatement ()
 {
+  return NULL;
 
 }
 

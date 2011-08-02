@@ -39,8 +39,9 @@ FortranCUDAUserSubroutine::patchReferencesToConstants ()
         if (oldVarRefExp != NULL)
         {
           for (map <string, string>::const_iterator it =
-              initialiseConstantsSubroutine->getFirstConstantName (); it
-              != initialiseConstantsSubroutine->getLastConstantName (); ++it)
+              initialiseConstantsSubroutine->getFirstConstantName (); 
+              it != initialiseConstantsSubroutine->getLastConstantName (); 
+              ++it)
           {
 
             if (iequals (it->first,

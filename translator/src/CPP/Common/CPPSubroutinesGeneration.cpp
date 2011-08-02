@@ -1,6 +1,6 @@
 #include <CPPSubroutinesGeneration.h>
 #include <FortranTypesBuilder.h>
-
+#include <Cxx_Grammar.h>
 /*
  * ======================================================
  * Private functions
@@ -9,8 +9,54 @@
 
 void
 CPPSubroutinesGeneration::patchCallsToParallelLoops (
-    std::string const & moduleName)
+    /*std::string const & moduleName*/)
 {
+  using std::map;
+  using std::string;
+  using std::vector;
+
+  Debug::getInstance()->debugMessage("Patching calls to OP_PAR_LOOPs", Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+
+  vector <string> processedFiles;
+
+  for (map <string, CPPParallelLoop *>::const_iterator it = declarations->firstParallelLoop();
+      it != declarations->lastParallelLoop();
+      ++it)
+    {
+      string const userSubroutineName = it->first;
+
+      CPPParallelLoop * parallelLoop = it->second;
+
+      CPPHostSubroutine * hostSubroutine =
+          hostSubroutines[userSubroutineName];
+
+      SgFunctionCallExp * functionCallExpression =
+          parallelLoop->getFunctionCall();
+
+      SgScopeStatement * scope =
+          isSgExprStatement( functionCallExpression->get_parent() )->get_scope();
+
+      SgFunctionRefExp * hostSubroutineReference = buildFunctionRefExp(
+          hostSubroutine->getSubroutineHeaderStatement() );
+
+      functionCallExpression->set_function( /* XXX */ );
+
+      /*
+       * ==================================================
+       * Remove the first parameter (kernel reference)
+       * ==================================================
+       */
+
+      SgExpressionPtrList & arguments =
+          functionCallExpression->get_args ()->get_expressions ();
+
+      arguments.erase (arguments.begin ());
+
+
+
+
+
+    }
 }
 
 SgSourceFile &
@@ -35,15 +81,13 @@ CPPSubroutinesGeneration::createSourceFile ()
   FILE * inputFile = fopen (inputFileName.c_str (), "w+");
   if (inputFile != NULL)
   {
-    Debug::getInstance ()->debugMessage ("Creating dummy source file '"
-        + inputFileName + "'", Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+    Debug::getInstance ()->debugMessage ("Creating dummy source file '" + inputFileName + "'", Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
     fclose (inputFile);
   }
   else
   {
-    Debug::getInstance ()->errorMessage ("Could not create dummy C++ file '"
-        + inputFileName + "'");
+    Debug::getInstance ()->errorMessage ("Could not create dummy C++ file '" + inputFileName + "'");
   }
 
   /*
@@ -57,8 +101,7 @@ CPPSubroutinesGeneration::createSourceFile ()
 
   string outputFileName = "rose_" + fileSuffix;
 
-  Debug::getInstance ()->debugMessage ("Generating file '" + outputFileName
-      + "'", Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+  Debug::getInstance ()->debugMessage ("Generating file '" + outputFileName + "'", Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
   SgSourceFile * sourceFile = isSgSourceFile (buildFile (inputFileName,
       outputFileName, NULL));
@@ -81,13 +124,31 @@ CPPSubroutinesGeneration::createSourceFile ()
   return *sourceFile;
 }
 
+
 CPPSubroutinesGeneration::CPPSubroutinesGeneration (
     CPPProgramDeclarationsAndDefinitions * declarations,
     std::string const & fileSuffix) :
-  SubroutinesGeneration <CPPProgramDeclarationsAndDefinitions,
-      CPPHostSubroutine> (declarations, fileSuffix)
+  SubroutinesGeneration <CPPProgramDeclarationsAndDefinitions, CPPHostSubroutine> (declarations, fileSuffix)
 {
   SgSourceFile & sourceFile = createSourceFile ();
 
   moduleScope = sourceFile.get_globalScope ();
 }
+
+void CPPSubroutinesGeneration::generate()
+{
+  SgSourceFile & sourceFile = createSourceFile();
+
+  initialiseConstantsSubroutine = new FortranInitialiseConstantsSubroutine (
+      moduleScope, declarations);
+
+  initialiseConstantsSubroutine->declareConstants ();
+
+  createSubroutines ();
+
+  patchCallsToParallelLoops ();
+
+  unparse ();
+}
+
+
