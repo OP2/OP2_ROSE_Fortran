@@ -12,6 +12,9 @@ class FortranOpenMPSubroutinesGeneration: public FortranSubroutinesGeneration
   private:
 
     virtual void
+    createReductionSubroutines ();
+
+    virtual void
     createSubroutines ();
 
     virtual void

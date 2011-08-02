@@ -29,6 +29,7 @@ class FortranCUDAKernelSubroutine: public FortranKernelSubroutine
     FortranCUDAKernelSubroutine (std::string const & subroutineName,
         std::string const & userSubroutineName,
         FortranParallelLoop * parallelLoop, SgScopeStatement * moduleScope,
+        FortranReductionSubroutines * reductionSubroutines,
         FortranOpDatDimensionsDeclaration * opDatDimensionsDeclaration);
 };
 

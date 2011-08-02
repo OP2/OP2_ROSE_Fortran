@@ -3,6 +3,7 @@
 
 #include <Subroutine.h>
 #include <ParallelLoop.h>
+#include <ReductionSubroutines.h>
 
 template <typename TSubroutineHeader>
   class KernelSubroutine: public Subroutine <TSubroutineHeader>
@@ -11,7 +12,9 @@ template <typename TSubroutineHeader>
 
       std::string userSubroutineName;
 
-      ParallelLoop <TSubroutineHeader> * parallelLoop;
+      ParallelLoop * parallelLoop;
+
+      ReductionSubroutines <TSubroutineHeader> * reductionSubroutines;
 
     protected:
 
@@ -22,14 +25,15 @@ template <typename TSubroutineHeader>
       createExecutionLoopStatements () = 0;
 
       virtual void
-      createOpDatFormalParameterDeclarations ()= 0;
+      createOpDatFormalParameterDeclarations () = 0;
 
       KernelSubroutine (std::string const & subroutineName,
-          std::string const & userSubroutineName, ParallelLoop <
-              TSubroutineHeader> * parallelLoop) :
+          std::string const & userSubroutineName, ParallelLoop * parallelLoop,
+          ReductionSubroutines <TSubroutineHeader> * reductionSubroutines) :
         Subroutine <TSubroutineHeader> (subroutineName + "_kernel"),
             userSubroutineName (userSubroutineName),
-            parallelLoop (parallelLoop)
+            parallelLoop (parallelLoop), reductionSubroutines (
+                reductionSubroutines)
       {
       }
   };

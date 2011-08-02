@@ -7,7 +7,7 @@
 
 #include <ParallelLoop.h>
 
-class FortranParallelLoop: public ParallelLoop <SgProcedureHeaderStatement>
+class FortranParallelLoop: public ParallelLoop
 {
   private:
 
@@ -43,13 +43,17 @@ class FortranParallelLoop: public ParallelLoop <SgProcedureHeaderStatement>
 
   public:
 
-    virtual void
-    generateReductionSubroutines (SgScopeStatement * moduleScope);
-
     virtual unsigned int
-    getNumberOfOpDatArgumentGroups ();
+    getNumberOfOpDatArgumentGroups ()
+    {
+      return (getActualArguments ().size () - NUMBER_OF_NON_OP_DAT_ARGUMENTS)
+          / NUMBER_OF_ARGUMENTS_PER_OP_DAT;
+    }
 
-    FortranParallelLoop (SgFunctionCallExp * functionCallExpression);
+    FortranParallelLoop (SgFunctionCallExp * functionCallExpression) :
+      ParallelLoop (functionCallExpression)
+    {
+    }
 };
 
 #endif

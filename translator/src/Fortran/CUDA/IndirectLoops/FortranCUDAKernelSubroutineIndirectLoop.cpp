@@ -1840,11 +1840,12 @@ FortranCUDAKernelSubroutineIndirectLoop::createFormalParameterDeclarations ()
 FortranCUDAKernelSubroutineIndirectLoop::FortranCUDAKernelSubroutineIndirectLoop (
     std::string const & subroutineName, std::string const & userSubroutineName,
     FortranParallelLoop * parallelLoop, SgScopeStatement * moduleScope,
+    FortranReductionSubroutines * reductionSubroutines,
     FortranCUDADataSizesDeclarationIndirectLoop * dataSizesDeclaration,
     FortranOpDatDimensionsDeclaration * opDatDimensionsDeclaration) :
   FortranCUDAKernelSubroutine (subroutineName, userSubroutineName,
-      parallelLoop, moduleScope, opDatDimensionsDeclaration),
-      dataSizesDeclaration (dataSizesDeclaration)
+      parallelLoop, moduleScope, reductionSubroutines,
+      opDatDimensionsDeclaration), dataSizesDeclaration (dataSizesDeclaration)
 {
   Debug::getInstance ()->debugMessage ("<Kernel, Indirect, CUDA>",
       Debug::CONSTRUCTOR_LEVEL, __FILE__, __LINE__);

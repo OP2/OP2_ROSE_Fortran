@@ -32,15 +32,6 @@ class FortranCUDAHostSubroutine: public FortranHostSubroutine
     SgStatement *
     createThreadSynchroniseCallStatement ();
 
-    /*
-     * ======================================================
-     * Returns a statement which calls the initialise
-     * constants subroutine
-     * ======================================================
-     */
-    SgStatement *
-    createInitialiseConstantsCallStatement ();
-
     virtual void
     createReductionEpilogueStatements ();
 
@@ -80,22 +71,23 @@ class FortranCUDAHostSubroutine: public FortranHostSubroutine
     SgBasicBlock *
     createFirstTimeExecutionStatements ();
 
+    SgBasicBlock *
+    createCallToInitialiseConstantsStatements ();
+
     void
     createCUDAKernelLocalVariableDeclarations ();
 
     void
     createDataMarshallingLocalVariableDeclarations ();
 
-        FortranCUDAHostSubroutine (
-            std::string const & subroutineName,
-            std::string const & userSubroutineName,
-            std::string const & kernelSubroutineName,
-            FortranParallelLoop * parallelLoop,
-            SgScopeStatement * moduleScope,
-            FortranInitialiseConstantsSubroutine * initialiseConstantsSubroutine,
-            FortranCUDADataSizesDeclaration * dataSizesDeclaration,
-            FortranOpDatDimensionsDeclaration * opDatDimensionsDeclaration,
-            FortranCUDAModuleDeclarations * moduleDeclarations);
+    FortranCUDAHostSubroutine (std::string const & subroutineName,
+        std::string const & userSubroutineName,
+        std::string const & kernelSubroutineName,
+        FortranParallelLoop * parallelLoop, SgScopeStatement * moduleScope,
+        FortranInitialiseConstantsSubroutine * initialiseConstantsSubroutine,
+        FortranCUDADataSizesDeclaration * dataSizesDeclaration,
+        FortranOpDatDimensionsDeclaration * opDatDimensionsDeclaration,
+        FortranCUDAModuleDeclarations * moduleDeclarations);
 };
 
 #endif

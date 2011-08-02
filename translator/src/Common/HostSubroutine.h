@@ -13,7 +13,7 @@ template <typename TSubroutineHeader>
 
       std::string kernelSubroutineName;
 
-      ParallelLoop <TSubroutineHeader> * parallelLoop;
+      ParallelLoop * parallelLoop;
 
     protected:
 
@@ -53,8 +53,7 @@ template <typename TSubroutineHeader>
 
       HostSubroutine (std::string const & subroutineName,
           std::string const & userSubroutineName,
-          std::string const & kernelSubroutineName, ParallelLoop <
-              TSubroutineHeader> * parallelLoop) :
+          std::string const & kernelSubroutineName, ParallelLoop * parallelLoop) :
         Subroutine <TSubroutineHeader> (subroutineName + "_host"),
             userSubroutineName (userSubroutineName), kernelSubroutineName (
                 kernelSubroutineName), parallelLoop (parallelLoop)

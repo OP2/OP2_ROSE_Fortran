@@ -3,6 +3,7 @@
 #include <FortranTypesBuilder.h>
 #include <FortranCUDAHostSubroutine.h>
 #include <FortranCUDAReductionSubroutine.h>
+#include <RoseStatementsAndExpressionsBuilder.h>
 
 /*
  * ======================================================
@@ -33,26 +34,6 @@ FortranCUDAHostSubroutine::createThreadSynchroniseCallStatement ()
       variableDeclarations->get (CUDA::Fortran::threadSynchRet)), functionCall);
 
   return callStatement;
-}
-
-SgStatement *
-FortranCUDAHostSubroutine::createInitialiseConstantsCallStatement ()
-{
-  using SageBuilder::buildExprListExp;
-  using SageBuilder::buildVoidType;
-  using SageBuilder::buildFunctionCallStmt;
-
-  Debug::getInstance ()->debugMessage (
-      "Creating statement to call initialise constant subroutine",
-      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
-
-  SgExprListExp * actualParameters = buildExprListExp ();
-
-  SgExprStatement * functionCallStatement = buildFunctionCallStmt (
-      initialiseConstantsSubroutine->getSubroutineName (), buildVoidType (),
-      actualParameters, subroutineScope);
-
-  return functionCallStatement;
 }
 
 void
@@ -480,21 +461,45 @@ FortranCUDAHostSubroutine::createTransferOpDatStatements ()
           variableDeclarations->get (VariableNames::getOpDatName (i))),
           buildOpaqueVarRefExp (CommonVariableNames::dim, block));
 
-      SgDotExp * dotExpression2 = buildDotExp (buildVarRefExp (
-          variableDeclarations->get (VariableNames::getOpDatName (i))),
-          buildOpaqueVarRefExp (CommonVariableNames::set, block));
+      if (parallelLoop->getOpMapValue (i) == GLOBAL)
+      {
+        switch (parallelLoop->getOpAccessValue (i))
+        {
+          case READ_ACCESS:
+          {
+            SgExprStatement * assignmentStatement = buildAssignStatement (
+                buildVarRefExp (variableDeclarations->get (
+                    VariableNames::getOpDatSizeName (i))), dotExpression1);
 
-      SgDotExp * dotExpression3 = buildDotExp (dotExpression2,
-          buildOpaqueVarRefExp (CommonVariableNames::size, block));
+            appendStatement (assignmentStatement, block);
 
-      SgExpression * multiplyExpression = buildMultiplyOp (dotExpression1,
-          dotExpression3);
+            break;
+          }
 
-      SgExprStatement * assignmentStatement = buildAssignStatement (
-          buildVarRefExp (variableDeclarations->get (
-              VariableNames::getOpDatSizeName (i))), multiplyExpression);
+          default:
+          {
+            break;
+          }
+        }
+      }
+      else
+      {
+        SgDotExp * dotExpression2 = buildDotExp (buildVarRefExp (
+            variableDeclarations->get (VariableNames::getOpDatName (i))),
+            buildOpaqueVarRefExp (CommonVariableNames::set, block));
 
-      appendStatement (assignmentStatement, block);
+        SgDotExp * dotExpression3 = buildDotExp (dotExpression2,
+            buildOpaqueVarRefExp (CommonVariableNames::size, block));
+
+        SgExpression * multiplyExpression = buildMultiplyOp (dotExpression1,
+            dotExpression3);
+
+        SgExprStatement * assignmentStatement = buildAssignStatement (
+            buildVarRefExp (variableDeclarations->get (
+                VariableNames::getOpDatSizeName (i))), multiplyExpression);
+
+        appendStatement (assignmentStatement, block);
+      }
     }
   }
 
@@ -509,24 +514,60 @@ FortranCUDAHostSubroutine::createTransferOpDatStatements ()
        * ======================================================
        */
 
-      SgDotExp * parameterExpression1 = buildDotExp (buildVarRefExp (
+      SgDotExp * parameterExpression1A = buildDotExp (buildVarRefExp (
           variableDeclarations->get (VariableNames::getOpDatName (i))),
           buildOpaqueVarRefExp (CommonVariableNames::dat_d, block));
 
-      SgVarRefExp * parameterExpression2 = buildVarRefExp (
+      SgVarRefExp * parameterExpression2A = buildVarRefExp (
           variableDeclarations->get (VariableNames::getOpDatDeviceName (i)));
 
-      SgExpression * parameterExpression3 = buildOpaqueVarRefExp ("(/"
+      SgExpression * parameterExpression3A = buildOpaqueVarRefExp ("(/"
           + buildVarRefExp (variableDeclarations->get (
               VariableNames::getOpDatSizeName (i)))->unparseToString () + "/)",
           block);
 
-      SgStatement * callStatement =
+      SgStatement * callStatementA =
           SubroutineCalls::createCToFortranPointerCallStatement (
-              subroutineScope, parameterExpression1, parameterExpression2,
-              parameterExpression3);
+              subroutineScope, parameterExpression1A, parameterExpression2A,
+              parameterExpression3A);
 
-      appendStatement (callStatement, block);
+      appendStatement (callStatementA, block);
+
+      if (parallelLoop->getOpMapValue (i) == GLOBAL)
+      {
+        SgDotExp * parameterExpression1B = buildDotExp (buildVarRefExp (
+            variableDeclarations->get (VariableNames::getOpDatName (i))),
+            buildOpaqueVarRefExp (CommonVariableNames::dat, block));
+
+        SgVarRefExp * parameterExpression2B = buildVarRefExp (
+            variableDeclarations->get (VariableNames::getOpDatHostName (i)));
+
+        SgExpression * parameterExpression3B = buildOpaqueVarRefExp ("(/"
+            + buildVarRefExp (variableDeclarations->get (
+                VariableNames::getOpDatSizeName (i)))->unparseToString ()
+            + "/)", block);
+
+        SgStatement * callStatementB =
+            SubroutineCalls::createCToFortranPointerCallStatement (
+                subroutineScope, parameterExpression1B, parameterExpression2B,
+                parameterExpression3B);
+
+        appendStatement (callStatementB, block);
+      }
+    }
+  }
+
+  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
+  {
+    if (parallelLoop->isDuplicateOpDat (i) == false
+        && parallelLoop->getOpMapValue (i) == GLOBAL)
+    {
+      SgExprStatement * assignmentStatement = buildAssignStatement (
+          buildVarRefExp (variableDeclarations->get (
+              VariableNames::getOpDatDeviceName (i))), buildVarRefExp (
+              variableDeclarations->get (VariableNames::getOpDatHostName (i))));
+
+      appendStatement (assignmentStatement, block);
     }
   }
 
@@ -589,27 +630,50 @@ FortranCUDAHostSubroutine::createFirstTimeExecutionStatements ()
           dataSizesDeclaration->getFieldDeclarations ()->get (
               VariableNames::getOpDatSizeName (i)));
 
-      SgDotExp * dotExpression1 = buildDotExp (buildVarRefExp (
-          variableDeclarations->get (VariableNames::getOpDatName (i))),
-          buildOpaqueVarRefExp (CommonVariableNames::dim, block));
+      SgDotExp * dotExpression1 = buildDotExp (dataSizesReference,
+          fieldReference);
 
       SgDotExp * dotExpression2 = buildDotExp (buildVarRefExp (
           variableDeclarations->get (VariableNames::getOpDatName (i))),
-          buildOpaqueVarRefExp (CommonVariableNames::set, block));
+          buildOpaqueVarRefExp (CommonVariableNames::dim, block));
 
-      SgDotExp * dotExpression3 = buildDotExp (dotExpression2,
-          buildOpaqueVarRefExp (CommonVariableNames::size, block));
+      if (parallelLoop->getOpMapValue (i) == GLOBAL)
+      {
+        switch (parallelLoop->getOpAccessValue (i))
+        {
+          case READ_ACCESS:
+          {
+            SgExprStatement * assignmentStatement = buildAssignStatement (
+                dotExpression1, dotExpression2);
 
-      SgExpression * multiplyExpression = buildMultiplyOp (dotExpression1,
-          dotExpression3);
+            appendStatement (assignmentStatement, block);
 
-      SgDotExp * dotExpression4 = buildDotExp (dataSizesReference,
-          fieldReference);
+            break;
+          }
 
-      SgExprStatement * assignmentStatement = buildAssignStatement (
-          dotExpression4, multiplyExpression);
+          default:
+          {
+            break;
+          }
+        }
+      }
+      else
+      {
+        SgDotExp * dotExpression3 = buildDotExp (buildVarRefExp (
+            variableDeclarations->get (VariableNames::getOpDatName (i))),
+            buildOpaqueVarRefExp (CommonVariableNames::set, block));
 
-      appendStatement (assignmentStatement, block);
+        SgDotExp * dotExpression4 = buildDotExp (dotExpression3,
+            buildOpaqueVarRefExp (CommonVariableNames::size, block));
+
+        SgExpression * multiplyExpression = buildMultiplyOp (dotExpression2,
+            dotExpression4);
+
+        SgExprStatement * assignmentStatement = buildAssignStatement (
+            dotExpression1, multiplyExpression);
+
+        appendStatement (assignmentStatement, block);
+      }
     }
   }
 
@@ -637,6 +701,54 @@ FortranCUDAHostSubroutine::createFirstTimeExecutionStatements ()
   return block;
 }
 
+SgBasicBlock *
+FortranCUDAHostSubroutine::createCallToInitialiseConstantsStatements ()
+{
+  using SageBuilder::buildExprListExp;
+  using SageBuilder::buildFunctionCallStmt;
+  using SageBuilder::buildVoidType;
+  using SageBuilder::buildVarRefExp;
+  using SageBuilder::buildBasicBlock;
+  using SageBuilder::buildEqualityOp;
+  using SageBuilder::buildAssignStatement;
+  using SageBuilder::buildBoolValExp;
+  using SageInterface::appendStatement;
+
+  Debug::getInstance ()->debugMessage (
+      "Creating statements to call initialise constants subroutine",
+      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+
+  SgBasicBlock * block = buildBasicBlock ();
+
+  SgBasicBlock * ifBody = buildBasicBlock ();
+
+  SgEqualityOp * ifGuardExpression = buildEqualityOp (buildVarRefExp (
+      moduleDeclarations->getInitialiseConstantsBooleanDeclaration ()),
+      buildBoolValExp (true));
+
+  SgExprStatement * assignmentStatement = buildAssignStatement (buildVarRefExp (
+      moduleDeclarations->getInitialiseConstantsBooleanDeclaration ()),
+      buildBoolValExp (false));
+
+  appendStatement (assignmentStatement, ifBody);
+
+  SgExprListExp * actualParameters = buildExprListExp ();
+
+  SgExprStatement * callStatement = buildFunctionCallStmt (
+      initialiseConstantsSubroutine->getSubroutineName (), buildVoidType (),
+      actualParameters, subroutineScope);
+
+  appendStatement (callStatement, ifBody);
+
+  SgIfStmt * ifStatement =
+      RoseStatementsAndExpressionsBuilder::buildIfStatementWithEmptyElse (
+          ifGuardExpression, ifBody);
+
+  appendStatement (ifStatement, block);
+
+  return block;
+}
+
 void
 FortranCUDAHostSubroutine::createDataMarshallingLocalVariableDeclarations ()
 {
@@ -644,6 +756,10 @@ FortranCUDAHostSubroutine::createDataMarshallingLocalVariableDeclarations ()
   using SageBuilder::buildPointerType;
   using SageInterface::appendStatement;
   using std::string;
+
+  Debug::getInstance ()->debugMessage (
+      "Creating local variable declarations for data marshalling",
+      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
@@ -671,6 +787,17 @@ FortranCUDAHostSubroutine::createDataMarshallingLocalVariableDeclarations ()
           FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
               variableName, isArrayType, subroutineScope, 2, DEVICE,
               ALLOCATABLE));
+
+      if (parallelLoop->getOpMapValue (i) == GLOBAL)
+      {
+        string const & variableName = VariableNames::getOpDatHostName (i);
+
+        variableDeclarations->add (variableName,
+            FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
+                variableName,
+                buildPointerType (parallelLoop->getOpDatType (i)),
+                subroutineScope));
+      }
     }
   }
 }

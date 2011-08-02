@@ -12,22 +12,31 @@
 void
 FortranCUDAModuleDeclarations::createReductionDeclarations ()
 {
-  SgVariableDeclaration * variableDeclaration1 =
-      FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
-          ReductionSubroutine::reductionArrayHost,
-          parallelLoop->getReductionType (), moduleScope, 1, ALLOCATABLE);
+  using std::vector;
 
-  variableDeclarations->add (ReductionSubroutine::reductionArrayHost,
-      variableDeclaration1);
+  vector <Reduction *> reductions;
 
-  SgVariableDeclaration * variableDeclaration2 =
-      FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
-          ReductionSubroutine::reductionArrayDevice,
-          parallelLoop->getReductionType (), moduleScope, 2, ALLOCATABLE,
-          DEVICE);
+  parallelLoop->getReductionsNeeded (reductions);
 
-  variableDeclarations->add (ReductionSubroutine::reductionArrayDevice,
-      variableDeclaration2);
+  for (vector <Reduction *>::iterator it = reductions.begin (); it
+      != reductions.end (); ++it)
+  {
+    SgVariableDeclaration * variableDeclaration1 =
+        FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
+            ReductionSubroutine::reductionArrayHost, (*it)->getArrayType (),
+            moduleScope, 1, ALLOCATABLE);
+
+    variableDeclarations->add (ReductionSubroutine::reductionArrayHost,
+        variableDeclaration1);
+
+    SgVariableDeclaration * variableDeclaration2 =
+        FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
+            ReductionSubroutine::reductionArrayDevice, (*it)->getArrayType (),
+            moduleScope, 2, ALLOCATABLE, DEVICE);
+
+    variableDeclarations->add (ReductionSubroutine::reductionArrayDevice,
+        variableDeclaration2);
+  }
 }
 
 void

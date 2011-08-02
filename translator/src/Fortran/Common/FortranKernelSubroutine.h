@@ -4,6 +4,7 @@
 #include <KernelSubroutine.h>
 #include <FortranParallelLoop.h>
 #include <FortranStatementsAndExpressionsBuilder.h>
+#include <FortranReductionSubroutines.h>
 
 class FortranKernelSubroutine: public KernelSubroutine <
     SgProcedureHeaderStatement>
@@ -12,9 +13,10 @@ class FortranKernelSubroutine: public KernelSubroutine <
 
     FortranKernelSubroutine (std::string const & subroutineName,
         std::string const & userSubroutineName,
-        FortranParallelLoop * parallelLoop, SgScopeStatement * moduleScope) :
+        FortranParallelLoop * parallelLoop, SgScopeStatement * moduleScope,
+        FortranReductionSubroutines * reductionSubroutines) :
       KernelSubroutine <SgProcedureHeaderStatement> (subroutineName,
-          userSubroutineName, parallelLoop)
+          userSubroutineName, parallelLoop, reductionSubroutines)
     {
       using SageBuilder::buildVoidType;
       using SageBuilder::buildProcedureHeaderStatement;
