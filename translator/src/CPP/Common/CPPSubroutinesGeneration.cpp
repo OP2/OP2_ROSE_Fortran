@@ -1,6 +1,5 @@
 #include <CPPSubroutinesGeneration.h>
 #include <FortranTypesBuilder.h>
-#include <Cxx_Grammar.h>
 /*
  * ======================================================
  * Private functions
@@ -9,7 +8,7 @@
 
 void
 CPPSubroutinesGeneration::patchCallsToParallelLoops (
-    /*std::string const & moduleName*/)
+    std::string const & moduleName)
 {
   using std::map;
   using std::string;

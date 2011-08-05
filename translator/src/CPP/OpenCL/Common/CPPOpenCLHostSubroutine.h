@@ -7,10 +7,36 @@ class CPPOpenCLHostSubroutine: public CPPHostSubroutine
 {
   protected:
 
-    CPPOpenCLHostSubroutine (std::string const & subroutineName,
-        std::string const & userSubroutineName,
-        std::string const & kernelSubroutineName,
-        SgScopeStatement * moduleScope, CPPParallelLoop * parallelLoop);
+  SgStatement *
+  createGetKernelStatement (
+      std::string & kernelName );
+
+  SgStatement *
+  createKernelArgumentStatement (
+      SgExpression * argumentNumber,
+      SgExpression * size,
+      SgExpression * data,
+      SgScopeStatement * scope );
+
+  SgStatement *
+  createKernelCallStatement ();
+
+  SgStatement *
+  createErrorCheckStatement (
+      std::string & message );
+
+  SgStatement *
+  createFinishStatement ();
+
+  SgStatement *
+  createKernelFunctionCallStatement ();
+
+
+  CPPOpenCLHostSubroutine (
+      std::string const & subroutineName,
+      std::string const & userSubroutineName,
+      std::string const & kernelSubroutineName,
+      SgScopeStatement * moduleScope, CPPParallelLoop * parallelLoop );
 };
 
 #endif

@@ -93,6 +93,7 @@ namespace PlanFunction
     std::string const nthrcol = "nthrcol";
     std::string const offset = "offset";
     std::string const pblkMap = "pblkMap";
+    std::string const partSize = "part_size";
     std::string const pblkMapSize = "pblkMapSize";
     std::string const pindMaps = "pindMaps";
     std::string const pindMapsSize = "pindMapsSize";

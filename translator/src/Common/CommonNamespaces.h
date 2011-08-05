@@ -136,17 +136,29 @@ namespace OpenCL
 
   namespace CPP
   {
-    std::string const blockidx = "get_group_id";
-    std::string const blockdim = "get_local_size";
+    std::string const getGroupId = "get_group_id";
+    std::string const getLocalSize = "get_local_size";
+    std::string const getLocalId = "get_local_id";
+    std::string const getNumGroups = "get_num_groups";
+    std::string const getGlobalId = "get_global_id";
+    std::string const getGlobalSize = "get_global_size";
     std::string const cudaThreadSynchronize = "cudaThreadSynchronize";
-    std::string const griddim = "get_num_groups";
     std::string const blocksPerGrid = "nblocks";
+    std::string const totalThreads = "ntotthread";
     std::string const sharedMemorySize = "nshared";
     std::string const threadsPerBlock = "nthread";
     std::string const syncthreads = "barrier( CLK_LOCAL_MEM_FENCE )";
-    std::string const threadidx = "get_local_id";
     std::string const threadSynchRet = "threadSynchRet";
     std::string const x = "x";
+    std::string const kernel = "hKernel";
+    std::string const errVar = "ciErrNum";
+    std::string const commanQueue = "cqCommandQueue";
+    std::string const setKernelArg = "clSetKernelArg";
+    std::string const enqueueKernel = "clEnqueueNDRangeKernel";
+    std::string const getKernel = "getKernel";
+    std::string const kernelType = "cl_kernel";
+    std::string const constants = "constants";
+
   }
 }
 namespace CUDA

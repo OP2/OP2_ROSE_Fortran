@@ -8,15 +8,17 @@
 #include <ProgramDeclarationsAndDefinitions.h>
 #include <CPPParallelLoop.h>
 
-class CPPProgramDeclarationsAndDefinitions: public ProgramDeclarationsAndDefinitions <
-    CPPParallelLoop, SgFunctionDeclaration> ,
-    public AstSimpleProcessing
+class CPPProgramDeclarationsAndDefinitions: 
+  public ProgramDeclarationsAndDefinitions <CPPParallelLoop, SgFunctionDeclaration> ,
+  public AstSimpleProcessing
 {
   private:
 
     void
-    detectAndHandleOP2Definition (SgVariableDeclaration * variableDeclaration,
-        std::string const variableName, SgTypedefType * typeDefinition);
+    detectAndHandleOP2Definition (
+        SgVariableDeclaration * variableDeclaration,
+        std::string const variableName, 
+        SgTypedefType * typeDefinition );
 
     virtual void
     visit (SgNode * node);
