@@ -1,5 +1,6 @@
 #include <CPPOpenCLHostSubroutine.h>
 
+
 /*
  * ======================================================
  * Protected functions
@@ -86,7 +87,35 @@ CPPOpenCLHostSubroutine::createKernelArgumentStatement (
   return assigment;
 }
 
-SgStatement *
+void
+CPPOpenCLHostSubroutine::createKernelCallBlock (
+    std::string & kernelName,
+    std::vector<std::pair<SgExpression *, SgExpression *> > & argList,
+    SgScopeStatement * scope )
+{
+  using SageBuilder::buildPlusPlusOp;
+  using SageBuilder::buildVarRefExp;
+  
+  createGetKernelStatement( kernelName );
+  
+  for (int i = 0; i < argList.size(); ++i ){
+    createKernelArgumentStatement(
+        buildPlusPlusOp(
+            buildVarRefExp(
+                variableDeclarations->get( OpenCL::CPP::argumentCounterVariable ) ) ),
+        argList[i].first,
+        argList[i].second,
+        scope );
+  }
+  
+  
+  createKernelCallStatement();
+  
+  createFinishStatement();
+}
+
+
+void 
 CPPOpenCLHostSubroutine::createKernelCallStatement ()
 {
   using SageBuilder::buildFunctionCallExp;
@@ -124,17 +153,16 @@ CPPOpenCLHostSubroutine::createKernelCallStatement ()
       buildVarRefExp( variableDeclarations->get( OpenCL::CPP::errVar ) ),
       enqueueKernel );
 
-  return assigment;
 }
 
-SgStatement *
+void 
 CPPOpenCLHostSubroutine::createErrorCheckStatement (
     std::string & message)
 {
   //TODO: implement me! (maybe)
 }
 
-SgStatement *
+void
 CPPOpenCLHostSubroutine::createFinishStatement ()
 {
   using SageBuilder::buildExprListExp;
@@ -158,7 +186,7 @@ CPPOpenCLHostSubroutine::createFinishStatement ()
 
 SgStatement *
 CPPOpenCLHostSubroutine::createKernelFunctionCallStatement ()
-{
+{ //XXX: scope?
   using SageBuilder::buildDotExp;
   using SageBuilder::buildOpaqueVarRefExp;
   using SageBuilder::buildVarRefExp;
@@ -176,6 +204,8 @@ CPPOpenCLHostSubroutine::createKernelFunctionCallStatement ()
   Debug::getInstance ()->debugMessage (
       "Creating statement to call OpenCL kernel", Debug::FUNCTION_LEVEL,
       __FILE__, __LINE__);
+  
+  std::vector<std::pair<SgExpression *, SgExpression *> > kernelArguments;
 
   /*SgExprListExp * actualParameters = buildExprListExp ();
 
@@ -192,39 +222,37 @@ CPPOpenCLHostSubroutine::createKernelFunctionCallStatement ()
     {
       if (parallelLoop->isReductionRequired (i) == false)
       {
-        SgSizeOfOp * size = buildSizeOfOp( buildOpaqueType( "cl_mem", NULL ) ); //FIXME
-        SgAddressOfOp * data = buildAddressOfOp(
-            variableDeclarations->get ( VariableNames::getOpDatDeviceName (i) ) );
-        createKernelFunctionCallStatement( NULL, size, data );
-
+        kernelArguments.push_back( 
+            std::make_pair(
+                buildSizeOfOp( buildOpaqueType( OpenCL::CPP::pointerType, NULL ) ), //FIXME
+                buildAddressOfOp(
+                    variableDeclarations->get ( VariableNames::getOpDatDeviceName (i) ) ) ) );
       }
       else
       {
-        //actualParameters->append_expression (buildVarRefExp (
-        //    moduleDeclarations->getReductionArrayDeviceVariableDeclaration ()));
-        SgSizeOfOp * size = buildSizeOfOp( buildOpaqueType( "cl_mem", NULL ) ); //FIXME
-        SgAddressOfOp * data = buildAddressOfOp(
-            moduleDeclarations->getReductionArrayDeviceVariableDeclaration () );
-        createKernelFunctionCallStatement( NULL, size, data );
+        kernelArguments.push_back( 
+            std::make_pair(
+                buildSizeOfOp( buildOpaqueType( OpenCL::CPP::pointerType, NULL ) ), //FIXME
+                buildAddressOfOp(
+                    moduleDeclarations->getReductionArrayDeviceVariableDeclaration () ) ) );
       }
     }
   }
+  
+  kernelArguments.push_back( 
+      std::make_pair(
+          buildSizeOfOp( buildIntType() ), //FIXME
+          buildVarRefExp (
+                    variableDeclarations->get (
+                        DirectLoop::CPP::KernelSubroutine::offsetInThreadBlock ) ) ) ); //FIXME move in VariableNames
 
-  SgSizeOfOp * size = buildSizeOfOp( buildIntType() );
-  SgAddressOfOp * data = buildAddressOfOp(
-      buildVarRefExp (
-          variableDeclarations->get (
-              DirectLoop::CPP::KernelSubroutine::offsetInThreadBlock ) ) ); //FIXME move in VariableNames
-  createKernelFunctionCallStatement( NULL, size, data );
+  kernelArguments.push_back( 
+      std::make_pair(
+          buildSizeOfOp( buildIntType() ), //FIXME
+          buildDotExp (
+                buildVarRefExp ( variableDeclarations->get ( VariableNames::getOpSetName () ) ),
+                buildOpaqueVarRefExp ( CommonVariableNames::size, subroutineScope ) ) ) ); //FIXME move in VariableNames
 
-
-  SgExpression * setSize = buildDotExp (
-      buildVarRefExp ( variableDeclarations->get ( VariableNames::getOpSetName () ) ),
-      buildOpaqueVarRefExp ( CommonVariableNames::size, subroutineScope ) );
-
-  SgSizeOfOp * size = buildSizeOfOp( buildIntType() );
-  SgAddressOfOp * data = buildAddressOfOp( setSize ); //FIXME move in VariableNames
-  createKernelFunctionCallStatement( NULL, size, data );
 
   //TODO: what about this?
 /*
@@ -243,20 +271,28 @@ CPPOpenCLHostSubroutine::createKernelFunctionCallStatement ()
   /*
    * Pass the size of the shared memory as a parameter
    */
-  SgVarRefExp * shared = buildVarRefExp( variableDeclarations->get(OpenCL::CPP::sharedMemorySize) );
-  createKernelFunctionCallStatement( NULL, size, buildNullExpression() );
+  kernelArguments.push_back( 
+      std::make_pair(
+          buildVarRefExp( variableDeclarations->get(OpenCL::CPP::sharedMemorySize) ), //FIXME
+          buildNullExpression() ) ); //FIXME move in VariableNames
 
-
-  SgExprStatement * callStatement = createKernelCallStatement();
-
-  return callStatement;
+  createKernelCallBlock(
+      kernelSubroutineName,
+      kernelArguments,
+      subroutineScope );
 }
 
 CPPOpenCLHostSubroutine::CPPOpenCLHostSubroutine (
-    std::string const & subroutineName, std::string const & userSubroutineName,
-    std::string const & kernelSubroutineName, SgScopeStatement * moduleScope,
+    std::string const & subroutineName, 
+    std::string const & userSubroutineName,
+    std::string const & kernelSubroutineName, 
+    SgScopeStatement * moduleScope,
     CPPParallelLoop * parallelLoop) :
-  CPPHostSubroutine (subroutineName, userSubroutineName, kernelSubroutineName,
-      moduleScope, parallelLoop)
+  CPPHostSubroutine (
+      subroutineName, 
+      userSubroutineName, 
+      kernelSubroutineName,
+      moduleScope, 
+      parallelLoop)
 {
 }

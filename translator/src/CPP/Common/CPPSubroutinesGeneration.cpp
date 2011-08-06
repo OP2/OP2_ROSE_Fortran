@@ -102,8 +102,8 @@ CPPSubroutinesGeneration::createSourceFile ()
 
   Debug::getInstance ()->debugMessage ("Generating file '" + outputFileName + "'", Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
-  SgSourceFile * sourceFile = isSgSourceFile (buildFile (inputFileName,
-      outputFileName, NULL));
+  SgSourceFile * sourceFile = isSgSourceFile (
+      buildFile (inputFileName, outputFileName, NULL));
 
   /*
    * ======================================================
@@ -138,7 +138,7 @@ void CPPSubroutinesGeneration::generate()
 {
   SgSourceFile & sourceFile = createSourceFile();
 
-  initialiseConstantsSubroutine = new FortranInitialiseConstantsSubroutine (
+  initialiseConstantsSubroutine = new CPPInitialiseConstantsSubroutine (
       moduleScope, declarations);
 
   initialiseConstantsSubroutine->declareConstants ();

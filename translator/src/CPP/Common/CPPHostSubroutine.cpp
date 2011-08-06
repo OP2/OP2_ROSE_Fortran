@@ -1,6 +1,5 @@
 #include <CPPHostSubroutine.h>
 
-//XXX: why Statement???
 SgStatement *
 CPPHostSubroutine::createKernelFunctionCallStatement ()
 {

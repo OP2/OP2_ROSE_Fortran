@@ -13,7 +13,8 @@ class CPPSubroutinesGeneration:
   protected:
 
     virtual CPPHostSubroutine *
-    createSubroutines (CPPParallelLoop * parallelLoop,
+    createSubroutines (
+        CPPParallelLoop * parallelLoop,
         std::string const & userSubroutineName) = 0;
 
     void

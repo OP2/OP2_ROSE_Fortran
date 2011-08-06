@@ -152,12 +152,14 @@ namespace OpenCL
     std::string const x = "x";
     std::string const kernel = "hKernel";
     std::string const errVar = "ciErrNum";
+    std::string const pointerType = "cl_mem";
     std::string const commanQueue = "cqCommandQueue";
     std::string const setKernelArg = "clSetKernelArg";
     std::string const enqueueKernel = "clEnqueueNDRangeKernel";
     std::string const getKernel = "getKernel";
     std::string const kernelType = "cl_kernel";
     std::string const constants = "constants";
+    std::string const globalConstants = "global_constants";
 
   }
 }

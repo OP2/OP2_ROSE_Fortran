@@ -4,7 +4,8 @@
 #include <HostSubroutine.h>
 #include <CPPParallelLoop.h>
 
-class CPPHostSubroutine: public HostSubroutine <SgFunctionDeclaration>
+class CPPHostSubroutine: 
+  public HostSubroutine <SgFunctionDeclaration>
 {
 
   private:

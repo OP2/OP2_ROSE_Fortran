@@ -73,13 +73,13 @@ namespace PlanFunction
     std::string const accesses = "accesses";
     std::string const actualPlan = "actualPlan";
     std::string const args = "args";
-    std::string const argsNumber = "argsNumber";
+    std::string const argsNumber = "nargs";
     std::string const blkmap = "blkmap";
     std::string const blockOffset = "blockOffset";
     std::string const cplan = "cplan";
     std::string const idxs = "idxs";
     std::string const inds = "inds";
-    std::string const indsNumber = "indsNumber";
+    std::string const indsNumber = "ninds";
     std::string const ind_maps = "ind_maps";
     std::string const ind_offs = "ind_offs";
     std::string const ind_sizes = "ind_sizes";
@@ -113,6 +113,7 @@ namespace PlanFunction
     std::string const pthrcol = "pthrcol";
     std::string const pthrcolSize = "pthrcolSize";
     std::string const thrcol = "thrcol";
+    std::string const plan = "Plan";
   }
 }
 
