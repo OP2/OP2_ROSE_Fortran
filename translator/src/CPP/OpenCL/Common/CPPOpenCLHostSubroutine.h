@@ -30,13 +30,17 @@ class CPPOpenCLHostSubroutine: public CPPHostSubroutine
 
   SgStatement *
   createKernelFunctionCallStatement ();
+  
+  void
+  CPPOpenCLHostSubroutine::createKernelCallBlock ();
 
 
   CPPOpenCLHostSubroutine (
       std::string const & subroutineName,
       std::string const & userSubroutineName,
       std::string const & kernelSubroutineName,
-      SgScopeStatement * moduleScope, CPPParallelLoop * parallelLoop );
+      SgScopeStatement * moduleScope, 
+      CPPParallelLoop * parallelLoop );
 };
 
 #endif

@@ -83,6 +83,7 @@ CPPProgramDeclarationsAndDefinitions::detectAndHandleOP2Definition (
 void
 CPPProgramDeclarationsAndDefinitions::visit (SgNode * node)
 {
+  //TODO: where are all the missing pieces to parse OP2 variable declarations?
   using boost::iequals;
   using std::string;
 

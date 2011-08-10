@@ -82,7 +82,7 @@ CPPOpenCLUserSubroutine::createStatements()
       __FILE__,
       __LINE__);
 
-  SgProcedureHeaderStatement * originalSubroutine = NULL;
+  SgFunctionDeclaration * originalSubroutine = NULL;
 
   SgFunctionParameterList * originalParameters = NULL;
 
@@ -93,11 +93,11 @@ CPPOpenCLUserSubroutine::createStatements()
    * ======================================================
    */
 
-  for ( vector<SgProcedureHeaderStatement *>::const_iterator it =
-      declarations->firstSubroutineInSourceCode(); it
-      != declarations->lastSubroutineInSourceCode(); ++it )
+  for ( vector<SgFunctionDeclaration *>::const_iterator it = declarations->firstSubroutineInSourceCode(); 
+      it != declarations->lastSubroutineInSourceCode(); 
+      ++it )
     {
-      SgProcedureHeaderStatement * subroutine = *it;
+      SgFunctionDeclaration * subroutine = *it;
 
       if ( iequals( hostSubroutineName, subroutine->get_name().getString() ) )
         {
@@ -116,9 +116,10 @@ CPPOpenCLUserSubroutine::createStatements()
 
   vector<SgStatement *> originalStatements =
       originalSubroutine->get_definition()->get_body()->get_statements();
+  
 
-  for ( vector<SgStatement *>::iterator it = originalStatements.begin(); it
-      != originalStatements.end(); ++it )
+  for ( vector<SgStatement *>::iterator it = originalStatements.begin(); 
+      it != originalStatements.end(); ++it )
     {
       /*
        * ======================================================
@@ -135,6 +136,7 @@ CPPOpenCLUserSubroutine::createStatements()
         {
           appendStatement( *it, subroutineScope );
 
+          //FIXME
           if ( isSgImplicitStatement( *it ) != NULL )
             {
               /*
@@ -151,9 +153,9 @@ CPPOpenCLUserSubroutine::createStatements()
 
               unsigned int opDatCounter = 1;
 
-              for ( SgInitializedNamePtrList::iterator paramIt =
-                  originalParameters->get_args().begin(); paramIt
-                  != originalParameters->get_args().end(); ++paramIt )
+              for ( SgInitializedNamePtrList::iterator paramIt = originalParameters->get_args().begin(); 
+                  paramIt != originalParameters->get_args().end(); 
+                  ++paramIt )
                 {
                   std::string const variableName =
                       ( *paramIt )->get_name().getString();
@@ -172,25 +174,25 @@ CPPOpenCLUserSubroutine::createStatements()
                       && parallelLoop->getOpAccessValue( opDatCounter )
                           == READ_ACCESS )
                     {
-                      SgVariableDeclaration
-                          * variableDeclaration =
-                              CPPStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter(
-                                  variableName,
-                                  type,
-                                  subroutineScope,
-                                  formalParameters,
-                                  1,
-                                  SHARED );
+
+                      SgVariableDeclaration * variableDeclaration =
+                          CPPStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter(
+                              variableName,
+                              type,
+                              subroutineScope,
+                              formalParameters,
+                              1,
+                              SHARED );
                     }
                   else
                     {
-                      SgVariableDeclaration
-                          * variableDeclaration =
-                              CPPStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter(
-                                  variableName,
-                                  type,
-                                  subroutineScope,
-                                  formalParameters );
+                      SgVariableDeclaration * variableDeclaration =
+                          CPPStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter(
+                              variableName,
+                              type,
+                              subroutineScope,
+                              formalParameters );
+                      // XXX: DEVICE?
                     }
 
                   ++opDatCounter;
@@ -201,13 +203,12 @@ CPPOpenCLUserSubroutine::createStatements()
         {
           bool isFormalParameter = false;
 
-          string const
-              variableName =
-                  isVariableDeclaration->get_definition()->get_vardefn()->get_name().getString();
+          string const variableName =
+              isVariableDeclaration->get_definition()->get_vardefn()->get_name().getString();
 
-          for ( SgInitializedNamePtrList::iterator paramIt =
-              formalParameters->get_args().begin(); paramIt
-              != formalParameters->get_args().end(); ++paramIt )
+          for ( SgInitializedNamePtrList::iterator paramIt = formalParameters->get_args().begin(); 
+              paramIt != formalParameters->get_args().end(); 
+              ++paramIt )
             {
               string const parameterName = ( *paramIt )->get_name().getString();
 
@@ -229,6 +230,15 @@ CPPOpenCLUserSubroutine::createStatements()
             }
         }
     }
+  
+  SgVariableDeclaration * globalConstantsParameter =
+      CPPStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter(
+          OpenCL::CPP::constants,
+          type,
+          subroutineScope,
+          formalParameters,
+          1,
+          CONSTANT);
 }
 
 void
@@ -253,21 +263,17 @@ CPPOpenCLUserSubroutine::CPPOpenCLUserSubroutine(
     CPPInitialiseConstantsSubroutine * initialiseConstantsSubroutine,
     CPPProgramDeclarationsAndDefinitions * declarations,
     CPPParallelLoop * parallelLoop ) :
-  UserSubroutine<SgProcedureHeaderStatement,
-      CPPProgramDeclarationsAndDefinitions> (
+  UserSubroutine<SgFunctionDeclaration, CPPProgramDeclarationsAndDefinitions> (
       subroutineName,
       declarations,
-      parallelLoop ), initialiseConstantsSubroutine(
-      initialiseConstantsSubroutine )
+      parallelLoop ), 
+  initialiseConstantsSubroutine( initialiseConstantsSubroutine )
 {
   using SageBuilder::buildDefiningFunctionDeclaration;
   using SageBuilder::buildVoidType;
   using SageInterface::appendStatement;
   using SageInterface::addTextForUnparser;
 
-  formalParameters->append_arg( buildInitializedName(
-      "global_constants",
-      buildOpaqueType( "struct global_constants" ) ) );
 
   subroutineHeaderStatement = buildDefiningFunctionDeclaration(
       this->subroutineName.c_str(),
@@ -276,9 +282,11 @@ CPPOpenCLUserSubroutine::CPPOpenCLUserSubroutine(
       moduleScope );
 
   appendStatement( subroutineHeaderStatement, moduleScope );
-
-  //addTextForUnparser (subroutineHeaderStatement, "attributes(device) ",
-  //    AstUnparseAttribute::e_before);
+  
+  /*
+   * Inline user kernel function
+   */
+  subroutineHeaderStatement->get_functionModifier().setInline();
 
   subroutineScope = subroutineHeaderStatement->get_definition()->get_body();
 

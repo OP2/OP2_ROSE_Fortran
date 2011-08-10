@@ -1,7 +1,7 @@
 #include <CPPOpenCLSubroutinesGeneration.h>
-#include <CPPOpenCLModuleDeclarationsIndirectLoop.h>
+//#include <CPPOpenCLModuleDeclarationsIndirectLoop.h>
 #include <CPPOpenCLKernelSubroutineDirectLoop.h>
-#include <CPPOpenCLKernelSubroutineIndirectLoop.h>
+//#include <CPPOpenCLKernelSubroutineIndirectLoop.h>
 #include <CPPOpenCLHostSubroutineDirectLoop.h>
 #include <CPPOpenCLHostSubroutineIndirectLoop.h>
 #include <CPPOpenCLUserSubroutine.h>
@@ -34,7 +34,7 @@ CPPOpenCLSubroutinesGeneration::createSubroutines (
 
     if (parallelLoop->isDirectLoop ())
     {
-      userDeviceSubroutine s= new CPPOpenCLUserSubroutine (
+      userDeviceSubroutine = new CPPOpenCLUserSubroutine (
           userSubroutineName,
           moduleScope,
           initialiseConstantsSubroutine,

@@ -65,6 +65,31 @@ namespace TargetBackends
 
 namespace IndirectLoop
 {
+  namespace CPP
+  {
+    namespace VariablePrefixes
+    {
+      std::string const numberOfBytes = "nBytes";
+      std::string const pindMaps = "pindMaps";
+      std::string const pMaps = "pMaps";
+      std::string const roundUp = "roundUp";
+    }
+
+    namespace KernelSubroutine
+    {
+      namespace VariableNames
+      {
+        std::string const blockID = "blockId";
+        std::string const blockOffsetShared = "offset_b";
+        std::string const moduled = "moduled";
+        std::string const moduloResult = "moduloResult";
+        std::string const nbytes = "nbytes";
+        std::string const ncolor = "ncolor";
+        std::string const nelem = "nelem";
+        std::string const nelems2 = "nelems2";
+      }
+    }
+  }
   namespace Fortran
   {
     namespace VariablePrefixes
@@ -98,8 +123,8 @@ namespace DirectLoop
   {
     namespace KernelSubroutine
     {
-      std::string const setSize = "setSize";
-      std::string const warpScratchpadSize = "warpScratchpadSize";
+      std::string const setSize = "set_size";
+      std::string const warpScratchpadSize = "offset_s";
       std::string const warpSize = "OP_WARPSIZE";
       std::string const setElementCounter = "n";
       std::string const dataPerElementCounter = "m";
@@ -137,6 +162,7 @@ namespace OpenCL
   namespace CPP
   {
     std::string const getGroupId = "get_group_id";
+    std::string const getGroupSize = "get_group_size";
     std::string const getLocalSize = "get_local_size";
     std::string const getLocalId = "get_local_id";
     std::string const getNumGroups = "get_num_groups";
@@ -147,9 +173,9 @@ namespace OpenCL
     std::string const totalThreads = "ntotthread";
     std::string const sharedMemorySize = "nshared";
     std::string const threadsPerBlock = "nthread";
-    std::string const syncthreads = "barrier( CLK_LOCAL_MEM_FENCE )";
+    std::string const barrier = "barrier";
+    //std::string const syncthreads = "barrier( CLK_LOCAL_MEM_FENCE )";
     std::string const threadSynchRet = "threadSynchRet";
-    std::string const x = "x";
     std::string const kernel = "hKernel";
     std::string const errVar = "ciErrNum";
     std::string const pointerType = "cl_mem";
@@ -159,7 +185,12 @@ namespace OpenCL
     std::string const getKernel = "getKernel";
     std::string const kernelType = "cl_kernel";
     std::string const constants = "constants";
-    std::string const globalConstants = "global_constants";
+    std::string const globalConstants = "globalConstants";
+    std::string const globalConstantsType = "global_constants_t";
+    std::string const localModifier = "__local";
+    std::string const globalModifier = "__global";
+    std::string const constantModifier = "__constant";
+    
 
   }
 }
@@ -269,6 +300,15 @@ namespace VariableNames
    */
   std::string
   getOpDatGlobalName (unsigned int OP_DAT_ArgumentGroup);
+
+  /*
+   * ======================================================
+   * Returns the name of a global OP_DAT variable in this
+   * OP_DAT argument group
+   * ======================================================
+   */
+  std::string
+  getOpDatSharedName (unsigned int OP_DAT_ArgumentGroup);
 
   /*
    * ======================================================

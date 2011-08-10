@@ -49,6 +49,7 @@ namespace VariableSuffixes
   std::string const Global = "Global";
   std::string const Device = "Device";
   std::string const Host = "Host";
+  std::string const Host = "Shared";
   std::string const Dimension = "Dimension";
 }
 
@@ -102,6 +103,16 @@ VariableNames::getOpDatGlobalName (unsigned int OP_DAT_ArgumentGroup)
 
   return VariablePrefixes::OP_DAT
       + lexical_cast <string> (OP_DAT_ArgumentGroup) + VariableSuffixes::Global;
+}
+
+std::string
+VariableNames::getOpDatSharedName (unsigned int OP_DAT_ArgumentGroup)
+{
+  using boost::lexical_cast;
+  using std::string;
+
+  return VariablePrefixes::OP_DAT
+      + lexical_cast <string> (OP_DAT_ArgumentGroup) + VariableSuffixes::Shared;
 }
 
 std::string

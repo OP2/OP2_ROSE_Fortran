@@ -19,7 +19,7 @@ template <typename TSubroutineHeader>
       /*
        * ======================================================
        * Access to this statement allows ROSE to build function
-       * call expressions to the generated subroutine. TSubroutineHeaderhis
+       * call expressions to the generated subroutine. This
        * is needed, for example, when patching the user-supplied
        * code
        * ======================================================
@@ -28,21 +28,21 @@ template <typename TSubroutineHeader>
 
       /*
        * ======================================================
-       * TSubroutineHeaderhe name of the generated subroutine
+       * The name of the generated subroutine
        * ======================================================
        */
       std::string subroutineName;
 
       /*
        * ======================================================
-       * TSubroutineHeaderhe parameters of the newly created subroutine
+       * The parameters of the newly created subroutine
        * ======================================================
        */
       SgFunctionParameterList * formalParameters;
 
       /*
        * ======================================================
-       * TSubroutineHeaderhe scope of the newly created subroutine
+       * The scope of the newly created subroutine
        * ======================================================
        */
       SgScopeStatement * subroutineScope;

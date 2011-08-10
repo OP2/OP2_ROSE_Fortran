@@ -27,16 +27,23 @@ CPPOpenCLKernelSubroutineDirectLoop::createUserSubroutineCallStatement ()
   using SageBuilder::buildExprListExp;
   using std::string;
   using std::vector;
+  
+  Debug::getInstance ()->debugMessage ( "Creating call to user device subroutine", Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
-  Debug::getInstance ()->debugMessage (
-      "Creating call to user device subroutine", Debug::FUNCTION_LEVEL,
-      __FILE__, __LINE__);
-
-  SgExprListExp * actualParameters = buildExprListExp ();
+  SgExprListExp * userDeviceSubroutineParameters = buildExprListExp ();
 
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
     int dim = parallelLoop->getOpDatDimension (i);
+    
+    SgExpression * parameterExpression = buildIntVal (1);
+    
+    SgExpression * varOpDat = buildVarRefExp(variableDeclarations->get(VariableNames::getOpDatName(i))); //FIXME: same as parameter
+    SgExpression * varOpDatLocal = buildVarRefExp(variableDeclarations->get(VariableNames::getOpDatLocalName(i)));
+    SgExpression * varGlobalToLocalMapping = buildVarRefExp(variableDeclarations->get(VariableNames::getGlobalToLocalMappingName(i)));
+    SgExpression * varSetElementCounter = buildVarRefExp(variableDeclarations->get(DirectLoop::CPP::KernelSubroutine::setElementCounter));
+    SgExpression * varOffsetInThreadBlock = buildVarRefExp ( variableDeclarations->get(DirectLoop::CPP::KernelSubroutine::offsetInThreadBlock));
+    SgExpression * valOpDatDimension = buildIntVal(parallelLoop->getOpDatDimension(i));
 
     if (parallelLoop->getOpMapValue (i) == GLOBAL)
     {
@@ -50,35 +57,7 @@ CPPOpenCLKernelSubroutineDirectLoop::createUserSubroutineCallStatement ()
          * 0:argSize%<devVarName>-1
          * ======================================================
          */
-        //FIXME
-
-
-        SgDotExp * dotExpression = buildDotExp (
-            buildVarRefExp (
-              variableDeclarations->get ( VariableNames::getDataSizesVariableDeclarationName (userSubroutineName) ) ), 
-            buildOpaqueVarRefExp (
-              VariableNames::getOpDatSizeName (i), 
-              subroutineScope ) );
-
-        SgSubtractOp * subtractExpression = buildSubtractOp (
-            dotExpression,
-            buildIntVal (1));
-
-        SgSubscriptExpression * arraySubscriptExpression =
-            new SgSubscriptExpression (
-                RoseHelper::getFileInfo (), 
-                buildIntVal (0), 
-                subtractExpression, 
-                buildIntVal (1));
-
-        arraySubscriptExpression->set_endOfConstruct (
-            RoseHelper::getFileInfo ());
-
-        SgPntrArrRefExp * parameterExpression = buildPntrArrRefExp (
-            buildVarRefExp (variableDeclarations->get (
-                VariableNames::getOpDatName (i))), arraySubscriptExpression);
-
-        actualParameters->append_expression (parameterExpression);
+        parameterExpression = varOpDat;
       }
       else
       {
@@ -88,84 +67,45 @@ CPPOpenCLKernelSubroutineDirectLoop::createUserSubroutineCallStatement ()
          * we access the corresponding local thread variable
          * ======================================================
          */
-
-        actualParameters->append_expression (
-            buildVarRefExp ( variableDeclarations->get (VariableNames::getOpDatLocalName (i))));
+        parameterExpression = varOpDatLocal;
       }
     }
     else if (parallelLoop->getOpMapValue (i) == DIRECT)
     {
       if (parallelLoop->getNumberOfIndirectOpDats () > 0)
       {
-        SgExpression * deviceVarAccessDirectBegin = 
-            buildMultiplyOp (
-                    buildAddOp (
-                        buildVarRefExp ( variableDeclarations->get ( DirectLoop::CPP::KernelSubroutine::setElementCounter)),
-                        buildVarRefExp ( variableDeclarations->get ( DirectLoop::CPP::KernelSubroutine::offsetInThreadBlock))),
-                    buildIntVal (dim));
-
-        SgExpression * deviceVarAccessDirectEnd = buildAddOp (
-            deviceVarAccessDirectBegin, buildIntVal (dim));
-
-        SgSubscriptExpression * arraySubscriptExpression =
-            new SgSubscriptExpression (RoseHelper::getFileInfo (),
-                deviceVarAccessDirectBegin, deviceVarAccessDirectEnd,
-                buildIntVal (1));
-
-        arraySubscriptExpression->set_endOfConstruct (
-            RoseHelper::getFileInfo ());
-
-        SgPntrArrRefExp * parameterExpression = buildPntrArrRefExp (
-            buildVarRefExp (variableDeclarations->get (
-                VariableNames::getOpDatName (i))), arraySubscriptExpression);
-
-        actualParameters->append_expression (parameterExpression);
+        parameterExpression = buildAddOp(
+            varOpDat,
+            buildMultiplyOp(
+                buildAddOp(
+                    varSetElementCounter,
+                    varOffsetInThreadBlock ),
+                valOpDatDimension ) );
       }
       else if (dim == 1)
       {
-        SgAddOp * addExpression = buildAddOp (buildVarRefExp (
-            variableDeclarations->get (
-                DirectLoop::CPP::KernelSubroutine::setElementCounter)),
-            buildIntVal (dim - 1));
-
-        SgSubscriptExpression * arraySubscriptExpression =
-            new SgSubscriptExpression (RoseHelper::getFileInfo (),
-                buildVarRefExp (variableDeclarations->get (
-                    DirectLoop::CPP::KernelSubroutine::setElementCounter)),
-                addExpression, buildIntVal (1));
-
-        arraySubscriptExpression->set_endOfConstruct (
-            RoseHelper::getFileInfo ());
-
-        SgPntrArrRefExp * parameterExpression = buildPntrArrRefExp (
-            buildVarRefExp (variableDeclarations->get (
-                VariableNames::getOpDatName (i))), arraySubscriptExpression);
-
-        actualParameters->append_expression (parameterExpression);
+        parameterExpression = buildAddOp(
+            varOpDat,
+            varSetElementCounter );
       }
       else
       {
-        actualParameters->append_expression (buildVarRefExp (
-            variableDeclarations->get (VariableNames::getOpDatLocalName (i))));
+        parameterExpression = varOpDatLocal;
       }
     }
-    else
-    {
-      SgIntVal * parameterExpression = buildIntVal (1);
-
-      actualParameters->append_expression (parameterExpression);
-    }
+    
+    userDeviceSubroutineParameters->append_expression (parameterExpression);
   }
   
   //needed to have the constants accessible in the user kernel
   // TODO: declare constants struct
-  actualParameters->append_expression( 
+  userDeviceSubroutineParameters->append_expression( 
       buildVarRefExp ( variableDeclarations->get ( OpenCL::CPP::constants ) ) );
 
   return buildFunctionCallStmt (
       userSubroutineName, 
       buildVoidType (),
-      actualParameters, 
+      userDeviceSubroutineParameters, 
       subroutineScope);
 }
 
@@ -542,11 +482,7 @@ CPPOpenCLKernelSubroutineDirectLoop::createExecutionLoopStatements ()
 
   SgExpression * initialisationExpression = buildAssignOp (
       buildVarRefExp ( variableDeclarations->get ( DirectLoop::CPP::KernelSubroutine::setElementCounter)),
-      buildFunctionCallExp(
-          OpenCL::CPP::getGlobalId,
-          buildIntType(),
-          buildExprListExp(
-              buildIntVal(0))));
+      CPPOpenCLStatementsAndExpressionsBuilder::generateGetGlobalId());
   
   SgExpression * testExpression = buildLessThanOp(
       buildVarRefExp ( variableDeclarations->get ( DirectLoop::CPP::KernelSubroutine::setElementCounter)),
@@ -554,11 +490,7 @@ CPPOpenCLKernelSubroutineDirectLoop::createExecutionLoopStatements ()
   
   SgExpression * incrementExpression = buildPlusAssignOp(
       buildVarRefExp ( variableDeclarations->get ( DirectLoop::CPP::KernelSubroutine::setElementCounter)),
-      buildFunctionCallExp(
-          OpenCL::CPP::getGlobalSize,
-          buildIntType(),
-          buildExprListExp(
-              buildIntVal(0))));
+      CPPOpenCLStatementsAndExpressionsBuilder::generateGetGlobalSize());
   
   SgForStatement * forStatement = buildForStatement(
       initialisationExpression,
@@ -583,16 +515,11 @@ CPPOpenCLKernelSubroutineDirectLoop::createAutoSharedDisplacementInitialisationS
   using SageInterface::appendStatement;
 
   SgDivideOp * divideExpression1 = buildDivideOp (
-      buildFunctionCallExp(
-           OpenCL::CPP::getLocalId,
-           buildIntType(),
-           buildExprListExp(
-               buildIntVal(0))),
+      CPPOpenCLStatementsAndExpressionsBuilder::generateGetLocalId(),
       buildVarRefExp (variableDeclarations->get ( DirectLoop::CPP::KernelSubroutine::warpSize)));
 
-  SgMultiplyOp * multiplyExpression = buildMultiplyOp (buildVarRefExp (
-      variableDeclarations->get (
-          DirectLoop::CPP::KernelSubroutine::warpScratchpadSize)),
+  SgMultiplyOp * multiplyExpression = buildMultiplyOp (
+      buildVarRefExp (variableDeclarations->get (DirectLoop::CPP::KernelSubroutine::warpScratchpadSize)),
       divideExpression1);
 
   if (parallelLoop->getSizeOfOpDat () == 8)
@@ -643,11 +570,7 @@ CPPOpenCLKernelSubroutineDirectLoop::createThreadIDInitialisationStatement ()
   SgExprStatement * assignmentStatement = buildAssignStatement (
       buildVarRefExp( variableDeclarations->get ( DirectLoop::CPP::KernelSubroutine::threadIDModulus ) ),
       buildModOp(
-          buildFunctionCallExp(
-              OpenCL::CPP::getGlobalSize,
-              buildIntType(),
-              buildExprListExp(
-                  buildIntVal(0))),
+          CPPOpenCLStatementsAndExpressionsBuilder::generateGetGlobalSize(),
           buildVarRefExp (variableDeclarations->get ( DirectLoop::CPP::KernelSubroutine::warpSize) ) ) );
 
   appendStatement (assignmentStatement, subroutineScope);
@@ -673,54 +596,25 @@ CPPOpenCLKernelSubroutineDirectLoop::createOpDatFormalParameterDeclarations ()
        * Obtain the base type of the OP_DAT argument
        * ======================================================
        */
+      
+      string const & variableName = VariableNames::getOpDatName(i);
 
-      SgType * opDatType = parallelLoop->getOpDatType (i);
+      SgType * opDatType = parallelLoop->getOpDatType(i);
 
       SgArrayType * isArrayType = isSgArrayType (opDatType);
 
       SgType * opDatBaseType = isArrayType->get_base_type ();
+      
+      SgPointerType * pointerType = buildPointerType( opDatBaseType );
 
-      /*
-       * ======================================================
-       * Build the upper bound of the OP_DAT array which
-       * is stored in the argSizes variable
-       * ======================================================
-       */
-      SgDotExp * dotExpression = buildDotExp (buildVarRefExp (
-          variableDeclarations->get (
-              VariableNames::getDataSizesVariableDeclarationName (
-                  userSubroutineName))), buildVarRefExp (
-          dataSizesDeclaration->getFieldDeclarations ()->get (
-              VariableNames::getOpDatSizeName (i))));
-
-      SgSubtractOp * subtractExpression = buildSubtractOp (dotExpression,
-          buildIntVal (1));
-
-      SgSubscriptExpression * arraySubscriptExpression =
-          new SgSubscriptExpression (RoseHelper::getFileInfo (),
-              buildIntVal (0), subtractExpression, buildIntVal (1));
-
-      arraySubscriptExpression->set_endOfConstruct (RoseHelper::getFileInfo ());
-
-      /*
-       * ======================================================
-       * Build array type with the correct subscript
-       * ======================================================
-       */
-
-      SgArrayType * arrayType = buildArrayType (opDatBaseType,
-          arraySubscriptExpression);
-
-      arrayType->set_rank (1);
-
-      arrayType->set_dim_info (buildExprListExp (arraySubscriptExpression));
-
-      string const & variableName = VariableNames::getOpDatName (i);
-
-      variableDeclarations->add (
+      variableDeclarations->add(
           variableName,
           CPPStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
-              variableName, arrayType, subroutineScope, formalParameters, 1,
+              variableName, 
+              pointerType, 
+              subroutineScope, 
+              formalParameters, 
+              1,
               DEVICE));
     }
   }
@@ -797,6 +691,7 @@ CPPOpenCLKernelSubroutineDirectLoop::createLocalVariableDeclarations ()
 void
 CPPOpenCLKernelSubroutineDirectLoop::createFormalParameterDeclarations ()
 {
+#if 0
   /*
    * ======================================================
    * OP_DAT dimensions formal parameter
@@ -822,6 +717,7 @@ CPPOpenCLKernelSubroutineDirectLoop::createFormalParameterDeclarations ()
           VariableNames::getDataSizesVariableDeclarationName (
               userSubroutineName), dataSizesDeclaration->getType (),
           subroutineScope, formalParameters, 1, DEVICE));
+#endif
 
   /*
    * ======================================================
@@ -830,6 +726,7 @@ CPPOpenCLKernelSubroutineDirectLoop::createFormalParameterDeclarations ()
    */
 
   createOpDatFormalParameterDeclarations ();
+
 
   /*
    * ======================================================
@@ -844,8 +741,10 @@ CPPOpenCLKernelSubroutineDirectLoop::createFormalParameterDeclarations ()
       DirectLoop::CPP::KernelSubroutine::warpScratchpadSize,
       CPPStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
           DirectLoop::CPP::KernelSubroutine::warpScratchpadSize,
-          CPPTypesBuilder::getFourByteInteger (), subroutineScope,
-          formalParameters, 1, VALUE));
+          buildIntType(), 
+          subroutineScope,
+          formalParameters ) );
+
 
   /*
    * ======================================================
@@ -857,9 +756,31 @@ CPPOpenCLKernelSubroutineDirectLoop::createFormalParameterDeclarations ()
       DirectLoop::CPP::KernelSubroutine::setSize,
       CPPStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
           DirectLoop::CPP::KernelSubroutine::setSize,
-          CPPTypesBuilder::getFourByteInteger (), subroutineScope,
-          formalParameters, 1, VALUE));
+          buildIntType(), 
+          subroutineScope,
+          formalParameters ) );
+  
+  /*
+   * ======================================================
+   * Shared memory formal parameter
+   * ======================================================
+   */
 
+  variableDeclarations->add (
+      CommonVariableNames::autoshared,
+      CPPStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
+          CommonVariableNames::autoshared,
+          buildPointerType( buildCharType() ), //TODO: char* vs float*
+          subroutineScope,
+          formalParameters,
+          1,
+          SHARED ) );
+  
+
+  
+  //TODO: add global constants parameter
+
+#if 0
   /*
    * ======================================================
    * Warp size formal parameter
@@ -872,6 +793,7 @@ CPPOpenCLKernelSubroutineDirectLoop::createFormalParameterDeclarations ()
           DirectLoop::CPP::KernelSubroutine::warpSize,
           CPPTypesBuilder::getFourByteInteger (), subroutineScope,
           formalParameters, 1, VALUE));
+#endif
 }
 
 /*
