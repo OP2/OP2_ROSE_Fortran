@@ -7,12 +7,24 @@ class CPPOpenCLKernelSubroutine: public CPPKernelSubroutine
 {
   protected:
 
+    FortranOpDatDimensionsDeclaration * opDatDimensionsDeclaration; //FIXME
+
+  protected:
+    void
+    createReductionLoopStatements ();
+
+    void
+    createLocalThreadDeclarations ();
+
+    void
+    createAutoSharedDeclaration ();
+
     CPPOpenCLKernelSubroutine (
-        std::string const & subroutineName,
-        std::string const & userSubroutineName, 
-        SgScopeStatement * moduleScope,
-        CPPParallelLoop * parallelLoop,
-        CPPReductionSubroutines * reductionSubroutines);
+            std::string const & subroutineName,
+            std::string const & userSubroutineName, 
+            SgScopeStatement * moduleScope,
+            CPPParallelLoop * parallelLoop,
+            CPPReductionSubroutines * reductionSubroutines);
 };
 
 #endif

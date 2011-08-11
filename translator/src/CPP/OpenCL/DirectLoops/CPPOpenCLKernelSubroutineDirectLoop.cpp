@@ -29,22 +29,23 @@ CPPOpenCLKernelSubroutineDirectLoop::createUserSubroutineCallStatement ()
   using std::vector;
   
   Debug::getInstance ()->debugMessage ( "Creating call to user device subroutine", Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+  
+  SgExpression * n_ref = buildVarRefExp(variableDeclarations->get(DirectLoop::CPP::KernelSubroutine::setElementCounter));
+  SgExpression * offset_ref = buildVarRefExp ( variableDeclarations->get(DirectLoop::CPP::KernelSubroutine::offsetInThreadBlock));
 
   SgExprListExp * userDeviceSubroutineParameters = buildExprListExp ();
 
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
+    SgExpression * argN_ref = buildVarRefExp(variableDeclarations->get(VariableNames::getOpDatName(i)));
+    SgExpression * argN_l_ref = buildVarRefExp(variableDeclarations->get(VariableNames::getOpDatLocalName(i)));
+    SgExpression * argN_maps_ref = buildVarRefExp(variableDeclarations->get(VariableNames::getGlobalToLocalMappingName(i)));
+    SgExpression * dimN_val = buildIntVal(parallelLoop->getOpDatDimension(i));
+
     int dim = parallelLoop->getOpDatDimension (i);
     
     SgExpression * parameterExpression = buildIntVal (1);
     
-    SgExpression * varOpDat = buildVarRefExp(variableDeclarations->get(VariableNames::getOpDatName(i))); //FIXME: same as parameter
-    SgExpression * varOpDatLocal = buildVarRefExp(variableDeclarations->get(VariableNames::getOpDatLocalName(i)));
-    SgExpression * varGlobalToLocalMapping = buildVarRefExp(variableDeclarations->get(VariableNames::getGlobalToLocalMappingName(i)));
-    SgExpression * varSetElementCounter = buildVarRefExp(variableDeclarations->get(DirectLoop::CPP::KernelSubroutine::setElementCounter));
-    SgExpression * varOffsetInThreadBlock = buildVarRefExp ( variableDeclarations->get(DirectLoop::CPP::KernelSubroutine::offsetInThreadBlock));
-    SgExpression * valOpDatDimension = buildIntVal(parallelLoop->getOpDatDimension(i));
-
     if (parallelLoop->getOpMapValue (i) == GLOBAL)
     {
       if (parallelLoop->getOpAccessValue (i) == READ_ACCESS)
@@ -57,7 +58,7 @@ CPPOpenCLKernelSubroutineDirectLoop::createUserSubroutineCallStatement ()
          * 0:argSize%<devVarName>-1
          * ======================================================
          */
-        parameterExpression = varOpDat;
+        parameterExpression = argN_ref;
       }
       else
       {
@@ -67,7 +68,7 @@ CPPOpenCLKernelSubroutineDirectLoop::createUserSubroutineCallStatement ()
          * we access the corresponding local thread variable
          * ======================================================
          */
-        parameterExpression = varOpDatLocal;
+        parameterExpression = argN_l_ref;
       }
     }
     else if (parallelLoop->getOpMapValue (i) == DIRECT)
@@ -75,22 +76,22 @@ CPPOpenCLKernelSubroutineDirectLoop::createUserSubroutineCallStatement ()
       if (parallelLoop->getNumberOfIndirectOpDats () > 0)
       {
         parameterExpression = buildAddOp(
-            varOpDat,
+            argN_ref,
             buildMultiplyOp(
                 buildAddOp(
-                    varSetElementCounter,
-                    varOffsetInThreadBlock ),
-                valOpDatDimension ) );
+                    n_ref,
+                    offset_ref ),
+                dimN_val ) );
       }
       else if (dim == 1)
       {
         parameterExpression = buildAddOp(
-            varOpDat,
-            varSetElementCounter );
+            argN_ref,
+            n_ref );
       }
       else
       {
-        parameterExpression = varOpDatLocal;
+        parameterExpression = argN_l_ref;
       }
     }
     
@@ -98,9 +99,9 @@ CPPOpenCLKernelSubroutineDirectLoop::createUserSubroutineCallStatement ()
   }
   
   //needed to have the constants accessible in the user kernel
-  // TODO: declare constants struct
-  userDeviceSubroutineParameters->append_expression( 
-      buildVarRefExp ( variableDeclarations->get ( OpenCL::CPP::constants ) ) );
+  SgExpression * global_constants_ref = buildVarRefExp ( variableDeclarations->get ( OpenCL::CPP::globalConstants ) );
+  
+  userDeviceSubroutineParameters->append_expression( global_constants_ref );
 
   return buildFunctionCallStmt (
       userSubroutineName, 
@@ -112,7 +113,6 @@ CPPOpenCLKernelSubroutineDirectLoop::createUserSubroutineCallStatement ()
 SgBasicBlock *
 CPPOpenCLKernelSubroutineDirectLoop::createStageInFromDeviceMemoryToLocalThreadVariablesStatements ()
 {
-  //TODO: implement this first!
   using SageBuilder::buildBasicBlock;
   using SageBuilder::buildVarRefExp;
   using SageBuilder::buildDotExp;
@@ -129,143 +129,116 @@ CPPOpenCLKernelSubroutineDirectLoop::createStageInFromDeviceMemoryToLocalThreadV
   using SageBuilder::buildPlusPlusOp;
   using SageInterface::appendStatement;
 
+  SgExpression * arg_s_ref = buildVarRefExp(variableDeclarations->get(CommonVariableNames::argShared));
+  SgExpression * tid_ref = buildVarRefExp(variableDeclarations->get(DirectLoop::CPP::KernelSubroutine::threadIDModulus));
+  SgExpression * m_ref = buildVarRefExp(variableDeclarations->get(DirectLoop::CPP::KernelSubroutine::dataPerElementCounter));
+  SgExpression * nelems_ref = buildVarRefExp( variableDeclarations-get( PlanFunction::CPP::pnelems ) );
+  SgExpression * offset_ref = buildVarRefExp ( variableDeclarations->get(DirectLoop::CPP::KernelSubroutine::offsetInThreadBlock));
+
   SgBasicBlock * outerBlock = buildBasicBlock ();
 
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
+    SgExpression * argN_ref = buildVarRefExp(variableDeclarations->get(VariableNames::getOpDatName(i)));
+    SgExpression * argN_l_ref = buildVarRefExp(variableDeclarations->get(VariableNames::getOpDatLocalName(i)));
+    SgExpression * argN_maps_ref = buildVarRefExp(variableDeclarations->get(VariableNames::getGlobalToLocalMappingName(i)));
+    SgExpression * dimN_val = buildIntVal(parallelLoop->getOpDatDimension(i));
+    
     if (parallelLoop->getOpMapValue (i) != GLOBAL
         && parallelLoop->getOpAccessValue (i) != WRITE_ACCESS
         && parallelLoop->getOpDatDimension (i) != 1)
     {
-      /*
-       * ======================================================
-       * Builds stage in from device memory to shared memory
+      /* ======================================================
+       * for ( m=0; m<dimN; m++ ) {
+       *        arg_s[tid + m * nelems] = argN[tid + m * nelems + offset * dimN]
+       * }
        * ======================================================
        */
+      SgStatement * initialisationExpression1 = buildExprStatement( buildAssignOp (
+          m_ref,
+          buildIntVal(0) ) );
+      
+      SgStatement * testExpression1 = buildExprStatement( buildLessThanOp(
+          m_ref,
+          dimN_val ) );
+      
+      SgExpression * incrementExpression1 = buildPlusPlusOp(
+          m_ref );
 
-      SgDotExp * dotExpression = buildDotExp ( //FIXME
-          buildVarRefExp ( variableDeclarations->get ( VariableNames::getDimensionsVariableDeclarationName ( userSubroutineName))), 
-          buildVarRefExp ( opDatDimensionsDeclaration->getOpDatDimensionField (i)));
-
-      SgMultiplyOp * multiplyExpression1 = buildMultiplyOp (
-          buildVarRefExp ( variableDeclarations->get ( DirectLoop::CPP::KernelSubroutine::dataPerElementCounter)),
-          buildVarRefExp (variableDeclarations->get ( DirectLoop::CPP::KernelSubroutine::remainingElements)));
-
-      SgAddOp * addExpression1 = buildAddOp (
-          buildVarRefExp ( variableDeclarations->get ( DirectLoop::CPP::KernelSubroutine::threadIDModulus)),
-          multiplyExpression1);
-
-      SgAddOp * addExpression2 = buildAddOp (
-          buildVarRefExp ( variableDeclarations->get ( DirectLoop::CPP::KernelSubroutine::autosharedDisplacement)),
-          addExpression1);
-
-      SgMultiplyOp * multiplyExpression2 = buildMultiplyOp (
-          buildVarRefExp ( variableDeclarations->get ( DirectLoop::CPP::KernelSubroutine::dataPerElementCounter)),
-          buildVarRefExp ( variableDeclarations->get ( DirectLoop::CPP::KernelSubroutine::remainingElements)));
-
-      SgMultiplyOp * multiplyExpression3 = buildMultiplyOp (
-          buildVarRefExp ( variableDeclarations->get ( DirectLoop::CPP::KernelSubroutine::offsetInThreadBlock)),
-          dotExpression);
-
-      SgAddOp * addExpression3 = buildAddOp (
-          multiplyExpression2,
-          multiplyExpression3);
-
-      SgAddOp * addExpression4 = buildAddOp (buildVarRefExp (
-          variableDeclarations->get ( DirectLoop::CPP::KernelSubroutine::threadIDModulus)),
-          addExpression3);
-
-      SgPntrArrRefExp * arrayExpression1 = buildPntrArrRefExp (
-          buildVarRefExp ( variableDeclarations->get (CommonVariableNames::autoshared)),
-          addExpression2);
-
-      SgPntrArrRefExp * arrayExpression2 = buildPntrArrRefExp (
-          buildVarRefExp ( variableDeclarations->get (VariableNames::getOpDatName (i))),
-          addExpression4);
+      SgBasicBlock * loopBody1 = buildBasicBlock();
+      
+      SgForStatement * forStatement1 = buildForStatement(
+          initialisationExpression1,
+          testExpression1,
+          incrementExpression1,
+          loopBody1 );
+      
+      appendStatement( forStatement1, outerBlock );
+      
+      SgStatement * assignStatement1 = buildAssignStatement(
+          buildPntrArrRefExp(
+              arg_s_ref,
+              buildAddOp(
+                  tid_ref,
+                  buildMultiplyOp(
+                      m_ref,
+                      nelems_ref ) ) ),
+          buildPntrArrRefExp(
+              argN_ref,
+              buildAddOp(
+                  tid_ref,
+                  buildAddOp(
+                      buildMultiplyOp(
+                          m_ref,
+                          nelems_ref ),
+                      buildMultiplyOp(
+                          offset_ref,
+                          dimN_val ) ) ) ) );
+      
+      appendStatement( assignStatement1, forStatement1 );
       
       /* ======================================================
-       * autoshared[tid + m * nelems] = autoshared[tid + m * nelems + offset * XX]
+       * for ( m=0; m<dimN; m++ ) {
+       *        argN_l[m] = arg_s[m + tid * dimN]
+       * }
        * ======================================================
        */
-      SgExprStatement * assignmentStatement1 = buildAssignStatement (
-          arrayExpression1, 
-          arrayExpression2);
       
-      SgAssignOp * initialisationExpression = buildAssignOp (
-          buildVarRefExp ( variableDeclarations->get ( DirectLoop::CPP::KernelSubroutine::dataPerElementCounter)),
-          buildIntVal (0) );
+      SgStatement * initialisationExpression2 = buildExprStatement( buildAssignOp (
+          m_ref,
+          buildIntVal(0) ) );
       
-      SgExpression * testExpression = buildLessThanOp(
-          buildVarRefExp ( variableDeclarations->get ( DirectLoop::CPP::KernelSubroutine::dataPerElementCounter)),
-          dotExpression );
+      SgStatement * testExpression2 = buildExprStatement( buildLessThanOp(
+          m_ref,
+          dimN_val ) );
       
-      SgExpression * incrementExpression = buildPlusPlusOp(
-          buildVarRefExp ( variableDeclarations->get ( DirectLoop::CPP::KernelSubroutine::dataPerElementCounter)),
-          SgUnaryOp::postfix);
+      SgExpression * incrementExpression2 = buildPlusPlusOp(
+          m_ref );
+
+      SgBasicBlock * loopBody2 = buildBasicBlock();
       
-      SgBasicBlock * firstLoopBody = buildBasicBlock (assignmentStatement1);
-     
-      SgForStatement * firstLoopStatement = buildForStatement(
-          initialisationExpression,
-          testExpression,
-          incrementExpression,
-          firstLoopBody );
-
-      /* SgCPPDo * firstLoopStatement =
-          CPPStatementsAndExpressionsBuilder::buildCPPDoStatement (
-              initialisationExpression, dotExpression, buildIntVal (1),
-              firstLoopBody); */
-
-      appendStatement (firstLoopStatement, outerBlock);
-
-      /*
-       * ======================================================
-       * Builds stage in from shared memory to local thread
-       * variables
-       * ======================================================
-       */
-
-      SgMultiplyOp * multiplyExpression4 = buildMultiplyOp (buildVarRefExp (
-          variableDeclarations->get (
-              DirectLoop::CPP::KernelSubroutine::threadIDModulus)),
-          dotExpression);
-
-      SgAddOp * addExpression5 = buildAddOp (buildVarRefExp (
-          variableDeclarations->get (
-              DirectLoop::CPP::KernelSubroutine::dataPerElementCounter)),
-          multiplyExpression4);
-
-      SgAddOp * addExpression6 = buildAddOp (buildVarRefExp (
-          variableDeclarations->get (
-              DirectLoop::CPP::KernelSubroutine::autosharedDisplacement)),
-          addExpression5);
-
-      SgPntrArrRefExp * arrayExpression3 = buildPntrArrRefExp (buildVarRefExp (
-          variableDeclarations->get (VariableNames::getOpDatLocalName (i))),
-          buildVarRefExp (variableDeclarations->get (
-              DirectLoop::CPP::KernelSubroutine::dataPerElementCounter)));
-
-      SgPntrArrRefExp * arrayExpression4 = buildPntrArrRefExp (buildVarRefExp (
-          variableDeclarations->get (CommonVariableNames::autoshared)),
-          addExpression6);
-
-      SgExprStatement * assignmentStatement2 = buildAssignStatement (
-          arrayExpression3, arrayExpression4);
-
-      SgBasicBlock * secondLoopBody = buildBasicBlock (assignmentStatement2);
+      SgForStatement * forStatement2 = buildForStatement(
+          initialisationExpression2,
+          testExpression2,
+          incrementExpression2,
+          loopBody2 );
       
-      SgForStatement * secondLoopStatement = buildForStatement(
-          initialisationExpression,
-          testExpression,
-          incrementExpression,
-          secondLoopBody );
-
-      /*SgCPPDo * secondLoopStatement =
-          CPPStatementsAndExpressionsBuilder::buildCPPDoStatement (
-              initialisationExpression, dotExpression, buildIntVal (1),
-              secondLoopBody); */
-
-      appendStatement (secondLoopStatement, outerBlock);
+      appendStatement( forStatement2, outerBlock );
+      
+      SgStatement * assignStatement2 = buildAssignStatement(
+          buildPntrArrRefExp(
+              argN_l_ref,
+              m_ref ),
+          buildPntrArrRefExp(
+              arg_s_ref,
+              buildAddOp(
+                  m_ref,
+                  buildMultiplyOp(
+                      tid_ref,
+                      dimN_val ) ) ) );
+      
+      appendStatement( assignStatement2, forStatement2 );
+      
     }
   }
 
@@ -289,135 +262,116 @@ CPPOpenCLKernelSubroutineDirectLoop::createStageOutFromLocalThreadVariablesToDev
   using SageBuilder::buildNullExpression;
   using SageInterface::appendStatement;
 
+  SgExpression * arg_s_ref = buildVarRefExp(variableDeclarations->get(CommonVariableNames::argShared));
+  SgExpression * tid_ref = buildVarRefExp(variableDeclarations->get(DirectLoop::CPP::KernelSubroutine::threadIDModulus));
+  SgExpression * m_ref = buildVarRefExp(variableDeclarations->get(DirectLoop::CPP::KernelSubroutine::dataPerElementCounter));
+  SgExpression * nelems_ref = buildVarRefExp( variableDeclarations-get( PlanFunction::CPP::pnelems ) );
+  SgExpression * offset_ref = buildVarRefExp ( variableDeclarations->get(DirectLoop::CPP::KernelSubroutine::offsetInThreadBlock));
+
   SgBasicBlock * outerBlock = buildBasicBlock ();
 
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
+    SgExpression * argN_ref = buildVarRefExp(variableDeclarations->get(VariableNames::getOpDatName(i)));
+    SgExpression * argN_l_ref = buildVarRefExp(variableDeclarations->get(VariableNames::getOpDatLocalName(i)));
+    SgExpression * argN_maps_ref = buildVarRefExp(variableDeclarations->get(VariableNames::getGlobalToLocalMappingName(i)));
+    SgExpression * dimN_val = buildIntVal(parallelLoop->getOpDatDimension(i));
+    
     if (parallelLoop->getOpMapValue (i) != GLOBAL
-        && parallelLoop->getOpAccessValue (i) != READ_ACCESS
+        && parallelLoop->getOpAccessValue (i) != WRITE_ACCESS
         && parallelLoop->getOpDatDimension (i) != 1)
     {
-      SgDotExp * dotExpression = buildDotExp (buildVarRefExp ( //FIXME: set_size (arg)
-          variableDeclarations->get (
-              VariableNames::getDimensionsVariableDeclarationName (
-                  userSubroutineName))), buildVarRefExp (
-          opDatDimensionsDeclaration->getOpDatDimensionField (i)));
-
-      /*
-       * ======================================================
-       * Builds stage out from local thread variables to
-       * shared memory
+      /* ======================================================
+       * for ( m=0; m<dimN; m++ ) {
+       *        arg_s[m + tid * dimN] = argN_l[m]
+       * }
        * ======================================================
        */
-
-      SgExprStatement * assignmentStatement1 = buildAssignStatement (
-          buildPntrArrRefExp (
-              buildVarRefExp (variableDeclarations->get (CommonVariableNames::autoshared)),
-              buildAddOp ( //FIXME: need autoshared_displaced1
-                  buildVarRefExp (variableDeclarations->get ( DirectLoop::CPP::KernelSubroutine::autosharedDisplacement)),
-                  buildAddOp (
-                      buildVarRefExp (variableDeclarations->get ( DirectLoop::CPP::KernelSubroutine::dataPerElementCounter)),
-                      buildMultiplyOp (
-                          buildVarRefExp (variableDeclarations->get ( DirectLoop::CPP::KernelSubroutine::threadIDModulus)),
-                          dotExpression)))),
-          buildPntrArrRefExp (
-              buildVarRefExp ( variableDeclarations->get (VariableNames::getOpDatLocalName (i))),
-              buildVarRefExp ( variableDeclarations->get ( DirectLoop::CPP::KernelSubroutine::dataPerElementCounter))));
-
-      SgBasicBlock * loopBody1 = buildBasicBlock (assignmentStatement1);
-
-      SgAssignOp * initialisationExpression = buildAssignOp (
-          buildVarRefExp ( variableDeclarations->get ( DirectLoop::CPP::KernelSubroutine::dataPerElementCounter)),
-          buildIntVal (0) );
       
-      SgExpression * testExpression = buildLessThanOp(
-          buildVarRefExp ( variableDeclarations->get ( DirectLoop::CPP::KernelSubroutine::dataPerElementCounter)),
-          dotExpression );
+      SgStatement * initialisationExpression1 = buildExprStatement( buildAssignOp (
+          m_ref,
+          buildIntVal(0) ) );
       
-      SgExpression * incrementExpression = buildPlusPlusOp(
-          buildVarRefExp ( variableDeclarations->get ( DirectLoop::CPP::KernelSubroutine::dataPerElementCounter)));
-     
-      SgForStatement * loopStatement1 = buildForStatement(
-          initialisationExpression,
-          testExpression,
-          incrementExpression,
+      SgStatement * testExpression1 = buildExprStatement( buildLessThanOp(
+          m_ref,
+          dimN_val ) );
+      
+      SgExpression * incrementExpression1 = buildPlusPlusOp(
+          m_ref );
+
+      SgBasicBlock * loopBody1 = buildBasicBlock();
+      
+      SgForStatement * forStatement1 = buildForStatement(
+          initialisationExpression1,
+          testExpression1,
+          incrementExpression1,
           loopBody1 );
       
-      /* SgCPPDo * loopStatement1 =
-          CPPStatementsAndExpressionsBuilder::buildCPPDoStatement (
-              loopInitializationExpression, upperBoundExpression, buildIntVal (
-                  1), loopBody1); */
-
-      appendStatement (loopStatement1, outerBlock);
-
-      /*
-       * ======================================================
-       * Builds stage out from shared memory to device
-       * variables
+      appendStatement( forStatement1, outerBlock );
+      
+      SgStatement * assignStatement1 = buildAssignStatement(
+          buildPntrArrRefExp(
+              arg_s_ref,
+              buildAddOp(
+                  m_ref,
+                  buildMultiplyOp(
+                      tid_ref,
+                      dimN_val ) ) ),
+          buildPntrArrRefExp(
+              argN_l_ref,
+              m_ref ) );
+      
+      appendStatement( assignStatement1, forStatement1 );
+      
+      /* ======================================================
+       * for ( m=0; m<dimN; m++ ) {
+       *        argN[tid + m * nelems + offset * dimN] = arg_s[tid + m * nelems]
+       * }
        * ======================================================
        */
+      SgStatement * initialisationExpression2 = buildExprStatement( buildAssignOp (
+          m_ref,
+          buildIntVal(0) ) );
+      
+      SgStatement * testExpression2 = buildExprStatement( buildLessThanOp(
+          m_ref,
+          dimN_val ) );
+      
+      SgExpression * incrementExpression2 = buildPlusPlusOp(
+          m_ref );
 
-      SgMultiplyOp * multiplyExpression2 = buildMultiplyOp (buildVarRefExp (
-          variableDeclarations->get (
-              DirectLoop::CPP::KernelSubroutine::dataPerElementCounter)),
-          buildVarRefExp (variableDeclarations->get (
-              DirectLoop::CPP::KernelSubroutine::remainingElements)));
-
-      SgMultiplyOp * multiplyExpression3 = buildMultiplyOp (buildVarRefExp (
-          variableDeclarations->get (
-              DirectLoop::CPP::KernelSubroutine::offsetInThreadBlock)),
-          dotExpression);
-
-      SgAddOp * addExpression3 = buildAddOp (multiplyExpression2,
-          multiplyExpression3);
-
-      SgAddOp * addExpression4 = buildAddOp (buildVarRefExp (
-          variableDeclarations->get (
-              DirectLoop::CPP::KernelSubroutine::threadIDModulus)),
-          addExpression3);
-
-      SgMultiplyOp * multiplyExpression4 = buildMultiplyOp (buildVarRefExp (
-          variableDeclarations->get (
-              DirectLoop::CPP::KernelSubroutine::dataPerElementCounter)),
-          buildVarRefExp (variableDeclarations->get (
-              DirectLoop::CPP::KernelSubroutine::remainingElements)));
-
-      SgAddOp * addExpression5 = buildAddOp (buildVarRefExp (
-          variableDeclarations->get (
-              DirectLoop::CPP::KernelSubroutine::threadIDModulus)),
-          multiplyExpression4);
-
-      SgAddOp * addExpression6 = buildAddOp (buildVarRefExp (
-          variableDeclarations->get (
-              DirectLoop::CPP::KernelSubroutine::autosharedDisplacement)),
-          addExpression5);
-
-      SgPntrArrRefExp * arrayExpression3 = buildPntrArrRefExp (buildVarRefExp (
-          variableDeclarations->get (VariableNames::getOpDatName (i))),
-          addExpression4);
-
-      SgPntrArrRefExp * arrayExpression4 = buildPntrArrRefExp (buildVarRefExp (
-          variableDeclarations->get (CommonVariableNames::autoshared)),
-          addExpression6);
-
-      SgExprStatement * assignmentStatement2 = buildAssignStatement (
-          arrayExpression3, arrayExpression4);
-
-      SgBasicBlock * loopBody2 = buildBasicBlock (assignmentStatement2);
-
-      SgForStatement * loopStatement2 = buildForStatement(
-          initialisationExpression,
-          testExpression,
-          incrementExpression,
+      SgBasicBlock * loopBody2 = buildBasicBlock();
+      
+      SgForStatement * forStatement2 = buildForStatement(
+          initialisationExpression2,
+          testExpression2,
+          incrementExpression2,
           loopBody2 );
       
-      /*
-      SgCPPDo * loopStatement2 =
-          CPPStatementsAndExpressionsBuilder::buildCPPDoStatement (
-              loopInitializationExpression, upperBoundExpression, buildIntVal (
-                  1), loopBody2); */
-
-      appendStatement (loopStatement2, outerBlock);
+      appendStatement( forStatement2, outerBlock );
+      
+      SgStatement * assignStatement2 = buildAssignStatement(
+          buildPntrArrRefExp(
+              argN_ref,
+              buildAddOp(
+                  tid_ref,
+                  buildAddOp(
+                      buildMultiplyOp(
+                          m_ref,
+                          nelems_ref ),
+                      buildMultiplyOp(
+                          offset_ref,
+                          dimN_val ) ) ) ),
+          buildPntrArrRefExp(
+              arg_s_ref,
+              buildAddOp(
+                  tid_ref,
+                  buildMultiplyOp(
+                      m_ref,
+                      nelems_ref ) ) ) );
+      
+      appendStatement( assignStatement2, forStatement2 );
+      
     }
   }
 
@@ -442,62 +396,81 @@ CPPOpenCLKernelSubroutineDirectLoop::createExecutionLoopStatements ()
   using SageBuilder::buildExprStatement;
   using SageBuilder::buildIntType;
   using SageInterface::appendStatement;
-
-  SgBasicBlock * loopBody = buildBasicBlock ();
-
-  SgExprStatement * assignmentStatement1 = buildAssignStatement (
-      buildVarRefExp (variableDeclarations->get ( DirectLoop::CPP::KernelSubroutine::offsetInThreadBlock)),
-      buildSubtractOp (
-            buildVarRefExp ( variableDeclarations->get ( DirectLoop::CPP::KernelSubroutine::setElementCounter)),
-            buildVarRefExp ( variableDeclarations->get ( DirectLoop::CPP::KernelSubroutine::threadIDModulus))));
-
-  appendStatement (assignmentStatement1, loopBody);
-
-
-  SgFunctionCallExp * functionCall = buildFunctionCallExp (
-      CPPTypesBuilder::buildNewCPPFunction ("MIN", subroutineScope),
-      buildExprListExp (
-          buildVarRefExp ( variableDeclarations->get (DirectLoop::CPP::KernelSubroutine::warpSize)),
-          buildSubtractOp (
-              buildVarRefExp (variableDeclarations->get ( DirectLoop::CPP::KernelSubroutine::setSize)), 
-              buildVarRefExp (variableDeclarations->get ( DirectLoop::CPP::KernelSubroutine::offsetInThreadBlock)))));
-
-  SgExprStatement * assignmentStatement2 = buildAssignStatement (
-      buildVarRefExp ( variableDeclarations->get ( DirectLoop::CPP::KernelSubroutine::remainingElements) ),
-      functionCall);
-
-  appendStatement (assignmentStatement2, loopBody);
-
-  appendStatement (
-      createStageInFromDeviceMemoryToLocalThreadVariablesStatements (),
-      loopBody);
-
-  appendStatement (createUserSubroutineCallStatement (), 
-      loopBody);
-
-  appendStatement (
-      createStageOutFromLocalThreadVariablesToDeviceMemoryStatements (),
-      loopBody);
-
-  SgExpression * initialisationExpression = buildAssignOp (
-      buildVarRefExp ( variableDeclarations->get ( DirectLoop::CPP::KernelSubroutine::setElementCounter)),
-      CPPOpenCLStatementsAndExpressionsBuilder::generateGetGlobalId());
   
-  SgExpression * testExpression = buildLessThanOp(
-      buildVarRefExp ( variableDeclarations->get ( DirectLoop::CPP::KernelSubroutine::setElementCounter)),
-      buildVarRefExp (variableDeclarations->get ( DirectLoop::CPP::KernelSubroutine::setSize) ) );
+  SgExpression * set_size_ref = buildVarRefExp (variableDeclarations->get ( DirectLoop::CPP::KernelSubroutine::setSize));
+  SgExpression * nelems_ref = buildVarRefExp( variableDeclarations-get( PlanFunction::CPP::pnelems ) );
+  SgExpression * offset_ref = buildVarRefExp( variableDeclarations-get( PlanFunction::CPP::poffset ) );
+  SgExpression * tid_ref = buildVarRefExp(variableDeclarations->get(DirectLoop::CPP::KernelSubroutine::threadIDModulus));
+  SgExpression * n_ref = buildVarRefExp (variableDeclarations->get(DirectLoop::CPP::KernelSubroutine::setElementCounter));
+
+  /* ======================================================
+   * for ( n = get_global_id(0); n < set_size; n++ )
+   * ======================================================
+   */
   
-  SgExpression * incrementExpression = buildPlusAssignOp(
-      buildVarRefExp ( variableDeclarations->get ( DirectLoop::CPP::KernelSubroutine::setElementCounter)),
-      CPPOpenCLStatementsAndExpressionsBuilder::generateGetGlobalSize());
+  SgStatement * initialisationExpression = buildExprStatement( buildAssignOp (
+      n_ref,
+      CPPOpenCLStatementsAndExpressionsBuilder::generateGetGlobalId() ) );
+  
+  SgStatement * testExpression = buildExprStatement( buildLessThanOp(
+      n_ref,
+      set_size_ref ) );
+  
+  SgExpression * incrementExpression = buildPlusPlusOp(
+      n_ref );
+  
+
+  SgBasicBlock * loopBody = buildBasicBlock();
   
   SgForStatement * forStatement = buildForStatement(
       initialisationExpression,
       testExpression,
       incrementExpression,
       loopBody );
+  
+  appendStatement( forStatement, subroutineScope );
+  
+  /* ======================================================
+   * offset = n - tid
+   * ======================================================
+   */
+  SgExprStatement * assignmentStatement1 = buildAssignStatement (
+      offset_ref,
+      buildSubtractOp (
+            n_ref,
+            tid_ref ) );
 
-  appendStatement (forStatement, subroutineScope);
+  appendStatement (assignmentStatement1, loopBody);
+  
+  /* ======================================================
+   * nelems = MIN( OP_WARPSIZE, set_size - offset )
+   * ======================================================
+   */
+  SgExprStatement * assignmentStatement2 = buildAssignStatement (
+      nelems_ref,
+      buildFunctionCallExp (
+            CPPTypesBuilder::buildNewCPPFunction ("MIN", subroutineScope), //FIXME
+            buildExprListExp (
+                buildVarRefExp ( variableDeclarations->get (DirectLoop::CPP::KernelSubroutine::warpSize)),
+                buildSubtractOp (
+                    set_size_ref, 
+                    offset_ref ) ) ) );
+
+
+  appendStatement (assignmentStatement2, loopBody);
+  
+  appendStatement (
+      createStageInFromDeviceMemoryToLocalThreadVariablesStatements (),
+      loopBody);
+
+  appendStatement (
+      createUserSubroutineCallStatement (), 
+      loopBody);
+
+  appendStatement (
+      createStageOutFromLocalThreadVariablesToDeviceMemoryStatements (),
+      loopBody);
+
 }
 
 void
@@ -512,15 +485,28 @@ CPPOpenCLKernelSubroutineDirectLoop::createAutoSharedDisplacementInitialisationS
   using SageBuilder::buildIntVal;
   using SageBuilder::buildAssignStatement;
   using SageInterface::appendStatement;
+  
+  SgExpression * shared_ref = buildVarRefExp(variableDeclarations->get(CommonVariableNames::autoshared));
+  SgExpression * arg_s_ref = buildVarRefExp(variableDeclarations->get(CommonVariableNames::argShared));
+  SgExpression * offset_s_ref = buildVarRefExp (variableDeclarations->get (DirectLoop::CPP::KernelSubroutine::warpScratchpadSize));
+  
+  SgStatement * assignStatement = buildAssignStatement(
+      arg_s_ref,
+      buildCastExp(
+          buildAddOp(
+              shared_ref,
+              buildMultiplyOp(
+                  offset_s_ref,
+                  buildDivideOp(
+                      CPPOpenCLStatementsAndExpressionsBuilder::generateGetLocalId(),
+                      buildVarRefExp (variableDeclarations->get ( DirectLoop::CPP::KernelSubroutine::warpSize) ) ) ) ),
+          buildPointerType( 
+              buildFloatType() ) ) ); //FIXME (__local float *)
+  
+  appendStatement ( assignStatement, subroutineScope);
 
-  SgDivideOp * divideExpression1 = buildDivideOp (
-      CPPOpenCLStatementsAndExpressionsBuilder::generateGetLocalId(),
-      buildVarRefExp (variableDeclarations->get ( DirectLoop::CPP::KernelSubroutine::warpSize)));
-
-  SgMultiplyOp * multiplyExpression = buildMultiplyOp (
-      buildVarRefExp (variableDeclarations->get (DirectLoop::CPP::KernelSubroutine::warpScratchpadSize)),
-      divideExpression1);
-
+  //TODO: what about this?
+  /*
   if (parallelLoop->getSizeOfOpDat () == 8)
   {
     SgDivideOp * divideExpression2 = buildDivideOp (multiplyExpression,
@@ -544,7 +530,7 @@ CPPOpenCLKernelSubroutineDirectLoop::createAutoSharedDisplacementInitialisationS
         divideExpression2);
 
     appendStatement (assignmentStatement, subroutineScope);
-  }
+  }*/
 }
 
 void
@@ -560,6 +546,9 @@ CPPOpenCLKernelSubroutineDirectLoop::createThreadIDInitialisationStatement ()
   using SageBuilder::buildAssignStatement;
   using SageInterface::appendStatement;
   
+  SgExpression * tid_ref = buildVarRefExp(variableDeclarations->get(DirectLoop::CPP::KernelSubroutine::threadIDModulus));
+
+  
   /*
    * ======================================================
    * tid = get_local_id(0) % OP_WARP_SIZE
@@ -567,7 +556,7 @@ CPPOpenCLKernelSubroutineDirectLoop::createThreadIDInitialisationStatement ()
    */ 
 
   SgExprStatement * assignmentStatement = buildAssignStatement (
-      buildVarRefExp( variableDeclarations->get ( DirectLoop::CPP::KernelSubroutine::threadIDModulus ) ),
+      tid_ref,
       buildModOp(
           CPPOpenCLStatementsAndExpressionsBuilder::generateGetGlobalSize(),
           buildVarRefExp (variableDeclarations->get ( DirectLoop::CPP::KernelSubroutine::warpSize) ) ) );
@@ -618,6 +607,111 @@ CPPOpenCLKernelSubroutineDirectLoop::createOpDatFormalParameterDeclarations ()
     }
   }
 }
+
+void
+CPPOpenCLKernelSubroutineDirectLoop::createInitialiseLocalThreadVariablesStatements ()
+{
+  using SageBuilder::buildOpaqueVarRefExp;
+  using SageBuilder::buildPntrArrRefExp;
+  using SageBuilder::buildAssignOp;
+  using SageBuilder::buildAssignStatement;
+  using SageBuilder::buildVarRefExp;
+  using SageBuilder::buildAssignOp;
+  using SageBuilder::buildIntVal;
+  using SageBuilder::buildBasicBlock;
+  using SageBuilder::buildMultiplyOp;
+  using SageBuilder::buildDotExp;
+  using SageBuilder::buildAddOp;
+  using SageBuilder::buildPlusPlusOp;
+  using SageInterface::appendStatement;
+
+  /*
+   * ======================================================
+   * We essentially do a similar thing to the one we make
+   * when we declare local thread variables
+   * ======================================================
+   */
+  SgExpression * d_ref = buildVarRefExp (variableDeclarations->get(DirectLoop::CPP::KernelSubroutine::setElementCounter));
+
+
+  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
+  {
+    SgExpression * argN = buildVarRefExp(variableDeclarations->get ( VariableNames::getOpDatName(i) ) );
+    SgExpression * argN_l = buildVarRefExp(variableDeclarations->get ( VariableNames::getOpDatLocalName (i) ) );
+    SgExpression * dimN_val = buildIntVal(parallelLoop->getOpDatDimension(i));
+    
+    if (parallelLoop->getOpMapValue (i) == GLOBAL
+        && parallelLoop->getOpAccessValue (i) != READ_ACCESS)
+    {
+      /*
+       * ======================================================
+       * for ( d=0; d<dimN; d++)
+       * ======================================================
+       */
+      
+      SgStatement * initialisationExpression = buildExprStatement( buildAssignOp (
+          d_ref,
+          buildIntVal(0) ) );
+      
+      SgStatement * testExpression = buildExprStatement( buildLessThanOp(
+          d_ref,
+          dimN_val ) );
+      
+      SgExpression * incrementExpression = buildPlusPlusOp(
+          d_ref );
+      
+      SgBasicBlock * loopBody = buildBasicBlock();
+      
+      SgForStatement * forStatement = buildForStatement(
+          initialisationExpression,
+          testExpression,
+          incrementExpression,
+          loopBody );
+      
+      appendStatement( forStatement, subroutineScope );
+      
+      SgExprStatement * assignmentStatement;
+
+      if (parallelLoop->getOpAccessValue (i) == INC_ACCESS)
+      {
+        /*
+         * ======================================================
+         * argN_l[d] = 0
+         * ======================================================
+         */
+        assignmentStatement = buildAssignStatement (
+            buildPntrArrRefExp(
+                argN_l,
+                d_ref ),
+            buildIntVal (0)); //FIXME 0.0f
+      }
+      else
+      {
+        /*
+         * ======================================================
+         * argN_l[d] = argN[d+get_group_id(0)*dimN]
+         * ======================================================
+         */
+        assignmentStatement = buildAssignStatement (
+            buildPntrArrRefExp(
+                argN_l,
+                d_ref ),
+            buildPntrArrRefExp(
+                argN,
+                buildAddOp(
+                    d_ref,
+                    buildMultiplyOp(
+                        CPPOpenCLStatementsAndExpressionsBuilder::generateGetGroupId(),
+                        dimN_val ) ) ) );
+       
+      }
+      
+      appendStatement (assignmentStatement, loopBody);
+      
+    }
+  }
+}
+
 
 void
 CPPOpenCLKernelSubroutineDirectLoop::createStatements ()
@@ -690,33 +784,6 @@ CPPOpenCLKernelSubroutineDirectLoop::createLocalVariableDeclarations ()
 void
 CPPOpenCLKernelSubroutineDirectLoop::createFormalParameterDeclarations ()
 {
-#if 0
-  /*
-   * ======================================================
-   * OP_DAT dimensions formal parameter
-   * ======================================================
-   */
-
-  variableDeclarations->add (
-      VariableNames::getDimensionsVariableDeclarationName (userSubroutineName),
-      CPPStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
-          VariableNames::getDimensionsVariableDeclarationName (
-              userSubroutineName), opDatDimensionsDeclaration->getType (),
-          subroutineScope, formalParameters, 1, DEVICE));
-
-  /*
-   * ======================================================
-   * Argsizes formal parameter
-   * ======================================================
-   */
-
-  variableDeclarations->add (
-      VariableNames::getDataSizesVariableDeclarationName (userSubroutineName),
-      CPPStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
-          VariableNames::getDataSizesVariableDeclarationName (
-              userSubroutineName), dataSizesDeclaration->getType (),
-          subroutineScope, formalParameters, 1, DEVICE));
-#endif
 
   /*
    * ======================================================

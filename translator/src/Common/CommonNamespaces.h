@@ -232,6 +232,7 @@ namespace OpenMP
 namespace CommonVariableNames
 {
   std::string const autoshared = "autoshared";
+  std::string const argShared = "arg_s";
   std::string const col = "col";
   std::string const col2 = "col2";
   std::string const dat = "dat";

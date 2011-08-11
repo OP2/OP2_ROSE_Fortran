@@ -50,6 +50,9 @@ class CPPOpenCLKernelSubroutineDirectLoop: public CPPOpenCLKernelSubroutine
 
     virtual void
     createOpDatFormalParameterDeclarations ();
+    
+    void
+    createInitialiseLocalThreadVariablesStatements ();
 
     virtual void
     createStatements ();
