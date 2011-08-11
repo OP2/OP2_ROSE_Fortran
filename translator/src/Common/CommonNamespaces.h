@@ -243,6 +243,7 @@ namespace CommonVariableNames
   std::string const set = "set";
   std::string const size = "size";
   std::string const upperBound = "n";
+  std::string const numberofBytes = "nbytes";
 }
 
 namespace VariableNames
@@ -282,6 +283,15 @@ namespace VariableNames
    */
   std::string
   getOpDatHostName (unsigned int OP_DAT_ArgumentGroup);
+
+  /*
+   * ======================================================
+   * Returns the name of a local OP_DAT variable in this
+   * OP_DAT argument group
+   * ======================================================
+   */
+  std::string
+  getOpDatSharedName (unsigned int OP_DAT_ArgumentGroup);
 
   /*
    * ======================================================
@@ -415,9 +425,9 @@ namespace VariableNames
 
   std::string
   getIncrementAccessMapName (unsigned int OP_DAT_ArgumentGroup);
-
+  
   std::string
-  getIncrementAccessMapName (unsigned int OP_DAT_ArgumentGroup);
+  getOpIndirectionSharedName (unsigned int OP_DAT_ArgumentGroup);
 
   std::string
   getIndirectionArgumentSizeName (unsigned int OP_DAT_ArgumentGroup);

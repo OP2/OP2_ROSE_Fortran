@@ -47,6 +47,7 @@ namespace VariableSuffixes
   std::string const Size = "Size";
   std::string const Local = "Local";
   std::string const Global = "Global";
+  std::string const Global = "Shared";
   std::string const Device = "Device";
   std::string const Host = "Host";
   std::string const Host = "Shared";
@@ -258,8 +259,16 @@ VariableNames::getIncrementAccessMapName (unsigned int OP_DAT_ArgumentGroup)
 }
 
 std::string
-VariableNames::getIndirectionArgumentSizeName (
-    unsigned int OP_DAT_ArgumentGroup)
+VariableNames::getOpIndirectionSharedName (unsigned int OP_DAT_ArgumentGroup)
+{
+  using boost::lexical_cast;
+  using std::string;
+  
+  return "ind_arg" + lexical_cast <string> (OP_DAT_ArgumentGroup) + "_s";
+}
+
+std::string
+VariableNames::getIndirectionArgumentSizeName (unsigned int OP_DAT_ArgumentGroup)
 {
   using boost::lexical_cast;
   using std::string;

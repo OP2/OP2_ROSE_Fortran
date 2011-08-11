@@ -335,8 +335,7 @@ CPPOpenCLKernelSubroutineDirectLoop::createStageOutFromLocalThreadVariablesToDev
           dotExpression );
       
       SgExpression * incrementExpression = buildPlusPlusOp(
-          buildVarRefExp ( variableDeclarations->get ( DirectLoop::CPP::KernelSubroutine::dataPerElementCounter)),
-          SgUnaryOp::postfix);
+          buildVarRefExp ( variableDeclarations->get ( DirectLoop::CPP::KernelSubroutine::dataPerElementCounter)));
      
       SgForStatement * loopStatement1 = buildForStatement(
           initialisationExpression,

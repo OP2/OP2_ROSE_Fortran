@@ -97,7 +97,7 @@ namespace PlanFunction
     std::string const pblkMapSize = "pblkMapSize";
     std::string const pindMaps = "pindMaps";
     std::string const pindMapsSize = "pindMapsSize";
-    std::string const pindOffs = "Ind_arg_offs";
+    std::string const pindOffs = "ind_arg_offs";
     std::string const pindOffsSize = "pindOffsSize";
     std::string const pindSizes = "ind_arg_sizes";
     std::string const pindSizesSize = "pindSizesSize";
