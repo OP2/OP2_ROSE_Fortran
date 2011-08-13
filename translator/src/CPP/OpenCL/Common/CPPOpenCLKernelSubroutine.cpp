@@ -6,11 +6,17 @@
 CPPOpenCLKernelSubroutine::CPPOpenCLKernelSubroutine (
     std::string const & subroutineName, 
     std::string const & userSubroutineName,
-    SgScopeStatement * moduleScope, 
     CPPParallelLoop * parallelLoop,
-    CPPReductionSubroutines * reductionSubroutines) :
-  CPPKernelSubroutine (subroutineName, userSubroutineName, moduleScope,
-      parallelLoop, reductionSubroutines)
+    SgScopeStatement * moduleScope, 
+    CPPReductionSubroutines * reductionSubroutines,
+    CPPOpDatDimensionsDeclaration * opDatDimensionsDeclaration) :
+  CPPKernelSubroutine (
+      subroutineName, 
+      userSubroutineName, 
+      parallelLoop,
+      moduleScope,
+      reductionSubroutines),
+  opDatDimensionsDeclaration( opDatDimensionsDeclaration )
 {
   using SageInterface::addTextForUnparser;
 

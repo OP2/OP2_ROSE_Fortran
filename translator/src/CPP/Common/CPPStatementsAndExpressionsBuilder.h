@@ -11,6 +11,13 @@
 #include <rose.h>
 #include <stdarg.h>
 
+enum CPP_VARIABLE_ATTRIBUTES
+{
+  CONSTANT,
+  DEVICE,
+  SHARED
+};
+
 class CPPStatementsAndExpressionsBuilder
 {
   private:

@@ -47,10 +47,9 @@ namespace VariableSuffixes
   std::string const Size = "Size";
   std::string const Local = "Local";
   std::string const Global = "Global";
-  std::string const Global = "Shared";
+  std::string const Shared = "Shared";
   std::string const Device = "Device";
   std::string const Host = "Host";
-  std::string const Host = "Shared";
   std::string const Dimension = "Dimension";
 }
 

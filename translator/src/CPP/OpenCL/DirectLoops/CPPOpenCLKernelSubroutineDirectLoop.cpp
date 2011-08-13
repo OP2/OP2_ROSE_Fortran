@@ -1,9 +1,10 @@
 #include <CPPOpenCLKernelSubroutineDirectLoop.h>
 //#include <CPPTypesBuilder.h>
-//#include <CPPStatementsAndExpressionsBuilder.h>
+#include <CPPOpenCLStatementsAndExpressionsBuilder.h>
 //#include <CPPOpenCLReductionSubroutine.h>
 #include <RoseHelper.h>
 #include <Debug.h>
+#include <CPPOpenCLReductionSubroutine.h>
 using namespace SageBuilder; //TODO: remove
 /*
  * ======================================================
@@ -39,7 +40,6 @@ CPPOpenCLKernelSubroutineDirectLoop::createUserSubroutineCallStatement ()
   {
     SgExpression * argN_ref = buildVarRefExp(variableDeclarations->get(VariableNames::getOpDatName(i)));
     SgExpression * argN_l_ref = buildVarRefExp(variableDeclarations->get(VariableNames::getOpDatLocalName(i)));
-    SgExpression * argN_maps_ref = buildVarRefExp(variableDeclarations->get(VariableNames::getGlobalToLocalMappingName(i)));
     SgExpression * dimN_val = buildIntVal(parallelLoop->getOpDatDimension(i));
 
     int dim = parallelLoop->getOpDatDimension (i);
@@ -132,7 +132,7 @@ CPPOpenCLKernelSubroutineDirectLoop::createStageInFromDeviceMemoryToLocalThreadV
   SgExpression * arg_s_ref = buildVarRefExp(variableDeclarations->get(CommonVariableNames::argShared));
   SgExpression * tid_ref = buildVarRefExp(variableDeclarations->get(DirectLoop::CPP::KernelSubroutine::threadIDModulus));
   SgExpression * m_ref = buildVarRefExp(variableDeclarations->get(DirectLoop::CPP::KernelSubroutine::dataPerElementCounter));
-  SgExpression * nelems_ref = buildVarRefExp( variableDeclarations-get( PlanFunction::CPP::pnelems ) );
+  SgExpression * nelems_ref = buildVarRefExp( variableDeclarations->get(DirectLoop::CPP::KernelSubroutine::remainingElements ) );
   SgExpression * offset_ref = buildVarRefExp ( variableDeclarations->get(DirectLoop::CPP::KernelSubroutine::offsetInThreadBlock));
 
   SgBasicBlock * outerBlock = buildBasicBlock ();
@@ -141,7 +141,6 @@ CPPOpenCLKernelSubroutineDirectLoop::createStageInFromDeviceMemoryToLocalThreadV
   {
     SgExpression * argN_ref = buildVarRefExp(variableDeclarations->get(VariableNames::getOpDatName(i)));
     SgExpression * argN_l_ref = buildVarRefExp(variableDeclarations->get(VariableNames::getOpDatLocalName(i)));
-    SgExpression * argN_maps_ref = buildVarRefExp(variableDeclarations->get(VariableNames::getGlobalToLocalMappingName(i)));
     SgExpression * dimN_val = buildIntVal(parallelLoop->getOpDatDimension(i));
     
     if (parallelLoop->getOpMapValue (i) != GLOBAL
@@ -265,7 +264,7 @@ CPPOpenCLKernelSubroutineDirectLoop::createStageOutFromLocalThreadVariablesToDev
   SgExpression * arg_s_ref = buildVarRefExp(variableDeclarations->get(CommonVariableNames::argShared));
   SgExpression * tid_ref = buildVarRefExp(variableDeclarations->get(DirectLoop::CPP::KernelSubroutine::threadIDModulus));
   SgExpression * m_ref = buildVarRefExp(variableDeclarations->get(DirectLoop::CPP::KernelSubroutine::dataPerElementCounter));
-  SgExpression * nelems_ref = buildVarRefExp( variableDeclarations-get( PlanFunction::CPP::pnelems ) );
+  SgExpression * nelems_ref = buildVarRefExp( variableDeclarations->get(DirectLoop::CPP::KernelSubroutine::remainingElements ) );
   SgExpression * offset_ref = buildVarRefExp ( variableDeclarations->get(DirectLoop::CPP::KernelSubroutine::offsetInThreadBlock));
 
   SgBasicBlock * outerBlock = buildBasicBlock ();
@@ -274,7 +273,6 @@ CPPOpenCLKernelSubroutineDirectLoop::createStageOutFromLocalThreadVariablesToDev
   {
     SgExpression * argN_ref = buildVarRefExp(variableDeclarations->get(VariableNames::getOpDatName(i)));
     SgExpression * argN_l_ref = buildVarRefExp(variableDeclarations->get(VariableNames::getOpDatLocalName(i)));
-    SgExpression * argN_maps_ref = buildVarRefExp(variableDeclarations->get(VariableNames::getGlobalToLocalMappingName(i)));
     SgExpression * dimN_val = buildIntVal(parallelLoop->getOpDatDimension(i));
     
     if (parallelLoop->getOpMapValue (i) != GLOBAL
@@ -398,8 +396,8 @@ CPPOpenCLKernelSubroutineDirectLoop::createExecutionLoopStatements ()
   using SageInterface::appendStatement;
   
   SgExpression * set_size_ref = buildVarRefExp (variableDeclarations->get ( DirectLoop::CPP::KernelSubroutine::setSize));
-  SgExpression * nelems_ref = buildVarRefExp( variableDeclarations-get( PlanFunction::CPP::pnelems ) );
-  SgExpression * offset_ref = buildVarRefExp( variableDeclarations-get( PlanFunction::CPP::poffset ) );
+  SgExpression * nelems_ref = buildVarRefExp( variableDeclarations->get(DirectLoop::CPP::KernelSubroutine::remainingElements ) );
+  SgExpression * offset_ref = buildVarRefExp ( variableDeclarations->get(DirectLoop::CPP::KernelSubroutine::offsetInThreadBlock));
   SgExpression * tid_ref = buildVarRefExp(variableDeclarations->get(DirectLoop::CPP::KernelSubroutine::threadIDModulus));
   SgExpression * n_ref = buildVarRefExp (variableDeclarations->get(DirectLoop::CPP::KernelSubroutine::setElementCounter));
 
@@ -449,7 +447,8 @@ CPPOpenCLKernelSubroutineDirectLoop::createExecutionLoopStatements ()
   SgExprStatement * assignmentStatement2 = buildAssignStatement (
       nelems_ref,
       buildFunctionCallExp (
-            CPPTypesBuilder::buildNewCPPFunction ("MIN", subroutineScope), //FIXME
+            "MIN", //FIXME
+            buildIntType(),
             buildExprListExp (
                 buildVarRefExp ( variableDeclarations->get (DirectLoop::CPP::KernelSubroutine::warpSize)),
                 buildSubtractOp (
@@ -625,14 +624,14 @@ CPPOpenCLKernelSubroutineDirectLoop::createInitialiseLocalThreadVariablesStateme
   using SageBuilder::buildPlusPlusOp;
   using SageInterface::appendStatement;
 
+
+  SgExpression * d_ref = buildVarRefExp (variableDeclarations->get(DirectLoop::CPP::KernelSubroutine::setElementCounter));
   /*
    * ======================================================
    * We essentially do a similar thing to the one we make
    * when we declare local thread variables
    * ======================================================
    */
-  SgExpression * d_ref = buildVarRefExp (variableDeclarations->get(DirectLoop::CPP::KernelSubroutine::setElementCounter));
-
 
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
@@ -776,8 +775,8 @@ CPPOpenCLKernelSubroutineDirectLoop::createLocalVariableDeclarations ()
     variableDeclarations->add (ReductionSubroutine::offsetForReduction,
         CPPStatementsAndExpressionsBuilder::appendVariableDeclaration (
             ReductionSubroutine::offsetForReduction,
-            CPPTypesBuilder::getFourByteInteger (), subroutineScope, 1,
-            VALUE));
+            buildIntType(), 
+            subroutineScope));
   }
 }
 
@@ -846,22 +845,7 @@ CPPOpenCLKernelSubroutineDirectLoop::createFormalParameterDeclarations ()
   
   //TODO: add global constants parameter
 
-#if 0
-  /*
-   * ======================================================
-   * Warp size formal parameter
-   * ======================================================
-   */
-
-  variableDeclarations->add (
-      DirectLoop::CPP::KernelSubroutine::warpSize,
-      CPPStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
-          DirectLoop::CPP::KernelSubroutine::warpSize,
-          CPPTypesBuilder::getFourByteInteger (), subroutineScope,
-          formalParameters, 1, VALUE));
-#endif
 }
-
 /*
  * ======================================================
  * Public functions
@@ -869,13 +853,20 @@ CPPOpenCLKernelSubroutineDirectLoop::createFormalParameterDeclarations ()
  */
 
 CPPOpenCLKernelSubroutineDirectLoop::CPPOpenCLKernelSubroutineDirectLoop (
-    std::string const & subroutineName, std::string const & userSubroutineName,
-    CPPParallelLoop * parallelLoop, SgScopeStatement * moduleScope,
-    CPPOpenCLDataSizesDeclarationDirectLoop * dataSizesDeclaration,
+    std::string const & subroutineName, 
+    std::string const & userSubroutineName,
+    CPPParallelLoop * parallelLoop, 
+    SgScopeStatement * moduleScope,
+    CPPReductionSubroutines * reductionSubroutines,
     CPPOpDatDimensionsDeclaration * opDatDimensionsDeclaration) :
-  CPPOpenCLKernelSubroutine (subroutineName, userSubroutineName,
-      parallelLoop, moduleScope, opDatDimensionsDeclaration),
-      dataSizesDeclaration (dataSizesDeclaration)
+  CPPOpenCLKernelSubroutine (
+      subroutineName, 
+      userSubroutineName,
+      parallelLoop,
+      moduleScope,
+      reductionSubroutines,
+      opDatDimensionsDeclaration),
+  dataSizesDeclaration (dataSizesDeclaration)
 {
   Debug::getInstance ()->debugMessage ("<Kernel, Direct, OpenCL>",
       Debug::CONSTRUCTOR_LEVEL, __FILE__, __LINE__);

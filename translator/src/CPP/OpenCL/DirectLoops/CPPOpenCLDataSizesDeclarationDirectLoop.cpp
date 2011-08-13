@@ -1,5 +1,5 @@
 #include <CPPOpenCLDataSizesDeclarationDirectLoop.h>
-#include <CPPTypesBuilder.h>
+//#include <CPPTypesBuilder.h>
 
 /*
  * ======================================================
@@ -11,6 +11,7 @@ void
 CPPOpenCLDataSizesDeclarationDirectLoop::addFields ()
 {
   using SageBuilder::buildVariableDeclaration;
+  using SageBuilder::buildIntType;
   using std::string;
 
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
@@ -20,7 +21,9 @@ CPPOpenCLDataSizesDeclarationDirectLoop::addFields ()
       string const & variableName = VariableNames::getOpDatSizeName (i);
 
       SgVariableDeclaration * fieldDeclaration = buildVariableDeclaration (
-          variableName, CPPTypesBuilder::getFourByteInteger (), NULL,
+          variableName, 
+          buildIntType(), 
+          NULL,
           moduleScope);
 
       fieldDeclaration->get_declarationModifier ().get_accessModifier ().setUndefined ();

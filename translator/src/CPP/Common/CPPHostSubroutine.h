@@ -8,7 +8,7 @@ class CPPHostSubroutine:
   public HostSubroutine <SgFunctionDeclaration>
 {
 
-  private:
+  protected:
 
     virtual SgStatement *
     createKernelFunctionCallStatement ();
@@ -31,7 +31,6 @@ class CPPHostSubroutine:
     virtual void
     createFormalParameterDeclarations ();
 
-  protected:
 
     CPPHostSubroutine (std::string const & subroutineName,
         std::string const & userSubroutineName,

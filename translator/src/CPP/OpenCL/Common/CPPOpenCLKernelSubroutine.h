@@ -2,12 +2,13 @@
 #define CPP_OPENCL_KERNEL_SUBROUTINE_H
 
 #include <CPPKernelSubroutine.h>
+#include <CPPOpDatDimensionsDeclaration.h>
 
 class CPPOpenCLKernelSubroutine: public CPPKernelSubroutine
 {
   protected:
 
-    FortranOpDatDimensionsDeclaration * opDatDimensionsDeclaration; //FIXME
+    CPPOpDatDimensionsDeclaration * opDatDimensionsDeclaration; //FIXME
 
   protected:
     void
@@ -22,9 +23,10 @@ class CPPOpenCLKernelSubroutine: public CPPKernelSubroutine
     CPPOpenCLKernelSubroutine (
             std::string const & subroutineName,
             std::string const & userSubroutineName, 
-            SgScopeStatement * moduleScope,
             CPPParallelLoop * parallelLoop,
-            CPPReductionSubroutines * reductionSubroutines);
+            SgScopeStatement * moduleScope,
+            CPPReductionSubroutines * reductionSubroutines,
+            CPPOpDatDimensionsDeclaration * opDatDimensionsDeclaration);
 };
 
 #endif

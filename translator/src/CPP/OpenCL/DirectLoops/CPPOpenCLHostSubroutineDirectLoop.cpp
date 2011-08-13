@@ -6,7 +6,7 @@
 #include <CPPOpenCLReductionSubroutine.h>
 #include <CommonNamespaces.h>
 
-//using namespace SageBuilder;
+using namespace SageBuilder;
 /*
  * ======================================================
  * Private functions
@@ -27,7 +27,8 @@ CPPOpenCLHostSubroutineDirectLoop::createVariableSizesInitialisationStatements (
   Debug::getInstance ()->debugMessage (
       "Creating OpenCL kernel prologue statements", Debug::FUNCTION_LEVEL,
       __FILE__, __LINE__);
-
+  //FIXME: needed?
+#if 0
   /*
    * ======================================================
    * In direct loops, sizes are only related to OP_DAT
@@ -37,6 +38,8 @@ CPPOpenCLHostSubroutineDirectLoop::createVariableSizesInitialisationStatements (
 
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
+    SgExpression * argN_size = buildVarRefExp(variableDeclarations->get(VariableNames::getOpDatName(i)));
+    
     if (parallelLoop->isDuplicateOpDat (i) == false)
     {
       string const & variableName = VariableNames::getOpDatSizeName (i);
@@ -70,6 +73,7 @@ CPPOpenCLHostSubroutineDirectLoop::createVariableSizesInitialisationStatements (
       }
     }
   }
+#endif
 }
 
 void
@@ -87,6 +91,14 @@ CPPOpenCLHostSubroutineDirectLoop::createOpenCLKernelInitialisationStatements ()
 
   string const OPWarpSizeVariableName = "OP_WARP_SIZE";
   string const maxFunctionName = "MAX";
+  
+  
+  SgExpression * nblocks_ref = buildVarRefExp ( variableDeclarations->get (OpenCL::CPP::blocksPerGrid) );
+  SgExpression * nthreads_ref = buildVarRefExp ( variableDeclarations->get (OpenCL::CPP::threadsPerBlock));
+  SgExpression * nthreadstot_ref = buildVarRefExp ( variableDeclarations->get (OpenCL::CPP::totalThreads));
+  SgExpression * nshared_ref = buildVarRefExp (variableDeclarations->get (OpenCL::CPP::sharedMemorySize));
+  SgExpression * reduct_size_ref = buildVarRefExp (variableDeclarations->get (ReductionSubroutine::reductionArraySize));
+  SgExpression * offset_s_ref = buildVarRefExp (variableDeclarations->get (DirectLoop::CPP::KernelSubroutine::warpScratchpadSize));
 
   /*
    * ======================================================
@@ -96,59 +108,56 @@ CPPOpenCLHostSubroutineDirectLoop::createOpenCLKernelInitialisationStatements ()
    */
   int const nblocks = 200;
   int const nthreads = 128;
+  
+  SgExprStatement * tempStatement = NULL;
 
   /*
    * ======================================================
    * nblocks = 200
    * ======================================================
    */
-  SgExprStatement * assignmentStatement1 = buildAssignStatement (
-      buildVarRefExp (variableDeclarations->get ( OpenCL::CPP::blocksPerGrid) ), 
+  tempStatement = buildAssignStatement (
+      nblocks_ref, 
       buildIntVal (nblocks) );
 
-  appendStatement (assignmentStatement1, subroutineScope);
+  appendStatement ( tempStatement, subroutineScope );
 
   /*
    * ======================================================
    * nthread = 128 //TODO: change in order to wrap with OP_BLOCK_SIZE (how?)
    * ======================================================
    */
-  SgExprStatement * assignmentStatement2 = buildAssignStatement (
-      buildVarRefExp ( variableDeclarations->get (OpenCL::CPP::threadsPerBlock)),
-      buildIntVal (nthreads));
+  
+  tempStatement = buildAssignStatement (
+      nthreads_ref, 
+      buildIntVal (nthreads) );
 
-  appendStatement (assignmentStatement2, subroutineScope);
+  appendStatement ( tempStatement, subroutineScope );
   
   /*
    * ======================================================
-   * ntotthread = nblocks * nthread //TODO: check if we can reuse SgExprStatement pointers
+   * ntotthread = nblocks * nthread
    * ======================================================
    */
-  SgMultiplyOp * multiplyExpression2 = buildMultiplyOp (
-      buildVarRefExp( variableDeclarations->get(OpenCL::CPP::blocksPerGrid) ),
-      buildVarRefExp( variableDeclarations->get(OpenCL::CPP::threadsPerBlock) ) );
   
-  SgExprStatement * assignmentStatement2 = buildAssignStatement (
-      buildVarRefExp ( variableDeclarations->get (OpenCL::CPP::totalThreads)),
-      multiplyExpression2 );
+  tempStatement = buildAssignStatement (
+      nthreadstot_ref, 
+      buildMultiplyOp(
+          nblocks_ref,
+          nthreads_ref ) );
 
-  appendStatement (assignmentStatement2, subroutineScope);
-
-  /*SgExprStatement * assignmentStatement3 = buildAssignStatement (
-      buildVarRefExp (variableDeclarations->get (DirectLoop::CPP::KernelSubroutine::warpSize)),
-      buildOpaqueVarRefExp (OPWarpSizeVariableName, subroutineScope));*/
-
-  appendStatement (assignmentStatement3, subroutineScope);
+  appendStatement ( tempStatement, subroutineScope );
+  
 
   /* ======================================================
    * nshared = 0
    * ======================================================
    */
-  SgExprStatement * assignmentStatement4 = buildAssignStatement (
-      buildVarRefExp (variableDeclarations->get (OpenCL::CPP::sharedMemorySize)), 
+  tempStatement = buildAssignStatement (
+      nshared_ref, 
       buildIntVal (0) );
 
-  appendStatement (assignmentStatement4, subroutineScope);
+  appendStatement (tempStatement, subroutineScope);
 
   /*
    * ======================================================
@@ -162,6 +171,8 @@ CPPOpenCLHostSubroutineDirectLoop::createOpenCLKernelInitialisationStatements ()
    */
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
+    SgExpression * dimN_val = buildIntVal ( parallelLoop->getOpDatDimension (i));
+    
     if (parallelLoop->isDuplicateOpDat (i) == false)
     {
       if (parallelLoop->getOpDatDimension (i) > 1
@@ -172,61 +183,77 @@ CPPOpenCLHostSubroutineDirectLoop::createOpenCLKernelInitialisationStatements ()
          * nshared = MAX(nshared, size * dim)
          * ======================================================
          */
-
-        SgVarRefExp * parameterExpression1 = buildVarRefExp (
-            variableDeclarations->get (OpenCL::CPP::sharedMemorySize));
-
-        SgExpression * parameterExpression2 = buildMultiplyOp (
-            buildIntVal ( parallelLoop->getOpDatDimension (i)),
-            CPPStatementsAndExpressionsBuilder::getCPPKindOfOpDat ( parallelLoop->getOpDatType (i))); //FIXME: sizeof(..)?
-
-        SgExprListExp * actualParameters = buildExprListExp (
-            parameterExpression1, parameterExpression2);
-
-        SgFunctionSymbol * maxFunctionSymbol =
-            CPPTypesBuilder::buildNewCPPFunction (maxFunctionName, subroutineScope);
-
-        SgFunctionCallExp * maxFunctionCall = buildFunctionCallExp (
-            maxFunctionSymbol, actualParameters);
-
-        SgExprStatement * assignmentStatement = buildAssignStatement (
-            buildVarRefExp (variableDeclarations->get(OpenCL::CPP::sharedMemorySize)), 
-            maxFunctionCall);
-
-        appendStatement (assignmentStatement, subroutineScope);
+        
+        tempStatement = buildAssignStatement (
+            nshared_ref, 
+            buildFunctionCallExp(
+                maxFunctionName,
+                buildIntType(),
+                buildExprListExp(
+                    nshared_ref,
+                    buildMultiplyOp(
+                        buildSizeOfOp(
+                            parallelLoop->getOpDatType(i) ),
+                        dimN_val ) ) ) );
+        
+        appendStatement (tempStatement, subroutineScope);
       }
     }
   }
 
   /*
    * ======================================================
-   * offsetS = nshared * OP_WARP_SIZE
+   * offset_s = nshared * OP_WARP_SIZE
    * ======================================================
    */
+  
+  tempStatement = buildAssignStatement (
+      offset_s_ref,
+      buildMultiplyOp(
+          nshared_ref,
+          buildOpaqueVarRefExp (OPWarpSizeVariableName, subroutineScope) ) );
 
-  SgMultiplyOp * multiplyExpression5 = buildMultiplyOp (buildVarRefExp (
-      variableDeclarations->get (OpenCL::CPP::sharedMemorySize)),
-      buildOpaqueVarRefExp (OPWarpSizeVariableName, subroutineScope));
+  appendStatement (tempStatement, subroutineScope);
 
-  SgExprStatement * assignmentStatement5 = buildAssignStatement (
-      buildVarRefExp (variableDeclarations->get ( DirectLoop::CPP::KernelSubroutine::offsetInThreadBlock)),
-      multiplyExpression5);
 
-  appendStatement (assignmentStatement5, subroutineScope);
 
-  /*
-   * ======================================================
-   * nshared = nshared * nthreads
-   * ======================================================
-   */
-  SgExpression * multiplyExpression6 = buildMultiplyOp (buildVarRefExp (
-      variableDeclarations->get (OpenCL::CPP::sharedMemorySize)),
-      buildVarRefExp ( variableDeclarations->get (OpenCL::CPP::threadsPerBlock)));
-
-  SgExprStatement * assignmentStatement6 = buildAssignStatement (
-      buildVarRefExp (variableDeclarations->get (OpenCL::CPP::sharedMemorySize)), multiplyExpression6);
-
-  appendStatement (assignmentStatement6, subroutineScope);
+  if ( parallelLoop->isReductionRequired() ) 
+  {
+    /*
+     * ======================================================
+     * nshared = MAX(nshared*nthreads, reduct_size*nthreads)
+     * ======================================================
+     */
+    tempStatement = buildAssignStatement (
+        nshared_ref,
+        buildFunctionCallExp(
+            maxFunctionName,
+            buildIntType(),
+            buildExprListExp(
+                buildMultiplyOp(
+                    nshared_ref,
+                    nthreads_ref ),
+                buildMultiplyOp(
+                    reduct_size_ref,
+                    nthreads_ref ) ) ) );
+    
+    appendStatement (tempStatement, subroutineScope);
+  } 
+  else 
+  {
+    /*
+     * ======================================================
+     * nshared = nshared * nthreads
+     * ======================================================
+     */
+    tempStatement = buildAssignStatement (
+        nshared_ref,
+        buildMultiplyOp(
+            nshared_ref,
+            nthreads_ref ) );
+    
+    appendStatement (tempStatement, subroutineScope);
+  }  
 }
 
 void
@@ -244,7 +271,7 @@ CPPOpenCLHostSubroutineDirectLoop::createOpenCLKernelLocalVariableDeclarationsFo
 
   SgVariableDeclaration * variableDeclaration1 = buildVariableDeclaration (
       DirectLoop::CPP::KernelSubroutine::offsetInThreadBlock,
-      CPPTypesBuilder::getFourByteInteger (), buildAssignInitializer (
+      buildIntType(), buildAssignInitializer (
           buildIntVal (0), buildIntType ()), subroutineScope);
 
   variableDeclarations->add (
@@ -257,7 +284,7 @@ CPPOpenCLHostSubroutineDirectLoop::createOpenCLKernelLocalVariableDeclarationsFo
 
   SgVariableDeclaration * variableDeclaration2 = buildVariableDeclaration (
       DirectLoop::CPP::KernelSubroutine::warpSize,
-      CPPTypesBuilder::getFourByteInteger (), buildAssignInitializer (
+      buildIntType(), buildAssignInitializer (
           buildIntVal (0), buildIntType ()), subroutineScope);
 
   variableDeclarations->add (DirectLoop::CPP::KernelSubroutine::warpSize,
@@ -277,28 +304,13 @@ CPPOpenCLHostSubroutineDirectLoop::createStatements ()
   using SageBuilder::buildAssignStatement;
   using SageInterface::appendStatement;
 
-  SgEqualityOp * ifGuardExpression = buildEqualityOp (buildVarRefExp (
-      moduleDeclarations->getFirstExecutionBooleanDeclaration ()),
-      buildBoolValExp (true));
 
-  SgBasicBlock * ifBody = createFirstTimeExecutionStatements ();
-
-  SgExprStatement * assignmentStatement1 = buildAssignStatement (
-      buildVarRefExp (
-          moduleDeclarations->getFirstExecutionBooleanDeclaration ()),
-      buildBoolValExp (false));
-
-  appendStatement (assignmentStatement1, ifBody);
-
-  SgIfStmt * ifStatement =
-      RoseStatementsAndExpressionsBuilder::buildIfStatementWithEmptyElse (
-          ifGuardExpression, ifBody);
-
-  appendStatement (ifStatement, subroutineScope);
 
   createOpenCLKernelInitialisationStatements ();
+  
+  //FIXME
 
-  appendStatement (createTransferOpDatStatements (), subroutineScope);
+  //appendStatement (createTransferOpDatStatements (), subroutineScope);
 
   if (parallelLoop->isReductionRequired () == true)
   {
@@ -307,11 +319,11 @@ CPPOpenCLHostSubroutineDirectLoop::createStatements ()
 
   createVariableSizesInitialisationStatements ();
 
-  appendStatement (createInitialiseConstantsCallStatement (), subroutineScope);
+  //appendStatement (createInitialiseConstantsCallStatement (), subroutineScope);
 
   appendStatement (createKernelFunctionCallStatement (), subroutineScope);
 
-  appendStatement (createThreadSynchroniseCallStatement (), subroutineScope);
+  //appendStatement (createThreadSynchroniseCallStatement (), subroutineScope);
 
   if (parallelLoop->isReductionRequired () == true)
   {
@@ -322,9 +334,9 @@ CPPOpenCLHostSubroutineDirectLoop::createStatements ()
 void
 CPPOpenCLHostSubroutineDirectLoop::createLocalVariableDeclarations ()
 {
-  createDataMarshallingLocalVariableDeclarations ();
+  //createDataMarshallingLocalVariableDeclarations ();
 
-  createOpenCLKernelLocalVariableDeclarations ();
+  //createOpenCLKernelLocalVariableDeclarations ();
 
   createOpenCLKernelLocalVariableDeclarationsForDirectLoop ();
 
@@ -348,18 +360,14 @@ CPPOpenCLHostSubroutineDirectLoop::CPPOpenCLHostSubroutineDirectLoop (
     SgScopeStatement * moduleScope,
     CPPInitialiseConstantsSubroutine * initialiseConstantsSubroutine,
     CPPOpenCLDataSizesDeclarationDirectLoop * dataSizesDeclaration,
-    CPPOpDatDimensionsDeclaration * opDatDimensionsDeclaration,
-    CPPOpenCLModuleDeclarations * moduleDeclarations) :
+    CPPOpDatDimensionsDeclaration * opDatDimensionsDeclaration):
+//    CPPOpenCLModuleDeclarations * moduleDeclarations) :
   CPPOpenCLHostSubroutine (
       subroutineName, 
       userSubroutineName,
       kernelSubroutineName, 
-      parallelLoop, 
       moduleScope,
-      initialiseConstantsSubroutine, 
-      dataSizesDeclaration,
-      opDatDimensionsDeclaration, 
-      moduleDeclarations)
+      parallelLoop )
 {
   Debug::getInstance ()->debugMessage (
       "Creating host subroutine of direct loop", Debug::CONSTRUCTOR_LEVEL,

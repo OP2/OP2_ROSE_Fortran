@@ -13,6 +13,8 @@
 
 namespace ReductionSubroutine
 {
+  std::string const reductionType = "reduction";
+  std::string const autosharedV = "vtemp";
   std::string const inputValue = "dat_l";
   std::string const reductionResultOnDevice = "dat_g";
   std::string const sharedMemoryStartOffset = "sharedMemoryStartOffset";
@@ -24,6 +26,7 @@ namespace ReductionSubroutine
   std::string const offsetForReduction = "offsetReduction";
   std::string const reductionArrayHost = "reductionArrayHost";
   std::string const reductionArrayDevice = "reductionArrayDevice";
+  std::string const reductionArraySize = "reductionArraySize";
 }
 
 class CPPOpenCLReductionSubroutine: public Subroutine <

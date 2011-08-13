@@ -22,6 +22,9 @@
 
 #include <CPPOpenCLHostSubroutine.h>
 #include <CPPOpenCLDataSizesDeclarationDirectLoop.h>
+#include <CPPInitialiseConstantsSubroutine.h>
+#include <CPPOpenCLModuleDeclarations.h>
+#include <CPPOpDatDimensionsDeclaration.h>
 
 class CPPOpenCLHostSubroutineDirectLoop: public CPPOpenCLHostSubroutine
 {
@@ -72,8 +75,8 @@ class CPPOpenCLHostSubroutineDirectLoop: public CPPOpenCLHostSubroutine
             SgScopeStatement * moduleScope,
             CPPInitialiseConstantsSubroutine * initialiseConstantsSubroutine,
             CPPOpenCLDataSizesDeclarationDirectLoop * dataSizesDeclaration,
-            CPPOpDatDimensionsDeclaration * opDatDimensionsDeclaration,
-            CPPOpenCLModuleDeclarations * moduleDeclarations);
+            CPPOpDatDimensionsDeclaration * opDatDimensionsDeclaration);
+            /*CPPOpenCLModuleDeclarations * moduleDeclarations);*/
 };
 
 #endif

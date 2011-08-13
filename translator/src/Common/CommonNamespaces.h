@@ -170,9 +170,9 @@ namespace OpenCL
     std::string const getGlobalSize = "get_global_size";
     std::string const cudaThreadSynchronize = "cudaThreadSynchronize";
     std::string const blocksPerGrid = "nblocks";
-    std::string const totalThreads = "ntotthread";
+    std::string const totalThreads = "nthreadstot";
     std::string const sharedMemorySize = "nshared";
-    std::string const threadsPerBlock = "nthread";
+    std::string const threadsPerBlock = "nthreads";
     std::string const barrier = "barrier";
     //std::string const syncthreads = "barrier( CLK_LOCAL_MEM_FENCE )";
     std::string const threadSynchRet = "threadSynchRet";

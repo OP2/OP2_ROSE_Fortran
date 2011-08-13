@@ -90,11 +90,11 @@ CPPOpenCLStatementsAndExpressionsBuilder::generateGetGroupSize (
   return functionCallExp;
 }
 
-static SgExpression *
-CPPOpenCLStatementsAndExpressionsBuilder::generateBarrier (
+static SgStatement *
+CPPOpenCLStatementsAndExpressionsBuilder::generateBarrierStatement (
     SgScopeStatement * scope = NULL )
 {
-  SgFunctionCallExp * functionCallExp = buildFunctionCallExp(
+  SgStatement * functionCallExp = buildFunctionCallStmt(
       OpenCL::CPP::barrier,
       buildIntType(),
       buildOpaqueVarRefExp(

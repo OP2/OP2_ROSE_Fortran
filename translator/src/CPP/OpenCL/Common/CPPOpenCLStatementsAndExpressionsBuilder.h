@@ -10,6 +10,8 @@
 #include <rose.h>
 #include <stdarg.h>
 
+#include <CPPStatementsAndExpressionsBuilder.h>
+
 class CPPOpenCLStatementsAndExpressionsBuilder :
   public CPPStatementsAndExpressionsBuilder
 {
@@ -39,8 +41,8 @@ class CPPOpenCLStatementsAndExpressionsBuilder :
     generateGetGroupSize (
         SgScopeStatement * scope = NULL );
     
-    static SgExpression *
-    generateBarrier (
+    static SgStatement *
+    generateBarrierStatement (
         SgScopeStatement * scope = NULL );
     
 

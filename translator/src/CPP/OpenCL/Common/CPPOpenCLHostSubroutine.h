@@ -32,7 +32,7 @@ class CPPOpenCLHostSubroutine: public CPPHostSubroutine
   createKernelFunctionCallStatement ();
   
   void
-  CPPOpenCLHostSubroutine::createKernelCallBlock ();
+  createKernelCallBlock ();
 
 
   CPPOpenCLHostSubroutine (
