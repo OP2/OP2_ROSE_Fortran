@@ -1,5 +1,6 @@
 #include <Debug.h>
-//#include <CPPOpenCLHostSubroutineIndirectLoop.h>
+#include <CPPOpenCLHostSubroutineIndirectLoop.h>
+#include <CPPOpenCLStatementsAndExpressionsBuilder.h>
 //#include <CPPTypesBuilder.h>
 #include <RoseStatementsAndExpressionsBuilder.h>
 #include <CommonNamespaces.h>
@@ -126,126 +127,151 @@ CPPOpenCLHostSubroutineIndirectLoop::createPlanFunctionExecutionStatements ()
   Debug::getInstance ()->debugMessage (
       "Creating plan function execution statements", Debug::FUNCTION_LEVEL,
       __FILE__, __LINE__);
+  
+  SgExpression * block_offset_ref = buildVarRefExp (variableDeclarations->get (PlanFunction::CPP::blockOffset));
+  SgExpression * col_ref = buildVarRefExp (variableDeclarations->get (CommonVariableNames::col));
+  SgExpression * Plan_ref = buildVarRefExp (variableDeclarations->get (PlanFunction::CPP::actualPlan));
+  SgExpression * nblocks_ref = buildVarRefExp ( variableDeclarations->get (OpenCL::CPP::blocksPerGrid) );
+  SgExpression * nthreads_ref = buildVarRefExp ( variableDeclarations->get (OpenCL::CPP::threadsPerBlock));
+  SgExpression * nthreadstot_ref = buildVarRefExp ( variableDeclarations->get (OpenCL::CPP::totalThreads));
+  SgExpression * nshared_ref = buildVarRefExp (variableDeclarations->get (OpenCL::CPP::sharedMemorySize));
+  //SgExpression * reduct_size_ref = buildVarRefExp (variableDeclarations->get (ReductionSubroutine::reductionArraySize));
+  //SgExpression * offset_s_ref = buildVarRefExp (variableDeclarations->get (DirectLoop::CPP::KernelSubroutine::warpScratchpadSize));
+  SgExpression * OP_block_size_ref = buildVarRefExp ( variableDeclarations->get (OpenCL::CPP::totalThreads));
 
-  SgBasicBlock * loopBody = buildBasicBlock ();
-
+  SgStatement * tempStatement = NULL;
+  
+  
+  
+  
   /*
    * ======================================================
-   * Statement to initialise the block offset
+   * block_offset = 0
    * ======================================================
    */
-
-  SgExprStatement * assignmentStatement = buildAssignStatement (buildVarRefExp (
-      variableDeclarations->get (PlanFunction::CPP::blockOffset)),
+  
+  tempStatement = buildAssignStatement (
+      block_offset_ref,
       buildIntVal (0));
 
-  appendStatement (assignmentStatement, subroutineScope);
-
+  appendStatement (tempStatement, subroutineScope);
+  
   /*
    * ======================================================
-   * Statement to initialise the grid dimension of the
-   * OpenCL kernel
+   * Plan = op_plan_get( name, set, part_size, nargs, args, ninds, inds )
    * ======================================================
    */
-
-  SgExpression * arrayIndexExpression1 = buildAddOp (buildVarRefExp (
-      variableDeclarations->get (CommonVariableNames::col)), buildIntVal (1));
-
-  SgPntrArrRefExp * arrayExpression1 = buildPntrArrRefExp (buildVarRefExp (
-      variableDeclarations->get (PlanFunction::CPP::ncolblk)),
-      arrayIndexExpression1);
-
-  SgExprStatement * statement1 = buildAssignStatement (buildVarRefExp (
-      variableDeclarations->get (OpenCL::CPP::blocksPerGrid)),
-      arrayExpression1);
-
-  appendStatement (statement1, loopBody);
-
-  /*
+  
+  //XXX
+  
+  /* 
    * ======================================================
-   * Statement to initialise the number of threads per block
-   * in the OpenCL kernel
+   * BEGIN for ( col=0; col < Plan->ncolors; col++ )
    * ======================================================
    */
+  
+  SgStatement * initialisationExpression1 = buildExprStatement( buildAssignOp (
+      col_ref,
+      buildIntVal(0) ) );
+  
+  SgStatement * testExpression1 = buildExprStatement( buildLessThanOp(
+      col_ref,
+      buildArrowExp(
+          Plan_ref,
+          buildOpaqueVarRefExp("ncolors") ) ) );
+  
+  SgExpression * incrementExpression1 = buildPlusPlusOp(
+      col_ref );
 
-  SgExprStatement * statement2 = buildAssignStatement (buildVarRefExp (
-      variableDeclarations->get (OpenCL::CPP::threadsPerBlock)),
-      buildOpaqueVarRefExp ("FOP_BLOCK_SIZE", subroutineScope));
-
-  appendStatement (statement2, loopBody);
-
+  SgBasicBlock * loopBody1 = buildBasicBlock();
+  
+  SgForStatement * forStatement1 = buildForStatement(
+      initialisationExpression1,
+      testExpression1,
+      incrementExpression1,
+      loopBody1 );
+  
+  appendStatement( forStatement1, subroutineScope );
+  
   /*
    * ======================================================
-   * Statement to initialise the shared memory size in the
-   * OpenCL kernel
+   * nthread = 128 //TODO: change in order to wrap with OP_BLOCK_SIZE (how?)
    * ======================================================
    */
+  
+  tempStatement = buildAssignStatement (
+      nthreads_ref, 
+      OP_block_size_ref );
 
-  SgDotExp * dotExpression3 = buildDotExp (buildVarRefExp (
-      variableDeclarations->get (PlanFunction::CPP::actualPlan)),
-      buildOpaqueVarRefExp (PlanFunction::CPP::nshared, subroutineScope));
-
-  SgExprStatement * statement3 = buildAssignStatement (buildVarRefExp (
-      variableDeclarations->get (OpenCL::CPP::sharedMemorySize)),
-      dotExpression3);
-
-  appendStatement (statement3, loopBody);
-
-  appendStatement (createKernelFunctionCallStatement (), loopBody);
-
-  appendStatement (createThreadSynchroniseCallStatement (), loopBody);
-
+  appendStatement ( tempStatement, loopBody1 );
+  
   /*
    * ======================================================
-   * Statement to increment the block offset
+   * nblocks = Plan->ncolblk[col]
    * ======================================================
    */
+  tempStatement = buildAssignStatement (
+      nblocks_ref, 
+      buildPntrArrRefExp(
+          buildArrowExp(
+              Plan_ref,
+              buildOpaqueVarRefExp("ncolblk") ),
+          col_ref ) );
 
-  SgAddOp * addExpression4 =
-      buildAddOp (buildVarRefExp (variableDeclarations->get (
-          PlanFunction::CPP::blockOffset)), buildVarRefExp (
-          variableDeclarations->get (OpenCL::CPP::blocksPerGrid)));
-
-  SgStatement * statement4 = buildAssignStatement (buildVarRefExp (
-      variableDeclarations->get (PlanFunction::CPP::blockOffset)),
-      addExpression4);
-
-  appendStatement (statement4, loopBody);
-
+  appendStatement ( tempStatement, loopBody1 );
+  
   /*
    * ======================================================
-   * The loop starts counting from 0
+   * ntotthread = nblocks * nthread
    * ======================================================
    */
+  
+  tempStatement = buildAssignStatement (
+      nthreadstot_ref, 
+      buildMultiplyOp(
+          nblocks_ref,
+          nthreads_ref ) );
 
-  SgAssignOp * initializationExpression = buildAssignOp (buildVarRefExp (
-      variableDeclarations->get (CommonVariableNames::col)), buildIntVal (0));
-
-  /*
-   * ======================================================
-   * The loop stops counting at the number of colours in
-   * the plan, minus one
+  appendStatement ( tempStatement, loopBody1 );
+  
+  /* ======================================================
+   * nshared = Plan->nshared
    * ======================================================
    */
+  tempStatement = buildAssignStatement (
+      nshared_ref, 
+      buildArrowExp(
+          Plan_ref,
+          buildOpaqueVarRefExp("nshared") ) );
 
-  SgDotExp * dotExpression = buildDotExp (buildVarRefExp (
-      variableDeclarations->get (PlanFunction::CPP::actualPlan)),
-      buildOpaqueVarRefExp (PlanFunction::CPP::ncolors, subroutineScope));
+  appendStatement (tempStatement, loopBody1);
+  
+  
+  
+  appendStatement (createKernelFunctionCallStatement (), loopBody1);
 
-  SgExpression * upperBoundExpression = buildSubtractOp (dotExpression,
-      buildIntVal (1));
+  appendStatement (CPPOpenCLStatementsAndExpressionsBuilder::generateBarrierStatement(), loopBody1);
+  
+  /* 
+   * ======================================================
+   * END for ( col=0; col < plan->ncolors; col++ )
+   * ======================================================
+   */
+  
+  
+  /* 
+   * ======================================================
+   * block_offset += nblocks
+   * ======================================================
+   */
+  
+  tempStatement = buildExprStatement( buildPlusAssignOp(
+      block_offset_ref,
+      nblocks_ref ) );
 
-  SgForStatement * loopStatement = new SgForStatement (
-      upperBoundExpression,
-      incrementExpression,
-      loopBody);
-  /*
-      CPPStatementsAndExpressionsBuilder::buildCPPDoStatement (
-          initializationExpression, upperBoundExpression, buildIntVal (1),
-          loopBody);
-          */
-
-  appendStatement (loopStatement, subroutineScope);
+  appendStatement (tempStatement, subroutineScope);
+  
+  
 }
 
 void
@@ -439,8 +465,7 @@ CPPOpenCLHostSubroutineIndirectLoop::createExecutionPlanDeclarations ()
 
       variableDeclarations->add (variableName,
           CPPStatementsAndExpressionsBuilder::appendVariableDeclaration (
-              variableName, CPPTypesBuilder::getArray_RankOne (
-                  CPPTypesBuilder::getFourByteInteger ()), subroutineScope,
+              variableName, buildArrayType(buildIntType()), subroutineScope,
               2, DEVICE, ALLOCATABLE));
     }
   }
@@ -459,26 +484,28 @@ CPPOpenCLHostSubroutineIndirectLoop::createExecutionPlanDeclarations ()
    * ======================================================
    */
 
-  vector <string> fourByteIntegerArrays;
+  vector <string> integerArrays;
 
-  fourByteIntegerArrays.push_back (PlanFunction::CPP::args);
+  integerArrays.push_back (PlanFunction::CPP::args);
 
-  fourByteIntegerArrays.push_back (PlanFunction::CPP::idxs);
+  //fourByteIntegerArrays.push_back (PlanFunction::CPP::idxs);
 
-  fourByteIntegerArrays.push_back (PlanFunction::CPP::maps);
+  //fourByteIntegerArrays.push_back (PlanFunction::CPP::maps);
 
-  fourByteIntegerArrays.push_back (PlanFunction::CPP::accesses);
+  //fourByteIntegerArrays.push_back (PlanFunction::CPP::accesses);
 
-  fourByteIntegerArrays.push_back (PlanFunction::CPP::inds);
+  integerArrays.push_back (PlanFunction::CPP::inds);
 
-  for (vector <string>::iterator it = fourByteIntegerArrays.begin (); it
-      != fourByteIntegerArrays.end (); ++it)
+  for (vector <string>::iterator it = integerArrays.begin (); it
+      != integerArrays.end (); ++it)
   {
-    variableDeclarations->add (*it,
-        CPPStatementsAndExpressionsBuilder::appendVariableDeclaration (*it,
-            CPPTypesBuilder::getArray_RankOne (
-                CPPTypesBuilder::getFourByteInteger (), 1,
-                parallelLoop->getNumberOfOpDatArgumentGroups ()),
+    variableDeclarations->add (
+        *it,
+        CPPStatementsAndExpressionsBuilder::appendVariableDeclaration (
+            *it,
+            buildArrayType(
+                buildIntType(), 
+                buildIntVal(parallelLoop->getNumberOfOpDatArgumentGroups ())),
             subroutineScope));
   }
 
@@ -498,9 +525,11 @@ CPPOpenCLHostSubroutineIndirectLoop::createExecutionPlanDeclarations ()
 
       variableDeclarations->add (variableName,
           CPPStatementsAndExpressionsBuilder::appendVariableDeclaration (
-              variableName, CPPTypesBuilder::getArray_RankOne (
-                  CPPTypesBuilder::getTwoByteInteger ()), subroutineScope,
-              2, DEVICE, ALLOCATABLE));
+              variableName, 
+              buildArrayType(buildShortType()), 
+              subroutineScope,
+              1, 
+              DEVICE));
     }
   }
 
@@ -519,7 +548,8 @@ CPPOpenCLHostSubroutineIndirectLoop::createExecutionPlanDeclarations ()
 
       variableDeclarations->add (variableName,
           CPPStatementsAndExpressionsBuilder::appendVariableDeclaration (
-              variableName, CPPTypesBuilder::getFourByteInteger (),
+              variableName, 
+              buildIntType(),
               subroutineScope));
     }
   }
@@ -533,38 +563,40 @@ CPPOpenCLHostSubroutineIndirectLoop::createExecutionPlanDeclarations ()
    * ======================================================
    */
 
-  vector <string> fourByteIntegerVariables;
+  vector <string> integerVariables;
 
-  fourByteIntegerVariables.push_back (CommonVariableNames::col);
+  integerVariables.push_back (CommonVariableNames::col);
 
-  fourByteIntegerVariables.push_back (CommonVariableNames::iterationCounter1);
+  integerVariables.push_back (CommonVariableNames::iterationCounter1);
 
-  fourByteIntegerVariables.push_back (PlanFunction::CPP::argsNumber);
+  integerVariables.push_back (PlanFunction::CPP::argsNumber);
 
-  fourByteIntegerVariables.push_back (PlanFunction::CPP::indsNumber);
+  integerVariables.push_back (PlanFunction::CPP::indsNumber);
 
-  fourByteIntegerVariables.push_back (PlanFunction::CPP::blockOffset);
+  integerVariables.push_back (PlanFunction::CPP::blockOffset);
 
-  fourByteIntegerVariables.push_back (PlanFunction::CPP::pindSizesSize);
+  integerVariables.push_back (PlanFunction::CPP::pindSizesSize);
 
-  fourByteIntegerVariables.push_back (PlanFunction::CPP::pindOffsSize);
+  integerVariables.push_back (PlanFunction::CPP::pindOffsSize);
 
-  fourByteIntegerVariables.push_back (PlanFunction::CPP::pblkMapSize);
+  integerVariables.push_back (PlanFunction::CPP::pblkMapSize);
 
-  fourByteIntegerVariables.push_back (PlanFunction::CPP::poffsetSize);
+  integerVariables.push_back (PlanFunction::CPP::poffsetSize);
 
-  fourByteIntegerVariables.push_back (PlanFunction::CPP::pnelemsSize);
+  integerVariables.push_back (PlanFunction::CPP::pnelemsSize);
 
-  fourByteIntegerVariables.push_back (PlanFunction::CPP::pnthrcolSize);
+  integerVariables.push_back (PlanFunction::CPP::pnthrcolSize);
 
-  fourByteIntegerVariables.push_back (PlanFunction::CPP::pthrcolSize);
+  integerVariables.push_back (PlanFunction::CPP::pthrcolSize);
 
-  for (vector <string>::iterator it = fourByteIntegerVariables.begin (); it
-      != fourByteIntegerVariables.end (); ++it)
+  for (vector <string>::iterator it = integerVariables.begin (); it
+      != integerVariables.end (); ++it)
   {
     variableDeclarations->add (*it,
-        CPPStatementsAndExpressionsBuilder::appendVariableDeclaration (*it,
-            CPPTypesBuilder::getFourByteInteger (), subroutineScope));
+        CPPStatementsAndExpressionsBuilder::appendVariableDeclaration (
+            *it,
+            buildIntType(), 
+            subroutineScope));
   }
 
   /*
@@ -586,11 +618,13 @@ CPPOpenCLHostSubroutineIndirectLoop::createExecutionPlanDeclarations ()
       != integerPointerVariables.end (); ++it)
   {
     variableDeclarations->add (*it,
-        CPPStatementsAndExpressionsBuilder::appendVariableDeclaration (*it,
-            buildPointerType (CPPTypesBuilder::getArray_RankOne (
-                CPPTypesBuilder::getFourByteInteger ())), subroutineScope));
+        CPPStatementsAndExpressionsBuilder::appendVariableDeclaration (
+            *it,
+            buildPointerType(buildArrayType(buildIntType())), 
+            subroutineScope));
   }
 
+#if 0
   /*
    * ======================================================
    * The plan function fills up a 'struct' which has a
@@ -621,10 +655,12 @@ CPPOpenCLHostSubroutineIndirectLoop::createExecutionPlanDeclarations ()
   {
     variableDeclarations->add (*it,
         CPPStatementsAndExpressionsBuilder::appendVariableDeclaration (*it,
-            CPPTypesBuilder::getArray_RankOne (
-                CPPTypesBuilder::getFourByteInteger ()), subroutineScope,
-            2, DEVICE, ALLOCATABLE));
+            buildArrayType(buildIntType()), 
+            subroutineScope,
+            1, 
+            DEVICE));
   }
+#endif
 }
 
 void
@@ -635,10 +671,14 @@ CPPOpenCLHostSubroutineIndirectLoop::createStatements ()
   using SageBuilder::buildEqualityOp;
   using SageInterface::appendStatement;
   using std::vector;
+  
+
+  SgExprStatement * tempStatement = NULL;
+
 
   vector <SubroutineVariableDeclarations *> declarationSets;
   declarationSets.push_back (moduleDeclarations->getAllDeclarations ());
-  declarationSets.push_back (variableDeclarations);
+  declarationSets.push_back (variableDeclarations); //FIXME
 
   SubroutineVariableDeclarations * allDeclarations =
       new SubroutineVariableDeclarations (declarationSets);

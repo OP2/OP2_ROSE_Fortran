@@ -147,7 +147,8 @@ CPPOpenCLKernelSubroutineDirectLoop::createStageInFromDeviceMemoryToLocalThreadV
         && parallelLoop->getOpAccessValue (i) != WRITE_ACCESS
         && parallelLoop->getOpDatDimension (i) != 1)
     {
-      /* ======================================================
+      /* 
+       * ======================================================
        * for ( m=0; m<dimN; m++ ) {
        *        arg_s[tid + m * nelems] = argN[tid + m * nelems + offset * dimN]
        * }
@@ -196,7 +197,8 @@ CPPOpenCLKernelSubroutineDirectLoop::createStageInFromDeviceMemoryToLocalThreadV
       
       appendStatement( assignStatement1, forStatement1 );
       
-      /* ======================================================
+      /* 
+       * ======================================================
        * for ( m=0; m<dimN; m++ ) {
        *        argN_l[m] = arg_s[m + tid * dimN]
        * }
@@ -735,28 +737,28 @@ CPPOpenCLKernelSubroutineDirectLoop::createLocalVariableDeclarations ()
   using std::vector;
   using std::string;
 
-  vector <string> fourByteIntegers;
+  vector <string> integers;
 
-  fourByteIntegers.push_back (
+  integers.push_back (
       DirectLoop::CPP::KernelSubroutine::setElementCounter);
 
-  fourByteIntegers.push_back (
+  integers.push_back (
       DirectLoop::CPP::KernelSubroutine::dataPerElementCounter);
 
-  fourByteIntegers.push_back (
+  integers.push_back (
       DirectLoop::CPP::KernelSubroutine::threadIDModulus);
 
-  fourByteIntegers.push_back (
+  integers.push_back (
       DirectLoop::CPP::KernelSubroutine::offsetInThreadBlock);
 
-  fourByteIntegers.push_back (
+  integers.push_back (
       DirectLoop::CPP::KernelSubroutine::remainingElements);
 
-  fourByteIntegers.push_back (
+  integers.push_back (
       DirectLoop::CPP::KernelSubroutine::autosharedDisplacement);
 
-  for (vector <string>::iterator it = fourByteIntegers.begin (); it
-      != fourByteIntegers.end (); ++it)
+  for (vector <string>::iterator it = integers.begin (); it
+      != integers.end (); ++it)
   {
     variableDeclarations->add (*it,
         buildVariableDeclaration(

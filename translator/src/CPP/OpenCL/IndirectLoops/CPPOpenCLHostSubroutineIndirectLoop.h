@@ -10,7 +10,7 @@
 
 #include <CPPOpenCLHostSubroutine.h>
 #include <CPPOpenCLKernelSubroutine.h>
-#include <CPPOpenCLModuleDeclarationsIndirectLoop.h>
+//#include <CPPOpenCLModuleDeclarationsIndirectLoop.h>
 #include <CPPOpenCLDataSizesDeclarationIndirectLoop.h>
 #include <CPPPlan.h>
 

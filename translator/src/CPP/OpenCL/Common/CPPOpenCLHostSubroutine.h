@@ -2,9 +2,25 @@
 #define CPP_OPENCL_HOST_SUBROUTINE_H
 
 #include <CPPHostSubroutine.h>
+#include <CPPInitialiseConstantsSubroutine.h>
+#include <CPPOpenCLKernelSubroutine.h>
+#include <CPPOpenCLDataSizesDeclaration.h>
+#include <CPPOpDatDimensionsDeclaration.h>
+#include <CPPParallelLoop.h>
+#include <CPPOpenCLModuleDeclarations.h>
 
 class CPPOpenCLHostSubroutine: public CPPHostSubroutine
 {
+  protected:
+
+  CPPInitialiseConstantsSubroutine * initialiseConstantsSubroutine;
+
+  CPPOpenCLDataSizesDeclaration * dataSizesDeclaration;
+
+  CPPOpDatDimensionsDeclaration * opDatDimensionsDeclaration;
+
+  CPPOpenCLModuleDeclarations * moduleDeclarations;
+  
   protected:
 
   SgStatement *
