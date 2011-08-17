@@ -10,23 +10,25 @@
 
 #include <CPPOpenCLHostSubroutine.h>
 #include <CPPOpenCLKernelSubroutine.h>
-//#include <CPPOpenCLModuleDeclarationsIndirectLoop.h>
 #include <CPPOpenCLDataSizesDeclarationIndirectLoop.h>
 #include <CPPPlan.h>
 
-class CPPOpenCLHostSubroutineIndirectLoop: public CPPOpenCLHostSubroutine,
-    public CPPPlan
+class CPPOpenCLHostSubroutineIndirectLoop: 
+  public CPPOpenCLHostSubroutine,
+  public CPPPlan
 {
   private:
+    void
+    createPlanFunctionExecutionStatements ();   
+
+    void
+    createVariablesSizesInitialisationStatements ();
 
     virtual SgStatement *
     createKernelFunctionCallStatement ();
 
-    void
-    createPlanFunctionExecutionStatements ();
 
-    void
-    createVariablesSizesInitialisationStatements ();
+
 
     void
     createExecutionPlanDeclarations ();
@@ -45,10 +47,9 @@ class CPPOpenCLHostSubroutineIndirectLoop: public CPPOpenCLHostSubroutine,
             std::string const & kernelSubroutineName,
             CPPParallelLoop * parallelLoop,
             SgScopeStatement * moduleScope,
-            CPPInitialiseConstantsSubroutine * initialiseConstantsSubroutine,
+//            CPPInitialiseConstantsSubroutine * initialiseConstantsSubroutine,
             CPPOpenCLDataSizesDeclarationIndirectLoop * dataSizesDeclaration,
-            CPPOpDatDimensionsDeclaration * opDatDimensionsDeclaration,
-            CPPOpenCLModuleDeclarationsIndirectLoop * moduleDeclarations);
+            CPPOpDatDimensionsDeclaration * opDatDimensionsDeclaration);
 };
 
 #endif

@@ -9,7 +9,8 @@
 #include <CPPParallelLoop.h>
 #include <CPPOpenCLModuleDeclarations.h>
 
-class CPPOpenCLHostSubroutine: public CPPHostSubroutine
+class CPPOpenCLHostSubroutine: 
+  public CPPHostSubroutine
 {
   protected:
 
@@ -22,6 +23,15 @@ class CPPOpenCLHostSubroutine: public CPPHostSubroutine
   CPPOpenCLModuleDeclarations * moduleDeclarations;
   
   protected:
+  
+  virtual void
+  createReductionPrologueStatements ();
+  
+  virtual void
+  createReductionEpilogueStatements () {};
+
+  virtual void
+  createReductionLocalVariableDeclarations () {};
 
   SgStatement *
   createGetKernelStatement (
@@ -44,19 +54,22 @@ class CPPOpenCLHostSubroutine: public CPPHostSubroutine
   SgStatement *
   createFinishStatement ();
 
-  SgStatement *
+  virtual SgStatement *
   createKernelFunctionCallStatement ();
   
-  void
-  createKernelCallBlock ();
+  SgStatement *
+  createKernelCallBlock (
+      std::string & kernelName,
+      std::vector<std::pair<SgExpression *, SgExpression *> > & argList,
+      SgScopeStatement * scope );
 
 
   CPPOpenCLHostSubroutine (
-      std::string const & subroutineName,
+      std::string const & subroutineName, 
       std::string const & userSubroutineName,
-      std::string const & kernelSubroutineName,
-      SgScopeStatement * moduleScope, 
-      CPPParallelLoop * parallelLoop );
+      std::string const & kernelSubroutineName, 
+      CPPParallelLoop * parallelLoop,
+      SgScopeStatement * moduleScope);
 };
 
 #endif

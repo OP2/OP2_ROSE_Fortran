@@ -10,7 +10,7 @@ class CPPOpenCLUserSubroutine:
 {
   private:
 
-    FortranInitialiseConstantsSubroutine * initialiseConstantsSubroutine;
+    CPPInitialiseConstantsSubroutine * initialiseConstantsSubroutine;
 
   private:
 
@@ -31,7 +31,7 @@ class CPPOpenCLUserSubroutine:
         CPPOpenCLUserSubroutine (
             std::string const & subroutineName,
             SgScopeStatement * moduleScope,
-            CPPInitialiseConstantsSubroutine * initialiseConstantsSubroutine,
+            //CPPInitialiseConstantsSubroutine * initialiseConstantsSubroutine,
             CPPProgramDeclarationsAndDefinitions * declarations,
             CPPParallelLoop * parallelLoop);
 };

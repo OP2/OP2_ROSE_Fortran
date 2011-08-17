@@ -421,39 +421,13 @@ CPPOpenCLHostSubroutineIndirectLoop::createExecutionPlanDeclarations ()
    * ======================================================
    */
 
-  SgType * op_planType = CPPTypesBuilder::buildClassDeclaration ("op_plan",
-      subroutineScope)->get_type ();
 
   variableDeclarations->add (PlanFunction::CPP::actualPlan,
       CPPStatementsAndExpressionsBuilder::appendVariableDeclaration (
-          PlanFunction::CPP::actualPlan, buildPointerType (op_planType),
+          PlanFunction::CPP::actualPlan, 
+          buildPointerType ( buildClassDeclaration("op_plan", subroutineScope)->get_type() ),
           subroutineScope));
 
-  /*
-   * ======================================================
-   * Create pointer to the
-   * ======================================================
-   */
-
-  SgType * c_devptrType = CPPTypesBuilder::buildClassDeclaration (
-      "c_devptr", subroutineScope)->get_type ();
-
-  variableDeclarations->add (PlanFunction::CPP::pindMaps,
-      CPPStatementsAndExpressionsBuilder::appendVariableDeclaration (
-          PlanFunction::CPP::pindMaps, buildPointerType (
-              CPPTypesBuilder::getArray_RankOne (c_devptrType)),
-          subroutineScope));
-
-  variableDeclarations->add (PlanFunction::CPP::pmaps,
-      CPPStatementsAndExpressionsBuilder::appendVariableDeclaration (
-          PlanFunction::CPP::pmaps, buildPointerType (
-              CPPTypesBuilder::getArray_RankOne (c_devptrType)),
-          subroutineScope));
-
-  variableDeclarations->add (PlanFunction::CPP::pindMapsSize,
-      CPPStatementsAndExpressionsBuilder::appendVariableDeclaration (
-          PlanFunction::CPP::pindMapsSize,
-          CPPTypesBuilder::getFourByteInteger (), subroutineScope));
 
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
@@ -465,8 +439,11 @@ CPPOpenCLHostSubroutineIndirectLoop::createExecutionPlanDeclarations ()
 
       variableDeclarations->add (variableName,
           CPPStatementsAndExpressionsBuilder::appendVariableDeclaration (
-              variableName, buildArrayType(buildIntType()), subroutineScope,
-              2, DEVICE, ALLOCATABLE));
+              variableName, 
+              buildArrayType(buildIntType()), 
+              subroutineScope,
+              1, 
+              DEVICE ));
     }
   }
 
@@ -687,7 +664,7 @@ CPPOpenCLHostSubroutineIndirectLoop::createStatements ()
       moduleDeclarations->getFirstExecutionBooleanDeclaration ()),
       buildBoolValExp (true));
 
-  SgBasicBlock * ifBody = createFirstTimeExecutionStatements ();
+  SgBasicBlock * ifBody = buildBasicBlock(); //createFirstTimeExecutionStatements ();
 
   appendStatement (createPlanFunctionParametersPreparationStatements (
       allDeclarations, (CPPParallelLoop *) parallelLoop), ifBody);
@@ -695,7 +672,7 @@ CPPOpenCLHostSubroutineIndirectLoop::createStatements ()
   appendStatement (createPlanFunctionCallStatement (allDeclarations,
       subroutineScope), ifBody);
 
-  appendStatement (createInitialiseConstantsCallStatement (), ifBody);
+  //appendStatement (createInitialiseConstantsCallStatement (), ifBody);
 
   SgIfStmt * ifStatement =
       RoseStatementsAndExpressionsBuilder::buildIfStatementWithEmptyElse (
@@ -703,19 +680,19 @@ CPPOpenCLHostSubroutineIndirectLoop::createStatements ()
 
   appendStatement (ifStatement, subroutineScope);
 
-  appendStatement (createTransferOpDatStatements (), subroutineScope);
+  //appendStatement (createTransferOpDatStatements (), subroutineScope);
 
   if (parallelLoop->isReductionRequired () == true)
   {
     createReductionPrologueStatements ();
   }
 
-  appendStatement (createConvertPositionInPMapsStatements (allDeclarations,
-      (CPPParallelLoop *) parallelLoop, subroutineScope), subroutineScope);
+  //appendStatement (createConvertPositionInPMapsStatements (allDeclarations,
+  //   (CPPParallelLoop *) parallelLoop, subroutineScope), subroutineScope);
 
-  appendStatement (createConvertPlanFunctionParametersStatements (
-      allDeclarations, (CPPParallelLoop *) parallelLoop, subroutineScope),
-      subroutineScope);
+  //appendStatement (createConvertPlanFunctionParametersStatements (
+  //    allDeclarations, (CPPParallelLoop *) parallelLoop, subroutineScope),
+  //    subroutineScope);
 
   createVariablesSizesInitialisationStatements ();
 
@@ -730,9 +707,9 @@ CPPOpenCLHostSubroutineIndirectLoop::createStatements ()
 void
 CPPOpenCLHostSubroutineIndirectLoop::createLocalVariableDeclarations ()
 {
-  createDataMarshallingLocalVariableDeclarations ();
+  //createDataMarshallingLocalVariableDeclarations ();
 
-  createOpenCLKernelLocalVariableDeclarations ();
+  //createOpenCLKernelLocalVariableDeclarations ();
 
   createExecutionPlanDeclarations ();
 
@@ -751,15 +728,17 @@ CPPOpenCLHostSubroutineIndirectLoop::createLocalVariableDeclarations ()
 CPPOpenCLHostSubroutineIndirectLoop::CPPOpenCLHostSubroutineIndirectLoop (
     std::string const & subroutineName, std::string const & userSubroutineName,
     std::string const & kernelSubroutineName,
-    CPPParallelLoop * parallelLoop, SgScopeStatement * moduleScope,
-    CPPInitialiseConstantsSubroutine * initialiseConstantsSubroutine,
+    CPPParallelLoop * parallelLoop, 
+    SgScopeStatement * moduleScope,
+//    CPPInitialiseConstantsSubroutine * initialiseConstantsSubroutine,
     CPPOpenCLDataSizesDeclarationIndirectLoop * dataSizesDeclaration,
-    CPPOpDatDimensionsDeclaration * opDatDimensionsDeclaration,
-    CPPOpenCLModuleDeclarationsIndirectLoop * moduleDeclarations) :
-  CPPOpenCLHostSubroutine (subroutineName, userSubroutineName,
-      kernelSubroutineName, parallelLoop, moduleScope,
-      initialiseConstantsSubroutine, dataSizesDeclaration,
-      opDatDimensionsDeclaration, moduleDeclarations)
+    CPPOpDatDimensionsDeclaration * opDatDimensionsDeclaration) :
+  CPPOpenCLHostSubroutine (
+      subroutineName, 
+      userSubroutineName,
+      kernelSubroutineName, 
+      parallelLoop,
+      moduleScope)
 {
   Debug::getInstance ()->debugMessage (
       "Creating host subroutine of indirect loop", Debug::CONSTRUCTOR_LEVEL,

@@ -1,9 +1,10 @@
 #include <CPPOpenCLDataSizesDeclarationIndirectLoop.h>
 #include <CPPStatementsAndExpressionsBuilder.h>
-#include <CPPTypesBuilder.h>
+//#include <CPPTypesBuilder.h>
 #include <CommonNamespaces.h>
 #include <Plan.h>
 
+using namespace SageBuilder;
 /*
  * ======================================================
  * Public functions
@@ -25,7 +26,9 @@ CPPOpenCLDataSizesDeclarationIndirectLoop::addFields ()
       string const variableName = VariableNames::getOpDatSizeName (i);
 
       SgVariableDeclaration * fieldDeclaration = buildVariableDeclaration (
-          variableName, CPPTypesBuilder::getFourByteInteger (), NULL,
+          variableName, 
+          buildIntType(), 
+          NULL,
           moduleScope);
 
       fieldDeclaration->get_declarationModifier ().get_accessModifier ().setUndefined ();
@@ -46,7 +49,9 @@ CPPOpenCLDataSizesDeclarationIndirectLoop::addFields ()
           VariableNames::getLocalToGlobalMappingSizeName (i);
 
       SgVariableDeclaration * fieldDeclaration = buildVariableDeclaration (
-          variableName, CPPTypesBuilder::getFourByteInteger (), NULL,
+          variableName, 
+          buildIntType(), 
+          NULL,
           moduleScope);
 
       fieldDeclaration->get_declarationModifier ().get_accessModifier ().setUndefined ();
@@ -66,7 +71,9 @@ CPPOpenCLDataSizesDeclarationIndirectLoop::addFields ()
           VariableNames::getGlobalToLocalMappingSizeName (i);
 
       SgVariableDeclaration * fieldDeclaration = buildVariableDeclaration (
-          variableName, CPPTypesBuilder::getFourByteInteger (), NULL,
+          variableName, 
+          buildIntType(), 
+          NULL,
           moduleScope);
 
       fieldDeclaration->get_declarationModifier ().get_accessModifier ().setUndefined ();
@@ -87,7 +94,9 @@ CPPOpenCLDataSizesDeclarationIndirectLoop::addFields ()
       string const variableName = VariableNames::getOpDatSizeName (i);
 
       SgVariableDeclaration * fieldDeclaration = buildVariableDeclaration (
-          variableName, CPPTypesBuilder::getFourByteInteger (), NULL,
+          variableName, 
+          buildIntType(), 
+          NULL,
           moduleScope);
 
       fieldDeclaration->get_declarationModifier ().get_accessModifier ().setUndefined ();
@@ -118,8 +127,11 @@ CPPOpenCLDataSizesDeclarationIndirectLoop::addFields ()
   for (vector <string>::iterator it = planFunctionSizeVariables.begin (); it
       != planFunctionSizeVariables.end (); ++it)
   {
-    SgVariableDeclaration * fieldDeclaration = buildVariableDeclaration (*it,
-        CPPTypesBuilder::getFourByteInteger (), NULL, moduleScope);
+    SgVariableDeclaration * fieldDeclaration = buildVariableDeclaration (
+        *it,
+        buildIntType(), 
+        NULL, 
+        moduleScope);
 
     fieldDeclaration->get_declarationModifier ().get_accessModifier ().setUndefined ();
 

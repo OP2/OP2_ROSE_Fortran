@@ -1,7 +1,22 @@
 #include <CPPOpenCLKernelSubroutine.h>
 
+void
+CPPOpenCLKernelSubroutine::createReductionLoopStatements ()
+{
+  //FIXME
+}
 
+void
+CPPOpenCLKernelSubroutine::createLocalThreadDeclarations ()
+{
+  //FIXME
+}
 
+void
+CPPOpenCLKernelSubroutine::createAutoSharedDeclaration ()
+{
+  //FIXME
+}
 
 CPPOpenCLKernelSubroutine::CPPOpenCLKernelSubroutine (
     std::string const & subroutineName, 

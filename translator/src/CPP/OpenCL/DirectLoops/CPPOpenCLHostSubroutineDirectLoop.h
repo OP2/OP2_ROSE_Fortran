@@ -26,26 +26,20 @@
 #include <CPPOpenCLModuleDeclarations.h>
 #include <CPPOpDatDimensionsDeclaration.h>
 
-class CPPOpenCLHostSubroutineDirectLoop: public CPPOpenCLHostSubroutine
+class CPPOpenCLHostSubroutineDirectLoop: 
+  public CPPOpenCLHostSubroutine
 {
   private:
-
-    /*
-     * ======================================================
-     * Generates the code initialising the device variable
-     * sizes variable
-     * ======================================================
-     */
-    void
-    createVariableSizesInitialisationStatements ();
 
     /*
      * ======================================================
      * Initialises OpenCL-specific variables
      * ======================================================
      */
-    void
+    virtual void
     createOpenCLKernelInitialisationStatements ();
+    
+
 
     /*
      * ======================================================
@@ -55,9 +49,20 @@ class CPPOpenCLHostSubroutineDirectLoop: public CPPOpenCLHostSubroutine
      */
     void
     createOpenCLKernelLocalVariableDeclarationsForDirectLoop ();
+    
+    /*
+     * ======================================================
+     * Generates the code initialising the device variable
+     * sizes variable
+     * ======================================================
+     */
+    void
+    createVariableSizesInitialisationStatements ();
+
+
 
     virtual SgStatement *
-    createKernelFunctionCallStatement ();
+    createKernelFunctionCallStatement () {};
 
     virtual void
     createStatements ();
@@ -73,7 +78,7 @@ class CPPOpenCLHostSubroutineDirectLoop: public CPPOpenCLHostSubroutine
             std::string const & kernelSubroutineName,
             CPPParallelLoop * parallelLoop,
             SgScopeStatement * moduleScope,
-            CPPInitialiseConstantsSubroutine * initialiseConstantsSubroutine,
+            //CPPInitialiseConstantsSubroutine * initialiseConstantsSubroutine,
             CPPOpenCLDataSizesDeclarationDirectLoop * dataSizesDeclaration,
             CPPOpDatDimensionsDeclaration * opDatDimensionsDeclaration);
             /*CPPOpenCLModuleDeclarations * moduleDeclarations);*/

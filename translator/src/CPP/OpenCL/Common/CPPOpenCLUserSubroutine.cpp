@@ -2,7 +2,7 @@
 #include <CPPOpenCLUserSubroutine.h>
 #include <Debug.h>
 #include <algorithm>
-//#include <CPPStatementsAndExpressionsBuilder.h>
+#include <CPPOpenCLStatementsAndExpressionsBuilder.h>
 //#include <CPPTypesBuilder.h>
 using namespace SageBuilder;
 /*
@@ -30,7 +30,8 @@ CPPOpenCLUserSubroutine::patchReferencesToConstants()
       initialiseConstantsSubroutine( initialiseConstantsSubroutine )
     {
     }
-
+/*
+ * TODO: fix ModifyReferencesToConstantVariables
     virtual void
     visit( SgNode * node )
     {
@@ -60,12 +61,13 @@ CPPOpenCLUserSubroutine::patchReferencesToConstants()
         {
           locatedNode->setOutputInCodeGeneration();
         }
-    }
+    } */
   };
 
+  /*
   ( new ModifyReferencesToConstantVariables( initialiseConstantsSubroutine ) )->traverse(
       subroutineHeaderStatement,
-      preorder );
+      preorder ); */
 }
 
 void
@@ -176,7 +178,7 @@ CPPOpenCLUserSubroutine::createStatements()
                     {
 
                       SgVariableDeclaration * variableDeclaration =
-                          CPPStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter(
+                          CPPOpenCLStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter(
                               variableName,
                               type,
                               subroutineScope,
@@ -187,7 +189,7 @@ CPPOpenCLUserSubroutine::createStatements()
                   else
                     {
                       SgVariableDeclaration * variableDeclaration =
-                          CPPStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter(
+                          CPPOpenCLStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter(
                               variableName,
                               type,
                               subroutineScope,
@@ -232,9 +234,9 @@ CPPOpenCLUserSubroutine::createStatements()
     }
   
   SgVariableDeclaration * globalConstantsParameter =
-      CPPStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter(
-          OpenCL::CPP::constants,
-          type,
+      CPPOpenCLStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter(
+          OpenCL::CPP::globalConstants,
+          buildOpaqueType(OpenCL::CPP::globalConstantsType, subroutineScope),
           subroutineScope,
           formalParameters,
           1,
@@ -260,14 +262,14 @@ CPPOpenCLUserSubroutine::createFormalParameterDeclarations()
 CPPOpenCLUserSubroutine::CPPOpenCLUserSubroutine(
     std::string const & subroutineName,
     SgScopeStatement * moduleScope,
-    CPPInitialiseConstantsSubroutine * initialiseConstantsSubroutine,
+    //CPPInitialiseConstantsSubroutine * initialiseConstantsSubroutine,
     CPPProgramDeclarationsAndDefinitions * declarations,
     CPPParallelLoop * parallelLoop ) :
   UserSubroutine<SgFunctionDeclaration, CPPProgramDeclarationsAndDefinitions> (
       subroutineName,
       declarations,
-      parallelLoop ), 
-  initialiseConstantsSubroutine( initialiseConstantsSubroutine )
+      parallelLoop )
+  //initialiseConstantsSubroutine( initialiseConstantsSubroutine )
 {
   using SageBuilder::buildDefiningFunctionDeclaration;
   using SageBuilder::buildVoidType;

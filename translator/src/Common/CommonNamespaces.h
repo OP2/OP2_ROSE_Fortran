@@ -174,6 +174,7 @@ namespace OpenCL
     std::string const sharedMemorySize = "nshared";
     std::string const threadsPerBlock = "nthreads";
     std::string const barrier = "barrier";
+    std::string const argumentCounterVariable = "argCnt";
     //std::string const syncthreads = "barrier( CLK_LOCAL_MEM_FENCE )";
     std::string const threadSynchRet = "threadSynchRet";
     std::string const kernel = "hKernel";

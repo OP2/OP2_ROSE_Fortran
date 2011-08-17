@@ -112,13 +112,13 @@ CPPInitialiseConstantsSubroutine::declareConstants ()
   }
 }
 
-std::map <std::string, std::string>::const_iterator
+std::map <std::string, SgExpression *>::const_iterator
 CPPInitialiseConstantsSubroutine::getFirstConstantName ()
 {
   return constantVariableNames.begin ();
 }
 
-std::map <std::string, std::string>::const_iterator
+std::map <std::string, SgExpression *>::const_iterator
 CPPInitialiseConstantsSubroutine::getLastConstantName ()
 {
   return constantVariableNames.end ();

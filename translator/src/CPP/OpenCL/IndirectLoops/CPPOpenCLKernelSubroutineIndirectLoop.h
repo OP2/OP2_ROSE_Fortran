@@ -12,7 +12,8 @@
 #include <CPPOpenCLKernelSubroutine.h>
 #include <CPPOpenCLDataSizesDeclarationIndirectLoop.h>
 
-class CPPOpenCLKernelSubroutineIndirectLoop: public CPPOpenCLKernelSubroutine
+class CPPOpenCLKernelSubroutineIndirectLoop: 
+  public CPPOpenCLKernelSubroutine
 {
   private:
 
@@ -69,7 +70,8 @@ class CPPOpenCLKernelSubroutineIndirectLoop: public CPPOpenCLKernelSubroutine
     CPPOpenCLKernelSubroutineIndirectLoop (
         std::string const & subroutineName,
         std::string const & userSubroutineName,
-        CPPParallelLoop * parallelLoop, SgScopeStatement * moduleScope,
+        CPPParallelLoop * parallelLoop, 
+        SgScopeStatement * moduleScope,
         CPPReductionSubroutines * reductionSubroutines,
         CPPOpenCLDataSizesDeclarationIndirectLoop * dataSizesDeclaration,
         CPPOpDatDimensionsDeclaration * opDatDimensionsDeclaration);

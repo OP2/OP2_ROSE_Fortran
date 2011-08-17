@@ -1,5 +1,14 @@
 #include <CPPPlan.h>
 
+SgBasicBlock *
+CPPPlan::createPlanFunctionParametersPreparationStatements (
+    SubroutineVariableDeclarations * variableDeclarations,
+    CPPParallelLoop * parallelLoop)
+{
+  //FIXME 
+  return NULL;
+  
+}
 
 SgBasicBlock *
 CPPPlan::createPlanFunctionCallStatement (
@@ -12,11 +21,14 @@ CPPPlan::createPlanFunctionCallStatement (
   using SageBuilder::buildExprListExp;
   using SageBuilder::buildAssignStatement;
   using SageBuilder::buildFunctionCallExp;
+  using SageBuilder::buildOpaqueVarRefExp;
+  using SageBuilder::buildVoidType;
+  using SageInterface::appendStatement;
 
   SgBasicBlock * block = buildBasicBlock();
 
   SgVarRefExp * parameter1 = buildVarRefExp(
-      variableDeclarations->get( VariableNames::getUserSubroutineName ) );
+      variableDeclarations->get( VariableNames::getUserSubroutineName() ) );
 
   SgDotExp * parameter2 = buildDotExp ( //TODO: set
       buildVarRefExp ( variableDeclarations->get ( VariableNames::getOpSetName () ) ),
@@ -56,12 +68,10 @@ CPPPlan::createPlanFunctionCallStatement (
   SgExprListExp * actualParameters = buildExprListExp ( parameter1, parameter2,
       parameter3, parameter4, parameter5, parameter6, parameter7 );
 
-  SgFunctionSymbol * functionSymbol = //FIXME
-      CPPTypesBuilder::buildNewCPPFunction (
-          PlanFunction::CPP::cplan, subroutineScope);
 
   SgFunctionCallExp * functionCall = buildFunctionCallExp (
-      functionSymbol,
+      PlanFunction::CPP::cplan,
+      buildVoidType(), //FIXME
       actualParameters
       );
 

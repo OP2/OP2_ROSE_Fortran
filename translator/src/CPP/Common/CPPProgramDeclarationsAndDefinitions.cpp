@@ -16,7 +16,7 @@ CPPProgramDeclarationsAndDefinitions::detectAndHandleOP2Definition (
   using boost::iequals;
   using std::string;
 
-  string const typeName = typeDefinition->get_name ().getString ();
+  string const typeName = typeDefinition->get_name().getString ();
 
   if (iequals (typeName, OP2::OP_SET))
   {
@@ -83,7 +83,6 @@ CPPProgramDeclarationsAndDefinitions::detectAndHandleOP2Definition (
 void
 CPPProgramDeclarationsAndDefinitions::visit (SgNode * node)
 {
-  //TODO: where are all the missing pieces to parse OP2 variable declarations?
   using boost::iequals;
   using std::string;
 

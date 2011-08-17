@@ -27,6 +27,8 @@ namespace ReductionSubroutine
   std::string const reductionArrayHost = "reductionArrayHost";
   std::string const reductionArrayDevice = "reductionArrayDevice";
   std::string const reductionArraySize = "reductionArraySize";
+  std::string const reductionArrayBytes = "reductionArrayBytes";
+  std::string const reductionH = "OP_reduct_h";
 }
 
 class CPPOpenCLReductionSubroutine: public Subroutine <

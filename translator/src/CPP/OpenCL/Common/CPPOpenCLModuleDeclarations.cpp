@@ -22,16 +22,20 @@ CPPOpenCLModuleDeclarations::createReductionDeclarations ()
   {
     SgVariableDeclaration * variableDeclaration1 =
         CPPStatementsAndExpressionsBuilder::appendVariableDeclaration (
-            ReductionSubroutine::reductionArrayHost, (*it)->getArrayType (),
-            moduleScope, 1, ALLOCATABLE);
+            ReductionSubroutine::reductionArrayHost, 
+            (*it)->getArrayType (),
+            moduleScope );
 
     variableDeclarations->add (ReductionSubroutine::reductionArrayHost,
         variableDeclaration1);
 
     SgVariableDeclaration * variableDeclaration2 =
         CPPStatementsAndExpressionsBuilder::appendVariableDeclaration (
-            ReductionSubroutine::reductionArrayDevice, (*it)->getArrayType (),
-            moduleScope, 2, ALLOCATABLE, DEVICE);
+            ReductionSubroutine::reductionArrayDevice, 
+            (*it)->getArrayType (),
+            moduleScope, 
+            1, 
+            DEVICE);
 
     variableDeclarations->add (ReductionSubroutine::reductionArrayDevice,
         variableDeclaration2);
@@ -50,7 +54,10 @@ CPPOpenCLModuleDeclarations::createDataSizesDeclaration ()
 
   SgVariableDeclaration * variableDeclaration =
       CPPStatementsAndExpressionsBuilder::appendVariableDeclaration (
-          variableName, dataSizesDeclaration->getType (), moduleScope, 1,
+          variableName, 
+          dataSizesDeclaration->getType (), 
+          moduleScope, 
+          1,
           DEVICE);
 
   variableDeclarations->add (variableName, variableDeclaration);
@@ -68,7 +75,10 @@ CPPOpenCLModuleDeclarations::createDimensionsDeclaration ()
 
   SgVariableDeclaration * variableDeclaration =
       CPPStatementsAndExpressionsBuilder::appendVariableDeclaration (
-          variableName, dimensionsDeclaration->getType (), moduleScope, 1,
+          variableName, 
+          dimensionsDeclaration->getType (), 
+          moduleScope, 
+          1,
           DEVICE);
 
   variableDeclarations->add (variableName, variableDeclaration);

@@ -1,5 +1,7 @@
 #include <CPPOpenCLHostSubroutine.h>
+#include <CPPOpenCLReductionSubroutine.h>
 
+using namespace SageBuilder;
 
 /*
  * ======================================================
@@ -7,6 +9,283 @@
  * ======================================================
  */
 
+void
+CPPOpenCLHostSubroutine::createReductionPrologueStatements ()
+{
+  using SageInterface::appendStatement;
+  
+  SgExpression * b_ref = buildVarRefExp (variableDeclarations->get (CommonVariableNames::iterationCounter1));
+  SgExpression * d_ref = buildVarRefExp (variableDeclarations->get (CommonVariableNames::iterationCounter2));
+  SgExpression * reduct_size_ref = buildVarRefExp (variableDeclarations->get (ReductionSubroutine::reductionArraySize));
+  SgExpression * reduct_bytes_ref = buildVarRefExp (variableDeclarations->get (ReductionSubroutine::reductionArrayBytes));
+//  SgExpression * nblocks_ref = buildVarRefExp ( variableDeclarations->get (OpenCL::CPP::blocksPerGrid) );
+  SgExpression * maxblocks_ref = buildVarRefExp (variableDeclarations->get (ReductionSubroutine::maximumNumberOfThreadBlocks));
+  SgExpression * OP_reduct_h_ref = buildVarRefExp (variableDeclarations->get (ReductionSubroutine::reductionH));
+
+  
+  SgExprStatement * tempStatement = NULL;
+
+  /*
+   * ======================================================
+   * reduct_bytes = 0
+   * ======================================================
+   */
+  tempStatement = buildAssignStatement (
+      reduct_bytes_ref,
+      buildIntVal(0) );
+
+  appendStatement ( tempStatement, subroutineScope );
+  
+  /*
+   * ======================================================
+   * reduct_size = 0
+   * ======================================================
+   */
+  tempStatement = buildAssignStatement (
+      reduct_size_ref,
+      buildIntVal(0) );
+
+  appendStatement ( tempStatement, subroutineScope );
+  
+  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
+  {
+    SgExpression * argNh_ref = buildVarRefExp ( variableDeclarations->get(VariableNames::getOpDatHostName(i) ) ); //TODO: check
+    SgExpression * dimN_val = buildIntVal ( parallelLoop->getOpDatDimension (i));
+    
+    if (parallelLoop->isDuplicateOpDat (i) == false)
+    {
+      if (parallelLoop->getOpMapValue (i) == GLOBAL &&
+          parallelLoop->getOpAccessValue(i) != READ_ACCESS )
+      {
+        /*
+         * ======================================================
+         * reduct_bytes += ROUND_UP( maxblocks*dimN*sizeof(TYP) )
+         * ======================================================
+         */
+        tempStatement = buildExprStatement( buildPlusAssignOp(
+            reduct_bytes_ref,
+            buildFunctionCallExp(
+                "ROUND_UP",
+                buildIntType(),
+                buildExprListExp(
+                    buildMultiplyOp(
+                        maxblocks_ref,
+                        buildMultiplyOp(
+                            dimN_val,
+                            buildSizeOfOp(
+                                parallelLoop->getOpDatType(i) ) ) ) ) ) ) );
+
+        appendStatement ( tempStatement, subroutineScope );
+        
+        /*
+         * ======================================================
+         * reduct_size = MAX(reduct_size, sizeof(TYP) )
+         * ======================================================
+         */
+        tempStatement = buildAssignStatement (
+            reduct_size_ref,
+            buildFunctionCallExp(
+                 "MAX",
+                 buildIntType(),
+                 buildExprListExp(
+                     reduct_size_ref,
+                     buildSizeOfOp(
+                         parallelLoop->getOpDatType(i) ) ) ) );
+
+        appendStatement ( tempStatement, subroutineScope );
+      }
+    }
+  }
+  
+  /*
+   * ======================================================
+   * reallocReductArrays( reduct_bytes )
+   * ======================================================
+   */
+  tempStatement = buildFunctionCallStmt(
+       "reallocReductArrays",
+       buildVoidType(),
+       buildExprListExp(
+           reduct_bytes_ref ) );
+  
+  appendStatement ( tempStatement, subroutineScope );
+  
+  /*
+   * ======================================================
+   * reduct_bytes = 0
+   * ======================================================
+   */
+  tempStatement = buildAssignStatement (
+      reduct_bytes_ref,
+      buildIntVal(0) );
+
+  appendStatement ( tempStatement, subroutineScope );
+  
+  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
+  {
+    SgExpression * argNh_ref = buildVarRefExp ( variableDeclarations->get(VariableNames::getOpDatHostName(i) ) ); //TODO: check
+    SgExpression * argN_ref = buildVarRefExp(variableDeclarations->get(VariableNames::getOpDatName(i)));
+    SgExpression * dimN_val = buildIntVal ( parallelLoop->getOpDatDimension (i));
+    
+    if (parallelLoop->isDuplicateOpDat (i) == false)
+    {
+      if (parallelLoop->getOpMapValue (i) == GLOBAL &&
+          parallelLoop->getOpAccessValue(i) != READ_ACCESS )
+      {
+        /*
+         * ======================================================
+         * argN.data = OP_reduct_h + reduct_bytes
+         * ======================================================
+         */
+        tempStatement = buildAssignStatement(
+            buildDotExp(
+                argN_ref,
+                buildOpaqueVarRefExp(
+                    "data" ) ),
+            buildAddOp(
+                OP_reduct_h_ref,
+                reduct_bytes_ref ) );
+            
+        appendStatement ( tempStatement, subroutineScope );
+        
+        /*
+         * ======================================================
+         * argN.data_d = OP_reduct_h + reduct_bytes
+         * ======================================================
+         */
+        tempStatement = buildAssignStatement(
+            buildDotExp(
+                argN_ref,
+                buildOpaqueVarRefExp(
+                    "data_d" ) ),
+            buildAddOp(
+                OP_reduct_h_ref,
+                reduct_bytes_ref ) );
+            
+        appendStatement ( tempStatement, subroutineScope );
+        
+        /* 
+         * ======================================================
+         * BEGIN for ( b=0; b<maxblocks; b++ ) 
+         * ======================================================
+         */
+        
+        SgStatement * initialisationExpression1 = buildExprStatement( buildAssignOp (
+            b_ref,
+            buildIntVal(0) ) );
+        
+        SgStatement * testExpression1 = buildExprStatement( buildLessThanOp(
+            b_ref,
+            maxblocks_ref ) );
+        
+        SgExpression * incrementExpression1 = buildPlusPlusOp(
+            b_ref );
+  
+        SgBasicBlock * loopBody1 = buildBasicBlock();
+        
+        SgForStatement * forStatement1 = buildForStatement(
+            initialisationExpression1,
+            testExpression1,
+            incrementExpression1,
+            loopBody1 );
+        
+        appendStatement( forStatement1, subroutineScope );
+        
+        /* 
+         * ======================================================
+         * BEGIN for ( d=0; d<dimN; d++ ) 
+         * ======================================================
+         */
+        
+        SgStatement * initialisationExpression2 = buildExprStatement( buildAssignOp (
+            d_ref,
+            buildIntVal(0) ) );
+        
+        SgStatement * testExpression2 = buildExprStatement( buildLessThanOp(
+            d_ref,
+            dimN_val ) );
+        
+        SgExpression * incrementExpression2 = buildPlusPlusOp(
+            d_ref );
+  
+        SgBasicBlock * loopBody2 = buildBasicBlock();
+        
+        SgForStatement * forStatement2 = buildForStatement(
+            initialisationExpression2,
+            testExpression2,
+            incrementExpression2,
+            loopBody2 );
+        
+        appendStatement( forStatement2, loopBody1 );
+        
+        if ( parallelLoop->getOpAccessValue (i) == INC_ACCESS ) 
+        {
+          /*
+           * ======================================================
+           * ((TYP *)argN.data)[d+b*dimN] = 0
+           * ======================================================
+           */
+          tempStatement = buildAssignStatement(
+              buildPntrArrRefExp(
+                  buildCastExp(
+                      buildDotExp(
+                          argN_ref,
+                          buildOpaqueVarRefExp(
+                              "data" ) ),
+                      buildPointerType(
+                          parallelLoop->getOpDatType(i) ) ),
+                  buildAddOp(
+                      d_ref,
+                      buildMultiplyOp(
+                          b_ref,
+                          dimN_val ) ) ),
+              buildIntVal(0) );
+              
+        } else 
+        {
+          /*
+           * ======================================================
+           * ((TYP *)argN.data)[d+b*dimN] = argNh[d]
+           * ======================================================
+           */
+          tempStatement = buildAssignStatement(
+              buildPntrArrRefExp(
+                  buildCastExp(
+                      buildDotExp(
+                          argN_ref,
+                          buildOpaqueVarRefExp(
+                              "data" ) ),
+                      buildPointerType(
+                          parallelLoop->getOpDatType(i) ) ),
+                  buildAddOp(
+                      d_ref,
+                      buildMultiplyOp(
+                          b_ref,
+                          dimN_val ) ) ),
+              buildPntrArrRefExp(
+                  argNh_ref, //XXX ???
+                  d_ref ) );
+              
+        }
+        appendStatement ( tempStatement, loopBody2 );
+
+      }
+      /* 
+       * ======================================================
+       * END for ( d=0; d<dimN; d++ ) 
+       * ======================================================
+       */
+      
+      /* 
+       * ======================================================
+       * END for ( b=0; b<maxblocks; b++ ) 
+       * ======================================================
+       */
+    }
+  }
+
+  
+}
 
 SgStatement *
 CPPOpenCLHostSubroutine::createGetKernelStatement (
@@ -14,7 +293,7 @@ CPPOpenCLHostSubroutine::createGetKernelStatement (
 {
   using SageBuilder::buildExprListExp;
   using SageBuilder::buildVarRefExp;
-  using SageBuilder::buildFunctionCallStmt;
+  using SageBuilder::buildFunctionCallExp;
   using SageBuilder::buildVoidType;
   using SageBuilder::buildStringVal;
   using SageBuilder::buildAssignStatement;
@@ -27,7 +306,7 @@ CPPOpenCLHostSubroutine::createGetKernelStatement (
   actualParameters->append_expression( buildStringVal( kernelName ) );
 
 
-  SgExpression * getKernel = buildFunctionCallStmt (
+  SgExpression * getKernel = buildFunctionCallExp (
       OpenCL::CPP::getKernel,
       buildVoidType(), //FIXME
       actualParameters,
@@ -35,11 +314,11 @@ CPPOpenCLHostSubroutine::createGetKernelStatement (
 
   SgAssignInitializer * assignInitializer = buildAssignInitializer(
       getKernel,
-      buildOpaqueType( OpenCL::CPP::kernelType ) );
+      buildOpaqueType( OpenCL::CPP::kernelType, subroutineScope ) );
 
-  SgVariableDeclaration variableDeclaration = buildVariableDeclaration(
+  SgVariableDeclaration * variableDeclaration = buildVariableDeclaration(
       OpenCL::CPP::kernel,
-      buildOpaqueType( OpenCL::CPP::kernelType ),
+      buildOpaqueType( OpenCL::CPP::kernelType, subroutineScope ),
       assignInitializer,
       subroutineScope );
 
@@ -60,6 +339,8 @@ CPPOpenCLHostSubroutine::createKernelArgumentStatement (
   using SageBuilder::buildAssignStatement;
   using SageBuilder::buildBitOrOp;
   using SageBuilder::buildVarRefExp;
+  using SageBuilder::buildIntType;
+  using SageBuilder::buildExprListExp;
   
   SgExprListExp * actualParameters = buildExprListExp ();
 
@@ -71,6 +352,7 @@ CPPOpenCLHostSubroutine::createKernelArgumentStatement (
 
   SgFunctionCallExp * setKernelArgument = buildFunctionCallExp(
       OpenCL::CPP::setKernelArg,
+      buildIntType(),
       actualParameters,
       scope );
 
@@ -84,10 +366,10 @@ CPPOpenCLHostSubroutine::createKernelArgumentStatement (
       buildVarRefExp( variableDeclarations->get( OpenCL::CPP::errVar ) ),
       bitOrExpression );
 
-  return assigment;
+  return assignment;
 }
 
-void
+SgStatement *
 CPPOpenCLHostSubroutine::createKernelCallBlock (
     std::string & kernelName,
     std::vector<std::pair<SgExpression *, SgExpression *> > & argList,
@@ -95,8 +377,23 @@ CPPOpenCLHostSubroutine::createKernelCallBlock (
 {
   using SageBuilder::buildPlusPlusOp;
   using SageBuilder::buildVarRefExp;
+  using SageBuilder::buildAssignStatement;
+  using SageBuilder::buildIntVal;
+  using SageBuilder::buildBasicBlock;
+  using SageInterface::appendStatement;
   
-  createGetKernelStatement( kernelName );
+  SgBasicBlock * toReturn = buildBasicBlock();
+  
+  appendStatement(
+      createGetKernelStatement( kernelName ),
+      toReturn );
+  
+  buildAssignStatement(
+      buildVarRefExp(
+          variableDeclarations->get( OpenCL::CPP::argumentCounterVariable ) ),
+      buildIntVal( 0 ) );
+  
+  
   
   for (int i = 0; i < argList.size(); ++i ){
     createKernelArgumentStatement(
@@ -112,10 +409,13 @@ CPPOpenCLHostSubroutine::createKernelCallBlock (
   createKernelCallStatement();
   
   createFinishStatement();
+  
+  //FIXME
+  return NULL;
 }
 
 
-void 
+SgStatement * 
 CPPOpenCLHostSubroutine::createKernelCallStatement ()
 {
   using SageBuilder::buildFunctionCallExp;
@@ -126,6 +426,8 @@ CPPOpenCLHostSubroutine::createKernelCallStatement ()
   using SageBuilder::buildNullExpression;
   using SageBuilder::buildAddressOfOp;
   using SageBuilder::buildExprListExp;
+  using SageBuilder::buildVoidType;
+  using SageBuilder::buildFunctionCallStmt;
 
   SgExprListExp * actualParameters = buildExprListExp ();
 
@@ -143,26 +445,28 @@ CPPOpenCLHostSubroutine::createKernelCallStatement ()
 
 
 
-  SgExpression * enqueueKernel = buildFunctionCallStmt (
+  SgExpression * enqueueKernel = buildFunctionCallExp (
       OpenCL::CPP::enqueueKernel,
-      buildVoidType (), //FIXME
+      buildVoidType(), //FIXME
       actualParameters,
       subroutineScope);
 
   SgStatement * assignment = buildAssignStatement(
       buildVarRefExp( variableDeclarations->get( OpenCL::CPP::errVar ) ),
       enqueueKernel );
+  
+  return assignment;
 
 }
 
-void 
+SgStatement * 
 CPPOpenCLHostSubroutine::createErrorCheckStatement (
     std::string & message)
 {
   //TODO: implement me! (maybe)
 }
 
-void
+SgStatement * 
 CPPOpenCLHostSubroutine::createFinishStatement ()
 {
   using SageBuilder::buildExprListExp;
@@ -180,6 +484,8 @@ CPPOpenCLHostSubroutine::createFinishStatement ()
       buildVoidType(), //FIXME
       actualParameters,
       subroutineScope );
+  
+  return enqueueKernel;
 
 
 }
@@ -198,6 +504,7 @@ CPPOpenCLHostSubroutine::createKernelFunctionCallStatement ()
   using SageBuilder::buildNullExpression;
   using SageBuilder::buildIntType;
   using SageBuilder::buildAddressOfOp;
+  using SageBuilder::buildBasicBlock;
   using SageInterface::appendStatement;
 
 
@@ -206,6 +513,8 @@ CPPOpenCLHostSubroutine::createKernelFunctionCallStatement ()
       __FILE__, __LINE__);
   
   std::vector<std::pair<SgExpression *, SgExpression *> > kernelArguments;
+  
+  SgStatement * toReturn = buildBasicBlock();
 
   /*SgExprListExp * actualParameters = buildExprListExp ();
 
@@ -226,7 +535,8 @@ CPPOpenCLHostSubroutine::createKernelFunctionCallStatement ()
             std::make_pair(
                 buildSizeOfOp( buildOpaqueType( OpenCL::CPP::pointerType, NULL ) ), //FIXME
                 buildAddressOfOp(
-                    variableDeclarations->get ( VariableNames::getOpDatDeviceName (i) ) ) ) );
+                    buildVarRefExp(
+                        variableDeclarations->get ( VariableNames::getOpDatDeviceName (i) ) ) ) ) );
       }
       else
       {
@@ -234,7 +544,8 @@ CPPOpenCLHostSubroutine::createKernelFunctionCallStatement ()
             std::make_pair(
                 buildSizeOfOp( buildOpaqueType( OpenCL::CPP::pointerType, NULL ) ), //FIXME
                 buildAddressOfOp(
-                    moduleDeclarations->getReductionArrayDeviceVariableDeclaration () ) ) );
+                    buildVarRefExp(
+                        moduleDeclarations->getReductionArrayDeviceVariableDeclaration () ) ) ) );
       }
     }
   }
@@ -256,17 +567,13 @@ CPPOpenCLHostSubroutine::createKernelFunctionCallStatement ()
 
   //TODO: what about this?
 /*
-  actualParameters->append_expression (buildVarRefExp (
-      variableDeclarations->get (
-          DirectLoop::CPP::KernelSubroutine::warpSize)));
-          */
 
   if (parallelLoop->isReductionRequired () == true)
   {
     actualParameters->append_expression (
         buildVarRefExp (variableDeclarations->get (
             ReductionSubroutine::sharedMemoryStartOffset)));
-  }
+  } */
 
   /*
    * Pass the size of the shared memory as a parameter
@@ -276,23 +583,25 @@ CPPOpenCLHostSubroutine::createKernelFunctionCallStatement ()
           buildVarRefExp( variableDeclarations->get(OpenCL::CPP::sharedMemorySize) ), //FIXME
           buildNullExpression() ) ); //FIXME move in VariableNames
 
-  createKernelCallBlock(
+  toReturn = createKernelCallBlock(
       kernelSubroutineName,
       kernelArguments,
       subroutineScope );
+  
+  return toReturn;
 }
 
 CPPOpenCLHostSubroutine::CPPOpenCLHostSubroutine (
     std::string const & subroutineName, 
     std::string const & userSubroutineName,
     std::string const & kernelSubroutineName, 
-    SgScopeStatement * moduleScope,
-    CPPParallelLoop * parallelLoop) :
+    CPPParallelLoop * parallelLoop,
+    SgScopeStatement * moduleScope) :
   CPPHostSubroutine (
       subroutineName, 
       userSubroutineName, 
       kernelSubroutineName,
-      moduleScope, 
-      parallelLoop)
+      parallelLoop,
+      moduleScope)
 {
 }

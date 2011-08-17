@@ -1,7 +1,7 @@
 #include <CPPOpenCLSubroutinesGeneration.h>
 //#include <CPPOpenCLModuleDeclarationsIndirectLoop.h>
 #include <CPPOpenCLKernelSubroutineDirectLoop.h>
-//#include <CPPOpenCLKernelSubroutineIndirectLoop.h>
+#include <CPPOpenCLKernelSubroutineIndirectLoop.h>
 #include <CPPOpenCLHostSubroutineDirectLoop.h>
 #include <CPPOpenCLHostSubroutineIndirectLoop.h>
 #include <CPPOpenCLUserSubroutine.h>
@@ -13,9 +13,7 @@
  */
 
 CPPHostSubroutine *
-CPPOpenCLSubroutinesGeneration::createSubroutines (
-    CPPParallelLoop * parallelLoop, 
-    std::string const & userSubroutineName)
+CPPOpenCLSubroutinesGeneration::createSubroutines ()
 {
   using std::string;
   using std::map;
@@ -37,7 +35,7 @@ CPPOpenCLSubroutinesGeneration::createSubroutines (
       userDeviceSubroutine = new CPPOpenCLUserSubroutine (
           userSubroutineName,
           moduleScope,
-          initialiseConstantsSubroutine,
+          //initialiseConstantsSubroutine,
           declarations,
           parallelLoop);
 
@@ -46,7 +44,8 @@ CPPOpenCLSubroutinesGeneration::createSubroutines (
           userDeviceSubroutine->getSubroutineName(),
           parallelLoop,
           moduleScope,
-          static_cast <CPPOpenCLDataSizesDeclarationDirectLoop *> (dataSizesDeclarations[userSubroutineName]),
+          NULL,
+          //static_cast <CPPOpenCLDataSizesDeclarationDirectLoop *> (dataSizesDeclarations[userSubroutineName]),
           dimensionsDeclarations[userSubroutineName]);
 
       hostSubroutines[userSubroutineName] = new CPPOpenCLHostSubroutineDirectLoop (
@@ -55,17 +54,17 @@ CPPOpenCLSubroutinesGeneration::createSubroutines (
           kernelSubroutine->getSubroutineName(),
           parallelLoop,
           moduleScope,
-          initialiseConstantsSubroutine,
+          //initialiseConstantsSubroutine,
           static_cast <CPPOpenCLDataSizesDeclarationDirectLoop *> (dataSizesDeclarations[userSubroutineName]),
-          dimensionsDeclarations[userSubroutineName],
-          static_cast <CPPOpenCLModuleDeclarations *> (moduleDeclarations[userSubroutineName]));
+          dimensionsDeclarations[userSubroutineName]);
+          //static_cast <CPPOpenCLModuleDeclarations *> (moduleDeclarations[userSubroutineName]));
     }
     else
     {
       userDeviceSubroutine = new CPPOpenCLUserSubroutine (
           userSubroutineName,
           moduleScope, 
-          initialiseConstantsSubroutine, 
+          //initialiseConstantsSubroutine, 
           declarations,
           parallelLoop);
 
@@ -74,6 +73,7 @@ CPPOpenCLSubroutinesGeneration::createSubroutines (
           userDeviceSubroutine->getSubroutineName (),
           parallelLoop,
           moduleScope,
+          NULL,
           static_cast <CPPOpenCLDataSizesDeclarationIndirectLoop *> (dataSizesDeclarations[userSubroutineName]),
           dimensionsDeclarations[userSubroutineName]);
 
@@ -83,12 +83,13 @@ CPPOpenCLSubroutinesGeneration::createSubroutines (
           kernelSubroutine->getSubroutineName (),
           parallelLoop,
           moduleScope,
-          initialiseConstantsSubroutine,
+          //initialiseConstantsSubroutine,
           static_cast <CPPOpenCLDataSizesDeclarationIndirectLoop *> (dataSizesDeclarations[userSubroutineName]),
-          dimensionsDeclarations[userSubroutineName],
-          static_cast <CPPOpenCLModuleDeclarationsIndirectLoop *> (moduleDeclarations[userSubroutineName]));
+          dimensionsDeclarations[userSubroutineName]);
+          //static_cast <CPPOpenCLModuleDeclarationsIndirectLoop *> (moduleDeclarations[userSubroutineName]));
     }
   }
+  return NULL; //FIXME
 }
 
 void

@@ -1,7 +1,5 @@
 #include <CPPOpenCLKernelSubroutineDirectLoop.h>
-//#include <CPPTypesBuilder.h>
 #include <CPPOpenCLStatementsAndExpressionsBuilder.h>
-//#include <CPPOpenCLReductionSubroutine.h>
 #include <RoseHelper.h>
 #include <Debug.h>
 #include <CPPOpenCLReductionSubroutine.h>

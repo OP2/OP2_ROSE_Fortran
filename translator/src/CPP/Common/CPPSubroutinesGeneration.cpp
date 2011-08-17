@@ -1,5 +1,6 @@
 #include <CPPSubroutinesGeneration.h>
 #include <FortranTypesBuilder.h>
+#include <CPPOpDatDimensionsDeclaration.h>
 /*
  * ======================================================
  * Private functions
@@ -7,12 +8,12 @@
  */
 
 void
-CPPSubroutinesGeneration::patchCallsToParallelLoops (
-    std::string const & moduleName)
+CPPSubroutinesGeneration::patchCallsToParallelLoops ()
 {
   using std::map;
   using std::string;
   using std::vector;
+  using SageBuilder::buildFunctionRefExp;
 
   Debug::getInstance()->debugMessage("Patching calls to OP_PAR_LOOPs", Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
@@ -38,7 +39,7 @@ CPPSubroutinesGeneration::patchCallsToParallelLoops (
       SgFunctionRefExp * hostSubroutineReference = buildFunctionRefExp(
           hostSubroutine->getSubroutineHeaderStatement() );
 
-      functionCallExpression->set_function( /* XXX */ );
+      functionCallExpression->set_function( hostSubroutineReference );
 
       /*
        * ==================================================
@@ -124,24 +125,16 @@ CPPSubroutinesGeneration::createSourceFile ()
 }
 
 
-CPPSubroutinesGeneration::CPPSubroutinesGeneration (
-    CPPProgramDeclarationsAndDefinitions * declarations,
-    std::string const & fileSuffix) :
-  SubroutinesGeneration <CPPProgramDeclarationsAndDefinitions, CPPHostSubroutine> (declarations, fileSuffix)
-{
-  SgSourceFile & sourceFile = createSourceFile ();
 
-  moduleScope = sourceFile.get_globalScope ();
-}
 
 void CPPSubroutinesGeneration::generate()
 {
   SgSourceFile & sourceFile = createSourceFile();
 
-  initialiseConstantsSubroutine = new CPPInitialiseConstantsSubroutine (
-      moduleScope, declarations);
+  //initialiseConstantsSubroutine = new CPPInitialiseConstantsSubroutine (
+  //    moduleScope, declarations);
 
-  initialiseConstantsSubroutine->declareConstants ();
+  //initialiseConstantsSubroutine->declareConstants ();
 
   createSubroutines ();
 

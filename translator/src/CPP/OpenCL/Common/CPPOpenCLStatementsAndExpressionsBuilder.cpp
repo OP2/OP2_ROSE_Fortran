@@ -3,12 +3,14 @@
  *
  * Helper functions to build particular OpenCL statements
  */
+#include <CPPOpenCLStatementsAndExpressionsBuilder.h>
+#include <CommonNamespaces.h>
 
 using namespace SageBuilder;
 
-static SgExpression *
+SgExpression *
 CPPOpenCLStatementsAndExpressionsBuilder::generateGetLocalId (
-    SgScopeStatement * scope = NULL )
+    SgScopeStatement * scope )
 {
   SgFunctionCallExp * functionCallExp = buildFunctionCallExp(
       OpenCL::CPP::getLocalId,
@@ -20,9 +22,9 @@ CPPOpenCLStatementsAndExpressionsBuilder::generateGetLocalId (
   return functionCallExp;
 }
 
-static SgExpression *
+SgExpression *
 CPPOpenCLStatementsAndExpressionsBuilder::generateGetLocalSize (
-    SgScopeStatement * scope = NULL )
+    SgScopeStatement * scope )
 {
   SgFunctionCallExp * functionCallExp = buildFunctionCallExp(
       OpenCL::CPP::getLocalSize,
@@ -34,9 +36,9 @@ CPPOpenCLStatementsAndExpressionsBuilder::generateGetLocalSize (
   return functionCallExp;
 }
 
-static SgExpression *
+SgExpression *
 CPPOpenCLStatementsAndExpressionsBuilder::generateGetGlobalId (
-    SgScopeStatement * scope = NULL )
+    SgScopeStatement * scope )
 {
   SgFunctionCallExp * functionCallExp = buildFunctionCallExp(
       OpenCL::CPP::getGlobalId,
@@ -48,9 +50,9 @@ CPPOpenCLStatementsAndExpressionsBuilder::generateGetGlobalId (
   return functionCallExp;
 }
 
-static SgExpression *
+SgExpression *
 CPPOpenCLStatementsAndExpressionsBuilder::generateGetGlobalSize (
-    SgScopeStatement * scope = NULL )
+    SgScopeStatement * scope )
 {
   SgFunctionCallExp * functionCallExp = buildFunctionCallExp(
       OpenCL::CPP::getGlobalSize,
@@ -62,9 +64,9 @@ CPPOpenCLStatementsAndExpressionsBuilder::generateGetGlobalSize (
   return functionCallExp;
 }
 
-static SgExpression *
+SgExpression *
 CPPOpenCLStatementsAndExpressionsBuilder::generateGetGroupId (
-    SgScopeStatement * scope = NULL )
+    SgScopeStatement * scope )
 {
   SgFunctionCallExp * functionCallExp = buildFunctionCallExp(
       OpenCL::CPP::getGroupId,
@@ -76,9 +78,9 @@ CPPOpenCLStatementsAndExpressionsBuilder::generateGetGroupId (
   return functionCallExp;
 }
 
-static SgExpression *
+SgExpression *
 CPPOpenCLStatementsAndExpressionsBuilder::generateGetGroupSize (
-    SgScopeStatement * scope = NULL )
+    SgScopeStatement * scope )
 {
   SgFunctionCallExp * functionCallExp = buildFunctionCallExp(
       OpenCL::CPP::getGroupSize,
@@ -90,16 +92,17 @@ CPPOpenCLStatementsAndExpressionsBuilder::generateGetGroupSize (
   return functionCallExp;
 }
 
-static SgStatement *
+SgStatement *
 CPPOpenCLStatementsAndExpressionsBuilder::generateBarrierStatement (
-    SgScopeStatement * scope = NULL )
+    SgScopeStatement * scope )
 {
   SgStatement * functionCallExp = buildFunctionCallStmt(
       OpenCL::CPP::barrier,
       buildIntType(),
-      buildOpaqueVarRefExp(
-          "CLK_LOCAL_MEM_FENCE",
-          scope ),
+      buildExprListExp(
+        buildOpaqueVarRefExp(
+            "CLK_LOCAL_MEM_FENCE",
+            scope ) ),
       scope );
   
   return functionCallExp;

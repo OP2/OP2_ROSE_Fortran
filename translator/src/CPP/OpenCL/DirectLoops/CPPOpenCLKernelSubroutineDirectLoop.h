@@ -11,7 +11,8 @@
 #include <CPPOpenCLDataSizesDeclarationDirectLoop.h>
 #include <CPPOpDatDimensionsDeclaration.h>
 
-class CPPOpenCLKernelSubroutineDirectLoop: public CPPOpenCLKernelSubroutine
+class CPPOpenCLKernelSubroutineDirectLoop: 
+  public CPPOpenCLKernelSubroutine
 {
   private:
 

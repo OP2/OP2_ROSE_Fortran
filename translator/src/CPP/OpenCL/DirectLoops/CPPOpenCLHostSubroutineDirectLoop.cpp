@@ -1,5 +1,4 @@
 #include <CPPOpenCLHostSubroutineDirectLoop.h>
-//#include <CPPTypesBuilder.h>
 #include <RoseStatementsAndExpressionsBuilder.h>
 #include <RoseHelper.h>
 #include <Debug.h>
@@ -358,16 +357,16 @@ CPPOpenCLHostSubroutineDirectLoop::CPPOpenCLHostSubroutineDirectLoop (
     std::string const & kernelSubroutineName,
     CPPParallelLoop * parallelLoop, 
     SgScopeStatement * moduleScope,
-    CPPInitialiseConstantsSubroutine * initialiseConstantsSubroutine,
+//    CPPInitialiseConstantsSubroutine * initialiseConstantsSubroutine,
     CPPOpenCLDataSizesDeclarationDirectLoop * dataSizesDeclaration,
-    CPPOpDatDimensionsDeclaration * opDatDimensionsDeclaration):
+    CPPOpDatDimensionsDeclaration * opDatDimensionsDeclaration) :
 //    CPPOpenCLModuleDeclarations * moduleDeclarations) :
   CPPOpenCLHostSubroutine (
       subroutineName, 
       userSubroutineName,
       kernelSubroutineName, 
-      moduleScope,
-      parallelLoop )
+      parallelLoop,
+      moduleScope)
 {
   Debug::getInstance ()->debugMessage (
       "Creating host subroutine of direct loop", Debug::CONSTRUCTOR_LEVEL,

@@ -6,19 +6,21 @@
 #include <CPPProgramDeclarationsAndDefinitions.h>
 #include <CPPParallelLoop.h>
 #include <CPPHostSubroutine.h>
+#include <CPPOpDatDimensionsDeclaration.h>
 
 class CPPSubroutinesGeneration: 
   public SubroutinesGeneration <CPPProgramDeclarationsAndDefinitions, CPPHostSubroutine>
 {
   protected:
+    
+    std::map <std::string, CPPOpDatDimensionsDeclaration *>
+        dimensionsDeclarations;
 
     virtual CPPHostSubroutine *
-    createSubroutines (
-        CPPParallelLoop * parallelLoop,
-        std::string const & userSubroutineName) = 0;
+    createSubroutines ( ) = 0;
 
     void
-    patchCallsToParallelLoops (  std::string const & moduleName );
+    patchCallsToParallelLoops ( );
 
     SgSourceFile &
     createSourceFile ();
@@ -30,7 +32,15 @@ class CPPSubroutinesGeneration:
 
     CPPSubroutinesGeneration (
         CPPProgramDeclarationsAndDefinitions * declarations,
-        std::string const & fileSuffix);
+        std::string const & fileSuffix) :
+      SubroutinesGeneration <CPPProgramDeclarationsAndDefinitions, CPPHostSubroutine> (
+          declarations, 
+          fileSuffix)
+    {
+      SgSourceFile & sourceFile = createSourceFile ();
+
+      moduleScope = sourceFile.get_globalScope ();
+    }
 };
 
 #endif

@@ -8,14 +8,17 @@
 #define CPP_OPENCL_SUBROUTINES_GENERATION_H
 
 #include <CPPSubroutinesGeneration.h>
+#include <CPPOpenCLDataSizesDeclaration.h>
 
 class CPPOpenCLSubroutinesGeneration: public CPPSubroutinesGeneration
 {
   private:
+  
+  std::map <std::string, CPPOpenCLDataSizesDeclaration *>
+      dataSizesDeclarations;
 
     virtual CPPHostSubroutine *
-    createSubroutines (CPPParallelLoop * parallelLoop,
-        std::string const & userSubroutineName);
+    createSubroutines ();
 
     virtual void
     addLibraries (SgModuleStatement * moduleStatement);

@@ -51,21 +51,21 @@ CPPStatementsAndExpressionsBuilder::setCPPAttributes (
 
       case CONSTANT:
       {
-        SageInterface::addTextForUnparser( variableDeclaration, OpenCL::CPP::constantModifier, PreprocessingInfo::before );
+        SageInterface::addTextForUnparser( variableDeclaration, OpenCL::CPP::constantModifier, AstUnparseAttribute::e_before );
         //variableDeclaration->get_declarationModifier ().get_typeModifier ().setConstant ();
         break;
       }
 
       case DEVICE:
       {
-        SageInterface::addTextForUnparser( variableDeclaration, OpenCL::CPP::globalModifier, PreprocessingInfo::before );
+        SageInterface::addTextForUnparser( variableDeclaration, OpenCL::CPP::globalModifier, AstUnparseAttribute::e_before );
         //variableDeclaration->get_declarationModifier ().get_typeModifier ().setDevice ();
         break;
       }
 
       case SHARED:
       {
-        SageInterface::addTextForUnparser( variableDeclaration, OpenCL::CPP::localModifier, PreprocessingInfo::before );
+        SageInterface::addTextForUnparser( variableDeclaration, OpenCL::CPP::localModifier, AstUnparseAttribute::e_before );
         //variableDeclaration->get_declarationModifier ().get_typeModifier ().setAttribute( OpenCL::CPP::localModifier );
         break;
       }

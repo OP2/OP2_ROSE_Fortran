@@ -4,7 +4,7 @@
 #include <CommonNamespaces.h>
 #include <CPPOpenCLReductionSubroutine.h>
 #include <RoseStatementsAndExpressionsBuilder.h>
-//#include <CPPStatementsAndExpressionsBuilder.h>
+#include <CPPOpenCLStatementsAndExpressionsBuilder.h>
 //#include <CPPTypesBuilder.h>
 
 
@@ -44,17 +44,38 @@ CPPOpenCLReductionSubroutine::createStatements ()
   SgExpression * vtemp_ref = buildVarRefExp ( variableDeclarations->get (ReductionSubroutine::autosharedV) ); //TODO: needed?
   SgExpression * dat_g_ref = buildVarRefExp ( variableDeclarations->get (ReductionSubroutine::reductionResultOnDevice) );
   
+  SgStatement * tempStatement;
+  SgStatement * initialisationStatement1;
+  SgStatement * testExpression1;
+  SgExpression * incrementExpression1;
+  SgScopeStatement * loopBody1;
+  SgStatement * forStatement1;
+  SgExpression * ifGuardExpression1;
+  SgScopeStatement * ifBody1;
+  SgStatement * ifStatement1;
+  SgScopeStatement * ifBody2;
+  SgStatement * ifStatement2;
+  SgExpression * switchExpression1;
+  SgScopeStatement * switchBody1;
+  SgStatement * switchStatement1;
+  SgScopeStatement * caseBody;
+  SgStatement * caseStatement;
+  SgScopeStatement * caseBody1;
+  SgStatement * caseStatement1;
+  SgExpression * ifGuardExpression2;
+  
+  
   /*
    * ======================================================
    * tid = get_local_id(0)
    * ======================================================
    */
   
-  SgStatement * assignStatement1 = buildAssignStatement(
+  tempStatement = buildAssignStatement(
       tid_ref,
       CPPOpenCLStatementsAndExpressionsBuilder::generateGetLocalId() );
   
-  appendStatement( assignStatement1, subroutineScope );
+  appendStatement( tempStatement, subroutineScope );
   
   /*
    * ======================================================
@@ -62,13 +83,13 @@ CPPOpenCLReductionSubroutine::createStatements ()
    * ======================================================
    */
   
-  SgStatement * assignStatement2 = buildAssignStatement(
+  tempStatement = buildAssignStatement(
       d_ref,
       buildRshiftOp(
           CPPOpenCLStatementsAndExpressionsBuilder::generateGetLocalSize(),
           buildIntVal(1) ) );
   
-  appendStatement( assignStatement2, subroutineScope );
+  appendStatement( tempStatement, subroutineScope );
   
   /*
    * ======================================================
@@ -76,23 +97,23 @@ CPPOpenCLReductionSubroutine::createStatements ()
    * ======================================================
    */
   
-  SgStatement * assignStatement3 = CPPOpenCLStatementsAndExpressionsBuilder::generateBarrierStatement();
+  tempStatement = CPPOpenCLStatementsAndExpressionsBuilder::generateBarrierStatement();
   
-  appendStatement( assignStatement3, subroutineScope );
+  appendStatement( tempStatement, subroutineScope );
   
-  SgStatement * assignStatement4 = buildAssignStatement(
+  tempStatement = buildAssignStatement(
       buildPntrArrRefExp(
           temp_ref,
           tid_ref ),
       dat_l_ref );
   
-  appendStatement( assignStatement4, subroutineScope );
+  appendStatement( tempStatement, subroutineScope );
   
-  SgStatement * assignStatement5 = buildAssignStatement(
+  tempStatement = buildAssignStatement(
       warpSize_ref,
       buildOpaqueVarRefExp("WARP_SIZE") );
   
-  appendStatement( assignStatement5, subroutineScope );
+  appendStatement( tempStatement, subroutineScope );
   
   /*
    * ======================================================
@@ -100,29 +121,29 @@ CPPOpenCLReductionSubroutine::createStatements ()
    * ======================================================
    */
   
-  SgStatement * initialisationExpression1 = buildBasicBlock();
+  initialisationStatement1 = buildBasicBlock();
   
-  SgStatement * testExpression1 = buildExprStatement( buildGreaterThanOp(
+  testExpression1 = buildExprStatement( buildGreaterThanOp(
       d_ref,
       warpSize_ref ) );
   
-  SgExpression * incrementExpression1 = buildRshiftAssignOp(
+  incrementExpression1 = buildRshiftAssignOp(
       d_ref,
       buildIntVal(1) );
   
-  SgBasicBlock * loopBody1 = buildBasicBlock();
+  loopBody1 = buildBasicBlock();
   
-  SgForStatement * forStatement1 = buildForStatement(
-      initialisationExpression1,
+  forStatement1 = buildForStatement(
+      initialisationStatement1,
       testExpression1,
       incrementExpression1,
       loopBody1 );
   
   appendStatement( forStatement1, subroutineScope );
   
-  SgStatement * assignStatement3 = CPPOpenCLStatementsAndExpressionsBuilder::generateBarrierStatement();
+  tempStatement = CPPOpenCLStatementsAndExpressionsBuilder::generateBarrierStatement();
   
-  appendStatement( assignStatement3, loopBody1 );
+  appendStatement( tempStatement, loopBody1 );
   
   /*
    * ======================================================
@@ -130,17 +151,17 @@ CPPOpenCLReductionSubroutine::createStatements ()
    * ======================================================
    */
   
-  SgExpression * ifGuardExpression1 = buildLessThanOp(
+  ifGuardExpression1 = buildLessThanOp(
       tid_ref,
       d_ref );
   
-  SgBasicBlock * ifBody1 = buildBasicBlock();
+  ifBody1 = buildBasicBlock();
   
-  SgIfStmt * ifStatement1 = RoseStatementsAndExpressionsBuilder::buildIfStatementWithEmptyElse (
+  ifStatement1 = RoseStatementsAndExpressionsBuilder::buildIfStatementWithEmptyElse (
           ifGuardExpression1, 
           ifBody1);
   
-  appendStatement( ifStatement1, forStatement1 );
+  appendStatement( ifStatement1, loopBody1 );
   
   /*
    * ======================================================
@@ -148,11 +169,11 @@ CPPOpenCLReductionSubroutine::createStatements ()
    * ======================================================
    */
   
-  SgExpression * switchExpression1 = reduction_ref;
+  switchExpression1 = reduction_ref;
   
-  SgBasicBlock * switchBody1 = buildBasicBlock();
+  switchBody1 = buildBasicBlock();
   
-  SgStatement switchStatement1 = buildSwitchStatement(
+  switchStatement1 = buildSwitchStatement(
       switchExpression1,
       switchBody1 );
   
@@ -164,15 +185,15 @@ CPPOpenCLReductionSubroutine::createStatements ()
    * ======================================================
    */
   
-  SgBasicBlock * caseBody = buildBasicBlock();  
+  caseBody1 = buildBasicBlock();  
   
-  SgStatement * caseStatement1 = buildCaseOptionStmt(
+  caseStatement1 = buildCaseOptionStmt(
       buildOpaqueVarRefExp("OP_INC"),
       caseBody );
   
-  appendStatement( caseStatement, switchStatement1 );
+  appendStatement( caseStatement1, switchBody1 );
   
-  SgStatement * tempStatement = buildAssignStatement(
+  tempStatement = buildAssignStatement(
       buildPntrArrRefExp(
           temp_ref,
           tid_ref ),
@@ -186,11 +207,11 @@ CPPOpenCLReductionSubroutine::createStatements ()
                   tid_ref,
                   d_ref ) ) ) );
   
-  appendStatement( tempStatement, caseBody );
+  appendStatement( tempStatement, caseBody1 );
   
-  SgStatement * tempStatement = buildBreakStmt();
+  tempStatement = buildBreakStmt();
   
-  appendStatement( tempStatement, caseBody );
+  appendStatement( tempStatement, caseBody1 );
   
   /*
    * ======================================================
@@ -198,15 +219,15 @@ CPPOpenCLReductionSubroutine::createStatements ()
    * ======================================================
    */
   
-  SgBasicBlock * caseBody = buildBasicBlock();  
+  caseBody = buildBasicBlock();  
   
-  SgStatement * caseStatement = buildCaseOptionStmt(
+  caseStatement = buildCaseOptionStmt(
       buildOpaqueVarRefExp("OP_MIN"),
       caseBody );
   
-  appendStatement( caseStatement, switchStatement1 );
+  appendStatement( caseStatement, switchBody1 );
   
-  SgExpression * ifGuardExpression2 = buildLessThanOp(
+  ifGuardExpression2 = buildLessThanOp(
       buildPntrArrRefExp( 
                     temp_ref,
                     buildAddOp(
@@ -216,15 +237,15 @@ CPPOpenCLReductionSubroutine::createStatements ()
           temp_ref,
           tid_ref ) );
   
-  SgBasicBlock * ifBody2 = buildBasicBlock();
+  ifBody2 = buildBasicBlock();
   
-  SgIfStmt * ifStatement2 = RoseStatementsAndExpressionsBuilder::buildIfStatementWithEmptyElse (
+  ifStatement2 = RoseStatementsAndExpressionsBuilder::buildIfStatementWithEmptyElse (
       ifGuardExpression2, 
       ifBody2);
   
   appendStatement( ifStatement2, caseBody );
   
-  SgStatement * tempStatement = buildAssignStatement(
+  tempStatement = buildAssignStatement(
       buildPntrArrRefExp(
           temp_ref,
           tid_ref ),
@@ -240,7 +261,7 @@ CPPOpenCLReductionSubroutine::createStatements ()
   
   appendStatement( tempStatement, ifBody2 );
   
-  SgStatement * tempStatement = buildBreakStmt();
+  tempStatement = buildBreakStmt();
   
   appendStatement( tempStatement, caseBody );
   
@@ -250,15 +271,15 @@ CPPOpenCLReductionSubroutine::createStatements ()
    * ======================================================
    */
   
-  SgBasicBlock * caseBody = buildBasicBlock();  
+  caseBody = buildBasicBlock();  
   
-  SgStatement * caseStatement = buildCaseOptionStmt(
+  caseStatement = buildCaseOptionStmt(
       buildOpaqueVarRefExp("OP_MAX"),
       caseBody );
   
-  appendStatement( caseStatement, switchStatement1 );
+  appendStatement( caseStatement, switchBody1 );
   
-  SgExpression * ifGuardExpression2 = buildGreaterThanOp(
+  ifGuardExpression2 = buildGreaterThanOp(
       buildPntrArrRefExp( 
                     temp_ref,
                     buildAddOp(
@@ -268,15 +289,15 @@ CPPOpenCLReductionSubroutine::createStatements ()
           temp_ref,
           tid_ref ) );
   
-  SgBasicBlock * ifBody2 = buildBasicBlock();
+  ifBody2 = buildBasicBlock();
   
-  SgIfStmt * ifStatement2 = RoseStatementsAndExpressionsBuilder::buildIfStatementWithEmptyElse (
+  ifStatement2 = RoseStatementsAndExpressionsBuilder::buildIfStatementWithEmptyElse (
       ifGuardExpression2, 
       ifBody2);
   
   appendStatement( ifStatement2, caseBody );
   
-  SgStatement * tempStatement = buildAssignStatement(
+  tempStatement = buildAssignStatement(
       buildPntrArrRefExp(
           temp_ref,
           tid_ref ),
@@ -292,7 +313,7 @@ CPPOpenCLReductionSubroutine::createStatements ()
   
   appendStatement( tempStatement, ifBody2 );
   
-  SgStatement * tempStatement = buildBreakStmt();
+  tempStatement = buildBreakStmt();
   
   appendStatement( tempStatement, caseBody );
   
@@ -320,7 +341,7 @@ CPPOpenCLReductionSubroutine::createStatements ()
    * ======================================================
    */
   
-  SgStatement * tempStatement = CPPOpenCLStatementsAndExpressionsBuilder::generateBarrierStatement();
+  tempStatement = CPPOpenCLStatementsAndExpressionsBuilder::generateBarrierStatement();
   
   appendStatement( tempStatement, subroutineScope );
   
@@ -330,7 +351,7 @@ CPPOpenCLReductionSubroutine::createStatements ()
    * ======================================================
    */
   
-  SgStatement * tempStatement = buildAssignStatement(
+  tempStatement = buildAssignStatement(
       vtemp_ref,
       temp_ref );
 
@@ -342,13 +363,13 @@ CPPOpenCLReductionSubroutine::createStatements ()
    * ======================================================
    */
   
-  SgExpression * ifGuardExpression1 = buildLessThanOp(
+  ifGuardExpression1 = buildLessThanOp(
       tid_ref,
       warpSize_ref );
   
-  SgBasicBlock * ifBody1 = buildBasicBlock();
+  ifBody1 = buildBasicBlock();
   
-  SgIfStmt * ifStatement1 = RoseStatementsAndExpressionsBuilder::buildIfStatementWithEmptyElse (
+  ifStatement1 = RoseStatementsAndExpressionsBuilder::buildIfStatementWithEmptyElse (
           ifGuardExpression1, 
           ifBody1);
   
@@ -360,20 +381,20 @@ CPPOpenCLReductionSubroutine::createStatements ()
    * ======================================================
    */
   
-  SgStatement * initialisationExpression1 = buildBasicBlock();
+  initialisationStatement1 = buildBasicBlock();
   
-  SgStatement * testExpression1 = buildExprStatement( buildGreaterThanOp(
+  testExpression1 = buildExprStatement( buildGreaterThanOp(
       d_ref,
       buildIntVal(0) ) );
   
-  SgExpression * incrementExpression1 = buildRshiftAssignOp(
+  incrementExpression1 = buildRshiftAssignOp(
       d_ref,
       buildIntVal(1) );
   
-  SgBasicBlock * loopBody1 = buildBasicBlock();
+  loopBody1 = buildBasicBlock();
   
-  SgForStatement * forStatement1 = buildForStatement(
-      initialisationExpression1,
+  forStatement1 = buildForStatement(
+      initialisationStatement1,
       testExpression1,
       incrementExpression1,
       loopBody1 );
@@ -386,13 +407,13 @@ CPPOpenCLReductionSubroutine::createStatements ()
    * ======================================================
    */
   
-  SgExpression * ifGuardExpression2 = buildLessThanOp(
+  ifGuardExpression2 = buildLessThanOp(
       tid_ref,
       d_ref );
   
-  SgBasicBlock * ifBody2 = buildBasicBlock();
+  ifBody2 = buildBasicBlock();
   
-  SgIfStmt * ifStatement2 = RoseStatementsAndExpressionsBuilder::buildIfStatementWithEmptyElse (
+  ifStatement2 = RoseStatementsAndExpressionsBuilder::buildIfStatementWithEmptyElse (
       ifGuardExpression2, 
       ifBody2);
   
@@ -404,11 +425,11 @@ CPPOpenCLReductionSubroutine::createStatements ()
    * ======================================================
    */
   
-  SgExpression * switchExpression1 = reduction_ref;
+  switchExpression1 = reduction_ref;
   
-  SgBasicBlock * switchBody1 = buildBasicBlock();
+  switchBody1 = buildBasicBlock();
   
-  SgStatement switchStatement1 = buildSwitchStatement(
+  switchStatement1 = buildSwitchStatement(
       switchExpression1,
       switchBody1 );
   
@@ -420,15 +441,15 @@ CPPOpenCLReductionSubroutine::createStatements ()
    * ======================================================
    */
   
-  SgBasicBlock * caseBody = buildBasicBlock();  
+  caseBody = buildBasicBlock();  
   
-  SgStatement * caseStatement1 = buildCaseOptionStmt(
+  caseStatement1 = buildCaseOptionStmt(
       buildOpaqueVarRefExp("OP_INC"),
       caseBody );
   
-  appendStatement( caseStatement, switchStatement1 );
+  appendStatement( caseStatement, switchBody1 );
   
-  SgStatement * tempStatement = buildAssignStatement(
+  tempStatement = buildAssignStatement(
       buildPntrArrRefExp(
           vtemp_ref,
           tid_ref ),
@@ -444,7 +465,7 @@ CPPOpenCLReductionSubroutine::createStatements ()
   
   appendStatement( tempStatement, caseBody );
   
-  SgStatement * tempStatement = buildBreakStmt();
+  tempStatement = buildBreakStmt();
   
   appendStatement( tempStatement, caseBody );
   
@@ -454,15 +475,15 @@ CPPOpenCLReductionSubroutine::createStatements ()
    * ======================================================
    */
   
-  SgBasicBlock * caseBody = buildBasicBlock();  
+  caseBody = buildBasicBlock();  
   
-  SgStatement * caseStatement = buildCaseOptionStmt(
+  caseStatement = buildCaseOptionStmt(
       buildOpaqueVarRefExp("OP_MIN"),
       caseBody );
   
-  appendStatement( caseStatement, switchStatement1 );
+  appendStatement( caseStatement, switchBody1 );
   
-  SgExpression * ifGuardExpression2 = buildLessThanOp(
+  ifGuardExpression2 = buildLessThanOp(
       buildPntrArrRefExp( 
           vtemp_ref,
           buildAddOp(
@@ -472,15 +493,15 @@ CPPOpenCLReductionSubroutine::createStatements ()
           vtemp_ref,
           tid_ref ) );
   
-  SgBasicBlock * ifBody2 = buildBasicBlock();
+  ifBody2 = buildBasicBlock();
   
-  SgIfStmt * ifStatement2 = RoseStatementsAndExpressionsBuilder::buildIfStatementWithEmptyElse (
+  ifStatement2 = RoseStatementsAndExpressionsBuilder::buildIfStatementWithEmptyElse (
       ifGuardExpression2, 
       ifBody2);
   
   appendStatement( ifStatement2, caseBody );
   
-  SgStatement * tempStatement = buildAssignStatement(
+  tempStatement = buildAssignStatement(
       buildPntrArrRefExp(
           vtemp_ref,
           tid_ref ),
@@ -496,7 +517,7 @@ CPPOpenCLReductionSubroutine::createStatements ()
   
   appendStatement( tempStatement, ifBody2 );
   
-  SgStatement * tempStatement = buildBreakStmt();
+  tempStatement = buildBreakStmt();
   
   appendStatement( tempStatement, caseBody );
   
@@ -506,15 +527,15 @@ CPPOpenCLReductionSubroutine::createStatements ()
    * ======================================================
    */
   
-  SgBasicBlock * caseBody = buildBasicBlock();  
+  caseBody = buildBasicBlock();  
   
-  SgStatement * caseStatement = buildCaseOptionStmt(
+  caseStatement = buildCaseOptionStmt(
       buildOpaqueVarRefExp("OP_MAX"),
       caseBody );
   
-  appendStatement( caseStatement, switchStatement1 );
+  appendStatement( caseStatement, switchBody1 );
   
-  SgExpression * ifGuardExpression2 = buildGreaterThanOp(
+  ifGuardExpression2 = buildGreaterThanOp(
       buildPntrArrRefExp( 
           vtemp_ref,
           buildAddOp(
@@ -524,15 +545,15 @@ CPPOpenCLReductionSubroutine::createStatements ()
           vtemp_ref,
           tid_ref ) );
   
-  SgBasicBlock * ifBody2 = buildBasicBlock();
+  ifBody2 = buildBasicBlock();
   
-  SgIfStmt * ifStatement2 = RoseStatementsAndExpressionsBuilder::buildIfStatementWithEmptyElse (
+  ifStatement2 = RoseStatementsAndExpressionsBuilder::buildIfStatementWithEmptyElse (
       ifGuardExpression2, 
       ifBody2);
   
   appendStatement( ifStatement2, caseBody );
   
-  SgStatement * tempStatement = buildAssignStatement(
+  tempStatement = buildAssignStatement(
       buildPntrArrRefExp(
           vtemp_ref,
           tid_ref ),
@@ -548,7 +569,7 @@ CPPOpenCLReductionSubroutine::createStatements ()
   
   appendStatement( tempStatement, ifBody2 );
   
-  SgStatement * tempStatement = buildBreakStmt();
+  tempStatement = buildBreakStmt();
   
   appendStatement( tempStatement, caseBody );
   
@@ -582,13 +603,13 @@ CPPOpenCLReductionSubroutine::createStatements ()
    * ======================================================
    */
   
-  SgExpression * ifGuardExpression1 = buildEqualityOp(
+  ifGuardExpression1 = buildEqualityOp(
       tid_ref,
       buildIntVal(0) );
   
-  SgBasicBlock * ifBody1 = buildBasicBlock();
+  ifBody1 = buildBasicBlock();
   
-  SgIfStmt * ifStatement1 = RoseStatementsAndExpressionsBuilder::buildIfStatementWithEmptyElse (
+  ifStatement1 = RoseStatementsAndExpressionsBuilder::buildIfStatementWithEmptyElse (
           ifGuardExpression1, 
           ifBody1);
   
@@ -600,11 +621,11 @@ CPPOpenCLReductionSubroutine::createStatements ()
    * ======================================================
    */
   
-  SgExpression * switchExpression1 = reduction_ref;
+  switchExpression1 = reduction_ref;
   
-  SgBasicBlock * switchBody1 = buildBasicBlock();
+  switchBody1 = buildBasicBlock();
   
-  SgStatement switchStatement1 = buildSwitchStatement(
+  switchStatement1 = buildSwitchStatement(
       switchExpression1,
       switchBody1 );
   
@@ -616,15 +637,15 @@ CPPOpenCLReductionSubroutine::createStatements ()
    * ======================================================
    */
   
-  SgBasicBlock * caseBody = buildBasicBlock();  
+  caseBody = buildBasicBlock();  
   
-  SgStatement * caseStatement1 = buildCaseOptionStmt(
+  caseStatement1 = buildCaseOptionStmt(
       buildOpaqueVarRefExp("OP_INC"),
       caseBody );
   
-  appendStatement( caseStatement, switchStatement1 );
+  appendStatement( caseStatement, switchBody1 );
   
-  SgStatement * tempStatement = buildAssignStatement(
+  tempStatement = buildAssignStatement(
       buildPointerDerefExp(
           dat_g_ref ),
       buildAddOp(
@@ -636,7 +657,7 @@ CPPOpenCLReductionSubroutine::createStatements ()
               
   appendStatement( tempStatement, caseBody );
   
-  SgStatement * tempStatement = buildBreakStmt();
+  tempStatement = buildBreakStmt();
   
   appendStatement( tempStatement, caseBody );
   
@@ -646,30 +667,30 @@ CPPOpenCLReductionSubroutine::createStatements ()
    * ======================================================
    */
   
-  SgBasicBlock * caseBody = buildBasicBlock();  
+  caseBody = buildBasicBlock();  
   
-  SgStatement * caseStatement = buildCaseOptionStmt(
+  caseStatement = buildCaseOptionStmt(
       buildOpaqueVarRefExp("OP_MIN"),
       caseBody );
   
-  appendStatement( caseStatement, switchStatement1 );
+  appendStatement( caseStatement, switchBody1 );
   
-  SgExpression * ifGuardExpression2 = buildLessThanOp(
+  ifGuardExpression2 = buildLessThanOp(
       buildPntrArrRefExp( 
           temp_ref,
           buildIntVal(0) ),
       buildPointerDerefExp(
           dat_g_ref ) );
   
-  SgBasicBlock * ifBody2 = buildBasicBlock();
+  ifBody2 = buildBasicBlock();
   
-  SgIfStmt * ifStatement2 = RoseStatementsAndExpressionsBuilder::buildIfStatementWithEmptyElse (
+  ifStatement2 = RoseStatementsAndExpressionsBuilder::buildIfStatementWithEmptyElse (
       ifGuardExpression2, 
       ifBody2);
   
   appendStatement( ifStatement2, caseBody );
   
-  SgStatement * tempStatement = buildAssignStatement(
+  tempStatement = buildAssignStatement(
       buildPointerDerefExp(
           dat_g_ref ),
       buildPntrArrRefExp(
@@ -678,7 +699,7 @@ CPPOpenCLReductionSubroutine::createStatements ()
   
   appendStatement( tempStatement, ifBody2 );
   
-  SgStatement * tempStatement = buildBreakStmt();
+  tempStatement = buildBreakStmt();
   
   appendStatement( tempStatement, caseBody );
   
@@ -688,30 +709,30 @@ CPPOpenCLReductionSubroutine::createStatements ()
    * ======================================================
    */
   
-  SgBasicBlock * caseBody = buildBasicBlock();  
+  caseBody = buildBasicBlock();  
   
-  SgStatement * caseStatement = buildCaseOptionStmt(
+  caseStatement = buildCaseOptionStmt(
       buildOpaqueVarRefExp("OP_MAX"),
       caseBody );
   
-  appendStatement( caseStatement, switchStatement1 );
+  appendStatement( caseStatement, switchBody1 );
   
-  SgExpression * ifGuardExpression2 = buildGreaterThanOp(
+  ifGuardExpression2 = buildGreaterThanOp(
       buildPntrArrRefExp( 
           temp_ref,
           buildIntVal(0) ),
       buildPointerDerefExp(
           dat_g_ref ) );
   
-  SgBasicBlock * ifBody2 = buildBasicBlock();
+  ifBody2 = buildBasicBlock();
   
-  SgIfStmt * ifStatement2 = RoseStatementsAndExpressionsBuilder::buildIfStatementWithEmptyElse (
+  ifStatement2 = RoseStatementsAndExpressionsBuilder::buildIfStatementWithEmptyElse (
       ifGuardExpression2, 
       ifBody2);
   
   appendStatement( ifStatement2, caseBody );
   
-  SgStatement * tempStatement = buildAssignStatement(
+  tempStatement = buildAssignStatement(
       buildPointerDerefExp(
           dat_g_ref ),
       buildPntrArrRefExp(
@@ -720,7 +741,7 @@ CPPOpenCLReductionSubroutine::createStatements ()
   
   appendStatement( tempStatement, ifBody2 );
   
-  SgStatement * tempStatement = buildBreakStmt();
+  tempStatement = buildBreakStmt();
   
   appendStatement( tempStatement, caseBody );
   
@@ -761,9 +782,8 @@ CPPOpenCLReductionSubroutine::createLocalVariableDeclarations ()
               buildVolatileType(
                   reduction->getBaseType() ) ), 
           subroutineScope, 
-          formalParameters, 
           1,
-          SHARED ));
+          SHARED ) );
 
   /*
    * ======================================================
