@@ -72,7 +72,7 @@ CommandLineOption::CommandLineOption (std::string helpMessage,
     if (starts_with (shortOption, "-"))
     {
       cerr << "Error: the short option '" + shortOption
-          + "' starts with trailing '-' characters.\n";
+          + "' starts with leading '-' characters.\n";
 
       exit (1);
     }
@@ -91,7 +91,7 @@ CommandLineOption::CommandLineOption (std::string helpMessage,
     if (starts_with (longOption, "-"))
     {
       cerr << "Error: the long option '" + longOption
-          + "' starts with trailing '-' characters.\n";
+          + "' starts with leading '-' characters.\n";
 
       exit (1);
     }
