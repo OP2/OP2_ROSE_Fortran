@@ -1,5 +1,6 @@
 #include <CPPHostSubroutine.h>
 #include <CPPOpenCLReductionSubroutine.h>
+#include <CPPStatementsAndExpressionsBuilder.h>
 
 using namespace SageBuilder;
 

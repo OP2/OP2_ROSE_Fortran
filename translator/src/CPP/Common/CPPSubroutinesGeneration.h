@@ -24,6 +24,16 @@ class CPPSubroutinesGeneration:
 
     SgSourceFile &
     createSourceFile ();
+    
+    /*
+     * ======================================================
+     * Adds the relevant library 'use' statements to the
+     * generated module. This function is pure virtual as the
+     * needed libraries are backend specific
+     * ======================================================
+     */
+    virtual void
+    addLibraries () = 0;
 
 
     void generate ();

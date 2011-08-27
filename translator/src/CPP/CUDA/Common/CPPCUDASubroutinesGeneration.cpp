@@ -12,6 +12,12 @@ CPPCUDASubroutinesGeneration::createSubroutines ()
   return NULL;
 }
 
+void
+CPPCUDASubroutinesGeneration::addLibraries ()
+{
+  return;
+}
+
 /*
  * ======================================================
  * Public functions

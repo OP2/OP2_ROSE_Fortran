@@ -10,6 +10,11 @@
 #include <CPPSubroutinesGeneration.h>
 #include <CPPOpenCLDataSizesDeclaration.h>
 
+namespace Libraries
+{
+  std::string const OPENCL = "CL/cl.h";
+}
+
 class CPPOpenCLSubroutinesGeneration: public CPPSubroutinesGeneration
 {
   private:
@@ -20,8 +25,9 @@ class CPPOpenCLSubroutinesGeneration: public CPPSubroutinesGeneration
     virtual CPPHostSubroutine *
     createSubroutines ();
 
+
     virtual void
-    addLibraries (SgModuleStatement * moduleStatement);
+    addLibraries ();
 
   public:
 

@@ -13,6 +13,9 @@ class CPPCUDASubroutinesGeneration: public CPPSubroutinesGeneration
 
     virtual CPPHostSubroutine *
     createSubroutines ();
+    
+    virtual void
+    addLibraries ();
 
   public:
 

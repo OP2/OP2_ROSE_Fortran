@@ -1,2 +1,0 @@
-translator=/home/kaoss/OP2_ROSE_Fortran/translator/bin/translator
-files=airfoil.cpp adt_calc.h adt_calc_kernel.cpp

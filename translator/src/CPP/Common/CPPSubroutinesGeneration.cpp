@@ -71,7 +71,7 @@ CPPSubroutinesGeneration::createSourceFile ()
    * the API expects the name of an existing file and the
    * name of the output file. There is no input file corresponding
    * to our output file, therefore we first create a dummy
-   * Fortran file. This will cause the unparser to generate
+   * CPP file. This will cause the unparser to generate
    * a warning about its internal stack state, but it can
    * suitably be ignored
    * ======================================================
@@ -135,6 +135,8 @@ void CPPSubroutinesGeneration::generate()
   //    moduleScope, declarations);
 
   //initialiseConstantsSubroutine->declareConstants ();
+  
+  addLibraries();
 
   createSubroutines ();
 

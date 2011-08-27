@@ -93,9 +93,30 @@ CPPOpenCLSubroutinesGeneration::createSubroutines ()
 }
 
 void
-CPPOpenCLSubroutinesGeneration::addLibraries (
-    SgModuleStatement * moduleStatement)
+CPPOpenCLSubroutinesGeneration::addLibraries ()
 {
+  using std::string;
+  using std::vector;
+  using SageInterface::appendStatement;
+
+  Debug::getInstance ()->debugMessage (
+      "Adding '#include' statements to main file", Debug::FUNCTION_LEVEL,
+      __FILE__, __LINE__);
+
+  vector <string> libs;
+  libs.push_back (Libraries::OPENCL);
+
+  for (vector <string>::const_iterator it = libs.begin (); it != libs.end (); ++it)
+  {
+    //SgIncludeDirectiveStatement *includeStatement = new SgIncludeDirectiveStatement();
+
+        
+
+
+    //appendStatement (includeStatement, moduleScope);
+  }
+  SgVariableDeclaration *test = SageBuilder::buildVariableDeclaration("test", SageBuilder::buildIntType(), NULL, moduleScope);
+  appendStatement(test, moduleScope);
 
 }
 
@@ -109,5 +130,5 @@ CPPOpenCLSubroutinesGeneration::CPPOpenCLSubroutinesGeneration (
     SgProject * project, CPPProgramDeclarationsAndDefinitions * declarations) :
   CPPSubroutinesGeneration (declarations, ".cpp")
 {
-  unparse ();
+  generate ();
 }

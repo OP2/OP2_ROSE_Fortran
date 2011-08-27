@@ -48,7 +48,7 @@ for path, dirs, files in os.walk(os.path.abspath(os.curdir + os.sep + 'src')):
 
 # Include directories and flags for g++
 env = Environment (CPPPATH=includeDirectories,
-		   CPPFLAGS=[ '-Wall', '-O2'],
+		   CPPFLAGS=[ '-Wall', '-O2', '-g'],
 		   CXXCOMSTR="=========================== Compiling $SOURCE ===========================")
 
 # The target binary directory and name
