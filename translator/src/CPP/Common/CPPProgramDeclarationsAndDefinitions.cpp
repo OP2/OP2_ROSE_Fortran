@@ -128,6 +128,24 @@ CPPProgramDeclarationsAndDefinitions::visit (SgNode * node)
 
       break;
     }
+    
+    case V_SgInitializedName:
+      {
+        SgInitializedName *initializedName = isSgInitializedName(node);
+        
+        if (initializedName) 
+          {
+            string const varName = initializedName->get_name().getString();
+            
+            SgAssignInitializer *assignInitializer = isSgAssignInitializer(initializedName->get_initializer());
+            
+            if (assignInitializer) 
+              {
+                SgFunctionCallExp *functionCallExp = isSgFunctionCallExp (assignInitializer->get_operand());
+              }
+          }
+        break;
+      }
 
     case V_SgFunctionCallExp:
     {
