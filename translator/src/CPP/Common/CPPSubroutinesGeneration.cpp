@@ -130,6 +130,7 @@ CPPSubroutinesGeneration::createSourceFile ()
 void CPPSubroutinesGeneration::generate()
 {
   SgSourceFile & sourceFile = createSourceFile();
+  moduleScope = sourceFile.get_globalScope ();
 
   //initialiseConstantsSubroutine = new CPPInitialiseConstantsSubroutine (
   //    moduleScope, declarations);

@@ -47,9 +47,9 @@ class CPPSubroutinesGeneration:
           declarations, 
           fileSuffix)
     {
-      SgSourceFile & sourceFile = createSourceFile ();
+      //SgSourceFile & sourceFile = createSourceFile ();
 
-      moduleScope = sourceFile.get_globalScope ();
+      //moduleScope = sourceFile.get_globalScope ();
     }
 };
 

@@ -128,7 +128,7 @@ CPPProgramDeclarationsAndDefinitions::visit (SgNode * node)
 
       break;
     }
-    
+    /*
     case V_SgInitializedName:
       {
         SgInitializedName *initializedName = isSgInitializedName(node);
@@ -142,10 +142,15 @@ CPPProgramDeclarationsAndDefinitions::visit (SgNode * node)
             if (assignInitializer) 
               {
                 SgFunctionCallExp *functionCallExp = isSgFunctionCallExp (assignInitializer->get_operand());
+                if (functionCallExp) 
+                  {
+                  Debug::getInstance ()->debugMessage ("Found initializer for '"
+                      + varName + "'", Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+                  }
               }
           }
         break;
-      }
+      }*/
 
     case V_SgFunctionCallExp:
     {
