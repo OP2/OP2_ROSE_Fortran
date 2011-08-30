@@ -16,7 +16,7 @@ CPPProgramDeclarationsAndDefinitions::detectAndHandleOP2Definition (
   using boost::iequals;
   using std::string;
 
-  string const typeName = typeDefinition->get_name().getString ();
+  string const typeName = typeDefinition->get_name ().getString ();
 
   if (iequals (typeName, OP2::OP_SET))
   {
@@ -128,29 +128,29 @@ CPPProgramDeclarationsAndDefinitions::visit (SgNode * node)
 
       break;
     }
-    /*
-    case V_SgInitializedName:
-      {
-        SgInitializedName *initializedName = isSgInitializedName(node);
-        
-        if (initializedName) 
-          {
-            string const varName = initializedName->get_name().getString();
-            
-            SgAssignInitializer *assignInitializer = isSgAssignInitializer(initializedName->get_initializer());
-            
-            if (assignInitializer) 
-              {
-                SgFunctionCallExp *functionCallExp = isSgFunctionCallExp (assignInitializer->get_operand());
-                if (functionCallExp) 
-                  {
-                  Debug::getInstance ()->debugMessage ("Found initializer for '"
-                      + varName + "'", Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
-                  }
-              }
-          }
-        break;
-      }*/
+      /*
+       case V_SgInitializedName:
+       {
+       SgInitializedName *initializedName = isSgInitializedName(node);
+
+       if (initializedName)
+       {
+       string const varName = initializedName->get_name().getString();
+
+       SgAssignInitializer *assignInitializer = isSgAssignInitializer(initializedName->get_initializer());
+
+       if (assignInitializer)
+       {
+       SgFunctionCallExp *functionCallExp = isSgFunctionCallExp (assignInitializer->get_operand());
+       if (functionCallExp)
+       {
+       Debug::getInstance ()->debugMessage ("Found initializer for '"
+       + varName + "'", Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+       }
+       }
+       }
+       break;
+       }*/
 
     case V_SgFunctionCallExp:
     {
@@ -183,6 +183,46 @@ CPPProgramDeclarationsAndDefinitions::visit (SgNode * node)
 
         OpConstDefinitions[opConstDeclaration->getVariableName ()]
             = opConstDeclaration;
+      }
+      if (iequals (calleeName, OP2::OP_PAR_LOOP))
+      {
+        SgExpressionPtrList & actualArguments =
+            functionCallExp->get_args ()->get_expressions ();
+
+        SgFunctionRefExp * functionRefExpression = isSgFunctionRefExp (
+            actualArguments.front ());
+
+        ROSE_ASSERT (functionRefExpression != NULL);
+
+        string const
+            userSubroutineName =
+                functionRefExpression->getAssociatedFunctionDeclaration ()->get_name ().getString ();
+
+        Debug::getInstance ()->debugMessage ("Found '" + calleeName
+            + "' with (host) user subroutine '" + userSubroutineName + "'",
+            Debug::OUTER_LOOP_LEVEL, __FILE__, __LINE__);
+
+        if (parallelLoops.find (userSubroutineName) == parallelLoops.end ())
+        {
+          /*
+           * ======================================================
+           * If this kernel has not been previously encountered then
+           * build a new parallel loop representation
+           * ======================================================
+           */
+
+          CPPParallelLoop * parallelLoop =
+              new CPPParallelLoop (functionCallExp);
+
+          parallelLoops[userSubroutineName] = parallelLoop;
+        }
+        else
+        {
+          Debug::getInstance ()->debugMessage ("Parallel loop for '"
+              + userSubroutineName + "' already created",
+              Debug::OUTER_LOOP_LEVEL, __FILE__, __LINE__);
+        }
+
       }
 
       break;

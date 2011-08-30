@@ -82,7 +82,7 @@ int main(int argc,char **argv)
 // read in grid
   printf("reading in grid \n");
   FILE *fp;
-  if ((fp = fopen("new_grid.dat","r")) == ((0L))) {
+  if ((fp = fopen("new_grid.dat","r")) == ((0))) {
     printf("can\'t open file new_grid.dat\n");
     exit((-1));
   }
@@ -90,17 +90,17 @@ int main(int argc,char **argv)
     printf("error reading from new_grid.dat\n");
     exit((-1));
   }
-  cell = ((int *)(malloc(((((4 * ncell)) * (sizeof(int )))))));
-  edge = ((int *)(malloc(((((2 * nedge)) * (sizeof(int )))))));
-  ecell = ((int *)(malloc(((((2 * nedge)) * (sizeof(int )))))));
-  bedge = ((int *)(malloc(((((2 * nbedge)) * (sizeof(int )))))));
-  becell = ((int *)(malloc((((nbedge) * (sizeof(int )))))));
-  bound = ((int *)(malloc((((nbedge) * (sizeof(int )))))));
-  x = ((float *)(malloc(((((2 * nnode)) * (sizeof(float )))))));
-  q = ((float *)(malloc(((((4 * ncell)) * (sizeof(float )))))));
-  qold = ((float *)(malloc(((((4 * ncell)) * (sizeof(float )))))));
-  res = ((float *)(malloc(((((4 * ncell)) * (sizeof(float )))))));
-  adt = ((float *)(malloc((((ncell) * (sizeof(float )))))));
+  cell = ((int *)(malloc((((4 * ncell)) * (sizeof(int ))))));
+  edge = ((int *)(malloc((((2 * nedge)) * (sizeof(int ))))));
+  ecell = ((int *)(malloc((((2 * nedge)) * (sizeof(int ))))));
+  bedge = ((int *)(malloc((((2 * nbedge)) * (sizeof(int ))))));
+  becell = ((int *)(malloc(((nbedge) * (sizeof(int ))))));
+  bound = ((int *)(malloc(((nbedge) * (sizeof(int ))))));
+  x = ((float *)(malloc((((2 * nnode)) * (sizeof(float ))))));
+  q = ((float *)(malloc((((4 * ncell)) * (sizeof(float ))))));
+  qold = ((float *)(malloc((((4 * ncell)) * (sizeof(float ))))));
+  res = ((float *)(malloc((((4 * ncell)) * (sizeof(float ))))));
+  adt = ((float *)(malloc(((ncell) * (sizeof(float ))))));
   for (int n = 0; n < nnode; n++) {
     if (fscanf(fp,"%f %f \n",(x + (2 * n)),(x + ((2 * n) + 1))) != 2) {
       printf("error reading from new_grid.dat\n");

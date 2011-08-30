@@ -18,11 +18,14 @@ CPPOpenCLSubroutinesGeneration::createSubroutines ()
   using std::string;
   using std::map;
 
-  for (map <string, CPPParallelLoop *>::const_iterator it = declarations->firstParallelLoop (); 
-      it != declarations->lastParallelLoop (); 
-      ++it)
+  for (map <string, CPPParallelLoop *>::const_iterator it =
+      declarations->firstParallelLoop (); it
+      != declarations->lastParallelLoop (); ++it)
   {
     string const userSubroutineName = it->first;
+
+    Debug::getInstance ()->debugMessage ("Analysing parallel loop "
+        + userSubroutineName, Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
     CPPParallelLoop * parallelLoop = it->second;
 
@@ -32,61 +35,57 @@ CPPOpenCLSubroutinesGeneration::createSubroutines ()
 
     if (parallelLoop->isDirectLoop ())
     {
-      userDeviceSubroutine = new CPPOpenCLUserSubroutine (
-          userSubroutineName,
+      userDeviceSubroutine = new CPPOpenCLUserSubroutine (userSubroutineName,
           moduleScope,
           //initialiseConstantsSubroutine,
-          declarations,
-          parallelLoop);
+          declarations, parallelLoop);
 
       kernelSubroutine = new CPPOpenCLKernelSubroutineDirectLoop (
-          userSubroutineName,
-          userDeviceSubroutine->getSubroutineName(),
-          parallelLoop,
-          moduleScope,
-          NULL,
+          userSubroutineName, userDeviceSubroutine->getSubroutineName (),
+          parallelLoop, moduleScope, NULL,
           //static_cast <CPPOpenCLDataSizesDeclarationDirectLoop *> (dataSizesDeclarations[userSubroutineName]),
           dimensionsDeclarations[userSubroutineName]);
 
-      hostSubroutines[userSubroutineName] = new CPPOpenCLHostSubroutineDirectLoop (
-          userSubroutineName,
-          userSubroutineName,
-          kernelSubroutine->getSubroutineName(),
-          parallelLoop,
-          moduleScope,
-          //initialiseConstantsSubroutine,
-          static_cast <CPPOpenCLDataSizesDeclarationDirectLoop *> (dataSizesDeclarations[userSubroutineName]),
-          dimensionsDeclarations[userSubroutineName]);
-          //static_cast <CPPOpenCLModuleDeclarations *> (moduleDeclarations[userSubroutineName]));
+      hostSubroutines[userSubroutineName]
+          = new CPPOpenCLHostSubroutineDirectLoop (
+              userSubroutineName,
+              userSubroutineName,
+              kernelSubroutine->getSubroutineName (),
+              parallelLoop,
+              moduleScope,
+              //initialiseConstantsSubroutine,
+              static_cast <CPPOpenCLDataSizesDeclarationDirectLoop *> (dataSizesDeclarations[userSubroutineName]),
+              dimensionsDeclarations[userSubroutineName]);
+      //static_cast <CPPOpenCLModuleDeclarations *> (moduleDeclarations[userSubroutineName]));
     }
     else
     {
-      userDeviceSubroutine = new CPPOpenCLUserSubroutine (
-          userSubroutineName,
-          moduleScope, 
+      userDeviceSubroutine = new CPPOpenCLUserSubroutine (userSubroutineName,
+          moduleScope,
           //initialiseConstantsSubroutine, 
-          declarations,
-          parallelLoop);
+          declarations, parallelLoop);
 
-      kernelSubroutine = new CPPOpenCLKernelSubroutineIndirectLoop (
-          userSubroutineName,
-          userDeviceSubroutine->getSubroutineName (),
-          parallelLoop,
-          moduleScope,
-          NULL,
-          static_cast <CPPOpenCLDataSizesDeclarationIndirectLoop *> (dataSizesDeclarations[userSubroutineName]),
-          dimensionsDeclarations[userSubroutineName]);
+      kernelSubroutine
+          = new CPPOpenCLKernelSubroutineIndirectLoop (
+              userSubroutineName,
+              userDeviceSubroutine->getSubroutineName (),
+              parallelLoop,
+              moduleScope,
+              NULL,
+              static_cast <CPPOpenCLDataSizesDeclarationIndirectLoop *> (dataSizesDeclarations[userSubroutineName]),
+              dimensionsDeclarations[userSubroutineName]);
 
-      hostSubroutines[userSubroutineName] = new CPPOpenCLHostSubroutineIndirectLoop (
-          userSubroutineName,
-          userSubroutineName,
-          kernelSubroutine->getSubroutineName (),
-          parallelLoop,
-          moduleScope,
-          //initialiseConstantsSubroutine,
-          static_cast <CPPOpenCLDataSizesDeclarationIndirectLoop *> (dataSizesDeclarations[userSubroutineName]),
-          dimensionsDeclarations[userSubroutineName]);
-          //static_cast <CPPOpenCLModuleDeclarationsIndirectLoop *> (moduleDeclarations[userSubroutineName]));
+      hostSubroutines[userSubroutineName]
+          = new CPPOpenCLHostSubroutineIndirectLoop (
+              userSubroutineName,
+              userSubroutineName,
+              kernelSubroutine->getSubroutineName (),
+              parallelLoop,
+              moduleScope,
+              //initialiseConstantsSubroutine,
+              static_cast <CPPOpenCLDataSizesDeclarationIndirectLoop *> (dataSizesDeclarations[userSubroutineName]),
+              dimensionsDeclarations[userSubroutineName]);
+      //static_cast <CPPOpenCLModuleDeclarationsIndirectLoop *> (moduleDeclarations[userSubroutineName]));
     }
   }
   return NULL; //FIXME
@@ -110,13 +109,12 @@ CPPOpenCLSubroutinesGeneration::addLibraries ()
   {
     //SgIncludeDirectiveStatement *includeStatement = new SgIncludeDirectiveStatement();
 
-        
-
 
     //appendStatement (includeStatement, moduleScope);
   }
-  SgVariableDeclaration *test = SageBuilder::buildVariableDeclaration("test", SageBuilder::buildIntType(), NULL, moduleScope);
-  appendStatement(test, moduleScope);
+  SgVariableDeclaration *test = SageBuilder::buildVariableDeclaration ("test",
+      SageBuilder::buildIntType (), NULL, moduleScope);
+  appendStatement (test, moduleScope);
 
 }
 
