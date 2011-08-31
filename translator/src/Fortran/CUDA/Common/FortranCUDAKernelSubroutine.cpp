@@ -291,11 +291,7 @@ FortranCUDAKernelSubroutine::createLocalThreadDeclarations ()
 void
 FortranCUDAKernelSubroutine::createAutoSharedDeclaration ()
 {
-  bool found = false;
-
-  unsigned int i = 1;
-
-  while (found == false && i <= parallelLoop->getNumberOfOpDatArgumentGroups ())
+  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
     if (parallelLoop->isDuplicateOpDat (i) == false)
     {
@@ -305,28 +301,20 @@ FortranCUDAKernelSubroutine::createAutoSharedDeclaration ()
 
       SgType * opDatBaseType = isArrayType->get_base_type ();
 
-      if (opDatBaseType->variantT () == V_SgTypeFloat)
-      {
-        SgExpression * upperBound = new SgAsteriskShapeExp (
-            RoseHelper::getFileInfo ());
+      SgExpression * upperBound = new SgAsteriskShapeExp (
+          RoseHelper::getFileInfo ());
 
-        variableDeclarations->add (CommonVariableNames::autoshared,
-            FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
-                CommonVariableNames::autoshared,
-                FortranTypesBuilder::getArray_RankOne (opDatBaseType, 0,
-                    upperBound), subroutineScope, 1, SHARED));
+      Debug::getInstance ()->debugMessage (
+          "Creating autoshared declaration with base type '"
+              + opDatBaseType->class_name (), Debug::FUNCTION_LEVEL, __FILE__,
+          __LINE__);
 
-        found = true;
-      }
+      variableDeclarations->add (CommonVariableNames::autoshared,
+          FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
+              CommonVariableNames::autoshared,
+              FortranTypesBuilder::getArray_RankOne (opDatBaseType, 0,
+                  upperBound), subroutineScope, 1, SHARED));
     }
-
-    ++i;
-  }
-
-  if (found == false)
-  {
-    Debug::getInstance ()->errorMessage (
-        "Unable to create autoshared variable as none of the OP_DATs have a base type of reals.");
   }
 }
 
@@ -336,10 +324,11 @@ FortranCUDAKernelSubroutine::FortranCUDAKernelSubroutine (
     FortranReductionSubroutines * reductionSubroutines,
     FortranOpDatDimensionsDeclaration * opDatDimensionsDeclaration) :
   FortranKernelSubroutine (subroutineName, userSubroutineName, parallelLoop,
-      moduleScope, reductionSubroutines), opDatDimensionsDeclaration (
-      opDatDimensionsDeclaration)
+      moduleScope), opDatDimensionsDeclaration (opDatDimensionsDeclaration)
 {
   using SageInterface::addTextForUnparser;
+
+  this->reductionSubroutines = reductionSubroutines;
 
   addTextForUnparser (subroutineHeaderStatement, "attributes(global) ",
       AstUnparseAttribute::e_before);

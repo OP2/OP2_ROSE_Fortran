@@ -10,7 +10,11 @@ class CPPOpenCLKernelSubroutine: public CPPKernelSubroutine
     CPPOpenCLKernelSubroutine (std::string const & subroutineName,
         std::string const & userSubroutineName, SgScopeStatement * moduleScope,
         CPPParallelLoop * parallelLoop,
-        CPPReductionSubroutines * reductionSubroutines);
+        CPPReductionSubroutines * reductionSubroutines) :
+      CPPKernelSubroutine (userSubroutineName, moduleScope, parallelLoop)
+    {
+      this->reductionSubroutines = reductionSubroutines;
+    }
 };
 
 #endif

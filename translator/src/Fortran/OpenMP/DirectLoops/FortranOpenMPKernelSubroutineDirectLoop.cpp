@@ -173,10 +173,9 @@ FortranOpenMPKernelSubroutineDirectLoop::createFormalParameterDeclarations ()
 
 FortranOpenMPKernelSubroutineDirectLoop::FortranOpenMPKernelSubroutineDirectLoop (
     std::string const & subroutineName, std::string const & userSubroutineName,
-    FortranParallelLoop * parallelLoop, SgScopeStatement * moduleScope,
-    FortranReductionSubroutines * reductionSubroutines) :
+    FortranParallelLoop * parallelLoop, SgScopeStatement * moduleScope) :
   FortranOpenMPKernelSubroutine (subroutineName, userSubroutineName,
-      parallelLoop, moduleScope, reductionSubroutines)
+      parallelLoop, moduleScope)
 {
   Debug::getInstance ()->debugMessage ("<Kernel, Direct, CUDA>",
       Debug::CONSTRUCTOR_LEVEL, __FILE__, __LINE__);

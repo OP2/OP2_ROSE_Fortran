@@ -28,12 +28,10 @@ template <typename TSubroutineHeader>
       createOpDatFormalParameterDeclarations () = 0;
 
       KernelSubroutine (std::string const & subroutineName,
-          std::string const & userSubroutineName, ParallelLoop * parallelLoop,
-          ReductionSubroutines <TSubroutineHeader> * reductionSubroutines) :
+          std::string const & userSubroutineName, ParallelLoop * parallelLoop) :
         Subroutine <TSubroutineHeader> (subroutineName + "_kernel"),
             userSubroutineName (userSubroutineName),
-            parallelLoop (parallelLoop), reductionSubroutines (
-                reductionSubroutines)
+            parallelLoop (parallelLoop)
       {
       }
   };

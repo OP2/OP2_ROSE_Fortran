@@ -21,11 +21,102 @@ FortranOpenMPSubroutinesGeneration::createReductionSubroutines ()
 void
 FortranOpenMPSubroutinesGeneration::createSubroutines ()
 {
+  using std::string;
+  using std::map;
+
+  for (map <string, FortranParallelLoop *>::const_iterator it =
+      declarations->firstParallelLoop (); it
+      != declarations->lastParallelLoop (); ++it)
+  {
+    string const userSubroutineName = it->first;
+
+    FortranParallelLoop * parallelLoop = it->second;
+
+    FortranOpenMPKernelSubroutine * kernelSubroutine;
+
+    if (parallelLoop->isDirectLoop ())
+    {
+      kernelSubroutine = new FortranOpenMPKernelSubroutineDirectLoop (
+          userSubroutineName, userSubroutineName, parallelLoop, moduleScope);
+
+      hostSubroutines[userSubroutineName]
+          = new FortranOpenMPHostSubroutineDirectLoop (
+              userSubroutineName,
+              userSubroutineName,
+              kernelSubroutine->getSubroutineName (),
+              parallelLoop,
+              moduleScope,
+              static_cast <FortranOpenMPModuleDeclarationsDirectLoop *> (moduleDeclarations[userSubroutineName]));
+    }
+    else
+    {
+      kernelSubroutine = new FortranOpenMPKernelSubroutineIndirectLoop (
+          userSubroutineName, userSubroutineName, parallelLoop, moduleScope);
+
+      hostSubroutines[userSubroutineName]
+          = new FortranOpenMPHostSubroutineIndirectLoop (
+              userSubroutineName,
+              userSubroutineName,
+              kernelSubroutine->getSubroutineName (),
+              parallelLoop,
+              moduleScope,
+              static_cast <FortranOpenMPModuleDeclarationsIndirectLoop *> (moduleDeclarations[userSubroutineName]));
+    }
+  }
 }
 
 void
 FortranOpenMPSubroutinesGeneration::createModuleDeclarations ()
 {
+  using std::map;
+  using std::string;
+
+  /*
+   * ======================================================
+   * First declare the type declarations
+   * ======================================================
+   */
+
+  for (map <string, FortranParallelLoop *>::const_iterator it =
+      declarations->firstParallelLoop (); it
+      != declarations->lastParallelLoop (); ++it)
+  {
+    string const userSubroutineName = it->first;
+
+    FortranParallelLoop * parallelLoop = it->second;
+
+    dimensionsDeclarations[userSubroutineName]
+        = new FortranOpDatDimensionsDeclaration (userSubroutineName,
+            parallelLoop, moduleScope);
+  }
+
+  /*
+   * ======================================================
+   * Now declare the variables
+   * ======================================================
+   */
+
+  for (map <string, FortranParallelLoop *>::const_iterator it =
+      declarations->firstParallelLoop (); it
+      != declarations->lastParallelLoop (); ++it)
+  {
+    string const userSubroutineName = it->first;
+
+    FortranParallelLoop * parallelLoop = it->second;
+
+    if (parallelLoop->isDirectLoop ())
+    {
+      moduleDeclarations[userSubroutineName]
+          = new FortranOpenMPModuleDeclarationsDirectLoop (userSubroutineName,
+              parallelLoop, moduleScope);
+    }
+    else
+    {
+      moduleDeclarations[userSubroutineName]
+          = new FortranOpenMPModuleDeclarationsIndirectLoop (
+              userSubroutineName, parallelLoop, moduleScope);
+    }
+  }
 }
 
 void

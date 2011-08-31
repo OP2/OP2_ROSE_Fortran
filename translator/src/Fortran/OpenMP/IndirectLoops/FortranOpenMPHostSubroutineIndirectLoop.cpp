@@ -19,6 +19,10 @@ FortranOpenMPHostSubroutineIndirectLoop::createKernelFunctionCallStatement ()
   using SageBuilder::buildVoidType;
   using SageBuilder::buildVarRefExp;
 
+  Debug::getInstance ()->debugMessage (
+      "Creating kernel function call statement", Debug::FUNCTION_LEVEL,
+      __FILE__, __LINE__);
+
   FortranOpenMPModuleDeclarationsIndirectLoop
       * moduleDeclarationsIndirectLoop =
           static_cast <FortranOpenMPModuleDeclarationsIndirectLoop *> (moduleDeclarations);
@@ -117,6 +121,10 @@ FortranOpenMPHostSubroutineIndirectLoop::createPlanFunctionExecutionStatements (
   using SageBuilder::buildBasicBlock;
   using SageInterface::appendStatement;
   using std::string;
+
+  Debug::getInstance ()->debugMessage (
+      "Creating plan function execution statements", Debug::FUNCTION_LEVEL,
+      __FILE__, __LINE__);
 
   FortranOpenMPModuleDeclarationsIndirectLoop
       * moduleDeclarationsIndirectLoop =

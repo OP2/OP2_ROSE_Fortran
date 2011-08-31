@@ -12,10 +12,9 @@ class CPPKernelSubroutine: public KernelSubroutine <SgFunctionDeclaration>
 
     CPPKernelSubroutine (std::string const & subroutineName,
         std::string const & userSubroutineName, SgScopeStatement * moduleScope,
-        CPPParallelLoop * parallelLoop,
-        CPPReductionSubroutines * reductionSubroutines) :
+        CPPParallelLoop * parallelLoop) :
       KernelSubroutine <SgFunctionDeclaration> (subroutineName,
-          userSubroutineName, parallelLoop, reductionSubroutines)
+          userSubroutineName, parallelLoop)
     {
       using SageBuilder::buildVoidType;
       using SageBuilder::buildDefiningFunctionDeclaration;

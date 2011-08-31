@@ -33,8 +33,7 @@ class FortranOpenMPKernelSubroutineIndirectLoop: public FortranOpenMPKernelSubro
     FortranOpenMPKernelSubroutineIndirectLoop (
         std::string const & subroutineName,
         std::string const & userSubroutineName,
-        FortranParallelLoop * parallelLoop, SgScopeStatement * moduleScope,
-        FortranReductionSubroutines * reductionSubroutines);
+        FortranParallelLoop * parallelLoop, SgScopeStatement * moduleScope);
 };
 
 #endif

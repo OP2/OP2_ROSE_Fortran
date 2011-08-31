@@ -129,6 +129,18 @@ CPPProgramDeclarationsAndDefinitions::visit (SgNode * node)
       break;
     }
 
+    case V_SgFunctionDefinition:
+    {
+      SgFunctionDefinition * functionDeclaration =
+          isSgFunctionDefinition (node);
+
+      Debug::getInstance ()->debugMessage ("Found definition: "
+          + functionDeclaration->get_declaration ()->get_name ().getString (),
+          Debug::INNER_LOOP_LEVEL, __FILE__, __LINE__);
+
+      break;
+    }
+
     case V_SgFunctionCallExp:
     {
       /*
@@ -181,5 +193,5 @@ CPPProgramDeclarationsAndDefinitions::visit (SgNode * node)
 CPPProgramDeclarationsAndDefinitions::CPPProgramDeclarationsAndDefinitions (
     SgProject * project)
 {
-  traverseInputFiles (project, preorder);
+  traverseInputFiles(project, preorder);
 }

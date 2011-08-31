@@ -20,6 +20,7 @@ FortranSubroutinesGeneration::fixUseStatement (SgUseStatement * useStatement,
 {
   using boost::iequals;
   using SageInterface::getPreviousStatement;
+  using SageInterface::removeStatement;
 
   std::string const & moduleNameToRemove = declarations->getModuleNameForFile (
       declarations->getFileNameForSubroutine (userSubroutineName));
@@ -30,11 +31,13 @@ FortranSubroutinesGeneration::fixUseStatement (SgUseStatement * useStatement,
 
   SgUseStatement * lastUseStatement = useStatement;
 
+  ROSE_ASSERT (lastUseStatement != NULL);
+
   do
   {
     if (iequals (lastUseStatement->get_name ().getString (), moduleNameToRemove))
     {
-      SageInterface::removeStatement (lastUseStatement);
+      removeStatement (lastUseStatement);
       break;
     }
 
@@ -139,11 +142,12 @@ FortranSubroutinesGeneration::patchCallsToParallelLoops ()
           "Could not find last 'use' statement");
     }
 
-    fixUseStatement (lastUseStatement, userSubroutineName);
-
     if (find (processedFiles.begin (), processedFiles.end (),
         parallelLoop->getFileName ()) == processedFiles.end ())
     {
+      Debug::getInstance ()->debugMessage ("Adding new use statement for '"
+          + moduleName + "'", Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+
       processedFiles.push_back (parallelLoop->getFileName ());
 
       /*
@@ -159,6 +163,8 @@ FortranSubroutinesGeneration::patchCallsToParallelLoops ()
 
       insertStatementAfter (lastUseStatement, newUseStatement);
     }
+
+    fixUseStatement (lastUseStatement, userSubroutineName);
 
     /*
      * ======================================================

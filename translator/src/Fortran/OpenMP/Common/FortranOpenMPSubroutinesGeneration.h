@@ -29,6 +29,7 @@ class FortranOpenMPSubroutinesGeneration: public FortranSubroutinesGeneration
         FortranProgramDeclarationsAndDefinitions * declarations) :
       FortranSubroutinesGeneration (declarations, "openmp_subroutines.F95")
     {
+      generate();
     }
 };
 
