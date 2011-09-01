@@ -22,6 +22,7 @@ FortranHostSubroutine::createFormalParameterDeclarations ()
   using std::string;
   using std::map;
 
+
   Debug::getInstance ()->debugMessage (
       "Creating host subroutine formal parameters", Debug::FUNCTION_LEVEL,
       __FILE__, __LINE__);

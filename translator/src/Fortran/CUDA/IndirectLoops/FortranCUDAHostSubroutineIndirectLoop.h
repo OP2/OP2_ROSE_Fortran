@@ -14,8 +14,9 @@
 #include <FortranCUDADataSizesDeclarationIndirectLoop.h>
 #include <FortranPlan.h>
 
-class FortranCUDAHostSubroutineIndirectLoop: public FortranCUDAHostSubroutine,
-    public FortranPlan
+class FortranCUDAHostSubroutineIndirectLoop: 
+  public FortranCUDAHostSubroutine,
+  public FortranPlan
 {
   private:
 

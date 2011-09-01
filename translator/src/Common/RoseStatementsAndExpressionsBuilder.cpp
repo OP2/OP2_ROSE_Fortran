@@ -3,7 +3,7 @@
 
 SgIfStmt *
 RoseStatementsAndExpressionsBuilder::buildIfStatementWithEmptyElse (
-    SgExpression * ifGuard, SgBasicBlock * thenBlock)
+    SgExpression * ifGuard, SgScopeStatement * thenBlock)
 {
   using SageBuilder::buildExprStatement;
   using SageInterface::setOneSourcePositionForTransformation;

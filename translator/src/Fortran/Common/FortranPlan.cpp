@@ -4,6 +4,7 @@
 #include <FortranTypesBuilder.h>
 #include <CommonNamespaces.h>
 #include <Debug.h>
+#include <Cxx_Grammar.h>
 
 SgBasicBlock *
 FortranPlan::createConvertPlanFunctionParametersStatements (
@@ -19,6 +20,8 @@ FortranPlan::createConvertPlanFunctionParametersStatements (
   using SageBuilder::buildPntrArrRefExp;
   using SageBuilder::buildIntVal;
   using SageInterface::appendStatement;
+
+
 
   Debug::getInstance ()->debugMessage (
       "Creating statements to convert plan function parameters",

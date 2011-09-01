@@ -2,19 +2,29 @@
 #define CPP_OPENCL_KERNEL_SUBROUTINE_H
 
 #include <CPPKernelSubroutine.h>
+#include <CPPOpDatDimensionsDeclaration.h>
 
 class CPPOpenCLKernelSubroutine: public CPPKernelSubroutine
 {
   protected:
 
+    CPPOpDatDimensionsDeclaration * opDatDimensionsDeclaration; //FIXME
+
+  protected:
+    void
+    createReductionLoopStatements ();
+
+    void
+    createLocalThreadDeclarations ();
+
+    void
+    createAutoSharedDeclaration ();
+
     CPPOpenCLKernelSubroutine (std::string const & subroutineName,
-        std::string const & userSubroutineName, SgScopeStatement * moduleScope,
-        CPPParallelLoop * parallelLoop,
-        CPPReductionSubroutines * reductionSubroutines) :
-      CPPKernelSubroutine (userSubroutineName, moduleScope, parallelLoop)
-    {
-      this->reductionSubroutines = reductionSubroutines;
-    }
+        std::string const & userSubroutineName, CPPParallelLoop * parallelLoop,
+        SgScopeStatement * moduleScope,
+        CPPReductionSubroutines * reductionSubroutines,
+        CPPOpDatDimensionsDeclaration * opDatDimensionsDeclaration);
 };
 
 #endif

@@ -12,8 +12,10 @@ class CPPCUDASubroutinesGeneration: public CPPSubroutinesGeneration
   private:
 
     virtual CPPHostSubroutine *
-    createSubroutines (CPPParallelLoop * parallelLoop,
-        std::string const & userSubroutineName);
+    createSubroutines ();
+    
+    virtual void
+    addLibraries ();
 
   public:
 

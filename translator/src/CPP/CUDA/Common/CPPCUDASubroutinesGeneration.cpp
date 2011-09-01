@@ -7,9 +7,15 @@
  */
 
 CPPHostSubroutine *
-CPPCUDASubroutinesGeneration::createSubroutines (
-    CPPParallelLoop * parallelLoop, std::string const & userSubroutineName)
+CPPCUDASubroutinesGeneration::createSubroutines ()
 {
+  return NULL;
+}
+
+void
+CPPCUDASubroutinesGeneration::addLibraries ()
+{
+  return;
 }
 
 /*

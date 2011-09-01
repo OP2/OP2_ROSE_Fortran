@@ -21,7 +21,7 @@ class RoseStatementsAndExpressionsBuilder
      */
     static SgIfStmt *
     buildIfStatementWithEmptyElse (SgExpression * ifGuard,
-        SgBasicBlock * thenBlock);
+        SgScopeStatement * thenBlock);
 
     /*
      * ======================================================

@@ -5,7 +5,8 @@
 #include <ParallelLoop.h>
 
 template <typename TSubroutineHeader>
-  class HostSubroutine: public Subroutine <TSubroutineHeader>
+  class HostSubroutine: 
+    public Subroutine <TSubroutineHeader>
   {
     protected:
 

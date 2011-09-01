@@ -65,6 +65,31 @@ namespace TargetBackends
 
 namespace IndirectLoop
 {
+  namespace CPP
+  {
+    namespace VariablePrefixes
+    {
+      std::string const numberOfBytes = "nBytes";
+      std::string const pindMaps = "pindMaps";
+      std::string const pMaps = "pMaps";
+      std::string const roundUp = "roundUp";
+    }
+
+    namespace KernelSubroutine
+    {
+      namespace VariableNames
+      {
+        std::string const blockID = "blockId";
+        std::string const blockOffsetShared = "offset_b";
+        std::string const moduled = "moduled";
+        std::string const moduloResult = "moduloResult";
+        std::string const nbytes = "nbytes";
+        std::string const ncolor = "ncolor";
+        std::string const nelem = "nelem";
+        std::string const nelems2 = "nelems2";
+      }
+    }
+  }
   namespace Fortran
   {
     namespace VariablePrefixes
@@ -94,6 +119,21 @@ namespace IndirectLoop
 
 namespace DirectLoop
 {
+  namespace CPP
+  {
+    namespace KernelSubroutine
+    {
+      std::string const setSize = "set_size";
+      std::string const warpScratchpadSize = "offset_s";
+      std::string const warpSize = "OP_WARPSIZE";
+      std::string const setElementCounter = "n";
+      std::string const dataPerElementCounter = "m";
+      std::string const threadIDModulus = "tid";
+      std::string const offsetInThreadBlock = "offset";
+      std::string const remainingElements = "nelems";
+      std::string const autosharedDisplacement = "autosharedDisplacement";
+    }
+  }
   namespace Fortran
   {
     namespace KernelSubroutine
@@ -111,6 +151,50 @@ namespace DirectLoop
   }
 }
 
+namespace OpenCL
+{
+  /*
+   * ======================================================
+   * The names used in the OpenCL libraries
+   * ======================================================
+   */
+
+  namespace CPP
+  {
+    std::string const getGroupId = "get_group_id";
+    std::string const getGroupSize = "get_group_size";
+    std::string const getLocalSize = "get_local_size";
+    std::string const getLocalId = "get_local_id";
+    std::string const getNumGroups = "get_num_groups";
+    std::string const getGlobalId = "get_global_id";
+    std::string const getGlobalSize = "get_global_size";
+    std::string const cudaThreadSynchronize = "cudaThreadSynchronize";
+    std::string const blocksPerGrid = "nblocks";
+    std::string const totalThreads = "nthreadstot";
+    std::string const sharedMemorySize = "nshared";
+    std::string const threadsPerBlock = "nthreads";
+    std::string const barrier = "barrier";
+    std::string const argumentCounterVariable = "argCnt";
+    //std::string const syncthreads = "barrier( CLK_LOCAL_MEM_FENCE )";
+    std::string const threadSynchRet = "threadSynchRet";
+    std::string const kernel = "hKernel";
+    std::string const errVar = "ciErrNum";
+    std::string const pointerType = "cl_mem";
+    std::string const commanQueue = "cqCommandQueue";
+    std::string const setKernelArg = "clSetKernelArg";
+    std::string const enqueueKernel = "clEnqueueNDRangeKernel";
+    std::string const getKernel = "getKernel";
+    std::string const kernelType = "cl_kernel";
+    std::string const constants = "constants";
+    std::string const globalConstants = "globalConstants";
+    std::string const globalConstantsType = "global_constants_t";
+    std::string const localModifier = "__local";
+    std::string const globalModifier = "__global";
+    std::string const constantModifier = "__constant";
+    
+
+  }
+}
 namespace CUDA
 {
   /*
@@ -149,6 +233,7 @@ namespace OpenMP
 namespace CommonVariableNames
 {
   std::string const autoshared = "autoshared";
+  std::string const argShared = "arg_s";
   std::string const col = "col";
   std::string const col2 = "col2";
   std::string const dat = "dat";
@@ -160,6 +245,7 @@ namespace CommonVariableNames
   std::string const set = "set";
   std::string const size = "size";
   std::string const upperBound = "n";
+  std::string const numberofBytes = "nbytes";
 }
 
 namespace VariableNames
@@ -207,6 +293,15 @@ namespace VariableNames
    * ======================================================
    */
   std::string
+  getOpDatSharedName (unsigned int OP_DAT_ArgumentGroup);
+
+  /*
+   * ======================================================
+   * Returns the name of a local OP_DAT variable in this
+   * OP_DAT argument group
+   * ======================================================
+   */
+  std::string
   getOpDatLocalName (unsigned int OP_DAT_ArgumentGroup);
 
   /*
@@ -217,6 +312,15 @@ namespace VariableNames
    */
   std::string
   getOpDatGlobalName (unsigned int OP_DAT_ArgumentGroup);
+
+  /*
+   * ======================================================
+   * Returns the name of a global OP_DAT variable in this
+   * OP_DAT argument group
+   * ======================================================
+   */
+  std::string
+  getOpDatSharedName (unsigned int OP_DAT_ArgumentGroup);
 
   /*
    * ======================================================
@@ -323,9 +427,9 @@ namespace VariableNames
 
   std::string
   getIncrementAccessMapName (unsigned int OP_DAT_ArgumentGroup);
-
+  
   std::string
-  getIncrementAccessMapName (unsigned int OP_DAT_ArgumentGroup);
+  getOpIndirectionSharedName (unsigned int OP_DAT_ArgumentGroup);
 
   std::string
   getIndirectionArgumentSizeName (unsigned int OP_DAT_ArgumentGroup);
