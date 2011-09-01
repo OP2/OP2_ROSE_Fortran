@@ -21,18 +21,22 @@ FortranCUDAModuleDeclarations::createReductionDeclarations ()
   for (vector <Reduction *>::iterator it = reductions.begin (); it
       != reductions.end (); ++it)
   {
+    SgType * baseType = (*it)->getArrayType ()->get_base_type ();
+
     SgVariableDeclaration * variableDeclaration1 =
         FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
-            ReductionSubroutine::reductionArrayHost, (*it)->getArrayType (),
-            moduleScope, 1, ALLOCATABLE);
+            ReductionSubroutine::reductionArrayHost,
+            FortranTypesBuilder::getArray_RankOne (baseType), moduleScope, 1,
+            ALLOCATABLE);
 
     variableDeclarations->add (ReductionSubroutine::reductionArrayHost,
         variableDeclaration1);
 
     SgVariableDeclaration * variableDeclaration2 =
         FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
-            ReductionSubroutine::reductionArrayDevice, (*it)->getArrayType (),
-            moduleScope, 2, ALLOCATABLE, DEVICE);
+            ReductionSubroutine::reductionArrayDevice,
+            FortranTypesBuilder::getArray_RankOne (baseType), moduleScope, 2,
+            ALLOCATABLE, DEVICE);
 
     variableDeclarations->add (ReductionSubroutine::reductionArrayDevice,
         variableDeclaration2);
