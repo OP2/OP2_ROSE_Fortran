@@ -366,9 +366,9 @@ FortranSubroutinesGeneration::generate ()
 
   initialiseConstantsSubroutine->declareConstants ();
 
-  createReductionSubroutines ();
-
   addContains ();
+
+  createReductionSubroutines ();
 
   initialiseConstantsSubroutine->generateSubroutine ();
 
