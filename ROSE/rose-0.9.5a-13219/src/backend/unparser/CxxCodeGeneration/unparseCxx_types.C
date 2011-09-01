@@ -213,6 +213,15 @@ string get_type_name(SgType* t)
                     res = res + "const ";
                 if (mod_type->get_typeModifier().get_constVolatileModifier().isVolatile())
                     res = res + "volatile ";
+                // Adam Betts (31/08/2011) Output local modifier
+                if (mod_type->get_typeModifier().isLocalMemory())
+                  res = res + "__local ";
+                if (mod_type->get_typeModifier().isGlobalMemory())
+                  res = res + "__global ";
+                if (mod_type->get_typeModifier().isConstantMemory())
+                  res = res + "__constant ";
+                if (mod_type->get_typeModifier().isPrivateMemory())
+                  res = res + "__private ";
                 if (mod_type->get_typeModifier().isRestrict())
                    {
                   // DQ (8/29/2005): Added support for classification of back-end compilers (independent of the name invoked to execute them)

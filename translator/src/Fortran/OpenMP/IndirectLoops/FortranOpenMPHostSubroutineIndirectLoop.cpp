@@ -301,8 +301,8 @@ FortranOpenMPHostSubroutineIndirectLoop::createTransferOpDatStatements ()
           moduleDeclarationsIndirectLoop->getGlobalOpDatSizeDeclaration (i));
 
       SgStatement * callStatement =
-          SubroutineCalls::createCToFortranPointerCallStatement (block,
-              parameterExpression1, parameterExpression2,
+          SubroutineCalls::createCToFortranPointerCallStatement (
+              subroutineScope, parameterExpression1, parameterExpression2,
               buildOpaqueVarRefExp ("(/"
                   + parameterExpression3->unparseToString () + "/)", block));
 
@@ -326,6 +326,10 @@ FortranOpenMPHostSubroutineIndirectLoop::createFirstTimeExecutionStatements ()
   using SageBuilder::buildAssignStatement;
   using SageInterface::appendStatement;
   using std::vector;
+
+  Debug::getInstance ()->debugMessage (
+      "Creating statements for first execution of host subroutine",
+      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
   vector <SubroutineVariableDeclarations *> declarationSets;
   declarationSets.push_back (variableDeclarations);
@@ -461,6 +465,9 @@ FortranOpenMPHostSubroutineIndirectLoop::createOpenMPVariableDeclarations ()
 void
 FortranOpenMPHostSubroutineIndirectLoop::createStatements ()
 {
+  Debug::getInstance ()->debugMessage ("Creating statements",
+      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+
   initialiseNumberOfThreadsStatements ();
 
   createFirstTimeExecutionStatements ();
@@ -481,6 +488,9 @@ FortranOpenMPHostSubroutineIndirectLoop::createStatements ()
 void
 FortranOpenMPHostSubroutineIndirectLoop::createLocalVariableDeclarations ()
 {
+  Debug::getInstance ()->debugMessage ("Creating local variable declarations",
+      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+
   createOpenMPVariableDeclarations ();
 
   createExecutionPlanDeclarations ();

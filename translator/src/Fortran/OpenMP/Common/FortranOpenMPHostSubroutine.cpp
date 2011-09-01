@@ -23,6 +23,10 @@ FortranOpenMPHostSubroutine::createReductionEpilogueStatements ()
   using SageBuilder::buildPntrArrRefExp;
   using SageInterface::appendStatement;
 
+  Debug::getInstance ()->debugMessage (
+      "Creating reduction epilogue statements", Debug::FUNCTION_LEVEL,
+      __FILE__, __LINE__);
+
   /*
    * ======================================================
    * Create the inner loop
@@ -124,6 +128,10 @@ FortranOpenMPHostSubroutine::createReductionPrologueStatements ()
   using SageBuilder::buildPntrArrRefExp;
   using SageInterface::appendStatement;
 
+  Debug::getInstance ()->debugMessage (
+      "Creating reduction prologue statements", Debug::FUNCTION_LEVEL,
+      __FILE__, __LINE__);
+
   /*
    * ======================================================
    * Create the inner loop
@@ -202,6 +210,10 @@ FortranOpenMPHostSubroutine::createReductionLocalVariableDeclarations ()
   using SageBuilder::buildSubtractOp;
   using SageBuilder::buildIntVal;
 
+  Debug::getInstance ()->debugMessage (
+      "Creating reduction local variable declarations", Debug::FUNCTION_LEVEL,
+      __FILE__, __LINE__);
+
   variableDeclarations->add (CommonVariableNames::iterationCounter1,
       FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
           CommonVariableNames::iterationCounter1,
@@ -251,6 +263,10 @@ FortranOpenMPHostSubroutine::initialiseNumberOfThreadsStatements ()
   using SageBuilder::buildAssignStatement;
   using SageInterface::appendStatement;
   using SageInterface::addTextForUnparser;
+
+  Debug::getInstance ()->debugMessage (
+      "Creating statements to initialise number of threads",
+      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
   SgFunctionSymbol * functionSymbol =
       FortranTypesBuilder::buildNewFortranFunction ("omp_get_max_threads",

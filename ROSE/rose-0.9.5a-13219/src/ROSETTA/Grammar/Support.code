@@ -1200,7 +1200,12 @@ HEADER_TYPE_MODIFIER_START
 						// Carlo (27/04/2011): added new attributes to enable generation of Fortran CUDA kernels
 							 e_shared															 = 30,
 							 e_constant														 = 31,
-
+							 
+						// Adam Betts (31/08/2011): added new attributes to enable generation of C++ OpenCL
+						     e_localMemory                                                    = 32,
+						     e_globalMemory													  = 33,
+						     e_constantMemory												  = 34,
+						     e_privateMemory												  = 35,
 
 
 
@@ -1308,21 +1313,37 @@ HEADER_TYPE_MODIFIER_START
           void unsetRestrict();
 
 
-					// Carlo (08/02/2011): added support for generation of CUDA Fortran kernels
+		  // Carlo (08/02/2011): added support for generation of CUDA Fortran kernels
           bool isDevice() const;
           void setDevice();
-					void unsetDevice();
-
-					// Carlo (26/04/2011): added further support for generation of CUDA Fortran kernels
+          void unsetDevice();
+          
+          // Carlo (26/04/2011): added further support for generation of CUDA Fortran kernels
           bool isShared() const;
           void setShared();
-					void unsetShared();
-
+          void unsetShared();
+					
+		  // Adam Betts (31/08/2011): functions to set and unset memory attributes of variable declaration
+		  // in OpenCL
+		  bool isLocalMemory() const;
+		  void setLocalMemory();
+		  void unsetLocalMemory();
+		  
+		  bool isGlobalMemory() const;
+		  void setGlobalMemory();
+		  void unsetGlobalMemory();
+		  
+		  bool isConstantMemory() const;
+		  void setConstantMemory();
+		  void unsetConstantMemory();
+		  
+		  bool isPrivateMemory() const;
+		  void setPrivateMemory();
+		  void unsetPrivateMemory();
+		  
           bool isConstant() const;
           void setConstant();
-					void unsetConstant();
-
-
+		  void unsetConstant();
 
        // Fortran specific attribute
           bool isAllocatable() const;
@@ -3012,6 +3033,23 @@ void SgTypeModifier::unsetDevice()     { unsetBit(e_device,p_modifierVector); }
 bool SgTypeModifier::isShared() const  { return checkBit(e_shared,p_modifierVector); }
 void SgTypeModifier::setShared()       { setBit(e_shared,p_modifierVector); }
 void SgTypeModifier::unsetShared()     { unsetBit(e_shared,p_modifierVector); }
+
+// Adam Betts (31/08/2011):
+bool SgTypeModifier::isLocalMemory() const   { return checkBit(e_localMemory,p_modifierVector); }
+void SgTypeModifier::setLocalMemory()        { setBit(e_localMemory,p_modifierVector); }
+void SgTypeModifier::unsetLocalMemory()      { unsetBit(e_localMemory,p_modifierVector); }
+
+bool SgTypeModifier::isGlobalMemory() const   { return checkBit(e_globalMemory,p_modifierVector); }
+void SgTypeModifier::setGlobalMemory()        { setBit(e_globalMemory,p_modifierVector); }
+void SgTypeModifier::unsetGlobalMemory()      { unsetBit(e_globalMemory,p_modifierVector); }
+
+bool SgTypeModifier::isConstantMemory() const   { return checkBit(e_constantMemory,p_modifierVector); }
+void SgTypeModifier::setConstantMemory()        { setBit(e_constantMemory,p_modifierVector); }
+void SgTypeModifier::unsetConstantMemory()      { unsetBit(e_constantMemory,p_modifierVector); }
+
+bool SgTypeModifier::isPrivateMemory() const   { return checkBit(e_privateMemory,p_modifierVector); }
+void SgTypeModifier::setPrivateMemory()        { setBit(e_privateMemory,p_modifierVector); }
+void SgTypeModifier::unsetPrivateMemory()      { unsetBit(e_privateMemory,p_modifierVector); }
 
 bool SgTypeModifier::isConstant() const  { return checkBit(e_constant,p_modifierVector); }
 void SgTypeModifier::setConstant()       { setBit(e_constant,p_modifierVector); }

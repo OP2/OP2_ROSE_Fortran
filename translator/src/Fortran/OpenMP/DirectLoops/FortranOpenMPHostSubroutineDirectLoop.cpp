@@ -89,6 +89,9 @@ FortranOpenMPHostSubroutineDirectLoop::createKernelDoLoop ()
   using SageInterface::appendStatement;
   using SageInterface::addTextForUnparser;
 
+  Debug::getInstance ()->debugMessage ("Creating kernel do loop",
+      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+
   SgAssignOp * initializationExpression = buildAssignOp (buildVarRefExp (
       variableDeclarations->get (OpenMP::threadIndex)), buildIntVal (0));
 
@@ -158,6 +161,10 @@ FortranOpenMPHostSubroutineDirectLoop::createTransferOpDatStatements ()
   using SageBuilder::buildDotExp;
   using SageInterface::appendStatement;
 
+  Debug::getInstance ()->debugMessage (
+      "Creating statements to transfer OP_DAT", Debug::FUNCTION_LEVEL,
+      __FILE__, __LINE__);
+
   SgBasicBlock * block = buildBasicBlock ();
 
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
@@ -187,8 +194,8 @@ FortranOpenMPHostSubroutineDirectLoop::createTransferOpDatStatements ()
       }
 
       SgStatement * callStatement =
-          SubroutineCalls::createCToFortranPointerCallStatement (block,
-              parameterExpression1, parameterExpression2,
+          SubroutineCalls::createCToFortranPointerCallStatement (
+              subroutineScope, parameterExpression1, parameterExpression2,
               buildOpaqueVarRefExp ("(/"
                   + parameterExpression3->unparseToString () + "/)", block));
 
@@ -208,6 +215,10 @@ FortranOpenMPHostSubroutineDirectLoop::createFirstTimeExecutionStatements ()
   using SageBuilder::buildEqualityOp;
   using SageBuilder::buildAssignStatement;
   using SageInterface::appendStatement;
+
+  Debug::getInstance ()->debugMessage (
+      "Creating statements for first execution of host subroutine",
+      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
   SgBasicBlock * ifBody = buildBasicBlock ();
 
@@ -237,6 +248,10 @@ FortranOpenMPHostSubroutineDirectLoop::initialiseThreadVariablesStatements ()
   using SageBuilder::buildIntVal;
   using SageBuilder::buildAssignStatement;
   using SageInterface::appendStatement;
+
+  Debug::getInstance ()->debugMessage (
+      "Creating statements to initialise thread variables",
+      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
   SgExprStatement * assignmentStatement1 = buildAssignStatement (
       buildVarRefExp (variableDeclarations->get (OpenMP::threadIndex)),
