@@ -34,16 +34,24 @@ CPPOpenCLReductionSubroutine::createStatements ()
   using SageBuilder::buildDivideOp;
   using SageBuilder::buildPntrArrRefExp;
   using SageBuilder::buildVoidType;
-  
-  SgExpression * tid_ref = buildVarRefExp ( variableDeclarations->get (ReductionSubroutine::threadID) );
-  SgExpression * d_ref = buildVarRefExp ( variableDeclarations->get (CommonVariableNames::iterationCounter1) );
-  SgExpression * temp_ref = buildVarRefExp ( variableDeclarations->get (CommonVariableNames::autoshared) );
-  SgExpression * dat_l_ref = buildVarRefExp ( variableDeclarations->get (ReductionSubroutine::inputValue) );
-  SgExpression * warpSize_ref = buildVarRefExp ( variableDeclarations->get (ReductionSubroutine::warpSize) );
-  SgExpression * reduction_ref = buildVarRefExp ( variableDeclarations->get (ReductionSubroutine::reductionType) );
-  SgExpression * vtemp_ref = buildVarRefExp ( variableDeclarations->get (ReductionSubroutine::autosharedV) ); //TODO: needed?
-  SgExpression * dat_g_ref = buildVarRefExp ( variableDeclarations->get (ReductionSubroutine::reductionResultOnDevice) );
-  
+
+  SgExpression * tid_ref = buildVarRefExp (variableDeclarations->get (
+      ReductionSubroutine::threadID));
+  SgExpression * d_ref = buildVarRefExp (variableDeclarations->get (
+      CommonVariableNames::iterationCounter1));
+  SgExpression * temp_ref = buildVarRefExp (variableDeclarations->get (
+      autosharedVariableName));
+  SgExpression * dat_l_ref = buildVarRefExp (variableDeclarations->get (
+      ReductionSubroutine::inputValue));
+  SgExpression * warpSize_ref = buildVarRefExp (variableDeclarations->get (
+      ReductionSubroutine::warpSize));
+  SgExpression * reduction_ref = buildVarRefExp (variableDeclarations->get (
+      ReductionSubroutine::reductionType));
+  SgExpression * vtemp_ref = buildVarRefExp (variableDeclarations->get (
+      ReductionSubroutine::autosharedV)); //TODO: needed?
+  SgExpression * dat_g_ref = buildVarRefExp (variableDeclarations->get (
+      ReductionSubroutine::reductionResultOnDevice));
+
   SgStatement * tempStatement;
   SgStatement * initialisationStatement1;
   SgStatement * testExpression1;
@@ -63,701 +71,551 @@ CPPOpenCLReductionSubroutine::createStatements ()
   SgScopeStatement * caseBody1;
   SgStatement * caseStatement1;
   SgExpression * ifGuardExpression2;
-  
-  
+
   /*
    * ======================================================
    * tid = get_local_id(0)
    * ======================================================
    */
-  
-  tempStatement = buildAssignStatement(
-      tid_ref,
-      CPPOpenCLStatementsAndExpressionsBuilder::generateGetLocalId() );
-  
-  appendStatement( tempStatement, subroutineScope );
-  
+
+  tempStatement = buildAssignStatement (tid_ref,
+      CPPOpenCLStatementsAndExpressionsBuilder::generateGetLocalId ());
+
+  appendStatement (tempStatement, subroutineScope);
+
   /*
    * ======================================================
    * d = get_local_size(0)>>1
    * ======================================================
    */
-  
-  tempStatement = buildAssignStatement(
-      d_ref,
-      buildRshiftOp(
-          CPPOpenCLStatementsAndExpressionsBuilder::generateGetLocalSize(),
-          buildIntVal(1) ) );
-  
-  appendStatement( tempStatement, subroutineScope );
-  
+
+  tempStatement = buildAssignStatement (d_ref, buildRshiftOp (
+      CPPOpenCLStatementsAndExpressionsBuilder::generateGetLocalSize (),
+      buildIntVal (1)));
+
+  appendStatement (tempStatement, subroutineScope);
+
   /*
    * ======================================================
    * barrier ( CLK_LOCAL_MEM_FENCE )
    * ======================================================
    */
-  
-  tempStatement = CPPOpenCLStatementsAndExpressionsBuilder::generateBarrierStatement();
-  
-  appendStatement( tempStatement, subroutineScope );
-  
-  tempStatement = buildAssignStatement(
-      buildPntrArrRefExp(
-          temp_ref,
-          tid_ref ),
-      dat_l_ref );
-  
-  appendStatement( tempStatement, subroutineScope );
-  
-  tempStatement = buildAssignStatement(
-      warpSize_ref,
-      buildOpaqueVarRefExp("WARP_SIZE") );
-  
-  appendStatement( tempStatement, subroutineScope );
-  
+
+  tempStatement
+      = CPPOpenCLStatementsAndExpressionsBuilder::generateBarrierStatement ();
+
+  appendStatement (tempStatement, subroutineScope);
+
+  tempStatement = buildAssignStatement (buildPntrArrRefExp (temp_ref, tid_ref),
+      dat_l_ref);
+
+  appendStatement (tempStatement, subroutineScope);
+
+  tempStatement = buildAssignStatement (warpSize_ref, buildOpaqueVarRefExp (
+      "WARP_SIZE"));
+
+  appendStatement (tempStatement, subroutineScope);
+
   /*
    * ======================================================
    * BEGIN for ( ; d>warpSize; d>>=1 )
    * ======================================================
    */
-  
-  initialisationStatement1 = buildBasicBlock();
-  
-  testExpression1 = buildExprStatement( buildGreaterThanOp(
-      d_ref,
-      warpSize_ref ) );
-  
-  incrementExpression1 = buildRshiftAssignOp(
-      d_ref,
-      buildIntVal(1) );
-  
-  loopBody1 = buildBasicBlock();
-  
-  forStatement1 = buildForStatement(
-      initialisationStatement1,
-      testExpression1,
-      incrementExpression1,
-      loopBody1 );
-  
-  appendStatement( forStatement1, subroutineScope );
-  
-  tempStatement = CPPOpenCLStatementsAndExpressionsBuilder::generateBarrierStatement();
-  
-  appendStatement( tempStatement, loopBody1 );
-  
+
+  initialisationStatement1 = buildBasicBlock ();
+
+  testExpression1 = buildExprStatement (
+      buildGreaterThanOp (d_ref, warpSize_ref));
+
+  incrementExpression1 = buildRshiftAssignOp (d_ref, buildIntVal (1));
+
+  loopBody1 = buildBasicBlock ();
+
+  forStatement1 = buildForStatement (initialisationStatement1, testExpression1,
+      incrementExpression1, loopBody1);
+
+  appendStatement (forStatement1, subroutineScope);
+
+  tempStatement
+      = CPPOpenCLStatementsAndExpressionsBuilder::generateBarrierStatement ();
+
+  appendStatement (tempStatement, loopBody1);
+
   /*
    * ======================================================
    * BEGIN if (tid<d)
    * ======================================================
    */
-  
-  ifGuardExpression1 = buildLessThanOp(
-      tid_ref,
-      d_ref );
-  
-  ifBody1 = buildBasicBlock();
-  
-  ifStatement1 = RoseStatementsAndExpressionsBuilder::buildIfStatementWithEmptyElse (
-          ifGuardExpression1, 
-          ifBody1);
-  
-  appendStatement( ifStatement1, loopBody1 );
-  
+
+  ifGuardExpression1 = buildLessThanOp (tid_ref, d_ref);
+
+  ifBody1 = buildBasicBlock ();
+
+  ifStatement1
+      = RoseStatementsAndExpressionsBuilder::buildIfStatementWithEmptyElse (
+          ifGuardExpression1, ifBody1);
+
+  appendStatement (ifStatement1, loopBody1);
+
   /*
    * ======================================================
    * BEGIN switch ( reduction )
    * ======================================================
    */
-  
+
   switchExpression1 = reduction_ref;
-  
-  switchBody1 = buildBasicBlock();
-  
-  switchStatement1 = buildSwitchStatement(
-      switchExpression1,
-      switchBody1 );
-  
-  appendStatement( switchStatement1, ifBody1 );
-  
+
+  switchBody1 = buildBasicBlock ();
+
+  switchStatement1 = buildSwitchStatement (switchExpression1, switchBody1);
+
+  appendStatement (switchStatement1, ifBody1);
+
   /*
    * ======================================================
    * case OP_INC
    * ======================================================
    */
-  
-  caseBody1 = buildBasicBlock();  
-  
-  caseStatement1 = buildCaseOptionStmt(
-      buildOpaqueVarRefExp("OP_INC"),
-      caseBody );
-  
-  appendStatement( caseStatement1, switchBody1 );
-  
-  tempStatement = buildAssignStatement(
-      buildPntrArrRefExp(
-          temp_ref,
-          tid_ref ),
-      buildAddOp(
-          buildPntrArrRefExp( 
-              temp_ref,
-              tid_ref ),
-          buildPntrArrRefExp( 
-              temp_ref,
-              buildAddOp(
-                  tid_ref,
-                  d_ref ) ) ) );
-  
-  appendStatement( tempStatement, caseBody1 );
-  
-  tempStatement = buildBreakStmt();
-  
-  appendStatement( tempStatement, caseBody1 );
-  
+
+  caseBody1 = buildBasicBlock ();
+
+  caseStatement1 = buildCaseOptionStmt (buildOpaqueVarRefExp ("OP_INC"),
+      caseBody);
+
+  appendStatement (caseStatement1, switchBody1);
+
+  tempStatement = buildAssignStatement (buildPntrArrRefExp (temp_ref, tid_ref),
+      buildAddOp (buildPntrArrRefExp (temp_ref, tid_ref), buildPntrArrRefExp (
+          temp_ref, buildAddOp (tid_ref, d_ref))));
+
+  appendStatement (tempStatement, caseBody1);
+
+  tempStatement = buildBreakStmt ();
+
+  appendStatement (tempStatement, caseBody1);
+
   /*
    * ======================================================
    * case OP_MIN
    * ======================================================
    */
-  
-  caseBody = buildBasicBlock();  
-  
-  caseStatement = buildCaseOptionStmt(
-      buildOpaqueVarRefExp("OP_MIN"),
-      caseBody );
-  
-  appendStatement( caseStatement, switchBody1 );
-  
-  ifGuardExpression2 = buildLessThanOp(
-      buildPntrArrRefExp( 
-                    temp_ref,
-                    buildAddOp(
-                        tid_ref,
-                        d_ref ) ),
-      buildPntrArrRefExp(
-          temp_ref,
-          tid_ref ) );
-  
-  ifBody2 = buildBasicBlock();
-  
-  ifStatement2 = RoseStatementsAndExpressionsBuilder::buildIfStatementWithEmptyElse (
-      ifGuardExpression2, 
-      ifBody2);
-  
-  appendStatement( ifStatement2, caseBody );
-  
-  tempStatement = buildAssignStatement(
-      buildPntrArrRefExp(
-          temp_ref,
-          tid_ref ),
-      buildAddOp(
-          buildPntrArrRefExp( 
-              temp_ref,
-              tid_ref ),
-          buildPntrArrRefExp( 
-              temp_ref,
-              buildAddOp(
-                  tid_ref,
-                  d_ref ) ) ) );
-  
-  appendStatement( tempStatement, ifBody2 );
-  
-  tempStatement = buildBreakStmt();
-  
-  appendStatement( tempStatement, caseBody );
-  
+
+  caseBody = buildBasicBlock ();
+
+  caseStatement = buildCaseOptionStmt (buildOpaqueVarRefExp ("OP_MIN"),
+      caseBody);
+
+  appendStatement (caseStatement, switchBody1);
+
+  ifGuardExpression2 = buildLessThanOp (buildPntrArrRefExp (temp_ref,
+      buildAddOp (tid_ref, d_ref)), buildPntrArrRefExp (temp_ref, tid_ref));
+
+  ifBody2 = buildBasicBlock ();
+
+  ifStatement2
+      = RoseStatementsAndExpressionsBuilder::buildIfStatementWithEmptyElse (
+          ifGuardExpression2, ifBody2);
+
+  appendStatement (ifStatement2, caseBody);
+
+  tempStatement = buildAssignStatement (buildPntrArrRefExp (temp_ref, tid_ref),
+      buildAddOp (buildPntrArrRefExp (temp_ref, tid_ref), buildPntrArrRefExp (
+          temp_ref, buildAddOp (tid_ref, d_ref))));
+
+  appendStatement (tempStatement, ifBody2);
+
+  tempStatement = buildBreakStmt ();
+
+  appendStatement (tempStatement, caseBody);
+
   /*
    * ======================================================
    * case OP_MAX
    * ======================================================
    */
-  
-  caseBody = buildBasicBlock();  
-  
-  caseStatement = buildCaseOptionStmt(
-      buildOpaqueVarRefExp("OP_MAX"),
-      caseBody );
-  
-  appendStatement( caseStatement, switchBody1 );
-  
-  ifGuardExpression2 = buildGreaterThanOp(
-      buildPntrArrRefExp( 
-                    temp_ref,
-                    buildAddOp(
-                        tid_ref,
-                        d_ref ) ),
-      buildPntrArrRefExp(
-          temp_ref,
-          tid_ref ) );
-  
-  ifBody2 = buildBasicBlock();
-  
-  ifStatement2 = RoseStatementsAndExpressionsBuilder::buildIfStatementWithEmptyElse (
-      ifGuardExpression2, 
-      ifBody2);
-  
-  appendStatement( ifStatement2, caseBody );
-  
-  tempStatement = buildAssignStatement(
-      buildPntrArrRefExp(
-          temp_ref,
-          tid_ref ),
-      buildAddOp(
-          buildPntrArrRefExp( 
-              temp_ref,
-              tid_ref ),
-          buildPntrArrRefExp( 
-              temp_ref,
-              buildAddOp(
-                  tid_ref,
-                  d_ref ) ) ) );
-  
-  appendStatement( tempStatement, ifBody2 );
-  
-  tempStatement = buildBreakStmt();
-  
-  appendStatement( tempStatement, caseBody );
-  
+
+  caseBody = buildBasicBlock ();
+
+  caseStatement = buildCaseOptionStmt (buildOpaqueVarRefExp ("OP_MAX"),
+      caseBody);
+
+  appendStatement (caseStatement, switchBody1);
+
+  ifGuardExpression2 = buildGreaterThanOp (buildPntrArrRefExp (temp_ref,
+      buildAddOp (tid_ref, d_ref)), buildPntrArrRefExp (temp_ref, tid_ref));
+
+  ifBody2 = buildBasicBlock ();
+
+  ifStatement2
+      = RoseStatementsAndExpressionsBuilder::buildIfStatementWithEmptyElse (
+          ifGuardExpression2, ifBody2);
+
+  appendStatement (ifStatement2, caseBody);
+
+  tempStatement = buildAssignStatement (buildPntrArrRefExp (temp_ref, tid_ref),
+      buildAddOp (buildPntrArrRefExp (temp_ref, tid_ref), buildPntrArrRefExp (
+          temp_ref, buildAddOp (tid_ref, d_ref))));
+
+  appendStatement (tempStatement, ifBody2);
+
+  tempStatement = buildBreakStmt ();
+
+  appendStatement (tempStatement, caseBody);
+
   /*
    * ======================================================
    * END switch ( reduction )
    * ======================================================
    */
-  
+
   /*
    * ======================================================
    * END if (tid<d)
    * ======================================================
    */
-  
+
   /*
    * ======================================================
    * END for ( ; d>warpSize; d>>=1 )
    * ======================================================
    */
-  
+
   /*
    * ======================================================
    * barrier ( CLK_LOCAL_MEM_FENCE )
    * ======================================================
    */
-  
-  tempStatement = CPPOpenCLStatementsAndExpressionsBuilder::generateBarrierStatement();
-  
-  appendStatement( tempStatement, subroutineScope );
-  
+
+  tempStatement
+      = CPPOpenCLStatementsAndExpressionsBuilder::generateBarrierStatement ();
+
+  appendStatement (tempStatement, subroutineScope);
+
   /*
    * ======================================================
    * vtemp = temp
    * ======================================================
    */
-  
-  tempStatement = buildAssignStatement(
-      vtemp_ref,
-      temp_ref );
 
-  appendStatement( tempStatement, subroutineScope );
-  
+  tempStatement = buildAssignStatement (vtemp_ref, temp_ref);
+
+  appendStatement (tempStatement, subroutineScope);
+
   /*
    * ======================================================
    * BEGIN if (tid<warpSize)
    * ======================================================
    */
-  
-  ifGuardExpression1 = buildLessThanOp(
-      tid_ref,
-      warpSize_ref );
-  
-  ifBody1 = buildBasicBlock();
-  
-  ifStatement1 = RoseStatementsAndExpressionsBuilder::buildIfStatementWithEmptyElse (
-          ifGuardExpression1, 
-          ifBody1);
-  
-  appendStatement( ifStatement1, subroutineScope );
-  
+
+  ifGuardExpression1 = buildLessThanOp (tid_ref, warpSize_ref);
+
+  ifBody1 = buildBasicBlock ();
+
+  ifStatement1
+      = RoseStatementsAndExpressionsBuilder::buildIfStatementWithEmptyElse (
+          ifGuardExpression1, ifBody1);
+
+  appendStatement (ifStatement1, subroutineScope);
+
   /*
    * ======================================================
    * BEGIN for ( ; d>0; d>>=1 )
    * ======================================================
    */
-  
-  initialisationStatement1 = buildBasicBlock();
-  
-  testExpression1 = buildExprStatement( buildGreaterThanOp(
-      d_ref,
-      buildIntVal(0) ) );
-  
-  incrementExpression1 = buildRshiftAssignOp(
-      d_ref,
-      buildIntVal(1) );
-  
-  loopBody1 = buildBasicBlock();
-  
-  forStatement1 = buildForStatement(
-      initialisationStatement1,
-      testExpression1,
-      incrementExpression1,
-      loopBody1 );
-  
-  appendStatement( forStatement1, ifBody1 );
-  
+
+  initialisationStatement1 = buildBasicBlock ();
+
+  testExpression1 = buildExprStatement (buildGreaterThanOp (d_ref, buildIntVal (
+      0)));
+
+  incrementExpression1 = buildRshiftAssignOp (d_ref, buildIntVal (1));
+
+  loopBody1 = buildBasicBlock ();
+
+  forStatement1 = buildForStatement (initialisationStatement1, testExpression1,
+      incrementExpression1, loopBody1);
+
+  appendStatement (forStatement1, ifBody1);
+
   /*
    * ======================================================
    * BEGIN if (tid<d)
    * ======================================================
    */
-  
-  ifGuardExpression2 = buildLessThanOp(
-      tid_ref,
-      d_ref );
-  
-  ifBody2 = buildBasicBlock();
-  
-  ifStatement2 = RoseStatementsAndExpressionsBuilder::buildIfStatementWithEmptyElse (
-      ifGuardExpression2, 
-      ifBody2);
-  
-  appendStatement( ifStatement2, loopBody1 );
-  
+
+  ifGuardExpression2 = buildLessThanOp (tid_ref, d_ref);
+
+  ifBody2 = buildBasicBlock ();
+
+  ifStatement2
+      = RoseStatementsAndExpressionsBuilder::buildIfStatementWithEmptyElse (
+          ifGuardExpression2, ifBody2);
+
+  appendStatement (ifStatement2, loopBody1);
+
   /*
    * ======================================================
    * BEGIN switch ( reduction )
    * ======================================================
    */
-  
+
   switchExpression1 = reduction_ref;
-  
-  switchBody1 = buildBasicBlock();
-  
-  switchStatement1 = buildSwitchStatement(
-      switchExpression1,
-      switchBody1 );
-  
-  appendStatement( switchStatement1, ifBody2 );
-  
+
+  switchBody1 = buildBasicBlock ();
+
+  switchStatement1 = buildSwitchStatement (switchExpression1, switchBody1);
+
+  appendStatement (switchStatement1, ifBody2);
+
   /*
    * ======================================================
    * case OP_INC
    * ======================================================
    */
-  
-  caseBody = buildBasicBlock();  
-  
-  caseStatement1 = buildCaseOptionStmt(
-      buildOpaqueVarRefExp("OP_INC"),
-      caseBody );
-  
-  appendStatement( caseStatement, switchBody1 );
-  
-  tempStatement = buildAssignStatement(
-      buildPntrArrRefExp(
-          vtemp_ref,
-          tid_ref ),
-      buildAddOp(
-          buildPntrArrRefExp( 
-              vtemp_ref,
-              tid_ref ),
-          buildPntrArrRefExp( 
-              vtemp_ref,
-              buildAddOp(
-                  tid_ref,
-                  d_ref ) ) ) );
-  
-  appendStatement( tempStatement, caseBody );
-  
-  tempStatement = buildBreakStmt();
-  
-  appendStatement( tempStatement, caseBody );
-  
+
+  caseBody = buildBasicBlock ();
+
+  caseStatement1 = buildCaseOptionStmt (buildOpaqueVarRefExp ("OP_INC"),
+      caseBody);
+
+  appendStatement (caseStatement, switchBody1);
+
+  tempStatement = buildAssignStatement (
+      buildPntrArrRefExp (vtemp_ref, tid_ref), buildAddOp (buildPntrArrRefExp (
+          vtemp_ref, tid_ref), buildPntrArrRefExp (vtemp_ref, buildAddOp (
+          tid_ref, d_ref))));
+
+  appendStatement (tempStatement, caseBody);
+
+  tempStatement = buildBreakStmt ();
+
+  appendStatement (tempStatement, caseBody);
+
   /*
    * ======================================================
    * case OP_MIN
    * ======================================================
    */
-  
-  caseBody = buildBasicBlock();  
-  
-  caseStatement = buildCaseOptionStmt(
-      buildOpaqueVarRefExp("OP_MIN"),
-      caseBody );
-  
-  appendStatement( caseStatement, switchBody1 );
-  
-  ifGuardExpression2 = buildLessThanOp(
-      buildPntrArrRefExp( 
-          vtemp_ref,
-          buildAddOp(
-              vtemp_ref,
-              d_ref ) ),
-      buildPntrArrRefExp(
-          vtemp_ref,
-          tid_ref ) );
-  
-  ifBody2 = buildBasicBlock();
-  
-  ifStatement2 = RoseStatementsAndExpressionsBuilder::buildIfStatementWithEmptyElse (
-      ifGuardExpression2, 
-      ifBody2);
-  
-  appendStatement( ifStatement2, caseBody );
-  
-  tempStatement = buildAssignStatement(
-      buildPntrArrRefExp(
-          vtemp_ref,
-          tid_ref ),
-      buildAddOp(
-          buildPntrArrRefExp( 
-              vtemp_ref,
-              tid_ref ),
-          buildPntrArrRefExp( 
-              vtemp_ref,
-              buildAddOp(
-                  tid_ref,
-                  d_ref ) ) ) );
-  
-  appendStatement( tempStatement, ifBody2 );
-  
-  tempStatement = buildBreakStmt();
-  
-  appendStatement( tempStatement, caseBody );
-  
+
+  caseBody = buildBasicBlock ();
+
+  caseStatement = buildCaseOptionStmt (buildOpaqueVarRefExp ("OP_MIN"),
+      caseBody);
+
+  appendStatement (caseStatement, switchBody1);
+
+  ifGuardExpression2 = buildLessThanOp (buildPntrArrRefExp (vtemp_ref,
+      buildAddOp (vtemp_ref, d_ref)), buildPntrArrRefExp (vtemp_ref, tid_ref));
+
+  ifBody2 = buildBasicBlock ();
+
+  ifStatement2
+      = RoseStatementsAndExpressionsBuilder::buildIfStatementWithEmptyElse (
+          ifGuardExpression2, ifBody2);
+
+  appendStatement (ifStatement2, caseBody);
+
+  tempStatement = buildAssignStatement (
+      buildPntrArrRefExp (vtemp_ref, tid_ref), buildAddOp (buildPntrArrRefExp (
+          vtemp_ref, tid_ref), buildPntrArrRefExp (vtemp_ref, buildAddOp (
+          tid_ref, d_ref))));
+
+  appendStatement (tempStatement, ifBody2);
+
+  tempStatement = buildBreakStmt ();
+
+  appendStatement (tempStatement, caseBody);
+
   /*
    * ======================================================
    * case OP_MAX
    * ======================================================
    */
-  
-  caseBody = buildBasicBlock();  
-  
-  caseStatement = buildCaseOptionStmt(
-      buildOpaqueVarRefExp("OP_MAX"),
-      caseBody );
-  
-  appendStatement( caseStatement, switchBody1 );
-  
-  ifGuardExpression2 = buildGreaterThanOp(
-      buildPntrArrRefExp( 
-          vtemp_ref,
-          buildAddOp(
-              vtemp_ref,
-              d_ref ) ),
-      buildPntrArrRefExp(
-          vtemp_ref,
-          tid_ref ) );
-  
-  ifBody2 = buildBasicBlock();
-  
-  ifStatement2 = RoseStatementsAndExpressionsBuilder::buildIfStatementWithEmptyElse (
-      ifGuardExpression2, 
-      ifBody2);
-  
-  appendStatement( ifStatement2, caseBody );
-  
-  tempStatement = buildAssignStatement(
-      buildPntrArrRefExp(
-          vtemp_ref,
-          tid_ref ),
-      buildAddOp(
-          buildPntrArrRefExp( 
-              vtemp_ref,
-              tid_ref ),
-          buildPntrArrRefExp( 
-              vtemp_ref,
-              buildAddOp(
-                  tid_ref,
-                  d_ref ) ) ) );
-  
-  appendStatement( tempStatement, ifBody2 );
-  
-  tempStatement = buildBreakStmt();
-  
-  appendStatement( tempStatement, caseBody );
-  
+
+  caseBody = buildBasicBlock ();
+
+  caseStatement = buildCaseOptionStmt (buildOpaqueVarRefExp ("OP_MAX"),
+      caseBody);
+
+  appendStatement (caseStatement, switchBody1);
+
+  ifGuardExpression2 = buildGreaterThanOp (buildPntrArrRefExp (vtemp_ref,
+      buildAddOp (vtemp_ref, d_ref)), buildPntrArrRefExp (vtemp_ref, tid_ref));
+
+  ifBody2 = buildBasicBlock ();
+
+  ifStatement2
+      = RoseStatementsAndExpressionsBuilder::buildIfStatementWithEmptyElse (
+          ifGuardExpression2, ifBody2);
+
+  appendStatement (ifStatement2, caseBody);
+
+  tempStatement = buildAssignStatement (
+      buildPntrArrRefExp (vtemp_ref, tid_ref), buildAddOp (buildPntrArrRefExp (
+          vtemp_ref, tid_ref), buildPntrArrRefExp (vtemp_ref, buildAddOp (
+          tid_ref, d_ref))));
+
+  appendStatement (tempStatement, ifBody2);
+
+  tempStatement = buildBreakStmt ();
+
+  appendStatement (tempStatement, caseBody);
+
   /*
    * ======================================================
    * END switch ( reduction )
    * ======================================================
    */
-  
+
   /*
    * ======================================================
    * END if (tid<d)
    * ======================================================
    */
-  
+
   /*
    * ======================================================
    * END for ( ; d>0; d>>=1 )
    * ======================================================
    */
-  
+
   /*
    * ======================================================
    * END if (tid<warpSize)
    * ======================================================
    */
-  
+
   /*
    * ======================================================
    * BEGIN if (tid == 0)
    * ======================================================
    */
-  
-  ifGuardExpression1 = buildEqualityOp(
-      tid_ref,
-      buildIntVal(0) );
-  
-  ifBody1 = buildBasicBlock();
-  
-  ifStatement1 = RoseStatementsAndExpressionsBuilder::buildIfStatementWithEmptyElse (
-          ifGuardExpression1, 
-          ifBody1);
-  
-  appendStatement( ifStatement1, subroutineScope );
-  
+
+  ifGuardExpression1 = buildEqualityOp (tid_ref, buildIntVal (0));
+
+  ifBody1 = buildBasicBlock ();
+
+  ifStatement1
+      = RoseStatementsAndExpressionsBuilder::buildIfStatementWithEmptyElse (
+          ifGuardExpression1, ifBody1);
+
+  appendStatement (ifStatement1, subroutineScope);
+
   /*
    * ======================================================
    * BEGIN switch ( reduction )
    * ======================================================
    */
-  
+
   switchExpression1 = reduction_ref;
-  
-  switchBody1 = buildBasicBlock();
-  
-  switchStatement1 = buildSwitchStatement(
-      switchExpression1,
-      switchBody1 );
-  
-  appendStatement( switchStatement1, ifBody1 );
-  
+
+  switchBody1 = buildBasicBlock ();
+
+  switchStatement1 = buildSwitchStatement (switchExpression1, switchBody1);
+
+  appendStatement (switchStatement1, ifBody1);
+
   /*
    * ======================================================
    * case OP_INC
    * ======================================================
    */
-  
-  caseBody = buildBasicBlock();  
-  
-  caseStatement1 = buildCaseOptionStmt(
-      buildOpaqueVarRefExp("OP_INC"),
-      caseBody );
-  
-  appendStatement( caseStatement, switchBody1 );
-  
-  tempStatement = buildAssignStatement(
-      buildPointerDerefExp(
-          dat_g_ref ),
-      buildAddOp(
-          buildPointerDerefExp(
-              dat_g_ref ),
-          buildPntrArrRefExp(
-              vtemp_ref,
-              buildIntVal(0) ) ) );
-              
-  appendStatement( tempStatement, caseBody );
-  
-  tempStatement = buildBreakStmt();
-  
-  appendStatement( tempStatement, caseBody );
-  
+
+  caseBody = buildBasicBlock ();
+
+  caseStatement1 = buildCaseOptionStmt (buildOpaqueVarRefExp ("OP_INC"),
+      caseBody);
+
+  appendStatement (caseStatement, switchBody1);
+
+  tempStatement = buildAssignStatement (buildPointerDerefExp (dat_g_ref),
+      buildAddOp (buildPointerDerefExp (dat_g_ref), buildPntrArrRefExp (
+          vtemp_ref, buildIntVal (0))));
+
+  appendStatement (tempStatement, caseBody);
+
+  tempStatement = buildBreakStmt ();
+
+  appendStatement (tempStatement, caseBody);
+
   /*
    * ======================================================
    * case OP_MIN
    * ======================================================
    */
-  
-  caseBody = buildBasicBlock();  
-  
-  caseStatement = buildCaseOptionStmt(
-      buildOpaqueVarRefExp("OP_MIN"),
-      caseBody );
-  
-  appendStatement( caseStatement, switchBody1 );
-  
-  ifGuardExpression2 = buildLessThanOp(
-      buildPntrArrRefExp( 
-          temp_ref,
-          buildIntVal(0) ),
-      buildPointerDerefExp(
-          dat_g_ref ) );
-  
-  ifBody2 = buildBasicBlock();
-  
-  ifStatement2 = RoseStatementsAndExpressionsBuilder::buildIfStatementWithEmptyElse (
-      ifGuardExpression2, 
-      ifBody2);
-  
-  appendStatement( ifStatement2, caseBody );
-  
-  tempStatement = buildAssignStatement(
-      buildPointerDerefExp(
-          dat_g_ref ),
-      buildPntrArrRefExp(
-          vtemp_ref,
-          buildIntVal(0) ) );
-  
-  appendStatement( tempStatement, ifBody2 );
-  
-  tempStatement = buildBreakStmt();
-  
-  appendStatement( tempStatement, caseBody );
-  
+
+  caseBody = buildBasicBlock ();
+
+  caseStatement = buildCaseOptionStmt (buildOpaqueVarRefExp ("OP_MIN"),
+      caseBody);
+
+  appendStatement (caseStatement, switchBody1);
+
+  ifGuardExpression2 = buildLessThanOp (buildPntrArrRefExp (temp_ref,
+      buildIntVal (0)), buildPointerDerefExp (dat_g_ref));
+
+  ifBody2 = buildBasicBlock ();
+
+  ifStatement2
+      = RoseStatementsAndExpressionsBuilder::buildIfStatementWithEmptyElse (
+          ifGuardExpression2, ifBody2);
+
+  appendStatement (ifStatement2, caseBody);
+
+  tempStatement = buildAssignStatement (buildPointerDerefExp (dat_g_ref),
+      buildPntrArrRefExp (vtemp_ref, buildIntVal (0)));
+
+  appendStatement (tempStatement, ifBody2);
+
+  tempStatement = buildBreakStmt ();
+
+  appendStatement (tempStatement, caseBody);
+
   /*
    * ======================================================
    * case OP_MAX
    * ======================================================
    */
-  
-  caseBody = buildBasicBlock();  
-  
-  caseStatement = buildCaseOptionStmt(
-      buildOpaqueVarRefExp("OP_MAX"),
-      caseBody );
-  
-  appendStatement( caseStatement, switchBody1 );
-  
-  ifGuardExpression2 = buildGreaterThanOp(
-      buildPntrArrRefExp( 
-          temp_ref,
-          buildIntVal(0) ),
-      buildPointerDerefExp(
-          dat_g_ref ) );
-  
-  ifBody2 = buildBasicBlock();
-  
-  ifStatement2 = RoseStatementsAndExpressionsBuilder::buildIfStatementWithEmptyElse (
-      ifGuardExpression2, 
-      ifBody2);
-  
-  appendStatement( ifStatement2, caseBody );
-  
-  tempStatement = buildAssignStatement(
-      buildPointerDerefExp(
-          dat_g_ref ),
-      buildPntrArrRefExp(
-          vtemp_ref,
-          buildIntVal(0) ) );
-  
-  appendStatement( tempStatement, ifBody2 );
-  
-  tempStatement = buildBreakStmt();
-  
-  appendStatement( tempStatement, caseBody );
-  
+
+  caseBody = buildBasicBlock ();
+
+  caseStatement = buildCaseOptionStmt (buildOpaqueVarRefExp ("OP_MAX"),
+      caseBody);
+
+  appendStatement (caseStatement, switchBody1);
+
+  ifGuardExpression2 = buildGreaterThanOp (buildPntrArrRefExp (temp_ref,
+      buildIntVal (0)), buildPointerDerefExp (dat_g_ref));
+
+  ifBody2 = buildBasicBlock ();
+
+  ifStatement2
+      = RoseStatementsAndExpressionsBuilder::buildIfStatementWithEmptyElse (
+          ifGuardExpression2, ifBody2);
+
+  appendStatement (ifStatement2, caseBody);
+
+  tempStatement = buildAssignStatement (buildPointerDerefExp (dat_g_ref),
+      buildPntrArrRefExp (vtemp_ref, buildIntVal (0)));
+
+  appendStatement (tempStatement, ifBody2);
+
+  tempStatement = buildBreakStmt ();
+
+  appendStatement (tempStatement, caseBody);
+
   /*
    * ======================================================
    * END switch ( reduction )
    * ======================================================
    */
-  
+
   /*
    * ======================================================
    * END if (tid==0)
    * ======================================================
    */
-  
-  
+
 }
 
 void
@@ -766,24 +624,17 @@ CPPOpenCLReductionSubroutine::createLocalVariableDeclarations ()
   using std::vector;
   using std::string;
 
-
-
   variableDeclarations->add (ReductionSubroutine::warpSize,
       CPPStatementsAndExpressionsBuilder::appendVariableDeclaration (
-          ReductionSubroutine::warpSize, 
-          buildOpaqueType( "size_t", subroutineScope ), //FIXME
-          subroutineScope ) );
-  
-  variableDeclarations->add (
-      ReductionSubroutine::autosharedV,
+          ReductionSubroutine::warpSize, buildOpaqueType ("size_t",
+              subroutineScope), //FIXME
+          subroutineScope));
+
+  variableDeclarations->add (ReductionSubroutine::autosharedV,
       CPPStatementsAndExpressionsBuilder::appendVariableDeclaration (
-          ReductionSubroutine::autosharedV,
-          buildPointerType(
-              buildVolatileType(
-                  reduction->getBaseType() ) ), 
-          subroutineScope, 
-          1,
-          SHARED ) );
+          ReductionSubroutine::autosharedV, buildPointerType (
+              buildVolatileType (reduction->getBaseType ())), subroutineScope,
+          1, SHARED));
 
   /*
    * ======================================================
@@ -796,15 +647,11 @@ CPPOpenCLReductionSubroutine::createLocalVariableDeclarations ()
   integers.push_back (CommonVariableNames::iterationCounter1);
   integers.push_back (ReductionSubroutine::threadID);
 
-  for (vector <string>::iterator it = integers.begin (); 
-      it != integers.end (); 
-      ++it)
+  for (vector <string>::iterator it = integers.begin (); it != integers.end (); ++it)
   {
     variableDeclarations->add (*it,
-        CPPStatementsAndExpressionsBuilder::appendVariableDeclaration (
-            *it,
-            buildIntType(), 
-            subroutineScope ) );
+        CPPStatementsAndExpressionsBuilder::appendVariableDeclaration (*it,
+            buildIntType (), subroutineScope));
   }
 }
 
@@ -825,14 +672,9 @@ CPPOpenCLReductionSubroutine::createFormalParameterDeclarations ()
   variableDeclarations->add (
       ReductionSubroutine::reductionResultOnDevice,
       CPPStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
-          ReductionSubroutine::reductionResultOnDevice,
-          buildPointerType(
-              buildVolatileType(
-                  reduction->getBaseType() ) ), 
-          subroutineScope, 
-          formalParameters, 
-          1,
-          DEVICE));
+          ReductionSubroutine::reductionResultOnDevice, buildPointerType (
+              buildVolatileType (reduction->getBaseType ())), subroutineScope,
+          formalParameters, 1, DEVICE));
 
   /*
    * ======================================================
@@ -846,30 +688,24 @@ CPPOpenCLReductionSubroutine::createFormalParameterDeclarations ()
   variableDeclarations->add (
       ReductionSubroutine::inputValue,
       CPPStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
-          ReductionSubroutine::inputValue, 
-          reduction->getBaseType(),
-          subroutineScope, 
-          formalParameters));
+          ReductionSubroutine::inputValue, reduction->getBaseType (),
+          subroutineScope, formalParameters));
 
-  
   variableDeclarations->add (
       ReductionSubroutine::reductionType,
       CPPStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
-          ReductionSubroutine::reductionType,
-          buildOpaqueType("op_access",subroutineScope), //FIXME
-          subroutineScope,
-          formalParameters));
-  
+          ReductionSubroutine::reductionType, buildOpaqueType ("op_access",
+              subroutineScope), //FIXME
+          subroutineScope, formalParameters));
+
+  autosharedVariableName = VariableNames::getAutosharedDeclarationName (
+      reduction->getBaseType (), reduction->getVariableSize ());
+
   variableDeclarations->add (
-      CommonVariableNames::autoshared,
+      autosharedVariableName,
       CPPStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
-          CommonVariableNames::autoshared,
-          buildPointerType(
-              reduction->getBaseType() ), 
-          subroutineScope, 
-          formalParameters, 
-          1,
-          SHARED));
+          autosharedVariableName, buildPointerType (reduction->getBaseType ()),
+          subroutineScope, formalParameters, 1, SHARED));
 }
 
 /*

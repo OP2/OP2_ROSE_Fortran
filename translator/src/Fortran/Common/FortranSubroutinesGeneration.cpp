@@ -118,7 +118,7 @@ FortranSubroutinesGeneration::patchCallsToParallelLoops ()
     if (lastDeclarationStatement == NULL)
     {
       Debug::getInstance ()->errorMessage (
-          "Could not find declaration statements");
+          "Could not find declaration statements", __FILE__, __LINE__);
     }
 
     /*
@@ -139,7 +139,7 @@ FortranSubroutinesGeneration::patchCallsToParallelLoops ()
     if (lastUseStatement == NULL)
     {
       Debug::getInstance ()->errorMessage (
-          "Could not find last 'use' statement");
+          "Could not find last 'use' statement", __FILE__, __LINE__);
     }
 
     if (find (processedFiles.begin (), processedFiles.end (),
@@ -294,7 +294,8 @@ FortranSubroutinesGeneration::createSourceFile ()
   else
   {
     Debug::getInstance ()->errorMessage (
-        "Could not create dummy Fortran file '" + inputFileName + "'");
+        "Could not create dummy Fortran file '" + inputFileName + "'",
+        __FILE__, __LINE__);
   }
 
   /*

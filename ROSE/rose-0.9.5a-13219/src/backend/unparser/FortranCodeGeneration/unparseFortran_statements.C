@@ -5109,9 +5109,9 @@ FortranCodeGeneration_locatedNode::unparseFunctionArgs(SgFunctionDeclaration* fu
           if (p != funcdecl_stmt->get_args().end())
              {
             // Adam Betts: added ampersands to break onto new line
-               curprint( ", &");
-               unp->cur.insert_newline(1);
-               curprint( "& ");
+               curprint( ", ");
+            //   unp->cur.insert_newline(1);
+            //   curprint( "& ");
              }
         }
    }

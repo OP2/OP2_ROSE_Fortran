@@ -41,7 +41,8 @@ template <typename TSubroutineHeader>
         }
 
         Debug::getInstance ()->errorMessage (
-            "Unable to find reduction subroutine for reduction");
+            "Unable to find reduction subroutine for reduction", __FILE__,
+            __LINE__);
       }
 
       void

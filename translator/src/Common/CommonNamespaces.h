@@ -191,7 +191,6 @@ namespace OpenCL
     std::string const localModifier = "__local";
     std::string const globalModifier = "__global";
     std::string const constantModifier = "__constant";
-    
 
   }
 }
@@ -232,7 +231,6 @@ namespace OpenMP
 
 namespace CommonVariableNames
 {
-  std::string const autoshared = "autoshared";
   std::string const argShared = "arg_s";
   std::string const col = "col";
   std::string const col2 = "col2";
@@ -427,7 +425,7 @@ namespace VariableNames
 
   std::string
   getIncrementAccessMapName (unsigned int OP_DAT_ArgumentGroup);
-  
+
   std::string
   getOpIndirectionSharedName (unsigned int OP_DAT_ArgumentGroup);
 
@@ -445,21 +443,26 @@ namespace VariableNames
 
   std::string
   getFirstTimeExecutionVariableDeclarationName (std::string const & suffix);
+
+  std::string
+  getAutosharedDeclarationName (SgType * type, unsigned int size);
 }
 
 namespace SubroutineCalls
 {
-
-  /*
-   * ======================================================
-   * Returns a statement which represents a C-to-Fortran
-   * pointer conversion
-   * ======================================================
-   */
-  SgStatement *
-  createCToFortranPointerCallStatement (SgScopeStatement * scope,
-      SgExpression * parameter1, SgExpression * parameter2,
-      SgExpression * parameter3 = NULL);
+  namespace Fortran
+  {
+    /*
+     * ======================================================
+     * Returns a statement which represents a C-to-Fortran
+     * pointer conversion
+     * ======================================================
+     */
+    SgStatement *
+    createCToFortranPointerCallStatement (SgScopeStatement * scope,
+        SgExpression * parameter1, SgExpression * parameter2,
+        SgExpression * parameter3 = NULL);
+  }
 }
 
 #endif

@@ -24,7 +24,8 @@ TargetBackends::toString (BACKEND_VALUE backend)
 
     default:
     {
-      Debug::getInstance ()->errorMessage ("Unknown backend selected");
+      Debug::getInstance ()->errorMessage ("Unknown backend selected",
+          __FILE__, __LINE__);
     }
   }
 }
@@ -262,12 +263,13 @@ VariableNames::getOpIndirectionSharedName (unsigned int OP_DAT_ArgumentGroup)
 {
   using boost::lexical_cast;
   using std::string;
-  
+
   return "ind_arg" + lexical_cast <string> (OP_DAT_ArgumentGroup) + "_s";
 }
 
 std::string
-VariableNames::getIndirectionArgumentSizeName (unsigned int OP_DAT_ArgumentGroup)
+VariableNames::getIndirectionArgumentSizeName (
+    unsigned int OP_DAT_ArgumentGroup)
 {
   using boost::lexical_cast;
   using std::string;
@@ -300,8 +302,35 @@ VariableNames::getFirstTimeExecutionVariableDeclarationName (
   return VariablePrefixes::isFirstTime + "_" + suffix;
 }
 
+std::string
+VariableNames::getAutosharedDeclarationName (SgType * type, unsigned int size)
+{
+  using boost::lexical_cast;
+  using std::string;
+
+  std::string const autoshared = "autoshared";
+
+  switch (type->variantT ())
+  {
+    case V_SgTypeInt:
+    {
+      return autoshared + "Integer" + lexical_cast <string> (size);
+    }
+    case V_SgTypeFloat:
+    {
+      return autoshared + "Float" + lexical_cast <string> (size);
+    }
+    default:
+    {
+      Debug::getInstance ()->errorMessage (
+          "Unsupported type for autoshared variable: '" + type->class_name ()
+              + "'", __FILE__, __LINE__);
+    }
+  }
+}
+
 SgStatement *
-SubroutineCalls::createCToFortranPointerCallStatement (
+SubroutineCalls::Fortran::createCToFortranPointerCallStatement (
     SgScopeStatement * scope, SgExpression * parameter1,
     SgExpression * parameter2, SgExpression * parameter3)
 {

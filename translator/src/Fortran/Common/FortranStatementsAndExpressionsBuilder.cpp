@@ -78,7 +78,8 @@ FortranStatementsAndExpressionsBuilder::setFortranAttributes (
 
       default:
       {
-        Debug::getInstance ()->errorMessage ("Unhandled Fortran attribute");
+        Debug::getInstance ()->errorMessage ("Unhandled Fortran attribute",
+            __FILE__, __LINE__);
       }
     }
   }

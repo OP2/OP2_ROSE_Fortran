@@ -22,7 +22,6 @@ FortranHostSubroutine::createFormalParameterDeclarations ()
   using std::string;
   using std::map;
 
-
   Debug::getInstance ()->debugMessage (
       "Creating host subroutine formal parameters", Debug::FUNCTION_LEVEL,
       __FILE__, __LINE__);
@@ -147,7 +146,7 @@ FortranHostSubroutine::createFormalParameterDeclarations ()
             else
             {
               Debug::getInstance ()->errorMessage ("Unrecognised class: "
-                  + className);
+                  + className, __FILE__, __LINE__);
             }
 
             break;

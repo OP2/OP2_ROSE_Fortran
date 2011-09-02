@@ -287,13 +287,13 @@ FortranCodeGeneration_locatedNode::unparseFuncCall(SgExpression* expr, SgUnparse
 //	SgConstructorInitializer* con_init = isSgConstructorInitializer(*arg);
 
 				if ( firstArg == false ) {
-				  curprint ( "& " );
+				  curprint ( " " );
 				} else firstArg = false;
 				
 				unparseExpression((*arg), ninfo);
 				arg++;
 				if (arg != list.end()) {
-					curprint(", &\n");
+					curprint(", ");
 				}
       }
     }

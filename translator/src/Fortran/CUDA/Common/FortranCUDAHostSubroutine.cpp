@@ -527,7 +527,7 @@ FortranCUDAHostSubroutine::createTransferOpDatStatements ()
           block);
 
       SgStatement * callStatementA =
-          SubroutineCalls::createCToFortranPointerCallStatement (
+          SubroutineCalls::Fortran::createCToFortranPointerCallStatement (
               subroutineScope, parameterExpression1A, parameterExpression2A,
               parameterExpression3A);
 
@@ -548,7 +548,7 @@ FortranCUDAHostSubroutine::createTransferOpDatStatements ()
             + "/)", block);
 
         SgStatement * callStatementB =
-            SubroutineCalls::createCToFortranPointerCallStatement (
+            SubroutineCalls::Fortran::createCToFortranPointerCallStatement (
                 subroutineScope, parameterExpression1B, parameterExpression2B,
                 parameterExpression3B);
 

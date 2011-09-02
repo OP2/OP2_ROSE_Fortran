@@ -16,10 +16,9 @@ FortranProgramDeclarationsAndDefinitions::handleOpGblDeclaration (
     FortranParallelLoop * parallelLoop, std::string const & variableName,
     int opDatArgumentGroup)
 {
-  Debug::getInstance ()->debugMessage (
-      "'" + variableName
-          + "' has been declared through OP_DECL_GBL (and not through OP_DECL_DAT)",
-      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+  Debug::getInstance ()->debugMessage ("'" + variableName
+      + "' has been declared through OP_DECL_GBL", Debug::FUNCTION_LEVEL,
+      __FILE__, __LINE__);
 
   OpGblDefinition * opGblDeclaration = getOpGblDefinition (variableName);
 
@@ -44,6 +43,10 @@ FortranProgramDeclarationsAndDefinitions::handleOpDatDeclaration (
   using boost::lexical_cast;
   using std::string;
 
+  Debug::getInstance ()->debugMessage ("'" + variableName
+      + "' has been declared through OP_DECL_DAT", Debug::FUNCTION_LEVEL,
+      __FILE__, __LINE__);
+
   OpDatDefinition * opDatDeclaration = getOpDatDefinition (variableName);
 
   parallelLoop->setOpDatType (opDatArgumentGroup,
@@ -60,35 +63,10 @@ FortranProgramDeclarationsAndDefinitions::handleOpDatDeclaration (
 
     parallelLoop->setDuplicateOpDat (opDatArgumentGroup, false);
 
-    SgArrayType * isArrayType = isSgArrayType (
-        opDatDeclaration->getPrimitiveType ());
-
-    if (isArrayType == NULL)
+    if (isSgArrayType (opDatDeclaration->getPrimitiveType ()) == NULL)
     {
       Debug::getInstance ()->errorMessage ("OP_DAT '" + variableName
-          + "' is not an array");
-    }
-
-    SgType * baseType = isArrayType->get_base_type ();
-
-    if (isSgTypeFloat (baseType) != NULL)
-    {
-      SgIntVal * sizeOfRealType = isSgIntVal (baseType->get_type_kind ());
-
-      if (sizeOfRealType == NULL)
-      {
-        Debug::getInstance ()->errorMessage (
-            "The size of the base type of OP_DAT '" + variableName
-                + "' cannot be determined");
-      }
-      else
-      {
-        Debug::getInstance ()->debugMessage ("...size of the base type is "
-            + lexical_cast <string> (sizeOfRealType->get_value ()),
-            Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
-
-        parallelLoop->setSizeOfOpDat (sizeOfRealType->get_value ());
-      }
+          + "' is not an array", __FILE__, __LINE__);
     }
   }
   else
@@ -256,7 +234,7 @@ FortranProgramDeclarationsAndDefinitions::retrieveOpDatDeclarations (
               Debug::getInstance ()->errorMessage (
                   "Unknown access descriptor: '" + variableName
                       + "' for OP_DAT argument #" + lexical_cast <string> (
-                      opDatArgumentGroup));
+                      opDatArgumentGroup), __FILE__, __LINE__);
             }
 
             break;
@@ -460,7 +438,8 @@ FortranProgramDeclarationsAndDefinitions::visit (SgNode * node)
           {
             Debug::getInstance ()->errorMessage ("OP_DAT variable '"
                 + opDatDeclaration->getVariableName ()
-                + "' is not an array type. Currently not supported.");
+                + "' is not an array type. Currently not supported.", __FILE__,
+                __LINE__);
           }
 
           OpDatDefinitions[opDatDeclaration->getVariableName ()]

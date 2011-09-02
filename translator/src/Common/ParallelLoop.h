@@ -98,14 +98,6 @@ class ParallelLoop
 
     /*
      * ======================================================
-     * What is the size of the OP_DAT data types? Either it
-     * is real(4) or real(8), so respectively 4 or 8
-     * ======================================================
-     */
-    unsigned int sizeOfOpDat;
-
-    /*
-     * ======================================================
      * The reductions needed in this Parallel loop
      * ======================================================
      */
@@ -185,6 +177,33 @@ class ParallelLoop
     getOpDatType (unsigned int OP_DAT_ArgumentGroup)
     {
       return OpDatTypes[OP_DAT_ArgumentGroup];
+    }
+
+    /*
+     * ======================================================
+     * What is the base type of the (assumed) array type wrapped
+     * by the OP_DAT declaration, in the particular OP_DAT
+     * argument group?
+     * ======================================================
+     */
+    SgType *
+    getOpDatBaseType (unsigned int OP_DAT_ArgumentGroup)
+    {
+      using boost::lexical_cast;
+      using std::string;
+
+      SgArrayType * isArrayType = isSgArrayType (
+          OpDatTypes[OP_DAT_ArgumentGroup]);
+
+      if (isArrayType == NULL)
+      {
+        Debug::getInstance ()->errorMessage ("OP_DAT argument '"
+            + lexical_cast <string> (OP_DAT_ArgumentGroup)
+            + "' is not array and therefore does not have a base type",
+            __FILE__, __LINE__);
+      }
+
+      return isArrayType->get_base_type ();
     }
 
     void
@@ -352,10 +371,17 @@ class ParallelLoop
       return OpDatVariableNames[OP_DAT_ArgumentGroup];
     }
 
-    void
-    setSizeOfOpDat (unsigned int size)
+    unsigned int
+    getSizeOfOpDat (unsigned int OP_DAT_ArgumentGroup)
     {
-      sizeOfOpDat = size;
+      SgArrayType * arrayType = isSgArrayType (getOpDatType (
+          OP_DAT_ArgumentGroup));
+
+      SgType * baseType = arrayType->get_base_type ();
+
+      SgIntVal * baseSize = isSgIntVal (baseType->get_type_kind ());
+
+      return baseSize->get_value ();
     }
 
     /*
@@ -365,9 +391,21 @@ class ParallelLoop
      * ======================================================
      */
     unsigned int
-    getSizeOfOpDat () const
+    getMaximumSizeOfOpDat ()
     {
-      return sizeOfOpDat;
+      unsigned int maximumSize = 0;
+
+      for (unsigned int i = 1; i <= getNumberOfOpDatArgumentGroups (); ++i)
+      {
+        unsigned int sizeOfOpDat = getSizeOfOpDat (i);
+
+        if (sizeOfOpDat > maximumSize)
+        {
+          maximumSize = sizeOfOpDat;
+        }
+      }
+
+      return maximumSize;
     }
 
     bool
@@ -421,9 +459,6 @@ class ParallelLoop
     Reduction *
     getReductionTuple (unsigned int OP_DAT_ArgumentGroup)
     {
-      using boost::lexical_cast;
-      using std::string;
-
       ROSE_ASSERT (OpDatMappingDescriptors[OP_DAT_ArgumentGroup] == GLOBAL && OpDatAccessDescriptors[OP_DAT_ArgumentGroup]
           != READ_ACCESS);
 
@@ -434,45 +469,7 @@ class ParallelLoop
 
       SgIntVal * baseSize = isSgIntVal (baseType->get_type_kind ());
 
-      Reduction * reduction;
-
-      if (OpDatAccessDescriptors[OP_DAT_ArgumentGroup] == MIN_ACCESS)
-      {
-        Debug::getInstance ()->debugMessage ("OP_DAT "
-            + lexical_cast <string> (OP_DAT_ArgumentGroup)
-            + " needs a MINIMUM reduction", Debug::FUNCTION_LEVEL, __FILE__,
-            __LINE__);
-
-        reduction = new Reduction (arrayType, baseType, baseSize->get_value (),
-            MINIMUM);
-      }
-      else if (OpDatAccessDescriptors[OP_DAT_ArgumentGroup] == MAX_ACCESS)
-      {
-        Debug::getInstance ()->debugMessage ("OP_DAT "
-            + lexical_cast <string> (OP_DAT_ArgumentGroup)
-            + " needs a MAXIMUM reduction", Debug::FUNCTION_LEVEL, __FILE__,
-            __LINE__);
-
-        reduction = new Reduction (arrayType, baseType, baseSize->get_value (),
-            MAXIMUM);
-      }
-      else if (OpDatAccessDescriptors[OP_DAT_ArgumentGroup] == INC_ACCESS)
-      {
-        Debug::getInstance ()->debugMessage ("OP_DAT "
-            + lexical_cast <string> (OP_DAT_ArgumentGroup)
-            + " needs an INCREMENT reduction", Debug::FUNCTION_LEVEL, __FILE__,
-            __LINE__);
-
-        reduction = new Reduction (arrayType, baseType, baseSize->get_value (),
-            INCREMENT);
-      }
-      else
-      {
-        Debug::getInstance ()->errorMessage (
-            "Cannot handle this type of reduction");
-      }
-
-      return reduction;
+      return new Reduction (arrayType, baseType, baseSize->get_value ());
     }
 
     void

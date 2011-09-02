@@ -174,6 +174,7 @@ FortranCUDAKernelSubroutineDirectLoop::createStageInFromDeviceMemoryToLocalThrea
   using SageBuilder::buildExprStatement;
   using SageBuilder::buildNullExpression;
   using SageInterface::appendStatement;
+  using std::string;
 
   SgBasicBlock * outerBlock = buildBasicBlock ();
 
@@ -188,6 +189,11 @@ FortranCUDAKernelSubroutineDirectLoop::createStageInFromDeviceMemoryToLocalThrea
        * Builds stage in from device memory to shared memory
        * ======================================================
        */
+
+      string const autosharedVariableName =
+          VariableNames::getAutosharedDeclarationName (
+              parallelLoop->getOpDatBaseType (i), parallelLoop->getSizeOfOpDat (
+                  i));
 
       SgAssignOp * initialisationExpression = buildAssignOp (buildVarRefExp (
           variableDeclarations->get (
@@ -236,8 +242,7 @@ FortranCUDAKernelSubroutineDirectLoop::createStageInFromDeviceMemoryToLocalThrea
           addExpression3);
 
       SgPntrArrRefExp * arrayExpression1 = buildPntrArrRefExp (buildVarRefExp (
-          variableDeclarations->get (CommonVariableNames::autoshared)),
-          addExpression2);
+          variableDeclarations->get (autosharedVariableName)), addExpression2);
 
       SgPntrArrRefExp * arrayExpression2 = buildPntrArrRefExp (buildVarRefExp (
           variableDeclarations->get (VariableNames::getOpDatName (i))),
@@ -283,8 +288,7 @@ FortranCUDAKernelSubroutineDirectLoop::createStageInFromDeviceMemoryToLocalThrea
               DirectLoop::Fortran::KernelSubroutine::dataPerElementCounter)));
 
       SgPntrArrRefExp * arrayExpression4 = buildPntrArrRefExp (buildVarRefExp (
-          variableDeclarations->get (CommonVariableNames::autoshared)),
-          addExpression6);
+          variableDeclarations->get (autosharedVariableName)), addExpression6);
 
       SgExprStatement * assignmentStatement2 = buildAssignStatement (
           arrayExpression3, arrayExpression4);
@@ -319,6 +323,7 @@ FortranCUDAKernelSubroutineDirectLoop::createStageOutFromLocalThreadVariablesToD
   using SageBuilder::buildExprStatement;
   using SageBuilder::buildNullExpression;
   using SageInterface::appendStatement;
+  using std::string;
 
   SgBasicBlock * outerBlock = buildBasicBlock ();
 
@@ -328,6 +333,11 @@ FortranCUDAKernelSubroutineDirectLoop::createStageOutFromLocalThreadVariablesToD
         && parallelLoop->getOpAccessValue (i) != READ_ACCESS
         && parallelLoop->getOpDatDimension (i) != 1)
     {
+      string const autosharedVariableName =
+          VariableNames::getAutosharedDeclarationName (
+              parallelLoop->getOpDatBaseType (i), parallelLoop->getSizeOfOpDat (
+                  i));
+
       SgExpression * loopInitializationExpression = buildAssignOp (
           buildVarRefExp (variableDeclarations->get (
               DirectLoop::Fortran::KernelSubroutine::dataPerElementCounter)),
@@ -370,8 +380,7 @@ FortranCUDAKernelSubroutineDirectLoop::createStageOutFromLocalThreadVariablesToD
               DirectLoop::Fortran::KernelSubroutine::dataPerElementCounter)));
 
       SgPntrArrRefExp * arrayExpression2 = buildPntrArrRefExp (buildVarRefExp (
-          variableDeclarations->get (CommonVariableNames::autoshared)),
-          addExpression2);
+          variableDeclarations->get (autosharedVariableName)), addExpression2);
 
       SgExprStatement * assignmentStatement1 = buildAssignStatement (
           arrayExpression2, arrayExpression1);
@@ -432,8 +441,7 @@ FortranCUDAKernelSubroutineDirectLoop::createStageOutFromLocalThreadVariablesToD
           addExpression4);
 
       SgPntrArrRefExp * arrayExpression4 = buildPntrArrRefExp (buildVarRefExp (
-          variableDeclarations->get (CommonVariableNames::autoshared)),
-          addExpression6);
+          variableDeclarations->get (autosharedVariableName)), addExpression6);
 
       SgExprStatement * assignmentStatement2 = buildAssignStatement (
           arrayExpression3, arrayExpression4);
@@ -596,7 +604,7 @@ FortranCUDAKernelSubroutineDirectLoop::createAutoSharedDisplacementInitialisatio
           DirectLoop::Fortran::KernelSubroutine::warpScratchpadSize)),
       divideExpression1);
 
-  if (parallelLoop->getSizeOfOpDat () == 8)
+  if (parallelLoop->getMaximumSizeOfOpDat () == 8)
   {
     SgDivideOp * divideExpression2 = buildDivideOp (multiplyExpression,
         buildIntVal (8));
@@ -677,18 +685,6 @@ FortranCUDAKernelSubroutineDirectLoop::createOpDatFormalParameterDeclarations ()
     {
       /*
        * ======================================================
-       * Obtain the base type of the OP_DAT argument
-       * ======================================================
-       */
-
-      SgType * opDatType = parallelLoop->getOpDatType (i);
-
-      SgArrayType * isArrayType = isSgArrayType (opDatType);
-
-      SgType * opDatBaseType = isArrayType->get_base_type ();
-
-      /*
-       * ======================================================
        * Build the upper bound of the OP_DAT array which
        * is stored in the argSizes variable
        * ======================================================
@@ -715,8 +711,8 @@ FortranCUDAKernelSubroutineDirectLoop::createOpDatFormalParameterDeclarations ()
        * ======================================================
        */
 
-      SgArrayType * arrayType = buildArrayType (opDatBaseType,
-          arraySubscriptExpression);
+      SgArrayType * arrayType = buildArrayType (parallelLoop->getOpDatBaseType (
+          i), arraySubscriptExpression);
 
       arrayType->set_rank (1);
 
@@ -786,7 +782,7 @@ FortranCUDAKernelSubroutineDirectLoop::createLocalVariableDeclarations ()
 
   createLocalThreadDeclarations ();
 
-  createAutoSharedDeclaration ();
+  createAutoSharedDeclarations ();
 
   if (parallelLoop->isReductionRequired () == true)
   {

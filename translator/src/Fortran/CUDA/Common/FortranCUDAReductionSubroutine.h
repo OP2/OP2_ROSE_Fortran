@@ -13,8 +13,9 @@
 
 namespace ReductionSubroutine
 {
-  std::string const inputValue = "dat_l";
-  std::string const reductionResultOnDevice = "dat_g";
+  std::string const reductionOperation = "reductionOperation";
+  std::string const inputValue = "inputValue";
+  std::string const reductionResultOnDevice = "resultOnDevice";
   std::string const sharedMemoryStartOffset = "sharedMemoryStartOffset";
   std::string const threadID = "threadID";
   std::string const warpSize = "warpSize";
@@ -38,7 +39,29 @@ class FortranCUDAReductionSubroutine: public Subroutine <
      */
     Reduction * reduction;
 
+    /*
+     * ======================================================
+     * There is one autoshared variable per reduction
+     * subroutine. This stores the name of that variable.
+     * The name is constructed from the base type of the OP_DAT
+     * variable and the size of the OP_DAT base type
+     * ======================================================
+     */
+    std::string autosharedVariableName;
+
   private:
+
+    void
+    createThreadZeroReductionStatements ();
+
+    void
+    createReductionStatements ();
+
+    void
+    createSharedVariableInitialisationStatements ();
+
+    void
+    createInitialisationStatements ();
 
     SgStatement *
     createSynchThreadsCallStatement ();

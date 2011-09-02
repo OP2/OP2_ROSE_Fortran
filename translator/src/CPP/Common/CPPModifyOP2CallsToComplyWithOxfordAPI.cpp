@@ -176,7 +176,7 @@ CPPModifyOP2CallsToComplyWithOxfordAPI::patchOpArgGblCall (
   else
   {
     Debug::getInstance ()->errorMessage ("Cannot ascertain type of OP_CONST '"
-        + opConstVariableName + "'");
+        + opConstVariableName + "'", __FILE__, __LINE__);
   }
 }
 
@@ -258,7 +258,8 @@ CPPModifyOP2CallsToComplyWithOxfordAPI::patchOpArgDatCall (
   else
   {
     Debug::getInstance ()->errorMessage (
-        "Cannot ascertain base type of OP_DAT '" + opDatVariableName + "'");
+        "Cannot ascertain base type of OP_DAT '" + opDatVariableName + "'",
+        __FILE__, __LINE__);
   }
 }
 
@@ -324,7 +325,7 @@ CPPModifyOP2CallsToComplyWithOxfordAPI::patchOpParLoopCall (
       else
       {
         Debug::getInstance ()->errorMessage ("Unknown function call '"
-            + functionCallName + "' in OP_PAR_LOOP");
+            + functionCallName + "' in OP_PAR_LOOP", __FILE__, __LINE__);
       }
     }
   }
@@ -393,7 +394,8 @@ CPPModifyOP2CallsToComplyWithOxfordAPI::patchOpDeclareConstCall (
   else
   {
     Debug::getInstance ()->errorMessage (
-        "Cannot ascertain base type of OP_CONST '" + variableName + "'");
+        "Cannot ascertain base type of OP_CONST '" + variableName + "'",
+        __FILE__, __LINE__);
   }
 }
 
@@ -459,7 +461,7 @@ CPPModifyOP2CallsToComplyWithOxfordAPI::patchOpDeclareDatCall (
   else
   {
     Debug::getInstance ()->errorMessage ("Cannot ascertain base type of data '"
-        + dataVariableName + "'");
+        + dataVariableName + "'", __FILE__, __LINE__);
   }
 
   /*

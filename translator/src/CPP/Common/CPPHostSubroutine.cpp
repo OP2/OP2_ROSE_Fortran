@@ -4,7 +4,6 @@
 
 using namespace SageBuilder;
 
-
 void
 CPPHostSubroutine::createFormalParameterDeclarations ()
 {
@@ -15,7 +14,6 @@ CPPHostSubroutine::createFormalParameterDeclarations ()
   using std::vector;
   using std::string;
   using std::map;
-
 
   Debug::getInstance ()->debugMessage (
       "Creating host subroutine formal parameters", Debug::FUNCTION_LEVEL,
@@ -29,9 +27,9 @@ CPPHostSubroutine::createFormalParameterDeclarations ()
 
   int OP_DAT_ArgumentGroup = 0;
 
-  for (vector <SgExpression *>::const_iterator it = parallelLoop->getActualArguments().begin (); 
-      it != parallelLoop->getActualArguments().end(); 
-      ++it)
+  for (vector <SgExpression *>::const_iterator it =
+      parallelLoop->getActualArguments ().begin (); it
+      != parallelLoop->getActualArguments ().end (); ++it)
   {
     Debug::getInstance ()->debugMessage ("Argument type: "
         + (*it)->class_name (), Debug::INNER_LOOP_LEVEL, __FILE__, __LINE__);
@@ -55,10 +53,8 @@ CPPHostSubroutine::createFormalParameterDeclarations ()
         SgVariableDeclaration
             * variableDeclaration =
                 CPPStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
-                    variableName, 
-                    buildPointerType(buildCharType()), 
-                    subroutineScope,
-                    formalParameters);
+                    variableName, buildPointerType (buildCharType ()),
+                    subroutineScope, formalParameters);
 
         variableDeclarations->add (variableName, variableDeclaration);
 
@@ -77,7 +73,7 @@ CPPHostSubroutine::createFormalParameterDeclarations ()
             SgClassType* classReference = isSgClassType (
                 variableReference->get_type ());
 
-            string const className = classReference->get_name().getString();
+            string const className = classReference->get_name ().getString ();
 
             if (iequals (className, OP2::OP_SET))
             {
@@ -91,9 +87,7 @@ CPPHostSubroutine::createFormalParameterDeclarations ()
               SgVariableDeclaration
                   * variableDeclaration =
                       CPPStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
-                          variableName, 
-                          classReference, 
-                          subroutineScope,
+                          variableName, classReference, subroutineScope,
                           formalParameters);
 
               variableDeclarations->add (variableName, variableDeclaration);
@@ -113,9 +107,7 @@ CPPHostSubroutine::createFormalParameterDeclarations ()
               SgVariableDeclaration
                   * variableDeclaration =
                       CPPStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
-                          variableName, 
-                          classReference, 
-                          subroutineScope,
+                          variableName, classReference, subroutineScope,
                           formalParameters);
 
               variableDeclarations->add (variableName, variableDeclaration);
@@ -137,9 +129,7 @@ CPPHostSubroutine::createFormalParameterDeclarations ()
               SgVariableDeclaration
                   * variableDeclaration =
                       CPPStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
-                          variableName, 
-                          classReference, 
-                          subroutineScope,
+                          variableName, classReference, subroutineScope,
                           formalParameters);
 
               variableDeclarations->add (variableName, variableDeclaration);
@@ -148,7 +138,7 @@ CPPHostSubroutine::createFormalParameterDeclarations ()
             else
             {
               Debug::getInstance ()->errorMessage ("Unrecognised class: "
-                  + className);
+                  + className, __FILE__, __LINE__);
             }
 
             break;
@@ -171,9 +161,7 @@ CPPHostSubroutine::createFormalParameterDeclarations ()
             SgVariableDeclaration
                 * variableDeclaration =
                     CPPStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
-                        variableName,
-                        buildIntType(),
-                        subroutineScope, 
+                        variableName, buildIntType (), subroutineScope,
                         formalParameters);
 
             variableDeclarations->add (variableName, variableDeclaration);
@@ -205,9 +193,7 @@ CPPHostSubroutine::createFormalParameterDeclarations ()
         SgVariableDeclaration
             * variableDeclaration =
                 CPPStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
-                    variableName, 
-                    buildIntType(),
-                    subroutineScope, 
+                    variableName, buildIntType (), subroutineScope,
                     formalParameters);
 
         variableDeclarations->add (variableName, variableDeclaration);
@@ -221,5 +207,5 @@ CPPHostSubroutine::createFormalParameterDeclarations ()
       }
     }
   }
-  
+
 }

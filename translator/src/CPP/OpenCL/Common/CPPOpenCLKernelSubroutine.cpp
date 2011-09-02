@@ -13,7 +13,7 @@ CPPOpenCLKernelSubroutine::createLocalThreadDeclarations ()
 }
 
 void
-CPPOpenCLKernelSubroutine::createAutoSharedDeclaration ()
+CPPOpenCLKernelSubroutine::createAutoSharedDeclarations ()
 {
   //FIXME
 }

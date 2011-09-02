@@ -1,10 +1,10 @@
-#include <Debug.h>
 #include <FortranCUDAKernelSubroutine.h>
 #include <CommonNamespaces.h>
 #include <FortranCUDAReductionSubroutine.h>
 #include <FortranTypesBuilder.h>
 #include <FortranStatementsAndExpressionsBuilder.h>
 #include <RoseHelper.h>
+#include <Debug.h>
 
 /*
  * ======================================================
@@ -50,8 +50,6 @@ FortranCUDAKernelSubroutine::createInitialiseLocalThreadVariablesStatements ()
 
       if (parallelLoop->getOpAccessValue (i) == INC_ACCESS)
       {
-        // for (int d=0; d<DIM; d++) ARG_l[d)=ZERO_TYP;
-
         SgExprStatement * assignmentStatement = buildAssignStatement (
             arrayIndexExpression1, buildIntVal (0));
 
@@ -59,8 +57,6 @@ FortranCUDAKernelSubroutine::createInitialiseLocalThreadVariablesStatements ()
       }
       else
       {
-        //for (int d=0; d<DIM; d++) ARG_l[d)=ARG[d+blockIdx.x*DIM);
-
         SgDotExp * dotExpression = buildDotExp (buildOpaqueVarRefExp (
             CUDA::Fortran::blockidx, subroutineScope), buildOpaqueVarRefExp (
             CUDA::Fortran::x, subroutineScope));
@@ -134,116 +130,136 @@ FortranCUDAKernelSubroutine::createReductionLoopStatements ()
   {
     if (parallelLoop->isReductionRequired (i) == true)
     {
+
+      /*
+       * ======================================================
+       * Create reduction call parameters
+       * ======================================================
+       */
+
+      SgDotExp * dotExpression1 = buildDotExp (buildOpaqueVarRefExp (
+          CUDA::Fortran::blockidx, subroutineScope), buildOpaqueVarRefExp (
+          CUDA::Fortran::x, subroutineScope));
+
+      SgSubtractOp * subtractExpression1 = buildSubtractOp (dotExpression1,
+          buildIntVal (1));
+
+      SgMultiplyOp * multiplyExpression1 = buildMultiplyOp (
+          subtractExpression1, buildIntVal (1));
+
+      SgAddOp * addExpression1 = buildAddOp (buildVarRefExp (
+          variableDeclarations->get (
+              DirectLoop::Fortran::KernelSubroutine::setElementCounter)),
+          multiplyExpression1);
+
+      SgAddOp * addExpression2 = buildAddOp (addExpression1, buildIntVal (
+          parallelLoop->getOpDatDimension (i) - 1));
+
+      SgSubscriptExpression * subscriptExpression1 = new SgSubscriptExpression (
+          RoseHelper::getFileInfo (), addExpression1, addExpression2,
+          buildIntVal (1));
+
+      subscriptExpression1->set_endOfConstruct (RoseHelper::getFileInfo ());
+
+      /*
+       * ======================================================
+       * Index into OP_DAT array
+       * ======================================================
+       */
+
+      SgPntrArrRefExp * arrayIndexExpression1 = buildPntrArrRefExp (
+          buildVarRefExp (variableDeclarations->get (
+              VariableNames::getOpDatName (i))), subscriptExpression1);
+
+      /*
+       * ======================================================
+       * Index into local OP_DAT array
+       * ======================================================
+       */
+
+      SgPntrArrRefExp * arrayIndexExpression2 = buildPntrArrRefExp (
+          buildVarRefExp (variableDeclarations->get (
+              VariableNames::getOpDatLocalName (i))), buildVarRefExp (
+              variableDeclarations->get (
+                  DirectLoop::Fortran::KernelSubroutine::setElementCounter)));
+
+      /*
+       * ======================================================
+       * Reduction operation parameter
+       * ======================================================
+       */
+
+      SgIntVal * reductionType;
+
       switch (parallelLoop->getOpAccessValue (i))
       {
         case INC_ACCESS:
         {
-          SgBasicBlock * loopBody = buildBasicBlock ();
-
-          /*
-           * ======================================================
-           * Get the reduction subroutine symbol
-           * ======================================================
-           */
-
-          SgSymbol * reductionSymbol =
-              reductionSubroutines->getHeader (parallelLoop->getReductionTuple (
-                  i))-> search_for_symbol_from_symbol_table ();
-
-          SgFunctionSymbol * reductionFunctionSymbol = isSgFunctionSymbol (
-              reductionSymbol);
-
-          ROSE_ASSERT (reductionFunctionSymbol != NULL);
-
-          /*
-           * ======================================================
-           * Create parameters
-           * ======================================================
-           */
-
-          SgDotExp * dotExpression = buildDotExp (buildOpaqueVarRefExp (
-              CUDA::Fortran::blockidx, subroutineScope), buildOpaqueVarRefExp (
-              CUDA::Fortran::x, subroutineScope));
-
-          SgSubtractOp * subtractExpression = buildSubtractOp (dotExpression,
-              buildIntVal (1));
-
-          SgMultiplyOp * multiplyExpression = buildMultiplyOp (
-              subtractExpression, buildIntVal (1));
-
-          SgAddOp * addExpression1 = buildAddOp (buildVarRefExp (
-              variableDeclarations->get (
-                  DirectLoop::Fortran::KernelSubroutine::setElementCounter)),
-              multiplyExpression);
-
-          SgAddOp * addExpression2 = buildAddOp (addExpression1, buildIntVal (
-              parallelLoop->getOpDatDimension (i) - 1));
-
-          SgSubscriptExpression * subscriptExpression =
-              new SgSubscriptExpression (RoseHelper::getFileInfo (),
-                  addExpression1, addExpression2, buildIntVal (1));
-
-          subscriptExpression->set_endOfConstruct (RoseHelper::getFileInfo ());
-
-          SgPntrArrRefExp * arrayIndexExpression1 = buildPntrArrRefExp (
-              buildVarRefExp (variableDeclarations->get (
-                  VariableNames::getOpDatName (i))), subscriptExpression);
-
-          SgPntrArrRefExp * arrayIndexExpression2 = buildPntrArrRefExp (
-              buildVarRefExp (variableDeclarations->get (
-                  VariableNames::getOpDatLocalName (i))),
-              buildVarRefExp (variableDeclarations->get (
-                  DirectLoop::Fortran::KernelSubroutine::setElementCounter)));
-
-          SgExprListExp * actualParameters = buildExprListExp (
-              arrayIndexExpression1, arrayIndexExpression2, buildVarRefExp (
-                  variableDeclarations->get (
-                      DirectLoop::Fortran::KernelSubroutine::warpSize)),
-              buildVarRefExp (variableDeclarations->get (
-                  ReductionSubroutine::offsetForReduction)));
-
-          SgFunctionCallExp * reductionFunctionCall = buildFunctionCallExp (
-              reductionFunctionSymbol, actualParameters);
-
-          appendStatement (buildExprStatement (reductionFunctionCall), loopBody);
-
-          SgAssignOp * initializationExpression = buildAssignOp (
-              buildVarRefExp (variableDeclarations->get (
-                  DirectLoop::Fortran::KernelSubroutine::setElementCounter)),
-              buildIntVal (0));
-
-          SgIntVal * upperBoundExpression = buildIntVal (
-              parallelLoop->getOpDatDimension (i) - 1);
-
-          SgFortranDo * loopStatement =
-              FortranStatementsAndExpressionsBuilder::buildFortranDoStatement (
-                  initializationExpression, upperBoundExpression, buildIntVal (
-                      1), loopBody);
-
-          appendStatement (loopStatement, subroutineScope);
-
+          reductionType = buildIntVal (INCREMENT);
           break;
         }
 
         case MAX_ACCESS:
         {
-          Debug::getInstance ()->errorMessage (
-              "Error: OP_MAX on reduction variables is not supported");
+          reductionType = buildIntVal (MAX_ACCESS);
+          break;
         }
 
         case MIN_ACCESS:
         {
-          Debug::getInstance ()->errorMessage (
-              "Error: OP_MIN on reduction variables is not supported");
+          reductionType = buildIntVal (MIN_ACCESS);
+          break;
         }
-
-        default:
-        {
-          Debug::getInstance ()->errorMessage (
-              "Error: wrong accessing code for global variable");
-        }
-
       }
+
+      SgExprListExp * actualParameters = buildExprListExp (
+          arrayIndexExpression1, arrayIndexExpression2, buildVarRefExp (
+              variableDeclarations->get (
+                  DirectLoop::Fortran::KernelSubroutine::warpSize)),
+          buildVarRefExp (variableDeclarations->get (
+              ReductionSubroutine::offsetForReduction)), reductionType);
+
+      /*
+       * ======================================================
+       * Create reduction function call
+       * ======================================================
+       */
+
+      SgFunctionSymbol * reductionFunctionSymbol =
+          isSgFunctionSymbol (
+              reductionSubroutines->getHeader (parallelLoop->getReductionTuple (
+                  i))->get_symbol_from_symbol_table ());
+
+      ROSE_ASSERT (reductionFunctionSymbol != NULL);
+
+      SgFunctionCallExp * reductionFunctionCall = buildFunctionCallExp (
+          reductionFunctionSymbol, actualParameters);
+
+      /*
+       * ======================================================
+       * Create loop to repeatedly call reduction subroutine
+       * up to the number of dimensions of OP_DAT
+       * ======================================================
+       */
+
+      SgBasicBlock * loopBody = buildBasicBlock ();
+
+      appendStatement (buildExprStatement (reductionFunctionCall), loopBody);
+
+      SgAssignOp * initializationExpression = buildAssignOp (buildVarRefExp (
+          variableDeclarations->get (
+              DirectLoop::Fortran::KernelSubroutine::setElementCounter)),
+          buildIntVal (0));
+
+      SgIntVal * upperBoundExpression = buildIntVal (
+          parallelLoop->getOpDatDimension (i) - 1);
+
+      SgFortranDo * loopStatement =
+          FortranStatementsAndExpressionsBuilder::buildFortranDoStatement (
+              initializationExpression, upperBoundExpression, buildIntVal (1),
+              loopBody);
+
+      appendStatement (loopStatement, subroutineScope);
     }
   }
 }
@@ -289,31 +305,45 @@ FortranCUDAKernelSubroutine::createLocalThreadDeclarations ()
 }
 
 void
-FortranCUDAKernelSubroutine::createAutoSharedDeclaration ()
+FortranCUDAKernelSubroutine::createAutoSharedDeclarations ()
 {
+  using std::find;
+  using std::vector;
+  using std::string;
+
+  Debug::getInstance ()->debugMessage ("Creating autoshared declarations",
+      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+
+  vector <string> autosharedNames;
+
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
     if (parallelLoop->isDuplicateOpDat (i) == false)
     {
-      SgType * opDatType = parallelLoop->getOpDatType (i);
+      string const autosharedVariableName =
+          VariableNames::getAutosharedDeclarationName (
+              parallelLoop->getOpDatBaseType (i), parallelLoop->getSizeOfOpDat (
+                  i));
 
-      SgArrayType * isArrayType = isSgArrayType (opDatType);
+      if (find (autosharedNames.begin (), autosharedNames.end (),
+          autosharedVariableName) == autosharedNames.end ())
+      {
+        Debug::getInstance ()->debugMessage (
+            "Creating autoshared declaration with name '"
+                + autosharedVariableName + "'", Debug::FUNCTION_LEVEL,
+            __FILE__, __LINE__);
 
-      SgType * opDatBaseType = isArrayType->get_base_type ();
+        SgExpression * upperBound = new SgAsteriskShapeExp (
+            RoseHelper::getFileInfo ());
 
-      SgExpression * upperBound = new SgAsteriskShapeExp (
-          RoseHelper::getFileInfo ());
+        variableDeclarations->add (autosharedVariableName,
+            FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
+                autosharedVariableName, FortranTypesBuilder::getArray_RankOne (
+                    parallelLoop->getOpDatBaseType (i), 0, upperBound),
+                subroutineScope, 1, SHARED));
 
-      Debug::getInstance ()->debugMessage (
-          "Creating autoshared declaration with base type '"
-              + opDatBaseType->class_name (), Debug::FUNCTION_LEVEL, __FILE__,
-          __LINE__);
-
-      variableDeclarations->add (CommonVariableNames::autoshared,
-          FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
-              CommonVariableNames::autoshared,
-              FortranTypesBuilder::getArray_RankOne (opDatBaseType, 0,
-                  upperBound), subroutineScope, 1, SHARED));
+        autosharedNames.push_back (autosharedVariableName);
+      }
     }
   }
 }

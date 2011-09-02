@@ -4,7 +4,6 @@
 #include <FortranTypesBuilder.h>
 #include <CommonNamespaces.h>
 #include <Debug.h>
-#include <Cxx_Grammar.h>
 
 SgBasicBlock *
 FortranPlan::createConvertPlanFunctionParametersStatements (
@@ -20,8 +19,6 @@ FortranPlan::createConvertPlanFunctionParametersStatements (
   using SageBuilder::buildPntrArrRefExp;
   using SageBuilder::buildIntVal;
   using SageInterface::appendStatement;
-
-
 
   Debug::getInstance ()->debugMessage (
       "Creating statements to convert plan function parameters",
@@ -47,8 +44,9 @@ FortranPlan::createConvertPlanFunctionParametersStatements (
           variableDeclarations->get (PlanFunction::Fortran::indsNumber), block);
 
   SgStatement * callStatementE =
-      SubroutineCalls::createCToFortranPointerCallStatement (subroutineScope,
-          parameterExpressionE1, parameterExpressionE2, parameterExpressionE3);
+      SubroutineCalls::Fortran::createCToFortranPointerCallStatement (
+          subroutineScope, parameterExpressionE1, parameterExpressionE2,
+          parameterExpressionE3);
 
   appendStatement (callStatementE, block);
 
@@ -71,8 +69,9 @@ FortranPlan::createConvertPlanFunctionParametersStatements (
       buildOpaqueVarRefExp (CommonVariableNames::size, block));
 
   SgStatement * callStatementF =
-      SubroutineCalls::createCToFortranPointerCallStatement (subroutineScope,
-          parameterExpressionF1, parameterExpressionF2, parameterExpressionF3);
+      SubroutineCalls::Fortran::createCToFortranPointerCallStatement (
+          subroutineScope, parameterExpressionF1, parameterExpressionF2,
+          parameterExpressionF3);
 
   appendStatement (callStatementF, block);
 
@@ -109,8 +108,9 @@ FortranPlan::createConvertPlanFunctionParametersStatements (
           block);
 
   SgStatement * callStatementG =
-      SubroutineCalls::createCToFortranPointerCallStatement (subroutineScope,
-          parameterExpressionG1, parameterExpressionG2, parameterExpressionG3);
+      SubroutineCalls::Fortran::createCToFortranPointerCallStatement (
+          subroutineScope, parameterExpressionG1, parameterExpressionG2,
+          parameterExpressionG3);
 
   appendStatement (callStatementG, block);
 
@@ -140,8 +140,9 @@ FortranPlan::createConvertPlanFunctionParametersStatements (
           block);
 
   SgStatement * callStatementH =
-      SubroutineCalls::createCToFortranPointerCallStatement (subroutineScope,
-          parameterExpressionH1, parameterExpressionH2, parameterExpressionH3);
+      SubroutineCalls::Fortran::createCToFortranPointerCallStatement (
+          subroutineScope, parameterExpressionH1, parameterExpressionH2,
+          parameterExpressionH3);
 
   appendStatement (callStatementH, block);
 
@@ -175,8 +176,9 @@ FortranPlan::createConvertPlanFunctionParametersStatements (
               block);
 
   SgStatement * callStatementI =
-      SubroutineCalls::createCToFortranPointerCallStatement (subroutineScope,
-          parameterExpressionI1, parameterExpressionI2, parameterExpressionI3);
+      SubroutineCalls::Fortran::createCToFortranPointerCallStatement (
+          subroutineScope, parameterExpressionI1, parameterExpressionI2,
+          parameterExpressionI3);
 
   appendStatement (callStatementI, block);
 
@@ -210,8 +212,9 @@ FortranPlan::createConvertPlanFunctionParametersStatements (
               block);
 
   SgStatement * callStatementJ =
-      SubroutineCalls::createCToFortranPointerCallStatement (subroutineScope,
-          parameterExpressionJ1, parameterExpressionJ2, parameterExpressionJ3);
+      SubroutineCalls::Fortran::createCToFortranPointerCallStatement (
+          subroutineScope, parameterExpressionJ1, parameterExpressionJ2,
+          parameterExpressionJ3);
 
   appendStatement (callStatementJ, block);
 
@@ -245,8 +248,9 @@ FortranPlan::createConvertPlanFunctionParametersStatements (
               block);
 
   SgStatement * callStatementK =
-      SubroutineCalls::createCToFortranPointerCallStatement (subroutineScope,
-          parameterExpressionK1, parameterExpressionK2, parameterExpressionK3);
+      SubroutineCalls::Fortran::createCToFortranPointerCallStatement (
+          subroutineScope, parameterExpressionK1, parameterExpressionK2,
+          parameterExpressionK3);
 
   appendStatement (callStatementK, block);
 
@@ -279,8 +283,9 @@ FortranPlan::createConvertPlanFunctionParametersStatements (
           block);
 
   SgStatement * callStatementL =
-      SubroutineCalls::createCToFortranPointerCallStatement (subroutineScope,
-          parameterExpressionL1, parameterExpressionL2, parameterExpressionL3);
+      SubroutineCalls::Fortran::createCToFortranPointerCallStatement (
+          subroutineScope, parameterExpressionL1, parameterExpressionL2,
+          parameterExpressionL3);
 
   appendStatement (callStatementL, block);
 
@@ -312,8 +317,9 @@ FortranPlan::createConvertPlanFunctionParametersStatements (
               block);
 
   SgStatement * callStatementM =
-      SubroutineCalls::createCToFortranPointerCallStatement (subroutineScope,
-          parameterExpressionM1, parameterExpressionM2, parameterExpressionM3);
+      SubroutineCalls::Fortran::createCToFortranPointerCallStatement (
+          subroutineScope, parameterExpressionM1, parameterExpressionM2,
+          parameterExpressionM3);
 
   appendStatement (callStatementM, block);
 
@@ -345,7 +351,7 @@ FortranPlan::createConvertPlanFunctionParametersStatements (
               countIndirectArgs));
 
       SgStatement * callStatementN =
-          SubroutineCalls::createCToFortranPointerCallStatement (
+          SubroutineCalls::Fortran::createCToFortranPointerCallStatement (
               subroutineScope, parameterExpressionN1, parameterExpressionN2,
               parameterExpressionN3);
 
@@ -392,8 +398,8 @@ FortranPlan::createConvertPositionInPMapsStatements (
       variableDeclarations->get (PlanFunction::Fortran::actualPlan));
 
   SgStatement * callStatementA =
-      SubroutineCalls::createCToFortranPointerCallStatement (subroutineScope,
-          parameterExpressionA1, parameterExpressionA2);
+      SubroutineCalls::Fortran::createCToFortranPointerCallStatement (
+          subroutineScope, parameterExpressionA1, parameterExpressionA2);
 
   appendStatement (callStatementA, block);
 
@@ -415,8 +421,9 @@ FortranPlan::createConvertPositionInPMapsStatements (
           variableDeclarations->get (PlanFunction::Fortran::indsNumber), block);
 
   SgStatement * callStatementB =
-      SubroutineCalls::createCToFortranPointerCallStatement (subroutineScope,
-          parameterExpressionB1, parameterExpressionB2, parameterExpressionB3);
+      SubroutineCalls::Fortran::createCToFortranPointerCallStatement (
+          subroutineScope, parameterExpressionB1, parameterExpressionB2,
+          parameterExpressionB3);
 
   appendStatement (callStatementB, block);
 
@@ -438,8 +445,9 @@ FortranPlan::createConvertPositionInPMapsStatements (
           variableDeclarations->get (PlanFunction::Fortran::argsNumber), block);
 
   SgStatement * callStatementC =
-      SubroutineCalls::createCToFortranPointerCallStatement (subroutineScope,
-          parameterExpressionC1, parameterExpressionC2, parameterExpressionC3);
+      SubroutineCalls::Fortran::createCToFortranPointerCallStatement (
+          subroutineScope, parameterExpressionC1, parameterExpressionC2,
+          parameterExpressionC3);
 
   appendStatement (callStatementC, block);
 
@@ -486,7 +494,7 @@ FortranPlan::createConvertPositionInPMapsStatements (
                   VariableNames::getGlobalToLocalMappingSizeName (i)), block);
 
       SgStatement * statement2 =
-          SubroutineCalls::createCToFortranPointerCallStatement (
+          SubroutineCalls::Fortran::createCToFortranPointerCallStatement (
               subroutineScope, parameterExpression1, parameterExpression2,
               parameterExpression3);
 

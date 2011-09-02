@@ -113,6 +113,11 @@ FortranCUDAKernelSubroutineIndirectLoop::createUserSubroutineCallStatement ()
           "Indirect OP_DAT with read/write access", Debug::OUTER_LOOP_LEVEL,
           __FILE__, __LINE__);
 
+      string const autosharedVariableName =
+          VariableNames::getAutosharedDeclarationName (
+              parallelLoop->getOpDatBaseType (i), parallelLoop->getSizeOfOpDat (
+                  i));
+
       SgAddOp
           * addExpression1 =
               buildAddOp (
@@ -170,7 +175,7 @@ FortranCUDAKernelSubroutineIndirectLoop::createUserSubroutineCallStatement ()
       subscriptExpression->set_endOfConstruct (RoseHelper::getFileInfo ());
 
       parameterExpression = buildPntrArrRefExp (buildVarRefExp (
-          variableDeclarations->get (CommonVariableNames::autoshared)),
+          variableDeclarations->get (autosharedVariableName)),
           buildExprListExp (subscriptExpression));
     }
     else if (parallelLoop->getOpMapValue (i) == DIRECT)
@@ -272,6 +277,7 @@ FortranCUDAKernelSubroutineIndirectLoop::createPointeredIncrementsOrWritesStatem
   using SageBuilder::buildLessThanOp;
   using SageBuilder::buildWhileStmt;
   using SageInterface::appendStatement;
+  using std::string;
 
   unsigned int pindOffsOffset = 0;
 
@@ -284,6 +290,11 @@ FortranCUDAKernelSubroutineIndirectLoop::createPointeredIncrementsOrWritesStatem
           || parallelLoop->getOpAccessValue (i) == RW_ACCESS
           || parallelLoop->getOpAccessValue (i) == INC_ACCESS)
       {
+        string const autosharedVariableName =
+            VariableNames::getAutosharedDeclarationName (
+                parallelLoop->getOpDatBaseType (i),
+                parallelLoop->getSizeOfOpDat (i));
+
         SgDotExp * dotExpression1 = buildDotExp (buildOpaqueVarRefExp (
             CUDA::Fortran::threadidx, subroutineScope), buildOpaqueVarRefExp (
             CUDA::Fortran::x, subroutineScope));
@@ -407,9 +418,9 @@ FortranCUDAKernelSubroutineIndirectLoop::createPointeredIncrementsOrWritesStatem
             buildVarRefExp (variableDeclarations->get (
                 CommonVariableNames::iterationCounter1)));
 
-        SgPntrArrRefExp * arrayIndexExpression2d = buildPntrArrRefExp (
-            buildVarRefExp (variableDeclarations->get (
-                CommonVariableNames::autoshared)), addExpression2e);
+        SgPntrArrRefExp * arrayIndexExpression2d =
+            buildPntrArrRefExp (buildVarRefExp (variableDeclarations->get (
+                autosharedVariableName)), addExpression2e);
 
         SgExprStatement * assignmentStatement3 = NULL;
 
@@ -494,6 +505,7 @@ FortranCUDAKernelSubroutineIndirectLoop::createInnerExecutionLoopStatements (
   using SageBuilder::buildExprStatement;
   using SageBuilder::buildBasicBlock;
   using SageInterface::appendStatement;
+  using std::string;
 
   SgBasicBlock * ifBody = buildBasicBlock ();
 
@@ -502,6 +514,11 @@ FortranCUDAKernelSubroutineIndirectLoop::createInnerExecutionLoopStatements (
     if (parallelLoop->getOpMapValue (i) == INDIRECT
         && parallelLoop->getOpAccessValue (i) == INC_ACCESS)
     {
+      string const autosharedVariableName =
+          VariableNames::getAutosharedDeclarationName (
+              parallelLoop->getOpDatBaseType (i), parallelLoop->getSizeOfOpDat (
+                  i));
+
       SgBasicBlock * innerLoopBody = buildBasicBlock ();
 
       SgPntrArrRefExp * arrayExpression1 = buildPntrArrRefExp (buildVarRefExp (
@@ -530,12 +547,10 @@ FortranCUDAKernelSubroutineIndirectLoop::createInnerExecutionLoopStatements (
               addExpression1);
 
       SgPntrArrRefExp * arrayExpression2 = buildPntrArrRefExp (buildVarRefExp (
-          variableDeclarations->get (CommonVariableNames::autoshared)),
-          addExpression2);
+          variableDeclarations->get (autosharedVariableName)), addExpression2);
 
       SgPntrArrRefExp * arrayExpression3 = buildPntrArrRefExp (buildVarRefExp (
-          variableDeclarations->get (CommonVariableNames::autoshared)),
-          addExpression2);
+          variableDeclarations->get (autosharedVariableName)), addExpression2);
 
       SgAddOp * addExpression3 =
           buildAddOp (arrayExpression2, arrayExpression1);
@@ -841,6 +856,7 @@ FortranCUDAKernelSubroutineIndirectLoop::createAutoSharedWhileLoopStatements ()
   using SageBuilder::buildExprListExp;
   using SageBuilder::buildFunctionCallExp;
   using SageInterface::appendStatement;
+  using std::string;
 
   unsigned int pindOffsOffset = 0;
 
@@ -849,6 +865,11 @@ FortranCUDAKernelSubroutineIndirectLoop::createAutoSharedWhileLoopStatements ()
     if (parallelLoop->isDuplicateOpDat (i) == false
         && parallelLoop->getOpMapValue (i) == INDIRECT)
     {
+      string const autosharedVariableName =
+          VariableNames::getAutosharedDeclarationName (
+              parallelLoop->getOpDatBaseType (i), parallelLoop->getSizeOfOpDat (
+                  i));
+
       /*
        * ======================================================
        * Initialise the lower bound of the while loop
@@ -945,9 +966,9 @@ FortranCUDAKernelSubroutineIndirectLoop::createAutoSharedWhileLoopStatements ()
             buildVarRefExp (variableDeclarations->get (
                 CommonVariableNames::iterationCounter1)));
 
-        SgPntrArrRefExp * arrayIndexExpression4a = buildPntrArrRefExp (
-            buildVarRefExp (variableDeclarations->get (
-                CommonVariableNames::autoshared)), addExpression4a);
+        SgPntrArrRefExp * arrayIndexExpression4a =
+            buildPntrArrRefExp (buildVarRefExp (variableDeclarations->get (
+                autosharedVariableName)), addExpression4a);
 
         SgMultiplyOp
             * multiplyExpression4a =
@@ -1021,9 +1042,9 @@ FortranCUDAKernelSubroutineIndirectLoop::createAutoSharedWhileLoopStatements ()
             buildVarRefExp (variableDeclarations->get (
                 CommonVariableNames::iterationCounter1)));
 
-        SgPntrArrRefExp * arrayIndexExpression4 = buildPntrArrRefExp (
-            buildVarRefExp (variableDeclarations->get (
-                CommonVariableNames::autoshared)), addExpression4);
+        SgPntrArrRefExp * arrayIndexExpression4 =
+            buildPntrArrRefExp (buildVarRefExp (variableDeclarations->get (
+                autosharedVariableName)), addExpression4);
 
         SgExprStatement * assignmentStatement4 = buildAssignStatement (
             arrayIndexExpression4, buildIntVal (0));
@@ -1685,6 +1706,8 @@ FortranCUDAKernelSubroutineIndirectLoop::createLocalVariableDeclarations ()
 
   createLocalThreadDeclarations ();
 
+  createAutoSharedDeclarations ();
+
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
     string const & variableName = VariableNames::getNumberOfBytesVariableName (
@@ -1774,16 +1797,6 @@ FortranCUDAKernelSubroutineIndirectLoop::createLocalVariableDeclarations ()
             FortranTypesBuilder::getFourByteInteger (), subroutineScope, 1,
             SHARED));
   }
-
-  SgExpression * upperBoundExpression = new SgAsteriskShapeExp (
-      RoseHelper::getFileInfo ());
-
-  variableDeclarations->add (CommonVariableNames::autoshared,
-      FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
-          CommonVariableNames::autoshared,
-          FortranTypesBuilder::getArray_RankOne (
-              FortranTypesBuilder::getDoublePrecisionFloat (), 0,
-              upperBoundExpression), subroutineScope, 1, SHARED));
 
   vector <string> fourByteIntegerVariables;
 

@@ -115,12 +115,17 @@ Debug::debugMessage (std::string const & message, int const debugLevel,
 }
 
 void
-Debug::errorMessage (std::string const & message) const
+Debug::errorMessage (std::string const & message, std::string const & filePath,
+    int const lineNumber) const
 {
+  using boost::lexical_cast;
   using std::cerr;
   using std::endl;
+  using std::string;
 
-  cerr << message + "." << endl;
+  cerr << "[" + debugInstance->getFileName (filePath) + ":" + lexical_cast <
+      string> (lineNumber) + "] " + message + "." << endl;
+
   exit (1);
 }
 

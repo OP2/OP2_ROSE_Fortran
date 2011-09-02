@@ -138,7 +138,7 @@ handleCPPProject (SgProject * project)
     case TargetBackends::OPENMP:
     {
       Debug::getInstance ()->errorMessage (
-          "OpenMP code generation not yet supported in C++");
+          "OpenMP code generation not yet supported in C++", __FILE__, __LINE__);
 
       break;
     }
@@ -155,7 +155,8 @@ handleCPPProject (SgProject * project)
 
     default:
     {
-      Debug::getInstance ()->errorMessage ("Unknown backend selected");
+      Debug::getInstance ()->errorMessage ("Unknown backend selected",
+          __FILE__, __LINE__);
 
       break;
     }
@@ -193,14 +194,16 @@ handleFortranProject (SgProject * project)
     case TargetBackends::OPENCL:
     {
       Debug::getInstance ()->errorMessage (
-          "OpenCL code generation not yet supported in Fortran");
+          "OpenCL code generation not yet supported in Fortran", __FILE__,
+          __LINE__);
 
       break;
     }
 
     default:
     {
-      Debug::getInstance ()->errorMessage ("Unknown backend selected");
+      Debug::getInstance ()->errorMessage ("Unknown backend selected",
+          __FILE__, __LINE__);
 
       break;
     }
@@ -235,7 +238,7 @@ checkBackendOption ()
 
     Debug::getInstance ()->errorMessage (
         "You have not selected a target backend on the command-line. Supported backends are: "
-            + backendsString);
+            + backendsString, __FILE__, __LINE__);
   }
 }
 
@@ -278,7 +281,8 @@ processUserSelections (SgProject * project)
         Debug::getInstance ()->errorMessage (
             "You have selected to generate code for " + toString (
                 Globals::getInstance ()->getTargetBackend ())
-                + " and replace all OP2 calls with the Oxford-compliant API. These options are mutually exclusive");
+                + " and replace all OP2 calls with the Oxford-compliant API. These options are mutually exclusive",
+            __FILE__, __LINE__);
       }
 
       CPPProgramDeclarationsAndDefinitions * declarations =
@@ -305,7 +309,8 @@ processUserSelections (SgProject * project)
     if (Globals::getInstance ()->getConstantsFileName ().empty ())
     {
       Debug::getInstance ()->errorMessage (
-          "The Fortran compiler requires the name of the file containing constants");
+          "The Fortran compiler requires the name of the file containing constants",
+          __FILE__, __LINE__);
     }
 
     checkBackendOption ();
@@ -317,7 +322,8 @@ processUserSelections (SgProject * project)
   else
   {
     Debug::getInstance ()->errorMessage (
-        "The translator does not supported the programming language of the given files");
+        "The translator does not supported the programming language of the given files",
+        __FILE__, __LINE__);
   }
 }
 

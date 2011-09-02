@@ -96,7 +96,8 @@ class Debug
      * ======================================================
      */
     void
-    errorMessage (std::string const & message) const;
+    errorMessage (std::string const & message, std::string const & filePath,
+        int const lineNumber) const;
 
     /*
      * ======================================================

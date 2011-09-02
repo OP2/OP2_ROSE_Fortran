@@ -43,6 +43,8 @@ class CPPOpenCLReductionSubroutine: public Subroutine <
      */
     Reduction * reduction;
 
+    std::string autosharedVariableName;
+
   private:
 
     SgStatement *

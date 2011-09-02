@@ -194,7 +194,7 @@ FortranOpenMPHostSubroutineDirectLoop::createTransferOpDatStatements ()
       }
 
       SgStatement * callStatement =
-          SubroutineCalls::createCToFortranPointerCallStatement (
+          SubroutineCalls::Fortran::createCToFortranPointerCallStatement (
               subroutineScope, parameterExpression1, parameterExpression2,
               buildOpaqueVarRefExp ("(/"
                   + parameterExpression3->unparseToString () + "/)", block));

@@ -13,7 +13,7 @@
 
 enum OPERATION
 {
-  MINIMUM, MAXIMUM, INCREMENT
+  INCREMENT, MINIMUM, MAXIMUM
 };
 
 class Reduction
@@ -45,14 +45,6 @@ class Reduction
 
     unsigned int variableSize;
 
-    /*
-     * ======================================================
-     * The reduction operation
-     * ======================================================
-     */
-
-    OPERATION operation;
-
   public:
 
     SgArrayType *
@@ -73,19 +65,13 @@ class Reduction
       return variableSize;
     }
 
-    OPERATION
-    getOperation () const
-    {
-      return operation;
-    }
-
     std::string
     getSubroutineName () const
     {
       using boost::lexical_cast;
       using std::string;
 
-      std::string name = "Reduction_";
+      std::string name = "Reduction";
 
       if (isSgTypeInt (baseType) != NULL)
       {
@@ -98,23 +84,11 @@ class Reduction
       else
       {
         Debug::getInstance ()->errorMessage (
-            "Error: base type of reduction variable is not supported");
+            "Error: base type of reduction variable is not supported",
+            __FILE__, __LINE__);
       }
 
       name += lexical_cast <string> (variableSize);
-
-      if (operation == MINIMUM)
-      {
-        name += "_Minimum";
-      }
-      else if (operation == MAXIMUM)
-      {
-        name += "_Maximum";
-      }
-      else if (operation == INCREMENT)
-      {
-        name += "_Increment";
-      }
 
       return name;
     }
@@ -142,7 +116,6 @@ class Reduction
       ROSE_ASSERT (key > 0);
 
       key += variableSize;
-      key += operation;
 
       return key;
     }
@@ -154,9 +127,8 @@ class Reduction
     }
 
     Reduction (SgArrayType * arrayType, SgType * baseType,
-        unsigned int variableSize, OPERATION operation) :
-      arrayType (arrayType), baseType (baseType), variableSize (variableSize),
-          operation (operation)
+        unsigned int variableSize) :
+      arrayType (arrayType), baseType (baseType), variableSize (variableSize)
     {
     }
 };

@@ -18,7 +18,7 @@ class CPPOpenCLKernelSubroutine: public CPPKernelSubroutine
     createLocalThreadDeclarations ();
 
     void
-    createAutoSharedDeclaration ();
+    createAutoSharedDeclarations ();
 
     CPPOpenCLKernelSubroutine (std::string const & subroutineName,
         std::string const & userSubroutineName, CPPParallelLoop * parallelLoop,
