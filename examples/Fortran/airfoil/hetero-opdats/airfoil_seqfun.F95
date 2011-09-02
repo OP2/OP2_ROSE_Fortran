@@ -126,6 +126,8 @@ subroutine res_calc ( x1, x2, fakeInt1, fakeInt2, q1, q2, adt1, adt2, res1, res2
 	! formal parameters
 	real(8), dimension(*) :: x1
 	real(8), dimension(*) :: x2
+	integer(4), dimension(3) :: fakeInt1
+	integer(4), dimension(3) :: fakeInt2
 	real(8), dimension(*) :: q1
 	real(8), dimension(*) :: q2
 	real(8), dimension(*) :: adt1
