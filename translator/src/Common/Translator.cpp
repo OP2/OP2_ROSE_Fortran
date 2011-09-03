@@ -296,7 +296,7 @@ processUserSelections (SgProject * project)
     {
       checkBackendOption ();
 
-      handleCPPProject (project);
+      //handleCPPProject (project);
 
       project->unparse ();
     }

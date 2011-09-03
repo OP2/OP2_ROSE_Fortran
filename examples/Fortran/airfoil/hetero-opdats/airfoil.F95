@@ -169,7 +169,7 @@ use, intrinsic :: ISO_C_BINDING
 
       ! calculate flux residual
 
-      call op_par_loop_8 ( res_calc, edges, &
+      call op_par_loop_10 ( res_calc, edges, &
                          & p_x,       1, pedge,  OP_READ, &
                          & p_x,       2, pedge,  OP_READ, &
                          & p_fakeInt, 1, pecell, OP_READ, &
@@ -179,18 +179,16 @@ use, intrinsic :: ISO_C_BINDING
                          & p_adt,     1, pecell, OP_READ, &
                          & p_adt,     2, pecell, OP_READ, &
                          & p_res,     1, pecell, OP_INC,  &
-                         & p_res,     2, pecell, OP_INC   &
-											 & )
+                         & p_res,     2, pecell, OP_INC)
 
 
       call op_par_loop_6 ( bres_calc, bedges, &
-												 & p_x,      1, pbedge,  OP_READ, &
-												 & p_x,      2, pbedge,  OP_READ, &
-												 & p_q,      1, pbecell, OP_READ, &
-												 & p_adt,    1, pbecell, OP_READ, &
-											   & p_res,    1, pbecell, OP_INC,  &
-                         & p_bound,  -1, OP_ID, OP_READ  &
-											 & )
+			 & p_x,      1, pbedge,  OP_READ, &
+			 & p_x,      2, pbedge,  OP_READ, &
+			 & p_q,      1, pbecell, OP_READ, &
+			 & p_adt,    1, pbecell, OP_READ, &
+			 & p_res,    1, pbecell, OP_INC,  &
+                         & p_bound, -1, OP_ID,   OP_READ)
 
       ! update flow field
       
