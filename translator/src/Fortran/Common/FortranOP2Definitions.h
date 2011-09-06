@@ -26,6 +26,12 @@ class FortranOpDatDefinition: public OpDatDefinition
 
   public:
 
+    static unsigned int
+    getNumberOfExpectedArguments ()
+    {
+      return 4;
+    }
+
     FortranOpDatDefinition (SgExpressionPtrList & parameters);
 };
 
@@ -47,6 +53,12 @@ class FortranOpSetDefinition: public OpSetDefinition
     static int const index_OpSetName = 1;
 
   public:
+
+    static unsigned int
+    getNumberOfExpectedArguments ()
+    {
+      return 2;
+    }
 
     FortranOpSetDefinition (SgExpressionPtrList & parameters);
 };
@@ -82,6 +94,12 @@ class FortranOpMapDefinition: public OpMapDefinition
 
   public:
 
+    static unsigned int
+    getNumberOfExpectedArguments ()
+    {
+      return 6;
+    }
+
     std::string const &
     getMappingCardinalityName () const
     {
@@ -112,7 +130,41 @@ class FortranOpGblDefinition: public OpGblDefinition
 
   public:
 
+    static unsigned int
+    getNumberOfExpectedArguments ()
+    {
+      return 3;
+    }
+
     FortranOpGblDefinition (SgExpressionPtrList & parameters);
+};
+
+class FortranOpGblScalarDefinition: public OpGblDefinition
+{
+    /*
+     * ======================================================
+     * Models a scalar OP_GBL definition in Fortran.
+     *
+     * The following style is assumed:
+     * OP_DECL_GBL (data, OpDatName)
+     * ======================================================
+     */
+
+  private:
+
+    static int const index_data = 0;
+
+    static int const index_OpDatName = 1;
+
+  public:
+
+    static unsigned int
+    getNumberOfExpectedArguments ()
+    {
+      return 2;
+    }
+
+    FortranOpGblScalarDefinition (SgExpressionPtrList & parameters);
 };
 
 class FortranOpConstDefinition: public OpConstDefinition
@@ -133,6 +185,12 @@ class FortranOpConstDefinition: public OpConstDefinition
     static int const index_OpConstName = 1;
 
   public:
+
+    static unsigned int
+    getNumberOfExpectedArguments ()
+    {
+      return 2;
+    }
 
     FortranOpConstDefinition (SgExpressionPtrList & parameters);
 };

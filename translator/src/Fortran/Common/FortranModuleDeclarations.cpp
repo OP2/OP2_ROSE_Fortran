@@ -103,6 +103,22 @@ FortranModuleDeclarations::getFirstExecutionBooleanDeclaration ()
 }
 
 SgVariableDeclaration *
+FortranModuleDeclarations::getReductionArrayHostDeclaration (
+    unsigned int OP_DAT_ArgumentGroup)
+{
+  return variableDeclarations->get (VariableNames::getReductionArrayHostName (
+      OP_DAT_ArgumentGroup, userSubroutineName));
+}
+
+SgVariableDeclaration *
+FortranModuleDeclarations::getReductionArrayDeviceDeclaration (
+    unsigned int OP_DAT_ArgumentGroup)
+{
+  return variableDeclarations->get (VariableNames::getReductionArrayDeviceName (
+      OP_DAT_ArgumentGroup, userSubroutineName));
+}
+
+SgVariableDeclaration *
 FortranModuleDeclarations::getGlobalOpDatDeclaration (
     unsigned int OP_DAT_ArgumentGroup)
 {

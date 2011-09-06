@@ -130,7 +130,6 @@ FortranCUDAKernelSubroutine::createReductionLoopStatements ()
   {
     if (parallelLoop->isReductionRequired (i) == true)
     {
-
       /*
        * ======================================================
        * Create reduction call parameters

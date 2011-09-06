@@ -12,34 +12,34 @@
 void
 FortranCUDAModuleDeclarations::createReductionDeclarations ()
 {
-  using std::vector;
+  using std::string;
 
-  vector <Reduction *> reductions;
-
-  parallelLoop->getReductionsNeeded (reductions);
-
-  for (vector <Reduction *>::iterator it = reductions.begin (); it
-      != reductions.end (); ++it)
+  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
-    SgType * baseType = (*it)->getArrayType ()->get_base_type ();
+    if (parallelLoop->isReductionRequired (i))
+    {
+      SgType * baseType = parallelLoop->getOpDatBaseType (i);
 
-    SgVariableDeclaration * variableDeclaration1 =
-        FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
-            ReductionSubroutine::reductionArrayHost,
-            FortranTypesBuilder::getArray_RankOne (baseType), moduleScope, 1,
-            ALLOCATABLE);
+      string const reductionArrayHostName =
+          VariableNames::getReductionArrayHostName (i, userSubroutineName);
 
-    variableDeclarations->add (ReductionSubroutine::reductionArrayHost,
-        variableDeclaration1);
+      SgVariableDeclaration * reductionArrayHost =
+          FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
+              reductionArrayHostName, FortranTypesBuilder::getArray_RankOne (
+                  baseType), moduleScope, 1, ALLOCATABLE);
 
-    SgVariableDeclaration * variableDeclaration2 =
-        FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
-            ReductionSubroutine::reductionArrayDevice,
-            FortranTypesBuilder::getArray_RankOne (baseType), moduleScope, 2,
-            ALLOCATABLE, DEVICE);
+      variableDeclarations->add (reductionArrayHostName, reductionArrayHost);
 
-    variableDeclarations->add (ReductionSubroutine::reductionArrayDevice,
-        variableDeclaration2);
+      string const reductionArrayDeviceName =
+          VariableNames::getReductionArrayDeviceName (i, userSubroutineName);
+
+      SgVariableDeclaration * reductionArrayDevice =
+          FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
+              reductionArrayDeviceName, FortranTypesBuilder::getArray_RankOne (
+                  baseType), moduleScope, 2, ALLOCATABLE, DEVICE);
+
+      variableDeclarations->add (reductionArrayDeviceName, reductionArrayDevice);
+    }
   }
 }
 
@@ -84,18 +84,6 @@ FortranCUDAModuleDeclarations::createDimensionsDeclaration ()
  * Public functions
  * ======================================================
  */
-
-SgVariableDeclaration *
-FortranCUDAModuleDeclarations::getReductionArrayHostVariableDeclaration ()
-{
-  return variableDeclarations->get (ReductionSubroutine::reductionArrayHost);
-}
-
-SgVariableDeclaration *
-FortranCUDAModuleDeclarations::getReductionArrayDeviceVariableDeclaration ()
-{
-  return variableDeclarations->get (ReductionSubroutine::reductionArrayDevice);
-}
 
 SgVariableDeclaration *
 FortranCUDAModuleDeclarations::getDataSizesVariableDeclaration ()

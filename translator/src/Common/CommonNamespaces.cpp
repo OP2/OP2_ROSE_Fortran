@@ -329,6 +329,28 @@ VariableNames::getAutosharedDeclarationName (SgType * type, unsigned int size)
   }
 }
 
+std::string
+VariableNames::getReductionArrayHostName (unsigned int OP_DAT_ArgumentGroup,
+    std::string const & suffix)
+{
+  using boost::lexical_cast;
+  using std::string;
+
+  return "reductionArrayHost" + lexical_cast <string> (OP_DAT_ArgumentGroup)
+      + suffix;
+}
+
+std::string
+VariableNames::getReductionArrayDeviceName (unsigned int OP_DAT_ArgumentGroup,
+    std::string const & suffix)
+{
+  using boost::lexical_cast;
+  using std::string;
+
+  return "reductionArrayDevice" + lexical_cast <string> (OP_DAT_ArgumentGroup)
+      + suffix;
+}
+
 SgStatement *
 SubroutineCalls::Fortran::createCToFortranPointerCallStatement (
     SgScopeStatement * scope, SgExpression * parameter1,

@@ -31,12 +31,6 @@ class FortranCUDAModuleDeclarations: public FortranModuleDeclarations
   public:
 
     SgVariableDeclaration *
-    getReductionArrayHostVariableDeclaration ();
-
-    SgVariableDeclaration *
-    getReductionArrayDeviceVariableDeclaration ();
-
-    SgVariableDeclaration *
     getDataSizesVariableDeclaration ();
 
     SgVariableDeclaration *

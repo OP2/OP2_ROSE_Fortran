@@ -17,7 +17,7 @@ template <typename TSubroutineHeader>
       /*
        * ======================================================
        * Mapping from the hash key generated for a reduction
-       * triplet (type x size x operation) to its subroutine
+       * triplet (type x size) to its subroutine
        * ======================================================
        */
       std::map <unsigned int, TSubroutineHeader *> subroutines;
@@ -41,8 +41,7 @@ template <typename TSubroutineHeader>
         }
 
         Debug::getInstance ()->errorMessage (
-            "Unable to find reduction subroutine for reduction", __FILE__,
-            __LINE__);
+            "Unable to find reduction subroutine for reduction", __FILE__, __LINE__);
       }
 
       void

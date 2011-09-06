@@ -23,8 +23,6 @@ namespace ReductionSubroutine
   std::string const maximumNumberOfThreadBlocks = "maxThreadBlocks";
   std::string const numberOfThreadItems = "threadItems";
   std::string const offsetForReduction = "offsetReduction";
-  std::string const reductionArrayHost = "reductionArrayHost";
-  std::string const reductionArrayDevice = "reductionArrayDevice";
 }
 
 class FortranCUDAReductionSubroutine: public Subroutine <

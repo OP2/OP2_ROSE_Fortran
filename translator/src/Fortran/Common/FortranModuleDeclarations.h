@@ -64,6 +64,12 @@ class FortranModuleDeclarations
     getFirstExecutionBooleanDeclaration ();
 
     SgVariableDeclaration *
+    getReductionArrayHostDeclaration (unsigned int OP_DAT_ArgumentGroup);
+
+    SgVariableDeclaration *
+    getReductionArrayDeviceDeclaration (unsigned int OP_DAT_ArgumentGroup);
+
+    SgVariableDeclaration *
     getGlobalOpDatDeclaration (unsigned int OP_DAT_ArgumentGroup);
 
     SubroutineVariableDeclarations *

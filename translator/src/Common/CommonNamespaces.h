@@ -446,6 +446,14 @@ namespace VariableNames
 
   std::string
   getAutosharedDeclarationName (SgType * type, unsigned int size);
+
+  std::string
+  getReductionArrayHostName (unsigned int OP_DAT_ArgumentGroup,
+      std::string const & suffix);
+
+  std::string
+  getReductionArrayDeviceName (unsigned int OP_DAT_ArgumentGroup,
+      std::string const & suffix);
 }
 
 namespace SubroutineCalls

@@ -108,6 +108,25 @@ FortranOpGblDefinition::FortranOpGblDefinition (
       Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 }
 
+FortranOpGblScalarDefinition::FortranOpGblScalarDefinition (
+    SgExpressionPtrList & parameters)
+{
+  using boost::lexical_cast;
+  using std::string;
+
+  primitiveType = isSgVarRefExp (parameters[index_data])->get_type ();
+
+  variableName
+      = isSgVarRefExp (parameters[index_OpDatName])->get_symbol ()->get_name ().getString ();
+
+  ROSE_ASSERT (primitiveType != NULL);
+  ROSE_ASSERT (variableName.empty () == false);
+
+  Debug::getInstance ()->debugMessage ("Found an OP_GBL scalar definition: '"
+      + variableName + "'. Its actual type is " + primitiveType->class_name (),
+      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+}
+
 FortranOpConstDefinition::FortranOpConstDefinition (
     SgExpressionPtrList & parameters)
 {

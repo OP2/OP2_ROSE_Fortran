@@ -453,8 +453,20 @@ FortranProgramDeclarationsAndDefinitions::visit (SgNode * node)
            * ======================================================
            */
 
-          FortranOpGblDefinition * opGblDeclaration =
-              new FortranOpGblDefinition (actualArguments);
+          OpGblDefinition * opGblDeclaration;
+
+          if (actualArguments.size ()
+              == FortranOpGblDefinition::getNumberOfExpectedArguments ())
+          {
+            opGblDeclaration = new FortranOpGblDefinition (actualArguments);
+          }
+          else
+          {
+            ROSE_ASSERT (actualArguments.size() == FortranOpGblScalarDefinition::getNumberOfExpectedArguments());
+
+            opGblDeclaration = new FortranOpGblScalarDefinition (
+                actualArguments);
+          }
 
           OpGblDefinitions[opGblDeclaration->getVariableName ()]
               = opGblDeclaration;

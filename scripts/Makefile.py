@@ -211,26 +211,33 @@ def compile ():
 		outputStdout (stdoutLines)
 
 def writeLine (f, line, indent):
-	baseIndex       = 0
-	maxLineLength   = opts.format
-	ampersandNeeded = False
-
-	while len(line) - baseIndex > maxLineLength:		
-		f.write(" " * indent)						
-		if ampersandNeeded:
-			f.write("&")				
-		f.write(line[baseIndex:baseIndex+maxLineLength])
-		tempLine = line[baseIndex:baseIndex+maxLineLength].strip()
-		if tempLine.strip()[len(tempLine)-1] is not '&':
-			f.write("&")
-		f.write("\n")
-		baseIndex = baseIndex + maxLineLength		
-		ampersandNeeded = True
+	# Allows pretty-printing indentation
+	indentPrefix = " " * indent
 	
-	f.write(" " * indent)
-	if ampersandNeeded:
+	# Edit the line so that all extra whitespace is removed and prepend the indent prefix
+	line = line.strip()
+	line = indentPrefix + line
+
+	# Maximum line length, as requested by the user	
+	maxLineLength = opts.format
+
+	while len(line.rstrip()) > 0:
+		# While the line is not empty, break it up into substrings adhering to line length
+		# and print these smaller strings
+		upperIndex = maxLineLength - 1
+		f.write(line[:upperIndex])
+
+		remainingLine = line[upperIndex:]
+		line          = indentPrefix + remainingLine 
+
+		if len(line.rstrip()) > 0:
+			# If the remaining line is not empty then need
+			# to print '&' at the end of current line and 
+			# before the 1st character on the next one
 			f.write("&")
-	f.write(line[baseIndex:])
+			line = indentPrefix + "&" + remainingLine
+
+		f.write("\n")
 	
 def formatCode (files):
 	end_regex        = re.compile("\s*end\s", re.IGNORECASE)
@@ -244,7 +251,8 @@ def formatCode (files):
 	type_regex       = re.compile("\s*type\s", re.IGNORECASE)
 	call_regex       = re.compile("\s*call\s", re.IGNORECASE)
 	implicit_regex   = re.compile("\s*implicit none\s", re.IGNORECASE)
-	
+	contains_regex   = re.compile("\s*contains\s", re.IGNORECASE)
+
 	for fileName in files:
 		verboseMessage("Formatting '" + fileName + "'")
 
@@ -276,30 +284,20 @@ def formatCode (files):
 
 				if newLineNeeded:
 					f2.write("\n")
-		
+
 				writeLine(f2, line, indent)
+	
 				indent = indent + 2	
 				newLineNeeded = True
 
 			elif not re.compile("\n").match(line):
-				if implicit_regex.match(line):
-					f2.write("\n")
+				if implicit_regex.match(line) or contains_regex.match(line):
+					if not newLineNeeded:
+						f2.write("\n")
 					writeLine(f2, line, indent)
-					f2.write("\n")
 				else:
 					writeLine(f2, line, indent)	
-					newLineNeeded = True	
-				
-				if callFound and line.endswith(")\n"):
-					f2.write("\n")
-					callFound = False
-					newLineNeeded = False
-				elif call_regex.match(line):
-					if not line.endswith("&\n"):
-						f2.write("\n")
-						newLineNeeded = False
-					else:
-						callFound = True			
+					newLineNeeded = True				
 
 		f.close()
 		f2.close()

@@ -47,7 +47,7 @@ FortranCUDAHostSubroutineDirectLoop::createKernelFunctionCallStatement ()
       else
       {
         actualParameters->append_expression (buildVarRefExp (
-            moduleDeclarations->getReductionArrayDeviceVariableDeclaration ()));
+            moduleDeclarations->getReductionArrayDeviceDeclaration (i)));
       }
     }
   }
