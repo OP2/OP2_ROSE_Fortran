@@ -49,7 +49,7 @@ FortranCUDAReductionSubroutine::createThreadZeroReductionStatements ()
   SgIntVal * incrementCaseExpression = buildIntVal (INCREMENT);
 
   SgCaseOptionStmt * incrementCaseStatement = buildCaseOptionStmt (
-      incrementCaseExpression, assignmentStatement1);
+      incrementCaseExpression, buildBasicBlock (assignmentStatement1));
 
   /*
    * ======================================================
@@ -90,7 +90,7 @@ FortranCUDAReductionSubroutine::createThreadZeroReductionStatements ()
   SgIntVal * minimumCaseExpression = buildIntVal (MINIMUM);
 
   SgCaseOptionStmt * minimumCaseStatement = buildCaseOptionStmt (
-      minimumCaseExpression, minimumIfStatement);
+      minimumCaseExpression, buildBasicBlock (minimumIfStatement));
 
   /*
    * ======================================================
@@ -131,7 +131,7 @@ FortranCUDAReductionSubroutine::createThreadZeroReductionStatements ()
   SgIntVal * maximumCaseExpression = buildIntVal (MAXIMUM);
 
   SgCaseOptionStmt * maximumCaseStatement = buildCaseOptionStmt (
-      maximumCaseExpression, maximumIfStatement);
+      maximumCaseExpression, buildBasicBlock (maximumIfStatement));
 
   /*
    * ======================================================
@@ -222,7 +222,7 @@ FortranCUDAReductionSubroutine::createReductionStatements ()
   SgIntVal * incrementCaseExpression = buildIntVal (INCREMENT);
 
   SgCaseOptionStmt * incrementCaseStatement = buildCaseOptionStmt (
-      incrementCaseExpression, assignmentStatement1);
+      incrementCaseExpression, buildBasicBlock (assignmentStatement1));
 
   /*
    * ======================================================
@@ -259,7 +259,7 @@ FortranCUDAReductionSubroutine::createReductionStatements ()
   SgIntVal * minimumCaseExpression = buildIntVal (MINIMUM);
 
   SgCaseOptionStmt * minimumCaseStatement = buildCaseOptionStmt (
-      minimumCaseExpression, minimumIfStatement);
+      minimumCaseExpression, buildBasicBlock (minimumIfStatement));
 
   /*
    * ======================================================
@@ -296,7 +296,7 @@ FortranCUDAReductionSubroutine::createReductionStatements ()
   SgIntVal * maximumCaseExpression = buildIntVal (MAXIMUM);
 
   SgCaseOptionStmt * maximumCaseStatement = buildCaseOptionStmt (
-      maximumCaseExpression, maximumIfStatement);
+      maximumCaseExpression, buildBasicBlock (maximumIfStatement));
 
   /*
    * ======================================================

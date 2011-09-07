@@ -90,7 +90,6 @@ parser.add_option("-M",
 def clean ():
 	filesToRemove = []
 	filesToRemove.extend(glob.glob('BLANK*.[fF?]*'))
-	filesToRemove.extend(glob.glob('rose_[!^openmp]*.[fF?]*'))
 	filesToRemove.extend(glob.glob('[!^BLANK]*_postprocessed.[fF?]*'))
 	filesToRemove.extend(glob.glob('*.rmod'))
 	filesToRemove.extend(glob.glob('*.mod'))
@@ -98,10 +97,11 @@ def clean ():
 	filesToRemove.extend(glob.glob('~*'))
 
 	if opts.cuda:
+		filesToRemove.extend(glob.glob('rose*.[fF?]*'))
 		filesToRemove.extend(glob.glob('rose*.CUF'))
 	
 	if opts.openmp:			
-		filesToRemove.extend(glob.glob('rose*_ope.[fF?]*'))
+		filesToRemove.extend(glob.glob('rose*.[fF?]*'))
 
 	for file in filesToRemove:
 		if opts.verbose:
