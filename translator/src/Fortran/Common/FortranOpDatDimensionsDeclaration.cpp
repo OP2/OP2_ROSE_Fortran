@@ -21,17 +21,28 @@ FortranOpDatDimensionsDeclaration::addFields ()
 
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
-    string const & variableName = VariableNames::getOpDatDimensionName (i);
+    if (parallelLoop->isDirect (i) || parallelLoop->isIndirect (i)
+        || parallelLoop->isGlobalScalar (i) == false)
+    {
+      /*
+       * ======================================================
+       * Only declare a dimension field if the OP_DAT is not
+       * a global or a non-scalar global
+       * ======================================================
+       */
 
-    SgVariableDeclaration * fieldDeclaration = buildVariableDeclaration (
-        variableName, FortranTypesBuilder::getFourByteInteger (), NULL,
-        moduleScope);
+      string const & variableName = VariableNames::getOpDatDimensionName (i);
 
-    fieldDeclaration->get_declarationModifier ().get_accessModifier ().setUndefined ();
+      SgVariableDeclaration * fieldDeclaration = buildVariableDeclaration (
+          variableName, FortranTypesBuilder::getFourByteInteger (), NULL,
+          moduleScope);
 
-    typeStatement->get_definition ()->append_member (fieldDeclaration);
+      fieldDeclaration->get_declarationModifier ().get_accessModifier ().setUndefined ();
 
-    fieldDeclarations->add (variableName, fieldDeclaration);
+      typeStatement->get_definition ()->append_member (fieldDeclaration);
+
+      fieldDeclarations->add (variableName, fieldDeclaration);
+    }
   }
 }
 

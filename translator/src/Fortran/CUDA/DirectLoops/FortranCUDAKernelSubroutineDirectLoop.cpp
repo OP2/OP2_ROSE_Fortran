@@ -17,14 +17,10 @@ FortranCUDAKernelSubroutineDirectLoop::createUserSubroutineCallStatement ()
   using SageBuilder::buildFunctionCallStmt;
   using SageBuilder::buildVoidType;
   using SageBuilder::buildIntVal;
-  using SageBuilder::buildMultiplyOp;
   using SageBuilder::buildAddOp;
-  using SageBuilder::buildSubtractOp;
-  using SageBuilder::buildOpaqueVarRefExp;
-  using SageBuilder::buildDotExp;
-  using SageBuilder::buildVarRefExp;
-  using SageBuilder::buildPntrArrRefExp;
   using SageBuilder::buildExprListExp;
+  using SageBuilder::buildPntrArrRefExp;
+  using SageBuilder::buildVarRefExp;
   using std::string;
   using std::vector;
 
@@ -36,95 +32,24 @@ FortranCUDAKernelSubroutineDirectLoop::createUserSubroutineCallStatement ()
 
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
-    int dim = parallelLoop->getOpDatDimension (i);
+    SgExpression * parameterExpression;
 
     if (parallelLoop->getOpMapValue (i) == GLOBAL)
     {
-      if (parallelLoop->getOpAccessValue (i) == READ_ACCESS)
-      {
-        /*
-         * ======================================================
-         * Case of global variable accessed in read mode:
-         * we directly access the device variable, by
-         * passing the kernel the variable name in positions
-         * 0:argSize%<devVarName>-1
-         * ======================================================
-         */
-
-        SgDotExp * dotExpression = buildDotExp (buildVarRefExp (
-            variableDeclarations->get (
-                VariableNames::getDataSizesVariableDeclarationName (
-                    userSubroutineName))), buildOpaqueVarRefExp (
-            VariableNames::getOpDatSizeName (i), subroutineScope));
-
-        SgSubtractOp * subtractExpression = buildSubtractOp (dotExpression,
-            buildIntVal (1));
-
-        SgSubscriptExpression * arraySubscriptExpression =
-            new SgSubscriptExpression (RoseHelper::getFileInfo (), buildIntVal (
-                0), subtractExpression, buildIntVal (1));
-
-        arraySubscriptExpression->set_endOfConstruct (
-            RoseHelper::getFileInfo ());
-
-        SgPntrArrRefExp * parameterExpression = buildPntrArrRefExp (
-            buildVarRefExp (variableDeclarations->get (
-                VariableNames::getOpDatName (i))), arraySubscriptExpression);
-
-        actualParameters->append_expression (parameterExpression);
-      }
-      else
-      {
-        /*
-         * ======================================================
-         * Case of global variable accessed NOT in read mode:
-         * we access the corresponding local thread variable
-         * ======================================================
-         */
-
-        actualParameters->append_expression (buildVarRefExp (
-            variableDeclarations->get (VariableNames::getOpDatLocalName (i))));
-      }
+      actualParameters->append_expression (
+          buildOpGlobalActualParameterExpression (i));
     }
     else if (parallelLoop->getOpMapValue (i) == DIRECT)
     {
-      if (parallelLoop->getNumberOfIndirectOpDats () > 0)
-      {
-        SgExpression
-            * deviceVarAccessDirectBegin =
-                buildMultiplyOp (
-                    buildAddOp (
-                        buildVarRefExp (
-                            variableDeclarations->get (
-                                DirectLoop::Fortran::KernelSubroutine::setElementCounter)),
-                        buildVarRefExp (
-                            variableDeclarations->get (
-                                DirectLoop::Fortran::KernelSubroutine::offsetInThreadBlock))),
-                    buildIntVal (dim));
+      Debug::getInstance ()->debugMessage ("Direct OP_DAT",
+          Debug::OUTER_LOOP_LEVEL, __FILE__, __LINE__);
 
-        SgExpression * deviceVarAccessDirectEnd = buildAddOp (
-            deviceVarAccessDirectBegin, buildIntVal (dim));
-
-        SgSubscriptExpression * arraySubscriptExpression =
-            new SgSubscriptExpression (RoseHelper::getFileInfo (),
-                deviceVarAccessDirectBegin, deviceVarAccessDirectEnd,
-                buildIntVal (1));
-
-        arraySubscriptExpression->set_endOfConstruct (
-            RoseHelper::getFileInfo ());
-
-        SgPntrArrRefExp * parameterExpression = buildPntrArrRefExp (
-            buildVarRefExp (variableDeclarations->get (
-                VariableNames::getOpDatName (i))), arraySubscriptExpression);
-
-        actualParameters->append_expression (parameterExpression);
-      }
-      else if (dim == 1)
+      if (parallelLoop->getOpDatDimension (i) == 1)
       {
         SgAddOp * addExpression = buildAddOp (buildVarRefExp (
             variableDeclarations->get (
                 DirectLoop::Fortran::KernelSubroutine::setElementCounter)),
-            buildIntVal (dim - 1));
+            buildIntVal (parallelLoop->getOpDatDimension (i) - 1));
 
         SgSubscriptExpression * arraySubscriptExpression =
             new SgSubscriptExpression (RoseHelper::getFileInfo (),
@@ -146,12 +71,6 @@ FortranCUDAKernelSubroutineDirectLoop::createUserSubroutineCallStatement ()
         actualParameters->append_expression (buildVarRefExp (
             variableDeclarations->get (VariableNames::getOpDatLocalName (i))));
       }
-    }
-    else
-    {
-      SgIntVal * parameterExpression = buildIntVal (1);
-
-      actualParameters->append_expression (parameterExpression);
     }
   }
 
@@ -683,48 +602,37 @@ FortranCUDAKernelSubroutineDirectLoop::createOpDatFormalParameterDeclarations ()
   {
     if (parallelLoop->isDuplicateOpDat (i) == false)
     {
-      /*
-       * ======================================================
-       * Build the upper bound of the OP_DAT array which
-       * is stored in the argSizes variable
-       * ======================================================
-       */
-      SgDotExp * dotExpression = buildDotExp (buildVarRefExp (
-          variableDeclarations->get (
-              VariableNames::getDataSizesVariableDeclarationName (
-                  userSubroutineName))), buildVarRefExp (
-          dataSizesDeclaration->getFieldDeclarations ()->get (
-              VariableNames::getOpDatSizeName (i))));
-
-      SgSubtractOp * subtractExpression = buildSubtractOp (dotExpression,
-          buildIntVal (1));
-
-      SgSubscriptExpression * arraySubscriptExpression =
-          new SgSubscriptExpression (RoseHelper::getFileInfo (),
-              buildIntVal (0), subtractExpression, buildIntVal (1));
-
-      arraySubscriptExpression->set_endOfConstruct (RoseHelper::getFileInfo ());
-
-      /*
-       * ======================================================
-       * Build array type with the correct subscript
-       * ======================================================
-       */
-
-      SgArrayType * arrayType = buildArrayType (parallelLoop->getOpDatBaseType (
-          i), arraySubscriptExpression);
-
-      arrayType->set_rank (1);
-
-      arrayType->set_dim_info (buildExprListExp (arraySubscriptExpression));
-
       string const & variableName = VariableNames::getOpDatName (i);
 
-      variableDeclarations->add (
-          variableName,
-          FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
-              variableName, arrayType, subroutineScope, formalParameters, 1,
-              DEVICE));
+      if (parallelLoop->isGlobalNonScalar (i))
+      {
+        SgDotExp * dotExpression = buildDotExp (buildVarRefExp (
+            variableDeclarations->get (
+                VariableNames::getDataSizesVariableDeclarationName (
+                    userSubroutineName))), buildVarRefExp (
+            dataSizesDeclaration->getFieldDeclarations ()->get (
+                VariableNames::getOpDatSizeName (i))));
+
+        SgSubtractOp * upperBoundExpression = buildSubtractOp (dotExpression,
+            buildIntVal (1));
+
+        variableDeclarations->add (
+            variableName,
+            FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
+                variableName,
+                FortranTypesBuilder::getArray_RankOne_WithLowerAndUpperBounds (
+                    parallelLoop->getOpDatBaseType (i), buildIntVal (0),
+                    upperBoundExpression), subroutineScope, formalParameters,
+                1, DEVICE));
+      }
+      else
+      {
+        variableDeclarations->add (
+            variableName,
+            FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
+                variableName, parallelLoop->getOpDatType (i), subroutineScope,
+                formalParameters, 1, VALUE));
+      }
     }
   }
 }

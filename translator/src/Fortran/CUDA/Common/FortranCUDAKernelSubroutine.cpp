@@ -12,6 +12,66 @@
  * ======================================================
  */
 
+SgExpression *
+FortranCUDAKernelSubroutine::buildOpGlobalActualParameterExpression (
+    unsigned int OP_DAT_ArgumentGroup)
+{
+  using SageBuilder::buildSubtractOp;
+  using SageBuilder::buildIntVal;
+  using SageBuilder::buildOpaqueVarRefExp;
+  using SageBuilder::buildDotExp;
+  using SageBuilder::buildVarRefExp;
+  using SageBuilder::buildPntrArrRefExp;
+  using std::string;
+
+  SgExpression * parameterExpression;
+
+  if (parallelLoop->getOpAccessValue (OP_DAT_ArgumentGroup) == READ_ACCESS)
+  {
+    Debug::getInstance ()->debugMessage ("OP_GBL with read access",
+        Debug::OUTER_LOOP_LEVEL, __FILE__, __LINE__);
+
+    string const variableName = VariableNames::getOpDatSizeName (
+        OP_DAT_ArgumentGroup);
+
+    SgDotExp * dotExpression = buildDotExp (buildVarRefExp (
+        variableDeclarations->get (
+            VariableNames::getDataSizesVariableDeclarationName (
+                userSubroutineName))), buildOpaqueVarRefExp (variableName,
+        subroutineScope));
+
+    SgSubtractOp * subtractExpression = buildSubtractOp (dotExpression,
+        buildIntVal (1));
+
+    SgSubscriptExpression * subscriptExpression = new SgSubscriptExpression (
+        RoseHelper::getFileInfo (), buildIntVal (0), subtractExpression,
+        buildIntVal (1));
+
+    subscriptExpression->set_endOfConstruct (RoseHelper::getFileInfo ());
+
+    parameterExpression = buildPntrArrRefExp (buildVarRefExp (
+        variableDeclarations->get (VariableNames::getOpDatName (
+            OP_DAT_ArgumentGroup))), subscriptExpression);
+  }
+  else
+  {
+    Debug::getInstance ()->debugMessage ("OP_GBL with write access",
+        Debug::OUTER_LOOP_LEVEL, __FILE__, __LINE__);
+
+    /*
+     * ======================================================
+     * Case of global variable accessed NOT in read mode:
+     * we access the corresponding local thread variable
+     * ======================================================
+     */
+
+    parameterExpression = buildVarRefExp (variableDeclarations->get (
+        VariableNames::getOpDatLocalName (OP_DAT_ArgumentGroup)));
+  }
+
+  return parameterExpression;
+}
+
 void
 FortranCUDAKernelSubroutine::createInitialiseLocalThreadVariablesStatements ()
 {
@@ -319,29 +379,35 @@ FortranCUDAKernelSubroutine::createAutoSharedDeclarations ()
   {
     if (parallelLoop->isDuplicateOpDat (i) == false)
     {
-      string const autosharedVariableName =
-          VariableNames::getAutosharedDeclarationName (
-              parallelLoop->getOpDatBaseType (i), parallelLoop->getSizeOfOpDat (
-                  i));
-
-      if (find (autosharedNames.begin (), autosharedNames.end (),
-          autosharedVariableName) == autosharedNames.end ())
+      if (parallelLoop->isGlobalScalar (i) == false)
       {
-        Debug::getInstance ()->debugMessage (
-            "Creating autoshared declaration with name '"
-                + autosharedVariableName + "'", Debug::FUNCTION_LEVEL,
-            __FILE__, __LINE__);
+        string const autosharedVariableName =
+            VariableNames::getAutosharedDeclarationName (
+                parallelLoop->getOpDatBaseType (i),
+                parallelLoop->getSizeOfOpDat (i));
 
-        SgExpression * upperBound = new SgAsteriskShapeExp (
-            RoseHelper::getFileInfo ());
+        if (find (autosharedNames.begin (), autosharedNames.end (),
+            autosharedVariableName) == autosharedNames.end ())
+        {
+          Debug::getInstance ()->debugMessage (
+              "Creating autoshared declaration with name '"
+                  + autosharedVariableName + "' for OP_DAT '"
+                  + parallelLoop->getOpDatVariableName (i) + "'",
+              Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
-        variableDeclarations->add (autosharedVariableName,
-            FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
-                autosharedVariableName, FortranTypesBuilder::getArray_RankOne (
-                    parallelLoop->getOpDatBaseType (i), 0, upperBound),
-                subroutineScope, 1, SHARED));
+          SgExpression * upperBound = new SgAsteriskShapeExp (
+              RoseHelper::getFileInfo ());
 
-        autosharedNames.push_back (autosharedVariableName);
+          variableDeclarations->add (
+              autosharedVariableName,
+              FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
+                  autosharedVariableName,
+                  FortranTypesBuilder::getArray_RankOne (
+                      parallelLoop->getOpDatBaseType (i), 0, upperBound),
+                  subroutineScope, 1, SHARED));
+
+          autosharedNames.push_back (autosharedVariableName);
+        }
       }
     }
   }

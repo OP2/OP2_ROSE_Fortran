@@ -105,10 +105,7 @@ class ParallelLoop
 
   protected:
 
-    ParallelLoop (SgFunctionCallExp * functionCallExpression) :
-      functionCallExpression (functionCallExpression)
-    {
-    }
+    ParallelLoop (SgFunctionCallExp * functionCallExpression);
 
   public:
 
@@ -126,17 +123,7 @@ class ParallelLoop
      * ======================================================
      */
     bool
-    isDirectLoop ()
-    {
-      for (unsigned int i = 1; i <= getNumberOfOpDatArgumentGroups (); ++i)
-      {
-        if (OpDatMappingDescriptors[i] == INDIRECT)
-        {
-          return false;
-        }
-      }
-      return true;
-    }
+    isDirectLoop ();
 
     /*
      * ======================================================
@@ -145,27 +132,10 @@ class ParallelLoop
      * ======================================================
      */
     unsigned int
-    getNumberOfDistinctIndirectOpDatArguments ()
-    {
-      unsigned int count = 0;
-      for (unsigned int i = 1; i <= getNumberOfOpDatArgumentGroups (); ++i)
-      {
-        if (OpDatDuplicates[i] == false)
-        {
-          if (OpDatMappingDescriptors[i] == INDIRECT)
-          {
-            count++;
-          }
-        }
-      }
-      return count;
-    }
+    getNumberOfDistinctIndirectOpDatArguments ();
 
     void
-    setOpDatType (unsigned int OP_DAT_ArgumentGroup, SgType * type)
-    {
-      OpDatTypes[OP_DAT_ArgumentGroup] = type;
-    }
+    setOpDatType (unsigned int OP_DAT_ArgumentGroup, SgType * type);
 
     /*
      * ======================================================
@@ -174,10 +144,7 @@ class ParallelLoop
      * ======================================================
      */
     SgType *
-    getOpDatType (unsigned int OP_DAT_ArgumentGroup)
-    {
-      return OpDatTypes[OP_DAT_ArgumentGroup];
-    }
+    getOpDatType (unsigned int OP_DAT_ArgumentGroup);
 
     /*
      * ======================================================
@@ -187,31 +154,11 @@ class ParallelLoop
      * ======================================================
      */
     SgType *
-    getOpDatBaseType (unsigned int OP_DAT_ArgumentGroup)
-    {
-      using boost::lexical_cast;
-      using std::string;
-
-      SgArrayType * isArrayType = isSgArrayType (
-          OpDatTypes[OP_DAT_ArgumentGroup]);
-
-      if (isArrayType == NULL)
-      {
-        Debug::getInstance ()->errorMessage ("OP_DAT argument '"
-            + lexical_cast <string> (OP_DAT_ArgumentGroup)
-            + "' is not array and therefore does not have a base type",
-            __FILE__, __LINE__);
-      }
-
-      return isArrayType->get_base_type ();
-    }
+    getOpDatBaseType (unsigned int OP_DAT_ArgumentGroup);
 
     void
     setOpDatDimension (unsigned int OP_DAT_ArgumentGroup,
-        unsigned int dimension)
-    {
-      OpDatDimensions[OP_DAT_ArgumentGroup] = dimension;
-    }
+        unsigned int dimension);
 
     /*
      * ======================================================
@@ -220,16 +167,10 @@ class ParallelLoop
      * ======================================================
      */
     unsigned int
-    getOpDatDimension (unsigned int OP_DAT_ArgumentGroup)
-    {
-      return OpDatDimensions[OP_DAT_ArgumentGroup];
-    }
+    getOpDatDimension (unsigned int OP_DAT_ArgumentGroup);
 
     void
-    setDuplicateOpDat (unsigned int OP_DAT_ArgumentGroup, bool value)
-    {
-      OpDatDuplicates[OP_DAT_ArgumentGroup] = value;
-    }
+    setDuplicateOpDat (unsigned int OP_DAT_ArgumentGroup, bool value);
 
     /*
      * ======================================================
@@ -239,16 +180,10 @@ class ParallelLoop
      * ======================================================
      */
     bool
-    isDuplicateOpDat (unsigned int OP_DAT_ArgumentGroup)
-    {
-      return OpDatDuplicates[OP_DAT_ArgumentGroup];
-    }
+    isDuplicateOpDat (unsigned int OP_DAT_ArgumentGroup);
 
     void
-    setOpMapValue (unsigned int OP_DAT_ArgumentGroup, MAPPING_VALUE value)
-    {
-      OpDatMappingDescriptors[OP_DAT_ArgumentGroup] = value;
-    }
+    setOpMapValue (unsigned int OP_DAT_ArgumentGroup, MAPPING_VALUE value);
 
     /*
      * ======================================================
@@ -257,17 +192,26 @@ class ParallelLoop
      * ======================================================
      */
     MAPPING_VALUE
-    getOpMapValue (unsigned int OP_DAT_ArgumentGroup)
-    {
-      return OpDatMappingDescriptors[OP_DAT_ArgumentGroup];
-    }
+    getOpMapValue (unsigned int OP_DAT_ArgumentGroup);
+
+    bool
+    isIndirect (unsigned int OP_DAT_ArgumentGroup);
+
+    bool
+    isDirect (unsigned int OP_DAT_ArgumentGroup);
+
+    bool
+    isGlobal (unsigned int OP_DAT_ArgumentGroup);
+
+    bool
+    isGlobalScalar (unsigned int OP_DAT_ArgumentGroup);
+
+    bool
+    isGlobalNonScalar (unsigned int OP_DAT_ArgumentGroup);
 
     void
     setOpAccessValue (unsigned int OP_DAT_ArgumentGroup,
-        ACCESS_CODE_VALUE value)
-    {
-      OpDatAccessDescriptors[OP_DAT_ArgumentGroup] = value;
-    }
+        ACCESS_CODE_VALUE value);
 
     /*
      * ======================================================
@@ -276,10 +220,25 @@ class ParallelLoop
      * ======================================================
      */
     ACCESS_CODE_VALUE
-    getOpAccessValue (unsigned int OP_DAT_ArgumentGroup)
-    {
-      return OpDatAccessDescriptors[OP_DAT_ArgumentGroup];
-    }
+    getOpAccessValue (unsigned int OP_DAT_ArgumentGroup);
+
+    bool
+    isRead (unsigned int OP_DAT_ArgumentGroup);
+
+    bool
+    isWritten (unsigned int OP_DAT_ArgumentGroup);
+
+    bool
+    isReadAndWritten (unsigned int OP_DAT_ArgumentGroup);
+
+    bool
+    isIncremented (unsigned int OP_DAT_ArgumentGroup);
+
+    bool
+    isMaximised (unsigned int OP_DAT_ArgumentGroup);
+
+    bool
+    isMinimised (unsigned int OP_DAT_ArgumentGroup);
 
     /*
      * ======================================================
@@ -287,18 +246,7 @@ class ParallelLoop
      * ======================================================
      */
     unsigned int
-    getNumberOfIndirectOpDats ()
-    {
-      int count = 0;
-      for (unsigned int i = 1; i <= getNumberOfOpDatArgumentGroups (); ++i)
-      {
-        if (OpDatMappingDescriptors[i] == INDIRECT)
-        {
-          count++;
-        }
-      }
-      return count;
-    }
+    getNumberOfIndirectOpDats ();
 
     /*
      * ======================================================
@@ -307,38 +255,7 @@ class ParallelLoop
      * ======================================================
      */
     unsigned int
-    getNumberOfDifferentIndirectOpDats ()
-    {
-      int count = 0;
-      for (unsigned int i = 1; i <= getNumberOfOpDatArgumentGroups (); ++i)
-      {
-        if (OpDatMappingDescriptors[i] == INDIRECT && isDuplicateOpDat (i)
-            == false)
-        {
-          count++;
-        }
-      }
-      return count;
-    }
-
-    /*
-     * ======================================================
-     * Does this parallel loop require a reduction?
-     * ======================================================
-     */
-    bool
-    isReductionRequired ()
-    {
-      for (unsigned int i = 1; i <= getNumberOfOpDatArgumentGroups (); ++i)
-      {
-        if (OpDatMappingDescriptors[i] == GLOBAL && OpDatAccessDescriptors[i]
-            != READ_ACCESS)
-        {
-          return true;
-        }
-      }
-      return false;
-    }
+    getNumberOfDifferentIndirectOpDats ();
 
     /*
      * ======================================================
@@ -346,18 +263,19 @@ class ParallelLoop
      * ======================================================
      */
     bool
-    isReductionRequired (int OP_DAT_ArgumentGroup)
-    {
-      return OpDatMappingDescriptors[OP_DAT_ArgumentGroup] == GLOBAL
-          && OpDatAccessDescriptors[OP_DAT_ArgumentGroup] != READ_ACCESS;
-    }
+    isReductionRequired (int OP_DAT_ArgumentGroup);
+
+    /*
+     * ======================================================
+     * Does this parallel loop require a reduction?
+     * ======================================================
+     */
+    bool
+    isReductionRequired ();
 
     void
     setOpDatVariableName (unsigned int OP_DAT_ArgumentGroup,
-        std::string const variableName)
-    {
-      OpDatVariableNames[OP_DAT_ArgumentGroup] = variableName;
-    }
+        std::string const variableName);
 
     /*
      * ======================================================
@@ -366,23 +284,10 @@ class ParallelLoop
      * ======================================================
      */
     std::string
-    getOpDatVariableName (unsigned int OP_DAT_ArgumentGroup)
-    {
-      return OpDatVariableNames[OP_DAT_ArgumentGroup];
-    }
+    getOpDatVariableName (unsigned int OP_DAT_ArgumentGroup);
 
     unsigned int
-    getSizeOfOpDat (unsigned int OP_DAT_ArgumentGroup)
-    {
-      SgArrayType * arrayType = isSgArrayType (getOpDatType (
-          OP_DAT_ArgumentGroup));
-
-      SgType * baseType = arrayType->get_base_type ();
-
-      SgIntVal * baseSize = isSgIntVal (baseType->get_type_kind ());
-
-      return baseSize->get_value ();
-    }
+    getSizeOfOpDat (unsigned int OP_DAT_ArgumentGroup);
 
     /*
      * ======================================================
@@ -391,35 +296,13 @@ class ParallelLoop
      * ======================================================
      */
     unsigned int
-    getMaximumSizeOfOpDat ()
-    {
-      unsigned int maximumSize = 0;
-
-      for (unsigned int i = 1; i <= getNumberOfOpDatArgumentGroups (); ++i)
-      {
-        unsigned int sizeOfOpDat = getSizeOfOpDat (i);
-
-        if (sizeOfOpDat > maximumSize)
-        {
-          maximumSize = sizeOfOpDat;
-        }
-      }
-
-      return maximumSize;
-    }
+    getMaximumSizeOfOpDat ();
 
     bool
-    isUniqueOpDat (std::string const & variableName)
-    {
-      return find (uniqueOpDats.begin (), uniqueOpDats.end (), variableName)
-          == uniqueOpDats.end ();
-    }
+    isUniqueOpDat (std::string const & variableName);
 
     void
-    setUniqueOpDat (std::string const & variableName)
-    {
-      uniqueOpDats.push_back (variableName);
-    }
+    setUniqueOpDat (std::string const & variableName);
 
     /*
      * ======================================================
@@ -427,22 +310,16 @@ class ParallelLoop
      * ======================================================
      */
     SgExpressionPtrList &
-    getActualArguments ()
-    {
-      return functionCallExpression->get_args ()->get_expressions ();
-    }
+    getActualArguments ();
 
     /*
      * ======================================================
-     * Returns the function call node in the AST corresponding
+     * Returns the node in the AST modelling the call to
      * to this OP_PAR_LOOP
      * ======================================================
      */
     SgFunctionCallExp *
-    getFunctionCall ()
-    {
-      return functionCallExpression;
-    }
+    getFunctionCall ();
 
     /*
      * ======================================================
@@ -451,58 +328,13 @@ class ParallelLoop
      * ======================================================
      */
     std::string const &
-    getFileName () const
-    {
-      return functionCallExpression->getFilenameString ();
-    }
+    getFileName () const;
 
     Reduction *
-    getReductionTuple (unsigned int OP_DAT_ArgumentGroup)
-    {
-      ROSE_ASSERT (OpDatMappingDescriptors[OP_DAT_ArgumentGroup] == GLOBAL && OpDatAccessDescriptors[OP_DAT_ArgumentGroup]
-          != READ_ACCESS);
-
-      SgArrayType * arrayType = isSgArrayType (getOpDatType (
-          OP_DAT_ArgumentGroup));
-
-      SgType * baseType = arrayType->get_base_type ();
-
-      SgIntVal * baseSize = isSgIntVal (baseType->get_type_kind ());
-
-      return new Reduction (arrayType, baseType, baseSize->get_value ());
-    }
+    getReductionTuple (unsigned int OP_DAT_ArgumentGroup);
 
     void
-    getReductionsNeeded (std::vector <Reduction *> & reductions)
-    {
-      using std::vector;
-
-      for (unsigned int i = 1; i <= getNumberOfOpDatArgumentGroups (); ++i)
-      {
-        if (OpDatMappingDescriptors[i] == GLOBAL && OpDatAccessDescriptors[i]
-            != READ_ACCESS)
-        {
-          Reduction * reduction = getReductionTuple (i);
-
-          bool equivalentReductionFound = false;
-
-          for (std::vector <Reduction *>::const_iterator it =
-              reductions.begin (); it != reductions.end (); ++it)
-          {
-            if (reduction->isEquivalent (*it))
-            {
-              equivalentReductionFound = true;
-              break;
-            }
-          }
-
-          if (equivalentReductionFound == false)
-          {
-            reductions.push_back (reduction);
-          }
-        }
-      }
-    }
+    getReductionsNeeded (std::vector <Reduction *> & reductions);
 };
 
 #endif

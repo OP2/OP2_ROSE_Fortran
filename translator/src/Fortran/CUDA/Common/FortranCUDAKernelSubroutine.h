@@ -14,6 +14,9 @@ class FortranCUDAKernelSubroutine: public FortranKernelSubroutine
 
   protected:
 
+    SgExpression *
+    buildOpGlobalActualParameterExpression (unsigned int OP_DAT_ArgumentGroup);
+
     void
     createInitialiseLocalThreadVariablesStatements ();
 

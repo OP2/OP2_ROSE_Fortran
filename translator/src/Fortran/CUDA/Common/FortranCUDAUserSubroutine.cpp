@@ -19,6 +19,9 @@ FortranCUDAUserSubroutine::patchReferencesToConstants ()
   using std::map;
   using std::string;
 
+  Debug::getInstance ()->debugMessage ("Patching references to constants",
+      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+
   class ModifyReferencesToConstantVariables: public AstSimpleProcessing
   {
     public:
@@ -39,9 +42,8 @@ FortranCUDAUserSubroutine::patchReferencesToConstants ()
         if (oldVarRefExp != NULL)
         {
           for (map <string, string>::const_iterator it =
-              initialiseConstantsSubroutine->getFirstConstantName (); 
-              it != initialiseConstantsSubroutine->getLastConstantName (); 
-              ++it)
+              initialiseConstantsSubroutine->getFirstConstantName (); it
+              != initialiseConstantsSubroutine->getLastConstantName (); ++it)
           {
 
             if (iequals (it->first,
@@ -71,27 +73,14 @@ FortranCUDAUserSubroutine::patchReferencesToConstants ()
 }
 
 void
-FortranCUDAUserSubroutine::createStatements ()
+FortranCUDAUserSubroutine::findOriginalSubroutine ()
 {
   using boost::iequals;
-  using SageInterface::appendStatement;
-  using std::string;
   using std::vector;
 
   Debug::getInstance ()->debugMessage (
-      "Modifying and outputting user subroutine to file",
-      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
-
-  SgProcedureHeaderStatement * originalSubroutine = NULL;
-
-  SgFunctionParameterList * originalParameters = NULL;
-
-  /*
-   * ======================================================
-   * Find the original subroutine (otherwise the definition
-   * would be empty)
-   * ======================================================
-   */
+      "Searching for original user subroutine", Debug::FUNCTION_LEVEL,
+      __FILE__, __LINE__);
 
   for (vector <SgProcedureHeaderStatement *>::const_iterator it =
       declarations->firstSubroutineInSourceCode (); it
@@ -101,18 +90,27 @@ FortranCUDAUserSubroutine::createStatements ()
 
     if (iequals (hostSubroutineName, subroutine->get_name ().getString ()))
     {
-      /*
-       * ======================================================
-       * Grab the subroutine and its parameters
-       * ======================================================
-       */
       originalSubroutine = subroutine;
-      originalParameters = subroutine->get_parameterList ();
       break;
     }
   }
 
   ROSE_ASSERT (originalSubroutine != NULL);
+}
+
+void
+FortranCUDAUserSubroutine::createStatements ()
+{
+  using boost::iequals;
+  using SageInterface::appendStatement;
+  using std::string;
+  using std::vector;
+
+  Debug::getInstance ()->debugMessage ("Outputting and modifying statements",
+      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+
+  SgFunctionParameterList * originalParameters =
+      originalSubroutine->get_parameterList ();
 
   vector <SgStatement *> originalStatements =
       originalSubroutine->get_definition ()->get_body ()->get_statements ();
@@ -149,42 +147,43 @@ FortranCUDAUserSubroutine::createStatements ()
          * ======================================================
          */
 
-        unsigned int opDatCounter = 1;
+        unsigned int OP_DAT_ArgumentGroup = 1;
 
         for (SgInitializedNamePtrList::iterator paramIt =
             originalParameters->get_args ().begin (); paramIt
             != originalParameters->get_args ().end (); ++paramIt)
         {
-          std::string const variableName = (*paramIt)->get_name ().getString ();
+          string const variableName = (*paramIt)->get_name ().getString ();
 
           SgType * type = (*paramIt)->get_typeptr ();
 
-          /*
-           * ======================================================
-           * Set the Fortran attributes of the declared variables:
-           * either shared or device. As device is the default
-           * attribute in Fortran CUDA, we do not need to define it
-           * ======================================================
-           */
-
-          if (parallelLoop->getOpMapValue (opDatCounter) == INDIRECT
-              && parallelLoop->getOpAccessValue (opDatCounter) == READ_ACCESS)
+          if (parallelLoop->isIndirect (OP_DAT_ArgumentGroup)
+              && parallelLoop->isRead (OP_DAT_ArgumentGroup))
           {
             SgVariableDeclaration
                 * variableDeclaration =
                     FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
                         variableName, type, subroutineScope, formalParameters,
-                        1, SHARED);
+                        2, DEVICE, SHARED);
+          }
+          else if (parallelLoop->isGlobalScalar (OP_DAT_ArgumentGroup))
+          {
+            SgVariableDeclaration
+                * variableDeclaration =
+                    FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
+                        variableName, type, subroutineScope, formalParameters,
+                        1, VALUE);
           }
           else
           {
             SgVariableDeclaration
                 * variableDeclaration =
                     FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
-                        variableName, type, subroutineScope, formalParameters);
+                        variableName, type, subroutineScope, formalParameters,
+                        1, DEVICE);
           }
 
-          ++opDatCounter;
+          ++OP_DAT_ArgumentGroup;
         }
       }
     }
@@ -263,6 +262,8 @@ FortranCUDAUserSubroutine::FortranCUDAUserSubroutine (
       AstUnparseAttribute::e_before);
 
   subroutineScope = subroutineHeaderStatement->get_definition ()->get_body ();
+
+  findOriginalSubroutine ();
 
   createStatements ();
 

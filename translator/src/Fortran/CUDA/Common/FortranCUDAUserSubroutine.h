@@ -12,10 +12,15 @@ class FortranCUDAUserSubroutine: public UserSubroutine <
 
     FortranInitialiseConstantsSubroutine * initialiseConstantsSubroutine;
 
+    SgProcedureHeaderStatement * originalSubroutine;
+
   private:
 
     void
     patchReferencesToConstants ();
+
+    void
+    findOriginalSubroutine ();
 
     virtual void
     createStatements ();
@@ -28,12 +33,11 @@ class FortranCUDAUserSubroutine: public UserSubroutine <
 
   public:
 
-        FortranCUDAUserSubroutine (
-            std::string const & subroutineName,
-            SgScopeStatement * moduleScope,
-            FortranInitialiseConstantsSubroutine * initialiseConstantsSubroutine,
-            FortranProgramDeclarationsAndDefinitions * declarations,
-            FortranParallelLoop * parallelLoop);
+    FortranCUDAUserSubroutine (std::string const & subroutineName,
+        SgScopeStatement * moduleScope,
+        FortranInitialiseConstantsSubroutine * initialiseConstantsSubroutine,
+        FortranProgramDeclarationsAndDefinitions * declarations,
+        FortranParallelLoop * parallelLoop);
 };
 
 #endif

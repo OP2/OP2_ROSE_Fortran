@@ -20,6 +20,10 @@ FortranCUDAHostSubroutineIndirectLoop::createKernelFunctionCallStatement ()
   using SageBuilder::buildVoidType;
   using SageBuilder::buildVarRefExp;
 
+  Debug::getInstance ()->debugMessage (
+      "Creating CUDA kernel function call statement", Debug::FUNCTION_LEVEL,
+      __FILE__, __LINE__);
+
   SgExprListExp * actualParameters = buildExprListExp ();
 
   actualParameters->append_expression (buildVarRefExp (
@@ -28,10 +32,14 @@ FortranCUDAHostSubroutineIndirectLoop::createKernelFunctionCallStatement ()
   actualParameters->append_expression (buildVarRefExp (
       moduleDeclarations->getDataSizesVariableDeclaration ()));
 
+  Debug::getInstance ()->debugMessage (
+      "Adding OP_DAT parameters with indirect access", Debug::FUNCTION_LEVEL,
+      __FILE__, __LINE__);
+
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
     if (parallelLoop->isDuplicateOpDat (i) == false
-        && parallelLoop->getOpMapValue (i) == INDIRECT)
+        && parallelLoop->isIndirect (i))
     {
       actualParameters->append_expression (buildVarRefExp (
           variableDeclarations->get (VariableNames::getOpDatDeviceName (i))));
@@ -42,9 +50,13 @@ FortranCUDAHostSubroutineIndirectLoop::createKernelFunctionCallStatement ()
     }
   }
 
+  Debug::getInstance ()->debugMessage (
+      "Adding global to local memory remapping parameters",
+      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
-    if (parallelLoop->getOpMapValue (i) == INDIRECT)
+    if (parallelLoop->isIndirect (i))
     {
       actualParameters->append_expression (buildVarRefExp (
           variableDeclarations->get (
@@ -52,16 +64,24 @@ FortranCUDAHostSubroutineIndirectLoop::createKernelFunctionCallStatement ()
     }
   }
 
+  Debug::getInstance ()->debugMessage (
+      "Adding direct and non-scalar global parameters", Debug::FUNCTION_LEVEL,
+      __FILE__, __LINE__);
+
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
-    if (parallelLoop->isDuplicateOpDat (i) == false
-        && (parallelLoop->getOpMapValue (i) == DIRECT
-            || parallelLoop->getOpMapValue (i) == GLOBAL))
+    if (parallelLoop->isDuplicateOpDat (i) == false)
     {
-      actualParameters->append_expression (buildVarRefExp (
-          variableDeclarations->get (VariableNames::getOpDatDeviceName (i))));
+      if (parallelLoop->isDirect (i) || parallelLoop->isGlobalNonScalar (i))
+      {
+        actualParameters->append_expression (buildVarRefExp (
+            variableDeclarations->get (VariableNames::getOpDatDeviceName (i))));
+      }
     }
   }
+
+  Debug::getInstance ()->debugMessage ("Adding plan function parameters",
+      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
   actualParameters->append_expression (buildVarRefExp (
       variableDeclarations->get (PlanFunction::Fortran::pindSizes)));

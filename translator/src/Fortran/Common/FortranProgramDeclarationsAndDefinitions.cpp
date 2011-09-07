@@ -16,19 +16,39 @@ FortranProgramDeclarationsAndDefinitions::handleOpGblDeclaration (
     FortranParallelLoop * parallelLoop, std::string const & variableName,
     int opDatArgumentGroup)
 {
-  Debug::getInstance ()->debugMessage ("'" + variableName
-      + "' has been declared through OP_DECL_GBL", Debug::FUNCTION_LEVEL,
-      __FILE__, __LINE__);
-
   OpGblDefinition * opGblDeclaration = getOpGblDefinition (variableName);
+
+  FortranOpGblDefinition * fortanOpGBL =
+      dynamic_cast <FortranOpGblDefinition *> (opGblDeclaration);
+
+  if (fortanOpGBL == NULL)
+  {
+    Debug::getInstance ()->debugMessage ("'" + variableName
+        + "' has been declared through OP_DECL_GBL (SCALAR)",
+        Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+
+    /*
+     * ======================================================
+     * Since this is a scalar, set the dimension to 1
+     * ======================================================
+     */
+
+    parallelLoop->setOpDatDimension (opDatArgumentGroup, 1);
+  }
+  else
+  {
+    Debug::getInstance ()->debugMessage ("'" + variableName
+        + "' has been declared through OP_DECL_GBL", Debug::FUNCTION_LEVEL,
+        __FILE__, __LINE__);
+
+    parallelLoop->setOpDatDimension (opDatArgumentGroup,
+        opGblDeclaration->getDimension ());
+  }
 
   parallelLoop->setUniqueOpDat (variableName);
 
   parallelLoop->setOpDatType (opDatArgumentGroup,
       opGblDeclaration->getPrimitiveType ());
-
-  parallelLoop->setOpDatDimension (opDatArgumentGroup,
-      opGblDeclaration->getDimension ());
 
   parallelLoop->setOpDatVariableName (opDatArgumentGroup, variableName);
 
@@ -43,11 +63,11 @@ FortranProgramDeclarationsAndDefinitions::handleOpDatDeclaration (
   using boost::lexical_cast;
   using std::string;
 
+  OpDatDefinition * opDatDeclaration = getOpDatDefinition (variableName);
+
   Debug::getInstance ()->debugMessage ("'" + variableName
       + "' has been declared through OP_DECL_DAT", Debug::FUNCTION_LEVEL,
       __FILE__, __LINE__);
-
-  OpDatDefinition * opDatDeclaration = getOpDatDefinition (variableName);
 
   parallelLoop->setOpDatType (opDatArgumentGroup,
       opDatDeclaration->getPrimitiveType ());

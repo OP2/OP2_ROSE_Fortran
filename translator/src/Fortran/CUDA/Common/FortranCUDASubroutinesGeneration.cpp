@@ -63,6 +63,9 @@ FortranCUDASubroutinesGeneration::createSubroutines ()
   {
     string const userSubroutineName = it->first;
 
+    Debug::getInstance ()->debugMessage ("Analysing user subroutine '"
+        + userSubroutineName + "'", Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+
     FortranParallelLoop * parallelLoop = it->second;
 
     FortranCUDAUserSubroutine * userDeviceSubroutine;

@@ -99,7 +99,7 @@ FortranInitialiseConstantsSubroutine::declareConstants ()
 
     SgVariableDeclaration * variableDeclaration =
         FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
-            moduleVariableName, type, moduleScope);
+            moduleVariableName, type, moduleScope, 1, CONSTANT);
 
     variableDeclarations->add (moduleVariableName, variableDeclaration);
   }

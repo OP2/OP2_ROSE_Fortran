@@ -114,7 +114,7 @@ FortranOpenMPKernelSubroutineIndirectLoop::createOpDatFormalParameterDeclaration
 
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
-    if (parallelLoop->getOpMapValue (i) == INDIRECT)
+    if (parallelLoop->isIndirect (i))
     {
       SgAsteriskShapeExp * upperBoundExpression = new SgAsteriskShapeExp (
           RoseHelper::getFileInfo ());
@@ -131,8 +131,8 @@ FortranOpenMPKernelSubroutineIndirectLoop::createOpDatFormalParameterDeclaration
 
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
-    if (parallelLoop->isDuplicateOpDat (i) == false
-        && parallelLoop->getOpMapValue (i) == DIRECT)
+    if (parallelLoop->isDuplicateOpDat (i) == false && parallelLoop->isDirect (
+        i))
     {
       SgAsteriskShapeExp * upperBoundExpression = new SgAsteriskShapeExp (
           RoseHelper::getFileInfo ());
@@ -166,7 +166,7 @@ FortranOpenMPKernelSubroutineIndirectLoop::createLocalVariableDeclarations ()
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
     if (parallelLoop->isDuplicateOpDat (i) == false
-        && parallelLoop->getOpMapValue (i) == INDIRECT)
+        && parallelLoop->isIndirect (i))
     {
       string const & variableName =
           VariableNames::getNumberOfBytesVariableName (i);
@@ -181,7 +181,7 @@ FortranOpenMPKernelSubroutineIndirectLoop::createLocalVariableDeclarations ()
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
     if (parallelLoop->isDuplicateOpDat (i) == false
-        && parallelLoop->getOpMapValue (i) == INDIRECT)
+        && parallelLoop->isIndirect (i))
     {
       string const & variableName =
           VariableNames::getNumberOfBytesVariableName (i);
@@ -196,7 +196,7 @@ FortranOpenMPKernelSubroutineIndirectLoop::createLocalVariableDeclarations ()
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
     if (parallelLoop->isDuplicateOpDat (i) == false
-        && parallelLoop->getOpMapValue (i) == INDIRECT)
+        && parallelLoop->isIndirect (i))
     {
       string const & variableName = VariableNames::getRoundUpVariableName (i);
 

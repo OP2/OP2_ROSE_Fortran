@@ -23,6 +23,10 @@ FortranCUDAModuleDeclarations::createReductionDeclarations ()
       string const reductionArrayHostName =
           VariableNames::getReductionArrayHostName (i, userSubroutineName);
 
+      Debug::getInstance ()->debugMessage ("Creating host reduction array '"
+          + reductionArrayHostName + "'", Debug::HIGHEST_DEBUG_LEVEL, __FILE__,
+          __LINE__);
+
       SgVariableDeclaration * reductionArrayHost =
           FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
               reductionArrayHostName, FortranTypesBuilder::getArray_RankOne (
@@ -32,6 +36,10 @@ FortranCUDAModuleDeclarations::createReductionDeclarations ()
 
       string const reductionArrayDeviceName =
           VariableNames::getReductionArrayDeviceName (i, userSubroutineName);
+
+      Debug::getInstance ()->debugMessage ("Creating device reduction array '"
+          + reductionArrayDeviceName + "'", Debug::HIGHEST_DEBUG_LEVEL,
+          __FILE__, __LINE__);
 
       SgVariableDeclaration * reductionArrayDevice =
           FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
@@ -64,12 +72,12 @@ FortranCUDAModuleDeclarations::createDataSizesDeclaration ()
 void
 FortranCUDAModuleDeclarations::createDimensionsDeclaration ()
 {
-  Debug::getInstance ()->debugMessage (
-      "Generating OP_DAT dimensions declaration at module scope",
-      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
-
   std::string const & variableName =
       VariableNames::getDimensionsVariableDeclarationName (userSubroutineName);
+
+  Debug::getInstance ()->debugMessage (
+      "Generating OP_DAT dimensions declaration '" + variableName + "'",
+      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
   SgVariableDeclaration * variableDeclaration =
       FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (

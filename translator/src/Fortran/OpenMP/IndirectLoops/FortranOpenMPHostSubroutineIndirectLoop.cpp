@@ -35,7 +35,7 @@ FortranOpenMPHostSubroutineIndirectLoop::createKernelFunctionCallStatement ()
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
     if (parallelLoop->isDuplicateOpDat (i) == false
-        && parallelLoop->getOpMapValue (i) == INDIRECT)
+        && parallelLoop->isIndirect (i))
     {
       actualParameters->append_expression (buildVarRefExp (
           moduleDeclarationsIndirectLoop->getGlobalOpDatDeclaration (i)));
@@ -49,7 +49,7 @@ FortranOpenMPHostSubroutineIndirectLoop::createKernelFunctionCallStatement ()
 
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
-    if (parallelLoop->getOpMapValue (i) == INDIRECT)
+    if (parallelLoop->isIndirect (i))
     {
       actualParameters->append_expression (
           buildVarRefExp (
@@ -60,8 +60,8 @@ FortranOpenMPHostSubroutineIndirectLoop::createKernelFunctionCallStatement ()
 
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
-    if (parallelLoop->isDuplicateOpDat (i) == false
-        && parallelLoop->getOpMapValue (i) == DIRECT)
+    if (parallelLoop->isDuplicateOpDat (i) == false && parallelLoop->isDirect (
+        i))
     {
       actualParameters->append_expression (buildVarRefExp (
           moduleDeclarationsIndirectLoop->getGlobalOpDatDeclaration (i)));
