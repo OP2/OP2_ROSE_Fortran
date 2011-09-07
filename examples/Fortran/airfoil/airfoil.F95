@@ -127,7 +127,6 @@ use, intrinsic :: ISO_C_BINDING
   call op_decl_const (1, eps)
   call op_decl_const (1, mach)
   call op_decl_const (1, alpha)
-  call op_decl_const (1, eps)
   call op_decl_const (4, qinf)
 
   ! main time-marching loop

@@ -142,7 +142,6 @@ def compile ():
 
 	translatorPath = None
 	filesToCompile = []
-	constantsFile  = None
 
 	for line in open(configFile, 'r'):
 		line = line.strip()
@@ -158,8 +157,6 @@ def compile ():
 				filesToCompile.append(f)
 				if not os.path.isfile(f):
 					exitMessage("File '" + f + "' does not exist.")
-		elif line.startswith('constants'):
-			constantsFile = words[1].strip()
 
 	if translatorPath is None:
 		exitMessage("You did not specify a path to the translator. Use 'translator=<path/to/translator>' in the configuration file.")
@@ -178,9 +175,6 @@ def compile ():
 
 	for f in filesToCompile:
 		cmd += f + ' '
-
-	if constantsFile is not None:
-		cmd += "--constants " + constantsFile 
 
 	verboseMessage("Running: '" + cmd + "'")
 

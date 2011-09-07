@@ -15,10 +15,6 @@ class OP2Definition
      * ======================================================
      */
 
-  public:
-
-//    static unsigned int const SCALAR_DIMENSION = 1;
-
   protected:
 
     std::string variableName;

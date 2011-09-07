@@ -291,57 +291,6 @@ FortranProgramDeclarationsAndDefinitions::visit (SgNode * node)
     Debug::getInstance ()->debugMessage ("Source file '" + currentSourceFile
         + "' detected", Debug::OUTER_LOOP_LEVEL, __FILE__, __LINE__ );
   }
-  else if (iequals (Globals::getInstance ()->getConstantsFileName (),
-      currentSourceFile))
-  {
-    /*
-     * ======================================================
-     * Only process this portion of the AST if we recognise
-     * this source file as the constants source file
-     * ======================================================
-     */
-    switch (node->variantT ())
-    {
-      case V_SgVariableDeclaration:
-      {
-        SgVariableDeclaration * variableDeclaration = isSgVariableDeclaration (
-            node);
-
-        for (SgInitializedNamePtrList::iterator it =
-            variableDeclaration->get_variables ().begin (); it
-            != variableDeclaration->get_variables ().end (); it++)
-        {
-          string const variableName = (*it)->get_name ().getString ();
-
-          SgType * type =
-              variableDeclaration->get_decl_item (variableName)->get_type ();
-
-          if (variableDeclaration->get_declarationModifier ().get_typeModifier ().get_constVolatileModifier ().isConst ())
-          {
-            /*
-             * ======================================================
-             * This is the ROSE hack to shoe horn Fortran constants
-             * into C-style constants
-             * ======================================================
-             */
-
-            Debug::getInstance ()->debugMessage ("Variable '" + variableName
-                + "' is a constant", Debug::OUTER_LOOP_LEVEL, __FILE__,
-                __LINE__ );
-
-            constantDeclarations[variableName] = type;
-          }
-        }
-
-        break;
-      }
-
-      default:
-      {
-        break;
-      }
-    }
-  }
   else if (Globals::getInstance ()->isInputFile (currentSourceFile))
   {
     /*
@@ -553,6 +502,26 @@ FortranProgramDeclarationsAndDefinitions::visit (SgNode * node)
                 + userSubroutineName + "' already created",
                 Debug::OUTER_LOOP_LEVEL, __FILE__, __LINE__);
           }
+        }
+
+        break;
+      }
+
+      case V_SgVariableDeclaration:
+      {
+        SgVariableDeclaration * variableDeclaration = isSgVariableDeclaration (
+            node);
+
+        for (SgInitializedNamePtrList::iterator it =
+            variableDeclaration->get_variables ().begin (); it
+            != variableDeclaration->get_variables ().end (); it++)
+        {
+          string const variableName = (*it)->get_name ().getString ();
+
+          SgType * type =
+              variableDeclaration->get_decl_item (variableName)->get_type ();
+
+          declarations[variableName] = type;
         }
 
         break;

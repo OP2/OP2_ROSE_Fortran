@@ -25,8 +25,6 @@ class Globals
 
     std::vector <std::string> inputFiles;
 
-    std::string constantsFileName;
-
   private:
 
     /*
@@ -81,12 +79,6 @@ class Globals
 
     bool
     isInputFile (std::string const & fileName) const;
-
-    void
-    setConstantsFileName (std::string const & fileName);
-
-    std::string const &
-    getConstantsFileName () const;
 };
 
 #endif
