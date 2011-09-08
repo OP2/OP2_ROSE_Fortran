@@ -13,32 +13,6 @@
 void
 FortranInitialiseConstantsSubroutine::createStatements ()
 {
-  using SageBuilder::buildVarRefExp;
-  using SageBuilder::buildOpaqueVarRefExp;
-  using SageBuilder::buildAssignStatement;
-  using SageInterface::appendStatement;
-  using std::string;
-  using std::map;
-  using std::vector;
-
-  Debug::getInstance ()->debugMessage (
-      "Creating statements in initialise constants subroutine",
-      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
-
-  for (map <string, SgType *>::const_iterator it =
-      declarations->firstConstantDeclaration (); it
-      != declarations->lastConstantDeclaration (); ++it)
-  {
-    string const variableName = it->first;
-
-    string const moduleVariableName = constantVariableNames[variableName];
-
-    SgExprStatement * assignmentStatement = buildAssignStatement (
-        buildVarRefExp (variableDeclarations->get (moduleVariableName)),
-        buildOpaqueVarRefExp (variableName, subroutineScope));
-
-    appendStatement (assignmentStatement, subroutineScope);
-  }
 }
 
 void
@@ -85,13 +59,11 @@ FortranInitialiseConstantsSubroutine::declareConstants ()
   using std::map;
   using std::string;
 
-  for (map <string, SgType *>::const_iterator it =
-      declarations->firstConstantDeclaration (); it
-      != declarations->lastConstantDeclaration (); ++it)
+  for (map <string, OpConstDefinition *>::const_iterator it =
+      declarations->firstOpConstDefinition (); it
+      != declarations->lastOpConstDefinition (); ++it)
   {
     string const variableName = it->first;
-
-    SgType * type = it->second;
 
     string const moduleVariableName = "INTERNAL_" + variableName;
 
@@ -99,7 +71,8 @@ FortranInitialiseConstantsSubroutine::declareConstants ()
 
     SgVariableDeclaration * variableDeclaration =
         FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
-            moduleVariableName, type, moduleScope, 1, CONSTANT);
+            moduleVariableName, declarations->getType (variableName),
+            moduleScope, 1, CONSTANT);
 
     variableDeclarations->add (moduleVariableName, variableDeclaration);
   }

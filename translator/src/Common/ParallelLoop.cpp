@@ -239,7 +239,8 @@ bool
 ParallelLoop::isReductionRequired (int OP_DAT_ArgumentGroup)
 {
   return OpDatMappingDescriptors[OP_DAT_ArgumentGroup] == GLOBAL
-      && OpDatAccessDescriptors[OP_DAT_ArgumentGroup] != READ_ACCESS;
+      && OpDatAccessDescriptors[OP_DAT_ArgumentGroup] != READ_ACCESS
+      && isSgArrayType (OpDatTypes[OP_DAT_ArgumentGroup]) != NULL;
 }
 
 bool
@@ -287,11 +288,14 @@ ParallelLoop::getMaximumSizeOfOpDat ()
 
   for (unsigned int i = 1; i <= getNumberOfOpDatArgumentGroups (); ++i)
   {
-    unsigned int sizeOfOpDat = getSizeOfOpDat (i);
-
-    if (sizeOfOpDat > maximumSize)
+    if (isReductionRequired (i) == false && isGlobalNonScalar (i))
     {
-      maximumSize = sizeOfOpDat;
+      unsigned int sizeOfOpDat = getSizeOfOpDat (i);
+
+      if (sizeOfOpDat > maximumSize)
+      {
+        maximumSize = sizeOfOpDat;
+      }
     }
   }
 
@@ -332,8 +336,7 @@ ParallelLoop::getFileName () const
 Reduction *
 ParallelLoop::getReductionTuple (unsigned int OP_DAT_ArgumentGroup)
 {
-  ROSE_ASSERT (OpDatMappingDescriptors[OP_DAT_ArgumentGroup] == GLOBAL && OpDatAccessDescriptors[OP_DAT_ArgumentGroup]
-      != READ_ACCESS);
+  ROSE_ASSERT (isReductionRequired(OP_DAT_ArgumentGroup));
 
   SgArrayType * arrayType = isSgArrayType (getOpDatType (OP_DAT_ArgumentGroup));
 
@@ -351,8 +354,7 @@ ParallelLoop::getReductionsNeeded (std::vector <Reduction *> & reductions)
 
   for (unsigned int i = 1; i <= getNumberOfOpDatArgumentGroups (); ++i)
   {
-    if (OpDatMappingDescriptors[i] == GLOBAL && OpDatAccessDescriptors[i]
-        != READ_ACCESS)
+    if (isReductionRequired (i))
     {
       Reduction * reduction = getReductionTuple (i);
 

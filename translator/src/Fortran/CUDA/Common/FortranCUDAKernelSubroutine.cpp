@@ -26,10 +26,10 @@ FortranCUDAKernelSubroutine::buildOpGlobalActualParameterExpression (
 
   SgExpression * parameterExpression;
 
-  if (parallelLoop->getOpAccessValue (OP_DAT_ArgumentGroup) == READ_ACCESS)
+  if (parallelLoop->isRead (OP_DAT_ArgumentGroup))
   {
     Debug::getInstance ()->debugMessage ("OP_GBL with read access",
-        Debug::OUTER_LOOP_LEVEL, __FILE__, __LINE__);
+        Debug::HIGHEST_DEBUG_LEVEL, __FILE__, __LINE__);
 
     string const variableName = VariableNames::getOpDatSizeName (
         OP_DAT_ArgumentGroup);
@@ -53,7 +53,7 @@ FortranCUDAKernelSubroutine::buildOpGlobalActualParameterExpression (
         variableDeclarations->get (VariableNames::getOpDatName (
             OP_DAT_ArgumentGroup))), subscriptExpression);
   }
-  else
+  else if (parallelLoop->isWritten (OP_DAT_ArgumentGroup))
   {
     Debug::getInstance ()->debugMessage ("OP_GBL with write access",
         Debug::OUTER_LOOP_LEVEL, __FILE__, __LINE__);
@@ -67,6 +67,14 @@ FortranCUDAKernelSubroutine::buildOpGlobalActualParameterExpression (
 
     parameterExpression = buildVarRefExp (variableDeclarations->get (
         VariableNames::getOpDatLocalName (OP_DAT_ArgumentGroup)));
+  }
+  else if (parallelLoop->isIncremented (OP_DAT_ArgumentGroup))
+  {
+    Debug::getInstance ()->debugMessage ("OP_GBL with increment access",
+        Debug::OUTER_LOOP_LEVEL, __FILE__, __LINE__);
+
+    parameterExpression = buildVarRefExp (variableDeclarations->get (
+        VariableNames::getOpDatName (OP_DAT_ArgumentGroup)));
   }
 
   return parameterExpression;
@@ -88,19 +96,21 @@ FortranCUDAKernelSubroutine::createInitialiseLocalThreadVariablesStatements ()
   using SageBuilder::buildAddOp;
   using SageInterface::appendStatement;
 
-  /*
-   * ======================================================
-   * We essentially do a similar thing to the one we make
-   * when we declare local thread variables
-   * ======================================================
-   */
+  Debug::getInstance ()->debugMessage (
+      "Creating initialise local thread variable statements",
+      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
-    if (parallelLoop->getOpMapValue (i) == GLOBAL
-        && parallelLoop->getOpAccessValue (i) != READ_ACCESS)
+    if (parallelLoop->isReductionRequired (i) || (parallelLoop->isIndirect (i)
+        && parallelLoop->isIncremented (i)) || (parallelLoop->isDirect (i)
+        && parallelLoop->getOpDatDimension (i) > 1))
     {
       SgBasicBlock * loopBody = buildBasicBlock ();
+
+      Debug::getInstance ()->debugMessage ("OP_DAT '"
+          + parallelLoop->getOpDatVariableName (i) + "'",
+          Debug::HIGHEST_DEBUG_LEVEL, __FILE__, __LINE__);
 
       SgPntrArrRefExp * arrayIndexExpression1 = buildPntrArrRefExp (
           buildVarRefExp (variableDeclarations->get (
@@ -108,7 +118,7 @@ FortranCUDAKernelSubroutine::createInitialiseLocalThreadVariablesStatements ()
               variableDeclarations->get (
                   DirectLoop::Fortran::KernelSubroutine::setElementCounter)));
 
-      if (parallelLoop->getOpAccessValue (i) == INC_ACCESS)
+      if (parallelLoop->isIncremented (i))
       {
         SgExprStatement * assignmentStatement = buildAssignStatement (
             arrayIndexExpression1, buildIntVal (0));
@@ -338,13 +348,9 @@ FortranCUDAKernelSubroutine::createLocalThreadDeclarations ()
 
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
-    if ((parallelLoop->isDirectLoop () == true
-        && parallelLoop->getOpDatDimension (i) > 1
-        && parallelLoop->getOpMapValue (i) == DIRECT)
-        || (parallelLoop->getOpMapValue (i) == GLOBAL
-            && parallelLoop->getOpAccessValue (i) != READ_ACCESS)
-        || (parallelLoop->getOpMapValue (i) == INDIRECT
-            && parallelLoop->getOpAccessValue (i) == INC_ACCESS))
+    if (parallelLoop->isReductionRequired (i) || (parallelLoop->isIndirect (i)
+        && parallelLoop->isIncremented (i)) || (parallelLoop->isDirect (i)
+        && parallelLoop->getOpDatDimension (i) > 1))
     {
       SgType * opDatType = parallelLoop->getOpDatType (i);
 

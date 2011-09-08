@@ -8,36 +8,6 @@
  * ======================================================
  */
 
-namespace
-{
-  std::string const doInitialiseConstants = "doInitialiseConstants";
-}
-
-void
-FortranModuleDeclarations::createInitialiseConstantsBooleanDeclaration ()
-{
-  using SageBuilder::buildVariableDeclaration;
-  using SageBuilder::buildBoolType;
-  using SageBuilder::buildBoolValExp;
-  using SageBuilder::buildAssignInitializer;
-  using SageInterface::appendStatement;
-  using std::string;
-
-  Debug::getInstance ()->debugMessage (
-      "Creating initialise constants boolean at module scope",
-      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
-
-  SgVariableDeclaration * variableDeclaration = buildVariableDeclaration (
-      doInitialiseConstants, buildBoolType (), buildAssignInitializer (
-          buildBoolValExp (true), buildBoolType ()), moduleScope);
-
-  variableDeclarations->add (doInitialiseConstants, variableDeclaration);
-
-  variableDeclaration->get_declarationModifier ().get_accessModifier ().setUndefined ();
-
-  appendStatement (variableDeclaration, moduleScope);
-}
-
 void
 FortranModuleDeclarations::createFirstExecutionBooleanDeclaration ()
 {
@@ -76,8 +46,6 @@ FortranModuleDeclarations::FortranModuleDeclarations (
   variableDeclarations = new SubroutineVariableDeclarations ();
 
   createFirstExecutionBooleanDeclaration ();
-
-  createInitialiseConstantsBooleanDeclaration ();
 }
 
 /*
@@ -85,12 +53,6 @@ FortranModuleDeclarations::FortranModuleDeclarations (
  * Public functions
  * ======================================================
  */
-
-SgVariableDeclaration *
-FortranModuleDeclarations::getInitialiseConstantsBooleanDeclaration ()
-{
-  return variableDeclarations->get (doInitialiseConstants);
-}
 
 SgVariableDeclaration *
 FortranModuleDeclarations::getFirstExecutionBooleanDeclaration ()

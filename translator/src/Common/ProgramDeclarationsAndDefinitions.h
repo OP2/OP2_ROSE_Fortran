@@ -70,15 +70,6 @@ template <typename TParallelLoop, typename TSubroutineHeader>
 
       /*
        * ======================================================
-       * Mapping from variable name declared in constants file
-       * to its type
-       * ======================================================
-       */
-
-      std::map <std::string, SgType *> constantDeclarations;
-
-      /*
-       * ======================================================
        * Other declarations
        * ======================================================
        */
@@ -95,6 +86,8 @@ template <typename TParallelLoop, typename TSubroutineHeader>
 
       std::vector <std::string> doubleDeclarations;
 
+      std::map <std::string, SgType *> declarations;
+
       /*
        * ======================================================
        * The source file AST currently being scanned
@@ -108,6 +101,8 @@ template <typename TParallelLoop, typename TSubroutineHeader>
       handleBaseTypeDeclaration (SgType * type,
           std::string const & variableName)
       {
+        declarations[variableName] = type;
+
         if (isSgTypeBool (type) != NULL)
         {
           Debug::getInstance ()->debugMessage ("'" + variableName
@@ -297,18 +292,6 @@ template <typename TParallelLoop, typename TSubroutineHeader>
         return OpConstDefinitions.end ();
       }
 
-      std::map <std::string, SgType *>::const_iterator
-      firstConstantDeclaration ()
-      {
-        return constantDeclarations.begin ();
-      }
-
-      std::map <std::string, SgType *>::const_iterator
-      lastConstantDeclaration ()
-      {
-        return constantDeclarations.end ();
-      }
-
       bool
       isTypeBoolean (std::string const & variableName) const
       {
@@ -361,6 +344,12 @@ template <typename TParallelLoop, typename TSubroutineHeader>
 
         return find (doubleDeclarations.begin (), doubleDeclarations.end (),
             variableName) != doubleDeclarations.end ();
+      }
+
+      SgType *
+      getType (std::string const & variableName)
+      {
+        return declarations[variableName];
       }
 
       typename std::vector <TSubroutineHeader *>::const_iterator

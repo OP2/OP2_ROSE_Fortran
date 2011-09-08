@@ -14,32 +14,6 @@ using namespace SageBuilder;
 void
 CPPInitialiseConstantsSubroutine::createStatements ()
 {
-  using SageBuilder::buildVarRefExp;
-  using SageBuilder::buildOpaqueVarRefExp;
-  using SageBuilder::buildAssignStatement;
-  using SageInterface::appendStatement;
-  using std::string;
-  using std::map;
-  using std::vector;
-
-  Debug::getInstance ()->debugMessage (
-      "Creating statements in initialise constants subroutine",
-      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
-
-  for (map <string, SgType *>::const_iterator it = declarations->firstConstantDeclaration (); 
-      it != declarations->lastConstantDeclaration (); 
-      ++it)
-  {
-    string const variableName = it->first;
-
-    SgExpression * moduleVariableExpr = constantVariableNames[variableName];
-
-    SgExprStatement * assignmentStatement = buildAssignStatement (
-        moduleVariableExpr,
-        buildOpaqueVarRefExp (variableName, subroutineScope));
-
-    appendStatement (assignmentStatement, subroutineScope);
-  }
 }
 
 void
@@ -86,29 +60,17 @@ CPPInitialiseConstantsSubroutine::declareConstants ()
   using std::map;
   using std::string;
 
-
-  for (map <string, SgType *>::const_iterator it = declarations->firstConstantDeclaration (); 
-      it != declarations->lastConstantDeclaration (); 
-      ++it)
+  for (map <string, OpConstDefinition *>::const_iterator it =
+      declarations->firstOpConstDefinition (); it
+      != declarations->lastOpConstDefinition (); ++it)
   {
     string const variableName = it->first;
 
-    SgType * type = it->second;
-    
-    SgExpression * moduleVariableExpr = buildDotExp(
-        buildVarRefExp( variableDeclarations->get( OpenCL::CPP::globalConstants ) ),
-        buildOpaqueVarRefExp( variableName ) );
-
-    //string const moduleVariableName = "INTERNAL_" + variableName;
+    SgExpression * moduleVariableExpr = buildDotExp (buildVarRefExp (
+        variableDeclarations->get (OpenCL::CPP::globalConstants)),
+        buildOpaqueVarRefExp (variableName));
 
     constantVariableNames[variableName] = moduleVariableExpr;
-
-    // not going to be a variable on its own
-    /*SgVariableDeclaration * variableDeclaration =
-        CPPStatementsAndExpressionsBuilder::appendVariableDeclaration (
-            moduleVariableName, type, moduleScope);
-
-    variableDeclarations->add (moduleVariableName, variableDeclaration); */
   }
 }
 

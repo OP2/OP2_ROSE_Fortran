@@ -39,15 +39,20 @@ FortranCUDAHostSubroutineDirectLoop::createKernelFunctionCallStatement ()
   {
     if (parallelLoop->isDuplicateOpDat (i) == false)
     {
-      if (parallelLoop->isReductionRequired (i) == false)
+      if (parallelLoop->isReductionRequired (i))
       {
         actualParameters->append_expression (buildVarRefExp (
-            variableDeclarations->get (VariableNames::getOpDatDeviceName (i))));
+            moduleDeclarations->getReductionArrayDeviceDeclaration (i)));
+      }
+      else if (parallelLoop->isGlobalScalar (i))
+      {
+        actualParameters->append_expression (buildVarRefExp (
+            variableDeclarations->get (VariableNames::getOpDatName (i))));
       }
       else
       {
         actualParameters->append_expression (buildVarRefExp (
-            moduleDeclarations->getReductionArrayDeviceDeclaration (i)));
+            variableDeclarations->get (VariableNames::getOpDatDeviceName (i))));
       }
     }
   }
@@ -354,9 +359,6 @@ FortranCUDAHostSubroutineDirectLoop::createStatements ()
   }
 
   createVariableSizesInitialisationStatements ();
-
-  appendStatement (createCallToInitialiseConstantsStatements (),
-      subroutineScope);
 
   appendStatement (createKernelFunctionCallStatement (), subroutineScope);
 

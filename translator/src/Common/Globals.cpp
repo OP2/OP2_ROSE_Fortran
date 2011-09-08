@@ -94,20 +94,3 @@ Globals::isInputFile (std::string const & fileName) const
   return std::find (inputFiles.begin (), inputFiles.end (), fileName)
       != inputFiles.end ();
 }
-
-void
-Globals::setConstantsFileName (std::string const & fileName)
-{
-  using boost::filesystem::path;
-  using boost::filesystem::system_complete;
-
-  path p = system_complete (path (fileName));
-
-  constantsFileName = p.file_string ();
-}
-
-std::string const &
-Globals::getConstantsFileName () const
-{
-  return constantsFileName;
-}

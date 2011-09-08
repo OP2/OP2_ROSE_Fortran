@@ -659,22 +659,24 @@ FortranCUDAHostSubroutine::createFirstTimeExecutionStatements ()
           variableDeclarations->get (VariableNames::getOpDatName (i))),
           buildOpaqueVarRefExp (CommonVariableNames::dim, block));
 
-      if (parallelLoop->isGlobal (i))
+      if (parallelLoop->isGlobalNonScalar (i))
       {
         if (parallelLoop->isRead (i))
         {
-          Debug::getInstance ()->debugMessage ("OP_GBL with read access",
-              Debug::HIGHEST_DEBUG_LEVEL, __FILE__, __LINE__);
+          Debug::getInstance ()->debugMessage (
+              "Non-scalar OP_GBL with read access", Debug::HIGHEST_DEBUG_LEVEL,
+              __FILE__, __LINE__);
 
           SgExprStatement * assignmentStatement = buildAssignStatement (
               dotExpression1, dotExpression2);
 
           appendStatement (assignmentStatement, block);
         }
-        else
+        else if (parallelLoop->isWritten (i) || parallelLoop->isReadAndWritten (
+            i))
         {
           Debug::getInstance ()->debugMessage (
-              "OP_GBL with write/read-write access",
+              "Non-scalar OP_GBL with write/read-write access",
               Debug::HIGHEST_DEBUG_LEVEL, __FILE__, __LINE__);
 
           SgPntrArrRefExp * arrayIndexExpression3 = buildPntrArrRefExp (
@@ -694,6 +696,12 @@ FortranCUDAHostSubroutine::createFirstTimeExecutionStatements ()
 
           FortranStatementsAndExpressionsBuilder::appendAllocateStatement (
               buildExprListExp (arrayIndexExpression4), block);
+        }
+        else if (parallelLoop->isIncremented (i))
+        {
+          Debug::getInstance ()->debugMessage (
+              "Non-scalar OP_GBL with increment access",
+              Debug::HIGHEST_DEBUG_LEVEL, __FILE__, __LINE__);
         }
       }
       else
@@ -718,54 +726,6 @@ FortranCUDAHostSubroutine::createFirstTimeExecutionStatements ()
       }
     }
   }
-
-  return block;
-}
-
-SgBasicBlock *
-FortranCUDAHostSubroutine::createCallToInitialiseConstantsStatements ()
-{
-  using SageBuilder::buildExprListExp;
-  using SageBuilder::buildFunctionCallStmt;
-  using SageBuilder::buildVoidType;
-  using SageBuilder::buildVarRefExp;
-  using SageBuilder::buildBasicBlock;
-  using SageBuilder::buildEqualityOp;
-  using SageBuilder::buildAssignStatement;
-  using SageBuilder::buildBoolValExp;
-  using SageInterface::appendStatement;
-
-  Debug::getInstance ()->debugMessage (
-      "Creating statements to call initialise constants subroutine",
-      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
-
-  SgBasicBlock * block = buildBasicBlock ();
-
-  SgBasicBlock * ifBody = buildBasicBlock ();
-
-  SgEqualityOp * ifGuardExpression = buildEqualityOp (buildVarRefExp (
-      moduleDeclarations->getInitialiseConstantsBooleanDeclaration ()),
-      buildBoolValExp (true));
-
-  SgExprStatement * assignmentStatement = buildAssignStatement (buildVarRefExp (
-      moduleDeclarations->getInitialiseConstantsBooleanDeclaration ()),
-      buildBoolValExp (false));
-
-  appendStatement (assignmentStatement, ifBody);
-
-  SgExprListExp * actualParameters = buildExprListExp ();
-
-  SgExprStatement * callStatement = buildFunctionCallStmt (
-      initialiseConstantsSubroutine->getSubroutineName (), buildVoidType (),
-      actualParameters, subroutineScope);
-
-  appendStatement (callStatement, ifBody);
-
-  SgIfStmt * ifStatement =
-      RoseStatementsAndExpressionsBuilder::buildIfStatementWithEmptyElse (
-          ifGuardExpression, ifBody);
-
-  appendStatement (ifStatement, block);
 
   return block;
 }

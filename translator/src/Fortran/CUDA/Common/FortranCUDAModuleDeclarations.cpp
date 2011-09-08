@@ -18,7 +18,11 @@ FortranCUDAModuleDeclarations::createReductionDeclarations ()
   {
     if (parallelLoop->isReductionRequired (i))
     {
+      std::cout << "HERE 1\n";
+
       SgType * baseType = parallelLoop->getOpDatBaseType (i);
+
+      std::cout << "HERE 2\n";
 
       string const reductionArrayHostName =
           VariableNames::getReductionArrayHostName (i, userSubroutineName);

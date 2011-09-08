@@ -683,9 +683,6 @@ FortranCUDAHostSubroutineIndirectLoop::createStatements ()
 
   createVariablesSizesInitialisationStatements ();
 
-  appendStatement (createCallToInitialiseConstantsStatements (),
-      subroutineScope);
-
   createPlanFunctionExecutionStatements ();
 
   if (parallelLoop->isReductionRequired () == true)
