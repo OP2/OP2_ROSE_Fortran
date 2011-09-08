@@ -71,9 +71,6 @@ class FortranCUDAHostSubroutine: public FortranHostSubroutine
     SgBasicBlock *
     createFirstTimeExecutionStatements ();
 
-    SgBasicBlock *
-    createCallToInitialiseConstantsStatements ();
-
     void
     createCUDAKernelLocalVariableDeclarations ();
 

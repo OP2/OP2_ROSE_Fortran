@@ -95,6 +95,9 @@ FortranCUDAKernelSubroutineDirectLoop::createStageInFromDeviceMemoryToLocalThrea
   using SageInterface::appendStatement;
   using std::string;
 
+  Debug::getInstance ()->debugMessage ("Creating stage in statements",
+      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+
   SgBasicBlock * outerBlock = buildBasicBlock ();
 
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
@@ -243,6 +246,9 @@ FortranCUDAKernelSubroutineDirectLoop::createStageOutFromLocalThreadVariablesToD
   using SageBuilder::buildNullExpression;
   using SageInterface::appendStatement;
   using std::string;
+
+  Debug::getInstance ()->debugMessage ("Creating stage out statements",
+      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
   SgBasicBlock * outerBlock = buildBasicBlock ();
 
@@ -397,6 +403,9 @@ FortranCUDAKernelSubroutineDirectLoop::createExecutionLoopStatements ()
   using SageBuilder::buildExprStatement;
   using SageInterface::appendStatement;
 
+  Debug::getInstance ()->debugMessage ("Creating execution loop statements",
+      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+
   SgBasicBlock * loopBody = buildBasicBlock ();
 
   SgSubtractOp * subtractExpression1 = buildSubtractOp (buildVarRefExp (
@@ -507,6 +516,10 @@ FortranCUDAKernelSubroutineDirectLoop::createAutoSharedDisplacementInitialisatio
   using SageBuilder::buildAssignStatement;
   using SageInterface::appendStatement;
 
+  Debug::getInstance ()->debugMessage (
+      "Creating autoshared displacement initialisation statement",
+      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+
   SgDotExp * dotExpression = buildDotExp (buildOpaqueVarRefExp (
       CUDA::Fortran::threadidx, subroutineScope), buildOpaqueVarRefExp (
       CUDA::Fortran::x, subroutineScope));
@@ -523,30 +536,15 @@ FortranCUDAKernelSubroutineDirectLoop::createAutoSharedDisplacementInitialisatio
           DirectLoop::Fortran::KernelSubroutine::warpScratchpadSize)),
       divideExpression1);
 
-  if (parallelLoop->getMaximumSizeOfOpDat () == 8)
-  {
-    SgDivideOp * divideExpression2 = buildDivideOp (multiplyExpression,
-        buildIntVal (8));
+  SgDivideOp * divideExpression2 = buildDivideOp (multiplyExpression,
+      buildIntVal (parallelLoop->getMaximumSizeOfOpDat ()));
 
-    SgExprStatement * assignmentStatement = buildAssignStatement (
-        buildVarRefExp (variableDeclarations->get (
-            DirectLoop::Fortran::KernelSubroutine::autosharedDisplacement)),
-        divideExpression2);
+  SgExprStatement * assignmentStatement = buildAssignStatement (buildVarRefExp (
+      variableDeclarations->get (
+          DirectLoop::Fortran::KernelSubroutine::autosharedDisplacement)),
+      divideExpression2);
 
-    appendStatement (assignmentStatement, subroutineScope);
-  }
-  else
-  {
-    SgDivideOp * divideExpression2 = buildDivideOp (multiplyExpression,
-        buildIntVal (4));
-
-    SgExprStatement * assignmentStatement = buildAssignStatement (
-        buildVarRefExp (variableDeclarations->get (
-            DirectLoop::Fortran::KernelSubroutine::autosharedDisplacement)),
-        divideExpression2);
-
-    appendStatement (assignmentStatement, subroutineScope);
-  }
+  appendStatement (assignmentStatement, subroutineScope);
 }
 
 void
@@ -561,6 +559,10 @@ FortranCUDAKernelSubroutineDirectLoop::createThreadIDInitialisationStatement ()
   using SageBuilder::buildFunctionCallExp;
   using SageBuilder::buildAssignStatement;
   using SageInterface::appendStatement;
+
+  Debug::getInstance ()->debugMessage (
+      "Creating thread ID initialisation statement", Debug::FUNCTION_LEVEL,
+      __FILE__, __LINE__);
 
   SgDotExp * dotExpression = buildDotExp (buildOpaqueVarRefExp (
       CUDA::Fortran::threadidx, subroutineScope), buildOpaqueVarRefExp (
@@ -597,6 +599,10 @@ FortranCUDAKernelSubroutineDirectLoop::createOpDatFormalParameterDeclarations ()
   using SageBuilder::buildExprListExp;
   using SageBuilder::buildDotExp;
   using std::string;
+
+  Debug::getInstance ()->debugMessage (
+      "Creating OP_DAT formal parameter declarations", Debug::FUNCTION_LEVEL,
+      __FILE__, __LINE__);
 
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
@@ -659,6 +665,9 @@ FortranCUDAKernelSubroutineDirectLoop::createLocalVariableDeclarations ()
 {
   using std::vector;
   using std::string;
+
+  Debug::getInstance ()->debugMessage ("Creating local variable declarations",
+      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
   vector <string> fourByteIntegers;
 

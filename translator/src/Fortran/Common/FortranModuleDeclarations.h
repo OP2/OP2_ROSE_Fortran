@@ -58,9 +58,6 @@ class FortranModuleDeclarations
   public:
 
     SgVariableDeclaration *
-    getInitialiseConstantsBooleanDeclaration ();
-
-    SgVariableDeclaration *
     getFirstExecutionBooleanDeclaration ();
 
     SgVariableDeclaration *
