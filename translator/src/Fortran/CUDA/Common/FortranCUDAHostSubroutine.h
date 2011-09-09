@@ -2,7 +2,6 @@
 #define FORTRAN_CUDA_HOST_SUBROUTINE_H
 
 #include <FortranHostSubroutine.h>
-#include <FortranInitialiseConstantsSubroutine.h>
 #include <FortranCUDAKernelSubroutine.h>
 #include <FortranCUDADataSizesDeclaration.h>
 #include <FortranOpDatDimensionsDeclaration.h>
@@ -13,8 +12,6 @@ class FortranCUDAHostSubroutine: public FortranHostSubroutine
 {
   protected:
 
-    FortranInitialiseConstantsSubroutine * initialiseConstantsSubroutine;
-
     FortranCUDADataSizesDeclaration * dataSizesDeclaration;
 
     FortranOpDatDimensionsDeclaration * opDatDimensionsDeclaration;
@@ -22,15 +19,6 @@ class FortranCUDAHostSubroutine: public FortranHostSubroutine
     FortranCUDAModuleDeclarations * moduleDeclarations;
 
   protected:
-
-    /*
-     * ======================================================
-     * Returns a statement which represents a CUDA thread
-     * synchronisation call
-     * ======================================================
-     */
-    SgStatement *
-    createThreadSynchroniseCallStatement ();
 
     virtual void
     createReductionEpilogueStatements ();
@@ -81,7 +69,6 @@ class FortranCUDAHostSubroutine: public FortranHostSubroutine
         std::string const & userSubroutineName,
         std::string const & kernelSubroutineName,
         FortranParallelLoop * parallelLoop, SgScopeStatement * moduleScope,
-        FortranInitialiseConstantsSubroutine * initialiseConstantsSubroutine,
         FortranCUDADataSizesDeclaration * dataSizesDeclaration,
         FortranOpDatDimensionsDeclaration * opDatDimensionsDeclaration,
         FortranCUDAModuleDeclarations * moduleDeclarations);

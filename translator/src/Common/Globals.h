@@ -9,7 +9,7 @@
 #ifndef GLOBALS_H
 #define GLOBALS_H
 
-#include <CommonNamespaces.h>
+#include <TargetBackend.h>
 
 class Globals
 {
@@ -17,7 +17,7 @@ class Globals
 
     static Globals * globalsInstance;
 
-    TargetBackends::BACKEND_VALUE backend;
+    TargetBackend::BACKEND_VALUE backend;
 
     bool oxfordOption;
 
@@ -52,14 +52,14 @@ class Globals
      * ======================================================
      */
     void
-    setTargetBackend (TargetBackends::BACKEND_VALUE backend);
+    setTargetBackend (TargetBackend::BACKEND_VALUE backend);
 
     /*
      * ======================================================
      * What type of code should be generated?
      * ======================================================
      */
-    TargetBackends::BACKEND_VALUE
+    TargetBackend::BACKEND_VALUE
     getTargetBackend () const;
 
     void

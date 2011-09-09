@@ -17,7 +17,7 @@ FortranCUDADataSizesDeclarationDirectLoop::addFields ()
   {
     if (parallelLoop->isDuplicateOpDat (i) == false)
     {
-      string const & variableName = VariableNames::getOpDatSizeName (i);
+      string const & variableName = OP2::VariableNames::getOpDatSizeName (i);
 
       SgVariableDeclaration * fieldDeclaration = buildVariableDeclaration (
           variableName, FortranTypesBuilder::getFourByteInteger (), NULL,

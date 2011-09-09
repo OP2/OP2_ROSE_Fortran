@@ -4,6 +4,7 @@
 #include <FortranTypesBuilder.h>
 #include <RoseHelper.h>
 #include <Debug.h>
+#include <OpenMP.h>
 
 /*
  * ======================================================
@@ -48,7 +49,7 @@ FortranOpenMPHostSubroutineDirectLoop::createKernelFunctionCallStatement ()
 
         SgPntrArrRefExp * parameterExpression = buildPntrArrRefExp (
             buildVarRefExp (variableDeclarations->get (
-                VariableNames::getOpDatLocalName (i))), buildExprListExp (
+                OP2::VariableNames::getOpDatLocalName (i))), buildExprListExp (
                 arraySubscriptExpression));
 
         actualParameters->append_expression (parameterExpression);
@@ -101,8 +102,8 @@ FortranOpenMPHostSubroutineDirectLoop::createKernelDoLoop ()
   SgBasicBlock * loopBody = buildBasicBlock ();
 
   SgDotExp * dotExpression1 = buildDotExp (buildVarRefExp (
-      variableDeclarations->get (VariableNames::getOpSetName ())),
-      buildOpaqueVarRefExp (CommonVariableNames::size, subroutineScope));
+      variableDeclarations->get (OP2::VariableNames::getOpSetName ())),
+      buildOpaqueVarRefExp (OP2::VariableNames::size, subroutineScope));
 
   SgMultiplyOp * multiplyExpression1 = buildMultiplyOp (dotExpression1,
       buildVarRefExp (variableDeclarations->get (OpenMP::threadIndex)));
@@ -115,8 +116,8 @@ FortranOpenMPHostSubroutineDirectLoop::createKernelDoLoop ()
       divideExpression1);
 
   SgDotExp * dotExpression2 = buildDotExp (buildVarRefExp (
-      variableDeclarations->get (VariableNames::getOpSetName ())),
-      buildOpaqueVarRefExp (CommonVariableNames::size, subroutineScope));
+      variableDeclarations->get (OP2::VariableNames::getOpSetName ())),
+      buildOpaqueVarRefExp (OP2::VariableNames::size, subroutineScope));
 
   SgAddOp * addExpression2 = buildAddOp (buildVarRefExp (
       variableDeclarations->get (OpenMP::threadIndex)), buildIntVal (1));
@@ -172,8 +173,8 @@ FortranOpenMPHostSubroutineDirectLoop::createTransferOpDatStatements ()
     if (parallelLoop->isDuplicateOpDat (i) == false)
     {
       SgDotExp * parameterExpression1 = buildDotExp (buildVarRefExp (
-          variableDeclarations->get (VariableNames::getOpDatName (i))),
-          buildOpaqueVarRefExp (CommonVariableNames::dat, block));
+          variableDeclarations->get (OP2::VariableNames::getOpDatName (i))),
+          buildOpaqueVarRefExp (OP2::VariableNames::dataOnHost, block));
 
       SgVarRefExp * parameterExpression2 = buildVarRefExp (
           moduleDeclarations->getGlobalOpDatDeclaration (i));
@@ -183,14 +184,14 @@ FortranOpenMPHostSubroutineDirectLoop::createTransferOpDatStatements ()
       if (parallelLoop->isReductionRequired (i) == false)
       {
         parameterExpression3 = buildDotExp (buildVarRefExp (
-            variableDeclarations->get (VariableNames::getOpSetName ())),
-            buildOpaqueVarRefExp (CommonVariableNames::size, block));
+            variableDeclarations->get (OP2::VariableNames::getOpSetName ())),
+            buildOpaqueVarRefExp (OP2::VariableNames::size, block));
       }
       else
       {
         parameterExpression3 = buildDotExp (buildVarRefExp (
-            variableDeclarations->get (VariableNames::getOpDatName (i))),
-            buildOpaqueVarRefExp (CommonVariableNames::dim, block));
+            variableDeclarations->get (OP2::VariableNames::getOpDatName (i))),
+            buildOpaqueVarRefExp (OP2::VariableNames::dimension, block));
       }
 
       SgStatement * callStatement =

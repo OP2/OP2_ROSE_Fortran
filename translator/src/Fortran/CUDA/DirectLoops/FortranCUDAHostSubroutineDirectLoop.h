@@ -62,16 +62,13 @@ class FortranCUDAHostSubroutineDirectLoop: public FortranCUDAHostSubroutine
 
   public:
 
-        FortranCUDAHostSubroutineDirectLoop (
-            std::string const & subroutineName,
-            std::string const & userSubroutineName,
-            std::string const & kernelSubroutineName,
-            FortranParallelLoop * parallelLoop,
-            SgScopeStatement * moduleScope,
-            FortranInitialiseConstantsSubroutine * initialiseConstantsSubroutine,
-            FortranCUDADataSizesDeclarationDirectLoop * dataSizesDeclaration,
-            FortranOpDatDimensionsDeclaration * opDatDimensionsDeclaration,
-            FortranCUDAModuleDeclarations * moduleDeclarations);
+    FortranCUDAHostSubroutineDirectLoop (std::string const & subroutineName,
+        std::string const & userSubroutineName,
+        std::string const & kernelSubroutineName,
+        FortranParallelLoop * parallelLoop, SgScopeStatement * moduleScope,
+        FortranCUDADataSizesDeclarationDirectLoop * dataSizesDeclaration,
+        FortranOpDatDimensionsDeclaration * opDatDimensionsDeclaration,
+        FortranCUDAModuleDeclarations * moduleDeclarations);
 };
 
 #endif

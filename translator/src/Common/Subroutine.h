@@ -11,6 +11,14 @@
 #include <rose.h>
 #include <SubroutineVariableDeclarations.h>
 
+namespace CommonVariableNames
+{
+  std::string const iterationCounter1 = "i1";
+  std::string const iterationCounter2 = "i2";
+  std::string const threadID = "threadID";
+  std::string const upperBound = "bound";
+}
+
 template <typename TSubroutineHeader>
   class Subroutine
   {

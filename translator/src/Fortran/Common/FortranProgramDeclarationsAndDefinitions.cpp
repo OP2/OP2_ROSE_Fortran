@@ -521,7 +521,7 @@ FortranProgramDeclarationsAndDefinitions::visit (SgNode * node)
           SgType * type =
               variableDeclaration->get_decl_item (variableName)->get_type ();
 
-          declarations[variableName] = type;
+          declarations[variableName] = variableDeclaration;
         }
 
         break;

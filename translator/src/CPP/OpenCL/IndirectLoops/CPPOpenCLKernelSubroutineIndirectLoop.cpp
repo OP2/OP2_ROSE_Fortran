@@ -48,13 +48,13 @@ CPPOpenCLKernelSubroutineIndirectLoop::createUserSubroutineCallStatement ()
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
     SgExpression * argN_ref = buildVarRefExp (variableDeclarations->get (
-        VariableNames::getOpDatName (i))); //FIXME: same as parameter
+        OP2::VariableNames::getOpDatName (i))); //FIXME: same as parameter
     SgExpression * argN_l_ref = buildVarRefExp (variableDeclarations->get (
-        VariableNames::getOpDatLocalName (i)));
+        OP2::VariableNames::getOpDatLocalName (i)));
     SgExpression * ind_argN_s = buildVarRefExp (variableDeclarations->get (
-        VariableNames::getOpIndirectionSharedName (i)));
+        OP2::VariableNames::getOpIndirectionSharedName (i)));
     SgExpression * argN_maps_ref = buildVarRefExp (variableDeclarations->get (
-        VariableNames::getGlobalToLocalMappingName (i)));
+        OP2::VariableNames::getGlobalToLocalMappingName (i)));
     SgExpression * dimN_val = buildIntVal (parallelLoop->getOpDatDimension (i));
 
     //int dim = parallelLoop->getOpDatDimension (i);
@@ -174,13 +174,13 @@ CPPOpenCLKernelSubroutineIndirectLoop::createPointeredIncrementsOrWritesStatemen
           || parallelLoop->getOpAccessValue (i) == INC_ACCESS)
       {
         SgExpression * argN_ref = buildVarRefExp (variableDeclarations->get (
-            VariableNames::getOpDatName (i)));
+            OP2::VariableNames::getOpDatName (i)));
         SgExpression * ind_argN_size_ref = buildVarRefExp (
             variableDeclarations->get (
-                VariableNames::getIndirectionArgumentSizeName (i)));
+                OP2::VariableNames::getIndirectionArgumentSizeName (i)));
         SgExpression * argN_maps_ref = buildVarRefExp (
             variableDeclarations->get (
-                VariableNames::getGlobalToLocalMappingName (i)));
+                OP2::VariableNames::getGlobalToLocalMappingName (i)));
         SgExpression * n_ref = buildVarRefExp (variableDeclarations->get (
             CommonVariableNames::iterationCounter1));
         SgExpression * dimN_val = buildIntVal (parallelLoop->getOpDatDimension (
@@ -268,11 +268,11 @@ CPPOpenCLKernelSubroutineIndirectLoop::createInnerExecutionLoopStatements (
   using SageInterface::appendStatement;
 
   SgExpression * col2_ref = buildVarRefExp (variableDeclarations->get (
-      CommonVariableNames::col2));
+      OP2::VariableNames::col2));
   SgExpression * varCol = buildVarRefExp (variableDeclarations->get (
-      CommonVariableNames::col));
+      OP2::VariableNames::col));
   SgExpression * varNcolor = buildVarRefExp (variableDeclarations->get (
-      IndirectLoop::CPP::KernelSubroutine::VariableNames::ncolor));
+      OP2::VariableNames::ncolor));
 
   SgStatement * outerLoopInitialisationExpression = buildAssignStatement (
       varCol, buildIntVal (0));
@@ -305,15 +305,16 @@ CPPOpenCLKernelSubroutineIndirectLoop::createInnerExecutionLoopStatements (
     if (parallelLoop->getOpMapValue (i) == INDIRECT
         && parallelLoop->getOpAccessValue (i) == INC_ACCESS)
     {
-      //SgExpression * argN_ref = buildVarRefExp(variableDeclarations->get(VariableNames::getOpDatName(i)));
+      //SgExpression * argN_ref = buildVarRefExp(variableDeclarations->get(OP2::VariableNames::getOpDatName(i)));
       SgExpression * argN_l_ref = buildVarRefExp (variableDeclarations->get (
-          VariableNames::getOpDatLocalName (i)));
-      SgExpression * ind_argN_s_ref = buildVarRefExp (
-          variableDeclarations->get (VariableNames::getOpDatSharedName (i)));
-      //SgExpression * ind_argN_size_ref = buildVarRefExp(variableDeclarations->get(VariableNames::getOpDatSizeName(i)));
+          OP2::VariableNames::getOpDatLocalName (i)));
+      SgExpression * ind_argN_s_ref =
+          buildVarRefExp (variableDeclarations->get (
+              OP2::VariableNames::getOpDatSharedName (i)));
+      //SgExpression * ind_argN_size_ref = buildVarRefExp(variableDeclarations->get(OP2::VariableNames::getOpDatSizeName(i)));
       SgExpression * varLocalToGlobalMapping = buildVarRefExp (
           variableDeclarations->get (
-              VariableNames::getLocalToGlobalMappingName (i)));
+              OP2::VariableNames::getLocalToGlobalMappingName (i)));
       SgExpression * dimN_val = buildIntVal (
           parallelLoop->getOpDatDimension (i));
       SgExpression * varIterationCounter2 = buildVarRefExp (
@@ -380,11 +381,13 @@ CPPOpenCLKernelSubroutineIndirectLoop::createIncrementAdjustmentStatements (
 
       SgPntrArrRefExp * arrayExpression = buildPntrArrRefExp (buildVarRefExp (
           variableDeclarations->get (
-              VariableNames::getGlobalToLocalMappingName (i))), addExpression);
+              OP2::VariableNames::getGlobalToLocalMappingName (i))),
+          addExpression);
 
       SgExprStatement * assignmentStatement = buildAssignStatement (
           buildVarRefExp (variableDeclarations->get (
-              VariableNames::getIncrementAccessMapName (i))), arrayExpression);
+              OP2::VariableNames::getIncrementAccessMapName (i))),
+          arrayExpression);
 
       appendStatement (assignmentStatement, scope);
     }
@@ -412,8 +415,9 @@ CPPOpenCLKernelSubroutineIndirectLoop::createInitialiseLocalOpDatStatements (
     {
       SgBasicBlock * loopBody = buildBasicBlock ();
 
-      SgPntrArrRefExp * arrayExpression = buildPntrArrRefExp (buildVarRefExp (
-          variableDeclarations->get (VariableNames::getOpDatLocalName (i))),
+      SgPntrArrRefExp * arrayExpression = buildPntrArrRefExp (
+          buildVarRefExp (variableDeclarations->get (
+              OP2::VariableNames::getOpDatLocalName (i))),
           buildVarRefExp (variableDeclarations->get (
               CommonVariableNames::iterationCounter2)));
 
@@ -465,11 +469,11 @@ CPPOpenCLKernelSubroutineIndirectLoop::createExecutionLoopStatements ()
   SgExpression * n_ref = buildVarRefExp (variableDeclarations->get (
       CommonVariableNames::iterationCounter1));
   SgExpression * nelems2_ref = buildVarRefExp (variableDeclarations->get (
-      IndirectLoop::CPP::KernelSubroutine::VariableNames::nelems2));
+      OP2::VariableNames::nelems2));
   SgExpression * col2_ref = buildVarRefExp (variableDeclarations->get (
-      CommonVariableNames::col2));
+      OP2::VariableNames::col2));
   SgExpression * nelem_ref = buildVarRefExp (variableDeclarations->get (
-      IndirectLoop::CPP::KernelSubroutine::VariableNames::nelem));
+      OP2::VariableNames::nelems));
   SgExpression * offset_b_ref = buildVarRefExp (variableDeclarations->get (
       IndirectLoop::CPP::KernelSubroutine::VariableNames::blockOffsetShared));
 
@@ -562,18 +566,18 @@ CPPOpenCLKernelSubroutineIndirectLoop::createAutoSharedWhileLoopStatements ()
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
     SgExpression * ind_argN_ref = buildVarRefExp (variableDeclarations->get (
-        VariableNames::getOpIndirectionName (i)));
-    SgExpression * ind_argN_map_ref =
-        buildVarRefExp (variableDeclarations->get (
-            VariableNames::getIncrementAccessMapName (i)));
+        OP2::VariableNames::getOpIndirectionName (i)));
+    SgExpression * ind_argN_map_ref = buildVarRefExp (
+        variableDeclarations->get (
+            OP2::VariableNames::getIncrementAccessMapName (i)));
     SgExpression * ind_argN_maps_ref = buildVarRefExp (
-        variableDeclarations->get (VariableNames::getLocalToGlobalMappingName (
-            i)));
+        variableDeclarations->get (
+            OP2::VariableNames::getLocalToGlobalMappingName (i)));
     SgExpression * ind_argN_s_ref = buildVarRefExp (variableDeclarations->get (
-        VariableNames::getOpIndirectionSharedName (i)));
+        OP2::VariableNames::getOpIndirectionSharedName (i)));
     SgExpression * ind_argN_size_ref = buildVarRefExp (
         variableDeclarations->get (
-            VariableNames::getIndirectionArgumentSizeName (i)));
+            OP2::VariableNames::getIndirectionArgumentSizeName (i)));
     SgExpression * dimN_val = buildIntVal (parallelLoop->getOpDatDimension (i));
 
     if (parallelLoop->isDuplicateOpDat (i) == false
@@ -645,7 +649,7 @@ CPPOpenCLKernelSubroutineIndirectLoop::createInitialiseLocalVariablesStatements 
   using std::string;
 
   SgExpression * nbytes_ref = buildVarRefExp (variableDeclarations->get (
-      CommonVariableNames::numberofBytes));
+      OP2::VariableNames::nbytes));
 
   bool firstInitialization = true;
   //unsigned int previous_OP_DAT_Location;
@@ -653,7 +657,7 @@ CPPOpenCLKernelSubroutineIndirectLoop::createInitialiseLocalVariablesStatements 
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
     string const autosharedVariableName =
-        VariableNames::getAutosharedDeclarationName (
+        OP2::VariableNames::getAutosharedDeclarationName (
             parallelLoop->getOpDatBaseType (i),
             parallelLoop->getSizeOfOpDat (i));
 
@@ -661,10 +665,10 @@ CPPOpenCLKernelSubroutineIndirectLoop::createInitialiseLocalVariablesStatements 
         autosharedVariableName));
 
     SgExpression * ind_argN_s_ref = buildVarRefExp (variableDeclarations->get (
-        VariableNames::getOpIndirectionSharedName (i)));
+        OP2::VariableNames::getOpIndirectionSharedName (i)));
     SgExpression * ind_argN_size_ref = buildVarRefExp (
         variableDeclarations->get (
-            VariableNames::getIndirectionArgumentSizeName (i)));
+            OP2::VariableNames::getIndirectionArgumentSizeName (i)));
     SgExpression * dimN_val = buildIntVal (parallelLoop->getOpDatDimension (i));
 
     if (parallelLoop->isDuplicateOpDat (i) == false
@@ -719,13 +723,13 @@ CPPOpenCLKernelSubroutineIndirectLoop::createThreadZeroStatements ()
   using SageInterface::appendStatement;
 
   SgExpression * blockId_ref = buildVarRefExp (variableDeclarations->get (
-      IndirectLoop::CPP::KernelSubroutine::VariableNames::blockID));
+      OP2::VariableNames::blockID));
   SgExpression * blkmap_ref = buildVarRefExp (variableDeclarations->get (
       PlanFunction::CPP::pblkMap));
   SgExpression * block_offset_ref = buildVarRefExp (variableDeclarations->get (
       PlanFunction::CPP::blockOffset));
   SgExpression * nelem_ref = buildVarRefExp (variableDeclarations->get (
-      IndirectLoop::CPP::KernelSubroutine::VariableNames::nelem));
+      OP2::VariableNames::nelems));
   SgExpression * nelems_ref = buildVarRefExp (variableDeclarations->get (
       PlanFunction::CPP::pnelems));
   SgExpression * offset_b_ref = buildVarRefExp (variableDeclarations->get (
@@ -733,9 +737,9 @@ CPPOpenCLKernelSubroutineIndirectLoop::createThreadZeroStatements ()
   SgExpression * offset_ref = buildVarRefExp (variableDeclarations->get (
       PlanFunction::CPP::poffset));
   SgExpression * nelems2_ref = buildVarRefExp (variableDeclarations->get (
-      IndirectLoop::CPP::KernelSubroutine::VariableNames::nelems2));
+      OP2::VariableNames::nelems2));
   SgExpression * ncolor_ref = buildVarRefExp (variableDeclarations->get (
-      IndirectLoop::CPP::KernelSubroutine::VariableNames::ncolor));
+      OP2::VariableNames::ncolor));
   SgExpression * ncolors_ref = buildVarRefExp (variableDeclarations->get (
       PlanFunction::CPP::pnthrcol));
 
@@ -847,18 +851,18 @@ CPPOpenCLKernelSubroutineIndirectLoop::createThreadZeroStatements ()
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
     SgExpression * ind_argN_ref = buildVarRefExp (variableDeclarations->get (
-        VariableNames::getOpIndirectionName (i)));
-    SgExpression * ind_argN_map_ref =
-        buildVarRefExp (variableDeclarations->get (
-            VariableNames::getIncrementAccessMapName (i)));
+        OP2::VariableNames::getOpIndirectionName (i)));
+    SgExpression * ind_argN_map_ref = buildVarRefExp (
+        variableDeclarations->get (
+            OP2::VariableNames::getIncrementAccessMapName (i)));
     SgExpression * ind_argN_maps_ref = buildVarRefExp (
-        variableDeclarations->get (VariableNames::getLocalToGlobalMappingName (
-            i)));
+        variableDeclarations->get (
+            OP2::VariableNames::getLocalToGlobalMappingName (i)));
     SgExpression * ind_argN_s_ref = buildVarRefExp (variableDeclarations->get (
-        VariableNames::getOpIndirectionSharedName (i)));
+        OP2::VariableNames::getOpIndirectionSharedName (i)));
     SgExpression * ind_argN_size_ref = buildVarRefExp (
         variableDeclarations->get (
-            VariableNames::getIndirectionArgumentSizeName (i)));
+            OP2::VariableNames::getIndirectionArgumentSizeName (i)));
     SgExpression * dimN_val = buildIntVal (parallelLoop->getOpDatDimension (i));
 
     if (parallelLoop->isDuplicateOpDat (i) == false
@@ -885,18 +889,18 @@ CPPOpenCLKernelSubroutineIndirectLoop::createThreadZeroStatements ()
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
     SgExpression * ind_argN_ref = buildVarRefExp (variableDeclarations->get (
-        VariableNames::getOpIndirectionName (i)));
-    SgExpression * ind_argN_map_ref =
-        buildVarRefExp (variableDeclarations->get (
-            VariableNames::getIncrementAccessMapName (i)));
+        OP2::VariableNames::getOpIndirectionName (i)));
+    SgExpression * ind_argN_map_ref = buildVarRefExp (
+        variableDeclarations->get (
+            OP2::VariableNames::getIncrementAccessMapName (i)));
     SgExpression * ind_argN_maps_ref = buildVarRefExp (
-        variableDeclarations->get (VariableNames::getLocalToGlobalMappingName (
-            i)));
+        variableDeclarations->get (
+            OP2::VariableNames::getLocalToGlobalMappingName (i)));
     SgExpression * ind_argN_s_ref = buildVarRefExp (variableDeclarations->get (
-        VariableNames::getOpIndirectionSharedName (i)));
+        OP2::VariableNames::getOpIndirectionSharedName (i)));
     SgExpression * ind_argN_size_ref = buildVarRefExp (
         variableDeclarations->get (
-            VariableNames::getIndirectionArgumentSizeName (i)));
+            OP2::VariableNames::getIndirectionArgumentSizeName (i)));
     SgExpression * dimN_val = buildIntVal (parallelLoop->getOpDatDimension (i));
 
     if (parallelLoop->isDuplicateOpDat (i) == false
@@ -960,7 +964,7 @@ CPPOpenCLKernelSubroutineIndirectLoop::createPlanFormalParameterDeclarations ()
 
     SgVarRefExp * argsSizesReference = buildVarRefExp (
         variableDeclarations->get (
-            VariableNames::getDataSizesVariableDeclarationName (
+            OP2::VariableNames::getDataSizesVariableDeclarationName (
                 userSubroutineName)));
 
     SgVarRefExp * fieldReference = buildVarRefExp (
@@ -1027,17 +1031,17 @@ CPPOpenCLKernelSubroutineIndirectLoop::createOpDatFormalParameterDeclarations ()
       SgPointerType * pointerType = buildPointerType (opDatBaseType);
 
       variableDeclarations->add (
-          VariableNames::getOpDatName (i),
+          OP2::VariableNames::getOpDatName (i),
           CPPOpenCLStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
-              VariableNames::getOpDatName (i), pointerType, subroutineScope,
-              formalParameters, 1, DEVICE));
+              OP2::VariableNames::getOpDatName (i), pointerType,
+              subroutineScope, formalParameters, 1, DEVICE));
 
       variableDeclarations->add (
-          VariableNames::getLocalToGlobalMappingName (i),
+          OP2::VariableNames::getLocalToGlobalMappingName (i),
           CPPOpenCLStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
-              VariableNames::getLocalToGlobalMappingName (i), buildPointerType (
-                  buildIntType ()), subroutineScope, formalParameters, 1,
-              DEVICE));
+              OP2::VariableNames::getLocalToGlobalMappingName (i),
+              buildPointerType (buildIntType ()), subroutineScope,
+              formalParameters, 1, DEVICE));
     }
   }
 
@@ -1047,11 +1051,11 @@ CPPOpenCLKernelSubroutineIndirectLoop::createOpDatFormalParameterDeclarations ()
     {
 
       variableDeclarations->add (
-          VariableNames::getGlobalToLocalMappingName (i),
+          OP2::VariableNames::getGlobalToLocalMappingName (i),
           CPPOpenCLStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
-              VariableNames::getGlobalToLocalMappingName (i), buildPointerType (
-                  buildShortType ()), subroutineScope, formalParameters, 1,
-              DEVICE));
+              OP2::VariableNames::getGlobalToLocalMappingName (i),
+              buildPointerType (buildShortType ()), subroutineScope,
+              formalParameters, 1, DEVICE));
     }
   }
 
@@ -1061,7 +1065,7 @@ CPPOpenCLKernelSubroutineIndirectLoop::createOpDatFormalParameterDeclarations ()
         && (parallelLoop->getOpMapValue (i) == DIRECT
             || parallelLoop->getOpMapValue (i) == GLOBAL))
     {
-      string const variableName = VariableNames::getOpDatName (i);
+      string const variableName = OP2::VariableNames::getOpDatName (i);
 
       SgType * opDatType = parallelLoop->getOpDatType (i);
 
@@ -1105,8 +1109,8 @@ CPPOpenCLKernelSubroutineIndirectLoop::createLocalVariableDeclarations ()
 
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
-    string const & variableName = VariableNames::getNumberOfBytesVariableName (
-        i);
+    string const & variableName =
+        OP2::VariableNames::getNumberOfBytesVariableName (i);
 
     if (parallelLoop->isDuplicateOpDat (i) == false)
     {
@@ -1119,7 +1123,7 @@ CPPOpenCLKernelSubroutineIndirectLoop::createLocalVariableDeclarations ()
     else
     {
       variableDeclarations->add (variableName, variableDeclarations->get (
-          VariableNames::getNumberOfBytesVariableName (
+          OP2::VariableNames::getNumberOfBytesVariableName (
               positionOfNbytes[parallelLoop->getOpDatVariableName (i)])));
     }
   }
@@ -1128,7 +1132,8 @@ CPPOpenCLKernelSubroutineIndirectLoop::createLocalVariableDeclarations ()
   {
     if (parallelLoop->isDuplicateOpDat (i) == false)
     {
-      string const & variableName = VariableNames::getRoundUpVariableName (i);
+      string const & variableName = OP2::VariableNames::getRoundUpVariableName (
+          i);
 
       variableDeclarations->add (variableName,
           CPPOpenCLStatementsAndExpressionsBuilder::appendVariableDeclaration (
@@ -1140,7 +1145,8 @@ CPPOpenCLKernelSubroutineIndirectLoop::createLocalVariableDeclarations ()
   {
     if (parallelLoop->getOpAccessValue (i) == INC_ACCESS)
     {
-      string const variableName = VariableNames::getIncrementAccessMapName (i);
+      string const variableName =
+          OP2::VariableNames::getIncrementAccessMapName (i);
 
       variableDeclarations->add (variableName,
           CPPOpenCLStatementsAndExpressionsBuilder::appendVariableDeclaration (
@@ -1154,7 +1160,7 @@ CPPOpenCLKernelSubroutineIndirectLoop::createLocalVariableDeclarations ()
         && parallelLoop->getOpMapValue (i) == INDIRECT)
     {
       string const variableName =
-          VariableNames::getIndirectionArgumentSizeName (i);
+          OP2::VariableNames::getIndirectionArgumentSizeName (i);
 
       variableDeclarations->add (variableName,
           CPPOpenCLStatementsAndExpressionsBuilder::appendVariableDeclaration (
@@ -1164,20 +1170,16 @@ CPPOpenCLKernelSubroutineIndirectLoop::createLocalVariableDeclarations ()
 
   vector <string> sharedFourByteIntegerVariables;
 
-  sharedFourByteIntegerVariables.push_back (
-      IndirectLoop::CPP::KernelSubroutine::VariableNames::blockID);
+  sharedFourByteIntegerVariables.push_back (OP2::VariableNames::blockID);
 
   sharedFourByteIntegerVariables.push_back (
       IndirectLoop::CPP::KernelSubroutine::VariableNames::blockOffsetShared);
 
-  sharedFourByteIntegerVariables.push_back (
-      IndirectLoop::CPP::KernelSubroutine::VariableNames::ncolor);
+  sharedFourByteIntegerVariables.push_back (OP2::VariableNames::ncolor);
 
-  sharedFourByteIntegerVariables.push_back (
-      IndirectLoop::CPP::KernelSubroutine::VariableNames::nelem);
+  sharedFourByteIntegerVariables.push_back (OP2::VariableNames::nelems);
 
-  sharedFourByteIntegerVariables.push_back (
-      IndirectLoop::CPP::KernelSubroutine::VariableNames::nelems2);
+  sharedFourByteIntegerVariables.push_back (OP2::VariableNames::nelems2);
 
   for (vector <string>::const_iterator it =
       sharedFourByteIntegerVariables.begin (); it
@@ -1189,9 +1191,9 @@ CPPOpenCLKernelSubroutineIndirectLoop::createLocalVariableDeclarations ()
   }
 
   /*
-   variableDeclarations->add (CommonVariableNames::autoshared,
+   variableDeclarations->add (CommonOP2::VariableNames::autoshared,
    CPPOpenCLStatementsAndExpressionsBuilder::appendVariableDeclaration (
-   CommonVariableNames::autoshared,
+   CommonOP2::VariableNames::autoshared,
    buildPointerType( buildFloatType() ),
    subroutineScope,
    1,
@@ -1199,9 +1201,9 @@ CPPOpenCLKernelSubroutineIndirectLoop::createLocalVariableDeclarations ()
 
   vector <string> integerVariables;
 
-  integerVariables.push_back (CommonVariableNames::col);
+  integerVariables.push_back (OP2::VariableNames::col);
 
-  integerVariables.push_back (CommonVariableNames::col2);
+  integerVariables.push_back (OP2::VariableNames::col2);
 
   integerVariables.push_back (CommonVariableNames::iterationCounter1);
 
@@ -1215,8 +1217,7 @@ CPPOpenCLKernelSubroutineIndirectLoop::createLocalVariableDeclarations ()
   integerVariables.push_back (
       IndirectLoop::CPP::KernelSubroutine::VariableNames::moduled);
 
-  integerVariables.push_back (
-      IndirectLoop::CPP::KernelSubroutine::VariableNames::nbytes);
+  integerVariables.push_back (OP2::VariableNames::nbytes);
 
   for (vector <string>::const_iterator it = integerVariables.begin (); it
       != integerVariables.end (); ++it)
@@ -1244,9 +1245,9 @@ CPPOpenCLKernelSubroutineIndirectLoop::createFormalParameterDeclarations ()
   // (type, size) combination
 
   //  variableDeclarations->add (
-  //      CommonVariableNames::autoshared,
+  //      CommonOP2::VariableNames::autoshared,
   //      CPPOpenCLStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
-  //          CommonVariableNames::autoshared,
+  //          CommonOP2::VariableNames::autoshared,
   //          buildPointerType( buildCharType() ), //TODO: char* vs float*
   //          subroutineScope,
   //          formalParameters,

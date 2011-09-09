@@ -14,9 +14,8 @@
 #include <FortranCUDADataSizesDeclarationIndirectLoop.h>
 #include <FortranPlan.h>
 
-class FortranCUDAHostSubroutineIndirectLoop: 
-  public FortranCUDAHostSubroutine,
-  public FortranPlan
+class FortranCUDAHostSubroutineIndirectLoop: public FortranCUDAHostSubroutine,
+    public FortranPlan
 {
   private:
 
@@ -40,16 +39,13 @@ class FortranCUDAHostSubroutineIndirectLoop:
 
   public:
 
-        FortranCUDAHostSubroutineIndirectLoop (
-            std::string const & subroutineName,
-            std::string const & userSubroutineName,
-            std::string const & kernelSubroutineName,
-            FortranParallelLoop * parallelLoop,
-            SgScopeStatement * moduleScope,
-            FortranInitialiseConstantsSubroutine * initialiseConstantsSubroutine,
-            FortranCUDADataSizesDeclarationIndirectLoop * dataSizesDeclaration,
-            FortranOpDatDimensionsDeclaration * opDatDimensionsDeclaration,
-            FortranCUDAModuleDeclarationsIndirectLoop * moduleDeclarations);
+    FortranCUDAHostSubroutineIndirectLoop (std::string const & subroutineName,
+        std::string const & userSubroutineName,
+        std::string const & kernelSubroutineName,
+        FortranParallelLoop * parallelLoop, SgScopeStatement * moduleScope,
+        FortranCUDADataSizesDeclarationIndirectLoop * dataSizesDeclaration,
+        FortranOpDatDimensionsDeclaration * opDatDimensionsDeclaration,
+        FortranCUDAModuleDeclarationsIndirectLoop * moduleDeclarations);
 };
 
 #endif

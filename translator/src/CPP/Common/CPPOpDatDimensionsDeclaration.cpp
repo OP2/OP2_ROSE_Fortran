@@ -22,12 +22,10 @@ CPPOpDatDimensionsDeclaration::addFields ()
 
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
-    string const & variableName = VariableNames::getOpDatDimensionName (i);
+    string const & variableName = OP2::VariableNames::getOpDatDimensionName (i);
 
     SgVariableDeclaration * fieldDeclaration = buildVariableDeclaration (
-        variableName, 
-        buildIntType(), NULL,
-        moduleScope);
+        variableName, buildIntType (), NULL, moduleScope);
 
     fieldDeclaration->get_declarationModifier ().get_accessModifier ().setUndefined ();
 
@@ -65,7 +63,7 @@ SgVariableDeclaration *
 CPPOpDatDimensionsDeclaration::getOpDatDimensionField (
     unsigned int OP_DAT_ArgumentGroup)
 {
-  return fieldDeclarations->get (VariableNames::getOpDatDimensionName (
+  return fieldDeclarations->get (OP2::VariableNames::getOpDatDimensionName (
       OP_DAT_ArgumentGroup));
 }
 

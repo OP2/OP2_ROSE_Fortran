@@ -1,7 +1,6 @@
 #include <cstdlib>
 #include <boost/filesystem.hpp>
 #include <Globals.h>
-#include <CommonNamespaces.h>
 
 Globals * Globals::globalsInstance = NULL;
 
@@ -18,7 +17,7 @@ Globals::Globals ()
    * Assume that the target backend is unknown
    * ======================================================
    */
-  backend = TargetBackends::UNKNOWN;
+  backend = TargetBackend::UNKNOWN;
 
   /*
    * ======================================================
@@ -47,12 +46,12 @@ Globals::getInstance ()
 }
 
 void
-Globals::setTargetBackend (TargetBackends::BACKEND_VALUE backend)
+Globals::setTargetBackend (TargetBackend::BACKEND_VALUE backend)
 {
   this->backend = backend;
 }
 
-TargetBackends::BACKEND_VALUE
+TargetBackend::BACKEND_VALUE
 Globals::getTargetBackend () const
 {
   return backend;

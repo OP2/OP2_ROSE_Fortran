@@ -53,7 +53,7 @@ CPPModuleDeclarations::createFirstExecutionBooleanDeclaration ()
       Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
   std::string const & variableName =
-      VariableNames::getFirstTimeExecutionVariableDeclarationName (
+      OP2::VariableNames::getFirstTimeExecutionVariableDeclarationName (
           userSubroutineName);
 
   SgVariableDeclaration * variableDeclaration = buildVariableDeclaration (
@@ -96,7 +96,7 @@ SgVariableDeclaration *
 CPPModuleDeclarations::getFirstExecutionBooleanDeclaration ()
 {
   std::string const & variableName =
-      VariableNames::getFirstTimeExecutionVariableDeclarationName (
+      OP2::VariableNames::getFirstTimeExecutionVariableDeclarationName (
           userSubroutineName);
 
   return variableDeclarations->get (variableName);
@@ -106,7 +106,7 @@ SgVariableDeclaration *
 CPPModuleDeclarations::getGlobalOpDatDeclaration (
     unsigned int OP_DAT_ArgumentGroup)
 {
-  return variableDeclarations->get (VariableNames::getOpDatGlobalName (
+  return variableDeclarations->get (OP2::VariableNames::getOpDatGlobalName (
       OP_DAT_ArgumentGroup));
 }
 

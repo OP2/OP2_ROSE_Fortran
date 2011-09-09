@@ -22,7 +22,7 @@ FortranCUDADataSizesDeclarationIndirectLoop::addFields ()
     if (parallelLoop->isDuplicateOpDat (i) == false
         && parallelLoop->getOpMapValue (i) == INDIRECT)
     {
-      string const variableName = VariableNames::getOpDatSizeName (i);
+      string const variableName = OP2::VariableNames::getOpDatSizeName (i);
 
       SgVariableDeclaration * fieldDeclaration = buildVariableDeclaration (
           variableName, FortranTypesBuilder::getFourByteInteger (), NULL,
@@ -43,7 +43,7 @@ FortranCUDADataSizesDeclarationIndirectLoop::addFields ()
         && parallelLoop->getOpMapValue (i) == INDIRECT)
     {
       string const variableName =
-          VariableNames::getLocalToGlobalMappingSizeName (i);
+          OP2::VariableNames::getLocalToGlobalMappingSizeName (i);
 
       SgVariableDeclaration * fieldDeclaration = buildVariableDeclaration (
           variableName, FortranTypesBuilder::getFourByteInteger (), NULL,
@@ -63,7 +63,7 @@ FortranCUDADataSizesDeclarationIndirectLoop::addFields ()
     if (parallelLoop->getOpMapValue (i) == INDIRECT)
     {
       string const variableName =
-          VariableNames::getGlobalToLocalMappingSizeName (i);
+          OP2::VariableNames::getGlobalToLocalMappingSizeName (i);
 
       SgVariableDeclaration * fieldDeclaration = buildVariableDeclaration (
           variableName, FortranTypesBuilder::getFourByteInteger (), NULL,
@@ -84,7 +84,7 @@ FortranCUDADataSizesDeclarationIndirectLoop::addFields ()
         && (parallelLoop->getOpMapValue (i) == DIRECT
             || parallelLoop->getOpMapValue (i) == GLOBAL))
     {
-      string const variableName = VariableNames::getOpDatSizeName (i);
+      string const variableName = OP2::VariableNames::getOpDatSizeName (i);
 
       SgVariableDeclaration * fieldDeclaration = buildVariableDeclaration (
           variableName, FortranTypesBuilder::getFourByteInteger (), NULL,
@@ -101,19 +101,26 @@ FortranCUDADataSizesDeclarationIndirectLoop::addFields ()
 
   vector <string> planFunctionSizeVariables;
 
-  planFunctionSizeVariables.push_back (PlanFunction::Fortran::pblkMapSize);
+  planFunctionSizeVariables.push_back (
+      OP2::VariableNames::PlanFunction::pblkMapSize);
 
-  planFunctionSizeVariables.push_back (PlanFunction::Fortran::pindOffsSize);
+  planFunctionSizeVariables.push_back (
+      OP2::VariableNames::PlanFunction::pindOffsSize);
 
-  planFunctionSizeVariables.push_back (PlanFunction::Fortran::pindSizesSize);
+  planFunctionSizeVariables.push_back (
+      OP2::VariableNames::PlanFunction::pindSizesSize);
 
-  planFunctionSizeVariables.push_back (PlanFunction::Fortran::pnelemsSize);
+  planFunctionSizeVariables.push_back (
+      OP2::VariableNames::PlanFunction::pnelemsSize);
 
-  planFunctionSizeVariables.push_back (PlanFunction::Fortran::pnthrcolSize);
+  planFunctionSizeVariables.push_back (
+      OP2::VariableNames::PlanFunction::pnthrcolSize);
 
-  planFunctionSizeVariables.push_back (PlanFunction::Fortran::poffsetSize);
+  planFunctionSizeVariables.push_back (
+      OP2::VariableNames::PlanFunction::poffsetSize);
 
-  planFunctionSizeVariables.push_back (PlanFunction::Fortran::pthrcolSize);
+  planFunctionSizeVariables.push_back (
+      OP2::VariableNames::PlanFunction::pthrcolSize);
 
   for (vector <string>::iterator it = planFunctionSizeVariables.begin (); it
       != planFunctionSizeVariables.end (); ++it)

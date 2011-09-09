@@ -23,7 +23,7 @@ FortranModuleDeclarations::createFirstExecutionBooleanDeclaration ()
       Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
   std::string const & variableName =
-      VariableNames::getFirstTimeExecutionVariableDeclarationName (
+      OP2::VariableNames::getFirstTimeExecutionVariableDeclarationName (
           userSubroutineName);
 
   SgVariableDeclaration * variableDeclaration = buildVariableDeclaration (
@@ -58,7 +58,7 @@ SgVariableDeclaration *
 FortranModuleDeclarations::getFirstExecutionBooleanDeclaration ()
 {
   std::string const & variableName =
-      VariableNames::getFirstTimeExecutionVariableDeclarationName (
+      OP2::VariableNames::getFirstTimeExecutionVariableDeclarationName (
           userSubroutineName);
 
   return variableDeclarations->get (variableName);
@@ -68,23 +68,25 @@ SgVariableDeclaration *
 FortranModuleDeclarations::getReductionArrayHostDeclaration (
     unsigned int OP_DAT_ArgumentGroup)
 {
-  return variableDeclarations->get (VariableNames::getReductionArrayHostName (
-      OP_DAT_ArgumentGroup, userSubroutineName));
+  return variableDeclarations->get (
+      OP2::VariableNames::getReductionArrayHostName (OP_DAT_ArgumentGroup,
+          userSubroutineName));
 }
 
 SgVariableDeclaration *
 FortranModuleDeclarations::getReductionArrayDeviceDeclaration (
     unsigned int OP_DAT_ArgumentGroup)
 {
-  return variableDeclarations->get (VariableNames::getReductionArrayDeviceName (
-      OP_DAT_ArgumentGroup, userSubroutineName));
+  return variableDeclarations->get (
+      OP2::VariableNames::getReductionArrayDeviceName (OP_DAT_ArgumentGroup,
+          userSubroutineName));
 }
 
 SgVariableDeclaration *
 FortranModuleDeclarations::getGlobalOpDatDeclaration (
     unsigned int OP_DAT_ArgumentGroup)
 {
-  return variableDeclarations->get (VariableNames::getOpDatGlobalName (
+  return variableDeclarations->get (OP2::VariableNames::getOpDatGlobalName (
       OP_DAT_ArgumentGroup));
 }
 

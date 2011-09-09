@@ -1,4 +1,5 @@
 #include <SubroutineVariableDeclarations.h>
+#include <Debug.h>
 
 bool
 SubroutineVariableDeclarations::exists (std::string const & variableName)
@@ -9,6 +10,12 @@ SubroutineVariableDeclarations::exists (std::string const & variableName)
 SgVariableDeclaration *
 SubroutineVariableDeclarations::get (std::string const & variableName)
 {
+  if (theDeclarations.count (variableName) == 0)
+  {
+    Debug::getInstance ()->errorMessage ("Unable to find '" + variableName
+        + "' in variable declarations", __FILE__, __LINE__);
+  }
+
   return theDeclarations[variableName];
 }
 

@@ -2,255 +2,195 @@
 #include <CommonNamespaces.h>
 #include <FortranTypesBuilder.h>
 
-std::string
-TargetBackends::toString (BACKEND_VALUE backend)
+namespace
 {
-  switch (backend)
-  {
-    case CUDA:
-    {
-      return "CUDA";
-    }
-
-    case OPENMP:
-    {
-      return "OpenMP";
-    }
-
-    case OPENCL:
-    {
-      return "OpenCL";
-    }
-
-    default:
-    {
-      Debug::getInstance ()->errorMessage ("Unknown backend selected",
-          __FILE__, __LINE__);
-    }
-  }
-}
-
-namespace VariablePrefixes
-{
-  std::string const argsSizes = "argsSizes";
-  std::string const dimensions = "dimensions";
-  std::string const isFirstTime = "isFirstTime";
-  std::string const planRet = "planRet";
   std::string const OP_DAT = "opDat";
-  std::string const OP_MAP = "opMap";
-  std::string const OP_ACCESS = "opAccess";
-  std::string const OP_INDIRECTION = "opIndirection";
-  std::string const cFortranPointer = "cFortranPointer";
-}
-
-namespace VariableSuffixes
-{
   std::string const Size = "Size";
-  std::string const Local = "Local";
-  std::string const Global = "Global";
-  std::string const Shared = "Shared";
-  std::string const Device = "Device";
-  std::string const Host = "Host";
-  std::string const Dimension = "Dimension";
 }
 
 std::string
-VariableNames::getUserSubroutineName ()
+OP2::VariableNames::getUserSubroutineName ()
 {
   return "userSubroutine";
 }
 
 std::string
-VariableNames::getOpSetName ()
+OP2::VariableNames::getOpSetName ()
 {
   return "set";
 }
 
 std::string
-VariableNames::getOpDatName (unsigned int OP_DAT_ArgumentGroup)
+OP2::VariableNames::getOpDatName (unsigned int OP_DAT_ArgumentGroup)
 {
   using boost::lexical_cast;
   using std::string;
 
-  return VariablePrefixes::OP_DAT
-      + lexical_cast <string> (OP_DAT_ArgumentGroup);
+  return OP_DAT + lexical_cast <string> (OP_DAT_ArgumentGroup);
 }
 
 std::string
-VariableNames::getOpDatHostName (unsigned int OP_DAT_ArgumentGroup)
+OP2::VariableNames::getOpDatHostName (unsigned int OP_DAT_ArgumentGroup)
 {
   using boost::lexical_cast;
   using std::string;
 
-  return VariablePrefixes::OP_DAT
-      + lexical_cast <string> (OP_DAT_ArgumentGroup) + VariableSuffixes::Host;
+  return OP_DAT + lexical_cast <string> (OP_DAT_ArgumentGroup) + "Host";
 }
 
 std::string
-VariableNames::getOpDatLocalName (unsigned int OP_DAT_ArgumentGroup)
+OP2::VariableNames::getOpDatLocalName (unsigned int OP_DAT_ArgumentGroup)
 {
   using boost::lexical_cast;
   using std::string;
 
-  return VariablePrefixes::OP_DAT
-      + lexical_cast <string> (OP_DAT_ArgumentGroup) + VariableSuffixes::Local;
+  return OP_DAT + lexical_cast <string> (OP_DAT_ArgumentGroup) + "Local";
 }
 
 std::string
-VariableNames::getOpDatGlobalName (unsigned int OP_DAT_ArgumentGroup)
+OP2::VariableNames::getOpDatGlobalName (unsigned int OP_DAT_ArgumentGroup)
 {
   using boost::lexical_cast;
   using std::string;
 
-  return VariablePrefixes::OP_DAT
-      + lexical_cast <string> (OP_DAT_ArgumentGroup) + VariableSuffixes::Global;
+  return OP_DAT + lexical_cast <string> (OP_DAT_ArgumentGroup) + "Global";
 }
 
 std::string
-VariableNames::getOpDatSharedName (unsigned int OP_DAT_ArgumentGroup)
+OP2::VariableNames::getOpDatSharedName (unsigned int OP_DAT_ArgumentGroup)
 {
   using boost::lexical_cast;
   using std::string;
 
-  return VariablePrefixes::OP_DAT
-      + lexical_cast <string> (OP_DAT_ArgumentGroup) + VariableSuffixes::Shared;
+  return OP_DAT + lexical_cast <string> (OP_DAT_ArgumentGroup) + "Shared";
 }
 
 std::string
-VariableNames::getOpDatSizeName (unsigned int OP_DAT_ArgumentGroup)
+OP2::VariableNames::getOpDatSizeName (unsigned int OP_DAT_ArgumentGroup)
 {
   using boost::lexical_cast;
   using std::string;
 
-  return VariablePrefixes::OP_DAT
-      + lexical_cast <string> (OP_DAT_ArgumentGroup) + VariableSuffixes::Size;
+  return OP_DAT + lexical_cast <string> (OP_DAT_ArgumentGroup) + Size;
 }
 
 std::string
-VariableNames::getOpDatDeviceName (unsigned int OP_DAT_ArgumentGroup)
+OP2::VariableNames::getOpDatDeviceName (unsigned int OP_DAT_ArgumentGroup)
 {
   using boost::lexical_cast;
   using std::string;
 
-  return VariablePrefixes::OP_DAT
-      + lexical_cast <string> (OP_DAT_ArgumentGroup) + VariableSuffixes::Device;
+  return OP_DAT + lexical_cast <string> (OP_DAT_ArgumentGroup) + "Device";
 }
 
 std::string
-VariableNames::getOpDatDimensionName (unsigned int OP_DAT_ArgumentGroup)
+OP2::VariableNames::getOpDatDimensionName (unsigned int OP_DAT_ArgumentGroup)
 {
   using boost::lexical_cast;
   using std::string;
 
-  return VariablePrefixes::OP_DAT
-      + lexical_cast <string> (OP_DAT_ArgumentGroup)
-      + VariableSuffixes::Dimension;
+  return OP_DAT + lexical_cast <string> (OP_DAT_ArgumentGroup) + "Dimension";
 }
 
 std::string
-VariableNames::getOpIndirectionName (unsigned int OP_DAT_ArgumentGroup)
+OP2::VariableNames::getOpIndirectionName (unsigned int OP_DAT_ArgumentGroup)
 {
   using boost::lexical_cast;
   using std::string;
 
-  return VariablePrefixes::OP_INDIRECTION + lexical_cast <string> (
-      OP_DAT_ArgumentGroup);
+  return "opIndirection" + lexical_cast <string> (OP_DAT_ArgumentGroup);
 }
 
 std::string
-VariableNames::getOpMapName (unsigned int OP_DAT_ArgumentGroup)
+OP2::VariableNames::getOpMapName (unsigned int OP_DAT_ArgumentGroup)
 {
   using boost::lexical_cast;
   using std::string;
 
-  return VariablePrefixes::OP_MAP
-      + lexical_cast <string> (OP_DAT_ArgumentGroup);
+  return "opMap" + lexical_cast <string> (OP_DAT_ArgumentGroup);
 }
 
 std::string
-VariableNames::getOpAccessName (unsigned int OP_DAT_ArgumentGroup)
+OP2::VariableNames::getOpAccessName (unsigned int OP_DAT_ArgumentGroup)
 {
   using boost::lexical_cast;
   using std::string;
 
-  return VariablePrefixes::OP_ACCESS + lexical_cast <string> (
-      OP_DAT_ArgumentGroup);
+  return "opAccess" + lexical_cast <string> (OP_DAT_ArgumentGroup);
 }
 
 std::string
-VariableNames::getCToFortranVariableName (unsigned int OP_DAT_ArgumentGroup)
-{
-  using boost::lexical_cast;
-  using std::string;
-
-  return VariablePrefixes::cFortranPointer + lexical_cast <string> (
-      OP_DAT_ArgumentGroup);
-}
-
-std::string
-VariableNames::getLocalToGlobalMappingName (unsigned int OP_DAT_ArgumentGroup)
-{
-  using boost::lexical_cast;
-  using std::string;
-
-  return IndirectLoop::Fortran::VariablePrefixes::pindMaps + lexical_cast <
-      string> (OP_DAT_ArgumentGroup);
-}
-
-std::string
-VariableNames::getLocalToGlobalMappingSizeName (
+OP2::VariableNames::getCToFortranVariableName (
     unsigned int OP_DAT_ArgumentGroup)
 {
   using boost::lexical_cast;
   using std::string;
 
-  return IndirectLoop::Fortran::VariablePrefixes::pindMaps + lexical_cast <
-      string> (OP_DAT_ArgumentGroup) + VariableSuffixes::Size;
+  return "cFortranPointer" + lexical_cast <string> (OP_DAT_ArgumentGroup);
 }
 
 std::string
-VariableNames::getGlobalToLocalMappingName (unsigned int OP_DAT_ArgumentGroup)
-{
-  using boost::lexical_cast;
-  using std::string;
-
-  return IndirectLoop::Fortran::VariablePrefixes::pMaps
-      + lexical_cast <string> (OP_DAT_ArgumentGroup);
-}
-
-std::string
-VariableNames::getGlobalToLocalMappingSizeName (
+OP2::VariableNames::getLocalToGlobalMappingName (
     unsigned int OP_DAT_ArgumentGroup)
 {
   using boost::lexical_cast;
   using std::string;
 
-  return IndirectLoop::Fortran::VariablePrefixes::pMaps
-      + lexical_cast <string> (OP_DAT_ArgumentGroup) + VariableSuffixes::Size;
+  return "pindMaps" + lexical_cast <string> (OP_DAT_ArgumentGroup);
 }
 
 std::string
-VariableNames::getNumberOfBytesVariableName (unsigned int OP_DAT_ArgumentGroup)
+OP2::VariableNames::getLocalToGlobalMappingSizeName (
+    unsigned int OP_DAT_ArgumentGroup)
 {
   using boost::lexical_cast;
   using std::string;
 
-  return IndirectLoop::Fortran::VariablePrefixes::numberOfBytes + lexical_cast <
-      string> (OP_DAT_ArgumentGroup);
+  return "pindMaps" + lexical_cast <string> (OP_DAT_ArgumentGroup) + Size;
 }
 
 std::string
-VariableNames::getRoundUpVariableName (unsigned int OP_DAT_ArgumentGroup)
+OP2::VariableNames::getGlobalToLocalMappingName (
+    unsigned int OP_DAT_ArgumentGroup)
 {
   using boost::lexical_cast;
   using std::string;
 
-  return IndirectLoop::Fortran::VariablePrefixes::roundUp + lexical_cast <
-      string> (OP_DAT_ArgumentGroup);
+  return "pMaps" + lexical_cast <string> (OP_DAT_ArgumentGroup);
 }
 
 std::string
-VariableNames::getIncrementAccessMapName (unsigned int OP_DAT_ArgumentGroup)
+OP2::VariableNames::getGlobalToLocalMappingSizeName (
+    unsigned int OP_DAT_ArgumentGroup)
+{
+  using boost::lexical_cast;
+  using std::string;
+
+  return "pMaps" + lexical_cast <string> (OP_DAT_ArgumentGroup) + Size;
+}
+
+std::string
+OP2::VariableNames::getNumberOfBytesVariableName (
+    unsigned int OP_DAT_ArgumentGroup)
+{
+  using boost::lexical_cast;
+  using std::string;
+
+  return "nBytes" + lexical_cast <string> (OP_DAT_ArgumentGroup);
+}
+
+std::string
+OP2::VariableNames::getRoundUpVariableName (unsigned int OP_DAT_ArgumentGroup)
+{
+  using boost::lexical_cast;
+  using std::string;
+
+  return "roundUp" + lexical_cast <string> (OP_DAT_ArgumentGroup);
+}
+
+std::string
+OP2::VariableNames::getIncrementAccessMapName (
+    unsigned int OP_DAT_ArgumentGroup)
 {
   using boost::lexical_cast;
   using std::string;
@@ -259,7 +199,8 @@ VariableNames::getIncrementAccessMapName (unsigned int OP_DAT_ArgumentGroup)
 }
 
 std::string
-VariableNames::getOpIndirectionSharedName (unsigned int OP_DAT_ArgumentGroup)
+OP2::VariableNames::getOpIndirectionSharedName (
+    unsigned int OP_DAT_ArgumentGroup)
 {
   using boost::lexical_cast;
   using std::string;
@@ -268,7 +209,7 @@ VariableNames::getOpIndirectionSharedName (unsigned int OP_DAT_ArgumentGroup)
 }
 
 std::string
-VariableNames::getIndirectionArgumentSizeName (
+OP2::VariableNames::getIndirectionArgumentSizeName (
     unsigned int OP_DAT_ArgumentGroup)
 {
   using boost::lexical_cast;
@@ -278,32 +219,36 @@ VariableNames::getIndirectionArgumentSizeName (
 }
 
 std::string
-VariableNames::getDataSizesVariableDeclarationName (std::string const & suffix)
-{
-  return VariablePrefixes::argsSizes + "_" + suffix;
-}
-
-std::string
-VariableNames::getDimensionsVariableDeclarationName (std::string const & suffix)
-{
-  return VariablePrefixes::dimensions + "_" + suffix;
-}
-
-std::string
-VariableNames::getPlanReturnVariableDeclarationName (std::string const & suffix)
-{
-  return VariablePrefixes::planRet + "_" + suffix;
-}
-
-std::string
-VariableNames::getFirstTimeExecutionVariableDeclarationName (
+OP2::VariableNames::getDataSizesVariableDeclarationName (
     std::string const & suffix)
 {
-  return VariablePrefixes::isFirstTime + "_" + suffix;
+  return "sizes_" + suffix;
 }
 
 std::string
-VariableNames::getAutosharedDeclarationName (SgType * type, unsigned int size)
+OP2::VariableNames::getDimensionsVariableDeclarationName (
+    std::string const & suffix)
+{
+  return "dimensions_" + suffix;
+}
+
+std::string
+OP2::VariableNames::getPlanReturnVariableDeclarationName (
+    std::string const & suffix)
+{
+  return "planRet_" + suffix;
+}
+
+std::string
+OP2::VariableNames::getFirstTimeExecutionVariableDeclarationName (
+    std::string const & suffix)
+{
+  return "isFirstTime_" + suffix;
+}
+
+std::string
+OP2::VariableNames::getAutosharedDeclarationName (SgType * type,
+    unsigned int size)
 {
   using boost::lexical_cast;
   using std::string;
@@ -330,8 +275,8 @@ VariableNames::getAutosharedDeclarationName (SgType * type, unsigned int size)
 }
 
 std::string
-VariableNames::getReductionArrayHostName (unsigned int OP_DAT_ArgumentGroup,
-    std::string const & suffix)
+OP2::VariableNames::getReductionArrayHostName (
+    unsigned int OP_DAT_ArgumentGroup, std::string const & suffix)
 {
   using boost::lexical_cast;
   using std::string;
@@ -341,8 +286,8 @@ VariableNames::getReductionArrayHostName (unsigned int OP_DAT_ArgumentGroup,
 }
 
 std::string
-VariableNames::getReductionArrayDeviceName (unsigned int OP_DAT_ArgumentGroup,
-    std::string const & suffix)
+OP2::VariableNames::getReductionArrayDeviceName (
+    unsigned int OP_DAT_ArgumentGroup, std::string const & suffix)
 {
   using boost::lexical_cast;
   using std::string;

@@ -1,7 +1,6 @@
 #include <FortranCUDAModuleDeclarationsIndirectLoop.h>
 #include <FortranStatementsAndExpressionsBuilder.h>
 #include <FortranTypesBuilder.h>
-#include <FortranPlan.h>
 
 void
 FortranCUDAModuleDeclarationsIndirectLoop::createCPlanDeclaration ()
@@ -9,15 +8,15 @@ FortranCUDAModuleDeclarationsIndirectLoop::createCPlanDeclaration ()
   SgType * c_ptrType = FortranTypesBuilder::buildClassDeclaration ("c_ptr",
       moduleScope)->get_type ();
 
-  variableDeclarations->add (PlanFunction::Fortran::planRet,
+  variableDeclarations->add (OP2::VariableNames::PlanFunction::planRet,
       FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
-          PlanFunction::Fortran::planRet, c_ptrType, moduleScope));
+          OP2::VariableNames::PlanFunction::planRet, c_ptrType, moduleScope));
 }
 
 SgVariableDeclaration *
 FortranCUDAModuleDeclarationsIndirectLoop::getCPlanDeclaration ()
 {
-  return variableDeclarations->get (PlanFunction::Fortran::planRet);
+  return variableDeclarations->get (OP2::VariableNames::PlanFunction::planRet);
 }
 
 FortranCUDAModuleDeclarationsIndirectLoop::FortranCUDAModuleDeclarationsIndirectLoop (
@@ -28,5 +27,5 @@ FortranCUDAModuleDeclarationsIndirectLoop::FortranCUDAModuleDeclarationsIndirect
   FortranCUDAModuleDeclarations (userSubroutineName, parallelLoop, moduleScope,
       dataSizesDeclaration, dimensionsDeclaration)
 {
-  createCPlanDeclaration();
+  createCPlanDeclaration ();
 }

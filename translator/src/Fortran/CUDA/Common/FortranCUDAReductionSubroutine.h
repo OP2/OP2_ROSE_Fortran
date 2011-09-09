@@ -11,20 +11,6 @@
 #include <Subroutine.h>
 #include <Reduction.h>
 
-namespace ReductionSubroutine
-{
-  std::string const reductionOperation = "reductionOperation";
-  std::string const inputValue = "inputValue";
-  std::string const reductionResultOnDevice = "resultOnDevice";
-  std::string const sharedMemoryStartOffset = "sharedMemoryStartOffset";
-  std::string const threadID = "threadID";
-  std::string const warpSize = "warpSize";
-  std::string const maximumBytesInSharedMemory = "maxSharedMemoryBytes";
-  std::string const maximumNumberOfThreadBlocks = "maxThreadBlocks";
-  std::string const numberOfThreadItems = "threadItems";
-  std::string const offsetForReduction = "offsetReduction";
-}
-
 class FortranCUDAReductionSubroutine: public Subroutine <
     SgProcedureHeaderStatement>
 {
@@ -60,9 +46,6 @@ class FortranCUDAReductionSubroutine: public Subroutine <
 
     void
     createInitialisationStatements ();
-
-    SgStatement *
-    createSynchThreadsCallStatement ();
 
     virtual void
     createStatements ();

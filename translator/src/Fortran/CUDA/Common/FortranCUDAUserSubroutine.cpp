@@ -12,67 +12,6 @@
  */
 
 void
-FortranCUDAUserSubroutine::patchReferencesToConstants ()
-{
-  using boost::iequals;
-  using SageBuilder::buildVarRefExp;
-  using std::map;
-  using std::string;
-
-  Debug::getInstance ()->debugMessage ("Patching references to constants",
-      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
-
-  class ModifyReferencesToConstantVariables: public AstSimpleProcessing
-  {
-    public:
-
-      FortranInitialiseConstantsSubroutine * initialiseConstantsSubroutine;
-
-      ModifyReferencesToConstantVariables (
-          FortranInitialiseConstantsSubroutine * initialiseConstantsSubroutine) :
-        initialiseConstantsSubroutine (initialiseConstantsSubroutine)
-      {
-      }
-
-      virtual void
-      visit (SgNode * node)
-      {
-        SgVarRefExp * oldVarRefExp = isSgVarRefExp (node);
-
-        if (oldVarRefExp != NULL)
-        {
-          for (map <string, string>::const_iterator it =
-              initialiseConstantsSubroutine->getFirstConstantName (); it
-              != initialiseConstantsSubroutine->getLastConstantName (); ++it)
-          {
-
-            if (iequals (it->first,
-                oldVarRefExp->get_symbol ()->get_name ().getString ()))
-            {
-              SgVarRefExp
-                  * newVarRefExp =
-                      buildVarRefExp (
-                          initialiseConstantsSubroutine->getVariableDeclarations ()->get (
-                              it->second));
-
-              oldVarRefExp->set_symbol (newVarRefExp->get_symbol ());
-            }
-          }
-        }
-
-        SgLocatedNode * locatedNode = isSgLocatedNode (node);
-        if (locatedNode != NULL)
-        {
-          locatedNode->setOutputInCodeGeneration ();
-        }
-      }
-  };
-
-  (new ModifyReferencesToConstantVariables (initialiseConstantsSubroutine))->traverse (
-      subroutineHeaderStatement, preorder);
-}
-
-void
 FortranCUDAUserSubroutine::findOriginalSubroutine ()
 {
   using boost::iequals;
@@ -239,13 +178,11 @@ FortranCUDAUserSubroutine::createFormalParameterDeclarations ()
 
 FortranCUDAUserSubroutine::FortranCUDAUserSubroutine (
     std::string const & subroutineName, SgScopeStatement * moduleScope,
-    FortranInitialiseConstantsSubroutine * initialiseConstantsSubroutine,
     FortranProgramDeclarationsAndDefinitions * declarations,
     FortranParallelLoop * parallelLoop) :
   UserSubroutine <SgProcedureHeaderStatement,
       FortranProgramDeclarationsAndDefinitions> (subroutineName, declarations,
-      parallelLoop), initialiseConstantsSubroutine (
-      initialiseConstantsSubroutine)
+      parallelLoop)
 {
   using SageBuilder::buildProcedureHeaderStatement;
   using SageBuilder::buildVoidType;
@@ -266,6 +203,4 @@ FortranCUDAUserSubroutine::FortranCUDAUserSubroutine (
   findOriginalSubroutine ();
 
   createStatements ();
-
-  patchReferencesToConstants ();
 }

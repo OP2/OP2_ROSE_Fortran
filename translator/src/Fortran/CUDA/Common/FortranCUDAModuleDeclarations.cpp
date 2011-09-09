@@ -14,18 +14,17 @@ FortranCUDAModuleDeclarations::createReductionDeclarations ()
 {
   using std::string;
 
+  Debug::getInstance ()->debugMessage ("Creating reduction declarations",
+      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
     if (parallelLoop->isReductionRequired (i))
     {
-      std::cout << "HERE 1\n";
-
       SgType * baseType = parallelLoop->getOpDatBaseType (i);
 
-      std::cout << "HERE 2\n";
-
       string const reductionArrayHostName =
-          VariableNames::getReductionArrayHostName (i, userSubroutineName);
+          OP2::VariableNames::getReductionArrayHostName (i, userSubroutineName);
 
       Debug::getInstance ()->debugMessage ("Creating host reduction array '"
           + reductionArrayHostName + "'", Debug::HIGHEST_DEBUG_LEVEL, __FILE__,
@@ -39,7 +38,8 @@ FortranCUDAModuleDeclarations::createReductionDeclarations ()
       variableDeclarations->add (reductionArrayHostName, reductionArrayHost);
 
       string const reductionArrayDeviceName =
-          VariableNames::getReductionArrayDeviceName (i, userSubroutineName);
+          OP2::VariableNames::getReductionArrayDeviceName (i,
+              userSubroutineName);
 
       Debug::getInstance ()->debugMessage ("Creating device reduction array '"
           + reductionArrayDeviceName + "'", Debug::HIGHEST_DEBUG_LEVEL,
@@ -63,7 +63,8 @@ FortranCUDAModuleDeclarations::createDataSizesDeclaration ()
       Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
   std::string const & variableName =
-      VariableNames::getDataSizesVariableDeclarationName (userSubroutineName);
+      OP2::VariableNames::getDataSizesVariableDeclarationName (
+          userSubroutineName);
 
   SgVariableDeclaration * variableDeclaration =
       FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
@@ -77,7 +78,8 @@ void
 FortranCUDAModuleDeclarations::createDimensionsDeclaration ()
 {
   std::string const & variableName =
-      VariableNames::getDimensionsVariableDeclarationName (userSubroutineName);
+      OP2::VariableNames::getDimensionsVariableDeclarationName (
+          userSubroutineName);
 
   Debug::getInstance ()->debugMessage (
       "Generating OP_DAT dimensions declaration '" + variableName + "'",
@@ -101,7 +103,8 @@ SgVariableDeclaration *
 FortranCUDAModuleDeclarations::getDataSizesVariableDeclaration ()
 {
   std::string const & variableName =
-      VariableNames::getDataSizesVariableDeclarationName (userSubroutineName);
+      OP2::VariableNames::getDataSizesVariableDeclarationName (
+          userSubroutineName);
 
   return variableDeclarations->get (variableName);
 }
@@ -110,7 +113,8 @@ SgVariableDeclaration *
 FortranCUDAModuleDeclarations::getDimensionsVariableDeclaration ()
 {
   std::string const & variableName =
-      VariableNames::getDimensionsVariableDeclarationName (userSubroutineName);
+      OP2::VariableNames::getDimensionsVariableDeclarationName (
+          userSubroutineName);
 
   return variableDeclarations->get (variableName);
 }

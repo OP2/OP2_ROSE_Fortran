@@ -31,7 +31,8 @@ FortranOpDatDimensionsDeclaration::addFields ()
        * ======================================================
        */
 
-      string const & variableName = VariableNames::getOpDatDimensionName (i);
+      string const & variableName = OP2::VariableNames::getOpDatDimensionName (
+          i);
 
       SgVariableDeclaration * fieldDeclaration = buildVariableDeclaration (
           variableName, FortranTypesBuilder::getFourByteInteger (), NULL,
@@ -74,7 +75,7 @@ SgVariableDeclaration *
 FortranOpDatDimensionsDeclaration::getOpDatDimensionField (
     unsigned int OP_DAT_ArgumentGroup)
 {
-  return fieldDeclarations->get (VariableNames::getOpDatDimensionName (
+  return fieldDeclarations->get (OP2::VariableNames::getOpDatDimensionName (
       OP_DAT_ArgumentGroup));
 }
 
