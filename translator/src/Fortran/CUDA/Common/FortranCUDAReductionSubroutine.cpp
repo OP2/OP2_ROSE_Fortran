@@ -554,7 +554,8 @@ FortranCUDAReductionSubroutine::createFormalParameterDeclarations ()
   variableDeclarations->add (
       OP2::VariableNames::reductionResult,
       FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
-          OP2::VariableNames::reductionResult, reduction->getArrayType (),
+          OP2::VariableNames::reductionResult,
+          FortranTypesBuilder::getArray_RankOne (reduction->getBaseType ()),
           subroutineScope, formalParameters, 1, DEVICE));
 
   /*

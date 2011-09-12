@@ -327,23 +327,35 @@ FortranCUDAKernelSubroutine::createLocalThreadDeclarations ()
 
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
-    if (parallelLoop->isReductionRequired (i) || (parallelLoop->isIndirect (i)
-        && parallelLoop->isIncremented (i)) || (parallelLoop->isDirect (i)
-        && parallelLoop->getOpDatDimension (i) > 1))
+
+    string const & variableName = OP2::VariableNames::getOpDatLocalName (i);
+
+    if (parallelLoop->isReductionRequired (i))
     {
-      SgType * opDatType = parallelLoop->getOpDatType (i);
-
-      SgArrayType * arrayType = isSgArrayType (opDatType);
-
-      SgType * opDatBaseType = arrayType->get_base_type ();
-
-      string const & variableName = OP2::VariableNames::getOpDatLocalName (i);
-
+      if (parallelLoop->isGlobalScalar (i))
+      {
+        variableDeclarations->add (variableName,
+            FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
+                variableName, parallelLoop->getOpDatType (i), subroutineScope));
+      }
+      else
+      {
+        variableDeclarations->add (variableName,
+            FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
+                variableName, FortranTypesBuilder::getArray_RankOne (
+                    parallelLoop->getOpDatBaseType (i), 0,
+                    parallelLoop->getOpDatDimension (i) - 1), subroutineScope));
+      }
+    }
+    else if ((parallelLoop->isIndirect (i) && parallelLoop->isIncremented (i))
+        || (parallelLoop->isDirect (i) && parallelLoop->getOpDatDimension (i)
+            > 1))
+    {
       variableDeclarations->add (variableName,
           FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
               variableName, FortranTypesBuilder::getArray_RankOne (
-                  opDatBaseType, 0, parallelLoop->getOpDatDimension (i) - 1),
-              subroutineScope));
+                  parallelLoop->getOpDatBaseType (i), 0,
+                  parallelLoop->getOpDatDimension (i) - 1), subroutineScope));
     }
   }
 }

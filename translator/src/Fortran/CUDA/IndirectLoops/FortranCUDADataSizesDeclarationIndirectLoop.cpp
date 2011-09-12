@@ -11,7 +11,7 @@
  */
 
 void
-FortranCUDADataSizesDeclarationIndirectLoop::addFields ()
+FortranCUDADataSizesDeclarationIndirectLoop::addIndirectLoopFields ()
 {
   using SageBuilder::buildVariableDeclaration;
   using std::string;
@@ -19,83 +19,40 @@ FortranCUDADataSizesDeclarationIndirectLoop::addFields ()
 
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
-    if (parallelLoop->isDuplicateOpDat (i) == false
-        && parallelLoop->getOpMapValue (i) == INDIRECT)
+    if (parallelLoop->isIndirect (i))
     {
-      string const variableName = OP2::VariableNames::getOpDatSizeName (i);
+      if (parallelLoop->isDuplicateOpDat (i) == false)
+      {
 
-      SgVariableDeclaration * fieldDeclaration = buildVariableDeclaration (
-          variableName, FortranTypesBuilder::getFourByteInteger (), NULL,
-          moduleScope);
+        string const variableName1 =
+            OP2::VariableNames::getLocalToGlobalMappingSizeName (i);
 
-      fieldDeclaration->get_declarationModifier ().get_accessModifier ().setUndefined ();
+        SgVariableDeclaration * fieldDeclaration1 = buildVariableDeclaration (
+            variableName1, FortranTypesBuilder::getFourByteInteger (), NULL,
+            moduleScope);
 
-      deviceDatatypeStatement->get_definition ()->append_member (
-          fieldDeclaration);
+        fieldDeclaration1->get_declarationModifier ().get_accessModifier ().setUndefined ();
 
-      fieldDeclarations->add (variableName, fieldDeclaration);
-    }
-  }
+        deviceDatatypeStatement->get_definition ()->append_member (
+            fieldDeclaration1);
 
-  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
-  {
-    if (parallelLoop->isDuplicateOpDat (i) == false
-        && parallelLoop->getOpMapValue (i) == INDIRECT)
-    {
-      string const variableName =
-          OP2::VariableNames::getLocalToGlobalMappingSizeName (i);
+        fieldDeclarations->add (variableName1, fieldDeclaration1);
+      }
 
-      SgVariableDeclaration * fieldDeclaration = buildVariableDeclaration (
-          variableName, FortranTypesBuilder::getFourByteInteger (), NULL,
-          moduleScope);
-
-      fieldDeclaration->get_declarationModifier ().get_accessModifier ().setUndefined ();
-
-      deviceDatatypeStatement->get_definition ()->append_member (
-          fieldDeclaration);
-
-      fieldDeclarations->add (variableName, fieldDeclaration);
-    }
-  }
-
-  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
-  {
-    if (parallelLoop->getOpMapValue (i) == INDIRECT)
-    {
-      string const variableName =
+      string const variableName2 =
           OP2::VariableNames::getGlobalToLocalMappingSizeName (i);
 
-      SgVariableDeclaration * fieldDeclaration = buildVariableDeclaration (
-          variableName, FortranTypesBuilder::getFourByteInteger (), NULL,
+      SgVariableDeclaration * fieldDeclaration2 = buildVariableDeclaration (
+          variableName2, FortranTypesBuilder::getFourByteInteger (), NULL,
           moduleScope);
 
-      fieldDeclaration->get_declarationModifier ().get_accessModifier ().setUndefined ();
+      fieldDeclaration2->get_declarationModifier ().get_accessModifier ().setUndefined ();
 
       deviceDatatypeStatement->get_definition ()->append_member (
-          fieldDeclaration);
+          fieldDeclaration2);
 
-      fieldDeclarations->add (variableName, fieldDeclaration);
-    }
-  }
+      fieldDeclarations->add (variableName2, fieldDeclaration2);
 
-  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
-  {
-    if (parallelLoop->isDuplicateOpDat (i) == false
-        && (parallelLoop->getOpMapValue (i) == DIRECT
-            || parallelLoop->getOpMapValue (i) == GLOBAL))
-    {
-      string const variableName = OP2::VariableNames::getOpDatSizeName (i);
-
-      SgVariableDeclaration * fieldDeclaration = buildVariableDeclaration (
-          variableName, FortranTypesBuilder::getFourByteInteger (), NULL,
-          moduleScope);
-
-      fieldDeclaration->get_declarationModifier ().get_accessModifier ().setUndefined ();
-
-      deviceDatatypeStatement->get_definition ()->append_member (
-          fieldDeclaration);
-
-      fieldDeclarations->add (variableName, fieldDeclaration);
     }
   }
 
@@ -141,5 +98,5 @@ FortranCUDADataSizesDeclarationIndirectLoop::FortranCUDADataSizesDeclarationIndi
     SgScopeStatement * moduleScope) :
   FortranCUDADataSizesDeclaration (subroutineName, parallelLoop, moduleScope)
 {
-  addFields ();
+  addIndirectLoopFields ();
 }

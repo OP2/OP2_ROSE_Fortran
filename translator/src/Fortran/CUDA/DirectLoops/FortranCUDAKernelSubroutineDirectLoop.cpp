@@ -34,12 +34,12 @@ FortranCUDAKernelSubroutineDirectLoop::createUserSubroutineCallStatement ()
   {
     SgExpression * parameterExpression;
 
-    if (parallelLoop->getOpMapValue (i) == GLOBAL)
+    if (parallelLoop->isGlobal (i))
     {
       actualParameters->append_expression (
           buildOpGlobalActualParameterExpression (i));
     }
-    else if (parallelLoop->getOpMapValue (i) == DIRECT)
+    else if (parallelLoop->isDirect (i))
     {
       Debug::getInstance ()->debugMessage ("Direct OP_DAT",
           Debug::OUTER_LOOP_LEVEL, __FILE__, __LINE__);
@@ -104,9 +104,8 @@ FortranCUDAKernelSubroutineDirectLoop::createStageInFromDeviceMemoryToLocalThrea
 
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
-    if (parallelLoop->getOpMapValue (i) != GLOBAL
-        && parallelLoop->getOpAccessValue (i) != WRITE_ACCESS
-        && parallelLoop->getOpDatDimension (i) != 1)
+    if (parallelLoop->isGlobal (i) == false && parallelLoop->isWritten (i)
+        == false && parallelLoop->getOpDatDimension (i) != 1)
     {
       /*
        * ======================================================
@@ -247,9 +246,8 @@ FortranCUDAKernelSubroutineDirectLoop::createStageOutFromLocalThreadVariablesToD
 
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
-    if (parallelLoop->getOpMapValue (i) != GLOBAL
-        && parallelLoop->getOpAccessValue (i) != READ_ACCESS
-        && parallelLoop->getOpDatDimension (i) != 1)
+    if (parallelLoop->isGlobal (i) == false && parallelLoop->isRead (i)
+        == false && parallelLoop->getOpDatDimension (i) != 1)
     {
       string const autosharedVariableName =
           OP2::VariableNames::getAutosharedDeclarationName (
@@ -741,7 +739,7 @@ FortranCUDAKernelSubroutineDirectLoop::FortranCUDAKernelSubroutineDirectLoop (
     std::string const & subroutineName, std::string const & userSubroutineName,
     FortranParallelLoop * parallelLoop, SgScopeStatement * moduleScope,
     FortranReductionSubroutines * reductionSubroutines,
-    FortranCUDADataSizesDeclarationDirectLoop * dataSizesDeclaration,
+    FortranCUDADataSizesDeclaration * dataSizesDeclaration,
     FortranOpDatDimensionsDeclaration * opDatDimensionsDeclaration) :
   FortranCUDAKernelSubroutine (subroutineName, userSubroutineName,
       parallelLoop, moduleScope, reductionSubroutines,

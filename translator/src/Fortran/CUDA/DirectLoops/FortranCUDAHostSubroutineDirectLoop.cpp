@@ -185,55 +185,52 @@ FortranCUDAHostSubroutineDirectLoop::createCUDAKernelInitialisationStatements ()
 
   appendStatement (assignmentStatement3, subroutineScope);
 
-  SgExprStatement * assignmentStatement4 = buildAssignStatement (
-      buildVarRefExp (variableDeclarations->get (CUDA::sharedMemorySize)),
-      buildIntVal (0));
-
-  appendStatement (assignmentStatement4, subroutineScope);
-
   /*
    * ======================================================
-   * Computing value for nshared: an input OP_DAT is copied
-   * to shared memory only if its dimension is larger than
-   * 1 or it is not encapsulating global data.
-   * Therefore, the maximum size of shared memory is
-   * equal to maximum size * dimension OP_DAT copied on
-   * shared memory, multiplied by the number of threads
+   * Compute the value of shared memory passed at CUDA kernel
+   * launch.
+   *
+   * An OP_DAT is only copied into shared memory if its
+   * dimension exceeds 1 and it is not an OP_GBL. To
+   * compute the value, therefore, we need to get the maximum
+   * of (dimension * size of primitive type) across all
+   * OP_DATs
    * ======================================================
    */
+
+  unsigned int sharedMemorySize = 0;
+
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
     if (parallelLoop->isDuplicateOpDat (i) == false)
     {
-      if (parallelLoop->getOpDatDimension (i) > 1
-          && parallelLoop->getOpMapValue (i) != GLOBAL)
+      if (parallelLoop->getOpDatDimension (i) > 1 && parallelLoop->isGlobal (i)
+          == false)
       {
-        SgVarRefExp * parameterExpression1 = buildVarRefExp (
-            variableDeclarations->get (CUDA::sharedMemorySize));
+        unsigned int opDatSharedMemoryRequirements =
+            parallelLoop->getOpDatDimension (i) * parallelLoop->getSizeOfOpDat (
+                i);
 
-        SgExpression * parameterExpression2 = buildMultiplyOp (buildIntVal (
-            parallelLoop->getOpDatDimension (i)),
-            FortranStatementsAndExpressionsBuilder::getFortranKindOfOpDat (
-                parallelLoop->getOpDatType (i)));
-
-        SgExprListExp * actualParameters = buildExprListExp (
-            parameterExpression1, parameterExpression2);
-
-        SgFunctionSymbol * maxFunctionSymbol =
-            FortranTypesBuilder::buildNewFortranFunction ("max",
-                subroutineScope);
-
-        SgFunctionCallExp * maxFunctionCall = buildFunctionCallExp (
-            maxFunctionSymbol, actualParameters);
-
-        SgExprStatement * assignmentStatement =
-            buildAssignStatement (buildVarRefExp (variableDeclarations->get (
-                CUDA::sharedMemorySize)), maxFunctionCall);
-
-        appendStatement (assignmentStatement, subroutineScope);
+        if (opDatSharedMemoryRequirements > sharedMemorySize)
+        {
+          sharedMemorySize = opDatSharedMemoryRequirements;
+        }
       }
     }
   }
+
+  if (sharedMemorySize == 0)
+  {
+    Debug::getInstance ()->errorMessage (
+        "The shared memory size will be set to zero during kernel launch",
+        __FILE__, __LINE__);
+  }
+
+  SgExprStatement * assignmentStatement4 = buildAssignStatement (
+      buildVarRefExp (variableDeclarations->get (CUDA::sharedMemorySize)),
+      buildIntVal (sharedMemorySize));
+
+  appendStatement (assignmentStatement4, subroutineScope);
 
   SgMultiplyOp * multiplyExpression5 =
       buildMultiplyOp (buildVarRefExp (variableDeclarations->get (
@@ -371,7 +368,7 @@ FortranCUDAHostSubroutineDirectLoop::FortranCUDAHostSubroutineDirectLoop (
     std::string const & subroutineName, std::string const & userSubroutineName,
     std::string const & kernelSubroutineName,
     FortranParallelLoop * parallelLoop, SgScopeStatement * moduleScope,
-    FortranCUDADataSizesDeclarationDirectLoop * dataSizesDeclaration,
+    FortranCUDADataSizesDeclaration * dataSizesDeclaration,
     FortranOpDatDimensionsDeclaration * opDatDimensionsDeclaration,
     FortranCUDAModuleDeclarations * moduleDeclarations) :
   FortranCUDAHostSubroutine (subroutineName, userSubroutineName,

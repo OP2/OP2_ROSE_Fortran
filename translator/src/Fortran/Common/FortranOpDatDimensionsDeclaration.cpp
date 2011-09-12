@@ -13,6 +13,7 @@
 void
 FortranOpDatDimensionsDeclaration::addFields ()
 {
+  using boost::lexical_cast;
   using SageInterface::appendStatement;
   using SageBuilder::buildVariableDeclaration;
   using std::string;
@@ -21,29 +22,21 @@ FortranOpDatDimensionsDeclaration::addFields ()
 
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
-    if (parallelLoop->isDirect (i) || parallelLoop->isIndirect (i)
-        || parallelLoop->isGlobalScalar (i) == false)
-    {
-      /*
-       * ======================================================
-       * Only declare a dimension field if the OP_DAT is not
-       * a global or a non-scalar global
-       * ======================================================
-       */
+    Debug::getInstance ()->debugMessage ("Adding dimensions field for OP_DAT "
+        + lexical_cast <string> (i), Debug::INNER_LOOP_LEVEL, __FILE__,
+        __LINE__);
 
-      string const & variableName = OP2::VariableNames::getOpDatDimensionName (
-          i);
+    string const & variableName = OP2::VariableNames::getOpDatDimensionName (i);
 
-      SgVariableDeclaration * fieldDeclaration = buildVariableDeclaration (
-          variableName, FortranTypesBuilder::getFourByteInteger (), NULL,
-          moduleScope);
+    SgVariableDeclaration * fieldDeclaration = buildVariableDeclaration (
+        variableName, FortranTypesBuilder::getFourByteInteger (), NULL,
+        moduleScope);
 
-      fieldDeclaration->get_declarationModifier ().get_accessModifier ().setUndefined ();
+    fieldDeclaration->get_declarationModifier ().get_accessModifier ().setUndefined ();
 
-      typeStatement->get_definition ()->append_member (fieldDeclaration);
+    typeStatement->get_definition ()->append_member (fieldDeclaration);
 
-      fieldDeclarations->add (variableName, fieldDeclaration);
-    }
+    fieldDeclarations->add (variableName, fieldDeclaration);
   }
 }
 
@@ -85,6 +78,10 @@ FortranOpDatDimensionsDeclaration::FortranOpDatDimensionsDeclaration (
   subroutineName (subroutineName), parallelLoop (parallelLoop), moduleScope (
       moduleScope)
 {
+  Debug::getInstance ()->debugMessage (
+      "Creating OP_DAT dimensions type declaration", Debug::CONSTRUCTOR_LEVEL,
+      __FILE__, __LINE__);
+
   addTypeDeclaration ();
 
   addFields ();

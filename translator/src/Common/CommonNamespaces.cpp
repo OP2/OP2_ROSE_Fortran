@@ -4,7 +4,7 @@
 
 namespace
 {
-  std::string const OP_DAT = "opDat";
+  std::string const OpDatPrefix = "opDat";
   std::string const Size = "Size";
 }
 
@@ -26,7 +26,7 @@ OP2::VariableNames::getOpDatName (unsigned int OP_DAT_ArgumentGroup)
   using boost::lexical_cast;
   using std::string;
 
-  return OP_DAT + lexical_cast <string> (OP_DAT_ArgumentGroup);
+  return OpDatPrefix + lexical_cast <string> (OP_DAT_ArgumentGroup);
 }
 
 std::string
@@ -35,7 +35,7 @@ OP2::VariableNames::getOpDatHostName (unsigned int OP_DAT_ArgumentGroup)
   using boost::lexical_cast;
   using std::string;
 
-  return OP_DAT + lexical_cast <string> (OP_DAT_ArgumentGroup) + "Host";
+  return OpDatPrefix + lexical_cast <string> (OP_DAT_ArgumentGroup) + "Host";
 }
 
 std::string
@@ -44,7 +44,7 @@ OP2::VariableNames::getOpDatLocalName (unsigned int OP_DAT_ArgumentGroup)
   using boost::lexical_cast;
   using std::string;
 
-  return OP_DAT + lexical_cast <string> (OP_DAT_ArgumentGroup) + "Local";
+  return OpDatPrefix + lexical_cast <string> (OP_DAT_ArgumentGroup) + "Local";
 }
 
 std::string
@@ -53,7 +53,7 @@ OP2::VariableNames::getOpDatGlobalName (unsigned int OP_DAT_ArgumentGroup)
   using boost::lexical_cast;
   using std::string;
 
-  return OP_DAT + lexical_cast <string> (OP_DAT_ArgumentGroup) + "Global";
+  return OpDatPrefix + lexical_cast <string> (OP_DAT_ArgumentGroup) + "Global";
 }
 
 std::string
@@ -62,7 +62,7 @@ OP2::VariableNames::getOpDatSharedName (unsigned int OP_DAT_ArgumentGroup)
   using boost::lexical_cast;
   using std::string;
 
-  return OP_DAT + lexical_cast <string> (OP_DAT_ArgumentGroup) + "Shared";
+  return OpDatPrefix + lexical_cast <string> (OP_DAT_ArgumentGroup) + "Shared";
 }
 
 std::string
@@ -71,7 +71,7 @@ OP2::VariableNames::getOpDatSizeName (unsigned int OP_DAT_ArgumentGroup)
   using boost::lexical_cast;
   using std::string;
 
-  return OP_DAT + lexical_cast <string> (OP_DAT_ArgumentGroup) + Size;
+  return OpDatPrefix + lexical_cast <string> (OP_DAT_ArgumentGroup) + Size;
 }
 
 std::string
@@ -80,7 +80,7 @@ OP2::VariableNames::getOpDatDeviceName (unsigned int OP_DAT_ArgumentGroup)
   using boost::lexical_cast;
   using std::string;
 
-  return OP_DAT + lexical_cast <string> (OP_DAT_ArgumentGroup) + "Device";
+  return OpDatPrefix + lexical_cast <string> (OP_DAT_ArgumentGroup) + "Device";
 }
 
 std::string
@@ -89,7 +89,8 @@ OP2::VariableNames::getOpDatDimensionName (unsigned int OP_DAT_ArgumentGroup)
   using boost::lexical_cast;
   using std::string;
 
-  return OP_DAT + lexical_cast <string> (OP_DAT_ArgumentGroup) + "Dimension";
+  return OpDatPrefix + lexical_cast <string> (OP_DAT_ArgumentGroup)
+      + "Dimension";
 }
 
 std::string

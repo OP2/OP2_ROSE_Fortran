@@ -344,10 +344,10 @@ template <typename TParallelLoop, typename TSubroutineHeader>
             variableName) != doubleDeclarations.end ();
       }
 
-      SgType *
-      getType (std::string const & variableName)
+      SgVariableDeclaration *
+      getOriginalDeclaration (std::string const & variableName)
       {
-        return declarations[variableName]->get_decl_item (variableName)->get_type ();
+        return declarations[variableName];
       }
 
       typename std::vector <TSubroutineHeader *>::const_iterator

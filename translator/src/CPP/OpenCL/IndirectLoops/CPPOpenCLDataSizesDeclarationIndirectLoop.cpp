@@ -21,7 +21,7 @@ CPPOpenCLDataSizesDeclarationIndirectLoop::addFields ()
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
     if (parallelLoop->isDuplicateOpDat (i) == false
-        && parallelLoop->getOpMapValue (i) == INDIRECT)
+        && parallelLoop->isIndirect (i))
     {
       string const variableName = OP2::VariableNames::getOpDatSizeName (i);
 
@@ -40,7 +40,7 @@ CPPOpenCLDataSizesDeclarationIndirectLoop::addFields ()
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
     if (parallelLoop->isDuplicateOpDat (i) == false
-        && parallelLoop->getOpMapValue (i) == INDIRECT)
+        && parallelLoop->isIndirect (i))
     {
       string const variableName =
           OP2::VariableNames::getLocalToGlobalMappingSizeName (i);
@@ -59,7 +59,7 @@ CPPOpenCLDataSizesDeclarationIndirectLoop::addFields ()
 
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
-    if (parallelLoop->getOpMapValue (i) == INDIRECT)
+    if (parallelLoop->isIndirect (i))
     {
       string const variableName =
           OP2::VariableNames::getGlobalToLocalMappingSizeName (i);
@@ -78,9 +78,8 @@ CPPOpenCLDataSizesDeclarationIndirectLoop::addFields ()
 
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
-    if (parallelLoop->isDuplicateOpDat (i) == false
-        && (parallelLoop->getOpMapValue (i) == DIRECT
-            || parallelLoop->getOpMapValue (i) == GLOBAL))
+    if (parallelLoop->isDuplicateOpDat (i) == false && (parallelLoop->isDirect (
+        i) || parallelLoop->isGlobal (i)))
     {
       string const variableName = OP2::VariableNames::getOpDatSizeName (i);
 

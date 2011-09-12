@@ -55,11 +55,8 @@ class FortranCUDADataSizesDeclaration
 
   protected:
 
-    virtual void
-    addFields () = 0;
-
-    FortranCUDADataSizesDeclaration (std::string const & subroutineName,
-        FortranParallelLoop * parallelLoop, SgScopeStatement * moduleScope);
+    void
+    addDataSizesFields ();
 
   public:
 
@@ -78,6 +75,9 @@ class FortranCUDADataSizesDeclaration
      */
     SubroutineVariableDeclarations *
     getFieldDeclarations ();
+
+    FortranCUDADataSizesDeclaration (std::string const & subroutineName,
+        FortranParallelLoop * parallelLoop, SgScopeStatement * moduleScope);
 };
 
 #endif

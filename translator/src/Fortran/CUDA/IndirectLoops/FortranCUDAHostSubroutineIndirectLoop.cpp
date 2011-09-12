@@ -164,8 +164,9 @@ FortranCUDAHostSubroutineIndirectLoop::createPlanFunctionExecutionStatements ()
    * ======================================================
    */
 
-  SgExpression * arrayIndexExpression1 = buildAddOp (buildVarRefExp (
-      variableDeclarations->get (OP2::VariableNames::col)), buildIntVal (1));
+  SgExpression * arrayIndexExpression1 =
+      buildAddOp (buildVarRefExp (variableDeclarations->get (
+          OP2::VariableNames::colour1)), buildIntVal (1));
 
   SgPntrArrRefExp * arrayExpression1 = buildPntrArrRefExp (buildVarRefExp (
       variableDeclarations->get (OP2::VariableNames::PlanFunction::ncolblk)),
@@ -235,8 +236,9 @@ FortranCUDAHostSubroutineIndirectLoop::createPlanFunctionExecutionStatements ()
    * ======================================================
    */
 
-  SgAssignOp * initializationExpression = buildAssignOp (buildVarRefExp (
-      variableDeclarations->get (OP2::VariableNames::col)), buildIntVal (0));
+  SgAssignOp * initializationExpression =
+      buildAssignOp (buildVarRefExp (variableDeclarations->get (
+          OP2::VariableNames::colour1)), buildIntVal (0));
 
   /*
    * ======================================================
@@ -293,48 +295,38 @@ FortranCUDAHostSubroutineIndirectLoop::createVariablesSizesInitialisationStateme
 
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
-    if (parallelLoop->isDuplicateOpDat (i) == false
-        && parallelLoop->getOpMapValue (i) == INDIRECT)
+    if (parallelLoop->isDuplicateOpDat (i) == false)
     {
-      SgVarRefExp * dataSizesReferences = buildVarRefExp (
-          moduleDeclarations->getDataSizesVariableDeclaration ());
+      if (parallelLoop->isIndirect (i))
+      {
+        SgDotExp * dotExpression = buildDotExp (buildVarRefExp (
+            moduleDeclarations->getDataSizesVariableDeclaration ()),
+            buildVarRefExp (dataSizesDeclaration->getFieldDeclarations ()->get (
+                OP2::VariableNames::getLocalToGlobalMappingSizeName (i))));
 
-      SgVarRefExp * fieldReference = buildVarRefExp (
-          dataSizesDeclaration->getFieldDeclarations ()->get (
-              OP2::VariableNames::getLocalToGlobalMappingSizeName (i)));
+        SgPntrArrRefExp * arrayIndexExpression = buildPntrArrRefExp (
+            buildVarRefExp (variableDeclarations->get (
+                OP2::VariableNames::PlanFunction::pnindirect)), buildIntVal (
+                countIndirectArgs));
 
-      SgDotExp * fieldSelectionExpression = buildDotExp (dataSizesReferences,
-          fieldReference);
+        SgExprStatement * assignmentStatement = buildAssignStatement (
+            dotExpression, arrayIndexExpression);
 
-      SgVarRefExp * pnindirect_Reference = buildVarRefExp (
-          variableDeclarations->get (
-              OP2::VariableNames::PlanFunction::pnindirect));
+        appendStatement (assignmentStatement, ifBody);
 
-      SgPntrArrRefExp * arrayIndexExpression = buildPntrArrRefExp (
-          pnindirect_Reference, buildIntVal (countIndirectArgs));
-
-      SgExprStatement * assignmentStatement = buildAssignStatement (
-          fieldSelectionExpression, arrayIndexExpression);
-
-      appendStatement (assignmentStatement, ifBody);
-
-      countIndirectArgs++;
+        countIndirectArgs++;
+      }
     }
   }
 
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
-    if (parallelLoop->getOpMapValue (i) == INDIRECT)
+    if (parallelLoop->isIndirect (i))
     {
-      SgVarRefExp * dataSizesReferences = buildVarRefExp (
-          moduleDeclarations->getDataSizesVariableDeclaration ());
-
-      SgVarRefExp * fieldReference = buildVarRefExp (
-          dataSizesDeclaration->getFieldDeclarations ()->get (
-              OP2::VariableNames::getGlobalToLocalMappingSizeName (i)));
-
-      SgDotExp * fieldSelectionExpression = buildDotExp (dataSizesReferences,
-          fieldReference);
+      SgDotExp * fieldSelectionExpression = buildDotExp (buildVarRefExp (
+          moduleDeclarations->getDataSizesVariableDeclaration ()),
+          buildVarRefExp (dataSizesDeclaration->getFieldDeclarations ()->get (
+              OP2::VariableNames::getGlobalToLocalMappingSizeName (i))));
 
       SgExprStatement * assignmentStatement = buildAssignStatement (
           fieldSelectionExpression, buildVarRefExp (variableDeclarations->get (
@@ -370,14 +362,10 @@ FortranCUDAHostSubroutineIndirectLoop::createVariablesSizesInitialisationStateme
   for (vector <string>::iterator it = planFunctionSizeVariables.begin (); it
       != planFunctionSizeVariables.end (); ++it)
   {
-    SgVarRefExp * dataSizesReferences = buildVarRefExp (
-        moduleDeclarations->getDataSizesVariableDeclaration ());
-
-    SgVarRefExp * fieldReference = buildVarRefExp (
-        dataSizesDeclaration->getFieldDeclarations ()->get (*it));
-
-    SgDotExp * fieldSelectionExpression = buildDotExp (dataSizesReferences,
-        fieldReference);
+    SgDotExp * fieldSelectionExpression = buildDotExp (buildVarRefExp (
+        moduleDeclarations->getDataSizesVariableDeclaration ()),
+        buildVarRefExp (
+            dataSizesDeclaration->getFieldDeclarations ()->get (*it)));
 
     SgExprStatement * assignmentStatement = buildAssignStatement (
         fieldSelectionExpression, buildVarRefExp (variableDeclarations->get (
@@ -452,17 +440,19 @@ FortranCUDAHostSubroutineIndirectLoop::createExecutionPlanDeclarations ()
 
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
-    if (parallelLoop->isDuplicateOpDat (i) == false
-        && parallelLoop->getOpMapValue (i) == INDIRECT)
+    if (parallelLoop->isDuplicateOpDat (i) == false)
     {
-      string const variableName =
-          OP2::VariableNames::getLocalToGlobalMappingName (i);
+      if (parallelLoop->isIndirect (i))
+      {
+        string const variableName =
+            OP2::VariableNames::getLocalToGlobalMappingName (i);
 
-      variableDeclarations->add (variableName,
-          FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
-              variableName, FortranTypesBuilder::getArray_RankOne (
-                  FortranTypesBuilder::getFourByteInteger ()), subroutineScope,
-              2, DEVICE, ALLOCATABLE));
+        variableDeclarations->add (variableName,
+            FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
+                variableName, FortranTypesBuilder::getArray_RankOne (
+                    FortranTypesBuilder::getFourByteInteger ()),
+                subroutineScope, 2, DEVICE, ALLOCATABLE));
+      }
     }
   }
 
@@ -512,7 +502,7 @@ FortranCUDAHostSubroutineIndirectLoop::createExecutionPlanDeclarations ()
 
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
-    if (parallelLoop->getOpMapValue (i) == INDIRECT)
+    if (parallelLoop->isIndirect (i))
     {
       string const variableName =
           OP2::VariableNames::getGlobalToLocalMappingName (i);
@@ -533,7 +523,7 @@ FortranCUDAHostSubroutineIndirectLoop::createExecutionPlanDeclarations ()
    */
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
-    if (parallelLoop->getOpMapValue (i) == INDIRECT)
+    if (parallelLoop->isIndirect (i))
     {
       string const variableName =
           OP2::VariableNames::getGlobalToLocalMappingSizeName (i);
@@ -556,7 +546,7 @@ FortranCUDAHostSubroutineIndirectLoop::createExecutionPlanDeclarations ()
 
   vector <string> fourByteIntegerVariables;
 
-  fourByteIntegerVariables.push_back (OP2::VariableNames::col);
+  fourByteIntegerVariables.push_back (OP2::VariableNames::colour1);
 
   fourByteIntegerVariables.push_back (CommonVariableNames::iterationCounter1);
 

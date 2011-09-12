@@ -46,19 +46,19 @@ namespace OP2
     /*
      * ======================================================
      * Some of these names are hardwired in the OP2 run-time
-     * support and cannot easily be changed.
+     * support and cannot easily be changed
      * ======================================================
      */
     std::string const blockID = "blockID";
-    std::string const col = "col";
-    std::string const col2 = "col2";
+    std::string const colour1 = "colour";
+    std::string const colour2 = "colour2";
     std::string const dataOnHost = "dat";
     std::string const dataOnDevice = "dat_d";
     std::string const dimension = "dim";
     std::string const index = "index";
     std::string const moduloResult = "moduloResult";
     std::string const nbytes = "nbytes";
-    std::string const ncolor = "ncolor";
+    std::string const numberOfColours = "numOfColours";
     std::string const nelems = "nelems";
     std::string const nelems2 = "nelems2";
     std::string const offset = "offset";
@@ -352,19 +352,6 @@ namespace IndirectLoop
       {
         std::string const blockID = "blockId";
         std::string const blockOffsetShared = "offset_b";
-        std::string const moduled = "moduled";
-        std::string const moduloResult = "moduloResult";
-      }
-    }
-  }
-  namespace Fortran
-  {
-    namespace KernelSubroutine
-    {
-      namespace VariableNames
-      {
-        std::string const blockID = "blockID";
-        std::string const blockOffsetShared = "blockOffsetShared";
         std::string const moduled = "moduled";
         std::string const moduloResult = "moduloResult";
       }

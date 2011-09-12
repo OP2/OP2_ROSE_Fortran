@@ -29,24 +29,6 @@ class FortranCUDAHostSubroutine: public FortranHostSubroutine
     virtual void
     createReductionLocalVariableDeclarations ();
 
-    /*
-     * ======================================================
-     * Creates the statements needed after the kernel has
-     * completed
-     * ======================================================
-     */
-    void
-    createCUDAKernelEpilogueStatements ();
-
-    /*
-     * ======================================================
-     * Creates the statements needed before the kernel is
-     * launched
-     * ======================================================
-     */
-    void
-    createCUDAKernelPrologueStatements ();
-
     virtual SgBasicBlock *
     createTransferOpDatStatements ();
 

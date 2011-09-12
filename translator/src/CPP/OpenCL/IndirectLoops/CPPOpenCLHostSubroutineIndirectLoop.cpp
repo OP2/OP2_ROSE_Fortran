@@ -37,7 +37,7 @@ CPPOpenCLHostSubroutineIndirectLoop::createKernelFunctionCallStatement ()
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
     if (parallelLoop->isDuplicateOpDat (i) == false
-        && parallelLoop->getOpMapValue (i) == INDIRECT)
+        && parallelLoop->isIndirect (i))
     {
       actualParameters->append_expression (
           buildVarRefExp (variableDeclarations->get (
@@ -51,7 +51,7 @@ CPPOpenCLHostSubroutineIndirectLoop::createKernelFunctionCallStatement ()
 
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
-    if (parallelLoop->getOpMapValue (i) == INDIRECT)
+    if (parallelLoop->isIndirect (i))
     {
       actualParameters->append_expression (buildVarRefExp (
           variableDeclarations->get (
@@ -61,9 +61,8 @@ CPPOpenCLHostSubroutineIndirectLoop::createKernelFunctionCallStatement ()
 
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
-    if (parallelLoop->isDuplicateOpDat (i) == false
-        && (parallelLoop->getOpMapValue (i) == DIRECT
-            || parallelLoop->getOpMapValue (i) == GLOBAL))
+    if (parallelLoop->isDuplicateOpDat (i) == false && (parallelLoop->isDirect (
+        i) || parallelLoop->isGlobal (i)))
     {
       actualParameters->append_expression (
           buildVarRefExp (variableDeclarations->get (
@@ -135,7 +134,7 @@ CPPOpenCLHostSubroutineIndirectLoop::createPlanFunctionExecutionStatements ()
   SgExpression * block_offset_ref = buildVarRefExp (variableDeclarations->get (
       PlanFunction::CPP::blockOffset));
   SgExpression * col_ref = buildVarRefExp (variableDeclarations->get (
-      OP2::VariableNames::col));
+      OP2::VariableNames::colour1));
   SgExpression * Plan_ref = buildVarRefExp (variableDeclarations->get (
       PlanFunction::CPP::actualPlan));
   SgExpression * nblocks_ref = buildVarRefExp (variableDeclarations->get (
@@ -291,7 +290,7 @@ CPPOpenCLHostSubroutineIndirectLoop::createVariablesSizesInitialisationStatement
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
     if (parallelLoop->isDuplicateOpDat (i) == false
-        && parallelLoop->getOpMapValue (i) == INDIRECT)
+        && parallelLoop->isIndirect (i))
     {
       SgVarRefExp * dataSizesReferences = buildVarRefExp (
           moduleDeclarations->getDataSizesVariableDeclaration ());
@@ -320,7 +319,7 @@ CPPOpenCLHostSubroutineIndirectLoop::createVariablesSizesInitialisationStatement
 
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
-    if (parallelLoop->getOpMapValue (i) == INDIRECT)
+    if (parallelLoop->isIndirect (i))
     {
       SgVarRefExp * dataSizesReferences = buildVarRefExp (
           moduleDeclarations->getDataSizesVariableDeclaration ());
@@ -414,7 +413,7 @@ CPPOpenCLHostSubroutineIndirectLoop::createExecutionPlanDeclarations ()
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
     if (parallelLoop->isDuplicateOpDat (i) == false
-        && parallelLoop->getOpMapValue (i) == INDIRECT)
+        && parallelLoop->isIndirect (i))
     {
       string const variableName =
           OP2::VariableNames::getLocalToGlobalMappingName (i);
@@ -471,7 +470,7 @@ CPPOpenCLHostSubroutineIndirectLoop::createExecutionPlanDeclarations ()
 
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
-    if (parallelLoop->getOpMapValue (i) == INDIRECT)
+    if (parallelLoop->isIndirect (i))
     {
       string const variableName =
           OP2::VariableNames::getGlobalToLocalMappingName (i);
@@ -491,7 +490,7 @@ CPPOpenCLHostSubroutineIndirectLoop::createExecutionPlanDeclarations ()
    */
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
-    if (parallelLoop->getOpMapValue (i) == INDIRECT)
+    if (parallelLoop->isIndirect (i))
     {
       string const variableName =
           OP2::VariableNames::getGlobalToLocalMappingSizeName (i);
@@ -513,7 +512,7 @@ CPPOpenCLHostSubroutineIndirectLoop::createExecutionPlanDeclarations ()
 
   vector <string> integerVariables;
 
-  integerVariables.push_back (OP2::VariableNames::col);
+  integerVariables.push_back (OP2::VariableNames::colour1);
 
   integerVariables.push_back (CommonVariableNames::iterationCounter1);
 

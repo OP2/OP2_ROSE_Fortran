@@ -19,19 +19,51 @@
 void
 FortranCUDASubroutinesGeneration::createConstantDeclarations ()
 {
+  using boost::lexical_cast;
+  using boost::iequals;
+  using SageInterface::removeStatement;
   using std::map;
   using std::string;
+  using std::vector;
+
+  Debug::getInstance ()->debugMessage ("Creating constant declarations",
+      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
   for (map <string, OpConstDefinition *>::const_iterator it =
       declarations->firstOpConstDefinition (); it
       != declarations->lastOpConstDefinition (); ++it)
   {
-    string const variableName = it->first;
+    string const constantName = it->first;
 
-    SgVariableDeclaration * variableDeclaration =
+    Debug::getInstance ()->debugMessage ("Creating declaration for variable '"
+        + constantName + "'", Debug::HIGHEST_DEBUG_LEVEL, __FILE__, __LINE__);
+
+    SgVariableDeclaration * originalDeclaration =
+        declarations->getOriginalDeclaration (constantName);
+
+    SgVariableDeclaration * newDeclaration =
         FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
-            variableName, declarations->getType (variableName), moduleScope, 1,
-            CONSTANT);
+            constantName,
+            originalDeclaration ->get_decl_item (constantName)->get_type (),
+            moduleScope, 1, CONSTANT);
+
+    SgInitializedNamePtrList & variables =
+        originalDeclaration->get_variables ();
+
+    if (variables.size () == 1)
+    {
+      Debug::getInstance ()->debugMessage (
+          "Single variable in declaration. Removing entire statement",
+          Debug::HIGHEST_DEBUG_LEVEL, __FILE__, __LINE__);
+
+      removeStatement (originalDeclaration);
+    }
+    else
+    {
+      Debug::getInstance ()->errorMessage (
+          "Multiple variables in original declaration. Currently not supported",
+          __FILE__, __LINE__);
+    }
   }
 }
 
@@ -96,15 +128,11 @@ FortranCUDASubroutinesGeneration::createSubroutines ()
 
     if (parallelLoop->isDirectLoop ())
     {
-      kernelSubroutine
-          = new FortranCUDAKernelSubroutineDirectLoop (
-              userSubroutineName,
-              userDeviceSubroutine->getSubroutineName (),
-              parallelLoop,
-              moduleScope,
-              reductionSubroutines,
-              static_cast <FortranCUDADataSizesDeclarationDirectLoop *> (dataSizesDeclarations[userSubroutineName]),
-              dimensionsDeclarations[userSubroutineName]);
+      kernelSubroutine = new FortranCUDAKernelSubroutineDirectLoop (
+          userSubroutineName, userDeviceSubroutine->getSubroutineName (),
+          parallelLoop, moduleScope, reductionSubroutines,
+          dataSizesDeclarations[userSubroutineName],
+          dimensionsDeclarations[userSubroutineName]);
 
       hostSubroutines[userSubroutineName]
           = new FortranCUDAHostSubroutineDirectLoop (
@@ -113,7 +141,7 @@ FortranCUDASubroutinesGeneration::createSubroutines ()
               kernelSubroutine->getSubroutineName (),
               parallelLoop,
               moduleScope,
-              static_cast <FortranCUDADataSizesDeclarationDirectLoop *> (dataSizesDeclarations[userSubroutineName]),
+              dataSizesDeclarations[userSubroutineName],
               dimensionsDeclarations[userSubroutineName],
               static_cast <FortranCUDAModuleDeclarations *> (moduleDeclarations[userSubroutineName]));
     }
@@ -170,7 +198,7 @@ FortranCUDASubroutinesGeneration::createModuleDeclarations ()
     if (parallelLoop->isDirectLoop ())
     {
       dataSizesDeclarations[userSubroutineName]
-          = new FortranCUDADataSizesDeclarationDirectLoop (userSubroutineName,
+          = new FortranCUDADataSizesDeclaration (userSubroutineName,
               parallelLoop, moduleScope);
     }
     else

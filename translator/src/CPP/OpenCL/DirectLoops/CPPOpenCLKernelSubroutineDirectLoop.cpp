@@ -51,9 +51,9 @@ CPPOpenCLKernelSubroutineDirectLoop::createUserSubroutineCallStatement ()
 
     SgExpression * parameterExpression = buildIntVal (1);
 
-    if (parallelLoop->getOpMapValue (i) == GLOBAL)
+    if (parallelLoop->isGlobal (i))
     {
-      if (parallelLoop->getOpAccessValue (i) == READ_ACCESS)
+      if (parallelLoop->isRead (i))
       {
         /*
          * ======================================================
@@ -76,7 +76,7 @@ CPPOpenCLKernelSubroutineDirectLoop::createUserSubroutineCallStatement ()
         parameterExpression = argN_l_ref;
       }
     }
-    else if (parallelLoop->getOpMapValue (i) == DIRECT)
+    else if (parallelLoop->isDirect (i))
     {
       if (parallelLoop->getNumberOfIndirectOpDats () > 0)
       {
@@ -146,9 +146,8 @@ CPPOpenCLKernelSubroutineDirectLoop::createStageInFromDeviceMemoryToLocalThreadV
         OP2::VariableNames::getOpDatLocalName (i)));
     SgExpression * dimN_val = buildIntVal (parallelLoop->getOpDatDimension (i));
 
-    if (parallelLoop->getOpMapValue (i) != GLOBAL
-        && parallelLoop->getOpAccessValue (i) != WRITE_ACCESS
-        && parallelLoop->getOpDatDimension (i) != 1)
+    if (parallelLoop->isGlobal (i) == false && parallelLoop->isWritten (i)
+        == false && parallelLoop->getOpDatDimension (i) != 1)
     {
       /* 
        * ======================================================
@@ -256,9 +255,8 @@ CPPOpenCLKernelSubroutineDirectLoop::createStageOutFromLocalThreadVariablesToDev
         OP2::VariableNames::getOpDatLocalName (i)));
     SgExpression * dimN_val = buildIntVal (parallelLoop->getOpDatDimension (i));
 
-    if (parallelLoop->getOpMapValue (i) != GLOBAL
-        && parallelLoop->getOpAccessValue (i) != WRITE_ACCESS
-        && parallelLoop->getOpDatDimension (i) != 1)
+    if (parallelLoop->isGlobal (i) == false && parallelLoop->isWritten (i)
+        == false && parallelLoop->getOpDatDimension (i) != 1)
     {
       /* ======================================================
        * for ( m=0; m<dimN; m++ ) {
@@ -592,8 +590,7 @@ CPPOpenCLKernelSubroutineDirectLoop::createInitialiseLocalThreadVariablesStateme
         OP2::VariableNames::getOpDatLocalName (i)));
     SgExpression * dimN_val = buildIntVal (parallelLoop->getOpDatDimension (i));
 
-    if (parallelLoop->getOpMapValue (i) == GLOBAL
-        && parallelLoop->getOpAccessValue (i) != READ_ACCESS)
+    if (parallelLoop->isGlobal (i) && parallelLoop->isRead (i) == false)
     {
       /*
        * ======================================================
@@ -619,7 +616,7 @@ CPPOpenCLKernelSubroutineDirectLoop::createInitialiseLocalThreadVariablesStateme
 
       SgExprStatement * assignmentStatement;
 
-      if (parallelLoop->getOpAccessValue (i) == INC_ACCESS)
+      if (parallelLoop->isIncremented (i))
       {
         /*
          * ======================================================

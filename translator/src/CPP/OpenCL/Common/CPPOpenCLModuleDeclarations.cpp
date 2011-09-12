@@ -22,7 +22,7 @@ CPPOpenCLModuleDeclarations::createReductionDeclarations ()
   {
     SgVariableDeclaration * variableDeclaration1 =
         CPPStatementsAndExpressionsBuilder::appendVariableDeclaration (
-            ReductionSubroutine::reductionArrayHost, (*it)->getArrayType (),
+            ReductionSubroutine::reductionArrayHost, (*it)->getBaseType (),
             moduleScope);
 
     variableDeclarations->add (ReductionSubroutine::reductionArrayHost,
@@ -30,7 +30,7 @@ CPPOpenCLModuleDeclarations::createReductionDeclarations ()
 
     SgVariableDeclaration * variableDeclaration2 =
         CPPStatementsAndExpressionsBuilder::appendVariableDeclaration (
-            ReductionSubroutine::reductionArrayDevice, (*it)->getArrayType (),
+            ReductionSubroutine::reductionArrayDevice, (*it)->getBaseType (),
             moduleScope, 1, DEVICE);
 
     variableDeclarations->add (ReductionSubroutine::reductionArrayDevice,

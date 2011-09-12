@@ -56,8 +56,7 @@ CPPOpenCLHostSubroutine::createReductionPrologueStatements ()
 
     if (parallelLoop->isDuplicateOpDat (i) == false)
     {
-      if (parallelLoop->getOpMapValue (i) == GLOBAL
-          && parallelLoop->getOpAccessValue (i) != READ_ACCESS)
+      if (parallelLoop->isGlobal (i) && parallelLoop->isRead (i) == false)
       {
         /*
          * ======================================================
@@ -116,8 +115,7 @@ CPPOpenCLHostSubroutine::createReductionPrologueStatements ()
 
     if (parallelLoop->isDuplicateOpDat (i) == false)
     {
-      if (parallelLoop->getOpMapValue (i) == GLOBAL
-          && parallelLoop->getOpAccessValue (i) != READ_ACCESS)
+      if (parallelLoop->isGlobal (i) && parallelLoop->isRead (i) == false)
       {
         /*
          * ======================================================
@@ -185,7 +183,7 @@ CPPOpenCLHostSubroutine::createReductionPrologueStatements ()
 
         appendStatement (forStatement2, loopBody1);
 
-        if (parallelLoop->getOpAccessValue (i) == INC_ACCESS)
+        if (parallelLoop->isIncremented (i))
         {
           /*
            * ======================================================

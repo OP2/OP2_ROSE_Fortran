@@ -195,7 +195,7 @@ FortranOpenMPHostSubroutineIndirectLoop::createPlanFunctionExecutionStatements (
    */
 
   SgAddOp * addExpression2 = buildAddOp (buildVarRefExp (
-      variableDeclarations->get (OP2::VariableNames::col)), buildIntVal (1));
+      variableDeclarations->get (OP2::VariableNames::colour1)), buildIntVal (1));
 
   SgPntrArrRefExp * arrayIndexExpression2 = buildPntrArrRefExp (buildVarRefExp (
       moduleDeclarationsIndirectLoop->getPlanFunctionDeclaration (
@@ -228,7 +228,7 @@ FortranOpenMPHostSubroutineIndirectLoop::createPlanFunctionExecutionStatements (
    */
 
   SgAssignOp * outerLoopInitializationExpression = buildAssignOp (
-      buildVarRefExp (variableDeclarations->get (OP2::VariableNames::col)),
+      buildVarRefExp (variableDeclarations->get (OP2::VariableNames::colour1)),
       buildIntVal (0));
 
   SgDotExp * dotExpression3 = buildDotExp (buildVarRefExp (
@@ -430,7 +430,7 @@ FortranOpenMPHostSubroutineIndirectLoop::createExecutionPlanDeclarations ()
 
   fourByteIntegerVariables.push_back (CommonVariableNames::iterationCounter1);
 
-  fourByteIntegerVariables.push_back (OP2::VariableNames::col);
+  fourByteIntegerVariables.push_back (OP2::VariableNames::colour1);
 
   fourByteIntegerVariables.push_back (
       OP2::VariableNames::PlanFunction::argsNumber);

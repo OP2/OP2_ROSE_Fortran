@@ -12,6 +12,45 @@
  */
 
 void
+FortranCUDAUserSubroutine::forceOutputOfCodeToFile ()
+{
+  Debug::getInstance ()->debugMessage (
+      "Ensuring user subroutine is generated in output file",
+      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+
+  /*
+   * ======================================================
+   * We have to set each node in the AST representation of
+   * this subroutine as compiler generated, otherwise chunks
+   * of the user kernel are missing in the output
+   * ======================================================
+   */
+
+  class TreeVisitor: public AstSimpleProcessing
+  {
+    public:
+
+      TreeVisitor ()
+      {
+      }
+
+      virtual void
+      visit (SgNode * node)
+      {
+        SgLocatedNode * locatedNode = isSgLocatedNode (node);
+        if (locatedNode != NULL)
+        {
+          locatedNode->setOutputInCodeGeneration ();
+        }
+      }
+  };
+
+  TreeVisitor * visitor = new TreeVisitor ();
+
+  visitor->traverse (subroutineHeaderStatement, preorder);
+}
+
+void
 FortranCUDAUserSubroutine::findOriginalSubroutine ()
 {
   using boost::iequals;
@@ -34,7 +73,11 @@ FortranCUDAUserSubroutine::findOriginalSubroutine ()
     }
   }
 
-  ROSE_ASSERT (originalSubroutine != NULL);
+  if (originalSubroutine == NULL)
+  {
+    Debug::getInstance ()->errorMessage ("Unable to find user kernel '"
+        + hostSubroutineName + "'", __FILE__, __LINE__);
+  }
 }
 
 void
@@ -70,6 +113,10 @@ FortranCUDAUserSubroutine::createStatements ()
 
     if (isVariableDeclaration == NULL)
     {
+      Debug::getInstance ()->debugMessage (
+          "Appending (non-variable-declaration) statement",
+          Debug::HIGHEST_DEBUG_LEVEL, __FILE__, __LINE__);
+
       appendStatement (*it, subroutineScope);
 
       if (isSgImplicitStatement (*it) != NULL)
@@ -155,6 +202,7 @@ FortranCUDAUserSubroutine::createStatements ()
          * ======================================================
          */
         appendStatement (*it, subroutineScope);
+
       }
     }
   }
@@ -203,4 +251,6 @@ FortranCUDAUserSubroutine::FortranCUDAUserSubroutine (
   findOriginalSubroutine ();
 
   createStatements ();
+
+  forceOutputOfCodeToFile ();
 }

@@ -110,12 +110,6 @@ ParallelLoop::setOpMapValue (unsigned int OP_DAT_ArgumentGroup,
   OpDatMappingDescriptors[OP_DAT_ArgumentGroup] = value;
 }
 
-MAPPING_VALUE
-ParallelLoop::getOpMapValue (unsigned int OP_DAT_ArgumentGroup)
-{
-  return OpDatMappingDescriptors[OP_DAT_ArgumentGroup];
-}
-
 bool
 ParallelLoop::isIndirect (unsigned int OP_DAT_ArgumentGroup)
 {
@@ -163,12 +157,6 @@ ParallelLoop::setOpAccessValue (unsigned int OP_DAT_ArgumentGroup,
     ACCESS_CODE_VALUE value)
 {
   OpDatAccessDescriptors[OP_DAT_ArgumentGroup] = value;
-}
-
-ACCESS_CODE_VALUE
-ParallelLoop::getOpAccessValue (unsigned int OP_DAT_ArgumentGroup)
-{
-  return OpDatAccessDescriptors[OP_DAT_ArgumentGroup];
 }
 
 bool
@@ -239,8 +227,7 @@ bool
 ParallelLoop::isReductionRequired (int OP_DAT_ArgumentGroup)
 {
   return OpDatMappingDescriptors[OP_DAT_ArgumentGroup] == GLOBAL
-      && OpDatAccessDescriptors[OP_DAT_ArgumentGroup] != READ_ACCESS
-      && isSgArrayType (OpDatTypes[OP_DAT_ArgumentGroup]) != NULL;
+      && OpDatAccessDescriptors[OP_DAT_ArgumentGroup] != READ_ACCESS;
 }
 
 bool
@@ -338,13 +325,23 @@ ParallelLoop::getReductionTuple (unsigned int OP_DAT_ArgumentGroup)
 {
   ROSE_ASSERT (isReductionRequired(OP_DAT_ArgumentGroup));
 
-  SgArrayType * arrayType = isSgArrayType (getOpDatType (OP_DAT_ArgumentGroup));
+  SgType * baseType;
 
-  SgType * baseType = arrayType->get_base_type ();
+  if (isGlobalScalar (OP_DAT_ArgumentGroup))
+  {
+    baseType = getOpDatType (OP_DAT_ArgumentGroup);
+  }
+  else
+  {
+    SgArrayType * arrayType = isSgArrayType (
+        getOpDatType (OP_DAT_ArgumentGroup));
+
+    baseType = arrayType->get_base_type ();
+  }
 
   SgIntVal * baseSize = isSgIntVal (baseType->get_type_kind ());
 
-  return new Reduction (arrayType, baseType, baseSize->get_value ());
+  return new Reduction (baseType, baseSize->get_value ());
 }
 
 void

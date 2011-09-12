@@ -185,15 +185,6 @@ class ParallelLoop
     void
     setOpMapValue (unsigned int OP_DAT_ArgumentGroup, MAPPING_VALUE value);
 
-    /*
-     * ======================================================
-     * What is the mapping value of the OP_DAT argument
-     * in this OP_DAT argument group?
-     * ======================================================
-     */
-    MAPPING_VALUE
-    getOpMapValue (unsigned int OP_DAT_ArgumentGroup);
-
     bool
     isIndirect (unsigned int OP_DAT_ArgumentGroup);
 
@@ -212,15 +203,6 @@ class ParallelLoop
     void
     setOpAccessValue (unsigned int OP_DAT_ArgumentGroup,
         ACCESS_CODE_VALUE value);
-
-    /*
-     * ======================================================
-     * What is the access descriptor of the OP_DAT argument
-     * in this OP_DAT argument group?
-     * ======================================================
-     */
-    ACCESS_CODE_VALUE
-    getOpAccessValue (unsigned int OP_DAT_ArgumentGroup);
 
     bool
     isRead (unsigned int OP_DAT_ArgumentGroup);

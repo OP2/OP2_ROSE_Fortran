@@ -21,36 +21,79 @@ FortranCUDAModuleDeclarations::createReductionDeclarations ()
   {
     if (parallelLoop->isReductionRequired (i))
     {
-      SgType * baseType = parallelLoop->getOpDatBaseType (i);
+      if (parallelLoop->isRead (i) == false)
+      {
+        /*
+         * ======================================================
+         * If the OP_GBL is not read then declare both a host and
+         * device array as part of the reduction will be done on
+         * the GPU and its results collected on the CPU
+         *
+         * Note that, if the OP_GBL is read, then the data will be
+         * passed to the CUDA and user kernels by reference (if
+         * it is an array) or by value (if it is a scalar).
+         * Therefore, nothing needs to be allocated on the host or
+         * device to store intermediate and final reduction results
+         * ======================================================
+         */
 
-      string const reductionArrayHostName =
-          OP2::VariableNames::getReductionArrayHostName (i, userSubroutineName);
+        SgType * baseType;
 
-      Debug::getInstance ()->debugMessage ("Creating host reduction array '"
-          + reductionArrayHostName + "'", Debug::HIGHEST_DEBUG_LEVEL, __FILE__,
-          __LINE__);
+        if (parallelLoop->isGlobalScalar (i))
+        {
+          /*
+           * ======================================================
+           * If the OP_GBL is a scalar then the base type of the
+           * allocated arrays is the primitive type of the OP_GBL
+           * ======================================================
+           */
 
-      SgVariableDeclaration * reductionArrayHost =
-          FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
-              reductionArrayHostName, FortranTypesBuilder::getArray_RankOne (
-                  baseType), moduleScope, 1, ALLOCATABLE);
+          baseType = parallelLoop->getOpDatType (i);
+        }
+        else
+        {
+          /*
+           * ======================================================
+           * If the OP_GBL is an array then the base type of the
+           * allocated arrays is the base type of the OP_GBL array
+           * ======================================================
+           */
 
-      variableDeclarations->add (reductionArrayHostName, reductionArrayHost);
+          baseType = parallelLoop->getOpDatBaseType (i);
+        }
 
-      string const reductionArrayDeviceName =
-          OP2::VariableNames::getReductionArrayDeviceName (i,
-              userSubroutineName);
+        string const reductionArrayHostName =
+            OP2::VariableNames::getReductionArrayHostName (i,
+                userSubroutineName);
 
-      Debug::getInstance ()->debugMessage ("Creating device reduction array '"
-          + reductionArrayDeviceName + "'", Debug::HIGHEST_DEBUG_LEVEL,
-          __FILE__, __LINE__);
+        Debug::getInstance ()->debugMessage ("Creating host reduction array '"
+            + reductionArrayHostName + "'", Debug::HIGHEST_DEBUG_LEVEL,
+            __FILE__, __LINE__);
 
-      SgVariableDeclaration * reductionArrayDevice =
-          FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
-              reductionArrayDeviceName, FortranTypesBuilder::getArray_RankOne (
-                  baseType), moduleScope, 2, ALLOCATABLE, DEVICE);
+        SgVariableDeclaration * reductionArrayHost =
+            FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
+                reductionArrayHostName, FortranTypesBuilder::getArray_RankOne (
+                    baseType), moduleScope, 1, ALLOCATABLE);
 
-      variableDeclarations->add (reductionArrayDeviceName, reductionArrayDevice);
+        variableDeclarations->add (reductionArrayHostName, reductionArrayHost);
+
+        string const reductionArrayDeviceName =
+            OP2::VariableNames::getReductionArrayDeviceName (i,
+                userSubroutineName);
+
+        Debug::getInstance ()->debugMessage (
+            "Creating device reduction array '" + reductionArrayDeviceName
+                + "'", Debug::HIGHEST_DEBUG_LEVEL, __FILE__, __LINE__);
+
+        SgVariableDeclaration * reductionArrayDevice =
+            FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
+                reductionArrayDeviceName,
+                FortranTypesBuilder::getArray_RankOne (baseType), moduleScope,
+                2, ALLOCATABLE, DEVICE);
+
+        variableDeclarations->add (reductionArrayDeviceName,
+            reductionArrayDevice);
+      }
     }
   }
 }

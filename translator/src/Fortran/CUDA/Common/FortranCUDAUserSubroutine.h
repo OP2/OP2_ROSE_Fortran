@@ -15,6 +15,9 @@ class FortranCUDAUserSubroutine: public UserSubroutine <
   private:
 
     void
+    forceOutputOfCodeToFile ();
+
+    void
     findOriginalSubroutine ();
 
     virtual void
