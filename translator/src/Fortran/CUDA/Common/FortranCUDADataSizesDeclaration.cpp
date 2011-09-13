@@ -14,25 +14,7 @@ FortranCUDADataSizesDeclaration::addDataSizesFields ()
   {
     if (parallelLoop->isDuplicateOpDat (i) == false)
     {
-      /*
-       * ======================================================
-       * The only time we do NOT need a sizes field is when:
-       * a) The data is OP_GBL
-       * b) The data is scalar
-       * c) The data is read
-       *
-       * This is because, in this case, there is no transferal of
-       * OP_GBL data into device memory. The data is instead
-       * passed by value directly to the CUDA kernel.
-       * ======================================================
-       */
-
-      bool sizeFieldNeeded = parallelLoop->isGlobal (i) == false
-          || parallelLoop->isGlobalNonScalar (i)
-          || (parallelLoop->isGlobalScalar (i) && parallelLoop->isRead (i)
-              == false);
-
-      if (sizeFieldNeeded)
+      if (parallelLoop->dataSizesDeclarationNeeded (i))
       {
         Debug::getInstance ()->debugMessage ("Creating size field for OP_DAT "
             + lexical_cast <string> (i), Debug::HIGHEST_DEBUG_LEVEL, __FILE__,

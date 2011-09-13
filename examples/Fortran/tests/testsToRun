@@ -1,0 +1,3 @@
+OpGblWithWrite.F95 FAIL
+OpGblWithReadAndWrite.F95 FAIL
+OpGblWithScalarRead.F95 PASS

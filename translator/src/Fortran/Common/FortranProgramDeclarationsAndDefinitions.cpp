@@ -495,6 +495,8 @@ FortranProgramDeclarationsAndDefinitions::visit (SgNode * node)
             parallelLoops[userSubroutineName] = parallelLoop;
 
             retrieveOpDatDeclarations (parallelLoop, actualArguments);
+
+            parallelLoop->checkArguments();
           }
           else
           {

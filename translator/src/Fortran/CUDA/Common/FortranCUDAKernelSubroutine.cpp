@@ -29,45 +29,41 @@ FortranCUDAKernelSubroutine::buildOpGlobalActualParameterExpression (
 
   if (parallelLoop->isRead (OP_DAT_ArgumentGroup))
   {
-    Debug::getInstance ()->debugMessage ("OP_GBL with read access",
-        Debug::HIGHEST_DEBUG_LEVEL, __FILE__, __LINE__);
+    if (parallelLoop->isGlobalScalar (OP_DAT_ArgumentGroup))
+    {
+      Debug::getInstance ()->debugMessage ("OP_GBL with read access (Scalar)",
+          Debug::HIGHEST_DEBUG_LEVEL, __FILE__, __LINE__);
 
-    string const variableName = OP2::VariableNames::getOpDatSizeName (
-        OP_DAT_ArgumentGroup);
+      parameterExpression = buildVarRefExp (variableDeclarations->get (
+          OP2::VariableNames::getOpDatName (OP_DAT_ArgumentGroup)));
+    }
+    else
+    {
+      Debug::getInstance ()->debugMessage ("OP_GBL with read access (Array)",
+          Debug::HIGHEST_DEBUG_LEVEL, __FILE__, __LINE__);
 
-    SgDotExp * dotExpression = buildDotExp (buildVarRefExp (
-        variableDeclarations->get (
-            OP2::VariableNames::getDataSizesVariableDeclarationName (
-                userSubroutineName))), buildOpaqueVarRefExp (variableName,
-        subroutineScope));
+      string const variableName = OP2::VariableNames::getOpDatSizeName (
+          OP_DAT_ArgumentGroup);
 
-    SgSubtractOp * subtractExpression = buildSubtractOp (dotExpression,
-        buildIntVal (1));
+      SgDotExp * dotExpression = buildDotExp (buildVarRefExp (
+          variableDeclarations->get (
+              OP2::VariableNames::getDataSizesVariableDeclarationName (
+                  userSubroutineName))), buildOpaqueVarRefExp (variableName,
+          subroutineScope));
 
-    SgSubscriptExpression * subscriptExpression = new SgSubscriptExpression (
-        RoseHelper::getFileInfo (), buildIntVal (0), subtractExpression,
-        buildIntVal (1));
+      SgSubtractOp * subtractExpression = buildSubtractOp (dotExpression,
+          buildIntVal (1));
 
-    subscriptExpression->set_endOfConstruct (RoseHelper::getFileInfo ());
+      SgSubscriptExpression * subscriptExpression = new SgSubscriptExpression (
+          RoseHelper::getFileInfo (), buildIntVal (0), subtractExpression,
+          buildIntVal (1));
 
-    parameterExpression = buildPntrArrRefExp (buildVarRefExp (
-        variableDeclarations->get (OP2::VariableNames::getOpDatName (
-            OP_DAT_ArgumentGroup))), subscriptExpression);
-  }
-  else if (parallelLoop->isWritten (OP_DAT_ArgumentGroup))
-  {
-    Debug::getInstance ()->debugMessage ("OP_GBL with write access",
-        Debug::OUTER_LOOP_LEVEL, __FILE__, __LINE__);
+      subscriptExpression->set_endOfConstruct (RoseHelper::getFileInfo ());
 
-    /*
-     * ======================================================
-     * Case of global variable accessed NOT in read mode:
-     * we access the corresponding local thread variable
-     * ======================================================
-     */
-
-    parameterExpression = buildVarRefExp (variableDeclarations->get (
-        OP2::VariableNames::getOpDatLocalName (OP_DAT_ArgumentGroup)));
+      parameterExpression = buildPntrArrRefExp (buildVarRefExp (
+          variableDeclarations->get (OP2::VariableNames::getOpDatName (
+              OP_DAT_ArgumentGroup))), subscriptExpression);
+    }
   }
   else if (parallelLoop->isIncremented (OP_DAT_ArgumentGroup))
   {

@@ -74,7 +74,7 @@ FortranCUDAHostSubroutineIndirectLoop::createKernelFunctionCallStatement ()
   {
     if (parallelLoop->isDuplicateOpDat (i) == false)
     {
-      if (parallelLoop->isDirect (i) || parallelLoop->isGlobalNonScalar (i))
+      if (parallelLoop->isDirect (i) || parallelLoop->isGlobalArray (i))
       {
         actualParameters->append_expression (buildVarRefExp (
             variableDeclarations->get (OP2::VariableNames::getOpDatDeviceName (

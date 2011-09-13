@@ -156,6 +156,11 @@ FortranCUDAHostSubroutineDirectLoop::createCUDAKernelInitialisationStatements ()
   using SageBuilder::buildFunctionCallExp;
   using SageInterface::appendStatement;
   using std::string;
+  using std::max;
+
+  Debug::getInstance ()->debugMessage (
+      "Creating CUDA kernel initialisation statements", Debug::FUNCTION_LEVEL,
+      __FILE__, __LINE__);
 
   /*
    * ======================================================
@@ -198,28 +203,38 @@ FortranCUDAHostSubroutineDirectLoop::createCUDAKernelInitialisationStatements ()
    * ======================================================
    */
 
-  unsigned int sharedMemorySize = 0;
+  unsigned int sharedOpDatMemorySize = 0;
+  unsigned int sharedReductionMemorySize = 0;
 
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
     if (parallelLoop->isDuplicateOpDat (i) == false)
     {
-      if (parallelLoop->getOpDatDimension (i) > 1 && parallelLoop->isGlobal (i)
-          == false)
+      if (parallelLoop->isGlobal (i) == false)
       {
-        unsigned int opDatSharedMemoryRequirements =
+        unsigned int opDatMemoryRequirements = parallelLoop->getOpDatDimension (
+            i) * parallelLoop->getSizeOfOpDat (i);
+
+        if (opDatMemoryRequirements > sharedOpDatMemorySize)
+        {
+          sharedOpDatMemorySize = opDatMemoryRequirements;
+        }
+      }
+      else if (parallelLoop->isReductionRequired (i))
+      {
+        unsigned int reductionMemoryRequirements =
             parallelLoop->getOpDatDimension (i) * parallelLoop->getSizeOfOpDat (
                 i);
 
-        if (opDatSharedMemoryRequirements > sharedMemorySize)
+        if (reductionMemoryRequirements > sharedReductionMemorySize)
         {
-          sharedMemorySize = opDatSharedMemoryRequirements;
+          sharedReductionMemorySize = reductionMemoryRequirements;
         }
       }
     }
   }
 
-  if (sharedMemorySize == 0)
+  if (sharedOpDatMemorySize == 0 && sharedReductionMemorySize == 0)
   {
     Debug::getInstance ()->errorMessage (
         "The shared memory size will be set to zero during kernel launch",
@@ -228,7 +243,7 @@ FortranCUDAHostSubroutineDirectLoop::createCUDAKernelInitialisationStatements ()
 
   SgExprStatement * assignmentStatement4 = buildAssignStatement (
       buildVarRefExp (variableDeclarations->get (CUDA::sharedMemorySize)),
-      buildIntVal (sharedMemorySize));
+      buildIntVal (max (sharedOpDatMemorySize, sharedReductionMemorySize)));
 
   appendStatement (assignmentStatement4, subroutineScope);
 
@@ -322,7 +337,7 @@ FortranCUDAHostSubroutineDirectLoop::createStatements ()
 
   appendStatement (createTransferOpDatStatements (), subroutineScope);
 
-  if (parallelLoop->isReductionRequired () == true)
+  if (parallelLoop->isReductionRequired ())
   {
     createReductionPrologueStatements ();
   }
@@ -337,7 +352,7 @@ FortranCUDAHostSubroutineDirectLoop::createStatements ()
 
   appendStatement (assignmentStatement2, subroutineScope);
 
-  if (parallelLoop->isReductionRequired () == true)
+  if (parallelLoop->isReductionRequired ())
   {
     createReductionEpilogueStatements ();
   }

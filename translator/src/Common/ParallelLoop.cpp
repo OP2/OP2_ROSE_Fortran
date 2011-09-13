@@ -17,6 +17,36 @@ ParallelLoop::ParallelLoop (SgFunctionCallExp * functionCallExpression) :
  * ======================================================
  */
 
+void
+ParallelLoop::checkArguments ()
+{
+  using boost::lexical_cast;
+  using std::string;
+
+  for (unsigned int i = 1; i <= getNumberOfOpDatArgumentGroups (); ++i)
+  {
+    if (OpDatMappingDescriptors[i] == GLOBAL)
+    {
+      if (OpDatAccessDescriptors[i] == RW_ACCESS)
+      {
+        Debug::getInstance ()->errorMessage (
+            "The READ/WRITE access descriptor of OP_GBL (in argument group "
+                + lexical_cast <string> (i)
+                + ") is not supported as its semantics are undefined",
+            __FILE__, __LINE__);
+      }
+      else if (OpDatAccessDescriptors[i] == WRITE_ACCESS)
+      {
+        Debug::getInstance ()->errorMessage (
+            "The WRITE access descriptor of OP_GBL (in argument group "
+                + lexical_cast <string> (i)
+                + ") is not supported as its semantics are undefined",
+            __FILE__, __LINE__);
+      }
+    }
+  }
+}
+
 bool
 ParallelLoop::isDirectLoop ()
 {
@@ -67,15 +97,14 @@ ParallelLoop::getOpDatBaseType (unsigned int OP_DAT_ArgumentGroup)
 
   SgArrayType * isArrayType = isSgArrayType (OpDatTypes[OP_DAT_ArgumentGroup]);
 
-  if (isArrayType == NULL)
+  if (isArrayType != NULL)
   {
-    Debug::getInstance ()->errorMessage ("OP_DAT argument '" + lexical_cast <
-        string> (OP_DAT_ArgumentGroup)
-        + "' is not array and therefore does not have a base type", __FILE__,
-        __LINE__);
+    return isArrayType->get_base_type ();
   }
-
-  return isArrayType->get_base_type ();
+  else
+  {
+    return OpDatTypes[OP_DAT_ArgumentGroup];
+  }
 }
 
 void
@@ -135,21 +164,26 @@ ParallelLoop::isGlobalScalar (unsigned int OP_DAT_ArgumentGroup)
    * ======================================================
    * Global scalar has the following properties:
    * 1) GLOBAL mapping descriptor
-   * 2) Dimension of 1
-   * 3) Base type NOT an array
+   * 2) Base type NOT an array
    * ======================================================
    */
 
   return OpDatMappingDescriptors[OP_DAT_ArgumentGroup] == GLOBAL
-      && OpDatDimensions[OP_DAT_ArgumentGroup] == 1 && isSgArrayType (
-      OpDatTypes[OP_DAT_ArgumentGroup]) == NULL;
+      && isSgArrayType (OpDatTypes[OP_DAT_ArgumentGroup]) == NULL;
 }
 
 bool
-ParallelLoop::isGlobalNonScalar (unsigned int OP_DAT_ArgumentGroup)
+ParallelLoop::isGlobalArray (unsigned int OP_DAT_ArgumentGroup)
 {
   return OpDatMappingDescriptors[OP_DAT_ArgumentGroup] == GLOBAL
-      && OpDatDimensions[OP_DAT_ArgumentGroup] > 1;
+      && isSgArrayType (OpDatTypes[OP_DAT_ArgumentGroup]);
+}
+
+bool
+ParallelLoop::isGlobalRead (unsigned int OP_DAT_ArgumentGroup)
+{
+  return OpDatMappingDescriptors[OP_DAT_ArgumentGroup] == GLOBAL
+      && OpDatAccessDescriptors[OP_DAT_ArgumentGroup] == READ_ACCESS;
 }
 
 void
@@ -275,7 +309,7 @@ ParallelLoop::getMaximumSizeOfOpDat ()
 
   for (unsigned int i = 1; i <= getNumberOfOpDatArgumentGroups (); ++i)
   {
-    if (isReductionRequired (i) == false && isGlobalNonScalar (i))
+    if (isReductionRequired (i) == false && isGlobalArray (i))
     {
       unsigned int sizeOfOpDat = getSizeOfOpDat (i);
 
@@ -300,6 +334,27 @@ void
 ParallelLoop::setUniqueOpDat (std::string const & variableName)
 {
   uniqueOpDats.push_back (variableName);
+}
+
+bool
+ParallelLoop::dataSizesDeclarationNeeded (unsigned int OP_DAT_ArgumentGroup)
+{
+  /*
+   * ======================================================
+   * The only time we do NOT need a sizes field is when:
+   * a) The data is OP_GBL
+   * b) The data is scalar
+   * c) The data is read
+   *
+   * This is because, in this case, there is no transferal of
+   * OP_GBL data into device memory. The data is instead
+   * passed by value directly to the CUDA kernel.
+   * ======================================================
+   */
+
+  return isDirect (OP_DAT_ArgumentGroup) || isIndirect (OP_DAT_ArgumentGroup)
+      || isReductionRequired (OP_DAT_ArgumentGroup) || (isGlobalArray (
+      OP_DAT_ArgumentGroup) && isRead (OP_DAT_ArgumentGroup));
 }
 
 SgExpressionPtrList &

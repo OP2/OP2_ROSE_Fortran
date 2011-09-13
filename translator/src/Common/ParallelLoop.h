@@ -119,6 +119,15 @@ class ParallelLoop
 
     /*
      * ======================================================
+     * Checks the consistency of the OP_DAT arguments with
+     * respect to their access values
+     * ======================================================
+     */
+    void
+    checkArguments ();
+
+    /*
+     * ======================================================
      * Is this parallel loop direct or indirect?
      * ======================================================
      */
@@ -198,7 +207,10 @@ class ParallelLoop
     isGlobalScalar (unsigned int OP_DAT_ArgumentGroup);
 
     bool
-    isGlobalNonScalar (unsigned int OP_DAT_ArgumentGroup);
+    isGlobalArray (unsigned int OP_DAT_ArgumentGroup);
+
+    bool
+    isGlobalRead (unsigned int OP_DAT_ArgumentGroup);
 
     void
     setOpAccessValue (unsigned int OP_DAT_ArgumentGroup,
@@ -285,6 +297,15 @@ class ParallelLoop
 
     void
     setUniqueOpDat (std::string const & variableName);
+
+    /*
+     * ======================================================
+     * Does this OP_DAT argument group need a data sizes
+     * declaration?
+     * ======================================================
+     */
+    bool
+    dataSizesDeclarationNeeded (unsigned int OP_DAT_ArgumentGroup);
 
     /*
      * ======================================================

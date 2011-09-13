@@ -189,6 +189,9 @@ FortranCUDASubroutinesGeneration::createModuleDeclarations ()
   {
     string const userSubroutineName = it->first;
 
+    Debug::getInstance ()->debugMessage ("Analysing '" + userSubroutineName
+        + "'", Debug::OUTER_LOOP_LEVEL, __FILE__, __LINE__);
+
     FortranParallelLoop * parallelLoop = it->second;
 
     dimensionsDeclarations[userSubroutineName]
@@ -220,6 +223,9 @@ FortranCUDASubroutinesGeneration::createModuleDeclarations ()
       != declarations->lastParallelLoop (); ++it)
   {
     string const userSubroutineName = it->first;
+
+    Debug::getInstance ()->debugMessage ("Analysing '" + userSubroutineName
+        + "'", Debug::OUTER_LOOP_LEVEL, __FILE__, __LINE__);
 
     FortranParallelLoop * parallelLoop = it->second;
 

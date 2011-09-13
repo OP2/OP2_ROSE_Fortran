@@ -1404,7 +1404,7 @@ FortranCUDAKernelSubroutineIndirectLoop::createOpDatFormalParameterDeclarations 
     {
       string const variableName = OP2::VariableNames::getOpDatName (i);
 
-      if (parallelLoop->isDirect (i) || parallelLoop->isGlobalNonScalar (i))
+      if (parallelLoop->isDirect (i) || parallelLoop->isGlobalArray (i))
       {
         SgDotExp * dotExpression = buildDotExp (buildVarRefExp (
             variableDeclarations->get (

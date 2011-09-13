@@ -552,7 +552,22 @@ FortranCUDAKernelSubroutineDirectLoop::createOpDatFormalParameterDeclarations ()
     {
       string const & variableName = OP2::VariableNames::getOpDatName (i);
 
-      if (parallelLoop->isGlobalNonScalar (i))
+      if (parallelLoop->isGlobal (i) && parallelLoop->isRead (i))
+      {
+        if (parallelLoop->isGlobalScalar (i))
+        {
+          variableDeclarations->add (
+              variableName,
+              FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
+                  variableName, parallelLoop->getOpDatType (i),
+                  subroutineScope, formalParameters, 1, VALUE));
+        }
+        else
+        {
+
+        }
+      }
+      else if (parallelLoop->isGlobal (i) && parallelLoop->isRead (i) == false)
       {
         SgDotExp * dotExpression = buildDotExp (buildVarRefExp (
             variableDeclarations->get (
@@ -575,11 +590,24 @@ FortranCUDAKernelSubroutineDirectLoop::createOpDatFormalParameterDeclarations ()
       }
       else
       {
+        SgDotExp * dotExpression = buildDotExp (buildVarRefExp (
+            variableDeclarations->get (
+                OP2::VariableNames::getDataSizesVariableDeclarationName (
+                    userSubroutineName))), buildVarRefExp (
+            dataSizesDeclaration->getFieldDeclarations ()->get (
+                OP2::VariableNames::getOpDatSizeName (i))));
+
+        SgSubtractOp * upperBoundExpression = buildSubtractOp (dotExpression,
+            buildIntVal (1));
+
         variableDeclarations->add (
             variableName,
             FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
-                variableName, parallelLoop->getOpDatType (i), subroutineScope,
-                formalParameters, 1, VALUE));
+                variableName,
+                FortranTypesBuilder::getArray_RankOne_WithLowerAndUpperBounds (
+                    parallelLoop->getOpDatBaseType (i), buildIntVal (0),
+                    upperBoundExpression), subroutineScope, formalParameters,
+                1, DEVICE));
       }
     }
   }
@@ -594,11 +622,11 @@ FortranCUDAKernelSubroutineDirectLoop::createStatements ()
 
   createInitialiseLocalThreadVariablesStatements ();
 
-  createExecutionLoopStatements ();
+//  createExecutionLoopStatements ();
 
   if (parallelLoop->isReductionRequired () == true)
   {
-    createReductionLoopStatements ();
+   createReductionLoopStatements ();
   }
 }
 
@@ -666,7 +694,7 @@ FortranCUDAKernelSubroutineDirectLoop::createFormalParameterDeclarations ()
 
   /*
    * ======================================================
-   * Argsizes formal parameter
+   * OP_DAT sizes formal parameter
    * ======================================================
    */
 

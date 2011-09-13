@@ -22,21 +22,32 @@ FortranOpDatDimensionsDeclaration::addFields ()
 
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
-    Debug::getInstance ()->debugMessage ("Adding dimensions field for OP_DAT "
-        + lexical_cast <string> (i), Debug::INNER_LOOP_LEVEL, __FILE__,
-        __LINE__);
+    /*
+     * ======================================================
+     * We do NOT need a dimensions field when OP_GBL data
+     * is read
+     * ======================================================
+     */
 
-    string const & variableName = OP2::VariableNames::getOpDatDimensionName (i);
+    if (parallelLoop->isGlobalRead (i) == false)
+    {
+      Debug::getInstance ()->debugMessage (
+          "Adding dimensions field for OP_DAT " + lexical_cast <string> (i),
+          Debug::INNER_LOOP_LEVEL, __FILE__, __LINE__);
 
-    SgVariableDeclaration * fieldDeclaration = buildVariableDeclaration (
-        variableName, FortranTypesBuilder::getFourByteInteger (), NULL,
-        moduleScope);
+      string const & variableName = OP2::VariableNames::getOpDatDimensionName (
+          i);
 
-    fieldDeclaration->get_declarationModifier ().get_accessModifier ().setUndefined ();
+      SgVariableDeclaration * fieldDeclaration = buildVariableDeclaration (
+          variableName, FortranTypesBuilder::getFourByteInteger (), NULL,
+          moduleScope);
 
-    typeStatement->get_definition ()->append_member (fieldDeclaration);
+      fieldDeclaration->get_declarationModifier ().get_accessModifier ().setUndefined ();
 
-    fieldDeclarations->add (variableName, fieldDeclaration);
+      typeStatement->get_definition ()->append_member (fieldDeclaration);
+
+      fieldDeclarations->add (variableName, fieldDeclaration);
+    }
   }
 }
 
@@ -58,6 +69,7 @@ FortranOpDatDimensionsDeclaration::addTypeDeclaration ()
  * Public functions
  * ======================================================
  */
+
 SgClassType *
 FortranOpDatDimensionsDeclaration::getType ()
 {

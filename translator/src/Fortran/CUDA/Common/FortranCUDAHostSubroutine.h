@@ -34,6 +34,15 @@ class FortranCUDAHostSubroutine: public FortranHostSubroutine
 
     /*
      * ======================================================
+     * Creates the statements which initialises the sizes of
+     * the OP_DATs
+     * ======================================================
+     */
+    void
+    createInitialiseOpDatSizesStatements (SgScopeStatement * scope);
+
+    /*
+     * ======================================================
      * Creates the statements which are executed when the
      * host subroutine is executed for the first time
      * ======================================================
