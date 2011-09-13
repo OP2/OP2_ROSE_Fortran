@@ -622,11 +622,11 @@ FortranCUDAKernelSubroutineDirectLoop::createStatements ()
 
   createInitialiseLocalThreadVariablesStatements ();
 
-//  createExecutionLoopStatements ();
+  createExecutionLoopStatements ();
 
   if (parallelLoop->isReductionRequired () == true)
   {
-   createReductionLoopStatements ();
+    createReductionLoopStatements ();
   }
 }
 

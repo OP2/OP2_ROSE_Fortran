@@ -1,5 +1,5 @@
 program OpGblWithScalarRead
-  use OP2
+  use OP2_C
   use UserKernels
   use, intrinsic :: ISO_C_BINDING
   implicit none

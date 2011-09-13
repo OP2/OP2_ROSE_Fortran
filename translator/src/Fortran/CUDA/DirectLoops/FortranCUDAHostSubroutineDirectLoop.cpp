@@ -46,7 +46,7 @@ FortranCUDAHostSubroutineDirectLoop::createKernelFunctionCallStatement ()
       else if (parallelLoop->isGlobalScalar (i))
       {
         actualParameters->append_expression (buildVarRefExp (
-            variableDeclarations->get (OP2::VariableNames::getOpDatName (i))));
+            variableDeclarations->get (OP2::VariableNames::getOpDatHostName (i))));
       }
       else
       {

@@ -73,7 +73,7 @@ namespace OP2
     std::string const threadBlockSizeMacro = "OP_BLOCK_SIZE";
     std::string const warpSize = "warpSize";
     std::string const warpMemorySize = "warpMemorySize";
-    std::string const warpSizeMacro = "OP_WARPSIZE";
+    std::string const warpSizeMacro = "OP_WARP_SIZE";
 
     namespace PlanFunction
     {

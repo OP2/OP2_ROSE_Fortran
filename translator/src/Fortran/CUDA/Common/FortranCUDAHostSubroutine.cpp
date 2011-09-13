@@ -597,7 +597,8 @@ FortranCUDAHostSubroutine::createDataMarshallingLocalVariableDeclarations ()
           variableDeclarations->add (
               variableName,
               FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
-                  variableName, parallelLoop->getOpDatType (i), subroutineScope));
+                  variableName, buildPointerType (
+                      parallelLoop->getOpDatType (i)), subroutineScope));
         }
         else
         {
