@@ -27,15 +27,6 @@ class FortranCUDAHostSubroutineDirectLoop: public FortranCUDAHostSubroutine
 
     /*
      * ======================================================
-     * Generates the code initialising the device variable
-     * sizes variable
-     * ======================================================
-     */
-    void
-    createVariableSizesInitialisationStatements ();
-
-    /*
-     * ======================================================
      * Initialises CUDA-specific variables
      * ======================================================
      */

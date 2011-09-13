@@ -87,64 +87,6 @@ FortranCUDAHostSubroutineDirectLoop::createKernelFunctionCallStatement ()
 }
 
 void
-FortranCUDAHostSubroutineDirectLoop::createVariableSizesInitialisationStatements ()
-{
-  using SageBuilder::buildOpaqueVarRefExp;
-  using SageBuilder::buildDotExp;
-  using SageBuilder::buildVarRefExp;
-  using SageBuilder::buildAssignStatement;
-  using SageInterface::appendStatement;
-  using std::string;
-
-  Debug::getInstance ()->debugMessage (
-      "Creating CUDA kernel prologue statements", Debug::FUNCTION_LEVEL,
-      __FILE__, __LINE__);
-
-  /*
-   * ======================================================
-   * In direct loops, sizes are only related to OP_DAT
-   * variables
-   * ======================================================
-   */
-
-  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
-  {
-    if (parallelLoop->isDuplicateOpDat (i) == false)
-    {
-      string const & variableName = OP2::VariableNames::getOpDatSizeName (i);
-
-      SgDotExp * dotExpression = buildDotExp (buildVarRefExp (
-          moduleDeclarations->getDataSizesVariableDeclaration ()),
-          buildOpaqueVarRefExp (variableName, subroutineScope));
-
-      /*
-       * ======================================================
-       * The size value changes for reduction variables
-       * ======================================================
-       */
-
-      if (parallelLoop->isReductionRequired (i) == false)
-      {
-        SgExprStatement * assignmentStatement = buildAssignStatement (
-            dotExpression, buildVarRefExp (
-                dataSizesDeclaration->getFieldDeclarations ()->get (
-                    variableName)));
-
-        appendStatement (assignmentStatement, subroutineScope);
-      }
-      else
-      {
-        SgExprStatement * assignmentStatement = buildAssignStatement (
-            dotExpression, buildVarRefExp (variableDeclarations->get (
-                OP2::VariableNames::threadItems)));
-
-        appendStatement (assignmentStatement, subroutineScope);
-      }
-    }
-  }
-}
-
-void
 FortranCUDAHostSubroutineDirectLoop::createCUDAKernelInitialisationStatements ()
 {
   using SageBuilder::buildOpaqueVarRefExp;
@@ -341,8 +283,6 @@ FortranCUDAHostSubroutineDirectLoop::createStatements ()
   {
     createReductionPrologueStatements ();
   }
-
-  createVariableSizesInitialisationStatements ();
 
   appendStatement (createKernelFunctionCallStatement (), subroutineScope);
 

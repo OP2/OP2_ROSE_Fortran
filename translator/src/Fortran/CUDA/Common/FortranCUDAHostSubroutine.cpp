@@ -256,6 +256,75 @@ FortranCUDAHostSubroutine::createReductionLocalVariableDeclarations ()
       variableDeclaration5);
 }
 
+SgExpression *
+FortranCUDAHostSubroutine::createRHSOfInitialiseOpDatSizeStatement (
+    SgScopeStatement * scope, unsigned int OP_DAT_ArgumentGroup)
+{
+  using SageBuilder::buildDotExp;
+  using SageBuilder::buildVarRefExp;
+  using SageBuilder::buildOpaqueVarRefExp;
+  using SageBuilder::buildMultiplyOp;
+
+  if (parallelLoop->isDirect (OP_DAT_ArgumentGroup)
+      || parallelLoop->isIndirect (OP_DAT_ArgumentGroup))
+  {
+    SgDotExp * dotExpression1 = buildDotExp (buildVarRefExp (
+        variableDeclarations->get (OP2::VariableNames::getOpDatName (
+            OP_DAT_ArgumentGroup))), buildOpaqueVarRefExp (
+        OP2::VariableNames::dimension, scope));
+
+    SgDotExp * dotExpression2 = buildDotExp (buildVarRefExp (
+        variableDeclarations->get (OP2::VariableNames::getOpDatName (
+            OP_DAT_ArgumentGroup))), buildOpaqueVarRefExp (
+        OP2::VariableNames::set, scope));
+
+    SgDotExp * dotExpression3 = buildDotExp (dotExpression2,
+        buildOpaqueVarRefExp (OP2::VariableNames::size, scope));
+
+    SgExpression * multiplyExpression = buildMultiplyOp (dotExpression1,
+        dotExpression3);
+
+    return multiplyExpression;
+  }
+  else if (parallelLoop->isReductionRequired (OP_DAT_ArgumentGroup))
+  {
+    if (parallelLoop->isGlobalScalar (OP_DAT_ArgumentGroup))
+    {
+      SgDotExp * dotExpression = buildDotExp (buildVarRefExp (
+          variableDeclarations->get (OP2::VariableNames::getOpSetName ())),
+          buildOpaqueVarRefExp (OP2::VariableNames::size, scope));
+
+      return dotExpression;
+    }
+    else
+    {
+      SgDotExp * dotExpression1 = buildDotExp (buildVarRefExp (
+          variableDeclarations->get (OP2::VariableNames::getOpDatName (
+              OP_DAT_ArgumentGroup))), buildOpaqueVarRefExp (
+          OP2::VariableNames::dimension, scope));
+
+      SgDotExp * dotExpression2 = buildDotExp (buildVarRefExp (
+          variableDeclarations->get (OP2::VariableNames::getOpSetName ())),
+          buildOpaqueVarRefExp (OP2::VariableNames::size, scope));
+
+      SgExpression * multiplyExpression = buildMultiplyOp (dotExpression1,
+          dotExpression2);
+
+      return multiplyExpression;
+    }
+  }
+  else if (parallelLoop->isGlobalArray (OP_DAT_ArgumentGroup)
+      && parallelLoop->isRead (OP_DAT_ArgumentGroup))
+  {
+    SgDotExp * dotExpression = buildDotExp (buildVarRefExp (
+        variableDeclarations->get (OP2::VariableNames::getOpDatName (
+            OP_DAT_ArgumentGroup))), buildOpaqueVarRefExp (
+        OP2::VariableNames::dimension, scope));
+
+    return dotExpression;
+  }
+}
+
 SgBasicBlock *
 FortranCUDAHostSubroutine::createTransferOpDatStatements ()
 {
@@ -281,41 +350,14 @@ FortranCUDAHostSubroutine::createTransferOpDatStatements ()
   {
     if (parallelLoop->isDuplicateOpDat (i) == false)
     {
-      /*
-       * ======================================================
-       * Statement to initialise size of OP_DAT
-       * ======================================================
-       */
-      SgDotExp * dotExpression1 = buildDotExp (buildVarRefExp (
-          variableDeclarations->get (OP2::VariableNames::getOpDatName (i))),
-          buildOpaqueVarRefExp (OP2::VariableNames::dimension, block));
-
-      if (parallelLoop->isGlobal (i))
+      if (parallelLoop->dataSizesDeclarationNeeded (i))
       {
-        if (parallelLoop->isRead (i))
-        {
-          SgExprStatement * assignmentStatement = buildAssignStatement (
-              buildVarRefExp (variableDeclarations->get (
-                  OP2::VariableNames::getOpDatSizeName (i))), dotExpression1);
-
-          appendStatement (assignmentStatement, block);
-        }
-      }
-      else
-      {
-        SgDotExp * dotExpression2 = buildDotExp (buildVarRefExp (
-            variableDeclarations->get (OP2::VariableNames::getOpDatName (i))),
-            buildOpaqueVarRefExp (OP2::VariableNames::set, block));
-
-        SgDotExp * dotExpression3 = buildDotExp (dotExpression2,
-            buildOpaqueVarRefExp (OP2::VariableNames::size, block));
-
-        SgExpression * multiplyExpression = buildMultiplyOp (dotExpression1,
-            dotExpression3);
+        SgExpression * rhsOfAssigment =
+            createRHSOfInitialiseOpDatSizeStatement (block, i);
 
         SgExprStatement * assignmentStatement = buildAssignStatement (
             buildVarRefExp (variableDeclarations->get (
-                OP2::VariableNames::getOpDatSizeName (i))), multiplyExpression);
+                OP2::VariableNames::getOpDatSizeName (i))), rhsOfAssigment);
 
         appendStatement (assignmentStatement, block);
       }
@@ -443,121 +485,6 @@ FortranCUDAHostSubroutine::createTransferOpDatStatements ()
   return block;
 }
 
-void
-FortranCUDAHostSubroutine::createInitialiseOpDatSizesStatements (
-    SgScopeStatement * scope)
-{
-  using SageBuilder::buildAssignStatement;
-  using SageBuilder::buildVarRefExp;
-  using SageBuilder::buildOpaqueVarRefExp;
-  using SageBuilder::buildExprListExp;
-  using SageBuilder::buildDotExp;
-  using SageBuilder::buildMultiplyOp;
-  using SageInterface::appendStatement;
-
-  Debug::getInstance ()->debugMessage (
-      "Creating statements to initialise OP_DAT sizes", Debug::FUNCTION_LEVEL,
-      __FILE__, __LINE__);
-
-  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
-  {
-    if (parallelLoop->isDuplicateOpDat (i) == false)
-    {
-      if (parallelLoop->dataSizesDeclarationNeeded (i))
-      {
-        if (parallelLoop->isDirect (i) || parallelLoop->isIndirect (i))
-        {
-          SgDotExp * dotExpression1 = buildDotExp (buildVarRefExp (
-              moduleDeclarations->getDataSizesVariableDeclaration ()),
-              buildVarRefExp (
-                  dataSizesDeclaration->getFieldDeclarations ()->get (
-                      OP2::VariableNames::getOpDatSizeName (i))));
-
-          SgDotExp * dotExpression2 = buildDotExp (
-              buildVarRefExp (variableDeclarations->get (
-                  OP2::VariableNames::getOpDatName (i))), buildOpaqueVarRefExp (
-                  OP2::VariableNames::dimension, scope));
-
-          SgDotExp * dotExpression3 = buildDotExp (
-              buildVarRefExp (variableDeclarations->get (
-                  OP2::VariableNames::getOpDatName (i))), buildOpaqueVarRefExp (
-                  OP2::VariableNames::set, scope));
-
-          SgDotExp * dotExpression4 = buildDotExp (dotExpression3,
-              buildOpaqueVarRefExp (OP2::VariableNames::size, scope));
-
-          SgExpression * multiplyExpression = buildMultiplyOp (dotExpression2,
-              dotExpression4);
-
-          SgExprStatement * assignmentStatement = buildAssignStatement (
-              dotExpression1, multiplyExpression);
-
-          appendStatement (assignmentStatement, scope);
-        }
-        else if (parallelLoop->isReductionRequired (i))
-        {
-          SgDotExp * dotExpression1 = buildDotExp (buildVarRefExp (
-              moduleDeclarations->getDataSizesVariableDeclaration ()),
-              buildVarRefExp (
-                  dataSizesDeclaration->getFieldDeclarations ()->get (
-                      OP2::VariableNames::getOpDatSizeName (i))));
-
-          if (parallelLoop->isGlobalScalar (i))
-          {
-            SgDotExp * dotExpression2 = buildDotExp (
-                buildVarRefExp (variableDeclarations->get (
-                    OP2::VariableNames::getOpSetName ())),
-                buildOpaqueVarRefExp (OP2::VariableNames::size, scope));
-
-            SgExprStatement * assignmentStatement = buildAssignStatement (
-                dotExpression1, dotExpression2);
-
-            appendStatement (assignmentStatement, scope);
-          }
-          else
-          {
-            SgDotExp * dotExpression2 = buildDotExp (
-                buildVarRefExp (variableDeclarations->get (
-                    OP2::VariableNames::getOpDatName (i))),
-                buildOpaqueVarRefExp (OP2::VariableNames::dimension, scope));
-
-            SgDotExp * dotExpression3 = buildDotExp (
-                buildVarRefExp (variableDeclarations->get (
-                    OP2::VariableNames::getOpSetName ())),
-                buildOpaqueVarRefExp (OP2::VariableNames::size, scope));
-
-            SgExpression * multiplyExpression = buildMultiplyOp (
-                dotExpression2, dotExpression3);
-
-            SgExprStatement * assignmentStatement = buildAssignStatement (
-                dotExpression1, multiplyExpression);
-
-            appendStatement (assignmentStatement, scope);
-          }
-        }
-        else if (parallelLoop->isGlobalArray (i) && parallelLoop->isRead (i))
-        {
-          SgDotExp * dotExpression1 = buildDotExp (buildVarRefExp (
-              moduleDeclarations->getDataSizesVariableDeclaration ()),
-              buildVarRefExp (
-                  dataSizesDeclaration->getFieldDeclarations ()->get (
-                      OP2::VariableNames::getOpDatSizeName (i))));
-
-          SgDotExp * dotExpression2 = buildDotExp (
-              buildVarRefExp (variableDeclarations->get (
-                  OP2::VariableNames::getOpDatName (i))), buildOpaqueVarRefExp (
-                  OP2::VariableNames::dimension, scope));
-
-          SgExprStatement * assignmentStatement = buildAssignStatement (
-              dotExpression1, dotExpression2);
-
-          appendStatement (assignmentStatement, scope);
-        }
-      }
-    }
-  }
-}
-
 SgBasicBlock *
 FortranCUDAHostSubroutine::createFirstTimeExecutionStatements ()
 {
@@ -592,9 +519,33 @@ FortranCUDAHostSubroutine::createFirstTimeExecutionStatements ()
 
       appendStatement (assignmentStatement, block);
     }
-  }
 
-  createInitialiseOpDatSizesStatements (block);
+  }
+  Debug::getInstance ()->debugMessage (
+      "Creating statements to initialise OP_DAT sizes (on device)",
+      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+
+  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
+  {
+    if (parallelLoop->isDuplicateOpDat (i) == false)
+    {
+      if (parallelLoop->dataSizesDeclarationNeeded (i))
+      {
+        SgDotExp * dotExpression = buildDotExp (buildVarRefExp (
+            moduleDeclarations->getDataSizesVariableDeclaration ()),
+            buildVarRefExp (dataSizesDeclaration->getFieldDeclarations ()->get (
+                OP2::VariableNames::getOpDatSizeName (i))));
+
+        SgExpression * rhsOfAssigment =
+            createRHSOfInitialiseOpDatSizeStatement (block, i);
+
+        SgExprStatement * assignmentStatement = buildAssignStatement (
+            dotExpression, rhsOfAssigment);
+
+        appendStatement (assignmentStatement, block);
+      }
+    }
+  }
 
   return block;
 }

@@ -29,17 +29,19 @@ class FortranCUDAHostSubroutine: public FortranHostSubroutine
     virtual void
     createReductionLocalVariableDeclarations ();
 
-    virtual SgBasicBlock *
-    createTransferOpDatStatements ();
-
     /*
      * ======================================================
-     * Creates the statements which initialises the sizes of
-     * the OP_DATs
+     * Creates the expression on the right-hand side of the
+     * statement which initialises the size of the OP_DAT in this
+     * argument group
      * ======================================================
      */
-    void
-    createInitialiseOpDatSizesStatements (SgScopeStatement * scope);
+    SgExpression *
+    createRHSOfInitialiseOpDatSizeStatement (SgScopeStatement * scope,
+        unsigned int OP_DAT_ArgumentGroup);
+
+    virtual SgBasicBlock *
+    createTransferOpDatStatements ();
 
     /*
      * ======================================================
