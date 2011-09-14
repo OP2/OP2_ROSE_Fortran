@@ -372,7 +372,7 @@ FortranCUDAKernelSubroutine::createAutoSharedDeclarations ()
   {
     if (parallelLoop->isDuplicateOpDat (i) == false)
     {
-      if (parallelLoop->isGlobalScalar (i) == false)
+      if (parallelLoop->isGlobal (i) == false)
       {
         string const autosharedVariableName =
             OP2::VariableNames::getAutosharedDeclarationName (

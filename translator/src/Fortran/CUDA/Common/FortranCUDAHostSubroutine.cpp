@@ -372,7 +372,7 @@ FortranCUDAHostSubroutine::createTransferOpDatStatements ()
   {
     if (parallelLoop->isDuplicateOpDat (i) == false)
     {
-      if (parallelLoop->isGlobalScalar (i))
+      if (parallelLoop->isGlobalScalar (i) && parallelLoop->isRead (i))
       {
         Debug::getInstance ()->debugMessage ("Global scalar conversion",
             Debug::HIGHEST_DEBUG_LEVEL, __FILE__, __LINE__);
@@ -424,7 +424,7 @@ FortranCUDAHostSubroutine::createTransferOpDatStatements ()
 
         appendStatement (callStatementA, block);
 
-        if (parallelLoop->isGlobal (i))
+        if (parallelLoop->isGlobal (i) && parallelLoop->isRead (i) == false)
         {
           Debug::getInstance ()->debugMessage (
               "Global non-scalar additional conversion",
@@ -466,7 +466,7 @@ FortranCUDAHostSubroutine::createTransferOpDatStatements ()
   {
     if (parallelLoop->isDuplicateOpDat (i) == false)
     {
-      if (parallelLoop->isGlobalArray (i))
+      if (parallelLoop->isGlobalArray (i) && parallelLoop->isRead (i) == false)
       {
         Debug::getInstance ()->debugMessage ("Global non-scalar transfer",
             Debug::HIGHEST_DEBUG_LEVEL, __FILE__, __LINE__);
@@ -503,7 +503,7 @@ FortranCUDAHostSubroutine::createFirstTimeExecutionStatements ()
 
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
-    if (parallelLoop->isGlobalScalar (i) == false)
+    if (parallelLoop->isGlobalRead (i) == false)
     {
       SgDotExp * dotExpression1 = buildDotExp (buildVarRefExp (
           moduleDeclarations->getDimensionsVariableDeclaration ()),
@@ -608,7 +608,7 @@ FortranCUDAHostSubroutine::createDataMarshallingLocalVariableDeclarations ()
           variableDeclarations->add (
               variableName,
               FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
-                  variableName, parallelLoop->getOpDatBaseType (i),
+                  variableName, parallelLoop->getOpDatType (i),
                   subroutineScope, 2, DEVICE, ALLOCATABLE));
         }
       }

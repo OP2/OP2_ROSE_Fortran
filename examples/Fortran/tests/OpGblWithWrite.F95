@@ -17,6 +17,8 @@ use, intrinsic :: ISO_C_BINDING
   type(op_dat) :: global
 
   allocate ( hostGlobal ( 1 ) )
+
+  call op_init ()
 	
   call op_decl_set ( setCardinality, set, setName )
   call op_decl_gbl ( hostGlobal, 1, global )
@@ -24,6 +26,5 @@ use, intrinsic :: ISO_C_BINDING
   call op_par_loop_1 ( kernel_1parameter_floatArray, set, &
                        & global,    -1, OP_GBL, OP_WRITE &
                        & )
-
 
 end program OpGblWithWrite

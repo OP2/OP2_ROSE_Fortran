@@ -18,12 +18,13 @@ use, intrinsic :: ISO_C_BINDING
 
   allocate ( hostGlobal ( 1 ) )
 	
+  call op_init ()
+
   call op_decl_set ( setCardinality, set, setName )
   call op_decl_gbl ( hostGlobal, 1, global )
 
   call op_par_loop_1 ( kernel_1parameter_floatArray, set, &
                        & global,    -1, OP_GBL, OP_RW &
                        & )
-
 
 end program OpGblWithReadAndWrite

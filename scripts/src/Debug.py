@@ -6,12 +6,12 @@ class Debug ():
 
 	def debugMessage (self, str, debugLevel):
 		if debugLevel >= self.debug:
-			print(str + ".")
+			print(str)
 
 	def verboseMessage (self, str):
 		if self.verbose:
-			print(str + ".")
+			print(str)
 
 	def exitMessage(self, str):
-		print(str + ".")
+		print(str)
 		exit(1)

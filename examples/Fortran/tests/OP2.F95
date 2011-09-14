@@ -1,4 +1,4 @@
-module OP2
+module OP2_C
 
 use, intrinsic :: ISO_C_BINDING
 
@@ -241,4 +241,4 @@ contains
     type(op_map) :: map0, map1, map2, map3, map4, map5, map6, map7            
   end subroutine op_par_loop_8
 
-end module OP2
+end module OP2_C

@@ -564,7 +564,14 @@ FortranCUDAKernelSubroutineDirectLoop::createOpDatFormalParameterDeclarations ()
         }
         else
         {
-
+          variableDeclarations->add (
+              variableName,
+              FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
+                  variableName,
+                  FortranTypesBuilder::getArray_RankOne_WithLowerAndUpperBounds (
+                      parallelLoop->getOpDatType (i), buildIntVal (0),
+                      buildIntVal (parallelLoop->getOpDatDimension (i) - 1)),
+                  subroutineScope, formalParameters, 1, DEVICE));
         }
       }
       else if (parallelLoop->isGlobal (i) && parallelLoop->isRead (i) == false)

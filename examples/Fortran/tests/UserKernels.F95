@@ -1,8 +1,19 @@
 module UserKernels
 
 contains
+
   
-  subroutine kernel_2parameter_floatArray_floatScalar ( x, y ) BIND(C)
+  subroutine kernel_2parameter_floatArray_floatArray ( x, y )
+    implicit none
+
+    real(8), dimension(*) :: x
+    integer(4), dimension(*) :: y
+
+    x(1) = x(1) + y(1) + y(2)
+
+  end subroutine kernel_2parameter_floatArray_floatArray
+  
+  subroutine kernel_2parameter_floatArray_floatScalar ( x, y )
     implicit none
 
     real(8), dimension(*) :: x
@@ -12,7 +23,7 @@ contains
 
   end subroutine kernel_2parameter_floatArray_floatScalar
 
-  subroutine kernel_1parameter_floatArray ( x ) BIND(C)
+  subroutine kernel_1parameter_floatArray ( x )
     implicit none
 
     real(8), dimension(*) :: x

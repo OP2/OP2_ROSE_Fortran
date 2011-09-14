@@ -44,6 +44,8 @@ parser.add_option("-v",
 
 debug = Debug(opts.verbose)
 
+generatedFilesDirectory = "generatedFiles"
+
 # Cleans out files generated during the compilation process
 def clean ():
 	filesToRemove = []
@@ -61,11 +63,67 @@ def clean ():
 			print("Removing file: '" + file + "'") 
 		os.remove(file)
 
-def outputStdout (stdoutLines):
-	print('==================================== STANDARD OUTPUT ===========================================')
-	for line in stdoutLines.splitlines():
-		print(line)
-	print('================================================================================================')
+def generateCUDAMakefile (generatedFiles, executableName, testNum):
+	from FileDependencies import getBaseFileName, determineModuleDependencies
+	from Graph import Graph
+
+	debug.verboseMessage("Generating Makefile for CUDA")
+
+	CObjectFiles        = ['op_support.o', 'op_seq.o', 'debug.o']
+	fortranSupportFiles = ['cudaConfigurationParams.F95', 'op2_c.F95']
+	op2Directory        = "OP2_DIR"
+	linkTarget          = "link"
+	fortranTarget       = "fortranFiles"
+
+	# Work out the dependencies between modules 
+	g = determineModuleDependencies(generatedFiles)
+
+	# Create the Makefile  
+	CUDAMakefile = open("Makefile." + str(testNum), "w")
+	   
+	# Makefile variables
+	CUDAMakefile.write("FC      = pgfortran\n")
+	CUDAMakefile.write("FC_OPT  = -Mcuda=cuda3.1 -fast -O2 -Mcuda=ptxinfo -Minform=inform\n")
+	CUDAMakefile.write("OUT     = %s\n" % (executableName))
+	CUDAMakefile.write("%s = \n\n" % (op2Directory))
+
+	# PHONY targets
+	CUDAMakefile.write("# Phony targets\n")
+	CUDAMakefile.write(".PHONY: all clean\n\n")
+	CUDAMakefile.write("all: %s %s\n\n" % (fortranTarget, linkTarget))
+	CUDAMakefile.write("clean:\n\t")
+	CUDAMakefile.write("rm -f *.o *.mod *.MOD $(OUT)\n\n")
+
+	# Fortran target
+	fortranLine = ""
+	for f in fortranSupportFiles:
+		fortranLine += f + " "
+	for f in generatedFiles:
+		fortranLine += os.path.basename(f) + " "
+
+	CUDAMakefile.write(fortranTarget + ": ")
+	CUDAMakefile.write(fortranLine + "\n\t")
+	CUDAMakefile.write("$(FC) $(FC_OPT) -c ")
+	CUDAMakefile.write(fortranLine + "\n\n")
+
+	# Link target
+	linkLine = ""	
+	for f in CObjectFiles:
+		linkLine += "$(%s)/%s " % (op2Directory, f)
+	for f in fortranSupportFiles:
+		linkLine += f[:-4] + ".o "
+	for f in generatedFiles:
+		basename = os.path.basename(f)
+		linkLine += basename[:-4] + ".o "
+
+	CUDAMakefile.write(linkTarget + ": ")
+	CUDAMakefile.write(linkLine + "\n\t")
+	CUDAMakefile.write("$(FC) $(FC_OPT) ")
+	CUDAMakefile.write(linkLine + "-o " + executableName + "\n\n")
+
+	CUDAMakefile.close()
+
+	return CUDAMakefile.name
 
 # Runs the compiler
 def runTests ():
@@ -93,8 +151,11 @@ def runTests ():
 
 	failLexeme = 'FAIL'
 	passLexeme = 'PASS'
+	i = 0
 	
 	for line in open(testsFile, 'r'):
+		i = i + 1
+		debug.verboseMessage("========== Test %s ==========" % i)
 		tokens     = line.split(' ')
 		testResult = tokens[1].strip()
 		testFile   = tokens[0].strip()	
@@ -141,13 +202,24 @@ def runTests ():
  				files.append("rose_cuda_code.CUF")
 				files.append("rose_" + testFile)
 				f = FormatFortranCode (files) 
+			
+				if not os.path.exists(generatedFilesDirectory):
+					os.makedirs(generatedFilesDirectory)
 
+				renamedFiles = []
 				for f in files:
-					destName = testFile[:-4] + "_" + f
-					print(destName)
+					destName = generatedFilesDirectory + os.sep + testFile[:-4] + "_" + f
+					debug.verboseMessage("Keeping file '%s'" % (destName))
 					os.rename(f, destName)
+					renamedFiles.append(destName)
+				
+				makefile = generateCUDAMakefile(renamedFiles, "program", i)
+				destName = generatedFilesDirectory + os.sep + makefile
+				debug.verboseMessage("Generating Makefile '%s'" % (destName))				
+				os.rename(makefile, destName)
 			else:
 				debug.verboseMessage("Test on file '%s' did NOT pass" % (testFile))
+		debug.verboseMessage("")
 
 if opts.clean:
 	clean()
