@@ -17,6 +17,8 @@ program OpGblWithScalarRead
   type(op_set) :: set
   type(op_dat) :: deviceData
   type(op_dat) :: global
+
+  setCardinality = 10
   
   allocate ( hostData (4 * setCardinality) )
 

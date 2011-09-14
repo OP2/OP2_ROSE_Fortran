@@ -598,7 +598,7 @@ FortranCUDAHostSubroutine::createDataMarshallingLocalVariableDeclarations ()
               variableName,
               FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
                   variableName, buildPointerType (
-                      parallelLoop->getOpDatType (i)), subroutineScope));
+                      parallelLoop->getOpDatBaseType (i)), subroutineScope));
         }
         else
         {
@@ -608,7 +608,7 @@ FortranCUDAHostSubroutine::createDataMarshallingLocalVariableDeclarations ()
           variableDeclarations->add (
               variableName,
               FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
-                  variableName, parallelLoop->getOpDatType (i),
+                  variableName, parallelLoop->getOpDatBaseType (i),
                   subroutineScope, 2, DEVICE, ALLOCATABLE));
         }
       }
@@ -629,7 +629,7 @@ FortranCUDAHostSubroutine::createDataMarshallingLocalVariableDeclarations ()
         variableDeclarations->add (variableNameOnHost,
             FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
                 variableNameOnHost, buildPointerType (
-                    parallelLoop->getOpDatType (i)), subroutineScope));
+                    parallelLoop->getOpDatBaseType (i)), subroutineScope));
       }
       else
       {

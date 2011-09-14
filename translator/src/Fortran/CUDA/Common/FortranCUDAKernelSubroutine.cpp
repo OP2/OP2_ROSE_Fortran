@@ -99,26 +99,30 @@ FortranCUDAKernelSubroutine::createInitialiseLocalThreadVariablesStatements ()
 
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
-    if (parallelLoop->isReductionRequired (i) || (parallelLoop->isIndirect (i)
-        && parallelLoop->isIncremented (i)) || (parallelLoop->isDirect (i)
-        && parallelLoop->getOpDatDimension (i) > 1))
+    if (parallelLoop->localThreadVariableDeclarationNeeded (i))
     {
       SgBasicBlock * loopBody = buildBasicBlock ();
 
-      Debug::getInstance ()->debugMessage ("OP_DAT '"
-          + parallelLoop->getOpDatVariableName (i) + "'",
-          Debug::HIGHEST_DEBUG_LEVEL, __FILE__, __LINE__);
+      SgExpression * LHSOfAssigment;
 
-      SgPntrArrRefExp * arrayIndexExpression1 = buildPntrArrRefExp (
-          buildVarRefExp (variableDeclarations->get (
-              OP2::VariableNames::getOpDatLocalName (i))),
-          buildVarRefExp (variableDeclarations->get (
-              CommonVariableNames::iterationCounter1)));
+      if (parallelLoop->isGlobalScalar (i))
+      {
+        LHSOfAssigment = buildVarRefExp (variableDeclarations->get (
+            OP2::VariableNames::getOpDatLocalName (i)));
+      }
+      else
+      {
+        LHSOfAssigment
+            = buildPntrArrRefExp (buildVarRefExp (variableDeclarations->get (
+                OP2::VariableNames::getOpDatLocalName (i))), buildVarRefExp (
+                variableDeclarations->get (
+                    CommonVariableNames::iterationCounter1)));
+      }
 
       if (parallelLoop->isIncremented (i))
       {
         SgExprStatement * assignmentStatement = buildAssignStatement (
-            arrayIndexExpression1, buildIntVal (0));
+            LHSOfAssigment, buildIntVal (0));
 
         appendStatement (assignmentStatement, loopBody);
       }
@@ -137,7 +141,7 @@ FortranCUDAKernelSubroutine::createInitialiseLocalThreadVariablesStatements ()
                 OP2::VariableNames::getOpDatLocalName (i))), addExpression);
 
         SgExprStatement * assignmentStatement = buildAssignStatement (
-            arrayIndexExpression1, arrayIndexExpression2);
+            LHSOfAssigment, arrayIndexExpression2);
 
         appendStatement (assignmentStatement, loopBody);
       }
@@ -183,7 +187,7 @@ FortranCUDAKernelSubroutine::createReductionLoopStatements ()
 
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
-    if (parallelLoop->isReductionRequired (i) == true)
+    if (parallelLoop->isReductionRequired (i))
     {
       /*
        * ======================================================
@@ -215,7 +219,7 @@ FortranCUDAKernelSubroutine::createReductionLoopStatements ()
        * ======================================================
        */
 
-      SgPntrArrRefExp * arrayIndexExpression1 = buildPntrArrRefExp (
+      SgPntrArrRefExp * parameterExpression1 = buildPntrArrRefExp (
           buildVarRefExp (variableDeclarations->get (
               OP2::VariableNames::getOpDatName (i))), subscriptExpression1);
 
@@ -225,11 +229,21 @@ FortranCUDAKernelSubroutine::createReductionLoopStatements ()
        * ======================================================
        */
 
-      SgPntrArrRefExp * arrayIndexExpression2 = buildPntrArrRefExp (
-          buildVarRefExp (variableDeclarations->get (
-              OP2::VariableNames::getOpDatLocalName (i))),
-          buildVarRefExp (variableDeclarations->get (
-              CommonVariableNames::iterationCounter1)));
+      SgExpression * parameterExpression2;
+
+      if (parallelLoop->isGlobalScalar (i))
+      {
+        parameterExpression2 = buildVarRefExp (variableDeclarations->get (
+            OP2::VariableNames::getOpDatLocalName (i)));
+      }
+      else
+      {
+        parameterExpression2
+            = buildPntrArrRefExp (buildVarRefExp (variableDeclarations->get (
+                OP2::VariableNames::getOpDatLocalName (i))), buildVarRefExp (
+                variableDeclarations->get (
+                    CommonVariableNames::iterationCounter1)));
+      }
 
       /*
        * ======================================================
@@ -258,7 +272,7 @@ FortranCUDAKernelSubroutine::createReductionLoopStatements ()
       }
 
       SgExprListExp * actualParameters = buildExprListExp (
-          arrayIndexExpression1, arrayIndexExpression2, buildVarRefExp (
+          parameterExpression1, parameterExpression2, buildVarRefExp (
               variableDeclarations->get (OP2::VariableNames::warpSize)),
           buildVarRefExp (
               variableDeclarations->get (OP2::VariableNames::offset)),
@@ -323,16 +337,16 @@ FortranCUDAKernelSubroutine::createLocalThreadDeclarations ()
 
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
-
     string const & variableName = OP2::VariableNames::getOpDatLocalName (i);
 
-    if (parallelLoop->isReductionRequired (i))
+    if (parallelLoop->localThreadVariableDeclarationNeeded (i))
     {
       if (parallelLoop->isGlobalScalar (i))
       {
         variableDeclarations->add (variableName,
             FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
-                variableName, parallelLoop->getOpDatType (i), subroutineScope));
+                variableName, parallelLoop->getOpDatBaseType (i),
+                subroutineScope));
       }
       else
       {
@@ -342,16 +356,6 @@ FortranCUDAKernelSubroutine::createLocalThreadDeclarations ()
                     parallelLoop->getOpDatBaseType (i), 0,
                     parallelLoop->getOpDatDimension (i) - 1), subroutineScope));
       }
-    }
-    else if ((parallelLoop->isIndirect (i) && parallelLoop->isIncremented (i))
-        || (parallelLoop->isDirect (i) && parallelLoop->getOpDatDimension (i)
-            > 1))
-    {
-      variableDeclarations->add (variableName,
-          FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
-              variableName, FortranTypesBuilder::getArray_RankOne (
-                  parallelLoop->getOpDatBaseType (i), 0,
-                  parallelLoop->getOpDatDimension (i) - 1), subroutineScope));
     }
   }
 }

@@ -2,7 +2,17 @@ module UserKernels
 
 contains
 
-  
+  subroutine  kernel_2parameter_integerScalar_integerScalar ( x, y )
+    implicit none
+
+    integer(4) :: x
+    integer(4) :: y
+
+    x = x + y
+
+  end subroutine kernel_2parameter_integerScalar_integerScalar  
+
+
   subroutine kernel_2parameter_floatArray_floatArray ( x, y )
     implicit none
 

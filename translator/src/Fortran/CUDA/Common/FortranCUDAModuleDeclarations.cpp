@@ -37,31 +37,6 @@ FortranCUDAModuleDeclarations::createReductionDeclarations ()
          * ======================================================
          */
 
-        SgType * baseType;
-
-        if (parallelLoop->isGlobalScalar (i))
-        {
-          /*
-           * ======================================================
-           * If the OP_GBL is a scalar then the base type of the
-           * allocated arrays is the primitive type of the OP_GBL
-           * ======================================================
-           */
-
-          baseType = parallelLoop->getOpDatType (i);
-        }
-        else
-        {
-          /*
-           * ======================================================
-           * If the OP_GBL is an array then the base type of the
-           * allocated arrays is the base type of the OP_GBL array
-           * ======================================================
-           */
-
-          baseType = parallelLoop->getOpDatBaseType (i);
-        }
-
         string const reductionArrayHostName =
             OP2::VariableNames::getReductionArrayHostName (i,
                 userSubroutineName);
@@ -73,7 +48,8 @@ FortranCUDAModuleDeclarations::createReductionDeclarations ()
         SgVariableDeclaration * reductionArrayHost =
             FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
                 reductionArrayHostName, FortranTypesBuilder::getArray_RankOne (
-                    baseType), moduleScope, 1, ALLOCATABLE);
+                    parallelLoop->getOpDatBaseType (i)), moduleScope, 1,
+                ALLOCATABLE);
 
         variableDeclarations->add (reductionArrayHostName, reductionArrayHost);
 
@@ -88,8 +64,9 @@ FortranCUDAModuleDeclarations::createReductionDeclarations ()
         SgVariableDeclaration * reductionArrayDevice =
             FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
                 reductionArrayDeviceName,
-                FortranTypesBuilder::getArray_RankOne (baseType), moduleScope,
-                2, ALLOCATABLE, DEVICE);
+                FortranTypesBuilder::getArray_RankOne (
+                    parallelLoop->getOpDatBaseType (i)), moduleScope, 2,
+                ALLOCATABLE, DEVICE);
 
         variableDeclarations->add (reductionArrayDeviceName,
             reductionArrayDevice);

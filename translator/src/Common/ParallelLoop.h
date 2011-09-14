@@ -309,6 +309,15 @@ class ParallelLoop
 
     /*
      * ======================================================
+     * Does this OP_DAT argument group need a CUDA local
+     * thread variable declaration?
+     * ======================================================
+     */
+    bool
+    localThreadVariableDeclarationNeeded (unsigned int OP_DAT_ArgumentGroup);
+
+    /*
+     * ======================================================
      * Returns the actual arguments passed to the OP_PAR_LOOP
      * ======================================================
      */

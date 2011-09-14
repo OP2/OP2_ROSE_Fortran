@@ -490,6 +490,13 @@ FortranCUDAKernelSubroutineDirectLoop::createAutoSharedDisplacementInitialisatio
   SgDivideOp * divideExpression2 = buildDivideOp (multiplyExpression,
       buildIntVal (parallelLoop->getMaximumSizeOfOpDat ()));
 
+  if (parallelLoop->getMaximumSizeOfOpDat () == 0)
+  {
+    Debug::getInstance ()->errorMessage (
+        "Generating code which will produce divide-by-zero error. The maximum size of all OP_DATs is 0.",
+        __FILE__, __LINE__);
+  }
+
   SgExprStatement * assignmentStatement = buildAssignStatement (buildVarRefExp (
       variableDeclarations->get (OP2::VariableNames::offset)),
       divideExpression2);
@@ -559,7 +566,7 @@ FortranCUDAKernelSubroutineDirectLoop::createOpDatFormalParameterDeclarations ()
           variableDeclarations->add (
               variableName,
               FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
-                  variableName, parallelLoop->getOpDatType (i),
+                  variableName, parallelLoop->getOpDatBaseType (i),
                   subroutineScope, formalParameters, 1, VALUE));
         }
         else
@@ -569,12 +576,12 @@ FortranCUDAKernelSubroutineDirectLoop::createOpDatFormalParameterDeclarations ()
               FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
                   variableName,
                   FortranTypesBuilder::getArray_RankOne_WithLowerAndUpperBounds (
-                      parallelLoop->getOpDatType (i), buildIntVal (0),
+                      parallelLoop->getOpDatBaseType (i), buildIntVal (0),
                       buildIntVal (parallelLoop->getOpDatDimension (i) - 1)),
                   subroutineScope, formalParameters, 1, DEVICE));
         }
       }
-      else if (parallelLoop->isGlobal (i) && parallelLoop->isRead (i) == false)
+      else if (parallelLoop->isReductionRequired (i))
       {
         SgDotExp * dotExpression = buildDotExp (buildVarRefExp (
             variableDeclarations->get (
@@ -646,6 +653,10 @@ FortranCUDAKernelSubroutineDirectLoop::createLocalVariableDeclarations ()
   Debug::getInstance ()->debugMessage ("Creating local variable declarations",
       Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
+  createLocalThreadDeclarations ();
+
+  createAutoSharedDeclarations ();
+
   vector <string> fourByteIntegers;
 
   fourByteIntegers.push_back (CommonVariableNames::iterationCounter1);
@@ -667,10 +678,6 @@ FortranCUDAKernelSubroutineDirectLoop::createLocalVariableDeclarations ()
         FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (*it,
             FortranTypesBuilder::getFourByteInteger (), subroutineScope));
   }
-
-  createLocalThreadDeclarations ();
-
-  createAutoSharedDeclarations ();
 
   if (parallelLoop->isReductionRequired () == true)
   {

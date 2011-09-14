@@ -293,9 +293,7 @@ ParallelLoop::getOpDatVariableName (unsigned int OP_DAT_ArgumentGroup)
 unsigned int
 ParallelLoop::getSizeOfOpDat (unsigned int OP_DAT_ArgumentGroup)
 {
-  SgArrayType * arrayType = isSgArrayType (getOpDatType (OP_DAT_ArgumentGroup));
-
-  SgType * baseType = arrayType->get_base_type ();
+  SgType * baseType = getOpDatBaseType (OP_DAT_ArgumentGroup);
 
   SgIntVal * baseSize = isSgIntVal (baseType->get_type_kind ());
 
@@ -305,19 +303,13 @@ ParallelLoop::getSizeOfOpDat (unsigned int OP_DAT_ArgumentGroup)
 unsigned int
 ParallelLoop::getMaximumSizeOfOpDat ()
 {
+  using std::max;
+
   unsigned int maximumSize = 0;
 
   for (unsigned int i = 1; i <= getNumberOfOpDatArgumentGroups (); ++i)
   {
-    if (isReductionRequired (i) == false && isGlobalArray (i))
-    {
-      unsigned int sizeOfOpDat = getSizeOfOpDat (i);
-
-      if (sizeOfOpDat > maximumSize)
-      {
-        maximumSize = sizeOfOpDat;
-      }
-    }
+    maximumSize = max (maximumSize, getSizeOfOpDat (i));
   }
 
   return maximumSize;
@@ -355,6 +347,26 @@ ParallelLoop::dataSizesDeclarationNeeded (unsigned int OP_DAT_ArgumentGroup)
   return isDirect (OP_DAT_ArgumentGroup) || isIndirect (OP_DAT_ArgumentGroup)
       || isReductionRequired (OP_DAT_ArgumentGroup) || (isGlobalArray (
       OP_DAT_ArgumentGroup) && isRead (OP_DAT_ArgumentGroup));
+}
+
+bool
+ParallelLoop::localThreadVariableDeclarationNeeded (
+    unsigned int OP_DAT_ArgumentGroup)
+{
+  /*
+   * ======================================================
+   * We need a local thread variable when:
+   * a) The data is to be reduced
+   * b) The data is indirect AND incremented
+   * c) The data dimension exceeds one AND the entire parallel
+   *    loop is direct
+   * ======================================================
+   */
+
+  return isReductionRequired (OP_DAT_ArgumentGroup) || (isIndirect (
+      OP_DAT_ArgumentGroup) && isIncremented (OP_DAT_ArgumentGroup))
+      || (isDirect (OP_DAT_ArgumentGroup) && getOpDatDimension (
+          OP_DAT_ArgumentGroup) > 1);
 }
 
 SgExpressionPtrList &

@@ -16,6 +16,8 @@ use, intrinsic :: ISO_C_BINDING
   type(op_set) :: set
   type(op_dat) :: global
 
+  setCardinality = 10
+
   allocate ( hostGlobal ( 1 ) )
 	
   call op_init ()

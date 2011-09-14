@@ -1421,7 +1421,7 @@ FortranCUDAKernelSubroutineIndirectLoop::createOpDatFormalParameterDeclarations 
             FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
                 variableName,
                 FortranTypesBuilder::getArray_RankOne_WithLowerAndUpperBounds (
-                    parallelLoop->getOpDatType (i), buildIntVal (0),
+                    parallelLoop->getOpDatBaseType (i), buildIntVal (0),
                     upperBoundExpression), subroutineScope, formalParameters,
                 1, DEVICE));
       }
@@ -1430,8 +1430,8 @@ FortranCUDAKernelSubroutineIndirectLoop::createOpDatFormalParameterDeclarations 
         variableDeclarations->add (
             variableName,
             FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
-                variableName, parallelLoop->getOpDatType (i), subroutineScope,
-                formalParameters, 1, VALUE));
+                variableName, parallelLoop->getOpDatBaseType (i),
+                subroutineScope, formalParameters, 1, VALUE));
       }
     }
   }

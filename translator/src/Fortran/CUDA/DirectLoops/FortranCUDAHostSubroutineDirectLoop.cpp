@@ -45,8 +45,9 @@ FortranCUDAHostSubroutineDirectLoop::createKernelFunctionCallStatement ()
       }
       else if (parallelLoop->isGlobalScalar (i))
       {
-        actualParameters->append_expression (buildVarRefExp (
-            variableDeclarations->get (OP2::VariableNames::getOpDatHostName (i))));
+        actualParameters->append_expression (
+            buildVarRefExp (variableDeclarations->get (
+                OP2::VariableNames::getOpDatHostName (i))));
       }
       else
       {
@@ -89,6 +90,7 @@ FortranCUDAHostSubroutineDirectLoop::createKernelFunctionCallStatement ()
 void
 FortranCUDAHostSubroutineDirectLoop::createCUDAKernelInitialisationStatements ()
 {
+  using boost::lexical_cast;
   using SageBuilder::buildOpaqueVarRefExp;
   using SageBuilder::buildVarRefExp;
   using SageBuilder::buildIntVal;
@@ -181,6 +183,14 @@ FortranCUDAHostSubroutineDirectLoop::createCUDAKernelInitialisationStatements ()
     Debug::getInstance ()->errorMessage (
         "The shared memory size will be set to zero during kernel launch",
         __FILE__, __LINE__);
+  }
+  else
+  {
+    Debug::getInstance ()->debugMessage (
+        "The shared memory size will be set to " + lexical_cast <string> (max (
+            sharedOpDatMemorySize, sharedReductionMemorySize))
+            + " during kernel launch", Debug::OUTER_LOOP_LEVEL, __FILE__,
+        __LINE__);
   }
 
   SgExprStatement * assignmentStatement4 = buildAssignStatement (
