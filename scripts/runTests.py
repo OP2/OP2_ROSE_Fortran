@@ -63,7 +63,7 @@ def clean ():
 			print("Removing file: '" + file + "'") 
 		os.remove(file)
 
-def generateCUDAMakefile (generatedFiles, executableName, testNum):
+def generateCUDAMakefile (generatedFiles, testNum):
 	from FileDependencies import getBaseFileName, determineModuleDependencies
 	from Graph import Graph
 
@@ -74,6 +74,7 @@ def generateCUDAMakefile (generatedFiles, executableName, testNum):
 	op2Directory        = "OP2_DIR"
 	linkTarget          = "link"
 	fortranTarget       = "fortranFiles"
+	executableName      = "Test" + str(testNum)
 
 	# Work out the dependencies between modules 
 	g = determineModuleDependencies(generatedFiles)
@@ -207,13 +208,15 @@ def runTests ():
 					os.makedirs(generatedFilesDirectory)
 
 				renamedFiles = []
+				j = 0
 				for f in files:
-					destName = generatedFilesDirectory + os.sep + testFile[:-4] + "_" + f
+					j = j + 1
+					destName = generatedFilesDirectory + os.sep + "Test" + str(i) + "File" + str(j) + f[-4:]
 					debug.verboseMessage("Keeping file '%s'" % (destName))
 					os.rename(f, destName)
 					renamedFiles.append(destName)
 				
-				makefile = generateCUDAMakefile(renamedFiles, "program", i)
+				makefile = generateCUDAMakefile(renamedFiles, i)
 				destName = generatedFilesDirectory + os.sep + makefile
 				debug.verboseMessage("Generating Makefile '%s'" % (destName))				
 				os.rename(makefile, destName)
