@@ -1,5 +1,5 @@
-OpGblWithWrite_DirectLoop.F95 FAIL
-OpGblWithReadAndWrite_DirectLoop.F95 FAIL
-OpGblWithScalarRead_DirectLoop.F95 PASS
-OpGblWithArrayRead_DirectLoop.F95 PASS
-OpGblWithScalarIncrement_DirectLoop.F95 PASS
+1 OpGblWithWrite_DirectLoop.F95 FAIL
+2 OpGblWithReadAndWrite_DirectLoop.F95 FAIL
+3 OpGblWithScalarRead_DirectLoop.F95 PASS
+4 OpGblWithArrayRead_DirectLoop.F95 PASS
+5 OpGblWithScalarIncrement_DirectLoop.F95 PASS

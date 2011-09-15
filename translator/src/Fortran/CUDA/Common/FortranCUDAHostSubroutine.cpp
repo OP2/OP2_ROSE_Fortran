@@ -608,8 +608,9 @@ FortranCUDAHostSubroutine::createDataMarshallingLocalVariableDeclarations ()
           variableDeclarations->add (
               variableName,
               FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
-                  variableName, parallelLoop->getOpDatBaseType (i),
-                  subroutineScope, 2, DEVICE, ALLOCATABLE));
+                  variableName, FortranTypesBuilder::getArray_RankOne (
+                      parallelLoop->getOpDatBaseType (i)), subroutineScope, 2,
+                  DEVICE, ALLOCATABLE));
         }
       }
       else if (parallelLoop->isGlobal (i) && parallelLoop->isRead (i) == false)

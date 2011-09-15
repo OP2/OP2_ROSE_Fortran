@@ -1,4 +1,4 @@
-program OpGblWithArrayRead
+program OpGblWithArrayRead_DirectLoop
   use OP2_C
   use UserKernels
   use, intrinsic :: ISO_C_BINDING
@@ -47,5 +47,5 @@ program OpGblWithArrayRead
     print *, hostData(i)
   end do
 
-end program OpGblWithArrayRead
+end program OpGblWithArrayRead_DirectLoop
 
