@@ -1,4 +1,5 @@
 #include <boost/lexical_cast.hpp>
+#include <boost/crc.hpp>
 #include <CommonNamespaces.h>
 #include <FortranTypesBuilder.h>
 
@@ -254,7 +255,7 @@ OP2::VariableNames::getAutosharedDeclarationName (SgType * type,
   using boost::lexical_cast;
   using std::string;
 
-  std::string const autoshared = "autoshared";
+  std::string const autoshared = "shared";
 
   switch (type->variantT ())
   {
@@ -282,8 +283,21 @@ OP2::VariableNames::getReductionArrayHostName (
   using boost::lexical_cast;
   using std::string;
 
-  return "reductionArrayHost" + lexical_cast <string> (OP_DAT_ArgumentGroup)
-      + suffix;
+  string const prefix = "reductionArrayHost" + lexical_cast <string> (
+      OP_DAT_ArgumentGroup);
+
+  if (suffix.length () > 10)
+  {
+    boost::crc_32_type result;
+
+    result.process_bytes (suffix.c_str (), suffix.length ());
+
+    string const newSuffix = lexical_cast <string> (result.checksum ());
+
+    return prefix + newSuffix;
+  }
+
+  return prefix + suffix;
 }
 
 std::string
@@ -293,8 +307,21 @@ OP2::VariableNames::getReductionArrayDeviceName (
   using boost::lexical_cast;
   using std::string;
 
-  return "reductionArrayDevice" + lexical_cast <string> (OP_DAT_ArgumentGroup)
-      + suffix;
+  string const prefix = "reductionArrayDevice" + lexical_cast <string> (
+      OP_DAT_ArgumentGroup);
+
+  if (suffix.length () > 10)
+  {
+    boost::crc_32_type result;
+
+    result.process_bytes (suffix.c_str (), suffix.length ());
+
+    string const newSuffix = lexical_cast <string> (result.checksum ());
+
+    return prefix + newSuffix;
+  }
+
+  return prefix + suffix;
 }
 
 std::string

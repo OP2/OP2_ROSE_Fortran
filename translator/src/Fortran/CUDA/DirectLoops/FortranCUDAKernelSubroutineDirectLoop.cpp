@@ -483,11 +483,7 @@ FortranCUDAKernelSubroutineDirectLoop::createAutoSharedDisplacementInitialisatio
       buildDivideOp (subtractExpression, buildVarRefExp (
           variableDeclarations->get (OP2::VariableNames::warpSize)));
 
-  SgMultiplyOp * multiplyExpression = buildMultiplyOp (buildVarRefExp (
-      variableDeclarations->get (OP2::VariableNames::warpMemorySize)),
-      divideExpression1);
-
-  SgDivideOp * divideExpression2 = buildDivideOp (multiplyExpression,
+  SgDivideOp * divideExpression2 = buildDivideOp (divideExpression1,
       buildIntVal (parallelLoop->getMaximumSizeOfOpDat ()));
 
   if (parallelLoop->getMaximumSizeOfOpDat () == 0)
@@ -709,22 +705,6 @@ FortranCUDAKernelSubroutineDirectLoop::createFormalParameterDeclarations ()
    */
 
   createOpDatFormalParameterDeclarations ();
-
-  /*
-   * ======================================================
-   * Warp scratch pad size formal parameter. This is the offset
-   * in the shared memory variable assigned to each
-   * thread block (see Mike's Developers Guide, direct
-   * loops section)
-   * ======================================================
-   */
-
-  variableDeclarations->add (
-      OP2::VariableNames::warpMemorySize,
-      FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
-          OP2::VariableNames::warpMemorySize,
-          FortranTypesBuilder::getFourByteInteger (), subroutineScope,
-          formalParameters, 1, VALUE));
 
   /*
    * ======================================================

@@ -45,7 +45,7 @@ FortranCUDAReductionSubroutine::createThreadZeroReductionStatements ()
       buildIntVal (1));
 
   SgPntrArrRefExp * subscriptExpression3 = buildPntrArrRefExp (buildVarRefExp (
-      variableDeclarations->get (autosharedVariableName)), buildIntVal (1));
+      variableDeclarations->get (autosharedVariableName)), buildIntVal (0));
 
   SgExprStatement * assignmentStatement1 = buildAssignStatement (
       subscriptExpression1, buildAddOp (subscriptExpression2,
@@ -67,7 +67,7 @@ FortranCUDAReductionSubroutine::createThreadZeroReductionStatements ()
       buildIntVal (1));
 
   SgPntrArrRefExp * subscriptExpression5 = buildPntrArrRefExp (buildVarRefExp (
-      variableDeclarations->get (autosharedVariableName)), buildIntVal (1));
+      variableDeclarations->get (autosharedVariableName)), buildIntVal (0));
 
   SgExprStatement * assignmentStatement2 = buildAssignStatement (
       subscriptExpression4, subscriptExpression5);
@@ -77,7 +77,7 @@ FortranCUDAReductionSubroutine::createThreadZeroReductionStatements ()
       buildIntVal (1));
 
   SgPntrArrRefExp * subscriptExpression7 = buildPntrArrRefExp (buildVarRefExp (
-      variableDeclarations->get (autosharedVariableName)), buildIntVal (1));
+      variableDeclarations->get (autosharedVariableName)), buildIntVal (0));
 
   SgLessThanOp * minimumGuardExpression = buildLessThanOp (
       subscriptExpression7, subscriptExpression6);
@@ -104,7 +104,7 @@ FortranCUDAReductionSubroutine::createThreadZeroReductionStatements ()
       buildIntVal (1));
 
   SgPntrArrRefExp * subscriptExpression9 = buildPntrArrRefExp (buildVarRefExp (
-      variableDeclarations->get (autosharedVariableName)), buildIntVal (1));
+      variableDeclarations->get (autosharedVariableName)), buildIntVal (0));
 
   SgExprStatement * assignmentStatement3 = buildAssignStatement (
       subscriptExpression8, subscriptExpression9);
@@ -114,7 +114,7 @@ FortranCUDAReductionSubroutine::createThreadZeroReductionStatements ()
       buildIntVal (1));
 
   SgPntrArrRefExp * subscriptExpression11 = buildPntrArrRefExp (buildVarRefExp (
-      variableDeclarations->get (autosharedVariableName)), buildIntVal (1));
+      variableDeclarations->get (autosharedVariableName)), buildIntVal (0));
 
   SgGreaterThanOp * maximumGuardExpression = buildGreaterThanOp (
       subscriptExpression11, subscriptExpression10);
