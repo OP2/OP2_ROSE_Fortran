@@ -152,7 +152,8 @@ FortranCUDAUserSubroutine::createStatements ()
                         variableName, type, subroutineScope, formalParameters,
                         2, DEVICE, SHARED);
           }
-          else if (parallelLoop->isGlobalScalar (OP_DAT_ArgumentGroup))
+          else if (parallelLoop->isGlobalScalar (OP_DAT_ArgumentGroup)
+              && parallelLoop->isRead (OP_DAT_ArgumentGroup))
           {
             SgVariableDeclaration
                 * variableDeclaration =
