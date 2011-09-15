@@ -63,7 +63,9 @@ namespace OP2
     std::string const nelems2 = "nelems2";
     std::string const offset = "offset";
     std::string const offset2 = "offset2";
+    std::string const reductionCardinality = "reductionCardinality";
     std::string const reductionResult = "reductionResult";
+    std::string const reductionSharedMemorySize = "reductionSharedMemorySize";
     std::string const set = "set";
     std::string const size = "size";
     std::string const setSize = "setSize";
@@ -333,6 +335,9 @@ namespace OP2
     std::string
     getReductionArrayDeviceName (unsigned int OP_DAT_ArgumentGroup,
         std::string const & suffix);
+
+    std::string
+    getReductionResultName (unsigned int OP_DAT_ArgumentGroup);
   }
 }
 

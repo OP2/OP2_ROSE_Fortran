@@ -13,10 +13,6 @@ class FortranCUDAKernelSubroutineDirectLoop: public FortranCUDAKernelSubroutine
 {
   private:
 
-    FortranCUDADataSizesDeclaration * dataSizesDeclaration;
-
-  private:
-
     virtual SgStatement *
     createUserSubroutineCallStatement ();
 
@@ -66,7 +62,8 @@ class FortranCUDAKernelSubroutineDirectLoop: public FortranCUDAKernelSubroutine
         FortranParallelLoop * parallelLoop, SgScopeStatement * moduleScope,
         FortranReductionSubroutines * reductionSubroutines,
         FortranCUDADataSizesDeclaration * dataSizesDeclaration,
-        FortranOpDatDimensionsDeclaration * opDatDimensionsDeclaration);
+        FortranOpDatDimensionsDeclaration * opDatDimensionsDeclaration,
+        FortranCUDAModuleDeclarations * moduleDeclarations);
 };
 
 #endif

@@ -19,6 +19,7 @@ program OpGblWithScalarRead
   type(op_dat) :: global
 
   setCardinality = 10
+  hostGlobal = 10
   
   allocate ( hostData (4 * setCardinality) )
 
@@ -32,7 +33,7 @@ program OpGblWithScalarRead
   call op_decl_dat ( set, 4, hostData, deviceData, dataName)
   call op_decl_gbl ( hostGlobal, global )
   
-  call op_par_loop_2 ( kernel_2parameter_floatArray_floatScalar, set, &
+  call op_par_loop_2 ( kernel_2parameter_floatArray_integerScalar, set, &
                      & deviceData, -1, OP_ID,  OP_WRITE, &
                      & global,     -1, OP_GBL, OP_READ)
 

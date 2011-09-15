@@ -297,6 +297,15 @@ OP2::VariableNames::getReductionArrayDeviceName (
       + suffix;
 }
 
+std::string
+OP2::VariableNames::getReductionResultName (unsigned int OP_DAT_ArgumentGroup)
+{
+  using boost::lexical_cast;
+  using std::string;
+
+  return "reductionResult" + lexical_cast <string> (OP_DAT_ArgumentGroup);
+}
+
 SgStatement *
 SubroutineCalls::Fortran::createCToFortranPointerCallStatement (
     SgScopeStatement * scope, SgExpression * parameter1,

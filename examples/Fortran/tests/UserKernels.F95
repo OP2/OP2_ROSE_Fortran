@@ -23,7 +23,7 @@ contains
 
   end subroutine kernel_2parameter_floatArray_floatArray
   
-  subroutine kernel_2parameter_floatArray_floatScalar ( x, y )
+  subroutine kernel_2parameter_floatArray_integerScalar ( x, y )
     implicit none
 
     real(8), dimension(*) :: x
@@ -31,7 +31,7 @@ contains
 
     x(1) = x(1) + y
 
-  end subroutine kernel_2parameter_floatArray_floatScalar
+  end subroutine kernel_2parameter_floatArray_integerScalar
 
   subroutine kernel_1parameter_floatArray ( x )
     implicit none

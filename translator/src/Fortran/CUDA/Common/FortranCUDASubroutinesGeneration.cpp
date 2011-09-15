@@ -128,11 +128,16 @@ FortranCUDASubroutinesGeneration::createSubroutines ()
 
     if (parallelLoop->isDirectLoop ())
     {
-      kernelSubroutine = new FortranCUDAKernelSubroutineDirectLoop (
-          userSubroutineName, userDeviceSubroutine->getSubroutineName (),
-          parallelLoop, moduleScope, reductionSubroutines,
-          dataSizesDeclarations[userSubroutineName],
-          dimensionsDeclarations[userSubroutineName]);
+      kernelSubroutine
+          = new FortranCUDAKernelSubroutineDirectLoop (
+              userSubroutineName,
+              userDeviceSubroutine->getSubroutineName (),
+              parallelLoop,
+              moduleScope,
+              reductionSubroutines,
+              dataSizesDeclarations[userSubroutineName],
+              dimensionsDeclarations[userSubroutineName],
+              static_cast <FortranCUDAModuleDeclarations *> (moduleDeclarations[userSubroutineName]));
 
       hostSubroutines[userSubroutineName]
           = new FortranCUDAHostSubroutineDirectLoop (
@@ -155,7 +160,8 @@ FortranCUDASubroutinesGeneration::createSubroutines ()
               moduleScope,
               reductionSubroutines,
               static_cast <FortranCUDADataSizesDeclarationIndirectLoop *> (dataSizesDeclarations[userSubroutineName]),
-              dimensionsDeclarations[userSubroutineName]);
+              dimensionsDeclarations[userSubroutineName],
+              static_cast <FortranCUDAModuleDeclarations *> (moduleDeclarations[userSubroutineName]));
 
       hostSubroutines[userSubroutineName]
           = new FortranCUDAHostSubroutineIndirectLoop (

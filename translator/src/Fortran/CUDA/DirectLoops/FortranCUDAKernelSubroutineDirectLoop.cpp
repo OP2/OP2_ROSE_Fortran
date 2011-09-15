@@ -557,71 +557,53 @@ FortranCUDAKernelSubroutineDirectLoop::createOpDatFormalParameterDeclarations ()
   {
     if (parallelLoop->isDuplicateOpDat (i) == false)
     {
-      string const & variableName = OP2::VariableNames::getOpDatName (i);
-
-      if (parallelLoop->isGlobal (i) && parallelLoop->isRead (i))
+      if (parallelLoop->isReductionRequired (i) == false)
       {
-        if (parallelLoop->isGlobalScalar (i))
+        string const & variableName = OP2::VariableNames::getOpDatName (i);
+
+        if (parallelLoop->isGlobal (i) && parallelLoop->isRead (i))
         {
-          variableDeclarations->add (
-              variableName,
-              FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
-                  variableName, parallelLoop->getOpDatBaseType (i),
-                  subroutineScope, formalParameters, 1, VALUE));
+          if (parallelLoop->isGlobalScalar (i))
+          {
+            variableDeclarations->add (
+                variableName,
+                FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
+                    variableName, parallelLoop->getOpDatBaseType (i),
+                    subroutineScope, formalParameters, 1, VALUE));
+          }
+          else
+          {
+            variableDeclarations->add (
+                variableName,
+                FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
+                    variableName,
+                    FortranTypesBuilder::getArray_RankOne_WithLowerAndUpperBounds (
+                        parallelLoop->getOpDatBaseType (i), buildIntVal (0),
+                        buildIntVal (parallelLoop->getOpDatDimension (i) - 1)),
+                    subroutineScope, formalParameters, 1, DEVICE));
+          }
         }
         else
         {
+          SgDotExp * dotExpression = buildDotExp (buildVarRefExp (
+              variableDeclarations->get (
+                  OP2::VariableNames::getDataSizesVariableDeclarationName (
+                      userSubroutineName))), buildVarRefExp (
+              dataSizesDeclaration->getFieldDeclarations ()->get (
+                  OP2::VariableNames::getOpDatSizeName (i))));
+
+          SgSubtractOp * upperBoundExpression = buildSubtractOp (dotExpression,
+              buildIntVal (1));
+
           variableDeclarations->add (
               variableName,
               FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
                   variableName,
                   FortranTypesBuilder::getArray_RankOne_WithLowerAndUpperBounds (
                       parallelLoop->getOpDatBaseType (i), buildIntVal (0),
-                      buildIntVal (parallelLoop->getOpDatDimension (i) - 1)),
-                  subroutineScope, formalParameters, 1, DEVICE));
+                      upperBoundExpression), subroutineScope, formalParameters,
+                  1, DEVICE));
         }
-      }
-      else if (parallelLoop->isReductionRequired (i))
-      {
-        SgDotExp * dotExpression = buildDotExp (buildVarRefExp (
-            variableDeclarations->get (
-                OP2::VariableNames::getDataSizesVariableDeclarationName (
-                    userSubroutineName))), buildVarRefExp (
-            dataSizesDeclaration->getFieldDeclarations ()->get (
-                OP2::VariableNames::getOpDatSizeName (i))));
-
-        SgSubtractOp * upperBoundExpression = buildSubtractOp (dotExpression,
-            buildIntVal (1));
-
-        variableDeclarations->add (
-            variableName,
-            FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
-                variableName,
-                FortranTypesBuilder::getArray_RankOne_WithLowerAndUpperBounds (
-                    parallelLoop->getOpDatBaseType (i), buildIntVal (0),
-                    upperBoundExpression), subroutineScope, formalParameters,
-                1, DEVICE));
-      }
-      else
-      {
-        SgDotExp * dotExpression = buildDotExp (buildVarRefExp (
-            variableDeclarations->get (
-                OP2::VariableNames::getDataSizesVariableDeclarationName (
-                    userSubroutineName))), buildVarRefExp (
-            dataSizesDeclaration->getFieldDeclarations ()->get (
-                OP2::VariableNames::getOpDatSizeName (i))));
-
-        SgSubtractOp * upperBoundExpression = buildSubtractOp (dotExpression,
-            buildIntVal (1));
-
-        variableDeclarations->add (
-            variableName,
-            FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
-                variableName,
-                FortranTypesBuilder::getArray_RankOne_WithLowerAndUpperBounds (
-                    parallelLoop->getOpDatBaseType (i), buildIntVal (0),
-                    upperBoundExpression), subroutineScope, formalParameters,
-                1, DEVICE));
       }
     }
   }
@@ -640,7 +622,7 @@ FortranCUDAKernelSubroutineDirectLoop::createStatements ()
 
   if (parallelLoop->isReductionRequired () == true)
   {
-    createReductionLoopStatements ();
+    createReductionEpilogueStatements ();
   }
 }
 
@@ -782,10 +764,11 @@ FortranCUDAKernelSubroutineDirectLoop::FortranCUDAKernelSubroutineDirectLoop (
     FortranParallelLoop * parallelLoop, SgScopeStatement * moduleScope,
     FortranReductionSubroutines * reductionSubroutines,
     FortranCUDADataSizesDeclaration * dataSizesDeclaration,
-    FortranOpDatDimensionsDeclaration * opDatDimensionsDeclaration) :
+    FortranOpDatDimensionsDeclaration * opDatDimensionsDeclaration,
+    FortranCUDAModuleDeclarations * moduleDeclarations) :
   FortranCUDAKernelSubroutine (subroutineName, userSubroutineName,
-      parallelLoop, moduleScope, reductionSubroutines,
-      opDatDimensionsDeclaration), dataSizesDeclaration (dataSizesDeclaration)
+      parallelLoop, moduleScope, reductionSubroutines, dataSizesDeclaration,
+      opDatDimensionsDeclaration, moduleDeclarations)
 {
   Debug::getInstance ()->debugMessage ("<Kernel, Direct, CUDA>",
       Debug::CONSTRUCTOR_LEVEL, __FILE__, __LINE__);

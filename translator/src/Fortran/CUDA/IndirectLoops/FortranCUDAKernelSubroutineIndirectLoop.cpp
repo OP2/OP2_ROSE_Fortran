@@ -1607,10 +1607,11 @@ FortranCUDAKernelSubroutineIndirectLoop::FortranCUDAKernelSubroutineIndirectLoop
     FortranParallelLoop * parallelLoop, SgScopeStatement * moduleScope,
     FortranReductionSubroutines * reductionSubroutines,
     FortranCUDADataSizesDeclarationIndirectLoop * dataSizesDeclaration,
-    FortranOpDatDimensionsDeclaration * opDatDimensionsDeclaration) :
+    FortranOpDatDimensionsDeclaration * opDatDimensionsDeclaration,
+    FortranCUDAModuleDeclarations * moduleDeclarations) :
   FortranCUDAKernelSubroutine (subroutineName, userSubroutineName,
-      parallelLoop, moduleScope, reductionSubroutines,
-      opDatDimensionsDeclaration), dataSizesDeclaration (dataSizesDeclaration)
+      parallelLoop, moduleScope, reductionSubroutines, dataSizesDeclaration,
+      opDatDimensionsDeclaration, moduleDeclarations)
 {
   Debug::getInstance ()->debugMessage ("<Kernel, Indirect, CUDA>",
       Debug::CONSTRUCTOR_LEVEL, __FILE__, __LINE__);
