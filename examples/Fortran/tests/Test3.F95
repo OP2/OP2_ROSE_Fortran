@@ -1,17 +1,12 @@
-program OpGblWithScalarRead
+program Test3 
   use OP2_C
   use UserKernels
-  use, intrinsic :: ISO_C_BINDING
-  implicit none
   
   ! Host declarations
-  character(kind=c_char,len=7) :: setName = C_CHAR_'theSet'//C_NULL_CHAR
-  character(kind=c_char,len=8) :: dataName = C_CHAR_'theData'//C_NULL_CHAR
-  
   integer (4) :: setCardinality
   integer (4) :: hostGlobal
-  integer (4) :: i
   real (8), dimension (:), allocatable :: hostData
+  integer (4) :: i
   
   ! OP2 declarations
   type(op_set) :: set
@@ -29,11 +24,11 @@ program OpGblWithScalarRead
 
   call op_init ()
   
-  call op_decl_set ( setCardinality, set, setName )
-  call op_decl_dat ( set, 4, hostData, deviceData, dataName)
+  call op_decl_set ( setCardinality, set, "" )
+  call op_decl_dat ( set, 4, hostData, deviceData, "")
   call op_decl_gbl ( hostGlobal, global )
   
-  call op_par_loop_2 ( kernel_2parameter_floatArray_integerScalar, set, &
+  call op_par_loop_2 ( real8Array_integer4Scalar, set, &
                      & deviceData, -1, OP_ID,  OP_WRITE, &
                      & global,     -1, OP_GBL, OP_READ)
 
@@ -41,5 +36,5 @@ program OpGblWithScalarRead
     print *, hostData(i)
   end do
 
-end program OpGblWithScalarRead
+end program Test3
 

@@ -2,7 +2,7 @@ module UserKernels
 
 contains
 
-  subroutine  kernel_2parameter_integerScalar_integerScalar ( x, y )
+  subroutine  integer4Scalar_integer4Scalar ( x, y )
     implicit none
 
     integer(4) :: x
@@ -10,10 +10,9 @@ contains
 
     x = x + y
 
-  end subroutine kernel_2parameter_integerScalar_integerScalar  
+  end subroutine integer4Scalar_integer4Scalar 
 
-
-  subroutine kernel_2parameter_floatArray_floatArray ( x, y )
+  subroutine real8Array_integer4Array ( x, y )
     implicit none
 
     real(8), dimension(*) :: x
@@ -21,9 +20,9 @@ contains
 
     x(1) = x(1) + y(1) + y(2)
 
-  end subroutine kernel_2parameter_floatArray_floatArray
+  end subroutine real8Array_integer4Array
   
-  subroutine kernel_2parameter_floatArray_integerScalar ( x, y )
+  subroutine real8Array_integer4Scalar ( x, y )
     implicit none
 
     real(8), dimension(*) :: x
@@ -31,15 +30,33 @@ contains
 
     x(1) = x(1) + y
 
-  end subroutine kernel_2parameter_floatArray_integerScalar
+  end subroutine real8Array_integer4Scalar
 
-  subroutine kernel_1parameter_floatArray ( x )
+  subroutine real8Array ( x )
     implicit none
 
     real(8), dimension(*) :: x
 
     x(1) = x(1) * 10
 
-  end subroutine kernel_1parameter_floatArray
+  end subroutine real8Array
+
+  subroutine real8Array_integer4Array_real8Array ( a, b, c )
+  
+    real(8),    dimension(4)  :: a
+    integer(4), dimension(7)  :: b
+    real(8),    dimension(11) :: c
+    
+    integer(4) :: i
+    
+    do i = 1, 4
+      c(i) = a(i)
+    end do
+
+    do i = 5, 11
+      c(i) = int ( b(i-4) )
+    end do
+    
+  end subroutine real8Array_integer4Array_real8Array
 
 end module UserKernels

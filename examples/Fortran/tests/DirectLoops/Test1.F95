@@ -33,7 +33,7 @@ program Test1
   
   call op_init ()
       
-  call op_par_loop_3 ( newKernel, iterationSet, &
+  call op_par_loop_3 ( real8Array_integer4Array_real8Array, iterationSet, &
                      & opDatA, -1, OP_ID, OP_READ, &
                      & opDatB, -1, OP_ID, OP_READ, &
                      & opDatC, -1, OP_ID, OP_WRITE  &                     
