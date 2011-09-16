@@ -156,17 +156,26 @@ def runTests ():
 	if not os.path.isfile(configFile):
 		debug.exitMessage("Unable to find configuration file '%s' with the absolute path to source-to-source translator" % (configFile))
 
-	translatorPath = None
+	translatorPath   = None
+	translatorString = 'translator'
+	op2Path          = None
+	op2String        = 'OP2_DIR'
 	for line in open(configFile, 'r'):
 		line = line.strip()
 		words = line.split('=')
-		if line.startswith('translator'):
+		if line.startswith(translatorString):
 			translatorPath = words[1].strip()
 			if not os.path.isfile(translatorPath):
-				debug.exitMessage("'" + translatorPath + "' does not exist")
+				debug.exitMessage("The translator binary '" + translatorPath + "' does not exist")
+		elif line.startswith(op2String):
+			op2Path = words[1].strip()
+			if not os.path.isdir(op2Path):
+				debug.exitMessage("The OP2_DIR '" + op2Path + "' specified in the config file is not a directory")
 
 	if translatorPath is None:
 		debug.exitMessage("You did not specify a path to the translator. Use 'translator=<path/to/translator>' in the configuration file")
+	if op2Path is None:
+		debug.exitMessage("You did not specify where the OP2 library, ISO_C_BINDING library, and User Kernels are to be found. Use 'OP2_DIR=<dir> in the configuration file'")
 
 	failLexeme = 'FAIL'
 	passLexeme = 'PASS'
@@ -197,11 +206,12 @@ def runTests ():
 				debug.exitMessage("File '" + FortranFile + "' does not exist")		
 
 			filesToCompile = ['ISO_C_BINDING.F95', 'OP2.F95', 'UserKernels.F95']
-			filesToCompile.append(FortranFile)		
 
 			cmd = translatorPath + ' --CUDA '
 			for f in filesToCompile:
-				cmd += f + ' '
+				cmd += op2Path + os.sep + f + ' '
+
+			cmd += FortranFile
 
 			debug.verboseMessage("Running: '" + cmd + "'")
 
@@ -217,8 +227,6 @@ def runTests ():
 			stdoutLines, stderrLines = proc.communicate()
 
 			if proc.returncode != 0:
-				lines = stderrLines.splitlines()
-				debug.verboseMessage("Last error message '%s'" % (lines[len(lines)-1]))
 				if testResult == failLexeme:
 					debug.verboseMessage("Test on file '%s' passed" % (FortranFile))
 				else:
