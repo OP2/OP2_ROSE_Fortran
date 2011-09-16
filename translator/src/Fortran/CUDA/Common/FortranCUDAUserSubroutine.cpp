@@ -57,8 +57,8 @@ FortranCUDAUserSubroutine::findOriginalSubroutine ()
   using std::vector;
 
   Debug::getInstance ()->debugMessage (
-      "Searching for original user subroutine", Debug::FUNCTION_LEVEL,
-      __FILE__, __LINE__);
+      "Searching for original user subroutine '" + hostSubroutineName + "'",
+      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
   for (vector <SgProcedureHeaderStatement *>::const_iterator it =
       declarations->firstSubroutineInSourceCode (); it
@@ -68,6 +68,10 @@ FortranCUDAUserSubroutine::findOriginalSubroutine ()
 
     if (iequals (hostSubroutineName, subroutine->get_name ().getString ()))
     {
+      Debug::getInstance ()->debugMessage ("Found user kernel '"
+          + hostSubroutineName + "'", Debug::OUTER_LOOP_LEVEL, __FILE__,
+          __LINE__);
+
       originalSubroutine = subroutine;
       break;
     }
@@ -176,6 +180,9 @@ FortranCUDAUserSubroutine::createStatements ()
     }
     else
     {
+      Debug::getInstance ()->debugMessage ("Appending variable declaration",
+          Debug::HIGHEST_DEBUG_LEVEL, __FILE__, __LINE__);
+
       bool isFormalParameter = false;
 
       string const

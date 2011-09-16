@@ -286,7 +286,7 @@ CommandLine::parse (int argc, char ** argv)
 
         ROSEArguments.push_back (argv[i]);
 
-        Globals::getInstance ()->addInputFile (p.file_string ());
+        Globals::getInstance ()->addInputFile (p.filename ());
       }
       else
       {

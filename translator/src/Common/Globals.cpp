@@ -1,6 +1,7 @@
 #include <cstdlib>
 #include <boost/filesystem.hpp>
 #include <Globals.h>
+#include <Debug.h>
 
 Globals * Globals::globalsInstance = NULL;
 
@@ -84,6 +85,9 @@ Globals::outputUDrawGraphs () const
 void
 Globals::addInputFile (std::string const & fileName)
 {
+  Debug::getInstance ()->debugMessage ("Adding file '" + fileName + "'",
+      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+
   inputFiles.push_back (fileName);
 }
 
