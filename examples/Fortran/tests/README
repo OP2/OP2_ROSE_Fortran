@@ -1,0 +1,32 @@
+To add a test case, create a Fortran file Test<number>.F95. For example, Test128.F95.
+Normally you will also need to add a user kernel subroutine declaration and definition
+to the file 'UserKernels.F95' found in 'OP2_ROSE_Fortran/examples/Fortran/tests'. This
+depends on the OP_PAR_LOOP (e.g. types of OP_DAT passed), so check before adding a new
+one because there might be one already that is sufficient.
+
+Then add a line to the file 'testsToRun' with the following syntax:
+TestCase FortranFile PASS|FAIL
+where TestCase is a positive integer
+      FortranFile is the test case created
+      PASS|FAIL is the lexeme describing the expected result of the test
+
+For instance:
+12 Test12.F95 FAIL
+says that test number 12 associated with Fortran file Test12.F95 is expected to fail.
+
+To run tests, use the 'runTests' Python script found in the 'OP2_ROSE_Fortran/scripts' directory.
+Use '-h' to display its options. 
+
+However, in general, to run all tests, use:
+'runTests --run'
+
+To run specific test cases 12 and 128, for example, use:
+'runTests --run -T 12 -T 128'
+
+To clean out temporary files, use:
+'runTests --clean'
+
+When a test case should pass, the translator should generate a bunch of Fortran files: these
+are output into a sub-directory 'generatedFiles' such that each generated file has a prefix
+Test<number> and a suffix File<number>.F95. A makefile, intended for the backend compiler, is
+also generated for each test case.

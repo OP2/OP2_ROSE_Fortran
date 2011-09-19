@@ -44,7 +44,8 @@ CPPHostSubroutine::createFormalParameterDeclarations ()
          * ======================================================
          */
 
-        string const & variableName = VariableNames::getUserSubroutineName ();
+        string const & variableName =
+            OP2::VariableNames::getUserSubroutineName ();
 
         Debug::getInstance ()->debugMessage ("User subroutine '"
             + userSubroutineName + "'", Debug::OUTER_LOOP_LEVEL, __FILE__,
@@ -82,7 +83,7 @@ CPPHostSubroutine::createFormalParameterDeclarations ()
                * Found an OP_SET argument
                * ======================================================
                */
-              string const & variableName = VariableNames::getOpSetName ();
+              string const & variableName = OP2::VariableNames::getOpSetName ();
 
               SgVariableDeclaration
                   * variableDeclaration =
@@ -101,7 +102,7 @@ CPPHostSubroutine::createFormalParameterDeclarations ()
                * ======================================================
                */
 
-              string const & variableName = VariableNames::getOpMapName (
+              string const & variableName = OP2::VariableNames::getOpMapName (
                   OP_DAT_ArgumentGroup);
 
               SgVariableDeclaration
@@ -123,7 +124,7 @@ CPPHostSubroutine::createFormalParameterDeclarations ()
 
               OP_DAT_ArgumentGroup++;
 
-              string const & variableName = VariableNames::getOpDatName (
+              string const & variableName = OP2::VariableNames::getOpDatName (
                   OP_DAT_ArgumentGroup);
 
               SgVariableDeclaration
@@ -155,7 +156,7 @@ CPPHostSubroutine::createFormalParameterDeclarations ()
             Debug::getInstance ()->debugMessage ("Access descriptor found",
                 Debug::INNER_LOOP_LEVEL, __FILE__, __LINE__);
 
-            string const & variableName = VariableNames::getOpAccessName (
+            string const & variableName = OP2::VariableNames::getOpAccessName (
                 OP_DAT_ArgumentGroup);
 
             SgVariableDeclaration
@@ -187,7 +188,7 @@ CPPHostSubroutine::createFormalParameterDeclarations ()
          * ======================================================
          */
 
-        string const & variableName = VariableNames::getOpIndirectionName (
+        string const & variableName = OP2::VariableNames::getOpIndirectionName (
             OP_DAT_ArgumentGroup);
 
         SgVariableDeclaration

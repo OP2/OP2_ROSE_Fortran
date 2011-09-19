@@ -2,6 +2,7 @@
 #include <CommonNamespaces.h>
 #include <FortranStatementsAndExpressionsBuilder.h>
 #include <FortranTypesBuilder.h>
+#include <OpenMP.h>
 
 /*
  * ======================================================
@@ -59,7 +60,7 @@ FortranOpenMPHostSubroutine::createReductionEpilogueStatements ()
 
       SgPntrArrRefExp * arrayIndexExpression1 = buildPntrArrRefExp (
           buildVarRefExp (variableDeclarations->get (
-              VariableNames::getOpDatLocalName (i))), addExpression1);
+              OP2::VariableNames::getOpDatLocalName (i))), addExpression1);
 
       SgAddOp * addExpression2 = buildAddOp (buildIntVal (
           parallelLoop->getOpDatDimension (i)), buildVarRefExp (
@@ -164,7 +165,7 @@ FortranOpenMPHostSubroutine::createReductionPrologueStatements ()
 
       SgPntrArrRefExp * arrayIndexExpression = buildPntrArrRefExp (
           buildVarRefExp (variableDeclarations->get (
-              VariableNames::getOpDatLocalName (i))), addExpression);
+              OP2::VariableNames::getOpDatLocalName (i))), addExpression);
 
       SgExprStatement * assignmentStatement = buildAssignStatement (
           arrayIndexExpression, buildIntVal (0));
@@ -209,6 +210,7 @@ FortranOpenMPHostSubroutine::createReductionLocalVariableDeclarations ()
   using SageBuilder::buildAddOp;
   using SageBuilder::buildSubtractOp;
   using SageBuilder::buildIntVal;
+  using std::string;
 
   Debug::getInstance ()->debugMessage (
       "Creating reduction local variable declarations", Debug::FUNCTION_LEVEL,
@@ -229,7 +231,7 @@ FortranOpenMPHostSubroutine::createReductionLocalVariableDeclarations ()
     if (parallelLoop->isDuplicateOpDat (i) == false
         && parallelLoop->isReductionRequired (i))
     {
-      SgArrayType * arrayType = isSgArrayType (parallelLoop->getOpDatType (i));
+      string const & variableName = OP2::VariableNames::getOpDatLocalName (i);
 
       SgMultiplyOp * multiplyExpression = buildMultiplyOp (buildIntVal (64),
           buildIntVal (64));
@@ -242,12 +244,12 @@ FortranOpenMPHostSubroutine::createReductionLocalVariableDeclarations ()
 
       SgType * newArrayType =
           FortranTypesBuilder::getArray_RankOne_WithLowerAndUpperBounds (
-              arrayType->get_base_type (), buildIntVal (0), subtractExpression);
+              parallelLoop->getOpDatBaseType (i), buildIntVal (0),
+              subtractExpression);
 
-      variableDeclarations->add (VariableNames::getOpDatLocalName (i),
+      variableDeclarations->add (variableName,
           FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
-              VariableNames::getOpDatLocalName (i), newArrayType,
-              subroutineScope));
+              variableName, newArrayType, subroutineScope));
     }
   }
 }

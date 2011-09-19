@@ -24,7 +24,7 @@ FortranOpenMPModuleDeclarations::createOpDatDeclarations ()
   {
     if (parallelLoop->isDuplicateOpDat (i) == false)
     {
-      string const & variableName = VariableNames::getOpDatGlobalName (i);
+      string const & variableName = OP2::VariableNames::getOpDatGlobalName (i);
 
       SgVariableDeclaration * variableDeclaration = buildVariableDeclaration (
           variableName, buildPointerType (parallelLoop->getOpDatType (i)),

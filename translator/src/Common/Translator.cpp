@@ -26,7 +26,7 @@
 #include <CommandLine.h>
 #include <CommandLineOption.h>
 #include <CommandLineOptionWithParameters.h>
-#include <CommonNamespaces.h>
+#include <TargetBackend.h>
 #include <Debug.h>
 #include <Globals.h>
 #include <UDrawGraph.h>
@@ -61,7 +61,7 @@ class CUDAOption: public CommandLineOption
     virtual void
     run ()
     {
-      Globals::getInstance ()->setTargetBackend (TargetBackends::CUDA);
+      Globals::getInstance ()->setTargetBackend (TargetBackend::CUDA);
     }
 
     CUDAOption (std::string helpMessage, std::string longOption) :
@@ -77,7 +77,7 @@ class OpenMPOption: public CommandLineOption
     virtual void
     run ()
     {
-      Globals::getInstance ()->setTargetBackend (TargetBackends::OPENMP);
+      Globals::getInstance ()->setTargetBackend (TargetBackend::OPENMP);
     }
 
     OpenMPOption (std::string helpMessage, std::string longOption) :
@@ -93,7 +93,7 @@ class OpenCLOption: public CommandLineOption
     virtual void
     run ()
     {
-      Globals::getInstance ()->setTargetBackend (TargetBackends::OPENCL);
+      Globals::getInstance ()->setTargetBackend (TargetBackend::OPENCL);
     }
 
     OpenCLOption (std::string helpMessage, std::string longOption) :
@@ -110,14 +110,14 @@ handleCPPProject (SgProject * project)
 
   switch (Globals::getInstance ()->getTargetBackend ())
   {
-    case TargetBackends::CUDA:
+    case TargetBackend::CUDA:
     {
       new CPPCUDASubroutinesGeneration (project, declarations);
 
       break;
     }
 
-    case TargetBackends::OPENMP:
+    case TargetBackend::OPENMP:
     {
       Debug::getInstance ()->errorMessage (
           "OpenMP code generation not yet supported in C++", __FILE__, __LINE__);
@@ -125,7 +125,7 @@ handleCPPProject (SgProject * project)
       break;
     }
 
-    case TargetBackends::OPENCL:
+    case TargetBackend::OPENCL:
     {
       Debug::getInstance ()->debugMessage ("OpenCL code generation selected",
           Debug::VERBOSE_LEVEL, __FILE__, __LINE__);
@@ -148,36 +148,42 @@ handleCPPProject (SgProject * project)
 void
 handleFortranProject (SgProject * project)
 {
-  FortranProgramDeclarationsAndDefinitions * declarations =
-      new FortranProgramDeclarationsAndDefinitions (project);
-
   switch (Globals::getInstance ()->getTargetBackend ())
   {
-    case TargetBackends::CUDA:
+    case TargetBackend::CUDA:
     {
       Debug::getInstance ()->debugMessage ("CUDA code generation selected",
           Debug::VERBOSE_LEVEL, __FILE__, __LINE__);
+
+      FortranProgramDeclarationsAndDefinitions * declarations =
+          new FortranProgramDeclarationsAndDefinitions (project);
 
       new FortranCUDASubroutinesGeneration (project, declarations);
 
       break;
     }
 
-    case TargetBackends::OPENMP:
+    case TargetBackend::OPENMP:
     {
       Debug::getInstance ()->debugMessage ("OpenMP code generation selected",
           Debug::VERBOSE_LEVEL, __FILE__, __LINE__);
+
+      FortranProgramDeclarationsAndDefinitions * declarations =
+          new FortranProgramDeclarationsAndDefinitions (project);
 
       new FortranOpenMPSubroutinesGeneration (project, declarations);
 
       break;
     }
 
-    case TargetBackends::OPENCL:
+    case TargetBackend::OPENCL:
     {
       Debug::getInstance ()->errorMessage (
           "OpenCL code generation not yet supported in Fortran", __FILE__,
           __LINE__);
+
+      FortranProgramDeclarationsAndDefinitions * declarations =
+          new FortranProgramDeclarationsAndDefinitions (project);
 
       break;
     }
@@ -198,19 +204,19 @@ checkBackendOption ()
   using std::vector;
   using std::string;
 
-  if (Globals::getInstance ()->getTargetBackend () == TargetBackends::UNKNOWN)
+  if (Globals::getInstance ()->getTargetBackend () == TargetBackend::UNKNOWN)
   {
-    vector <TargetBackends::BACKEND_VALUE> values;
-    values.push_back (TargetBackends::CUDA);
-    values.push_back (TargetBackends::OPENMP);
+    vector <TargetBackend::BACKEND_VALUE> values;
+    values.push_back (TargetBackend::CUDA);
+    values.push_back (TargetBackend::OPENMP);
 
     string backendsString;
 
     unsigned int i = 1;
-    for (vector <TargetBackends::BACKEND_VALUE>::iterator it = values.begin (); it
+    for (vector <TargetBackend::BACKEND_VALUE>::iterator it = values.begin (); it
         != values.end (); ++it, ++i)
     {
-      backendsString += TargetBackends::toString (*it);
+      backendsString += TargetBackend::toString (*it);
 
       if (i < values.size ())
       {
@@ -228,15 +234,13 @@ void
 addCommandLineOptions ()
 {
   CommandLine::getInstance ()->addOption (new CUDAOption ("Generate CUDA code",
-      TargetBackends::toString (TargetBackends::CUDA)));
+      TargetBackend::toString (TargetBackend::CUDA)));
 
-  CommandLine::getInstance ()->addOption (
-      new OpenMPOption ("Generate OpenMP code", TargetBackends::toString (
-          TargetBackends::OPENMP)));
+  CommandLine::getInstance ()->addOption (new OpenMPOption (
+      "Generate OpenMP code", TargetBackend::toString (TargetBackend::OPENMP)));
 
-  CommandLine::getInstance ()->addOption (
-      new OpenCLOption ("Generate OpenCL code", TargetBackends::toString (
-          TargetBackends::OPENCL)));
+  CommandLine::getInstance ()->addOption (new OpenCLOption (
+      "Generate OpenCL code", TargetBackend::toString (TargetBackend::OPENCL)));
 
   CommandLine::getInstance ()->addOption (new OxfordOption (
       "Refactor OP2 calls to comply with Oxford API", "oxford"));
@@ -255,7 +259,7 @@ processUserSelections (SgProject * project)
     if (Globals::getInstance ()->renderOxfordAPICalls ())
     {
       if (Globals::getInstance ()->getTargetBackend ()
-          != TargetBackends::UNKNOWN)
+          != TargetBackend::UNKNOWN)
       {
         Debug::getInstance ()->errorMessage (
             "You have selected to generate code for " + toString (

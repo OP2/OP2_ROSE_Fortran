@@ -6,7 +6,6 @@
 #include <FortranProgramDeclarationsAndDefinitions.h>
 #include <FortranParallelLoop.h>
 #include <FortranHostSubroutine.h>
-#include <FortranInitialiseConstantsSubroutine.h>
 #include <FortranOpDatDimensionsDeclaration.h>
 #include <FortranModuleDeclarations.h>
 #include <FortranReductionSubroutines.h>
@@ -27,8 +26,6 @@ class FortranSubroutinesGeneration: public SubroutinesGeneration <
   protected:
 
     FortranReductionSubroutines * reductionSubroutines;
-
-    FortranInitialiseConstantsSubroutine * initialiseConstantsSubroutine;
 
     std::map <std::string, FortranOpDatDimensionsDeclaration *>
         dimensionsDeclarations;

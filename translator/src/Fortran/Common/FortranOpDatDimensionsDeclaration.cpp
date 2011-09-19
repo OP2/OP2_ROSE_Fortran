@@ -13,6 +13,7 @@
 void
 FortranOpDatDimensionsDeclaration::addFields ()
 {
+  using boost::lexical_cast;
   using SageInterface::appendStatement;
   using SageBuilder::buildVariableDeclaration;
   using std::string;
@@ -21,17 +22,21 @@ FortranOpDatDimensionsDeclaration::addFields ()
 
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
-    if (parallelLoop->isDirect (i) || parallelLoop->isIndirect (i)
-        || parallelLoop->isGlobalScalar (i) == false)
-    {
-      /*
-       * ======================================================
-       * Only declare a dimension field if the OP_DAT is not
-       * a global or a non-scalar global
-       * ======================================================
-       */
+    /*
+     * ======================================================
+     * We do NOT need a dimensions field when OP_GBL data
+     * is read
+     * ======================================================
+     */
 
-      string const & variableName = VariableNames::getOpDatDimensionName (i);
+    if (parallelLoop->isGlobalRead (i) == false)
+    {
+      Debug::getInstance ()->debugMessage (
+          "Adding dimensions field for OP_DAT " + lexical_cast <string> (i),
+          Debug::INNER_LOOP_LEVEL, __FILE__, __LINE__);
+
+      string const & variableName = OP2::VariableNames::getOpDatDimensionName (
+          i);
 
       SgVariableDeclaration * fieldDeclaration = buildVariableDeclaration (
           variableName, FortranTypesBuilder::getFourByteInteger (), NULL,
@@ -64,6 +69,7 @@ FortranOpDatDimensionsDeclaration::addTypeDeclaration ()
  * Public functions
  * ======================================================
  */
+
 SgClassType *
 FortranOpDatDimensionsDeclaration::getType ()
 {
@@ -74,7 +80,7 @@ SgVariableDeclaration *
 FortranOpDatDimensionsDeclaration::getOpDatDimensionField (
     unsigned int OP_DAT_ArgumentGroup)
 {
-  return fieldDeclarations->get (VariableNames::getOpDatDimensionName (
+  return fieldDeclarations->get (OP2::VariableNames::getOpDatDimensionName (
       OP_DAT_ArgumentGroup));
 }
 
@@ -84,6 +90,10 @@ FortranOpDatDimensionsDeclaration::FortranOpDatDimensionsDeclaration (
   subroutineName (subroutineName), parallelLoop (parallelLoop), moduleScope (
       moduleScope)
 {
+  Debug::getInstance ()->debugMessage (
+      "Creating OP_DAT dimensions type declaration", Debug::CONSTRUCTOR_LEVEL,
+      __FILE__, __LINE__);
+
   addTypeDeclaration ();
 
   addFields ();

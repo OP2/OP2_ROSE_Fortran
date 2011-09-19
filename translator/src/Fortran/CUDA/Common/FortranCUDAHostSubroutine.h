@@ -2,7 +2,6 @@
 #define FORTRAN_CUDA_HOST_SUBROUTINE_H
 
 #include <FortranHostSubroutine.h>
-#include <FortranInitialiseConstantsSubroutine.h>
 #include <FortranCUDAKernelSubroutine.h>
 #include <FortranCUDADataSizesDeclaration.h>
 #include <FortranOpDatDimensionsDeclaration.h>
@@ -13,8 +12,6 @@ class FortranCUDAHostSubroutine: public FortranHostSubroutine
 {
   protected:
 
-    FortranInitialiseConstantsSubroutine * initialiseConstantsSubroutine;
-
     FortranCUDADataSizesDeclaration * dataSizesDeclaration;
 
     FortranOpDatDimensionsDeclaration * opDatDimensionsDeclaration;
@@ -22,15 +19,6 @@ class FortranCUDAHostSubroutine: public FortranHostSubroutine
     FortranCUDAModuleDeclarations * moduleDeclarations;
 
   protected:
-
-    /*
-     * ======================================================
-     * Returns a statement which represents a CUDA thread
-     * synchronisation call
-     * ======================================================
-     */
-    SgStatement *
-    createThreadSynchroniseCallStatement ();
 
     virtual void
     createReductionEpilogueStatements ();
@@ -43,21 +31,14 @@ class FortranCUDAHostSubroutine: public FortranHostSubroutine
 
     /*
      * ======================================================
-     * Creates the statements needed after the kernel has
-     * completed
+     * Creates the expression on the right-hand side of the
+     * statement which initialises the size of the OP_DAT in this
+     * argument group
      * ======================================================
      */
-    void
-    createCUDAKernelEpilogueStatements ();
-
-    /*
-     * ======================================================
-     * Creates the statements needed before the kernel is
-     * launched
-     * ======================================================
-     */
-    void
-    createCUDAKernelPrologueStatements ();
+    SgExpression *
+    createRHSOfInitialiseOpDatSizeStatement (SgScopeStatement * scope,
+        unsigned int OP_DAT_ArgumentGroup);
 
     virtual SgBasicBlock *
     createTransferOpDatStatements ();
@@ -81,7 +62,6 @@ class FortranCUDAHostSubroutine: public FortranHostSubroutine
         std::string const & userSubroutineName,
         std::string const & kernelSubroutineName,
         FortranParallelLoop * parallelLoop, SgScopeStatement * moduleScope,
-        FortranInitialiseConstantsSubroutine * initialiseConstantsSubroutine,
         FortranCUDADataSizesDeclaration * dataSizesDeclaration,
         FortranOpDatDimensionsDeclaration * opDatDimensionsDeclaration,
         FortranCUDAModuleDeclarations * moduleDeclarations);

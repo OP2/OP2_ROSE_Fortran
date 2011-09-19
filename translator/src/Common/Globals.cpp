@@ -1,7 +1,7 @@
 #include <cstdlib>
 #include <boost/filesystem.hpp>
 #include <Globals.h>
-#include <CommonNamespaces.h>
+#include <Debug.h>
 
 Globals * Globals::globalsInstance = NULL;
 
@@ -18,7 +18,7 @@ Globals::Globals ()
    * Assume that the target backend is unknown
    * ======================================================
    */
-  backend = TargetBackends::UNKNOWN;
+  backend = TargetBackend::UNKNOWN;
 
   /*
    * ======================================================
@@ -47,12 +47,12 @@ Globals::getInstance ()
 }
 
 void
-Globals::setTargetBackend (TargetBackends::BACKEND_VALUE backend)
+Globals::setTargetBackend (TargetBackend::BACKEND_VALUE backend)
 {
   this->backend = backend;
 }
 
-TargetBackends::BACKEND_VALUE
+TargetBackend::BACKEND_VALUE
 Globals::getTargetBackend () const
 {
   return backend;
@@ -85,6 +85,9 @@ Globals::outputUDrawGraphs () const
 void
 Globals::addInputFile (std::string const & fileName)
 {
+  Debug::getInstance ()->debugMessage ("Adding file '" + fileName + "'",
+      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+
   inputFiles.push_back (fileName);
 }
 

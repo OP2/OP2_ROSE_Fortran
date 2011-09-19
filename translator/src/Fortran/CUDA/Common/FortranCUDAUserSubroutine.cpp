@@ -12,54 +12,31 @@
  */
 
 void
-FortranCUDAUserSubroutine::patchReferencesToConstants ()
+FortranCUDAUserSubroutine::forceOutputOfCodeToFile ()
 {
-  using boost::iequals;
-  using SageBuilder::buildVarRefExp;
-  using std::map;
-  using std::string;
-
-  Debug::getInstance ()->debugMessage ("Patching references to constants",
+  Debug::getInstance ()->debugMessage (
+      "Ensuring user subroutine is generated in output file",
       Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
-  class ModifyReferencesToConstantVariables: public AstSimpleProcessing
+  /*
+   * ======================================================
+   * We have to set each node in the AST representation of
+   * this subroutine as compiler generated, otherwise chunks
+   * of the user kernel are missing in the output
+   * ======================================================
+   */
+
+  class TreeVisitor: public AstSimpleProcessing
   {
     public:
 
-      FortranInitialiseConstantsSubroutine * initialiseConstantsSubroutine;
-
-      ModifyReferencesToConstantVariables (
-          FortranInitialiseConstantsSubroutine * initialiseConstantsSubroutine) :
-        initialiseConstantsSubroutine (initialiseConstantsSubroutine)
+      TreeVisitor ()
       {
       }
 
       virtual void
       visit (SgNode * node)
       {
-        SgVarRefExp * oldVarRefExp = isSgVarRefExp (node);
-
-        if (oldVarRefExp != NULL)
-        {
-          for (map <string, string>::const_iterator it =
-              initialiseConstantsSubroutine->getFirstConstantName (); it
-              != initialiseConstantsSubroutine->getLastConstantName (); ++it)
-          {
-
-            if (iequals (it->first,
-                oldVarRefExp->get_symbol ()->get_name ().getString ()))
-            {
-              SgVarRefExp
-                  * newVarRefExp =
-                      buildVarRefExp (
-                          initialiseConstantsSubroutine->getVariableDeclarations ()->get (
-                              it->second));
-
-              oldVarRefExp->set_symbol (newVarRefExp->get_symbol ());
-            }
-          }
-        }
-
         SgLocatedNode * locatedNode = isSgLocatedNode (node);
         if (locatedNode != NULL)
         {
@@ -68,8 +45,9 @@ FortranCUDAUserSubroutine::patchReferencesToConstants ()
       }
   };
 
-  (new ModifyReferencesToConstantVariables (initialiseConstantsSubroutine))->traverse (
-      subroutineHeaderStatement, preorder);
+  TreeVisitor * visitor = new TreeVisitor ();
+
+  visitor->traverse (subroutineHeaderStatement, preorder);
 }
 
 void
@@ -79,8 +57,8 @@ FortranCUDAUserSubroutine::findOriginalSubroutine ()
   using std::vector;
 
   Debug::getInstance ()->debugMessage (
-      "Searching for original user subroutine", Debug::FUNCTION_LEVEL,
-      __FILE__, __LINE__);
+      "Searching for original user subroutine '" + hostSubroutineName + "'",
+      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
   for (vector <SgProcedureHeaderStatement *>::const_iterator it =
       declarations->firstSubroutineInSourceCode (); it
@@ -90,12 +68,20 @@ FortranCUDAUserSubroutine::findOriginalSubroutine ()
 
     if (iequals (hostSubroutineName, subroutine->get_name ().getString ()))
     {
+      Debug::getInstance ()->debugMessage ("Found user kernel '"
+          + hostSubroutineName + "'", Debug::OUTER_LOOP_LEVEL, __FILE__,
+          __LINE__);
+
       originalSubroutine = subroutine;
       break;
     }
   }
 
-  ROSE_ASSERT (originalSubroutine != NULL);
+  if (originalSubroutine == NULL)
+  {
+    Debug::getInstance ()->errorMessage ("Unable to find user kernel '"
+        + hostSubroutineName + "'", __FILE__, __LINE__);
+  }
 }
 
 void
@@ -131,6 +117,10 @@ FortranCUDAUserSubroutine::createStatements ()
 
     if (isVariableDeclaration == NULL)
     {
+      Debug::getInstance ()->debugMessage (
+          "Appending (non-variable-declaration) statement",
+          Debug::HIGHEST_DEBUG_LEVEL, __FILE__, __LINE__);
+
       appendStatement (*it, subroutineScope);
 
       if (isSgImplicitStatement (*it) != NULL)
@@ -166,7 +156,8 @@ FortranCUDAUserSubroutine::createStatements ()
                         variableName, type, subroutineScope, formalParameters,
                         2, DEVICE, SHARED);
           }
-          else if (parallelLoop->isGlobalScalar (OP_DAT_ArgumentGroup))
+          else if (parallelLoop->isGlobalScalar (OP_DAT_ArgumentGroup)
+              && parallelLoop->isRead (OP_DAT_ArgumentGroup))
           {
             SgVariableDeclaration
                 * variableDeclaration =
@@ -189,6 +180,9 @@ FortranCUDAUserSubroutine::createStatements ()
     }
     else
     {
+      Debug::getInstance ()->debugMessage ("Appending variable declaration",
+          Debug::HIGHEST_DEBUG_LEVEL, __FILE__, __LINE__);
+
       bool isFormalParameter = false;
 
       string const
@@ -216,6 +210,7 @@ FortranCUDAUserSubroutine::createStatements ()
          * ======================================================
          */
         appendStatement (*it, subroutineScope);
+
       }
     }
   }
@@ -239,13 +234,11 @@ FortranCUDAUserSubroutine::createFormalParameterDeclarations ()
 
 FortranCUDAUserSubroutine::FortranCUDAUserSubroutine (
     std::string const & subroutineName, SgScopeStatement * moduleScope,
-    FortranInitialiseConstantsSubroutine * initialiseConstantsSubroutine,
     FortranProgramDeclarationsAndDefinitions * declarations,
     FortranParallelLoop * parallelLoop) :
   UserSubroutine <SgProcedureHeaderStatement,
       FortranProgramDeclarationsAndDefinitions> (subroutineName, declarations,
-      parallelLoop), initialiseConstantsSubroutine (
-      initialiseConstantsSubroutine)
+      parallelLoop)
 {
   using SageBuilder::buildProcedureHeaderStatement;
   using SageBuilder::buildVoidType;
@@ -267,5 +260,5 @@ FortranCUDAUserSubroutine::FortranCUDAUserSubroutine (
 
   createStatements ();
 
-  patchReferencesToConstants ();
+  forceOutputOfCodeToFile ();
 }

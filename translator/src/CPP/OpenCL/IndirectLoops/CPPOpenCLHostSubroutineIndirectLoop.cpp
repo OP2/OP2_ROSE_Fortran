@@ -7,7 +7,8 @@
 #include <RoseHelper.h>
 #include <CPPPlan.h>
 
-using namespace SageBuilder; //TODO: remove
+using namespace SageBuilder;
+//TODO: remove
 /*
  * ======================================================
  * Private functions
@@ -24,8 +25,8 @@ CPPOpenCLHostSubroutineIndirectLoop::createKernelFunctionCallStatement ()
   using SageBuilder::buildVarRefExp;
 
   SgExprListExp * actualParameters = buildExprListExp ();
-  
-  std::vector<std::pair<SgExpression *, SgExpression *> > kernelArguments;
+
+  std::vector <std::pair <SgExpression *, SgExpression *> > kernelArguments;
 
   actualParameters->append_expression (buildVarRefExp (
       moduleDeclarations->getDimensionsVariableDeclaration ()));
@@ -36,45 +37,47 @@ CPPOpenCLHostSubroutineIndirectLoop::createKernelFunctionCallStatement ()
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
     if (parallelLoop->isDuplicateOpDat (i) == false
-        && parallelLoop->getOpMapValue (i) == INDIRECT)
+        && parallelLoop->isIndirect (i))
     {
       actualParameters->append_expression (
-          buildVarRefExp (variableDeclarations->get (VariableNames::getOpDatDeviceName (i))));
+          buildVarRefExp (variableDeclarations->get (
+              OP2::VariableNames::getOpDatDeviceName (i))));
 
-      actualParameters->append_expression (
-          buildVarRefExp ( variableDeclarations->get ( VariableNames::getLocalToGlobalMappingName (i))));
+      actualParameters->append_expression (buildVarRefExp (
+          variableDeclarations->get (
+              OP2::VariableNames::getLocalToGlobalMappingName (i))));
     }
   }
 
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
-    if (parallelLoop->getOpMapValue (i) == INDIRECT)
+    if (parallelLoop->isIndirect (i))
     {
       actualParameters->append_expression (buildVarRefExp (
-          variableDeclarations->get ( VariableNames::getGlobalToLocalMappingName (i))));
+          variableDeclarations->get (
+              OP2::VariableNames::getGlobalToLocalMappingName (i))));
     }
   }
 
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
-    if (parallelLoop->isDuplicateOpDat (i) == false
-        && (parallelLoop->getOpMapValue (i) == DIRECT
-            || parallelLoop->getOpMapValue (i) == GLOBAL))
+    if (parallelLoop->isDuplicateOpDat (i) == false && (parallelLoop->isDirect (
+        i) || parallelLoop->isGlobal (i)))
     {
-      actualParameters->append_expression (buildVarRefExp (
-          variableDeclarations->get (VariableNames::getOpDatDeviceName (i))));
+      actualParameters->append_expression (
+          buildVarRefExp (variableDeclarations->get (
+              OP2::VariableNames::getOpDatDeviceName (i))));
     }
   }
 
-  actualParameters->append_expression (
-      buildDotExp(
-          buildVarRefExp( variableDeclarations->get( PlanFunction::CPP::plan ) ),
-          buildVarRefExp ( variableDeclarations->get (PlanFunction::CPP::pindSizes ) ) ) );
-          
+  actualParameters->append_expression (buildDotExp (buildVarRefExp (
+      variableDeclarations->get (PlanFunction::CPP::plan)), buildVarRefExp (
+      variableDeclarations->get (PlanFunction::CPP::pindSizes))));
+
   /*
-      buildVarRefExp (
-      variableDeclarations->get (PlanFunction::CPP::pindSizes)));
-      */
+   buildVarRefExp (
+   variableDeclarations->get (PlanFunction::CPP::pindSizes)));
+   */
 
   actualParameters->append_expression (buildVarRefExp (
       variableDeclarations->get (PlanFunction::CPP::pindOffs)));
@@ -127,151 +130,131 @@ CPPOpenCLHostSubroutineIndirectLoop::createPlanFunctionExecutionStatements ()
   Debug::getInstance ()->debugMessage (
       "Creating plan function execution statements", Debug::FUNCTION_LEVEL,
       __FILE__, __LINE__);
-  
-  SgExpression * block_offset_ref = buildVarRefExp (variableDeclarations->get (PlanFunction::CPP::blockOffset));
-  SgExpression * col_ref = buildVarRefExp (variableDeclarations->get (CommonVariableNames::col));
-  SgExpression * Plan_ref = buildVarRefExp (variableDeclarations->get (PlanFunction::CPP::actualPlan));
-  SgExpression * nblocks_ref = buildVarRefExp ( variableDeclarations->get (OpenCL::CPP::blocksPerGrid) );
-  SgExpression * nthreads_ref = buildVarRefExp ( variableDeclarations->get (OpenCL::CPP::threadsPerBlock));
-  SgExpression * nthreadstot_ref = buildVarRefExp ( variableDeclarations->get (OpenCL::CPP::totalThreads));
-  SgExpression * nshared_ref = buildVarRefExp (variableDeclarations->get (OpenCL::CPP::sharedMemorySize));
+
+  SgExpression * block_offset_ref = buildVarRefExp (variableDeclarations->get (
+      PlanFunction::CPP::blockOffset));
+  SgExpression * col_ref = buildVarRefExp (variableDeclarations->get (
+      OP2::VariableNames::colour1));
+  SgExpression * Plan_ref = buildVarRefExp (variableDeclarations->get (
+      PlanFunction::CPP::actualPlan));
+  SgExpression * nblocks_ref = buildVarRefExp (variableDeclarations->get (
+      OpenCL::CPP::blocksPerGrid));
+  SgExpression * nthreads_ref = buildVarRefExp (variableDeclarations->get (
+      OpenCL::CPP::threadsPerBlock));
+  SgExpression * nthreadstot_ref = buildVarRefExp (variableDeclarations->get (
+      OpenCL::CPP::totalThreads));
+  SgExpression * nshared_ref = buildVarRefExp (variableDeclarations->get (
+      OpenCL::CPP::sharedMemorySize));
   //SgExpression * reduct_size_ref = buildVarRefExp (variableDeclarations->get (ReductionSubroutine::reductionArraySize));
   //SgExpression * offset_s_ref = buildVarRefExp (variableDeclarations->get (DirectLoop::CPP::KernelSubroutine::warpScratchpadSize));
-  SgExpression * OP_block_size_ref = buildVarRefExp ( variableDeclarations->get (OpenCL::CPP::totalThreads));
+  SgExpression * OP_block_size_ref = buildVarRefExp (variableDeclarations->get (
+      OpenCL::CPP::totalThreads));
 
   SgStatement * tempStatement = NULL;
-  
-  
-  
-  
+
   /*
    * ======================================================
    * block_offset = 0
    * ======================================================
    */
-  
-  tempStatement = buildAssignStatement (
-      block_offset_ref,
-      buildIntVal (0));
+
+  tempStatement = buildAssignStatement (block_offset_ref, buildIntVal (0));
 
   appendStatement (tempStatement, subroutineScope);
-  
+
   /*
    * ======================================================
    * Plan = op_plan_get( name, set, part_size, nargs, args, ninds, inds )
    * ======================================================
    */
-  
+
   //XXX
-  
+
   /* 
    * ======================================================
    * BEGIN for ( col=0; col < Plan->ncolors; col++ )
    * ======================================================
    */
-  
-  SgStatement * initialisationExpression1 = buildExprStatement( buildAssignOp (
-      col_ref,
-      buildIntVal(0) ) );
-  
-  SgStatement * testExpression1 = buildExprStatement( buildLessThanOp(
-      col_ref,
-      buildArrowExp(
-          Plan_ref,
-          buildOpaqueVarRefExp("ncolors") ) ) );
-  
-  SgExpression * incrementExpression1 = buildPlusPlusOp(
-      col_ref );
 
-  SgBasicBlock * loopBody1 = buildBasicBlock();
-  
-  SgForStatement * forStatement1 = buildForStatement(
-      initialisationExpression1,
-      testExpression1,
-      incrementExpression1,
-      loopBody1 );
-  
-  appendStatement( forStatement1, subroutineScope );
-  
+  SgStatement * initialisationExpression1 = buildExprStatement (buildAssignOp (
+      col_ref, buildIntVal (0)));
+
+  SgStatement * testExpression1 = buildExprStatement (buildLessThanOp (col_ref,
+      buildArrowExp (Plan_ref, buildOpaqueVarRefExp ("ncolors"))));
+
+  SgExpression * incrementExpression1 = buildPlusPlusOp (col_ref);
+
+  SgBasicBlock * loopBody1 = buildBasicBlock ();
+
+  SgForStatement * forStatement1 = buildForStatement (
+      initialisationExpression1, testExpression1, incrementExpression1,
+      loopBody1);
+
+  appendStatement (forStatement1, subroutineScope);
+
   /*
    * ======================================================
    * nthread = 128 //TODO: change in order to wrap with OP_BLOCK_SIZE (how?)
    * ======================================================
    */
-  
-  tempStatement = buildAssignStatement (
-      nthreads_ref, 
-      OP_block_size_ref );
 
-  appendStatement ( tempStatement, loopBody1 );
-  
+  tempStatement = buildAssignStatement (nthreads_ref, OP_block_size_ref);
+
+  appendStatement (tempStatement, loopBody1);
+
   /*
    * ======================================================
    * nblocks = Plan->ncolblk[col]
    * ======================================================
    */
-  tempStatement = buildAssignStatement (
-      nblocks_ref, 
-      buildPntrArrRefExp(
-          buildArrowExp(
-              Plan_ref,
-              buildOpaqueVarRefExp("ncolblk") ),
-          col_ref ) );
+  tempStatement = buildAssignStatement (nblocks_ref, buildPntrArrRefExp (
+      buildArrowExp (Plan_ref, buildOpaqueVarRefExp ("ncolblk")), col_ref));
 
-  appendStatement ( tempStatement, loopBody1 );
-  
+  appendStatement (tempStatement, loopBody1);
+
   /*
    * ======================================================
    * ntotthread = nblocks * nthread
    * ======================================================
    */
-  
-  tempStatement = buildAssignStatement (
-      nthreadstot_ref, 
-      buildMultiplyOp(
-          nblocks_ref,
-          nthreads_ref ) );
 
-  appendStatement ( tempStatement, loopBody1 );
-  
+  tempStatement = buildAssignStatement (nthreadstot_ref, buildMultiplyOp (
+      nblocks_ref, nthreads_ref));
+
+  appendStatement (tempStatement, loopBody1);
+
   /* ======================================================
    * nshared = Plan->nshared
    * ======================================================
    */
-  tempStatement = buildAssignStatement (
-      nshared_ref, 
-      buildArrowExp(
-          Plan_ref,
-          buildOpaqueVarRefExp("nshared") ) );
+  tempStatement = buildAssignStatement (nshared_ref, buildArrowExp (Plan_ref,
+      buildOpaqueVarRefExp ("nshared")));
 
   appendStatement (tempStatement, loopBody1);
-  
-  
-  
+
   appendStatement (createKernelFunctionCallStatement (), loopBody1);
 
-  appendStatement (CPPOpenCLStatementsAndExpressionsBuilder::generateBarrierStatement(), loopBody1);
-  
+  appendStatement (
+      CPPOpenCLStatementsAndExpressionsBuilder::generateBarrierStatement (),
+      loopBody1);
+
   /* 
    * ======================================================
    * END for ( col=0; col < plan->ncolors; col++ )
    * ======================================================
    */
-  
-  
+
   /* 
    * ======================================================
    * block_offset += nblocks
    * ======================================================
    */
-  
-  tempStatement = buildExprStatement( buildPlusAssignOp(
-      block_offset_ref,
-      nblocks_ref ) );
+
+  tempStatement = buildExprStatement (buildPlusAssignOp (block_offset_ref,
+      nblocks_ref));
 
   appendStatement (tempStatement, subroutineScope);
-  
-  
+
 }
 
 void
@@ -307,14 +290,14 @@ CPPOpenCLHostSubroutineIndirectLoop::createVariablesSizesInitialisationStatement
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
     if (parallelLoop->isDuplicateOpDat (i) == false
-        && parallelLoop->getOpMapValue (i) == INDIRECT)
+        && parallelLoop->isIndirect (i))
     {
       SgVarRefExp * dataSizesReferences = buildVarRefExp (
           moduleDeclarations->getDataSizesVariableDeclaration ());
 
       SgVarRefExp * fieldReference = buildVarRefExp (
           dataSizesDeclaration->getFieldDeclarations ()->get (
-              VariableNames::getLocalToGlobalMappingSizeName (i)));
+              OP2::VariableNames::getLocalToGlobalMappingSizeName (i)));
 
       SgDotExp * fieldSelectionExpression = buildDotExp (dataSizesReferences,
           fieldReference);
@@ -336,21 +319,21 @@ CPPOpenCLHostSubroutineIndirectLoop::createVariablesSizesInitialisationStatement
 
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
-    if (parallelLoop->getOpMapValue (i) == INDIRECT)
+    if (parallelLoop->isIndirect (i))
     {
       SgVarRefExp * dataSizesReferences = buildVarRefExp (
           moduleDeclarations->getDataSizesVariableDeclaration ());
 
       SgVarRefExp * fieldReference = buildVarRefExp (
           dataSizesDeclaration->getFieldDeclarations ()->get (
-              VariableNames::getGlobalToLocalMappingSizeName (i)));
+              OP2::VariableNames::getGlobalToLocalMappingSizeName (i)));
 
       SgDotExp * fieldSelectionExpression = buildDotExp (dataSizesReferences,
           fieldReference);
 
       SgExprStatement * assignmentStatement = buildAssignStatement (
           fieldSelectionExpression, buildVarRefExp (variableDeclarations->get (
-              VariableNames::getGlobalToLocalMappingSizeName (i))));
+              OP2::VariableNames::getGlobalToLocalMappingSizeName (i))));
 
       appendStatement (assignmentStatement, ifBody);
     }
@@ -421,29 +404,24 @@ CPPOpenCLHostSubroutineIndirectLoop::createExecutionPlanDeclarations ()
    * ======================================================
    */
 
-
   variableDeclarations->add (PlanFunction::CPP::actualPlan,
       CPPStatementsAndExpressionsBuilder::appendVariableDeclaration (
-          PlanFunction::CPP::actualPlan, 
-          buildPointerType ( buildClassDeclaration("op_plan", subroutineScope)->get_type() ),
+          PlanFunction::CPP::actualPlan, buildPointerType (
+              buildClassDeclaration ("op_plan", subroutineScope)->get_type ()),
           subroutineScope));
-
 
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
     if (parallelLoop->isDuplicateOpDat (i) == false
-        && parallelLoop->getOpMapValue (i) == INDIRECT)
+        && parallelLoop->isIndirect (i))
     {
       string const variableName =
-          VariableNames::getLocalToGlobalMappingName (i);
+          OP2::VariableNames::getLocalToGlobalMappingName (i);
 
       variableDeclarations->add (variableName,
           CPPStatementsAndExpressionsBuilder::appendVariableDeclaration (
-              variableName, 
-              buildArrayType(buildIntType()), 
-              subroutineScope,
-              1, 
-              DEVICE ));
+              variableName, buildArrayType (buildIntType ()), subroutineScope,
+              1, DEVICE));
     }
   }
 
@@ -476,13 +454,10 @@ CPPOpenCLHostSubroutineIndirectLoop::createExecutionPlanDeclarations ()
   for (vector <string>::iterator it = integerArrays.begin (); it
       != integerArrays.end (); ++it)
   {
-    variableDeclarations->add (
-        *it,
-        CPPStatementsAndExpressionsBuilder::appendVariableDeclaration (
-            *it,
-            buildArrayType(
-                buildIntType(), 
-                buildIntVal(parallelLoop->getNumberOfOpDatArgumentGroups ())),
+    variableDeclarations->add (*it,
+        CPPStatementsAndExpressionsBuilder::appendVariableDeclaration (*it,
+            buildArrayType (buildIntType (), buildIntVal (
+                parallelLoop->getNumberOfOpDatArgumentGroups ())),
             subroutineScope));
   }
 
@@ -495,18 +470,15 @@ CPPOpenCLHostSubroutineIndirectLoop::createExecutionPlanDeclarations ()
 
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
-    if (parallelLoop->getOpMapValue (i) == INDIRECT)
+    if (parallelLoop->isIndirect (i))
     {
       string const variableName =
-          VariableNames::getGlobalToLocalMappingName (i);
+          OP2::VariableNames::getGlobalToLocalMappingName (i);
 
       variableDeclarations->add (variableName,
           CPPStatementsAndExpressionsBuilder::appendVariableDeclaration (
-              variableName, 
-              buildArrayType(buildShortType()), 
-              subroutineScope,
-              1, 
-              DEVICE));
+              variableName, buildArrayType (buildShortType ()),
+              subroutineScope, 1, DEVICE));
     }
   }
 
@@ -518,16 +490,14 @@ CPPOpenCLHostSubroutineIndirectLoop::createExecutionPlanDeclarations ()
    */
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
-    if (parallelLoop->getOpMapValue (i) == INDIRECT)
+    if (parallelLoop->isIndirect (i))
     {
       string const variableName =
-          VariableNames::getGlobalToLocalMappingSizeName (i);
+          OP2::VariableNames::getGlobalToLocalMappingSizeName (i);
 
       variableDeclarations->add (variableName,
           CPPStatementsAndExpressionsBuilder::appendVariableDeclaration (
-              variableName, 
-              buildIntType(),
-              subroutineScope));
+              variableName, buildIntType (), subroutineScope));
     }
   }
 
@@ -542,7 +512,7 @@ CPPOpenCLHostSubroutineIndirectLoop::createExecutionPlanDeclarations ()
 
   vector <string> integerVariables;
 
-  integerVariables.push_back (CommonVariableNames::col);
+  integerVariables.push_back (OP2::VariableNames::colour1);
 
   integerVariables.push_back (CommonVariableNames::iterationCounter1);
 
@@ -570,10 +540,8 @@ CPPOpenCLHostSubroutineIndirectLoop::createExecutionPlanDeclarations ()
       != integerVariables.end (); ++it)
   {
     variableDeclarations->add (*it,
-        CPPStatementsAndExpressionsBuilder::appendVariableDeclaration (
-            *it,
-            buildIntType(), 
-            subroutineScope));
+        CPPStatementsAndExpressionsBuilder::appendVariableDeclaration (*it,
+            buildIntType (), subroutineScope));
   }
 
   /*
@@ -595,9 +563,8 @@ CPPOpenCLHostSubroutineIndirectLoop::createExecutionPlanDeclarations ()
       != integerPointerVariables.end (); ++it)
   {
     variableDeclarations->add (*it,
-        CPPStatementsAndExpressionsBuilder::appendVariableDeclaration (
-            *it,
-            buildPointerType(buildArrayType(buildIntType())), 
+        CPPStatementsAndExpressionsBuilder::appendVariableDeclaration (*it,
+            buildPointerType (buildArrayType (buildIntType ())),
             subroutineScope));
   }
 
@@ -632,9 +599,9 @@ CPPOpenCLHostSubroutineIndirectLoop::createExecutionPlanDeclarations ()
   {
     variableDeclarations->add (*it,
         CPPStatementsAndExpressionsBuilder::appendVariableDeclaration (*it,
-            buildArrayType(buildIntType()), 
+            buildArrayType(buildIntType()),
             subroutineScope,
-            1, 
+            1,
             DEVICE));
   }
 #endif
@@ -648,10 +615,8 @@ CPPOpenCLHostSubroutineIndirectLoop::createStatements ()
   using SageBuilder::buildEqualityOp;
   using SageInterface::appendStatement;
   using std::vector;
-  
 
   SgExprStatement * tempStatement = NULL;
-
 
   vector <SubroutineVariableDeclarations *> declarationSets;
   declarationSets.push_back (moduleDeclarations->getAllDeclarations ());
@@ -664,7 +629,7 @@ CPPOpenCLHostSubroutineIndirectLoop::createStatements ()
       moduleDeclarations->getFirstExecutionBooleanDeclaration ()),
       buildBoolValExp (true));
 
-  SgBasicBlock * ifBody = buildBasicBlock(); //createFirstTimeExecutionStatements ();
+  SgBasicBlock * ifBody = buildBasicBlock (); //createFirstTimeExecutionStatements ();
 
   appendStatement (createPlanFunctionParametersPreparationStatements (
       allDeclarations, (CPPParallelLoop *) parallelLoop), ifBody);
@@ -727,18 +692,13 @@ CPPOpenCLHostSubroutineIndirectLoop::createLocalVariableDeclarations ()
 
 CPPOpenCLHostSubroutineIndirectLoop::CPPOpenCLHostSubroutineIndirectLoop (
     std::string const & subroutineName, std::string const & userSubroutineName,
-    std::string const & kernelSubroutineName,
-    CPPParallelLoop * parallelLoop, 
+    std::string const & kernelSubroutineName, CPPParallelLoop * parallelLoop,
     SgScopeStatement * moduleScope,
-//    CPPInitialiseConstantsSubroutine * initialiseConstantsSubroutine,
+    //    CPPInitialiseConstantsSubroutine * initialiseConstantsSubroutine,
     CPPOpenCLDataSizesDeclarationIndirectLoop * dataSizesDeclaration,
     CPPOpDatDimensionsDeclaration * opDatDimensionsDeclaration) :
-  CPPOpenCLHostSubroutine (
-      subroutineName, 
-      userSubroutineName,
-      kernelSubroutineName, 
-      parallelLoop,
-      moduleScope)
+  CPPOpenCLHostSubroutine (subroutineName, userSubroutineName,
+      kernelSubroutineName, parallelLoop, moduleScope)
 {
   Debug::getInstance ()->debugMessage (
       "Creating host subroutine of indirect loop", Debug::CONSTRUCTOR_LEVEL,

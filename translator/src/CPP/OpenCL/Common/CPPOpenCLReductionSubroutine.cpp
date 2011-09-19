@@ -698,7 +698,7 @@ CPPOpenCLReductionSubroutine::createFormalParameterDeclarations ()
               subroutineScope), //FIXME
           subroutineScope, formalParameters));
 
-  autosharedVariableName = VariableNames::getAutosharedDeclarationName (
+  autosharedVariableName = OP2::VariableNames::getAutosharedDeclarationName (
       reduction->getBaseType (), reduction->getVariableSize ());
 
   variableDeclarations->add (

@@ -11,8 +11,8 @@ class FortranCUDADataSizesDeclarationIndirectLoop: public FortranCUDADataSizesDe
 {
   private:
 
-    virtual void
-    addFields ();
+    void
+    addIndirectLoopFields ();
 
   public:
 

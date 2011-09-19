@@ -40,27 +40,305 @@ namespace OP2
   std::string const OP_DECL_CONST = "op_decl_const";
   std::string const OP_ARG_DAT = "op_arg_dat";
   std::string const OP_ARG_GBL = "op_arg_gbl";
-}
 
-namespace TargetBackends
-{
-  /*
-   * ======================================================
-   * The different backends supported:
-   * 1) Unknown: primarily for debugging reasons
-   * 2) CUDA
-   * 3) OpenMP
-   * 4) OpenCL
-   * ======================================================
-   */
-
-  enum BACKEND_VALUE
+  namespace VariableNames
   {
-    UNKNOWN, CUDA, OPENMP, OPENCL
-  };
+    /*
+     * ======================================================
+     * Some of these names are hardwired in the OP2 run-time
+     * support and cannot easily be changed
+     * ======================================================
+     */
+    std::string const blockID = "blockID";
+    std::string const colour1 = "colour";
+    std::string const colour2 = "colour2";
+    std::string const dataOnHost = "dat";
+    std::string const dataOnDevice = "dat_d";
+    std::string const dimension = "dim";
+    std::string const index = "index";
+    std::string const moduloResult = "moduloResult";
+    std::string const nbytes = "nbytes";
+    std::string const numberOfColours = "numOfColours";
+    std::string const nelems = "nelems";
+    std::string const nelems2 = "nelems2";
+    std::string const offset = "offset";
+    std::string const offset2 = "offset2";
+    std::string const reductionCardinality = "reductionCardinality";
+    std::string const reductionResult = "reductionResult";
+    std::string const reductionSharedMemorySize = "reductionSharedMemorySize";
+    std::string const set = "set";
+    std::string const size = "size";
+    std::string const setSize = "setSize";
+    std::string const sharedMemoryBytes = "sharedMemoryBytes";
+    std::string const threadID = "threadID";
+    std::string const threadItems = "threadItems";
+    std::string const threadBlockSizeMacro = "OP_BLOCK_SIZE";
+    std::string const warpSize = "warpSize";
+    std::string const warpMemorySize = "warpMemorySize";
+    std::string const warpSizeMacro = "OP_WARP_SIZE";
 
-  std::string
-  toString (BACKEND_VALUE backend);
+    namespace PlanFunction
+    {
+      /*
+       * ======================================================
+       * Variable names used in the plan function
+       * ======================================================
+       */
+
+      std::string const accesses = "accesses";
+      std::string const actualPlan = "actualPlan";
+      std::string const args = "args";
+      std::string const argsNumber = "argsNumber";
+      std::string const blkmap = "blkmap";
+      std::string const blockOffset = "blockOffset";
+      std::string const cplan = "cplan";
+      std::string const idxs = "idxs";
+      std::string const inds = "inds";
+      std::string const indsNumber = "indsNumber";
+      std::string const ind_maps = "ind_maps";
+      std::string const ind_offs = "ind_offs";
+      std::string const ind_sizes = "ind_sizes";
+      std::string const maps = "maps";
+      std::string const nblocks = "nblocks";
+      std::string const ncolblk = "ncolblk";
+      std::string const ncolors = "ncolors";
+      std::string const nelems = "nelems";
+      std::string const nindirect = "nindirect";
+      std::string const nshared = "nshared";
+      std::string const nthrcol = "nthrcol";
+      std::string const offset = "offset";
+      std::string const pblkMap = "pblkMap";
+      std::string const pblkMapSize = "pblkMapSize";
+      std::string const pindMaps = "pindMaps";
+      std::string const pindMapsSize = "pindMapsSize";
+      std::string const pindOffs = "pindOffs";
+      std::string const pindOffsSize = "pindOffsSize";
+      std::string const pindSizes = "pindSizes";
+      std::string const pindSizesSize = "pindSizesSize";
+      std::string const planRet = "planRet";
+      std::string const pmaps = "pmaps";
+      std::string const pnelems = "pnelems";
+      std::string const pnelemsSize = "pnelemsSize";
+      std::string const pnindirect = "pnindirect";
+      std::string const pnthrcol = "pnthrcol";
+      std::string const pnthrcolSize = "pnthrcolSize";
+      std::string const poffset = "poffset";
+      std::string const poffsetSize = "poffsetSize";
+      std::string const pthrcol = "pthrcol";
+      std::string const pthrcolSize = "pthrcolSize";
+      std::string const thrcol = "thrcol";
+    }
+
+    /*
+     * ======================================================
+     * Returns the name of the formal parameter which models the
+     * name of the user subroutine
+     * ======================================================
+     */
+    std::string
+    getUserSubroutineName ();
+
+    /*
+     * ======================================================
+     * Returns the name of the formal parameter which models the
+     * OP_SET
+     * ======================================================
+     */
+    std::string
+    getOpSetName ();
+
+    /*
+     * ======================================================
+     * Returns the name of an OP_DAT variable in this OP_DAT
+     * argument group
+     * ======================================================
+     */
+    std::string
+    getOpDatName (unsigned int OP_DAT_ArgumentGroup);
+
+    /*
+     * ======================================================
+     * Returns the name of an OP_DAT variable in this OP_DAT
+     * argument group on the host
+     * ======================================================
+     */
+    std::string
+    getOpDatHostName (unsigned int OP_DAT_ArgumentGroup);
+
+    /*
+     * ======================================================
+     * Returns the name of a local OP_DAT variable in this
+     * OP_DAT argument group
+     * ======================================================
+     */
+    std::string
+    getOpDatSharedName (unsigned int OP_DAT_ArgumentGroup);
+
+    /*
+     * ======================================================
+     * Returns the name of a local OP_DAT variable in this
+     * OP_DAT argument group
+     * ======================================================
+     */
+    std::string
+    getOpDatLocalName (unsigned int OP_DAT_ArgumentGroup);
+
+    /*
+     * ======================================================
+     * Returns the name of a global OP_DAT variable in this
+     * OP_DAT argument group
+     * ======================================================
+     */
+    std::string
+    getOpDatGlobalName (unsigned int OP_DAT_ArgumentGroup);
+
+    /*
+     * ======================================================
+     * Returns the name of a global OP_DAT variable in this
+     * OP_DAT argument group
+     * ======================================================
+     */
+    std::string
+    getOpDatSharedName (unsigned int OP_DAT_ArgumentGroup);
+
+    /*
+     * ======================================================
+     * Returns the name of the variable modelling the size of
+     * an OP_DAT in this OP_DAT argument group
+     * ======================================================
+     */
+    std::string
+    getOpDatSizeName (unsigned int OP_DAT_ArgumentGroup);
+
+    /*
+     * ======================================================
+     * Returns the name of the OP_DAT device variable
+     * in this OP_DAT argument group
+     * ======================================================
+     */
+    std::string
+    getOpDatDeviceName (unsigned int OP_DAT_ArgumentGroup);
+
+    /*
+     * ======================================================
+     * Returns the name of the OP_DAT dimension variable
+     * in this OP_DAT argument group
+     * ======================================================
+     */
+    std::string
+    getOpDatDimensionName (unsigned int OP_DAT_ArgumentGroup);
+
+    /*
+     * ======================================================
+     * Returns the name of the indirection variable in this
+     * OP_DAT argument group
+     * ======================================================
+     */
+    std::string
+    getOpIndirectionName (unsigned int OP_DAT_ArgumentGroup);
+
+    /*
+     * ======================================================
+     * Returns the name of the mapping variable in this OP_DAT
+     * argument group
+     * ======================================================
+     */
+    std::string
+    getOpMapName (unsigned int OP_DAT_ArgumentGroup);
+
+    /*
+     * ======================================================
+     * Returns the name of the access variable in this OP_DAT
+     * argument group
+     * ======================================================
+     */
+    std::string
+    getOpAccessName (unsigned int OP_DAT_ArgumentGroup);
+
+    /*
+     * ======================================================
+     * Returns the name of the C to Fortran variable
+     * in this OP_DAT argument group
+     * ======================================================
+     */
+    std::string
+    getCToFortranVariableName (unsigned int OP_DAT_ArgumentGroup);
+
+    /*
+     * ======================================================
+     * Name of the field which represents the size of a
+     * local to global renumbering (i.e. from local memory
+     * into global device memory in the CUDA architecture)
+     * argument used for an indirect OP_DAT.
+     *
+     * These are the 'ind_maps' variable sizes in the plan
+     * function according to Mike Giles documentation
+     * ======================================================
+     */
+    std::string
+    getLocalToGlobalMappingName (unsigned int OP_DAT_ArgumentGroup);
+
+    std::string
+    getLocalToGlobalMappingSizeName (unsigned int OP_DAT_ArgumentGroup);
+
+    /*
+     * ======================================================
+     * Name of the field which represents the size of a
+     * global to local renumbering (i.e. from global device memory
+     * to local memory in the CUDA architecture)
+     * argument used for an indirect OP_DAT.
+     *
+     * These are the 'maps' variable sizes in the plan function
+     * according to Mike Giles documentation
+     * ======================================================
+     */
+    std::string
+    getGlobalToLocalMappingName (unsigned int OP_DAT_ArgumentGroup);
+
+    std::string
+    getGlobalToLocalMappingSizeName (unsigned int OP_DAT_ArgumentGroup);
+
+    std::string
+    getNumberOfBytesVariableName (unsigned int OP_DAT_ArgumentGroup);
+
+    std::string
+    getRoundUpVariableName (unsigned int OP_DAT_ArgumentGroup);
+
+    std::string
+    getIncrementAccessMapName (unsigned int OP_DAT_ArgumentGroup);
+
+    std::string
+    getOpIndirectionSharedName (unsigned int OP_DAT_ArgumentGroup);
+
+    std::string
+    getIndirectionArgumentSizeName (unsigned int OP_DAT_ArgumentGroup);
+
+    std::string
+    getDataSizesVariableDeclarationName (std::string const & suffix);
+
+    std::string
+    getDimensionsVariableDeclarationName (std::string const & suffix);
+
+    std::string
+    getPlanReturnVariableDeclarationName (std::string const & suffix);
+
+    std::string
+    getFirstTimeExecutionVariableDeclarationName (std::string const & suffix);
+
+    std::string
+    getAutosharedDeclarationName (SgType * type, unsigned int size);
+
+    std::string
+    getReductionArrayHostName (unsigned int OP_DAT_ArgumentGroup,
+        std::string const & suffix);
+
+    std::string
+    getReductionArrayDeviceName (unsigned int OP_DAT_ArgumentGroup,
+        std::string const & suffix);
+
+    std::string
+    getReductionResultName (unsigned int OP_DAT_ArgumentGroup);
+  }
 }
 
 namespace IndirectLoop
@@ -70,8 +348,6 @@ namespace IndirectLoop
     namespace VariablePrefixes
     {
       std::string const numberOfBytes = "nBytes";
-      std::string const pindMaps = "pindMaps";
-      std::string const pMaps = "pMaps";
       std::string const roundUp = "roundUp";
     }
 
@@ -83,35 +359,6 @@ namespace IndirectLoop
         std::string const blockOffsetShared = "offset_b";
         std::string const moduled = "moduled";
         std::string const moduloResult = "moduloResult";
-        std::string const nbytes = "nbytes";
-        std::string const ncolor = "ncolor";
-        std::string const nelem = "nelem";
-        std::string const nelems2 = "nelems2";
-      }
-    }
-  }
-  namespace Fortran
-  {
-    namespace VariablePrefixes
-    {
-      std::string const numberOfBytes = "nBytes";
-      std::string const pindMaps = "pindMaps";
-      std::string const pMaps = "pMaps";
-      std::string const roundUp = "roundUp";
-    }
-
-    namespace KernelSubroutine
-    {
-      namespace VariableNames
-      {
-        std::string const blockID = "blockID";
-        std::string const blockOffsetShared = "blockOffsetShared";
-        std::string const moduled = "moduled";
-        std::string const moduloResult = "moduloResult";
-        std::string const nbytes = "nbytes";
-        std::string const ncolor = "ncolor";
-        std::string const nelem = "nelem";
-        std::string const nelems2 = "nelems2";
       }
     }
   }
@@ -126,21 +373,6 @@ namespace DirectLoop
       std::string const setSize = "set_size";
       std::string const warpScratchpadSize = "offset_s";
       std::string const warpSize = "OP_WARPSIZE";
-      std::string const setElementCounter = "n";
-      std::string const dataPerElementCounter = "m";
-      std::string const threadIDModulus = "tid";
-      std::string const offsetInThreadBlock = "offset";
-      std::string const remainingElements = "nelems";
-      std::string const autosharedDisplacement = "autosharedDisplacement";
-    }
-  }
-  namespace Fortran
-  {
-    namespace KernelSubroutine
-    {
-      std::string const setSize = "setSize";
-      std::string const warpScratchpadSize = "warpScratchpadSize";
-      std::string const warpSize = "warpSize";
       std::string const setElementCounter = "n";
       std::string const dataPerElementCounter = "m";
       std::string const threadIDModulus = "tid";
@@ -193,267 +425,6 @@ namespace OpenCL
     std::string const constantModifier = "__constant";
 
   }
-}
-namespace CUDA
-{
-  /*
-   * ======================================================
-   * The names used in the CUDA libraries
-   * ======================================================
-   */
-
-  namespace Fortran
-  {
-    std::string const blockidx = "blockidx";
-    std::string const blockdim = "blockdim";
-    std::string const cudaThreadSynchronize = "cudaThreadSynchronize";
-    std::string const griddim = "griddim";
-    std::string const blocksPerGrid = "nblocks";
-    std::string const sharedMemorySize = "nshared";
-    std::string const threadsPerBlock = "nthread";
-    std::string const syncthreads = "syncthreads";
-    std::string const threadidx = "threadidx";
-    std::string const threadSynchRet = "threadSynchRet";
-    std::string const x = "x";
-  }
-}
-
-namespace OpenMP
-{
-  std::string const numberOfThreads = "nthreads";
-  std::string const threadIndex = "threadIndex";
-  std::string const sliceStart = "sliceStart";
-  std::string const sliceEnd = "sliceEnd";
-  std::string const threadID = "threadID";
-  std::string const sliceIterator = "sliceIterator";
-  std::string const blockID = "blockID";
-}
-
-namespace CommonVariableNames
-{
-  std::string const argShared = "arg_s";
-  std::string const col = "col";
-  std::string const col2 = "col2";
-  std::string const dat = "dat";
-  std::string const dat_d = "dat_d";
-  std::string const dim = "dim";
-  std::string const index = "index";
-  std::string const iterationCounter1 = "i1";
-  std::string const iterationCounter2 = "i2";
-  std::string const set = "set";
-  std::string const size = "size";
-  std::string const upperBound = "n";
-  std::string const numberofBytes = "nbytes";
-}
-
-namespace VariableNames
-{
-  /*
-   * ======================================================
-   * Returns the name of the formal parameter which models the
-   * name of the user subroutine
-   * ======================================================
-   */
-  std::string
-  getUserSubroutineName ();
-
-  /*
-   * ======================================================
-   * Returns the name of the formal parameter which models the
-   * OP_SET
-   * ======================================================
-   */
-  std::string
-  getOpSetName ();
-
-  /*
-   * ======================================================
-   * Returns the name of an OP_DAT variable in this OP_DAT
-   * argument group
-   * ======================================================
-   */
-  std::string
-  getOpDatName (unsigned int OP_DAT_ArgumentGroup);
-
-  /*
-   * ======================================================
-   * Returns the name of an OP_DAT variable in this OP_DAT
-   * argument group on the host
-   * ======================================================
-   */
-  std::string
-  getOpDatHostName (unsigned int OP_DAT_ArgumentGroup);
-
-  /*
-   * ======================================================
-   * Returns the name of a local OP_DAT variable in this
-   * OP_DAT argument group
-   * ======================================================
-   */
-  std::string
-  getOpDatSharedName (unsigned int OP_DAT_ArgumentGroup);
-
-  /*
-   * ======================================================
-   * Returns the name of a local OP_DAT variable in this
-   * OP_DAT argument group
-   * ======================================================
-   */
-  std::string
-  getOpDatLocalName (unsigned int OP_DAT_ArgumentGroup);
-
-  /*
-   * ======================================================
-   * Returns the name of a global OP_DAT variable in this
-   * OP_DAT argument group
-   * ======================================================
-   */
-  std::string
-  getOpDatGlobalName (unsigned int OP_DAT_ArgumentGroup);
-
-  /*
-   * ======================================================
-   * Returns the name of a global OP_DAT variable in this
-   * OP_DAT argument group
-   * ======================================================
-   */
-  std::string
-  getOpDatSharedName (unsigned int OP_DAT_ArgumentGroup);
-
-  /*
-   * ======================================================
-   * Returns the name of the variable modelling the size of
-   * an OP_DAT in this OP_DAT argument group
-   * ======================================================
-   */
-  std::string
-  getOpDatSizeName (unsigned int OP_DAT_ArgumentGroup);
-
-  /*
-   * ======================================================
-   * Returns the name of the OP_DAT device variable
-   * in this OP_DAT argument group
-   * ======================================================
-   */
-  std::string
-  getOpDatDeviceName (unsigned int OP_DAT_ArgumentGroup);
-
-  /*
-   * ======================================================
-   * Returns the name of the OP_DAT dimension variable
-   * in this OP_DAT argument group
-   * ======================================================
-   */
-  std::string
-  getOpDatDimensionName (unsigned int OP_DAT_ArgumentGroup);
-
-  /*
-   * ======================================================
-   * Returns the name of the indirection variable in this
-   * OP_DAT argument group
-   * ======================================================
-   */
-  std::string
-  getOpIndirectionName (unsigned int OP_DAT_ArgumentGroup);
-
-  /*
-   * ======================================================
-   * Returns the name of the mapping variable in this OP_DAT
-   * argument group
-   * ======================================================
-   */
-  std::string
-  getOpMapName (unsigned int OP_DAT_ArgumentGroup);
-
-  /*
-   * ======================================================
-   * Returns the name of the access variable in this OP_DAT
-   * argument group
-   * ======================================================
-   */
-  std::string
-  getOpAccessName (unsigned int OP_DAT_ArgumentGroup);
-
-  /*
-   * ======================================================
-   * Returns the name of the C to Fortran variable
-   * in this OP_DAT argument group
-   * ======================================================
-   */
-  std::string
-  getCToFortranVariableName (unsigned int OP_DAT_ArgumentGroup);
-
-  /*
-   * ======================================================
-   * Name of the field which represents the size of a
-   * local to global renumbering (i.e. from local memory
-   * into global device memory in the CUDA architecture)
-   * argument used for an indirect OP_DAT.
-   *
-   * These are the 'ind_maps' variable sizes in the plan
-   * function according to Mike Giles documentation
-   * ======================================================
-   */
-  std::string
-  getLocalToGlobalMappingName (unsigned int OP_DAT_ArgumentGroup);
-
-  std::string
-  getLocalToGlobalMappingSizeName (unsigned int OP_DAT_ArgumentGroup);
-
-  /*
-   * ======================================================
-   * Name of the field which represents the size of a
-   * global to local renumbering (i.e. from global device memory
-   * to local memory in the CUDA architecture)
-   * argument used for an indirect OP_DAT.
-   *
-   * These are the 'maps' variable sizes in the plan function
-   * according to Mike Giles documentation
-   * ======================================================
-   */
-  std::string
-  getGlobalToLocalMappingName (unsigned int OP_DAT_ArgumentGroup);
-
-  std::string
-  getGlobalToLocalMappingSizeName (unsigned int OP_DAT_ArgumentGroup);
-
-  std::string
-  getNumberOfBytesVariableName (unsigned int OP_DAT_ArgumentGroup);
-
-  std::string
-  getRoundUpVariableName (unsigned int OP_DAT_ArgumentGroup);
-
-  std::string
-  getIncrementAccessMapName (unsigned int OP_DAT_ArgumentGroup);
-
-  std::string
-  getOpIndirectionSharedName (unsigned int OP_DAT_ArgumentGroup);
-
-  std::string
-  getIndirectionArgumentSizeName (unsigned int OP_DAT_ArgumentGroup);
-
-  std::string
-  getDataSizesVariableDeclarationName (std::string const & suffix);
-
-  std::string
-  getDimensionsVariableDeclarationName (std::string const & suffix);
-
-  std::string
-  getPlanReturnVariableDeclarationName (std::string const & suffix);
-
-  std::string
-  getFirstTimeExecutionVariableDeclarationName (std::string const & suffix);
-
-  std::string
-  getAutosharedDeclarationName (SgType * type, unsigned int size);
-
-  std::string
-  getReductionArrayHostName (unsigned int OP_DAT_ArgumentGroup,
-      std::string const & suffix);
-
-  std::string
-  getReductionArrayDeviceName (unsigned int OP_DAT_ArgumentGroup,
-      std::string const & suffix);
 }
 
 namespace SubroutineCalls

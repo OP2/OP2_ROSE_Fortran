@@ -119,6 +119,15 @@ class ParallelLoop
 
     /*
      * ======================================================
+     * Checks the consistency of the OP_DAT arguments with
+     * respect to their access values
+     * ======================================================
+     */
+    void
+    checkArguments ();
+
+    /*
+     * ======================================================
      * Is this parallel loop direct or indirect?
      * ======================================================
      */
@@ -185,15 +194,6 @@ class ParallelLoop
     void
     setOpMapValue (unsigned int OP_DAT_ArgumentGroup, MAPPING_VALUE value);
 
-    /*
-     * ======================================================
-     * What is the mapping value of the OP_DAT argument
-     * in this OP_DAT argument group?
-     * ======================================================
-     */
-    MAPPING_VALUE
-    getOpMapValue (unsigned int OP_DAT_ArgumentGroup);
-
     bool
     isIndirect (unsigned int OP_DAT_ArgumentGroup);
 
@@ -207,20 +207,14 @@ class ParallelLoop
     isGlobalScalar (unsigned int OP_DAT_ArgumentGroup);
 
     bool
-    isGlobalNonScalar (unsigned int OP_DAT_ArgumentGroup);
+    isGlobalArray (unsigned int OP_DAT_ArgumentGroup);
+
+    bool
+    isGlobalRead (unsigned int OP_DAT_ArgumentGroup);
 
     void
     setOpAccessValue (unsigned int OP_DAT_ArgumentGroup,
         ACCESS_CODE_VALUE value);
-
-    /*
-     * ======================================================
-     * What is the access descriptor of the OP_DAT argument
-     * in this OP_DAT argument group?
-     * ======================================================
-     */
-    ACCESS_CODE_VALUE
-    getOpAccessValue (unsigned int OP_DAT_ArgumentGroup);
 
     bool
     isRead (unsigned int OP_DAT_ArgumentGroup);
@@ -303,6 +297,24 @@ class ParallelLoop
 
     void
     setUniqueOpDat (std::string const & variableName);
+
+    /*
+     * ======================================================
+     * Does this OP_DAT argument group need a data sizes
+     * declaration?
+     * ======================================================
+     */
+    bool
+    dataSizesDeclarationNeeded (unsigned int OP_DAT_ArgumentGroup);
+
+    /*
+     * ======================================================
+     * Does this OP_DAT argument group need a CUDA local
+     * thread variable declaration?
+     * ======================================================
+     */
+    bool
+    localThreadVariableDeclarationNeeded (unsigned int OP_DAT_ArgumentGroup);
 
     /*
      * ======================================================

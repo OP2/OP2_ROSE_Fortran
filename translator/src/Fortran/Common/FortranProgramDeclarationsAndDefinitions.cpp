@@ -4,6 +4,7 @@
 #include <Globals.h>
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
+#include <boost/filesystem.hpp>
 
 /*
  * ======================================================
@@ -280,13 +281,17 @@ FortranProgramDeclarationsAndDefinitions::retrieveOpDatDeclarations (
 void
 FortranProgramDeclarationsAndDefinitions::visit (SgNode * node)
 {
+  using boost::filesystem::path;
+  using boost::filesystem::system_complete;
   using boost::iequals;
   using boost::starts_with;
   using std::string;
 
   if (isSgSourceFile (node))
   {
-    currentSourceFile = isSgSourceFile (node)->getFileName ();
+    path p = system_complete (path (isSgSourceFile (node)->getFileName ()));
+
+    currentSourceFile = p.filename ();
 
     Debug::getInstance ()->debugMessage ("Source file '" + currentSourceFile
         + "' detected", Debug::OUTER_LOOP_LEVEL, __FILE__, __LINE__ );
@@ -495,6 +500,8 @@ FortranProgramDeclarationsAndDefinitions::visit (SgNode * node)
             parallelLoops[userSubroutineName] = parallelLoop;
 
             retrieveOpDatDeclarations (parallelLoop, actualArguments);
+
+            parallelLoop->checkArguments ();
           }
           else
           {
@@ -521,7 +528,7 @@ FortranProgramDeclarationsAndDefinitions::visit (SgNode * node)
           SgType * type =
               variableDeclaration->get_decl_item (variableName)->get_type ();
 
-          declarations[variableName] = type;
+          declarations[variableName] = variableDeclaration;
         }
 
         break;

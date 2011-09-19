@@ -14,43 +14,63 @@ FortranCUDAModuleDeclarations::createReductionDeclarations ()
 {
   using std::string;
 
+  Debug::getInstance ()->debugMessage ("Creating reduction declarations",
+      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
     if (parallelLoop->isReductionRequired (i))
     {
-      std::cout << "HERE 1\n";
+      if (parallelLoop->isRead (i) == false)
+      {
+        /*
+         * ======================================================
+         * If the OP_GBL is not read then declare both a host and
+         * device array as part of the reduction will be done on
+         * the GPU and its results collected on the CPU
+         *
+         * Note that, if the OP_GBL is read, then the data will be
+         * passed to the CUDA and user kernels by reference (if
+         * it is an array) or by value (if it is a scalar).
+         * Therefore, nothing needs to be allocated on the host or
+         * device to store intermediate and final reduction results
+         * ======================================================
+         */
 
-      SgType * baseType = parallelLoop->getOpDatBaseType (i);
+        string const reductionArrayHostName =
+            OP2::VariableNames::getReductionArrayHostName (i,
+                userSubroutineName);
 
-      std::cout << "HERE 2\n";
+        Debug::getInstance ()->debugMessage ("Creating host reduction array '"
+            + reductionArrayHostName + "'", Debug::HIGHEST_DEBUG_LEVEL,
+            __FILE__, __LINE__);
 
-      string const reductionArrayHostName =
-          VariableNames::getReductionArrayHostName (i, userSubroutineName);
+        SgVariableDeclaration * reductionArrayHost =
+            FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
+                reductionArrayHostName, FortranTypesBuilder::getArray_RankOne (
+                    parallelLoop->getOpDatBaseType (i)), moduleScope, 1,
+                ALLOCATABLE);
 
-      Debug::getInstance ()->debugMessage ("Creating host reduction array '"
-          + reductionArrayHostName + "'", Debug::HIGHEST_DEBUG_LEVEL, __FILE__,
-          __LINE__);
+        variableDeclarations->add (reductionArrayHostName, reductionArrayHost);
 
-      SgVariableDeclaration * reductionArrayHost =
-          FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
-              reductionArrayHostName, FortranTypesBuilder::getArray_RankOne (
-                  baseType), moduleScope, 1, ALLOCATABLE);
+        string const reductionArrayDeviceName =
+            OP2::VariableNames::getReductionArrayDeviceName (i,
+                userSubroutineName);
 
-      variableDeclarations->add (reductionArrayHostName, reductionArrayHost);
+        Debug::getInstance ()->debugMessage (
+            "Creating device reduction array '" + reductionArrayDeviceName
+                + "'", Debug::HIGHEST_DEBUG_LEVEL, __FILE__, __LINE__);
 
-      string const reductionArrayDeviceName =
-          VariableNames::getReductionArrayDeviceName (i, userSubroutineName);
+        SgVariableDeclaration * reductionArrayDevice =
+            FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
+                reductionArrayDeviceName,
+                FortranTypesBuilder::getArray_RankOne (
+                    parallelLoop->getOpDatBaseType (i)), moduleScope, 2,
+                ALLOCATABLE, DEVICE);
 
-      Debug::getInstance ()->debugMessage ("Creating device reduction array '"
-          + reductionArrayDeviceName + "'", Debug::HIGHEST_DEBUG_LEVEL,
-          __FILE__, __LINE__);
-
-      SgVariableDeclaration * reductionArrayDevice =
-          FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
-              reductionArrayDeviceName, FortranTypesBuilder::getArray_RankOne (
-                  baseType), moduleScope, 2, ALLOCATABLE, DEVICE);
-
-      variableDeclarations->add (reductionArrayDeviceName, reductionArrayDevice);
+        variableDeclarations->add (reductionArrayDeviceName,
+            reductionArrayDevice);
+      }
     }
   }
 }
@@ -63,7 +83,8 @@ FortranCUDAModuleDeclarations::createDataSizesDeclaration ()
       Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
   std::string const & variableName =
-      VariableNames::getDataSizesVariableDeclarationName (userSubroutineName);
+      OP2::VariableNames::getDataSizesVariableDeclarationName (
+          userSubroutineName);
 
   SgVariableDeclaration * variableDeclaration =
       FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
@@ -77,7 +98,8 @@ void
 FortranCUDAModuleDeclarations::createDimensionsDeclaration ()
 {
   std::string const & variableName =
-      VariableNames::getDimensionsVariableDeclarationName (userSubroutineName);
+      OP2::VariableNames::getDimensionsVariableDeclarationName (
+          userSubroutineName);
 
   Debug::getInstance ()->debugMessage (
       "Generating OP_DAT dimensions declaration '" + variableName + "'",
@@ -101,7 +123,8 @@ SgVariableDeclaration *
 FortranCUDAModuleDeclarations::getDataSizesVariableDeclaration ()
 {
   std::string const & variableName =
-      VariableNames::getDataSizesVariableDeclarationName (userSubroutineName);
+      OP2::VariableNames::getDataSizesVariableDeclarationName (
+          userSubroutineName);
 
   return variableDeclarations->get (variableName);
 }
@@ -110,7 +133,8 @@ SgVariableDeclaration *
 FortranCUDAModuleDeclarations::getDimensionsVariableDeclaration ()
 {
   std::string const & variableName =
-      VariableNames::getDimensionsVariableDeclarationName (userSubroutineName);
+      OP2::VariableNames::getDimensionsVariableDeclarationName (
+          userSubroutineName);
 
   return variableDeclarations->get (variableName);
 }

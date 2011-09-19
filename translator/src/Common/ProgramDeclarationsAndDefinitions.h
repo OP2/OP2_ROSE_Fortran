@@ -86,7 +86,7 @@ template <typename TParallelLoop, typename TSubroutineHeader>
 
       std::vector <std::string> doubleDeclarations;
 
-      std::map <std::string, SgType *> declarations;
+      std::map <std::string, SgVariableDeclaration *> declarations;
 
       /*
        * ======================================================
@@ -101,8 +101,6 @@ template <typename TParallelLoop, typename TSubroutineHeader>
       handleBaseTypeDeclaration (SgType * type,
           std::string const & variableName)
       {
-        declarations[variableName] = type;
-
         if (isSgTypeBool (type) != NULL)
         {
           Debug::getInstance ()->debugMessage ("'" + variableName
@@ -346,8 +344,8 @@ template <typename TParallelLoop, typename TSubroutineHeader>
             variableName) != doubleDeclarations.end ();
       }
 
-      SgType *
-      getType (std::string const & variableName)
+      SgVariableDeclaration *
+      getOriginalDeclaration (std::string const & variableName)
       {
         return declarations[variableName];
       }

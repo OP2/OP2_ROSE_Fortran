@@ -5,12 +5,17 @@
 #include <FortranParallelLoop.h>
 #include <FortranCUDADataSizesDeclaration.h>
 #include <FortranOpDatDimensionsDeclaration.h>
+#include <FortranCUDAModuleDeclarations.h>
 
 class FortranCUDAKernelSubroutine: public FortranKernelSubroutine
 {
   protected:
 
+    FortranCUDADataSizesDeclaration * dataSizesDeclaration;
+
     FortranOpDatDimensionsDeclaration * opDatDimensionsDeclaration;
+
+    FortranCUDAModuleDeclarations * moduleDeclarations;
 
   protected:
 
@@ -21,7 +26,7 @@ class FortranCUDAKernelSubroutine: public FortranKernelSubroutine
     createInitialiseLocalThreadVariablesStatements ();
 
     void
-    createReductionLoopStatements ();
+    createReductionEpilogueStatements ();
 
     void
     createLocalThreadDeclarations ();
@@ -33,7 +38,9 @@ class FortranCUDAKernelSubroutine: public FortranKernelSubroutine
         std::string const & userSubroutineName,
         FortranParallelLoop * parallelLoop, SgScopeStatement * moduleScope,
         FortranReductionSubroutines * reductionSubroutines,
-        FortranOpDatDimensionsDeclaration * opDatDimensionsDeclaration);
+        FortranCUDADataSizesDeclaration * dataSizesDeclaration,
+        FortranOpDatDimensionsDeclaration * opDatDimensionsDeclaration,
+        FortranCUDAModuleDeclarations * moduleDeclarations);
 };
 
 #endif

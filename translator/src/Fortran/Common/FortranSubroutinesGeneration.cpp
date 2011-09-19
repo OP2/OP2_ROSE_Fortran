@@ -362,16 +362,9 @@ FortranSubroutinesGeneration::generate ()
 
   createModuleDeclarations ();
 
-  initialiseConstantsSubroutine = new FortranInitialiseConstantsSubroutine (
-      moduleScope, declarations);
-
-  initialiseConstantsSubroutine->declareConstants ();
-
   addContains ();
 
   createReductionSubroutines ();
-
-  initialiseConstantsSubroutine->generateSubroutine ();
 
   createSubroutines ();
 

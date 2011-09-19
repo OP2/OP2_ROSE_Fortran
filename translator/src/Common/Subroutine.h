@@ -8,8 +8,19 @@
 #ifndef SUBROUTINE_H
 #define SUBROUTINE_H
 
+#include <boost/lexical_cast.hpp>
+#include <boost/crc.hpp>
 #include <rose.h>
 #include <SubroutineVariableDeclarations.h>
+#include <Debug.h>
+
+namespace CommonVariableNames
+{
+  std::string const iterationCounter1 = "i1";
+  std::string const iterationCounter2 = "i2";
+  std::string const threadID = "threadID";
+  std::string const upperBound = "bound";
+}
 
 template <typename TSubroutineHeader>
   class Subroutine
@@ -89,9 +100,28 @@ template <typename TSubroutineHeader>
        */
       Subroutine (std::string const & subroutineName)
       {
+        using boost::lexical_cast;
         using SageBuilder::buildFunctionParameterList;
+        using std::string;
 
-        this->subroutineName = subroutineName;
+        if (subroutineName.length () > 20)
+        {
+          boost::crc_32_type result;
+
+          result.process_bytes (subroutineName.c_str (),
+              subroutineName.length ());
+
+          this->subroutineName = "s" + lexical_cast <string> (
+              result.checksum ());
+        }
+        else
+        {
+          this->subroutineName = subroutineName;
+        }
+
+        Debug::getInstance ()->debugMessage ("Subroutine name = "
+            + this->subroutineName, Debug::CONSTRUCTOR_LEVEL, __FILE__,
+            __LINE__);
 
         formalParameters = buildFunctionParameterList ();
 

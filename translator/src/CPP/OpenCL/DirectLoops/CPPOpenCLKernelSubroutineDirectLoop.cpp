@@ -42,18 +42,18 @@ CPPOpenCLKernelSubroutineDirectLoop::createUserSubroutineCallStatement ()
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
     SgExpression * argN_ref = buildVarRefExp (variableDeclarations->get (
-        VariableNames::getOpDatName (i)));
+        OP2::VariableNames::getOpDatName (i)));
     SgExpression * argN_l_ref = buildVarRefExp (variableDeclarations->get (
-        VariableNames::getOpDatLocalName (i)));
+        OP2::VariableNames::getOpDatLocalName (i)));
     SgExpression * dimN_val = buildIntVal (parallelLoop->getOpDatDimension (i));
 
     int dim = parallelLoop->getOpDatDimension (i);
 
     SgExpression * parameterExpression = buildIntVal (1);
 
-    if (parallelLoop->getOpMapValue (i) == GLOBAL)
+    if (parallelLoop->isGlobal (i))
     {
-      if (parallelLoop->getOpAccessValue (i) == READ_ACCESS)
+      if (parallelLoop->isRead (i))
       {
         /*
          * ======================================================
@@ -76,7 +76,7 @@ CPPOpenCLKernelSubroutineDirectLoop::createUserSubroutineCallStatement ()
         parameterExpression = argN_l_ref;
       }
     }
-    else if (parallelLoop->getOpMapValue (i) == DIRECT)
+    else if (parallelLoop->isDirect (i))
     {
       if (parallelLoop->getNumberOfIndirectOpDats () > 0)
       {
@@ -126,7 +126,7 @@ CPPOpenCLKernelSubroutineDirectLoop::createStageInFromDeviceMemoryToLocalThreadV
   using SageInterface::appendStatement;
 
   SgExpression * arg_s_ref = buildVarRefExp (variableDeclarations->get (
-      CommonVariableNames::argShared));
+      "argShared"));
   SgExpression * tid_ref = buildVarRefExp (variableDeclarations->get (
       DirectLoop::CPP::KernelSubroutine::threadIDModulus));
   SgExpression * m_ref = buildVarRefExp (variableDeclarations->get (
@@ -141,14 +141,13 @@ CPPOpenCLKernelSubroutineDirectLoop::createStageInFromDeviceMemoryToLocalThreadV
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
     SgExpression * argN_ref = buildVarRefExp (variableDeclarations->get (
-        VariableNames::getOpDatName (i)));
+        OP2::VariableNames::getOpDatName (i)));
     SgExpression * argN_l_ref = buildVarRefExp (variableDeclarations->get (
-        VariableNames::getOpDatLocalName (i)));
+        OP2::VariableNames::getOpDatLocalName (i)));
     SgExpression * dimN_val = buildIntVal (parallelLoop->getOpDatDimension (i));
 
-    if (parallelLoop->getOpMapValue (i) != GLOBAL
-        && parallelLoop->getOpAccessValue (i) != WRITE_ACCESS
-        && parallelLoop->getOpDatDimension (i) != 1)
+    if (parallelLoop->isGlobal (i) == false && parallelLoop->isWritten (i)
+        == false && parallelLoop->getOpDatDimension (i) != 1)
     {
       /* 
        * ======================================================
@@ -236,7 +235,7 @@ CPPOpenCLKernelSubroutineDirectLoop::createStageOutFromLocalThreadVariablesToDev
   using SageInterface::appendStatement;
 
   SgExpression * arg_s_ref = buildVarRefExp (variableDeclarations->get (
-      CommonVariableNames::argShared));
+      "argShared"));
   SgExpression * tid_ref = buildVarRefExp (variableDeclarations->get (
       DirectLoop::CPP::KernelSubroutine::threadIDModulus));
   SgExpression * m_ref = buildVarRefExp (variableDeclarations->get (
@@ -251,14 +250,13 @@ CPPOpenCLKernelSubroutineDirectLoop::createStageOutFromLocalThreadVariablesToDev
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
     SgExpression * argN_ref = buildVarRefExp (variableDeclarations->get (
-        VariableNames::getOpDatName (i)));
+        OP2::VariableNames::getOpDatName (i)));
     SgExpression * argN_l_ref = buildVarRefExp (variableDeclarations->get (
-        VariableNames::getOpDatLocalName (i)));
+        OP2::VariableNames::getOpDatLocalName (i)));
     SgExpression * dimN_val = buildIntVal (parallelLoop->getOpDatDimension (i));
 
-    if (parallelLoop->getOpMapValue (i) != GLOBAL
-        && parallelLoop->getOpAccessValue (i) != WRITE_ACCESS
-        && parallelLoop->getOpDatDimension (i) != 1)
+    if (parallelLoop->isGlobal (i) == false && parallelLoop->isWritten (i)
+        == false && parallelLoop->getOpDatDimension (i) != 1)
     {
       /* ======================================================
        * for ( m=0; m<dimN; m++ ) {
@@ -428,14 +426,14 @@ CPPOpenCLKernelSubroutineDirectLoop::createAutoSharedDisplacementInitialisationS
     if (parallelLoop->isDuplicateOpDat (i) == false)
     {
       string const autosharedVariableName =
-          VariableNames::getAutosharedDeclarationName (
+          OP2::VariableNames::getAutosharedDeclarationName (
               parallelLoop->getOpDatBaseType (i), parallelLoop->getSizeOfOpDat (
                   i));
 
       SgExpression * shared_ref = buildVarRefExp (variableDeclarations->get (
           autosharedVariableName));
       SgExpression * arg_s_ref = buildVarRefExp (variableDeclarations->get (
-          CommonVariableNames::argShared));
+          "argShared"));
       SgExpression * offset_s_ref = buildVarRefExp (variableDeclarations->get (
           DirectLoop::CPP::KernelSubroutine::warpScratchpadSize));
 
@@ -539,7 +537,7 @@ CPPOpenCLKernelSubroutineDirectLoop::createOpDatFormalParameterDeclarations ()
        * ======================================================
        */
 
-      string const & variableName = VariableNames::getOpDatName (i);
+      string const & variableName = OP2::VariableNames::getOpDatName (i);
 
       SgType * opDatType = parallelLoop->getOpDatType (i);
 
@@ -587,13 +585,12 @@ CPPOpenCLKernelSubroutineDirectLoop::createInitialiseLocalThreadVariablesStateme
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
     SgExpression * argN = buildVarRefExp (variableDeclarations->get (
-        VariableNames::getOpDatName (i)));
+        OP2::VariableNames::getOpDatName (i)));
     SgExpression * argN_l = buildVarRefExp (variableDeclarations->get (
-        VariableNames::getOpDatLocalName (i)));
+        OP2::VariableNames::getOpDatLocalName (i)));
     SgExpression * dimN_val = buildIntVal (parallelLoop->getOpDatDimension (i));
 
-    if (parallelLoop->getOpMapValue (i) == GLOBAL
-        && parallelLoop->getOpAccessValue (i) != READ_ACCESS)
+    if (parallelLoop->isGlobal (i) && parallelLoop->isRead (i) == false)
     {
       /*
        * ======================================================
@@ -619,7 +616,7 @@ CPPOpenCLKernelSubroutineDirectLoop::createInitialiseLocalThreadVariablesStateme
 
       SgExprStatement * assignmentStatement;
 
-      if (parallelLoop->getOpAccessValue (i) == INC_ACCESS)
+      if (parallelLoop->isIncremented (i))
       {
         /*
          * ======================================================
@@ -758,11 +755,11 @@ CPPOpenCLKernelSubroutineDirectLoop::createFormalParameterDeclarations ()
 
   // Adam Betts (1/9/2011): This is commented out because we need one autoshared per
   // (type, size) combination
- // variableDeclarations->add (
- //     CommonVariableNames::autoshared,
- //     CPPStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
- //         CommonVariableNames::autoshared, buildPointerType (buildCharType ()), //TODO: char* vs float*
- //         subroutineScope, formalParameters, 1, SHARED));
+  // variableDeclarations->add (
+  //     CommonOP2::VariableNames::autoshared,
+  //     CPPStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
+  //         CommonOP2::VariableNames::autoshared, buildPointerType (buildCharType ()), //TODO: char* vs float*
+  //         subroutineScope, formalParameters, 1, SHARED));
 
   //TODO: add global constants parameter
 

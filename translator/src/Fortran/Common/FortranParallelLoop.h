@@ -44,11 +44,7 @@ class FortranParallelLoop: public ParallelLoop
   public:
 
     virtual unsigned int
-    getNumberOfOpDatArgumentGroups ()
-    {
-      return (getActualArguments ().size () - NUMBER_OF_NON_OP_DAT_ARGUMENTS)
-          / NUMBER_OF_ARGUMENTS_PER_OP_DAT;
-    }
+    getNumberOfOpDatArgumentGroups ();
 
     FortranParallelLoop (SgFunctionCallExp * functionCallExpression) :
       ParallelLoop (functionCallExpression)

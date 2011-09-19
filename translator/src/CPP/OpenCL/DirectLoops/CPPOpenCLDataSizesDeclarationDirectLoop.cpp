@@ -18,13 +18,10 @@ CPPOpenCLDataSizesDeclarationDirectLoop::addFields ()
   {
     if (parallelLoop->isDuplicateOpDat (i) == false)
     {
-      string const & variableName = VariableNames::getOpDatSizeName (i);
+      string const & variableName = OP2::VariableNames::getOpDatSizeName (i);
 
       SgVariableDeclaration * fieldDeclaration = buildVariableDeclaration (
-          variableName, 
-          buildIntType(), 
-          NULL,
-          moduleScope);
+          variableName, buildIntType (), NULL, moduleScope);
 
       fieldDeclaration->get_declarationModifier ().get_accessModifier ().setUndefined ();
 

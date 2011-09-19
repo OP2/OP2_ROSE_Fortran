@@ -22,14 +22,6 @@ class Reduction
 
     /*
      * ======================================================
-     * The array type of the OP_DAT variable
-     * ======================================================
-     */
-
-    SgArrayType * arrayType;
-
-    /*
-     * ======================================================
      * The base type of the variable on which the reduction
      * operates
      * ======================================================
@@ -46,12 +38,6 @@ class Reduction
     unsigned int variableSize;
 
   public:
-
-    SgArrayType *
-    getArrayType ()
-    {
-      return arrayType;
-    }
 
     SgType *
     getBaseType ()
@@ -126,9 +112,8 @@ class Reduction
       return reduction->hashKey () == hashKey ();
     }
 
-    Reduction (SgArrayType * arrayType, SgType * baseType,
-        unsigned int variableSize) :
-      arrayType (arrayType), baseType (baseType), variableSize (variableSize)
+    Reduction (SgType * baseType, unsigned int variableSize) :
+      baseType (baseType), variableSize (variableSize)
     {
     }
 };

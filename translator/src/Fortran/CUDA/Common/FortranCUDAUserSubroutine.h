@@ -2,22 +2,20 @@
 #define FORTRAN_CUDA_USER_SUBROUTINE_H
 
 #include <UserSubroutine.h>
-#include <FortranInitialiseConstantsSubroutine.h>
 #include <FortranParallelLoop.h>
+#include <FortranProgramDeclarationsAndDefinitions.h>
 
 class FortranCUDAUserSubroutine: public UserSubroutine <
     SgProcedureHeaderStatement, FortranProgramDeclarationsAndDefinitions>
 {
   private:
 
-    FortranInitialiseConstantsSubroutine * initialiseConstantsSubroutine;
-
     SgProcedureHeaderStatement * originalSubroutine;
 
   private:
 
     void
-    patchReferencesToConstants ();
+    forceOutputOfCodeToFile ();
 
     void
     findOriginalSubroutine ();
@@ -35,7 +33,6 @@ class FortranCUDAUserSubroutine: public UserSubroutine <
 
     FortranCUDAUserSubroutine (std::string const & subroutineName,
         SgScopeStatement * moduleScope,
-        FortranInitialiseConstantsSubroutine * initialiseConstantsSubroutine,
         FortranProgramDeclarationsAndDefinitions * declarations,
         FortranParallelLoop * parallelLoop);
 };

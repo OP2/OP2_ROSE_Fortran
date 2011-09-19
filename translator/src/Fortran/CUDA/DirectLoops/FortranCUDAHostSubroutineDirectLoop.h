@@ -19,20 +19,11 @@
 #define FORTRAN_CUDA_HOST_SUBROUTINE_DIRECT_LOOP_H
 
 #include <FortranCUDAHostSubroutine.h>
-#include <FortranCUDADataSizesDeclarationDirectLoop.h>
+#include <FortranCUDADataSizesDeclaration.h>
 
 class FortranCUDAHostSubroutineDirectLoop: public FortranCUDAHostSubroutine
 {
   private:
-
-    /*
-     * ======================================================
-     * Generates the code initialising the device variable
-     * sizes variable
-     * ======================================================
-     */
-    void
-    createVariableSizesInitialisationStatements ();
 
     /*
      * ======================================================
@@ -62,16 +53,13 @@ class FortranCUDAHostSubroutineDirectLoop: public FortranCUDAHostSubroutine
 
   public:
 
-        FortranCUDAHostSubroutineDirectLoop (
-            std::string const & subroutineName,
-            std::string const & userSubroutineName,
-            std::string const & kernelSubroutineName,
-            FortranParallelLoop * parallelLoop,
-            SgScopeStatement * moduleScope,
-            FortranInitialiseConstantsSubroutine * initialiseConstantsSubroutine,
-            FortranCUDADataSizesDeclarationDirectLoop * dataSizesDeclaration,
-            FortranOpDatDimensionsDeclaration * opDatDimensionsDeclaration,
-            FortranCUDAModuleDeclarations * moduleDeclarations);
+    FortranCUDAHostSubroutineDirectLoop (std::string const & subroutineName,
+        std::string const & userSubroutineName,
+        std::string const & kernelSubroutineName,
+        FortranParallelLoop * parallelLoop, SgScopeStatement * moduleScope,
+        FortranCUDADataSizesDeclaration * dataSizesDeclaration,
+        FortranOpDatDimensionsDeclaration * opDatDimensionsDeclaration,
+        FortranCUDAModuleDeclarations * moduleDeclarations);
 };
 
 #endif

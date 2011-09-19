@@ -3,6 +3,7 @@
 #include <FortranTypesBuilder.h>
 #include <RoseHelper.h>
 #include <Debug.h>
+#include <OpenMP.h>
 
 /*
  * ======================================================
@@ -55,7 +56,7 @@ FortranOpenMPKernelSubroutineDirectLoop::createUserSubroutineCallStatement ()
 
         SgPntrArrRefExp * parameterExpression = buildPntrArrRefExp (
             buildVarRefExp (variableDeclarations->get (
-                VariableNames::getOpDatName (i))), buildExprListExp (
+                OP2::VariableNames::getOpDatName (i))), buildExprListExp (
                 arraySubscriptExpression));
 
         actualParameters->append_expression (parameterExpression);
@@ -63,7 +64,7 @@ FortranOpenMPKernelSubroutineDirectLoop::createUserSubroutineCallStatement ()
       else
       {
         actualParameters->append_expression (buildVarRefExp (
-            variableDeclarations->get (VariableNames::getOpDatName (i))));
+            variableDeclarations->get (OP2::VariableNames::getOpDatName (i))));
       }
     }
   }
@@ -124,10 +125,10 @@ FortranOpenMPKernelSubroutineDirectLoop::createOpDatFormalParameterDeclarations 
               new SgAsteriskShapeExp (RoseHelper::getFileInfo ()));
 
       variableDeclarations->add (
-          VariableNames::getOpDatName (i),
+          OP2::VariableNames::getOpDatName (i),
           FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
-              VariableNames::getOpDatName (i), newArrayType, subroutineScope,
-              formalParameters));
+              OP2::VariableNames::getOpDatName (i), newArrayType,
+              subroutineScope, formalParameters));
     }
   }
 }

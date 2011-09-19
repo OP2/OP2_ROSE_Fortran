@@ -11,7 +11,7 @@
  */
 
 void
-FortranCUDADataSizesDeclarationIndirectLoop::addFields ()
+FortranCUDADataSizesDeclarationIndirectLoop::addIndirectLoopFields ()
 {
   using SageBuilder::buildVariableDeclaration;
   using std::string;
@@ -19,101 +19,65 @@ FortranCUDADataSizesDeclarationIndirectLoop::addFields ()
 
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
-    if (parallelLoop->isDuplicateOpDat (i) == false
-        && parallelLoop->getOpMapValue (i) == INDIRECT)
+    if (parallelLoop->isIndirect (i))
     {
-      string const variableName = VariableNames::getOpDatSizeName (i);
+      if (parallelLoop->isDuplicateOpDat (i) == false)
+      {
 
-      SgVariableDeclaration * fieldDeclaration = buildVariableDeclaration (
-          variableName, FortranTypesBuilder::getFourByteInteger (), NULL,
+        string const variableName1 =
+            OP2::VariableNames::getLocalToGlobalMappingSizeName (i);
+
+        SgVariableDeclaration * fieldDeclaration1 = buildVariableDeclaration (
+            variableName1, FortranTypesBuilder::getFourByteInteger (), NULL,
+            moduleScope);
+
+        fieldDeclaration1->get_declarationModifier ().get_accessModifier ().setUndefined ();
+
+        deviceDatatypeStatement->get_definition ()->append_member (
+            fieldDeclaration1);
+
+        fieldDeclarations->add (variableName1, fieldDeclaration1);
+      }
+
+      string const variableName2 =
+          OP2::VariableNames::getGlobalToLocalMappingSizeName (i);
+
+      SgVariableDeclaration * fieldDeclaration2 = buildVariableDeclaration (
+          variableName2, FortranTypesBuilder::getFourByteInteger (), NULL,
           moduleScope);
 
-      fieldDeclaration->get_declarationModifier ().get_accessModifier ().setUndefined ();
+      fieldDeclaration2->get_declarationModifier ().get_accessModifier ().setUndefined ();
 
       deviceDatatypeStatement->get_definition ()->append_member (
-          fieldDeclaration);
+          fieldDeclaration2);
 
-      fieldDeclarations->add (variableName, fieldDeclaration);
-    }
-  }
+      fieldDeclarations->add (variableName2, fieldDeclaration2);
 
-  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
-  {
-    if (parallelLoop->isDuplicateOpDat (i) == false
-        && parallelLoop->getOpMapValue (i) == INDIRECT)
-    {
-      string const variableName =
-          VariableNames::getLocalToGlobalMappingSizeName (i);
-
-      SgVariableDeclaration * fieldDeclaration = buildVariableDeclaration (
-          variableName, FortranTypesBuilder::getFourByteInteger (), NULL,
-          moduleScope);
-
-      fieldDeclaration->get_declarationModifier ().get_accessModifier ().setUndefined ();
-
-      deviceDatatypeStatement->get_definition ()->append_member (
-          fieldDeclaration);
-
-      fieldDeclarations->add (variableName, fieldDeclaration);
-    }
-  }
-
-  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
-  {
-    if (parallelLoop->getOpMapValue (i) == INDIRECT)
-    {
-      string const variableName =
-          VariableNames::getGlobalToLocalMappingSizeName (i);
-
-      SgVariableDeclaration * fieldDeclaration = buildVariableDeclaration (
-          variableName, FortranTypesBuilder::getFourByteInteger (), NULL,
-          moduleScope);
-
-      fieldDeclaration->get_declarationModifier ().get_accessModifier ().setUndefined ();
-
-      deviceDatatypeStatement->get_definition ()->append_member (
-          fieldDeclaration);
-
-      fieldDeclarations->add (variableName, fieldDeclaration);
-    }
-  }
-
-  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
-  {
-    if (parallelLoop->isDuplicateOpDat (i) == false
-        && (parallelLoop->getOpMapValue (i) == DIRECT
-            || parallelLoop->getOpMapValue (i) == GLOBAL))
-    {
-      string const variableName = VariableNames::getOpDatSizeName (i);
-
-      SgVariableDeclaration * fieldDeclaration = buildVariableDeclaration (
-          variableName, FortranTypesBuilder::getFourByteInteger (), NULL,
-          moduleScope);
-
-      fieldDeclaration->get_declarationModifier ().get_accessModifier ().setUndefined ();
-
-      deviceDatatypeStatement->get_definition ()->append_member (
-          fieldDeclaration);
-
-      fieldDeclarations->add (variableName, fieldDeclaration);
     }
   }
 
   vector <string> planFunctionSizeVariables;
 
-  planFunctionSizeVariables.push_back (PlanFunction::Fortran::pblkMapSize);
+  planFunctionSizeVariables.push_back (
+      OP2::VariableNames::PlanFunction::pblkMapSize);
 
-  planFunctionSizeVariables.push_back (PlanFunction::Fortran::pindOffsSize);
+  planFunctionSizeVariables.push_back (
+      OP2::VariableNames::PlanFunction::pindOffsSize);
 
-  planFunctionSizeVariables.push_back (PlanFunction::Fortran::pindSizesSize);
+  planFunctionSizeVariables.push_back (
+      OP2::VariableNames::PlanFunction::pindSizesSize);
 
-  planFunctionSizeVariables.push_back (PlanFunction::Fortran::pnelemsSize);
+  planFunctionSizeVariables.push_back (
+      OP2::VariableNames::PlanFunction::pnelemsSize);
 
-  planFunctionSizeVariables.push_back (PlanFunction::Fortran::pnthrcolSize);
+  planFunctionSizeVariables.push_back (
+      OP2::VariableNames::PlanFunction::pnthrcolSize);
 
-  planFunctionSizeVariables.push_back (PlanFunction::Fortran::poffsetSize);
+  planFunctionSizeVariables.push_back (
+      OP2::VariableNames::PlanFunction::poffsetSize);
 
-  planFunctionSizeVariables.push_back (PlanFunction::Fortran::pthrcolSize);
+  planFunctionSizeVariables.push_back (
+      OP2::VariableNames::PlanFunction::pthrcolSize);
 
   for (vector <string>::iterator it = planFunctionSizeVariables.begin (); it
       != planFunctionSizeVariables.end (); ++it)
@@ -134,5 +98,5 @@ FortranCUDADataSizesDeclarationIndirectLoop::FortranCUDADataSizesDeclarationIndi
     SgScopeStatement * moduleScope) :
   FortranCUDADataSizesDeclaration (subroutineName, parallelLoop, moduleScope)
 {
-  addFields ();
+  addIndirectLoopFields ();
 }

@@ -5,6 +5,7 @@
 #include <RoseHelper.h>
 #include <Debug.h>
 #include <Plan.h>
+#include <OpenMP.h>
 
 /*
  * ======================================================
@@ -33,19 +34,26 @@ FortranOpenMPKernelSubroutineIndirectLoop::createPlanFormalParameterDeclarations
 
   vector <string> fourByteIntegerArrayVariables;
 
-  fourByteIntegerArrayVariables.push_back (PlanFunction::Fortran::pindSizes);
+  fourByteIntegerArrayVariables.push_back (
+      OP2::VariableNames::PlanFunction::pindSizes);
 
-  fourByteIntegerArrayVariables.push_back (PlanFunction::Fortran::pindOffs);
+  fourByteIntegerArrayVariables.push_back (
+      OP2::VariableNames::PlanFunction::pindOffs);
 
-  fourByteIntegerArrayVariables.push_back (PlanFunction::Fortran::pblkMap);
+  fourByteIntegerArrayVariables.push_back (
+      OP2::VariableNames::PlanFunction::pblkMap);
 
-  fourByteIntegerArrayVariables.push_back (PlanFunction::Fortran::poffset);
+  fourByteIntegerArrayVariables.push_back (
+      OP2::VariableNames::PlanFunction::poffset);
 
-  fourByteIntegerArrayVariables.push_back (PlanFunction::Fortran::pnelems);
+  fourByteIntegerArrayVariables.push_back (
+      OP2::VariableNames::PlanFunction::pnelems);
 
-  fourByteIntegerArrayVariables.push_back (PlanFunction::Fortran::pnthrcol);
+  fourByteIntegerArrayVariables.push_back (
+      OP2::VariableNames::PlanFunction::pnthrcol);
 
-  fourByteIntegerArrayVariables.push_back (PlanFunction::Fortran::pthrcol);
+  fourByteIntegerArrayVariables.push_back (
+      OP2::VariableNames::PlanFunction::pthrcol);
 
   for (vector <string>::const_iterator it =
       fourByteIntegerArrayVariables.begin (); it
@@ -63,9 +71,9 @@ FortranOpenMPKernelSubroutineIndirectLoop::createPlanFormalParameterDeclarations
   }
 
   variableDeclarations->add (
-      PlanFunction::Fortran::blockOffset,
+      OP2::VariableNames::PlanFunction::blockOffset,
       FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
-          PlanFunction::Fortran::blockOffset,
+          OP2::VariableNames::PlanFunction::blockOffset,
           FortranTypesBuilder::getFourByteInteger (), subroutineScope,
           formalParameters));
 }
@@ -81,34 +89,33 @@ FortranOpenMPKernelSubroutineIndirectLoop::createOpDatFormalParameterDeclaration
 
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
-    if (parallelLoop->isDuplicateOpDat (i) == false
-        && parallelLoop->getOpMapValue (i) == INDIRECT)
+    if (parallelLoop->isDuplicateOpDat (i) == false)
     {
-      SgAsteriskShapeExp * upperBoundExpression1 = new SgAsteriskShapeExp (
-          RoseHelper::getFileInfo ());
+      if (parallelLoop->isIndirect (i))
+      {
+        SgAsteriskShapeExp * upperBoundExpression1 = new SgAsteriskShapeExp (
+            RoseHelper::getFileInfo ());
 
-      SgType * opdatType = parallelLoop->getOpDatType (i);
+        variableDeclarations->add (
+            OP2::VariableNames::getOpDatName (i),
+            FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
+                OP2::VariableNames::getOpDatName (i),
+                FortranTypesBuilder::getArray_RankOne_WithLowerAndUpperBounds (
+                    parallelLoop->getOpDatBaseType (i), buildIntVal (0),
+                    upperBoundExpression1), subroutineScope, formalParameters));
 
-      SgArrayType * baseArrayType = isSgArrayType (opdatType);
+        SgAsteriskShapeExp * upperBoundExpression2 = new SgAsteriskShapeExp (
+            RoseHelper::getFileInfo ());
 
-      variableDeclarations->add (
-          VariableNames::getOpDatName (i),
-          FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
-              VariableNames::getOpDatName (i),
-              FortranTypesBuilder::getArray_RankOne_WithLowerAndUpperBounds (
-                  baseArrayType->get_base_type (), buildIntVal (0),
-                  upperBoundExpression1), subroutineScope, formalParameters));
-
-      SgAsteriskShapeExp * upperBoundExpression2 = new SgAsteriskShapeExp (
-          RoseHelper::getFileInfo ());
-
-      variableDeclarations->add (
-          VariableNames::getLocalToGlobalMappingName (i),
-          FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
-              VariableNames::getLocalToGlobalMappingName (i),
-              FortranTypesBuilder::getArray_RankOne_WithLowerAndUpperBounds (
-                  FortranTypesBuilder::getFourByteInteger (), buildIntVal (0),
-                  upperBoundExpression2), subroutineScope, formalParameters));
+        variableDeclarations->add (
+            OP2::VariableNames::getLocalToGlobalMappingName (i),
+            FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
+                OP2::VariableNames::getLocalToGlobalMappingName (i),
+                FortranTypesBuilder::getArray_RankOne_WithLowerAndUpperBounds (
+                    FortranTypesBuilder::getFourByteInteger (),
+                    buildIntVal (0), upperBoundExpression2), subroutineScope,
+                formalParameters));
+      }
     }
   }
 
@@ -120,9 +127,9 @@ FortranOpenMPKernelSubroutineIndirectLoop::createOpDatFormalParameterDeclaration
           RoseHelper::getFileInfo ());
 
       variableDeclarations->add (
-          VariableNames::getGlobalToLocalMappingName (i),
+          OP2::VariableNames::getGlobalToLocalMappingName (i),
           FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
-              VariableNames::getGlobalToLocalMappingName (i),
+              OP2::VariableNames::getGlobalToLocalMappingName (i),
               FortranTypesBuilder::getArray_RankOne_WithLowerAndUpperBounds (
                   FortranTypesBuilder::getTwoByteInteger (), buildIntVal (0),
                   upperBoundExpression), subroutineScope, formalParameters));
@@ -142,9 +149,9 @@ FortranOpenMPKernelSubroutineIndirectLoop::createOpDatFormalParameterDeclaration
       SgArrayType * baseArrayType = isSgArrayType (opdatType);
 
       variableDeclarations->add (
-          VariableNames::getOpDatName (i),
+          OP2::VariableNames::getOpDatName (i),
           FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
-              VariableNames::getOpDatName (i),
+              OP2::VariableNames::getOpDatName (i),
               FortranTypesBuilder::getArray_RankOne_WithLowerAndUpperBounds (
                   baseArrayType->get_base_type (), buildIntVal (0),
                   upperBoundExpression), subroutineScope, formalParameters));
@@ -169,7 +176,7 @@ FortranOpenMPKernelSubroutineIndirectLoop::createLocalVariableDeclarations ()
         && parallelLoop->isIndirect (i))
     {
       string const & variableName =
-          VariableNames::getNumberOfBytesVariableName (i);
+          OP2::VariableNames::getNumberOfBytesVariableName (i);
 
       variableDeclarations->add (variableName,
           FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
@@ -184,7 +191,7 @@ FortranOpenMPKernelSubroutineIndirectLoop::createLocalVariableDeclarations ()
         && parallelLoop->isIndirect (i))
     {
       string const & variableName =
-          VariableNames::getNumberOfBytesVariableName (i);
+          OP2::VariableNames::getNumberOfBytesVariableName (i);
 
       variableDeclarations->add (variableName,
           FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
@@ -198,7 +205,8 @@ FortranOpenMPKernelSubroutineIndirectLoop::createLocalVariableDeclarations ()
     if (parallelLoop->isDuplicateOpDat (i) == false
         && parallelLoop->isIndirect (i))
     {
-      string const & variableName = VariableNames::getRoundUpVariableName (i);
+      string const & variableName = OP2::VariableNames::getRoundUpVariableName (
+          i);
 
       variableDeclarations->add (variableName,
           FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (

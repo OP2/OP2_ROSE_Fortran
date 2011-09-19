@@ -21,15 +21,12 @@ CPPOpenCLDataSizesDeclarationIndirectLoop::addFields ()
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
     if (parallelLoop->isDuplicateOpDat (i) == false
-        && parallelLoop->getOpMapValue (i) == INDIRECT)
+        && parallelLoop->isIndirect (i))
     {
-      string const variableName = VariableNames::getOpDatSizeName (i);
+      string const variableName = OP2::VariableNames::getOpDatSizeName (i);
 
       SgVariableDeclaration * fieldDeclaration = buildVariableDeclaration (
-          variableName, 
-          buildIntType(), 
-          NULL,
-          moduleScope);
+          variableName, buildIntType (), NULL, moduleScope);
 
       fieldDeclaration->get_declarationModifier ().get_accessModifier ().setUndefined ();
 
@@ -43,16 +40,13 @@ CPPOpenCLDataSizesDeclarationIndirectLoop::addFields ()
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
     if (parallelLoop->isDuplicateOpDat (i) == false
-        && parallelLoop->getOpMapValue (i) == INDIRECT)
+        && parallelLoop->isIndirect (i))
     {
       string const variableName =
-          VariableNames::getLocalToGlobalMappingSizeName (i);
+          OP2::VariableNames::getLocalToGlobalMappingSizeName (i);
 
       SgVariableDeclaration * fieldDeclaration = buildVariableDeclaration (
-          variableName, 
-          buildIntType(), 
-          NULL,
-          moduleScope);
+          variableName, buildIntType (), NULL, moduleScope);
 
       fieldDeclaration->get_declarationModifier ().get_accessModifier ().setUndefined ();
 
@@ -65,16 +59,13 @@ CPPOpenCLDataSizesDeclarationIndirectLoop::addFields ()
 
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
-    if (parallelLoop->getOpMapValue (i) == INDIRECT)
+    if (parallelLoop->isIndirect (i))
     {
       string const variableName =
-          VariableNames::getGlobalToLocalMappingSizeName (i);
+          OP2::VariableNames::getGlobalToLocalMappingSizeName (i);
 
       SgVariableDeclaration * fieldDeclaration = buildVariableDeclaration (
-          variableName, 
-          buildIntType(), 
-          NULL,
-          moduleScope);
+          variableName, buildIntType (), NULL, moduleScope);
 
       fieldDeclaration->get_declarationModifier ().get_accessModifier ().setUndefined ();
 
@@ -87,17 +78,13 @@ CPPOpenCLDataSizesDeclarationIndirectLoop::addFields ()
 
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
-    if (parallelLoop->isDuplicateOpDat (i) == false
-        && (parallelLoop->getOpMapValue (i) == DIRECT
-            || parallelLoop->getOpMapValue (i) == GLOBAL))
+    if (parallelLoop->isDuplicateOpDat (i) == false && (parallelLoop->isDirect (
+        i) || parallelLoop->isGlobal (i)))
     {
-      string const variableName = VariableNames::getOpDatSizeName (i);
+      string const variableName = OP2::VariableNames::getOpDatSizeName (i);
 
       SgVariableDeclaration * fieldDeclaration = buildVariableDeclaration (
-          variableName, 
-          buildIntType(), 
-          NULL,
-          moduleScope);
+          variableName, buildIntType (), NULL, moduleScope);
 
       fieldDeclaration->get_declarationModifier ().get_accessModifier ().setUndefined ();
 
@@ -127,11 +114,8 @@ CPPOpenCLDataSizesDeclarationIndirectLoop::addFields ()
   for (vector <string>::iterator it = planFunctionSizeVariables.begin (); it
       != planFunctionSizeVariables.end (); ++it)
   {
-    SgVariableDeclaration * fieldDeclaration = buildVariableDeclaration (
-        *it,
-        buildIntType(), 
-        NULL, 
-        moduleScope);
+    SgVariableDeclaration * fieldDeclaration = buildVariableDeclaration (*it,
+        buildIntType (), NULL, moduleScope);
 
     fieldDeclaration->get_declarationModifier ().get_accessModifier ().setUndefined ();
 

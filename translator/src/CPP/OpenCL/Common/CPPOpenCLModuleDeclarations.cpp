@@ -22,20 +22,16 @@ CPPOpenCLModuleDeclarations::createReductionDeclarations ()
   {
     SgVariableDeclaration * variableDeclaration1 =
         CPPStatementsAndExpressionsBuilder::appendVariableDeclaration (
-            ReductionSubroutine::reductionArrayHost, 
-            (*it)->getArrayType (),
-            moduleScope );
+            ReductionSubroutine::reductionArrayHost, (*it)->getBaseType (),
+            moduleScope);
 
     variableDeclarations->add (ReductionSubroutine::reductionArrayHost,
         variableDeclaration1);
 
     SgVariableDeclaration * variableDeclaration2 =
         CPPStatementsAndExpressionsBuilder::appendVariableDeclaration (
-            ReductionSubroutine::reductionArrayDevice, 
-            (*it)->getArrayType (),
-            moduleScope, 
-            1, 
-            DEVICE);
+            ReductionSubroutine::reductionArrayDevice, (*it)->getBaseType (),
+            moduleScope, 1, DEVICE);
 
     variableDeclarations->add (ReductionSubroutine::reductionArrayDevice,
         variableDeclaration2);
@@ -50,14 +46,12 @@ CPPOpenCLModuleDeclarations::createDataSizesDeclaration ()
       Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
   std::string const & variableName =
-      VariableNames::getDataSizesVariableDeclarationName (userSubroutineName);
+      OP2::VariableNames::getDataSizesVariableDeclarationName (
+          userSubroutineName);
 
   SgVariableDeclaration * variableDeclaration =
       CPPStatementsAndExpressionsBuilder::appendVariableDeclaration (
-          variableName, 
-          dataSizesDeclaration->getType (), 
-          moduleScope, 
-          1,
+          variableName, dataSizesDeclaration->getType (), moduleScope, 1,
           DEVICE);
 
   variableDeclarations->add (variableName, variableDeclaration);
@@ -71,14 +65,12 @@ CPPOpenCLModuleDeclarations::createDimensionsDeclaration ()
       Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
   std::string const & variableName =
-      VariableNames::getDimensionsVariableDeclarationName (userSubroutineName);
+      OP2::VariableNames::getDimensionsVariableDeclarationName (
+          userSubroutineName);
 
   SgVariableDeclaration * variableDeclaration =
       CPPStatementsAndExpressionsBuilder::appendVariableDeclaration (
-          variableName, 
-          dimensionsDeclaration->getType (), 
-          moduleScope, 
-          1,
+          variableName, dimensionsDeclaration->getType (), moduleScope, 1,
           DEVICE);
 
   variableDeclarations->add (variableName, variableDeclaration);
@@ -106,7 +98,8 @@ SgVariableDeclaration *
 CPPOpenCLModuleDeclarations::getDataSizesVariableDeclaration ()
 {
   std::string const & variableName =
-      VariableNames::getDataSizesVariableDeclarationName (userSubroutineName);
+      OP2::VariableNames::getDataSizesVariableDeclarationName (
+          userSubroutineName);
 
   return variableDeclarations->get (variableName);
 }
@@ -115,7 +108,8 @@ SgVariableDeclaration *
 CPPOpenCLModuleDeclarations::getDimensionsVariableDeclaration ()
 {
   std::string const & variableName =
-      VariableNames::getDimensionsVariableDeclarationName (userSubroutineName);
+      OP2::VariableNames::getDimensionsVariableDeclarationName (
+          userSubroutineName);
 
   return variableDeclarations->get (variableName);
 }
