@@ -73,6 +73,22 @@ FortranCUDAKernelSubroutine::buildOpGlobalActualParameterExpression (
     parameterExpression = buildVarRefExp (variableDeclarations->get (
         OP2::VariableNames::getOpDatLocalName (OP_DAT_ArgumentGroup)));
   }
+  else if (parallelLoop->isMaximised (OP_DAT_ArgumentGroup))
+  {
+    Debug::getInstance ()->debugMessage ("OP_GBL with maximum access",
+        Debug::OUTER_LOOP_LEVEL, __FILE__, __LINE__);
+
+    parameterExpression = buildVarRefExp (variableDeclarations->get (
+        OP2::VariableNames::getOpDatLocalName (OP_DAT_ArgumentGroup)));
+  }
+  else if (parallelLoop->isMinimised (OP_DAT_ArgumentGroup))
+  {
+    Debug::getInstance ()->debugMessage ("OP_GBL with minimum access",
+        Debug::OUTER_LOOP_LEVEL, __FILE__, __LINE__);
+
+    parameterExpression = buildVarRefExp (variableDeclarations->get (
+        OP2::VariableNames::getOpDatLocalName (OP_DAT_ArgumentGroup)));
+  }
 
   return parameterExpression;
 }
@@ -235,11 +251,11 @@ FortranCUDAKernelSubroutine::createReductionEpilogueStatements ()
       }
       else if (parallelLoop->isMaximised (i))
       {
-        reductionType = buildIntVal (MAX_ACCESS);
+        reductionType = buildIntVal (MAXIMUM);
       }
       else if (parallelLoop->isMinimised (i))
       {
-        reductionType = buildIntVal (MIN_ACCESS);
+        reductionType = buildIntVal (MINIMUM);
       }
       else
       {

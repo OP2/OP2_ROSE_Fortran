@@ -1,3 +1,7 @@
+! This program contains:
+! 1) An OP_DAT with WRITE access
+! 2) An OP_GBL (array) with READ access
+
 program Test4 
   use OP2_C
   use UserKernels

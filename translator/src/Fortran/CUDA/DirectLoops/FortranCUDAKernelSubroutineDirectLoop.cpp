@@ -36,6 +36,9 @@ FortranCUDAKernelSubroutineDirectLoop::createUserSubroutineCallStatement ()
 
     if (parallelLoop->isGlobal (i))
     {
+      Debug::getInstance ()->debugMessage ("OP_GBL",
+          Debug::HIGHEST_DEBUG_LEVEL, __FILE__, __LINE__);
+
       actualParameters->append_expression (
           buildOpGlobalActualParameterExpression (i));
     }
@@ -750,9 +753,6 @@ FortranCUDAKernelSubroutineDirectLoop::FortranCUDAKernelSubroutineDirectLoop (
       parallelLoop, moduleScope, reductionSubroutines, dataSizesDeclaration,
       opDatDimensionsDeclaration, moduleDeclarations)
 {
-  Debug::getInstance ()->debugMessage ("<Kernel, Direct, CUDA>",
-      Debug::CONSTRUCTOR_LEVEL, __FILE__, __LINE__);
-
   createFormalParameterDeclarations ();
 
   createLocalVariableDeclarations ();

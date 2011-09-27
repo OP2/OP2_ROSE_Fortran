@@ -1,3 +1,7 @@
+! This program contains:
+! 1) An OP_DAT with WRITE access
+! 2) An OP_GBL (scalar) with READ access
+
 program Test3 
   use OP2_C
   use UserKernels

@@ -29,4 +29,4 @@ To clean out temporary files, use:
 When a test case should pass, the translator should generate a bunch of Fortran files: these
 are output into a sub-directory 'generatedFiles' such that each generated file has a prefix
 Test<number> and a suffix File<number>.F95. A makefile, intended for the backend compiler, is
-also generated for each test case.
+also generated for each test case (provided the test case should pass).

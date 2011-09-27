@@ -4,10 +4,12 @@ use, intrinsic :: ISO_C_BINDING
 
   integer, parameter :: MAX_NAME_LEN = 100
 
-  integer(4) :: OP_READ =   1
-  integer(4) :: OP_WRITE =  2
-  integer(4) :: OP_INC =    3
-  integer(4) :: OP_RW =     4
+  integer(4) :: OP_READ  = 1
+  integer(4) :: OP_WRITE = 2
+  integer(4) :: OP_INC   = 3
+  integer(4) :: OP_RW    = 4
+  integer(4) :: OP_MAX   = 5
+  integer(4) :: OP_MIN   = 6
 
   type op_set
     integer:: id

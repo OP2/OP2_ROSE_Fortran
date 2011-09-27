@@ -340,7 +340,7 @@ ParallelLoop::dataSizesDeclarationNeeded (unsigned int OP_DAT_ArgumentGroup)
    *
    * This is because, in this case, there is no transferal of
    * OP_GBL data into device memory. The data is instead
-   * passed by value directly to the CUDA kernel.
+   * passed by value directly to the CUDA kernel
    * ======================================================
    */
 
@@ -358,8 +358,7 @@ ParallelLoop::localThreadVariableDeclarationNeeded (
    * We need a local thread variable when:
    * a) The data is to be reduced
    * b) The data is indirect AND incremented
-   * c) The data dimension exceeds one AND the entire parallel
-   *    loop is direct
+   * c) The data is direct AND its dimension exceeds one
    * ======================================================
    */
 

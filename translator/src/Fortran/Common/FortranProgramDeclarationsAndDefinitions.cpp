@@ -222,7 +222,6 @@ FortranProgramDeclarationsAndDefinitions::retrieveOpDatDeclarations (
 
               parallelLoop->setOpAccessValue (opDatArgumentGroup, READ_ACCESS);
             }
-
             else if (iequals (variableName, OP2::OP_WRITE))
             {
               Debug::getInstance ()->debugMessage (
@@ -231,7 +230,6 @@ FortranProgramDeclarationsAndDefinitions::retrieveOpDatDeclarations (
 
               parallelLoop->setOpAccessValue (opDatArgumentGroup, WRITE_ACCESS);
             }
-
             else if (iequals (variableName, OP2::OP_INC))
             {
               Debug::getInstance ()->debugMessage (
@@ -240,7 +238,6 @@ FortranProgramDeclarationsAndDefinitions::retrieveOpDatDeclarations (
 
               parallelLoop->setOpAccessValue (opDatArgumentGroup, INC_ACCESS);
             }
-
             else if (iequals (variableName, OP2::OP_RW))
             {
               Debug::getInstance ()->debugMessage (
@@ -249,7 +246,22 @@ FortranProgramDeclarationsAndDefinitions::retrieveOpDatDeclarations (
 
               parallelLoop->setOpAccessValue (opDatArgumentGroup, RW_ACCESS);
             }
+            else if (iequals (variableName, OP2::OP_MAX))
+            {
+              Debug::getInstance ()->debugMessage (
+                  "...MAXIMUM access descriptor", Debug::OUTER_LOOP_LEVEL,
+                  __FILE__, __LINE__);
 
+              parallelLoop->setOpAccessValue (opDatArgumentGroup, MAX_ACCESS);
+            }
+            else if (iequals (variableName, OP2::OP_MIN))
+            {
+              Debug::getInstance ()->debugMessage (
+                  "...MINIMUM access descriptor", Debug::OUTER_LOOP_LEVEL,
+                  __FILE__, __LINE__);
+
+              parallelLoop->setOpAccessValue (opDatArgumentGroup, MIN_ACCESS);
+            }
             else
             {
               Debug::getInstance ()->errorMessage (
