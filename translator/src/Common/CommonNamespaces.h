@@ -61,14 +61,13 @@ namespace OP2
     std::string const numberOfColours = "numOfColours";
     std::string const nelems = "nelems";
     std::string const nelems2 = "nelems2";
-    std::string const offset = "offset";
-    std::string const offset2 = "offset2";
     std::string const reductionCardinality = "reductionCardinality";
     std::string const reductionResult = "reductionResult";
     std::string const reductionSharedMemorySize = "reductionSharedMemorySize";
     std::string const set = "set";
     std::string const size = "size";
     std::string const setSize = "setSize";
+    std::string const sharedMemoryOffset = "sharedMemoryOffset";
     std::string const sharedMemoryBytes = "sharedMemoryBytes";
     std::string const threadID = "threadID";
     std::string const threadItems = "threadItems";
@@ -327,6 +326,9 @@ namespace OP2
 
     std::string
     getAutosharedDeclarationName (SgType * type, unsigned int size);
+
+    std::string
+    getAutosharedOffsetDeclarationName (SgType * type, unsigned int size);
 
     std::string
     getReductionArrayHostName (unsigned int OP_DAT_ArgumentGroup,

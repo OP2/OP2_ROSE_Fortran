@@ -372,6 +372,23 @@ FortranCUDAKernelSubroutine::createAutoSharedDeclarations ()
                   subroutineScope, 1, SHARED));
 
           autosharedNames.push_back (autosharedVariableName);
+
+          string const autosharedOffsetVariableName =
+              OP2::VariableNames::getAutosharedOffsetDeclarationName (
+                  parallelLoop->getOpDatBaseType (i),
+                  parallelLoop->getSizeOfOpDat (i));
+
+          Debug::getInstance ()->debugMessage (
+              "Creating autoshared offset declaration with name '"
+                  + autosharedOffsetVariableName + "' for OP_DAT '"
+                  + parallelLoop->getOpDatVariableName (i) + "'",
+              Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+
+          variableDeclarations->add (
+              autosharedOffsetVariableName,
+              FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
+                  autosharedOffsetVariableName,
+                  FortranTypesBuilder::getFourByteInteger (), subroutineScope));
         }
       }
     }

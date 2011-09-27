@@ -69,7 +69,8 @@ FortranCUDAKernelSubroutineIndirectLoop::createUserSubroutineCallStatement ()
         SgAddOp * addExpression1 = buildAddOp (
             buildVarRefExp (variableDeclarations->get (
                 CommonVariableNames::iterationCounter1)), buildVarRefExp (
-                variableDeclarations->get (OP2::VariableNames::offset)));
+                variableDeclarations->get (
+                    OP2::VariableNames::sharedMemoryOffset)));
 
         SgPntrArrRefExp * arrayExpression1 = buildPntrArrRefExp (
             buildVarRefExp (variableDeclarations->get (
@@ -93,7 +94,8 @@ FortranCUDAKernelSubroutineIndirectLoop::createUserSubroutineCallStatement ()
         SgAddOp * addExpression3 = buildAddOp (
             buildVarRefExp (variableDeclarations->get (
                 CommonVariableNames::iterationCounter1)), buildVarRefExp (
-                variableDeclarations->get (OP2::VariableNames::offset)));
+                variableDeclarations->get (
+                    OP2::VariableNames::sharedMemoryOffset)));
 
         SgPntrArrRefExp * arrayExpression2 = buildPntrArrRefExp (
             buildVarRefExp (variableDeclarations->get (
@@ -130,8 +132,8 @@ FortranCUDAKernelSubroutineIndirectLoop::createUserSubroutineCallStatement ()
 
       SgAddOp * addExpression1 = buildAddOp (buildVarRefExp (
           variableDeclarations->get (CommonVariableNames::iterationCounter1)),
-          buildVarRefExp (
-              variableDeclarations->get (OP2::VariableNames::offset)));
+          buildVarRefExp (variableDeclarations->get (
+              OP2::VariableNames::sharedMemoryOffset)));
 
       SgDotExp * dotExpression = buildDotExp (buildVarRefExp (
           variableDeclarations->get (
@@ -496,8 +498,8 @@ FortranCUDAKernelSubroutineIndirectLoop::createIncrementAdjustmentStatements (
     {
       SgAddOp * addExpression = buildAddOp (buildVarRefExp (
           variableDeclarations->get (CommonVariableNames::iterationCounter1)),
-          buildVarRefExp (
-              variableDeclarations->get (OP2::VariableNames::offset)));
+          buildVarRefExp (variableDeclarations->get (
+              OP2::VariableNames::sharedMemoryOffset)));
 
       SgPntrArrRefExp * arrayExpression = buildPntrArrRefExp (buildVarRefExp (
           variableDeclarations->get (
@@ -629,7 +631,8 @@ FortranCUDAKernelSubroutineIndirectLoop::createExecutionLoopStatements ()
 
   SgAddOp * addExpression3 = buildAddOp (buildVarRefExp (
       variableDeclarations->get (CommonVariableNames::iterationCounter1)),
-      buildVarRefExp (variableDeclarations->get (OP2::VariableNames::offset)));
+      buildVarRefExp (variableDeclarations->get (
+          OP2::VariableNames::sharedMemoryOffset)));
 
   SgPntrArrRefExp * arrayExpression3 = buildPntrArrRefExp (buildVarRefExp (
       variableDeclarations->get (OP2::VariableNames::PlanFunction::pthrcol)),
@@ -1132,7 +1135,8 @@ FortranCUDAKernelSubroutineIndirectLoop::createThreadZeroStatements ()
           OP2::VariableNames::blockID)));
 
   SgStatement * statement3 = buildAssignStatement (buildOpaqueVarRefExp (
-      OP2::VariableNames::offset, subroutineScope), arrayExpression3);
+      OP2::VariableNames::sharedMemoryOffset, subroutineScope),
+      arrayExpression3);
 
   appendStatement (statement3, ifBlock);
 
@@ -1533,7 +1537,8 @@ FortranCUDAKernelSubroutineIndirectLoop::createLocalVariableDeclarations ()
 
   sharedFourByteIntegerVariables.push_back (OP2::VariableNames::blockID);
 
-  sharedFourByteIntegerVariables.push_back (OP2::VariableNames::offset);
+  sharedFourByteIntegerVariables.push_back (
+      OP2::VariableNames::sharedMemoryOffset);
 
   sharedFourByteIntegerVariables.push_back (OP2::VariableNames::numberOfColours);
 
