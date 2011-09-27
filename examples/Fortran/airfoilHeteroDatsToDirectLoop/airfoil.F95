@@ -144,7 +144,7 @@ use, intrinsic :: ISO_C_BINDING
 
     call op_par_loop_2 ( save_soln, cells, &
                        & p_q,    -1, OP_ID, OP_READ, &
-		       % p_fakeInt, -1, OP_ID, OP_RW, &
+		       & p_fakeInt, -1, OP_ID, OP_RW, &
                        & p_qold, -1, OP_ID, OP_WRITE &
                        & )
 	
