@@ -104,14 +104,6 @@ FortranCUDAUserSubroutine::createStatements ()
   for (vector <SgStatement *>::iterator it = originalStatements.begin (); it
       != originalStatements.end (); ++it)
   {
-    /*
-     * ======================================================
-     * Copy the statement if:
-     * 1) It is NOT a variable declaration
-     * 2) It is a variable declaration BUT it is not a formal
-     * parameter declaration
-     * ======================================================
-     */
     SgVariableDeclaration * isVariableDeclaration = isSgVariableDeclaration (
         *it);
 
@@ -122,95 +114,81 @@ FortranCUDAUserSubroutine::createStatements ()
           Debug::HIGHEST_DEBUG_LEVEL, __FILE__, __LINE__);
 
       appendStatement (*it, subroutineScope);
-
-      if (isSgImplicitStatement (*it) != NULL)
-      {
-        /*
-         * ======================================================
-         * Append the variable declarations immediately after the
-         * 'IMPLICIT NONE' statement
-         * We scan the parallel loop arguments to understand
-         * if the parameter will be allocated on shared or device
-         * memory. It is based on the assumption that the number
-         * of kernel parameters is equal to the number of par.
-         * loop argument lines
-         * ======================================================
-         */
-
-        unsigned int OP_DAT_ArgumentGroup = 1;
-
-        for (SgInitializedNamePtrList::iterator paramIt =
-            originalParameters->get_args ().begin (); paramIt
-            != originalParameters->get_args ().end (); ++paramIt)
-        {
-          string const variableName = (*paramIt)->get_name ().getString ();
-
-          SgType * type = (*paramIt)->get_typeptr ();
-
-          if (parallelLoop->isIndirect (OP_DAT_ArgumentGroup)
-              && parallelLoop->isRead (OP_DAT_ArgumentGroup))
-          {
-            SgVariableDeclaration
-                * variableDeclaration =
-                    FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
-                        variableName, type, subroutineScope, formalParameters,
-                        2, DEVICE, SHARED);
-          }
-          else if (parallelLoop->isGlobalScalar (OP_DAT_ArgumentGroup)
-              && parallelLoop->isRead (OP_DAT_ArgumentGroup))
-          {
-            SgVariableDeclaration
-                * variableDeclaration =
-                    FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
-                        variableName, type, subroutineScope, formalParameters,
-                        1, VALUE);
-          }
-          else
-          {
-            SgVariableDeclaration
-                * variableDeclaration =
-                    FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
-                        variableName, type, subroutineScope, formalParameters,
-                        1, DEVICE);
-          }
-
-          ++OP_DAT_ArgumentGroup;
-        }
-      }
     }
     else
     {
       Debug::getInstance ()->debugMessage ("Appending variable declaration",
           Debug::HIGHEST_DEBUG_LEVEL, __FILE__, __LINE__);
 
-      bool isFormalParameter = false;
+      unsigned int OP_DAT_ArgumentGroup = 1;
 
-      string const
-          variableName =
-              isVariableDeclaration->get_definition ()->get_vardefn ()->get_name ().getString ();
-
-      for (SgInitializedNamePtrList::iterator paramIt =
-          formalParameters->get_args ().begin (); paramIt
-          != formalParameters->get_args ().end (); ++paramIt)
+      for (SgInitializedNamePtrList::iterator variableIt =
+          isVariableDeclaration->get_variables ().begin (); variableIt
+          != isVariableDeclaration->get_variables ().end (); ++variableIt)
       {
-        string const parameterName = (*paramIt)->get_name ().getString ();
+        string const variableName = (*variableIt)->get_name ().getString ();
 
-        if (iequals (variableName, parameterName))
+        SgType * type = (*variableIt)->get_typeptr ();
+
+        bool isFormalParamater = false;
+
+        for (SgInitializedNamePtrList::iterator paramIt =
+            originalParameters->get_args ().begin (); paramIt
+            != originalParameters->get_args ().end (); ++paramIt)
         {
-          isFormalParameter = true;
+          string const formalParamterName =
+              (*paramIt)->get_name ().getString ();
+
+          if (iequals (variableName, formalParamterName))
+          {
+            Debug::getInstance ()->debugMessage ("'" + variableName
+                + "' is a formal parameter", Debug::HIGHEST_DEBUG_LEVEL,
+                __FILE__, __LINE__);
+
+            isFormalParamater = true;
+
+            if (parallelLoop->isIndirect (OP_DAT_ArgumentGroup)
+                && parallelLoop->isRead (OP_DAT_ArgumentGroup))
+            {
+              SgVariableDeclaration
+                  * variableDeclaration =
+                      FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
+                          variableName, type, subroutineScope,
+                          formalParameters, 2, DEVICE, SHARED);
+            }
+            else if (parallelLoop->isGlobalScalar (OP_DAT_ArgumentGroup)
+                && parallelLoop->isRead (OP_DAT_ArgumentGroup))
+            {
+              SgVariableDeclaration
+                  * variableDeclaration =
+                      FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
+                          variableName, type, subroutineScope,
+                          formalParameters, 1, VALUE);
+            }
+            else
+            {
+              SgVariableDeclaration
+                  * variableDeclaration =
+                      FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
+                          variableName, type, subroutineScope,
+                          formalParameters, 1, DEVICE);
+            }
+
+            ++OP_DAT_ArgumentGroup;
+          }
         }
-      }
 
-      if (isFormalParameter == false)
-      {
-        /*
-         * ======================================================
-         * Append the statement to the new subroutine only if it
-         * is not a formal parameter
-         * ======================================================
-         */
-        appendStatement (*it, subroutineScope);
+        if (isFormalParamater == false)
+        {
+          Debug::getInstance ()->debugMessage ("'" + variableName
+              + "' is NOT a formal parameter", Debug::HIGHEST_DEBUG_LEVEL,
+              __FILE__, __LINE__);
 
+          SgVariableDeclaration
+              * variableDeclaration =
+                  FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
+                      variableName, type, subroutineScope, 1, DEVICE);
+        }
       }
     }
   }

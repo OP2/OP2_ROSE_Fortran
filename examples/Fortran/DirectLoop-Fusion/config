@@ -1,3 +1,2 @@
-translator=/data/carlo/FortranTranslator/OP2_ROSE_Fortran/translator/bin/translator
-files= SimpleHomogeneousLoops.F95
-OP2_DIR=/data/carlo/FortranTranslator/OP2_ROSE_Fortran/examples/Fortran/tests
+translator=/home/abetts/SILOET/OP2_ROSE_Fortran/translator/bin/translator
+OP2_DIR=/home/abetts/SILOET/OP2_ROSE_Fortran/examples/Fortran/tests
