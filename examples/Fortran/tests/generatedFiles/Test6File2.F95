@@ -1,0 +1,24 @@
+PROGRAM Test6
+  USE OP2_C
+  USE GENERATED_MODULE
+  ! Host declarations
+  INTEGER(kind=4) :: setCardinality
+  INTEGER(kind=4) :: hostGlobal1
+  INTEGER(kind=4) :: hostGlobal2
+  ! OP2 declarations
+  TYPE ( op_set )  :: set
+  TYPE ( op_dat )  :: global1
+  TYPE ( op_dat )  :: global2
+  character(len=33) :: integer4Scalar_integer4Scalar_max_user = "integer4Scalar_integer4Scalar_max"
+  setCardinality = 10
+  hostGlobal1 = 0
+  hostGlobal2 = 10
+  CALL op_init()
+  CALL op_decl_set(setCardinality,  set,  "")
+  CALL op_decl_gbl(hostGlobal1,  global1)
+  CALL op_decl_gbl(hostGlobal2,  global2)
+  CALL s1514303263(integer4Scalar_integer4Scalar_max_user,  set,  global1,  -1,  OP_GBL,  OP_MAX,  global2,  -1,  OP_GB&
+  &L,  OP_READ)
+  PRINT *, hostGlobal1
+END PROGRAM Test6
+
