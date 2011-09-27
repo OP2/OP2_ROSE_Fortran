@@ -66,7 +66,7 @@ use, intrinsic :: ISO_C_BINDING
   character(kind=c_char,len=5) :: qoldName =	C_CHAR_'qold'//C_NULL_CHAR
   character(kind=c_char,len=4) :: adtName =	C_CHAR_'adt'//C_NULL_CHAR
   character(kind=c_char,len=4) :: resName =	C_CHAR_'res'//C_NULL_CHAR
-  character(kind=c_char,len=3) :: resName =	C_CHAR_'fi'//C_NULL_CHAR
+  character(kind=c_char,len=3) :: fakeIntName =	C_CHAR_'fi'//C_NULL_CHAR
 
   ! read set sizes from input file (input is subdivided in two routines as we cannot allocate arrays in subroutines in
   ! fortran 90)
