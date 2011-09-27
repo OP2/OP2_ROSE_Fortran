@@ -187,7 +187,7 @@ FortranCUDAUserSubroutine::createStatements ()
           SgVariableDeclaration
               * variableDeclaration =
                   FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
-                      variableName, type, subroutineScope, 1, DEVICE);
+                      variableName, type, subroutineScope);
         }
       }
     }
