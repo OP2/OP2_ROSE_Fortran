@@ -1,3 +1,6 @@
+! This program contains a read/write to an OP_GBL which is not allowed
+! and should therefore be flagged as an error by the compiler
+
 program Test2 
 
 use OP2_C

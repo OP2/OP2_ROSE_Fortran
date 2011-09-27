@@ -12,6 +12,26 @@ contains
 
   end subroutine integer4Scalar_integer4Scalar 
 
+  subroutine  integer4Scalar_integer4Scalar_max ( x, y )
+    implicit none
+
+    integer(4) :: x
+    integer(4) :: y
+
+    x = max(x * y, x + y)
+
+  end subroutine integer4Scalar_integer4Scalar_max
+
+  subroutine  integer4Scalar_integer4Scalar_min ( x, y )
+    implicit none
+
+    integer(4) :: x
+    integer(4) :: y
+
+    x = min(x - y + 100, x + y - 15)
+
+  end subroutine integer4Scalar_integer4Scalar_min
+
   subroutine real8Array_integer4Array ( x, y )
     implicit none
 
@@ -58,5 +78,49 @@ contains
     end do
     
   end subroutine real8Array_integer4Array_real8Array
+
+ subroutine ker1 ( x, y, z )
+
+    real(8) :: x(6), y(6), z(6)
+
+
+    do i = 1, 6
+
+      z(i) = z(i) + x(i) + y(i)
+
+    end do
+
+  end subroutine
+
+  subroutine ker2 ( x, y, k )
+
+    real(8) :: x(6), y(6), k(6)
+
+
+    do i = 1, 6
+
+      k(i) = k(i) + x(i) - z(i)
+
+    end do
+
+  end subroutine
+
+  subroutine ker3 ( x, y, z, k )
+
+    real(8) :: x(6), y(6), z(6), k(6)
+
+    do i = 1, 6
+
+      z(i) = z(i) + x(i) + y(i)
+
+    end do
+
+    do i = 1, 6
+
+      k(i) = k(i) + x(i) - z(i)
+
+    end do
+
+  end subroutine
 
 end module UserKernels

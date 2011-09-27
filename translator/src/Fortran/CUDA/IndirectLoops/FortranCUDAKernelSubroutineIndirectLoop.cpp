@@ -1613,9 +1613,6 @@ FortranCUDAKernelSubroutineIndirectLoop::FortranCUDAKernelSubroutineIndirectLoop
       parallelLoop, moduleScope, reductionSubroutines, dataSizesDeclaration,
       opDatDimensionsDeclaration, moduleDeclarations)
 {
-  Debug::getInstance ()->debugMessage ("<Kernel, Indirect, CUDA>",
-      Debug::CONSTRUCTOR_LEVEL, __FILE__, __LINE__);
-
   createFormalParameterDeclarations ();
 
   createLocalVariableDeclarations ();

@@ -335,9 +335,6 @@ namespace OP2
     std::string
     getReductionArrayDeviceName (unsigned int OP_DAT_ArgumentGroup,
         std::string const & suffix);
-
-    std::string
-    getReductionResultName (unsigned int OP_DAT_ArgumentGroup);
   }
 }
 

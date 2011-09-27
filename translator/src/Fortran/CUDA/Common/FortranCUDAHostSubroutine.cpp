@@ -136,21 +136,6 @@ FortranCUDAHostSubroutine::createReductionEpilogueStatements ()
 
         /*
          * ======================================================
-         * Initialise the reduction result to the previous
-         * value computed
-         * ======================================================
-         */
-
-        SgExprStatement * assignmentStatement2 = buildAssignStatement (
-            buildVarRefExp (variableDeclarations->get (
-                OP2::VariableNames::getReductionResultName (i))),
-            buildVarRefExp (variableDeclarations->get (
-                OP2::VariableNames::getOpDatHostName (i))));
-
-        appendStatement (assignmentStatement2, subroutineScope);
-
-        /*
-         * ======================================================
          * Iterate over all elements in the reduction host array
          * and compute either the sum, maximum, or minimum
          * ======================================================
@@ -168,7 +153,7 @@ FortranCUDAHostSubroutine::createReductionEpilogueStatements ()
         {
           reductionComputationExpression = buildAddOp (arrayIndexExpression1,
               buildVarRefExp (variableDeclarations->get (
-                  OP2::VariableNames::getReductionResultName (i))));
+                  OP2::VariableNames::getOpDatHostName (i))));
         }
         else if (parallelLoop->isMaximised (i))
         {
@@ -178,7 +163,7 @@ FortranCUDAHostSubroutine::createReductionEpilogueStatements ()
 
           SgExprListExp * actualParameters = buildExprListExp (
               arrayIndexExpression1, buildVarRefExp (variableDeclarations->get (
-                  OP2::VariableNames::getReductionResultName (i))));
+                  OP2::VariableNames::getOpDatHostName (i))));
 
           reductionComputationExpression = buildFunctionCallExp (
               maxFunctionSymbol, actualParameters);
@@ -191,7 +176,7 @@ FortranCUDAHostSubroutine::createReductionEpilogueStatements ()
 
           SgExprListExp * actualParameters = buildExprListExp (
               arrayIndexExpression1, buildVarRefExp (variableDeclarations->get (
-                  OP2::VariableNames::getReductionResultName (i))));
+                  OP2::VariableNames::getOpDatHostName (i))));
 
           reductionComputationExpression = buildFunctionCallExp (
               maxFunctionSymbol, actualParameters);
@@ -204,7 +189,7 @@ FortranCUDAHostSubroutine::createReductionEpilogueStatements ()
 
         SgExprStatement * assignmentStatement3 = buildAssignStatement (
             buildVarRefExp (variableDeclarations->get (
-                OP2::VariableNames::getReductionResultName (i))),
+                OP2::VariableNames::getOpDatHostName (i))),
             reductionComputationExpression);
 
         SgBasicBlock * outerLoopBody = buildBasicBlock ();
@@ -223,20 +208,6 @@ FortranCUDAHostSubroutine::createReductionEpilogueStatements ()
                 buildIntVal (1), outerLoopBody);
 
         appendStatement (outerLoopStatement, subroutineScope);
-
-        /*
-         * ======================================================
-         * Store the computed reduction back on the host
-         * ======================================================
-         */
-
-        SgExprStatement * assignmentStatement4 = buildAssignStatement (
-            buildVarRefExp (variableDeclarations->get (
-                OP2::VariableNames::getOpDatHostName (i))), buildVarRefExp (
-                variableDeclarations->get (
-                    OP2::VariableNames::getReductionResultName (i))));
-
-        appendStatement (assignmentStatement4, subroutineScope);
       }
     }
   }
@@ -266,24 +237,6 @@ FortranCUDAHostSubroutine::createReductionLocalVariableDeclarations ()
       FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
           OP2::VariableNames::reductionCardinality,
           FortranTypesBuilder::getFourByteInteger (), subroutineScope));
-
-  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
-  {
-    if (parallelLoop->isReductionRequired (i) == true)
-    {
-      Debug::getInstance ()->debugMessage (
-          "Creating reduction result for OP_DAT argument '" + lexical_cast <
-              string> (i) + "'", Debug::HIGHEST_DEBUG_LEVEL, __FILE__, __LINE__);
-
-      string const & variableName = OP2::VariableNames::getReductionResultName (
-          i);
-
-      variableDeclarations->add (
-          variableName,
-          FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
-              variableName, parallelLoop->getOpDatBaseType (i), subroutineScope));
-    }
-  }
 }
 
 SgExpression *

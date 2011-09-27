@@ -1,8 +1,8 @@
 ! This program contains:
-! 1) An OP_GBL (scalar) with INCREMENT access
+! 1) An OP_GBL (scalar) with MAX access
 ! 2) An OP_GBL (scalar) with READ access
 
-program Test5 
+program Test6 
   use OP2_C
   use UserKernels
   
@@ -26,11 +26,11 @@ program Test5
   call op_decl_gbl ( hostGlobal1, global1 )
   call op_decl_gbl ( hostGlobal2, global2 )
   
-  call op_par_loop_2 ( integer4Scalar_integer4Scalar, set, &
-                     & global1, -1, OP_GBL, OP_INC, &
+  call op_par_loop_2 ( integer4Scalar_integer4Scalar_max, set, &
+                     & global1, -1, OP_GBL, OP_MAX, &
                      & global2, -1, OP_GBL, OP_READ)
 
   print *, hostGlobal1
 
-end program Test5
+end program Test6
 
