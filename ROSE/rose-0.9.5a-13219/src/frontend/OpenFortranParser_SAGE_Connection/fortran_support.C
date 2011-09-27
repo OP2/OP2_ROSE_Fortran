@@ -1841,13 +1841,15 @@ trace_back_through_parent_scopes_lookup_variable_symbol_but_do_not_build_variabl
 
   // DQ (4/29/2008): Added support for detecting SgClassSymbol IR nodes (fro drived types).
 
-     if ( SgProject::get_verbose() > DEBUG_COMMENT_LEVEL )
+//     if ( SgProject::get_verbose() > DEBUG_COMMENT_LEVEL )
+     // if (strcmp ( variableName.str(), "v_ne" ) == 0 ) 
           printf ("In trace_back_through_parent_scopes_lookup_variable_symbol_but_do_not_build_variable(): variableName = %s currentScope = %p = %s \n",variableName.str(),currentScope,currentScope->class_name().c_str());
 
-#if 1
+//#if 1
   // Output debugging information about saved state (stack) information.
-     outputState("In trace_back_through_parent_scopes_lookup_variable_symbol_but_do_not_build_variable()");
-#endif
+     // if (strcmp ( variableName.str(), "v_ne" ) == 0 )
+       outputState("In trace_back_through_parent_scopes_lookup_variable_symbol_but_do_not_build_variable()");
+//#endif
 
   // printf ("############### Could this variable = %s be a data member in a module? ############## \n",variableName.str());
 
@@ -1858,7 +1860,8 @@ trace_back_through_parent_scopes_lookup_variable_symbol_but_do_not_build_variabl
         {
           if ((*scopeInterator)->isCaseInsensitive() == false)
              {
-               printf ("##### Error (in initialize_global_scope_if_required): the scope handling is set to case sensitive scopeInterator = %p = %s \n",*scopeInterator,(*scopeInterator)->class_name().c_str());
+               // if (strcmp ( variableName.str(), "v_ne" ) == 0 )
+                 printf ("##### Error (in initialize_global_scope_if_required): the scope handling is set to case sensitive scopeInterator = %p = %s \n",*scopeInterator,(*scopeInterator)->class_name().c_str());
             // (*scopeInterator)->setCaseInsensitive(true);
              }
           ROSE_ASSERT((*scopeInterator)->isCaseInsensitive() == true);
@@ -1878,22 +1881,25 @@ trace_back_through_parent_scopes_lookup_variable_symbol_but_do_not_build_variabl
   // while (variableSymbol == NULL && tempScope != NULL)
      while (variableSymbol == NULL && functionSymbol == NULL && classSymbol == NULL && tempScope != NULL)
         {
-#if 0
-          printf ("Searching in scope = %p = %s \n",tempScope,tempScope->class_name().c_str());
+//#if 0
+          // if (strcmp ( variableName.str(), "v_ne" ) == 0 )
+            printf ("Searching in scope = %p = %s \n",tempScope,tempScope->class_name().c_str());
           tempScope->get_startOfConstruct()->display("Searching in scope");
-#endif
+//#endif
        // DQ (11/26/2010): The variable name that we will search for needs to be case normalized (see test2010_112.f90).
           variableSymbol = tempScope->lookup_variable_symbol(variableName);
           functionSymbol = tempScope->lookup_function_symbol(variableName);
           classSymbol    = tempScope->lookup_class_symbol(variableName);
-#if 0
-          printf ("In trace_back_through_parent_scopes_lookup_variable_symbol_but_do_not_build_variable(): tempScope = %p = %s variableSymbol = %p functionSymbol = %p classSymbol = %p \n",
-               tempScope,tempScope->class_name().c_str(),variableSymbol,functionSymbol,classSymbol);
-#endif
+//#if 0
+          // if (strcmp ( variableName.str(), "v_ne" ) == 0 )
+            printf ("In trace_back_through_parent_scopes_lookup_variable_symbol_but_do_not_build_variable(): tempScope = %p = %s variableSymbol = %p functionSymbol = %p classSymbol = %p \n",
+                    tempScope,tempScope->class_name().c_str(),variableSymbol,functionSymbol,classSymbol);
+//#endif
 
-#if 0
-          tempScope->print_symboltable("In trace_back_through_parent_scopes_lookup_variable_symbol_but_do_not_build_variable()");
-#endif
+//#if 0
+          // if (strcmp ( variableName.str(), "v_ne" ) == 0 )
+            tempScope->print_symboltable("In trace_back_through_parent_scopes_lookup_variable_symbol_but_do_not_build_variable()");
+//#endif
 
        // If we have processed the global scope then we can stop (if we have not found the symbol at this
        // point then it is not available (or it is only available through a USE statment and we have not 
@@ -1901,16 +1907,18 @@ trace_back_through_parent_scopes_lookup_variable_symbol_but_do_not_build_variabl
           tempScope = isSgGlobal(tempScope) ? NULL : tempScope->get_scope();
         }
 
-#if 0
+//#if 0
   // Output debugging information about saved state (stack) information.
-     outputState("At BOTTOM of trace_back_through_parent_scopes_lookup_variable_symbol_but_do_not_build_variable()");
-#endif
+    // if (strcmp ( variableName.str(), "v_ne" ) == 0 )
+      outputState("At BOTTOM of trace_back_through_parent_scopes_lookup_variable_symbol_but_do_not_build_variable()");
+//#endif
 
-#if 1
+//#if 1
   // This function could have returned a NULL pointer if there was no symbol found ???
-     if ( SgProject::get_verbose() > DEBUG_COMMENT_LEVEL )
+//     if ( SgProject::get_verbose() > DEBUG_COMMENT_LEVEL )
+       // if (strcmp ( variableName.str(), "v_ne" ) == 0 )
           printf ("Leaving trace_back_through_parent_scopes_lookup_variable_symbol_but_do_not_build_variable(): variableSymbol = %p functionSymbol = %p \n",variableSymbol,functionSymbol);
-#endif
+//#endif
    }
 
 // void build_implicit_program_statement_if_required();
@@ -2101,14 +2109,16 @@ trace_back_through_parent_scopes_lookup_member_variable_symbol(const std::vector
   // std::vector<SgVariableSymbol*> returnSymbolList;
      std::vector<SgSymbol*> returnSymbolList;
 
-#if 1
+//#if 1
   // Output debugging information about saved state (stack) information.
-     outputState("At TOP of trace_back_through_parent_scopes_lookup_member_variable_symbol(const std::vector<std::string>,SgScopeStatement*)");
-#endif
+//       // if (strcmp ( generateQualifiedName(qualifiedNameList).c_str(), "v_ne" ) == 0 )
+         outputState("At TOP of trace_back_through_parent_scopes_lookup_member_variable_symbol(const std::vector<std::string>,SgScopeStatement*)");
+//#endif
 
-#if 0
-     printf ("qualifiedNameList name = %s \n",generateQualifiedName(qualifiedNameList).c_str());
-#endif
+     //#if 0
+//          // if (strcmp ( generateQualifiedName(qualifiedNameList).c_str(), "v_ne" ) == 0 )
+            printf ("qualifiedNameList name = %s \n",generateQualifiedName(qualifiedNameList).c_str());
+     //#endif
 
         {
        // This is the more sophisticated case (multi-part references)...
@@ -2123,40 +2133,50 @@ trace_back_through_parent_scopes_lookup_member_variable_symbol(const std::vector
              {
             // name = qualifiedNameList[i];
                name = qualifiedNameList[i].name;
-#if 0
-               printf ("structureScope = %p = %s name = %s \n",structureScope,structureScope->class_name().c_str(),name.c_str());
-#endif
-#if 0
-               printf ("Output the symbol table at the structureScope (debugging i = %zu): \n",i);
+//#if 0
+               // if (strcmp ( generateQualifiedName(qualifiedNameList).c_str(), "v_ne" ) == 0 )
+                 printf ("structureScope = %p = %s name = %s \n",structureScope,structureScope->class_name().c_str(),name.c_str());
+//#endif
+//#if 0
+               // if (strcmp ( generateQualifiedName(qualifiedNameList).c_str(), "v_ne" ) == 0 )
+                 printf ("Output the symbol table at the structureScope (debugging i = %zu): \n",i);
                structureScope->get_symbol_table()->print("Output the symbol table at the current scope");
-#endif
+//#endif
 
             // variableSymbol = trace_back_through_parent_scopes_lookup_variable_symbol(qualifiedNameList[i],structureScope);
             // trace_back_through_parent_scopes_lookup_variable_symbol_but_do_not_build_variable(qualifiedNameList[i],structureScope,variableSymbol,functionSymbol,classSymbol);
                trace_back_through_parent_scopes_lookup_variable_symbol_but_do_not_build_variable(name,structureScope,variableSymbol,functionSymbol,classSymbol);
 
-#if 0
-               printf ("In trace_back_through_parent_scopes_lookup_member_variable_symbol(): variableSymbol = %p \n",variableSymbol);
-               printf ("In trace_back_through_parent_scopes_lookup_member_variable_symbol(): functionSymbol = %p \n",functionSymbol);
-               printf ("In trace_back_through_parent_scopes_lookup_member_variable_symbol(): classSymbol    = %p \n",classSymbol);
-#endif
+//#if 0
+               // if (strcmp ( generateQualifiedName(qualifiedNameList).c_str(), "v_ne" ) == 0 )
+                 printf ("In trace_back_through_parent_scopes_lookup_member_variable_symbol(): variableSymbol = %p \n",variableSymbol);
+                 printf ("In trace_back_through_parent_scopes_lookup_member_variable_symbol(): functionSymbol = %p \n",functionSymbol);
+                 printf ("In trace_back_through_parent_scopes_lookup_member_variable_symbol(): classSymbol    = %p \n",classSymbol);
+//#endif
 
                if (variableSymbol != NULL)
                   {
                  // ROSE_ASSERT(variableSymbol->get_type() != NULL);
-#if 0
-                    printf ("variable type = %s \n",variableSymbol->get_type()->class_name().c_str());
-#endif
+//#if 0
+                    // if (strcmp ( generateQualifiedName(qualifiedNameList).c_str(), "v_ne" ) == 0 )
+                      printf ("variable type = %s \n",variableSymbol->get_type()->class_name().c_str());
+//#endif
                  // This is a reference to a variable (perhaps a structure), and we can return variableSymbol as NULL.
                  // name = qualifiedNameList[i];
-#if 0
-                    printf ("Found a variableSymbol = %p Next variable name = %s \n",variableSymbol,name.c_str());
-#endif
+		    //#if 0
+                    // if (strcmp ( generateQualifiedName(qualifiedNameList).c_str(), "v_ne" ) == 0 )
+                      printf ("Found a variableSymbol = %p Next variable name = %s \n",variableSymbol,name.c_str());
+		    //#endif
                     SgType* type = variableSymbol->get_type();
                     ROSE_ASSERT(type != NULL);
-#if 0
-                    printf ("associated variable type = %s \n",type->class_name().c_str());
-#endif
+//#if 0
+                    // if (strcmp ( generateQualifiedName(qualifiedNameList).c_str(), "v_ne" ) == 0 )
+                      printf ("associated variable type = %s \n",type->class_name().c_str());
+
+                    // if (strcmp ( generateQualifiedName(qualifiedNameList).c_str(), "grid" ) == 0 )                      
+                    structureScope->get_symbol_table()->print("Output the symbol table FOR GRID");
+
+//#endif
                  // DQ (12/23/2010): I think a better implementation would strip off SgArrayType and SgPointerType as needed to get the the SgClassType
                  // I am unclear how many cases we will have to handle here.
 
@@ -2180,7 +2200,10 @@ trace_back_through_parent_scopes_lookup_member_variable_symbol(const std::vector
                               ROSE_ASSERT(classDefinition != NULL);
 
                               structureScope = classDefinition;
-                           // printf ("Set structureScope to %p (case of class type) \n",structureScope);
+
+                              // if (strcmp ( generateQualifiedName(qualifiedNameList).c_str(), "v_ne" ) == 0 )
+                                printf ("Set structureScope to %p (case of class type) \n",structureScope);
+
                               break;
                             }
 
@@ -2189,9 +2212,10 @@ trace_back_through_parent_scopes_lookup_member_variable_symbol(const std::vector
                               SgArrayType* arrayType = isSgArrayType(type);
                               SgType* baseType = arrayType->get_base_type();
                               ROSE_ASSERT(baseType != NULL);
-#if 0
-                              printf ("baseType = %p = %s \n",baseType,baseType->class_name().c_str());
-#endif
+//#if 0
+                              // if (strcmp ( generateQualifiedName(qualifiedNameList).c_str(), "grid" ) == 0 )                      
+                                 printf ("baseType = %p = %s \n",baseType,baseType->class_name().c_str());
+//#endif
                               SgClassType* classType = isSgClassType(baseType);
                               if (classType != NULL)
                                  {
@@ -2217,9 +2241,10 @@ trace_back_through_parent_scopes_lookup_member_variable_symbol(const std::vector
 
                                         SgType* baseType = pointerType->get_base_type();
                                         ROSE_ASSERT(baseType != NULL);
-#if 0
-                                        printf ("baseType = %p = %s \n",baseType,baseType->class_name().c_str());
-#endif
+//#if 0
+                                        // if (strcmp ( generateQualifiedName(qualifiedNameList).c_str(), "grid" ) == 0 )                       
+                                          printf ("baseType = %p = %s \n",baseType,baseType->class_name().c_str());
+//#endif
                                         SgClassType* classType = isSgClassType(baseType);
                                         if (classType != NULL)
                                            {
@@ -2254,9 +2279,10 @@ trace_back_through_parent_scopes_lookup_member_variable_symbol(const std::vector
                               SgPointerType* pointerType = isSgPointerType(type);
                               SgType* baseType = pointerType->get_base_type();
                               ROSE_ASSERT(baseType != NULL);
-#if 0
-                              printf ("baseType = %p = %s \n",baseType,baseType->class_name().c_str());
-#endif
+//#if 0
+                              // if (strcmp ( generateQualifiedName(qualifiedNameList).c_str(), "grid" ) == 0 )                      
+                                printf ("baseType = %p = %s \n",baseType,baseType->class_name().c_str());
+//#endif
                            // This is the same code for handling the class type as in the "case V_SgArrayType:" above.
                               SgClassType* classType = isSgClassType(baseType);
                               if (classType != NULL)
@@ -2282,9 +2308,10 @@ trace_back_through_parent_scopes_lookup_member_variable_symbol(const std::vector
                                       {
                                         SgType* baseType = arrayType->get_base_type();
                                         ROSE_ASSERT(baseType != NULL);
-#if 0
-                                        printf ("In the array: baseType = %p = %s \n",baseType,baseType->class_name().c_str());
-#endif
+//#if 0
+                                        // if (strcmp ( generateQualifiedName(qualifiedNameList).c_str(), "grid" ) == 0 )                      
+                                          printf ("In the array: baseType = %p = %s \n",baseType,baseType->class_name().c_str());
+//#endif
                                         SgClassType* classType = isSgClassType(baseType);
                                         if (classType != NULL)
                                            {
@@ -2306,7 +2333,8 @@ trace_back_through_parent_scopes_lookup_member_variable_symbol(const std::vector
                                              SgTypeDefault* defaultType = isSgTypeDefault(baseType);
                                              if (defaultType != NULL)
                                                 {
-                                                  printf ("Error: SgTypeDefault identified in array base-type (result of unfixed up reference to type defined after initial reference). \n");
+                                                  // if (strcmp ( generateQualifiedName(qualifiedNameList).c_str(), "grid" ) == 0 )                      
+                                                    printf ("Error: SgTypeDefault identified in array base-type (result of unfixed up reference to type defined after initial reference). \n");
                                                // ROSE_ASSERT(false);
                                                 }
                                                else
@@ -2357,26 +2385,29 @@ trace_back_through_parent_scopes_lookup_member_variable_symbol(const std::vector
                   }
                  else
                   {
-#if 0
-                    printf ("In trace_back_through_parent_scopes_lookup_member_variable_symbol(): functionSymbol = %p \n",functionSymbol);
-#endif
+//#if 0
+                    // if (strcmp ( generateQualifiedName(qualifiedNameList).c_str(), "grid" ) == 0 )                      
+                      printf ("In trace_back_through_parent_scopes_lookup_member_variable_symbol(): functionSymbol = %p \n",functionSymbol);
+//#endif
                     if (functionSymbol != NULL)
                        {
                       // This is a reference to a function (maybe a member function of a module?), and we can return variableSymbol as NULL.
                       // See test2010_176.f90 for an example of this (setting a data member of the return value of a function returning a type!
                       // name = qualifiedNameList[i];
-#if 0
-                         printf ("Found a functionSymbol = %p Next variable name = %s \n",functionSymbol,name.c_str());
-#endif
+//#if 0
+                         // if (strcmp ( generateQualifiedName(qualifiedNameList).c_str(), "grid" ) == 0 )                      
+                           printf ("Found a functionSymbol = %p Next variable name = %s \n",functionSymbol,name.c_str());
+//#endif
                          SgType* type = functionSymbol->get_type();
                          ROSE_ASSERT(type != NULL);
                          SgFunctionType* functionType = isSgFunctionType(type);
                          ROSE_ASSERT(functionType != NULL);
                          SgType* functionReturnType = functionType->get_return_type();
                          ROSE_ASSERT(functionReturnType != NULL);
-#if 0
-                         printf ("functionReturnType = %p = %s \n",functionReturnType,functionReturnType->class_name().c_str());
-#endif
+//#if 0
+                         // if (strcmp ( generateQualifiedName(qualifiedNameList).c_str(), "grid" ) == 0 )                      
+                           printf ("functionReturnType = %p = %s \n",functionReturnType,functionReturnType->class_name().c_str());
+//#endif
                          SgClassType* classType = isSgClassType(functionReturnType);
                          if (classType != NULL)
                             {
@@ -2406,9 +2437,10 @@ trace_back_through_parent_scopes_lookup_member_variable_symbol(const std::vector
                        }
                       else
                        {
-#if 0
-                         printf ("In trace_back_through_parent_scopes_lookup_member_variable_symbol(): classSymbol = %p \n",classSymbol);
-#endif
+//#if 0
+                         // if (strcmp ( generateQualifiedName(qualifiedNameList).c_str(), "grid" ) == 0 )                      
+                           printf ("In trace_back_through_parent_scopes_lookup_member_variable_symbol(): classSymbol = %p \n",classSymbol);
+//#endif
                          if (classSymbol != NULL)
                             {
                            // This is a reference to a type, and we can return variableSymbol as NULL.
@@ -2417,9 +2449,10 @@ trace_back_through_parent_scopes_lookup_member_variable_symbol(const std::vector
                             }
                            else
                             {
-#if 0
-                               printf ("########## This is reference has not been seen previously: name = %s qualifiedNameList.size() = %zu \n",name.c_str(),qualifiedNameList.size());
-#endif
+//#if 0
+                              // if (strcmp ( generateQualifiedName(qualifiedNameList).c_str(), "grid" ) == 0 )                      
+                                printf ("########## This is reference has not been seen previously: name = %s qualifiedNameList.size() = %zu \n",name.c_str(),qualifiedNameList.size());
+//#endif
                            // Nothing was found, so we can return variableSymbol as NULL.
                            // Note: types could be buried (modules defined in modules), but they are not likely a part of multi-part references (in Fortran).
                               structureScope = NULL;
@@ -2440,14 +2473,16 @@ trace_back_through_parent_scopes_lookup_member_variable_symbol(const std::vector
                                 // Returning an empty list (returnSymbolList) is how we would return the equivalant of "variableSymbol == NULL".
                                    if (variableSymbol != NULL)
                                       {
+                                      
                                         returnSymbolList.push_back(variableSymbol);
                                       }
                                      else
                                       {
                                      // I think this may be an error...output a message for now.
-#if 0
-                                        printf ("Warning: variable symbol not built for expected implicit reference = %s \n",name.c_str());
-#endif
+//#if 0
+                                        // if (strcmp ( generateQualifiedName(qualifiedNameList).c_str(), "grid" ) == 0 )                      
+                                          printf ("Warning: variable symbol not built for expected implicit reference = %s \n",name.c_str());
+//#endif
 #if 0
                                      // Returning a SgDefaultSymbol will be used to indicate that the name is not known and can be interpreted later.
                                         SgSymbol* defaultSymbol = new SgDefaultSymbol();
@@ -2465,10 +2500,12 @@ trace_back_through_parent_scopes_lookup_member_variable_symbol(const std::vector
                  // This should be the last iteration!
                     if (i != (qualifiedNameList.size() - 1))
                        {
-                         printf ("WARNING: i != (qualifiedNameList.size() - 1) for LANL_POP code only! (i = %zu qualifiedNameList.size() = %zu) \n",i,qualifiedNameList.size());
+                         // if (strcmp ( generateQualifiedName(qualifiedNameList).c_str(), "grid" ) == 0 )                      
+                           printf ("WARNING: i != (qualifiedNameList.size() - 1) for LANL_POP code only! (i = %zu qualifiedNameList.size() = %zu) \n",i,qualifiedNameList.size());
 
                       // Debugging...
-                         printf ("Leaving trace_back_through_parent_scopes_lookup_member_variable_symbol(): \n");
+                         // if (strcmp ( generateQualifiedName(qualifiedNameList).c_str(), "grid" ) == 0 )                      
+                           printf ("Leaving trace_back_through_parent_scopes_lookup_member_variable_symbol(): \n");
                          for (size_t i = 0; i < returnSymbolList.size(); i++)
                             {
                                printf ("--- returnSymbolList[%zu] = %p = %s = %s \n",i,returnSymbolList[i],returnSymbolList[i]->class_name().c_str(),returnSymbolList[i]->get_name().str());
@@ -2504,6 +2541,7 @@ trace_back_through_parent_scopes_lookup_member_variable_symbol(const std::vector
   // DQ (1/19/2011): I think this is valid debugging code.
      if (returnSymbolList.empty() == true)
         {
+        
           printf ("*** WARNING: returnSymbolList is empty (might be an error) *** \n");
         }
 #endif
@@ -2513,8 +2551,10 @@ trace_back_through_parent_scopes_lookup_member_variable_symbol(const std::vector
   // if (returnSymbolList.size() != qualifiedNameList.size())
      if (qualifiedNameList.size() > 1 && returnSymbolList.size() != qualifiedNameList.size())
         {
-          printf ("Error: returnSymbolList.size() = %zu qualifiedNameList.size() = %zu \n",returnSymbolList.size(),qualifiedNameList.size());
+          // if (strcmp ( generateQualifiedName(qualifiedNameList).c_str(), "grid" ) == 0 )                      
+            printf ("Error: returnSymbolList.size() = %zu qualifiedNameList.size() = %zu \n",returnSymbolList.size(),qualifiedNameList.size());
         }
+        
   // ROSE_ASSERT(returnSymbolList.size() == qualifiedNameList.size());
      ROSE_ASSERT(qualifiedNameList.size() == 1 || returnSymbolList.size() == qualifiedNameList.size());
 
@@ -4093,7 +4133,22 @@ buildAttributeSpecificationStatement ( SgAttributeSpecificationStatement::attrib
 void
 setDeclarationAttributeSpec ( SgDeclarationStatement* variableDeclaration, int astAttributeSpec )
    {
-  // printf ("In setDeclarationAttributeSpec(): variableDeclaration = %p astAttributeSpec = %d \n",variableDeclaration,astAttributeSpec);
+     printf ("In setDeclarationAttributeSpec(): variableDeclaration = %p astAttributeSpec = %d \n",variableDeclaration,astAttributeSpec);
+
+     SgVariableDeclaration * vardecl = NULL;
+     vardecl = isSgVariableDeclaration ( variableDeclaration );
+     if ( vardecl == NULL ) 
+       {
+	 printf ( "No var decl\n" );
+       }
+     else
+       {
+	 printf ( "Var decl\n" );
+	 SgInitializedNamePtrList names = vardecl->get_variables ();
+	 SgName name = (names[0])->get_name();
+	 printf ( "Name is %s\n", name.str() );
+				     //	 printf ( "Variable name is %s\n", (names[0])->get_name()->getString() );
+       }
 
 #if 0
   // Output debugging information about saved state (stack) information.
@@ -4282,7 +4337,9 @@ setDeclarationAttributeSpec ( SgDeclarationStatement* variableDeclaration, int a
 
           case ComponentAttrSpec_allocatable:
                printf ("Error: ComponentAttrSpec_allocatable used as an attribute specifier (unclear how to process this) \n");
-               ROSE_ASSERT(false);
+	       // CB (09/26/2011): This is legal for Fortran 2003
+               variableDeclaration->get_declarationModifier().get_typeModifier().setAllocatable();
+               //ROSE_ASSERT(false);
                break;
 
           case ComponentAttrSpec_access_spec:

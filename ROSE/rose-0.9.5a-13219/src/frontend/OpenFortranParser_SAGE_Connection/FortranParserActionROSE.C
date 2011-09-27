@@ -7386,7 +7386,7 @@ void c_action_data_ref(int numPartRef)
   // This is important since now we can use information about the index number of the symbol in variableSymbolList to map back to the
   // hasSelectionSubscriptList data field in the vector of MultipartReferenceType object build in R612 for each part of the multi-part reference.
   // printf ("numPartRef = %d variableSymbolList.size() = %zu \n",numPartRef,variableSymbolList.size());
-     ROSE_ASSERT( (size_t) numPartRef == variableSymbolList.size());
+     //     ROSE_ASSERT( (size_t) numPartRef == variableSymbolList.size());
 
   // Build a list of intermedate expressions so that we don't disturb the astExpressionStack.
      std::list<SgExpression*> intermediateExpresionList;
