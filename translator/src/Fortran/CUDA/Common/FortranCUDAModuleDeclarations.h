@@ -13,7 +13,7 @@ class FortranCUDAModuleDeclarations: public FortranModuleDeclarations
 {
   protected:
 
-    FortranCUDADataSizesDeclaration * dataSizesDeclaration;
+    FortranCUDAOpDatCardinalitiesDeclaration * dataSizesDeclaration;
 
     FortranOpDatDimensionsDeclaration * dimensionsDeclaration;
 
@@ -38,7 +38,7 @@ class FortranCUDAModuleDeclarations: public FortranModuleDeclarations
 
     FortranCUDAModuleDeclarations (FortranParallelLoop * parallelLoop,
         SgScopeStatement * moduleScope,
-        FortranCUDADataSizesDeclaration * dataSizesDeclaration,
+        FortranCUDAOpDatCardinalitiesDeclaration * dataSizesDeclaration,
         FortranOpDatDimensionsDeclaration * dimensionsDeclaration);
 };
 

@@ -86,8 +86,7 @@ FortranOpenMPSubroutinesGeneration::createModuleDeclarations ()
     FortranParallelLoop * parallelLoop = it->second;
 
     dimensionsDeclarations[userSubroutineName]
-        = new FortranOpDatDimensionsDeclaration (userSubroutineName,
-            parallelLoop, moduleScope);
+        = new FortranOpDatDimensionsDeclaration (parallelLoop, moduleScope);
   }
 
   /*

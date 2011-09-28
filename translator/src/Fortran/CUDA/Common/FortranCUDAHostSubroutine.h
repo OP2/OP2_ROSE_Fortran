@@ -12,7 +12,7 @@ class FortranCUDAHostSubroutine: public FortranHostSubroutine
 {
   protected:
 
-    FortranCUDADataSizesDeclaration * dataSizesDeclaration;
+    FortranCUDAOpDatCardinalitiesDeclaration * dataSizesDeclaration;
 
     FortranOpDatDimensionsDeclaration * opDatDimensionsDeclaration;
 
@@ -62,7 +62,7 @@ class FortranCUDAHostSubroutine: public FortranHostSubroutine
         std::string const & userSubroutineName,
         std::string const & kernelSubroutineName,
         FortranParallelLoop * parallelLoop, SgScopeStatement * moduleScope,
-        FortranCUDADataSizesDeclaration * dataSizesDeclaration,
+        FortranCUDAOpDatCardinalitiesDeclaration * dataSizesDeclaration,
         FortranOpDatDimensionsDeclaration * opDatDimensionsDeclaration,
         FortranCUDAModuleDeclarations * moduleDeclarations);
 };

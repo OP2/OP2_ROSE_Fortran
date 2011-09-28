@@ -756,7 +756,7 @@ FortranCUDAHostSubroutineIndirectLoop::FortranCUDAHostSubroutineIndirectLoop (
     std::string const & subroutineName, std::string const & userSubroutineName,
     std::string const & kernelSubroutineName,
     FortranParallelLoop * parallelLoop, SgScopeStatement * moduleScope,
-    FortranCUDADataSizesDeclarationIndirectLoop * dataSizesDeclaration,
+    FortranCUDAOpDatCardinalitiesDeclarationIndirectLoop * dataSizesDeclaration,
     FortranOpDatDimensionsDeclaration * opDatDimensionsDeclaration,
     FortranCUDAModuleDeclarations * moduleDeclarations) :
   FortranCUDAHostSubroutine (subroutineName, userSubroutineName,

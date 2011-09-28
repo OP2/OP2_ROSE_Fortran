@@ -1333,7 +1333,7 @@ FortranCUDAKernelSubroutineIndirectLoop::createOpDatFormalParameterDeclarations 
                 OP2::VariableNames::getDataSizesVariableDeclarationName (
                     userSubroutineName))), buildVarRefExp (
             dataSizesDeclaration->getFieldDeclarations ()->get (
-                OP2::VariableNames::getOpDatSizeName (i))));
+                OP2::VariableNames::getOpDatCardinalityName (i))));
 
         SgSubtractOp * upperBoundExpression = buildSubtractOp (dotExpression,
             buildIntVal (1));
@@ -1415,7 +1415,7 @@ FortranCUDAKernelSubroutineIndirectLoop::createOpDatFormalParameterDeclarations 
                 OP2::VariableNames::getDataSizesVariableDeclarationName (
                     userSubroutineName))), buildVarRefExp (
             dataSizesDeclaration->getFieldDeclarations ()->get (
-                OP2::VariableNames::getOpDatSizeName (i))));
+                OP2::VariableNames::getOpDatCardinalityName (i))));
 
         SgSubtractOp * upperBoundExpression = buildSubtractOp (dotExpression,
             buildIntVal (1));
@@ -1599,7 +1599,7 @@ FortranCUDAKernelSubroutineIndirectLoop::FortranCUDAKernelSubroutineIndirectLoop
     std::string const & subroutineName, std::string const & userSubroutineName,
     FortranParallelLoop * parallelLoop, SgScopeStatement * moduleScope,
     FortranReductionSubroutines * reductionSubroutines,
-    FortranCUDADataSizesDeclarationIndirectLoop * dataSizesDeclaration,
+    FortranCUDAOpDatCardinalitiesDeclarationIndirectLoop * dataSizesDeclaration,
     FortranOpDatDimensionsDeclaration * opDatDimensionsDeclaration,
     FortranCUDAModuleDeclarations * moduleDeclarations) :
   FortranCUDAKernelSubroutine (subroutineName, userSubroutineName,

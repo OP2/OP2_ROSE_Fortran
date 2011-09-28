@@ -340,7 +340,7 @@ FortranCUDAHostSubroutine::createTransferOpDatStatements ()
 
         SgExprStatement * assignmentStatement = buildAssignStatement (
             buildVarRefExp (variableDeclarations->get (
-                OP2::VariableNames::getOpDatSizeName (i))), rhsOfAssigment);
+                OP2::VariableNames::getOpDatCardinalityName (i))), rhsOfAssigment);
 
         appendStatement (assignmentStatement, block);
       }
@@ -397,7 +397,7 @@ FortranCUDAHostSubroutine::createTransferOpDatStatements ()
 
         SgExpression * parameterExpression3A = buildOpaqueVarRefExp ("(/"
             + buildVarRefExp (variableDeclarations->get (
-                OP2::VariableNames::getOpDatSizeName (i)))->unparseToString ()
+                OP2::VariableNames::getOpDatCardinalityName (i)))->unparseToString ()
             + "/)", block);
 
         SgStatement * callStatementA =
@@ -462,7 +462,7 @@ FortranCUDAHostSubroutine::createFirstTimeExecutionStatements ()
         SgDotExp * dotExpression = buildDotExp (buildVarRefExp (
             moduleDeclarations->getDataSizesVariableDeclaration ()),
             buildVarRefExp (dataSizesDeclaration->getFieldDeclarations ()->get (
-                OP2::VariableNames::getOpDatSizeName (i))));
+                OP2::VariableNames::getOpDatCardinalityName (i))));
 
         SgExpression * rhsOfAssigment =
             createRHSOfInitialiseOpDatSizeStatement (block, i);
@@ -501,7 +501,7 @@ FortranCUDAHostSubroutine::createDataMarshallingLocalVariableDeclarations ()
                 + lexical_cast <string> (i), Debug::HIGHEST_DEBUG_LEVEL,
             __FILE__, __LINE__);
 
-        string const & variableName = OP2::VariableNames::getOpDatSizeName (i);
+        string const & variableName = OP2::VariableNames::getOpDatCardinalityName (i);
 
         variableDeclarations->add (variableName,
             FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
@@ -588,7 +588,7 @@ FortranCUDAHostSubroutine::FortranCUDAHostSubroutine (
     std::string const & subroutineName, std::string const & userSubroutineName,
     std::string const & kernelSubroutineName,
     FortranParallelLoop * parallelLoop, SgScopeStatement * moduleScope,
-    FortranCUDADataSizesDeclaration * dataSizesDeclaration,
+    FortranCUDAOpDatCardinalitiesDeclaration * dataSizesDeclaration,
     FortranOpDatDimensionsDeclaration * opDatDimensionsDeclaration,
     FortranCUDAModuleDeclarations * moduleDeclarations) :
   FortranHostSubroutine (subroutineName, userSubroutineName,

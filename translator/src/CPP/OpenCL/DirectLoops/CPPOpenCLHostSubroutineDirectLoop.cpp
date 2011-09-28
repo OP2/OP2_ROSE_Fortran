@@ -40,7 +40,7 @@ CPPOpenCLHostSubroutineDirectLoop::createVariableSizesInitialisationStatements (
 
     if (parallelLoop->isDuplicateOpDat (i) == false)
     {
-      string const & variableName = VariableNames::getOpDatSizeName (i);
+      string const & variableName = VariableNames::getOpDatCardinalityName (i);
 
       SgDotExp * dotExpression = buildDotExp (buildVarRefExp (
               moduleDeclarations->getDataSizesVariableDeclaration ()),

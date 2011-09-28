@@ -11,7 +11,7 @@
  */
 
 void
-FortranCUDADataSizesDeclarationIndirectLoop::addIndirectLoopFields ()
+FortranCUDAOpDatCardinalitiesDeclarationIndirectLoop::addIndirectLoopFields ()
 {
   using SageBuilder::buildVariableDeclaration;
   using std::string;
@@ -93,10 +93,9 @@ FortranCUDADataSizesDeclarationIndirectLoop::addIndirectLoopFields ()
   }
 }
 
-FortranCUDADataSizesDeclarationIndirectLoop::FortranCUDADataSizesDeclarationIndirectLoop (
-    std::string const & subroutineName, FortranParallelLoop * parallelLoop,
-    SgScopeStatement * moduleScope) :
-  FortranCUDADataSizesDeclaration (subroutineName, parallelLoop, moduleScope)
+FortranCUDAOpDatCardinalitiesDeclarationIndirectLoop::FortranCUDAOpDatCardinalitiesDeclarationIndirectLoop (
+    FortranParallelLoop * parallelLoop, SgScopeStatement * moduleScope) :
+  FortranCUDAOpDatCardinalitiesDeclaration (parallelLoop, moduleScope)
 {
   addIndirectLoopFields ();
 }

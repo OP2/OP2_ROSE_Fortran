@@ -67,12 +67,13 @@ OP2::VariableNames::getOpDatSharedName (unsigned int OP_DAT_ArgumentGroup)
 }
 
 std::string
-OP2::VariableNames::getOpDatSizeName (unsigned int OP_DAT_ArgumentGroup)
+OP2::VariableNames::getOpDatCardinalityName (unsigned int OP_DAT_ArgumentGroup)
 {
   using boost::lexical_cast;
   using std::string;
 
-  return OpDatPrefix + lexical_cast <string> (OP_DAT_ArgumentGroup) + Size;
+  return OpDatPrefix + lexical_cast <string> (OP_DAT_ArgumentGroup)
+      + "Cardinality";
 }
 
 std::string

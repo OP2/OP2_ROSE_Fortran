@@ -141,7 +141,7 @@ FortranCUDAModuleDeclarations::getDimensionsVariableDeclaration ()
 
 FortranCUDAModuleDeclarations::FortranCUDAModuleDeclarations (
     FortranParallelLoop * parallelLoop, SgScopeStatement * moduleScope,
-    FortranCUDADataSizesDeclaration * dataSizesDeclaration,
+    FortranCUDAOpDatCardinalitiesDeclaration * dataSizesDeclaration,
     FortranOpDatDimensionsDeclaration * dimensionsDeclaration) :
   FortranModuleDeclarations (parallelLoop, moduleScope), dataSizesDeclaration (
       dataSizesDeclaration), dimensionsDeclaration (dimensionsDeclaration)

@@ -4,7 +4,7 @@
 #include <FortranTypesBuilder.h>
 
 void
-FortranCUDADataSizesDeclaration::addDataSizesFields ()
+FortranCUDAOpDatCardinalitiesDeclaration::addFields ()
 {
   using boost::lexical_cast;
   using SageBuilder::buildVariableDeclaration;
@@ -16,11 +16,12 @@ FortranCUDADataSizesDeclaration::addDataSizesFields ()
     {
       if (parallelLoop->dataSizesDeclarationNeeded (i))
       {
-        Debug::getInstance ()->debugMessage ("Creating size field for OP_DAT "
-            + lexical_cast <string> (i), Debug::HIGHEST_DEBUG_LEVEL, __FILE__,
-            __LINE__);
+        Debug::getInstance ()->debugMessage (
+            "Creating cardinality field for OP_DAT "
+                + lexical_cast <string> (i), Debug::HIGHEST_DEBUG_LEVEL,
+            __FILE__, __LINE__);
 
-        string const & variableName = OP2::VariableNames::getOpDatSizeName (i);
+        string const & variableName = OP2::VariableNames::getOpDatCardinalityName (i);
 
         SgVariableDeclaration * fieldDeclaration = buildVariableDeclaration (
             variableName, FortranTypesBuilder::getFourByteInteger (), NULL,
@@ -38,20 +39,19 @@ FortranCUDADataSizesDeclaration::addDataSizesFields ()
 }
 
 SgClassType *
-FortranCUDADataSizesDeclaration::getType ()
+FortranCUDAOpDatCardinalitiesDeclaration::getType ()
 {
   return deviceDatatypeStatement->get_type ();
 }
 
 SubroutineVariableDeclarations *
-FortranCUDADataSizesDeclaration::getFieldDeclarations ()
+FortranCUDAOpDatCardinalitiesDeclaration::getFieldDeclarations ()
 {
   return fieldDeclarations;
 }
 
-FortranCUDADataSizesDeclaration::FortranCUDADataSizesDeclaration (
-    std::string const & subroutineName, FortranParallelLoop * parallelLoop,
-    SgScopeStatement * moduleScope) :
+FortranCUDAOpDatCardinalitiesDeclaration::FortranCUDAOpDatCardinalitiesDeclaration (
+    FortranParallelLoop * parallelLoop, SgScopeStatement * moduleScope) :
   parallelLoop (parallelLoop), moduleScope (moduleScope)
 {
   using SageInterface::appendStatement;
@@ -60,11 +60,12 @@ FortranCUDADataSizesDeclaration::FortranCUDADataSizesDeclaration (
 
   deviceDatatypeStatement
       = RoseStatementsAndExpressionsBuilder::buildTypeDeclaration (
-          subroutineName + "_variableSizes", moduleScope);
+          parallelLoop->getUserSubroutineName () + "_opDatCardinalities",
+          moduleScope);
 
   deviceDatatypeStatement->get_declarationModifier ().get_accessModifier ().setUndefined ();
 
   appendStatement (deviceDatatypeStatement, moduleScope);
 
-  addDataSizesFields ();
+  addFields ();
 }

@@ -7,7 +7,7 @@
 
 #include <FortranCUDADataSizesDeclaration.h>
 
-class FortranCUDADataSizesDeclarationIndirectLoop: public FortranCUDADataSizesDeclaration
+class FortranCUDAOpDatCardinalitiesDeclarationIndirectLoop: public FortranCUDAOpDatCardinalitiesDeclaration
 {
   private:
 
@@ -16,9 +16,8 @@ class FortranCUDADataSizesDeclarationIndirectLoop: public FortranCUDADataSizesDe
 
   public:
 
-    FortranCUDADataSizesDeclarationIndirectLoop (
-        std::string const & subroutineName, FortranParallelLoop * parallelLoop,
-        SgScopeStatement * moduleScope);
+    FortranCUDAOpDatCardinalitiesDeclarationIndirectLoop (
+        FortranParallelLoop * parallelLoop, SgScopeStatement * moduleScope);
 };
 
 #endif

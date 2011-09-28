@@ -207,7 +207,7 @@ namespace OP2
      * ======================================================
      */
     std::string
-    getOpDatSizeName (unsigned int OP_DAT_ArgumentGroup);
+    getOpDatCardinalityName (unsigned int OP_DAT_ArgumentGroup);
 
     /*
      * ======================================================
