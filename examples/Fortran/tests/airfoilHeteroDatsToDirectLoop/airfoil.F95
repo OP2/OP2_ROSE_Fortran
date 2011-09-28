@@ -41,7 +41,8 @@ use, intrinsic :: ISO_C_BINDING
   
   ! arrays used in data
   integer(4), dimension(:), allocatable, target :: ecell, bound, edge, bedge, becell, cell, fakeInt
-  real(8), dimension(:), allocatable, target :: x, q, qold, adt, res, rms
+  real(8), dimension(:), allocatable, target :: x, q, qold, adt, res
+  real(8) :: rms
 
   character(kind=c_char,len=10) :: savesolnName = C_CHAR_'save_soln'//C_NULL_CHAR
   character(kind=c_char, len=9) :: adtcalcName = C_CHAR_'adt_calc' // C_NULL_CHAR
@@ -87,7 +88,6 @@ use, intrinsic :: ISO_C_BINDING
   allocate ( adt ( ncell ) )
   allocate ( fakeInt ( 10 * ncell ) )
 
-  allocate ( rms ( 1 ) )
 
   ! fill up arrays from file
   call getSetInfo ( nnode, ncell, nedge, nbedge, cell, edge, ecell, bedge, becell, bound, x, q, qold, res, adt )
@@ -126,7 +126,7 @@ use, intrinsic :: ISO_C_BINDING
   call op_decl_dat ( cells, 4, res, p_res, resName )
   call op_decl_dat ( cells, 10, fakeInt, p_fakeInt, fakeIntName )
 
-  call op_decl_gbl ( rms, 1, p_rms )
+  call op_decl_gbl ( rms, p_rms )
 
   call op_decl_const (1, gam)
   call op_decl_const (1, gm1)
@@ -142,7 +142,7 @@ use, intrinsic :: ISO_C_BINDING
 
     ! save old flow solution
 
-    call op_par_loop_2 ( save_soln, cells, &
+    call op_par_loop_3 ( save_soln, cells, &
                        & p_q,    -1, OP_ID, OP_READ, &
 		       & p_fakeInt, -1, OP_ID, OP_RW, &
                        & p_qold, -1, OP_ID, OP_WRITE &
@@ -190,7 +190,7 @@ use, intrinsic :: ISO_C_BINDING
 
       ! update flow field
       
-      rms(1) = 0.0
+      rms = 0.0
 
       call op_par_loop_5 ( update, cells, &
                          & p_qold, -1, OP_ID,  OP_READ,  &
@@ -204,7 +204,7 @@ use, intrinsic :: ISO_C_BINDING
     end do ! internal loop
 
     ncellr = real ( ncell )
-    rms(1) = sqrt ( rms(1) / ncellr )
+    rms = sqrt ( rms / ncellr )
 	
   end do ! external loop
 

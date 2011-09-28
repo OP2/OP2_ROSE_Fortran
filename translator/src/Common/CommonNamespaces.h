@@ -56,6 +56,7 @@ namespace OP2
     std::string const dataOnDevice = "dat_d";
     std::string const dimension = "dim";
     std::string const index = "index";
+    std::string const localOffset = "localOffset";
     std::string const moduloResult = "moduloResult";
     std::string const nbytes = "nbytes";
     std::string const numberOfColours = "numOfColours";

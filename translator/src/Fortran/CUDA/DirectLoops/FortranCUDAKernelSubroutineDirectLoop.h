@@ -21,24 +21,50 @@ class FortranCUDAKernelSubroutineDirectLoop: public FortranCUDAKernelSubroutine
 
     /*
      * ======================================================
-     * Builds the assignments of shared memory and local
-     * thread variables
+     * Builds the statements which stages in data from device
+     * memory into shared memory for the OP_DAT in this
+     * argument group
      * ======================================================
      */
-    SgBasicBlock *
-    createStageInFromDeviceMemoryToLocalThreadVariablesStatements ();
+    SgFortranDo *
+    createStageInFromDeviceMemoryToSharedMemoryStatements (
+        unsigned int OP_DAT_ArgumentGroup);
 
     /*
      * ======================================================
-     * Builds the assignments of shared memory and local
-     * thread variables
+     * Builds the statements which stages in data from shared
+     * memory into local memory for the OP_DAT in this
+     * argument group
      * ======================================================
      */
-    SgBasicBlock *
-    createStageOutFromLocalThreadVariablesToDeviceMemoryStatements ();
+    SgFortranDo *
+    createStageInFromSharedMemoryToLocalMemoryStatements (
+        unsigned int OP_DAT_ArgumentGroup);
+
+    /*
+     * ======================================================
+     * Builds the statements which stages out data from shared
+     * memory into device memory for the OP_DAT in this
+     * argument group
+     * ======================================================
+     */
+    SgFortranDo *
+    createStageOutFromSharedMemoryToDeviceMemoryStatements (
+        unsigned int OP_DAT_ArgumentGroup);
+
+    /*
+     * ======================================================
+     * Builds the statements which stages out data from local
+     * memory into shared memory for the OP_DAT in this
+     * argument group
+     * ======================================================
+     */
+    SgFortranDo *
+    createStageOutFromLocalMemoryToSharedMemoryStatements (
+        unsigned int OP_DAT_ArgumentGroup);
 
     void
-    createAutoSharedDisplacementInitialisationStatement ();
+    createAutoSharedOffsetInitialisationStatements ();
 
     void
     createThreadIDInitialisationStatement ();

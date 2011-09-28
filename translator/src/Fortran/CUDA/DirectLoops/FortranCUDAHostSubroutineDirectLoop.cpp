@@ -72,6 +72,9 @@ FortranCUDAHostSubroutineDirectLoop::createKernelFunctionCallStatement ()
   actualParameters->append_expression (buildVarRefExp (
       variableDeclarations->get (OP2::VariableNames::warpSize)));
 
+  actualParameters->append_expression (buildVarRefExp (
+      variableDeclarations->get (OP2::VariableNames::sharedMemoryOffset)));
+
   string const kernelLaunchString = kernelSubroutineName + "<<<"
       + RoseHelper::getFirstVariableName (variableDeclarations->get (
           CUDA::blocksPerGrid)) + ", " + RoseHelper::getFirstVariableName (

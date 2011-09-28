@@ -30,7 +30,10 @@ use, intrinsic :: ISO_C_BINDING
   end interface op_decl_dat
  
   interface op_decl_gbl
-     module procedure op_decl_gbl_real_8, op_decl_gbl_integer_4, op_decl_gbl_scalar_integer_4
+     module procedure op_decl_gbl_real_8, &
+     & op_decl_gbl_integer_4, &
+     & op_decl_gbl_scalar_integer_4, &
+     & op_decl_gbl_scalar_real_8
   end interface op_decl_gbl     
 
  interface op_decl_const
@@ -104,6 +107,11 @@ contains
     type(op_dat) :: data    
   end subroutine op_decl_gbl_scalar_integer_4
  
+  subroutine op_decl_gbl_scalar_real_8 ( dat, data)
+    real(8) :: dat
+    type(op_dat) :: data    
+  end subroutine op_decl_gbl_scalar_real_8
+
   ! OP_CONST declarations
 
   subroutine op_decl_const_scalar_logical ( dim, data )
