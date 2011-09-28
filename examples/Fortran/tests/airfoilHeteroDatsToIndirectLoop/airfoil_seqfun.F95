@@ -119,7 +119,7 @@ subroutine adt_calc ( x1, x2, x3, x4, q, adt ) BIND(C)
 
 end subroutine adt_calc
 
-subroutine res_calc ( x1, x2, q1, q2, adt1, adt2, res1, res2 ) BIND(C)
+subroutine res_calc ( x1, x2, q1, q2, fakeInt1, fakeInt2, adt1, adt2, res1, res2 ) BIND(C)
 
 	implicit none
 
@@ -128,6 +128,8 @@ subroutine res_calc ( x1, x2, q1, q2, adt1, adt2, res1, res2 ) BIND(C)
 	real(8), dimension(*) :: x2
 	real(8), dimension(*) :: q1
 	real(8), dimension(*) :: q2
+	integer(4), dimension(10) :: fakeInt1
+	integer(4), dimension(10) :: fakeInt2
 	real(8), dimension(*) :: adt1
 	real(8), dimension(*) :: adt2
 	real(8), dimension(*) :: res1
@@ -166,6 +168,28 @@ subroutine res_calc ( x1, x2, q1, q2, adt1, adt2, res1, res2 ) BIND(C)
 	f = 0.5 * (vol1*(q1(4)+p1)     + vol2*(q2(4)+p2)    ) + mu*(q1(4)-q2(4))
   res1(4) = res1(4) + f
   res2(4) = res2(4) - f
+
+  fakeInt1(1) = fakeInt1(1) + 1
+  fakeInt1(2) = fakeInt1(2) + 1
+  fakeInt1(3) = fakeInt1(3) + 1
+  fakeInt1(4) = fakeInt1(4) + 1
+  fakeInt1(5) = fakeInt1(5) + 1
+  fakeInt1(6) = fakeInt1(6) + 1
+  fakeInt1(7) = fakeInt1(7) + 1
+  fakeInt1(8) = fakeInt1(8) + 1
+  fakeInt1(9) = fakeInt1(9) + 1
+  fakeInt1(10) = fakeInt1(10) + 1
+
+  fakeInt2(1) = fakeInt2(1) + 1
+  fakeInt2(2) = fakeInt2(2) + 1
+  fakeInt2(3) = fakeInt2(3) + 1
+  fakeInt2(4) = fakeInt2(4) + 1
+  fakeInt2(5) = fakeInt2(5) + 1
+  fakeInt2(6) = fakeInt2(6) + 1
+  fakeInt2(7) = fakeInt2(7) + 1
+  fakeInt2(8) = fakeInt2(8) + 1
+  fakeInt2(9) = fakeInt2(9) + 1
+  fakeInt2(10) = fakeInt2(10) + 1
 
 end subroutine res_calc
 
