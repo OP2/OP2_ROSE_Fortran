@@ -151,11 +151,11 @@ FortranCUDAHostSubroutineIndirectLoop::createPlanFunctionExecutionStatements ()
    * ======================================================
    */
 
-  SgExprStatement * assignmentStatement = buildAssignStatement (
+  SgExprStatement * assignmentStatement1 = buildAssignStatement (
       buildVarRefExp (variableDeclarations->get (
           OP2::VariableNames::PlanFunction::blockOffset)), buildIntVal (0));
 
-  appendStatement (assignmentStatement, subroutineScope);
+  appendStatement (assignmentStatement1, subroutineScope);
 
   /*
    * ======================================================
@@ -209,9 +209,17 @@ FortranCUDAHostSubroutineIndirectLoop::createPlanFunctionExecutionStatements ()
 
   appendStatement (createKernelFunctionCallStatement (), loopBody);
 
-  appendStatement (buildExprStatement (
-      CUDA::createHostThreadSynchronisationCallStatement (subroutineScope)),
-      loopBody);
+  /*
+   * ======================================================
+   * Statement to synchronise the CUDA threads
+   * ======================================================
+   */
+
+  SgExprStatement * assignmentStatement2 = buildAssignStatement (
+      buildVarRefExp (variableDeclarations->get (CUDA::threadSynchRet)),
+      CUDA::createHostThreadSynchronisationCallStatement (subroutineScope));
+
+  appendStatement (assignmentStatement2, loopBody);
 
   /*
    * ======================================================
@@ -662,15 +670,8 @@ FortranCUDAHostSubroutineIndirectLoop::createStatements ()
   using SageBuilder::buildVarRefExp;
   using SageBuilder::buildBoolValExp;
   using SageBuilder::buildEqualityOp;
+  using SageBuilder::buildAssignStatement;
   using SageInterface::appendStatement;
-  using std::vector;
-
-  vector <SubroutineVariableDeclarations *> declarationSets;
-  declarationSets.push_back (moduleDeclarations->getAllDeclarations ());
-  declarationSets.push_back (variableDeclarations);
-
-  SubroutineVariableDeclarations * allDeclarations =
-      new SubroutineVariableDeclarations (declarationSets);
 
   SgEqualityOp * ifGuardExpression = buildEqualityOp (buildVarRefExp (
       moduleDeclarations->getFirstExecutionBooleanDeclaration ()),
@@ -679,10 +680,16 @@ FortranCUDAHostSubroutineIndirectLoop::createStatements ()
   SgBasicBlock * ifBody = createFirstTimeExecutionStatements ();
 
   appendStatement (createPlanFunctionParametersPreparationStatements (
-      allDeclarations, (FortranParallelLoop *) parallelLoop), ifBody);
+      (FortranParallelLoop *) parallelLoop, variableDeclarations), ifBody);
 
-  appendStatement (createPlanFunctionCallStatement (allDeclarations,
-      subroutineScope), ifBody);
+  SgFunctionCallExp * planFunctionCallExpression =
+      createPlanFunctionCallExpression (subroutineScope, variableDeclarations);
+
+  SgExprStatement * assignmentStatement1 = buildAssignStatement (
+      buildVarRefExp (moduleDeclarations->getCPlanReturnDeclaration ()),
+      planFunctionCallExpression);
+
+  appendStatement (assignmentStatement1, ifBody);
 
   SgIfStmt * ifStatement =
       RoseStatementsAndExpressionsBuilder::buildIfStatementWithEmptyElse (
@@ -697,12 +704,22 @@ FortranCUDAHostSubroutineIndirectLoop::createStatements ()
     createReductionPrologueStatements ();
   }
 
-  appendStatement (createConvertPositionInPMapsStatements (allDeclarations,
-      (FortranParallelLoop *) parallelLoop, subroutineScope), subroutineScope);
+  SgStatement * callStatement1 =
+      SubroutineCalls::Fortran::createCToFortranPointerCallStatement (
+          subroutineScope, buildVarRefExp (
+              moduleDeclarations->getCPlanReturnDeclaration ()),
+          buildVarRefExp (variableDeclarations->get (
+              OP2::VariableNames::PlanFunction::actualPlan)));
+
+  appendStatement (callStatement1, subroutineScope);
+
+  appendStatement (createConvertPositionInPMapsStatements (
+      (FortranParallelLoop *) parallelLoop, subroutineScope,
+      variableDeclarations), subroutineScope);
 
   appendStatement (createConvertPlanFunctionParametersStatements (
-      allDeclarations, (FortranParallelLoop *) parallelLoop, subroutineScope),
-      subroutineScope);
+      (FortranParallelLoop *) parallelLoop, subroutineScope,
+      variableDeclarations), subroutineScope);
 
   createVariablesSizesInitialisationStatements ();
 
@@ -739,9 +756,9 @@ FortranCUDAHostSubroutineIndirectLoop::FortranCUDAHostSubroutineIndirectLoop (
     std::string const & subroutineName, std::string const & userSubroutineName,
     std::string const & kernelSubroutineName,
     FortranParallelLoop * parallelLoop, SgScopeStatement * moduleScope,
-    FortranCUDADataSizesDeclarationIndirectLoop * dataSizesDeclaration,
+    FortranCUDAOpDatCardinalitiesDeclarationIndirectLoop * dataSizesDeclaration,
     FortranOpDatDimensionsDeclaration * opDatDimensionsDeclaration,
-    FortranCUDAModuleDeclarationsIndirectLoop * moduleDeclarations) :
+    FortranCUDAModuleDeclarations * moduleDeclarations) :
   FortranCUDAHostSubroutine (subroutineName, userSubroutineName,
       kernelSubroutineName, parallelLoop, moduleScope, dataSizesDeclaration,
       opDatDimensionsDeclaration, moduleDeclarations)

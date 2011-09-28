@@ -103,6 +103,14 @@ class ParallelLoop
      */
     std::vector <Reduction *> reductionsNeeded;
 
+    /*
+     * ======================================================
+     * The name of the user kernel associated with this
+     * parallel loop
+     * ======================================================
+     */
+    std::string userSubroutineName;
+
   protected:
 
     ParallelLoop (SgFunctionCallExp * functionCallExpression);
@@ -347,6 +355,9 @@ class ParallelLoop
 
     void
     getReductionsNeeded (std::vector <Reduction *> & reductions);
+
+    std::string
+    getUserSubroutineName ();
 };
 
 #endif

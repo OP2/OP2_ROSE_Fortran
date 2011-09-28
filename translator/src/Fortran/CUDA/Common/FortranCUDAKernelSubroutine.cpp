@@ -42,7 +42,7 @@ FortranCUDAKernelSubroutine::buildOpGlobalActualParameterExpression (
       Debug::getInstance ()->debugMessage ("OP_GBL with read access (Array)",
           Debug::HIGHEST_DEBUG_LEVEL, __FILE__, __LINE__);
 
-      string const variableName = OP2::VariableNames::getOpDatSizeName (
+      string const variableName = OP2::VariableNames::getOpDatCardinalityName (
           OP_DAT_ArgumentGroup);
 
       SgDotExp * dotExpression = buildDotExp (buildVarRefExp (
@@ -372,6 +372,23 @@ FortranCUDAKernelSubroutine::createAutoSharedDeclarations ()
                   subroutineScope, 1, SHARED));
 
           autosharedNames.push_back (autosharedVariableName);
+
+          string const autosharedOffsetVariableName =
+              OP2::VariableNames::getAutosharedOffsetDeclarationName (
+                  parallelLoop->getOpDatBaseType (i),
+                  parallelLoop->getSizeOfOpDat (i));
+
+          Debug::getInstance ()->debugMessage (
+              "Creating autoshared offset declaration with name '"
+                  + autosharedOffsetVariableName + "' for OP_DAT '"
+                  + parallelLoop->getOpDatVariableName (i) + "'",
+              Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+
+          variableDeclarations->add (
+              autosharedOffsetVariableName,
+              FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
+                  autosharedOffsetVariableName,
+                  FortranTypesBuilder::getFourByteInteger (), subroutineScope));
         }
       }
     }
@@ -382,7 +399,7 @@ FortranCUDAKernelSubroutine::FortranCUDAKernelSubroutine (
     std::string const & subroutineName, std::string const & userSubroutineName,
     FortranParallelLoop * parallelLoop, SgScopeStatement * moduleScope,
     FortranReductionSubroutines * reductionSubroutines,
-    FortranCUDADataSizesDeclaration * dataSizesDeclaration,
+    FortranCUDAOpDatCardinalitiesDeclaration * dataSizesDeclaration,
     FortranOpDatDimensionsDeclaration * opDatDimensionsDeclaration,
     FortranCUDAModuleDeclarations * moduleDeclarations) :
   FortranKernelSubroutine (subroutineName, userSubroutineName, parallelLoop,

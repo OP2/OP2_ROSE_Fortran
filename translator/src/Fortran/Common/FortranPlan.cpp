@@ -8,8 +8,8 @@
 
 SgBasicBlock *
 FortranPlan::createConvertPlanFunctionParametersStatements (
-    SubroutineVariableDeclarations * variableDeclarations,
-    FortranParallelLoop * parallelLoop, SgScopeStatement * subroutineScope)
+    FortranParallelLoop * parallelLoop, SgScopeStatement * subroutineScope,
+    SubroutineVariableDeclarations * variableDeclarations)
 {
   using SageBuilder::buildBasicBlock;
   using SageBuilder::buildMultiplyOp;
@@ -372,8 +372,8 @@ FortranPlan::createConvertPlanFunctionParametersStatements (
 
 SgBasicBlock *
 FortranPlan::createConvertPositionInPMapsStatements (
-    SubroutineVariableDeclarations * variableDeclarations,
-    FortranParallelLoop * parallelLoop, SgScopeStatement * subroutineScope)
+    FortranParallelLoop * parallelLoop, SgScopeStatement * subroutineScope,
+    SubroutineVariableDeclarations * variableDeclarations)
 {
   using SageBuilder::buildBasicBlock;
   using SageBuilder::buildIntVal;
@@ -390,21 +390,6 @@ FortranPlan::createConvertPositionInPMapsStatements (
       Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
   SgBasicBlock * block = buildBasicBlock ();
-
-  /*
-   * ======================================================
-   * New C-To-Fortran pointer conversion call
-   * ======================================================
-   */
-
-  SgStatement * callStatementA =
-      SubroutineCalls::Fortran::createCToFortranPointerCallStatement (
-          subroutineScope, buildVarRefExp (variableDeclarations->get (
-              OP2::VariableNames::PlanFunction::planRet)), buildVarRefExp (
-              variableDeclarations->get (
-                  OP2::VariableNames::PlanFunction::actualPlan)));
-
-  appendStatement (callStatementA, block);
 
   /*
    * ======================================================
@@ -532,8 +517,8 @@ FortranPlan::createConvertPositionInPMapsStatements (
 
 SgBasicBlock *
 FortranPlan::createPlanFunctionParametersPreparationStatements (
-    SubroutineVariableDeclarations * variableDeclarations,
-    FortranParallelLoop * parallelLoop)
+    FortranParallelLoop * parallelLoop,
+    SubroutineVariableDeclarations * variableDeclarations)
 {
   using SageBuilder::buildBasicBlock;
   using SageBuilder::buildVarRefExp;
@@ -744,16 +729,14 @@ FortranPlan::createPlanFunctionParametersPreparationStatements (
   return block;
 }
 
-SgBasicBlock *
-FortranPlan::createPlanFunctionCallStatement (
-    SubroutineVariableDeclarations * variableDeclarations,
-    SgScopeStatement * subroutineScope)
+SgFunctionCallExp *
+FortranPlan::createPlanFunctionCallExpression (
+    SgScopeStatement * subroutineScope,
+    SubroutineVariableDeclarations * variableDeclarations)
 {
-  using SageBuilder::buildBasicBlock;
   using SageBuilder::buildExprListExp;
   using SageBuilder::buildVarRefExp;
   using SageBuilder::buildFunctionCallExp;
-  using SageBuilder::buildAssignStatement;
   using SageBuilder::buildOpaqueVarRefExp;
   using SageBuilder::buildDotExp;
   using SageInterface::appendStatement;
@@ -761,14 +744,12 @@ FortranPlan::createPlanFunctionCallStatement (
   Debug::getInstance ()->debugMessage ("Creating plan function call statement",
       Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
-  SgBasicBlock * block = buildBasicBlock ();
-
   SgVarRefExp * parameter1 = buildVarRefExp (variableDeclarations->get (
       OP2::VariableNames::getUserSubroutineName ()));
 
   SgDotExp * parameter2 = buildDotExp (buildVarRefExp (
       variableDeclarations->get (OP2::VariableNames::getOpSetName ())),
-      buildOpaqueVarRefExp (OP2::VariableNames::index, block));
+      buildOpaqueVarRefExp (OP2::VariableNames::index, subroutineScope));
 
   SgVarRefExp * parameter3 = buildVarRefExp (variableDeclarations->get (
       OP2::VariableNames::PlanFunction::argsNumber));
@@ -802,11 +783,5 @@ FortranPlan::createPlanFunctionCallStatement (
   SgFunctionCallExp * functionCall = buildFunctionCallExp (functionSymbol,
       actualParameters);
 
-  SgExprStatement * assignmentStatement = buildAssignStatement (buildVarRefExp (
-      variableDeclarations->get (OP2::VariableNames::PlanFunction::planRet)),
-      functionCall);
-
-  appendStatement (assignmentStatement, block);
-
-  return block;
+  return functionCall;
 }

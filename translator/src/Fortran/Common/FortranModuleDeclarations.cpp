@@ -1,10 +1,12 @@
 #include <FortranModuleDeclarations.h>
+#include <FortranStatementsAndExpressionsBuilder.h>
+#include <FortranTypesBuilder.h>
 #include <Debug.h>
 #include <CommonNamespaces.h>
 
 /*
  * ======================================================
- * Protected functions
+ * Private functions
  * ======================================================
  */
 
@@ -24,7 +26,7 @@ FortranModuleDeclarations::createFirstExecutionBooleanDeclaration ()
 
   std::string const & variableName =
       OP2::VariableNames::getFirstTimeExecutionVariableDeclarationName (
-          userSubroutineName);
+          parallelLoop->getUserSubroutineName ());
 
   SgVariableDeclaration * variableDeclaration = buildVariableDeclaration (
       variableName, buildBoolType (), buildAssignInitializer (buildBoolValExp (
@@ -37,15 +39,41 @@ FortranModuleDeclarations::createFirstExecutionBooleanDeclaration ()
   appendStatement (variableDeclaration, moduleScope);
 }
 
+void
+FortranModuleDeclarations::createCPlanReturnDeclaration ()
+{
+  using std::string;
+
+  SgType * c_ptrType = FortranTypesBuilder::buildClassDeclaration ("c_ptr",
+      moduleScope)->get_type ();
+
+  std::string const & variableName =
+      OP2::VariableNames::getPlanReturnVariableDeclarationName (
+          parallelLoop->getUserSubroutineName ());
+
+  variableDeclarations->add (variableName,
+      FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
+          variableName, c_ptrType, moduleScope));
+}
+
+/*
+ * ======================================================
+ * Protected functions
+ * ======================================================
+ */
+
 FortranModuleDeclarations::FortranModuleDeclarations (
-    std::string const & userSubroutineName, FortranParallelLoop * parallelLoop,
-    SgScopeStatement * moduleScope) :
-  userSubroutineName (userSubroutineName), parallelLoop (parallelLoop),
-      moduleScope (moduleScope)
+    FortranParallelLoop * parallelLoop, SgScopeStatement * moduleScope) :
+  parallelLoop (parallelLoop), moduleScope (moduleScope)
 {
   variableDeclarations = new SubroutineVariableDeclarations ();
 
   createFirstExecutionBooleanDeclaration ();
+
+  if (parallelLoop->isDirectLoop () == false)
+  {
+    createCPlanReturnDeclaration ();
+  }
 }
 
 /*
@@ -55,11 +83,19 @@ FortranModuleDeclarations::FortranModuleDeclarations (
  */
 
 SgVariableDeclaration *
+FortranModuleDeclarations::getCPlanReturnDeclaration ()
+{
+  return variableDeclarations->get (
+      OP2::VariableNames::getPlanReturnVariableDeclarationName (
+          parallelLoop->getUserSubroutineName ()));
+}
+
+SgVariableDeclaration *
 FortranModuleDeclarations::getFirstExecutionBooleanDeclaration ()
 {
   std::string const & variableName =
       OP2::VariableNames::getFirstTimeExecutionVariableDeclarationName (
-          userSubroutineName);
+          parallelLoop->getUserSubroutineName ());
 
   return variableDeclarations->get (variableName);
 }
@@ -70,7 +106,7 @@ FortranModuleDeclarations::getReductionArrayHostDeclaration (
 {
   return variableDeclarations->get (
       OP2::VariableNames::getReductionArrayHostName (OP_DAT_ArgumentGroup,
-          userSubroutineName));
+          parallelLoop->getUserSubroutineName ()));
 }
 
 SgVariableDeclaration *
@@ -79,7 +115,7 @@ FortranModuleDeclarations::getReductionArrayDeviceDeclaration (
 {
   return variableDeclarations->get (
       OP2::VariableNames::getReductionArrayDeviceName (OP_DAT_ArgumentGroup,
-          userSubroutineName));
+          parallelLoop->getUserSubroutineName ()));
 }
 
 SgVariableDeclaration *

@@ -40,8 +40,7 @@ FortranOpenMPModuleDeclarations::createOpDatDeclarations ()
 }
 
 FortranOpenMPModuleDeclarations::FortranOpenMPModuleDeclarations (
-    std::string const & userSubroutineName, FortranParallelLoop * parallelLoop,
-    SgScopeStatement * moduleScope) :
-  FortranModuleDeclarations (userSubroutineName, parallelLoop, moduleScope)
+    FortranParallelLoop * parallelLoop, SgScopeStatement * moduleScope) :
+  FortranModuleDeclarations (parallelLoop, moduleScope)
 {
 }

@@ -57,7 +57,7 @@ FortranOpDatDimensionsDeclaration::addTypeDeclaration ()
   using SageInterface::appendStatement;
 
   typeStatement = RoseStatementsAndExpressionsBuilder::buildTypeDeclaration (
-      subroutineName + "_opDatDimensions", moduleScope);
+      parallelLoop->getUserSubroutineName () + "_opDatDimensions", moduleScope);
 
   typeStatement->get_declarationModifier ().get_accessModifier ().setUndefined ();
 
@@ -85,10 +85,8 @@ FortranOpDatDimensionsDeclaration::getOpDatDimensionField (
 }
 
 FortranOpDatDimensionsDeclaration::FortranOpDatDimensionsDeclaration (
-    std::string const & subroutineName, FortranParallelLoop * parallelLoop,
-    SgScopeStatement * moduleScope) :
-  subroutineName (subroutineName), parallelLoop (parallelLoop), moduleScope (
-      moduleScope)
+    FortranParallelLoop * parallelLoop, SgScopeStatement * moduleScope) :
+  parallelLoop (parallelLoop), moduleScope (moduleScope)
 {
   Debug::getInstance ()->debugMessage (
       "Creating OP_DAT dimensions type declaration", Debug::CONSTRUCTOR_LEVEL,

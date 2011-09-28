@@ -614,16 +614,8 @@ CPPOpenCLHostSubroutineIndirectLoop::createStatements ()
   using SageBuilder::buildBoolValExp;
   using SageBuilder::buildEqualityOp;
   using SageInterface::appendStatement;
-  using std::vector;
 
   SgExprStatement * tempStatement = NULL;
-
-  vector <SubroutineVariableDeclarations *> declarationSets;
-  declarationSets.push_back (moduleDeclarations->getAllDeclarations ());
-  declarationSets.push_back (variableDeclarations); //FIXME
-
-  SubroutineVariableDeclarations * allDeclarations =
-      new SubroutineVariableDeclarations (declarationSets);
 
   SgEqualityOp * ifGuardExpression = buildEqualityOp (buildVarRefExp (
       moduleDeclarations->getFirstExecutionBooleanDeclaration ()),
@@ -632,10 +624,10 @@ CPPOpenCLHostSubroutineIndirectLoop::createStatements ()
   SgBasicBlock * ifBody = buildBasicBlock (); //createFirstTimeExecutionStatements ();
 
   appendStatement (createPlanFunctionParametersPreparationStatements (
-      allDeclarations, (CPPParallelLoop *) parallelLoop), ifBody);
+      (CPPParallelLoop *) parallelLoop, variableDeclarations), ifBody);
 
-  appendStatement (createPlanFunctionCallStatement (allDeclarations,
-      subroutineScope), ifBody);
+  SgFunctionCallExp * planFunctionCallExpression =
+      createPlanFunctionCallExpression (subroutineScope, variableDeclarations);
 
   //appendStatement (createInitialiseConstantsCallStatement (), ifBody);
 

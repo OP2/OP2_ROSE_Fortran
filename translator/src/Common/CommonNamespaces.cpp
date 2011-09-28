@@ -67,12 +67,13 @@ OP2::VariableNames::getOpDatSharedName (unsigned int OP_DAT_ArgumentGroup)
 }
 
 std::string
-OP2::VariableNames::getOpDatSizeName (unsigned int OP_DAT_ArgumentGroup)
+OP2::VariableNames::getOpDatCardinalityName (unsigned int OP_DAT_ArgumentGroup)
 {
   using boost::lexical_cast;
   using std::string;
 
-  return OpDatPrefix + lexical_cast <string> (OP_DAT_ArgumentGroup) + Size;
+  return OpDatPrefix + lexical_cast <string> (OP_DAT_ArgumentGroup)
+      + "Cardinality";
 }
 
 std::string
@@ -266,6 +267,34 @@ OP2::VariableNames::getAutosharedDeclarationName (SgType * type,
     case V_SgTypeFloat:
     {
       return autoshared + "Float" + lexical_cast <string> (size);
+    }
+    default:
+    {
+      Debug::getInstance ()->errorMessage (
+          "Unsupported type for autoshared variable: '" + type->class_name ()
+              + "'", __FILE__, __LINE__);
+    }
+  }
+}
+
+std::string
+OP2::VariableNames::getAutosharedOffsetDeclarationName (SgType * type,
+    unsigned int size)
+{
+  using boost::lexical_cast;
+  using std::string;
+
+  std::string const autosharedOffset = "sharedOffset";
+
+  switch (type->variantT ())
+  {
+    case V_SgTypeInt:
+    {
+      return autosharedOffset + "Integer" + lexical_cast <string> (size);
+    }
+    case V_SgTypeFloat:
+    {
+      return autosharedOffset + "Float" + lexical_cast <string> (size);
     }
     default:
     {

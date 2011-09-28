@@ -86,8 +86,7 @@ FortranOpenMPSubroutinesGeneration::createModuleDeclarations ()
     FortranParallelLoop * parallelLoop = it->second;
 
     dimensionsDeclarations[userSubroutineName]
-        = new FortranOpDatDimensionsDeclaration (userSubroutineName,
-            parallelLoop, moduleScope);
+        = new FortranOpDatDimensionsDeclaration (parallelLoop, moduleScope);
   }
 
   /*
@@ -107,14 +106,14 @@ FortranOpenMPSubroutinesGeneration::createModuleDeclarations ()
     if (parallelLoop->isDirectLoop ())
     {
       moduleDeclarations[userSubroutineName]
-          = new FortranOpenMPModuleDeclarationsDirectLoop (userSubroutineName,
-              parallelLoop, moduleScope);
+          = new FortranOpenMPModuleDeclarationsDirectLoop (parallelLoop,
+              moduleScope);
     }
     else
     {
       moduleDeclarations[userSubroutineName]
-          = new FortranOpenMPModuleDeclarationsIndirectLoop (
-              userSubroutineName, parallelLoop, moduleScope);
+          = new FortranOpenMPModuleDeclarationsIndirectLoop (parallelLoop,
+              moduleScope);
     }
   }
 }

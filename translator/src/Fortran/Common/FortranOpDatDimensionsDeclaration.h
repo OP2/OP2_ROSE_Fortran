@@ -16,12 +16,6 @@
 class FortranOpDatDimensionsDeclaration
 {
   private:
-    /*
-     * ======================================================
-     * The subroutine name
-     * ======================================================
-     */
-    std::string subroutineName;
 
     /*
      * ======================================================
@@ -79,8 +73,8 @@ class FortranOpDatDimensionsDeclaration
     SgVariableDeclaration *
     getOpDatDimensionField (unsigned int OP_DAT_ArgumentGroup);
 
-    FortranOpDatDimensionsDeclaration (std::string const & subroutineName,
-        FortranParallelLoop * parallelLoop, SgScopeStatement * moduleScope);
+    FortranOpDatDimensionsDeclaration (FortranParallelLoop * parallelLoop,
+        SgScopeStatement * moduleScope);
 };
 
 #endif

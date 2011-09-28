@@ -1,5 +1,4 @@
 #include <FortranCUDASubroutinesGeneration.h>
-#include <FortranCUDAModuleDeclarationsIndirectLoop.h>
 #include <FortranCUDAKernelSubroutineDirectLoop.h>
 #include <FortranCUDAKernelSubroutineIndirectLoop.h>
 #include <FortranCUDAHostSubroutineDirectLoop.h>
@@ -135,7 +134,7 @@ FortranCUDASubroutinesGeneration::createSubroutines ()
               parallelLoop,
               moduleScope,
               reductionSubroutines,
-              dataSizesDeclarations[userSubroutineName],
+              cardinalitiesDeclarations[userSubroutineName],
               dimensionsDeclarations[userSubroutineName],
               static_cast <FortranCUDAModuleDeclarations *> (moduleDeclarations[userSubroutineName]));
 
@@ -146,7 +145,7 @@ FortranCUDASubroutinesGeneration::createSubroutines ()
               kernelSubroutine->getSubroutineName (),
               parallelLoop,
               moduleScope,
-              dataSizesDeclarations[userSubroutineName],
+              cardinalitiesDeclarations[userSubroutineName],
               dimensionsDeclarations[userSubroutineName],
               static_cast <FortranCUDAModuleDeclarations *> (moduleDeclarations[userSubroutineName]));
     }
@@ -159,7 +158,7 @@ FortranCUDASubroutinesGeneration::createSubroutines ()
               parallelLoop,
               moduleScope,
               reductionSubroutines,
-              static_cast <FortranCUDADataSizesDeclarationIndirectLoop *> (dataSizesDeclarations[userSubroutineName]),
+              static_cast <FortranCUDAOpDatCardinalitiesDeclarationIndirectLoop *> (cardinalitiesDeclarations[userSubroutineName]),
               dimensionsDeclarations[userSubroutineName],
               static_cast <FortranCUDAModuleDeclarations *> (moduleDeclarations[userSubroutineName]));
 
@@ -170,9 +169,9 @@ FortranCUDASubroutinesGeneration::createSubroutines ()
               kernelSubroutine->getSubroutineName (),
               parallelLoop,
               moduleScope,
-              static_cast <FortranCUDADataSizesDeclarationIndirectLoop *> (dataSizesDeclarations[userSubroutineName]),
+              static_cast <FortranCUDAOpDatCardinalitiesDeclarationIndirectLoop *> (cardinalitiesDeclarations[userSubroutineName]),
               dimensionsDeclarations[userSubroutineName],
-              static_cast <FortranCUDAModuleDeclarationsIndirectLoop *> (moduleDeclarations[userSubroutineName]));
+              static_cast <FortranCUDAModuleDeclarations *> (moduleDeclarations[userSubroutineName]));
     }
   }
 }
@@ -201,20 +200,19 @@ FortranCUDASubroutinesGeneration::createModuleDeclarations ()
     FortranParallelLoop * parallelLoop = it->second;
 
     dimensionsDeclarations[userSubroutineName]
-        = new FortranOpDatDimensionsDeclaration (userSubroutineName,
-            parallelLoop, moduleScope);
+        = new FortranOpDatDimensionsDeclaration (parallelLoop, moduleScope);
 
     if (parallelLoop->isDirectLoop ())
     {
-      dataSizesDeclarations[userSubroutineName]
-          = new FortranCUDADataSizesDeclaration (userSubroutineName,
-              parallelLoop, moduleScope);
+      cardinalitiesDeclarations[userSubroutineName]
+          = new FortranCUDAOpDatCardinalitiesDeclaration (parallelLoop,
+              moduleScope);
     }
     else
     {
-      dataSizesDeclarations[userSubroutineName]
-          = new FortranCUDADataSizesDeclarationIndirectLoop (
-              userSubroutineName, parallelLoop, moduleScope);
+      cardinalitiesDeclarations[userSubroutineName]
+          = new FortranCUDAOpDatCardinalitiesDeclarationIndirectLoop (
+              parallelLoop, moduleScope);
     }
   }
 
@@ -235,24 +233,10 @@ FortranCUDASubroutinesGeneration::createModuleDeclarations ()
 
     FortranParallelLoop * parallelLoop = it->second;
 
-    if (parallelLoop->isDirectLoop ())
-    {
-      moduleDeclarations[userSubroutineName]
-          = new FortranCUDAModuleDeclarations (userSubroutineName,
-              parallelLoop, moduleScope,
-              dataSizesDeclarations[userSubroutineName],
-              dimensionsDeclarations[userSubroutineName]);
-    }
-    else
-    {
-      moduleDeclarations[userSubroutineName]
-          = new FortranCUDAModuleDeclarationsIndirectLoop (
-              userSubroutineName,
-              parallelLoop,
-              moduleScope,
-              static_cast <FortranCUDADataSizesDeclarationIndirectLoop *> (dataSizesDeclarations[userSubroutineName]),
-              dimensionsDeclarations[userSubroutineName]);
-    }
+    moduleDeclarations[userSubroutineName] = new FortranCUDAModuleDeclarations (
+        parallelLoop, moduleScope,
+        cardinalitiesDeclarations[userSubroutineName],
+        dimensionsDeclarations[userSubroutineName]);
   }
 
   /*

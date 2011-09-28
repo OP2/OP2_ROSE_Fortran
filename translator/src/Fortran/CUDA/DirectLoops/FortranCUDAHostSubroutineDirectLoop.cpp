@@ -197,7 +197,25 @@ FortranCUDAHostSubroutineDirectLoop::createCUDAKernelInitialisationStatements ()
 
   appendStatement (assignmentStatement4, subroutineScope);
 
-  SgExpression * multiplyExpression6 = buildMultiplyOp (buildVarRefExp (
+  /*
+   * ======================================================
+   * Initialise the offset into shared memory to <shared
+   * memory size> * <warp size>
+   * ======================================================
+   */
+
+  SgMultiplyOp * multiplyExpression5 =
+      buildMultiplyOp (buildVarRefExp (variableDeclarations->get (
+          CUDA::sharedMemorySize)), buildOpaqueVarRefExp (
+          OP2::VariableNames::warpSizeMacro, subroutineScope));
+
+  SgExprStatement * assignmentStatement5 = buildAssignStatement (
+      buildVarRefExp (variableDeclarations->get (
+          OP2::VariableNames::sharedMemoryOffset)), multiplyExpression5);
+
+  appendStatement (assignmentStatement5, subroutineScope);
+
+  SgMultiplyOp * multiplyExpression6 = buildMultiplyOp (buildVarRefExp (
       variableDeclarations->get (CUDA::sharedMemorySize)), buildVarRefExp (
       variableDeclarations->get (CUDA::threadsPerBlock)));
 
@@ -214,6 +232,11 @@ FortranCUDAHostSubroutineDirectLoop::createCUDAKernelLocalVariableDeclarationsFo
   Debug::getInstance ()->debugMessage (
       "Creating CUDA configuration parameters", Debug::FUNCTION_LEVEL,
       __FILE__, __LINE__);
+
+  variableDeclarations->add (OP2::VariableNames::sharedMemoryOffset,
+      FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
+          OP2::VariableNames::sharedMemoryOffset,
+          FortranTypesBuilder::getFourByteInteger (), subroutineScope));
 
   variableDeclarations->add (OP2::VariableNames::warpSize,
       FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
@@ -297,7 +320,7 @@ FortranCUDAHostSubroutineDirectLoop::FortranCUDAHostSubroutineDirectLoop (
     std::string const & subroutineName, std::string const & userSubroutineName,
     std::string const & kernelSubroutineName,
     FortranParallelLoop * parallelLoop, SgScopeStatement * moduleScope,
-    FortranCUDADataSizesDeclaration * dataSizesDeclaration,
+    FortranCUDAOpDatCardinalitiesDeclaration * dataSizesDeclaration,
     FortranOpDatDimensionsDeclaration * opDatDimensionsDeclaration,
     FortranCUDAModuleDeclarations * moduleDeclarations) :
   FortranCUDAHostSubroutine (subroutineName, userSubroutineName,

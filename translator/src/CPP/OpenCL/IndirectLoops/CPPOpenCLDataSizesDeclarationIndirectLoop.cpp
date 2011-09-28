@@ -23,7 +23,7 @@ CPPOpenCLDataSizesDeclarationIndirectLoop::addFields ()
     if (parallelLoop->isDuplicateOpDat (i) == false
         && parallelLoop->isIndirect (i))
     {
-      string const variableName = OP2::VariableNames::getOpDatSizeName (i);
+      string const variableName = OP2::VariableNames::getOpDatCardinalityName (i);
 
       SgVariableDeclaration * fieldDeclaration = buildVariableDeclaration (
           variableName, buildIntType (), NULL, moduleScope);
@@ -81,7 +81,7 @@ CPPOpenCLDataSizesDeclarationIndirectLoop::addFields ()
     if (parallelLoop->isDuplicateOpDat (i) == false && (parallelLoop->isDirect (
         i) || parallelLoop->isGlobal (i)))
     {
-      string const variableName = OP2::VariableNames::getOpDatSizeName (i);
+      string const variableName = OP2::VariableNames::getOpDatCardinalityName (i);
 
       SgVariableDeclaration * fieldDeclaration = buildVariableDeclaration (
           variableName, buildIntType (), NULL, moduleScope);

@@ -34,7 +34,6 @@ class FortranOpenMPModuleDeclarationsIndirectLoop: public FortranOpenMPModuleDec
     getPlanFunctionDeclaration (std::string const & variableName);
 
     FortranOpenMPModuleDeclarationsIndirectLoop (
-        std::string const & userSubroutineName,
         FortranParallelLoop * parallelLoop, SgScopeStatement * moduleScope);
 
 };

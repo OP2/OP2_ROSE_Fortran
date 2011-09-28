@@ -17,8 +17,8 @@ class FortranCUDASubroutinesGeneration: public FortranSubroutinesGeneration
 
   private:
 
-    std::map <std::string, FortranCUDADataSizesDeclaration *>
-        dataSizesDeclarations;
+    std::map <std::string, FortranCUDAOpDatCardinalitiesDeclaration *>
+        cardinalitiesDeclarations;
 
   private:
 

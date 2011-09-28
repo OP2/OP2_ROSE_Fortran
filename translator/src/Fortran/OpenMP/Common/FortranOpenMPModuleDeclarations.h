@@ -10,8 +10,8 @@ class FortranOpenMPModuleDeclarations: public FortranModuleDeclarations
     void
     createOpDatDeclarations ();
 
-    FortranOpenMPModuleDeclarations (std::string const & userSubroutineName,
-        FortranParallelLoop * parallelLoop, SgScopeStatement * moduleScope);
+    FortranOpenMPModuleDeclarations (FortranParallelLoop * parallelLoop,
+        SgScopeStatement * moduleScope);
 };
 
 #endif

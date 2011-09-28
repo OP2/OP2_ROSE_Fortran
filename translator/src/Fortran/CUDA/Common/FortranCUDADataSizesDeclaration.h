@@ -1,17 +1,14 @@
 /*
  * Written by Adam Betts and Carlo Bertolli
  *
- * This class models a variable declaration: it includes
- * fields for the sizes of data passed to the device.
- * These sizes are needed in Fortran to prevent segmentation
- * faults.
+ * This class models a type declaration in Fortran.
  *
- * These sizes must be passed in a struct-like data
- * structure as the number of kernel parameters can be become
- * unwieldly. In these cases, the code might not compile
- * with current-generation CUDA compilers due to the number of
- * parameters, so the solution is to instead pack them into
- * a struct
+ * The type declaration includes a field to store the
+ * cardinality of each OP_DAT. The cardinality of an OP_DAT
+ * equals <OP_SET size> * <dimension of OP_DAT>.
+ *
+ * These cardinalities are needed in Fortran to prevent
+ * segmentation faults
  */
 
 #ifndef FORTRAN_CUDA_DATA_SIZES_DECLARATION_H
@@ -20,7 +17,7 @@
 #include <FortranParallelLoop.h>
 #include <SubroutineVariableDeclarations.h>
 
-class FortranCUDADataSizesDeclaration
+class FortranCUDAOpDatCardinalitiesDeclaration
 {
   protected:
 
@@ -56,7 +53,7 @@ class FortranCUDADataSizesDeclaration
   protected:
 
     void
-    addDataSizesFields ();
+    addFields ();
 
   public:
 
@@ -76,7 +73,7 @@ class FortranCUDADataSizesDeclaration
     SubroutineVariableDeclarations *
     getFieldDeclarations ();
 
-    FortranCUDADataSizesDeclaration (std::string const & subroutineName,
+    FortranCUDAOpDatCardinalitiesDeclaration (
         FortranParallelLoop * parallelLoop, SgScopeStatement * moduleScope);
 };
 

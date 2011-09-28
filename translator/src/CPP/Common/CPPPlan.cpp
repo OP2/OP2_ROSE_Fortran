@@ -2,30 +2,25 @@
 
 SgBasicBlock *
 CPPPlan::createPlanFunctionParametersPreparationStatements (
-    SubroutineVariableDeclarations * variableDeclarations,
-    CPPParallelLoop * parallelLoop)
+    CPPParallelLoop * parallelLoop,
+    SubroutineVariableDeclarations * variableDeclarations)
 {
   //FIXME 
   return NULL;
 
 }
 
-SgBasicBlock *
-CPPPlan::createPlanFunctionCallStatement (
-    SubroutineVariableDeclarations * variableDeclarations,
-    SgScopeStatement * subroutineScope)
+SgFunctionCallExp *
+CPPPlan::createPlanFunctionCallExpression (SgScopeStatement * subroutineScope,
+    SubroutineVariableDeclarations * variableDeclarations)
 {
-  using SageBuilder::buildBasicBlock;
   using SageBuilder::buildVarRefExp;
   using SageBuilder::buildDotExp;
   using SageBuilder::buildExprListExp;
-  using SageBuilder::buildAssignStatement;
   using SageBuilder::buildFunctionCallExp;
   using SageBuilder::buildOpaqueVarRefExp;
   using SageBuilder::buildVoidType;
   using SageInterface::appendStatement;
-
-  SgBasicBlock * block = buildBasicBlock ();
 
   SgVarRefExp * parameter1 = buildVarRefExp (variableDeclarations->get (
       OP2::VariableNames::getUserSubroutineName ()));
@@ -33,7 +28,7 @@ CPPPlan::createPlanFunctionCallStatement (
   SgDotExp * parameter2 = buildDotExp ( //TODO: set
       buildVarRefExp (variableDeclarations->get (
           OP2::VariableNames::getOpSetName ())), buildOpaqueVarRefExp (
-          OP2::VariableNames::index, block));
+          OP2::VariableNames::index, subroutineScope));
 
   SgVarRefExp * parameter3 = buildVarRefExp (variableDeclarations->get (
       PlanFunction::CPP::partSize));
@@ -66,10 +61,5 @@ CPPPlan::createPlanFunctionCallStatement (
       PlanFunction::CPP::cplan, buildVoidType (), //FIXME
       actualParameters);
 
-  SgExprStatement * assignmentStatement = buildAssignStatement (buildVarRefExp (
-      variableDeclarations->get (PlanFunction::CPP::planRet)), functionCall);
-
-  appendStatement (assignmentStatement, block);
-
-  return block;
+  return functionCall;
 }

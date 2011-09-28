@@ -101,7 +101,7 @@ template <typename TDeclarations, typename THostSubroutine>
       SubroutinesGeneration (
           TDeclarations * declarations,
           std::string const & fileSuffix) :
-        declarations (declarations), 
+        declarations (declarations),
         fileSuffix (fileSuffix)
       {
       }
