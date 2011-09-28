@@ -626,8 +626,8 @@ CPPOpenCLHostSubroutineIndirectLoop::createStatements ()
   appendStatement (createPlanFunctionParametersPreparationStatements (
       (CPPParallelLoop *) parallelLoop, variableDeclarations), ifBody);
 
-  appendStatement (createPlanFunctionCallStatement (subroutineScope,
-      variableDeclarations), ifBody);
+  SgFunctionCallExp * planFunctionCallExpression =
+      createPlanFunctionCallExpression (subroutineScope, variableDeclarations);
 
   //appendStatement (createInitialiseConstantsCallStatement (), ifBody);
 

@@ -1536,14 +1536,10 @@ FortranCUDAKernelSubroutineIndirectLoop::createLocalVariableDeclarations ()
   vector <string> sharedFourByteIntegerVariables;
 
   sharedFourByteIntegerVariables.push_back (OP2::VariableNames::blockID);
-
   sharedFourByteIntegerVariables.push_back (
       OP2::VariableNames::sharedMemoryOffset);
-
   sharedFourByteIntegerVariables.push_back (OP2::VariableNames::numberOfColours);
-
   sharedFourByteIntegerVariables.push_back (OP2::VariableNames::nelems);
-
   sharedFourByteIntegerVariables.push_back (OP2::VariableNames::nelems2);
 
   for (vector <string>::const_iterator it =
@@ -1559,20 +1555,12 @@ FortranCUDAKernelSubroutineIndirectLoop::createLocalVariableDeclarations ()
   vector <string> fourByteIntegerVariables;
 
   fourByteIntegerVariables.push_back (OP2::VariableNames::colour1);
-
   fourByteIntegerVariables.push_back (OP2::VariableNames::colour2);
-
-  fourByteIntegerVariables.push_back (CommonVariableNames::iterationCounter1);
-
-  fourByteIntegerVariables.push_back (CommonVariableNames::iterationCounter2);
-
-  fourByteIntegerVariables.push_back (CommonVariableNames::upperBound);
-
   fourByteIntegerVariables.push_back (OP2::VariableNames::moduloResult);
-
-  fourByteIntegerVariables.push_back (OP2::VariableNames::moduloResult);
-
   fourByteIntegerVariables.push_back (OP2::VariableNames::nbytes);
+  fourByteIntegerVariables.push_back (CommonVariableNames::iterationCounter1);
+  fourByteIntegerVariables.push_back (CommonVariableNames::iterationCounter2);
+  fourByteIntegerVariables.push_back (CommonVariableNames::upperBound);
 
   for (vector <string>::const_iterator it = fourByteIntegerVariables.begin (); it
       != fourByteIntegerVariables.end (); ++it)

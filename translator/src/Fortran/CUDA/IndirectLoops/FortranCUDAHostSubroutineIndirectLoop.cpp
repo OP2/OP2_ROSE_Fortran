@@ -151,11 +151,11 @@ FortranCUDAHostSubroutineIndirectLoop::createPlanFunctionExecutionStatements ()
    * ======================================================
    */
 
-  SgExprStatement * assignmentStatement = buildAssignStatement (
+  SgExprStatement * assignmentStatement1 = buildAssignStatement (
       buildVarRefExp (variableDeclarations->get (
           OP2::VariableNames::PlanFunction::blockOffset)), buildIntVal (0));
 
-  appendStatement (assignmentStatement, subroutineScope);
+  appendStatement (assignmentStatement1, subroutineScope);
 
   /*
    * ======================================================
@@ -209,9 +209,17 @@ FortranCUDAHostSubroutineIndirectLoop::createPlanFunctionExecutionStatements ()
 
   appendStatement (createKernelFunctionCallStatement (), loopBody);
 
-  appendStatement (buildExprStatement (
-      CUDA::createHostThreadSynchronisationCallStatement (subroutineScope)),
-      loopBody);
+  /*
+   * ======================================================
+   * Statement to synchronise the CUDA threads
+   * ======================================================
+   */
+
+  SgExprStatement * assignmentStatement2 = buildAssignStatement (
+      buildVarRefExp (variableDeclarations->get (CUDA::threadSynchRet)),
+      CUDA::createHostThreadSynchronisationCallStatement (subroutineScope));
+
+  appendStatement (assignmentStatement2, loopBody);
 
   /*
    * ======================================================
@@ -675,16 +683,13 @@ FortranCUDAHostSubroutineIndirectLoop::createStatements ()
       (FortranParallelLoop *) parallelLoop, variableDeclarations), ifBody);
 
   SgFunctionCallExp * planFunctionCallExpression =
-      createPlanFunctionCallStatement (subroutineScope, variableDeclarations);
+      createPlanFunctionCallExpression (subroutineScope, variableDeclarations);
 
-  SgExprStatement
-      * assignmentStatement =
-          buildAssignStatement (
-              buildVarRefExp (
-                  static_cast <FortranCUDAModuleDeclarationsIndirectLoop *> (moduleDeclarations)->getCPlanDeclaration ()),
-              planFunctionCallExpression);
+  SgExprStatement * assignmentStatement1 = buildAssignStatement (
+      buildVarRefExp (moduleDeclarations->getCPlanReturnDeclaration ()),
+      planFunctionCallExpression);
 
-  appendStatement (assignmentStatement, ifBody);
+  appendStatement (assignmentStatement1, ifBody);
 
   SgIfStmt * ifStatement =
       RoseStatementsAndExpressionsBuilder::buildIfStatementWithEmptyElse (
@@ -698,6 +703,15 @@ FortranCUDAHostSubroutineIndirectLoop::createStatements ()
   {
     createReductionPrologueStatements ();
   }
+
+  SgStatement * callStatement1 =
+      SubroutineCalls::Fortran::createCToFortranPointerCallStatement (
+          subroutineScope, buildVarRefExp (
+              moduleDeclarations->getCPlanReturnDeclaration ()),
+          buildVarRefExp (variableDeclarations->get (
+              OP2::VariableNames::PlanFunction::actualPlan)));
+
+  appendStatement (callStatement1, subroutineScope);
 
   appendStatement (createConvertPositionInPMapsStatements (
       (FortranParallelLoop *) parallelLoop, subroutineScope,
@@ -744,7 +758,7 @@ FortranCUDAHostSubroutineIndirectLoop::FortranCUDAHostSubroutineIndirectLoop (
     FortranParallelLoop * parallelLoop, SgScopeStatement * moduleScope,
     FortranCUDADataSizesDeclarationIndirectLoop * dataSizesDeclaration,
     FortranOpDatDimensionsDeclaration * opDatDimensionsDeclaration,
-    FortranCUDAModuleDeclarationsIndirectLoop * moduleDeclarations) :
+    FortranCUDAModuleDeclarations * moduleDeclarations) :
   FortranCUDAHostSubroutine (subroutineName, userSubroutineName,
       kernelSubroutineName, parallelLoop, moduleScope, dataSizesDeclaration,
       opDatDimensionsDeclaration, moduleDeclarations)

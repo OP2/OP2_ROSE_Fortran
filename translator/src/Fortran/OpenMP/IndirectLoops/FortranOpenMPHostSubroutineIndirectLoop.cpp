@@ -338,17 +338,24 @@ FortranOpenMPHostSubroutineIndirectLoop::createFirstTimeExecutionStatements ()
 
   SgBasicBlock * ifBody = buildBasicBlock ();
 
-  SgExprStatement * assignmentStatement = buildAssignStatement (buildVarRefExp (
-      moduleDeclarations->getFirstExecutionBooleanDeclaration ()),
+  SgExprStatement * assignmentStatement1 = buildAssignStatement (
+      buildVarRefExp (
+          moduleDeclarations->getFirstExecutionBooleanDeclaration ()),
       buildBoolValExp (false));
 
-  appendStatement (assignmentStatement, ifBody);
+  appendStatement (assignmentStatement1, ifBody);
 
   appendStatement (createPlanFunctionParametersPreparationStatements (
       (FortranParallelLoop *) parallelLoop, variableDeclarations), ifBody);
 
-  appendStatement (createPlanFunctionCallStatement (subroutineScope,
-      variableDeclarations, moduleDeclarations->getAllDeclarations ()), ifBody);
+  SgFunctionCallExp * planFunctionCallExpression =
+      createPlanFunctionCallExpression (subroutineScope, variableDeclarations);
+
+  SgExprStatement * assignmentStatement2 = buildAssignStatement (
+      buildVarRefExp (moduleDeclarations->getCPlanReturnDeclaration ()),
+      planFunctionCallExpression);
+
+  appendStatement (assignmentStatement2, ifBody);
 
   appendStatement (createTransferOpDatStatements (), ifBody);
 

@@ -397,21 +397,6 @@ FortranPlan::createConvertPositionInPMapsStatements (
    * ======================================================
    */
 
-  SgStatement * callStatementA =
-      SubroutineCalls::Fortran::createCToFortranPointerCallStatement (
-          subroutineScope, buildVarRefExp (variableDeclarations->get (
-              OP2::VariableNames::PlanFunction::planRet)), buildVarRefExp (
-              variableDeclarations->get (
-                  OP2::VariableNames::PlanFunction::actualPlan)));
-
-  appendStatement (callStatementA, block);
-
-  /*
-   * ======================================================
-   * New C-To-Fortran pointer conversion call
-   * ======================================================
-   */
-
   SgDotExp * parameterExpressionB1 = buildDotExp (
       buildVarRefExp (variableDeclarations->get (
           OP2::VariableNames::PlanFunction::actualPlan)), buildOpaqueVarRefExp (

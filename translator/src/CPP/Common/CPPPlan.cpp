@@ -10,22 +10,17 @@ CPPPlan::createPlanFunctionParametersPreparationStatements (
 
 }
 
-SgBasicBlock *
-CPPPlan::createPlanFunctionCallStatement (SgScopeStatement * subroutineScope,
-    SubroutineVariableDeclarations * variableDeclarations,
-    SubroutineVariableDeclarations * moduleDeclarations)
+SgFunctionCallExp *
+CPPPlan::createPlanFunctionCallExpression (SgScopeStatement * subroutineScope,
+    SubroutineVariableDeclarations * variableDeclarations)
 {
-  using SageBuilder::buildBasicBlock;
   using SageBuilder::buildVarRefExp;
   using SageBuilder::buildDotExp;
   using SageBuilder::buildExprListExp;
-  using SageBuilder::buildAssignStatement;
   using SageBuilder::buildFunctionCallExp;
   using SageBuilder::buildOpaqueVarRefExp;
   using SageBuilder::buildVoidType;
   using SageInterface::appendStatement;
-
-  SgBasicBlock * block = buildBasicBlock ();
 
   SgVarRefExp * parameter1 = buildVarRefExp (variableDeclarations->get (
       OP2::VariableNames::getUserSubroutineName ()));
@@ -33,7 +28,7 @@ CPPPlan::createPlanFunctionCallStatement (SgScopeStatement * subroutineScope,
   SgDotExp * parameter2 = buildDotExp ( //TODO: set
       buildVarRefExp (variableDeclarations->get (
           OP2::VariableNames::getOpSetName ())), buildOpaqueVarRefExp (
-          OP2::VariableNames::index, block));
+          OP2::VariableNames::index, subroutineScope));
 
   SgVarRefExp * parameter3 = buildVarRefExp (variableDeclarations->get (
       PlanFunction::CPP::partSize));
@@ -66,10 +61,5 @@ CPPPlan::createPlanFunctionCallStatement (SgScopeStatement * subroutineScope,
       PlanFunction::CPP::cplan, buildVoidType (), //FIXME
       actualParameters);
 
-  SgExprStatement * assignmentStatement = buildAssignStatement (buildVarRefExp (
-      variableDeclarations->get (PlanFunction::CPP::planRet)), functionCall);
-
-  appendStatement (assignmentStatement, block);
-
-  return block;
+  return functionCall;
 }

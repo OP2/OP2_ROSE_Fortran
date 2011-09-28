@@ -20,10 +20,9 @@ class CPPPlan: public Plan <CPPParallelLoop>
         CPPParallelLoop * parallelLoop,
         SubroutineVariableDeclarations * variableDeclarations);
 
-    virtual SgBasicBlock *
-    createPlanFunctionCallStatement (SgScopeStatement * subroutineScope,
-        SubroutineVariableDeclarations * variableDeclarations,
-        SubroutineVariableDeclarations * moduleDeclarations = NULL);
+    virtual SgFunctionCallExp *
+    createPlanFunctionCallExpression (SgScopeStatement * subroutineScope,
+        SubroutineVariableDeclarations * variableDeclarations);
 };
 
 #endif /* CPPPLAN_H_ */
