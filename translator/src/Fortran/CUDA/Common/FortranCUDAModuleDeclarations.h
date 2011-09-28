@@ -36,8 +36,8 @@ class FortranCUDAModuleDeclarations: public FortranModuleDeclarations
     SgVariableDeclaration *
     getDimensionsVariableDeclaration ();
 
-    FortranCUDAModuleDeclarations (std::string const & userSubroutineName,
-        FortranParallelLoop * parallelLoop, SgScopeStatement * moduleScope,
+    FortranCUDAModuleDeclarations (FortranParallelLoop * parallelLoop,
+        SgScopeStatement * moduleScope,
         FortranCUDADataSizesDeclaration * dataSizesDeclaration,
         FortranOpDatDimensionsDeclaration * dimensionsDeclaration);
 };

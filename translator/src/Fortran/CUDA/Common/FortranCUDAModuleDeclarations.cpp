@@ -39,7 +39,7 @@ FortranCUDAModuleDeclarations::createReductionDeclarations ()
 
         string const reductionArrayHostName =
             OP2::VariableNames::getReductionArrayHostName (i,
-                userSubroutineName);
+                parallelLoop->getUserSubroutineName ());
 
         Debug::getInstance ()->debugMessage ("Creating host reduction array '"
             + reductionArrayHostName + "'", Debug::HIGHEST_DEBUG_LEVEL,
@@ -55,7 +55,7 @@ FortranCUDAModuleDeclarations::createReductionDeclarations ()
 
         string const reductionArrayDeviceName =
             OP2::VariableNames::getReductionArrayDeviceName (i,
-                userSubroutineName);
+                parallelLoop->getUserSubroutineName ());
 
         Debug::getInstance ()->debugMessage (
             "Creating device reduction array '" + reductionArrayDeviceName
@@ -84,7 +84,7 @@ FortranCUDAModuleDeclarations::createDataSizesDeclaration ()
 
   std::string const & variableName =
       OP2::VariableNames::getDataSizesVariableDeclarationName (
-          userSubroutineName);
+          parallelLoop->getUserSubroutineName ());
 
   SgVariableDeclaration * variableDeclaration =
       FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
@@ -99,7 +99,7 @@ FortranCUDAModuleDeclarations::createDimensionsDeclaration ()
 {
   std::string const & variableName =
       OP2::VariableNames::getDimensionsVariableDeclarationName (
-          userSubroutineName);
+          parallelLoop->getUserSubroutineName ());
 
   Debug::getInstance ()->debugMessage (
       "Generating OP_DAT dimensions declaration '" + variableName + "'",
@@ -124,7 +124,7 @@ FortranCUDAModuleDeclarations::getDataSizesVariableDeclaration ()
 {
   std::string const & variableName =
       OP2::VariableNames::getDataSizesVariableDeclarationName (
-          userSubroutineName);
+          parallelLoop->getUserSubroutineName ());
 
   return variableDeclarations->get (variableName);
 }
@@ -134,19 +134,17 @@ FortranCUDAModuleDeclarations::getDimensionsVariableDeclaration ()
 {
   std::string const & variableName =
       OP2::VariableNames::getDimensionsVariableDeclarationName (
-          userSubroutineName);
+          parallelLoop->getUserSubroutineName ());
 
   return variableDeclarations->get (variableName);
 }
 
 FortranCUDAModuleDeclarations::FortranCUDAModuleDeclarations (
-    std::string const & userSubroutineName, FortranParallelLoop * parallelLoop,
-    SgScopeStatement * moduleScope,
+    FortranParallelLoop * parallelLoop, SgScopeStatement * moduleScope,
     FortranCUDADataSizesDeclaration * dataSizesDeclaration,
     FortranOpDatDimensionsDeclaration * dimensionsDeclaration) :
-  FortranModuleDeclarations (userSubroutineName, parallelLoop, moduleScope),
-      dataSizesDeclaration (dataSizesDeclaration), dimensionsDeclaration (
-          dimensionsDeclaration)
+  FortranModuleDeclarations (parallelLoop, moduleScope), dataSizesDeclaration (
+      dataSizesDeclaration), dimensionsDeclaration (dimensionsDeclaration)
 {
   Debug::getInstance ()->debugMessage (
       "Generating CUDA module scope declarations", Debug::CONSTRUCTOR_LEVEL,

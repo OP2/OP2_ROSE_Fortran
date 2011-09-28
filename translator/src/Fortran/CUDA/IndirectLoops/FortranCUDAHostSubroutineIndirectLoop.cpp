@@ -662,15 +662,8 @@ FortranCUDAHostSubroutineIndirectLoop::createStatements ()
   using SageBuilder::buildVarRefExp;
   using SageBuilder::buildBoolValExp;
   using SageBuilder::buildEqualityOp;
+  using SageBuilder::buildAssignStatement;
   using SageInterface::appendStatement;
-  using std::vector;
-
-  vector <SubroutineVariableDeclarations *> declarationSets;
-  declarationSets.push_back (moduleDeclarations->getAllDeclarations ());
-  declarationSets.push_back (variableDeclarations);
-
-  SubroutineVariableDeclarations * allDeclarations =
-      new SubroutineVariableDeclarations (declarationSets);
 
   SgEqualityOp * ifGuardExpression = buildEqualityOp (buildVarRefExp (
       moduleDeclarations->getFirstExecutionBooleanDeclaration ()),
@@ -679,10 +672,19 @@ FortranCUDAHostSubroutineIndirectLoop::createStatements ()
   SgBasicBlock * ifBody = createFirstTimeExecutionStatements ();
 
   appendStatement (createPlanFunctionParametersPreparationStatements (
-      allDeclarations, (FortranParallelLoop *) parallelLoop), ifBody);
+      (FortranParallelLoop *) parallelLoop, variableDeclarations), ifBody);
 
-  appendStatement (createPlanFunctionCallStatement (allDeclarations,
-      subroutineScope), ifBody);
+  SgFunctionCallExp * planFunctionCallExpression =
+      createPlanFunctionCallStatement (subroutineScope, variableDeclarations);
+
+  SgExprStatement
+      * assignmentStatement =
+          buildAssignStatement (
+              buildVarRefExp (
+                  static_cast <FortranCUDAModuleDeclarationsIndirectLoop *> (moduleDeclarations)->getCPlanDeclaration ()),
+              planFunctionCallExpression);
+
+  appendStatement (assignmentStatement, ifBody);
 
   SgIfStmt * ifStatement =
       RoseStatementsAndExpressionsBuilder::buildIfStatementWithEmptyElse (
@@ -697,12 +699,13 @@ FortranCUDAHostSubroutineIndirectLoop::createStatements ()
     createReductionPrologueStatements ();
   }
 
-  appendStatement (createConvertPositionInPMapsStatements (allDeclarations,
-      (FortranParallelLoop *) parallelLoop, subroutineScope), subroutineScope);
+  appendStatement (createConvertPositionInPMapsStatements (
+      (FortranParallelLoop *) parallelLoop, subroutineScope,
+      variableDeclarations), subroutineScope);
 
   appendStatement (createConvertPlanFunctionParametersStatements (
-      allDeclarations, (FortranParallelLoop *) parallelLoop, subroutineScope),
-      subroutineScope);
+      (FortranParallelLoop *) parallelLoop, subroutineScope,
+      variableDeclarations), subroutineScope);
 
   createVariablesSizesInitialisationStatements ();
 

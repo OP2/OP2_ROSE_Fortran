@@ -18,13 +18,6 @@ class FortranModuleDeclarations
 
     /*
      * ======================================================
-     * The name of the user subroutine
-     * ======================================================
-     */
-    std::string userSubroutineName;
-
-    /*
-     * ======================================================
      * Variables declared at module scope level
      * ======================================================
      */
@@ -44,18 +37,23 @@ class FortranModuleDeclarations
      */
     SgScopeStatement * moduleScope;
 
-  protected:
-
-    void
-    createInitialiseConstantsBooleanDeclaration ();
+  private:
 
     void
     createFirstExecutionBooleanDeclaration ();
 
-    FortranModuleDeclarations (std::string const & userSubroutineName,
-        FortranParallelLoop * parallelLoop, SgScopeStatement * moduleScope);
+    void
+    createCPlanReturnDeclaration ();
+
+  protected:
+
+    FortranModuleDeclarations (FortranParallelLoop * parallelLoop,
+        SgScopeStatement * moduleScope);
 
   public:
+
+    SgVariableDeclaration *
+    getCPlanReturnDeclaration ();
 
     SgVariableDeclaration *
     getFirstExecutionBooleanDeclaration ();

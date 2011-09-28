@@ -30,9 +30,6 @@ class SubroutineVariableDeclarations
     add (std::string const & variableName, SgVariableDeclaration * declaration);
 
     SubroutineVariableDeclarations ();
-
-    SubroutineVariableDeclarations (
-        std::vector <SubroutineVariableDeclarations *> & allDeclarations);
 };
 
 #endif

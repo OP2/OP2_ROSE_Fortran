@@ -87,20 +87,19 @@ template <typename TParallelLoop>
        */
       virtual SgBasicBlock *
       createPlanFunctionParametersPreparationStatements (
-          SubroutineVariableDeclarations * variableDeclarations,
-          TParallelLoop * parallelLoop) = 0;
+          TParallelLoop * parallelLoop,
+          SubroutineVariableDeclarations * variableDeclarations) = 0;
 
       /*
        * ======================================================
-       * Create the statement which calls the plan function. The
-       * scope of the enclosing subroutine is also needed to build
-       * the function call correctly
+       * Create the expression representing the call to the plan
+       * function. The scope of the enclosing subroutine is also
+       * needed to build the function call correctly
        * ======================================================
        */
-      virtual SgBasicBlock *
-      createPlanFunctionCallStatement (
-          SubroutineVariableDeclarations * variableDeclarations,
-          SgScopeStatement * subroutineScope) = 0;
+      virtual SgFunctionCallExp *
+      createPlanFunctionCallExpression (SgScopeStatement * subroutineScope,
+          SubroutineVariableDeclarations * variableDeclarations) = 0;
 
       /*
        * ======================================================

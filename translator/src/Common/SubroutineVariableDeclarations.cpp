@@ -28,20 +28,4 @@ SubroutineVariableDeclarations::add (std::string const & variableName,
 
 SubroutineVariableDeclarations::SubroutineVariableDeclarations ()
 {
-
-}
-
-SubroutineVariableDeclarations::SubroutineVariableDeclarations (std::vector <
-    SubroutineVariableDeclarations *> & allDeclarations)
-{
-  using std::vector;
-
-  for (vector <SubroutineVariableDeclarations *>::iterator it =
-      allDeclarations.begin (); it != allDeclarations.end (); ++it)
-  {
-    SubroutineVariableDeclarations * declarations = *it;
-
-    theDeclarations.insert (declarations->theDeclarations.begin (),
-        declarations->theDeclarations.end ());
-  }
 }

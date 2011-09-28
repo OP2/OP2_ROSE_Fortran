@@ -2,8 +2,8 @@
 
 SgBasicBlock *
 CPPPlan::createPlanFunctionParametersPreparationStatements (
-    SubroutineVariableDeclarations * variableDeclarations,
-    CPPParallelLoop * parallelLoop)
+    CPPParallelLoop * parallelLoop,
+    SubroutineVariableDeclarations * variableDeclarations)
 {
   //FIXME 
   return NULL;
@@ -11,9 +11,9 @@ CPPPlan::createPlanFunctionParametersPreparationStatements (
 }
 
 SgBasicBlock *
-CPPPlan::createPlanFunctionCallStatement (
+CPPPlan::createPlanFunctionCallStatement (SgScopeStatement * subroutineScope,
     SubroutineVariableDeclarations * variableDeclarations,
-    SgScopeStatement * subroutineScope)
+    SubroutineVariableDeclarations * moduleDeclarations)
 {
   using SageBuilder::buildBasicBlock;
   using SageBuilder::buildVarRefExp;

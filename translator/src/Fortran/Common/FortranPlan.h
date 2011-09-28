@@ -17,23 +17,22 @@ class FortranPlan: public Plan <FortranParallelLoop>
 
     virtual SgBasicBlock *
     createConvertPlanFunctionParametersStatements (
-        SubroutineVariableDeclarations * variableDeclarations,
-        FortranParallelLoop * parallelLoop, SgScopeStatement * subroutineScope);
+        FortranParallelLoop * parallelLoop, SgScopeStatement * subroutineScope,
+        SubroutineVariableDeclarations * variableDeclarations);
 
     virtual SgBasicBlock *
-    createConvertPositionInPMapsStatements (
-        SubroutineVariableDeclarations * variableDeclarations,
-        FortranParallelLoop * parallelLoop, SgScopeStatement * subroutineScope);
+    createConvertPositionInPMapsStatements (FortranParallelLoop * parallelLoop,
+        SgScopeStatement * subroutineScope,
+        SubroutineVariableDeclarations * variableDeclarations);
 
     virtual SgBasicBlock *
     createPlanFunctionParametersPreparationStatements (
-        SubroutineVariableDeclarations * variableDeclarations,
-        FortranParallelLoop * parallelLoop);
+        FortranParallelLoop * parallelLoop,
+        SubroutineVariableDeclarations * variableDeclarations);
 
-    virtual SgBasicBlock *
-    createPlanFunctionCallStatement (
-        SubroutineVariableDeclarations * variableDeclarations,
-        SgScopeStatement * subroutineScope);
+    virtual SgFunctionCallExp *
+    createPlanFunctionCallExpression (SgScopeStatement * subroutineScope,
+        SubroutineVariableDeclarations * variableDeclarations);
 };
 
 #endif

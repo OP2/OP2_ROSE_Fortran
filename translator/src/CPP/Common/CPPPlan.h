@@ -11,20 +11,19 @@
 #include <Plan.h>
 #include <CPPParallelLoop.h>
 
-class CPPPlan : 
-  public Plan <CPPParallelLoop>
+class CPPPlan: public Plan <CPPParallelLoop>
 {
-protected:
+  protected:
 
-  virtual SgBasicBlock *
-  createPlanFunctionParametersPreparationStatements (
-      SubroutineVariableDeclarations * variableDeclarations,
-      CPPParallelLoop * parallelLoop);
-  
-  virtual SgBasicBlock *
-  createPlanFunctionCallStatement (
-      SubroutineVariableDeclarations * variableDeclarations,
-      SgScopeStatement * subroutineScope );
+    virtual SgBasicBlock *
+    createPlanFunctionParametersPreparationStatements (
+        CPPParallelLoop * parallelLoop,
+        SubroutineVariableDeclarations * variableDeclarations);
+
+    virtual SgBasicBlock *
+    createPlanFunctionCallStatement (SgScopeStatement * subroutineScope,
+        SubroutineVariableDeclarations * variableDeclarations,
+        SubroutineVariableDeclarations * moduleDeclarations = NULL);
 };
 
 #endif /* CPPPLAN_H_ */
