@@ -257,6 +257,8 @@ FortranSubroutinesGeneration::createFortranModule (SgSourceFile & sourceFile)
   SgModuleStatement * moduleStatement =
       FortranTypesBuilder::buildModuleDeclaration (moduleName, globalScope);
 
+  moduleStatement->get_declarationModifier ().get_accessModifier ().setPublic ();
+
   moduleStatement->get_definition ()->setCaseInsensitive (true);
 
   appendStatement (moduleStatement, globalScope);

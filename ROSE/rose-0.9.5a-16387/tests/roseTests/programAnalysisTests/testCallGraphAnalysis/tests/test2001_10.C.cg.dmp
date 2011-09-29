@@ -1,0 +1,6 @@
+A::A ->
+A::A ->
+A::A ->
+A::operator() -> A::A Domain::Domain
+Domain::Domain ->
+main ->

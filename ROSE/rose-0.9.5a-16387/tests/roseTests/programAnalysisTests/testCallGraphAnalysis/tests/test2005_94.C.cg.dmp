@@ -1,0 +1,12 @@
+X::foo ->
+X::foo ->
+X_namespace::foo ->
+X_namespace::foo ->
+Y::foo ->
+Y::foo ->
+Y_namespace::foo ->
+Y_namespace::foo ->
+foo ->
+foobar1 ->
+foobar2 ->
+main ->

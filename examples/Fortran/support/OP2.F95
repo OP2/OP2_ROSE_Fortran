@@ -180,7 +180,7 @@ contains
   subroutine op_par_loop_3 ( subroutineName, set, &
                            & data0, itemSel0, map0, access0, &
                            & data1, itemSel1, map1, access1, &
-			   & data2, itemSel2, map2, access2 &
+                           & data2, itemSel2, map2, access2 &
                          & )
     external subroutineName
     type(op_set) :: set
@@ -192,8 +192,8 @@ contains
   subroutine op_par_loop_4 ( subroutineName, set, &
                            & data0, itemSel0, map0, access0, &
                            & data1, itemSel1, map1, access1, &
-			   & data2, itemSel2, map2, access2, &
-     	                   & data3, itemSel3, map3, access3 &
+                           & data2, itemSel2, map2, access2, &
+                           & data3, itemSel3, map3, access3 &
                          & )
     external subroutineName
     type(op_set) :: set

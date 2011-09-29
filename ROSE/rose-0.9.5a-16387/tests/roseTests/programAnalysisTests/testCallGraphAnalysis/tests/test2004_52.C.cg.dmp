@@ -1,0 +1,3 @@
+XXX::test -> globalTest
+call -> XXX::test
+globalTest ->

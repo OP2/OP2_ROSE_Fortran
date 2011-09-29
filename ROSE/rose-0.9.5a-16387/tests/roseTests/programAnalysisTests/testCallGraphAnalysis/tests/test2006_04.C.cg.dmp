@@ -1,0 +1,4 @@
+X::foo1 ->
+Y::operator new ->
+foobar ->
+foobar2 -> Y::operator new

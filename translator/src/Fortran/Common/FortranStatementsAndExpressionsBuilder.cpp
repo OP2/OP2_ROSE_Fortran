@@ -36,19 +36,19 @@ FortranStatementsAndExpressionsBuilder::setFortranAttributes (
 
       case CONSTANT:
       {
-        variableDeclaration->get_declarationModifier ().get_typeModifier ().setConstant ();
+        variableDeclaration->get_declarationModifier ().get_storageModifier ().setCudaConstant ();
         break;
       }
 
       case DEVICE:
       {
-        variableDeclaration->get_declarationModifier ().get_typeModifier ().setDevice ();
+        variableDeclaration->get_declarationModifier ().get_storageModifier ().setCudaDevice ();
         break;
       }
 
       case SHARED:
       {
-        variableDeclaration->get_declarationModifier ().get_typeModifier ().setShared ();
+        variableDeclaration->get_declarationModifier ().get_storageModifier ().setCudaShared ();
         break;
       }
 

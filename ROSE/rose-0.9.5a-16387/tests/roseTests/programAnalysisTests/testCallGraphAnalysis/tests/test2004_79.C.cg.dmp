@@ -1,0 +1,8 @@
+A::B::B::foo_C ->
+A::B::B::foox ->
+A::B::foo ->
+A::B::foo_B ->
+A::B::foox -> A::B::B::foo_C
+A::foo ->
+A::foo_A ->
+main -> A::B::B::foo_C A::B::foo_B A::foo_A
