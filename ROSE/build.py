@@ -115,6 +115,8 @@ def buildROSE (ROSEVersion, boostInstallDirectory):
 		print("Command 'make install' failed")
 		sys.exit(1)
 
+	print("====== MY WORK IS DONE ======")
+
 # Main
 checkEnvironment()
 ROSEVersion           = selectROSEVersion ()
