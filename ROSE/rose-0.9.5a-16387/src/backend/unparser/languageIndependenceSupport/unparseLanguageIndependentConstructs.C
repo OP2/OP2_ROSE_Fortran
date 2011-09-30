@@ -606,12 +606,12 @@ UnparseLanguageIndependentConstructs::unparseStatement(SgStatement* stmt, SgUnpa
      
 
   // DQ (5/27/2007): Commented out, uncomment when we are ready for Robert's new hidden list mechanism.
-     if (info.get_current_scope() == NULL)
+/*     if (info.get_current_scope() == NULL)
         {
           printf ("In unparseStatement(): info.get_current_scope() == NULL (likely called from SgNode::unparseToString()) stmt = %p = %s \n",stmt,stmt->class_name().c_str());
           stmt->get_startOfConstruct()->display("In unparseStatement(): info.get_current_scope() == NULL: debug");
-          //ROSE_ASSERT(false);
-        }
+          ROSE_ASSERT(false);
+        } */
   // ROSE_ASSERT(info.get_current_scope() != NULL);
 
   // DQ (7/20/2008): This mechanism is now extended to SgStatement and revised to handle 
@@ -702,7 +702,7 @@ UnparseLanguageIndependentConstructs::unparseStatement(SgStatement* stmt, SgUnpa
      if (scopeStatement != NULL)
         {
        // DQ (12/5/2007): This assertion appears to work better.
-//          ROSE_ASSERT(savedScope != NULL || isSgGlobal(scopeStatement) != NULL);
+       //   ROSE_ASSERT(savedScope != NULL || isSgGlobal(scopeStatement) != NULL);
 
 #if 0
           printf ("At end of scope: Setting the current_scope in info: scopeStatement = %p = %s = %s \n",

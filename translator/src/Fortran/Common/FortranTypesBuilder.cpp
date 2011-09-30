@@ -367,6 +367,10 @@ FortranTypesBuilder::buildModuleDeclaration (std::string const & moduleName,
   completeNewDeclaration (classDefinition, classDeclaration,
       nonDefiningClassDeclaration, scope);
 
+  nonDefiningClassDeclaration->get_declarationModifier().get_accessModifier().setUndefined();
+  classDeclaration->get_declarationModifier().get_accessModifier().setUndefined();
+  classDefinition->get_declaration ()->get_declarationModifier ().get_accessModifier ().setUndefined ();
+
   return classDeclaration;
 }
 

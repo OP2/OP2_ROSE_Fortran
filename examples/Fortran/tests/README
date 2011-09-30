@@ -1,6 +1,6 @@
 To add a test case, create a Fortran file Test<number>.F95. For example, Test128.F95.
 Normally you will also need to add a user kernel subroutine declaration and definition
-to the file 'UserKernels.F95' found in 'OP2_ROSE_Fortran/examples/Fortran/tests'. This
+to the file 'UserKernels.F95' found in the directory where you are running tests. This
 depends on the OP_PAR_LOOP (e.g. types of OP_DAT passed), so check before adding a new
 one because there might be one already that is sufficient.
 

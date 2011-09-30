@@ -20,6 +20,7 @@ FortranCUDAHostSubroutineDirectLoop::createKernelFunctionCallStatement ()
   using SageBuilder::buildFunctionCallStmt;
   using SageBuilder::buildExprListExp;
   using SageBuilder::buildVoidType;
+  using SageBuilder::buildNullExpression;
   using SageInterface::appendStatement;
   using std::string;
 
@@ -74,7 +75,6 @@ FortranCUDAHostSubroutineDirectLoop::createKernelFunctionCallStatement ()
 
   actualParameters->append_expression (buildVarRefExp (
       variableDeclarations->get (OP2::VariableNames::sharedMemoryOffset)));
-
   string const kernelLaunchString = kernelSubroutineName + "<<<"
       + RoseHelper::getFirstVariableName (variableDeclarations->get (
           CUDA::blocksPerGrid)) + ", " + RoseHelper::getFirstVariableName (

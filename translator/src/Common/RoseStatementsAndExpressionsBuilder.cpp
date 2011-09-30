@@ -37,12 +37,14 @@ RoseStatementsAndExpressionsBuilder::buildTypeDeclaration (
       classDefinition);
   classDeclaration->set_endOfConstruct (RoseHelper::getFileInfo ());
   classDeclaration->set_definingDeclaration (classDeclaration);
+  classDeclaration->get_declarationModifier ().get_accessModifier ().setUndefined ();
 
   SgDerivedTypeStatement* nondefiningClassDeclaration =
       new SgDerivedTypeStatement (RoseHelper::getFileInfo (), typeName,
           SgClassDeclaration::e_struct, NULL, NULL);
   nondefiningClassDeclaration->set_endOfConstruct (RoseHelper::getFileInfo ());
   nondefiningClassDeclaration->set_parent (scope);
+  nondefiningClassDeclaration->get_declarationModifier ().get_accessModifier ().setUndefined ();
 
   nondefiningClassDeclaration->set_type (SgClassType::createType (
       nondefiningClassDeclaration));
@@ -58,6 +60,7 @@ RoseStatementsAndExpressionsBuilder::buildTypeDeclaration (
   nondefiningClassDeclaration->setForward ();
 
   classDefinition->set_declaration (classDeclaration);
+  classDefinition->get_declaration ()->get_declarationModifier ().get_accessModifier ().setUndefined ();
 
   classDeclaration->set_scope (scope);
   nondefiningClassDeclaration->set_scope (scope);

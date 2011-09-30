@@ -1,7 +1,4 @@
-
-
-
-program SimpleLoops
+program Test2
 
   use OP2_C
   use UserKernels
@@ -46,24 +43,18 @@ program SimpleLoops
 
   do iter = 1, 1000
 
-    call op_par_loop_3 ( ker1, edges, &
+    call op_par_loop_3 ( real8Array_real8Array_real8Array_kernel1, edges, &
                       & x, -1, OP_ID, OP_READ, &
                       & y, -1, OP_ID, OP_READ, &
                       & z, -1, OP_ID, OP_INC &
                     & )
 
-    call op_par_loop_3 ( ker2, edges, &
+    call op_par_loop_3 ( real8Array_real8Array_real8Array_kernel2, edges, &
                       & x, -1, OP_ID, OP_READ, &
                       & y, -1, OP_ID, OP_READ, &
                       & k, -1, OP_ID, OP_INC &
                     & )
 
-  !  call op_par_loop_4 ( ker1, edges, &
-  !                     & x, -1, OP_ID, OP_READ, &
-  !                     & y, -1, OP_ID, OP_READ, &
-  !                     & z, -1, OP_ID, OP_INC, &
-  !                     & k, -1, OP_ID, OP_INC, &
-  !                   & )
   end do
 
 end program

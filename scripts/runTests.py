@@ -180,6 +180,7 @@ def runTests ():
 	failLexeme = 'FAIL'
 	passLexeme = 'PASS'
 	
+	testReportLines  = []
 	for line in open(testsFile, 'r'):
 		tokens      = line.split(' ')
 		testNum     = tokens[0].strip()
@@ -205,13 +206,13 @@ def runTests ():
 			if not os.path.isfile(FortranFile):
 				debug.exitMessage("File '" + FortranFile + "' does not exist")		
 
-			filesToCompile = ['ISO_C_BINDING.F95', 'OP2.F95', 'UserKernels.F95']
+			filesToCompile = ['ISO_C_BINDING.F95', 'OP2.F95']
 
 			cmd = translatorPath + ' --CUDA '
 			for f in filesToCompile:
 				cmd += op2Path + os.sep + f + ' '
 
-			cmd += FortranFile
+			cmd += 'UserKernels.F95 ' + FortranFile
 
 			debug.verboseMessage("Running: '" + cmd + "'")
 
@@ -231,6 +232,10 @@ def runTests ():
 					debug.verboseMessage("Test on file '%s' passed" % (FortranFile))
 				else:
 					debug.verboseMessage("Test on file '%s' did NOT pass" % (FortranFile))
+					testReportLines.append("========== Test %s ==========\n" % (testNum))
+					for line in stderrLines.splitlines():
+						testReportLines.append(line + "\n")
+					testReportLines.append("\n\n")
 			else:
 				if testResult == passLexeme:				
 					debug.verboseMessage("Test on file '%s' passed" % (FortranFile))
@@ -260,6 +265,12 @@ def runTests ():
 				else:
 					debug.verboseMessage("Test on file '%s' did NOT pass" % (FortranFile))
 			debug.verboseMessage("")
+
+	if testReportLines:
+		testReport = open("testReport.txt", "w")
+		for line in testReportLines:
+			testReport.write(line)
+		testReport.close()
 
 if opts.clean:
 	clean()
