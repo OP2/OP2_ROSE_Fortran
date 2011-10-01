@@ -8,15 +8,75 @@ FortranOpDatDefinition::FortranOpDatDefinition (
   using boost::lexical_cast;
   using std::string;
 
-  opSetName
-      = isSgVarRefExp (parameters[index_OpSetName])->get_symbol ()->get_name ().getString ();
+  /*
+   * ======================================================
+   * Get name of OP_SET
+   * ======================================================
+   */
+
+  SgVarRefExp * opSetVariableReference;
+
+  if (isSgDotExp (parameters[index_OpSetName]) != NULL)
+  {
+    opSetVariableReference = isSgVarRefExp (isSgDotExp (
+        parameters[index_OpSetName])->get_rhs_operand ());
+  }
+  else
+  {
+    opSetVariableReference = isSgVarRefExp (parameters[index_OpSetName]);
+  }
+
+  opSetName = opSetVariableReference->get_symbol ()->get_name ().getString ();
+
+  /*
+   * ======================================================
+   * Get dimension of OP_DAT
+   * ======================================================
+   */
 
   dimension = isSgIntVal (parameters[index_dimension])->get_value ();
 
-  primitiveType = isSgVarRefExp (parameters[index_data])->get_type ();
+  /*
+   * ======================================================
+   * Get type of OP_DAT from the actual data declaration
+   * it wraps
+   * ======================================================
+   */
+
+  SgVarRefExp * actualDataVariableReference;
+
+  if (isSgDotExp (parameters[index_data]) != NULL)
+  {
+    actualDataVariableReference = isSgVarRefExp (isSgDotExp (
+        parameters[index_data])->get_rhs_operand ());
+  }
+  else
+  {
+    actualDataVariableReference = isSgVarRefExp (parameters[index_data]);
+  }
+
+  primitiveType = actualDataVariableReference->get_type ();
+
+  /*
+   * ======================================================
+   * Get name of OP_DAT
+   * ======================================================
+   */
+
+  SgVarRefExp * opDatVariableReference;
+
+  if (isSgDotExp (parameters[index_OpDatName]) != NULL)
+  {
+    opDatVariableReference = isSgVarRefExp (isSgDotExp (
+        parameters[index_OpDatName])->get_rhs_operand ());
+  }
+  else
+  {
+    opDatVariableReference = isSgVarRefExp (parameters[index_OpDatName]);
+  }
 
   variableName
-      = isSgVarRefExp (parameters[index_OpDatName])->get_symbol ()->get_name ().getString ();
+      = opDatVariableReference->get_symbol ()->get_name ().getString ();
 
   ROSE_ASSERT (opSetName.empty () == false);
   ROSE_ASSERT (dimension > 0);
@@ -33,11 +93,43 @@ FortranOpDatDefinition::FortranOpDatDefinition (
 FortranOpSetDefinition::FortranOpSetDefinition (
     SgExpressionPtrList & parameters)
 {
-  dimensionName
-      = isSgVarRefExp (parameters[index_setCardinalityName])->get_symbol ()->get_name ().getString ();
+  /*
+   * ======================================================
+   * Get name of OP_SET dimension variable
+   * ======================================================
+   */
+
+  if (isSgPntrArrRefExp (parameters[index_setCardinalityName]) != NULL)
+  {
+    dimensionName
+        = isSgPntrArrRefExp (parameters[index_setCardinalityName])->unparseToString ();
+  }
+  else
+  {
+    dimensionName
+        = isSgVarRefExp (parameters[index_setCardinalityName])->get_symbol ()->get_name ().getString ();
+  }
+
+  /*
+   * ======================================================
+   * Get name of OP_SET
+   * ======================================================
+   */
+
+  SgVarRefExp * opSetVariableReference;
+
+  if (isSgDotExp (parameters[index_OpSetName]) != NULL)
+  {
+    opSetVariableReference = isSgVarRefExp (isSgDotExp (
+        parameters[index_OpSetName])->get_rhs_operand ());
+  }
+  else
+  {
+    opSetVariableReference = isSgVarRefExp (parameters[index_OpSetName]);
+  }
 
   variableName
-      = isSgVarRefExp (parameters[index_OpSetName])->get_symbol ()->get_name ().getString ();
+      = opSetVariableReference->get_symbol ()->get_name ().getString ();
 
   ROSE_ASSERT (dimensionName.empty () == false);
   ROSE_ASSERT (variableName.empty () == false);
@@ -53,19 +145,106 @@ FortranOpMapDefinition::FortranOpMapDefinition (
   using boost::lexical_cast;
   using std::string;
 
+  /*
+   * ======================================================
+   * Get name of source OP_SET
+   * ======================================================
+   */
+
+  SgVarRefExp * opSetSourceVariableReference;
+
+  if (isSgDotExp (parameters[index_sourceOpSetName]) != NULL)
+  {
+    opSetSourceVariableReference = isSgVarRefExp (isSgDotExp (
+        parameters[index_sourceOpSetName])->get_rhs_operand ());
+  }
+  else
+  {
+    opSetSourceVariableReference = isSgVarRefExp (
+        parameters[index_sourceOpSetName]);
+  }
+
   sourceOpSetName
-      = isSgVarRefExp (parameters[index_sourceOpSetName])->get_symbol ()->get_name ().getString ();
+      = opSetSourceVariableReference->get_symbol ()->get_name ().getString ();
+
+  /*
+   * ======================================================
+   * Get name of destination OP_SET
+   * ======================================================
+   */
+
+  SgVarRefExp * opSetDestinationVariableReference;
+
+  if (isSgDotExp (parameters[index_destinationOpSetName]) != NULL)
+  {
+    opSetDestinationVariableReference = isSgVarRefExp (isSgDotExp (
+        parameters[index_destinationOpSetName])->get_rhs_operand ());
+  }
+  else
+  {
+    opSetDestinationVariableReference = isSgVarRefExp (
+        parameters[index_destinationOpSetName]);
+  }
 
   destinationOpSetName
-      = isSgVarRefExp (parameters[index_destinationOpSetName])->get_symbol ()->get_name ().getString ();
+      = opSetDestinationVariableReference->get_symbol ()->get_name ().getString ();
+
+  /*
+   * ======================================================
+   * Get number of elements per mapping
+   * ======================================================
+   */
 
   dimension = isSgIntVal (parameters[index_dimension])->get_value ();
 
+  /*
+   * ======================================================
+   * Get dimension of
+   * ======================================================
+   */
+
+  SgVarRefExp * mappingCardinalityVariableReference;
+
+  if (isSgDotExp (parameters[index_mappingCardinalityName]) != NULL)
+  {
+    mappingCardinalityVariableReference = isSgVarRefExp (isSgDotExp (
+        parameters[index_mappingCardinalityName])->get_rhs_operand ());
+  }
+  else
+  {
+    mappingCardinalityVariableReference = isSgVarRefExp (
+        parameters[index_mappingCardinalityName]);
+  }
+
   mappingCardinalityName
-      = isSgVarRefExp (parameters[index_mappingCardinalityName])->get_symbol ()->get_name ().getString ();
+      = mappingCardinalityVariableReference->get_symbol ()->get_name ().getString ();
+
+  /*
+   * ======================================================
+   * Get mapping name
+   * ======================================================
+   */
+
+  SgVarRefExp * mappingVariableReference;
+
+  if (isSgDotExp (parameters[index_mappingName]) != NULL)
+  {
+    mappingVariableReference = isSgVarRefExp (isSgDotExp (
+        parameters[index_mappingName])->get_rhs_operand ());
+  }
+  else
+  {
+    mappingVariableReference = isSgVarRefExp (parameters[index_mappingName]);
+  }
 
   mappingName
-      = isSgVarRefExp (parameters[index_mappingName])->get_symbol ()->get_name ().getString ();
+      = mappingVariableReference->get_symbol ()->get_name ().getString ();
+
+  /*
+   * ======================================================
+   * Get name of OP_MAP
+   * ======================================================
+   */
 
   variableName
       = isSgVarRefExp (parameters[index_OpMapName])->get_symbol ()->get_name ().getString ();

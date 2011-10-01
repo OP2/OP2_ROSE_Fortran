@@ -129,13 +129,13 @@ def compile ():
 			backendsSelected.append(backend)
 
 	if len(backendsSelected) == 0:
-		exitMessage("You must specify one of %s on the command line." % allBackendOptions)
+		debug.exitMessage("You must specify one of %s on the command line." % allBackendOptions)
 	elif len(backendsSelected) > 1:
-		exitMessage("You specified multiple backends on the command line. Please only specify one of these." % backendsSelected)
+		debug.exitMessage("You specified multiple backends on the command line. Please only specify one of these." % backendsSelected)
 
 	configFile = 'config'
 	if not os.path.isfile(configFile):
-		exitMessage("Unable to find configuration file '%s' with the path to source-to-source translator and files to translate." % (configFile))
+		debug.exitMessage("Unable to find configuration file '%s' with the path to source-to-source translator and files to translate." % (configFile))
 
 	translatorPath = None
 	filesToCompile = []
@@ -146,20 +146,20 @@ def compile ():
 		if line.startswith('translator'):
 			translatorPath = words[1].strip()
 			if not os.path.isfile(translatorPath):
-				exitMessage("'" + translatorPath + "' does not exist.")
+				debug.exitMessage("'" + translatorPath + "' does not exist.")
 		elif line.startswith('files'):
 			files = words[1].strip().split(' ')
 			for f in files:
 				f = f.strip()
 				filesToCompile.append(f)
 				if not os.path.isfile(f):
-					exitMessage("File '" + f + "' does not exist.")
+					debug.exitMessage("File '" + f + "' does not exist.")
 
 	if translatorPath is None:
-		exitMessage("You did not specify a path to the translator. Use 'translator=<path/to/translator>' in the configuration file.")
+		debug.exitMessage("You did not specify a path to the translator. Use 'translator=<path/to/translator>' in the configuration file.")
 
 	if not filesToCompile:
-		exitMessage("You did not specify which files need to compiled. Use files=<list/of/files> in the configuration file.")
+		debug.exitMessage("You did not specify which files need to compiled. Use files=<list/of/files> in the configuration file.")
 
 	cmd = translatorPath + ' -d ' + str(opts.debug) + ' '
 
@@ -291,7 +291,7 @@ if opts.clean:
 
 if opts.format:
 	if opts.format < 40:
-		exitMessage("Formatting length must be positive number greater than or equal to 40. Currently set to " + str(opts.format))
+		debug.exitMessage("Formatting length must be positive number greater than or equal to 40. Currently set to " + str(opts.format))
 
 if opts.compile:
 	compile()
@@ -307,4 +307,4 @@ if opts.compile:
 		files.append (generateBackendMakefile (files))
 
 if not opts.clean and not opts.compile:
-	exitMessage("No actions selected. Use %s for options." % helpShortFlag)
+	debug.exitMessage("No actions selected. Use %s for options." % helpShortFlag)

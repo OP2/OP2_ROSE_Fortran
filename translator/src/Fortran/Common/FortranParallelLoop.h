@@ -9,7 +9,7 @@
 
 class FortranParallelLoop: public ParallelLoop
 {
-  private:
+  public:
 
     /*
      * ======================================================
@@ -40,6 +40,20 @@ class FortranParallelLoop: public ParallelLoop
      * ======================================================
      */
     static unsigned int const NUMBER_OF_NON_OP_DAT_ARGUMENTS = 2;
+
+    /*
+     * ======================================================
+     * In an OP_DAT argument group:
+     * 1) The OP_DAT appears in position 0
+     * 2) The index into the data appears in position 1
+     * 3) The mapping appears in position 2
+     * 4) The access descriptor appears in position 3
+     * ======================================================
+     */
+    static unsigned int const POSITION_OF_OP_DAT = 0;
+    static unsigned int const POSITION_OF_INDEX = 1;
+    static unsigned int const POSITION_OF_MAPPING = 2;
+    static unsigned int const POSITION_OF_ACCESS = 3;
 
   public:
 

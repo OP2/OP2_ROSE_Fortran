@@ -1,3 +1,2 @@
 translator=/home/abetts/SILOET/OP2_ROSE_Fortran/translator/bin/translator
-files=/home/abetts/SILOET/OP2_ROSE_Fortran/examples/Fortran/support/ISO_C_BINDING.F95 /home/abetts/SILOET/OP2_ROSE_Fortran/examples/Fortran/support/OP2.F95 output.F95 input.F95 constvars.F95 airfoil_seqfun.F95 airfoil.F95
-constants=constvars.F95
+files=/home/abetts/SILOET/OP2_ROSE_Fortran/support/Fortran/ISO_C_BINDING.F95 /home/abetts/SILOET/OP2_ROSE_Fortran/support/Fortran/OP2.F95 output.F95 input.F95 constvars.F95 airfoil_seqfun.F95 airfoil.F95

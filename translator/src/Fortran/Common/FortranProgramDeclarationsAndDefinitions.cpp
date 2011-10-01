@@ -97,7 +97,72 @@ FortranProgramDeclarationsAndDefinitions::handleOpDatDeclaration (
 }
 
 void
-FortranProgramDeclarationsAndDefinitions::retrieveOpDatDeclarations (
+FortranProgramDeclarationsAndDefinitions::setParallelLoopAccessDescriptor (
+    FortranParallelLoop * parallelLoop, SgExpressionPtrList & actualArguments,
+    unsigned int OP_DAT_ArgumentGroup, unsigned int argumentPosition)
+{
+  using boost::iequals;
+  using boost::lexical_cast;
+  using std::string;
+
+  SgVarRefExp * accessExpression = isSgVarRefExp (
+      actualArguments[argumentPosition]);
+
+  string const accessValue =
+      accessExpression->get_symbol ()->get_name ().getString ();
+
+  if (iequals (accessValue, OP2::OP_READ))
+  {
+    Debug::getInstance ()->debugMessage ("...READ access descriptor",
+        Debug::OUTER_LOOP_LEVEL, __FILE__, __LINE__);
+
+    parallelLoop->setOpAccessValue (OP_DAT_ArgumentGroup, READ_ACCESS);
+  }
+  else if (iequals (accessValue, OP2::OP_WRITE))
+  {
+    Debug::getInstance ()->debugMessage ("...WRITE access descriptor",
+        Debug::OUTER_LOOP_LEVEL, __FILE__, __LINE__);
+
+    parallelLoop->setOpAccessValue (OP_DAT_ArgumentGroup, WRITE_ACCESS);
+  }
+  else if (iequals (accessValue, OP2::OP_INC))
+  {
+    Debug::getInstance ()->debugMessage ("...INCREMENT access descriptor",
+        Debug::OUTER_LOOP_LEVEL, __FILE__, __LINE__);
+
+    parallelLoop->setOpAccessValue (OP_DAT_ArgumentGroup, INC_ACCESS);
+  }
+  else if (iequals (accessValue, OP2::OP_RW))
+  {
+    Debug::getInstance ()->debugMessage ("...READ/WRITE access descriptor",
+        Debug::OUTER_LOOP_LEVEL, __FILE__, __LINE__);
+
+    parallelLoop->setOpAccessValue (OP_DAT_ArgumentGroup, RW_ACCESS);
+  }
+  else if (iequals (accessValue, OP2::OP_MAX))
+  {
+    Debug::getInstance ()->debugMessage ("...MAXIMUM access descriptor",
+        Debug::OUTER_LOOP_LEVEL, __FILE__, __LINE__);
+
+    parallelLoop->setOpAccessValue (OP_DAT_ArgumentGroup, MAX_ACCESS);
+  }
+  else if (iequals (accessValue, OP2::OP_MIN))
+  {
+    Debug::getInstance ()->debugMessage ("...MINIMUM access descriptor",
+        Debug::OUTER_LOOP_LEVEL, __FILE__, __LINE__);
+
+    parallelLoop->setOpAccessValue (OP_DAT_ArgumentGroup, MIN_ACCESS);
+  }
+  else
+  {
+    Debug::getInstance ()->errorMessage ("Unknown access descriptor: '"
+        + accessValue + "' for OP_DAT argument #" + lexical_cast <string> (
+        OP_DAT_ArgumentGroup), __FILE__, __LINE__);
+  }
+}
+
+void
+FortranProgramDeclarationsAndDefinitions::analyseParallelLoopArguments (
     FortranParallelLoop * parallelLoop, SgExpressionPtrList & actualArguments)
 {
   using boost::iequals;
@@ -107,186 +172,111 @@ FortranProgramDeclarationsAndDefinitions::retrieveOpDatDeclarations (
   using std::vector;
   using std::map;
 
-  Debug::getInstance ()->debugMessage ("Retrieving OP_DAT declarations",
-      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+  Debug::getInstance ()->debugMessage (
+      "Analysing OP_PAR_LOOP actual arguments", Debug::FUNCTION_LEVEL,
+      __FILE__, __LINE__);
 
-  int opDatArgumentGroup = 0;
+  unsigned int opDatArgumentGroup = 1;
 
-  for (vector <SgExpression *>::iterator it = actualArguments.begin (); it
-      != actualArguments.end (); ++it)
+  for (unsigned int offset = parallelLoop->NUMBER_OF_NON_OP_DAT_ARGUMENTS; offset
+      < actualArguments.size (); offset
+      += parallelLoop->NUMBER_OF_ARGUMENTS_PER_OP_DAT)
   {
-    switch ((*it)->variantT ())
+    /*
+     * ======================================================
+     * Get the OP_DAT variable name
+     * ======================================================
+     */
+
+    unsigned int opDatArgumentPosition = offset
+        + parallelLoop->POSITION_OF_OP_DAT;
+
+    SgVarRefExp * opDatReference;
+
+    if (isSgDotExp (actualArguments[opDatArgumentPosition]) != NULL)
     {
-      case V_SgVarRefExp:
+      opDatReference = isSgVarRefExp (isSgDotExp (
+          actualArguments[opDatArgumentPosition])->get_rhs_operand ());
+    }
+    else
+    {
+      opDatReference = isSgVarRefExp (actualArguments[opDatArgumentPosition]);
+    }
+
+    string const opDatName =
+        opDatReference->get_symbol ()->get_name ().getString ();
+
+    unsigned int opMapArgumentPosition = offset
+        + parallelLoop->POSITION_OF_MAPPING;
+
+    /*
+     * ======================================================
+     * Get the OP_MAP name
+     * ======================================================
+     */
+
+    SgVarRefExp * opMapReference;
+
+    if (isSgDotExp (actualArguments[opMapArgumentPosition]) != NULL)
+    {
+      opMapReference = isSgVarRefExp (isSgDotExp (
+          actualArguments[opMapArgumentPosition])->get_rhs_operand ());
+    }
+    else
+    {
+      opMapReference = isSgVarRefExp (actualArguments[opMapArgumentPosition]);
+    }
+
+    string const mappingValue =
+        opMapReference->get_symbol ()->get_name ().getString ();
+
+    Debug::getInstance ()->debugMessage ("OP_DAT '" + opDatName + "'",
+        Debug::OUTER_LOOP_LEVEL, __FILE__, __LINE__);
+
+    if (iequals (mappingValue, OP2::OP_GBL))
+    {
+      /*
+       * ======================================================
+       * OP_GBL signals that the OP_DAT is a global variable
+       * ======================================================
+       */
+      Debug::getInstance ()->debugMessage ("...GLOBAL mapping descriptor",
+          Debug::OUTER_LOOP_LEVEL, __FILE__, __LINE__);
+
+      handleOpGblDeclaration (parallelLoop, opDatName, opDatArgumentGroup);
+
+      parallelLoop->setOpMapValue (opDatArgumentGroup, GLOBAL);
+    }
+    else
+    {
+      handleOpDatDeclaration (parallelLoop, opDatName, opDatArgumentGroup);
+
+      if (iequals (mappingValue, OP2::OP_ID))
       {
         /*
          * ======================================================
-         * The argument of the OP_PAR_LOOP is a variable
-         * reference (expression)
+         * OP_ID signals identity mapping and therefore direct
+         * access to the data
          * ======================================================
          */
+        Debug::getInstance ()->debugMessage ("...DIRECT mapping descriptor",
+            Debug::OUTER_LOOP_LEVEL, __FILE__, __LINE__);
 
-        SgVarRefExp * variableReference = isSgVarRefExp (*it);
-
-        switch (variableReference->get_type ()->variantT ())
-        {
-          case V_SgClassType:
-          {
-            SgClassType * classReference = isSgClassType (
-                variableReference->get_type ());
-
-            string const variableName =
-                variableReference->get_symbol ()->get_name ().getString ();
-
-            string const className = classReference->get_name ().getString ();
-
-            if (iequals (className, OP2::OP_DAT))
-            {
-              opDatArgumentGroup++;
-
-              /*
-               * ======================================================
-               * Found an OP_DAT variable. To retrieve its declaration,
-               * we must check whether it was declared via OP_DECL_DAT
-               * or OP_DECL_GBL
-               * ======================================================
-               */
-
-              try
-              {
-                handleOpDatDeclaration (parallelLoop, variableName,
-                    opDatArgumentGroup);
-              }
-              catch (const std::string &)
-              {
-                handleOpGblDeclaration (parallelLoop, variableName,
-                    opDatArgumentGroup);
-              }
-            }
-
-            else if (iequals (className, OP2::OP_MAP))
-            {
-              if (iequals (variableName, OP2::OP_ID))
-              {
-                /*
-                 * ======================================================
-                 * OP_ID signals identity mapping and therefore direct
-                 * access to the data
-                 * ======================================================
-                 */
-                Debug::getInstance ()->debugMessage (
-                    "...DIRECT mapping descriptor", Debug::OUTER_LOOP_LEVEL,
-                    __FILE__, __LINE__);
-
-                parallelLoop->setOpMapValue (opDatArgumentGroup, DIRECT);
-              }
-              else
-              {
-                if (iequals (variableName, OP2::OP_GBL))
-                {
-                  /*
-                   * ======================================================
-                   * OP_GBL signals that the OP_DAT is a global variable
-                   * ======================================================
-                   */
-                  Debug::getInstance ()->debugMessage (
-                      "...GLOBAL mapping descriptor", Debug::OUTER_LOOP_LEVEL,
-                      __FILE__, __LINE__);
-
-                  parallelLoop->setOpMapValue (opDatArgumentGroup, GLOBAL);
-                }
-
-                else
-                {
-                  Debug::getInstance ()->debugMessage (
-                      "...INDIRECT mapping descriptor",
-                      Debug::OUTER_LOOP_LEVEL, __FILE__, __LINE__);
-
-                  parallelLoop->setOpMapValue (opDatArgumentGroup, INDIRECT);
-                }
-              }
-            }
-
-            break;
-          }
-
-          case V_SgTypeInt:
-          {
-            string const variableName =
-                variableReference->get_symbol ()->get_name ().getString ();
-
-            if (iequals (variableName, OP2::OP_READ))
-            {
-              Debug::getInstance ()->debugMessage ("...READ access descriptor",
-                  Debug::OUTER_LOOP_LEVEL, __FILE__, __LINE__);
-
-              parallelLoop->setOpAccessValue (opDatArgumentGroup, READ_ACCESS);
-            }
-            else if (iequals (variableName, OP2::OP_WRITE))
-            {
-              Debug::getInstance ()->debugMessage (
-                  "...WRITE access descriptor", Debug::OUTER_LOOP_LEVEL,
-                  __FILE__, __LINE__);
-
-              parallelLoop->setOpAccessValue (opDatArgumentGroup, WRITE_ACCESS);
-            }
-            else if (iequals (variableName, OP2::OP_INC))
-            {
-              Debug::getInstance ()->debugMessage (
-                  "...INCREMENT access descriptor", Debug::OUTER_LOOP_LEVEL,
-                  __FILE__, __LINE__);
-
-              parallelLoop->setOpAccessValue (opDatArgumentGroup, INC_ACCESS);
-            }
-            else if (iequals (variableName, OP2::OP_RW))
-            {
-              Debug::getInstance ()->debugMessage (
-                  "...READ/WRITE access descriptor", Debug::OUTER_LOOP_LEVEL,
-                  __FILE__, __LINE__);
-
-              parallelLoop->setOpAccessValue (opDatArgumentGroup, RW_ACCESS);
-            }
-            else if (iequals (variableName, OP2::OP_MAX))
-            {
-              Debug::getInstance ()->debugMessage (
-                  "...MAXIMUM access descriptor", Debug::OUTER_LOOP_LEVEL,
-                  __FILE__, __LINE__);
-
-              parallelLoop->setOpAccessValue (opDatArgumentGroup, MAX_ACCESS);
-            }
-            else if (iequals (variableName, OP2::OP_MIN))
-            {
-              Debug::getInstance ()->debugMessage (
-                  "...MINIMUM access descriptor", Debug::OUTER_LOOP_LEVEL,
-                  __FILE__, __LINE__);
-
-              parallelLoop->setOpAccessValue (opDatArgumentGroup, MIN_ACCESS);
-            }
-            else
-            {
-              Debug::getInstance ()->errorMessage (
-                  "Unknown access descriptor: '" + variableName
-                      + "' for OP_DAT argument #" + lexical_cast <string> (
-                      opDatArgumentGroup), __FILE__, __LINE__);
-            }
-
-            break;
-          }
-
-          default:
-          {
-            break;
-          }
-        }
-
-        break;
+        parallelLoop->setOpMapValue (opDatArgumentGroup, DIRECT);
       }
-
-      default:
+      else
       {
-        break;
+        Debug::getInstance ()->debugMessage ("...INDIRECT mapping descriptor",
+            Debug::OUTER_LOOP_LEVEL, __FILE__, __LINE__);
+
+        parallelLoop->setOpMapValue (opDatArgumentGroup, INDIRECT);
       }
     }
+
+    setParallelLoopAccessDescriptor (parallelLoop, actualArguments,
+        opDatArgumentGroup, offset + +parallelLoop->POSITION_OF_ACCESS);
+
+    opDatArgumentGroup++;
   }
 }
 
@@ -305,7 +295,7 @@ FortranProgramDeclarationsAndDefinitions::visit (SgNode * node)
 
     currentSourceFile = p.filename ();
 
-    Debug::getInstance ()->debugMessage ("Source file '" + currentSourceFile
+    Debug::getInstance ()->debugMessage ("Given source file '" + currentSourceFile
         + "' detected", Debug::OUTER_LOOP_LEVEL, __FILE__, __LINE__ );
   }
   else if (Globals::getInstance ()->isInputFile (currentSourceFile))
@@ -511,7 +501,7 @@ FortranProgramDeclarationsAndDefinitions::visit (SgNode * node)
 
             parallelLoops[userSubroutineName] = parallelLoop;
 
-            retrieveOpDatDeclarations (parallelLoop, actualArguments);
+            analyseParallelLoopArguments (parallelLoop, actualArguments);
 
             parallelLoop->checkArguments ();
           }

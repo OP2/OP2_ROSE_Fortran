@@ -184,8 +184,8 @@ def runTests ():
 	for line in open(testsFile, 'r'):
 		tokens      = line.split(' ')
 		testNum     = tokens[0].strip()
-		FortranFile = tokens[1].strip()
-		testResult  = tokens[2].strip()	
+		testResult  = tokens[1].strip()
+		FortranFile = tokens[2].strip()	
 		run         = False
 
 		testInteger("The test number '%s' in the file '%s' is not an integer" % (testNum, testsFile), testNum)
