@@ -1,3 +1,0 @@
-translator=/home/abetts/SILOET/OP2_ROSE_Fortran/translator/bin/translator
-files=output.F95 input.F95 ISO_C_BINDING.F95 OP2.F95 constvars.F95 airfoil_seqfun.F95 airfoil.F95
-constants=constvars.F95
