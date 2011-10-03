@@ -221,16 +221,14 @@ FortranCUDAUserSubroutine::FortranCUDAUserSubroutine (
   using SageBuilder::buildProcedureHeaderStatement;
   using SageBuilder::buildVoidType;
   using SageInterface::appendStatement;
-  using SageInterface::addTextForUnparser;
 
   subroutineHeaderStatement = buildProcedureHeaderStatement (
       this->subroutineName.c_str (), buildVoidType (), formalParameters,
       SgProcedureHeaderStatement::e_subroutine_subprogram_kind, moduleScope);
 
-  appendStatement (subroutineHeaderStatement, moduleScope);
+  subroutineHeaderStatement->get_functionModifier ().setCudaDevice ();
 
-  addTextForUnparser (subroutineHeaderStatement, "attributes(device) ",
-      AstUnparseAttribute::e_before);
+  appendStatement (subroutineHeaderStatement, moduleScope);
 
   subroutineScope = subroutineHeaderStatement->get_definition ()->get_body ();
 

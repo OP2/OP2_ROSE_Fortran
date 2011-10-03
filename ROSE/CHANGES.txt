@@ -1,0 +1,163 @@
+This is a log of changes made to the ROSE compiler so that future versions of ROSE
+can be tuned accordingly to work with our translator.
+
+For each functional change, this file outlines:
+1) Which ROSE source file requires changing;
+2) The signature of the function requiring change,; 
+3) The code requiring insertion (this should be valid C++ so it can be copied verbatim);
+4) Brief rationale for the change.
+
+===== File backend/unparser/FortranCodeGeneration/unparseFortran_statements.C =====
+
+--------
+Function
+-------- 
+void
+FortranCodeGeneration_locatedNode::
+unparseProcHdrStmt (SgStatement* stmt, SgUnparse_Info& info)
+
+-------
+Changes
+-------
+// Imperial College changes 
+if (procedureHeader->get_functionModifier ().isCudaDevice () == true)
+{
+  curprint("attributes (device) ");
+}
+else if (procedureHeader->get_functionModifier ().isCudaKernel () == true)
+{
+  curprint("attributes (global) ");
+}
+else if (procedureHeader->get_functionModifier ().isCudaHost () == true)
+{
+  curprint("attributes (host) ");
+}
+
+---------
+Rationale
+---------
+Support to print CUDA function modifiers in Fortran
+
+===== File backend/unparser/FortranCodeGeneration/unparseFortran_statements.C  =====
+
+--------
+Function
+--------
+void
+FortranCodeGeneration_locatedNode::
+unparseVarDecl (SgStatement* stmt, SgInitializedName* initializedName, SgUnparse_Info& info)
+
+-------
+Changes
+-------
+// Imperial College changes
+if (variableDeclaration->get_declarationModifier ().get_storageModifier ().isCudaDevice () == true)
+{
+  curprint (", DEVICE");
+}
+if (variableDeclaration->get_declarationModifier ().get_storageModifier ().isCudaShared () == true)
+{
+  curprint (", SHARED");
+}
+if (variableDeclaration->get_declarationModifier ().get_storageModifier ().isCudaConstant () == true)
+{
+  curprint (", CONSTANT");
+}
+
+---------
+Rationale
+---------
+Support to print variable declaration storage modifiers in CUDA Fortran
+
+===== File backend/unparser/languageIndependenceSupport/modified_sage.C =====
+
+--------
+Function
+--------
+
+void
+Unparse_MOD_SAGE::
+printSpecifier1 (SgDeclarationStatement * decl_stmt, SgUnparse_Info & info)
+
+-------
+Changes
+-------
+
+// Imperial College changes 
+if (decl_stmt->get_declarationModifier ().get_accessModifier ().isPrivate ())
+{
+  info.set_isPrivateAccess ();
+  if (flag)
+  {
+    curprint ("private: ");
+    // printf ("Output PRIVATE keyword! \n");
+  }
+}
+else if (decl_stmt->get_declarationModifier ().get_accessModifier ().isProtected ())
+{
+  info.set_isProtectedAccess ();
+  if (flag)
+  {
+    curprint ("protected: ");
+    // printf ("Output PROTECTED keyword! \n");
+  }
+}
+else if (decl_stmt->get_declarationModifier ().get_accessModifier ().isPublic ())
+{
+  info.set_isPublicAccess ();
+  if (flag)
+  {
+    curprint ("public: ");
+    // printf ("Output PUBLIC keyword! \n");
+  }
+}
+
+---------
+Rationale
+---------
+
+Fortran type declarations should not print out access modifiers
+
+===== File ROSETTA/Grammar/Support.code =====
+
+--------
+Function
+--------
+
+None. This looks like templated code which is generated whether certain macros hold or not
+
+--------
+Change 1
+--------
+
+// Imperial College changes 
+e_cuda_device	     = 19,
+
+// TV (05/06/2010): Support for OpenCL storage modifiers
+e_opencl_global   = 20, /*!< OpenCL, accessible from all the device */
+e_opencl_local    = 21, /*!< OpenCL, accessible for a work-group only */
+e_opencl_constant = 22, /*!< OpenCL, read-only variable accessible from all the device */
+e_opencl_private  = 23, /*!< OpenCL, accessible only from one work-item */
+
+--------
+Change 2
+--------
+
+// Imperial College changes 
+bool isCudaDevice() const;
+void setCudaDevice();
+
+--------
+Change 3
+--------
+
+// Imperial College changes 
+bool SgStorageModifier::isCudaDevice() const { return p_modifier == e_cuda_device; }
+void SgStorageModifier::setCudaDevice()      { p_modifier = e_cuda_device; }
+
+---------
+Rationale
+---------
+
+Need an additional attribute to support CUDA Fortran DEVICE attribute of variable 
+declarations

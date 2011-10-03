@@ -407,10 +407,7 @@ FortranCUDAKernelSubroutine::FortranCUDAKernelSubroutine (
       opDatDimensionsDeclaration (opDatDimensionsDeclaration),
       moduleDeclarations (moduleDeclarations)
 {
-  using SageInterface::addTextForUnparser;
-
   this->reductionSubroutines = reductionSubroutines;
 
-  addTextForUnparser (subroutineHeaderStatement, "attributes(global) ",
-      AstUnparseAttribute::e_before);
+  subroutineHeaderStatement->get_functionModifier ().setCudaKernel ();
 }

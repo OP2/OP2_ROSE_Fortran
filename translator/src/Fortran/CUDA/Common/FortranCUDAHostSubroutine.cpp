@@ -340,7 +340,8 @@ FortranCUDAHostSubroutine::createTransferOpDatStatements ()
 
         SgExprStatement * assignmentStatement = buildAssignStatement (
             buildVarRefExp (variableDeclarations->get (
-                OP2::VariableNames::getOpDatCardinalityName (i))), rhsOfAssigment);
+                OP2::VariableNames::getOpDatCardinalityName (i))),
+            rhsOfAssigment);
 
         appendStatement (assignmentStatement, block);
       }
@@ -395,10 +396,13 @@ FortranCUDAHostSubroutine::createTransferOpDatStatements ()
             variableDeclarations->get (OP2::VariableNames::getOpDatDeviceName (
                 i)));
 
-        SgExpression * parameterExpression3A = buildOpaqueVarRefExp ("(/"
-            + buildVarRefExp (variableDeclarations->get (
-                OP2::VariableNames::getOpDatCardinalityName (i)))->unparseToString ()
-            + "/)", block);
+        SgExpression
+            * parameterExpression3A =
+                buildOpaqueVarRefExp (
+                    "(/"
+                        + buildVarRefExp (variableDeclarations->get (
+                            OP2::VariableNames::getOpDatCardinalityName (i)))->unparseToString ()
+                        + "/)", block);
 
         SgStatement * callStatementA =
             SubroutineCalls::Fortran::createCToFortranPointerCallStatement (
@@ -501,7 +505,8 @@ FortranCUDAHostSubroutine::createDataMarshallingLocalVariableDeclarations ()
                 + lexical_cast <string> (i), Debug::HIGHEST_DEBUG_LEVEL,
             __FILE__, __LINE__);
 
-        string const & variableName = OP2::VariableNames::getOpDatCardinalityName (i);
+        string const & variableName =
+            OP2::VariableNames::getOpDatCardinalityName (i);
 
         variableDeclarations->add (variableName,
             FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
@@ -596,8 +601,5 @@ FortranCUDAHostSubroutine::FortranCUDAHostSubroutine (
       dataSizesDeclaration), opDatDimensionsDeclaration (
       opDatDimensionsDeclaration), moduleDeclarations (moduleDeclarations)
 {
-  using SageInterface::addTextForUnparser;
-
-  addTextForUnparser (subroutineHeaderStatement, "attributes(host) ",
-      AstUnparseAttribute::e_before);
+  subroutineHeaderStatement->get_functionModifier ().setCudaHost ();
 }

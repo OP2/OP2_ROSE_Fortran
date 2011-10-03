@@ -1,7 +1,7 @@
-# 1 "/home/abetts/SILOET/OP2_ROSE_Fortran/examples/Fortran/tests/Globals/Test2yI2pVn.F90"
+# 1 "/home/abetts/SILOET/OP2_ROSE_Fortran/tests/Fortran/Globals/Test2DrfuyQ.F90"
 # 1 "<built-in>"
 # 1 "<command-line>"
-# 1 "/home/abetts/SILOET/OP2_ROSE_Fortran/examples/Fortran/tests/Globals/Test2yI2pVn.F90"
+# 1 "/home/abetts/SILOET/OP2_ROSE_Fortran/tests/Fortran/Globals/Test2DrfuyQ.F90"
 ! This program contains a read/write to an OP_GBL which is not allowed
 ! and should therefore be flagged as an error by the compiler
 

@@ -5,13 +5,13 @@ depends on the OP_PAR_LOOP (e.g. types of OP_DAT passed), so check before adding
 one because there might be one already that is sufficient.
 
 Then add a line to the file 'testsToRun' with the following syntax:
-TestCase FortranFile PASS|FAIL
+TestCase (PASS|FAIL) (FortranFile)+ 
 where TestCase is a positive integer
-      FortranFile is the test case created
       PASS|FAIL is the lexeme describing the expected result of the test
+      FortranFile is a Fortran file associated with this test case
 
 For instance:
-12 Test12.F95 FAIL
+12 FAIL Test12.F95 
 says that test number 12 associated with Fortran file Test12.F95 is expected to fail.
 
 To run tests, use the 'runTests' Python script found in the 'OP2_ROSE_Fortran/scripts' directory.
@@ -30,3 +30,4 @@ When a test case should pass, the translator should generate a bunch of Fortran 
 are output into a sub-directory 'generatedFiles' such that each generated file has a prefix
 Test<number> and a suffix File<number>.F95. A makefile, intended for the backend compiler, is
 also generated for each test case (provided the test case should pass).
+

@@ -1,7 +1,7 @@
-# 1 "/home/abetts/SILOET/OP2_ROSE_Fortran/examples/Fortran/tests/Globals/Test55lqZD6.F90"
+# 1 "/home/abetts/SILOET/OP2_ROSE_Fortran/tests/Fortran/Globals/Test51ogLQW.F90"
 # 1 "<built-in>"
 # 1 "<command-line>"
-# 1 "/home/abetts/SILOET/OP2_ROSE_Fortran/examples/Fortran/tests/Globals/Test55lqZD6.F90"
+# 1 "/home/abetts/SILOET/OP2_ROSE_Fortran/tests/Fortran/Globals/Test51ogLQW.F90"
 ! This program contains:
 ! 1) An OP_GBL (scalar) with INCREMENT access
 ! 2) An OP_GBL (scalar) with READ access

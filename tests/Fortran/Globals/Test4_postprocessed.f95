@@ -1,7 +1,7 @@
-# 1 "/home/abetts/SILOET/OP2_ROSE_Fortran/examples/Fortran/tests/Globals/Test4gI6ejM.F90"
+# 1 "/home/abetts/SILOET/OP2_ROSE_Fortran/tests/Fortran/Globals/Test4WUcRht.F90"
 # 1 "<built-in>"
 # 1 "<command-line>"
-# 1 "/home/abetts/SILOET/OP2_ROSE_Fortran/examples/Fortran/tests/Globals/Test4gI6ejM.F90"
+# 1 "/home/abetts/SILOET/OP2_ROSE_Fortran/tests/Fortran/Globals/Test4WUcRht.F90"
 ! This program contains:
 ! 1) An OP_DAT with WRITE access
 ! 2) An OP_GBL (array) with READ access

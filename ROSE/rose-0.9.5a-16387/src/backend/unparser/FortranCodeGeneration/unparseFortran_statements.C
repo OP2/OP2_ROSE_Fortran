@@ -4662,6 +4662,20 @@ FortranCodeGeneration_locatedNode::unparseProcHdrStmt (SgStatement* stmt,
       curprint ("recursive ");
     }
 
+    // Adam Betts (03/10/2011): Added support for CUDA attributes
+    if (procedureHeader->get_functionModifier ().isCudaDevice () == true)
+    {
+      curprint("attributes (device) ");
+    }
+    else if (procedureHeader->get_functionModifier ().isCudaKernel () == true)
+    {
+      curprint("attributes (global) ");
+    }
+    else if (procedureHeader->get_functionModifier ().isCudaHost () == true)
+    {
+      curprint("attributes (host) ");
+    }
+
     // Output the forward declaration only
     // printf ("Output the forward declaration only \n");
     // curprint ("! Output the forward declaration only \n ");
