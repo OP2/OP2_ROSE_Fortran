@@ -1,0 +1,19 @@
+FC      = pgfortran
+FC_OPT  = -Mcuda=cuda3.1 -fast -O2 -Mcuda=ptxinfo -Minform=inform
+OUT     = Test2
+OP2_DIR = 
+
+# Phony targets
+.PHONY: all clean
+
+all: fortranFiles link
+
+clean:
+	rm -f *.o *.mod *.MOD $(OUT)
+
+fortranFiles: cudaConfigurationParams.F95 op2_c.F95 Test2File1.CUF Test2File2.F95 
+	$(FC) $(FC_OPT) -c cudaConfigurationParams.F95 op2_c.F95 Test2File1.CUF Test2File2.F95 
+
+link: $(OP2_DIR)/op_support.o $(OP2_DIR)/op_seq.o $(OP2_DIR)/debug.o cudaConfigurationParams.o op2_c.o Test2File1.o Test2File2.o 
+	$(FC) $(FC_OPT) $(OP2_DIR)/op_support.o $(OP2_DIR)/op_seq.o $(OP2_DIR)/debug.o cudaConfigurationParams.o op2_c.o Test2File1.o Test2File2.o -o Test2
+

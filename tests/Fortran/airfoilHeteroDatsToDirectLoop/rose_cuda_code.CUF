@@ -1,0 +1,1888 @@
+MODULE GENERATED_MODULE
+  USE ISO_C_BINDING
+  USE OP2_C
+  USE cudaConfigurationParams
+  USE CUDAFOR
+  TYPE  :: adt_calc_opDatDimensions
+  INTEGER(kind=4) :: opDat1Dimension
+  INTEGER(kind=4) :: opDat2Dimension
+  INTEGER(kind=4) :: opDat3Dimension
+  INTEGER(kind=4) :: opDat4Dimension
+  INTEGER(kind=4) :: opDat5Dimension
+  INTEGER(kind=4) :: opDat6Dimension
+  END TYPE adt_calc_opDatDimensions
+
+  TYPE  :: adt_calc_opDatCardinalities
+  INTEGER(kind=4) :: opDat1Cardinality
+  INTEGER(kind=4) :: opDat5Cardinality
+  INTEGER(kind=4) :: opDat6Cardinality
+  INTEGER(kind=4) :: pindMaps1Size
+  INTEGER(kind=4) :: pMaps1Size
+  INTEGER(kind=4) :: pMaps2Size
+  INTEGER(kind=4) :: pMaps3Size
+  INTEGER(kind=4) :: pMaps4Size
+  INTEGER(kind=4) :: pblkMapSize
+  INTEGER(kind=4) :: pindOffsSize
+  INTEGER(kind=4) :: pindSizesSize
+  INTEGER(kind=4) :: pnelemsSize
+  INTEGER(kind=4) :: pnthrcolSize
+  INTEGER(kind=4) :: poffsetSize
+  INTEGER(kind=4) :: pthrcolSize
+  END TYPE adt_calc_opDatCardinalities
+
+  TYPE  :: bres_calc_opDatDimensions
+  INTEGER(kind=4) :: opDat1Dimension
+  INTEGER(kind=4) :: opDat2Dimension
+  INTEGER(kind=4) :: opDat3Dimension
+  INTEGER(kind=4) :: opDat4Dimension
+  INTEGER(kind=4) :: opDat5Dimension
+  INTEGER(kind=4) :: opDat6Dimension
+  END TYPE bres_calc_opDatDimensions
+
+  TYPE  :: bres_calc_opDatCardinalities
+  INTEGER(kind=4) :: opDat1Cardinality
+  INTEGER(kind=4) :: opDat3Cardinality
+  INTEGER(kind=4) :: opDat4Cardinality
+  INTEGER(kind=4) :: opDat5Cardinality
+  INTEGER(kind=4) :: opDat6Cardinality
+  INTEGER(kind=4) :: pindMaps1Size
+  INTEGER(kind=4) :: pMaps1Size
+  INTEGER(kind=4) :: pMaps2Size
+  INTEGER(kind=4) :: pindMaps3Size
+  INTEGER(kind=4) :: pMaps3Size
+  INTEGER(kind=4) :: pindMaps4Size
+  INTEGER(kind=4) :: pMaps4Size
+  INTEGER(kind=4) :: pindMaps5Size
+  INTEGER(kind=4) :: pMaps5Size
+  INTEGER(kind=4) :: pblkMapSize
+  INTEGER(kind=4) :: pindOffsSize
+  INTEGER(kind=4) :: pindSizesSize
+  INTEGER(kind=4) :: pnelemsSize
+  INTEGER(kind=4) :: pnthrcolSize
+  INTEGER(kind=4) :: poffsetSize
+  INTEGER(kind=4) :: pthrcolSize
+  END TYPE bres_calc_opDatCardinalities
+
+  TYPE  :: res_calc_opDatDimensions
+  INTEGER(kind=4) :: opDat1Dimension
+  INTEGER(kind=4) :: opDat2Dimension
+  INTEGER(kind=4) :: opDat3Dimension
+  INTEGER(kind=4) :: opDat4Dimension
+  INTEGER(kind=4) :: opDat5Dimension
+  INTEGER(kind=4) :: opDat6Dimension
+  INTEGER(kind=4) :: opDat7Dimension
+  INTEGER(kind=4) :: opDat8Dimension
+  END TYPE res_calc_opDatDimensions
+
+  TYPE  :: res_calc_opDatCardinalities
+  INTEGER(kind=4) :: opDat1Cardinality
+  INTEGER(kind=4) :: opDat3Cardinality
+  INTEGER(kind=4) :: opDat5Cardinality
+  INTEGER(kind=4) :: opDat7Cardinality
+  INTEGER(kind=4) :: pindMaps1Size
+  INTEGER(kind=4) :: pMaps1Size
+  INTEGER(kind=4) :: pMaps2Size
+  INTEGER(kind=4) :: pindMaps3Size
+  INTEGER(kind=4) :: pMaps3Size
+  INTEGER(kind=4) :: pMaps4Size
+  INTEGER(kind=4) :: pindMaps5Size
+  INTEGER(kind=4) :: pMaps5Size
+  INTEGER(kind=4) :: pMaps6Size
+  INTEGER(kind=4) :: pindMaps7Size
+  INTEGER(kind=4) :: pMaps7Size
+  INTEGER(kind=4) :: pMaps8Size
+  INTEGER(kind=4) :: pblkMapSize
+  INTEGER(kind=4) :: pindOffsSize
+  INTEGER(kind=4) :: pindSizesSize
+  INTEGER(kind=4) :: pnelemsSize
+  INTEGER(kind=4) :: pnthrcolSize
+  INTEGER(kind=4) :: poffsetSize
+  INTEGER(kind=4) :: pthrcolSize
+  END TYPE res_calc_opDatCardinalities
+
+  TYPE  :: save_soln_opDatDimensions
+  INTEGER(kind=4) :: opDat1Dimension
+  INTEGER(kind=4) :: opDat2Dimension
+  INTEGER(kind=4) :: opDat3Dimension
+  END TYPE save_soln_opDatDimensions
+
+  TYPE  :: save_soln_opDatCardinalities
+  INTEGER(kind=4) :: opDat1Cardinality
+  INTEGER(kind=4) :: opDat2Cardinality
+  INTEGER(kind=4) :: opDat3Cardinality
+  END TYPE save_soln_opDatCardinalities
+
+  TYPE  :: update_opDatDimensions
+  INTEGER(kind=4) :: opDat1Dimension
+  INTEGER(kind=4) :: opDat2Dimension
+  INTEGER(kind=4) :: opDat3Dimension
+  INTEGER(kind=4) :: opDat4Dimension
+  INTEGER(kind=4) :: opDat5Dimension
+  END TYPE update_opDatDimensions
+
+  TYPE  :: update_opDatCardinalities
+  INTEGER(kind=4) :: opDat1Cardinality
+  INTEGER(kind=4) :: opDat2Cardinality
+  INTEGER(kind=4) :: opDat3Cardinality
+  INTEGER(kind=4) :: opDat4Cardinality
+  INTEGER(kind=4) :: opDat5Cardinality
+  END TYPE update_opDatCardinalities
+
+  LOGICAL :: isFirstTime_adt_calc = .TRUE.
+  TYPE ( c_ptr )  :: planRet_adt_calc
+  TYPE ( adt_calc_opDatCardinalities ) , DEVICE :: sizes_adt_calc
+  TYPE ( adt_calc_opDatDimensions ) , DEVICE :: dimensions_adt_calc
+  LOGICAL :: isFirstTime_bres_calc = .TRUE.
+  TYPE ( c_ptr )  :: planRet_bres_calc
+  TYPE ( bres_calc_opDatCardinalities ) , DEVICE :: sizes_bres_calc
+  TYPE ( bres_calc_opDatDimensions ) , DEVICE :: dimensions_bres_calc
+  LOGICAL :: isFirstTime_res_calc = .TRUE.
+  TYPE ( c_ptr )  :: planRet_res_calc
+  TYPE ( res_calc_opDatCardinalities ) , DEVICE :: sizes_res_calc
+  TYPE ( res_calc_opDatDimensions ) , DEVICE :: dimensions_res_calc
+  LOGICAL :: isFirstTime_save_soln = .TRUE.
+  TYPE ( save_soln_opDatCardinalities ) , DEVICE :: sizes_save_soln
+  TYPE ( save_soln_opDatDimensions ) , DEVICE :: dimensions_save_soln
+  LOGICAL :: isFirstTime_update = .TRUE.
+  TYPE ( update_opDatCardinalities ) , DEVICE :: sizes_update
+  TYPE ( update_opDatDimensions ) , DEVICE :: dimensions_update
+  REAL(kind=8), ALLOCATABLE :: reductionArrayHost5update(:)
+  REAL(kind=8), DEVICE, ALLOCATABLE :: reductionArrayDevice5update(:)
+  REAL(kind=8), CONSTANT :: alpha
+  REAL(kind=8), CONSTANT :: cfl
+  REAL(kind=8), CONSTANT :: eps
+  REAL(kind=8), CONSTANT :: gam
+  REAL(kind=8), CONSTANT :: gm1
+  REAL(kind=8), CONSTANT :: mach
+  REAL(kind=8), CONSTANT :: qinf(4)
+  CONTAINS
+
+  attributes(device) SUBROUTINE ReductionFloat8(reductionResult,inputValue,warpSize,reductionOperation)
+    REAL(kind=8), DEVICE :: reductionResult(:)
+    REAL(kind=8), VALUE :: inputValue
+    INTEGER(kind=4), VALUE :: warpSize
+    INTEGER(kind=4), VALUE :: reductionOperation
+    REAL(kind=8), SHARED :: sharedFloat8(0:*)
+    INTEGER(kind=4) :: i1
+    INTEGER(kind=4) :: threadID
+    threadID = threadidx%x - 1
+    i1 = ishft(blockdim%x,-1)
+    CALL syncthreads()
+    sharedFloat8(threadID) = inputValue
+
+    DO WHILE (i1 > 0)
+      CALL syncthreads()
+
+      IF (threadID < i1) THEN
+
+        SELECT CASE(reductionOperation)
+          CASE (0)
+          sharedFloat8(threadID) = sharedFloat8(threadID) + sharedFloat8(threadID + i1)
+          CASE (1)
+
+          IF (sharedFloat8(threadID + i1) < sharedFloat8(threadID)) THEN
+            sharedFloat8(threadID) = sharedFloat8(threadID + i1)
+          END IF
+
+          CASE (2)
+
+          IF (sharedFloat8(threadID + i1) > sharedFloat8(threadID)) THEN
+            sharedFloat8(threadID) = sharedFloat8(threadID + i1)
+          END IF
+
+        END SELECT
+
+      END IF
+
+      i1 = ishft(i1,-1)
+    END DO
+
+    CALL syncthreads()
+
+    IF (threadID .EQ. 0) THEN
+
+      SELECT CASE(reductionOperation)
+        CASE (0)
+        reductionResult(1) = reductionResult(1) + sharedFloat8(0)
+        CASE (1)
+
+        IF (sharedFloat8(0) < reductionResult(1)) THEN
+          reductionResult(1) = sharedFloat8(0)
+        END IF
+
+        CASE (2)
+
+        IF (sharedFloat8(0) > reductionResult(1)) THEN
+          reductionResult(1) = sharedFloat8(0)
+        END IF
+
+      END SELECT
+
+    END IF
+
+    CALL syncthreads()
+  END SUBROUTINE
+
+  attributes(device) SUBROUTINE adt_calc_device(x1,x2,x3,x4,q,adt)
+    IMPLICIT NONE
+    REAL(kind=8), SHARED :: x1(*)
+    REAL(kind=8), SHARED :: x2(*)
+    REAL(kind=8), SHARED :: x3(*)
+    REAL(kind=8), SHARED :: x4(*)
+    REAL(kind=8), SHARED :: q(*)
+    REAL(kind=8), SHARED :: adt(*)
+    REAL(kind=8) :: dx
+    REAL(kind=8) :: dy
+    REAL(kind=8) :: ri
+    REAL(kind=8) :: u
+    REAL(kind=8) :: v
+    REAL(kind=8) :: c
+    ri = 1.0 / q(1)
+    u = ri * q(2)
+    v = ri * q(3)
+    c = sqrt(gam * gm1 * (ri * q(4) - 0.5 * (u * u + v * v)))
+    dx = x2(1) - x1(1)
+    dy = x2(2) - x1(2)
+    adt(1) = abs(u * dy - v * dx) + c * sqrt(dx * dx + dy * dy)
+    dx = x3(1) - x2(1)
+    dy = x3(2) - x2(2)
+    adt(1) = adt(1) + abs(u * dy - v * dx) + c * sqrt(dx * dx + dy * dy)
+    dx = x4(1) - x3(1)
+    dy = x4(2) - x3(2)
+    adt(1) = adt(1) + abs(u * dy - v * dx) + c * sqrt(dx * dx + dy * dy)
+    dx = x1(1) - x4(1)
+    dy = x1(2) - x4(2)
+    adt(1) = adt(1) + abs(u * dy - v * dx) + c * sqrt(dx * dx + dy * dy)
+    adt(1) = adt(1) / cfl
+  END SUBROUTINE
+
+  attributes(global) SUBROUTINE adt_calc_kernel(dimensions_adt_calc_device,sizes_adt_calc_device,opDat1,pindMaps1,pMaps&
+  &1,pMaps2,pMaps3,pMaps4,opDat5,opDat6,pindSizes,pindOffs,pblkMap,poffset,pnelems,pnthrcol,pthrcol,blockOffset)
+    IMPLICIT NONE
+    TYPE ( adt_calc_opDatDimensions ) , DEVICE :: dimensions_adt_calc_device
+    TYPE ( adt_calc_opDatCardinalities ) , DEVICE :: sizes_adt_calc_device
+    REAL(kind=8), DEVICE :: opDat1(0:sizes_adt_calc_device%opDat1Cardinality - 1)
+    INTEGER(kind=4), DEVICE :: pindMaps1(0:sizes_adt_calc_device%pindMaps1Size - 1)
+    INTEGER(kind=2), DEVICE :: pMaps1(0:sizes_adt_calc_device%pMaps1Size - 1)
+    INTEGER(kind=2), DEVICE :: pMaps2(0:sizes_adt_calc_device%pMaps2Size - 1)
+    INTEGER(kind=2), DEVICE :: pMaps3(0:sizes_adt_calc_device%pMaps3Size - 1)
+    INTEGER(kind=2), DEVICE :: pMaps4(0:sizes_adt_calc_device%pMaps4Size - 1)
+    REAL(kind=8), DEVICE :: opDat5(0:sizes_adt_calc_device%opDat5Cardinality - 1)
+    REAL(kind=8), DEVICE :: opDat6(0:sizes_adt_calc_device%opDat6Cardinality - 1)
+    INTEGER(kind=4), DEVICE :: pindSizes(0:sizes_adt_calc_device%pindSizesSize - 1)
+    INTEGER(kind=4), DEVICE :: pindOffs(0:sizes_adt_calc_device%pindOffsSize - 1)
+    INTEGER(kind=4), DEVICE :: pblkMap(0:sizes_adt_calc_device%pblkMapSize - 1)
+    INTEGER(kind=4), DEVICE :: poffset(0:sizes_adt_calc_device%poffsetSize - 1)
+    INTEGER(kind=4), DEVICE :: pnelems(0:sizes_adt_calc_device%pnelemsSize - 1)
+    INTEGER(kind=4), DEVICE :: pnthrcol(0:sizes_adt_calc_device%pnthrcolSize - 1)
+    INTEGER(kind=4), DEVICE :: pthrcol(0:sizes_adt_calc_device%pthrcolSize - 1)
+    INTEGER(kind=4), VALUE :: blockOffset
+    REAL(kind=8) :: opDat5Local(0:3)
+    REAL(kind=8), SHARED :: sharedFloat8(0:*)
+    INTEGER(kind=4) :: sharedOffsetFloat8
+    INTEGER(kind=4) :: nBytes1
+    INTEGER(kind=4) :: nBytes5
+    INTEGER(kind=4) :: nBytes6
+    INTEGER(kind=4) :: roundUp1
+    INTEGER(kind=4) :: roundUp5
+    INTEGER(kind=4) :: roundUp6
+    INTEGER(kind=4), SHARED :: ind_arg1
+    INTEGER(kind=4), SHARED :: blockID
+    INTEGER(kind=4), SHARED :: sharedMemoryOffset
+    INTEGER(kind=4), SHARED :: numOfColours
+    INTEGER(kind=4), SHARED :: nelems
+    INTEGER(kind=4), SHARED :: nelems2
+    INTEGER(kind=4) :: colour
+    INTEGER(kind=4) :: colour2
+    INTEGER(kind=4) :: moduloResult
+    INTEGER(kind=4) :: nbytes
+    INTEGER(kind=4) :: i1
+    INTEGER(kind=4) :: i2
+    INTEGER(kind=4) :: bound
+
+    IF (threadidx%x - 1 .EQ. 0) THEN
+      blockID = pblkMap(threadidx%x - 1 + blockOffset)
+      nelems = pnelems(blockID)
+      sharedMemoryOffset = poffset(blockID)
+      nelems2 = blockdim%x * (1 + (nelems - 1) / blockdim%x)
+      numOfColours = pnthrcol(blockID)
+      ind_arg1 = pindSizes(0 + blockID * 1)
+    END IF
+
+    CALL syncthreads()
+    roundUp1 = ind_arg1 * dimensions_adt_calc_device%opDat1Dimension
+    nBytes1 = 0
+    i1 = blockdim%x - 1
+    bound = ind_arg1 * dimensions_adt_calc_device%opDat1Dimension
+
+    DO WHILE (i1 < bound)
+      moduloResult = mod(i1,dimensions_adt_calc_device%opDat1Dimension)
+      sharedFloat8(nBytes1 + i1) = opDat1(moduloResult + pindMaps1(0 + (pindOffs(0 + blockID * 1) + i1 / dimensions_adt&
+      &_calc_device%opDat1Dimension)) * dimensions_adt_calc_device%opDat1Dimension)
+      i1 = i1 + blockdim%x
+    END DO
+
+    CALL syncthreads()
+    i1 = threadidx%x - 1
+
+    DO WHILE (i1 < nelems2)
+      colour2 = -1
+
+      IF (i1 < nelems) THEN
+        CALL adt_calc_device(sharedFloat8(nBytes1 + pMaps1(i1 + sharedMemoryOffset) * dimensions_adt_calc_device%opDat1&
+        &Dimension:nBytes1 + pMaps1(i1 + sharedMemoryOffset) * dimensions_adt_calc_device%opDat1Dimension + dimensions_&
+        &adt_calc_device%opDat1Dimension),sharedFloat8(nBytes1 + pMaps2(i1 + sharedMemoryOffset) * dimensions_adt_calc_&
+        &device%opDat2Dimension:nBytes1 + pMaps2(i1 + sharedMemoryOffset) * dimensions_adt_calc_device%opDat2Dimension &
+        &+ dimensions_adt_calc_device%opDat2Dimension),sharedFloat8(nBytes1 + pMaps3(i1 + sharedMemoryOffset) * dimensi&
+        &ons_adt_calc_device%opDat3Dimension:nBytes1 + pMaps3(i1 + sharedMemoryOffset) * dimensions_adt_calc_device%opD&
+        &at3Dimension + dimensions_adt_calc_device%opDat3Dimension),sharedFloat8(nBytes1 + pMaps4(i1 + sharedMemoryOffs&
+        &et) * dimensions_adt_calc_device%opDat4Dimension:nBytes1 + pMaps4(i1 + sharedMemoryOffset) * dimensions_adt_ca&
+        &lc_device%opDat4Dimension + dimensions_adt_calc_device%opDat4Dimension),opDat5((i1 + sharedMemoryOffset) * dim&
+        &ensions_adt_calc_device%opDat5Dimension:(i1 + sharedMemoryOffset) * dimensions_adt_calc_device%opDat5Dimension&
+        & + dimensions_adt_calc_device%opDat5Dimension),opDat6((i1 + sharedMemoryOffset) * dimensions_adt_calc_device%o&
+        &pDat6Dimension:(i1 + sharedMemoryOffset) * dimensions_adt_calc_device%opDat6Dimension + dimensions_adt_calc_de&
+        &vice%opDat6Dimension))
+        colour2 = pthrcol(i1 + sharedMemoryOffset)
+      END IF
+
+      DO colour = 0, numOfColours - 1, 1
+
+        IF (colour2 .EQ. colour) THEN
+        END IF
+
+        CALL syncthreads()
+      END DO
+
+      i1 = i1 + blockdim%x
+    END DO
+
+  END SUBROUTINE
+
+  attributes(host) SUBROUTINE adt_calc_host(userSubroutine,set,opDat1,opIndirection1,opMap1,opAccess1,opDat2,opIndirect&
+  &ion2,opMap2,opAccess2,opDat3,opIndirection3,opMap3,opAccess3,opDat4,opIndirection4,opMap4,opAccess4,opDat5,opIndirec&
+  &tion5,opMap5,opAccess5,opDat6,opIndirection6,opMap6,opAccess6)
+    IMPLICIT NONE
+    CHARACTER, INTENT(IN) :: userSubroutine*(8)
+    TYPE ( op_set ) , INTENT(IN) :: set
+    TYPE ( op_dat ) , INTENT(IN) :: opDat1
+    INTEGER(kind=4), INTENT(IN) :: opIndirection1
+    TYPE ( op_map ) , INTENT(IN) :: opMap1
+    INTEGER(kind=4), INTENT(IN) :: opAccess1
+    TYPE ( op_dat ) , INTENT(IN) :: opDat2
+    INTEGER(kind=4), INTENT(IN) :: opIndirection2
+    TYPE ( op_map ) , INTENT(IN) :: opMap2
+    INTEGER(kind=4), INTENT(IN) :: opAccess2
+    TYPE ( op_dat ) , INTENT(IN) :: opDat3
+    INTEGER(kind=4), INTENT(IN) :: opIndirection3
+    TYPE ( op_map ) , INTENT(IN) :: opMap3
+    INTEGER(kind=4), INTENT(IN) :: opAccess3
+    TYPE ( op_dat ) , INTENT(IN) :: opDat4
+    INTEGER(kind=4), INTENT(IN) :: opIndirection4
+    TYPE ( op_map ) , INTENT(IN) :: opMap4
+    INTEGER(kind=4), INTENT(IN) :: opAccess4
+    TYPE ( op_dat ) , INTENT(IN) :: opDat5
+    INTEGER(kind=4), INTENT(IN) :: opIndirection5
+    TYPE ( op_map ) , INTENT(IN) :: opMap5
+    INTEGER(kind=4), INTENT(IN) :: opAccess5
+    TYPE ( op_dat ) , INTENT(IN) :: opDat6
+    INTEGER(kind=4), INTENT(IN) :: opIndirection6
+    TYPE ( op_map ) , INTENT(IN) :: opMap6
+    INTEGER(kind=4), INTENT(IN) :: opAccess6
+    INTEGER(kind=4) :: opDat1Cardinality
+    INTEGER(kind=4) :: opDat5Cardinality
+    INTEGER(kind=4) :: opDat6Cardinality
+    REAL(kind=8), DEVICE, ALLOCATABLE :: opDat1Device(:)
+    REAL(kind=8), DEVICE, ALLOCATABLE :: opDat5Device(:)
+    REAL(kind=8), DEVICE, ALLOCATABLE :: opDat6Device(:)
+    INTEGER(kind=4) :: nblocks
+    INTEGER(kind=4) :: nthreads
+    INTEGER(kind=4) :: nshared
+    INTEGER(kind=4) :: threadSynchRet
+    TYPE ( op_plan ) , POINTER :: actualPlan
+    TYPE ( c_devptr ) , POINTER :: pindMaps(:)
+    TYPE ( c_devptr ) , POINTER :: pmaps(:)
+    INTEGER(kind=4) :: pindMapsSize
+    INTEGER(kind=4), DEVICE, ALLOCATABLE :: pindMaps1(:)
+    INTEGER(kind=4) :: args(1:6)
+    INTEGER(kind=4) :: idxs(1:6)
+    INTEGER(kind=4) :: maps(1:6)
+    INTEGER(kind=4) :: accesses(1:6)
+    INTEGER(kind=4) :: inds(1:6)
+    INTEGER(kind=2), DEVICE, ALLOCATABLE :: pMaps1(:)
+    INTEGER(kind=2), DEVICE, ALLOCATABLE :: pMaps2(:)
+    INTEGER(kind=2), DEVICE, ALLOCATABLE :: pMaps3(:)
+    INTEGER(kind=2), DEVICE, ALLOCATABLE :: pMaps4(:)
+    INTEGER(kind=4) :: pMaps1Size
+    INTEGER(kind=4) :: pMaps2Size
+    INTEGER(kind=4) :: pMaps3Size
+    INTEGER(kind=4) :: pMaps4Size
+    INTEGER(kind=4) :: colour
+    INTEGER(kind=4) :: i1
+    INTEGER(kind=4) :: argsNumber
+    INTEGER(kind=4) :: indsNumber
+    INTEGER(kind=4) :: blockOffset
+    INTEGER(kind=4) :: pindSizesSize
+    INTEGER(kind=4) :: pindOffsSize
+    INTEGER(kind=4) :: pblkMapSize
+    INTEGER(kind=4) :: poffsetSize
+    INTEGER(kind=4) :: pnelemsSize
+    INTEGER(kind=4) :: pnthrcolSize
+    INTEGER(kind=4) :: pthrcolSize
+    INTEGER(kind=4), POINTER :: ncolblk(:)
+    INTEGER(kind=4), POINTER :: pnindirect(:)
+    INTEGER(kind=4), DEVICE, ALLOCATABLE :: pindSizes(:)
+    INTEGER(kind=4), DEVICE, ALLOCATABLE :: pindOffs(:)
+    INTEGER(kind=4), DEVICE, ALLOCATABLE :: pblkMap(:)
+    INTEGER(kind=4), DEVICE, ALLOCATABLE :: poffset(:)
+    INTEGER(kind=4), DEVICE, ALLOCATABLE :: pnelems(:)
+    INTEGER(kind=4), DEVICE, ALLOCATABLE :: pnthrcol(:)
+    INTEGER(kind=4), DEVICE, ALLOCATABLE :: pthrcol(:)
+
+    IF (isFirstTime_adt_calc .EQV. .TRUE.) THEN
+      dimensions_adt_calc%opDat1Dimension = opDat1%dim
+      dimensions_adt_calc%opDat2Dimension = opDat2%dim
+      dimensions_adt_calc%opDat3Dimension = opDat3%dim
+      dimensions_adt_calc%opDat4Dimension = opDat4%dim
+      dimensions_adt_calc%opDat5Dimension = opDat5%dim
+      dimensions_adt_calc%opDat6Dimension = opDat6%dim
+      sizes_adt_calc%opDat1Cardinality = opDat1%dim * opDat1%set%size
+      sizes_adt_calc%opDat5Cardinality = opDat5%dim * opDat5%set%size
+      sizes_adt_calc%opDat6Cardinality = opDat6%dim * opDat6%set%size
+      args(1) = opDat1%index
+      args(2) = opDat2%index
+      args(3) = opDat3%index
+      args(4) = opDat4%index
+      args(5) = opDat5%index
+      args(6) = opDat6%index
+      idxs(1) = opIndirection1
+      idxs(2) = opIndirection2
+      idxs(3) = opIndirection3
+      idxs(4) = opIndirection4
+      idxs(5) = opIndirection5
+      idxs(6) = opIndirection6
+
+      DO i1 = 1, 6, 1
+
+        IF (idxs(i1) .NE. -1) THEN
+          idxs(i1) = idxs(i1) - 1
+        END IF
+
+      END DO
+
+      maps(1) = opMap1%index
+      maps(2) = opMap2%index
+      maps(3) = opMap3%index
+      maps(4) = opMap4%index
+      maps(5) = opMap5%index
+      maps(6) = opMap6%index
+      accesses(1) = opAccess1
+      accesses(2) = opAccess2
+      accesses(3) = opAccess3
+      accesses(4) = opAccess4
+      accesses(5) = opAccess5
+      accesses(6) = opAccess6
+      inds(1) = 0
+      inds(2) = 0
+      inds(3) = 0
+      inds(4) = 0
+      inds(5) = -1
+      inds(6) = -1
+      argsNumber = 6
+      indsNumber = 1
+      planRet_adt_calc = cplan(userSubroutine,set%index,argsNumber,args,idxs,maps,accesses,indsNumber,inds)
+    END IF
+
+    opDat1Cardinality = opDat1%dim * opDat1%set%size
+    opDat5Cardinality = opDat5%dim * opDat5%set%size
+    opDat6Cardinality = opDat6%dim * opDat6%set%size
+    CALL c_f_pointer(opDat1%dat_d,opDat1Device,(/opDat1Cardinality/))
+    CALL c_f_pointer(opDat5%dat_d,opDat5Device,(/opDat5Cardinality/))
+    CALL c_f_pointer(opDat6%dat_d,opDat6Device,(/opDat6Cardinality/))
+    CALL c_f_pointer(planRet_adt_calc,actualPlan)
+    CALL c_f_pointer(actualPlan%nindirect,pnindirect,(/indsNumber/))
+    CALL c_f_pointer(actualPlan%maps,pmaps,(/argsNumber/))
+
+    IF (inds(1) >= 0) THEN
+      pMaps1Size = set%size
+      CALL c_f_pointer(pmaps(1),pMaps1,(/pMaps1Size/))
+    END IF
+
+    IF (inds(2) >= 0) THEN
+      pMaps2Size = set%size
+      CALL c_f_pointer(pmaps(2),pMaps2,(/pMaps2Size/))
+    END IF
+
+    IF (inds(3) >= 0) THEN
+      pMaps3Size = set%size
+      CALL c_f_pointer(pmaps(3),pMaps3,(/pMaps3Size/))
+    END IF
+
+    IF (inds(4) >= 0) THEN
+      pMaps4Size = set%size
+      CALL c_f_pointer(pmaps(4),pMaps4,(/pMaps4Size/))
+    END IF
+
+    CALL c_f_pointer(actualPlan%ind_maps,pindMaps,(/indsNumber/))
+    CALL c_f_pointer(actualPlan%ncolblk,ncolblk,set%size)
+    pindSizesSize = actualPlan%nblocks * indsNumber
+    CALL c_f_pointer(actualPlan%ind_sizes,pindSizes,(/pindSizesSize/))
+    pindOffsSize = pindSizesSize
+    CALL c_f_pointer(actualPlan%ind_offs,pindOffs,(/pindOffsSize/))
+    pblkMapSize = actualPlan%nblocks
+    CALL c_f_pointer(actualPlan%blkmap,pblkMap,(/pblkMapSize/))
+    poffsetSize = actualPlan%nblocks
+    CALL c_f_pointer(actualPlan%offset,poffset,(/poffsetSize/))
+    pnelemsSize = actualPlan%nblocks
+    CALL c_f_pointer(actualPlan%nelems,pnelems,(/pnelemsSize/))
+    pnthrcolSize = actualPlan%nblocks
+    CALL c_f_pointer(actualPlan%nthrcol,pnthrcol,(/pnthrcolSize/))
+    pthrcolSize = set%size
+    CALL c_f_pointer(actualPlan%thrcol,pthrcol,(/pthrcolSize/))
+    CALL c_f_pointer(pindMaps(1),pindMaps1,pnindirect(1))
+
+    IF (isFirstTime_adt_calc .EQV. .TRUE.) THEN
+      isFirstTime_adt_calc = .FALSE.
+      sizes_adt_calc%pindMaps1Size = pnindirect(1)
+      sizes_adt_calc%pMaps1Size = pMaps1Size
+      sizes_adt_calc%pMaps2Size = pMaps2Size
+      sizes_adt_calc%pMaps3Size = pMaps3Size
+      sizes_adt_calc%pMaps4Size = pMaps4Size
+      sizes_adt_calc%pblkMapSize = pblkMapSize
+      sizes_adt_calc%pindOffsSize = pindOffsSize
+      sizes_adt_calc%pindSizesSize = pindSizesSize
+      sizes_adt_calc%pnelemsSize = pnelemsSize
+      sizes_adt_calc%pnthrcolSize = pnthrcolSize
+      sizes_adt_calc%poffsetSize = poffsetSize
+      sizes_adt_calc%pthrcolSize = pthrcolSize
+    END IF
+
+    blockOffset = 0
+
+    DO colour = 0, actualPlan%ncolors - 1, 1
+      nblocks = ncolblk(colour + 1)
+      nthreads = OP_BLOCK_SIZE
+      nshared = actualPlan%nshared
+      CALL adt_calc_kernel<<<nblocks, nthreads, nshared>>>(dimensions_adt_calc,sizes_adt_calc,opDat1Device,pindMaps1,pM&
+      &aps1,pMaps2,pMaps3,pMaps4,opDat5Device,opDat6Device,pindSizes,pindOffs,pblkMap,poffset,pnelems,pnthrcol,pthrcol,&
+      &blockOffset)
+      threadSynchRet = cudaThreadSynchronize()
+      blockOffset = blockOffset + nblocks
+    END DO
+
+  END SUBROUTINE
+
+  attributes(device) SUBROUTINE bres_calc_device(x1,x2,q1,adt1,res1,bound)
+    IMPLICIT NONE
+    REAL(kind=8), SHARED :: x1(*)
+    REAL(kind=8), SHARED :: x2(*)
+    REAL(kind=8), SHARED :: q1(*)
+    REAL(kind=8), SHARED :: adt1(*)
+    REAL(kind=8), SHARED :: res1(*)
+    INTEGER(kind=4), SHARED :: bound(*)
+    REAL(kind=8) :: dx
+    REAL(kind=8) :: dy
+    REAL(kind=8) :: mu
+    REAL(kind=8) :: ri
+    REAL(kind=8) :: p1
+    REAL(kind=8) :: vol1
+    REAL(kind=8) :: p2
+    REAL(kind=8) :: vol2
+    REAL(kind=8) :: f
+    dx = x1(1) - x2(1)
+    dy = x1(2) - x2(2)
+    ri = 1.0 / q1(1)
+    p1 = gm1 * (q1(4) - 0.5 * ri * (q1(2) * q1(2) + q1(3) * q1(3)))
+
+    IF (bound(1) .EQ. 1) THEN
+      res1(2) = res1(2) + +(p1 * dy)
+      res1(3) = res1(3) + -(p1 * dx)
+      ELSE
+      vol1 = ri * (q1(2) * dy - q1(3) * dx)
+      ri = 1.0 / qinf(1)
+      p2 = gm1 * (qinf(4) - 0.5 * ri * (qinf(2) * qinf(2) + qinf(3) * qinf(3)))
+      vol2 = ri * (qinf(2) * dy - qinf(3) * dx)
+      mu = adt1(1) * eps
+      f = 0.5 * (vol1 * q1(1) + vol2 * qinf(1)) + mu * (q1(1) - qinf(1))
+      res1(1) = res1(1) + f
+      f = 0.5 * (vol1 * q1(2) + p1 * dy + vol2 * qinf(2) + p2 * dy) + mu * (q1(2) - qinf(2))
+      res1(2) = res1(2) + f
+      f = 0.5 * (vol1 * q1(3) - p1 * dx + vol2 * qinf(3) - p2 * dx) + mu * (q1(3) - qinf(3))
+      res1(3) = res1(3) + f
+      f = 0.5 * (vol1 * (q1(4) + p1) + vol2 * (qinf(4) + p2)) + mu * (q1(4) - qinf(4))
+      res1(4) = res1(4) + f
+    END IF
+
+  END SUBROUTINE
+
+  attributes(global) SUBROUTINE bres_calc_kernel(dimensions_bres_calc_device,sizes_bres_calc_device,opDat1,pindMaps1,op&
+  &Dat3,pindMaps3,opDat4,pindMaps4,opDat5,pindMaps5,pMaps1,pMaps2,pMaps3,pMaps4,pMaps5,opDat6,pindSizes,pindOffs,pblkMa&
+  &p,poffset,pnelems,pnthrcol,pthrcol,blockOffset)
+    IMPLICIT NONE
+    TYPE ( bres_calc_opDatDimensions ) , DEVICE :: dimensions_bres_calc_device
+    TYPE ( bres_calc_opDatCardinalities ) , DEVICE :: sizes_bres_calc_device
+    REAL(kind=8), DEVICE :: opDat1(0:sizes_bres_calc_device%opDat1Cardinality - 1)
+    INTEGER(kind=4), DEVICE :: pindMaps1(0:sizes_bres_calc_device%pindMaps1Size - 1)
+    REAL(kind=8), DEVICE :: opDat3(0:sizes_bres_calc_device%opDat3Cardinality - 1)
+    INTEGER(kind=4), DEVICE :: pindMaps3(0:sizes_bres_calc_device%pindMaps3Size - 1)
+    REAL(kind=8), DEVICE :: opDat4(0:sizes_bres_calc_device%opDat4Cardinality - 1)
+    INTEGER(kind=4), DEVICE :: pindMaps4(0:sizes_bres_calc_device%pindMaps4Size - 1)
+    REAL(kind=8), DEVICE :: opDat5(0:sizes_bres_calc_device%opDat5Cardinality - 1)
+    INTEGER(kind=4), DEVICE :: pindMaps5(0:sizes_bres_calc_device%pindMaps5Size - 1)
+    INTEGER(kind=2), DEVICE :: pMaps1(0:sizes_bres_calc_device%pMaps1Size - 1)
+    INTEGER(kind=2), DEVICE :: pMaps2(0:sizes_bres_calc_device%pMaps2Size - 1)
+    INTEGER(kind=2), DEVICE :: pMaps3(0:sizes_bres_calc_device%pMaps3Size - 1)
+    INTEGER(kind=2), DEVICE :: pMaps4(0:sizes_bres_calc_device%pMaps4Size - 1)
+    INTEGER(kind=2), DEVICE :: pMaps5(0:sizes_bres_calc_device%pMaps5Size - 1)
+    INTEGER(kind=4), DEVICE :: opDat6(0:sizes_bres_calc_device%opDat6Cardinality - 1)
+    INTEGER(kind=4), DEVICE :: pindSizes(0:sizes_bres_calc_device%pindSizesSize - 1)
+    INTEGER(kind=4), DEVICE :: pindOffs(0:sizes_bres_calc_device%pindOffsSize - 1)
+    INTEGER(kind=4), DEVICE :: pblkMap(0:sizes_bres_calc_device%pblkMapSize - 1)
+    INTEGER(kind=4), DEVICE :: poffset(0:sizes_bres_calc_device%poffsetSize - 1)
+    INTEGER(kind=4), DEVICE :: pnelems(0:sizes_bres_calc_device%pnelemsSize - 1)
+    INTEGER(kind=4), DEVICE :: pnthrcol(0:sizes_bres_calc_device%pnthrcolSize - 1)
+    INTEGER(kind=4), DEVICE :: pthrcol(0:sizes_bres_calc_device%pthrcolSize - 1)
+    INTEGER(kind=4), VALUE :: blockOffset
+    REAL(kind=8) :: opDat5Local(0:3)
+    REAL(kind=8), SHARED :: sharedFloat8(0:*)
+    INTEGER(kind=4) :: sharedOffsetFloat8
+    INTEGER(kind=4), SHARED :: sharedInteger4(0:*)
+    INTEGER(kind=4) :: sharedOffsetInteger4
+    INTEGER(kind=4) :: nBytes1
+    INTEGER(kind=4) :: nBytes3
+    INTEGER(kind=4) :: nBytes4
+    INTEGER(kind=4) :: nBytes5
+    INTEGER(kind=4) :: nBytes6
+    INTEGER(kind=4) :: roundUp1
+    INTEGER(kind=4) :: roundUp3
+    INTEGER(kind=4) :: roundUp4
+    INTEGER(kind=4) :: roundUp5
+    INTEGER(kind=4) :: roundUp6
+    INTEGER(kind=4) :: argMap5
+    INTEGER(kind=4), SHARED :: ind_arg1
+    INTEGER(kind=4), SHARED :: ind_arg3
+    INTEGER(kind=4), SHARED :: ind_arg4
+    INTEGER(kind=4), SHARED :: ind_arg5
+    INTEGER(kind=4), SHARED :: blockID
+    INTEGER(kind=4), SHARED :: sharedMemoryOffset
+    INTEGER(kind=4), SHARED :: numOfColours
+    INTEGER(kind=4), SHARED :: nelems
+    INTEGER(kind=4), SHARED :: nelems2
+    INTEGER(kind=4) :: colour
+    INTEGER(kind=4) :: colour2
+    INTEGER(kind=4) :: moduloResult
+    INTEGER(kind=4) :: nbytes
+    INTEGER(kind=4) :: i1
+    INTEGER(kind=4) :: i2
+    INTEGER(kind=4) :: bound
+
+    IF (threadidx%x - 1 .EQ. 0) THEN
+      blockID = pblkMap(threadidx%x - 1 + blockOffset)
+      nelems = pnelems(blockID)
+      sharedMemoryOffset = poffset(blockID)
+      nelems2 = blockdim%x * (1 + (nelems - 1) / blockdim%x)
+      numOfColours = pnthrcol(blockID)
+      ind_arg1 = pindSizes(0 + blockID * 4)
+      ind_arg3 = pindSizes(1 + blockID * 4)
+      ind_arg4 = pindSizes(2 + blockID * 4)
+      ind_arg5 = pindSizes(3 + blockID * 4)
+    END IF
+
+    CALL syncthreads()
+    roundUp1 = ind_arg1 * dimensions_bres_calc_device%opDat1Dimension
+    roundUp3 = ind_arg3 * dimensions_bres_calc_device%opDat3Dimension
+    roundUp4 = ind_arg4 * dimensions_bres_calc_device%opDat4Dimension
+    roundUp5 = ind_arg5 * dimensions_bres_calc_device%opDat5Dimension
+    nBytes1 = 0
+    nBytes3 = nBytes1 * 8 / 8 + roundUp1 * 8 / 8
+    nBytes4 = nBytes3 * 8 / 8 + roundUp3 * 8 / 8
+    nBytes5 = nBytes4 * 8 / 8 + roundUp4 * 8 / 8
+    i1 = blockdim%x - 1
+    bound = ind_arg1 * dimensions_bres_calc_device%opDat1Dimension
+
+    DO WHILE (i1 < bound)
+      moduloResult = mod(i1,dimensions_bres_calc_device%opDat1Dimension)
+      sharedFloat8(nBytes1 + i1) = opDat1(moduloResult + pindMaps1(0 + (pindOffs(0 + blockID * 4) + i1 / dimensions_bre&
+      &s_calc_device%opDat1Dimension)) * dimensions_bres_calc_device%opDat1Dimension)
+      i1 = i1 + blockdim%x
+    END DO
+
+    i1 = blockdim%x - 1
+    bound = ind_arg3 * dimensions_bres_calc_device%opDat3Dimension
+
+    DO WHILE (i1 < bound)
+      moduloResult = mod(i1,dimensions_bres_calc_device%opDat3Dimension)
+      sharedFloat8(nBytes3 + i1) = opDat3(moduloResult + pindMaps3(0 + (pindOffs(1 + blockID * 4) + i1 / dimensions_bre&
+      &s_calc_device%opDat3Dimension)) * dimensions_bres_calc_device%opDat3Dimension)
+      i1 = i1 + blockdim%x
+    END DO
+
+    i1 = blockdim%x - 1
+    bound = ind_arg4 * dimensions_bres_calc_device%opDat4Dimension
+
+    DO WHILE (i1 < bound)
+      moduloResult = mod(i1,dimensions_bres_calc_device%opDat4Dimension)
+      sharedFloat8(nBytes4 + i1) = opDat4(moduloResult + pindMaps4(0 + (pindOffs(2 + blockID * 4) + i1 / dimensions_bre&
+      &s_calc_device%opDat4Dimension)) * dimensions_bres_calc_device%opDat4Dimension)
+      i1 = i1 + blockdim%x
+    END DO
+
+    i1 = blockdim%x - 1
+    bound = ind_arg5 * dimensions_bres_calc_device%opDat5Dimension
+
+    DO WHILE (i1 < bound)
+      sharedFloat8(nBytes5 + i1) = 0
+      i1 = i1 + blockdim%x
+    END DO
+
+    CALL syncthreads()
+    i1 = threadidx%x - 1
+
+    DO WHILE (i1 < nelems2)
+      colour2 = -1
+
+      IF (i1 < nelems) THEN
+
+        DO i2 = 0, dimensions_bres_calc_device%opDat5Dimension - 1, 1
+          opDat5Local(i2) = 0
+        END DO
+
+        CALL bres_calc_device(sharedFloat8(nBytes1 + pMaps1(i1 + sharedMemoryOffset) * dimensions_bres_calc_device%opDa&
+        &t1Dimension:nBytes1 + pMaps1(i1 + sharedMemoryOffset) * dimensions_bres_calc_device%opDat1Dimension + dimensio&
+        &ns_bres_calc_device%opDat1Dimension),sharedFloat8(nBytes1 + pMaps2(i1 + sharedMemoryOffset) * dimensions_bres_&
+        &calc_device%opDat2Dimension:nBytes1 + pMaps2(i1 + sharedMemoryOffset) * dimensions_bres_calc_device%opDat2Dime&
+        &nsion + dimensions_bres_calc_device%opDat2Dimension),sharedFloat8(nBytes3 + pMaps3(i1 + sharedMemoryOffset) * &
+        &dimensions_bres_calc_device%opDat3Dimension:nBytes3 + pMaps3(i1 + sharedMemoryOffset) * dimensions_bres_calc_d&
+        &evice%opDat3Dimension + dimensions_bres_calc_device%opDat3Dimension),sharedFloat8(nBytes4 + pMaps4(i1 + shared&
+        &MemoryOffset) * dimensions_bres_calc_device%opDat4Dimension:nBytes4 + pMaps4(i1 + sharedMemoryOffset) * dimens&
+        &ions_bres_calc_device%opDat4Dimension + dimensions_bres_calc_device%opDat4Dimension),opDat5Local,opDat6((i1 + &
+        &sharedMemoryOffset) * dimensions_bres_calc_device%opDat6Dimension:(i1 + sharedMemoryOffset) * dimensions_bres_&
+        &calc_device%opDat6Dimension + dimensions_bres_calc_device%opDat6Dimension))
+        colour2 = pthrcol(i1 + sharedMemoryOffset)
+      END IF
+
+      argMap5 = pMaps5(i1 + sharedMemoryOffset)
+
+      DO colour = 0, numOfColours - 1, 1
+
+        IF (colour2 .EQ. colour) THEN
+
+          DO i2 = 0, dimensions_bres_calc_device%opDat5Dimension - 1, 1
+            sharedFloat8(nBytes5 + (i2 + argMap5 * dimensions_bres_calc_device%opDat5Dimension)) = sharedFloat8(nBytes5&
+            & + (i2 + argMap5 * dimensions_bres_calc_device%opDat5Dimension)) + opDat5Local(i2)
+          END DO
+
+        END IF
+
+        CALL syncthreads()
+      END DO
+
+      i1 = i1 + blockdim%x
+    END DO
+
+    i1 = threadidx%x - 1
+
+    DO WHILE (i1 < ind_arg5 * dimensions_bres_calc_device%opDat5Dimension)
+      moduloResult = mod(i1,dimensions_bres_calc_device%opDat5Dimension)
+      opDat5(moduloResult + pindMaps5(0 + (pindOffs(3 + blockID * 4) + i1 / dimensions_bres_calc_device%opDat5Dimension&
+      &)) * dimensions_bres_calc_device%opDat5Dimension) = opDat5(moduloResult + pindMaps5(0 + (pindOffs(3 + blockID * &
+      &4) + i1 / dimensions_bres_calc_device%opDat5Dimension)) * dimensions_bres_calc_device%opDat5Dimension) + sharedF&
+      &loat8(nBytes5 + i1)
+      i1 = i1 + blockdim%x
+    END DO
+
+  END SUBROUTINE
+
+  attributes(host) SUBROUTINE bres_calc_host(userSubroutine,set,opDat1,opIndirection1,opMap1,opAccess1,opDat2,opIndirec&
+  &tion2,opMap2,opAccess2,opDat3,opIndirection3,opMap3,opAccess3,opDat4,opIndirection4,opMap4,opAccess4,opDat5,opIndire&
+  &ction5,opMap5,opAccess5,opDat6,opIndirection6,opMap6,opAccess6)
+    IMPLICIT NONE
+    CHARACTER, INTENT(IN) :: userSubroutine*(9)
+    TYPE ( op_set ) , INTENT(IN) :: set
+    TYPE ( op_dat ) , INTENT(IN) :: opDat1
+    INTEGER(kind=4), INTENT(IN) :: opIndirection1
+    TYPE ( op_map ) , INTENT(IN) :: opMap1
+    INTEGER(kind=4), INTENT(IN) :: opAccess1
+    TYPE ( op_dat ) , INTENT(IN) :: opDat2
+    INTEGER(kind=4), INTENT(IN) :: opIndirection2
+    TYPE ( op_map ) , INTENT(IN) :: opMap2
+    INTEGER(kind=4), INTENT(IN) :: opAccess2
+    TYPE ( op_dat ) , INTENT(IN) :: opDat3
+    INTEGER(kind=4), INTENT(IN) :: opIndirection3
+    TYPE ( op_map ) , INTENT(IN) :: opMap3
+    INTEGER(kind=4), INTENT(IN) :: opAccess3
+    TYPE ( op_dat ) , INTENT(IN) :: opDat4
+    INTEGER(kind=4), INTENT(IN) :: opIndirection4
+    TYPE ( op_map ) , INTENT(IN) :: opMap4
+    INTEGER(kind=4), INTENT(IN) :: opAccess4
+    TYPE ( op_dat ) , INTENT(IN) :: opDat5
+    INTEGER(kind=4), INTENT(IN) :: opIndirection5
+    TYPE ( op_map ) , INTENT(IN) :: opMap5
+    INTEGER(kind=4), INTENT(IN) :: opAccess5
+    TYPE ( op_dat ) , INTENT(IN) :: opDat6
+    INTEGER(kind=4), INTENT(IN) :: opIndirection6
+    TYPE ( op_map ) , INTENT(IN) :: opMap6
+    INTEGER(kind=4), INTENT(IN) :: opAccess6
+    INTEGER(kind=4) :: opDat1Cardinality
+    INTEGER(kind=4) :: opDat3Cardinality
+    INTEGER(kind=4) :: opDat4Cardinality
+    INTEGER(kind=4) :: opDat5Cardinality
+    INTEGER(kind=4) :: opDat6Cardinality
+    REAL(kind=8), DEVICE, ALLOCATABLE :: opDat1Device(:)
+    REAL(kind=8), DEVICE, ALLOCATABLE :: opDat3Device(:)
+    REAL(kind=8), DEVICE, ALLOCATABLE :: opDat4Device(:)
+    REAL(kind=8), DEVICE, ALLOCATABLE :: opDat5Device(:)
+    INTEGER(kind=4), DEVICE, ALLOCATABLE :: opDat6Device(:)
+    INTEGER(kind=4) :: nblocks
+    INTEGER(kind=4) :: nthreads
+    INTEGER(kind=4) :: nshared
+    INTEGER(kind=4) :: threadSynchRet
+    TYPE ( op_plan ) , POINTER :: actualPlan
+    TYPE ( c_devptr ) , POINTER :: pindMaps(:)
+    TYPE ( c_devptr ) , POINTER :: pmaps(:)
+    INTEGER(kind=4) :: pindMapsSize
+    INTEGER(kind=4), DEVICE, ALLOCATABLE :: pindMaps1(:)
+    INTEGER(kind=4), DEVICE, ALLOCATABLE :: pindMaps3(:)
+    INTEGER(kind=4), DEVICE, ALLOCATABLE :: pindMaps4(:)
+    INTEGER(kind=4), DEVICE, ALLOCATABLE :: pindMaps5(:)
+    INTEGER(kind=4) :: args(1:6)
+    INTEGER(kind=4) :: idxs(1:6)
+    INTEGER(kind=4) :: maps(1:6)
+    INTEGER(kind=4) :: accesses(1:6)
+    INTEGER(kind=4) :: inds(1:6)
+    INTEGER(kind=2), DEVICE, ALLOCATABLE :: pMaps1(:)
+    INTEGER(kind=2), DEVICE, ALLOCATABLE :: pMaps2(:)
+    INTEGER(kind=2), DEVICE, ALLOCATABLE :: pMaps3(:)
+    INTEGER(kind=2), DEVICE, ALLOCATABLE :: pMaps4(:)
+    INTEGER(kind=2), DEVICE, ALLOCATABLE :: pMaps5(:)
+    INTEGER(kind=4) :: pMaps1Size
+    INTEGER(kind=4) :: pMaps2Size
+    INTEGER(kind=4) :: pMaps3Size
+    INTEGER(kind=4) :: pMaps4Size
+    INTEGER(kind=4) :: pMaps5Size
+    INTEGER(kind=4) :: colour
+    INTEGER(kind=4) :: i1
+    INTEGER(kind=4) :: argsNumber
+    INTEGER(kind=4) :: indsNumber
+    INTEGER(kind=4) :: blockOffset
+    INTEGER(kind=4) :: pindSizesSize
+    INTEGER(kind=4) :: pindOffsSize
+    INTEGER(kind=4) :: pblkMapSize
+    INTEGER(kind=4) :: poffsetSize
+    INTEGER(kind=4) :: pnelemsSize
+    INTEGER(kind=4) :: pnthrcolSize
+    INTEGER(kind=4) :: pthrcolSize
+    INTEGER(kind=4), POINTER :: ncolblk(:)
+    INTEGER(kind=4), POINTER :: pnindirect(:)
+    INTEGER(kind=4), DEVICE, ALLOCATABLE :: pindSizes(:)
+    INTEGER(kind=4), DEVICE, ALLOCATABLE :: pindOffs(:)
+    INTEGER(kind=4), DEVICE, ALLOCATABLE :: pblkMap(:)
+    INTEGER(kind=4), DEVICE, ALLOCATABLE :: poffset(:)
+    INTEGER(kind=4), DEVICE, ALLOCATABLE :: pnelems(:)
+    INTEGER(kind=4), DEVICE, ALLOCATABLE :: pnthrcol(:)
+    INTEGER(kind=4), DEVICE, ALLOCATABLE :: pthrcol(:)
+
+    IF (isFirstTime_bres_calc .EQV. .TRUE.) THEN
+      dimensions_bres_calc%opDat1Dimension = opDat1%dim
+      dimensions_bres_calc%opDat2Dimension = opDat2%dim
+      dimensions_bres_calc%opDat3Dimension = opDat3%dim
+      dimensions_bres_calc%opDat4Dimension = opDat4%dim
+      dimensions_bres_calc%opDat5Dimension = opDat5%dim
+      dimensions_bres_calc%opDat6Dimension = opDat6%dim
+      sizes_bres_calc%opDat1Cardinality = opDat1%dim * opDat1%set%size
+      sizes_bres_calc%opDat3Cardinality = opDat3%dim * opDat3%set%size
+      sizes_bres_calc%opDat4Cardinality = opDat4%dim * opDat4%set%size
+      sizes_bres_calc%opDat5Cardinality = opDat5%dim * opDat5%set%size
+      sizes_bres_calc%opDat6Cardinality = opDat6%dim * opDat6%set%size
+      args(1) = opDat1%index
+      args(2) = opDat2%index
+      args(3) = opDat3%index
+      args(4) = opDat4%index
+      args(5) = opDat5%index
+      args(6) = opDat6%index
+      idxs(1) = opIndirection1
+      idxs(2) = opIndirection2
+      idxs(3) = opIndirection3
+      idxs(4) = opIndirection4
+      idxs(5) = opIndirection5
+      idxs(6) = opIndirection6
+
+      DO i1 = 1, 6, 1
+
+        IF (idxs(i1) .NE. -1) THEN
+          idxs(i1) = idxs(i1) - 1
+        END IF
+
+      END DO
+
+      maps(1) = opMap1%index
+      maps(2) = opMap2%index
+      maps(3) = opMap3%index
+      maps(4) = opMap4%index
+      maps(5) = opMap5%index
+      maps(6) = opMap6%index
+      accesses(1) = opAccess1
+      accesses(2) = opAccess2
+      accesses(3) = opAccess3
+      accesses(4) = opAccess4
+      accesses(5) = opAccess5
+      accesses(6) = opAccess6
+      inds(1) = 0
+      inds(2) = 0
+      inds(3) = 1
+      inds(4) = 2
+      inds(5) = 3
+      inds(6) = -1
+      argsNumber = 6
+      indsNumber = 4
+      planRet_bres_calc = cplan(userSubroutine,set%index,argsNumber,args,idxs,maps,accesses,indsNumber,inds)
+    END IF
+
+    opDat1Cardinality = opDat1%dim * opDat1%set%size
+    opDat3Cardinality = opDat3%dim * opDat3%set%size
+    opDat4Cardinality = opDat4%dim * opDat4%set%size
+    opDat5Cardinality = opDat5%dim * opDat5%set%size
+    opDat6Cardinality = opDat6%dim * opDat6%set%size
+    CALL c_f_pointer(opDat1%dat_d,opDat1Device,(/opDat1Cardinality/))
+    CALL c_f_pointer(opDat3%dat_d,opDat3Device,(/opDat3Cardinality/))
+    CALL c_f_pointer(opDat4%dat_d,opDat4Device,(/opDat4Cardinality/))
+    CALL c_f_pointer(opDat5%dat_d,opDat5Device,(/opDat5Cardinality/))
+    CALL c_f_pointer(opDat6%dat_d,opDat6Device,(/opDat6Cardinality/))
+    CALL c_f_pointer(planRet_bres_calc,actualPlan)
+    CALL c_f_pointer(actualPlan%nindirect,pnindirect,(/indsNumber/))
+    CALL c_f_pointer(actualPlan%maps,pmaps,(/argsNumber/))
+
+    IF (inds(1) >= 0) THEN
+      pMaps1Size = set%size
+      CALL c_f_pointer(pmaps(1),pMaps1,(/pMaps1Size/))
+    END IF
+
+    IF (inds(2) >= 0) THEN
+      pMaps2Size = set%size
+      CALL c_f_pointer(pmaps(2),pMaps2,(/pMaps2Size/))
+    END IF
+
+    IF (inds(3) >= 0) THEN
+      pMaps3Size = set%size
+      CALL c_f_pointer(pmaps(3),pMaps3,(/pMaps3Size/))
+    END IF
+
+    IF (inds(4) >= 0) THEN
+      pMaps4Size = set%size
+      CALL c_f_pointer(pmaps(4),pMaps4,(/pMaps4Size/))
+    END IF
+
+    IF (inds(5) >= 0) THEN
+      pMaps5Size = set%size
+      CALL c_f_pointer(pmaps(5),pMaps5,(/pMaps5Size/))
+    END IF
+
+    CALL c_f_pointer(actualPlan%ind_maps,pindMaps,(/indsNumber/))
+    CALL c_f_pointer(actualPlan%ncolblk,ncolblk,set%size)
+    pindSizesSize = actualPlan%nblocks * indsNumber
+    CALL c_f_pointer(actualPlan%ind_sizes,pindSizes,(/pindSizesSize/))
+    pindOffsSize = pindSizesSize
+    CALL c_f_pointer(actualPlan%ind_offs,pindOffs,(/pindOffsSize/))
+    pblkMapSize = actualPlan%nblocks
+    CALL c_f_pointer(actualPlan%blkmap,pblkMap,(/pblkMapSize/))
+    poffsetSize = actualPlan%nblocks
+    CALL c_f_pointer(actualPlan%offset,poffset,(/poffsetSize/))
+    pnelemsSize = actualPlan%nblocks
+    CALL c_f_pointer(actualPlan%nelems,pnelems,(/pnelemsSize/))
+    pnthrcolSize = actualPlan%nblocks
+    CALL c_f_pointer(actualPlan%nthrcol,pnthrcol,(/pnthrcolSize/))
+    pthrcolSize = set%size
+    CALL c_f_pointer(actualPlan%thrcol,pthrcol,(/pthrcolSize/))
+    CALL c_f_pointer(pindMaps(1),pindMaps1,pnindirect(1))
+    CALL c_f_pointer(pindMaps(2),pindMaps3,pnindirect(2))
+    CALL c_f_pointer(pindMaps(3),pindMaps4,pnindirect(3))
+    CALL c_f_pointer(pindMaps(4),pindMaps5,pnindirect(4))
+
+    IF (isFirstTime_bres_calc .EQV. .TRUE.) THEN
+      isFirstTime_bres_calc = .FALSE.
+      sizes_bres_calc%pindMaps1Size = pnindirect(1)
+      sizes_bres_calc%pindMaps3Size = pnindirect(2)
+      sizes_bres_calc%pindMaps4Size = pnindirect(3)
+      sizes_bres_calc%pindMaps5Size = pnindirect(4)
+      sizes_bres_calc%pMaps1Size = pMaps1Size
+      sizes_bres_calc%pMaps2Size = pMaps2Size
+      sizes_bres_calc%pMaps3Size = pMaps3Size
+      sizes_bres_calc%pMaps4Size = pMaps4Size
+      sizes_bres_calc%pMaps5Size = pMaps5Size
+      sizes_bres_calc%pblkMapSize = pblkMapSize
+      sizes_bres_calc%pindOffsSize = pindOffsSize
+      sizes_bres_calc%pindSizesSize = pindSizesSize
+      sizes_bres_calc%pnelemsSize = pnelemsSize
+      sizes_bres_calc%pnthrcolSize = pnthrcolSize
+      sizes_bres_calc%poffsetSize = poffsetSize
+      sizes_bres_calc%pthrcolSize = pthrcolSize
+    END IF
+
+    blockOffset = 0
+
+    DO colour = 0, actualPlan%ncolors - 1, 1
+      nblocks = ncolblk(colour + 1)
+      nthreads = OP_BLOCK_SIZE
+      nshared = actualPlan%nshared
+      CALL bres_calc_kernel<<<nblocks, nthreads, nshared>>>(dimensions_bres_calc,sizes_bres_calc,opDat1Device,pindMaps1&
+      &,opDat3Device,pindMaps3,opDat4Device,pindMaps4,opDat5Device,pindMaps5,pMaps1,pMaps2,pMaps3,pMaps4,pMaps5,opDat6D&
+      &evice,pindSizes,pindOffs,pblkMap,poffset,pnelems,pnthrcol,pthrcol,blockOffset)
+      threadSynchRet = cudaThreadSynchronize()
+      blockOffset = blockOffset + nblocks
+    END DO
+
+  END SUBROUTINE
+
+  attributes(device) SUBROUTINE res_calc_device(x1,x2,q1,q2,adt1,adt2,res1,res2)
+    IMPLICIT NONE
+    REAL(kind=8), SHARED :: x1(*)
+    REAL(kind=8), SHARED :: x2(*)
+    REAL(kind=8), SHARED :: q1(*)
+    REAL(kind=8), SHARED :: q2(*)
+    REAL(kind=8), SHARED :: adt1(*)
+    REAL(kind=8), SHARED :: adt2(*)
+    REAL(kind=8), SHARED :: res1(*)
+    REAL(kind=8), SHARED :: res2(*)
+    REAL(kind=8) :: dx
+    REAL(kind=8) :: dy
+    REAL(kind=8) :: mu
+    REAL(kind=8) :: ri
+    REAL(kind=8) :: p1
+    REAL(kind=8) :: vol1
+    REAL(kind=8) :: p2
+    REAL(kind=8) :: vol2
+    REAL(kind=8) :: f
+    dx = x1(1) - x2(1)
+    dy = x1(2) - x2(2)
+    ri = 1.0 / q1(1)
+    p1 = gm1 * (q1(4) - 0.5 * ri * (q1(2) * q1(2) + q1(3) * q1(3)))
+    vol1 = ri * (q1(2) * dy - q1(3) * dx)
+    ri = 1.0 / q2(1)
+    p2 = gm1 * (q2(4) - 0.5 * ri * (q2(2) * q2(2) + q2(3) * q2(3)))
+    vol2 = ri * (q2(2) * dy - q2(3) * dx)
+    mu = 0.5 * (adt1(1) + adt2(1)) * eps
+    f = 0.5 * (vol1 * q1(1) + vol2 * q2(1)) + mu * (q1(1) - q2(1))
+    res1(1) = res1(1) + f
+    res2(1) = res2(1) - f
+    f = 0.5 * (vol1 * q1(2) + p1 * dy + vol2 * q2(2) + p2 * dy) + mu * (q1(2) - q2(2))
+    res1(2) = res1(2) + f
+    res2(2) = res2(2) - f
+    f = 0.5 * (vol1 * q1(3) - p1 * dx + vol2 * q2(3) - p2 * dx) + mu * (q1(3) - q2(3))
+    res1(3) = res1(3) + f
+    res2(3) = res2(3) - f
+    f = 0.5 * (vol1 * (q1(4) + p1) + vol2 * (q2(4) + p2)) + mu * (q1(4) - q2(4))
+    res1(4) = res1(4) + f
+    res2(4) = res2(4) - f
+  END SUBROUTINE
+
+  attributes(global) SUBROUTINE res_calc_kernel(dimensions_res_calc_device,sizes_res_calc_device,opDat1,pindMaps1,opDat&
+  &3,pindMaps3,opDat5,pindMaps5,opDat7,pindMaps7,pMaps1,pMaps2,pMaps3,pMaps4,pMaps5,pMaps6,pMaps7,pMaps8,pindSizes,pind&
+  &Offs,pblkMap,poffset,pnelems,pnthrcol,pthrcol,blockOffset)
+    IMPLICIT NONE
+    TYPE ( res_calc_opDatDimensions ) , DEVICE :: dimensions_res_calc_device
+    TYPE ( res_calc_opDatCardinalities ) , DEVICE :: sizes_res_calc_device
+    REAL(kind=8), DEVICE :: opDat1(0:sizes_res_calc_device%opDat1Cardinality - 1)
+    INTEGER(kind=4), DEVICE :: pindMaps1(0:sizes_res_calc_device%pindMaps1Size - 1)
+    REAL(kind=8), DEVICE :: opDat3(0:sizes_res_calc_device%opDat3Cardinality - 1)
+    INTEGER(kind=4), DEVICE :: pindMaps3(0:sizes_res_calc_device%pindMaps3Size - 1)
+    REAL(kind=8), DEVICE :: opDat5(0:sizes_res_calc_device%opDat5Cardinality - 1)
+    INTEGER(kind=4), DEVICE :: pindMaps5(0:sizes_res_calc_device%pindMaps5Size - 1)
+    REAL(kind=8), DEVICE :: opDat7(0:sizes_res_calc_device%opDat7Cardinality - 1)
+    INTEGER(kind=4), DEVICE :: pindMaps7(0:sizes_res_calc_device%pindMaps7Size - 1)
+    INTEGER(kind=2), DEVICE :: pMaps1(0:sizes_res_calc_device%pMaps1Size - 1)
+    INTEGER(kind=2), DEVICE :: pMaps2(0:sizes_res_calc_device%pMaps2Size - 1)
+    INTEGER(kind=2), DEVICE :: pMaps3(0:sizes_res_calc_device%pMaps3Size - 1)
+    INTEGER(kind=2), DEVICE :: pMaps4(0:sizes_res_calc_device%pMaps4Size - 1)
+    INTEGER(kind=2), DEVICE :: pMaps5(0:sizes_res_calc_device%pMaps5Size - 1)
+    INTEGER(kind=2), DEVICE :: pMaps6(0:sizes_res_calc_device%pMaps6Size - 1)
+    INTEGER(kind=2), DEVICE :: pMaps7(0:sizes_res_calc_device%pMaps7Size - 1)
+    INTEGER(kind=2), DEVICE :: pMaps8(0:sizes_res_calc_device%pMaps8Size - 1)
+    INTEGER(kind=4), DEVICE :: pindSizes(0:sizes_res_calc_device%pindSizesSize - 1)
+    INTEGER(kind=4), DEVICE :: pindOffs(0:sizes_res_calc_device%pindOffsSize - 1)
+    INTEGER(kind=4), DEVICE :: pblkMap(0:sizes_res_calc_device%pblkMapSize - 1)
+    INTEGER(kind=4), DEVICE :: poffset(0:sizes_res_calc_device%poffsetSize - 1)
+    INTEGER(kind=4), DEVICE :: pnelems(0:sizes_res_calc_device%pnelemsSize - 1)
+    INTEGER(kind=4), DEVICE :: pnthrcol(0:sizes_res_calc_device%pnthrcolSize - 1)
+    INTEGER(kind=4), DEVICE :: pthrcol(0:sizes_res_calc_device%pthrcolSize - 1)
+    INTEGER(kind=4), VALUE :: blockOffset
+    REAL(kind=8) :: opDat7Local(0:3)
+    REAL(kind=8) :: opDat8Local(0:3)
+    REAL(kind=8), SHARED :: sharedFloat8(0:*)
+    INTEGER(kind=4) :: sharedOffsetFloat8
+    INTEGER(kind=4) :: nBytes1
+    INTEGER(kind=4) :: nBytes3
+    INTEGER(kind=4) :: nBytes5
+    INTEGER(kind=4) :: nBytes7
+    INTEGER(kind=4) :: roundUp1
+    INTEGER(kind=4) :: roundUp3
+    INTEGER(kind=4) :: roundUp5
+    INTEGER(kind=4) :: roundUp7
+    INTEGER(kind=4) :: argMap7
+    INTEGER(kind=4) :: argMap8
+    INTEGER(kind=4), SHARED :: ind_arg1
+    INTEGER(kind=4), SHARED :: ind_arg3
+    INTEGER(kind=4), SHARED :: ind_arg5
+    INTEGER(kind=4), SHARED :: ind_arg7
+    INTEGER(kind=4), SHARED :: blockID
+    INTEGER(kind=4), SHARED :: sharedMemoryOffset
+    INTEGER(kind=4), SHARED :: numOfColours
+    INTEGER(kind=4), SHARED :: nelems
+    INTEGER(kind=4), SHARED :: nelems2
+    INTEGER(kind=4) :: colour
+    INTEGER(kind=4) :: colour2
+    INTEGER(kind=4) :: moduloResult
+    INTEGER(kind=4) :: nbytes
+    INTEGER(kind=4) :: i1
+    INTEGER(kind=4) :: i2
+    INTEGER(kind=4) :: bound
+
+    IF (threadidx%x - 1 .EQ. 0) THEN
+      blockID = pblkMap(threadidx%x - 1 + blockOffset)
+      nelems = pnelems(blockID)
+      sharedMemoryOffset = poffset(blockID)
+      nelems2 = blockdim%x * (1 + (nelems - 1) / blockdim%x)
+      numOfColours = pnthrcol(blockID)
+      ind_arg1 = pindSizes(0 + blockID * 4)
+      ind_arg3 = pindSizes(1 + blockID * 4)
+      ind_arg5 = pindSizes(2 + blockID * 4)
+      ind_arg7 = pindSizes(3 + blockID * 4)
+    END IF
+
+    CALL syncthreads()
+    roundUp1 = ind_arg1 * dimensions_res_calc_device%opDat1Dimension
+    roundUp3 = ind_arg3 * dimensions_res_calc_device%opDat3Dimension
+    roundUp5 = ind_arg5 * dimensions_res_calc_device%opDat5Dimension
+    roundUp7 = ind_arg7 * dimensions_res_calc_device%opDat7Dimension
+    nBytes1 = 0
+    nBytes3 = nBytes1 * 8 / 8 + roundUp1 * 8 / 8
+    nBytes5 = nBytes3 * 8 / 8 + roundUp3 * 8 / 8
+    nBytes7 = nBytes5 * 8 / 8 + roundUp5 * 8 / 8
+    i1 = blockdim%x - 1
+    bound = ind_arg1 * dimensions_res_calc_device%opDat1Dimension
+
+    DO WHILE (i1 < bound)
+      moduloResult = mod(i1,dimensions_res_calc_device%opDat1Dimension)
+      sharedFloat8(nBytes1 + i1) = opDat1(moduloResult + pindMaps1(0 + (pindOffs(0 + blockID * 4) + i1 / dimensions_res&
+      &_calc_device%opDat1Dimension)) * dimensions_res_calc_device%opDat1Dimension)
+      i1 = i1 + blockdim%x
+    END DO
+
+    i1 = blockdim%x - 1
+    bound = ind_arg3 * dimensions_res_calc_device%opDat3Dimension
+
+    DO WHILE (i1 < bound)
+      moduloResult = mod(i1,dimensions_res_calc_device%opDat3Dimension)
+      sharedFloat8(nBytes3 + i1) = opDat3(moduloResult + pindMaps3(0 + (pindOffs(1 + blockID * 4) + i1 / dimensions_res&
+      &_calc_device%opDat3Dimension)) * dimensions_res_calc_device%opDat3Dimension)
+      i1 = i1 + blockdim%x
+    END DO
+
+    i1 = blockdim%x - 1
+    bound = ind_arg5 * dimensions_res_calc_device%opDat5Dimension
+
+    DO WHILE (i1 < bound)
+      moduloResult = mod(i1,dimensions_res_calc_device%opDat5Dimension)
+      sharedFloat8(nBytes5 + i1) = opDat5(moduloResult + pindMaps5(0 + (pindOffs(2 + blockID * 4) + i1 / dimensions_res&
+      &_calc_device%opDat5Dimension)) * dimensions_res_calc_device%opDat5Dimension)
+      i1 = i1 + blockdim%x
+    END DO
+
+    i1 = blockdim%x - 1
+    bound = ind_arg7 * dimensions_res_calc_device%opDat7Dimension
+
+    DO WHILE (i1 < bound)
+      sharedFloat8(nBytes7 + i1) = 0
+      i1 = i1 + blockdim%x
+    END DO
+
+    CALL syncthreads()
+    i1 = threadidx%x - 1
+
+    DO WHILE (i1 < nelems2)
+      colour2 = -1
+
+      IF (i1 < nelems) THEN
+
+        DO i2 = 0, dimensions_res_calc_device%opDat7Dimension - 1, 1
+          opDat7Local(i2) = 0
+        END DO
+
+        DO i2 = 0, dimensions_res_calc_device%opDat8Dimension - 1, 1
+          opDat8Local(i2) = 0
+        END DO
+
+        CALL res_calc_device(sharedFloat8(nBytes1 + pMaps1(i1 + sharedMemoryOffset) * dimensions_res_calc_device%opDat1&
+        &Dimension:nBytes1 + pMaps1(i1 + sharedMemoryOffset) * dimensions_res_calc_device%opDat1Dimension + dimensions_&
+        &res_calc_device%opDat1Dimension),sharedFloat8(nBytes1 + pMaps2(i1 + sharedMemoryOffset) * dimensions_res_calc_&
+        &device%opDat2Dimension:nBytes1 + pMaps2(i1 + sharedMemoryOffset) * dimensions_res_calc_device%opDat2Dimension &
+        &+ dimensions_res_calc_device%opDat2Dimension),sharedFloat8(nBytes3 + pMaps3(i1 + sharedMemoryOffset) * dimensi&
+        &ons_res_calc_device%opDat3Dimension:nBytes3 + pMaps3(i1 + sharedMemoryOffset) * dimensions_res_calc_device%opD&
+        &at3Dimension + dimensions_res_calc_device%opDat3Dimension),sharedFloat8(nBytes3 + pMaps4(i1 + sharedMemoryOffs&
+        &et) * dimensions_res_calc_device%opDat4Dimension:nBytes3 + pMaps4(i1 + sharedMemoryOffset) * dimensions_res_ca&
+        &lc_device%opDat4Dimension + dimensions_res_calc_device%opDat4Dimension),sharedFloat8(nBytes5 + pMaps5(i1 + sha&
+        &redMemoryOffset) * dimensions_res_calc_device%opDat5Dimension:nBytes5 + pMaps5(i1 + sharedMemoryOffset) * dime&
+        &nsions_res_calc_device%opDat5Dimension + dimensions_res_calc_device%opDat5Dimension),sharedFloat8(nBytes5 + pM&
+        &aps6(i1 + sharedMemoryOffset) * dimensions_res_calc_device%opDat6Dimension:nBytes5 + pMaps6(i1 + sharedMemoryO&
+        &ffset) * dimensions_res_calc_device%opDat6Dimension + dimensions_res_calc_device%opDat6Dimension),opDat7Local,&
+        &opDat8Local)
+        colour2 = pthrcol(i1 + sharedMemoryOffset)
+      END IF
+
+      argMap7 = pMaps7(i1 + sharedMemoryOffset)
+      argMap8 = pMaps8(i1 + sharedMemoryOffset)
+
+      DO colour = 0, numOfColours - 1, 1
+
+        IF (colour2 .EQ. colour) THEN
+
+          DO i2 = 0, dimensions_res_calc_device%opDat7Dimension - 1, 1
+            sharedFloat8(nBytes7 + (i2 + argMap7 * dimensions_res_calc_device%opDat7Dimension)) = sharedFloat8(nBytes7 &
+            &+ (i2 + argMap7 * dimensions_res_calc_device%opDat7Dimension)) + opDat7Local(i2)
+          END DO
+
+          DO i2 = 0, dimensions_res_calc_device%opDat8Dimension - 1, 1
+            sharedFloat8(nBytes7 + (i2 + argMap8 * dimensions_res_calc_device%opDat8Dimension)) = sharedFloat8(nBytes7 &
+            &+ (i2 + argMap8 * dimensions_res_calc_device%opDat8Dimension)) + opDat8Local(i2)
+          END DO
+
+        END IF
+
+        CALL syncthreads()
+      END DO
+
+      i1 = i1 + blockdim%x
+    END DO
+
+    i1 = threadidx%x - 1
+
+    DO WHILE (i1 < ind_arg7 * dimensions_res_calc_device%opDat7Dimension)
+      moduloResult = mod(i1,dimensions_res_calc_device%opDat7Dimension)
+      opDat7(moduloResult + pindMaps7(0 + (pindOffs(3 + blockID * 4) + i1 / dimensions_res_calc_device%opDat7Dimension)&
+      &) * dimensions_res_calc_device%opDat7Dimension) = opDat7(moduloResult + pindMaps7(0 + (pindOffs(3 + blockID * 4)&
+      & + i1 / dimensions_res_calc_device%opDat7Dimension)) * dimensions_res_calc_device%opDat7Dimension) + sharedFloat&
+      &8(nBytes7 + i1)
+      i1 = i1 + blockdim%x
+    END DO
+
+  END SUBROUTINE
+
+  attributes(host) SUBROUTINE res_calc_host(userSubroutine,set,opDat1,opIndirection1,opMap1,opAccess1,opDat2,opIndirect&
+  &ion2,opMap2,opAccess2,opDat3,opIndirection3,opMap3,opAccess3,opDat4,opIndirection4,opMap4,opAccess4,opDat5,opIndirec&
+  &tion5,opMap5,opAccess5,opDat6,opIndirection6,opMap6,opAccess6,opDat7,opIndirection7,opMap7,opAccess7,opDat8,opIndire&
+  &ction8,opMap8,opAccess8)
+    IMPLICIT NONE
+    CHARACTER, INTENT(IN) :: userSubroutine*(8)
+    TYPE ( op_set ) , INTENT(IN) :: set
+    TYPE ( op_dat ) , INTENT(IN) :: opDat1
+    INTEGER(kind=4), INTENT(IN) :: opIndirection1
+    TYPE ( op_map ) , INTENT(IN) :: opMap1
+    INTEGER(kind=4), INTENT(IN) :: opAccess1
+    TYPE ( op_dat ) , INTENT(IN) :: opDat2
+    INTEGER(kind=4), INTENT(IN) :: opIndirection2
+    TYPE ( op_map ) , INTENT(IN) :: opMap2
+    INTEGER(kind=4), INTENT(IN) :: opAccess2
+    TYPE ( op_dat ) , INTENT(IN) :: opDat3
+    INTEGER(kind=4), INTENT(IN) :: opIndirection3
+    TYPE ( op_map ) , INTENT(IN) :: opMap3
+    INTEGER(kind=4), INTENT(IN) :: opAccess3
+    TYPE ( op_dat ) , INTENT(IN) :: opDat4
+    INTEGER(kind=4), INTENT(IN) :: opIndirection4
+    TYPE ( op_map ) , INTENT(IN) :: opMap4
+    INTEGER(kind=4), INTENT(IN) :: opAccess4
+    TYPE ( op_dat ) , INTENT(IN) :: opDat5
+    INTEGER(kind=4), INTENT(IN) :: opIndirection5
+    TYPE ( op_map ) , INTENT(IN) :: opMap5
+    INTEGER(kind=4), INTENT(IN) :: opAccess5
+    TYPE ( op_dat ) , INTENT(IN) :: opDat6
+    INTEGER(kind=4), INTENT(IN) :: opIndirection6
+    TYPE ( op_map ) , INTENT(IN) :: opMap6
+    INTEGER(kind=4), INTENT(IN) :: opAccess6
+    TYPE ( op_dat ) , INTENT(IN) :: opDat7
+    INTEGER(kind=4), INTENT(IN) :: opIndirection7
+    TYPE ( op_map ) , INTENT(IN) :: opMap7
+    INTEGER(kind=4), INTENT(IN) :: opAccess7
+    TYPE ( op_dat ) , INTENT(IN) :: opDat8
+    INTEGER(kind=4), INTENT(IN) :: opIndirection8
+    TYPE ( op_map ) , INTENT(IN) :: opMap8
+    INTEGER(kind=4), INTENT(IN) :: opAccess8
+    INTEGER(kind=4) :: opDat1Cardinality
+    INTEGER(kind=4) :: opDat3Cardinality
+    INTEGER(kind=4) :: opDat5Cardinality
+    INTEGER(kind=4) :: opDat7Cardinality
+    REAL(kind=8), DEVICE, ALLOCATABLE :: opDat1Device(:)
+    REAL(kind=8), DEVICE, ALLOCATABLE :: opDat3Device(:)
+    REAL(kind=8), DEVICE, ALLOCATABLE :: opDat5Device(:)
+    REAL(kind=8), DEVICE, ALLOCATABLE :: opDat7Device(:)
+    INTEGER(kind=4) :: nblocks
+    INTEGER(kind=4) :: nthreads
+    INTEGER(kind=4) :: nshared
+    INTEGER(kind=4) :: threadSynchRet
+    TYPE ( op_plan ) , POINTER :: actualPlan
+    TYPE ( c_devptr ) , POINTER :: pindMaps(:)
+    TYPE ( c_devptr ) , POINTER :: pmaps(:)
+    INTEGER(kind=4) :: pindMapsSize
+    INTEGER(kind=4), DEVICE, ALLOCATABLE :: pindMaps1(:)
+    INTEGER(kind=4), DEVICE, ALLOCATABLE :: pindMaps3(:)
+    INTEGER(kind=4), DEVICE, ALLOCATABLE :: pindMaps5(:)
+    INTEGER(kind=4), DEVICE, ALLOCATABLE :: pindMaps7(:)
+    INTEGER(kind=4) :: args(1:8)
+    INTEGER(kind=4) :: idxs(1:8)
+    INTEGER(kind=4) :: maps(1:8)
+    INTEGER(kind=4) :: accesses(1:8)
+    INTEGER(kind=4) :: inds(1:8)
+    INTEGER(kind=2), DEVICE, ALLOCATABLE :: pMaps1(:)
+    INTEGER(kind=2), DEVICE, ALLOCATABLE :: pMaps2(:)
+    INTEGER(kind=2), DEVICE, ALLOCATABLE :: pMaps3(:)
+    INTEGER(kind=2), DEVICE, ALLOCATABLE :: pMaps4(:)
+    INTEGER(kind=2), DEVICE, ALLOCATABLE :: pMaps5(:)
+    INTEGER(kind=2), DEVICE, ALLOCATABLE :: pMaps6(:)
+    INTEGER(kind=2), DEVICE, ALLOCATABLE :: pMaps7(:)
+    INTEGER(kind=2), DEVICE, ALLOCATABLE :: pMaps8(:)
+    INTEGER(kind=4) :: pMaps1Size
+    INTEGER(kind=4) :: pMaps2Size
+    INTEGER(kind=4) :: pMaps3Size
+    INTEGER(kind=4) :: pMaps4Size
+    INTEGER(kind=4) :: pMaps5Size
+    INTEGER(kind=4) :: pMaps6Size
+    INTEGER(kind=4) :: pMaps7Size
+    INTEGER(kind=4) :: pMaps8Size
+    INTEGER(kind=4) :: colour
+    INTEGER(kind=4) :: i1
+    INTEGER(kind=4) :: argsNumber
+    INTEGER(kind=4) :: indsNumber
+    INTEGER(kind=4) :: blockOffset
+    INTEGER(kind=4) :: pindSizesSize
+    INTEGER(kind=4) :: pindOffsSize
+    INTEGER(kind=4) :: pblkMapSize
+    INTEGER(kind=4) :: poffsetSize
+    INTEGER(kind=4) :: pnelemsSize
+    INTEGER(kind=4) :: pnthrcolSize
+    INTEGER(kind=4) :: pthrcolSize
+    INTEGER(kind=4), POINTER :: ncolblk(:)
+    INTEGER(kind=4), POINTER :: pnindirect(:)
+    INTEGER(kind=4), DEVICE, ALLOCATABLE :: pindSizes(:)
+    INTEGER(kind=4), DEVICE, ALLOCATABLE :: pindOffs(:)
+    INTEGER(kind=4), DEVICE, ALLOCATABLE :: pblkMap(:)
+    INTEGER(kind=4), DEVICE, ALLOCATABLE :: poffset(:)
+    INTEGER(kind=4), DEVICE, ALLOCATABLE :: pnelems(:)
+    INTEGER(kind=4), DEVICE, ALLOCATABLE :: pnthrcol(:)
+    INTEGER(kind=4), DEVICE, ALLOCATABLE :: pthrcol(:)
+
+    IF (isFirstTime_res_calc .EQV. .TRUE.) THEN
+      dimensions_res_calc%opDat1Dimension = opDat1%dim
+      dimensions_res_calc%opDat2Dimension = opDat2%dim
+      dimensions_res_calc%opDat3Dimension = opDat3%dim
+      dimensions_res_calc%opDat4Dimension = opDat4%dim
+      dimensions_res_calc%opDat5Dimension = opDat5%dim
+      dimensions_res_calc%opDat6Dimension = opDat6%dim
+      dimensions_res_calc%opDat7Dimension = opDat7%dim
+      dimensions_res_calc%opDat8Dimension = opDat8%dim
+      sizes_res_calc%opDat1Cardinality = opDat1%dim * opDat1%set%size
+      sizes_res_calc%opDat3Cardinality = opDat3%dim * opDat3%set%size
+      sizes_res_calc%opDat5Cardinality = opDat5%dim * opDat5%set%size
+      sizes_res_calc%opDat7Cardinality = opDat7%dim * opDat7%set%size
+      args(1) = opDat1%index
+      args(2) = opDat2%index
+      args(3) = opDat3%index
+      args(4) = opDat4%index
+      args(5) = opDat5%index
+      args(6) = opDat6%index
+      args(7) = opDat7%index
+      args(8) = opDat8%index
+      idxs(1) = opIndirection1
+      idxs(2) = opIndirection2
+      idxs(3) = opIndirection3
+      idxs(4) = opIndirection4
+      idxs(5) = opIndirection5
+      idxs(6) = opIndirection6
+      idxs(7) = opIndirection7
+      idxs(8) = opIndirection8
+
+      DO i1 = 1, 8, 1
+
+        IF (idxs(i1) .NE. -1) THEN
+          idxs(i1) = idxs(i1) - 1
+        END IF
+
+      END DO
+
+      maps(1) = opMap1%index
+      maps(2) = opMap2%index
+      maps(3) = opMap3%index
+      maps(4) = opMap4%index
+      maps(5) = opMap5%index
+      maps(6) = opMap6%index
+      maps(7) = opMap7%index
+      maps(8) = opMap8%index
+      accesses(1) = opAccess1
+      accesses(2) = opAccess2
+      accesses(3) = opAccess3
+      accesses(4) = opAccess4
+      accesses(5) = opAccess5
+      accesses(6) = opAccess6
+      accesses(7) = opAccess7
+      accesses(8) = opAccess8
+      inds(1) = 0
+      inds(2) = 0
+      inds(3) = 1
+      inds(4) = 1
+      inds(5) = 2
+      inds(6) = 2
+      inds(7) = 3
+      inds(8) = 3
+      argsNumber = 8
+      indsNumber = 4
+      planRet_res_calc = cplan(userSubroutine,set%index,argsNumber,args,idxs,maps,accesses,indsNumber,inds)
+    END IF
+
+    opDat1Cardinality = opDat1%dim * opDat1%set%size
+    opDat3Cardinality = opDat3%dim * opDat3%set%size
+    opDat5Cardinality = opDat5%dim * opDat5%set%size
+    opDat7Cardinality = opDat7%dim * opDat7%set%size
+    CALL c_f_pointer(opDat1%dat_d,opDat1Device,(/opDat1Cardinality/))
+    CALL c_f_pointer(opDat3%dat_d,opDat3Device,(/opDat3Cardinality/))
+    CALL c_f_pointer(opDat5%dat_d,opDat5Device,(/opDat5Cardinality/))
+    CALL c_f_pointer(opDat7%dat_d,opDat7Device,(/opDat7Cardinality/))
+    CALL c_f_pointer(planRet_res_calc,actualPlan)
+    CALL c_f_pointer(actualPlan%nindirect,pnindirect,(/indsNumber/))
+    CALL c_f_pointer(actualPlan%maps,pmaps,(/argsNumber/))
+
+    IF (inds(1) >= 0) THEN
+      pMaps1Size = set%size
+      CALL c_f_pointer(pmaps(1),pMaps1,(/pMaps1Size/))
+    END IF
+
+    IF (inds(2) >= 0) THEN
+      pMaps2Size = set%size
+      CALL c_f_pointer(pmaps(2),pMaps2,(/pMaps2Size/))
+    END IF
+
+    IF (inds(3) >= 0) THEN
+      pMaps3Size = set%size
+      CALL c_f_pointer(pmaps(3),pMaps3,(/pMaps3Size/))
+    END IF
+
+    IF (inds(4) >= 0) THEN
+      pMaps4Size = set%size
+      CALL c_f_pointer(pmaps(4),pMaps4,(/pMaps4Size/))
+    END IF
+
+    IF (inds(5) >= 0) THEN
+      pMaps5Size = set%size
+      CALL c_f_pointer(pmaps(5),pMaps5,(/pMaps5Size/))
+    END IF
+
+    IF (inds(6) >= 0) THEN
+      pMaps6Size = set%size
+      CALL c_f_pointer(pmaps(6),pMaps6,(/pMaps6Size/))
+    END IF
+
+    IF (inds(7) >= 0) THEN
+      pMaps7Size = set%size
+      CALL c_f_pointer(pmaps(7),pMaps7,(/pMaps7Size/))
+    END IF
+
+    IF (inds(8) >= 0) THEN
+      pMaps8Size = set%size
+      CALL c_f_pointer(pmaps(8),pMaps8,(/pMaps8Size/))
+    END IF
+
+    CALL c_f_pointer(actualPlan%ind_maps,pindMaps,(/indsNumber/))
+    CALL c_f_pointer(actualPlan%ncolblk,ncolblk,set%size)
+    pindSizesSize = actualPlan%nblocks * indsNumber
+    CALL c_f_pointer(actualPlan%ind_sizes,pindSizes,(/pindSizesSize/))
+    pindOffsSize = pindSizesSize
+    CALL c_f_pointer(actualPlan%ind_offs,pindOffs,(/pindOffsSize/))
+    pblkMapSize = actualPlan%nblocks
+    CALL c_f_pointer(actualPlan%blkmap,pblkMap,(/pblkMapSize/))
+    poffsetSize = actualPlan%nblocks
+    CALL c_f_pointer(actualPlan%offset,poffset,(/poffsetSize/))
+    pnelemsSize = actualPlan%nblocks
+    CALL c_f_pointer(actualPlan%nelems,pnelems,(/pnelemsSize/))
+    pnthrcolSize = actualPlan%nblocks
+    CALL c_f_pointer(actualPlan%nthrcol,pnthrcol,(/pnthrcolSize/))
+    pthrcolSize = set%size
+    CALL c_f_pointer(actualPlan%thrcol,pthrcol,(/pthrcolSize/))
+    CALL c_f_pointer(pindMaps(1),pindMaps1,pnindirect(1))
+    CALL c_f_pointer(pindMaps(2),pindMaps3,pnindirect(2))
+    CALL c_f_pointer(pindMaps(3),pindMaps5,pnindirect(3))
+    CALL c_f_pointer(pindMaps(4),pindMaps7,pnindirect(4))
+
+    IF (isFirstTime_res_calc .EQV. .TRUE.) THEN
+      isFirstTime_res_calc = .FALSE.
+      sizes_res_calc%pindMaps1Size = pnindirect(1)
+      sizes_res_calc%pindMaps3Size = pnindirect(2)
+      sizes_res_calc%pindMaps5Size = pnindirect(3)
+      sizes_res_calc%pindMaps7Size = pnindirect(4)
+      sizes_res_calc%pMaps1Size = pMaps1Size
+      sizes_res_calc%pMaps2Size = pMaps2Size
+      sizes_res_calc%pMaps3Size = pMaps3Size
+      sizes_res_calc%pMaps4Size = pMaps4Size
+      sizes_res_calc%pMaps5Size = pMaps5Size
+      sizes_res_calc%pMaps6Size = pMaps6Size
+      sizes_res_calc%pMaps7Size = pMaps7Size
+      sizes_res_calc%pMaps8Size = pMaps8Size
+      sizes_res_calc%pblkMapSize = pblkMapSize
+      sizes_res_calc%pindOffsSize = pindOffsSize
+      sizes_res_calc%pindSizesSize = pindSizesSize
+      sizes_res_calc%pnelemsSize = pnelemsSize
+      sizes_res_calc%pnthrcolSize = pnthrcolSize
+      sizes_res_calc%poffsetSize = poffsetSize
+      sizes_res_calc%pthrcolSize = pthrcolSize
+    END IF
+
+    blockOffset = 0
+
+    DO colour = 0, actualPlan%ncolors - 1, 1
+      nblocks = ncolblk(colour + 1)
+      nthreads = OP_BLOCK_SIZE
+      nshared = actualPlan%nshared
+      CALL res_calc_kernel<<<nblocks, nthreads, nshared>>>(dimensions_res_calc,sizes_res_calc,opDat1Device,pindMaps1,op&
+      &Dat3Device,pindMaps3,opDat5Device,pindMaps5,opDat7Device,pindMaps7,pMaps1,pMaps2,pMaps3,pMaps4,pMaps5,pMaps6,pMa&
+      &ps7,pMaps8,pindSizes,pindOffs,pblkMap,poffset,pnelems,pnthrcol,pthrcol,blockOffset)
+      threadSynchRet = cudaThreadSynchronize()
+      blockOffset = blockOffset + nblocks
+    END DO
+
+  END SUBROUTINE
+
+  attributes(device) SUBROUTINE save_soln_device(q,fakeInt,qold)
+    IMPLICIT NONE
+    REAL(kind=8), DEVICE :: q(4)
+    INTEGER(kind=4), DEVICE :: fakeInt(10)
+    REAL(kind=8), DEVICE :: qold(4)
+    INTEGER(kind=4) :: i
+
+    DO i = 1, 4
+      qold(i) = q(i)
+    END DO
+
+    DO i = 1, 10
+      fakeInt(i) = 1
+    END DO
+
+  END SUBROUTINE
+
+  attributes(global) SUBROUTINE save_soln_kernel(dimensions_save_soln_device,sizes_save_soln_device,opDat1,opDat2,opDat&
+  &3,setSize,warpSize,sharedMemoryOffset)
+    IMPLICIT NONE
+    TYPE ( save_soln_opDatDimensions ) , DEVICE :: dimensions_save_soln_device
+    TYPE ( save_soln_opDatCardinalities ) , DEVICE :: sizes_save_soln_device
+    REAL(kind=8), DEVICE :: opDat1(0:sizes_save_soln_device%opDat1Cardinality - 1)
+    INTEGER(kind=4), DEVICE :: opDat2(0:sizes_save_soln_device%opDat2Cardinality - 1)
+    REAL(kind=8), DEVICE :: opDat3(0:sizes_save_soln_device%opDat3Cardinality - 1)
+    INTEGER(kind=4), VALUE :: setSize
+    INTEGER(kind=4), VALUE :: warpSize
+    INTEGER(kind=4), VALUE :: sharedMemoryOffset
+    REAL(kind=8) :: opDat1Local(0:3)
+    INTEGER(kind=4) :: opDat2Local(0:9)
+    REAL(kind=8) :: opDat3Local(0:3)
+    REAL(kind=8), SHARED :: sharedFloat8(0:*)
+    INTEGER(kind=4) :: sharedOffsetFloat8
+    INTEGER(kind=4), SHARED :: sharedInteger4(0:*)
+    INTEGER(kind=4) :: sharedOffsetInteger4
+    INTEGER(kind=4) :: i1
+    INTEGER(kind=4) :: i2
+    INTEGER(kind=4) :: localOffset
+    INTEGER(kind=4) :: nelems
+    INTEGER(kind=4) :: threadID
+    threadID = mod(threadidx%x - 1,warpSize)
+    sharedOffsetFloat8 = sharedMemoryOffset * ((threadidx%x - 1) / warpSize) / 8
+    sharedOffsetInteger4 = sharedMemoryOffset * ((threadidx%x - 1) / warpSize) / 4
+
+    DO i1 = threadidx%x - 1 + (blockidx%x - 1) * blockdim%x, setSize - 1, blockdim%x * griddim%x
+      localOffset = i1 - threadID
+      nelems = min(warpSize,setSize - localOffset)
+
+      DO i2 = 0, dimensions_save_soln_device%opDat1Dimension, 1
+        sharedFloat8(sharedOffsetFloat8 + (threadID + i2 * nelems)) = opDat1(threadID + (i2 * nelems + localOffset * di&
+        &mensions_save_soln_device%opDat1Dimension))
+      END DO
+
+      DO i2 = 0, dimensions_save_soln_device%opDat1Dimension, 1
+        opDat1Local(i2) = sharedFloat8(sharedOffsetFloat8 + (i2 + threadID * dimensions_save_soln_device%opDat1Dimensio&
+        &n))
+      END DO
+
+      DO i2 = 0, dimensions_save_soln_device%opDat2Dimension, 1
+        sharedInteger4(sharedOffsetInteger4 + (threadID + i2 * nelems)) = opDat2(threadID + (i2 * nelems + localOffset &
+        &* dimensions_save_soln_device%opDat2Dimension))
+      END DO
+
+      DO i2 = 0, dimensions_save_soln_device%opDat2Dimension, 1
+        opDat2Local(i2) = sharedInteger4(sharedOffsetInteger4 + (i2 + threadID * dimensions_save_soln_device%opDat2Dime&
+        &nsion))
+      END DO
+
+      CALL save_soln_device(opDat1Local,opDat2Local,opDat3Local)
+
+      DO i2 = 0, dimensions_save_soln_device%opDat1Dimension - 1, 1
+        sharedFloat8(sharedOffsetFloat8 + (i2 + threadID * dimensions_save_soln_device%opDat1Dimension)) = opDat1Local(&
+        &i2)
+      END DO
+
+      DO i2 = 0, dimensions_save_soln_device%opDat1Dimension - 1, 1
+        opDat1(threadID + (i2 * nelems + localOffset * dimensions_save_soln_device%opDat1Dimension)) = sharedFloat8(sha&
+        &redOffsetFloat8 + (threadID + i2 * nelems))
+      END DO
+
+      DO i2 = 0, dimensions_save_soln_device%opDat2Dimension - 1, 1
+        sharedInteger4(sharedOffsetInteger4 + (i2 + threadID * dimensions_save_soln_device%opDat2Dimension)) = opDat2Lo&
+        &cal(i2)
+      END DO
+
+      DO i2 = 0, dimensions_save_soln_device%opDat2Dimension - 1, 1
+        opDat2(threadID + (i2 * nelems + localOffset * dimensions_save_soln_device%opDat2Dimension)) = sharedInteger4(s&
+        &haredOffsetInteger4 + (threadID + i2 * nelems))
+      END DO
+
+    END DO
+
+  END SUBROUTINE
+
+  attributes(host) SUBROUTINE save_soln_host(userSubroutine,set,opDat1,opIndirection1,opMap1,opAccess1,opDat2,opIndirec&
+  &tion2,opMap2,opAccess2,opDat3,opIndirection3,opMap3,opAccess3)
+    IMPLICIT NONE
+    CHARACTER, INTENT(IN) :: userSubroutine*(9)
+    TYPE ( op_set ) , INTENT(IN) :: set
+    TYPE ( op_dat ) , INTENT(IN) :: opDat1
+    INTEGER(kind=4), INTENT(IN) :: opIndirection1
+    TYPE ( op_map ) , INTENT(IN) :: opMap1
+    INTEGER(kind=4), INTENT(IN) :: opAccess1
+    TYPE ( op_dat ) , INTENT(IN) :: opDat2
+    INTEGER(kind=4), INTENT(IN) :: opIndirection2
+    TYPE ( op_map ) , INTENT(IN) :: opMap2
+    INTEGER(kind=4), INTENT(IN) :: opAccess2
+    TYPE ( op_dat ) , INTENT(IN) :: opDat3
+    INTEGER(kind=4), INTENT(IN) :: opIndirection3
+    TYPE ( op_map ) , INTENT(IN) :: opMap3
+    INTEGER(kind=4), INTENT(IN) :: opAccess3
+    INTEGER(kind=4) :: opDat1Cardinality
+    INTEGER(kind=4) :: opDat2Cardinality
+    INTEGER(kind=4) :: opDat3Cardinality
+    REAL(kind=8), DEVICE, ALLOCATABLE :: opDat1Device(:)
+    INTEGER(kind=4), DEVICE, ALLOCATABLE :: opDat2Device(:)
+    REAL(kind=8), DEVICE, ALLOCATABLE :: opDat3Device(:)
+    INTEGER(kind=4) :: nblocks
+    INTEGER(kind=4) :: nthreads
+    INTEGER(kind=4) :: nshared
+    INTEGER(kind=4) :: threadSynchRet
+    INTEGER(kind=4) :: sharedMemoryOffset
+    INTEGER(kind=4) :: warpSize
+
+    IF (isFirstTime_save_soln .EQV. .TRUE.) THEN
+      dimensions_save_soln%opDat1Dimension = opDat1%dim
+      dimensions_save_soln%opDat2Dimension = opDat2%dim
+      dimensions_save_soln%opDat3Dimension = opDat3%dim
+      sizes_save_soln%opDat1Cardinality = opDat1%dim * opDat1%set%size
+      sizes_save_soln%opDat2Cardinality = opDat2%dim * opDat2%set%size
+      sizes_save_soln%opDat3Cardinality = opDat3%dim * opDat3%set%size
+      isFirstTime_save_soln = .FALSE.
+    END IF
+
+    nblocks = 200
+    nthreads = 128
+    warpSize = OP_WARP_SIZE
+    nshared = 40
+    sharedMemoryOffset = nshared * OP_WARP_SIZE
+    nshared = nshared * nthreads
+    opDat1Cardinality = opDat1%dim * opDat1%set%size
+    opDat2Cardinality = opDat2%dim * opDat2%set%size
+    opDat3Cardinality = opDat3%dim * opDat3%set%size
+    CALL c_f_pointer(opDat1%dat_d,opDat1Device,(/opDat1Cardinality/))
+    CALL c_f_pointer(opDat2%dat_d,opDat2Device,(/opDat2Cardinality/))
+    CALL c_f_pointer(opDat3%dat_d,opDat3Device,(/opDat3Cardinality/))
+    CALL save_soln_kernel<<<nblocks, nthreads, nshared>>>(dimensions_save_soln,sizes_save_soln,opDat1Device,opDat2Devic&
+    &e,opDat3Device,set%size,warpSize,sharedMemoryOffset)
+    threadSynchRet = cudaThreadSynchronize()
+  END SUBROUTINE
+
+  attributes(device) SUBROUTINE update_device(qold,q,res,adt,rms)
+    IMPLICIT NONE
+    REAL(kind=8), DEVICE :: qold(*)
+    REAL(kind=8), DEVICE :: q(*)
+    REAL(kind=8), DEVICE :: res(*)
+    REAL(kind=8), DEVICE :: adt(*)
+    REAL(kind=8), DEVICE :: rms(*)
+    REAL(kind=8) :: del
+    REAL(kind=8) :: adti
+    INTEGER(kind=4) :: i
+    adti = 1.0 / adt(1)
+
+    DO i = 1, 4
+      del = adti * res(i)
+      q(i) = qold(i) - del
+      res(i) = 0.0
+      rms(1) = rms(1) + del * del
+    END DO
+
+  END SUBROUTINE
+
+  attributes(global) SUBROUTINE update_kernel(dimensions_update_device,sizes_update_device,opDat1,opDat2,opDat3,opDat4,&
+  &setSize,warpSize,sharedMemoryOffset)
+    IMPLICIT NONE
+    TYPE ( update_opDatDimensions ) , DEVICE :: dimensions_update_device
+    TYPE ( update_opDatCardinalities ) , DEVICE :: sizes_update_device
+    REAL(kind=8), DEVICE :: opDat1(0:sizes_update_device%opDat1Cardinality - 1)
+    REAL(kind=8), DEVICE :: opDat2(0:sizes_update_device%opDat2Cardinality - 1)
+    REAL(kind=8), DEVICE :: opDat3(0:sizes_update_device%opDat3Cardinality - 1)
+    REAL(kind=8), DEVICE :: opDat4(0:sizes_update_device%opDat4Cardinality - 1)
+    INTEGER(kind=4), VALUE :: setSize
+    INTEGER(kind=4), VALUE :: warpSize
+    INTEGER(kind=4), VALUE :: sharedMemoryOffset
+    REAL(kind=8) :: opDat1Local(0:3)
+    REAL(kind=8) :: opDat2Local(0:3)
+    REAL(kind=8) :: opDat3Local(0:3)
+    REAL(kind=8) :: opDat5Local
+    REAL(kind=8), SHARED :: sharedFloat8(0:*)
+    INTEGER(kind=4) :: sharedOffsetFloat8
+    INTEGER(kind=4) :: i1
+    INTEGER(kind=4) :: i2
+    INTEGER(kind=4) :: localOffset
+    INTEGER(kind=4) :: nelems
+    INTEGER(kind=4) :: threadID
+    threadID = mod(threadidx%x - 1,warpSize)
+    sharedOffsetFloat8 = sharedMemoryOffset * ((threadidx%x - 1) / warpSize) / 8
+
+    DO i1 = threadidx%x - 1 + (blockidx%x - 1) * blockdim%x, setSize - 1, blockdim%x * griddim%x
+      localOffset = i1 - threadID
+      nelems = min(warpSize,setSize - localOffset)
+
+      DO i2 = 0, dimensions_update_device%opDat1Dimension, 1
+        sharedFloat8(sharedOffsetFloat8 + (threadID + i2 * nelems)) = opDat1(threadID + (i2 * nelems + localOffset * di&
+        &mensions_update_device%opDat1Dimension))
+      END DO
+
+      DO i2 = 0, dimensions_update_device%opDat1Dimension, 1
+        opDat1Local(i2) = sharedFloat8(sharedOffsetFloat8 + (i2 + threadID * dimensions_update_device%opDat1Dimension))
+      END DO
+
+      DO i2 = 0, dimensions_update_device%opDat3Dimension, 1
+        sharedFloat8(sharedOffsetFloat8 + (threadID + i2 * nelems)) = opDat3(threadID + (i2 * nelems + localOffset * di&
+        &mensions_update_device%opDat3Dimension))
+      END DO
+
+      DO i2 = 0, dimensions_update_device%opDat3Dimension, 1
+        opDat3Local(i2) = sharedFloat8(sharedOffsetFloat8 + (i2 + threadID * dimensions_update_device%opDat3Dimension))
+      END DO
+
+      CALL update_device(opDat1Local,opDat2Local,opDat3Local,opDat4(i1:i1 + 0),opDat5Local)
+
+      DO i2 = 0, dimensions_update_device%opDat1Dimension - 1, 1
+        sharedFloat8(sharedOffsetFloat8 + (i2 + threadID * dimensions_update_device%opDat1Dimension)) = opDat1Local(i2)
+      END DO
+
+      DO i2 = 0, dimensions_update_device%opDat1Dimension - 1, 1
+        opDat1(threadID + (i2 * nelems + localOffset * dimensions_update_device%opDat1Dimension)) = sharedFloat8(shared&
+        &OffsetFloat8 + (threadID + i2 * nelems))
+      END DO
+
+      DO i2 = 0, dimensions_update_device%opDat3Dimension - 1, 1
+        sharedFloat8(sharedOffsetFloat8 + (i2 + threadID * dimensions_update_device%opDat3Dimension)) = opDat3Local(i2)
+      END DO
+
+      DO i2 = 0, dimensions_update_device%opDat3Dimension - 1, 1
+        opDat3(threadID + (i2 * nelems + localOffset * dimensions_update_device%opDat3Dimension)) = sharedFloat8(shared&
+        &OffsetFloat8 + (threadID + i2 * nelems))
+      END DO
+
+    END DO
+
+    CALL ReductionFloat8(reductionArrayDevice5update(blockidx%x - 1:blockidx%x - 1),opDat5Local,warpSize,0)
+  END SUBROUTINE
+
+  attributes(host) SUBROUTINE update_host(userSubroutine,set,opDat1,opIndirection1,opMap1,opAccess1,opDat2,opIndirectio&
+  &n2,opMap2,opAccess2,opDat3,opIndirection3,opMap3,opAccess3,opDat4,opIndirection4,opMap4,opAccess4,opDat5,opIndirecti&
+  &on5,opMap5,opAccess5)
+    IMPLICIT NONE
+    CHARACTER, INTENT(IN) :: userSubroutine*(6)
+    TYPE ( op_set ) , INTENT(IN) :: set
+    TYPE ( op_dat ) , INTENT(IN) :: opDat1
+    INTEGER(kind=4), INTENT(IN) :: opIndirection1
+    TYPE ( op_map ) , INTENT(IN) :: opMap1
+    INTEGER(kind=4), INTENT(IN) :: opAccess1
+    TYPE ( op_dat ) , INTENT(IN) :: opDat2
+    INTEGER(kind=4), INTENT(IN) :: opIndirection2
+    TYPE ( op_map ) , INTENT(IN) :: opMap2
+    INTEGER(kind=4), INTENT(IN) :: opAccess2
+    TYPE ( op_dat ) , INTENT(IN) :: opDat3
+    INTEGER(kind=4), INTENT(IN) :: opIndirection3
+    TYPE ( op_map ) , INTENT(IN) :: opMap3
+    INTEGER(kind=4), INTENT(IN) :: opAccess3
+    TYPE ( op_dat ) , INTENT(IN) :: opDat4
+    INTEGER(kind=4), INTENT(IN) :: opIndirection4
+    TYPE ( op_map ) , INTENT(IN) :: opMap4
+    INTEGER(kind=4), INTENT(IN) :: opAccess4
+    TYPE ( op_dat ) , INTENT(IN) :: opDat5
+    INTEGER(kind=4), INTENT(IN) :: opIndirection5
+    TYPE ( op_map ) , INTENT(IN) :: opMap5
+    INTEGER(kind=4), INTENT(IN) :: opAccess5
+    INTEGER(kind=4) :: opDat1Cardinality
+    INTEGER(kind=4) :: opDat2Cardinality
+    INTEGER(kind=4) :: opDat3Cardinality
+    INTEGER(kind=4) :: opDat4Cardinality
+    INTEGER(kind=4) :: opDat5Cardinality
+    REAL(kind=8), DEVICE, ALLOCATABLE :: opDat1Device(:)
+    REAL(kind=8), DEVICE, ALLOCATABLE :: opDat2Device(:)
+    REAL(kind=8), DEVICE, ALLOCATABLE :: opDat3Device(:)
+    REAL(kind=8), DEVICE, ALLOCATABLE :: opDat4Device(:)
+    REAL(kind=8), POINTER :: opDat5Host
+    INTEGER(kind=4) :: nblocks
+    INTEGER(kind=4) :: nthreads
+    INTEGER(kind=4) :: nshared
+    INTEGER(kind=4) :: threadSynchRet
+    INTEGER(kind=4) :: sharedMemoryOffset
+    INTEGER(kind=4) :: warpSize
+    INTEGER(kind=4) :: i1
+    INTEGER(kind=4) :: i2
+    INTEGER(kind=4) :: reductionCardinality
+
+    IF (isFirstTime_update .EQV. .TRUE.) THEN
+      dimensions_update%opDat1Dimension = opDat1%dim
+      dimensions_update%opDat2Dimension = opDat2%dim
+      dimensions_update%opDat3Dimension = opDat3%dim
+      dimensions_update%opDat4Dimension = opDat4%dim
+      dimensions_update%opDat5Dimension = opDat5%dim
+      sizes_update%opDat1Cardinality = opDat1%dim * opDat1%set%size
+      sizes_update%opDat2Cardinality = opDat2%dim * opDat2%set%size
+      sizes_update%opDat3Cardinality = opDat3%dim * opDat3%set%size
+      sizes_update%opDat4Cardinality = opDat4%dim * opDat4%set%size
+      sizes_update%opDat5Cardinality = set%size
+      isFirstTime_update = .FALSE.
+    END IF
+
+    nblocks = 200
+    nthreads = 128
+    warpSize = OP_WARP_SIZE
+    nshared = 32
+    sharedMemoryOffset = nshared * OP_WARP_SIZE
+    nshared = nshared * nthreads
+    opDat1Cardinality = opDat1%dim * opDat1%set%size
+    opDat2Cardinality = opDat2%dim * opDat2%set%size
+    opDat3Cardinality = opDat3%dim * opDat3%set%size
+    opDat4Cardinality = opDat4%dim * opDat4%set%size
+    opDat5Cardinality = set%size
+    CALL c_f_pointer(opDat1%dat_d,opDat1Device,(/opDat1Cardinality/))
+    CALL c_f_pointer(opDat2%dat_d,opDat2Device,(/opDat2Cardinality/))
+    CALL c_f_pointer(opDat3%dat_d,opDat3Device,(/opDat3Cardinality/))
+    CALL c_f_pointer(opDat4%dat_d,opDat4Device,(/opDat4Cardinality/))
+    CALL c_f_pointer(opDat5%dat,opDat5Host)
+    reductionCardinality = nblocks * 1
+
+    DO i1 = 0, reductionCardinality, 1
+      reductionArrayHost5update(i1) = 0.00000
+    END DO
+
+    reductionArrayDevice5update = reductionArrayHost5update
+    CALL update_kernel<<<nblocks, nthreads, nshared>>>(dimensions_update,sizes_update,opDat1Device,opDat2Device,opDat3D&
+    &evice,opDat4Device,set%size,warpSize,sharedMemoryOffset)
+    threadSynchRet = cudaThreadSynchronize()
+    reductionArrayHost5update = reductionArrayDevice5update
+
+    DO i1 = 0, reductionCardinality, 1
+      opDat5Host = reductionArrayHost5update(i1) + opDat5Host
+    END DO
+
+  END SUBROUTINE
+
+END MODULE GENERATED_MODULE
+

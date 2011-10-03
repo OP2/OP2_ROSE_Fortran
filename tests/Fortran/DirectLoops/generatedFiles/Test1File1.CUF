@@ -1,0 +1,173 @@
+MODULE GENERATED_MODULE
+  USE ISO_C_BINDING
+  USE OP2_C
+  USE cudaConfigurationParams
+  USE CUDAFOR
+  TYPE  :: real8Array_integer4Array_real8Array_opDatDimensions
+  INTEGER(kind=4) :: opDat1Dimension
+  INTEGER(kind=4) :: opDat2Dimension
+  INTEGER(kind=4) :: opDat3Dimension
+  END TYPE real8Array_integer4Array_real8Array_opDatDimensions
+
+  TYPE  :: real8Array_integer4Array_real8Array_opDatCardinalities
+  INTEGER(kind=4) :: opDat1Cardinality
+  INTEGER(kind=4) :: opDat2Cardinality
+  INTEGER(kind=4) :: opDat3Cardinality
+  END TYPE real8Array_integer4Array_real8Array_opDatCardinalities
+
+  LOGICAL :: isFirstTime_real8Array_integer4Array_real8Array = .TRUE.
+  TYPE ( real8Array_integer4Array_real8Array_opDatCardinalities ) , DEVICE :: sizes_real8Array_integer4Array_real8Array
+  TYPE ( real8Array_integer4Array_real8Array_opDatDimensions ) , DEVICE :: dimensions_real8Array_integer4Array_real8Arr&
+  &ay
+  CONTAINS
+
+  attributes(device) SUBROUTINE s2023763597(a,b,c)
+    REAL(kind=8), DEVICE :: a(4)
+    INTEGER(kind=4), DEVICE :: b(7)
+    REAL(kind=8), DEVICE :: c(11)
+    INTEGER(kind=4) :: i
+
+    DO i = 1, 4
+      c(i) = a(i)
+    END DO
+
+    DO i = 5, 11
+      c(i) = int(b(i - 4))
+    END DO
+
+  END SUBROUTINE
+
+  attributes(global) SUBROUTINE s744293032(dimensions_s2023763597,sizes_s2023763597,opDat1,opDat2,opDat3,setSize,warpSi&
+  &ze,sharedMemoryOffset)
+    IMPLICIT NONE
+    TYPE ( real8Array_integer4Array_real8Array_opDatDimensions ) , DEVICE :: dimensions_s2023763597
+    TYPE ( real8Array_integer4Array_real8Array_opDatCardinalities ) , DEVICE :: sizes_s2023763597
+    REAL(kind=8), DEVICE :: opDat1(0:sizes_s2023763597%opDat1Cardinality - 1)
+    INTEGER(kind=4), DEVICE :: opDat2(0:sizes_s2023763597%opDat2Cardinality - 1)
+    REAL(kind=8), DEVICE :: opDat3(0:sizes_s2023763597%opDat3Cardinality - 1)
+    INTEGER(kind=4), VALUE :: setSize
+    INTEGER(kind=4), VALUE :: warpSize
+    INTEGER(kind=4), VALUE :: sharedMemoryOffset
+    REAL(kind=8) :: opDat1Local(0:3)
+    INTEGER(kind=4) :: opDat2Local(0:6)
+    REAL(kind=8) :: opDat3Local(0:10)
+    REAL(kind=8), SHARED :: sharedFloat8(0:*)
+    INTEGER(kind=4) :: sharedOffsetFloat8
+    INTEGER(kind=4), SHARED :: sharedInteger4(0:*)
+    INTEGER(kind=4) :: sharedOffsetInteger4
+    INTEGER(kind=4) :: i1
+    INTEGER(kind=4) :: i2
+    INTEGER(kind=4) :: localOffset
+    INTEGER(kind=4) :: nelems
+    INTEGER(kind=4) :: threadID
+    threadID = mod(threadidx%x - 1,warpSize)
+    sharedOffsetFloat8 = sharedMemoryOffset * ((threadidx%x - 1) / warpSize) / 8
+    sharedOffsetInteger4 = sharedMemoryOffset * ((threadidx%x - 1) / warpSize) / 4
+
+    DO i1 = threadidx%x - 1 + (blockidx%x - 1) * blockdim%x, setSize - 1, blockdim%x * griddim%x
+      localOffset = i1 - threadID
+      nelems = min(warpSize,setSize - localOffset)
+
+      DO i2 = 0, dimensions_s2023763597%opDat1Dimension, 1
+        sharedFloat8(sharedOffsetFloat8 + (threadID + i2 * nelems)) = opDat1(threadID + (i2 * nelems + localOffset * di&
+        &mensions_s2023763597%opDat1Dimension))
+      END DO
+
+      DO i2 = 0, dimensions_s2023763597%opDat1Dimension, 1
+        opDat1Local(i2) = sharedFloat8(sharedOffsetFloat8 + (i2 + threadID * dimensions_s2023763597%opDat1Dimension))
+      END DO
+
+      DO i2 = 0, dimensions_s2023763597%opDat2Dimension, 1
+        sharedInteger4(sharedOffsetInteger4 + (threadID + i2 * nelems)) = opDat2(threadID + (i2 * nelems + localOffset &
+        &* dimensions_s2023763597%opDat2Dimension))
+      END DO
+
+      DO i2 = 0, dimensions_s2023763597%opDat2Dimension, 1
+        opDat2Local(i2) = sharedInteger4(sharedOffsetInteger4 + (i2 + threadID * dimensions_s2023763597%opDat2Dimension&
+        &))
+      END DO
+
+      CALL s2023763597(opDat1Local,opDat2Local,opDat3Local)
+
+      DO i2 = 0, dimensions_s2023763597%opDat1Dimension - 1, 1
+        sharedFloat8(sharedOffsetFloat8 + (i2 + threadID * dimensions_s2023763597%opDat1Dimension)) = opDat1Local(i2)
+      END DO
+
+      DO i2 = 0, dimensions_s2023763597%opDat1Dimension - 1, 1
+        opDat1(threadID + (i2 * nelems + localOffset * dimensions_s2023763597%opDat1Dimension)) = sharedFloat8(sharedOf&
+        &fsetFloat8 + (threadID + i2 * nelems))
+      END DO
+
+      DO i2 = 0, dimensions_s2023763597%opDat2Dimension - 1, 1
+        sharedInteger4(sharedOffsetInteger4 + (i2 + threadID * dimensions_s2023763597%opDat2Dimension)) = opDat2Local(i&
+        &2)
+      END DO
+
+      DO i2 = 0, dimensions_s2023763597%opDat2Dimension - 1, 1
+        opDat2(threadID + (i2 * nelems + localOffset * dimensions_s2023763597%opDat2Dimension)) = sharedInteger4(shared&
+        &OffsetInteger4 + (threadID + i2 * nelems))
+      END DO
+
+    END DO
+
+  END SUBROUTINE
+
+  attributes(host) SUBROUTINE s3168439322(userSubroutine,set,opDat1,opIndirection1,opMap1,opAccess1,opDat2,opIndirectio&
+  &n2,opMap2,opAccess2,opDat3,opIndirection3,opMap3,opAccess3)
+    IMPLICIT NONE
+    CHARACTER, INTENT(IN) :: userSubroutine*(35)
+    TYPE ( op_set ) , INTENT(IN) :: set
+    TYPE ( op_dat ) , INTENT(IN) :: opDat1
+    INTEGER(kind=4), INTENT(IN) :: opIndirection1
+    TYPE ( op_map ) , INTENT(IN) :: opMap1
+    INTEGER(kind=4), INTENT(IN) :: opAccess1
+    TYPE ( op_dat ) , INTENT(IN) :: opDat2
+    INTEGER(kind=4), INTENT(IN) :: opIndirection2
+    TYPE ( op_map ) , INTENT(IN) :: opMap2
+    INTEGER(kind=4), INTENT(IN) :: opAccess2
+    TYPE ( op_dat ) , INTENT(IN) :: opDat3
+    INTEGER(kind=4), INTENT(IN) :: opIndirection3
+    TYPE ( op_map ) , INTENT(IN) :: opMap3
+    INTEGER(kind=4), INTENT(IN) :: opAccess3
+    INTEGER(kind=4) :: opDat1Cardinality
+    INTEGER(kind=4) :: opDat2Cardinality
+    INTEGER(kind=4) :: opDat3Cardinality
+    REAL(kind=8), DEVICE, ALLOCATABLE :: opDat1Device(:)
+    INTEGER(kind=4), DEVICE, ALLOCATABLE :: opDat2Device(:)
+    REAL(kind=8), DEVICE, ALLOCATABLE :: opDat3Device(:)
+    INTEGER(kind=4) :: nblocks
+    INTEGER(kind=4) :: nthreads
+    INTEGER(kind=4) :: nshared
+    INTEGER(kind=4) :: threadSynchRet
+    INTEGER(kind=4) :: sharedMemoryOffset
+    INTEGER(kind=4) :: warpSize
+
+    IF (isFirstTime_real8Array_integer4Array_real8Array .EQV. .TRUE.) THEN
+      dimensions_real8Array_integer4Array_real8Array%opDat1Dimension = opDat1%dim
+      dimensions_real8Array_integer4Array_real8Array%opDat2Dimension = opDat2%dim
+      dimensions_real8Array_integer4Array_real8Array%opDat3Dimension = opDat3%dim
+      sizes_real8Array_integer4Array_real8Array%opDat1Cardinality = opDat1%dim * opDat1%set%size
+      sizes_real8Array_integer4Array_real8Array%opDat2Cardinality = opDat2%dim * opDat2%set%size
+      sizes_real8Array_integer4Array_real8Array%opDat3Cardinality = opDat3%dim * opDat3%set%size
+      isFirstTime_real8Array_integer4Array_real8Array = .FALSE.
+    END IF
+
+    nblocks = 200
+    nthreads = 128
+    warpSize = OP_WARP_SIZE
+    nshared = 88
+    sharedMemoryOffset = nshared * OP_WARP_SIZE
+    nshared = nshared * nthreads
+    opDat1Cardinality = opDat1%dim * opDat1%set%size
+    opDat2Cardinality = opDat2%dim * opDat2%set%size
+    opDat3Cardinality = opDat3%dim * opDat3%set%size
+    CALL c_f_pointer(opDat1%dat_d,opDat1Device,(/opDat1Cardinality/))
+    CALL c_f_pointer(opDat2%dat_d,opDat2Device,(/opDat2Cardinality/))
+    CALL c_f_pointer(opDat3%dat_d,opDat3Device,(/opDat3Cardinality/))
+    CALL s744293032<<<nblocks, nthreads, nshared>>>(dimensions_real8Array_integer4Array_real8Array,sizes_real8Array_int&
+    &eger4Array_real8Array,opDat1Device,opDat2Device,opDat3Device,set%size,warpSize,sharedMemoryOffset)
+    threadSynchRet = cudaThreadSynchronize()
+  END SUBROUTINE
+
+END MODULE GENERATED_MODULE
+
