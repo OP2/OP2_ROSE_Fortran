@@ -1,0 +1,5 @@
+X::X ->
+X::X ->
+Y::Y ->
+foo ->
+foobar -> X::X X::X Y::Y

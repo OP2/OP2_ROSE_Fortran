@@ -1,0 +1,4 @@
+SC_def_lookup ->
+X::foo ->
+foo -> SC_def_lookup
+main -> X::foo

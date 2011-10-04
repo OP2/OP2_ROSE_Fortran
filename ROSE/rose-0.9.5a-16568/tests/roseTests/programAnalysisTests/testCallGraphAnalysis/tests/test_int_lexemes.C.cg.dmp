@@ -1,0 +1,12 @@
+func_char ->
+func_int ->
+func_long ->
+func_long_long ->
+func_short ->
+func_signed_char ->
+func_unsigned_char ->
+func_unsigned_int ->
+func_unsigned_long ->
+func_unsigned_long_long ->
+func_unsigned_short ->
+main -> func_char func_int func_long func_short func_unsigned_int func_unsigned_long_long

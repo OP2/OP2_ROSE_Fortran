@@ -1,0 +1,2 @@
+A::operator int & ->
+f -> A::operator int &

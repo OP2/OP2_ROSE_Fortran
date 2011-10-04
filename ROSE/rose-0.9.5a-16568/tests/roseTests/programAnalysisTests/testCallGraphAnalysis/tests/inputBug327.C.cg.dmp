@@ -1,0 +1,4 @@
+CFGNode::outEdges ->
+CFGPath::target ->
+foo -> makeClosure
+makeClosure -> CFGPath::target

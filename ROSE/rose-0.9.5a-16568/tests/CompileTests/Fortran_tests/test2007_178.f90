@@ -1,0 +1,13 @@
+TYPE PERSON
+  SEQUENCE
+  CHARACTER*1 GENDER     ! Offset 0
+  INTEGER(4) AGE         ! Offset 1
+  CHARACTER(30) NAME     ! Offset 5
+  INTEGER(8) LONG_AGE    ! Offset 36
+  INTEGER(1) BYTE_AGE    ! Offset 44
+  INTEGER(2) SHORT_AGE   ! Offset 45
+  CHARACTER  CHAR_GENDER ! Offset 47
+  REAL(4) SHORT_FLOAT    ! Offset 48
+END TYPE PERSON
+END
+

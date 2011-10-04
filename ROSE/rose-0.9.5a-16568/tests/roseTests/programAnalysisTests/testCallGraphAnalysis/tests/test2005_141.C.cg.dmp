@@ -1,0 +1,6 @@
+foo -> min vector::norm vector::operator- vector::vector
+min ->
+vector::norm ->
+vector::operator- ->
+vector::vector ->
+vector::vector ->
