@@ -1,3 +1,0 @@
-! subroutine
-      SUBROUTINE TEST
-      END

@@ -1,6 +1,0 @@
-foo ->
-X::_S_initialized ->
-Y::X::afterDeclaration ->
-Y::X::beforeDeclaration ->
-Y::X::X2::beforeDeclaration ->
-Y::X::secondFunctionBeforeDeclaration ->

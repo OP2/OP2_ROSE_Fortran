@@ -1,3 +1,0 @@
-main -> dummy::operator[]
-dummy::operator[] ->
-super::operator[] ->
