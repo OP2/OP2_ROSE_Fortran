@@ -1,5 +1,6 @@
 #include <CPPProgramDeclarationsAndDefinitions.h>
 #include <CPPOP2Definitions.h>
+#include <CPPParallelLoop.h>
 #include <CommonNamespaces.h>
 
 /*
@@ -30,11 +31,9 @@ CPPProgramDeclarationsAndDefinitions::detectAndHandleOP2Definition (
 
     ROSE_ASSERT (functionCallExpression != NULL);
 
-    SgExpressionPtrList & actualArguments =
-        functionCallExpression->get_args ()->get_expressions ();
-
     CPPImperialOpSetDefinition * opSetDeclaration =
-        new CPPImperialOpSetDefinition (actualArguments, variableName);
+        new CPPImperialOpSetDefinition (functionCallExpression->get_args (),
+            variableName);
 
     OpSetDefinitions[opSetDeclaration->getVariableName ()] = opSetDeclaration;
   }
@@ -50,11 +49,9 @@ CPPProgramDeclarationsAndDefinitions::detectAndHandleOP2Definition (
 
     ROSE_ASSERT (functionCallExpression != NULL);
 
-    SgExpressionPtrList & actualArguments =
-        functionCallExpression->get_args ()->get_expressions ();
-
     CPPImperialOpMapDefinition * opMapDeclaration =
-        new CPPImperialOpMapDefinition (actualArguments, variableName);
+        new CPPImperialOpMapDefinition (functionCallExpression->get_args (),
+            variableName);
 
     OpMapDefinitions[opMapDeclaration->getVariableName ()] = opMapDeclaration;
   }
@@ -70,11 +67,9 @@ CPPProgramDeclarationsAndDefinitions::detectAndHandleOP2Definition (
 
     ROSE_ASSERT (functionCallExpression != NULL);
 
-    SgExpressionPtrList & actualArguments =
-        functionCallExpression->get_args ()->get_expressions ();
-
     CPPImperialOpDatDefinition * opDatDeclaration =
-        new CPPImperialOpDatDefinition (actualArguments, variableName);
+        new CPPImperialOpDatDefinition (functionCallExpression->get_args (),
+            variableName);
 
     OpDatDefinitions[opDatDeclaration->getVariableName ()] = opDatDeclaration;
   }
@@ -128,29 +123,6 @@ CPPProgramDeclarationsAndDefinitions::visit (SgNode * node)
 
       break;
     }
-      /*
-       case V_SgInitializedName:
-       {
-       SgInitializedName *initializedName = isSgInitializedName(node);
-
-       if (initializedName)
-       {
-       string const varName = initializedName->get_name().getString();
-
-       SgAssignInitializer *assignInitializer = isSgAssignInitializer(initializedName->get_initializer());
-
-       if (assignInitializer)
-       {
-       SgFunctionCallExp *functionCallExp = isSgFunctionCallExp (assignInitializer->get_operand());
-       if (functionCallExp)
-       {
-       Debug::getInstance ()->debugMessage ("Found initializer for '"
-       + varName + "'", Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
-       }
-       }
-       }
-       break;
-       }*/
 
     case V_SgFunctionDefinition:
     {
@@ -190,8 +162,7 @@ CPPProgramDeclarationsAndDefinitions::visit (SgNode * node)
          */
 
         CPPImperialOpConstDefinition * opConstDeclaration =
-            new CPPImperialOpConstDefinition (
-                functionCallExp->get_args ()->get_expressions ());
+            new CPPImperialOpConstDefinition (functionCallExp->get_args ());
 
         OpConstDefinitions[opConstDeclaration->getVariableName ()]
             = opConstDeclaration;
@@ -256,5 +227,5 @@ CPPProgramDeclarationsAndDefinitions::visit (SgNode * node)
 CPPProgramDeclarationsAndDefinitions::CPPProgramDeclarationsAndDefinitions (
     SgProject * project)
 {
-  traverseInputFiles(project, preorder);
+  traverseInputFiles (project, preorder);
 }

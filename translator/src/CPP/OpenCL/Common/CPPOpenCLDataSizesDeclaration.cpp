@@ -1,4 +1,5 @@
 #include <CPPOpenCLDataSizesDeclaration.h>
+#include <SubroutineVariableDeclarations.h>
 #include <RoseStatementsAndExpressionsBuilder.h>
 #include <rose.h>
 

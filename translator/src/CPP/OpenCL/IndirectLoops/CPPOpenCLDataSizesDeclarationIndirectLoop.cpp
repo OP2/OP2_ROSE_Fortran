@@ -1,10 +1,9 @@
 #include <CPPOpenCLDataSizesDeclarationIndirectLoop.h>
-#include <CPPStatementsAndExpressionsBuilder.h>
-//#include <CPPTypesBuilder.h>
+#include <CPPParallelLoop.h>
+#include <SubroutineVariableDeclarations.h>
 #include <CommonNamespaces.h>
-#include <Plan.h>
+#include <rose.h>
 
-using namespace SageBuilder;
 /*
  * ======================================================
  * Public functions
@@ -14,6 +13,7 @@ using namespace SageBuilder;
 void
 CPPOpenCLDataSizesDeclarationIndirectLoop::addFields ()
 {
+  using SageBuilder::buildIntType;
   using SageBuilder::buildVariableDeclaration;
   using std::string;
   using std::vector;
@@ -23,7 +23,8 @@ CPPOpenCLDataSizesDeclarationIndirectLoop::addFields ()
     if (parallelLoop->isDuplicateOpDat (i) == false
         && parallelLoop->isIndirect (i))
     {
-      string const variableName = OP2::VariableNames::getOpDatCardinalityName (i);
+      string const variableName = OP2::VariableNames::getOpDatCardinalityName (
+          i);
 
       SgVariableDeclaration * fieldDeclaration = buildVariableDeclaration (
           variableName, buildIntType (), NULL, moduleScope);
@@ -81,7 +82,8 @@ CPPOpenCLDataSizesDeclarationIndirectLoop::addFields ()
     if (parallelLoop->isDuplicateOpDat (i) == false && (parallelLoop->isDirect (
         i) || parallelLoop->isGlobal (i)))
     {
-      string const variableName = OP2::VariableNames::getOpDatCardinalityName (i);
+      string const variableName = OP2::VariableNames::getOpDatCardinalityName (
+          i);
 
       SgVariableDeclaration * fieldDeclaration = buildVariableDeclaration (
           variableName, buildIntType (), NULL, moduleScope);
@@ -97,19 +99,26 @@ CPPOpenCLDataSizesDeclarationIndirectLoop::addFields ()
 
   vector <string> planFunctionSizeVariables;
 
-  planFunctionSizeVariables.push_back (PlanFunction::CPP::pblkMapSize);
+  planFunctionSizeVariables.push_back (
+      OP2::VariableNames::PlanFunction::pblkMapSize);
 
-  planFunctionSizeVariables.push_back (PlanFunction::CPP::pindOffsSize);
+  planFunctionSizeVariables.push_back (
+      OP2::VariableNames::PlanFunction::pindOffsSize);
 
-  planFunctionSizeVariables.push_back (PlanFunction::CPP::pindSizesSize);
+  planFunctionSizeVariables.push_back (
+      OP2::VariableNames::PlanFunction::pindSizesSize);
 
-  planFunctionSizeVariables.push_back (PlanFunction::CPP::pnelemsSize);
+  planFunctionSizeVariables.push_back (
+      OP2::VariableNames::PlanFunction::pnelemsSize);
 
-  planFunctionSizeVariables.push_back (PlanFunction::CPP::pnthrcolSize);
+  planFunctionSizeVariables.push_back (
+      OP2::VariableNames::PlanFunction::pnthrcolSize);
 
-  planFunctionSizeVariables.push_back (PlanFunction::CPP::poffsetSize);
+  planFunctionSizeVariables.push_back (
+      OP2::VariableNames::PlanFunction::poffsetSize);
 
-  planFunctionSizeVariables.push_back (PlanFunction::CPP::pthrcolSize);
+  planFunctionSizeVariables.push_back (
+      OP2::VariableNames::PlanFunction::pthrcolSize);
 
   for (vector <string>::iterator it = planFunctionSizeVariables.begin (); it
       != planFunctionSizeVariables.end (); ++it)

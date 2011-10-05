@@ -1,8 +1,9 @@
 #include <CPPOpDatDimensionsDeclaration.h>
-//#include <CPPTypesBuilder.h>
+#include <CPPParallelLoop.h>
+#include <SubroutineVariableDeclarations.h>
 #include <RoseStatementsAndExpressionsBuilder.h>
-#include <CPPStatementsAndExpressionsBuilder.h>
 #include <CommonNamespaces.h>
+#include <rose.h>
 
 /*
  * ======================================================
@@ -53,6 +54,7 @@ CPPOpDatDimensionsDeclaration::addTypeDeclaration ()
  * Public functions
  * ======================================================
  */
+
 SgClassType *
 CPPOpDatDimensionsDeclaration::getType ()
 {

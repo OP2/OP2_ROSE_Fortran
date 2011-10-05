@@ -1,14 +1,10 @@
-#include <boost/lexical_cast.hpp>
+#include <CPPOpenCLReductionSubroutine.h>
+#include <CPPOpenCLStatementsAndExpressionsBuilder.h>
+#include <RoseStatementsAndExpressionsBuilder.h>
 #include <RoseHelper.h>
 #include <Debug.h>
 #include <CommonNamespaces.h>
-#include <CPPOpenCLReductionSubroutine.h>
-#include <RoseStatementsAndExpressionsBuilder.h>
-#include <CPPOpenCLStatementsAndExpressionsBuilder.h>
-//#include <CPPTypesBuilder.h>
-
-
-using namespace SageBuilder;
+#include <boost/lexical_cast.hpp>
 
 void
 CPPOpenCLReductionSubroutine::createStatements ()
@@ -34,6 +30,14 @@ CPPOpenCLReductionSubroutine::createStatements ()
   using SageBuilder::buildDivideOp;
   using SageBuilder::buildPntrArrRefExp;
   using SageBuilder::buildVoidType;
+  using SageBuilder::buildAssignStatement;
+  using SageBuilder::buildRshiftAssignOp;
+  using SageBuilder::buildForStatement;
+  using SageBuilder::buildSwitchStatement;
+  using SageBuilder::buildCaseOptionStmt;
+  using SageBuilder::buildPointerDerefExp;
+  using SageBuilder::buildBreakStmt;
+  using SageBuilder::buildRshiftOp;
 
   SgExpression * tid_ref = buildVarRefExp (variableDeclarations->get (
       ReductionSubroutine::threadID));
@@ -621,20 +625,22 @@ CPPOpenCLReductionSubroutine::createStatements ()
 void
 CPPOpenCLReductionSubroutine::createLocalVariableDeclarations ()
 {
+  using SageBuilder::buildOpaqueType;
+  using SageBuilder::buildVolatileType;
+  using SageBuilder::buildIntType;
+  using SageBuilder::buildPointerType;
   using std::vector;
   using std::string;
 
   variableDeclarations->add (ReductionSubroutine::warpSize,
-      CPPStatementsAndExpressionsBuilder::appendVariableDeclaration (
+      RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
           ReductionSubroutine::warpSize, buildOpaqueType ("size_t",
-              subroutineScope), //FIXME
-          subroutineScope));
+              subroutineScope), subroutineScope));
 
   variableDeclarations->add (ReductionSubroutine::autosharedV,
-      CPPStatementsAndExpressionsBuilder::appendVariableDeclaration (
+      RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
           ReductionSubroutine::autosharedV, buildPointerType (
-              buildVolatileType (reduction->getBaseType ())), subroutineScope,
-          1, SHARED));
+              buildVolatileType (reduction->getBaseType ())), subroutineScope));
 
   /*
    * ======================================================
@@ -645,12 +651,12 @@ CPPOpenCLReductionSubroutine::createLocalVariableDeclarations ()
   vector <string> integers;
 
   integers.push_back (CommonVariableNames::iterationCounter1);
-  integers.push_back (ReductionSubroutine::threadID);
+  integers.push_back (CommonVariableNames::threadID);
 
   for (vector <string>::iterator it = integers.begin (); it != integers.end (); ++it)
   {
     variableDeclarations->add (*it,
-        CPPStatementsAndExpressionsBuilder::appendVariableDeclaration (*it,
+        RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (*it,
             buildIntType (), subroutineScope));
   }
 }
@@ -658,54 +664,42 @@ CPPOpenCLReductionSubroutine::createLocalVariableDeclarations ()
 void
 CPPOpenCLReductionSubroutine::createFormalParameterDeclarations ()
 {
+  using SageBuilder::buildOpaqueType;
+  using SageBuilder::buildIntType;
+  using SageBuilder::buildPointerType;
   using SageBuilder::buildVolatileType;
+
   Debug::getInstance ()->debugMessage (
       "Creating reduction procedure formal parameter", Debug::FUNCTION_LEVEL,
       __FILE__, __LINE__);
 
-  /*
-   * ======================================================
-   * Declare the device variable on which the result of local
-   * reductions is stored by the first thread in the block
-   * ======================================================
-   */
   variableDeclarations->add (
       ReductionSubroutine::reductionResultOnDevice,
-      CPPStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
+      RoseStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
           ReductionSubroutine::reductionResultOnDevice, buildPointerType (
               buildVolatileType (reduction->getBaseType ())), subroutineScope,
-          formalParameters, 1, DEVICE));
-
-  /*
-   * ======================================================
-   * Declare the value of the reduction variable produced by
-   * each thread which is passed by value.
-   * WARNING: the type of the input data is for now limited
-   * to a scalar value (does not manage reduction on arrays)
-   * ======================================================
-   */
+          formalParameters));
 
   variableDeclarations->add (
       ReductionSubroutine::inputValue,
-      CPPStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
+      RoseStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
           ReductionSubroutine::inputValue, reduction->getBaseType (),
           subroutineScope, formalParameters));
 
   variableDeclarations->add (
       ReductionSubroutine::reductionType,
-      CPPStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
+      RoseStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
           ReductionSubroutine::reductionType, buildOpaqueType ("op_access",
-              subroutineScope), //FIXME
-          subroutineScope, formalParameters));
+              subroutineScope), subroutineScope, formalParameters));
 
   autosharedVariableName = OP2::VariableNames::getAutosharedDeclarationName (
       reduction->getBaseType (), reduction->getVariableSize ());
 
   variableDeclarations->add (
       autosharedVariableName,
-      CPPStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
+      RoseStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
           autosharedVariableName, buildPointerType (reduction->getBaseType ()),
-          subroutineScope, formalParameters, 1, SHARED));
+          subroutineScope, formalParameters));
 }
 
 /*

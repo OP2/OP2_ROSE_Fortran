@@ -5,6 +5,7 @@
 #include <CPPKernelSubroutine.h>
 
 class CPPOpDatDimensionsDeclaration;
+class CPPReductionSubroutines;
 
 class CPPOpenCLKernelSubroutine: public CPPKernelSubroutine
 {

@@ -1,7 +1,3 @@
-/*
- * Written by Adam Betts and Carlo Bertolli
- */
-
 #pragma once
 #ifndef CPP_REDUCTION_SUBROUTINES_H
 #define CPP_REDUCTION_SUBROUTINES_H

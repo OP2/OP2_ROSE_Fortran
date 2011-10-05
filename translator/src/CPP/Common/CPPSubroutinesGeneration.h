@@ -2,12 +2,11 @@
 #ifndef CPP_SUBROUTINES_GENERATION_H
 #define CPP_SUBROUTINES_GENERATION_H
 
-#include <rose.h>
 #include <SubroutinesGeneration.h>
-#include <CPPProgramDeclarationsAndDefinitions.h>
-#include <CPPParallelLoop.h>
-#include <CPPHostSubroutine.h>
-#include <CPPOpDatDimensionsDeclaration.h>
+
+class CPPProgramDeclarationsAndDefinitions;
+class CPPHostSubroutine;
+class CPPOpDatDimensionsDeclaration;
 
 class CPPSubroutinesGeneration: public SubroutinesGeneration <
     CPPProgramDeclarationsAndDefinitions, CPPHostSubroutine>

@@ -3,8 +3,9 @@
 #define CPP_OpenCL_MODULE_DECLARATIONS_H
 
 #include <CPPModuleDeclarations.h>
-#include <CPPOpenCLDataSizesDeclaration.h>
-#include <CPPOpDatDimensionsDeclaration.h>
+
+class CPPOpenCLDataSizesDeclaration;
+class CPPOpDatDimensionsDeclaration;
 
 class CPPOpenCLModuleDeclarations: public CPPModuleDeclarations
 {

@@ -1,8 +1,9 @@
 #include <CPPOpenCLHostSubroutineDirectLoop.h>
+#include <CPPParallelLoop.h>
+#include <CPPOpenCLReductionSubroutine.h>
 #include <RoseStatementsAndExpressionsBuilder.h>
 #include <RoseHelper.h>
 #include <Debug.h>
-#include <CPPOpenCLReductionSubroutine.h>
 #include <CommonNamespaces.h>
 
 using namespace SageBuilder;
@@ -25,53 +26,12 @@ CPPOpenCLHostSubroutineDirectLoop::createVariableSizesInitialisationStatements (
   Debug::getInstance ()->debugMessage (
       "Creating OpenCL kernel prologue statements", Debug::FUNCTION_LEVEL,
       __FILE__, __LINE__);
-  //FIXME: needed?
-#if 0
-  /*
-   * ======================================================
-   * In direct loops, sizes are only related to OP_DAT
-   * variables
-   * ======================================================
-   */
+}
 
-  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
-  {
-    SgExpression * argN_size = buildVarRefExp(variableDeclarations->get(VariableNames::getOpDatName(i)));
+SgStatement *
+CPPOpenCLHostSubroutineDirectLoop::createKernelFunctionCallStatement ()
+{
 
-    if (parallelLoop->isDuplicateOpDat (i) == false)
-    {
-      string const & variableName = VariableNames::getOpDatCardinalityName (i);
-
-      SgDotExp * dotExpression = buildDotExp (buildVarRefExp (
-              moduleDeclarations->getDataSizesVariableDeclaration ()),
-          buildOpaqueVarRefExp (variableName, subroutineScope));
-
-      /*
-       * ======================================================
-       * The size value changes for reduction variables
-       * ======================================================
-       */
-
-      if (parallelLoop->isReductionRequired (i) == false)
-      {
-        SgExprStatement * assignmentStatement = buildAssignStatement (
-            dotExpression, buildVarRefExp (
-                dataSizesDeclaration->getFieldDeclarations ()->get (
-                    variableName)));
-
-        appendStatement (assignmentStatement, subroutineScope);
-      }
-      else
-      {
-        SgExprStatement * assignmentStatement = buildAssignStatement (
-            dotExpression, buildVarRefExp (variableDeclarations->get (
-                    ReductionSubroutine::numberOfThreadItems)));
-
-        appendStatement (assignmentStatement, subroutineScope);
-      }
-    }
-  }
-#endif
 }
 
 void

@@ -1,6 +1,8 @@
 #include <CPPModuleDeclarations.h>
+#include <SubroutineVariableDeclarations.h>
 #include <Debug.h>
 #include <CommonNamespaces.h>
+#include <rose.h>
 
 /*
  * ======================================================

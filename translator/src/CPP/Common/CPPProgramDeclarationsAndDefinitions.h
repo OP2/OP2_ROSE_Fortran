@@ -1,7 +1,3 @@
-/*
- * Written by Adam Betts and Carlo Bertolli
- */
-
 #pragma once
 #ifndef CPP_PROGRAM_DECLARATIONS_AND_DEFINITIONS_H
 #define CPP_PROGRAM_DECLARATIONS_AND_DEFINITIONS_H

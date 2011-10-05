@@ -4,6 +4,8 @@
 
 #include <OP2Definitions.h>
 
+class SgExprListExp;
+
 class CPPImperialOpDatDefinition: public OpDatDefinition
 {
     /*
@@ -25,7 +27,7 @@ class CPPImperialOpDatDefinition: public OpDatDefinition
 
   public:
 
-    CPPImperialOpDatDefinition (SgExpressionPtrList & parameters,
+    CPPImperialOpDatDefinition (SgExprListExp * parameters,
         std::string const & variableName);
 };
 
@@ -46,7 +48,7 @@ class CPPImperialOpSetDefinition: public OpSetDefinition
 
   public:
 
-    CPPImperialOpSetDefinition (SgExpressionPtrList & parameters,
+    CPPImperialOpSetDefinition (SgExprListExp * parameters,
         std::string const & variableName);
 };
 
@@ -73,7 +75,7 @@ class CPPImperialOpMapDefinition: public OpMapDefinition
 
   public:
 
-    CPPImperialOpMapDefinition (SgExpressionPtrList & parameters,
+    CPPImperialOpMapDefinition (SgExprListExp * parameters,
         std::string const & variableName);
 };
 
@@ -96,7 +98,7 @@ class CPPImperialOpConstDefinition: public OpConstDefinition
 
   public:
 
-    CPPImperialOpConstDefinition (SgExpressionPtrList & parameters);
+    CPPImperialOpConstDefinition (SgExprListExp * parameters);
 };
 
 class CPPImperialOpArgDatCall
@@ -146,7 +148,7 @@ class CPPOxfordOpDatDefinition: public OpDatDefinition
 
   public:
 
-    CPPOxfordOpDatDefinition (SgExpressionPtrList & parameters,
+    CPPOxfordOpDatDefinition (SgExprListExp * parameters,
         std::string const & variableName);
 };
 
@@ -167,7 +169,7 @@ class CPPOxfordOpSetDefinition: public OpSetDefinition
 
   public:
 
-    CPPOxfordOpSetDefinition (SgExpressionPtrList & parameters,
+    CPPOxfordOpSetDefinition (SgExprListExp * parameters,
         std::string const & variableName);
 };
 
@@ -194,7 +196,7 @@ class CPPOxfordOpMapDefinition: public OpMapDefinition
 
   public:
 
-    CPPOxfordOpMapDefinition (SgExpressionPtrList & parameters,
+    CPPOxfordOpMapDefinition (SgExprListExp * parameters,
         std::string const & variableName);
 };
 
@@ -217,7 +219,7 @@ class CPPOxfordOpConstDefinition: public OpConstDefinition
 
   public:
 
-    CPPOxfordOpConstDefinition (SgExpressionPtrList & parameters);
+    CPPOxfordOpConstDefinition (SgExprListExp * parameters);
 };
 
 class CPPOxfordOpArgDatCall

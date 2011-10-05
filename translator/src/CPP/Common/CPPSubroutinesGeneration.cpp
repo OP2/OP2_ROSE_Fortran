@@ -1,6 +1,9 @@
 #include <CPPSubroutinesGeneration.h>
-#include <FortranTypesBuilder.h>
 #include <CPPOpDatDimensionsDeclaration.h>
+#include <CPPParallelLoop.h>
+#include <CPPHostSubroutine.h>
+#include <CPPProgramDeclarationsAndDefinitions.h>
+
 /*
  * ======================================================
  * Private functions
@@ -20,13 +23,14 @@ CPPSubroutinesGeneration::patchCallsToParallelLoops ()
 
   vector <string> processedFiles;
 
-  for (map <string, CPPParallelLoop *>::const_iterator it =
+  for (map <string, ParallelLoop *>::const_iterator it =
       declarations->firstParallelLoop (); it
       != declarations->lastParallelLoop (); ++it)
   {
     string const userSubroutineName = it->first;
 
-    CPPParallelLoop * parallelLoop = it->second;
+    CPPParallelLoop * parallelLoop =
+        static_cast <CPPParallelLoop *> (it->second);
 
     CPPHostSubroutine * hostSubroutine = hostSubroutines[userSubroutineName];
 

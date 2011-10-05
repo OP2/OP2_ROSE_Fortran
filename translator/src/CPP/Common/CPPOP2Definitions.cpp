@@ -1,9 +1,10 @@
 #include <CPPOP2Definitions.h>
 #include <boost/lexical_cast.hpp>
 #include <Debug.h>
+#include <rose.h>
 
 CPPImperialOpDatDefinition::CPPImperialOpDatDefinition (
-    SgExpressionPtrList & parameters, std::string const & variableName)
+    SgExprListExp * parameters, std::string const & variableName)
 {
   using boost::lexical_cast;
   using std::string;
@@ -11,11 +12,13 @@ CPPImperialOpDatDefinition::CPPImperialOpDatDefinition (
   this->variableName = variableName;
 
   opSetName
-      = isSgVarRefExp (parameters[index_OpSetName])->get_symbol ()->get_name ().getString ();
+      = isSgVarRefExp (parameters->get_expressions ()[index_OpSetName])->get_symbol ()->get_name ().getString ();
 
-  dimension = isSgIntVal (parameters[index_dimension])->get_value ();
+  dimension
+      = isSgIntVal (parameters->get_expressions ()[index_dimension])->get_value ();
 
-  primitiveType = isSgVarRefExp (parameters[index_data])->get_type ();
+  primitiveType
+      = isSgVarRefExp (parameters->get_expressions ()[index_data])->get_type ();
 
   ROSE_ASSERT (opSetName.empty () == false);
   ROSE_ASSERT (dimension > 0);
@@ -30,12 +33,12 @@ CPPImperialOpDatDefinition::CPPImperialOpDatDefinition (
 }
 
 CPPImperialOpSetDefinition::CPPImperialOpSetDefinition (
-    SgExpressionPtrList & parameters, std::string const & variableName)
+    SgExprListExp * parameters, std::string const & variableName)
 {
   this->variableName = variableName;
 
   dimensionName
-      = isSgVarRefExp (parameters[index_setCardinalityName])->get_symbol ()->get_name ().getString ();
+      = isSgVarRefExp (parameters->get_expressions ()[index_setCardinalityName])->get_symbol ()->get_name ().getString ();
 
   ROSE_ASSERT (dimensionName.empty () == false);
   ROSE_ASSERT (variableName.empty () == false);
@@ -46,7 +49,7 @@ CPPImperialOpSetDefinition::CPPImperialOpSetDefinition (
 }
 
 CPPImperialOpMapDefinition::CPPImperialOpMapDefinition (
-    SgExpressionPtrList & parameters, std::string const & variableName)
+    SgExprListExp * parameters, std::string const & variableName)
 {
   using boost::lexical_cast;
   using std::string;
@@ -54,15 +57,17 @@ CPPImperialOpMapDefinition::CPPImperialOpMapDefinition (
   this->variableName = variableName;
 
   sourceOpSetName
-      = isSgVarRefExp (parameters[index_sourceOpSetName])->get_symbol ()->get_name ().getString ();
+      = isSgVarRefExp (parameters->get_expressions ()[index_sourceOpSetName])->get_symbol ()->get_name ().getString ();
 
   destinationOpSetName
-      = isSgVarRefExp (parameters[index_destinationOpSetName])->get_symbol ()->get_name ().getString ();
+      = isSgVarRefExp (
+          parameters->get_expressions ()[index_destinationOpSetName])->get_symbol ()->get_name ().getString ();
 
-  dimension = isSgIntVal (parameters[index_setCardinality])->get_value ();
+  dimension
+      = isSgIntVal (parameters->get_expressions ()[index_setCardinality])->get_value ();
 
   mappingName
-      = isSgVarRefExp (parameters[index_mappingName])->get_symbol ()->get_name ().getString ();
+      = isSgVarRefExp (parameters->get_expressions ()[index_mappingName])->get_symbol ()->get_name ().getString ();
 
   ROSE_ASSERT (sourceOpSetName.empty () == false);
   ROSE_ASSERT (destinationOpSetName.empty () == false);
@@ -78,15 +83,16 @@ CPPImperialOpMapDefinition::CPPImperialOpMapDefinition (
 }
 
 CPPImperialOpConstDefinition::CPPImperialOpConstDefinition (
-    SgExpressionPtrList & parameters)
+    SgExprListExp * parameters)
 {
   using boost::lexical_cast;
   using std::string;
 
-  dimension = isSgIntVal (parameters[index_dimension])->get_value ();
+  dimension
+      = isSgIntVal (parameters->get_expressions ()[index_dimension])->get_value ();
 
   SgAddressOfOp * addressOfOperator = isSgAddressOfOp (
-      parameters[index_OpDatName]);
+      parameters->get_expressions ()[index_OpDatName]);
 
   if (addressOfOperator != NULL)
   {
@@ -100,7 +106,7 @@ CPPImperialOpConstDefinition::CPPImperialOpConstDefinition (
   else
   {
     variableName
-        = isSgVarRefExp (parameters[index_OpDatName])->get_symbol ()->get_name ().getString ();
+        = isSgVarRefExp (parameters->get_expressions ()[index_OpDatName])->get_symbol ()->get_name ().getString ();
   }
 
   ROSE_ASSERT (dimension > 0);

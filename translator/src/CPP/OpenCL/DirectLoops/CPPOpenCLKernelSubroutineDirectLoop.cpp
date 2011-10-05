@@ -1,10 +1,13 @@
 #include <CPPOpenCLKernelSubroutineDirectLoop.h>
 #include <CPPOpenCLStatementsAndExpressionsBuilder.h>
 #include <CPPOpenCLReductionSubroutine.h>
+#include <CPPParallelLoop.h>
+#include <CPPReductionSubroutines.h>
 #include <RoseStatementsAndExpressionsBuilder.h>
 #include <CommonNamespaces.h>
 #include <RoseHelper.h>
 #include <Debug.h>
+
 /*
  * ======================================================
  * Private functions

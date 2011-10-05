@@ -1,16 +1,16 @@
 #include <CPPHostSubroutine.h>
-#include <CPPOpenCLReductionSubroutine.h>
+#include <CPPParallelLoop.h>
+#include <RoseStatementsAndExpressionsBuilder.h>
+#include <CommonNamespaces.h>
 
 void
 CPPHostSubroutine::createFormalParameterDeclarations ()
 {
-  using boost::iequals;
-  using SageBuilder::buildVariableDeclaration;
+  using SageBuilder::buildClassDeclaration;
+  using SageBuilder::buildCharType;
+  using SageBuilder::buildPointerType;
   using SageBuilder::buildIntType;
-  using SageInterface::appendStatement;
-  using std::vector;
   using std::string;
-  using std::map;
 
   Debug::getInstance ()->debugMessage (
       "Creating host subroutine formal parameters", Debug::FUNCTION_LEVEL,
@@ -42,9 +42,8 @@ CPPHostSubroutine::createFormalParameterDeclarations ()
   variableDeclarations->add (
       opSetVariableName,
       RoseStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
-          opSetVariableName, FortranTypesBuilder::buildClassDeclaration (
-              OP2::OP_SET, subroutineScope)->get_type (), subroutineScope,
-          formalParameters, 1, INTENT_IN));
+          opSetVariableName, buildClassDeclaration (OP2::OP_SET,
+              subroutineScope)->get_type (), subroutineScope, formalParameters));
 
   /*
    * ======================================================
@@ -60,8 +59,8 @@ CPPHostSubroutine::createFormalParameterDeclarations ()
     variableDeclarations->add (
         opDatvariableName,
         RoseStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
-            opDatvariableName, FortranTypesBuilder::buildClassDeclaration (
-                OP2::OP_DAT, subroutineScope)->get_type (), subroutineScope,
+            opDatvariableName, buildClassDeclaration (OP2::OP_DAT,
+                subroutineScope)->get_type (), subroutineScope,
             formalParameters));
 
     string const & indirectionVariableName =
@@ -70,8 +69,7 @@ CPPHostSubroutine::createFormalParameterDeclarations ()
     variableDeclarations->add (
         indirectionVariableName,
         RoseStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
-            indirectionVariableName,
-            FortranTypesBuilder::getFourByteInteger (), subroutineScope,
+            indirectionVariableName, buildIntType (), subroutineScope,
             formalParameters));
 
     string const & opMapVariableName = OP2::VariableNames::getOpMapName (i);
@@ -79,8 +77,8 @@ CPPHostSubroutine::createFormalParameterDeclarations ()
     variableDeclarations->add (
         opMapVariableName,
         RoseStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
-            opMapVariableName, FortranTypesBuilder::buildClassDeclaration (
-                OP2::OP_MAP, subroutineScope)->get_type (), subroutineScope,
+            opMapVariableName, buildClassDeclaration (OP2::OP_MAP,
+                subroutineScope)->get_type (), subroutineScope,
             formalParameters));
 
     string const & accessVariableName = OP2::VariableNames::getOpAccessName (i);
@@ -88,8 +86,8 @@ CPPHostSubroutine::createFormalParameterDeclarations ()
     variableDeclarations->add (
         accessVariableName,
         RoseStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
-            accessVariableName, FortranTypesBuilder::getFourByteInteger (),
-            subroutineScope, formalParameters));
+            accessVariableName, buildIntType (), subroutineScope,
+            formalParameters));
   }
 }
 

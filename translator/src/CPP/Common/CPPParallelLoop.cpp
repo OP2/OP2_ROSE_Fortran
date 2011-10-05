@@ -1,4 +1,5 @@
 #include <CPPParallelLoop.h>
+#include <rose.h>
 
 unsigned int
 CPPParallelLoop::getNumberOfOpDatArgumentGroups ()

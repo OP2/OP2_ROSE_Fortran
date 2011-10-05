@@ -3,12 +3,8 @@
 #define CPP_OPENCL_SUBROUTINES_GENERATION_H
 
 #include <CPPSubroutinesGeneration.h>
-#include <CPPOpenCLDataSizesDeclaration.h>
 
-namespace Libraries
-{
-  std::string const OPENCL = "CL/cl.h";
-}
+class CPPOpenCLDataSizesDeclaration;
 
 class CPPOpenCLSubroutinesGeneration: public CPPSubroutinesGeneration
 {

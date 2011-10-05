@@ -3,7 +3,9 @@
 #define CPP_CUDA_USER_SUBROUTINE_H
 
 #include <UserSubroutine.h>
-#include <CPPParallelLoop.h>
+
+class CPPParallelLoop;
+class CPPProgramDeclarationsAndDefinitions;
 
 class CPPOpenCLUserSubroutine: public UserSubroutine <SgFunctionDeclaration,
     CPPProgramDeclarationsAndDefinitions>

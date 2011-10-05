@@ -2,8 +2,14 @@
 #ifndef CPP_OP_DAT_DIMENSIONS_DECLARATION_H
 #define CPP_OP_DAT_DIMENSIONS_DECLARATION_H
 
-#include <CPPParallelLoop.h>
-#include <SubroutineVariableDeclarations.h>
+#include <string>
+
+class SgScopeStatement;
+class SgDerivedTypeStatement;
+class SgClassType;
+class SgVariableDeclaration;
+class CPPParallelLoop;
+class SubroutineVariableDeclarations;
 
 class CPPOpDatDimensionsDeclaration
 {

@@ -1,14 +1,13 @@
-#include <Debug.h>
 #include <CPPOpenCLHostSubroutineIndirectLoop.h>
 #include <CPPOpenCLStatementsAndExpressionsBuilder.h>
-//#include <CPPTypesBuilder.h>
+#include <CPPParallelLoop.h>
+#include <CPPOpenCLDataSizesDeclaration.h>
+#include <CPPOpenCLModuleDeclarations.h>
 #include <RoseStatementsAndExpressionsBuilder.h>
 #include <CommonNamespaces.h>
 #include <RoseHelper.h>
-#include <CPPPlan.h>
+#include <Debug.h>
 
-using namespace SageBuilder;
-//TODO: remove
 /*
  * ======================================================
  * Private functions
@@ -18,6 +17,7 @@ using namespace SageBuilder;
 SgStatement *
 CPPOpenCLHostSubroutineIndirectLoop::createKernelFunctionCallStatement ()
 {
+  using SageBuilder::buildDotExp;
   using SageBuilder::buildFunctionCallStmt;
   using SageBuilder::buildFunctionCallExp;
   using SageBuilder::buildExprListExp;
@@ -70,35 +70,33 @@ CPPOpenCLHostSubroutineIndirectLoop::createKernelFunctionCallStatement ()
     }
   }
 
-  actualParameters->append_expression (buildDotExp (buildVarRefExp (
-      variableDeclarations->get (PlanFunction::CPP::plan)), buildVarRefExp (
-      variableDeclarations->get (PlanFunction::CPP::pindSizes))));
-
-  /*
-   buildVarRefExp (
-   variableDeclarations->get (PlanFunction::CPP::pindSizes)));
-   */
+  actualParameters->append_expression (buildDotExp (
+      buildVarRefExp (variableDeclarations->get (
+          OP2::VariableNames::PlanFunction::actualPlan)), buildVarRefExp (
+          variableDeclarations->get (
+              OP2::VariableNames::PlanFunction::pindSizes))));
 
   actualParameters->append_expression (buildVarRefExp (
-      variableDeclarations->get (PlanFunction::CPP::pindOffs)));
+      variableDeclarations->get (OP2::VariableNames::PlanFunction::pindOffs)));
 
   actualParameters->append_expression (buildVarRefExp (
-      variableDeclarations->get (PlanFunction::CPP::pblkMap)));
+      variableDeclarations->get (OP2::VariableNames::PlanFunction::pblkMap)));
 
   actualParameters->append_expression (buildVarRefExp (
-      variableDeclarations->get (PlanFunction::CPP::poffset)));
+      variableDeclarations->get (OP2::VariableNames::PlanFunction::poffset)));
 
   actualParameters->append_expression (buildVarRefExp (
-      variableDeclarations->get (PlanFunction::CPP::pnelems)));
+      variableDeclarations->get (OP2::VariableNames::PlanFunction::pnelems)));
 
   actualParameters->append_expression (buildVarRefExp (
-      variableDeclarations->get (PlanFunction::CPP::pnthrcol)));
+      variableDeclarations->get (OP2::VariableNames::PlanFunction::pnthrcol)));
 
   actualParameters->append_expression (buildVarRefExp (
-      variableDeclarations->get (PlanFunction::CPP::pthrcol)));
+      variableDeclarations->get (OP2::VariableNames::PlanFunction::pthrcol)));
 
-  actualParameters->append_expression (buildVarRefExp (
-      variableDeclarations->get (PlanFunction::CPP::blockOffset)));
+  actualParameters->append_expression (
+      buildVarRefExp (variableDeclarations->get (
+          OP2::VariableNames::PlanFunction::blockOffset)));
 
   SgExprStatement * callStatement = buildFunctionCallStmt (kernelSubroutineName
       + "<<<" + RoseHelper::getFirstVariableName (variableDeclarations->get (
@@ -122,8 +120,15 @@ CPPOpenCLHostSubroutineIndirectLoop::createPlanFunctionExecutionStatements ()
   using SageBuilder::buildVarRefExp;
   using SageBuilder::buildOpaqueVarRefExp;
   using SageBuilder::buildAssignOp;
+  using SageBuilder::buildArrowExp;
   using SageBuilder::buildAssignStatement;
   using SageBuilder::buildBasicBlock;
+  using SageBuilder::buildExprStatement;
+  using SageBuilder::buildLessThanOp;
+  using SageBuilder::buildPlusPlusOp;
+  using SageBuilder::buildForStatement;
+  using SageBuilder::buildPlusAssignOp;
+  using SageBuilder::buildMultiplyOp;
   using SageInterface::appendStatement;
   using std::string;
 
@@ -132,11 +137,11 @@ CPPOpenCLHostSubroutineIndirectLoop::createPlanFunctionExecutionStatements ()
       __FILE__, __LINE__);
 
   SgExpression * block_offset_ref = buildVarRefExp (variableDeclarations->get (
-      PlanFunction::CPP::blockOffset));
+      OP2::VariableNames::PlanFunction::blockOffset));
   SgExpression * col_ref = buildVarRefExp (variableDeclarations->get (
       OP2::VariableNames::colour1));
   SgExpression * Plan_ref = buildVarRefExp (variableDeclarations->get (
-      PlanFunction::CPP::actualPlan));
+      OP2::VariableNames::PlanFunction::actualPlan));
   SgExpression * nblocks_ref = buildVarRefExp (variableDeclarations->get (
       OpenCL::CPP::blocksPerGrid));
   SgExpression * nthreads_ref = buildVarRefExp (variableDeclarations->get (
@@ -303,7 +308,8 @@ CPPOpenCLHostSubroutineIndirectLoop::createVariablesSizesInitialisationStatement
           fieldReference);
 
       SgVarRefExp * pnindirect_Reference = buildVarRefExp (
-          variableDeclarations->get (PlanFunction::CPP::pnindirect));
+          variableDeclarations->get (
+              OP2::VariableNames::PlanFunction::pnindirect));
 
       SgPntrArrRefExp * arrayIndexExpression = buildPntrArrRefExp (
           pnindirect_Reference, buildIntVal (countIndirectArgs));
@@ -341,19 +347,26 @@ CPPOpenCLHostSubroutineIndirectLoop::createVariablesSizesInitialisationStatement
 
   vector <string> planFunctionSizeVariables;
 
-  planFunctionSizeVariables.push_back (PlanFunction::CPP::pblkMapSize);
+  planFunctionSizeVariables.push_back (
+      OP2::VariableNames::PlanFunction::pblkMapSize);
 
-  planFunctionSizeVariables.push_back (PlanFunction::CPP::pindOffsSize);
+  planFunctionSizeVariables.push_back (
+      OP2::VariableNames::PlanFunction::pindOffsSize);
 
-  planFunctionSizeVariables.push_back (PlanFunction::CPP::pindSizesSize);
+  planFunctionSizeVariables.push_back (
+      OP2::VariableNames::PlanFunction::pindSizesSize);
 
-  planFunctionSizeVariables.push_back (PlanFunction::CPP::pnelemsSize);
+  planFunctionSizeVariables.push_back (
+      OP2::VariableNames::PlanFunction::pnelemsSize);
 
-  planFunctionSizeVariables.push_back (PlanFunction::CPP::pnthrcolSize);
+  planFunctionSizeVariables.push_back (
+      OP2::VariableNames::PlanFunction::pnthrcolSize);
 
-  planFunctionSizeVariables.push_back (PlanFunction::CPP::poffsetSize);
+  planFunctionSizeVariables.push_back (
+      OP2::VariableNames::PlanFunction::poffsetSize);
 
-  planFunctionSizeVariables.push_back (PlanFunction::CPP::pthrcolSize);
+  planFunctionSizeVariables.push_back (
+      OP2::VariableNames::PlanFunction::pthrcolSize);
 
   for (vector <string>::iterator it = planFunctionSizeVariables.begin (); it
       != planFunctionSizeVariables.end (); ++it)
@@ -388,6 +401,11 @@ CPPOpenCLHostSubroutineIndirectLoop::createVariablesSizesInitialisationStatement
 void
 CPPOpenCLHostSubroutineIndirectLoop::createExecutionPlanDeclarations ()
 {
+  using SageBuilder::buildIntVal;
+  using SageBuilder::buildIntType;
+  using SageBuilder::buildShortType;
+  using SageBuilder::buildArrayType;
+  using SageBuilder::buildClassDeclaration;
   using SageBuilder::buildPointerType;
   using SageBuilder::buildVariableDeclaration;
   using SageInterface::appendStatement;
@@ -404,9 +422,9 @@ CPPOpenCLHostSubroutineIndirectLoop::createExecutionPlanDeclarations ()
    * ======================================================
    */
 
-  variableDeclarations->add (PlanFunction::CPP::actualPlan,
-      CPPStatementsAndExpressionsBuilder::appendVariableDeclaration (
-          PlanFunction::CPP::actualPlan, buildPointerType (
+  variableDeclarations->add (OP2::VariableNames::PlanFunction::actualPlan,
+      RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
+          OP2::VariableNames::PlanFunction::actualPlan, buildPointerType (
               buildClassDeclaration ("op_plan", subroutineScope)->get_type ()),
           subroutineScope));
 
@@ -419,9 +437,8 @@ CPPOpenCLHostSubroutineIndirectLoop::createExecutionPlanDeclarations ()
           OP2::VariableNames::getLocalToGlobalMappingName (i);
 
       variableDeclarations->add (variableName,
-          CPPStatementsAndExpressionsBuilder::appendVariableDeclaration (
-              variableName, buildArrayType (buildIntType ()), subroutineScope,
-              1, DEVICE));
+          RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
+              variableName, buildArrayType (buildIntType ()), subroutineScope));
     }
   }
 
@@ -441,21 +458,15 @@ CPPOpenCLHostSubroutineIndirectLoop::createExecutionPlanDeclarations ()
 
   vector <string> integerArrays;
 
-  integerArrays.push_back (PlanFunction::CPP::args);
+  integerArrays.push_back (OP2::VariableNames::PlanFunction::args);
 
-  //fourByteIntegerArrays.push_back (PlanFunction::CPP::idxs);
-
-  //fourByteIntegerArrays.push_back (PlanFunction::CPP::maps);
-
-  //fourByteIntegerArrays.push_back (PlanFunction::CPP::accesses);
-
-  integerArrays.push_back (PlanFunction::CPP::inds);
+  integerArrays.push_back (OP2::VariableNames::PlanFunction::inds);
 
   for (vector <string>::iterator it = integerArrays.begin (); it
       != integerArrays.end (); ++it)
   {
     variableDeclarations->add (*it,
-        CPPStatementsAndExpressionsBuilder::appendVariableDeclaration (*it,
+        RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (*it,
             buildArrayType (buildIntType (), buildIntVal (
                 parallelLoop->getNumberOfOpDatArgumentGroups ())),
             subroutineScope));
@@ -475,10 +486,10 @@ CPPOpenCLHostSubroutineIndirectLoop::createExecutionPlanDeclarations ()
       string const variableName =
           OP2::VariableNames::getGlobalToLocalMappingName (i);
 
-      variableDeclarations->add (variableName,
-          CPPStatementsAndExpressionsBuilder::appendVariableDeclaration (
-              variableName, buildArrayType (buildShortType ()),
-              subroutineScope, 1, DEVICE));
+      variableDeclarations->add (
+          variableName,
+          RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
+              variableName, buildArrayType (buildShortType ()), subroutineScope));
     }
   }
 
@@ -496,7 +507,7 @@ CPPOpenCLHostSubroutineIndirectLoop::createExecutionPlanDeclarations ()
           OP2::VariableNames::getGlobalToLocalMappingSizeName (i);
 
       variableDeclarations->add (variableName,
-          CPPStatementsAndExpressionsBuilder::appendVariableDeclaration (
+          RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
               variableName, buildIntType (), subroutineScope));
     }
   }
@@ -516,31 +527,31 @@ CPPOpenCLHostSubroutineIndirectLoop::createExecutionPlanDeclarations ()
 
   integerVariables.push_back (CommonVariableNames::iterationCounter1);
 
-  integerVariables.push_back (PlanFunction::CPP::argsNumber);
+  integerVariables.push_back (OP2::VariableNames::PlanFunction::argsNumber);
 
-  integerVariables.push_back (PlanFunction::CPP::indsNumber);
+  integerVariables.push_back (OP2::VariableNames::PlanFunction::indsNumber);
 
-  integerVariables.push_back (PlanFunction::CPP::blockOffset);
+  integerVariables.push_back (OP2::VariableNames::PlanFunction::blockOffset);
 
-  integerVariables.push_back (PlanFunction::CPP::pindSizesSize);
+  integerVariables.push_back (OP2::VariableNames::PlanFunction::pindSizesSize);
 
-  integerVariables.push_back (PlanFunction::CPP::pindOffsSize);
+  integerVariables.push_back (OP2::VariableNames::PlanFunction::pindOffsSize);
 
-  integerVariables.push_back (PlanFunction::CPP::pblkMapSize);
+  integerVariables.push_back (OP2::VariableNames::PlanFunction::pblkMapSize);
 
-  integerVariables.push_back (PlanFunction::CPP::poffsetSize);
+  integerVariables.push_back (OP2::VariableNames::PlanFunction::poffsetSize);
 
-  integerVariables.push_back (PlanFunction::CPP::pnelemsSize);
+  integerVariables.push_back (OP2::VariableNames::PlanFunction::pnelemsSize);
 
-  integerVariables.push_back (PlanFunction::CPP::pnthrcolSize);
+  integerVariables.push_back (OP2::VariableNames::PlanFunction::pnthrcolSize);
 
-  integerVariables.push_back (PlanFunction::CPP::pthrcolSize);
+  integerVariables.push_back (OP2::VariableNames::PlanFunction::pthrcolSize);
 
   for (vector <string>::iterator it = integerVariables.begin (); it
       != integerVariables.end (); ++it)
   {
     variableDeclarations->add (*it,
-        CPPStatementsAndExpressionsBuilder::appendVariableDeclaration (*it,
+        RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (*it,
             buildIntType (), subroutineScope));
   }
 
@@ -555,56 +566,19 @@ CPPOpenCLHostSubroutineIndirectLoop::createExecutionPlanDeclarations ()
 
   vector <string> integerPointerVariables;
 
-  integerPointerVariables.push_back (PlanFunction::CPP::ncolblk);
+  integerPointerVariables.push_back (OP2::VariableNames::PlanFunction::ncolblk);
 
-  integerPointerVariables.push_back (PlanFunction::CPP::pnindirect);
+  integerPointerVariables.push_back (
+      OP2::VariableNames::PlanFunction::pnindirect);
 
   for (vector <string>::iterator it = integerPointerVariables.begin (); it
       != integerPointerVariables.end (); ++it)
   {
     variableDeclarations->add (*it,
-        CPPStatementsAndExpressionsBuilder::appendVariableDeclaration (*it,
+        RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (*it,
             buildPointerType (buildArrayType (buildIntType ())),
             subroutineScope));
   }
-
-#if 0
-  /*
-   * ======================================================
-   * The plan function fills up a 'struct' which has a
-   * number of array integer fields. These fields need to be accessed
-   * on the CPP side ON THE DEVICE, so create local variables
-   * that enable the data to be transferred accordingly
-   * ======================================================
-   */
-
-  vector <string> deviceIntegerArrayVariables;
-
-  deviceIntegerArrayVariables.push_back (PlanFunction::CPP::pindSizes);
-
-  deviceIntegerArrayVariables.push_back (PlanFunction::CPP::pindOffs);
-
-  deviceIntegerArrayVariables.push_back (PlanFunction::CPP::pblkMap);
-
-  deviceIntegerArrayVariables.push_back (PlanFunction::CPP::poffset);
-
-  deviceIntegerArrayVariables.push_back (PlanFunction::CPP::pnelems);
-
-  deviceIntegerArrayVariables.push_back (PlanFunction::CPP::pnthrcol);
-
-  deviceIntegerArrayVariables.push_back (PlanFunction::CPP::pthrcol);
-
-  for (vector <string>::iterator it = deviceIntegerArrayVariables.begin (); it
-      != deviceIntegerArrayVariables.end (); ++it)
-  {
-    variableDeclarations->add (*it,
-        CPPStatementsAndExpressionsBuilder::appendVariableDeclaration (*it,
-            buildArrayType(buildIntType()),
-            subroutineScope,
-            1,
-            DEVICE));
-  }
-#endif
 }
 
 void
@@ -613,6 +587,7 @@ CPPOpenCLHostSubroutineIndirectLoop::createStatements ()
   using SageBuilder::buildVarRefExp;
   using SageBuilder::buildBoolValExp;
   using SageBuilder::buildEqualityOp;
+  using SageBuilder::buildBasicBlock;
   using SageInterface::appendStatement;
 
   SgExprStatement * tempStatement = NULL;
@@ -629,27 +604,16 @@ CPPOpenCLHostSubroutineIndirectLoop::createStatements ()
   SgFunctionCallExp * planFunctionCallExpression =
       createPlanFunctionCallExpression (subroutineScope, variableDeclarations);
 
-  //appendStatement (createInitialiseConstantsCallStatement (), ifBody);
-
   SgIfStmt * ifStatement =
       RoseStatementsAndExpressionsBuilder::buildIfStatementWithEmptyElse (
           ifGuardExpression, ifBody);
 
   appendStatement (ifStatement, subroutineScope);
 
-  //appendStatement (createTransferOpDatStatements (), subroutineScope);
-
   if (parallelLoop->isReductionRequired () == true)
   {
     createReductionPrologueStatements ();
   }
-
-  //appendStatement (createConvertPositionInPMapsStatements (allDeclarations,
-  //   (CPPParallelLoop *) parallelLoop, subroutineScope), subroutineScope);
-
-  //appendStatement (createConvertPlanFunctionParametersStatements (
-  //    allDeclarations, (CPPParallelLoop *) parallelLoop, subroutineScope),
-  //    subroutineScope);
 
   createVariablesSizesInitialisationStatements ();
 
@@ -664,10 +628,6 @@ CPPOpenCLHostSubroutineIndirectLoop::createStatements ()
 void
 CPPOpenCLHostSubroutineIndirectLoop::createLocalVariableDeclarations ()
 {
-  //createDataMarshallingLocalVariableDeclarations ();
-
-  //createOpenCLKernelLocalVariableDeclarations ();
-
   createExecutionPlanDeclarations ();
 
   if (parallelLoop->isReductionRequired () == true)
@@ -686,7 +646,6 @@ CPPOpenCLHostSubroutineIndirectLoop::CPPOpenCLHostSubroutineIndirectLoop (
     std::string const & subroutineName, std::string const & userSubroutineName,
     std::string const & kernelSubroutineName, CPPParallelLoop * parallelLoop,
     SgScopeStatement * moduleScope,
-    //    CPPInitialiseConstantsSubroutine * initialiseConstantsSubroutine,
     CPPOpenCLDataSizesDeclarationIndirectLoop * dataSizesDeclaration,
     CPPOpDatDimensionsDeclaration * opDatDimensionsDeclaration) :
   CPPOpenCLHostSubroutine (subroutineName, userSubroutineName,

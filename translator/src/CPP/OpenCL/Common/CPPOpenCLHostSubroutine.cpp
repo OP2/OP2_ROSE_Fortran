@@ -1,5 +1,9 @@
 #include <CPPOpenCLHostSubroutine.h>
 #include <CPPOpenCLReductionSubroutine.h>
+#include <CPPParallelLoop.h>
+#include <CPPOpenCLModuleDeclarations.h>
+#include <CommonNamespaces.h>
+#include <rose.h>
 
 /*
  * ======================================================
@@ -10,6 +14,29 @@
 void
 CPPOpenCLHostSubroutine::createReductionPrologueStatements ()
 {
+  using SageBuilder::buildVarRefExp;
+  using SageBuilder::buildIntVal;
+  using SageBuilder::buildIntType;
+  using SageBuilder::buildAssignStatement;
+  using SageBuilder::buildFunctionCallExp;
+  using SageBuilder::buildMultiplyOp;
+  using SageBuilder::buildExprListExp;
+  using SageBuilder::buildSizeOfOp;
+  using SageBuilder::buildPlusAssignOp;
+  using SageBuilder::buildExprStatement;
+  using SageBuilder::buildVoidType;
+  using SageBuilder::buildFunctionCallStmt;
+  using SageBuilder::buildDotExp;
+  using SageBuilder::buildOpaqueVarRefExp;
+  using SageBuilder::buildForStatement;
+  using SageBuilder::buildBasicBlock;
+  using SageBuilder::buildAddOp;
+  using SageBuilder::buildPlusPlusOp;
+  using SageBuilder::buildPntrArrRefExp;
+  using SageBuilder::buildLessThanOp;
+  using SageBuilder::buildAssignOp;
+  using SageBuilder::buildPointerType;
+  using SageBuilder::buildCastExp;
   using SageInterface::appendStatement;
 
   SgExpression * b_ref = buildVarRefExp (variableDeclarations->get (
@@ -227,6 +254,17 @@ CPPOpenCLHostSubroutine::createReductionPrologueStatements ()
        */
     }
   }
+}
+
+void
+CPPOpenCLHostSubroutine::createReductionEpilogueStatements ()
+{
+
+}
+
+void
+CPPOpenCLHostSubroutine::createReductionLocalVariableDeclarations ()
+{
 
 }
 

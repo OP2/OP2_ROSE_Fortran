@@ -1,4 +1,5 @@
 #include <CPPKernelSubroutine.h>
+#include <CPPParallelLoop.h>
 
 CPPKernelSubroutine::CPPKernelSubroutine (std::string const & subroutineName,
     std::string const & userSubroutineName, SgScopeStatement * moduleScope,

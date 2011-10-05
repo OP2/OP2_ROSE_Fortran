@@ -1,10 +1,18 @@
 #include <CPPOpenCLSubroutinesGeneration.h>
-//#include <CPPOpenCLModuleDeclarationsIndirectLoop.h>
 #include <CPPOpenCLKernelSubroutineDirectLoop.h>
 #include <CPPOpenCLKernelSubroutineIndirectLoop.h>
 #include <CPPOpenCLHostSubroutineDirectLoop.h>
 #include <CPPOpenCLHostSubroutineIndirectLoop.h>
 #include <CPPOpenCLUserSubroutine.h>
+#include <CPPParallelLoop.h>
+#include <CPPProgramDeclarationsAndDefinitions.h>
+#include <CPPOpenCLDataSizesDeclarationDirectLoop.h>
+#include <CPPOpenCLDataSizesDeclarationIndirectLoop.h>
+
+namespace Libraries
+{
+  std::string const OPENCL = "CL/cl.h";
+}
 
 /*
  * ======================================================
@@ -18,7 +26,7 @@ CPPOpenCLSubroutinesGeneration::createSubroutines ()
   using std::string;
   using std::map;
 
-  for (map <string, CPPParallelLoop *>::const_iterator it =
+  for (map <string, ParallelLoop *>::const_iterator it =
       declarations->firstParallelLoop (); it
       != declarations->lastParallelLoop (); ++it)
   {
@@ -27,7 +35,8 @@ CPPOpenCLSubroutinesGeneration::createSubroutines ()
     Debug::getInstance ()->debugMessage ("Analysing parallel loop "
         + userSubroutineName, Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
-    CPPParallelLoop * parallelLoop = it->second;
+    CPPParallelLoop * parallelLoop =
+        static_cast <CPPParallelLoop *> (it->second);
 
     CPPOpenCLUserSubroutine * userDeviceSubroutine;
 
@@ -107,15 +116,12 @@ CPPOpenCLSubroutinesGeneration::addLibraries ()
 
   for (vector <string>::const_iterator it = libs.begin (); it != libs.end (); ++it)
   {
-    //SgIncludeDirectiveStatement *includeStatement = new SgIncludeDirectiveStatement();
-
-
-    //appendStatement (includeStatement, moduleScope);
   }
+
   SgVariableDeclaration *test = SageBuilder::buildVariableDeclaration ("test",
       SageBuilder::buildIntType (), NULL, moduleScope);
-  appendStatement (test, moduleScope);
 
+  appendStatement (test, moduleScope);
 }
 
 /*

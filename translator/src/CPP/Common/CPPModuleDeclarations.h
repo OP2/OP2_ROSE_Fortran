@@ -4,6 +4,11 @@
 
 #include <string>
 
+class SgVariableDeclaration;
+class SgScopeStatement;
+class CPPParallelLoop;
+class SubroutineVariableDeclarations;
+
 class CPPModuleDeclarations
 {
   protected:

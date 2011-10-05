@@ -3,9 +3,9 @@
 #define CPP_OPENCL_HOST_SUBROUTINE_INDIRECT_LOOP_H
 
 #include <CPPOpenCLHostSubroutine.h>
-#include <CPPOpenCLKernelSubroutine.h>
-#include <CPPOpenCLDataSizesDeclarationIndirectLoop.h>
 #include <CPPPlan.h>
+
+class CPPOpenCLDataSizesDeclarationIndirectLoop;
 
 class CPPOpenCLHostSubroutineIndirectLoop: public CPPOpenCLHostSubroutine,
     public CPPPlan

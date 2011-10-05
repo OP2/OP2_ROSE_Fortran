@@ -1,6 +1,10 @@
 #include <CPPOpenCLModuleDeclarations.h>
-#include <CPPStatementsAndExpressionsBuilder.h>
 #include <CPPOpenCLReductionSubroutine.h>
+#include <CPPParallelLoop.h>
+#include <CPPOpenCLDataSizesDeclaration.h>
+#include <CPPOpDatDimensionsDeclaration.h>
+#include <RoseStatementsAndExpressionsBuilder.h>
+#include <CommonNamespaces.h>
 
 /*
  * ======================================================
@@ -21,7 +25,7 @@ CPPOpenCLModuleDeclarations::createReductionDeclarations ()
       != reductions.end (); ++it)
   {
     SgVariableDeclaration * variableDeclaration1 =
-        CPPStatementsAndExpressionsBuilder::appendVariableDeclaration (
+        RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
             ReductionSubroutine::reductionArrayHost, (*it)->getBaseType (),
             moduleScope);
 
@@ -29,9 +33,9 @@ CPPOpenCLModuleDeclarations::createReductionDeclarations ()
         variableDeclaration1);
 
     SgVariableDeclaration * variableDeclaration2 =
-        CPPStatementsAndExpressionsBuilder::appendVariableDeclaration (
+        RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
             ReductionSubroutine::reductionArrayDevice, (*it)->getBaseType (),
-            moduleScope, 1, DEVICE);
+            moduleScope);
 
     variableDeclarations->add (ReductionSubroutine::reductionArrayDevice,
         variableDeclaration2);
@@ -50,9 +54,8 @@ CPPOpenCLModuleDeclarations::createDataSizesDeclaration ()
           userSubroutineName);
 
   SgVariableDeclaration * variableDeclaration =
-      CPPStatementsAndExpressionsBuilder::appendVariableDeclaration (
-          variableName, dataSizesDeclaration->getType (), moduleScope, 1,
-          DEVICE);
+      RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
+          variableName, dataSizesDeclaration->getType (), moduleScope);
 
   variableDeclarations->add (variableName, variableDeclaration);
 }
@@ -69,9 +72,8 @@ CPPOpenCLModuleDeclarations::createDimensionsDeclaration ()
           userSubroutineName);
 
   SgVariableDeclaration * variableDeclaration =
-      CPPStatementsAndExpressionsBuilder::appendVariableDeclaration (
-          variableName, dimensionsDeclaration->getType (), moduleScope, 1,
-          DEVICE);
+      RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
+          variableName, dimensionsDeclaration->getType (), moduleScope);
 
   variableDeclarations->add (variableName, variableDeclaration);
 }

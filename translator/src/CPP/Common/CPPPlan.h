@@ -3,15 +3,14 @@
 #define CPPPLAN_H
 
 #include <Plan.h>
-#include <CPPParallelLoop.h>
 
-class CPPPlan: public Plan <CPPParallelLoop>
+class CPPPlan: public Plan
 {
   protected:
 
     virtual SgBasicBlock *
     createPlanFunctionParametersPreparationStatements (
-        CPPParallelLoop * parallelLoop,
+        ParallelLoop * parallelLoop,
         SubroutineVariableDeclarations * variableDeclarations);
 
     virtual SgFunctionCallExp *

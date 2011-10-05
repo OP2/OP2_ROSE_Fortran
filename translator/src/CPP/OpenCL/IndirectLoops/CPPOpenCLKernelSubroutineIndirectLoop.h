@@ -3,7 +3,8 @@
 #define CPP_OPENCL_KERNEL_SUBROUTINE_INDIRECT_LOOP_H
 
 #include <CPPOpenCLKernelSubroutine.h>
-#include <CPPOpenCLDataSizesDeclarationIndirectLoop.h>
+
+class CPPOpenCLDataSizesDeclarationIndirectLoop;
 
 class CPPOpenCLKernelSubroutineIndirectLoop: public CPPOpenCLKernelSubroutine
 {
