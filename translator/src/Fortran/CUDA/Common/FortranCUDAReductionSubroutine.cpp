@@ -497,7 +497,7 @@ FortranCUDAReductionSubroutine::createLocalVariableDeclarations ()
 
   variableDeclarations->add (autosharedVariableName,
       FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
-          autosharedVariableName, arrayType, subroutineScope, 1, SHARED));
+          autosharedVariableName, arrayType, subroutineScope, 1, CUDA_SHARED));
 
   /*
    * ======================================================
@@ -538,7 +538,7 @@ FortranCUDAReductionSubroutine::createFormalParameterDeclarations ()
       FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
           OP2::VariableNames::reductionResult,
           FortranTypesBuilder::getArray_RankOne (reduction->getBaseType ()),
-          subroutineScope, formalParameters, 1, DEVICE));
+          subroutineScope, formalParameters, 1, CUDA_DEVICE));
 
   /*
    * ======================================================

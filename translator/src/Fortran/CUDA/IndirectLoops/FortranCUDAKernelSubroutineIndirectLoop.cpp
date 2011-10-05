@@ -1293,7 +1293,7 @@ FortranCUDAKernelSubroutineIndirectLoop::createPlanFormalParameterDeclarations (
             *it, FortranTypesBuilder::getArray_RankOne_WithLowerAndUpperBounds (
                 FortranTypesBuilder::getFourByteInteger (), buildIntVal (0),
                 upperBoundExpression), subroutineScope, formalParameters, 1,
-            DEVICE));
+            CUDA_DEVICE));
   }
 
   vector <string> fourByteIntegerVariables;
@@ -1354,7 +1354,7 @@ FortranCUDAKernelSubroutineIndirectLoop::createOpDatFormalParameterDeclarations 
                 FortranTypesBuilder::getArray_RankOne_WithLowerAndUpperBounds (
                     parallelLoop->getOpDatBaseType (i), buildIntVal (0),
                     upperBoundExpression), subroutineScope, formalParameters,
-                1, DEVICE));
+                1, CUDA_DEVICE));
 
         SgDotExp * dotExpression2 = buildDotExp (buildVarRefExp (
             variableDeclarations->get (
@@ -1373,7 +1373,7 @@ FortranCUDAKernelSubroutineIndirectLoop::createOpDatFormalParameterDeclarations 
                 FortranTypesBuilder::getArray_RankOne_WithLowerAndUpperBounds (
                     FortranTypesBuilder::getFourByteInteger (),
                     buildIntVal (0), upperBoundExpression2), subroutineScope,
-                formalParameters, 1, DEVICE));
+                formalParameters, 1, CUDA_DEVICE));
       }
     }
   }
@@ -1401,7 +1401,7 @@ FortranCUDAKernelSubroutineIndirectLoop::createOpDatFormalParameterDeclarations 
               FortranTypesBuilder::getArray_RankOne_WithLowerAndUpperBounds (
                   FortranTypesBuilder::getTwoByteInteger (),
                   lowerBoundExpression, upperBoundExpression), subroutineScope,
-              formalParameters, 1, DEVICE));
+              formalParameters, 1, CUDA_DEVICE));
     }
   }
 
@@ -1430,7 +1430,7 @@ FortranCUDAKernelSubroutineIndirectLoop::createOpDatFormalParameterDeclarations 
                 FortranTypesBuilder::getArray_RankOne_WithLowerAndUpperBounds (
                     parallelLoop->getOpDatBaseType (i), buildIntVal (0),
                     upperBoundExpression), subroutineScope, formalParameters,
-                1, DEVICE));
+                1, CUDA_DEVICE));
       }
       else if (parallelLoop->isGlobalScalar (i))
       {
@@ -1531,7 +1531,7 @@ FortranCUDAKernelSubroutineIndirectLoop::createLocalVariableDeclarations ()
         variableDeclarations->add (variableName,
             FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
                 variableName, FortranTypesBuilder::getFourByteInteger (),
-                subroutineScope, 1, SHARED));
+                subroutineScope, 1, CUDA_SHARED));
       }
     }
   }
@@ -1552,7 +1552,7 @@ FortranCUDAKernelSubroutineIndirectLoop::createLocalVariableDeclarations ()
     variableDeclarations->add (*it,
         FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (*it,
             FortranTypesBuilder::getFourByteInteger (), subroutineScope, 1,
-            SHARED));
+            CUDA_SHARED));
   }
 
   vector <string> fourByteIntegerVariables;
@@ -1583,7 +1583,7 @@ FortranCUDAKernelSubroutineIndirectLoop::createFormalParameterDeclarations ()
       FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
           OP2::VariableNames::getDimensionsVariableDeclarationName (
               userSubroutineName), opDatDimensionsDeclaration->getType (),
-          subroutineScope, formalParameters, 1, DEVICE));
+          subroutineScope, formalParameters, 1, CUDA_DEVICE));
 
   variableDeclarations->add (
       OP2::VariableNames::getDataSizesVariableDeclarationName (
@@ -1591,7 +1591,7 @@ FortranCUDAKernelSubroutineIndirectLoop::createFormalParameterDeclarations ()
       FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
           OP2::VariableNames::getDataSizesVariableDeclarationName (
               userSubroutineName), dataSizesDeclaration->getType (),
-          subroutineScope, formalParameters, 1, DEVICE));
+          subroutineScope, formalParameters, 1, CUDA_DEVICE));
 
   createOpDatFormalParameterDeclarations ();
 

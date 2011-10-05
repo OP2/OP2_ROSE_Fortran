@@ -464,7 +464,7 @@ FortranCUDAHostSubroutineIndirectLoop::createExecutionPlanDeclarations ()
             FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
                 variableName, FortranTypesBuilder::getArray_RankOne (
                     FortranTypesBuilder::getFourByteInteger ()),
-                subroutineScope, 2, DEVICE, ALLOCATABLE));
+                subroutineScope, 2, CUDA_DEVICE, ALLOCATABLE));
       }
     }
   }
@@ -524,7 +524,7 @@ FortranCUDAHostSubroutineIndirectLoop::createExecutionPlanDeclarations ()
           FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
               variableName, FortranTypesBuilder::getArray_RankOne (
                   FortranTypesBuilder::getTwoByteInteger ()), subroutineScope,
-              2, DEVICE, ALLOCATABLE));
+              2, CUDA_DEVICE, ALLOCATABLE));
     }
   }
 
@@ -665,7 +665,7 @@ FortranCUDAHostSubroutineIndirectLoop::createExecutionPlanDeclarations ()
         FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (*it,
             FortranTypesBuilder::getArray_RankOne (
                 FortranTypesBuilder::getFourByteInteger ()), subroutineScope,
-            2, DEVICE, ALLOCATABLE));
+            2, CUDA_DEVICE, ALLOCATABLE));
   }
 }
 
@@ -758,9 +758,11 @@ FortranCUDAHostSubroutineIndirectLoop::createLocalVariableDeclarations ()
  */
 
 FortranCUDAHostSubroutineIndirectLoop::FortranCUDAHostSubroutineIndirectLoop (
-    std::string const & subroutineName, std::string const & userSubroutineName,
+    std::string const & subroutineName,
+    std::string const & userSubroutineName,
     std::string const & kernelSubroutineName,
-    FortranParallelLoop * parallelLoop, SgScopeStatement * moduleScope,
+    FortranParallelLoop * parallelLoop,
+    SgScopeStatement * moduleScope,
     FortranCUDAOpDatCardinalitiesDeclarationIndirectLoop * dataSizesDeclaration,
     FortranOpDatDimensionsDeclaration * opDatDimensionsDeclaration,
     FortranCUDAModuleDeclarations * moduleDeclarations) :

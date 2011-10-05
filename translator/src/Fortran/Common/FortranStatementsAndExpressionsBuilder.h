@@ -1,8 +1,5 @@
 /*
  * Written by Adam Betts and Carlo Bertolli
- *
- * Helper functions to build particular kinds of Fortran statements
- * and expressions
  */
 
 #pragma once

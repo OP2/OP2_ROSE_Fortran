@@ -156,7 +156,7 @@ FortranCUDAUserSubroutine::createStatements ()
                   * variableDeclaration =
                       FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
                           variableName, type, subroutineScope,
-                          formalParameters, 1, SHARED);
+                          formalParameters, 1, CUDA_SHARED);
             }
             else if (parallelLoop->isGlobalScalar (OP_DAT_ArgumentGroup)
                 && parallelLoop->isRead (OP_DAT_ArgumentGroup))
@@ -173,7 +173,7 @@ FortranCUDAUserSubroutine::createStatements ()
                   * variableDeclaration =
                       FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
                           variableName, type, subroutineScope,
-                          formalParameters, 1, DEVICE);
+                          formalParameters, 1, CUDA_DEVICE);
             }
 
             ++OP_DAT_ArgumentGroup;

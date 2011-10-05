@@ -373,7 +373,7 @@ FortranCUDAKernelSubroutine::createAutoSharedDeclarations ()
                   autosharedVariableName,
                   FortranTypesBuilder::getArray_RankOne (
                       parallelLoop->getOpDatBaseType (i), 0, upperBound),
-                  subroutineScope, 1, SHARED));
+                  subroutineScope, 1, CUDA_SHARED));
 
           autosharedNames.push_back (autosharedVariableName);
 

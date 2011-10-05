@@ -70,7 +70,7 @@ FortranCUDAModuleDeclarations::createReductionDeclarations ()
                 reductionArrayDeviceName,
                 FortranTypesBuilder::getArray_RankOne (
                     parallelLoop->getOpDatBaseType (i)), moduleScope, 2,
-                ALLOCATABLE, DEVICE);
+                ALLOCATABLE, CUDA_DEVICE);
 
         variableDeclarations->add (reductionArrayDeviceName,
             reductionArrayDevice);
@@ -93,7 +93,7 @@ FortranCUDAModuleDeclarations::createDataSizesDeclaration ()
   SgVariableDeclaration * variableDeclaration =
       FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
           variableName, dataSizesDeclaration->getType (), moduleScope, 1,
-          DEVICE);
+          CUDA_DEVICE);
 
   variableDeclarations->add (variableName, variableDeclaration);
 }
@@ -112,7 +112,7 @@ FortranCUDAModuleDeclarations::createDimensionsDeclaration ()
   SgVariableDeclaration * variableDeclaration =
       FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
           variableName, dimensionsDeclaration->getType (), moduleScope, 1,
-          DEVICE);
+          CUDA_DEVICE);
 
   variableDeclarations->add (variableName, variableDeclaration);
 }

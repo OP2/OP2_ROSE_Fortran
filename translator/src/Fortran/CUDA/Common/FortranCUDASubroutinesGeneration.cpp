@@ -53,7 +53,7 @@ FortranCUDASubroutinesGeneration::createConstantDeclarations ()
         FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
             constantName,
             originalDeclaration ->get_decl_item (constantName)->get_type (),
-            moduleScope, 1, CONSTANT);
+            moduleScope, 1, CUDA_CONSTANT);
 
     SgInitializedNamePtrList & variables =
         originalDeclaration->get_variables ();

@@ -676,7 +676,7 @@ FortranCUDAKernelSubroutineDirectLoop::createOpDatFormalParameterDeclarations ()
                     FortranTypesBuilder::getArray_RankOne_WithLowerAndUpperBounds (
                         parallelLoop->getOpDatBaseType (i), buildIntVal (0),
                         buildIntVal (parallelLoop->getOpDatDimension (i) - 1)),
-                    subroutineScope, formalParameters, 1, DEVICE));
+                    subroutineScope, formalParameters, 1, CUDA_DEVICE));
           }
         }
         else
@@ -698,7 +698,7 @@ FortranCUDAKernelSubroutineDirectLoop::createOpDatFormalParameterDeclarations ()
                   FortranTypesBuilder::getArray_RankOne_WithLowerAndUpperBounds (
                       parallelLoop->getOpDatBaseType (i), buildIntVal (0),
                       upperBoundExpression), subroutineScope, formalParameters,
-                  1, DEVICE));
+                  1, CUDA_DEVICE));
         }
       }
     }
@@ -769,7 +769,7 @@ FortranCUDAKernelSubroutineDirectLoop::createFormalParameterDeclarations ()
       FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
           OP2::VariableNames::getDimensionsVariableDeclarationName (
               userSubroutineName), opDatDimensionsDeclaration->getType (),
-          subroutineScope, formalParameters, 1, DEVICE));
+          subroutineScope, formalParameters, 1, CUDA_DEVICE));
 
   /*
    * ======================================================
@@ -783,7 +783,7 @@ FortranCUDAKernelSubroutineDirectLoop::createFormalParameterDeclarations ()
       FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
           OP2::VariableNames::getDataSizesVariableDeclarationName (
               userSubroutineName), dataSizesDeclaration->getType (),
-          subroutineScope, formalParameters, 1, DEVICE));
+          subroutineScope, formalParameters, 1, CUDA_DEVICE));
 
   /*
    * ======================================================

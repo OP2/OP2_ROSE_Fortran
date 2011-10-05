@@ -17,9 +17,11 @@ FortranStatementsAndExpressionsBuilder::setFortranAttributes (
 {
   /*
    * ======================================================
-   * The variable declaration is always undefined
+   * The access modifier to the variable declaration is
+   * always undefined
    * ======================================================
    */
+
   variableDeclaration->get_declarationModifier ().get_accessModifier ().setUndefined ();
 
   for (int i = 0; i < remainingArguments; ++i)
@@ -34,19 +36,19 @@ FortranStatementsAndExpressionsBuilder::setFortranAttributes (
         break;
       }
 
-      case CONSTANT:
+      case CUDA_CONSTANT:
       {
         variableDeclaration->get_declarationModifier ().get_storageModifier ().setCudaConstant ();
         break;
       }
 
-      case DEVICE:
+      case CUDA_DEVICE:
       {
         variableDeclaration->get_declarationModifier ().get_storageModifier ().setCudaDevice ();
         break;
       }
 
-      case SHARED:
+      case CUDA_SHARED:
       {
         variableDeclaration->get_declarationModifier ().get_storageModifier ().setCudaShared ();
         break;

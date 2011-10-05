@@ -548,7 +548,7 @@ FortranCUDAHostSubroutine::createDataMarshallingLocalVariableDeclarations ()
               FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
                   variableName, FortranTypesBuilder::getArray_RankOne (
                       parallelLoop->getOpDatBaseType (i)), subroutineScope, 2,
-                  DEVICE, ALLOCATABLE));
+                  CUDA_DEVICE, ALLOCATABLE));
         }
       }
       else
@@ -560,7 +560,7 @@ FortranCUDAHostSubroutine::createDataMarshallingLocalVariableDeclarations ()
             FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
                 variableName, FortranTypesBuilder::getArray_RankOne (
                     parallelLoop->getOpDatBaseType (i)), subroutineScope, 2,
-                DEVICE, ALLOCATABLE));
+                CUDA_DEVICE, ALLOCATABLE));
       }
     }
   }
