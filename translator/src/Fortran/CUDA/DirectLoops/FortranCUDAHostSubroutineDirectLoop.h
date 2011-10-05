@@ -1,25 +1,16 @@
 /*
  * Written by Adam Betts and Carlo Bertolli
  *
- * This class models the host subroutine for a direct loop.
- * Its declarations and statements do the following:
- *
- * 1) Set up CUDA run-time variables, such as block and grid
- * sizes
- *
- * 2) Allocates device memory for the user subroutine formal
- * parameters
- *
- * 3) Calls the kernel
- *
- * 4) Deallocates device memory
+ * This class models the host subroutine for a direct loop
  */
 
+#pragma once
 #ifndef FORTRAN_CUDA_HOST_SUBROUTINE_DIRECT_LOOP_H
 #define FORTRAN_CUDA_HOST_SUBROUTINE_DIRECT_LOOP_H
 
 #include <FortranCUDAHostSubroutine.h>
-#include <FortranCUDADataSizesDeclaration.h>
+
+class FortranCUDAModuleDeclarations;
 
 class FortranCUDAHostSubroutineDirectLoop: public FortranCUDAHostSubroutine
 {

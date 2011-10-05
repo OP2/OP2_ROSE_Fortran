@@ -5,9 +5,18 @@
 #include <FortranCUDAHostSubroutineIndirectLoop.h>
 #include <FortranCUDAUserSubroutine.h>
 #include <FortranCUDAReductionSubroutine.h>
+#include <FortranReductionSubroutines.h>
+#include <FortranCUDAModuleDeclarations.h>
+#include <FortranCUDADataSizesDeclarationIndirectLoop.h>
+#include <FortranOpDatDimensionsDeclaration.h>
+#include <FortranParallelLoop.h>
+#include <FortranProgramDeclarationsAndDefinitions.h>
 #include <FortranTypesBuilder.h>
+#include <FortranStatementsAndExpressionsBuilder.h>
+#include <OP2Definitions.h>
 #include <RoseHelper.h>
 #include <Reduction.h>
+#include <boost/algorithm/string.hpp>
 
 /*
  * ======================================================
@@ -79,13 +88,13 @@ FortranCUDASubroutinesGeneration::createReductionSubroutines ()
 
   vector <Reduction *> reductionsNeeded;
 
-  for (map <string, FortranParallelLoop *>::const_iterator it =
+  for (map <string, ParallelLoop *>::const_iterator it =
       declarations->firstParallelLoop (); it
       != declarations->lastParallelLoop (); ++it)
   {
     string const userSubroutineName = it->first;
 
-    FortranParallelLoop * parallelLoop = it->second;
+    ParallelLoop * parallelLoop = it->second;
 
     parallelLoop->getReductionsNeeded (reductionsNeeded);
   }
@@ -108,7 +117,7 @@ FortranCUDASubroutinesGeneration::createSubroutines ()
   using std::string;
   using std::map;
 
-  for (map <string, FortranParallelLoop *>::const_iterator it =
+  for (map <string, ParallelLoop *>::const_iterator it =
       declarations->firstParallelLoop (); it
       != declarations->lastParallelLoop (); ++it)
   {
@@ -117,7 +126,8 @@ FortranCUDASubroutinesGeneration::createSubroutines ()
     Debug::getInstance ()->debugMessage ("Analysing user subroutine '"
         + userSubroutineName + "'", Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
-    FortranParallelLoop * parallelLoop = it->second;
+    FortranParallelLoop * parallelLoop =
+        static_cast <FortranParallelLoop *> (it->second);
 
     FortranCUDAUserSubroutine * userDeviceSubroutine =
         new FortranCUDAUserSubroutine (userSubroutineName, moduleScope,
@@ -188,7 +198,7 @@ FortranCUDASubroutinesGeneration::createModuleDeclarations ()
    * ======================================================
    */
 
-  for (map <string, FortranParallelLoop *>::const_iterator it =
+  for (map <string, ParallelLoop *>::const_iterator it =
       declarations->firstParallelLoop (); it
       != declarations->lastParallelLoop (); ++it)
   {
@@ -197,7 +207,8 @@ FortranCUDASubroutinesGeneration::createModuleDeclarations ()
     Debug::getInstance ()->debugMessage ("Analysing '" + userSubroutineName
         + "'", Debug::OUTER_LOOP_LEVEL, __FILE__, __LINE__);
 
-    FortranParallelLoop * parallelLoop = it->second;
+    FortranParallelLoop * parallelLoop =
+        static_cast <FortranParallelLoop *> (it->second);
 
     dimensionsDeclarations[userSubroutineName]
         = new FortranOpDatDimensionsDeclaration (parallelLoop, moduleScope);
@@ -222,7 +233,7 @@ FortranCUDASubroutinesGeneration::createModuleDeclarations ()
    * ======================================================
    */
 
-  for (map <string, FortranParallelLoop *>::const_iterator it =
+  for (map <string, ParallelLoop *>::const_iterator it =
       declarations->firstParallelLoop (); it
       != declarations->lastParallelLoop (); ++it)
   {
@@ -231,7 +242,8 @@ FortranCUDASubroutinesGeneration::createModuleDeclarations ()
     Debug::getInstance ()->debugMessage ("Analysing '" + userSubroutineName
         + "'", Debug::OUTER_LOOP_LEVEL, __FILE__, __LINE__);
 
-    FortranParallelLoop * parallelLoop = it->second;
+    FortranParallelLoop * parallelLoop =
+        static_cast <FortranParallelLoop *> (it->second);
 
     moduleDeclarations[userSubroutineName] = new FortranCUDAModuleDeclarations (
         parallelLoop, moduleScope,

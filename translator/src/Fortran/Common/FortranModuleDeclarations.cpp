@@ -1,8 +1,11 @@
 #include <FortranModuleDeclarations.h>
 #include <FortranStatementsAndExpressionsBuilder.h>
 #include <FortranTypesBuilder.h>
+#include <FortranParallelLoop.h>
+#include <SubroutineVariableDeclarations.h>
 #include <Debug.h>
 #include <CommonNamespaces.h>
+#include <rose.h>
 
 /*
  * ======================================================

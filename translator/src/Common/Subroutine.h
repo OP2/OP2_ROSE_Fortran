@@ -5,14 +5,15 @@
  * compiler
  */
 
+#pragma once
 #ifndef SUBROUTINE_H
 #define SUBROUTINE_H
 
 #include <boost/lexical_cast.hpp>
 #include <boost/crc.hpp>
-#include <rose.h>
 #include <SubroutineVariableDeclarations.h>
 #include <Debug.h>
+#include <rose.h>
 
 namespace CommonVariableNames
 {

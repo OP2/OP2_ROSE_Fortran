@@ -7,11 +7,16 @@
  * as variables as opposed to constants
  */
 
+#pragma once
 #ifndef FORTRAN_OP_DAT_DIMENSIONS_DECLARATION_H
 #define FORTRAN_OP_DAT_DIMENSIONS_DECLARATION_H
 
-#include <FortranParallelLoop.h>
-#include <SubroutineVariableDeclarations.h>
+class SgClassType;
+class SgScopeStatement;
+class SgDerivedTypeStatement;
+class SgVariableDeclaration;
+class FortranParallelLoop;
+class SubroutineVariableDeclarations;
 
 class FortranOpDatDimensionsDeclaration
 {

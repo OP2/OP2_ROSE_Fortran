@@ -1,6 +1,7 @@
 #include <CUDA.h>
-#include <Debug.h>
 #include <FortranTypesBuilder.h>
+#include <Debug.h>
+#include <rose.h>
 
 namespace
 {

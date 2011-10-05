@@ -1,16 +1,8 @@
-/*
- * Written by Adam Betts and Carlo Bertolli
- *
- * This class models module-scope declarations in CPP
- */
-
+#pragma once
 #ifndef CPP_MODULE_DECLARATIONS_H
 #define CPP_MODULE_DECLARATIONS_H
 
 #include <string>
-#include <rose.h>
-#include <CPPParallelLoop.h>
-#include <SubroutineVariableDeclarations.h>
 
 class CPPModuleDeclarations
 {

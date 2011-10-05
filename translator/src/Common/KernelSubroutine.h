@@ -1,9 +1,14 @@
+
+#pragma once
 #ifndef KERNEL_SUBROUTINE_H
 #define KERNEL_SUBROUTINE_H
 
 #include <Subroutine.h>
-#include <ParallelLoop.h>
-#include <ReductionSubroutines.h>
+
+template <typename TSubroutineHeader>
+  class ReductionSubroutines;
+
+class ParallelLoop;
 
 template <typename TSubroutineHeader>
   class KernelSubroutine: public Subroutine <TSubroutineHeader>

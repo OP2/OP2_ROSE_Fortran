@@ -5,6 +5,7 @@
  * create a single Debug class
  */
 
+#pragma once
 #ifndef DEBUG_H
 #define DEBUG_H
 

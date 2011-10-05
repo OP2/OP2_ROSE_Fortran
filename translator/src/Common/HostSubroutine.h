@@ -1,8 +1,12 @@
+
+#pragma once
 #ifndef HOST_SUBROUTINE_H
 #define HOST_SUBROUTINE_H
 
 #include <Subroutine.h>
-#include <ParallelLoop.h>
+
+class SgStatement;
+class ParallelLoop;
 
 template <typename TSubroutineHeader>
   class HostSubroutine: 

@@ -1,12 +1,13 @@
-#include <boost/lexical_cast.hpp>
+#include <FortranCUDAReductionSubroutine.h>
+#include <Reduction.h>
+#include <FortranStatementsAndExpressionsBuilder.h>
+#include <FortranTypesBuilder.h>
+#include <RoseStatementsAndExpressionsBuilder.h>
+#include <CommonNamespaces.h>
 #include <RoseHelper.h>
 #include <Debug.h>
 #include <CUDA.h>
-#include <FortranCUDAReductionSubroutine.h>
-#include <RoseStatementsAndExpressionsBuilder.h>
-#include <FortranStatementsAndExpressionsBuilder.h>
-#include <FortranTypesBuilder.h>
-#include <CommonNamespaces.h>
+#include <boost/lexical_cast.hpp>
 
 namespace
 {

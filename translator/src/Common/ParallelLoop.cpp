@@ -1,4 +1,9 @@
 #include <ParallelLoop.h>
+#include <OP2Definitions.h>
+#include <Reduction.h>
+#include <Debug.h>
+#include <rose.h>
+#include <boost/lexical_cast.hpp>
 
 /*
  * ======================================================
@@ -366,12 +371,6 @@ ParallelLoop::localThreadVariableDeclarationNeeded (
       OP_DAT_ArgumentGroup) && isIncremented (OP_DAT_ArgumentGroup))
       || (isDirect (OP_DAT_ArgumentGroup) && getOpDatDimension (
           OP_DAT_ArgumentGroup) > 1);
-}
-
-SgExpressionPtrList &
-ParallelLoop::getActualArguments ()
-{
-  return functionCallExpression->get_args ()->get_expressions ();
 }
 
 SgFunctionCallExp *

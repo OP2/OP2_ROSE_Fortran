@@ -1,9 +1,4 @@
-/*
- * Written by Adam Betts and Carlo Bertolli
- *
- * Generates subroutines for CUDA Fortran
- */
-
+#pragma once
 #ifndef CPP_OPENCL_SUBROUTINES_GENERATION_H
 #define CPP_OPENCL_SUBROUTINES_GENERATION_H
 
@@ -18,13 +13,12 @@ namespace Libraries
 class CPPOpenCLSubroutinesGeneration: public CPPSubroutinesGeneration
 {
   private:
-  
-  std::map <std::string, CPPOpenCLDataSizesDeclaration *>
-      dataSizesDeclarations;
+
+    std::map <std::string, CPPOpenCLDataSizesDeclaration *>
+        dataSizesDeclarations;
 
     virtual CPPHostSubroutine *
     createSubroutines ();
-
 
     virtual void
     addLibraries ();

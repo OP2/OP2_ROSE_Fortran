@@ -1,7 +1,9 @@
+#include <CommonNamespaces.h>
 #include <boost/lexical_cast.hpp>
 #include <boost/crc.hpp>
-#include <CommonNamespaces.h>
 #include <FortranTypesBuilder.h>
+#include <rose.h>
+#include <Debug.h>
 
 namespace
 {

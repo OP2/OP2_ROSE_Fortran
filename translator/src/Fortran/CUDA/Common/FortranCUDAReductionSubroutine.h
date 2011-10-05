@@ -5,11 +5,13 @@
  * with OP_INC, OP_MAX or OP_MIN access
  */
 
+#pragma once
 #ifndef FORTRAN_CUDA_REDUCTION_SUBROUTINE_H
 #define FORTRAN_CUDA_REDUCTION_SUBROUTINE_H
 
 #include <Subroutine.h>
-#include <Reduction.h>
+
+class Reduction;
 
 class FortranCUDAReductionSubroutine: public Subroutine <
     SgProcedureHeaderStatement>

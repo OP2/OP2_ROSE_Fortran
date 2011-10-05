@@ -2,6 +2,7 @@
  * Written by Adam Betts and Carlo Bertolli
  */
 
+#pragma once
 #ifndef REDUCTION_SUBROUTINES_H
 #define REDUCTION_SUBROUTINES_H
 

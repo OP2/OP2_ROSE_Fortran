@@ -1,12 +1,4 @@
-/*
- * Written by Adam Betts and Carlo Bertolli
- *
- * This class models a variable declaration: it includes
- * fields for the sizes of each OP_DAT dimension.
- * These size fields allow OP_DAT dimensions to be passed
- * as variables as opposed to constants
- */
-
+#pragma once
 #ifndef CPP_OP_DAT_DIMENSIONS_DECLARATION_H
 #define CPP_OP_DAT_DIMENSIONS_DECLARATION_H
 

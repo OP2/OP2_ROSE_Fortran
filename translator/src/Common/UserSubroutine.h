@@ -1,8 +1,11 @@
+
+#pragma once
 #ifndef USER_SUBROUTINE_H
 #define USER_SUBROUTINE_H
 
 #include <Subroutine.h>
-#include <ParallelLoop.h>
+
+class ParallelLoop;
 
 template <typename TSubroutineHeader, typename TDeclarations>
   class UserSubroutine: public Subroutine <TSubroutineHeader>

@@ -5,12 +5,16 @@
  * variable names
  */
 
+#pragma once
 #ifndef COMMON_NAMESPACES_H
 #define COMMON_NAMESPACES_H
 
 #include <string>
-#include <rose.h>
-#include <Debug.h>
+
+class SgType;
+class SgStatement;
+class SgExpression;
+class SgScopeStatement;
 
 namespace OP2
 {

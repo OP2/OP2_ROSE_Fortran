@@ -2,6 +2,7 @@
  * Written by Adam Betts and Carlo Bertolli
  */
 
+#pragma once
 #ifndef FORTRAN_OPENMP_SUBROUTINES_GENERATION_H
 #define FORTRAN_OPENMP_SUBROUTINES_GENERATION_H
 

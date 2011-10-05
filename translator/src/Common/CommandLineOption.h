@@ -1,3 +1,5 @@
+
+#pragma once
 #ifndef COMMAND_LINE_OPTION_H
 #define COMMAND_LINE_OPTION_H
 

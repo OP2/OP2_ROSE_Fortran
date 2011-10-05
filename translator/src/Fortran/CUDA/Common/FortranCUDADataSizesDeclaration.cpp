@@ -1,7 +1,12 @@
-#include <boost/lexical_cast.hpp>
 #include <FortranCUDADataSizesDeclaration.h>
-#include <RoseStatementsAndExpressionsBuilder.h>
+#include <FortranParallelLoop.h>
 #include <FortranTypesBuilder.h>
+#include <RoseStatementsAndExpressionsBuilder.h>
+#include <SubroutineVariableDeclarations.h>
+#include <Debug.h>
+#include <CommonNamespaces.h>
+#include <boost/lexical_cast.hpp>
+#include <rose.h>
 
 void
 FortranCUDAOpDatCardinalitiesDeclaration::addFields ()

@@ -1,9 +1,11 @@
-#include <boost/algorithm/string/predicate.hpp>
-#include <CommonNamespaces.h>
-#include <Debug.h>
+#include <FortranHostSubroutine.h>
 #include <FortranStatementsAndExpressionsBuilder.h>
 #include <FortranTypesBuilder.h>
-#include <FortranHostSubroutine.h>
+#include <CommonNamespaces.h>
+#include <Debug.h>
+#include <FortranParallelLoop.h>
+#include <boost/algorithm/string/predicate.hpp>
+#include <rose.h>
 
 /*
  * ======================================================
@@ -102,4 +104,28 @@ FortranHostSubroutine::createFormalParameterDeclarations ()
             accessVariableName, FortranTypesBuilder::getFourByteInteger (),
             subroutineScope, formalParameters, 1, INTENT_IN));
   }
+}
+
+FortranHostSubroutine::FortranHostSubroutine (
+    std::string const & subroutineName, std::string const & userSubroutineName,
+    std::string const & kernelSubroutineName,
+    FortranParallelLoop * parallelLoop, SgScopeStatement * moduleScope) :
+  HostSubroutine <SgProcedureHeaderStatement> (subroutineName,
+      userSubroutineName, kernelSubroutineName, parallelLoop)
+{
+  using SageBuilder::buildVoidType;
+  using SageBuilder::buildProcedureHeaderStatement;
+  using SageInterface::appendStatement;
+
+  subroutineHeaderStatement = buildProcedureHeaderStatement (
+      this->subroutineName.c_str (), buildVoidType (), formalParameters,
+      SgProcedureHeaderStatement::e_subroutine_subprogram_kind, moduleScope);
+
+  subroutineScope = subroutineHeaderStatement->get_definition ()->get_body ();
+
+  appendStatement (subroutineHeaderStatement, moduleScope);
+
+  appendStatement (
+      FortranStatementsAndExpressionsBuilder::buildImplicitNoneStatement (),
+      subroutineScope);
 }

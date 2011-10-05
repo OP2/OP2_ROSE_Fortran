@@ -1,7 +1,4 @@
-/*
- * Written by Adam Betts and Carlo Bertolli
- */
-
+#pragma once
 #ifndef CPP_PARALLEL_LOOP_H
 #define CPP_PARALLEL_LOOP_H
 
@@ -36,15 +33,9 @@ class CPPParallelLoop: public ParallelLoop
   public:
 
     virtual unsigned int
-    getNumberOfOpDatArgumentGroups ()
-    {
-      return getActualArguments ().size () - NUMBER_OF_NON_OP_DAT_ARGUMENTS;
-    }
+    getNumberOfOpDatArgumentGroups ();
 
-    CPPParallelLoop (SgFunctionCallExp * functionCallExpression) :
-      ParallelLoop (functionCallExpression)
-    {
-    }
+    CPPParallelLoop (SgFunctionCallExp * functionCallExpression);
 };
 
 #endif

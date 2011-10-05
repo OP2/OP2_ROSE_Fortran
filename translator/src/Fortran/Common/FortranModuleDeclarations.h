@@ -4,13 +4,16 @@
  * This class models module-scope declarations in Fortran
  */
 
+#pragma once
 #ifndef FORTRAN_MODULE_DECLARATIONS_H
 #define FORTRAN_MODULE_DECLARATIONS_H
 
 #include <string>
-#include <rose.h>
-#include <FortranParallelLoop.h>
-#include <SubroutineVariableDeclarations.h>
+
+class SubroutineVariableDeclarations;
+class FortranParallelLoop;
+class SgScopeStatement;
+class SgVariableDeclaration;
 
 class FortranModuleDeclarations
 {

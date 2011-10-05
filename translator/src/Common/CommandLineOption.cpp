@@ -1,9 +1,8 @@
+#include <CommandLineOption.h>
 #include <iostream>
 #include <cstdlib>
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
-#include <CommandLineOption.h>
-#include <CommandLine.h>
 
 /*
  * ======================================================

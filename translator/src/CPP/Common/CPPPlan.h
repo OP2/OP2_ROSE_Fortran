@@ -1,10 +1,4 @@
-/*
- * CPPPlan.h
- *
- *  Created on: 28 Jul 2011
- *      Author: Tiziano Santoro
- */
-
+#pragma once
 #ifndef CPPPLAN_H
 #define CPPPLAN_H
 
@@ -25,4 +19,4 @@ class CPPPlan: public Plan <CPPParallelLoop>
         SubroutineVariableDeclarations * variableDeclarations);
 };
 
-#endif /* CPPPLAN_H_ */
+#endif

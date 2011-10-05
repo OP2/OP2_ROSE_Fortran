@@ -8,6 +8,7 @@
  * 4) OpenCL
  */
 
+#pragma once
 #ifndef TARGET_BACKEND_H
 #define TARGET_BACKEND_H
 

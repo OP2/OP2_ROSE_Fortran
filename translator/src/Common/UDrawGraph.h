@@ -1,3 +1,5 @@
+
+#pragma once
 #ifndef UDRAWGRAPH_H
 #define UDRAWGRAPH_H
 

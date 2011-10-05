@@ -5,29 +5,31 @@
  * Fortran when a plan function is involved
  */
 
+#pragma once
 #ifndef FORTRAN_PLAN_H
 #define FORTRAN_PLAN_H
 
 #include <Plan.h>
-#include <FortranParallelLoop.h>
 
-class FortranPlan: public Plan <FortranParallelLoop>
+class ParallelLoop;
+
+class FortranPlan: public Plan
 {
-  protected:
+  public:
 
     virtual SgBasicBlock *
-    createConvertPlanFunctionParametersStatements (
-        FortranParallelLoop * parallelLoop, SgScopeStatement * subroutineScope,
+    createConvertPlanFunctionParametersStatements (ParallelLoop * parallelLoop,
+        SgScopeStatement * subroutineScope,
         SubroutineVariableDeclarations * variableDeclarations);
 
     virtual SgBasicBlock *
-    createConvertPositionInPMapsStatements (FortranParallelLoop * parallelLoop,
+    createConvertPositionInPMapsStatements (ParallelLoop * parallelLoop,
         SgScopeStatement * subroutineScope,
         SubroutineVariableDeclarations * variableDeclarations);
 
     virtual SgBasicBlock *
     createPlanFunctionParametersPreparationStatements (
-        FortranParallelLoop * parallelLoop,
+        ParallelLoop * parallelLoop,
         SubroutineVariableDeclarations * variableDeclarations);
 
     virtual SgFunctionCallExp *

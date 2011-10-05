@@ -84,15 +84,15 @@ MODULE GENERATED_MODULE
     CALL syncthreads()
   END SUBROUTINE
 
-  attributes(device) SUBROUTINE s1037571366(x,y)
+  attributes (device) SUBROUTINE s1037571366(x,y)
     IMPLICIT NONE
     INTEGER(kind=4), DEVICE :: x
     INTEGER(kind=4), DEVICE :: y
     x = min(x - y + 100,x + y - 15)
   END SUBROUTINE
 
-  attributes(global) SUBROUTINE s1764047107(dimensions_s1037571366,sizes_s1037571366,opDat2,setSize,warpSize,sharedMemo&
-  &ryOffset)
+  attributes (global) SUBROUTINE s1764047107(dimensions_s1037571366,sizes_s1037571366,opDat2,setSize,warpSize,sharedMem&
+  &oryOffset)
     IMPLICIT NONE
     TYPE ( integer4Scalar_integer4Scalar_min_opDatDimensions ) , DEVICE :: dimensions_s1037571366
     TYPE ( integer4Scalar_integer4Scalar_min_opDatCardinalities ) , DEVICE :: sizes_s1037571366
@@ -117,8 +117,8 @@ MODULE GENERATED_MODULE
     CALL ReductionInteger4(reductionArrayDevice12549752926(blockidx%x - 1:blockidx%x - 1),opDat1Local,warpSize,1)
   END SUBROUTINE
 
-  attributes(host) SUBROUTINE s3156394238(userSubroutine,set,opDat1,opIndirection1,opMap1,opAccess1,opDat2,opIndirectio&
-  &n2,opMap2,opAccess2)
+  attributes (host) SUBROUTINE s3156394238(userSubroutine,set,opDat1,opIndirection1,opMap1,opAccess1,opDat2,opIndirecti&
+  &on2,opMap2,opAccess2)
     IMPLICIT NONE
     CHARACTER, INTENT(IN) :: userSubroutine*(33)
     TYPE ( op_set ) , INTENT(IN) :: set

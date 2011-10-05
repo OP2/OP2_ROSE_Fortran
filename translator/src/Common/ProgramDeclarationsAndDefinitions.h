@@ -5,14 +5,25 @@
  * under analysis
  */
 
+#pragma once
 #ifndef PROGRAM_DECLARATIONS_AND_DEFINTIONS_H
 #define PROGRAM_DECLARATIONS_AND_DEFINTIONS_H
 
-#include <OP2Definitions.h>
+#include <rose.h>
+#include <string>
+#include <map>
+#include <vector>
 #include <boost/algorithm/string.hpp>
 #include <Debug.h>
 
-template <typename TParallelLoop, typename TSubroutineHeader>
+class ParallelLoop;
+class OpSetDefinition;
+class OpMapDefinition;
+class OpDatDefinition;
+class OpGblDefinition;
+class OpConstDefinition;
+
+template <typename TSubroutineHeader>
   class ProgramDeclarationsAndDefinitions
   {
     protected:
@@ -66,7 +77,7 @@ template <typename TParallelLoop, typename TSubroutineHeader>
        * representation of an OP_PAR_LOOP
        * ======================================================
        */
-      std::map <std::string, TParallelLoop *> parallelLoops;
+      std::map <std::string, ParallelLoop *> parallelLoops;
 
       /*
        * ======================================================
@@ -362,13 +373,13 @@ template <typename TParallelLoop, typename TSubroutineHeader>
         return subroutinesInSourceCode.end ();
       }
 
-      typename std::map <std::string, TParallelLoop *>::const_iterator
+      typename std::map <std::string, ParallelLoop *>::const_iterator
       firstParallelLoop ()
       {
         return parallelLoops.begin ();
       }
 
-      typename std::map <std::string, TParallelLoop *>::const_iterator
+      typename std::map <std::string, ParallelLoop *>::const_iterator
       lastParallelLoop ()
       {
         return parallelLoops.end ();

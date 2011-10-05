@@ -11,11 +11,15 @@
  * segmentation faults
  */
 
+#pragma once
 #ifndef FORTRAN_CUDA_DATA_SIZES_DECLARATION_H
 #define FORTRAN_CUDA_DATA_SIZES_DECLARATION_H
 
-#include <FortranParallelLoop.h>
-#include <SubroutineVariableDeclarations.h>
+class SgScopeStatement;
+class SgDerivedTypeStatement;
+class SgClassType;
+class FortranParallelLoop;
+class SubroutineVariableDeclarations;
 
 class FortranCUDAOpDatCardinalitiesDeclaration
 {

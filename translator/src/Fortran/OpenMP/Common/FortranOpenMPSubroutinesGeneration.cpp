@@ -5,7 +5,10 @@
 #include <FortranOpenMPKernelSubroutineIndirectLoop.h>
 #include <FortranOpenMPHostSubroutineDirectLoop.h>
 #include <FortranOpenMPHostSubroutineIndirectLoop.h>
+#include <FortranProgramDeclarationsAndDefinitions.h>
+#include <FortranOpDatDimensionsDeclaration.h>
 #include <RoseHelper.h>
+#include <boost/algorithm/string.hpp>
 
 /*
  * ======================================================
@@ -24,13 +27,14 @@ FortranOpenMPSubroutinesGeneration::createSubroutines ()
   using std::string;
   using std::map;
 
-  for (map <string, FortranParallelLoop *>::const_iterator it =
+  for (map <string, ParallelLoop *>::const_iterator it =
       declarations->firstParallelLoop (); it
       != declarations->lastParallelLoop (); ++it)
   {
     string const userSubroutineName = it->first;
 
-    FortranParallelLoop * parallelLoop = it->second;
+    FortranParallelLoop * parallelLoop =
+        static_cast <FortranParallelLoop *> (it->second);
 
     FortranOpenMPKernelSubroutine * kernelSubroutine;
 
@@ -77,13 +81,14 @@ FortranOpenMPSubroutinesGeneration::createModuleDeclarations ()
    * ======================================================
    */
 
-  for (map <string, FortranParallelLoop *>::const_iterator it =
+  for (map <string, ParallelLoop *>::const_iterator it =
       declarations->firstParallelLoop (); it
       != declarations->lastParallelLoop (); ++it)
   {
     string const userSubroutineName = it->first;
 
-    FortranParallelLoop * parallelLoop = it->second;
+    FortranParallelLoop * parallelLoop =
+        static_cast <FortranParallelLoop *> (it->second);
 
     dimensionsDeclarations[userSubroutineName]
         = new FortranOpDatDimensionsDeclaration (parallelLoop, moduleScope);
@@ -95,13 +100,14 @@ FortranOpenMPSubroutinesGeneration::createModuleDeclarations ()
    * ======================================================
    */
 
-  for (map <string, FortranParallelLoop *>::const_iterator it =
+  for (map <string, ParallelLoop *>::const_iterator it =
       declarations->firstParallelLoop (); it
       != declarations->lastParallelLoop (); ++it)
   {
     string const userSubroutineName = it->first;
 
-    FortranParallelLoop * parallelLoop = it->second;
+    FortranParallelLoop * parallelLoop =
+        static_cast <FortranParallelLoop *> (it->second);
 
     if (parallelLoop->isDirectLoop ())
     {

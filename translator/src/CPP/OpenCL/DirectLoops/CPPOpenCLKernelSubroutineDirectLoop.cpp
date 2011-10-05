@@ -1,10 +1,10 @@
 #include <CPPOpenCLKernelSubroutineDirectLoop.h>
 #include <CPPOpenCLStatementsAndExpressionsBuilder.h>
+#include <CPPOpenCLReductionSubroutine.h>
+#include <RoseStatementsAndExpressionsBuilder.h>
+#include <CommonNamespaces.h>
 #include <RoseHelper.h>
 #include <Debug.h>
-#include <CPPOpenCLReductionSubroutine.h>
-using namespace SageBuilder;
-//TODO: remove
 /*
  * ======================================================
  * Private functions
@@ -232,6 +232,9 @@ CPPOpenCLKernelSubroutineDirectLoop::createStageOutFromLocalThreadVariablesToDev
   using SageBuilder::buildPntrArrRefExp;
   using SageBuilder::buildExprStatement;
   using SageBuilder::buildNullExpression;
+  using SageBuilder::buildPlusPlusOp;
+  using SageBuilder::buildLessThanOp;
+  using SageBuilder::buildForStatement;
   using SageInterface::appendStatement;
 
   SgExpression * arg_s_ref = buildVarRefExp (variableDeclarations->get (
@@ -340,6 +343,9 @@ CPPOpenCLKernelSubroutineDirectLoop::createExecutionLoopStatements ()
   using SageBuilder::buildFunctionCallExp;
   using SageBuilder::buildExprStatement;
   using SageBuilder::buildIntType;
+  using SageBuilder::buildPlusPlusOp;
+  using SageBuilder::buildLessThanOp;
+  using SageBuilder::buildForStatement;
   using SageInterface::appendStatement;
 
   SgExpression * set_size_ref = buildVarRefExp (variableDeclarations->get (
@@ -418,6 +424,10 @@ CPPOpenCLKernelSubroutineDirectLoop::createAutoSharedDisplacementInitialisationS
   using SageBuilder::buildMultiplyOp;
   using SageBuilder::buildIntVal;
   using SageBuilder::buildAssignStatement;
+  using SageBuilder::buildAddOp;
+  using SageBuilder::buildFloatType;
+  using SageBuilder::buildPointerType;
+  using SageBuilder::buildCastExp;
   using SageInterface::appendStatement;
   using std::string;
 
@@ -495,6 +505,7 @@ CPPOpenCLKernelSubroutineDirectLoop::createThreadIDInitialisationStatement ()
   using SageBuilder::buildSubtractOp;
   using SageBuilder::buildExprListExp;
   using SageBuilder::buildFunctionCallExp;
+  using SageBuilder::buildModOp;
   using SageBuilder::buildAssignStatement;
   using SageInterface::appendStatement;
 
@@ -525,6 +536,7 @@ CPPOpenCLKernelSubroutineDirectLoop::createOpDatFormalParameterDeclarations ()
   using SageBuilder::buildArrayType;
   using SageBuilder::buildExprListExp;
   using SageBuilder::buildDotExp;
+  using SageBuilder::buildPointerType;
   using std::string;
 
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
@@ -549,9 +561,8 @@ CPPOpenCLKernelSubroutineDirectLoop::createOpDatFormalParameterDeclarations ()
 
       variableDeclarations->add (
           variableName,
-          CPPStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
-              variableName, pointerType, subroutineScope, formalParameters, 1,
-              DEVICE));
+          RoseStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
+              variableName, pointerType, subroutineScope, formalParameters));
     }
   }
 }
@@ -569,6 +580,9 @@ CPPOpenCLKernelSubroutineDirectLoop::createInitialiseLocalThreadVariablesStateme
   using SageBuilder::buildBasicBlock;
   using SageBuilder::buildMultiplyOp;
   using SageBuilder::buildDotExp;
+  using SageBuilder::buildExprStatement;
+  using SageBuilder::buildLessThanOp;
+  using SageBuilder::buildForStatement;
   using SageBuilder::buildAddOp;
   using SageBuilder::buildPlusPlusOp;
   using SageInterface::appendStatement;
@@ -672,6 +686,8 @@ CPPOpenCLKernelSubroutineDirectLoop::createStatements ()
 void
 CPPOpenCLKernelSubroutineDirectLoop::createLocalVariableDeclarations ()
 {
+  using SageBuilder::buildVariableDeclaration;
+  using SageBuilder::buildIntType;
   using std::vector;
   using std::string;
 
@@ -702,7 +718,7 @@ CPPOpenCLKernelSubroutineDirectLoop::createLocalVariableDeclarations ()
   if (parallelLoop->isReductionRequired () == true)
   {
     variableDeclarations->add (ReductionSubroutine::offsetForReduction,
-        CPPStatementsAndExpressionsBuilder::appendVariableDeclaration (
+        RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
             ReductionSubroutine::offsetForReduction, buildIntType (),
             subroutineScope));
   }
@@ -711,6 +727,7 @@ CPPOpenCLKernelSubroutineDirectLoop::createLocalVariableDeclarations ()
 void
 CPPOpenCLKernelSubroutineDirectLoop::createFormalParameterDeclarations ()
 {
+  using SageBuilder::buildIntType;
 
   /*
    * ======================================================
@@ -731,7 +748,7 @@ CPPOpenCLKernelSubroutineDirectLoop::createFormalParameterDeclarations ()
 
   variableDeclarations->add (
       DirectLoop::CPP::KernelSubroutine::warpScratchpadSize,
-      CPPStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
+      RoseStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
           DirectLoop::CPP::KernelSubroutine::warpScratchpadSize,
           buildIntType (), subroutineScope, formalParameters));
 
@@ -743,27 +760,11 @@ CPPOpenCLKernelSubroutineDirectLoop::createFormalParameterDeclarations ()
 
   variableDeclarations->add (
       DirectLoop::CPP::KernelSubroutine::setSize,
-      CPPStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
+      RoseStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
           DirectLoop::CPP::KernelSubroutine::setSize, buildIntType (),
           subroutineScope, formalParameters));
-
-  /*
-   * ======================================================
-   * Shared memory formal parameter
-   * ======================================================
-   */
-
-  // Adam Betts (1/9/2011): This is commented out because we need one autoshared per
-  // (type, size) combination
-  // variableDeclarations->add (
-  //     CommonOP2::VariableNames::autoshared,
-  //     CPPStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
-  //         CommonOP2::VariableNames::autoshared, buildPointerType (buildCharType ()), //TODO: char* vs float*
-  //         subroutineScope, formalParameters, 1, SHARED));
-
-  //TODO: add global constants parameter
-
 }
+
 /*
  * ======================================================
  * Public functions

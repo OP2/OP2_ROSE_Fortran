@@ -4,6 +4,7 @@
  * This class models the kernel subroutine for a direct loop
  */
 
+#pragma once
 #ifndef FORTRAN_CUDA_KERNEL_SUBROUTINE_DIRECT_LOOP_H
 #define FORTRAN_CUDA_KERNEL_SUBROUTINE_DIRECT_LOOP_H
 

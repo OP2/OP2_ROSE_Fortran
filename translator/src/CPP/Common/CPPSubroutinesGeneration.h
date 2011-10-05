@@ -1,3 +1,4 @@
+#pragma once
 #ifndef CPP_SUBROUTINES_GENERATION_H
 #define CPP_SUBROUTINES_GENERATION_H
 
@@ -8,23 +9,23 @@
 #include <CPPHostSubroutine.h>
 #include <CPPOpDatDimensionsDeclaration.h>
 
-class CPPSubroutinesGeneration: 
-  public SubroutinesGeneration <CPPProgramDeclarationsAndDefinitions, CPPHostSubroutine>
+class CPPSubroutinesGeneration: public SubroutinesGeneration <
+    CPPProgramDeclarationsAndDefinitions, CPPHostSubroutine>
 {
   protected:
-    
+
     std::map <std::string, CPPOpDatDimensionsDeclaration *>
         dimensionsDeclarations;
 
     virtual CPPHostSubroutine *
-    createSubroutines ( ) = 0;
+    createSubroutines () = 0;
 
     void
-    patchCallsToParallelLoops ( );
+    patchCallsToParallelLoops ();
 
     SgSourceFile &
     createSourceFile ();
-    
+
     /*
      * ======================================================
      * Adds the relevant library 'use' statements to the
@@ -35,17 +36,16 @@ class CPPSubroutinesGeneration:
     virtual void
     addLibraries () = 0;
 
-
-    void generate ();
+    void
+    generate ();
 
   public:
 
     CPPSubroutinesGeneration (
         CPPProgramDeclarationsAndDefinitions * declarations,
         std::string const & fileSuffix) :
-      SubroutinesGeneration <CPPProgramDeclarationsAndDefinitions, CPPHostSubroutine> (
-          declarations, 
-          fileSuffix)
+      SubroutinesGeneration <CPPProgramDeclarationsAndDefinitions,
+          CPPHostSubroutine> (declarations, fileSuffix)
     {
       //SgSourceFile & sourceFile = createSourceFile ();
 

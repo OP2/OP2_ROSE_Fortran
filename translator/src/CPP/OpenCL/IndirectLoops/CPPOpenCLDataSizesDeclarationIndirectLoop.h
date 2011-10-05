@@ -1,7 +1,4 @@
-/*
- * Written by Adam Betts and Carlo Bertolli
- */
-
+#pragma once
 #ifndef CPP_OPENCL_DATA_SIZES_DECLARATION_INDIRECT_LOOP_H
 #define CPP_OPENCL_DATA_SIZES_DECLARATION_INDIRECT_LOOP_H
 

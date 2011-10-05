@@ -1,7 +1,11 @@
 #include <FortranCUDAModuleDeclarations.h>
+#include <FortranParallelLoop.h>
+#include <FortranCUDADataSizesDeclaration.h>
+#include <FortranOpDatDimensionsDeclaration.h>
 #include <FortranStatementsAndExpressionsBuilder.h>
 #include <FortranTypesBuilder.h>
 #include <FortranCUDAReductionSubroutine.h>
+#include <CommonNamespaces.h>
 
 /*
  * ======================================================

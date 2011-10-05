@@ -1,10 +1,4 @@
-/*
- * Written by Carlo Bertolli and Adam Betts
- *
- * This class generates code implementing reduction of OP_GBL variables marked
- * with OP_INC, OP_MAX or OP_MIN access
- */
-
+#pragma once
 #ifndef CPP_OpenCL_REDUCTION_SUBROUTINE_H
 #define CPP_OpenCL_REDUCTION_SUBROUTINE_H
 

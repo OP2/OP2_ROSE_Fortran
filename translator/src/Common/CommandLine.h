@@ -4,14 +4,16 @@
  * Allows extra options to be supplied to our tool
  */
 
+#pragma once
 #ifndef COMMAND_LINE_H
 #define COMMAND_LINE_H
 
 #include <vector>
 #include <string>
 #include <map>
-#include <CommandLineOption.h>
-#include <CommandLineOptionWithParameters.h>
+
+class CommandLineOption;
+class CommandLineOptionWithParameters;
 
 class CommandLine
 {

@@ -90,6 +90,7 @@ class FortranCodeGeneration_locatedNode : public UnparseLanguageIndependentConst
 
           virtual void unparseVarRef                  (SgExpression* expr, SgUnparse_Info& info);
           virtual void unparseClassRef                (SgExpression* expr, SgUnparse_Info& info);
+      //    virtual void unparseCudaKernelCall          (SgExpression* expr, SgUnparse_Info& info);
           virtual void unparseFuncRef                 (SgExpression* expr, SgUnparse_Info& info);
           virtual void unparseMFuncRef                (SgExpression* expr, SgUnparse_Info& info);
 

@@ -1,9 +1,14 @@
-#include <Debug.h>
-#include <CUDA.h>
+#include <FortranCUDAHostSubroutine.h>
+#include <FortranParallelLoop.h>
+#include <FortranCUDADataSizesDeclaration.h>
+#include <FortranCUDAModuleDeclarations.h>
+#include <FortranOpDatDimensionsDeclaration.h>
 #include <FortranStatementsAndExpressionsBuilder.h>
 #include <FortranTypesBuilder.h>
-#include <FortranCUDAHostSubroutine.h>
 #include <RoseStatementsAndExpressionsBuilder.h>
+#include <Debug.h>
+#include <CommonNamespaces.h>
+#include <CUDA.h>
 
 /*
  * ======================================================

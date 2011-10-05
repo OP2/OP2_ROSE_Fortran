@@ -1,10 +1,15 @@
-#include <Debug.h>
 #include <FortranCUDAHostSubroutineIndirectLoop.h>
+#include <FortranParallelLoop.h>
+#include <FortranOpDatDimensionsDeclaration.h>
+#include <FortranCUDAModuleDeclarations.h>
+#include <FortranCUDADataSizesDeclarationIndirectLoop.h>
 #include <FortranTypesBuilder.h>
+#include <FortranStatementsAndExpressionsBuilder.h>
 #include <RoseStatementsAndExpressionsBuilder.h>
 #include <CommonNamespaces.h>
 #include <RoseHelper.h>
 #include <CUDA.h>
+#include <Debug.h>
 
 /*
  * ======================================================

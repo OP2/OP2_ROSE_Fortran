@@ -1,5 +1,6 @@
 #include <FortranTypesBuilder.h>
 #include <RoseHelper.h>
+#include <rose.h>
 
 /*
  * ======================================================

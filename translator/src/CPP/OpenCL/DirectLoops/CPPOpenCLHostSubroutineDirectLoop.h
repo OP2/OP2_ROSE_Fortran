@@ -1,33 +1,12 @@
-/*
- * Written by Adam Betts and Carlo Bertolli
- *
- * This class models the host subroutine for a direct loop.
- * Its declarations and statements do the following:
- *
- * 1) Set up OpenCL run-time variables, such as block and grid
- * sizes
- *
- * 2) Allocates device memory for the user subroutine formal
- * parameters
- *
- * 3) Calls the kernel
- *
- * 4) Deallocates device memory
- */
-
+#pragma once
 #ifndef CPP_OpenCL_HOST_SUBROUTINE_DIRECT_LOOP_H
 #define CPP_OpenCL_HOST_SUBROUTINE_DIRECT_LOOP_H
 
-
-
 #include <CPPOpenCLHostSubroutine.h>
-#include <CPPOpenCLDataSizesDeclarationDirectLoop.h>
-#include <CPPInitialiseConstantsSubroutine.h>
-#include <CPPOpenCLModuleDeclarations.h>
-#include <CPPOpDatDimensionsDeclaration.h>
 
-class CPPOpenCLHostSubroutineDirectLoop: 
-  public CPPOpenCLHostSubroutine
+class CPPOpenCLDataSizesDeclarationDirectLoop;
+
+class CPPOpenCLHostSubroutineDirectLoop: public CPPOpenCLHostSubroutine
 {
   private:
 
@@ -38,8 +17,6 @@ class CPPOpenCLHostSubroutineDirectLoop:
      */
     virtual void
     createOpenCLKernelInitialisationStatements ();
-    
-
 
     /*
      * ======================================================
@@ -49,7 +26,7 @@ class CPPOpenCLHostSubroutineDirectLoop:
      */
     void
     createOpenCLKernelLocalVariableDeclarationsForDirectLoop ();
-    
+
     /*
      * ======================================================
      * Generates the code initialising the device variable
@@ -59,10 +36,8 @@ class CPPOpenCLHostSubroutineDirectLoop:
     void
     createVariableSizesInitialisationStatements ();
 
-
-
     virtual SgStatement *
-    createKernelFunctionCallStatement () {};
+    createKernelFunctionCallStatement ();
 
     virtual void
     createStatements ();
@@ -72,16 +47,12 @@ class CPPOpenCLHostSubroutineDirectLoop:
 
   public:
 
-        CPPOpenCLHostSubroutineDirectLoop (
-            std::string const & subroutineName,
-            std::string const & userSubroutineName,
-            std::string const & kernelSubroutineName,
-            CPPParallelLoop * parallelLoop,
-            SgScopeStatement * moduleScope,
-            //CPPInitialiseConstantsSubroutine * initialiseConstantsSubroutine,
-            CPPOpenCLDataSizesDeclarationDirectLoop * dataSizesDeclaration,
-            CPPOpDatDimensionsDeclaration * opDatDimensionsDeclaration);
-            /*CPPOpenCLModuleDeclarations * moduleDeclarations);*/
+    CPPOpenCLHostSubroutineDirectLoop (std::string const & subroutineName,
+        std::string const & userSubroutineName,
+        std::string const & kernelSubroutineName,
+        CPPParallelLoop * parallelLoop, SgScopeStatement * moduleScope,
+        CPPOpenCLDataSizesDeclarationDirectLoop * dataSizesDeclaration,
+        CPPOpDatDimensionsDeclaration * opDatDimensionsDeclaration);
 };
 
 #endif

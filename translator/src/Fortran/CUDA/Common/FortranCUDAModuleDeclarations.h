@@ -2,12 +2,14 @@
  * Written by Adam Betts and Carlo Bertolli
  */
 
+#pragma once
 #ifndef FORTRAN_CUDA_MODULE_DECLARATIONS_H
 #define FORTRAN_CUDA_MODULE_DECLARATIONS_H
 
 #include <FortranModuleDeclarations.h>
-#include <FortranCUDADataSizesDeclaration.h>
-#include <FortranOpDatDimensionsDeclaration.h>
+
+class FortranCUDAOpDatCardinalitiesDeclaration;
+class FortranOpDatDimensionsDeclaration;
 
 class FortranCUDAModuleDeclarations: public FortranModuleDeclarations
 {

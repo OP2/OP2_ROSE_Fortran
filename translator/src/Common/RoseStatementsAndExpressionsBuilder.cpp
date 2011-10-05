@@ -1,5 +1,6 @@
 #include <RoseStatementsAndExpressionsBuilder.h>
 #include <RoseHelper.h>
+#include <rose.h>
 
 SgIfStmt *
 RoseStatementsAndExpressionsBuilder::buildIfStatementWithEmptyElse (

@@ -1,10 +1,14 @@
 #include <FortranCUDAKernelSubroutine.h>
-#include <CommonNamespaces.h>
+#include <FortranParallelLoop.h>
+#include <FortranCUDAModuleDeclarations.h>
+#include <FortranReductionSubroutines.h>
 #include <FortranCUDAReductionSubroutine.h>
 #include <FortranTypesBuilder.h>
 #include <FortranStatementsAndExpressionsBuilder.h>
 #include <RoseHelper.h>
+#include <Reduction.h>
 #include <Debug.h>
+#include <CommonNamespaces.h>
 #include <CUDA.h>
 
 /*

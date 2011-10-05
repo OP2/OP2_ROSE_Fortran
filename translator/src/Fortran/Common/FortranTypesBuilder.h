@@ -5,10 +5,25 @@
  * attributes, such as an integer with n bytes
  */
 
+#pragma once
 #ifndef FORTRAN_TYPES_BUILDER_H
 #define FORTRAN_TYPES_BUILDER_H
 
-#include <rose.h>
+#include <vector>
+#include <string>
+
+class SgTypeBool;
+class SgTypeInt;
+class SgTypeFloat;
+class SgArrayType;
+class SgScopeStatement;
+class SgClassDeclaration;
+class SgClassDefinition;
+class SgType;
+class SgExpression;
+class SgFunctionSymbol;
+class SgModuleStatement;
+class SgTypeString;
 
 enum FORTRAN_VARIABLE_ATTRIBUTES
 {

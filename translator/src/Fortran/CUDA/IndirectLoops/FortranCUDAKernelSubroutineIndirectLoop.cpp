@@ -1,13 +1,16 @@
-#include <boost/lexical_cast.hpp>
-#include <Debug.h>
+#include <FortranCUDAKernelSubroutineIndirectLoop.h>
+#include <FortranParallelLoop.h>
+#include <FortranOpDatDimensionsDeclaration.h>
+#include <FortranCUDADataSizesDeclarationIndirectLoop.h>
 #include <FortranTypesBuilder.h>
 #include <RoseStatementsAndExpressionsBuilder.h>
 #include <FortranStatementsAndExpressionsBuilder.h>
-#include <FortranCUDAKernelSubroutineIndirectLoop.h>
 #include <CommonNamespaces.h>
 #include <RoseHelper.h>
 #include <Plan.h>
 #include <CUDA.h>
+#include <Debug.h>
+#include <boost/lexical_cast.hpp>
 
 /*
  * ======================================================
@@ -1596,8 +1599,10 @@ FortranCUDAKernelSubroutineIndirectLoop::createFormalParameterDeclarations ()
 }
 
 FortranCUDAKernelSubroutineIndirectLoop::FortranCUDAKernelSubroutineIndirectLoop (
-    std::string const & subroutineName, std::string const & userSubroutineName,
-    FortranParallelLoop * parallelLoop, SgScopeStatement * moduleScope,
+    std::string const & subroutineName,
+    std::string const & userSubroutineName,
+    FortranParallelLoop * parallelLoop,
+    SgScopeStatement * moduleScope,
     FortranReductionSubroutines * reductionSubroutines,
     FortranCUDAOpDatCardinalitiesDeclarationIndirectLoop * dataSizesDeclaration,
     FortranOpDatDimensionsDeclaration * opDatDimensionsDeclaration,

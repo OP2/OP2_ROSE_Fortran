@@ -1,12 +1,12 @@
-#include <boost/lexical_cast.hpp>
-#include <Debug.h>
-//#include <CPPTypesBuilder.h>
-#include <RoseStatementsAndExpressionsBuilder.h>
-#include <CPPOpenCLStatementsAndExpressionsBuilder.h>
 #include <CPPOpenCLKernelSubroutineIndirectLoop.h>
+#include <CPPOpenCLStatementsAndExpressionsBuilder.h>
 #include <CommonNamespaces.h>
 #include <RoseHelper.h>
+#include <RoseStatementsAndExpressionsBuilder.h>
+#include <CommonNamespaces.h>
 #include <Plan.h>
+#include <Debug.h>
+#include <boost/lexical_cast.hpp>
 
 using namespace SageBuilder;
 /*

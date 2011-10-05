@@ -5,7 +5,9 @@
 #ifndef OP2_DEFINITIONS_H
 #define OP2_DEFINITIONS_H
 
-#include <rose.h>
+#include <string>
+
+class SgType;
 
 class OP2Definition
 {
@@ -19,22 +21,15 @@ class OP2Definition
 
     std::string variableName;
 
-    OP2Definition ()
-    {
-    }
+    OP2Definition ();
 
     virtual
-    ~OP2Definition ()
-    {
-    }
+    ~OP2Definition ();
 
   public:
 
     std::string const &
-    getVariableName () const
-    {
-      return variableName;
-    }
+    getVariableName () const;
 };
 
 class OpDatDefinition: public OP2Definition
@@ -56,22 +51,13 @@ class OpDatDefinition: public OP2Definition
   public:
 
     std::string const &
-    getOpSetName () const
-    {
-      return opSetName;
-    }
+    getOpSetName () const;
 
     unsigned int
-    getDimension () const
-    {
-      return dimension;
-    }
+    getDimension () const;
 
     SgType *
-    getPrimitiveType ()
-    {
-      return primitiveType;
-    }
+    getPrimitiveType ();
 };
 
 class OpSetDefinition: public OP2Definition
@@ -89,10 +75,7 @@ class OpSetDefinition: public OP2Definition
   public:
 
     std::string const &
-    getDimensionName () const
-    {
-      return dimensionName;
-    }
+    getDimensionName () const;
 };
 
 class OpMapDefinition: public OP2Definition
@@ -116,28 +99,16 @@ class OpMapDefinition: public OP2Definition
   public:
 
     std::string const &
-    getSourceOpSetName () const
-    {
-      return sourceOpSetName;
-    }
+    getSourceOpSetName () const;
 
     std::string const &
-    getDestinationOpSetName () const
-    {
-      return destinationOpSetName;
-    }
+    getDestinationOpSetName () const;
 
     unsigned int
-    getDimension () const
-    {
-      return dimension;
-    }
+    getDimension () const;
 
     std::string const &
-    getMappingName () const
-    {
-      return mappingName;
-    }
+    getMappingName () const;
 };
 
 class OpGblDefinition: public OP2Definition
@@ -157,16 +128,10 @@ class OpGblDefinition: public OP2Definition
   public:
 
     unsigned int
-    getDimension () const
-    {
-      return dimension;
-    }
+    getDimension () const;
 
     SgType *
-    getPrimitiveType ()
-    {
-      return primitiveType;
-    }
+    getPrimitiveType ();
 };
 
 class OpConstDefinition: public OP2Definition
@@ -184,10 +149,7 @@ class OpConstDefinition: public OP2Definition
   public:
 
     unsigned int
-    getDimension () const
-    {
-      return dimension;
-    }
+    getDimension () const;
 };
 
 #endif

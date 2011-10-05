@@ -5,10 +5,15 @@
  * defined in the CUDA run-time library
  */
 
+#pragma once
 #ifndef CUDA_H
 #define CUDA_H
 
-#include <rose.h>
+#include <string>
+
+class SgScopeStatement;
+class SgDotExp;
+class SgFunctionCallExp;
 
 enum GRID_DIMENSION
 {

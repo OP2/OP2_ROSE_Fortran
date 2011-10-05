@@ -1,52 +1,33 @@
-/*
- * Written by Tiziano Santoro
- *
- * Helper functions to build particular OpenCL statements
- */
-
+#pragma once
 #ifndef CPP_OPENCL_STATEMENTS_AND_EXPRESSIONS_BUILDER_H
 #define CPP_OPENCL_STATEMENTS_AND_EXPRESSIONS_BUILDER_H
 
 #include <rose.h>
-#include <stdarg.h>
 
-#include <CPPStatementsAndExpressionsBuilder.h>
-
-class CPPOpenCLStatementsAndExpressionsBuilder :
-  public CPPStatementsAndExpressionsBuilder
+class CPPOpenCLStatementsAndExpressionsBuilder
 {
   public:
-    
+
     static SgExpression *
-    generateGetLocalId (
-        SgScopeStatement * scope = NULL );
-    
+    generateGetLocalId (SgScopeStatement * scope = NULL);
+
     static SgExpression *
-    generateGetLocalSize (
-        SgScopeStatement * scope = NULL );
-    
+    generateGetLocalSize (SgScopeStatement * scope = NULL);
+
     static SgExpression *
-    generateGetGlobalId (
-        SgScopeStatement * scope = NULL );
-    
+    generateGetGlobalId (SgScopeStatement * scope = NULL);
+
     static SgExpression *
-    generateGetGlobalSize (
-        SgScopeStatement * scope = NULL );
-    
+    generateGetGlobalSize (SgScopeStatement * scope = NULL);
+
     static SgExpression *
-    generateGetGroupId (
-        SgScopeStatement * scope = NULL );
-    
+    generateGetGroupId (SgScopeStatement * scope = NULL);
+
     static SgExpression *
-    generateGetGroupSize (
-        SgScopeStatement * scope = NULL );
-    
+    generateGetGroupSize (SgScopeStatement * scope = NULL);
+
     static SgStatement *
-    generateBarrierStatement (
-        SgScopeStatement * scope = NULL );
-    
-
-
+    generateBarrierStatement (SgScopeStatement * scope = NULL);
 };
 
 #endif

@@ -1,14 +1,16 @@
+#pragma once
 #ifndef CPP_OPENCL_KERNEL_SUBROUTINE_H
 #define CPP_OPENCL_KERNEL_SUBROUTINE_H
 
 #include <CPPKernelSubroutine.h>
-#include <CPPOpDatDimensionsDeclaration.h>
+
+class CPPOpDatDimensionsDeclaration;
 
 class CPPOpenCLKernelSubroutine: public CPPKernelSubroutine
 {
   protected:
 
-    CPPOpDatDimensionsDeclaration * opDatDimensionsDeclaration; //FIXME
+    CPPOpDatDimensionsDeclaration * opDatDimensionsDeclaration;
 
   protected:
     void

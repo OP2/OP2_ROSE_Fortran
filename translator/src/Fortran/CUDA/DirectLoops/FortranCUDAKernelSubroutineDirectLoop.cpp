@@ -1,8 +1,14 @@
 #include <FortranCUDAKernelSubroutineDirectLoop.h>
+#include <FortranCUDAModuleDeclarations.h>
+#include <FortranCUDADataSizesDeclaration.h>
+#include <FortranReductionSubroutines.h>
+#include <FortranParallelLoop.h>
+#include <FortranOpDatDimensionsDeclaration.h>
 #include <FortranTypesBuilder.h>
 #include <FortranStatementsAndExpressionsBuilder.h>
 #include <RoseHelper.h>
 #include <Debug.h>
+#include <CommonNamespaces.h>
 #include <CUDA.h>
 
 /*

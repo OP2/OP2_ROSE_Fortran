@@ -1,6 +1,6 @@
-#include <boost/lexical_cast.hpp>
 #include <CPPOpenCLDataSizesDeclaration.h>
 #include <RoseStatementsAndExpressionsBuilder.h>
+#include <rose.h>
 
 SgClassType *
 CPPOpenCLDataSizesDeclaration::getType ()

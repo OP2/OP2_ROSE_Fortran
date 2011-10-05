@@ -3,6 +3,7 @@
 #include <FortranTypesBuilder.h>
 #include <RoseHelper.h>
 #include <Debug.h>
+#include <CommonNamespaces.h>
 #include <OpenMP.h>
 
 /*

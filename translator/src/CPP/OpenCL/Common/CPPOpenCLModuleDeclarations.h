@@ -1,7 +1,4 @@
-/*
- * Written by Adam Betts and Carlo Bertolli
- */
-
+#pragma once
 #ifndef CPP_OpenCL_MODULE_DECLARATIONS_H
 #define CPP_OpenCL_MODULE_DECLARATIONS_H
 

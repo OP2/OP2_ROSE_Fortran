@@ -1,19 +1,11 @@
-/*
- * Written by Adam Betts and Carlo Bertolli
- *
- * This class models the kernel subroutine for an indirect loop.
- * Its declarations and statements do the following:
- *
- */
-
+#pragma once
 #ifndef CPP_OPENCL_KERNEL_SUBROUTINE_INDIRECT_LOOP_H
 #define CPP_OPENCL_KERNEL_SUBROUTINE_INDIRECT_LOOP_H
 
 #include <CPPOpenCLKernelSubroutine.h>
 #include <CPPOpenCLDataSizesDeclarationIndirectLoop.h>
 
-class CPPOpenCLKernelSubroutineIndirectLoop: 
-  public CPPOpenCLKernelSubroutine
+class CPPOpenCLKernelSubroutineIndirectLoop: public CPPOpenCLKernelSubroutine
 {
   private:
 
@@ -67,10 +59,8 @@ class CPPOpenCLKernelSubroutineIndirectLoop:
 
   public:
 
-    CPPOpenCLKernelSubroutineIndirectLoop (
-        std::string const & subroutineName,
-        std::string const & userSubroutineName,
-        CPPParallelLoop * parallelLoop, 
+    CPPOpenCLKernelSubroutineIndirectLoop (std::string const & subroutineName,
+        std::string const & userSubroutineName, CPPParallelLoop * parallelLoop,
         SgScopeStatement * moduleScope,
         CPPReductionSubroutines * reductionSubroutines,
         CPPOpenCLDataSizesDeclarationIndirectLoop * dataSizesDeclaration,

@@ -10,7 +10,8 @@
 
 #include <map>
 #include <string>
-#include <rose.h>
+
+class SgVariableDeclaration;
 
 class SubroutineVariableDeclarations
 {

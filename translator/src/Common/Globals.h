@@ -6,6 +6,7 @@
  * create a single instance
  */
 
+#pragma once
 #ifndef GLOBALS_H
 #define GLOBALS_H
 

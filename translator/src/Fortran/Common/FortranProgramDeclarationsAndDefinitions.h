@@ -6,10 +6,11 @@
 #define FORTRAN_PROGRAM_DECLARATIONS_AND_DEFINITIONS_H
 
 #include <ProgramDeclarationsAndDefinitions.h>
-#include <FortranParallelLoop.h>
+
+class FortranParallelLoop;
 
 class FortranProgramDeclarationsAndDefinitions: public ProgramDeclarationsAndDefinitions <
-    FortranParallelLoop, SgProcedureHeaderStatement> ,
+    SgProcedureHeaderStatement> ,
     public AstSimpleProcessing
 {
   private:
@@ -30,12 +31,12 @@ class FortranProgramDeclarationsAndDefinitions: public ProgramDeclarationsAndDef
 
     void
     setParallelLoopAccessDescriptor (FortranParallelLoop * parallelLoop,
-        SgExpressionPtrList & actualArguments,
+        SgExprListExp * actualArguments,
         unsigned int OP_DAT_ArgumentGroup, unsigned int argumentPosition);
 
     void
     analyseParallelLoopArguments (FortranParallelLoop * parallelLoop,
-        SgExpressionPtrList & actualArguments);
+        SgExprListExp * actualArguments);
 
     virtual void
     visit (SgNode * node);

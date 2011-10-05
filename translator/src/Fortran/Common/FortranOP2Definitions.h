@@ -1,7 +1,11 @@
+
+#pragma once
 #ifndef FORTRAN_OP2_DEFINITIONS_H
 #define FORTRAN_OP2_DEFINITIONS_H
 
 #include <OP2Definitions.h>
+
+class SgExprListExp;
 
 class FortranOpDatDefinition: public OpDatDefinition
 {
@@ -32,7 +36,7 @@ class FortranOpDatDefinition: public OpDatDefinition
       return 4;
     }
 
-    FortranOpDatDefinition (SgExpressionPtrList & parameters);
+    FortranOpDatDefinition (SgExprListExp * parameters);
 };
 
 class FortranOpSetDefinition: public OpSetDefinition
@@ -60,7 +64,7 @@ class FortranOpSetDefinition: public OpSetDefinition
       return 2;
     }
 
-    FortranOpSetDefinition (SgExpressionPtrList & parameters);
+    FortranOpSetDefinition (SgExprListExp * parameters);
 };
 
 class FortranOpMapDefinition: public OpMapDefinition
@@ -106,7 +110,7 @@ class FortranOpMapDefinition: public OpMapDefinition
       return mappingCardinalityName;
     }
 
-    FortranOpMapDefinition (SgExpressionPtrList & parameters);
+    FortranOpMapDefinition (SgExprListExp * parameters);
 };
 
 class FortranOpGblDefinition: public OpGblDefinition
@@ -136,7 +140,7 @@ class FortranOpGblDefinition: public OpGblDefinition
       return 3;
     }
 
-    FortranOpGblDefinition (SgExpressionPtrList & parameters);
+    FortranOpGblDefinition (SgExprListExp * parameters);
 };
 
 class FortranOpGblScalarDefinition: public OpGblDefinition
@@ -164,7 +168,7 @@ class FortranOpGblScalarDefinition: public OpGblDefinition
       return 2;
     }
 
-    FortranOpGblScalarDefinition (SgExpressionPtrList & parameters);
+    FortranOpGblScalarDefinition (SgExprListExp * parameters);
 };
 
 class FortranOpConstDefinition: public OpConstDefinition
@@ -192,7 +196,7 @@ class FortranOpConstDefinition: public OpConstDefinition
       return 2;
     }
 
-    FortranOpConstDefinition (SgExpressionPtrList & parameters);
+    FortranOpConstDefinition (SgExprListExp * parameters);
 };
 
 #endif

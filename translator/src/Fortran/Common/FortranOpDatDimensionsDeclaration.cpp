@@ -1,8 +1,13 @@
 #include <FortranOpDatDimensionsDeclaration.h>
 #include <FortranTypesBuilder.h>
-#include <RoseStatementsAndExpressionsBuilder.h>
 #include <FortranStatementsAndExpressionsBuilder.h>
+#include <FortranParallelLoop.h>
+#include <SubroutineVariableDeclarations.h>
+#include <RoseStatementsAndExpressionsBuilder.h>
 #include <CommonNamespaces.h>
+#include <Debug.h>
+#include <rose.h>
+#include <boost/lexical_cast.hpp>
 
 /*
  * ======================================================

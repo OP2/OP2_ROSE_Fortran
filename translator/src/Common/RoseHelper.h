@@ -4,6 +4,7 @@
  * Helper functions to build ROSE expressions and statements
  */
 
+#pragma once
 #ifndef ROSE_HELPER_H
 #define ROSE_HELPER_H
 

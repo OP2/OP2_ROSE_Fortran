@@ -5,13 +5,14 @@
  * Its declarations and statements do the following:
  */
 
+#pragma once
 #ifndef FORTRAN_CUDA_HOST_SUBROUTINE_INDIRECT_LOOP_H
 #define FORTRAN_CUDA_HOST_SUBROUTINE_INDIRECT_LOOP_H
 
 #include <FortranCUDAHostSubroutine.h>
-#include <FortranCUDAKernelSubroutine.h>
-#include <FortranCUDADataSizesDeclarationIndirectLoop.h>
 #include <FortranPlan.h>
+
+class FortranCUDAOpDatCardinalitiesDeclarationIndirectLoop;
 
 class FortranCUDAHostSubroutineIndirectLoop: public FortranCUDAHostSubroutine,
     public FortranPlan
@@ -38,13 +39,15 @@ class FortranCUDAHostSubroutineIndirectLoop: public FortranCUDAHostSubroutine,
 
   public:
 
-    FortranCUDAHostSubroutineIndirectLoop (std::string const & subroutineName,
-        std::string const & userSubroutineName,
-        std::string const & kernelSubroutineName,
-        FortranParallelLoop * parallelLoop, SgScopeStatement * moduleScope,
-        FortranCUDAOpDatCardinalitiesDeclarationIndirectLoop * dataSizesDeclaration,
-        FortranOpDatDimensionsDeclaration * opDatDimensionsDeclaration,
-        FortranCUDAModuleDeclarations * moduleDeclarations);
+        FortranCUDAHostSubroutineIndirectLoop (
+            std::string const & subroutineName,
+            std::string const & userSubroutineName,
+            std::string const & kernelSubroutineName,
+            FortranParallelLoop * parallelLoop,
+            SgScopeStatement * moduleScope,
+            FortranCUDAOpDatCardinalitiesDeclarationIndirectLoop * dataSizesDeclaration,
+            FortranOpDatDimensionsDeclaration * opDatDimensionsDeclaration,
+            FortranCUDAModuleDeclarations * moduleDeclarations);
 };
 
 #endif

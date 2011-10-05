@@ -1,5 +1,8 @@
 #include <CPPOpenCLDataSizesDeclarationDirectLoop.h>
-//#include <CPPTypesBuilder.h>
+#include <CPPParallelLoop.h>
+#include <SubroutineVariableDeclarations.h>
+#include <CommonNamespaces.h>
+#include <rose.h>
 
 /*
  * ======================================================
@@ -18,7 +21,8 @@ CPPOpenCLDataSizesDeclarationDirectLoop::addFields ()
   {
     if (parallelLoop->isDuplicateOpDat (i) == false)
     {
-      string const & variableName = OP2::VariableNames::getOpDatCardinalityName (i);
+      string const & variableName =
+          OP2::VariableNames::getOpDatCardinalityName (i);
 
       SgVariableDeclaration * fieldDeclaration = buildVariableDeclaration (
           variableName, buildIntType (), NULL, moduleScope);
@@ -45,5 +49,4 @@ CPPOpenCLDataSizesDeclarationDirectLoop::CPPOpenCLDataSizesDeclarationDirectLoop
   CPPOpenCLDataSizesDeclaration (subroutineName, parallelLoop, moduleScope)
 {
   addFields ();
-
 }

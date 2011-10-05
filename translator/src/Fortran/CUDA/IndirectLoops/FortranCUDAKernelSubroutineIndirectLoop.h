@@ -6,11 +6,13 @@
  *
  */
 
+#pragma once
 #ifndef FORTRAN_CUDA_KERNEL_SUBROUTINE_INDIRECT_LOOP_H
 #define FORTRAN_CUDA_KERNEL_SUBROUTINE_INDIRECT_LOOP_H
 
 #include <FortranCUDAKernelSubroutine.h>
-#include <FortranCUDADataSizesDeclarationIndirectLoop.h>
+
+class FortranCUDAOpDatCardinalitiesDeclarationIndirectLoop;
 
 class FortranCUDAKernelSubroutineIndirectLoop: public FortranCUDAKernelSubroutine
 {
@@ -64,14 +66,15 @@ class FortranCUDAKernelSubroutineIndirectLoop: public FortranCUDAKernelSubroutin
 
   public:
 
-    FortranCUDAKernelSubroutineIndirectLoop (
-        std::string const & subroutineName,
-        std::string const & userSubroutineName,
-        FortranParallelLoop * parallelLoop, SgScopeStatement * moduleScope,
-        FortranReductionSubroutines * reductionSubroutines,
-        FortranCUDAOpDatCardinalitiesDeclarationIndirectLoop * dataSizesDeclaration,
-        FortranOpDatDimensionsDeclaration * opDatDimensionsDeclaration,
-        FortranCUDAModuleDeclarations * moduleDeclarations);
+        FortranCUDAKernelSubroutineIndirectLoop (
+            std::string const & subroutineName,
+            std::string const & userSubroutineName,
+            FortranParallelLoop * parallelLoop,
+            SgScopeStatement * moduleScope,
+            FortranReductionSubroutines * reductionSubroutines,
+            FortranCUDAOpDatCardinalitiesDeclarationIndirectLoop * dataSizesDeclaration,
+            FortranOpDatDimensionsDeclaration * opDatDimensionsDeclaration,
+            FortranCUDAModuleDeclarations * moduleDeclarations);
 };
 
 #endif

@@ -1,9 +1,11 @@
-#include <boost/algorithm/string/predicate.hpp>
 #include <FortranCUDAUserSubroutine.h>
-#include <Debug.h>
-#include <algorithm>
+#include <FortranParallelLoop.h>
+#include <FortranProgramDeclarationsAndDefinitions.h>
 #include <FortranStatementsAndExpressionsBuilder.h>
 #include <FortranTypesBuilder.h>
+#include <Debug.h>
+#include <boost/algorithm/string/predicate.hpp>
+#include <algorithm>
 
 /*
  * ======================================================

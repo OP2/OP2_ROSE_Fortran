@@ -1,8 +1,6 @@
 #include <CPPOpenCLHostSubroutine.h>
 #include <CPPOpenCLReductionSubroutine.h>
 
-using namespace SageBuilder;
-
 /*
  * ======================================================
  * Protected functions

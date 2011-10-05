@@ -4,13 +4,13 @@
  * Generates subroutines for CUDA Fortran
  */
 
+#pragma once
 #ifndef FORTRAN_CUDA_SUBROUTINES_GENERATION_H
 #define FORTRAN_CUDA_SUBROUTINES_GENERATION_H
 
 #include <FortranSubroutinesGeneration.h>
-#include <FortranOpDatDimensionsDeclaration.h>
-#include <FortranCUDADataSizesDeclaration.h>
-#include <FortranCUDAModuleDeclarations.h>
+
+class FortranCUDAOpDatCardinalitiesDeclaration;
 
 class FortranCUDASubroutinesGeneration: public FortranSubroutinesGeneration
 {

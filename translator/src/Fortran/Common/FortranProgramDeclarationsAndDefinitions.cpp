@@ -1,5 +1,6 @@
 #include <FortranProgramDeclarationsAndDefinitions.h>
 #include <FortranOP2Definitions.h>
+#include <FortranParallelLoop.h>
 #include <CommonNamespaces.h>
 #include <Globals.h>
 #include <boost/algorithm/string.hpp>
@@ -98,7 +99,7 @@ FortranProgramDeclarationsAndDefinitions::handleOpDatDeclaration (
 
 void
 FortranProgramDeclarationsAndDefinitions::setParallelLoopAccessDescriptor (
-    FortranParallelLoop * parallelLoop, SgExpressionPtrList & actualArguments,
+    FortranParallelLoop * parallelLoop, SgExprListExp * actualArguments,
     unsigned int OP_DAT_ArgumentGroup, unsigned int argumentPosition)
 {
   using boost::iequals;
@@ -106,7 +107,7 @@ FortranProgramDeclarationsAndDefinitions::setParallelLoopAccessDescriptor (
   using std::string;
 
   SgVarRefExp * accessExpression = isSgVarRefExp (
-      actualArguments[argumentPosition]);
+      actualArguments->get_expressions ()[argumentPosition]);
 
   string const accessValue =
       accessExpression->get_symbol ()->get_name ().getString ();
@@ -163,7 +164,7 @@ FortranProgramDeclarationsAndDefinitions::setParallelLoopAccessDescriptor (
 
 void
 FortranProgramDeclarationsAndDefinitions::analyseParallelLoopArguments (
-    FortranParallelLoop * parallelLoop, SgExpressionPtrList & actualArguments)
+    FortranParallelLoop * parallelLoop, SgExprListExp * actualArguments)
 {
   using boost::iequals;
   using boost::lexical_cast;
@@ -179,7 +180,7 @@ FortranProgramDeclarationsAndDefinitions::analyseParallelLoopArguments (
   unsigned int opDatArgumentGroup = 1;
 
   for (unsigned int offset = parallelLoop->NUMBER_OF_NON_OP_DAT_ARGUMENTS; offset
-      < actualArguments.size (); offset
+      < actualArguments->get_expressions ().size (); offset
       += parallelLoop->NUMBER_OF_ARGUMENTS_PER_OP_DAT)
   {
     /*
@@ -193,14 +194,18 @@ FortranProgramDeclarationsAndDefinitions::analyseParallelLoopArguments (
 
     SgVarRefExp * opDatReference;
 
-    if (isSgDotExp (actualArguments[opDatArgumentPosition]) != NULL)
+    if (isSgDotExp (actualArguments->get_expressions ()[opDatArgumentPosition])
+        != NULL)
     {
-      opDatReference = isSgVarRefExp (isSgDotExp (
-          actualArguments[opDatArgumentPosition])->get_rhs_operand ());
+      opDatReference
+          = isSgVarRefExp (
+              isSgDotExp (
+                  actualArguments->get_expressions ()[opDatArgumentPosition])->get_rhs_operand ());
     }
     else
     {
-      opDatReference = isSgVarRefExp (actualArguments[opDatArgumentPosition]);
+      opDatReference = isSgVarRefExp (
+          actualArguments->get_expressions ()[opDatArgumentPosition]);
     }
 
     string const opDatName =
@@ -217,14 +222,18 @@ FortranProgramDeclarationsAndDefinitions::analyseParallelLoopArguments (
 
     SgVarRefExp * opMapReference;
 
-    if (isSgDotExp (actualArguments[opMapArgumentPosition]) != NULL)
+    if (isSgDotExp (actualArguments->get_expressions ()[opMapArgumentPosition])
+        != NULL)
     {
-      opMapReference = isSgVarRefExp (isSgDotExp (
-          actualArguments[opMapArgumentPosition])->get_rhs_operand ());
+      opMapReference
+          = isSgVarRefExp (
+              isSgDotExp (
+                  actualArguments->get_expressions ()[opMapArgumentPosition])->get_rhs_operand ());
     }
     else
     {
-      opMapReference = isSgVarRefExp (actualArguments[opMapArgumentPosition]);
+      opMapReference = isSgVarRefExp (
+          actualArguments->get_expressions ()[opMapArgumentPosition]);
     }
 
     string const mappingValue =
@@ -295,8 +304,9 @@ FortranProgramDeclarationsAndDefinitions::visit (SgNode * node)
 
     currentSourceFile = p.filename ();
 
-    Debug::getInstance ()->debugMessage ("Given source file '" + currentSourceFile
-        + "' detected", Debug::OUTER_LOOP_LEVEL, __FILE__, __LINE__ );
+    Debug::getInstance ()->debugMessage ("Given source file '"
+        + currentSourceFile + "' detected", Debug::OUTER_LOOP_LEVEL, __FILE__,
+        __LINE__ );
   }
   else if (Globals::getInstance ()->isInputFile (currentSourceFile))
   {
@@ -361,8 +371,7 @@ FortranProgramDeclarationsAndDefinitions::visit (SgNode * node)
          */
         SgFunctionCallExp * functionCallExp = isSgFunctionCallExp (node);
 
-        SgExpressionPtrList & actualArguments =
-            functionCallExp->get_args ()->get_expressions ();
+        SgExprListExp * actualArguments = functionCallExp->get_args ();
 
         string const
             calleeName =
@@ -431,14 +440,14 @@ FortranProgramDeclarationsAndDefinitions::visit (SgNode * node)
 
           OpGblDefinition * opGblDeclaration;
 
-          if (actualArguments.size ()
+          if (actualArguments->get_expressions ().size ()
               == FortranOpGblDefinition::getNumberOfExpectedArguments ())
           {
             opGblDeclaration = new FortranOpGblDefinition (actualArguments);
           }
           else
           {
-            ROSE_ASSERT (actualArguments.size() == FortranOpGblScalarDefinition::getNumberOfExpectedArguments());
+            ROSE_ASSERT (actualArguments->get_expressions().size() == FortranOpGblScalarDefinition::getNumberOfExpectedArguments());
 
             opGblDeclaration = new FortranOpGblScalarDefinition (
                 actualArguments);
@@ -471,11 +480,10 @@ FortranProgramDeclarationsAndDefinitions::visit (SgNode * node)
            * ======================================================
            */
 
-          SgExpressionPtrList & actualArguments =
-              functionCallExp->get_args ()->get_expressions ();
+          SgExprListExp * actualArguments = functionCallExp->get_args ();
 
           SgFunctionRefExp * functionRefExpression = isSgFunctionRefExp (
-              actualArguments.front ());
+              actualArguments->get_expressions ().front ());
 
           ROSE_ASSERT (functionRefExpression != NULL);
 
@@ -526,9 +534,6 @@ FortranProgramDeclarationsAndDefinitions::visit (SgNode * node)
             != variableDeclaration->get_variables ().end (); it++)
         {
           string const variableName = (*it)->get_name ().getString ();
-
-          SgType * type =
-              variableDeclaration->get_decl_item (variableName)->get_type ();
 
           declarations[variableName] = variableDeclaration;
         }

@@ -1,8 +1,10 @@
+#include <CommandLine.h>
+#include <CommandLineOption.h>
+#include <CommandLineOptionWithParameters.h>
 #include <iostream>
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/filesystem.hpp>
-#include <CommandLine.h>
 #include <Debug.h>
 #include <Globals.h>
 #include <CommonNamespaces.h>

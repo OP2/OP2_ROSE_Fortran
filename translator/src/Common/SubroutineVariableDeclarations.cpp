@@ -1,5 +1,6 @@
 #include <SubroutineVariableDeclarations.h>
 #include <Debug.h>
+#include <rose.h>
 
 bool
 SubroutineVariableDeclarations::exists (std::string const & variableName)

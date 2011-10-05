@@ -1,12 +1,12 @@
+#pragma once
 #ifndef FORTRAN_CUDA_HOST_SUBROUTINE_H
 #define FORTRAN_CUDA_HOST_SUBROUTINE_H
 
 #include <FortranHostSubroutine.h>
-#include <FortranCUDAKernelSubroutine.h>
-#include <FortranCUDADataSizesDeclaration.h>
-#include <FortranOpDatDimensionsDeclaration.h>
-#include <FortranParallelLoop.h>
-#include <FortranCUDAModuleDeclarations.h>
+
+class FortranCUDAOpDatCardinalitiesDeclaration;
+class FortranOpDatDimensionsDeclaration;
+class FortranCUDAModuleDeclarations;
 
 class FortranCUDAHostSubroutine: public FortranHostSubroutine
 {

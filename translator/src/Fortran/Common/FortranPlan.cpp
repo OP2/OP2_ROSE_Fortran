@@ -1,14 +1,15 @@
 #include <FortranPlan.h>
-#include <RoseStatementsAndExpressionsBuilder.h>
-#include <FortranStatementsAndExpressionsBuilder.h>
 #include <FortranTypesBuilder.h>
+#include <ParallelLoop.h>
+#include <FortranStatementsAndExpressionsBuilder.h>
+#include <RoseStatementsAndExpressionsBuilder.h>
 #include <CommonNamespaces.h>
 #include <Debug.h>
 #include <Subroutine.h>
 
 SgBasicBlock *
 FortranPlan::createConvertPlanFunctionParametersStatements (
-    FortranParallelLoop * parallelLoop, SgScopeStatement * subroutineScope,
+    ParallelLoop * parallelLoop, SgScopeStatement * subroutineScope,
     SubroutineVariableDeclarations * variableDeclarations)
 {
   using SageBuilder::buildBasicBlock;
@@ -372,7 +373,7 @@ FortranPlan::createConvertPlanFunctionParametersStatements (
 
 SgBasicBlock *
 FortranPlan::createConvertPositionInPMapsStatements (
-    FortranParallelLoop * parallelLoop, SgScopeStatement * subroutineScope,
+    ParallelLoop * parallelLoop, SgScopeStatement * subroutineScope,
     SubroutineVariableDeclarations * variableDeclarations)
 {
   using SageBuilder::buildBasicBlock;
@@ -517,7 +518,7 @@ FortranPlan::createConvertPositionInPMapsStatements (
 
 SgBasicBlock *
 FortranPlan::createPlanFunctionParametersPreparationStatements (
-    FortranParallelLoop * parallelLoop,
+    ParallelLoop * parallelLoop,
     SubroutineVariableDeclarations * variableDeclarations)
 {
   using SageBuilder::buildBasicBlock;

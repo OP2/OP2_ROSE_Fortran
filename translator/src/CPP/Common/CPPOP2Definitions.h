@@ -1,7 +1,4 @@
-/*
- * Written by Adam Betts and Carlo Bertolli
- */
-
+#pragma once
 #ifndef CPP_OP2_DEFINITIONS_H
 #define CPP_OP2_DEFINITIONS_H
 
@@ -244,6 +241,5 @@ class CPPOxfordOpArgGblCall
 
     static int const index_OpAccess = 1;
 };
-
 
 #endif

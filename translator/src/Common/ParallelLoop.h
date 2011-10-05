@@ -5,14 +5,17 @@
  * user-supplied code
  */
 
+#pragma once
 #ifndef PARALLEL_LOOP_H
 #define PARALLEL_LOOP_H
 
-#include <CommonNamespaces.h>
-#include <ProgramDeclarationsAndDefinitions.h>
-#include <OP2Definitions.h>
-#include <Reduction.h>
-#include <boost/lexical_cast.hpp>
+#include <string>
+#include <map>
+#include <vector>
+
+class SgFunctionCallExp;
+class SgType;
+class Reduction;
 
 enum MAPPING_VALUE
 {
@@ -323,14 +326,6 @@ class ParallelLoop
      */
     bool
     localThreadVariableDeclarationNeeded (unsigned int OP_DAT_ArgumentGroup);
-
-    /*
-     * ======================================================
-     * Returns the actual arguments passed to the OP_PAR_LOOP
-     * ======================================================
-     */
-    SgExpressionPtrList &
-    getActualArguments ();
 
     /*
      * ======================================================

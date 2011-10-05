@@ -2,6 +2,7 @@
  * Written by Adam Betts and Carlo Bertolli
  */
 
+#pragma once
 #ifndef FORTRAN_PARALLEL_LOOP_H
 #define FORTRAN_PARALLEL_LOOP_H
 
@@ -60,10 +61,7 @@ class FortranParallelLoop: public ParallelLoop
     virtual unsigned int
     getNumberOfOpDatArgumentGroups ();
 
-    FortranParallelLoop (SgFunctionCallExp * functionCallExpression) :
-      ParallelLoop (functionCallExpression)
-    {
-    }
+    FortranParallelLoop (SgFunctionCallExp * functionCallExpression);
 };
 
 #endif

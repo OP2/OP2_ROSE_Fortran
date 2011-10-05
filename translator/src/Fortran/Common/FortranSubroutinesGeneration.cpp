@@ -1,7 +1,11 @@
 #include <FortranSubroutinesGeneration.h>
-#include <boost/algorithm/string/predicate.hpp>
+#include <FortranParallelLoop.h>
+#include <FortranHostSubroutine.h>
 #include <FortranTypesBuilder.h>
+#include <FortranProgramDeclarationsAndDefinitions.h>
+#include <FortranReductionSubroutines.h>
 #include <RoseHelper.h>
+#include <boost/algorithm/string/predicate.hpp>
 
 namespace
 {
@@ -70,13 +74,14 @@ FortranSubroutinesGeneration::patchCallsToParallelLoops ()
 
   vector <string> processedFiles;
 
-  for (map <string, FortranParallelLoop *>::const_iterator it =
+  for (map <string, ParallelLoop *>::const_iterator it =
       declarations->firstParallelLoop (); it
       != declarations->lastParallelLoop (); ++it)
   {
     string const userSubroutineName = it->first;
 
-    FortranParallelLoop * parallelLoop = it->second;
+    FortranParallelLoop * parallelLoop =
+        static_cast <FortranParallelLoop *> (it->second);
 
     Debug::getInstance ()->debugMessage ("Parallel loop for "
         + userSubroutineName, Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
@@ -373,4 +378,13 @@ FortranSubroutinesGeneration::generate ()
   patchCallsToParallelLoops ();
 
   unparse ();
+}
+
+FortranSubroutinesGeneration::FortranSubroutinesGeneration (
+    FortranProgramDeclarationsAndDefinitions * declarations,
+    std::string const & fileSuffix) :
+  SubroutinesGeneration <FortranProgramDeclarationsAndDefinitions,
+      FortranHostSubroutine> (declarations, fileSuffix)
+{
+  reductionSubroutines = new FortranReductionSubroutines ();
 }

@@ -1,9 +1,9 @@
 #include <FortranOP2Definitions.h>
-#include <boost/lexical_cast.hpp>
 #include <Debug.h>
+#include <boost/lexical_cast.hpp>
+#include <rose.h>
 
-FortranOpDatDefinition::FortranOpDatDefinition (
-    SgExpressionPtrList & parameters)
+FortranOpDatDefinition::FortranOpDatDefinition (SgExprListExp * parameters)
 {
   using boost::lexical_cast;
   using std::string;
@@ -16,14 +16,15 @@ FortranOpDatDefinition::FortranOpDatDefinition (
 
   SgVarRefExp * opSetVariableReference;
 
-  if (isSgDotExp (parameters[index_OpSetName]) != NULL)
+  if (isSgDotExp (parameters->get_expressions ()[index_OpSetName]) != NULL)
   {
     opSetVariableReference = isSgVarRefExp (isSgDotExp (
-        parameters[index_OpSetName])->get_rhs_operand ());
+        parameters->get_expressions ()[index_OpSetName])->get_rhs_operand ());
   }
   else
   {
-    opSetVariableReference = isSgVarRefExp (parameters[index_OpSetName]);
+    opSetVariableReference = isSgVarRefExp (
+        parameters->get_expressions ()[index_OpSetName]);
   }
 
   opSetName = opSetVariableReference->get_symbol ()->get_name ().getString ();
@@ -34,7 +35,8 @@ FortranOpDatDefinition::FortranOpDatDefinition (
    * ======================================================
    */
 
-  dimension = isSgIntVal (parameters[index_dimension])->get_value ();
+  dimension
+      = isSgIntVal (parameters->get_expressions ()[index_dimension])->get_value ();
 
   /*
    * ======================================================
@@ -45,14 +47,15 @@ FortranOpDatDefinition::FortranOpDatDefinition (
 
   SgVarRefExp * actualDataVariableReference;
 
-  if (isSgDotExp (parameters[index_data]) != NULL)
+  if (isSgDotExp (parameters->get_expressions ()[index_data]) != NULL)
   {
     actualDataVariableReference = isSgVarRefExp (isSgDotExp (
-        parameters[index_data])->get_rhs_operand ());
+        parameters->get_expressions ()[index_data])->get_rhs_operand ());
   }
   else
   {
-    actualDataVariableReference = isSgVarRefExp (parameters[index_data]);
+    actualDataVariableReference = isSgVarRefExp (
+        parameters->get_expressions ()[index_data]);
   }
 
   primitiveType = actualDataVariableReference->get_type ();
@@ -65,14 +68,15 @@ FortranOpDatDefinition::FortranOpDatDefinition (
 
   SgVarRefExp * opDatVariableReference;
 
-  if (isSgDotExp (parameters[index_OpDatName]) != NULL)
+  if (isSgDotExp (parameters->get_expressions ()[index_OpDatName]) != NULL)
   {
     opDatVariableReference = isSgVarRefExp (isSgDotExp (
-        parameters[index_OpDatName])->get_rhs_operand ());
+        parameters->get_expressions ()[index_OpDatName])->get_rhs_operand ());
   }
   else
   {
-    opDatVariableReference = isSgVarRefExp (parameters[index_OpDatName]);
+    opDatVariableReference = isSgVarRefExp (
+        parameters->get_expressions ()[index_OpDatName]);
   }
 
   variableName
@@ -90,8 +94,7 @@ FortranOpDatDefinition::FortranOpDatDefinition (
       Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 }
 
-FortranOpSetDefinition::FortranOpSetDefinition (
-    SgExpressionPtrList & parameters)
+FortranOpSetDefinition::FortranOpSetDefinition (SgExprListExp * parameters)
 {
   /*
    * ======================================================
@@ -99,15 +102,18 @@ FortranOpSetDefinition::FortranOpSetDefinition (
    * ======================================================
    */
 
-  if (isSgPntrArrRefExp (parameters[index_setCardinalityName]) != NULL)
+  if (isSgPntrArrRefExp (
+      parameters->get_expressions ()[index_setCardinalityName]) != NULL)
   {
     dimensionName
-        = isSgPntrArrRefExp (parameters[index_setCardinalityName])->unparseToString ();
+        = isSgPntrArrRefExp (
+            parameters->get_expressions ()[index_setCardinalityName])->unparseToString ();
   }
   else
   {
     dimensionName
-        = isSgVarRefExp (parameters[index_setCardinalityName])->get_symbol ()->get_name ().getString ();
+        = isSgVarRefExp (
+            parameters->get_expressions ()[index_setCardinalityName])->get_symbol ()->get_name ().getString ();
   }
 
   /*
@@ -118,14 +124,15 @@ FortranOpSetDefinition::FortranOpSetDefinition (
 
   SgVarRefExp * opSetVariableReference;
 
-  if (isSgDotExp (parameters[index_OpSetName]) != NULL)
+  if (isSgDotExp (parameters->get_expressions ()[index_OpSetName]) != NULL)
   {
     opSetVariableReference = isSgVarRefExp (isSgDotExp (
-        parameters[index_OpSetName])->get_rhs_operand ());
+        parameters->get_expressions ()[index_OpSetName])->get_rhs_operand ());
   }
   else
   {
-    opSetVariableReference = isSgVarRefExp (parameters[index_OpSetName]);
+    opSetVariableReference = isSgVarRefExp (
+        parameters->get_expressions ()[index_OpSetName]);
   }
 
   variableName
@@ -139,8 +146,7 @@ FortranOpSetDefinition::FortranOpSetDefinition (
       + "'", Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 }
 
-FortranOpMapDefinition::FortranOpMapDefinition (
-    SgExpressionPtrList & parameters)
+FortranOpMapDefinition::FortranOpMapDefinition (SgExprListExp * parameters)
 {
   using boost::lexical_cast;
   using std::string;
@@ -153,15 +159,17 @@ FortranOpMapDefinition::FortranOpMapDefinition (
 
   SgVarRefExp * opSetSourceVariableReference;
 
-  if (isSgDotExp (parameters[index_sourceOpSetName]) != NULL)
+  if (isSgDotExp (parameters->get_expressions ()[index_sourceOpSetName])
+      != NULL)
   {
-    opSetSourceVariableReference = isSgVarRefExp (isSgDotExp (
-        parameters[index_sourceOpSetName])->get_rhs_operand ());
+    opSetSourceVariableReference
+        = isSgVarRefExp (
+            isSgDotExp (parameters->get_expressions ()[index_sourceOpSetName])->get_rhs_operand ());
   }
   else
   {
     opSetSourceVariableReference = isSgVarRefExp (
-        parameters[index_sourceOpSetName]);
+        parameters->get_expressions ()[index_sourceOpSetName]);
   }
 
   sourceOpSetName
@@ -175,15 +183,18 @@ FortranOpMapDefinition::FortranOpMapDefinition (
 
   SgVarRefExp * opSetDestinationVariableReference;
 
-  if (isSgDotExp (parameters[index_destinationOpSetName]) != NULL)
+  if (isSgDotExp (parameters->get_expressions ()[index_destinationOpSetName])
+      != NULL)
   {
-    opSetDestinationVariableReference = isSgVarRefExp (isSgDotExp (
-        parameters[index_destinationOpSetName])->get_rhs_operand ());
+    opSetDestinationVariableReference
+        = isSgVarRefExp (
+            isSgDotExp (
+                parameters->get_expressions ()[index_destinationOpSetName])->get_rhs_operand ());
   }
   else
   {
     opSetDestinationVariableReference = isSgVarRefExp (
-        parameters[index_destinationOpSetName]);
+        parameters->get_expressions ()[index_destinationOpSetName]);
   }
 
   destinationOpSetName
@@ -195,7 +206,8 @@ FortranOpMapDefinition::FortranOpMapDefinition (
    * ======================================================
    */
 
-  dimension = isSgIntVal (parameters[index_dimension])->get_value ();
+  dimension
+      = isSgIntVal (parameters->get_expressions ()[index_dimension])->get_value ();
 
   /*
    * ======================================================
@@ -205,15 +217,18 @@ FortranOpMapDefinition::FortranOpMapDefinition (
 
   SgVarRefExp * mappingCardinalityVariableReference;
 
-  if (isSgDotExp (parameters[index_mappingCardinalityName]) != NULL)
+  if (isSgDotExp (parameters->get_expressions ()[index_mappingCardinalityName])
+      != NULL)
   {
-    mappingCardinalityVariableReference = isSgVarRefExp (isSgDotExp (
-        parameters[index_mappingCardinalityName])->get_rhs_operand ());
+    mappingCardinalityVariableReference
+        = isSgVarRefExp (
+            isSgDotExp (
+                parameters->get_expressions ()[index_mappingCardinalityName])->get_rhs_operand ());
   }
   else
   {
     mappingCardinalityVariableReference = isSgVarRefExp (
-        parameters[index_mappingCardinalityName]);
+        parameters->get_expressions ()[index_mappingCardinalityName]);
   }
 
   mappingCardinalityName
@@ -227,14 +242,15 @@ FortranOpMapDefinition::FortranOpMapDefinition (
 
   SgVarRefExp * mappingVariableReference;
 
-  if (isSgDotExp (parameters[index_mappingName]) != NULL)
+  if (isSgDotExp (parameters->get_expressions ()[index_mappingName]) != NULL)
   {
     mappingVariableReference = isSgVarRefExp (isSgDotExp (
-        parameters[index_mappingName])->get_rhs_operand ());
+        parameters->get_expressions ()[index_mappingName])->get_rhs_operand ());
   }
   else
   {
-    mappingVariableReference = isSgVarRefExp (parameters[index_mappingName]);
+    mappingVariableReference = isSgVarRefExp (
+        parameters->get_expressions ()[index_mappingName]);
   }
 
   mappingName
@@ -247,7 +263,7 @@ FortranOpMapDefinition::FortranOpMapDefinition (
    */
 
   variableName
-      = isSgVarRefExp (parameters[index_OpMapName])->get_symbol ()->get_name ().getString ();
+      = isSgVarRefExp (parameters->get_expressions ()[index_OpMapName])->get_symbol ()->get_name ().getString ();
 
   ROSE_ASSERT (sourceOpSetName.empty () == false);
   ROSE_ASSERT (destinationOpSetName.empty () == false);
@@ -264,18 +280,19 @@ FortranOpMapDefinition::FortranOpMapDefinition (
       + " mappings per element", Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 }
 
-FortranOpGblDefinition::FortranOpGblDefinition (
-    SgExpressionPtrList & parameters)
+FortranOpGblDefinition::FortranOpGblDefinition (SgExprListExp * parameters)
 {
   using boost::lexical_cast;
   using std::string;
 
-  primitiveType = isSgVarRefExp (parameters[index_data])->get_type ();
+  primitiveType
+      = isSgVarRefExp (parameters->get_expressions ()[index_data])->get_type ();
 
-  dimension = isSgIntVal (parameters[index_dimension])->get_value ();
+  dimension
+      = isSgIntVal (parameters->get_expressions ()[index_dimension])->get_value ();
 
   variableName
-      = isSgVarRefExp (parameters[index_OpDatName])->get_symbol ()->get_name ().getString ();
+      = isSgVarRefExp (parameters->get_expressions ()[index_OpDatName])->get_symbol ()->get_name ().getString ();
 
   ROSE_ASSERT (dimension > 0);
   ROSE_ASSERT (primitiveType != NULL);
@@ -288,15 +305,16 @@ FortranOpGblDefinition::FortranOpGblDefinition (
 }
 
 FortranOpGblScalarDefinition::FortranOpGblScalarDefinition (
-    SgExpressionPtrList & parameters)
+    SgExprListExp * parameters)
 {
   using boost::lexical_cast;
   using std::string;
 
-  primitiveType = isSgVarRefExp (parameters[index_data])->get_type ();
+  primitiveType
+      = isSgVarRefExp (parameters->get_expressions ()[index_data])->get_type ();
 
   variableName
-      = isSgVarRefExp (parameters[index_OpDatName])->get_symbol ()->get_name ().getString ();
+      = isSgVarRefExp (parameters->get_expressions ()[index_OpDatName])->get_symbol ()->get_name ().getString ();
 
   ROSE_ASSERT (primitiveType != NULL);
   ROSE_ASSERT (variableName.empty () == false);
@@ -306,16 +324,16 @@ FortranOpGblScalarDefinition::FortranOpGblScalarDefinition (
       Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 }
 
-FortranOpConstDefinition::FortranOpConstDefinition (
-    SgExpressionPtrList & parameters)
+FortranOpConstDefinition::FortranOpConstDefinition (SgExprListExp * parameters)
 {
   using boost::lexical_cast;
   using std::string;
 
-  dimension = isSgIntVal (parameters[index_dimension])->get_value ();
+  dimension
+      = isSgIntVal (parameters->get_expressions ()[index_dimension])->get_value ();
 
   variableName
-      = isSgVarRefExp (parameters[index_OpConstName])->get_symbol ()->get_name ().getString ();
+      = isSgVarRefExp (parameters->get_expressions ()[index_OpConstName])->get_symbol ()->get_name ().getString ();
 
   ROSE_ASSERT (dimension > 0);
   ROSE_ASSERT (variableName.empty () == false);

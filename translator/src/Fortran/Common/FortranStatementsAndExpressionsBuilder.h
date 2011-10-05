@@ -5,11 +5,22 @@
  * and expressions
  */
 
+#pragma once
 #ifndef FORTRAN_STATEMENTS_AND_EXPRESSIONS_BUILDER_H
 #define FORTRAN_STATEMENTS_AND_EXPRESSIONS_BUILDER_H
 
-#include <rose.h>
 #include <stdarg.h>
+#include <string>
+
+class SgVariableDeclaration;
+class SgFortranDo;
+class SgExpression;
+class SgBasicBlock;
+class SgScopeStatement;
+class SgExprListExp;
+class SgImplicitStatement;
+class SgFunctionParameterList;
+class SgType;
 
 class FortranStatementsAndExpressionsBuilder
 {

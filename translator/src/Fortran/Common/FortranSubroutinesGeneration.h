@@ -1,14 +1,18 @@
+
+#pragma once
 #ifndef FORTRAN_SUBROUTINES_GENERATION_H
 #define FORTRAN_SUBROUTINES_GENERATION_H
 
-#include <rose.h>
 #include <SubroutinesGeneration.h>
-#include <FortranProgramDeclarationsAndDefinitions.h>
-#include <FortranParallelLoop.h>
-#include <FortranHostSubroutine.h>
-#include <FortranOpDatDimensionsDeclaration.h>
-#include <FortranModuleDeclarations.h>
-#include <FortranReductionSubroutines.h>
+
+class SgSourceFile;
+class SgModuleStatement;
+class FortranReductionSubroutines;
+class FortranOpDatDimensionsDeclaration;
+class FortranModuleDeclarations;
+class FortranHostSubroutine;
+class FortranParallelLoop;
+class FortranProgramDeclarationsAndDefinitions;
 
 namespace Libraries
 {
@@ -113,12 +117,7 @@ class FortranSubroutinesGeneration: public SubroutinesGeneration <
 
     FortranSubroutinesGeneration (
         FortranProgramDeclarationsAndDefinitions * declarations,
-        std::string const & fileSuffix) :
-      SubroutinesGeneration <FortranProgramDeclarationsAndDefinitions,
-          FortranHostSubroutine> (declarations, fileSuffix)
-    {
-      reductionSubroutines = new FortranReductionSubroutines ();
-    }
+        std::string const & fileSuffix);
 };
 
 #endif

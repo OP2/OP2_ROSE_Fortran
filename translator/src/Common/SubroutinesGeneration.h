@@ -11,10 +11,14 @@
  * language
  */
 
+#pragma once
 #ifndef SUBROUTINES_GENERATION_H
 #define SUBROUTINES_GENERATION_H
 
+#include <vector>
+#include <map>
 #include <Debug.h>
+#include <rose.h>
 
 template <typename TDeclarations, typename THostSubroutine>
   class SubroutinesGeneration

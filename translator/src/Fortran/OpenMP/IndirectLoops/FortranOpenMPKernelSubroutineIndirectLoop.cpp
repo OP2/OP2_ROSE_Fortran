@@ -1,4 +1,5 @@
 #include <FortranOpenMPKernelSubroutineIndirectLoop.h>
+#include <FortranParallelLoop.h>
 #include <FortranStatementsAndExpressionsBuilder.h>
 #include <FortranTypesBuilder.h>
 #include <CommonNamespaces.h>

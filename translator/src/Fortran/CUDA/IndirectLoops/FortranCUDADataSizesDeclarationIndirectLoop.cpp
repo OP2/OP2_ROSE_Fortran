@@ -1,8 +1,10 @@
 #include <FortranCUDADataSizesDeclarationIndirectLoop.h>
+#include <FortranParallelLoop.h>
 #include <FortranStatementsAndExpressionsBuilder.h>
 #include <FortranTypesBuilder.h>
+#include <SubroutineVariableDeclarations.h>
 #include <CommonNamespaces.h>
-#include <Plan.h>
+#include <rose.h>
 
 /*
  * ======================================================

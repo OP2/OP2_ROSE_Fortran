@@ -1,8 +1,5 @@
 #include <CPPHostSubroutine.h>
 #include <CPPOpenCLReductionSubroutine.h>
-#include <CPPStatementsAndExpressionsBuilder.h>
-
-using namespace SageBuilder;
 
 void
 CPPHostSubroutine::createFormalParameterDeclarations ()
@@ -21,192 +18,97 @@ CPPHostSubroutine::createFormalParameterDeclarations ()
 
   /*
    * ======================================================
-   * Keep track of the OP_DAT group number
+   * Add name of user kernel
    * ======================================================
    */
 
-  int OP_DAT_ArgumentGroup = 0;
+  string const & kernelVariableName =
+      OP2::VariableNames::getUserSubroutineName ();
 
-  for (vector <SgExpression *>::const_iterator it =
-      parallelLoop->getActualArguments ().begin (); it
-      != parallelLoop->getActualArguments ().end (); ++it)
+  variableDeclarations->add (
+      kernelVariableName,
+      RoseStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
+          kernelVariableName, buildPointerType (buildCharType ()),
+          subroutineScope, formalParameters));
+
+  /*
+   * ======================================================
+   * Add OP_SET
+   * ======================================================
+   */
+
+  string const & opSetVariableName = OP2::VariableNames::getOpSetName ();
+
+  variableDeclarations->add (
+      opSetVariableName,
+      RoseStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
+          opSetVariableName, FortranTypesBuilder::buildClassDeclaration (
+              OP2::OP_SET, subroutineScope)->get_type (), subroutineScope,
+          formalParameters, 1, INTENT_IN));
+
+  /*
+   * ======================================================
+   * Add OP_DAT, indirection, OP_MAP, access arguments for
+   * each OP_DAT argument group
+   * ======================================================
+   */
+
+  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
-    Debug::getInstance ()->debugMessage ("Argument type: "
-        + (*it)->class_name (), Debug::INNER_LOOP_LEVEL, __FILE__, __LINE__);
+    string const & opDatvariableName = OP2::VariableNames::getOpDatName (i);
 
-    switch ((*it)->variantT ())
-    {
-      case V_SgFunctionRefExp:
-      {
-        /*
-         * ======================================================
-         * Found the user subroutine argument
-         * ======================================================
-         */
+    variableDeclarations->add (
+        opDatvariableName,
+        RoseStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
+            opDatvariableName, FortranTypesBuilder::buildClassDeclaration (
+                OP2::OP_DAT, subroutineScope)->get_type (), subroutineScope,
+            formalParameters));
 
-        string const & variableName =
-            OP2::VariableNames::getUserSubroutineName ();
+    string const & indirectionVariableName =
+        OP2::VariableNames::getOpIndirectionName (i);
 
-        Debug::getInstance ()->debugMessage ("User subroutine '"
-            + userSubroutineName + "'", Debug::OUTER_LOOP_LEVEL, __FILE__,
-            __LINE__);
+    variableDeclarations->add (
+        indirectionVariableName,
+        RoseStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
+            indirectionVariableName,
+            FortranTypesBuilder::getFourByteInteger (), subroutineScope,
+            formalParameters));
 
-        SgVariableDeclaration
-            * variableDeclaration =
-                CPPStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
-                    variableName, buildPointerType (buildCharType ()),
-                    subroutineScope, formalParameters);
+    string const & opMapVariableName = OP2::VariableNames::getOpMapName (i);
 
-        variableDeclarations->add (variableName, variableDeclaration);
+    variableDeclarations->add (
+        opMapVariableName,
+        RoseStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
+            opMapVariableName, FortranTypesBuilder::buildClassDeclaration (
+                OP2::OP_MAP, subroutineScope)->get_type (), subroutineScope,
+            formalParameters));
 
-        break;
-      }
+    string const & accessVariableName = OP2::VariableNames::getOpAccessName (i);
 
-      case V_SgVarRefExp:
-      {
-        SgVarRefExp * variableReference = isSgVarRefExp (*it);
-
-        switch (variableReference->get_type ()->variantT ())
-        {
-
-          case V_SgClassType:
-          {
-            SgClassType* classReference = isSgClassType (
-                variableReference->get_type ());
-
-            string const className = classReference->get_name ().getString ();
-
-            if (iequals (className, OP2::OP_SET))
-            {
-              /*
-               * ======================================================
-               * Found an OP_SET argument
-               * ======================================================
-               */
-              string const & variableName = OP2::VariableNames::getOpSetName ();
-
-              SgVariableDeclaration
-                  * variableDeclaration =
-                      CPPStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
-                          variableName, classReference, subroutineScope,
-                          formalParameters);
-
-              variableDeclarations->add (variableName, variableDeclaration);
-            }
-
-            else if (iequals (className, OP2::OP_MAP))
-            {
-              /*
-               * ======================================================
-               * Found an OP_MAP argument
-               * ======================================================
-               */
-
-              string const & variableName = OP2::VariableNames::getOpMapName (
-                  OP_DAT_ArgumentGroup);
-
-              SgVariableDeclaration
-                  * variableDeclaration =
-                      CPPStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
-                          variableName, classReference, subroutineScope,
-                          formalParameters);
-
-              variableDeclarations->add (variableName, variableDeclaration);
-            }
-
-            else if (iequals (className, OP2::OP_DAT))
-            {
-              /*
-               * ======================================================
-               * Found an OP_DAT argument
-               * ======================================================
-               */
-
-              OP_DAT_ArgumentGroup++;
-
-              string const & variableName = OP2::VariableNames::getOpDatName (
-                  OP_DAT_ArgumentGroup);
-
-              SgVariableDeclaration
-                  * variableDeclaration =
-                      CPPStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
-                          variableName, classReference, subroutineScope,
-                          formalParameters);
-
-              variableDeclarations->add (variableName, variableDeclaration);
-            }
-
-            else
-            {
-              Debug::getInstance ()->errorMessage ("Unrecognised class: "
-                  + className, __FILE__, __LINE__);
-            }
-
-            break;
-          }
-
-          case V_SgTypeInt:
-          {
-            /*
-             * ======================================================
-             * Found an OP_ACCESS argument
-             * ======================================================
-             */
-
-            Debug::getInstance ()->debugMessage ("Access descriptor found",
-                Debug::INNER_LOOP_LEVEL, __FILE__, __LINE__);
-
-            string const & variableName = OP2::VariableNames::getOpAccessName (
-                OP_DAT_ArgumentGroup);
-
-            SgVariableDeclaration
-                * variableDeclaration =
-                    CPPStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
-                        variableName, buildIntType (), subroutineScope,
-                        formalParameters);
-
-            variableDeclarations->add (variableName, variableDeclaration);
-
-            break;
-          }
-
-          default:
-          {
-            break;
-          }
-        }
-
-        break;
-      }
-
-      case V_SgMinusOp:
-      case V_SgIntVal:
-      {
-        /*
-         * ======================================================
-         * Found an indirection argument
-         * ======================================================
-         */
-
-        string const & variableName = OP2::VariableNames::getOpIndirectionName (
-            OP_DAT_ArgumentGroup);
-
-        SgVariableDeclaration
-            * variableDeclaration =
-                CPPStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
-                    variableName, buildIntType (), subroutineScope,
-                    formalParameters);
-
-        variableDeclarations->add (variableName, variableDeclaration);
-
-        break;
-      }
-
-      default:
-      {
-        break;
-      }
-    }
+    variableDeclarations->add (
+        accessVariableName,
+        RoseStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
+            accessVariableName, FortranTypesBuilder::getFourByteInteger (),
+            subroutineScope, formalParameters));
   }
+}
 
+CPPHostSubroutine::CPPHostSubroutine (std::string const & subroutineName,
+    std::string const & userSubroutineName,
+    std::string const & kernelSubroutineName, CPPParallelLoop * parallelLoop,
+    SgScopeStatement * moduleScope) :
+  HostSubroutine <SgFunctionDeclaration> (subroutineName, userSubroutineName,
+      kernelSubroutineName, parallelLoop)
+{
+  using SageBuilder::buildVoidType;
+  using SageBuilder::buildDefiningFunctionDeclaration;
+  using SageInterface::appendStatement;
+
+  subroutineHeaderStatement = buildDefiningFunctionDeclaration (
+      this->subroutineName.c_str (), buildVoidType (), formalParameters,
+      moduleScope);
+
+  subroutineScope = subroutineHeaderStatement->get_definition ()->get_body ();
+
+  appendStatement (subroutineHeaderStatement, moduleScope);
 }

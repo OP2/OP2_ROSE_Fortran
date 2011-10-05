@@ -1,9 +1,11 @@
 #include <FortranOpenMPModuleDeclarationsIndirectLoop.h>
+#include <FortranParallelLoop.h>
 #include <FortranTypesBuilder.h>
 #include <FortranStatementsAndExpressionsBuilder.h>
+#include <SubroutineVariableDeclarations.h>
 #include <Debug.h>
 #include <CommonNamespaces.h>
-#include <Plan.h>
+#include <rose.h>
 
 /*
  * ======================================================

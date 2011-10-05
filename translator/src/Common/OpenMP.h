@@ -5,6 +5,7 @@
  * defined in the OpenMP run-time library
  */
 
+#pragma once
 #ifndef OPEN_MP_H
 #define OPEN_MP_H
 

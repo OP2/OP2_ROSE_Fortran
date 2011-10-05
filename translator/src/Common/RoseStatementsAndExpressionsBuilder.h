@@ -5,10 +5,19 @@
  * and expressions
  */
 
+#pragma once
 #ifndef ROSE_STATEMENTS_AND_EXPRESSIONS_BUILDER_H
 #define ROSE_STATEMENTS_AND_EXPRESSIONS_BUILDER_H
 
-#include <rose.h>
+#include <string>
+
+class SgExpression;
+class SgScopeStatement;
+class SgVariableDeclaration;
+class SgType;
+class SgFunctionParameterList;
+class SgIfStmt;
+class SgDerivedTypeStatement;
 
 class RoseStatementsAndExpressionsBuilder
 {

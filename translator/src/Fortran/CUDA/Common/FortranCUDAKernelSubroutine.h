@@ -1,11 +1,14 @@
+
+#pragma once
 #ifndef FORTRAN_CUDA_KERNEL_SUBROUTINE_H
 #define FORTRAN_CUDA_KERNEL_SUBROUTINE_H
 
 #include <FortranKernelSubroutine.h>
-#include <FortranParallelLoop.h>
-#include <FortranCUDADataSizesDeclaration.h>
-#include <FortranOpDatDimensionsDeclaration.h>
-#include <FortranCUDAModuleDeclarations.h>
+
+class FortranCUDAOpDatCardinalitiesDeclaration;
+class FortranCUDAModuleDeclarations;
+class FortranOpDatDimensionsDeclaration;
+class FortranReductionSubroutines;
 
 class FortranCUDAKernelSubroutine: public FortranKernelSubroutine
 {

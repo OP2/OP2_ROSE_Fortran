@@ -17,15 +17,15 @@ MODULE GENERATED_MODULE
   TYPE ( real8Array_integer4Array_opDatDimensions ) , DEVICE :: dimensions_real8Array_integer4Array
   CONTAINS
 
-  attributes(device) SUBROUTINE s3750292099(x,y)
+  attributes (device) SUBROUTINE s3750292099(x,y)
     IMPLICIT NONE
     REAL(kind=8), DEVICE :: x(*)
     INTEGER(kind=4), DEVICE :: y(*)
     x(1) = x(1) + y(1) + y(2)
   END SUBROUTINE
 
-  attributes(global) SUBROUTINE s2339751590(dimensions_s3750292099,sizes_s3750292099,opDat1,opDat2,setSize,warpSize,sha&
-  &redMemoryOffset)
+  attributes (global) SUBROUTINE s2339751590(dimensions_s3750292099,sizes_s3750292099,opDat1,opDat2,setSize,warpSize,sh&
+  &aredMemoryOffset)
     IMPLICIT NONE
     TYPE ( real8Array_integer4Array_opDatDimensions ) , DEVICE :: dimensions_s3750292099
     TYPE ( real8Array_integer4Array_opDatCardinalities ) , DEVICE :: sizes_s3750292099
@@ -53,8 +53,8 @@ MODULE GENERATED_MODULE
 
   END SUBROUTINE
 
-  attributes(host) SUBROUTINE s2168928953(userSubroutine,set,opDat1,opIndirection1,opMap1,opAccess1,opDat2,opIndirectio&
-  &n2,opMap2,opAccess2)
+  attributes (host) SUBROUTINE s2168928953(userSubroutine,set,opDat1,opIndirection1,opMap1,opAccess1,opDat2,opIndirecti&
+  &on2,opMap2,opAccess2)
     IMPLICIT NONE
     CHARACTER, INTENT(IN) :: userSubroutine*(24)
     TYPE ( op_set ) , INTENT(IN) :: set
