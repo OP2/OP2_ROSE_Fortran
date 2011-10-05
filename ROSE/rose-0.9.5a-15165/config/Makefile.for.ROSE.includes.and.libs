@@ -1,0 +1,395 @@
+# These definitions are for the benefit of independent software contained			-*- makefile -*-
+# in ROSE.  (Currently, this means SAGE and ROSETTA.)
+# It defines ROSE_INCLUDES and ROSE_LIBS so they can use the ROSE codes.
+
+# ROSE_INCLUDES contains the include flags for compiling with ROSE code.
+# (ROSE software should set the include paths in their respective Makefile.am
+# files, since they are expected to know the ROSE source tree structure.)
+# To use ROSE_INCLUDES, the independent software packages contained in ROSE
+# should define the variable ROSE_HOME to be the relative path to the root
+# of the ROSE directory tree.
+
+# This fixes some problem caused by automake or autoconf
+# (detailed documentation is in the ChangeLog)
+# MAKE=gmake
+
+# DQ (8/10/2007): Valentin suggested this be commented out.
+# DQ (4/23/2006): This is the default when build using automake version 1.6.3 but it
+# causes errors so we would like to specify --run automake instead
+# AUTOMAKE = ${SHELL} $(top_srcdir)/config/missing --run automake-1.6
+# AUTOMAKE = ${SHELL} $(top_srcdir)/config/missing --run automake
+
+# force ranlib to just call touch so that *.so (dynamic libraries) will not
+# be run with ranlib (which is a error).  This allows us to use dynamic 
+# libraries as the default within ROSE.
+# JJW 7/25/2008: Do we really need this?
+## RANLIB = touch
+
+# JJW (2/25/2008): set a flag (only used when running ROSE applications) to
+# have them run using the build tree rather than the install tree -- this is
+# important for "make check" in an uninstalled copy of ROSE.
+if USE_ROSE_IN_BUILD_TREE_VAR
+export ROSE_IN_BUILD_TREE=$(top_builddir)
+endif
+
+# DQ (12/22/2008): Specification of Boost path for use with "-isystem" option (may be GNU
+# specific).  We use this option only if the configuration of ROSE has detected a
+# previously installed version of Boost (which we do not want to use). 
+# Note that only one of these will be non-empty makefile variables.
+ROSE_BOOST_PREINCLUDE_PATH        = @ROSE_BOOST_PREINCLUDE_PATH@
+ROSE_BOOST_NORMAL_INCLUDE_PATH    = @ROSE_BOOST_NORMAL_INCLUDE_PATH@
+
+# SQLite is a simpler database to use than MySQL
+if ROSE_USE_SQLITE_DATABASE
+   ROSE_SQLITE_DATABASE_INCLUDE  = $(SQLITE3_CFLAGS)
+   SQLITE_DATABASE_INCLUDE       = $(SQLITE3_CFLAGS) -I$(top_srcdir)/src/roseExtensions/sqlite3x
+   SQLITE_DATABASE_LIBS          = $(SQLITE3_LDFLAGS)
+#   ROSE_SQLITE_DATABASE_OBJS     = $(top_builddir)/src/roseExtensions/sqlite3x/*o
+   ROSE_SQLITE_DATABASE_LIB_NAME = RoseSQLite3xDatabase
+   ROSE_SQLITE_DATABASE_LIB_FILE = lib$(ROSE_SQLITE_DATABASE_LIB_NAME).la
+   ROSE_SQLITE_DATABASE_LIBS     = -l$(ROSE_SQLITE_DATABASE_LIB_NAME)
+
+   ROSE_SIDEEFFECT_INCLUDE						 = -I$(top_srcdir)/src/midend/programAnalysis/sideEffectAnalysis
+endif
+
+# This is properly handled by automake even when specified in an include file
+EDG_LIBS = @EDG_LIBS@
+
+RT_LIBS = @RT_LIBS@
+
+VALGRIND_BINARY = @VALGRIND_BINARY@
+
+# Conditional support for Gabriel's QRose GUI Library 
+if ROSE_USE_QT
+#  ROSE_GUI_INCLUDE =   -I${QROSE_PREFIX}/include
+  ROSE_GUI_INCLUDE =  -I$(top_srcdir)/src/3rdPartyLibraries/qrose/Framework -I$(top_srcdir)/src/3rdPartyLibraries/qrose/Widgets -I$(top_srcdir)/src/3rdPartyLibraries/qrose/Components/Common -I$(top_srcdir)/src/3rdPartyLibraries/qrose/Components/QueryBox -I$(top_srcdir)/src/3rdPartyLibraries/qrose/Components/TreeBox -I$(top_srcdir)/src/3rdPartyLibraries/qrose/Components/QueryBox -I$(top_srcdir)/src/3rdPartyLibraries/qrose/Components/SourceBox
+ 
+# ROSE_GUI_LIBS = -lqrose
+#  ROSE_GUI_LIBS_WITH_PATH = -L${QROSE_PREFIX}/lib -lqrose
+#  ROSE_GUI_LIBS_WITH_PATH =  -L${top_builddir}/src/3rdPartyLibraries/qrose/QRoseLib/  -lqrose
+   ROSE_GUI_LIBS_WITH_PATH = ${top_builddir}/src/3rdPartyLibraries/qrose/QRoseLib/libqrose.la
+
+# ROSE_GUI_LIB_FILE = libqrose.a
+endif
+
+if ROSE_USE_QT
+  ROSE_QT_INCLUDE = $(QT_INCLUDES)
+# ROSE_QT_LIBS = -lqt
+  ROSE_QT_LIBS_WITH_PATH = ${QT_LDFLAGS}
+# ROSE_QT_LIB_FILE = libqt.a
+endif
+
+# ROSE-HPCToolkit module
+if ROSE_BUILD_ROSEHPCT
+  ROSE_ROSEHPCT_INCLUDES = -I$(top_srcdir)/src/roseExtensions/roseHPCToolkit/include
+  ROSE_ROSEHPCT_LIBS = -lrosehpct
+  ROSE_ROSEHPCT_LIBS_WITH_PATH = $(top_builddir)/src/roseExtensions/roseHPCToolkit/src/librosehpct.la
+# ROSE_ROSEHPCT_LIB_FILE = librosehpct.so
+endif
+
+# ROSE-YICES Package (destributed by SRI as a static library)
+if HAVE_LIBYICES
+  ROSE_YICES_INCLUDES = -I@YICES_PREFIX@/include
+  ROSE_YICES_LIBS = -lyices
+  ROSE_YICES_LIBS_WITH_PATH = @YICES_PREFIX@/lib/libyices.a
+endif
+
+GLUT_LIBS = ${glut_path}
+
+# ROSE-DWARF libdwarf support
+if ROSE_USE_DWARF
+  ROSE_DWARF_INCLUDES = -I$(dwarf_path)
+
+# DQ (3/13/2009): These do not appear to be used anywhere.
+# ROSE_DWARF_LIBS = -ldwarf
+# ROSE_DWARF_LIB_FILE = libdwarf.a
+
+if ROSE_USE_INTEL_PIN
+# DQ (3/13/2009):
+# If Dwarf is used with Intel Pin then reference the same copy of libdwarf.a (in the same
+# directory).  However, it does NOT work to link both references to libdwarf into more
+# than one dynamic (shared) library, so we need to link libdwarf dynamically.
+# To avoid additional LD_LIBRARY_PATH requirements, we do so using rpath.
+# To support this the libdwarf.so should be placed into $(INTEL_PIN_PATH)/intel64/lib-ext
+# and the static libdwarf.a moved out (renamed) so that it will not be used.
+# Note that this will also cause librose.so to use the shared library for 
+# dwarf when used with Intel Pin.
+# ROSE_DWARF_LIBS_WITH_PATH = $(INTEL_PIN_PATH)/intel64/lib-ext/libdwarf.a -lelf
+# ROSE_DWARF_LIBS_WITH_PATH = -Wl,--rpath $(INTEL_PIN_PATH)/intel64/lib-ext -L$(INTEL_PIN_PATH)/intel64/lib-ext -ldwarf -lelf
+  ROSE_DWARF_LIBS_WITH_PATH = -L$(INTEL_PIN_PATH)/intel64/lib-ext -ldwarf -lelf
+# DQ (3/14/2009): This factors the lib paths.
+  INTEL_PIN_WITH_DWARF_LIBS_PATH = $(INTEL_PIN_LIB_PATHS) -lpin -lxed -ldl $(ROSE_DWARF_LIBS_WITH_PATH)
+else
+# DQ (3/15/2009): Use the usual static linking when not using Intel Pin (what we used to do).
+# DQ (3/13/2009): Fixup libdwarf support in ROSE to always use the dynamic (shared) library.
+# ROSE_DWARF_LIBS_WITH_PATH = -Wl,--rpath $(dwarf_path) -L$(dwarf_path) -ldwarf -lelf
+# DQ (6/5/2010): Fixed to use the value set in the configure step (requires the dynamic library).
+# ROSE_DWARF_LIBS_WITH_PATH = $(dwarf_path)/libdwarf.a -lelf
+  ROSE_DWARF_LIBS_WITH_PATH = @DWARF_LINK@
+endif
+endif
+
+# ROSE-WINE Package (Wine is a package to permit execution of Windows binaries under Linux)
+if ROSE_USE_WINDOWS_ANALYSIS_SUPPORT
+  ROSE_WINE_INCLUDES = -I$(wine_path)/include
+endif
+
+if ROSE_USE_PHP
+  ROSE_PHP_INCLUDES = -I$(php_path)/include/phc -I$(php_path)/include/php
+  ROSE_PHP_LIBS = -lphp5 -lphc -lltdl
+  ROSE_PHP_LIBS_WITH_PATH = $(php_path)/lib/libphc.so $(php_path)/lib/libphp5.so $(LIBLTDL)
+endif
+
+# ASR (06/09/2010): adding llvm support variables
+if ROSE_USE_LLVM
+  ROSE_LLVM_INCLUDES = -I$(llvm_path)/include
+  ROSE_LLVM_LIBS = -L$(llvm_path)/lib -lLLVMXCoreCodeGen -lLLVMXCoreAsmPrinter -lLLVMXCoreInfo -lLLVMSystemZCodeGen -lLLVMSystemZAsmPrinter -lLLVMSystemZInfo -lLLVMSparcCodeGen -lLLVMSparcAsmPrinter -lLLVMSparcInfo -lLLVMPowerPCCodeGen -lLLVMPowerPCAsmPrinter -lLLVMPowerPCInfo -lLLVMpic16passes -lLLVMPIC16AsmPrinter -lLLVMPIC16CodeGen -lLLVMPIC16Info -lLLVMMSP430CodeGen -lLLVMMSP430AsmPrinter -lLLVMMSP430Info -lLLVMMSIL -lLLVMMSILInfo -lLLVMMipsAsmPrinter -lLLVMMipsCodeGen -lLLVMMipsInfo -lLLVMMBlazeAsmPrinter -lLLVMMBlazeCodeGen -lLLVMMBlazeInfo -lLLVMLinker -lLLVMipo -lLLVMInterpreter -lLLVMInstrumentation -lLLVMJIT -lLLVMExecutionEngine -lLLVMCppBackend -lLLVMCppBackendInfo -lLLVMCellSPUCodeGen -lLLVMCellSPUAsmPrinter -lLLVMCellSPUInfo -lLLVMCBackend -lLLVMCBackendInfo -lLLVMBlackfinCodeGen -lLLVMBlackfinAsmPrinter -lLLVMBlackfinInfo -lLLVMBitWriter -lLLVMX86Disassembler -lLLVMX86AsmParser -lLLVMX86AsmPrinter -lLLVMX86CodeGen -lLLVMX86Info -lLLVMAsmParser -lLLVMARMAsmParser -lLLVMMCParser -lLLVMARMAsmPrinter -lLLVMARMCodeGen -lLLVMARMInfo -lLLVMArchive -lLLVMBitReader -lLLVMAlphaCodeGen -lLLVMSelectionDAG -lLLVMAlphaAsmPrinter -lLLVMAsmPrinter -lLLVMCodeGen -lLLVMScalarOpts -lLLVMInstCombine -lLLVMTransformUtils -lLLVMipa -lLLVMAnalysis -lLLVMTarget -lLLVMMC -lLLVMCore -lLLVMAlphaInfo -lLLVMSupport -lLLVMSystem
+
+# adding all libraries for now
+#ROSE_LLVM_LIB_WITH_PATH = $(llvm_path)/lib/libLLVMXCoreCodeGen.a $(llvm_path)/lib/libLLVMXCoreAsmPrinter.a $(llvm_path)/lib/libLLVMXCoreInfo.a $(llvm_path)/lib/libLLVMSystemZCodeGen.a $(llvm_path)/lib/libLLVMSystemZAsmPrinter.a $(llvm_path)/lib/libLLVMSystemZInfo.a $(llvm_path)/lib/libLLVMSparcCodeGen.a $(llvm_path)/lib/libLLVMSparcAsmPrinter.a $(llvm_path)/lib/libLLVMSparcInfo.a $(llvm_path)/lib/libLLVMPowerPCCodeGen.a $(llvm_path)/lib/libLLVMPowerPCAsmPrinter.a $(llvm_path)/lib/libLLVMPowerPCInfo.a $(llvm_path)/lib/libLLVMpic16passes.a $(llvm_path)/lib/libLLVMPIC16AsmPrinter.a $(llvm_path)/lib/libLLVMPIC16CodeGen.a $(llvm_path)/lib/libLLVMPIC16Info.a $(llvm_path)/lib/libLLVMMSP430CodeGen.a $(llvm_path)/lib/libLLVMMSP430AsmPrinter.a $(llvm_path)/lib/libLLVMMSP430Info.a $(llvm_path)/lib/libLLVMMSIL.a $(llvm_path)/lib/libLLVMMSILInfo.a $(llvm_path)/lib/libLLVMMipsAsmPrinter.a $(llvm_path)/lib/libLLVMMipsCodeGen.a $(llvm_path)/lib/libLLVMMipsInfo.a $(llvm_path)/lib/libLLVMMBlazeAsmPrinter.a $(llvm_path)/lib/libLLVMMBlazeCodeGen.a $(llvm_path)/lib/libLLVMMBlazeInfo.a $(llvm_path)/lib/libLLVMLinker.a $(llvm_path)/lib/libLLVMipo.a $(llvm_path)/lib/libLLVMInterpreter.a $(llvm_path)/lib/libLLVMInstrumentation.a $(llvm_path)/lib/libLLVMJIT.a $(llvm_path)/lib/libLLVMExecutionEngine.a $(llvm_path)/lib/libLLVMCppBackend.a $(llvm_path)/lib/libLLVMCppBackendInfo.a $(llvm_path)/lib/libLLVMCellSPUCodeGen.a $(llvm_path)/lib/libLLVMCellSPUAsmPrinter.a $(llvm_path)/lib/libLLVMCellSPUInfo.a $(llvm_path)/lib/libLLVMCBackend.a $(llvm_path)/lib/libLLVMCBackendInfo.a $(llvm_path)/lib/libLLVMBlackfinCodeGen.a $(llvm_path)/lib/libLLVMBlackfinAsmPrinter.a $(llvm_path)/lib/libLLVMBlackfinInfo.a $(llvm_path)/lib/libLLVMBitWriter.a $(llvm_path)/lib/libLLVMX86Disassembler.a $(llvm_path)/lib/libLLVMX86AsmParser.a $(llvm_path)/lib/libLLVMX86AsmPrinter.a $(llvm_path)/lib/libLLVMX86CodeGen.a $(llvm_path)/lib/libLLVMX86Info.a $(llvm_path)/lib/libLLVMAsmParser.a $(llvm_path)/lib/libLLVMARMAsmParser.a $(llvm_path)/lib/libLLVMMCParser.a $(llvm_path)/lib/libLLVMARMAsmPrinter.a $(llvm_path)/lib/libLLVMARMCodeGen.a $(llvm_path)/lib/libLLVMARMInfo.a $(llvm_path)/lib/libLLVMArchive.a $(llvm_path)/lib/libLLVMBitReader.a $(llvm_path)/lib/libLLVMAlphaCodeGen.a $(llvm_path)/lib/libLLVMSelectionDAG.a $(llvm_path)/lib/libLLVMAlphaAsmPrinter.a $(llvm_path)/lib/libLLVMAsmPrinter.a $(llvm_path)/lib/libLLVMCodeGen.a $(llvm_path)/lib/libLLVMScalarOpts.a $(llvm_path)/lib/libLLVMInstCombine.a $(llvm_path)/lib/libLLVMTransformUtils.a $(llvm_path)/lib/libLLVMipa.a $(llvm_path)/lib/libLLVMAnalysis.a $(llvm_path)/lib/libLLVMTarget.a $(llvm_path)/lib/libLLVMMC.a $(llvm_path)/lib/libLLVMCore.a $(llvm_path)/lib/libLLVMAlphaInfo.a $(llvm_path)/lib/libLLVMSupport.a $(llvm_path)/lib/libLLVMSystem.a
+
+endif
+
+# SSL support permits use of MD5 checksums internally for binary library identification.
+if ROSE_USE_SSL_SUPPORT
+  ROSE_SSL_LIBS = -lssl -lcrypto
+endif
+
+# support for precompiled headers
+if ROSE_PCH
+  ROSE_PCH_INCLUDE = -Winvalid-pch -fPIC -DPIC
+endif
+
+if ROSE_USE_INTEL_PIN
+  INTEL_PIN_PATH          = @IntelPin_path@
+  INTEL_PIN_INCLUDE_PATHS = -I$(INTEL_PIN_PATH)/source/include -I$(INTEL_PIN_PATH)/source/include/gen -I$(INTEL_PIN_PATH)/extras/xed2-intel64/include -I$(INTEL_PIN_PATH)/source/tools/InstLib
+
+# DQ (3/8/2009): These cause rose/src/testSharedRoseLib to fail, I don't know why (fails in system call to map()).
+# INTEL_PIN_LIB_PATHS     = -L$(INTEL_PIN_PATH)/intel64/lib -L$(INTEL_PIN_PATH)/extras/xed2-intel64/lib -L$(INTEL_PIN_PATH)/intel64/lib-ext
+  INTEL_PIN_LIB_PATHS     = -L$(INTEL_PIN_PATH)/intel64/lib -L$(INTEL_PIN_PATH)/extras/xed2-intel64/lib
+
+# Do we want to handle this differently when Dwarf is used optionally with ROSE.
+  INTEL_PIN_LIBS          = -lpin -lxed -ldwarf -lelf -ldl
+#if ROSE_USE_DWARF
+#  INTEL_PIN_LIBS          = -lpin -lxed -lelf -ldl
+#else
+#  INTEL_PIN_LIBS          = -lpin -lxed -ldwarf -lelf -ldl
+#endif
+endif
+
+if ROSE_USE_ETHER
+  ROSE_ETHER_INCLUDE = -I$(ETHER_PREFIX)/include
+  ROSE_ETHER_LIBS    = -L$(ETHER_PREFIX)/lib -lxenctrl
+endif
+
+# DQ (1/9/2010): Added use of libimf with libm (the two go together when using Intel icc and icpc)
+if USING_INTEL_COMPILER
+  ROSE_INTEL_COMPILER_MATH_LIBS = -limf -lm
+endif
+
+# Note use of "-isystem" option in ROSE_BOOST_PREINCLUDE_PATH to have the 
+# boost specified on the configure
+# command-line be used instead of the OS version of boost that is sometimes
+# installed with Linux (it is always a version too old to be used with ROSE).
+# This is used only when the ROSE configuration detects a previously installed
+# version of Boost (e.g /usr/include/boost) that we don't want to use.
+ROSE_INCLUDES = \
+     $(ROSE_BOOST_PREINCLUDE_PATH) \
+     -I$(top_builddir)/src/roseSupport \
+     -I$(top_builddir)/src/frontend/SageIII \
+     -I$(top_srcdir)/src \
+     -I$(top_srcdir)/src/frontend/SageIII \
+     -I$(top_srcdir)/src/frontend/SageIII/astFixup \
+     -I$(top_srcdir)/src/frontend/SageIII/astPostProcessing \
+     -I$(top_srcdir)/src/frontend/SageIII/astMerge \
+     -I$(top_srcdir)/src/frontend/SageIII/astVisualization \
+     -I$(top_srcdir)/src/frontend/SageIII/astFileIO \
+     -I$(top_srcdir)/src/frontend/SageIII/sageInterface \
+     -I$(top_srcdir)/src/frontend/SageIII/virtualCFG \
+     -I$(top_srcdir)/src/frontend/SageIII/astTokenStream \
+     -I$(top_srcdir)/src/frontend/SageIII/astHiddenTypeAndDeclarationLists \
+     -I$(top_builddir)/src/frontend/SageIII/astFileIO \
+     -I$(top_srcdir)/src/frontend/SageIII/astFromString \
+     -I$(top_srcdir)/src/frontend/OpenFortranParser_SAGE_Connection \
+     -I$(top_srcdir)/src/frontend/ECJ_ROSE_Connection \
+     -I$(top_srcdir)/src/frontend/PHPFrontend \
+     -I$(top_srcdir)/src/frontend/PythonFrontend \
+     -I$(top_srcdir)/src/frontend/BinaryDisassembly \
+     -I$(top_srcdir)/src/frontend/BinaryFormats \
+     -I$(top_srcdir)/src/frontend/BinaryLoader \
+     -I$(top_srcdir)/src/frontend/Disassemblers \
+     -I$(top_srcdir)/src/backend/unparser \
+     -I$(top_srcdir)/src/backend/unparser/formatSupport \
+     -I$(top_srcdir)/src/backend/unparser/languageIndependenceSupport \
+     -I$(top_srcdir)/src/backend/unparser/CxxCodeGeneration \
+     -I$(top_srcdir)/src/backend/unparser/JavaCodeGeneration \
+     -I$(top_srcdir)/src/backend/unparser/FortranCodeGeneration \
+     -I$(top_srcdir)/src/backend/unparser/PHPCodeGeneration \
+     -I$(top_srcdir)/src/backend/unparser/PythonCodeGeneration \
+     -I$(top_srcdir)/src/backend/asmUnparser \
+     -I$(top_srcdir)/src/util \
+     -I$(top_srcdir)/src/util/support \
+     -I$(top_srcdir)/src/util/graphs  \
+     -I$(top_srcdir)/src/util/stringSupport \
+     -I$(top_srcdir)/src/util/commandlineProcessing \
+     -I$(top_srcdir)/src/midend/abstractHandle \
+     -I$(top_srcdir)/src/midend/astDiagnostics \
+     -I$(top_srcdir)/src/midend/programTransformation/astInlining \
+     -I$(top_srcdir)/src/midend/programTransformation/astOutlining  \
+     -I$(top_srcdir)/src/midend/astProcessing \
+     -I$(top_srcdir)/src/midend/astQuery \
+     -I$(top_srcdir)/src/midend/astRewriteMechanism \
+     -I$(top_srcdir)/src/midend/astUtil/annotation \
+     -I$(top_srcdir)/src/midend/astUtil/astInterface \
+     -I$(top_srcdir)/src/midend/astUtil/astSupport \
+     -I$(top_srcdir)/src/midend/astUtil/symbolicVal \
+     -I$(top_srcdir)/src/midend/binaryAnalyses \
+     -I$(top_srcdir)/src/midend/binaryAnalyses/dataflowanalyses \
+     -I$(top_srcdir)/src/midend/binaryAnalyses/instructionSemantics \
+     -I$(top_srcdir)/src/midend/programTransformation/loopProcessing/computation \
+     -I$(top_srcdir)/src/midend/programTransformation/loopProcessing/depGraph \
+     -I$(top_srcdir)/src/midend/programTransformation/loopProcessing/depInfo \
+     -I$(top_srcdir)/src/midend/programTransformation/loopProcessing/driver \
+     -I$(top_srcdir)/src/midend/programTransformation/loopProcessing/outsideInterface \
+     -I$(top_srcdir)/src/midend/programTransformation/loopProcessing/prepostTransformation \
+     -I$(top_srcdir)/src/midend/programTransformation/ompLowering \
+     -I$(top_srcdir)/src/midend/programAnalysis \
+     -I$(top_srcdir)/src/midend/programAnalysis/annotationLanguageParser \
+     -I$(top_srcdir)/src/midend/programAnalysis/CFG \
+     -I$(top_srcdir)/src/midend/programAnalysis/CallGraphAnalysis \
+     -I$(top_srcdir)/src/midend/programAnalysis/OAWrap \
+     -I$(top_srcdir)/src/midend/programAnalysis/dataflowAnalysis \
+     -I$(top_srcdir)/src/midend/programAnalysis/defUseAnalysis \
+     -I$(top_srcdir)/src/midend/programAnalysis/distributedMemoryAnalysis \
+     -I$(top_srcdir)/src/midend/programAnalysis/dominanceAnalysis \
+     -I$(top_srcdir)/src/midend/programAnalysis/graphAnalysis \
+     -I$(top_srcdir)/src/midend/programAnalysis/pointerAnal \
+     -I$(top_srcdir)/src/midend/programAnalysis/staticInterproceduralSlicing \
+     -I$(top_srcdir)/src/midend/programAnalysis/valuePropagation \
+     -I$(top_srcdir)/src/midend/programAnalysis/variableRenaming \
+      $(ROSE_SIDEEFFECTS_INCLUDE) \
+      $(ROSE_DATABASE_INCLUDE) \
+      $(ROSE_GUI_INCLUDE) \
+      $(ROSE_QT_INCLUDE) \
+      $(ROSE_SQLITE_DATABASE_INCLUDE) \
+			$(ROSE_SIDEEFFECT_INCLUDE) \
+      $(SQLITE_DATABASE_INCLUDE) \
+     -I$(top_srcdir)/src/midend/programTransformation/partialRedundancyElimination \
+     -I$(top_srcdir)/src/midend/programTransformation/finiteDifferencing \
+     -I$(top_srcdir)/src/midend/programTransformation/functionCallNormalization \
+     -I$(top_srcdir)/src/midend/programTransformation/constantFolding \
+     -I$(top_srcdir)/src/midend/programTransformation/implicitCodeGeneration \
+     -I$(top_srcdir)/src/roseSupport \
+     -I$(top_srcdir)/src/3rdPartyLibraries/MSTL \
+     -I$(top_srcdir)/src/3rdPartyLibraries/libharu-2.1.0/include \
+     -I$(top_builddir)/src/3rdPartyLibraries/libharu-2.1.0/include \
+     -I$(top_srcdir)/src/3rdPartyLibraries/qrose/Framework \
+     -I$(top_srcdir)/src/3rdPartyLibraries/qrose/Widgets  \
+     -I$(top_srcdir)/src/util/graphs \
+     -I$(top_srcdir)/src/midend/astUtil/astInterface \
+     -I$(top_srcdir)/libltdl \
+     $(ROSE_PHP_INCLUDES) \
+     $(ROSE_PYTHON_INCLUDES) \
+     $(ROSE_YICES_INCLUDES) \
+     $(ROSE_DWARF_INCLUDES) \
+     $(ROSE_WINE_INCLUDES) \
+     $(VALGRIND_CFLAGS) \
+     $(SQLITE3_CFLAGS) \
+     $(ROSE_BOOST_NORMAL_INCLUDE_PATH) -DBOOST_REGEX_MATCH_EXTRA \
+     $(ROSE_PCH_INCLUDE) \
+     $(INTEL_PIN_INCLUDE_PATHS) \
+     $(ROSE_ETHER_INCLUDE)
+
+
+# DQ (8/15/2010): I have removed these directories from the include paths since it no longer exists.
+# I expect that the directories were removed and the include list not properly cleaned up.
+# -I$(top_srcdir)/src/midend/binaryAnalyses/graph 
+# -I$(top_srcdir)/src/midend/programTransformation/runtimeTransformation
+# -I$(top_srcdir)/projects/dataBase
+
+# DQ (12/22/2008): Move Boost directory to front and used "-isystem" option so
+# that a system with a previous (older) installation of boost does not interfer 
+# with the use of ROSE (and the version of boost specified using "--with-boost").
+# $(BOOST_CPPFLAGS)
+
+# DQ (10/28/2008): I think these should be included, I don't know why they 
+# were removed (used with Microsoft Windows tests, and Yices tests).
+# DQ: Not used currently 
+#     $(ROSE_WINE_INCLUDES)
+
+# DQ (5/3/2007): Removed from ROSE
+#     -I$(top_srcdir)/src/midend/programAnalysis/dominatorTreesAndDominanceFrontiers
+#     -I$(top_srcdir)/src/midend/programAnalysis/staticProgramSlicing
+
+# DQ (10/22/2004): Removed when I could not get annotation work to compile properly with make distcheck rule
+#     -I$(top_srcdir)/src/midend/programAnalysis/annotationLanguageParser
+
+# New way using two libraries
+# ROSE_LIBS_WITH_PATH = $(top_builddir)/src/librose.a $(top_builddir)/src/libedg.a
+# ROSE_LIBS_WITH_PATH = $(top_builddir)/src/librose.so $(top_builddir)/src/libedg.so
+# ROSE_LIBS_WITH_PATH = $(libdir)/librose.so $(libdir)/libedg.so
+# ROSE_LIBS_WITH_PATH = $(top_builddir)/src/librose.la
+# ROSE_LIBS_WITH_PATH = $(top_builddir)/src/librose.la $(JAVA_JVM_LIB)
+# JJW 7/25/2008: This should probably just be the same as ROSE_LIBS
+ROSE_LIBS_WITH_PATH = $(ROSE_LIBS)
+
+# ROSE_LIBS = $(top_builddir)/src/librose.la -lm $(LEXLIB) $(SQLITE_DATABASE_LIBS) $(LIB_QT) $(WAVE_LDFLAGS) $(WAVE_LIBRARIES) $(WAVE_LIBS) $(JAVA_JVM_LIB) $(RT_LIBS)
+ROSE_LIBS = $(top_builddir)/src/librose.la -lm  $(JAVA_JVM_LINK) \
+  $(SQLITE_DATABASE_LIBS) $(QT_LIBS)  $(BOOST_LDFLAGS) $(BOOST_DATE_TIME_LIB) \
+  $(BOOST_THREAD_LIB) $(BOOST_FILESYSTEM_LIB) $(BOOST_PROGRAM_OPTIONS_LIB) \
+  $(BOOST_REGEX_LIB)  $(BOOST_SYSTEM_LIB) $(BOOST_SERIALIZATION_LIB)  \
+  $(BOOST_WAVE_LIB) $(SQLITE3_LDFLAGS)  $(RT_LIBS) \
+  $(ROSE_YICES_LIBS_WITH_PATH) $(ROSE_PHP_LIBS_WITH_PATH) $(ROSE_DWARF_LIBS_WITH_PATH) \
+  $(ROSE_GUI_LIBS_WITH_PATH) $(ROSE_QT_LIBS_WITH_PATH) $(ROSE_SSL_LIBS) $(ROSE_ETHER_LIBS) \
+  $(ROSE_INTEL_COMPILER_MATH_LIBS)
+
+# DQ (3/13/2009): Removed this from ROSE_LIBS because libtool warnings say it should be in AM_LDFLAGS
+# (this is because it has been moved from being linked statically to being linked dynamically).
+# $(ROSE_DWARF_LIBS_WITH_PATH)
+# AM_LDFLAGS = $(ROSE_DWARF_LIBS_WITH_PATH)
+
+# DQ (3/8/2009): This fails when I try to include it (fails in rose/src/testSharedRoseLib).
+#  $(INTEL_PIN_LIB_PATHS) $(INTEL_PIN_LIBS)
+
+# DQ (3/14/2009): It is cleaner to just required that Intel Pin support require setting
+# the LD_LIBRARYPATH to include: $(INTEL_PIN_PATH)/intel64/lib-ext
+# DQ (3/14/2009): Need to add rpath to LDFLAGS instead of LDADD (to follow libtool rules).
+# LDFLAGS += $(ROSE_DWARF_LIBS_WITH_PATH)
+
+
+# This ROSE_SEPARATE_LIBS is used for the linking of preprocessor.C used within
+# development. The use of the seperate libraries make the linking faster where the
+# main librose library is not built.  Libtool may have changed this so that we could
+# just link to librose now just as easily, but one has to rebuild librose each time
+# instead of just the individual shared library.
+# JJW 7/25/2008: This should probably just be the same as ROSE_LIBS
+ROSE_SEPARATE_LIBS = $(ROSE_LIBS)
+## ROSE_SEPARATE_LIBS = \
+##    $(top_builddir)/src/librose.la \
+##    $(ROSE_SIDEEFFECTS_LIBS) $(ROSE_DATABASE_LIBS) \
+##    $(ROSE_SQLITE_DATABASE_LIBS) $(SQLITE_DATABASE_LIBS) \
+##    $(LIB_QT) $(JAVA_JVM_LIB) \
+##    $(RT_LIBS) \
+##    $(BOOST_LDFLAGS) $(BOOST_DATE_TIME_LIB) $(BOOST_THREAD_LIB) $(BOOST_FILESYSTEM_LIB) \
+##    $(BOOST_SYSTEM_LIB) $(BOOST_SERIALIZATION_LIB) \
+##    $(BOOST_PROGRAM_OPTIONS_LIB) $(BOOST_REGEX_LIB) $(BOOST_WAVE_LIB) $(SQLITE3_LDFLAGS) 
+#   $(LIB_QT) $(JAVA_JVM_LIB) 
+
+
+# QY (11/2/04): removed -lastoutlining from ROSE_SEPARATE_LIBS 
+
+# DQ (10/22/2004): Removed when I could not get annotation work to compile properly 
+# with make distcheck rule 
+# -lannotationLanguageParser(appears after -lvaluePropagation)
+
+# Location of sample binary files (executables, libraries, etc) that serve as input to
+# some of the binary analysis tests.
+BINARY_SAMPLES = $(top_srcdir)/binaries/samples
+
+
+# Test harness variables. See "rth_run.pl --help" for more info.
+RTH_RUN=$(top_srcdir)/scripts/rth_run.pl \
+	srcdir=$(srcdir) top_srcdir=$(top_srcdir) \
+	VALGRIND=$(VALGRIND) BINARY_SAMPLES=$(BINARY_SAMPLES)
+
+RTH_STATS=$(top_srcdir)/scripts/rth_stats.pl

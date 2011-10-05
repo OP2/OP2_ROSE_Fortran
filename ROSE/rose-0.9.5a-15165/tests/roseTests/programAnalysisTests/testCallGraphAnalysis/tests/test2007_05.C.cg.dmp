@@ -1,0 +1,4 @@
+X::namespace_function ->
+foo::member_function ->
+global_function ->
+main ->

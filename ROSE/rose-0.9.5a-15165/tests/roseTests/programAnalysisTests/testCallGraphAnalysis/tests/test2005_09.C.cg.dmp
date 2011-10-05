@@ -1,0 +1,2 @@
+X::operator/ ->
+foo -> X::operator/

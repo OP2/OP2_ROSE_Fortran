@@ -1,0 +1,2 @@
+boost::throw_exception ->
+foo -> boost::throw_exception
