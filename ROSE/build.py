@@ -1,52 +1,37 @@
-import glob
-import os
-import re
 import sys
+import os
+import tarfile
+import glob
+import re
 import string
+
+from optparse import OptionParser
 from subprocess import Popen, PIPE
 
-LD_LIBRARY_PATH = string.split(os.environ.get("LD_LIBRARY_PATH"), os.pathsep)
+sys.path.append(os.path.dirname(os.getcwd()) + os.sep + 'scripts' + os.sep + 'src')
+from Debug import Debug
 
-def selectROSEVersion ():
-	# There might be several supported versions of ROSE in the repository.
-	# In which case it is the user's responsibility to select the version to install 
-	roseVersions  = glob.glob(os.getcwd() + "/*[0-9]?")
-	
-	if len(roseVersions) > 1:
-		print("======================================================================")
-		print("Detected the following ROSE versions:")
-		for i, version in enumerate(roseVersions):
-			print("%s) %s" % (i, version))
-		while True:
-			try:
-				answer = int(raw_input("Please choose which to build and install: "))
-				if answer > len(roseVersions) - 1 or answer < 0:
-					print("Invalid answer. Choose between 0..%s" % (len(roseVersions) - 1))
-				else:
-					selectedRoseVersion = roseVersions[answer]
-					break;
-			except ValueError:
-				print("Invalid answer. Choose an integer.")
-	else:
-		selectedRoseVersion = roseVersions[0]
-	return selectedRoseVersion
+# The command-line parser and its options
+parser = OptionParser(add_help_option=False)
 
-def getBoostPath ():
-	boostInstallDirectory = None
-	boostPattern          = re.compile("boost")
-	
-	for path in LD_LIBRARY_PATH:
-		if boostPattern.search(path):
-			boostInstallDirectory = path
+parser.add_option("-h",
+                  "--help",
+                  action="help",
+                  help="Display this help message.")
 
-	if boostInstallDirectory is None:
-		print("Could not find BOOST in your LD_LIBRARY_PATH")
-		sys.exit(1)
-	
-	return boostInstallDirectory
+parser.add_option("-v",
+                 "--verbose",
+                 action="store_true",
+                 dest="verbose",
+                 help="Be verbose.",
+                 default=False)
+
+(opts, args) = parser.parse_args(sys.argv[1:])
+
+debug = Debug(opts.verbose)
 
 def checkEnvironment ():
-	print("====== CHECKING G++ VERSION ======")
+	debug.verboseMessage("Checking G++ version")
 	
 	proc = Popen("g++ --version",
 	     	     shell=True,
@@ -67,58 +52,144 @@ def checkEnvironment ():
 				minorVersion = int(numbers[1])
 				
 				if majorVersion != 4:
-					print("Major version of g++ has to be 4 to successfully compile ROSE. Yours is currently '%s'" % numbers[0])
-					sys.exit(1)
+					debug.exitMessage("Major version of g++ has to be 4 to successfully compile ROSE. Yours is currently '%s'" % numbers[0])
 
 				if minorVersion > 4:
-					print("Minor version of g++ has to be between 0 and 4 to successfully compile ROSE. Yours is currently '%s'" % numbers[1])
-					sys.exit(1)
+					debug.exitMessage("Minor version of g++ has to be between 0 and 4 to successfully compile ROSE. Yours is currently '%s'" % numbers[1])
 				
-				print("g++ version %s passes" % token)
+				debug.verboseMessage("g++ version %s passes" % token)
 				break
 
-def buildROSE (ROSEVersion, boostInstallDirectory):
-	ROSEBuildDirectory   = ROSEVersion + "_build" 
-	ROSEInstallDirectory = ROSEVersion + "_inst"
+def getBoostPath ():	
+	LD_LIBRARY_PATH = string.split(os.environ.get("LD_LIBRARY_PATH"), os.pathsep)
+	boostDirectory  = None
+	boostPattern    = re.compile("boost")
+	
+	for path in LD_LIBRARY_PATH:
+		if boostPattern.search(path):
+			boostDirectory = path
 
-	if not os.path.exists(ROSEBuildDirectory):
-		os.mkdir(ROSEBuildDirectory)
+	if boostDirectory is None:
+		debug.exitMessage("Unable to find BOOST in your LD_LIBRARY_PATH")
+	
+	return boostDirectory
 
-	if not os.path.exists(ROSEInstallDirectory):
-		os.mkdir(ROSEInstallDirectory)
+def selectROSEVersion ():
+	debug.verboseMessage("Selecting ROSE tarball")
 
-	print("Build ROSE in '%s'" % ROSEBuildDirectory)	
-	print("Installing ROSE in '%s'" % ROSEInstallDirectory)
+	tarballs = glob.glob('rose*.tar.gz')
+	if len(tarballs) == 0:
+		debug.exitMessage("Unable to find ROSE tarballs")
+	
+	chosenTarball = None
+	if len(tarballs) > 1:
+		print("Detected the following ROSE tarballs:")
+		for i, file in enumerate(tarballs):
+			print("%s) %s" % (i, file))
+		while True:
+			try:
+				answer = int(raw_input("Please choose which to build and install: "))
+				if answer > len(tarballs) - 1 or answer < 0:
+					print("Invalid answer. Choose between 0..%s" % (len(tarballs) - 1))
+				else:
+					chosenTarball = tarballs[answer]
+					break;
+			except ValueError:
+				print("Invalid answer. Choose an integer.")
+	else:
+		chosenTarball = tarballs[0]
+	return chosenTarball
 
-	configureString = "%s/configure --prefix=%s --with-boost=%s --enable-static --enable-cuda --enable-edg-cuda --enable-opencl --enable-edg-opencl --with-java --without-haskell" % (ROSEVersion, ROSEInstallDirectory, boostInstallDirectory[:-4])
+def extractTarball (chosenTarball):
+	debug.verboseMessage("Uncompressing tarball '%s'" % chosenTarball)
+	tarball = tarfile.open(chosenTarball)
+	tarball.extractall()
+	tarball.close()
 
-	print("Configuring ROSE with '%s'" % configureString)
+	debug.verboseMessage("Obtaining extracted ROSE directory name")
+	tarExtension  = ".tar.gz"
+	tokens        = chosenTarball.split('-')
+	roseVersion   = tokens[len(tokens) - 1]
+	roseDirectory = tokens[0] + "-" + tokens[1] + "-" + roseVersion[:-len(tarExtension)]
+	
+	if not os.path.isdir(roseDirectory):
+		debug.exitMessage("Unable to find extracted ROSE directory '%s" % roseDirectory)
+	
+	return roseDirectory
+
+def getRoseDirectories (roseDirectory, create=False):
+	roseDirectoryBuild   = roseDirectory + "_build"
+	roseDirectoryInstall = roseDirectory + "_inst"
+
+	if create:
+		if not os.path.exists(roseDirectoryBuild):
+			os.mkdir(roseDirectoryBuild)
+		if not os.path.exists(roseDirectoryInstall):
+			os.mkdir(roseDirectoryInstall)
+
+	return roseDirectoryBuild, roseDirectoryInstall 
+
+def copyModifiedROSEFiles (roseDirectory):
+	imperialDirectory = "ImperialModifications"
+	fileLocationsFile = "fileLocations.txt"
+	f = open(os.getcwd() + os.sep + imperialDirectory + os.sep + fileLocationsFile, 'r')
+	for line in f:
+		tokens      = line.split('=')
+		sourceFile  = os.getcwd() + os.sep + imperialDirectory + os.sep + tokens[0]
+		destination = os.getcwd() + os.sep + roseDirectory + os.sep + tokens[1]
+		debug.verboseMessage("Moving Imperial changed file '%s' into '%s'" % (sourceFile, destination))
+		os.rename(sourceFile, destination)
+	f.close()
+
+def buildROSE (roseDirectory, boostDirectory):
+	roseDirectoryBuild, roseDirectoryInstall = getRoseDirectories(roseDirectory, True)
+
+	debug.verboseMessage("Build ROSE in '%s'" % roseDirectoryBuild)	
+	debug.verboseMessage("Installing ROSE in '%s'" % roseDirectoryInstall)
+
+	configureString = "%s/configure --prefix=%s --with-boost=%s --enable-static --enable-cuda --enable-edg-cuda --enable-opencl --enable-edg-opencl --with-java --without-haskell" % (os.getcwd() + os.sep + roseDirectory, os.getcwd() + os.sep + roseDirectoryInstall, boostDirectory)
+
+	debug.verboseMessage("Configuring ROSE with command '%s'" % (configureString))
 
 	# Run the ROSE configure command in the build directory
-	print("====== CONFIGURE ======")
-	configureCommand = Popen(args=configureString, cwd=ROSEBuildDirectory, shell="/bin/bash") 
-	if configureCommand.wait() != 0:
-		print("The configure command '%s' failed" % (configureString))
-		sys.exit(1)
+	proc = Popen(args=configureString, 
+		     cwd=roseDirectoryBuild, 
+		     shell="/bin/bash",
+		     stderr=PIPE,
+	             stdout=PIPE) 
+			
+	stdoutLines, stderrLines = proc.communicate()
+	if proc.returncode != 0:
+		debug.exitMessage("The configure command '%s' failed" % (configureString))
 
 	# Run the 'make' command in the 'src' tree of the build directory
-	print("====== MAKE ======")
-	makeCommand = Popen(args="make", cwd=ROSEBuildDirectory + os.sep + "src", shell="/bin/bash") 
-	if makeCommand.wait() != 0:
-		print("Command 'make' failed")
-		sys.exit(1)
+	makeString = "make -j 4"
+	proc = Popen(args=makeString, 
+		     cwd=roseDirectoryBuild + os.sep + "src", 
+		     shell="/bin/bash",
+		     stderr=PIPE,
+		     stdout=PIPE)
+ 
+	stdoutLines, stderrLines = proc.communicate()
+	if proc.returncode != 0:
+		debug.exitMessage("Command '%s' failed" % makeString)
 
 	# Run the 'make install' command in the 'src' tree of the build directory
-	print("====== MAKE INSTALL ======")
-	makeInstallCommand = Popen(args="make install", cwd=ROSEBuildDirectory + os.sep + "src", shell="/bin/bash") 
-	if makeCommand.wait() != 0:
-		print("Command 'make install' failed")
-		sys.exit(1)
-
-	print("====== MY WORK IS DONE ======")
+	makeInstallString = "make install"
+	proc = Popen(args=makeInstallString, 
+		     cwd=roseDirectoryBuild + os.sep + "src", 
+		     shell="/bin/bash",
+		     stderr=PIPE,
+		     stdout=PIPE)
+ 
+	stdoutLines, stderrLines = proc.communicate()
+	if proc.returncode != 0:
+		debug.exitMessage("Command '%s' failed" % makeInstallString)
 
 # Main
 checkEnvironment()
-ROSEVersion           = selectROSEVersion ()
-boostInstallDirectory = getBoostPath ()
-buildROSE (ROSEVersion, boostInstallDirectory)
+boostDirectory = getBoostPath ()
+tarball        = selectROSEVersion ()
+roseDirectory  = extractTarball (tarball)
+copyModifiedROSEFiles (roseDirectory)
+buildROSE (roseDirectory, boostDirectory[:-4])
