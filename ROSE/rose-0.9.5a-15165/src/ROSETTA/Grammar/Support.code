@@ -513,12 +513,15 @@ HEADER_STORAGE_MODIFIER_START
                e_cuda_constant       = 16, /*!< CUDA, in device's constant memory */
                e_cuda_shared         = 17, /*!< CUDA, in device's shared memory */
                e_cuda_dynamic_shared = 18, /*!< CUDA, in device's shared memory, dynamically allocated */
+ 
+            // Imperial College changes 
+               e_cuda_device	     = 19,
 
             // TV (05/06/2010): Support for OpenCL storage modifiers
-               e_opencl_global   = 19, /*!< OpenCL, accessible from all the device */
-               e_opencl_local    = 20, /*!< OpenCL, accessible for a work-group only */
-               e_opencl_constant = 21, /*!< OpenCL, read-only variable accessible from all the device */
-               e_opencl_private  = 22, /*!< OpenCL, accessible only from one work-item */
+               e_opencl_global   = 20, /*!< OpenCL, accessible from all the device */
+               e_opencl_local    = 21, /*!< OpenCL, accessible for a work-group only */
+               e_opencl_constant = 22, /*!< OpenCL, read-only variable accessible from all the device */
+               e_opencl_private  = 23, /*!< OpenCL, accessible only from one work-item */
                
                e_last_modifier  /*!< last value (upper bound on range of values, used in error checking) */
              };
@@ -597,6 +600,10 @@ HEADER_STORAGE_MODIFIER_START
 
           bool isCudaDynamicShared() const;
           void setCudaDynamicShared();
+
+       // Imperial College changes
+          bool isCudaDevice() const;
+          void setCudaDevice();
 
        // TV (05/06/2010): Support for OpenCL storage modifiers
 
@@ -2099,6 +2106,10 @@ void SgStorageModifier::setCudaShared()      { p_modifier = e_cuda_shared; }
 
 bool SgStorageModifier::isCudaDynamicShared() const { return p_modifier == e_cuda_dynamic_shared; }
 void SgStorageModifier::setCudaDynamicShared()      { p_modifier = e_cuda_dynamic_shared; }
+
+// Imperial College changes 
+bool SgStorageModifier::isCudaDevice() const { return p_modifier == e_cuda_device; }
+void SgStorageModifier::setCudaDevice()      { p_modifier = e_cuda_device; }
 
 // TV (05/06/2010): Support for OpenCL storage modifiers
 
