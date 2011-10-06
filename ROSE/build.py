@@ -200,7 +200,7 @@ def copyRosePublicConfigHeader (roseDirectory):
 	sourceFile          = os.getcwd() + os.sep + roseDirectory + os.sep + "rosePublicConfig.h"
 	destinatonDirectory = os.getcwd() + os.sep + roseDirectoryInstall + os.sep + "include"
 	debug.verboseMessage("Moving file '%s' into '%s'" % (sourceFile, destinatonDirectory))
-		shutil.copy(sourceFile, destinatonDirectory)
+	shutil.copy(sourceFile, destinatonDirectory)
 
 # Main
 checkEnvironment()
