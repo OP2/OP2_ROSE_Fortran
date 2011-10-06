@@ -165,6 +165,9 @@ def buildROSE (roseDirectory, boostDirectory):
 
 	# Run the 'make' command in the 'src' tree of the build directory
 	makeString = "make -j 4"
+
+	debug.verboseMessage("Building ROSE with command '%s'" % (makeString))
+
 	proc = Popen(args=makeString, 
 		     cwd=roseDirectoryBuild + os.sep + "src", 
 		     shell="/bin/bash",
@@ -177,6 +180,9 @@ def buildROSE (roseDirectory, boostDirectory):
 
 	# Run the 'make install' command in the 'src' tree of the build directory
 	makeInstallString = "make install"
+
+	debug.verboseMessage("Installing ROSE with command '%s'" % (makeInstallString))
+
 	proc = Popen(args=makeInstallString, 
 		     cwd=roseDirectoryBuild + os.sep + "src", 
 		     shell="/bin/bash",
