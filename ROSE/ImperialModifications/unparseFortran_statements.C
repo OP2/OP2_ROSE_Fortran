@@ -3999,6 +3999,7 @@ FortranCodeGeneration_locatedNode::unparseVarDecl(SgStatement* stmt, SgInitializ
           {
             curprint (", CONSTANT");
           }
+       // END Imperial College changes
 
        // printf ("variableDeclaration->get_declarationModifier().get_typeModifier().isAllocatable() = %s \n",variableDeclaration->get_declarationModifier().get_typeModifier().isAllocatable() ? "true" : "false");
           if (variableDeclaration->get_declarationModifier().get_typeModifier().isAllocatable() == true)
@@ -4484,6 +4485,7 @@ FortranCodeGeneration_locatedNode::unparseProcHdrStmt(SgStatement* stmt, SgUnpar
           {
             curprint("attributes (host) ");
           }
+       // END Imperial College changes
 
        // Output the forward declaration only
        // printf ("Output the forward declaration only \n");

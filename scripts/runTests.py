@@ -76,6 +76,7 @@ def clean ():
 	filesToRemove.extend(glob.glob('~*'))
 	filesToRemove.extend(glob.glob('rose*.[fF?]*'))
 	filesToRemove.extend(glob.glob('rose*.CUF'))
+	filesToRemove.append('testReport.txt')
 
 	for file in filesToRemove:
 		if opts.verbose:

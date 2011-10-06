@@ -1658,38 +1658,35 @@ Unparse_MOD_SAGE::printSpecifier1 ( SgDeclarationStatement * decl_stmt, SgUnpars
           printf ("decl_stmt->get_declarationModifier().get_accessModifier().isProtected() = %s \n",decl_stmt->get_declarationModifier().get_accessModifier().isProtected() ? "true" : "false");
           printf ("decl_stmt->get_declarationModifier().get_accessModifier().isPublic()    = %s \n",decl_stmt->get_declarationModifier().get_accessModifier().isPublic()    ? "true" : "false");
 #endif
-          if (decl_stmt->get_declarationModifier().get_accessModifier().isPrivate())
-             {
-               info.set_isPrivateAccess();
-               if (flag)
-                  {
-                    curprint( "private: ");
-                 // printf ("Output PRIVATE keyword! \n");
-                  }
-             }
-            else
-             {
-               if (decl_stmt->get_declarationModifier().get_accessModifier().isProtected())
-                  {
-                    info.set_isProtectedAccess();
-                    if (flag)
-                       {
-                         curprint( "protected: ");
-                      // printf ("Output PROTECTED keyword! \n");
-                       }
-                  }
-                 else
-                  {
-                 /* default, always print Public */
-                    ROSE_ASSERT (decl_stmt->get_declarationModifier().get_accessModifier().isPublic() == true);
-                    info.set_isPublicAccess();
-                    if (flag)
-                       {
-                         curprint( "public: ");
-                      // printf ("Output PUBLIC keyword! \n");
-                       }
-                  }
-             }
+	  // Imperial College changes 
+            if (decl_stmt->get_declarationModifier ().get_accessModifier ().isPrivate ())
+            {
+              info.set_isPrivateAccess ();
+              if (flag)
+              {
+                curprint ("private: ");
+                // printf ("Output PRIVATE keyword! \n");
+              }
+            }
+            else if (decl_stmt->get_declarationModifier ().get_accessModifier ().isProtected ())
+            {
+              info.set_isProtectedAccess ();
+              if (flag)
+              {
+                curprint ("protected: ");
+                // printf ("Output PROTECTED keyword! \n");
+              }
+            }
+            else if (decl_stmt->get_declarationModifier ().get_accessModifier ().isPublic ())
+            {
+              info.set_isPublicAccess ();
+              if (flag)
+              {
+                curprint ("public: ");
+                // printf ("Output PUBLIC keyword! \n");
+              }
+            }
+        // END Imperial College changes
 #if 0
           printf ("Was this reset: info.isPrivateAccess()   = %s \n",info.isPrivateAccess()   ? "true" : "false");
           printf ("Was this reset: info.isProtectedAccess() = %s \n",info.isProtectedAccess() ? "true" : "false");
