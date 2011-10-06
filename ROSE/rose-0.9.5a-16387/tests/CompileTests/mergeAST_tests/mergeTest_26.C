@@ -1,3 +1,0 @@
-enum { X };
-enum { Y };
-

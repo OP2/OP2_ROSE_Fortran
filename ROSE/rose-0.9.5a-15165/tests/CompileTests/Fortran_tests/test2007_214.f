@@ -1,2 +1,0 @@
-      PRINT *, PI
-      END

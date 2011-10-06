@@ -1,8 +1,0 @@
-PROGRAM ASSOCIATE_EXAMPLE
-
-! Do loop without expressions
-DO 
-   J = 7
-ENDDO
-
-END PROGRAM ASSOCIATE_EXAMPLE

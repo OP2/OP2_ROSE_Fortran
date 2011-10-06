@@ -1,3 +1,0 @@
-! SUM = SUM +I
-SUM = 0.0
-END

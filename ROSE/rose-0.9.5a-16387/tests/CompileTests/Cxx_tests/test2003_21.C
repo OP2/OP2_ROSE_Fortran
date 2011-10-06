@@ -1,1 +1,0 @@
-void foobarXXX(int,...);

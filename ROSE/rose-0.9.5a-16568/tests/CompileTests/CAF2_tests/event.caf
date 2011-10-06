@@ -1,5 +1,0 @@
-program eventtest 
-
-event :: e
-
-end program

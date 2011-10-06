@@ -1,3 +1,0 @@
-B::foo1 -> ErrorWithExplicitConstructor::ErrorWithExplicitConstructor
-B::foo2 ->
-ErrorWithExplicitConstructor::ErrorWithExplicitConstructor ->

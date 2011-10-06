@@ -1,2 +1,0 @@
-struct { typedef int X };
-

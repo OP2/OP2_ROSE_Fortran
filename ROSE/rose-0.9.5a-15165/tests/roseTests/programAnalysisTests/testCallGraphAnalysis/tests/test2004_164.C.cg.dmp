@@ -1,3 +1,0 @@
-A::foo ->
-A::operator* ->
-foo -> A::foo A::operator*

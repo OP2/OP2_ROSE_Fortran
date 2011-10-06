@@ -1,4 +1,0 @@
-struct X 
-   {
-     int e;
-   };

@@ -1,3 +1,0 @@
-program hworld
-  write(*, '(A)') "Hello, world"
-end program

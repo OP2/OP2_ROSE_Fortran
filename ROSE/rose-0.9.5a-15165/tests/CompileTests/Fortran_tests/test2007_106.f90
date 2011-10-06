@@ -1,5 +1,0 @@
- 
-     REAL SPARSE(50,50)
-
-     DATA SPARSE(1,1), SPARSE(50,50) / 1.0, 99.99999 /
-END
