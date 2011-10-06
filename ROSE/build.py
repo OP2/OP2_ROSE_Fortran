@@ -159,7 +159,7 @@ def buildROSE (roseDirectory, boostDirectory):
 		     stderr=PIPE,
 	             stdout=PIPE) 
 			
-	stdoutLines, stderrLines = proc.communicate()
+	proc.communicate()
 	if proc.returncode != 0:
 		debug.exitMessage("The configure command '%s' failed" % (configureString))
 
@@ -171,7 +171,7 @@ def buildROSE (roseDirectory, boostDirectory):
 		     stderr=PIPE,
 		     stdout=PIPE)
  
-	stdoutLines, stderrLines = proc.communicate()
+	proc.communicate()
 	if proc.returncode != 0:
 		debug.exitMessage("Command '%s' failed" % makeString)
 
@@ -183,7 +183,7 @@ def buildROSE (roseDirectory, boostDirectory):
 		     stderr=PIPE,
 		     stdout=PIPE)
  
-	stdoutLines, stderrLines = proc.communicate()
+	proc.communicate()
 	if proc.returncode != 0:
 		debug.exitMessage("Command '%s' failed" % makeInstallString)
 
