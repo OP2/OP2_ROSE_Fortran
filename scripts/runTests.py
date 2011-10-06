@@ -1,7 +1,8 @@
 #!/usr/bin/python
 
 import os
-import sys	
+import sys
+import string	
 
 # Add the 'src' directory to the module search and PYTHONPATH
 sys.path.append(sys.path[0] + os.sep + "src")
@@ -152,9 +153,10 @@ def runTests ():
 	if not os.path.isfile(testsFile):
 		debug.exitMessage("Unable to find file containing tests to run. It should be called '%s'" % (testsFile))
 
-	translatorEnvVariable  = 'IMPERIAL_TRANSLATOR_PATH'
-	translatorHome         = string.split(os.environ.get(translatorEnvVariable), os.pathsep)
+	translatorEnvVariable  = 'IMPERIAL_TRANSLATOR_HOME'
+	translatorHome         = string.split(os.environ.get(translatorEnvVariable), os.pathsep)[0]
 
+	print (translatorHome)
 	if translatorHome is None:
 		debug.exitMessage("Unable to find the root directory of the source-to-source translator. Please set environment variable '%s'" % translatorEnvVariable)
 	elif not os.path.isdir(translatorHome):
