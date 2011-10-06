@@ -124,8 +124,10 @@ def getRoseDirectories (roseDirectory, create=False):
 
 	if create:
 		if not os.path.exists(roseDirectoryBuild):
+			debug.verboseMessage("Making directory '%s'" % roseDirectoryBuild)	
 			os.mkdir(roseDirectoryBuild)
 		if not os.path.exists(roseDirectoryInstall):
+			debug.verboseMessage("Making directory '%s'" % roseDirectoryInstall)
 			os.mkdir(roseDirectoryInstall)
 
 	return roseDirectoryBuild, roseDirectoryInstall 
@@ -193,6 +195,13 @@ def buildROSE (roseDirectory, boostDirectory):
 	if proc.returncode != 0:
 		debug.exitMessage("Command '%s' failed" % makeInstallString)
 
+def copyRosePublicConfigHeader (roseDirectory):
+	roseDirectoryBuild, roseDirectoryInstall = getRoseDirectories(roseDirectory)
+	sourceFile          = os.getcwd() + os.sep + roseDirectory + os.sep + "rosePublicConfig.h"
+	destinatonDirectory = os.getcwd() + os.sep + roseDirectoryInstall + os.sep + "include"
+	debug.verboseMessage("Moving file '%s' into '%s'" % (sourceFile, destinatonDirectory))
+		shutil.copy(sourceFile, destinatonDirectory)
+
 # Main
 checkEnvironment()
 boostDirectory = getBoostPath ()
@@ -200,3 +209,4 @@ tarball        = selectROSEVersion ()
 roseDirectory  = extractTarball (tarball)
 copyModifiedROSEFiles (roseDirectory)
 buildROSE (roseDirectory, boostDirectory[:-4])
+copyRosePublicConfigHeader (roseDirectory)
