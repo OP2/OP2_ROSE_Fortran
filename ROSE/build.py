@@ -90,7 +90,7 @@ def buildROSE (ROSEVersion, boostInstallDirectory):
 	print("Build ROSE in '%s'" % ROSEBuildDirectory)	
 	print("Installing ROSE in '%s'" % ROSEInstallDirectory)
 
-	configureString = "%s/configure --prefix=%s --with-boost=%s --enable-cuda --enable-opencl --with-java --without-haskell  --with-CXX_DEBUG=-g --with-CXX_OPTIMIZE=-O0" % (ROSEVersion, ROSEInstallDirectory, boostInstallDirectory[:-4])
+	configureString = "%s/configure --prefix=%s --with-boost=%s --enable-cuda --enable-edg-cuda --enable-opencl --enable-edg-opencl --with-java --without-haskell" % (ROSEVersion, ROSEInstallDirectory, boostInstallDirectory[:-4])
 
 	print("Configuring ROSE with '%s'" % configureString)
 
