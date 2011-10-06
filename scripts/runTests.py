@@ -152,30 +152,21 @@ def runTests ():
 	if not os.path.isfile(testsFile):
 		debug.exitMessage("Unable to find file containing tests to run. It should be called '%s'" % (testsFile))
 
-	configFile = 'config'
-	if not os.path.isfile(configFile):
-		debug.exitMessage("Unable to find configuration file '%s' with the absolute path to source-to-source translator" % (configFile))
+	translatorEnvVariable  = 'IMPERIAL_TRANSLATOR_PATH'
+	translatorHome         = string.split(os.environ.get(translatorEnvVariable), os.pathsep)
 
-	translatorPath   = None
-	translatorString = 'translator'
-	op2Path          = None
-	op2String        = 'OP2_DIR'
-	for line in open(configFile, 'r'):
-		line = line.strip()
-		words = line.split('=')
-		if line.startswith(translatorString):
-			translatorPath = words[1].strip()
-			if not os.path.isfile(translatorPath):
-				debug.exitMessage("The translator binary '" + translatorPath + "' does not exist")
-		elif line.startswith(op2String):
-			op2Path = words[1].strip()
-			if not os.path.isdir(op2Path):
-				debug.exitMessage("The OP2_DIR '" + op2Path + "' specified in the config file is not a directory")
+	if translatorHome is None:
+		debug.exitMessage("Unable to find the root directory of the source-to-source translator. Please set environment variable '%s'" % translatorEnvVariable)
+	elif not os.path.isdir(translatorHome):
+		debug.exitMessage("The source-to-source translator path '%s' is not a directory" % (translatorHome))
 
-	if translatorPath is None:
-		debug.exitMessage("You did not specify a path to the translator. Use 'translator=<path/to/translator>' in the configuration file")
-	if op2Path is None:
-		debug.exitMessage("You did not specify where the OP2 library, ISO_C_BINDING library, and User Kernels are to be found. Use 'OP2_DIR=<dir> in the configuration file'")
+	translatorPath   = translatorHome + os.sep + 'translator' + os.sep + 'bin' + os.sep + 'translator'
+	op2Path          = translatorHome + os.sep + 'support' + os.sep + 'Fortran'
+
+	if not os.path.isfile(translatorPath):
+		debug.exitMessage("Unable to find the translator binary '" + translatorPath + "'. (Check the git repository directory structure has not changed. If so, modify this script!)")
+	if not os.path.isdir(op2Path):
+		debug.exitMessage("Unable to find the directory '" + op2Path + "' needed to compile Fortran programs using our translator. (Check the git repository directory structure has not changed. If so, modify this script!)")
 
 	failLexeme = 'FAIL'
 	passLexeme = 'PASS'
