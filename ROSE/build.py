@@ -4,6 +4,7 @@ import tarfile
 import glob
 import re
 import string
+import shutil
 
 from optparse import OptionParser
 from subprocess import Popen, PIPE
@@ -136,9 +137,9 @@ def copyModifiedROSEFiles (roseDirectory):
 	for line in f:
 		tokens      = line.split('=')
 		sourceFile  = os.getcwd() + os.sep + imperialDirectory + os.sep + tokens[0]
-		destination = os.getcwd() + os.sep + roseDirectory + os.sep + tokens[1]
+		destination = os.getcwd() + os.sep + roseDirectory + os.sep + tokens[1].strip() + os.sep + tokens[0]
 		debug.verboseMessage("Moving Imperial changed file '%s' into '%s'" % (sourceFile, destination))
-		os.rename(sourceFile, destination)
+		shutil.copy(sourceFile, destination)
 	f.close()
 
 def buildROSE (roseDirectory, boostDirectory):
