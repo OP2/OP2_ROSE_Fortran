@@ -14,7 +14,9 @@ sys.path.append(os.path.dirname(os.getcwd()) + os.sep + 'scripts' + os.sep + 'sr
 from Debug import Debug
 
 # The name of the sub-directory to the directory 'ROSE' where changes to ROSE have been implemented by Imperial College
+# and the name of the file containing file-location pairs
 imperialDirectory = "ImperialModifications"
+fileLocationsFile = "fileLocations.txt"
 
 # The command-line parser and its options
 parser = OptionParser(add_help_option=False)
@@ -93,31 +95,40 @@ def getBoostPath ():
 	
 	return boostDirectory
 
-def selectROSEVersion ():
-	debug.verboseMessage("Selecting ROSE tarball")
+def selectOption (options, msg):
+	print("=== %s ===" % msg)
+	for i, option in enumerate(options):
+		print("%s) %s" % (i, option))
+	while True:
+		try:
+			answer = int(raw_input())
+			if answer > len(options) - 1 or answer < 0:
+				print("Invalid answer. Choose between 0..%s." % (len(options) - 1))
+			else:
+				return answer
+				break;
+		except ValueError:
+			print("Invalid answer. Choose an integer.")
 
+def selectROSETarball ():
 	tarballs = glob.glob('rose*.tar.gz')
 	if len(tarballs) == 0:
 		debug.exitMessage("Unable to find ROSE tarballs")
 	
-	chosenTarball = None
+	answer = 0
 	if len(tarballs) > 1:
-		print("Detected the following ROSE tarballs:")
-		for i, file in enumerate(tarballs):
-			print("%s) %s" % (i, file))
-		while True:
-			try:
-				answer = int(raw_input("Please choose which to build and install: "))
-				if answer > len(tarballs) - 1 or answer < 0:
-					print("Invalid answer. Choose between 0..%s" % (len(tarballs) - 1))
-				else:
-					chosenTarball = tarballs[answer]
-					break;
-			except ValueError:
-				print("Invalid answer. Choose an integer.")
-	else:
-		chosenTarball = tarballs[0]
-	return chosenTarball
+		answer = selectOption(tarballs, "Please choose which tarball to build and install")
+	return tarballs[answer]
+
+def selectROSEVersion ():
+	directories = glob.glob('rose-[0-9].[0-9].[0-9]a-[0-9][0-9]*[!_a-zA-Z]')
+	if len(directories) == 0:
+		debug.exitMessage("Unable to find ROSE installation")
+
+	answer = 0
+	if len(directories) > 1:
+		answer = selectOption(directories, "Please choose which ROSE version you want to update")
+	return directories[answer]
 
 def extractTarball (chosenTarball):
 	debug.verboseMessage("Uncompressing tarball '%s'" % chosenTarball)
@@ -151,17 +162,17 @@ def getRoseDirectories (roseDirectory, create=False):
 	return roseDirectoryBuild, roseDirectoryInstall 
 
 def copyModifiedROSEFiles (roseDirectory):
-	fileLocationsFile = "fileLocations.txt"
-	f = open(os.getcwd() + os.sep + imperialDirectory + os.sep + fileLocationsFile, 'r')
-	for line in f:
-		tokens      = line.split('=')
-		sourceFile  = os.getcwd() + os.sep + imperialDirectory + os.sep + tokens[0]
-		destination = os.getcwd() + os.sep + roseDirectory + os.sep + tokens[1].strip() + os.sep + tokens[0]
-		debug.verboseMessage("Moving Imperial changed file '%s' into '%s'" % (sourceFile, destination))
-		shutil.copy(sourceFile, destination)
-	f.close()
+	fullPath = os.getcwd() + os.sep + imperialDirectory + os.sep + fileLocationsFile
+	fileListFile = open(fullPath, 'r')
+	for line in fileListFile:
+		tokens              = line.split('=')
+		sourceFileName      = os.getcwd() + os.sep + imperialDirectory + os.sep + tokens[0]
+		destinationFileName = os.getcwd() + os.sep + roseDirectory + os.sep + tokens[1].strip() + os.sep + tokens[0]
+		debug.verboseMessage("Moving Imperial changed file '%s' into '%s'" % (sourceFileName, destinationFileName))
+		shutil.copy(sourceFileName, destinationFileName)
+	fileListFile.close()
 
-def buildROSE (roseDirectory, boostDirectory):
+def configureROSE (roseDirectory, boostDirectory):
 	roseDirectoryBuild, roseDirectoryInstall = getRoseDirectories(roseDirectory, True)
 
 	debug.verboseMessage("Build ROSE in '%s'" % roseDirectoryBuild)	
@@ -182,6 +193,9 @@ def buildROSE (roseDirectory, boostDirectory):
 	if proc.returncode != 0:
 		debug.exitMessage("The configure command '%s' failed" % (configureString))
 
+def makeROSE (roseDirectory):
+	roseDirectoryBuild, roseDirectoryInstall = getRoseDirectories(roseDirectory)
+
 	# Run the 'make' command in the 'src' tree of the build directory
 	makeString = "make -j 4"
 
@@ -196,6 +210,9 @@ def buildROSE (roseDirectory, boostDirectory):
 	proc.communicate()
 	if proc.returncode != 0:
 		debug.exitMessage("Command '%s' failed" % makeString)
+
+def makeInstallROSE (roseDirectory):
+	roseDirectoryBuild, roseDirectoryInstall = getRoseDirectories(roseDirectory)
 
 	# Run the 'make install' command in the 'src' tree of the build directory
 	makeInstallString = "make install"
@@ -219,17 +236,54 @@ def copyRosePublicConfigHeader (roseDirectory):
 	debug.verboseMessage("Moving file '%s' into '%s'" % (sourceFile, destinatonDirectory))
 	shutil.copy(sourceFile, destinatonDirectory)
 
+def computeChecksum (fileName):
+	sourceFile = open(fileName, 'r')
+	md5        = hashlib.md5()
+	while True:
+		data = sourceFile.read(128)
+		if not data:
+			break
+		md5.update(data)
+	sourceFile.close()
+	return md5.hexdigest()
+
+def copyFilesIfNeeded (roseDirectory):
+	makeNeeded   = False
+	fullPath     = os.getcwd() + os.sep + imperialDirectory + os.sep + fileLocationsFile
+	fileListFile = open(fullPath, 'r')
+	for line in fileListFile:
+		tokens              = line.split('=')
+		sourceFileName      = os.getcwd() + os.sep + imperialDirectory + os.sep + tokens[0]
+		destinationFileName = os.getcwd() + os.sep + roseDirectory + os.sep + tokens[1].strip() + os.sep + tokens[0]
+		sourceMD5           = computeChecksum(sourceFileName)
+		destinationMD5      = computeChecksum(destinationFileName)
+		debug.debugMessage("MD5 of '%s' is '%s'" % (sourceFileName, sourceMD5), 1)
+		debug.debugMessage("MD5 of '%s' is '%s'" % (destinationFileName, destinationMD5), 1)
+		
+		if sourceMD5 != destinationMD5:
+			debug.verboseMessage("MD5s differ: moving Imperial changed file '%s' into '%s'" % (sourceFileName, destinationFileName))
+			shutil.copy(sourceFileName, destinationFileName)
+			makeNeeded = True
+	fileListFile.close()
+	return makeNeeded
+
 def buildAction ():
 	checkEnvironment()
 	boostDirectory = getBoostPath ()
-	tarball        = selectROSEVersion ()
+	tarball        = selectROSETarball ()
 	roseDirectory  = extractTarball (tarball)
 	copyModifiedROSEFiles (roseDirectory)
-	buildROSE (roseDirectory, boostDirectory[:-4])
+	configureROSE (roseDirectory, boostDirectory[:-4])	
+	makeROSE (roseDirectory)
+	makeInstallROSE (roseDirectory)
 	copyRosePublicConfigHeader (roseDirectory)
 
 def updateAction ():
-	pass
+	roseDirectory = selectROSEVersion ()
+	makeNeeded = copyFilesIfNeeded (roseDirectory)
+	if makeNeeded:
+		makeROSE (roseDirectory)
+		makeInstallROSE (roseDirectory)
 
 if opts.build:
 	buildAction ()

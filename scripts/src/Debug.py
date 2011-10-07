@@ -5,7 +5,7 @@ class Debug ():
 		self.debug = debug
 
 	def debugMessage (self, str, debugLevel):
-		if debugLevel >= self.debug:
+		if self.debug > 0 and debugLevel >= self.debug:
 			print(str)
 
 	def verboseMessage (self, str):
