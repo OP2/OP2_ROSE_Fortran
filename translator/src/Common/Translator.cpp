@@ -123,7 +123,7 @@ handleCPPProject (SgProject * project)
   }
 }
 
-void
+FortranSubroutinesGeneration *
 handleFortranProject (SgProject * project)
 {
   FortranSubroutinesGeneration * generator;
@@ -178,6 +178,13 @@ handleFortranProject (SgProject * project)
     }
   }
 
+  return generator;
+}
+
+void
+unparseOriginalSourceFiles (SgProject * project,
+    FortranSubroutinesGeneration * generator)
+{
   class TreeVisitor: public AstSimpleProcessing
   {
     private:
@@ -199,18 +206,28 @@ handleFortranProject (SgProject * project)
         SgSourceFile * file = isSgSourceFile (node);
         if (file != NULL)
         {
-          path p = system_complete (path (isSgSourceFile (node)->getFileName ()));
+          path p = system_complete (
+              path (isSgSourceFile (node)->getFileName ()));
 
-          std::cout<< "HERE " <<  p.filename() << std::endl;
-          if (generator->isDirty ( p.filename()))
+          if (generator->isDirty (p.filename ()))
           {
-            ;
+            Debug::getInstance ()->debugMessage ("Unparsing '" + p.filename ()
+                + "'", Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+
+            file->unparse ();
+          }
+          else
+          {
+            Debug::getInstance ()->debugMessage ("File '" + p.filename ()
+                + "' remains unchanged", Debug::FUNCTION_LEVEL, __FILE__,
+                __LINE__);
           }
         }
       }
   };
 
   TreeVisitor * visitor = new TreeVisitor (generator);
+
   visitor->traverse (project, preorder);
 }
 
@@ -310,9 +327,9 @@ processUserSelections (SgProject * project)
 
     checkBackendOption ();
 
-    handleFortranProject (project);
+    FortranSubroutinesGeneration * generator = handleFortranProject (project);
 
-    project->unparse ();
+    unparseOriginalSourceFiles (project, generator);
   }
   else
   {

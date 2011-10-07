@@ -123,14 +123,6 @@ template <typename TDeclarations, typename THostSubroutine>
       isDirty (std::string const & fileName)
       {
         using std::find;
-        using std::vector
-        ;
-        using std::string;
-
-        for (vector<string>::iterator it = dirtyFiles.begin(); it != dirtyFiles.end();++it)
-        {
-          std::cout << *it << std::endl;
-        }
 
         if (find (dirtyFiles.begin (), dirtyFiles.end (), fileName)
             != dirtyFiles.end ())
