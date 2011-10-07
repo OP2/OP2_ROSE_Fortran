@@ -1686,14 +1686,14 @@ Unparse_MOD_SAGE::printSpecifier1 ( SgDeclarationStatement * decl_stmt, SgUnpars
                 // printf ("Output PUBLIC keyword! \n");
               }
             }
-        // END Imperial College changes
 #if 0
           printf ("Was this reset: info.isPrivateAccess()   = %s \n",info.isPrivateAccess()   ? "true" : "false");
           printf ("Was this reset: info.isProtectedAccess() = %s \n",info.isProtectedAccess() ? "true" : "false");
           printf ("Was this reset: info.isPublicAccess()    = %s \n",info.isPublicAccess()    ? "true" : "false");
 #endif
        // If must have been set to one of the three values (but not left unset
-          ROSE_ASSERT(info.isUnsetAccess() == false);
+        //  ROSE_ASSERT(info.isUnsetAccess() == false);
+        // END Imperial College changes
         }
    }
 

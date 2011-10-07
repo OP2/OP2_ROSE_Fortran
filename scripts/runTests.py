@@ -5,7 +5,7 @@ import sys
 import string	
 
 # Add the 'src' directory to the module search and PYTHONPATH
-sys.path.append(os.getcwd() + os.sep + "src")
+sys.path.append(sys.path[0] + os.sep + "src")
 
 import glob
 from optparse import OptionParser
