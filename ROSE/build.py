@@ -5,6 +5,7 @@ import glob
 import re
 import string
 import shutil
+import md5
 
 from optparse import OptionParser
 from subprocess import Popen, PIPE
@@ -12,13 +13,30 @@ from subprocess import Popen, PIPE
 sys.path.append(os.path.dirname(os.getcwd()) + os.sep + 'scripts' + os.sep + 'src')
 from Debug import Debug
 
+# The name of the sub-directory to the directory 'ROSE' where changes to ROSE have been implemented by Imperial College
+imperialDirectory = "ImperialModifications"
+
 # The command-line parser and its options
 parser = OptionParser(add_help_option=False)
+
+parser.add_option("-b",
+                 "--build",
+                 action="store_true",
+                 dest="build",
+                 help="Build ROSE from scratch (i.e. the tarball).",
+                 default=False)
 
 parser.add_option("-h",
                   "--help",
                   action="help",
                   help="Display this help message.")
+
+parser.add_option("-u",
+                 "--update",
+                 action="store_true",
+                 dest="update",
+                 help="Update the ROSE source tree with local modifications found in '%s' and re-compile ROSE." % imperialDirectory,
+                 default=False)
 
 parser.add_option("-v",
                  "--verbose",
@@ -133,7 +151,6 @@ def getRoseDirectories (roseDirectory, create=False):
 	return roseDirectoryBuild, roseDirectoryInstall 
 
 def copyModifiedROSEFiles (roseDirectory):
-	imperialDirectory = "ImperialModifications"
 	fileLocationsFile = "fileLocations.txt"
 	f = open(os.getcwd() + os.sep + imperialDirectory + os.sep + fileLocationsFile, 'r')
 	for line in f:
@@ -202,11 +219,23 @@ def copyRosePublicConfigHeader (roseDirectory):
 	debug.verboseMessage("Moving file '%s' into '%s'" % (sourceFile, destinatonDirectory))
 	shutil.copy(sourceFile, destinatonDirectory)
 
-# Main
-checkEnvironment()
-boostDirectory = getBoostPath ()
-tarball        = selectROSEVersion ()
-roseDirectory  = extractTarball (tarball)
-copyModifiedROSEFiles (roseDirectory)
-buildROSE (roseDirectory, boostDirectory[:-4])
-copyRosePublicConfigHeader (roseDirectory)
+def buildROSE ():
+	checkEnvironment()
+	boostDirectory = getBoostPath ()
+	tarball        = selectROSEVersion ()
+	roseDirectory  = extractTarball (tarball)
+	copyModifiedROSEFiles (roseDirectory)
+	buildROSE (roseDirectory, boostDirectory[:-4])
+	copyRosePublicConfigHeader (roseDirectory)
+
+def updateROSE ():
+	pass
+
+if opts.build:
+	buildROSE ()
+
+if opts.update:
+	updateROSE ()
+
+if not opts.build and not opts.update:
+	debug.exitMessage("No actions selected. Use -h for options")
