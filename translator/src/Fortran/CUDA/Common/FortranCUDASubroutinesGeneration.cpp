@@ -7,7 +7,7 @@
 #include <FortranCUDAReductionSubroutine.h>
 #include <FortranReductionSubroutines.h>
 #include <FortranCUDAModuleDeclarations.h>
-#include <FortranCUDADataSizesDeclarationIndirectLoop.h>
+#include <FortranCUDAOpDatCardinalitiesDeclarationIndirectLoop.h>
 #include <FortranOpDatDimensionsDeclaration.h>
 #include <FortranParallelLoop.h>
 #include <FortranProgramDeclarationsAndDefinitions.h>
