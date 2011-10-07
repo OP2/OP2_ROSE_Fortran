@@ -5,7 +5,7 @@ import glob
 import re
 import string
 import shutil
-import md5
+import hashlib
 
 from optparse import OptionParser
 from subprocess import Popen, PIPE
@@ -219,7 +219,7 @@ def copyRosePublicConfigHeader (roseDirectory):
 	debug.verboseMessage("Moving file '%s' into '%s'" % (sourceFile, destinatonDirectory))
 	shutil.copy(sourceFile, destinatonDirectory)
 
-def buildROSE ():
+def buildAction ():
 	checkEnvironment()
 	boostDirectory = getBoostPath ()
 	tarball        = selectROSEVersion ()
@@ -228,14 +228,14 @@ def buildROSE ():
 	buildROSE (roseDirectory, boostDirectory[:-4])
 	copyRosePublicConfigHeader (roseDirectory)
 
-def updateROSE ():
+def updateAction ():
 	pass
 
 if opts.build:
-	buildROSE ()
+	buildAction ()
 
 if opts.update:
-	updateROSE ()
+	updateAction ()
 
 if not opts.build and not opts.update:
 	debug.exitMessage("No actions selected. Use -h for options")
