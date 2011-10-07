@@ -194,8 +194,8 @@ CPPProgramDeclarationsAndDefinitions::visit (SgNode * node)
            * ======================================================
            */
 
-          CPPParallelLoop * parallelLoop =
-              new CPPParallelLoop (functionCallExp);
+          CPPParallelLoop * parallelLoop = new CPPParallelLoop (
+              functionCallExp, functionCallExp->getFilenameString ());
 
           parallelLoops[userSubroutineName] = parallelLoop;
         }
