@@ -1,5 +1,5 @@
 #include <CPPOpenCLDataSizesDeclaration.h>
-#include <SubroutineVariableDeclarations.h>
+#include <ScopedVariableDeclarations.h>
 #include <RoseStatementsAndExpressionsBuilder.h>
 #include <rose.h>
 
@@ -9,7 +9,7 @@ CPPOpenCLDataSizesDeclaration::getType ()
   return deviceDatatypeStatement->get_type ();
 }
 
-SubroutineVariableDeclarations *
+ScopedVariableDeclarations *
 CPPOpenCLDataSizesDeclaration::getFieldDeclarations ()
 {
   return fieldDeclarations;
@@ -22,7 +22,7 @@ CPPOpenCLDataSizesDeclaration::CPPOpenCLDataSizesDeclaration (
 {
   using SageInterface::appendStatement;
 
-  fieldDeclarations = new SubroutineVariableDeclarations ();
+  fieldDeclarations = new ScopedVariableDeclarations ();
 
   deviceDatatypeStatement
       = RoseStatementsAndExpressionsBuilder::buildTypeDeclaration (

@@ -10,7 +10,7 @@
 
 #include <string>
 
-class SubroutineVariableDeclarations;
+class ScopedVariableDeclarations;
 class FortranParallelLoop;
 class SgScopeStatement;
 class SgVariableDeclaration;
@@ -24,7 +24,7 @@ class FortranModuleDeclarations
      * Variables declared at module scope level
      * ======================================================
      */
-    SubroutineVariableDeclarations * variableDeclarations;
+    ScopedVariableDeclarations * variableDeclarations;
 
     /*
      * ======================================================
@@ -70,7 +70,7 @@ class FortranModuleDeclarations
     SgVariableDeclaration *
     getGlobalOpDatDeclaration (unsigned int OP_DAT_ArgumentGroup);
 
-    SubroutineVariableDeclarations *
+    ScopedVariableDeclarations *
     getAllDeclarations ();
 };
 

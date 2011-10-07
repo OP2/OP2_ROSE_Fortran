@@ -18,7 +18,7 @@
 class SgBasicBlock;
 class SgFunctionCallExp;
 class SgScopeStatement;
-class SubroutineVariableDeclarations;
+class ScopedVariableDeclarations;
 class ParallelLoop;
 
 class Plan
@@ -35,7 +35,7 @@ class Plan
     virtual SgBasicBlock *
     createPlanFunctionParametersPreparationStatements (
         ParallelLoop * parallelLoop,
-        SubroutineVariableDeclarations * variableDeclarations) = 0;
+        ScopedVariableDeclarations * variableDeclarations) = 0;
 
     /*
      * ======================================================
@@ -46,7 +46,7 @@ class Plan
      */
     virtual SgFunctionCallExp *
     createPlanFunctionCallExpression (SgScopeStatement * subroutineScope,
-        SubroutineVariableDeclarations * variableDeclarations) = 0;
+        ScopedVariableDeclarations * variableDeclarations) = 0;
 
     /*
      * ======================================================

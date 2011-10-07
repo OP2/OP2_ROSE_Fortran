@@ -8,7 +8,7 @@ class SgScopeStatement;
 class SgDerivedTypeStatement;
 class SgClassType;
 class CPPParallelLoop;
-class SubroutineVariableDeclarations;
+class ScopedVariableDeclarations;
 
 class CPPOpenCLDataSizesDeclaration
 {
@@ -41,7 +41,7 @@ class CPPOpenCLDataSizesDeclaration
      * definition declaration statement
      * ======================================================
      */
-    SubroutineVariableDeclarations * fieldDeclarations;
+    ScopedVariableDeclarations * fieldDeclarations;
 
   protected:
 
@@ -66,7 +66,7 @@ class CPPOpenCLDataSizesDeclaration
      * Get the field declarations
      * ======================================================
      */
-    SubroutineVariableDeclarations *
+    ScopedVariableDeclarations *
     getFieldDeclarations ();
 };
 

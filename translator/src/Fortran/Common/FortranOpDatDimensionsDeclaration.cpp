@@ -2,12 +2,12 @@
 #include <FortranTypesBuilder.h>
 #include <FortranStatementsAndExpressionsBuilder.h>
 #include <FortranParallelLoop.h>
-#include <SubroutineVariableDeclarations.h>
+#include <ScopedVariableDeclarations.h>
 #include <RoseStatementsAndExpressionsBuilder.h>
 #include <CommonNamespaces.h>
 #include <Debug.h>
-#include <rose.h>
 #include <boost/lexical_cast.hpp>
+#include <rose.h>
 
 /*
  * ======================================================
@@ -23,7 +23,7 @@ FortranOpDatDimensionsDeclaration::addFields ()
   using SageBuilder::buildVariableDeclaration;
   using std::string;
 
-  fieldDeclarations = new SubroutineVariableDeclarations ();
+  fieldDeclarations = new ScopedVariableDeclarations ();
 
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {

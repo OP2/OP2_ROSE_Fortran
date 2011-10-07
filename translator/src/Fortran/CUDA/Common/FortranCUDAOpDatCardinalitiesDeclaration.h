@@ -12,14 +12,14 @@
  */
 
 #pragma once
-#ifndef FORTRAN_CUDA_DATA_SIZES_DECLARATION_H
-#define FORTRAN_CUDA_DATA_SIZES_DECLARATION_H
+#ifndef FORTRAN_CUDA_OP_DAT_CARDINALITIES_DECLARATION_H
+#define FORTRAN_CUDA_OP_DAT_CARDINALITIES_DECLARATION_H
 
 class SgScopeStatement;
 class SgDerivedTypeStatement;
 class SgClassType;
 class FortranParallelLoop;
-class SubroutineVariableDeclarations;
+class ScopedVariableDeclarations;
 
 class FortranCUDAOpDatCardinalitiesDeclaration
 {
@@ -52,7 +52,7 @@ class FortranCUDAOpDatCardinalitiesDeclaration
      * definition declaration statement
      * ======================================================
      */
-    SubroutineVariableDeclarations * fieldDeclarations;
+    ScopedVariableDeclarations * fieldDeclarations;
 
   protected:
 
@@ -74,7 +74,7 @@ class FortranCUDAOpDatCardinalitiesDeclaration
      * Get the field declarations
      * ======================================================
      */
-    SubroutineVariableDeclarations *
+    ScopedVariableDeclarations *
     getFieldDeclarations ();
 
     FortranCUDAOpDatCardinalitiesDeclaration (

@@ -16,7 +16,7 @@ class SgScopeStatement;
 class SgDerivedTypeStatement;
 class SgVariableDeclaration;
 class FortranParallelLoop;
-class SubroutineVariableDeclarations;
+class ScopedVariableDeclarations;
 
 class FortranOpDatDimensionsDeclaration
 {
@@ -49,7 +49,7 @@ class FortranOpDatDimensionsDeclaration
      * definition declaration statement
      * ======================================================
      */
-    SubroutineVariableDeclarations * fieldDeclarations;
+    ScopedVariableDeclarations * fieldDeclarations;
 
   private:
 

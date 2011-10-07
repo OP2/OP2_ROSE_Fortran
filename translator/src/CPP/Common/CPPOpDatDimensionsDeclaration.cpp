@@ -1,6 +1,6 @@
 #include <CPPOpDatDimensionsDeclaration.h>
 #include <CPPParallelLoop.h>
-#include <SubroutineVariableDeclarations.h>
+#include <ScopedVariableDeclarations.h>
 #include <RoseStatementsAndExpressionsBuilder.h>
 #include <CommonNamespaces.h>
 #include <rose.h>
@@ -19,7 +19,7 @@ CPPOpDatDimensionsDeclaration::addFields ()
   using SageBuilder::buildIntType;
   using std::string;
 
-  fieldDeclarations = new SubroutineVariableDeclarations ();
+  fieldDeclarations = new ScopedVariableDeclarations ();
 
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {

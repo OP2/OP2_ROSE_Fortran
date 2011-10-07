@@ -1,6 +1,6 @@
 #include <CPPOpenCLDataSizesDeclarationIndirectLoop.h>
 #include <CPPParallelLoop.h>
-#include <SubroutineVariableDeclarations.h>
+#include <ScopedVariableDeclarations.h>
 #include <CommonNamespaces.h>
 #include <rose.h>
 

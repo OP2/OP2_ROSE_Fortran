@@ -11,7 +11,7 @@
 
 #include <boost/lexical_cast.hpp>
 #include <boost/crc.hpp>
-#include <SubroutineVariableDeclarations.h>
+#include <ScopedVariableDeclarations.h>
 #include <Debug.h>
 #include <rose.h>
 
@@ -65,7 +65,7 @@ template <typename TSubroutineHeader>
        * newly created subroutine
        * ======================================================
        */
-      SubroutineVariableDeclarations * variableDeclarations;
+      ScopedVariableDeclarations * variableDeclarations;
 
     protected:
 
@@ -126,7 +126,7 @@ template <typename TSubroutineHeader>
 
         formalParameters = buildFunctionParameterList ();
 
-        variableDeclarations = new SubroutineVariableDeclarations ();
+        variableDeclarations = new ScopedVariableDeclarations ();
       }
 
     public:
@@ -159,7 +159,7 @@ template <typename TSubroutineHeader>
        * Returns the variable declarations in this subroutine
        * ======================================================
        */
-      SubroutineVariableDeclarations *
+      ScopedVariableDeclarations *
       getVariableDeclarations ()
       {
         return variableDeclarations;

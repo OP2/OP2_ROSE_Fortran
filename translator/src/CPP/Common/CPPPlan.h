@@ -11,11 +11,11 @@ class CPPPlan: public Plan
     virtual SgBasicBlock *
     createPlanFunctionParametersPreparationStatements (
         ParallelLoop * parallelLoop,
-        SubroutineVariableDeclarations * variableDeclarations);
+        ScopedVariableDeclarations * variableDeclarations);
 
     virtual SgFunctionCallExp *
     createPlanFunctionCallExpression (SgScopeStatement * subroutineScope,
-        SubroutineVariableDeclarations * variableDeclarations);
+        ScopedVariableDeclarations * variableDeclarations);
 };
 
 #endif

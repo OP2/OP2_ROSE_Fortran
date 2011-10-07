@@ -2,7 +2,7 @@
 #include <FortranParallelLoop.h>
 #include <FortranStatementsAndExpressionsBuilder.h>
 #include <FortranTypesBuilder.h>
-#include <SubroutineVariableDeclarations.h>
+#include <ScopedVariableDeclarations.h>
 #include <CommonNamespaces.h>
 #include <rose.h>
 

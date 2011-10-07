@@ -3,14 +3,14 @@
 SgBasicBlock *
 CPPPlan::createPlanFunctionParametersPreparationStatements (
     ParallelLoop * parallelLoop,
-    SubroutineVariableDeclarations * variableDeclarations)
+    ScopedVariableDeclarations * variableDeclarations)
 {
   return NULL;
 }
 
 SgFunctionCallExp *
 CPPPlan::createPlanFunctionCallExpression (SgScopeStatement * subroutineScope,
-    SubroutineVariableDeclarations * variableDeclarations)
+    ScopedVariableDeclarations * variableDeclarations)
 {
   return NULL;
 }

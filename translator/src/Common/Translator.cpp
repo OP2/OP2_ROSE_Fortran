@@ -1,26 +1,3 @@
-/*
- * Written by Adam Betts and Carlo Bertolli
- *
- * Contains the entry point (i.e. 'main') of the translator.
- * It does the following:
- *
- * 1) Adds viable options to the command line and parses them.
- * This process divides the command-line arguments into two sets:
- * those recognised by our translator and those recognised by ROSE
- *
- * 2) Obtains the definitions of OP2 variables (i.e. sets, maps,
- * data, etc.) and subroutines found in the source files to be
- * processed
- *
- * 3) Creates the subroutines which implement an OP_PAR_LOOP
- *
- * 4) Unparses the generated subroutines to files; there is one
- * file per unique OP_PAR_LOOP call
- *
- * 5) Unparses the original source files to reflect the changes
- * made to OP_PAR_LOOP calls
- */
-
 #include <boost/algorithm/string.hpp>
 #include <rose.h>
 #include <CommandLine.h>
@@ -251,6 +228,9 @@ addCommandLineOptions ()
 void
 processUserSelections (SgProject * project)
 {
+  using std::string;
+  using std::vector;
+
   if (project->get_Cxx_only () == true)
   {
     Debug::getInstance ()->debugMessage ("C++ project detected",
@@ -294,6 +274,12 @@ processUserSelections (SgProject * project)
     handleFortranProject (project);
 
     project->unparse ();
+
+    SgStringList & list = project->get_sourceFileNameList ();
+    for (vector <string>::iterator it = list.begin (); it != list.end (); ++it)
+    {
+      std::cout << *it << std::endl;
+    }
   }
   else
   {

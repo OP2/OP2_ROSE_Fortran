@@ -1,15 +1,15 @@
-#include <SubroutineVariableDeclarations.h>
+#include <ScopedVariableDeclarations.h>
 #include <Debug.h>
 #include <rose.h>
 
 bool
-SubroutineVariableDeclarations::exists (std::string const & variableName)
+ScopedVariableDeclarations::exists (std::string const & variableName)
 {
   return theDeclarations.find (variableName) != theDeclarations.end ();
 }
 
 SgVariableDeclaration *
-SubroutineVariableDeclarations::get (std::string const & variableName)
+ScopedVariableDeclarations::get (std::string const & variableName)
 {
   if (theDeclarations.count (variableName) == 0)
   {
@@ -21,12 +21,12 @@ SubroutineVariableDeclarations::get (std::string const & variableName)
 }
 
 void
-SubroutineVariableDeclarations::add (std::string const & variableName,
+ScopedVariableDeclarations::add (std::string const & variableName,
     SgVariableDeclaration * declaration)
 {
   theDeclarations[variableName] = declaration;
 }
 
-SubroutineVariableDeclarations::SubroutineVariableDeclarations ()
+ScopedVariableDeclarations::ScopedVariableDeclarations ()
 {
 }

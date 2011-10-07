@@ -2,7 +2,7 @@
 #include <FortranStatementsAndExpressionsBuilder.h>
 #include <FortranTypesBuilder.h>
 #include <FortranParallelLoop.h>
-#include <SubroutineVariableDeclarations.h>
+#include <ScopedVariableDeclarations.h>
 #include <Debug.h>
 #include <CommonNamespaces.h>
 #include <rose.h>
@@ -69,7 +69,7 @@ FortranModuleDeclarations::FortranModuleDeclarations (
     FortranParallelLoop * parallelLoop, SgScopeStatement * moduleScope) :
   parallelLoop (parallelLoop), moduleScope (moduleScope)
 {
-  variableDeclarations = new SubroutineVariableDeclarations ();
+  variableDeclarations = new ScopedVariableDeclarations ();
 
   createFirstExecutionBooleanDeclaration ();
 
@@ -129,7 +129,7 @@ FortranModuleDeclarations::getGlobalOpDatDeclaration (
       OP_DAT_ArgumentGroup));
 }
 
-SubroutineVariableDeclarations *
+ScopedVariableDeclarations *
 FortranModuleDeclarations::getAllDeclarations ()
 {
   return variableDeclarations;

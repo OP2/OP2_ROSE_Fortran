@@ -9,7 +9,7 @@ class SgDerivedTypeStatement;
 class SgClassType;
 class SgVariableDeclaration;
 class CPPParallelLoop;
-class SubroutineVariableDeclarations;
+class ScopedVariableDeclarations;
 
 class CPPOpDatDimensionsDeclaration
 {
@@ -48,7 +48,7 @@ class CPPOpDatDimensionsDeclaration
      * definition declaration statement
      * ======================================================
      */
-    SubroutineVariableDeclarations * fieldDeclarations;
+    ScopedVariableDeclarations * fieldDeclarations;
 
   private:
 

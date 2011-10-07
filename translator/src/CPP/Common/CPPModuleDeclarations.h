@@ -7,7 +7,7 @@
 class SgVariableDeclaration;
 class SgScopeStatement;
 class CPPParallelLoop;
-class SubroutineVariableDeclarations;
+class ScopedVariableDeclarations;
 
 class CPPModuleDeclarations
 {
@@ -25,7 +25,7 @@ class CPPModuleDeclarations
      * Variables declared at module scope level
      * ======================================================
      */
-    SubroutineVariableDeclarations * variableDeclarations;
+    ScopedVariableDeclarations * variableDeclarations;
 
     /*
      * ======================================================
@@ -63,7 +63,7 @@ class CPPModuleDeclarations
     SgVariableDeclaration *
     getGlobalOpDatDeclaration (unsigned int OP_DAT_ArgumentGroup);
 
-    SubroutineVariableDeclarations *
+    ScopedVariableDeclarations *
     getAllDeclarations ();
 };
 

@@ -1,8 +1,8 @@
-#include <FortranCUDADataSizesDeclaration.h>
+#include <FortranCUDAOpDatCardinalitiesDeclaration.h>
 #include <FortranParallelLoop.h>
 #include <FortranTypesBuilder.h>
 #include <RoseStatementsAndExpressionsBuilder.h>
-#include <SubroutineVariableDeclarations.h>
+#include <ScopedVariableDeclarations.h>
 #include <Debug.h>
 #include <CommonNamespaces.h>
 #include <boost/lexical_cast.hpp>
@@ -49,7 +49,7 @@ FortranCUDAOpDatCardinalitiesDeclaration::getType ()
   return deviceDatatypeStatement->get_type ();
 }
 
-SubroutineVariableDeclarations *
+ScopedVariableDeclarations *
 FortranCUDAOpDatCardinalitiesDeclaration::getFieldDeclarations ()
 {
   return fieldDeclarations;
@@ -61,7 +61,7 @@ FortranCUDAOpDatCardinalitiesDeclaration::FortranCUDAOpDatCardinalitiesDeclarati
 {
   using SageInterface::appendStatement;
 
-  fieldDeclarations = new SubroutineVariableDeclarations ();
+  fieldDeclarations = new ScopedVariableDeclarations ();
 
   deviceDatatypeStatement
       = RoseStatementsAndExpressionsBuilder::buildTypeDeclaration (

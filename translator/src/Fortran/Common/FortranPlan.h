@@ -20,21 +20,21 @@ class FortranPlan: public Plan
     virtual SgBasicBlock *
     createConvertPlanFunctionParametersStatements (ParallelLoop * parallelLoop,
         SgScopeStatement * subroutineScope,
-        SubroutineVariableDeclarations * variableDeclarations);
+        ScopedVariableDeclarations * variableDeclarations);
 
     virtual SgBasicBlock *
     createConvertPositionInPMapsStatements (ParallelLoop * parallelLoop,
         SgScopeStatement * subroutineScope,
-        SubroutineVariableDeclarations * variableDeclarations);
+        ScopedVariableDeclarations * variableDeclarations);
 
     virtual SgBasicBlock *
     createPlanFunctionParametersPreparationStatements (
         ParallelLoop * parallelLoop,
-        SubroutineVariableDeclarations * variableDeclarations);
+        ScopedVariableDeclarations * variableDeclarations);
 
     virtual SgFunctionCallExp *
     createPlanFunctionCallExpression (SgScopeStatement * subroutineScope,
-        SubroutineVariableDeclarations * variableDeclarations);
+        ScopedVariableDeclarations * variableDeclarations);
 };
 
 #endif

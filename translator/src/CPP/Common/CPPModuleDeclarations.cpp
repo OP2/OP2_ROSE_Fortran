@@ -1,5 +1,5 @@
 #include <CPPModuleDeclarations.h>
-#include <SubroutineVariableDeclarations.h>
+#include <ScopedVariableDeclarations.h>
 #include <Debug.h>
 #include <CommonNamespaces.h>
 #include <rose.h>
@@ -75,7 +75,7 @@ CPPModuleDeclarations::CPPModuleDeclarations (
   userSubroutineName (userSubroutineName), parallelLoop (parallelLoop),
       moduleScope (moduleScope)
 {
-  variableDeclarations = new SubroutineVariableDeclarations ();
+  variableDeclarations = new ScopedVariableDeclarations ();
 
   createFirstExecutionBooleanDeclaration ();
 
@@ -112,7 +112,7 @@ CPPModuleDeclarations::getGlobalOpDatDeclaration (
       OP_DAT_ArgumentGroup));
 }
 
-SubroutineVariableDeclarations *
+ScopedVariableDeclarations *
 CPPModuleDeclarations::getAllDeclarations ()
 {
   return variableDeclarations;
