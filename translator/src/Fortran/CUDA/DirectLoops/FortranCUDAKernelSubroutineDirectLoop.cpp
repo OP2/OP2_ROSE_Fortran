@@ -101,6 +101,7 @@ FortranCUDAKernelSubroutineDirectLoop::createStageInFromDeviceMemoryToSharedMemo
   using SageBuilder::buildAssignStatement;
   using SageBuilder::buildMultiplyOp;
   using SageBuilder::buildAddOp;
+  using SageBuilder::buildSubtractOp;
   using SageBuilder::buildPntrArrRefExp;
   using SageBuilder::buildExprStatement;
   using SageInterface::appendStatement;
@@ -166,9 +167,13 @@ FortranCUDAKernelSubroutineDirectLoop::createStageInFromDeviceMemoryToSharedMemo
 
   SgBasicBlock * loopBody = buildBasicBlock (assignmentStatement1);
 
+  SgSubtractOp * upperBoundExpression = buildSubtractOp (dotExpression,
+      buildIntVal (1));
+
   SgFortranDo * loopStatement =
       FortranStatementsAndExpressionsBuilder::buildFortranDoStatement (
-          initialisationExpression, dotExpression, buildIntVal (1), loopBody);
+          initialisationExpression, upperBoundExpression, buildIntVal (1),
+          loopBody);
 
   return loopStatement;
 }
@@ -184,6 +189,7 @@ FortranCUDAKernelSubroutineDirectLoop::createStageInFromSharedMemoryToLocalMemor
   using SageBuilder::buildAssignOp;
   using SageBuilder::buildAssignStatement;
   using SageBuilder::buildMultiplyOp;
+  using SageBuilder::buildSubtractOp;
   using SageBuilder::buildAddOp;
   using SageBuilder::buildPntrArrRefExp;
   using SageBuilder::buildExprStatement;
@@ -235,9 +241,13 @@ FortranCUDAKernelSubroutineDirectLoop::createStageInFromSharedMemoryToLocalMemor
 
   SgBasicBlock * loopBody = buildBasicBlock (assignmentStatement2);
 
+  SgSubtractOp * upperBoundExpression = buildSubtractOp (dotExpression,
+      buildIntVal (1));
+
   SgFortranDo * loopStatement =
       FortranStatementsAndExpressionsBuilder::buildFortranDoStatement (
-          initialisationExpression, dotExpression, buildIntVal (1), loopBody);
+          initialisationExpression, upperBoundExpression, buildIntVal (1),
+          loopBody);
 
   return loopStatement;
 }
@@ -281,9 +291,6 @@ FortranCUDAKernelSubroutineDirectLoop::createStageOutFromSharedMemoryToDeviceMem
       buildVarRefExp (opDatDimensionsDeclaration->getOpDatDimensionField (
           OP_DAT_ArgumentGroup)));
 
-  SgExpression * upperBoundExpression = buildSubtractOp (dotExpression,
-      buildIntVal (1));
-
   SgMultiplyOp * multiplyExpression2 = buildMultiplyOp (buildVarRefExp (
       variableDeclarations->get (CommonVariableNames::iterationCounter2)),
       buildVarRefExp (variableDeclarations->get (OP2::VariableNames::nelems)));
@@ -322,6 +329,9 @@ FortranCUDAKernelSubroutineDirectLoop::createStageOutFromSharedMemoryToDeviceMem
       arrayExpression3, arrayExpression4);
 
   SgBasicBlock * loopBody = buildBasicBlock (assignmentStatement2);
+
+  SgExpression * upperBoundExpression = buildSubtractOp (dotExpression,
+      buildIntVal (1));
 
   SgFortranDo * loopStatement =
       FortranStatementsAndExpressionsBuilder::buildFortranDoStatement (
@@ -370,9 +380,6 @@ FortranCUDAKernelSubroutineDirectLoop::createStageOutFromLocalMemoryToSharedMemo
       buildVarRefExp (opDatDimensionsDeclaration->getOpDatDimensionField (
           OP_DAT_ArgumentGroup)));
 
-  SgExpression * upperBoundExpression = buildSubtractOp (dotExpression,
-      buildIntVal (1));
-
   SgMultiplyOp * multiplyExpression1 = buildMultiplyOp (buildVarRefExp (
       variableDeclarations->get (OP2::VariableNames::threadID)), dotExpression);
 
@@ -396,6 +403,9 @@ FortranCUDAKernelSubroutineDirectLoop::createStageOutFromLocalMemoryToSharedMemo
       arrayExpression2, arrayExpression1);
 
   SgBasicBlock * loopBody = buildBasicBlock (assignmentStatement1);
+
+  SgExpression * upperBoundExpression = buildSubtractOp (dotExpression,
+      buildIntVal (1));
 
   SgFortranDo * loopStatement =
       FortranStatementsAndExpressionsBuilder::buildFortranDoStatement (
@@ -461,8 +471,8 @@ FortranCUDAKernelSubroutineDirectLoop::createExecutionLoopStatements ()
 
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
-    if (parallelLoop->isGlobal (i) == false && parallelLoop->isWritten (i)
-        == false && parallelLoop->getOpDatDimension (i) != 1)
+    if (parallelLoop->isGlobal (i) == false && parallelLoop->isRead (i)
+        && parallelLoop->getOpDatDimension (i) != 1)
     {
       Debug::getInstance ()->debugMessage (
           "Creating statements to stage in from device memory to shared memory for OP_DAT "
@@ -487,7 +497,7 @@ FortranCUDAKernelSubroutineDirectLoop::createExecutionLoopStatements ()
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
     if (parallelLoop->isGlobal (i) == false && parallelLoop->isWritten (i)
-        == false && parallelLoop->getOpDatDimension (i) != 1)
+        && parallelLoop->getOpDatDimension (i) != 1)
     {
       Debug::getInstance ()->debugMessage (
           "Creating statements to stage out from local memory to shared memory for OP_DAT "
