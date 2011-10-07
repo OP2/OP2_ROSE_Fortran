@@ -43,9 +43,6 @@ class FortranModuleDeclarations
   private:
 
     void
-    createFirstExecutionBooleanDeclaration ();
-
-    void
     createCPlanReturnDeclaration ();
 
   protected:
@@ -57,9 +54,6 @@ class FortranModuleDeclarations
 
     SgVariableDeclaration *
     getCPlanReturnDeclaration ();
-
-    SgVariableDeclaration *
-    getFirstExecutionBooleanDeclaration ();
 
     SgVariableDeclaration *
     getReductionArrayHostDeclaration (unsigned int OP_DAT_ArgumentGroup);

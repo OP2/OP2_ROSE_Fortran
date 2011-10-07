@@ -14,35 +14,6 @@
  */
 
 void
-FortranModuleDeclarations::createFirstExecutionBooleanDeclaration ()
-{
-  using SageBuilder::buildVariableDeclaration;
-  using SageBuilder::buildBoolType;
-  using SageBuilder::buildBoolValExp;
-  using SageBuilder::buildAssignInitializer;
-  using SageInterface::appendStatement;
-  using std::string;
-
-  Debug::getInstance ()->debugMessage (
-      "Creating first time execution boolean at module scope",
-      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
-
-  std::string const & variableName =
-      OP2::VariableNames::getFirstTimeExecutionVariableDeclarationName (
-          parallelLoop->getUserSubroutineName ());
-
-  SgVariableDeclaration * variableDeclaration = buildVariableDeclaration (
-      variableName, buildBoolType (), buildAssignInitializer (buildBoolValExp (
-          true), buildBoolType ()), moduleScope);
-
-  variableDeclarations->add (variableName, variableDeclaration);
-
-  variableDeclaration->get_declarationModifier ().get_accessModifier ().setUndefined ();
-
-  appendStatement (variableDeclaration, moduleScope);
-}
-
-void
 FortranModuleDeclarations::createCPlanReturnDeclaration ()
 {
   using std::string;
@@ -71,8 +42,6 @@ FortranModuleDeclarations::FortranModuleDeclarations (
 {
   variableDeclarations = new ScopedVariableDeclarations ();
 
-  createFirstExecutionBooleanDeclaration ();
-
   if (parallelLoop->isDirectLoop () == false)
   {
     createCPlanReturnDeclaration ();
@@ -91,16 +60,6 @@ FortranModuleDeclarations::getCPlanReturnDeclaration ()
   return variableDeclarations->get (
       OP2::VariableNames::getPlanReturnVariableDeclarationName (
           parallelLoop->getUserSubroutineName ()));
-}
-
-SgVariableDeclaration *
-FortranModuleDeclarations::getFirstExecutionBooleanDeclaration ()
-{
-  std::string const & variableName =
-      OP2::VariableNames::getFirstTimeExecutionVariableDeclarationName (
-          parallelLoop->getUserSubroutineName ());
-
-  return variableDeclarations->get (variableName);
 }
 
 SgVariableDeclaration *

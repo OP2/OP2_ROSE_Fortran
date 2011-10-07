@@ -43,15 +43,6 @@ class FortranCUDAHostSubroutine: public FortranHostSubroutine
     virtual SgBasicBlock *
     createTransferOpDatStatements ();
 
-    /*
-     * ======================================================
-     * Creates the statements which are executed when the
-     * host subroutine is executed for the first time
-     * ======================================================
-     */
-    SgBasicBlock *
-    createFirstTimeExecutionStatements ();
-
     void
     createCUDAKernelLocalVariableDeclarations ();
 

@@ -24,19 +24,7 @@ class FortranCUDAModuleDeclarations: public FortranModuleDeclarations
     void
     createReductionDeclarations ();
 
-    void
-    createDataSizesDeclaration ();
-
-    void
-    createDimensionsDeclaration ();
-
   public:
-
-    SgVariableDeclaration *
-    getDataSizesVariableDeclaration ();
-
-    SgVariableDeclaration *
-    getDimensionsVariableDeclaration ();
 
     FortranCUDAModuleDeclarations (FortranParallelLoop * parallelLoop,
         SgScopeStatement * moduleScope,

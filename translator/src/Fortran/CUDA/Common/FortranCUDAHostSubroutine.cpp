@@ -331,7 +331,57 @@ FortranCUDAHostSubroutine::createTransferOpDatStatements ()
   SgBasicBlock * block = buildBasicBlock ();
 
   Debug::getInstance ()->debugMessage (
-      "Creating statements to initialise size of OP_DAT",
+      "Creating statements to initialise OP_DAT dimensions",
+      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+
+  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
+  {
+    if (parallelLoop->isGlobalRead (i) == false)
+    {
+      SgDotExp * dotExpression1 = buildDotExp (buildVarRefExp (
+          moduleDeclarations->getDimensionsVariableDeclaration ()),
+          buildVarRefExp (
+              opDatDimensionsDeclaration->getOpDatDimensionField (i)));
+
+      SgDotExp * dotExpression2 = buildDotExp (buildVarRefExp (
+          variableDeclarations->get (OP2::VariableNames::getOpDatName (i))),
+          buildOpaqueVarRefExp (OP2::VariableNames::dimension, block));
+
+      SgExprStatement * assignmentStatement = buildAssignStatement (
+          dotExpression1, dotExpression2);
+
+      appendStatement (assignmentStatement, block);
+    }
+
+  }
+  Debug::getInstance ()->debugMessage (
+      "Creating statements to initialise OP_DAT cardinalities (on device)",
+      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+
+  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
+  {
+    if (parallelLoop->isDuplicateOpDat (i) == false)
+    {
+      if (parallelLoop->dataSizesDeclarationNeeded (i))
+      {
+        SgDotExp * dotExpression = buildDotExp (buildVarRefExp (
+            moduleDeclarations->getDataSizesVariableDeclaration ()),
+            buildVarRefExp (dataSizesDeclaration->getFieldDeclarations ()->get (
+                OP2::VariableNames::getOpDatCardinalityName (i))));
+
+        SgExpression * rhsOfAssigment =
+            createRHSOfInitialiseOpDatSizeStatement (block, i);
+
+        SgExprStatement * assignmentStatement = buildAssignStatement (
+            dotExpression, rhsOfAssigment);
+
+        appendStatement (assignmentStatement, block);
+      }
+    }
+  }
+
+  Debug::getInstance ()->debugMessage (
+      "Creating statements to initialise OP_DAT cardinalities (on host)",
       Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
@@ -433,56 +483,6 @@ FortranCUDAHostSubroutine::createFirstTimeExecutionStatements ()
   using SageInterface::appendStatement;
 
   SgBasicBlock * block = buildBasicBlock ();
-
-  Debug::getInstance ()->debugMessage (
-      "Creating statements to initialise OP_DAT dimensions",
-      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
-
-  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
-  {
-    if (parallelLoop->isGlobalRead (i) == false)
-    {
-      SgDotExp * dotExpression1 = buildDotExp (buildVarRefExp (
-          moduleDeclarations->getDimensionsVariableDeclaration ()),
-          buildVarRefExp (
-              opDatDimensionsDeclaration->getOpDatDimensionField (i)));
-
-      SgDotExp * dotExpression2 = buildDotExp (buildVarRefExp (
-          variableDeclarations->get (OP2::VariableNames::getOpDatName (i))),
-          buildOpaqueVarRefExp (OP2::VariableNames::dimension, block));
-
-      SgExprStatement * assignmentStatement = buildAssignStatement (
-          dotExpression1, dotExpression2);
-
-      appendStatement (assignmentStatement, block);
-    }
-
-  }
-  Debug::getInstance ()->debugMessage (
-      "Creating statements to initialise OP_DAT sizes (on device)",
-      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
-
-  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
-  {
-    if (parallelLoop->isDuplicateOpDat (i) == false)
-    {
-      if (parallelLoop->dataSizesDeclarationNeeded (i))
-      {
-        SgDotExp * dotExpression = buildDotExp (buildVarRefExp (
-            moduleDeclarations->getDataSizesVariableDeclaration ()),
-            buildVarRefExp (dataSizesDeclaration->getFieldDeclarations ()->get (
-                OP2::VariableNames::getOpDatCardinalityName (i))));
-
-        SgExpression * rhsOfAssigment =
-            createRHSOfInitialiseOpDatSizeStatement (block, i);
-
-        SgExprStatement * assignmentStatement = buildAssignStatement (
-            dotExpression, rhsOfAssigment);
-
-        appendStatement (assignmentStatement, block);
-      }
-    }
-  }
 
   return block;
 }
