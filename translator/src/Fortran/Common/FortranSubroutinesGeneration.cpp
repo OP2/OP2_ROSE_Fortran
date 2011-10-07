@@ -66,13 +66,10 @@ FortranSubroutinesGeneration::patchCallsToParallelLoops ()
   using SageInterface::findLastDeclarationStatement;
   using std::map;
   using std::string;
-  using std::vector;
   using std::find;
 
   Debug::getInstance ()->debugMessage ("Patching calls to OP_PAR_LOOPs",
       Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
-
-  vector <string> processedFiles;
 
   for (map <string, ParallelLoop *>::const_iterator it =
       declarations->firstParallelLoop (); it
@@ -147,13 +144,13 @@ FortranSubroutinesGeneration::patchCallsToParallelLoops ()
           "Could not find last 'use' statement", __FILE__, __LINE__);
     }
 
-    if (find (processedFiles.begin (), processedFiles.end (),
-        parallelLoop->getFileName ()) == processedFiles.end ())
+    if (find (dirtyFiles.begin (), dirtyFiles.end (),
+        parallelLoop->getFileName ()) == dirtyFiles.end ())
     {
       Debug::getInstance ()->debugMessage ("Adding new use statement for '"
           + moduleName + "'", Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
-      processedFiles.push_back (parallelLoop->getFileName ());
+      dirtyFiles.push_back (parallelLoop->getFileName ());
 
       /*
        * ======================================================

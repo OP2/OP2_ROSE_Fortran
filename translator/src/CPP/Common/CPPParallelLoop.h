@@ -35,7 +35,8 @@ class CPPParallelLoop: public ParallelLoop
     virtual unsigned int
     getNumberOfOpDatArgumentGroups ();
 
-    CPPParallelLoop (SgFunctionCallExp * functionCallExpression);
+    CPPParallelLoop (SgFunctionCallExp * functionCallExpression,
+        std::string fileName);
 };
 
 #endif

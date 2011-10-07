@@ -61,7 +61,8 @@ class FortranParallelLoop: public ParallelLoop
     virtual unsigned int
     getNumberOfOpDatArgumentGroups ();
 
-    FortranParallelLoop (SgFunctionCallExp * functionCallExpression);
+    FortranParallelLoop (SgFunctionCallExp * functionCallExpression,
+        std::string fileName);
 };
 
 #endif

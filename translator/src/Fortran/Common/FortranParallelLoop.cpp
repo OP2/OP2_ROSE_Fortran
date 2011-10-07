@@ -9,7 +9,7 @@ FortranParallelLoop::getNumberOfOpDatArgumentGroups ()
 }
 
 FortranParallelLoop::FortranParallelLoop (
-    SgFunctionCallExp * functionCallExpression) :
-  ParallelLoop (functionCallExpression)
+    SgFunctionCallExp * functionCallExpression, std::string fileName) :
+  ParallelLoop (functionCallExpression, fileName)
 {
 }

@@ -41,6 +41,13 @@ class ParallelLoop
 
     /*
      * ======================================================
+     * The file name where the call was detected
+     * ======================================================
+     */
+    std::string fileName;
+
+    /*
+     * ======================================================
      * The same OP_DAT variable can be passed as an argument
      * to OP_PAR_LOOP. This vector records the names of the
      * unique OP_DATs
@@ -116,7 +123,8 @@ class ParallelLoop
 
   protected:
 
-    ParallelLoop (SgFunctionCallExp * functionCallExpression);
+    ParallelLoop (SgFunctionCallExp * functionCallExpression,
+        std::string fileName);
 
   public:
 

@@ -17,6 +17,7 @@
 
 #include <vector>
 #include <map>
+#include <string>
 #include <Debug.h>
 #include <rose.h>
 
@@ -31,6 +32,14 @@ template <typename TDeclarations, typename THostSubroutine>
        * ======================================================
        */
       std::vector <SgSourceFile *> generatedFiles;
+
+      /*
+       * ======================================================
+       * The names of source files passed by the user which
+       * are modified by our compiler
+       * ======================================================
+       */
+      std::vector <std::string> dirtyFiles;
 
       /*
        * ======================================================
@@ -106,6 +115,34 @@ template <typename TDeclarations, typename THostSubroutine>
           std::string const & fileSuffix) :
         declarations (declarations), fileSuffix (fileSuffix)
       {
+      }
+
+    public:
+
+      bool
+      isDirty (std::string const & fileName)
+      {
+        using std::find;
+        using std::vector
+        ;
+        using std::string;
+
+        for (vector<string>::iterator it = dirtyFiles.begin(); it != dirtyFiles.end();++it)
+        {
+          std::cout << *it << std::endl;
+        }
+
+        if (find (dirtyFiles.begin (), dirtyFiles.end (), fileName)
+            != dirtyFiles.end ())
+        {
+          Debug::getInstance ()->debugMessage ("File '" + fileName
+              + "' has been modified", Debug::FUNCTION_LEVEL, __FILE__,
+              __LINE__);
+
+          return true;
+        }
+
+        return false;
       }
   };
 

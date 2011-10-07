@@ -1,5 +1,3 @@
-#include <boost/algorithm/string.hpp>
-#include <rose.h>
 #include <CommandLine.h>
 #include <CommandLineOption.h>
 #include <CommandLineOptionWithParameters.h>
@@ -14,6 +12,9 @@
 #include <CPPProgramDeclarationsAndDefinitions.h>
 #include <CPPCUDASubroutinesGeneration.h>
 #include <CPPOpenCLSubroutinesGeneration.h>
+#include <boost/algorithm/string.hpp>
+#include <boost/filesystem.hpp>
+#include <rose.h>
 
 class OxfordOption: public CommandLineOption
 {
@@ -125,6 +126,8 @@ handleCPPProject (SgProject * project)
 void
 handleFortranProject (SgProject * project)
 {
+  FortranSubroutinesGeneration * generator;
+
   switch (Globals::getInstance ()->getTargetBackend ())
   {
     case TargetBackend::CUDA:
@@ -135,7 +138,7 @@ handleFortranProject (SgProject * project)
       FortranProgramDeclarationsAndDefinitions * declarations =
           new FortranProgramDeclarationsAndDefinitions (project);
 
-      new FortranCUDASubroutinesGeneration (project, declarations);
+      generator = new FortranCUDASubroutinesGeneration (project, declarations);
 
       break;
     }
@@ -148,7 +151,8 @@ handleFortranProject (SgProject * project)
       FortranProgramDeclarationsAndDefinitions * declarations =
           new FortranProgramDeclarationsAndDefinitions (project);
 
-      new FortranOpenMPSubroutinesGeneration (project, declarations);
+      generator
+          = new FortranOpenMPSubroutinesGeneration (project, declarations);
 
       break;
     }
@@ -173,6 +177,41 @@ handleFortranProject (SgProject * project)
       break;
     }
   }
+
+  class TreeVisitor: public AstSimpleProcessing
+  {
+    private:
+      FortranSubroutinesGeneration * generator;
+
+    public:
+
+      TreeVisitor (FortranSubroutinesGeneration * generator) :
+        generator (generator)
+      {
+      }
+
+      virtual void
+      visit (SgNode * node)
+      {
+        using boost::filesystem::path;
+        using boost::filesystem::system_complete;
+
+        SgSourceFile * file = isSgSourceFile (node);
+        if (file != NULL)
+        {
+          path p = system_complete (path (isSgSourceFile (node)->getFileName ()));
+
+          std::cout<< "HERE " <<  p.filename() << std::endl;
+          if (generator->isDirty ( p.filename()))
+          {
+            ;
+          }
+        }
+      }
+  };
+
+  TreeVisitor * visitor = new TreeVisitor (generator);
+  visitor->traverse (project, preorder);
 }
 
 void
@@ -274,12 +313,6 @@ processUserSelections (SgProject * project)
     handleFortranProject (project);
 
     project->unparse ();
-
-    SgStringList & list = project->get_sourceFileNameList ();
-    for (vector <string>::iterator it = list.begin (); it != list.end (); ++it)
-    {
-      std::cout << *it << std::endl;
-    }
   }
   else
   {

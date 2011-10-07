@@ -11,9 +11,12 @@
  * ======================================================
  */
 
-ParallelLoop::ParallelLoop (SgFunctionCallExp * functionCallExpression) :
-  functionCallExpression (functionCallExpression)
+ParallelLoop::ParallelLoop (SgFunctionCallExp * functionCallExpression,
+    std::string fileName) :
+  functionCallExpression (functionCallExpression), fileName (fileName)
 {
+  Debug::getInstance ()->debugMessage ("Parallel loop created in file '"
+      + fileName + "'", Debug::CONSTRUCTOR_LEVEL, __FILE__, __LINE__);
 }
 
 /*
@@ -382,13 +385,13 @@ ParallelLoop::getFunctionCall ()
 std::string const &
 ParallelLoop::getFileName () const
 {
-  return functionCallExpression->getFilenameString ();
+  return fileName;
 }
 
 Reduction *
 ParallelLoop::getReductionTuple (unsigned int OP_DAT_ArgumentGroup)
 {
-  ROSE_ASSERT (isReductionRequired(OP_DAT_ArgumentGroup));
+  ROSE_ASSERT (isReductionRequired (OP_DAT_ArgumentGroup));
 
   SgType * baseType;
 
