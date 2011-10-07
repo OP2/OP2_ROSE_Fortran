@@ -1,7 +1,7 @@
 #include <FortranCUDAKernelSubroutineIndirectLoop.h>
 #include <FortranParallelLoop.h>
 #include <FortranOpDatDimensionsDeclaration.h>
-#include <FortranCUDADataSizesDeclarationIndirectLoop.h>
+#include <FortranCUDAOpDatCardinalitiesDeclarationIndirectLoop.h>
 #include <FortranTypesBuilder.h>
 #include <RoseStatementsAndExpressionsBuilder.h>
 #include <FortranStatementsAndExpressionsBuilder.h>

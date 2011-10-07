@@ -1,4 +1,4 @@
-#include <FortranCUDADataSizesDeclarationIndirectLoop.h>
+#include <FortranCUDAOpDatCardinalitiesDeclarationIndirectLoop.h>
 #include <FortranParallelLoop.h>
 #include <FortranStatementsAndExpressionsBuilder.h>
 #include <FortranTypesBuilder.h>

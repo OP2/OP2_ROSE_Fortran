@@ -2,7 +2,7 @@
 #include <FortranParallelLoop.h>
 #include <FortranOpDatDimensionsDeclaration.h>
 #include <FortranCUDAModuleDeclarations.h>
-#include <FortranCUDADataSizesDeclarationIndirectLoop.h>
+#include <FortranCUDAOpDatCardinalitiesDeclarationIndirectLoop.h>
 #include <FortranTypesBuilder.h>
 #include <FortranStatementsAndExpressionsBuilder.h>
 #include <RoseStatementsAndExpressionsBuilder.h>

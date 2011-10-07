@@ -1,6 +1,6 @@
 #include <FortranCUDAHostSubroutine.h>
 #include <FortranParallelLoop.h>
-#include <FortranCUDADataSizesDeclaration.h>
+#include <FortranCUDAOpDatCardinalitiesDeclaration.h>
 #include <FortranCUDAModuleDeclarations.h>
 #include <FortranOpDatDimensionsDeclaration.h>
 #include <FortranStatementsAndExpressionsBuilder.h>
