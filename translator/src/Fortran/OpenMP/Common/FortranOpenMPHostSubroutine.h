@@ -16,9 +16,6 @@ class FortranOpenMPHostSubroutine: public FortranHostSubroutine
   protected:
 
     virtual void
-    createFirstTimeExecutionStatements () = 0;
-
-    virtual void
     createOpenMPVariableDeclarations () = 0;
 
     virtual void

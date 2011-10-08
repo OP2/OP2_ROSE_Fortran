@@ -49,6 +49,12 @@ class FortranCUDAHostSubroutine: public FortranHostSubroutine
     void
     createDataMarshallingLocalVariableDeclarations ();
 
+    void
+    createOpDatCardinalitiesDeclaration ();
+
+    void
+    createOpDatDimensionsDeclaration ();
+
     FortranCUDAHostSubroutine (std::string const & subroutineName,
         std::string const & userSubroutineName,
         std::string const & kernelSubroutineName,

@@ -43,22 +43,10 @@ class CPPModuleDeclarations
 
   protected:
 
-    void
-    createInitialiseConstantsBooleanDeclaration ();
-
-    void
-    createFirstExecutionBooleanDeclaration ();
-
     CPPModuleDeclarations (std::string const & userSubroutineName,
         CPPParallelLoop * parallelLoop, SgScopeStatement * moduleScope);
 
   public:
-
-    SgVariableDeclaration *
-    getInitialiseConstantsBooleanDeclaration ();
-
-    SgVariableDeclaration *
-    getFirstExecutionBooleanDeclaration ();
 
     SgVariableDeclaration *
     getGlobalOpDatDeclaration (unsigned int OP_DAT_ArgumentGroup);

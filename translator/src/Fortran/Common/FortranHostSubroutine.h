@@ -1,4 +1,3 @@
-
 #pragma once
 #ifndef FORTRAN_HOST_SUBROUTINE_H
 #define FORTRAN_HOST_SUBROUTINE_H

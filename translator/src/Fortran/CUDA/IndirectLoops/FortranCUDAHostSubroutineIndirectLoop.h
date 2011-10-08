@@ -26,7 +26,7 @@ class FortranCUDAHostSubroutineIndirectLoop: public FortranCUDAHostSubroutine,
     createPlanFunctionExecutionStatements ();
 
     void
-    createVariablesSizesInitialisationStatements ();
+    createCardinalitiesInitialisationStatements ();
 
     void
     createExecutionPlanDeclarations ();

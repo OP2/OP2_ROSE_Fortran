@@ -224,31 +224,10 @@ OP2::VariableNames::getIndirectionArgumentSizeName (
 }
 
 std::string
-OP2::VariableNames::getDataSizesVariableDeclarationName (
-    std::string const & suffix)
-{
-  return "sizes_" + suffix;
-}
-
-std::string
-OP2::VariableNames::getDimensionsVariableDeclarationName (
-    std::string const & suffix)
-{
-  return "dimensions_" + suffix;
-}
-
-std::string
 OP2::VariableNames::getPlanReturnVariableDeclarationName (
     std::string const & suffix)
 {
   return "planRet_" + suffix;
-}
-
-std::string
-OP2::VariableNames::getFirstTimeExecutionVariableDeclarationName (
-    std::string const & suffix)
-{
-  return "isFirstTime_" + suffix;
 }
 
 std::string

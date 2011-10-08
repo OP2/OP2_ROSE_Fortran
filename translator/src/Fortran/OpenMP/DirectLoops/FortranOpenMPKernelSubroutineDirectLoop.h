@@ -4,7 +4,8 @@
 #define FORTRAN_OPENMP_KERNEL_SUBROUTINE_DIRECT_LOOP_H
 
 #include <FortranOpenMPKernelSubroutine.h>
-#include <FortranParallelLoop.h>
+
+class FortranParallelLoop;
 
 class FortranOpenMPKernelSubroutineDirectLoop: public FortranOpenMPKernelSubroutine
 {

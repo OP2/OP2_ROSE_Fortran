@@ -339,7 +339,7 @@ FortranCUDAHostSubroutine::createTransferOpDatStatements ()
     if (parallelLoop->isGlobalRead (i) == false)
     {
       SgDotExp * dotExpression1 = buildDotExp (buildVarRefExp (
-          moduleDeclarations->getDimensionsVariableDeclaration ()),
+          variableDeclarations->get (OP2::VariableNames::opDatDimensions)),
           buildVarRefExp (
               opDatDimensionsDeclaration->getOpDatDimensionField (i)));
 
@@ -352,8 +352,8 @@ FortranCUDAHostSubroutine::createTransferOpDatStatements ()
 
       appendStatement (assignmentStatement, block);
     }
-
   }
+
   Debug::getInstance ()->debugMessage (
       "Creating statements to initialise OP_DAT cardinalities (on device)",
       Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
@@ -364,10 +364,11 @@ FortranCUDAHostSubroutine::createTransferOpDatStatements ()
     {
       if (parallelLoop->dataSizesDeclarationNeeded (i))
       {
-        SgDotExp * dotExpression = buildDotExp (buildVarRefExp (
-            moduleDeclarations->getDataSizesVariableDeclaration ()),
-            buildVarRefExp (dataSizesDeclaration->getFieldDeclarations ()->get (
-                OP2::VariableNames::getOpDatCardinalityName (i))));
+        SgDotExp * dotExpression = buildDotExp (
+            buildVarRefExp (variableDeclarations->get (
+                OP2::VariableNames::opDatCardinalities)), buildVarRefExp (
+                dataSizesDeclaration->getFieldDeclarations ()->get (
+                    OP2::VariableNames::getOpDatCardinalityName (i))));
 
         SgExpression * rhsOfAssigment =
             createRHSOfInitialiseOpDatSizeStatement (block, i);
@@ -468,21 +469,6 @@ FortranCUDAHostSubroutine::createTransferOpDatStatements ()
       }
     }
   }
-
-  return block;
-}
-
-SgBasicBlock *
-FortranCUDAHostSubroutine::createFirstTimeExecutionStatements ()
-{
-  using SageBuilder::buildBasicBlock;
-  using SageBuilder::buildAssignStatement;
-  using SageBuilder::buildVarRefExp;
-  using SageBuilder::buildOpaqueVarRefExp;
-  using SageBuilder::buildDotExp;
-  using SageInterface::appendStatement;
-
-  SgBasicBlock * block = buildBasicBlock ();
 
   return block;
 }
@@ -592,6 +578,33 @@ FortranCUDAHostSubroutine::createCUDAKernelLocalVariableDeclarations ()
       FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
           CUDA::threadSynchRet, FortranTypesBuilder::getFourByteInteger (),
           subroutineScope));
+}
+
+void
+FortranCUDAHostSubroutine::createOpDatCardinalitiesDeclaration ()
+{
+  Debug::getInstance ()->debugMessage (
+      "Generating OP_DAT cardinalities declaration ", Debug::FUNCTION_LEVEL,
+      __FILE__, __LINE__);
+
+  variableDeclarations->add (OP2::VariableNames::opDatCardinalities,
+      FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
+          OP2::VariableNames::opDatCardinalities,
+          dataSizesDeclaration->getType (), subroutineScope, 1, CUDA_DEVICE));
+}
+
+void
+FortranCUDAHostSubroutine::createOpDatDimensionsDeclaration ()
+{
+  Debug::getInstance ()->debugMessage (
+      "Generating OP_DAT dimensions declaration", Debug::FUNCTION_LEVEL,
+      __FILE__, __LINE__);
+
+  variableDeclarations->add (OP2::VariableNames::opDatDimensions,
+      FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
+          OP2::VariableNames::opDatDimensions,
+          opDatDimensionsDeclaration->getType (), subroutineScope, 1,
+          CUDA_DEVICE));
 }
 
 FortranCUDAHostSubroutine::FortranCUDAHostSubroutine (

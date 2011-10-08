@@ -1,10 +1,10 @@
-
 #pragma once
 #ifndef FORTRAN_OPENMP_HOST_SUBROUTINE_DIRECT_LOOP_H
 #define FORTRAN_OPENMP_HOST_SUBROUTINE_DIRECT_LOOP_H
 
 #include <FortranOpenMPHostSubroutine.h>
-#include <FortranOpenMPModuleDeclarationsDirectLoop.h>
+
+class FortranOpenMPModuleDeclarationsDirectLoop;
 
 class FortranOpenMPHostSubroutineDirectLoop: public FortranOpenMPHostSubroutine
 {
@@ -15,9 +15,6 @@ class FortranOpenMPHostSubroutineDirectLoop: public FortranOpenMPHostSubroutine
 
     virtual SgBasicBlock *
     createTransferOpDatStatements ();
-
-    virtual void
-    createFirstTimeExecutionStatements ();
 
     void
     initialiseThreadVariablesStatements ();

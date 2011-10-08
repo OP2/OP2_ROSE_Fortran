@@ -317,65 +317,6 @@ FortranOpenMPHostSubroutineIndirectLoop::createTransferOpDatStatements ()
 }
 
 void
-FortranOpenMPHostSubroutineIndirectLoop::createFirstTimeExecutionStatements ()
-{
-  using SageBuilder::buildBasicBlock;
-  using SageBuilder::buildDotExp;
-  using SageBuilder::buildVarRefExp;
-  using SageBuilder::buildOpaqueVarRefExp;
-  using SageBuilder::buildBoolValExp;
-  using SageBuilder::buildAssignOp;
-  using SageBuilder::buildEqualityOp;
-  using SageBuilder::buildAssignStatement;
-  using SageInterface::appendStatement;
-
-  Debug::getInstance ()->debugMessage (
-      "Creating statements for first execution of host subroutine",
-      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
-
-  SgEqualityOp * ifGuardExpression = buildEqualityOp (buildVarRefExp (
-      moduleDeclarations->getFirstExecutionBooleanDeclaration ()),
-      buildBoolValExp (true));
-
-  SgBasicBlock * ifBody = buildBasicBlock ();
-
-  SgExprStatement * assignmentStatement1 = buildAssignStatement (
-      buildVarRefExp (
-          moduleDeclarations->getFirstExecutionBooleanDeclaration ()),
-      buildBoolValExp (false));
-
-  appendStatement (assignmentStatement1, ifBody);
-
-  appendStatement (createPlanFunctionParametersPreparationStatements (
-      (FortranParallelLoop *) parallelLoop, variableDeclarations), ifBody);
-
-  SgFunctionCallExp * planFunctionCallExpression =
-      createPlanFunctionCallExpression (subroutineScope, variableDeclarations);
-
-  SgExprStatement * assignmentStatement2 = buildAssignStatement (
-      buildVarRefExp (moduleDeclarations->getCPlanReturnDeclaration ()),
-      planFunctionCallExpression);
-
-  appendStatement (assignmentStatement2, ifBody);
-
-  appendStatement (createTransferOpDatStatements (), ifBody);
-
-  appendStatement (createConvertPositionInPMapsStatements (
-      (FortranParallelLoop *) parallelLoop, subroutineScope,
-      variableDeclarations), ifBody);
-
-  appendStatement (createConvertPlanFunctionParametersStatements (
-      (FortranParallelLoop *) parallelLoop, subroutineScope,
-      variableDeclarations), ifBody);
-
-  SgIfStmt * ifStatement =
-      RoseStatementsAndExpressionsBuilder::buildIfStatementWithEmptyElse (
-          ifGuardExpression, ifBody);
-
-  appendStatement (ifStatement, subroutineScope);
-}
-
-void
 FortranOpenMPHostSubroutineIndirectLoop::createExecutionPlanDeclarations ()
 {
   using std::string;
@@ -470,12 +411,37 @@ FortranOpenMPHostSubroutineIndirectLoop::createOpenMPVariableDeclarations ()
 void
 FortranOpenMPHostSubroutineIndirectLoop::createStatements ()
 {
+  using SageBuilder::buildAssignStatement;
+  using SageBuilder::buildVarRefExp;
+  using SageInterface::appendStatement;
+
   Debug::getInstance ()->debugMessage ("Creating statements",
       Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
   initialiseNumberOfThreadsStatements ();
 
-  createFirstTimeExecutionStatements ();
+  appendStatement (createPlanFunctionParametersPreparationStatements (
+      (FortranParallelLoop *) parallelLoop, variableDeclarations),
+      subroutineScope);
+
+  SgFunctionCallExp * planFunctionCallExpression =
+      createPlanFunctionCallExpression (subroutineScope, variableDeclarations);
+
+  SgExprStatement * assignmentStatement2 = buildAssignStatement (
+      buildVarRefExp (moduleDeclarations->getCPlanReturnDeclaration ()),
+      planFunctionCallExpression);
+
+  appendStatement (assignmentStatement2, subroutineScope);
+
+  appendStatement (createTransferOpDatStatements (), subroutineScope);
+
+  appendStatement (createConvertPositionInPMapsStatements (
+      (FortranParallelLoop *) parallelLoop, subroutineScope,
+      variableDeclarations), subroutineScope);
+
+  appendStatement (createConvertPlanFunctionParametersStatements (
+      (FortranParallelLoop *) parallelLoop, subroutineScope,
+      variableDeclarations), subroutineScope);
 
   if (parallelLoop->isReductionRequired ())
   {

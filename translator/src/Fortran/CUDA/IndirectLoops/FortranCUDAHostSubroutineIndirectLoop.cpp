@@ -33,10 +33,10 @@ FortranCUDAHostSubroutineIndirectLoop::createKernelFunctionCallStatement ()
   SgExprListExp * actualParameters = buildExprListExp ();
 
   actualParameters->append_expression (buildVarRefExp (
-      moduleDeclarations->getDimensionsVariableDeclaration ()));
+      variableDeclarations->get (OP2::VariableNames::opDatDimensions)));
 
   actualParameters->append_expression (buildVarRefExp (
-      moduleDeclarations->getDataSizesVariableDeclaration ()));
+      variableDeclarations->get (OP2::VariableNames::opDatCardinalities)));
 
   Debug::getInstance ()->debugMessage (
       "Adding OP_DAT parameters with indirect access", Debug::FUNCTION_LEVEL,
@@ -277,7 +277,7 @@ FortranCUDAHostSubroutineIndirectLoop::createPlanFunctionExecutionStatements ()
 }
 
 void
-FortranCUDAHostSubroutineIndirectLoop::createVariablesSizesInitialisationStatements ()
+FortranCUDAHostSubroutineIndirectLoop::createCardinalitiesInitialisationStatements ()
 {
   using SageBuilder::buildEqualityOp;
   using SageBuilder::buildBoolValExp;
@@ -292,17 +292,8 @@ FortranCUDAHostSubroutineIndirectLoop::createVariablesSizesInitialisationStateme
   using std::vector;
 
   Debug::getInstance ()->debugMessage (
-      "Creating statements to initialise variable sizes",
+      "Creating statements to initialise OP_DAT cardinalities",
       Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
-
-  SgBasicBlock * ifBody = buildBasicBlock ();
-
-  SgExprStatement * assignmentStatement1 = buildAssignStatement (
-      buildVarRefExp (
-          moduleDeclarations->getFirstExecutionBooleanDeclaration ()),
-      buildBoolValExp (false));
-
-  appendStatement (assignmentStatement1, ifBody);
 
   unsigned int countIndirectArgs = 1;
 
@@ -312,10 +303,11 @@ FortranCUDAHostSubroutineIndirectLoop::createVariablesSizesInitialisationStateme
     {
       if (parallelLoop->isIndirect (i))
       {
-        SgDotExp * dotExpression = buildDotExp (buildVarRefExp (
-            moduleDeclarations->getDataSizesVariableDeclaration ()),
-            buildVarRefExp (dataSizesDeclaration->getFieldDeclarations ()->get (
-                OP2::VariableNames::getLocalToGlobalMappingSizeName (i))));
+        SgDotExp * dotExpression = buildDotExp (
+            buildVarRefExp (variableDeclarations->get (
+                OP2::VariableNames::opDatCardinalities)), buildVarRefExp (
+                dataSizesDeclaration->getFieldDeclarations ()->get (
+                    OP2::VariableNames::getLocalToGlobalMappingSizeName (i))));
 
         SgPntrArrRefExp * arrayIndexExpression = buildPntrArrRefExp (
             buildVarRefExp (variableDeclarations->get (
@@ -325,7 +317,7 @@ FortranCUDAHostSubroutineIndirectLoop::createVariablesSizesInitialisationStateme
         SgExprStatement * assignmentStatement = buildAssignStatement (
             dotExpression, arrayIndexExpression);
 
-        appendStatement (assignmentStatement, ifBody);
+        appendStatement (assignmentStatement, subroutineScope);
 
         countIndirectArgs++;
       }
@@ -337,7 +329,7 @@ FortranCUDAHostSubroutineIndirectLoop::createVariablesSizesInitialisationStateme
     if (parallelLoop->isIndirect (i))
     {
       SgDotExp * fieldSelectionExpression = buildDotExp (buildVarRefExp (
-          moduleDeclarations->getDataSizesVariableDeclaration ()),
+          variableDeclarations->get (OP2::VariableNames::opDatCardinalities)),
           buildVarRefExp (dataSizesDeclaration->getFieldDeclarations ()->get (
               OP2::VariableNames::getGlobalToLocalMappingSizeName (i))));
 
@@ -345,7 +337,7 @@ FortranCUDAHostSubroutineIndirectLoop::createVariablesSizesInitialisationStateme
           fieldSelectionExpression, buildVarRefExp (variableDeclarations->get (
               OP2::VariableNames::getGlobalToLocalMappingSizeName (i))));
 
-      appendStatement (assignmentStatement, ifBody);
+      appendStatement (assignmentStatement, subroutineScope);
     }
   }
 
@@ -376,7 +368,7 @@ FortranCUDAHostSubroutineIndirectLoop::createVariablesSizesInitialisationStateme
       != planFunctionSizeVariables.end (); ++it)
   {
     SgDotExp * fieldSelectionExpression = buildDotExp (buildVarRefExp (
-        moduleDeclarations->getDataSizesVariableDeclaration ()),
+        variableDeclarations->get (OP2::VariableNames::opDatCardinalities)),
         buildVarRefExp (
             dataSizesDeclaration->getFieldDeclarations ()->get (*it)));
 
@@ -384,18 +376,8 @@ FortranCUDAHostSubroutineIndirectLoop::createVariablesSizesInitialisationStateme
         fieldSelectionExpression, buildVarRefExp (variableDeclarations->get (
             *it)));
 
-    appendStatement (assignmentStatement, ifBody);
+    appendStatement (assignmentStatement, subroutineScope);
   }
-
-  SgEqualityOp * ifGuardExpression = buildEqualityOp (buildVarRefExp (
-      moduleDeclarations->getFirstExecutionBooleanDeclaration ()),
-      buildBoolValExp (true));
-
-  SgIfStmt * ifStatement =
-      RoseStatementsAndExpressionsBuilder::buildIfStatementWithEmptyElse (
-          ifGuardExpression, ifBody);
-
-  appendStatement (ifStatement, subroutineScope);
 }
 
 void
@@ -673,19 +655,12 @@ void
 FortranCUDAHostSubroutineIndirectLoop::createStatements ()
 {
   using SageBuilder::buildVarRefExp;
-  using SageBuilder::buildBoolValExp;
-  using SageBuilder::buildEqualityOp;
   using SageBuilder::buildAssignStatement;
   using SageInterface::appendStatement;
 
-  SgEqualityOp * ifGuardExpression = buildEqualityOp (buildVarRefExp (
-      moduleDeclarations->getFirstExecutionBooleanDeclaration ()),
-      buildBoolValExp (true));
-
-  SgBasicBlock * ifBody = createFirstTimeExecutionStatements ();
-
   appendStatement (createPlanFunctionParametersPreparationStatements (
-      (FortranParallelLoop *) parallelLoop, variableDeclarations), ifBody);
+      (FortranParallelLoop *) parallelLoop, variableDeclarations),
+      subroutineScope);
 
   SgFunctionCallExp * planFunctionCallExpression =
       createPlanFunctionCallExpression (subroutineScope, variableDeclarations);
@@ -694,13 +669,7 @@ FortranCUDAHostSubroutineIndirectLoop::createStatements ()
       buildVarRefExp (moduleDeclarations->getCPlanReturnDeclaration ()),
       planFunctionCallExpression);
 
-  appendStatement (assignmentStatement1, ifBody);
-
-  SgIfStmt * ifStatement =
-      RoseStatementsAndExpressionsBuilder::buildIfStatementWithEmptyElse (
-          ifGuardExpression, ifBody);
-
-  appendStatement (ifStatement, subroutineScope);
+  appendStatement (assignmentStatement1, subroutineScope);
 
   appendStatement (createTransferOpDatStatements (), subroutineScope);
 
@@ -726,7 +695,7 @@ FortranCUDAHostSubroutineIndirectLoop::createStatements ()
       (FortranParallelLoop *) parallelLoop, subroutineScope,
       variableDeclarations), subroutineScope);
 
-  createVariablesSizesInitialisationStatements ();
+  createCardinalitiesInitialisationStatements ();
 
   createPlanFunctionExecutionStatements ();
 

@@ -50,10 +50,8 @@ FortranCUDAKernelSubroutine::buildOpGlobalActualParameterExpression (
           OP_DAT_ArgumentGroup);
 
       SgDotExp * dotExpression = buildDotExp (buildVarRefExp (
-          variableDeclarations->get (
-              OP2::VariableNames::getDataSizesVariableDeclarationName (
-                  userSubroutineName))), buildOpaqueVarRefExp (variableName,
-          subroutineScope));
+          variableDeclarations->get (OP2::VariableNames::opDatCardinalities)),
+          buildOpaqueVarRefExp (variableName, subroutineScope));
 
       SgSubtractOp * subtractExpression = buildSubtractOp (dotExpression,
           buildIntVal (1));

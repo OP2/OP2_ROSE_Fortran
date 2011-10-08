@@ -1,4 +1,3 @@
-
 #pragma once
 #ifndef HOST_SUBROUTINE_H
 #define HOST_SUBROUTINE_H
@@ -9,8 +8,7 @@ class SgStatement;
 class ParallelLoop;
 
 template <typename TSubroutineHeader>
-  class HostSubroutine: 
-    public Subroutine <TSubroutineHeader>
+  class HostSubroutine: public Subroutine <TSubroutineHeader>
   {
     protected:
 

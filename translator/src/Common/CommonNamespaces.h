@@ -66,6 +66,8 @@ namespace OP2
     std::string const numberOfColours = "numOfColours";
     std::string const nelems = "nelems";
     std::string const nelems2 = "nelems2";
+    std::string const opDatCardinalities = "opDatCardinalities";
+    std::string const opDatDimensions = "opDatDimensions";
     std::string const reductionCardinality = "reductionCardinality";
     std::string const reductionResult = "reductionResult";
     std::string const reductionSharedMemorySize = "reductionSharedMemorySize";
@@ -318,16 +320,7 @@ namespace OP2
     getIndirectionArgumentSizeName (unsigned int OP_DAT_ArgumentGroup);
 
     std::string
-    getDataSizesVariableDeclarationName (std::string const & suffix);
-
-    std::string
-    getDimensionsVariableDeclarationName (std::string const & suffix);
-
-    std::string
     getPlanReturnVariableDeclarationName (std::string const & suffix);
-
-    std::string
-    getFirstTimeExecutionVariableDeclarationName (std::string const & suffix);
 
     std::string
     getAutosharedDeclarationName (SgType * type, unsigned int size);

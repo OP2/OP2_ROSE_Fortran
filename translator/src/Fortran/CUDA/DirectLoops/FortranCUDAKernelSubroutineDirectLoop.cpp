@@ -122,9 +122,7 @@ FortranCUDAKernelSubroutineDirectLoop::createStageInFromDeviceMemoryToSharedMemo
       buildIntVal (0));
 
   SgDotExp * dotExpression = buildDotExp (buildVarRefExp (
-      variableDeclarations->get (
-          OP2::VariableNames::getDimensionsVariableDeclarationName (
-              userSubroutineName))),
+      variableDeclarations->get (OP2::VariableNames::opDatDimensions)),
       buildVarRefExp (opDatDimensionsDeclaration->getOpDatDimensionField (
           OP_DAT_ArgumentGroup)));
 
@@ -211,9 +209,7 @@ FortranCUDAKernelSubroutineDirectLoop::createStageInFromSharedMemoryToLocalMemor
       buildIntVal (0));
 
   SgDotExp * dotExpression = buildDotExp (buildVarRefExp (
-      variableDeclarations->get (
-          OP2::VariableNames::getDimensionsVariableDeclarationName (
-              userSubroutineName))),
+      variableDeclarations->get (OP2::VariableNames::opDatDimensions)),
       buildVarRefExp (opDatDimensionsDeclaration->getOpDatDimensionField (
           OP_DAT_ArgumentGroup)));
 
@@ -285,9 +281,7 @@ FortranCUDAKernelSubroutineDirectLoop::createStageOutFromSharedMemoryToDeviceMem
       buildIntVal (0));
 
   SgDotExp * dotExpression = buildDotExp (buildVarRefExp (
-      variableDeclarations->get (
-          OP2::VariableNames::getDimensionsVariableDeclarationName (
-              userSubroutineName))),
+      variableDeclarations->get (OP2::VariableNames::opDatDimensions)),
       buildVarRefExp (opDatDimensionsDeclaration->getOpDatDimensionField (
           OP_DAT_ArgumentGroup)));
 
@@ -374,9 +368,7 @@ FortranCUDAKernelSubroutineDirectLoop::createStageOutFromLocalMemoryToSharedMemo
       buildIntVal (0));
 
   SgDotExp * dotExpression = buildDotExp (buildVarRefExp (
-      variableDeclarations->get (
-          OP2::VariableNames::getDimensionsVariableDeclarationName (
-              userSubroutineName))),
+      variableDeclarations->get (OP2::VariableNames::opDatDimensions)),
       buildVarRefExp (opDatDimensionsDeclaration->getOpDatDimensionField (
           OP_DAT_ArgumentGroup)));
 
@@ -691,12 +683,11 @@ FortranCUDAKernelSubroutineDirectLoop::createOpDatFormalParameterDeclarations ()
         }
         else
         {
-          SgDotExp * dotExpression = buildDotExp (buildVarRefExp (
-              variableDeclarations->get (
-                  OP2::VariableNames::getDataSizesVariableDeclarationName (
-                      userSubroutineName))), buildVarRefExp (
-              dataSizesDeclaration->getFieldDeclarations ()->get (
-                  OP2::VariableNames::getOpDatCardinalityName (i))));
+          SgDotExp * dotExpression = buildDotExp (
+              buildVarRefExp (variableDeclarations->get (
+                  OP2::VariableNames::opDatCardinalities)), buildVarRefExp (
+                  dataSizesDeclaration->getFieldDeclarations ()->get (
+                      OP2::VariableNames::getOpDatCardinalityName (i))));
 
           SgSubtractOp * upperBoundExpression = buildSubtractOp (dotExpression,
               buildIntVal (1));
@@ -774,11 +765,9 @@ FortranCUDAKernelSubroutineDirectLoop::createFormalParameterDeclarations ()
    */
 
   variableDeclarations->add (
-      OP2::VariableNames::getDimensionsVariableDeclarationName (
-          userSubroutineName),
+      OP2::VariableNames::opDatDimensions,
       FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
-          OP2::VariableNames::getDimensionsVariableDeclarationName (
-              userSubroutineName), opDatDimensionsDeclaration->getType (),
+          OP2::VariableNames::opDatDimensions, opDatDimensionsDeclaration->getType (),
           subroutineScope, formalParameters, 1, CUDA_DEVICE));
 
   /*
@@ -788,11 +777,9 @@ FortranCUDAKernelSubroutineDirectLoop::createFormalParameterDeclarations ()
    */
 
   variableDeclarations->add (
-      OP2::VariableNames::getDataSizesVariableDeclarationName (
-          userSubroutineName),
+      OP2::VariableNames::opDatCardinalities,
       FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
-          OP2::VariableNames::getDataSizesVariableDeclarationName (
-              userSubroutineName), dataSizesDeclaration->getType (),
+          OP2::VariableNames::opDatCardinalities, dataSizesDeclaration->getType (),
           subroutineScope, formalParameters, 1, CUDA_DEVICE));
 
   /*

@@ -1,6 +1,7 @@
 #include <FortranOpenMPHostSubroutineDirectLoop.h>
 #include <FortranStatementsAndExpressionsBuilder.h>
 #include <FortranTypesBuilder.h>
+#include <FortranOpenMPModuleDeclarationsDirectLoop.h>
 #include <RoseStatementsAndExpressionsBuilder.h>
 #include <CommonNamespaces.h>
 #include <RoseHelper.h>
@@ -209,41 +210,6 @@ FortranOpenMPHostSubroutineDirectLoop::createTransferOpDatStatements ()
 }
 
 void
-FortranOpenMPHostSubroutineDirectLoop::createFirstTimeExecutionStatements ()
-{
-  using SageBuilder::buildBasicBlock;
-  using SageBuilder::buildVarRefExp;
-  using SageBuilder::buildBoolValExp;
-  using SageBuilder::buildEqualityOp;
-  using SageBuilder::buildAssignStatement;
-  using SageInterface::appendStatement;
-
-  Debug::getInstance ()->debugMessage (
-      "Creating statements for first execution of host subroutine",
-      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
-
-  SgBasicBlock * ifBody = buildBasicBlock ();
-
-  SgExprStatement * assignmentStatement = buildAssignStatement (buildVarRefExp (
-      moduleDeclarations->getFirstExecutionBooleanDeclaration ()),
-      buildBoolValExp (false));
-
-  appendStatement (assignmentStatement, ifBody);
-
-  appendStatement (createTransferOpDatStatements (), ifBody);
-
-  SgEqualityOp * ifGuardExpression = buildEqualityOp (buildVarRefExp (
-      moduleDeclarations->getFirstExecutionBooleanDeclaration ()),
-      buildBoolValExp (true));
-
-  SgIfStmt * ifStatement =
-      RoseStatementsAndExpressionsBuilder::buildIfStatementWithEmptyElse (
-          ifGuardExpression, ifBody);
-
-  appendStatement (ifStatement, subroutineScope);
-}
-
-void
 FortranOpenMPHostSubroutineDirectLoop::initialiseThreadVariablesStatements ()
 {
   using SageBuilder::buildVarRefExp;
@@ -301,11 +267,13 @@ FortranOpenMPHostSubroutineDirectLoop::createOpenMPVariableDeclarations ()
 void
 FortranOpenMPHostSubroutineDirectLoop::createStatements ()
 {
+  using SageInterface::appendStatement;
+
   initialiseThreadVariablesStatements ();
 
   initialiseNumberOfThreadsStatements ();
 
-  createFirstTimeExecutionStatements ();
+  appendStatement (createTransferOpDatStatements (), subroutineScope);
 
   if (parallelLoop->isReductionRequired ())
   {

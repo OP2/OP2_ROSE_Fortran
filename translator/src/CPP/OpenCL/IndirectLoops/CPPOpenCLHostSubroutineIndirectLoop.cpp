@@ -28,12 +28,6 @@ CPPOpenCLHostSubroutineIndirectLoop::createKernelFunctionCallStatement ()
 
   std::vector <std::pair <SgExpression *, SgExpression *> > kernelArguments;
 
-  actualParameters->append_expression (buildVarRefExp (
-      moduleDeclarations->getDimensionsVariableDeclaration ()));
-
-  actualParameters->append_expression (buildVarRefExp (
-      moduleDeclarations->getDataSizesVariableDeclaration ()));
-
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
     if (parallelLoop->isDuplicateOpDat (i) == false
@@ -173,8 +167,6 @@ CPPOpenCLHostSubroutineIndirectLoop::createPlanFunctionExecutionStatements ()
    * ======================================================
    */
 
-  //XXX
-
   /* 
    * ======================================================
    * BEGIN for ( col=0; col < Plan->ncolors; col++ )
@@ -280,122 +272,6 @@ CPPOpenCLHostSubroutineIndirectLoop::createVariablesSizesInitialisationStatement
   Debug::getInstance ()->debugMessage (
       "Creating statements to initialise variable sizes",
       Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
-
-  SgBasicBlock * ifBody = buildBasicBlock ();
-
-  SgExprStatement * assignmentStatement1 = buildAssignStatement (
-      buildVarRefExp (
-          moduleDeclarations->getFirstExecutionBooleanDeclaration ()),
-      buildBoolValExp (false));
-
-  appendStatement (assignmentStatement1, ifBody);
-
-  unsigned int countIndirectArgs = 1;
-
-  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
-  {
-    if (parallelLoop->isDuplicateOpDat (i) == false
-        && parallelLoop->isIndirect (i))
-    {
-      SgVarRefExp * dataSizesReferences = buildVarRefExp (
-          moduleDeclarations->getDataSizesVariableDeclaration ());
-
-      SgVarRefExp * fieldReference = buildVarRefExp (
-          dataSizesDeclaration->getFieldDeclarations ()->get (
-              OP2::VariableNames::getLocalToGlobalMappingSizeName (i)));
-
-      SgDotExp * fieldSelectionExpression = buildDotExp (dataSizesReferences,
-          fieldReference);
-
-      SgVarRefExp * pnindirect_Reference = buildVarRefExp (
-          variableDeclarations->get (
-              OP2::VariableNames::PlanFunction::pnindirect));
-
-      SgPntrArrRefExp * arrayIndexExpression = buildPntrArrRefExp (
-          pnindirect_Reference, buildIntVal (countIndirectArgs));
-
-      SgExprStatement * assignmentStatement = buildAssignStatement (
-          fieldSelectionExpression, arrayIndexExpression);
-
-      appendStatement (assignmentStatement, ifBody);
-
-      countIndirectArgs++;
-    }
-  }
-
-  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
-  {
-    if (parallelLoop->isIndirect (i))
-    {
-      SgVarRefExp * dataSizesReferences = buildVarRefExp (
-          moduleDeclarations->getDataSizesVariableDeclaration ());
-
-      SgVarRefExp * fieldReference = buildVarRefExp (
-          dataSizesDeclaration->getFieldDeclarations ()->get (
-              OP2::VariableNames::getGlobalToLocalMappingSizeName (i)));
-
-      SgDotExp * fieldSelectionExpression = buildDotExp (dataSizesReferences,
-          fieldReference);
-
-      SgExprStatement * assignmentStatement = buildAssignStatement (
-          fieldSelectionExpression, buildVarRefExp (variableDeclarations->get (
-              OP2::VariableNames::getGlobalToLocalMappingSizeName (i))));
-
-      appendStatement (assignmentStatement, ifBody);
-    }
-  }
-
-  vector <string> planFunctionSizeVariables;
-
-  planFunctionSizeVariables.push_back (
-      OP2::VariableNames::PlanFunction::pblkMapSize);
-
-  planFunctionSizeVariables.push_back (
-      OP2::VariableNames::PlanFunction::pindOffsSize);
-
-  planFunctionSizeVariables.push_back (
-      OP2::VariableNames::PlanFunction::pindSizesSize);
-
-  planFunctionSizeVariables.push_back (
-      OP2::VariableNames::PlanFunction::pnelemsSize);
-
-  planFunctionSizeVariables.push_back (
-      OP2::VariableNames::PlanFunction::pnthrcolSize);
-
-  planFunctionSizeVariables.push_back (
-      OP2::VariableNames::PlanFunction::poffsetSize);
-
-  planFunctionSizeVariables.push_back (
-      OP2::VariableNames::PlanFunction::pthrcolSize);
-
-  for (vector <string>::iterator it = planFunctionSizeVariables.begin (); it
-      != planFunctionSizeVariables.end (); ++it)
-  {
-    SgVarRefExp * dataSizesReferences = buildVarRefExp (
-        moduleDeclarations->getDataSizesVariableDeclaration ());
-
-    SgVarRefExp * fieldReference = buildVarRefExp (
-        dataSizesDeclaration->getFieldDeclarations ()->get (*it));
-
-    SgDotExp * fieldSelectionExpression = buildDotExp (dataSizesReferences,
-        fieldReference);
-
-    SgExprStatement * assignmentStatement = buildAssignStatement (
-        fieldSelectionExpression, buildVarRefExp (variableDeclarations->get (
-            *it)));
-
-    appendStatement (assignmentStatement, ifBody);
-  }
-
-  SgEqualityOp * ifGuardExpression = buildEqualityOp (buildVarRefExp (
-      moduleDeclarations->getFirstExecutionBooleanDeclaration ()),
-      buildBoolValExp (true));
-
-  SgIfStmt * ifStatement =
-      RoseStatementsAndExpressionsBuilder::buildIfStatementWithEmptyElse (
-          ifGuardExpression, ifBody);
-
-  appendStatement (ifStatement, subroutineScope);
 }
 
 void
@@ -584,32 +460,6 @@ CPPOpenCLHostSubroutineIndirectLoop::createExecutionPlanDeclarations ()
 void
 CPPOpenCLHostSubroutineIndirectLoop::createStatements ()
 {
-  using SageBuilder::buildVarRefExp;
-  using SageBuilder::buildBoolValExp;
-  using SageBuilder::buildEqualityOp;
-  using SageBuilder::buildBasicBlock;
-  using SageInterface::appendStatement;
-
-  SgExprStatement * tempStatement = NULL;
-
-  SgEqualityOp * ifGuardExpression = buildEqualityOp (buildVarRefExp (
-      moduleDeclarations->getFirstExecutionBooleanDeclaration ()),
-      buildBoolValExp (true));
-
-  SgBasicBlock * ifBody = buildBasicBlock (); //createFirstTimeExecutionStatements ();
-
-  appendStatement (createPlanFunctionParametersPreparationStatements (
-      (CPPParallelLoop *) parallelLoop, variableDeclarations), ifBody);
-
-  SgFunctionCallExp * planFunctionCallExpression =
-      createPlanFunctionCallExpression (subroutineScope, variableDeclarations);
-
-  SgIfStmt * ifStatement =
-      RoseStatementsAndExpressionsBuilder::buildIfStatementWithEmptyElse (
-          ifGuardExpression, ifBody);
-
-  appendStatement (ifStatement, subroutineScope);
-
   if (parallelLoop->isReductionRequired () == true)
   {
     createReductionPrologueStatements ();

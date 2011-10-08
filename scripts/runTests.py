@@ -79,9 +79,9 @@ def clean ():
 	filesToRemove.append('testReport.txt')
 
 	for file in filesToRemove:
-		if opts.verbose:
-			print("Removing file: '" + file + "'") 
-		os.remove(file)
+		if os.path.exists(file):
+			debug.verboseMessage("Removing file: '" + file + "'")
+			os.remove(file)
 
 def generateCUDAMakefile (generatedFiles, testNum):
 	from FileDependencies import getBaseFileName, determineModuleDependencies

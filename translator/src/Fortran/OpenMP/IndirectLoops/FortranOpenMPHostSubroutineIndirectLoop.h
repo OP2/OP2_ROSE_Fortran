@@ -1,4 +1,3 @@
-
 #pragma once
 #ifndef FORTRAN_OPENMP_HOST_SUBROUTINE_INDIRECT_LOOP_H
 #define FORTRAN_OPENMP_HOST_SUBROUTINE_INDIRECT_LOOP_H
@@ -20,9 +19,6 @@ class FortranOpenMPHostSubroutineIndirectLoop: public FortranOpenMPHostSubroutin
 
     virtual void
     createPlanFunctionExecutionStatements ();
-
-    virtual void
-    createFirstTimeExecutionStatements ();
 
     virtual SgStatement *
     createKernelFunctionCallStatement ();

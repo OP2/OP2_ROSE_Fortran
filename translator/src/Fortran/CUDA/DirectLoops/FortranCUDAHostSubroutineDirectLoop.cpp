@@ -36,10 +36,10 @@ FortranCUDAHostSubroutineDirectLoop::createKernelFunctionCallStatement ()
   SgExprListExp * actualParameters = buildExprListExp ();
 
   actualParameters->append_expression (buildVarRefExp (
-      moduleDeclarations->getDimensionsVariableDeclaration ()));
+      variableDeclarations->get (OP2::VariableNames::opDatDimensions)));
 
   actualParameters->append_expression (buildVarRefExp (
-      moduleDeclarations->getDataSizesVariableDeclaration ()));
+      variableDeclarations->get (OP2::VariableNames::opDatCardinalities)));
 
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
@@ -81,33 +81,33 @@ FortranCUDAHostSubroutineDirectLoop::createKernelFunctionCallStatement ()
   actualParameters->append_expression (buildVarRefExp (
       variableDeclarations->get (OP2::VariableNames::sharedMemoryOffset)));
 
-//  SgCudaKernelExecConfig * kernelConfiguration = new SgCudaKernelExecConfig (
-//      RoseHelper::getFileInfo (), buildVarRefExp (variableDeclarations->get (
-//          CUDA::blocksPerGrid)), buildVarRefExp (variableDeclarations->get (
-//          CUDA::threadsPerBlock)), buildVarRefExp (variableDeclarations->get (
-//          CUDA::sharedMemorySize)), buildNullExpression ());
-//
-//  kernelConfiguration->set_endOfConstruct (RoseHelper::getFileInfo ());
-//
-//  SgCudaKernelCallExp * kernelCallExpression = new SgCudaKernelCallExp (
-//      RoseHelper::getFileInfo (), buildFunctionRefExp (kernelSubroutineName,
-//          subroutineScope), actualParameters, kernelConfiguration);
-//
-//  kernelConfiguration->set_endOfConstruct (RoseHelper::getFileInfo ());
-//
-//  return SageBuilder::buildExprStatement(kernelCallExpression);
+  //  SgCudaKernelExecConfig * kernelConfiguration = new SgCudaKernelExecConfig (
+  //      RoseHelper::getFileInfo (), buildVarRefExp (variableDeclarations->get (
+  //          CUDA::blocksPerGrid)), buildVarRefExp (variableDeclarations->get (
+  //          CUDA::threadsPerBlock)), buildVarRefExp (variableDeclarations->get (
+  //          CUDA::sharedMemorySize)), buildNullExpression ());
+  //
+  //  kernelConfiguration->set_endOfConstruct (RoseHelper::getFileInfo ());
+  //
+  //  SgCudaKernelCallExp * kernelCallExpression = new SgCudaKernelCallExp (
+  //      RoseHelper::getFileInfo (), buildFunctionRefExp (kernelSubroutineName,
+  //          subroutineScope), actualParameters, kernelConfiguration);
+  //
+  //  kernelConfiguration->set_endOfConstruct (RoseHelper::getFileInfo ());
+  //
+  //  return SageBuilder::buildExprStatement(kernelCallExpression);
 
-    string const kernelLaunchString = kernelSubroutineName + "<<<"
-        + RoseHelper::getFirstVariableName (variableDeclarations->get (
-            CUDA::blocksPerGrid)) + ", " + RoseHelper::getFirstVariableName (
-        variableDeclarations->get (CUDA::threadsPerBlock)) + ", "
-        + RoseHelper::getFirstVariableName (variableDeclarations->get (
-            CUDA::sharedMemorySize)) + ">>>";
+  string const kernelLaunchString = kernelSubroutineName + "<<<"
+      + RoseHelper::getFirstVariableName (variableDeclarations->get (
+          CUDA::blocksPerGrid)) + ", " + RoseHelper::getFirstVariableName (
+      variableDeclarations->get (CUDA::threadsPerBlock)) + ", "
+      + RoseHelper::getFirstVariableName (variableDeclarations->get (
+          CUDA::sharedMemorySize)) + ">>>";
 
-    SgExprStatement * callStatement = buildFunctionCallStmt (kernelLaunchString,
-        buildVoidType (), actualParameters, subroutineScope);
+  SgExprStatement * callStatement = buildFunctionCallStmt (kernelLaunchString,
+      buildVoidType (), actualParameters, subroutineScope);
 
-    return callStatement;
+  return callStatement;
 }
 
 void
@@ -273,29 +273,8 @@ void
 FortranCUDAHostSubroutineDirectLoop::createStatements ()
 {
   using SageBuilder::buildVarRefExp;
-  using SageBuilder::buildBoolValExp;
-  using SageBuilder::buildEqualityOp;
   using SageBuilder::buildAssignStatement;
   using SageInterface::appendStatement;
-
-  SgEqualityOp * ifGuardExpression = buildEqualityOp (buildVarRefExp (
-      moduleDeclarations->getFirstExecutionBooleanDeclaration ()),
-      buildBoolValExp (true));
-
-  SgBasicBlock * ifBody = createFirstTimeExecutionStatements ();
-
-  SgExprStatement * assignmentStatement1 = buildAssignStatement (
-      buildVarRefExp (
-          moduleDeclarations->getFirstExecutionBooleanDeclaration ()),
-      buildBoolValExp (false));
-
-  appendStatement (assignmentStatement1, ifBody);
-
-  SgIfStmt * ifStatement =
-      RoseStatementsAndExpressionsBuilder::buildIfStatementWithEmptyElse (
-          ifGuardExpression, ifBody);
-
-  appendStatement (ifStatement, subroutineScope);
 
   createCUDAKernelInitialisationStatements ();
 
@@ -323,6 +302,10 @@ FortranCUDAHostSubroutineDirectLoop::createStatements ()
 void
 FortranCUDAHostSubroutineDirectLoop::createLocalVariableDeclarations ()
 {
+  createOpDatDimensionsDeclaration ();
+
+  createOpDatCardinalitiesDeclaration ();
+
   createDataMarshallingLocalVariableDeclarations ();
 
   createCUDAKernelLocalVariableDeclarations ();

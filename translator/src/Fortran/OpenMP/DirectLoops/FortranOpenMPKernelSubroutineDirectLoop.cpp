@@ -1,4 +1,5 @@
 #include <FortranOpenMPKernelSubroutineDirectLoop.h>
+#include <FortranParallelLoop.h>
 #include <FortranStatementsAndExpressionsBuilder.h>
 #include <FortranTypesBuilder.h>
 #include <RoseHelper.h>
@@ -31,7 +32,6 @@ FortranOpenMPKernelSubroutineDirectLoop::createUserSubroutineCallStatement ()
   {
     if (parallelLoop->isDuplicateOpDat (i) == false)
     {
-
       if (parallelLoop->isReductionRequired (i) == false)
       {
         SgMultiplyOp * multiplyExpression1 = buildMultiplyOp (buildVarRefExp (
