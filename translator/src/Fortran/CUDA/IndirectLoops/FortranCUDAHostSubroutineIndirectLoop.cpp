@@ -708,6 +708,11 @@ FortranCUDAHostSubroutineIndirectLoop::createStatements ()
 void
 FortranCUDAHostSubroutineIndirectLoop::createLocalVariableDeclarations ()
 {
+  
+  createOpDatDimensionsDeclaration ();
+
+  createOpDatCardinalitiesDeclaration ();
+  
   createDataMarshallingLocalVariableDeclarations ();
 
   createCUDAKernelLocalVariableDeclarations ();
