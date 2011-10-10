@@ -319,21 +319,13 @@ class ParallelLoop
 
     /*
      * ======================================================
-     * Does this OP_DAT argument group need a data sizes
-     * declaration?
+     * Does this OP_DAT argument group need a variable
+     * declaration in CUDA in order to stage in data from device
+     * memory?
      * ======================================================
      */
     bool
-    dataSizesDeclarationNeeded (unsigned int OP_DAT_ArgumentGroup);
-
-    /*
-     * ======================================================
-     * Does this OP_DAT argument group need a CUDA local
-     * thread variable declaration?
-     * ======================================================
-     */
-    bool
-    localThreadVariableDeclarationNeeded (unsigned int OP_DAT_ArgumentGroup);
+    isCUDAStageInVariableDeclarationNeeded (unsigned int OP_DAT_ArgumentGroup);
 
     /*
      * ======================================================

@@ -1,4 +1,5 @@
 #include <CPPModifyOP2CallsToComplyWithOxfordAPI.h>
+#include <CPPProgramDeclarationsAndDefinitions.h>
 #include <CPPOP2Definitions.h>
 #include <Debug.h>
 #include <CommonNamespaces.h>

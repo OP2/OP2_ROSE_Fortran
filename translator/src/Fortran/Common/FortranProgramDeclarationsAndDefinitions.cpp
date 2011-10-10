@@ -283,7 +283,7 @@ FortranProgramDeclarationsAndDefinitions::analyseParallelLoopArguments (
     }
 
     setParallelLoopAccessDescriptor (parallelLoop, actualArguments,
-        opDatArgumentGroup, offset + +parallelLoop->POSITION_OF_ACCESS);
+        opDatArgumentGroup, offset + parallelLoop->POSITION_OF_ACCESS);
 
     opDatArgumentGroup++;
   }

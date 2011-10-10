@@ -18,7 +18,7 @@
  */
 
 SgExpression *
-FortranCUDAKernelSubroutine::buildOpGlobalActualParameterExpression (
+FortranCUDAKernelSubroutine::createUserKernelOpGlobalActualParameterExpression (
     unsigned int OP_DAT_ArgumentGroup)
 {
   using SageBuilder::buildSubtractOp;
@@ -96,7 +96,7 @@ FortranCUDAKernelSubroutine::buildOpGlobalActualParameterExpression (
 }
 
 void
-FortranCUDAKernelSubroutine::createInitialiseLocalThreadVariablesStatements ()
+FortranCUDAKernelSubroutine::createInitialiseCUDAStageInVariablesStatements ()
 {
   using SageBuilder::buildOpaqueVarRefExp;
   using SageBuilder::buildPntrArrRefExp;
@@ -112,12 +112,12 @@ FortranCUDAKernelSubroutine::createInitialiseLocalThreadVariablesStatements ()
   using SageInterface::appendStatement;
 
   Debug::getInstance ()->debugMessage (
-      "Creating initialise local thread variable statements",
+      "Creating statements to initialise stage in variables",
       Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
-    if (parallelLoop->localThreadVariableDeclarationNeeded (i))
+    if (parallelLoop->isCUDAStageInVariableDeclarationNeeded (i))
     {
       if (parallelLoop->isReductionRequired (i))
       {
@@ -293,7 +293,7 @@ FortranCUDAKernelSubroutine::createReductionEpilogueStatements ()
 }
 
 void
-FortranCUDAKernelSubroutine::createLocalThreadDeclarations ()
+FortranCUDAKernelSubroutine::createCUDAStageInVariablesVariableDeclarations ()
 {
   using SageBuilder::buildIntVal;
   using SageBuilder::buildArrayType;
@@ -309,7 +309,7 @@ FortranCUDAKernelSubroutine::createLocalThreadDeclarations ()
   {
     string const & variableName = OP2::VariableNames::getOpDatLocalName (i);
 
-    if (parallelLoop->localThreadVariableDeclarationNeeded (i))
+    if (parallelLoop->isCUDAStageInVariableDeclarationNeeded (i))
     {
       if (parallelLoop->isGlobalScalar (i))
       {
@@ -331,14 +331,15 @@ FortranCUDAKernelSubroutine::createLocalThreadDeclarations ()
 }
 
 void
-FortranCUDAKernelSubroutine::createAutoSharedDeclarations ()
+FortranCUDAKernelSubroutine::createCUDASharedVariableDeclarations ()
 {
   using std::find;
   using std::vector;
   using std::string;
 
-  Debug::getInstance ()->debugMessage ("Creating autoshared declarations",
-      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+  Debug::getInstance ()->debugMessage (
+      "Creating CUDA shared variable declarations", Debug::FUNCTION_LEVEL,
+      __FILE__, __LINE__);
 
   vector <string> autosharedNames;
 
@@ -357,10 +358,9 @@ FortranCUDAKernelSubroutine::createAutoSharedDeclarations ()
             autosharedVariableName) == autosharedNames.end ())
         {
           Debug::getInstance ()->debugMessage (
-              "Creating autoshared declaration with name '"
-                  + autosharedVariableName + "' for OP_DAT '"
-                  + parallelLoop->getOpDatVariableName (i) + "'",
-              Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+              "Creating declaration with name '" + autosharedVariableName
+                  + "' for OP_DAT '" + parallelLoop->getOpDatVariableName (i)
+                  + "'", Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
           SgExpression * upperBound = new SgAsteriskShapeExp (
               RoseHelper::getFileInfo ());
@@ -381,7 +381,7 @@ FortranCUDAKernelSubroutine::createAutoSharedDeclarations ()
                   parallelLoop->getSizeOfOpDat (i));
 
           Debug::getInstance ()->debugMessage (
-              "Creating autoshared offset declaration with name '"
+              "Creating offset declaration with name '"
                   + autosharedOffsetVariableName + "' for OP_DAT '"
                   + parallelLoop->getOpDatVariableName (i) + "'",
               Debug::FUNCTION_LEVEL, __FILE__, __LINE__);

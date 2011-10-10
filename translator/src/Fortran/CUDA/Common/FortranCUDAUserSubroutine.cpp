@@ -143,15 +143,15 @@ FortranCUDAUserSubroutine::createStatements ()
 
           if (iequals (variableName, formalParamterName))
           {
-            Debug::getInstance ()->debugMessage ("'" + variableName
-                + "' is a formal parameter", Debug::HIGHEST_DEBUG_LEVEL,
-                __FILE__, __LINE__);
-
             isFormalParamater = true;
 
             if (parallelLoop->isIndirect (OP_DAT_ArgumentGroup)
                 && parallelLoop->isRead (OP_DAT_ArgumentGroup))
             {
+              Debug::getInstance ()->debugMessage ("'" + variableName
+                  + "' is an INDIRECT formal parameter which is READ",
+                  Debug::HIGHEST_DEBUG_LEVEL, __FILE__, __LINE__);
+
               SgVariableDeclaration
                   * variableDeclaration =
                       FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
@@ -161,6 +161,10 @@ FortranCUDAUserSubroutine::createStatements ()
             else if (parallelLoop->isGlobalScalar (OP_DAT_ArgumentGroup)
                 && parallelLoop->isRead (OP_DAT_ArgumentGroup))
             {
+              Debug::getInstance ()->debugMessage ("'" + variableName
+                  + "' is a GLOBAL SCALAR formal parameter which is READ",
+                  Debug::HIGHEST_DEBUG_LEVEL, __FILE__, __LINE__);
+
               SgVariableDeclaration
                   * variableDeclaration =
                       FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
@@ -169,6 +173,10 @@ FortranCUDAUserSubroutine::createStatements ()
             }
             else
             {
+              Debug::getInstance ()->debugMessage ("'" + variableName
+                  + "' is a formal parameter", Debug::HIGHEST_DEBUG_LEVEL,
+                  __FILE__, __LINE__);
+
               SgVariableDeclaration
                   * variableDeclaration =
                       FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (

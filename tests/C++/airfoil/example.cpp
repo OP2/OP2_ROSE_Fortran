@@ -1,9 +1,10 @@
+#include <math.h>
 
 int
 foo (int x)
 {
   int i = 1;
-
+  int j = sqrt(i);
   return i + x * 10;
 }
 

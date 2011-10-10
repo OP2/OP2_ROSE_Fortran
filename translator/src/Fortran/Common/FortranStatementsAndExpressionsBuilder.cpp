@@ -208,34 +208,6 @@ FortranStatementsAndExpressionsBuilder::appendDeallocateStatement (
   appendStatement (deallocateStatement, scope);
 }
 
-SgExpression *
-FortranStatementsAndExpressionsBuilder::getFortranKindOfOpDat (
-    SgType * OpDatBaseType)
-{
-  using SageBuilder::buildIntVal;
-
-  SgArrayType * isArrayType = isSgArrayType (OpDatBaseType);
-
-  ROSE_ASSERT (isArrayType != NULL);
-
-  SgType * arrayBaseType = isArrayType->get_base_type ();
-
-  SgExpression * sizeOfOpDatKind = arrayBaseType->get_type_kind ();
-
-  /*
-   * ======================================================
-   * If a Fortran kind has not been specified, then we
-   * have to assume standard ones: integer(4) and real(4)
-   * ======================================================
-   */
-  if (sizeOfOpDatKind == NULL)
-  {
-    sizeOfOpDatKind = buildIntVal (4);
-  }
-
-  return sizeOfOpDatKind;
-}
-
 SgImplicitStatement *
 FortranStatementsAndExpressionsBuilder::buildImplicitNoneStatement ()
 {

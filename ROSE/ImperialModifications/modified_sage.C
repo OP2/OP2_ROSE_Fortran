@@ -1658,7 +1658,7 @@ Unparse_MOD_SAGE::printSpecifier1 ( SgDeclarationStatement * decl_stmt, SgUnpars
           printf ("decl_stmt->get_declarationModifier().get_accessModifier().isProtected() = %s \n",decl_stmt->get_declarationModifier().get_accessModifier().isProtected() ? "true" : "false");
           printf ("decl_stmt->get_declarationModifier().get_accessModifier().isPublic()    = %s \n",decl_stmt->get_declarationModifier().get_accessModifier().isPublic()    ? "true" : "false");
 #endif
-	  // Imperial College changes 
+          // Imperial College changes 
             if (decl_stmt->get_declarationModifier ().get_accessModifier ().isPrivate ())
             {
               info.set_isPrivateAccess ();

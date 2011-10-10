@@ -3,7 +3,8 @@
 #define CPP_MODIFY_OP2_CALLS_TO_COMPLY_WITH_OXFORD_API_H
 
 #include <rose.h>
-#include <CPPProgramDeclarationsAndDefinitions.h>
+
+class CPPProgramDeclarationsAndDefinitions;
 
 class CPPModifyOP2CallsToComplyWithOxfordAPI: public AstSimpleProcessing
 {

@@ -337,33 +337,12 @@ ParallelLoop::setUniqueOpDat (std::string const & variableName)
 }
 
 bool
-ParallelLoop::dataSizesDeclarationNeeded (unsigned int OP_DAT_ArgumentGroup)
-{
-  /*
-   * ======================================================
-   * The only time we do NOT need a sizes field is when:
-   * a) The data is OP_GBL
-   * b) The data is scalar
-   * c) The data is read
-   *
-   * This is because, in this case, there is no transferal of
-   * OP_GBL data into device memory. The data is instead
-   * passed by value directly to the CUDA kernel
-   * ======================================================
-   */
-
-  return isDirect (OP_DAT_ArgumentGroup) || isIndirect (OP_DAT_ArgumentGroup)
-      || isReductionRequired (OP_DAT_ArgumentGroup) || (isGlobalArray (
-      OP_DAT_ArgumentGroup) && isRead (OP_DAT_ArgumentGroup));
-}
-
-bool
-ParallelLoop::localThreadVariableDeclarationNeeded (
+ParallelLoop::isCUDAStageInVariableDeclarationNeeded (
     unsigned int OP_DAT_ArgumentGroup)
 {
   /*
    * ======================================================
-   * We need a local thread variable when:
+   * We need a scratchpad variable when:
    * a) The data is to be reduced
    * b) The data is indirect AND incremented
    * c) The data is direct AND its dimension exceeds one

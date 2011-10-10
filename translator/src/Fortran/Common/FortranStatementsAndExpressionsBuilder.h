@@ -101,15 +101,6 @@ class FortranStatementsAndExpressionsBuilder
 
     /*
      * ======================================================
-     * Returns the Fortran kind of an OP_DAT type or a default
-     * one (in case of types without kind)
-     * ======================================================
-     */
-    static SgExpression *
-    getFortranKindOfOpDat (SgType * OpDatBaseType);
-
-    /*
-     * ======================================================
      * Builds the 'IMPLICIT NONE' statement
      * ======================================================
      */

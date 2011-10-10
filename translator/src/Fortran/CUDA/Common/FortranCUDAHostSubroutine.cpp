@@ -362,7 +362,10 @@ FortranCUDAHostSubroutine::createTransferOpDatStatements ()
   {
     if (parallelLoop->isDuplicateOpDat (i) == false)
     {
-      if (parallelLoop->dataSizesDeclarationNeeded (i))
+      FortranParallelLoop * fortranParallelLoop =
+          static_cast <FortranParallelLoop *> (parallelLoop);
+
+      if (fortranParallelLoop->isCardinalityDeclarationNeeded (i))
       {
         SgDotExp * dotExpression = buildDotExp (
             buildVarRefExp (variableDeclarations->get (
@@ -389,7 +392,10 @@ FortranCUDAHostSubroutine::createTransferOpDatStatements ()
   {
     if (parallelLoop->isDuplicateOpDat (i) == false)
     {
-      if (parallelLoop->dataSizesDeclarationNeeded (i))
+      FortranParallelLoop * fortranParallelLoop =
+          static_cast <FortranParallelLoop *> (parallelLoop);
+
+      if (fortranParallelLoop->isCardinalityDeclarationNeeded (i))
       {
         SgExpression * rhsOfAssigment =
             createRHSOfInitialiseOpDatSizeStatement (block, i);
@@ -489,7 +495,10 @@ FortranCUDAHostSubroutine::createDataMarshallingLocalVariableDeclarations ()
   {
     if (parallelLoop->isDuplicateOpDat (i) == false)
     {
-      if (parallelLoop->dataSizesDeclarationNeeded (i))
+      FortranParallelLoop * fortranParallelLoop =
+          static_cast <FortranParallelLoop *> (parallelLoop);
+
+      if (fortranParallelLoop->isCardinalityDeclarationNeeded (i))
       {
         Debug::getInstance ()->debugMessage (
             "Creating OP_DAT size variable for OP_DAT "

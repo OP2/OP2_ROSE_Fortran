@@ -46,7 +46,7 @@ FortranCUDAKernelSubroutineDirectLoop::createUserSubroutineCallStatement ()
           Debug::HIGHEST_DEBUG_LEVEL, __FILE__, __LINE__);
 
       actualParameters->append_expression (
-          buildOpGlobalActualParameterExpression (i));
+          createUserKernelOpGlobalActualParameterExpression (i));
     }
     else if (parallelLoop->isDirect (i))
     {
@@ -542,7 +542,7 @@ FortranCUDAKernelSubroutineDirectLoop::createExecutionLoopStatements ()
 }
 
 void
-FortranCUDAKernelSubroutineDirectLoop::createAutoSharedOffsetInitialisationStatements ()
+FortranCUDAKernelSubroutineDirectLoop::createInitialiseOffsetIntoCUDASharedVariableStatements ()
 {
   using SageBuilder::buildSubtractOp;
   using SageBuilder::buildDivideOp;
@@ -556,7 +556,7 @@ FortranCUDAKernelSubroutineDirectLoop::createAutoSharedOffsetInitialisationState
   using std::string;
 
   Debug::getInstance ()->debugMessage (
-      "Creating autoshared offset initialisation statements",
+      "Creating initialisation statements for offset in CUDA shared variables",
       Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
   vector <string> autosharedOffsetNames;
@@ -711,7 +711,7 @@ FortranCUDAKernelSubroutineDirectLoop::createStatements ()
 {
   createThreadIDInitialisationStatement ();
 
-  createAutoSharedOffsetInitialisationStatements ();
+  createInitialiseOffsetIntoCUDASharedVariableStatements ();
 
   createExecutionLoopStatements ();
 
@@ -730,20 +730,16 @@ FortranCUDAKernelSubroutineDirectLoop::createLocalVariableDeclarations ()
   Debug::getInstance ()->debugMessage ("Creating local variable declarations",
       Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
-  createLocalThreadDeclarations ();
+  createCUDAStageInVariablesVariableDeclarations ();
 
-  createAutoSharedDeclarations ();
+  createCUDASharedVariableDeclarations ();
 
   vector <string> fourByteIntegers;
 
   fourByteIntegers.push_back (CommonVariableNames::iterationCounter1);
-
   fourByteIntegers.push_back (CommonVariableNames::iterationCounter2);
-
   fourByteIntegers.push_back (OP2::VariableNames::localOffset);
-
   fourByteIntegers.push_back (OP2::VariableNames::nelems);
-
   fourByteIntegers.push_back (OP2::VariableNames::threadID);
 
   for (vector <string>::iterator it = fourByteIntegers.begin (); it
@@ -767,8 +763,9 @@ FortranCUDAKernelSubroutineDirectLoop::createFormalParameterDeclarations ()
   variableDeclarations->add (
       OP2::VariableNames::opDatDimensions,
       FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
-          OP2::VariableNames::opDatDimensions, opDatDimensionsDeclaration->getType (),
-          subroutineScope, formalParameters, 1, CUDA_DEVICE));
+          OP2::VariableNames::opDatDimensions,
+          opDatDimensionsDeclaration->getType (), subroutineScope,
+          formalParameters, 1, CUDA_DEVICE));
 
   /*
    * ======================================================
@@ -779,8 +776,9 @@ FortranCUDAKernelSubroutineDirectLoop::createFormalParameterDeclarations ()
   variableDeclarations->add (
       OP2::VariableNames::opDatCardinalities,
       FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
-          OP2::VariableNames::opDatCardinalities, dataSizesDeclaration->getType (),
-          subroutineScope, formalParameters, 1, CUDA_DEVICE));
+          OP2::VariableNames::opDatCardinalities,
+          dataSizesDeclaration->getType (), subroutineScope, formalParameters,
+          1, CUDA_DEVICE));
 
   /*
    * ======================================================

@@ -45,7 +45,8 @@ FortranCUDAKernelSubroutineIndirectLoop::createUserSubroutineCallStatement ()
 
     if (parallelLoop->isGlobal (i))
     {
-      parameterExpression = buildOpGlobalActualParameterExpression (i);
+      parameterExpression = createUserKernelOpGlobalActualParameterExpression (
+          i);
     }
     else if (parallelLoop->isIndirect (i))
     {
@@ -58,11 +59,50 @@ FortranCUDAKernelSubroutineIndirectLoop::createUserSubroutineCallStatement ()
         parameterExpression = buildVarRefExp (variableDeclarations->get (
             OP2::VariableNames::getOpDatLocalName (i)));
       }
+      else if (parallelLoop->isRead (i))
+      {
+        Debug::getInstance ()->debugMessage (
+            "Indirect OP_DAT with read access", Debug::OUTER_LOOP_LEVEL,
+            __FILE__, __LINE__);
+
+        string const autosharedVariableName =
+            OP2::VariableNames::getAutosharedDeclarationName (
+                parallelLoop->getOpDatBaseType (i),
+                parallelLoop->getSizeOfOpDat (i));
+
+        SgAddOp * addExpression1 = buildAddOp (
+            buildVarRefExp (variableDeclarations->get (
+                CommonVariableNames::iterationCounter1)), buildVarRefExp (
+                variableDeclarations->get (
+                    OP2::VariableNames::sharedMemoryOffset)));
+
+        SgPntrArrRefExp * arrayExpression1 = buildPntrArrRefExp (
+            buildVarRefExp (variableDeclarations->get (
+                OP2::VariableNames::getGlobalToLocalMappingName (i))),
+            addExpression1);
+
+        SgDotExp * dotExpression1 = buildDotExp (buildVarRefExp (
+            variableDeclarations->get (OP2::VariableNames::opDatDimensions)),
+            buildVarRefExp (opDatDimensionsDeclaration->getOpDatDimensionField (
+                i)));
+
+        SgMultiplyOp * multiplyExpression1 = buildMultiplyOp (arrayExpression1,
+            dotExpression1);
+
+        SgAddOp * addExpression2 = buildAddOp (buildVarRefExp (
+            variableDeclarations->get (
+                OP2::VariableNames::getNumberOfBytesVariableName (i))),
+            multiplyExpression1);
+
+        parameterExpression
+            = buildPntrArrRefExp (buildVarRefExp (variableDeclarations->get (
+                autosharedVariableName)), addExpression2);
+      }
       else
       {
         Debug::getInstance ()->debugMessage (
-            "Indirect OP_DAT with read/write access", Debug::OUTER_LOOP_LEVEL,
-            __FILE__, __LINE__);
+            "Indirect OP_DAT with read/write or write access",
+            Debug::OUTER_LOOP_LEVEL, __FILE__, __LINE__);
 
         string const autosharedVariableName =
             OP2::VariableNames::getAutosharedDeclarationName (
@@ -129,8 +169,6 @@ FortranCUDAKernelSubroutineIndirectLoop::createUserSubroutineCallStatement ()
     {
       Debug::getInstance ()->debugMessage ("Direct OP_DAT",
           Debug::OUTER_LOOP_LEVEL, __FILE__, __LINE__);
-
-      parameterExpression = buildIntVal (1);
 
       SgAddOp * addExpression1 = buildAddOp (buildVarRefExp (
           variableDeclarations->get (CommonVariableNames::iterationCounter1)),
@@ -1450,9 +1488,9 @@ FortranCUDAKernelSubroutineIndirectLoop::createLocalVariableDeclarations ()
   using std::string;
   using std::vector;
 
-  createLocalThreadDeclarations ();
+  createCUDAStageInVariablesVariableDeclarations ();
 
-  createAutoSharedDeclarations ();
+  createCUDASharedVariableDeclarations ();
 
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {

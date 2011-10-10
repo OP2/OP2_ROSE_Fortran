@@ -167,7 +167,7 @@ CPPProgramDeclarationsAndDefinitions::visit (SgNode * node)
         OpConstDefinitions[opConstDeclaration->getVariableName ()]
             = opConstDeclaration;
       }
-      if (iequals (calleeName, OP2::OP_PAR_LOOP))
+      else if (iequals (calleeName, OP2::OP_PAR_LOOP))
       {
         SgExpressionPtrList & actualArguments =
             functionCallExp->get_args ()->get_expressions ();
@@ -227,5 +227,5 @@ CPPProgramDeclarationsAndDefinitions::visit (SgNode * node)
 CPPProgramDeclarationsAndDefinitions::CPPProgramDeclarationsAndDefinitions (
     SgProject * project)
 {
-  traverseInputFiles (project, preorder);
+  traverse (project, preorder);
 }

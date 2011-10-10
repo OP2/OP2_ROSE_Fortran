@@ -65,7 +65,7 @@ class FortranCUDAKernelSubroutineDirectLoop: public FortranCUDAKernelSubroutine
         unsigned int OP_DAT_ArgumentGroup);
 
     void
-    createAutoSharedOffsetInitialisationStatements ();
+    createInitialiseOffsetIntoCUDASharedVariableStatements ();
 
     void
     createThreadIDInitialisationStatement ();

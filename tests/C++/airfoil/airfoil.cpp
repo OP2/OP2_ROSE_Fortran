@@ -51,7 +51,7 @@ float gam, gm1, cfl, eps, mach, alpha, qinf[4];
 // OP header file
 //
 
-#include "op2.h"
+#include "OP2_OXFORD.h"
 
 //
 // kernel routines for parallel loops

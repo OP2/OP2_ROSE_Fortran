@@ -58,6 +58,15 @@ class FortranParallelLoop: public ParallelLoop
 
   public:
 
+    /*
+     * ======================================================
+     * Does this OP_DAT argument group need a declaration
+     * for its cardinality (= setSize * dimension)?
+     * ======================================================
+     */
+    bool
+    isCardinalityDeclarationNeeded (unsigned int OP_DAT_ArgumentGroup);
+
     virtual unsigned int
     getNumberOfOpDatArgumentGroups ();
 

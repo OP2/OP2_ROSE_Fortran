@@ -229,12 +229,37 @@ def makeInstallROSE (roseDirectory):
 	if proc.returncode != 0:
 		debug.exitMessage("Command '%s' failed" % makeInstallString)
 
-def copyRosePublicConfigHeader (roseDirectory):
+def installAdditionalROSEHeaderFiles (roseDirectory):
 	roseDirectoryBuild, roseDirectoryInstall = getRoseDirectories(roseDirectory)
-	sourceFile          = os.getcwd() + os.sep + roseDirectory + os.sep + "rosePublicConfig.h"
-	destinatonDirectory = os.getcwd() + os.sep + roseDirectoryInstall + os.sep + "include"
-	debug.verboseMessage("Moving file '%s' into '%s'" % (sourceFile, destinatonDirectory))
-	shutil.copy(sourceFile, destinatonDirectory)
+
+	makeInstallCommand1 = "make install-includeHEADERS"	
+
+	debug.verboseMessage("Installing rosePublicConfig.h with command '%s'" % (makeInstallCommand1))
+
+	proc = Popen(args=makeInstallCommand1, 
+		     cwd=roseDirectoryBuild, 
+		     shell="/bin/bash",
+		     stderr=PIPE,
+		     stdout=PIPE)
+ 
+	proc.communicate()
+	if proc.returncode != 0:
+		debug.exitMessage("Command '%s' failed" % makeInstallCommand1)
+
+	makeInstallCommand2 = "make install-data-local"
+
+	debug.verboseMessage("Installing GCC/CUDA/OpenCL headers with command '%s'" % (makeInstallCommand2))
+
+	proc = Popen(args=makeInstallCommand2, 
+		     cwd=roseDirectoryBuild, 
+		     shell="/bin/bash",
+		     stderr=PIPE,
+		     stdout=PIPE)
+ 
+	proc.communicate()
+	if proc.returncode != 0:
+		debug.exitMessage("Command '%s' failed" % makeInstallCommand2)
+
 
 def computeChecksum (fileName):
 	sourceFile = open(fileName, 'r')
@@ -276,7 +301,7 @@ def buildAction ():
 	configureROSE (roseDirectory, boostDirectory[:-4])	
 	makeROSE (roseDirectory)
 	makeInstallROSE (roseDirectory)
-	copyRosePublicConfigHeader (roseDirectory)
+	installAdditionalROSEHeaderFiles (roseDirectory)
 
 def updateAction ():
 	roseDirectory = selectROSEVersion ()

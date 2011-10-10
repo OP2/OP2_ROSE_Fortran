@@ -19,7 +19,7 @@ FortranCUDAOpDatCardinalitiesDeclaration::addFields ()
   {
     if (parallelLoop->isDuplicateOpDat (i) == false)
     {
-      if (parallelLoop->dataSizesDeclarationNeeded (i))
+      if (parallelLoop->isCardinalityDeclarationNeeded (i))
       {
         Debug::getInstance ()->debugMessage (
             "Creating cardinality field for OP_DAT "

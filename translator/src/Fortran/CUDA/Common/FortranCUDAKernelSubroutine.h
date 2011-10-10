@@ -1,4 +1,3 @@
-
 #pragma once
 #ifndef FORTRAN_CUDA_KERNEL_SUBROUTINE_H
 #define FORTRAN_CUDA_KERNEL_SUBROUTINE_H
@@ -22,20 +21,50 @@ class FortranCUDAKernelSubroutine: public FortranKernelSubroutine
 
   protected:
 
+    /*
+     * ======================================================
+     * For this OP_GBL, create the expression
+     * ======================================================
+     */
     SgExpression *
-    buildOpGlobalActualParameterExpression (unsigned int OP_DAT_ArgumentGroup);
+    createUserKernelOpGlobalActualParameterExpression (
+        unsigned int OP_DAT_ArgumentGroup);
 
+    /*
+     * ======================================================
+     * Creates the statements which initialises the variables
+     * used to stage in data from device->shared->stack memory
+     * ======================================================
+     */
     void
-    createInitialiseLocalThreadVariablesStatements ();
+    createInitialiseCUDAStageInVariablesStatements ();
 
+    /*
+     * ======================================================
+     * Creates the statements executed after the call to the
+     * user subroutine to perform the thread-block reduction
+     * ======================================================
+     */
     void
     createReductionEpilogueStatements ();
 
+    /*
+     * ======================================================
+     * Creates the variable declarations needed to stage in
+     * data from device->shared->stack memory
+     * ======================================================
+     */
     void
-    createLocalThreadDeclarations ();
+    createCUDAStageInVariablesVariableDeclarations ();
 
+    /*
+     * ======================================================
+     * Creates the variable declarations needed in CUDA
+     * shared memory
+     * ======================================================
+     */
     void
-    createAutoSharedDeclarations ();
+    createCUDASharedVariableDeclarations ();
 
     FortranCUDAKernelSubroutine (std::string const & subroutineName,
         std::string const & userSubroutineName,
