@@ -33,12 +33,12 @@ class FortranCUDAHostSubroutine: public FortranHostSubroutine
     /*
      * ======================================================
      * Creates the expression on the right-hand side of the
-     * statement which initialises the size of the OP_DAT in this
-     * argument group
+     * statement which initialises the cardinality of the OP_DAT
+     * in this argument group
      * ======================================================
      */
     SgExpression *
-    createRHSOfInitialiseOpDatSizeStatement (SgScopeStatement * scope,
+    createRHSOfInitialiseOpDatCardinalityStatement (SgScopeStatement * scope,
         unsigned int OP_DAT_ArgumentGroup);
 
     virtual SgBasicBlock *

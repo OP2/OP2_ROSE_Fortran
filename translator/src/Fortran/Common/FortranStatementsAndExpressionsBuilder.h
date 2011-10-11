@@ -1,7 +1,3 @@
-/*
- * Written by Adam Betts and Carlo Bertolli
- */
-
 #pragma once
 #ifndef FORTRAN_STATEMENTS_AND_EXPRESSIONS_BUILDER_H
 #define FORTRAN_STATEMENTS_AND_EXPRESSIONS_BUILDER_H
@@ -16,6 +12,7 @@ class SgBasicBlock;
 class SgScopeStatement;
 class SgExprListExp;
 class SgImplicitStatement;
+class SgAggregateInitializer;
 class SgFunctionParameterList;
 class SgType;
 
@@ -42,13 +39,12 @@ class FortranStatementsAndExpressionsBuilder
 
     /*
      * ======================================================
-     * Builds a Fortran shape expression for a call to
-     * 'c_f_pointer'
+     * Builds a Fortran shape expression for a variable
+     * declaration assumed to be an integer
      * ======================================================
      */
-    static SgExpression *
-    buildShapeExpression (SgVariableDeclaration * variableDeclaration,
-        SgScopeStatement * scope);
+    static SgAggregateInitializer *
+    buildShapeExpression (SgVariableDeclaration * variableDeclaration);
 
     /*
      * ======================================================

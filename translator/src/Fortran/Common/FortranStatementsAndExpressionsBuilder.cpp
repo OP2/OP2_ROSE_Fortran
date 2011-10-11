@@ -115,14 +115,20 @@ FortranStatementsAndExpressionsBuilder::buildFortranDoStatement (
   return fortranDoStatement;
 }
 
-SgExpression *
+SgAggregateInitializer *
 FortranStatementsAndExpressionsBuilder::buildShapeExpression (
-    SgVariableDeclaration * variableDeclaration, SgScopeStatement * scope)
+    SgVariableDeclaration * variableDeclaration)
 {
-  using SageBuilder::buildOpaqueVarRefExp;
+  using SageBuilder::buildExprListExp;
+  using SageBuilder::buildIntType;
+  using SageBuilder::buildVarRefExp;
+  using SageBuilder::buildAggregateInitializer;
 
-  SgExpression * shapeExpression = buildOpaqueVarRefExp ("(/"
-      + RoseHelper::getFirstVariableName (variableDeclaration) + "/)", scope);
+  SgExprListExp * parameters = buildExprListExp (buildVarRefExp (
+      variableDeclaration));
+
+  SgAggregateInitializer * shapeExpression = buildAggregateInitializer (
+      parameters, buildIntType ());
 
   return shapeExpression;
 }
