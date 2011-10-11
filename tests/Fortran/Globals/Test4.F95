@@ -23,12 +23,15 @@ program Test4
   allocate ( hostGlobal (2) )
   allocate ( hostData (4 * setCardinality) )
 
+  print *, "Initialising host data"
   do i = 1, 2
-    hostGlobal(i) = i
+    hostGlobal(i) = i * 2
+    print *, "hostGlobal(", i, ")", hostGlobal(i)
   end do
 
   do i = 1, 4 * setCardinality
     hostData(i) = i
+    print *, "hostData(", i, ")", hostData(i)
   end do
 
   call op_init ()
@@ -42,7 +45,7 @@ program Test4
                      & global,     -1, OP_GBL, OP_READ)
 
   do i = 1, 4 * setCardinality
-    print *, hostData(i)
+    print *, "hostData(", i, ")", hostData(i)
   end do
 
 end program Test4

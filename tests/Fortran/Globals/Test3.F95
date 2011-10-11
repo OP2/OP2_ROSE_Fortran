@@ -22,8 +22,10 @@ program Test3
   
   allocate ( hostData (4 * setCardinality) )
 
+  print *, "Initialising host data"
   do i = 1, 4 * setCardinality
     hostData(i) = i
+    print *, "hostData(", i, ")", hostData(i)
   end do
 
   call op_init ()
@@ -36,8 +38,11 @@ program Test3
                      & deviceData, -1, OP_ID,  OP_WRITE, &
                      & global,     -1, OP_GBL, OP_READ)
 
+  call op_fetch_data ()
+
+  print *, "After kernel execution"
   do i = 1, 4 * setCardinality
-    print *, hostData(i)
+    print *, "hostData(", i, ")", hostData(i)
   end do
 
 end program Test3
