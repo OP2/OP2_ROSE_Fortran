@@ -2774,13 +2774,6 @@ FortranCodeGeneration_locatedNode::unparseCudaKernelCall (SgExpression* expr,
   {
     curprint (",");
     unparseExpression (shared_exp, info);
-
-    SgExpression * stream_exp = exec_config->get_stream ();
-    if (stream_exp != NULL)
-    {
-      curprint (",");
-      unparseExpression (stream_exp, info);
-    }
   }
 
   curprint (">>>");
