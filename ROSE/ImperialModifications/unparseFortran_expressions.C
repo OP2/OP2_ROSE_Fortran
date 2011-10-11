@@ -2756,7 +2756,7 @@ FortranCodeGeneration_locatedNode::unparseCudaKernelCall (SgExpression* expr,
       kernel_call->get_exec_config ());
   ROSE_ASSERT (exec_config != NULL);
 
-  curprint ("<<<");
+  curprint ("CALL <<<");
 
   SgExpression * grid_exp = exec_config->get_grid ();
   ROSE_ASSERT (grid_exp != NULL);

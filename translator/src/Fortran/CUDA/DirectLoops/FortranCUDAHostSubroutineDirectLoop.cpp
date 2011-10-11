@@ -16,12 +16,9 @@ FortranCUDAHostSubroutineDirectLoop::createKernelFunctionCallStatement ()
   using SageBuilder::buildOpaqueVarRefExp;
   using SageBuilder::buildFunctionRefExp;
   using SageBuilder::buildVarRefExp;
-  using SageBuilder::buildFunctionCallStmt;
   using SageBuilder::buildExprListExp;
-  using SageBuilder::buildVoidType;
   using SageBuilder::buildNullExpression;
-  using SageInterface::appendStatement;
-  using std::string;
+  using SageBuilder::buildExprStatement;
 
   Debug::getInstance ()->debugMessage (
       "Creating statement to call CUDA kernel", Debug::FUNCTION_LEVEL,
@@ -88,21 +85,9 @@ FortranCUDAHostSubroutineDirectLoop::createKernelFunctionCallStatement ()
           calleeSubroutine->getSubroutineName (), subroutineScope),
       actualParameters, kernelConfiguration);
 
-  kernelConfiguration->set_endOfConstruct (RoseHelper::getFileInfo ());
+  kernelCallExpression->set_endOfConstruct (RoseHelper::getFileInfo ());
 
-  return SageBuilder::buildExprStatement (kernelCallExpression);
-
-  //  string const kernelLaunchString = calleeSubroutine->getSubroutineName ()
-  //      + "<<<" + RoseHelper::getFirstVariableName (variableDeclarations->get (
-  //      CUDA::blocksPerGrid)) + ", " + RoseHelper::getFirstVariableName (
-  //      variableDeclarations->get (CUDA::threadsPerBlock)) + ", "
-  //      + RoseHelper::getFirstVariableName (variableDeclarations->get (
-  //          CUDA::sharedMemorySize)) + ">>>";
-  //
-  //  SgExprStatement * callStatement = buildFunctionCallStmt (kernelLaunchString,
-  //      buildVoidType (), actualParameters, subroutineScope);
-
- // return callStatement;
+  return buildExprStatement (kernelCallExpression);
 }
 
 void

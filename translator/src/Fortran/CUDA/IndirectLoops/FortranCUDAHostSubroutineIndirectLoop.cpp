@@ -14,11 +14,11 @@
 SgStatement *
 FortranCUDAHostSubroutineIndirectLoop::createKernelFunctionCallStatement ()
 {
-  using SageBuilder::buildFunctionCallStmt;
-  using SageBuilder::buildFunctionCallExp;
+  using SageBuilder::buildFunctionRefExp;
   using SageBuilder::buildExprListExp;
-  using SageBuilder::buildVoidType;
   using SageBuilder::buildVarRefExp;
+  using SageBuilder::buildNullExpression;
+  using SageBuilder::buildExprStatement;
 
   Debug::getInstance ()->debugMessage (
       "Creating CUDA kernel function call statement", Debug::FUNCTION_LEVEL,
@@ -38,16 +38,18 @@ FortranCUDAHostSubroutineIndirectLoop::createKernelFunctionCallStatement ()
 
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
-    if (parallelLoop->isDuplicateOpDat (i) == false
-        && parallelLoop->isIndirect (i))
+    if (parallelLoop->isDuplicateOpDat (i) == false)
     {
-      actualParameters->append_expression (
-          buildVarRefExp (variableDeclarations->get (
-              OP2::VariableNames::getOpDatDeviceName (i))));
+      if (parallelLoop->isIndirect (i))
+      {
+        actualParameters->append_expression (buildVarRefExp (
+            variableDeclarations->get (OP2::VariableNames::getOpDatDeviceName (
+                i))));
 
-      actualParameters->append_expression (buildVarRefExp (
-          variableDeclarations->get (
-              OP2::VariableNames::getLocalToGlobalMappingName (i))));
+        actualParameters->append_expression (buildVarRefExp (
+            variableDeclarations->get (
+                OP2::VariableNames::getLocalToGlobalMappingName (i))));
+      }
     }
   }
 
@@ -65,19 +67,27 @@ FortranCUDAHostSubroutineIndirectLoop::createKernelFunctionCallStatement ()
     }
   }
 
-  Debug::getInstance ()->debugMessage (
-      "Adding direct and non-scalar global parameters", Debug::FUNCTION_LEVEL,
-      __FILE__, __LINE__);
+  Debug::getInstance ()->debugMessage ("Adding direct and global parameters",
+      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
     if (parallelLoop->isDuplicateOpDat (i) == false)
     {
-      if (parallelLoop->isDirect (i) || parallelLoop->isGlobalArray (i))
+      if (parallelLoop->isRead (i))
       {
-        actualParameters->append_expression (buildVarRefExp (
-            variableDeclarations->get (OP2::VariableNames::getOpDatDeviceName (
-                i))));
+        if (parallelLoop->isGlobalScalar (i))
+        {
+          actualParameters->append_expression (buildVarRefExp (
+              variableDeclarations->get (OP2::VariableNames::getOpDatHostName (
+                  i))));
+        }
+        else
+        {
+          actualParameters->append_expression (buildVarRefExp (
+              variableDeclarations->get (
+                  OP2::VariableNames::getOpDatDeviceName (i))));
+        }
       }
     }
   }
@@ -110,16 +120,22 @@ FortranCUDAHostSubroutineIndirectLoop::createKernelFunctionCallStatement ()
       buildVarRefExp (variableDeclarations->get (
           OP2::VariableNames::PlanFunction::blockOffset)));
 
-  SgExprStatement * callStatement = buildFunctionCallStmt (
-      calleeSubroutine->getSubroutineName () + "<<<"
-          + RoseHelper::getFirstVariableName (variableDeclarations->get (
-              CUDA::blocksPerGrid)) + ", " + RoseHelper::getFirstVariableName (
-          variableDeclarations->get (CUDA::threadsPerBlock)) + ", "
-          + RoseHelper::getFirstVariableName (variableDeclarations->get (
-              CUDA::sharedMemorySize)) + ">>>", buildVoidType (),
-      actualParameters, subroutineScope);
+  SgCudaKernelExecConfig * kernelConfiguration = new SgCudaKernelExecConfig (
+      RoseHelper::getFileInfo (), buildVarRefExp (variableDeclarations->get (
+          CUDA::blocksPerGrid)), buildVarRefExp (variableDeclarations->get (
+          CUDA::threadsPerBlock)), buildVarRefExp (variableDeclarations->get (
+          CUDA::sharedMemorySize)), buildNullExpression ());
 
-  return callStatement;
+  kernelConfiguration->set_endOfConstruct (RoseHelper::getFileInfo ());
+
+  SgCudaKernelCallExp * kernelCallExpression = new SgCudaKernelCallExp (
+      RoseHelper::getFileInfo (), buildFunctionRefExp (
+          calleeSubroutine->getSubroutineName (), subroutineScope),
+      actualParameters, kernelConfiguration);
+
+  kernelCallExpression->set_endOfConstruct (RoseHelper::getFileInfo ());
+
+  return buildExprStatement (kernelCallExpression);
 }
 
 void
