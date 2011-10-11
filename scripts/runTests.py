@@ -157,7 +157,6 @@ def runTests ():
 	translatorEnvVariable  = 'IMPERIAL_TRANSLATOR_HOME'
 	translatorHome         = string.split(os.environ.get(translatorEnvVariable), os.pathsep)[0]
 
-	print (translatorHome)
 	if translatorHome is None:
 		debug.exitMessage("Unable to find the root directory of the source-to-source translator. Please set environment variable '%s'" % translatorEnvVariable)
 	elif not os.path.isdir(translatorHome):

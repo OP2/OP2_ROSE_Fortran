@@ -56,8 +56,6 @@ def add ():
 		for file in files:
 			fileBasename, fileExtension = os.path.splitext(file)
 			fullPath = os.path.join(path, file)
-			
-			debug.verboseMessage("Analysing file '" + file)
 
 			if fileExtension == '.cpp' or fileExtension == '.h':
 				cmd = 'git ls-files ' + fullPath
@@ -88,13 +86,13 @@ def add ():
 
 def output ():
 	if inRepo:
-    		print("===== These files already exist in the repository =====")
+    		debug.verboseMessage("===== These files already exist in the repository =====")
     		for f in inRepo:
-        		print(f)
+        		debug.verboseMessage(f)
 	if added:
-    		print("===== Added the following files =====")
+    		debug.verboseMessage("===== Added the following files =====")
     		for f in added:
-        		print(f)
+        		debug.verboseMessage(f)
 
 if opts.dir is None:
 	debug.exitMessage("You must supply a directory on the command line.")
@@ -102,7 +100,6 @@ elif not os.path.isdir(opts.dir):
 	debug.exitMessage("The directory '" + opts.dir + "' is not a valid directory")
 else:
 	add()
-
 	if opts.output:
 		output()    
 

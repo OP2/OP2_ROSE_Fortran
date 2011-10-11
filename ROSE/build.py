@@ -96,19 +96,19 @@ def getBoostPath ():
 	return boostDirectory
 
 def selectOption (options, msg):
-	print("=== %s ===" % msg)
+	sys.stdout.write("=== %s ===\n" % msg)
 	for i, option in enumerate(options):
-		print("%s) %s" % (i, option))
+		sys.stdout.write("%s) %s\n" % (i, option))
 	while True:
 		try:
 			answer = int(raw_input())
 			if answer > len(options) - 1 or answer < 0:
-				print("Invalid answer. Choose between 0..%s." % (len(options) - 1))
+				sys.stdout.write("Invalid answer. Choose between 0..%s.\n" % (len(options) - 1))
 			else:
 				return answer
 				break;
 		except ValueError:
-			print("Invalid answer. Choose an integer.")
+			sys.stdout.write("Invalid answer. Choose an integer.\n")
 
 def selectROSETarball ():
 	tarballs = glob.glob('rose*.tar.gz')
@@ -280,6 +280,13 @@ def copyFilesIfNeeded (roseDirectory):
 		tokens              = line.split('=')
 		sourceFileName      = os.getcwd() + os.sep + imperialDirectory + os.sep + tokens[0]
 		destinationFileName = os.getcwd() + os.sep + roseDirectory + os.sep + tokens[1].strip() + os.sep + tokens[0]
+
+		if not os.path.exists(sourceFileName):
+			debug.exitMessage("The source file '%s' does not exist. Check that this file exists in the git repository." % sourceFileName)		
+
+		if not os.path.exists(destinationFileName):
+			debug.exitMessage("The destination file '%s' does not exist. Check that this ROSE revision has been decompressed and exists in this location." % destinationFileName)
+
 		sourceMD5           = computeChecksum(sourceFileName)
 		destinationMD5      = computeChecksum(destinationFileName)
 		debug.debugMessage("MD5 of '%s' is '%s'" % (sourceFileName, sourceMD5), 1)
@@ -291,6 +298,43 @@ def copyFilesIfNeeded (roseDirectory):
 			makeNeeded = True
 	fileListFile.close()
 	return makeNeeded
+
+def queryYesNo(question, default="yes"):
+    valid = {"yes":"yes", "y":"yes", "ye":"yes", "no":"no","n":"no"}
+    if default == None:
+        prompt = " [y/n] "
+    elif default == "yes":
+        prompt = " [Y/n] "
+    elif default == "no":
+        prompt = " [y/N] "
+    else:
+        raise ValueError("Invalid default answer: '%s'" % default)
+
+    while True:
+	sys.stdout.write("=== %s ===" % question + prompt)
+        choice = raw_input().lower()
+        if default is not None and choice == '':
+            return default
+        elif choice in valid.keys():
+            return valid[choice]
+        else:
+            sys.stdout.write("Please respond with 'yes/y' or 'no/n'.\n")
+
+def rebuildTranslator ():
+	# Run the 'scons' command in the 'translator' directory
+	sconsString = "scons -j 6"
+
+	debug.verboseMessage("Rebuilding the translator with '%s'" % (sconsString))
+
+	proc = Popen(args=sconsString, 
+		     cwd=os.path.dirname(os.getcwd()) + os.sep + "translator", 
+		     shell="/bin/bash",
+		     stderr=PIPE,
+		     stdout=PIPE)
+ 
+	proc.communicate()
+	if proc.returncode != 0:
+		debug.exitMessage("Command '%s' failed" % sconsString)
 
 def buildAction ():
 	checkEnvironment()
@@ -309,6 +353,12 @@ def updateAction ():
 	if makeNeeded:
 		makeROSE (roseDirectory)
 		makeInstallROSE (roseDirectory)
+		if queryYesNo("ROSE installation has changed. Shall I rebuild the translator?") == "yes":
+			rebuildTranslator ()
+		else:
+			debug.verboseMessage("ROSE installation has changed but the translator has NOT been rebuilt. Therefore, there may be errors when using the translator.")
+	else:
+		debug.verboseMessage("None of the files in the ROSE distribution have changed. Therefore, nothing to do.")
 
 if opts.build:
 	buildAction ()
@@ -318,3 +368,5 @@ if opts.update:
 
 if not opts.build and not opts.update:
 	debug.exitMessage("No actions selected. Use -h for options")
+else:	
+	debug.verboseMessage("My work is done here.")
