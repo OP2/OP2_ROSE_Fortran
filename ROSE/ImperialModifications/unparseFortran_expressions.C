@@ -266,8 +266,8 @@ FortranCodeGeneration_locatedNode::unparseLanguageSpecificExpression (
       break;
 
       // Imperial College changes
-    case SgCudaKernelCallExp:
-      unparseCudaKernelCall (stmt, info);
+    case V_SgCudaKernelCallExp:
+      unparseCudaKernelCall (expr, info);
       break;
       // END Imperial College changes
 
