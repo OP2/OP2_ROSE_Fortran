@@ -5,6 +5,11 @@
 #include <CommonNamespaces.h>
 
 void
+CPPOpenCLReductionSubroutine::createStatements ()
+{
+}
+
+void
 CPPOpenCLReductionSubroutine::createLocalVariableDeclarations ()
 {
 }
