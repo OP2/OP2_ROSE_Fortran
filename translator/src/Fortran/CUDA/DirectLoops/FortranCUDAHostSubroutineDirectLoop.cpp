@@ -75,33 +75,34 @@ FortranCUDAHostSubroutineDirectLoop::createKernelFunctionCallStatement ()
   actualParameters->append_expression (buildVarRefExp (
       variableDeclarations->get (OP2::VariableNames::sharedMemoryOffset)));
 
-  //  SgCudaKernelExecConfig * kernelConfiguration = new SgCudaKernelExecConfig (
-  //      RoseHelper::getFileInfo (), buildVarRefExp (variableDeclarations->get (
-  //          CUDA::blocksPerGrid)), buildVarRefExp (variableDeclarations->get (
-  //          CUDA::threadsPerBlock)), buildVarRefExp (variableDeclarations->get (
-  //          CUDA::sharedMemorySize)), buildNullExpression ());
-  //
-  //  kernelConfiguration->set_endOfConstruct (RoseHelper::getFileInfo ());
-  //
-  //  SgCudaKernelCallExp * kernelCallExpression = new SgCudaKernelCallExp (
-  //      RoseHelper::getFileInfo (), buildFunctionRefExp (kernelSubroutineName,
-  //          subroutineScope), actualParameters, kernelConfiguration);
-  //
-  //  kernelConfiguration->set_endOfConstruct (RoseHelper::getFileInfo ());
-  //
-  //  return SageBuilder::buildExprStatement(kernelCallExpression);
+  SgCudaKernelExecConfig * kernelConfiguration = new SgCudaKernelExecConfig (
+      RoseHelper::getFileInfo (), buildVarRefExp (variableDeclarations->get (
+          CUDA::blocksPerGrid)), buildVarRefExp (variableDeclarations->get (
+          CUDA::threadsPerBlock)), buildVarRefExp (variableDeclarations->get (
+          CUDA::sharedMemorySize)), buildNullExpression ());
 
-  string const kernelLaunchString = calleeSubroutine->getSubroutineName ()
-      + "<<<" + RoseHelper::getFirstVariableName (variableDeclarations->get (
-      CUDA::blocksPerGrid)) + ", " + RoseHelper::getFirstVariableName (
-      variableDeclarations->get (CUDA::threadsPerBlock)) + ", "
-      + RoseHelper::getFirstVariableName (variableDeclarations->get (
-          CUDA::sharedMemorySize)) + ">>>";
+  kernelConfiguration->set_endOfConstruct (RoseHelper::getFileInfo ());
 
-  SgExprStatement * callStatement = buildFunctionCallStmt (kernelLaunchString,
-      buildVoidType (), actualParameters, subroutineScope);
+  SgCudaKernelCallExp * kernelCallExpression = new SgCudaKernelCallExp (
+      RoseHelper::getFileInfo (), buildFunctionRefExp (
+          calleeSubroutine->getSubroutineName (), subroutineScope),
+      actualParameters, kernelConfiguration);
 
-  return callStatement;
+  kernelConfiguration->set_endOfConstruct (RoseHelper::getFileInfo ());
+
+  return SageBuilder::buildExprStatement (kernelCallExpression);
+
+  //  string const kernelLaunchString = calleeSubroutine->getSubroutineName ()
+  //      + "<<<" + RoseHelper::getFirstVariableName (variableDeclarations->get (
+  //      CUDA::blocksPerGrid)) + ", " + RoseHelper::getFirstVariableName (
+  //      variableDeclarations->get (CUDA::threadsPerBlock)) + ", "
+  //      + RoseHelper::getFirstVariableName (variableDeclarations->get (
+  //          CUDA::sharedMemorySize)) + ">>>";
+  //
+  //  SgExprStatement * callStatement = buildFunctionCallStmt (kernelLaunchString,
+  //      buildVoidType (), actualParameters, subroutineScope);
+
+ // return callStatement;
 }
 
 void
