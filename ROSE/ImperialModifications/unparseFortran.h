@@ -215,6 +215,10 @@ class FortranCodeGeneration_locatedNode : public UnparseLanguageIndependentConst
        // DQ (11/24/2007): These will be translated away in a post-processing step, but allow them to be unparsed for debugging
           virtual void unparseUnknownArrayOrFunctionReference (SgExpression* expr, SgUnparse_Info& info);
 
+       // Imperial College changes
+          virtual void unparseCudaKernelCall           (SgExpression* expr, SgUnparse_Info& info);
+       // END Imperial College changes
+
           virtual bool isSubroutineCall                (SgFunctionCallExp* fcall);
 
        // DQ (10/10/2008): Added support for unser defined unary and binary operators.
@@ -424,10 +428,6 @@ class FortranCodeGeneration_locatedNode : public UnparseLanguageIndependentConst
           virtual void unparseOmpBeginDirectiveClauses     (SgStatement* stmt,SgUnparse_Info& info);
           virtual void unparseOmpEndDirectiveClauses       (SgStatement* stmt,     SgUnparse_Info& info);
           virtual void unparseOmpEndDirectivePrefixAndName (SgStatement* stmt, SgUnparse_Info& info);
-      
-        // Imperial College changes
-          virtual void unparseCudaKernelCall (SgStatement* stmt,SgUnparse_Info& info);
-        // END Imperial College changes
 
 };
 
