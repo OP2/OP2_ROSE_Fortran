@@ -436,12 +436,6 @@ FortranCodeGeneration_locatedNode::unparseLanguageSpecificStatement (
       unparseOmpDoStatement (stmt, info);
       break;
 
-      // Imperial College changes
-    case SgCudaKernelCallExp:
-      unparseCudaKernelCall (stmt, info);
-      break;
-      // END Imperial College changes
-
 #if 0
       // Optional support for unparsing Fortran from C
       case V_SgFunctionDeclaration: unparseProcHdrStmt(stmt, info); break;
@@ -6350,62 +6344,3 @@ FortranCodeGeneration_locatedNode::unparseOmpDoStatement (SgStatement* stmt,
   unparseOmpEndDirectiveClauses (stmt, info);
 
 }
-
-// Imperial College changes
-void
-FortranCodeGeneration_locatedNode::unparseCudaKernelCall (SgStatement* stmt,
-    SgUnparse_Info& info)
-{
-  SgCudaKernelCallExp* kernel_call = isSgCudaKernelCallExp (expr);
-  ROSE_ASSERT (kernel_call != NULL);
-
-  unparseExpression (kernel_call->get_function (), info);
-
-  SgCudaKernelExecConfig * exec_config = isSgCudaKernelExecConfig (
-      kernel_call->get_exec_config ());
-  ROSE_ASSERT (exec_config != NULL);
-
-  curprint ("<<<");
-
-  SgExpression * grid_exp = exec_config->get_grid ();
-  ROSE_ASSERT (grid_exp != NULL);
-  unparseExpression (grid_exp, info);
-  curprint (",");
-
-  SgExpression * blocks_exp = exec_config->get_blocks ();
-  ROSE_ASSERT (blocks_exp != NULL);
-  unparseExpression (blocks_exp, info);
-
-  SgExpression * shared_exp = exec_config->get_shared ();
-  if (shared_exp != NULL)
-  {
-    curprint (",");
-    unparseExpression (shared_exp, info);
-
-    SgExpression * stream_exp = exec_config->get_stream ();
-    if (stream_exp != NULL)
-    {
-      curprint (",");
-      unparseExpression (stream_exp, info);
-    }
-  }
-
-  curprint (">>>");
-
-  curprint ("(");
-  if (kernel_call->get_args () != NULL)
-  {
-    SgExpressionPtrList& list = kernel_call->get_args ()->get_expressions ();
-    SgExpressionPtrList::iterator arg = list.begin ();
-    while (arg != list.end ())
-    {
-      con_init = isSgConstructorInitializer (*arg);
-      unparseExpression ((*arg), info);
-      arg++;
-      if (arg != list.end ())
-        curprint (",");
-    }
-  }
-  curprint (")");
-}
-// END Imperial College changes
