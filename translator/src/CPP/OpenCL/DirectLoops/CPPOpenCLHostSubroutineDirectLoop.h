@@ -4,8 +4,6 @@
 
 #include <CPPOpenCLHostSubroutine.h>
 
-class CPPOpenCLDataSizesDeclarationDirectLoop;
-
 class CPPOpenCLHostSubroutineDirectLoop: public CPPOpenCLHostSubroutine
 {
   private:
@@ -47,12 +45,9 @@ class CPPOpenCLHostSubroutineDirectLoop: public CPPOpenCLHostSubroutine
 
   public:
 
-    CPPOpenCLHostSubroutineDirectLoop (std::string const & subroutineName,
-        std::string const & userSubroutineName,
-        std::string const & kernelSubroutineName,
-        CPPParallelLoop * parallelLoop, SgScopeStatement * moduleScope,
-        CPPOpenCLDataSizesDeclarationDirectLoop * dataSizesDeclaration,
-        CPPOpDatDimensionsDeclaration * opDatDimensionsDeclaration);
+    CPPOpenCLHostSubroutineDirectLoop (SgScopeStatement * moduleScope,
+        CPPOpenCLKernelSubroutine * kernelSubroutine,
+        CPPParallelLoop * parallelLoop);
 };
 
 #endif

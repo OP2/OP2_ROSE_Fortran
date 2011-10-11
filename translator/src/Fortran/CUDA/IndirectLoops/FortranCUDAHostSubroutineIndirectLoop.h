@@ -1,10 +1,3 @@
-/*
- * Written by Adam Betts and Carlo Bertolli
- *
- * This class models the host subroutine for an indirect loop.
- * Its declarations and statements do the following:
- */
-
 #pragma once
 #ifndef FORTRAN_CUDA_HOST_SUBROUTINE_INDIRECT_LOOP_H
 #define FORTRAN_CUDA_HOST_SUBROUTINE_INDIRECT_LOOP_H
@@ -40,13 +33,11 @@ class FortranCUDAHostSubroutineIndirectLoop: public FortranCUDAHostSubroutine,
   public:
 
         FortranCUDAHostSubroutineIndirectLoop (
-            std::string const & subroutineName,
-            std::string const & userSubroutineName,
-            std::string const & kernelSubroutineName,
-            FortranParallelLoop * parallelLoop,
             SgScopeStatement * moduleScope,
-            FortranCUDAOpDatCardinalitiesDeclarationIndirectLoop * dataSizesDeclaration,
-            FortranOpDatDimensionsDeclaration * opDatDimensionsDeclaration,
+            FortranKernelSubroutine * kernelSubroutine,
+            FortranParallelLoop * parallelLoop,
+            FortranCUDAOpDatCardinalitiesDeclarationIndirectLoop * cardinalitiesDeclaration,
+            FortranOpDatDimensionsDeclaration * dimensionsDeclaration,
             FortranCUDAModuleDeclarations * moduleDeclarations);
 };
 

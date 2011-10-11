@@ -1,9 +1,3 @@
-/*
- * Written by Adam Betts and Carlo Bertolli
- *
- * This class models the kernel subroutine for a direct loop
- */
-
 #pragma once
 #ifndef FORTRAN_CUDA_KERNEL_SUBROUTINE_DIRECT_LOOP_H
 #define FORTRAN_CUDA_KERNEL_SUBROUTINE_DIRECT_LOOP_H
@@ -84,12 +78,12 @@ class FortranCUDAKernelSubroutineDirectLoop: public FortranCUDAKernelSubroutine
 
   public:
 
-    FortranCUDAKernelSubroutineDirectLoop (std::string const & subroutineName,
-        std::string const & userSubroutineName,
-        FortranParallelLoop * parallelLoop, SgScopeStatement * moduleScope,
+    FortranCUDAKernelSubroutineDirectLoop (SgScopeStatement * moduleScope,
+        FortranCUDAUserSubroutine * userSubroutine,
+        FortranParallelLoop * parallelLoop,
         FortranReductionSubroutines * reductionSubroutines,
-        FortranCUDAOpDatCardinalitiesDeclaration * dataSizesDeclaration,
-        FortranOpDatDimensionsDeclaration * opDatDimensionsDeclaration,
+        FortranCUDAOpDatCardinalitiesDeclaration * cardinalitiesDeclaration,
+        FortranOpDatDimensionsDeclaration * dimensionsDeclaration,
         FortranCUDAModuleDeclarations * moduleDeclarations);
 };
 

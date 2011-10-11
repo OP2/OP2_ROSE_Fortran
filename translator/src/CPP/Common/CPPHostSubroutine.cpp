@@ -91,12 +91,10 @@ CPPHostSubroutine::createFormalParameterDeclarations ()
   }
 }
 
-CPPHostSubroutine::CPPHostSubroutine (std::string const & subroutineName,
-    std::string const & userSubroutineName,
-    std::string const & kernelSubroutineName, CPPParallelLoop * parallelLoop,
-    SgScopeStatement * moduleScope) :
-  HostSubroutine <SgFunctionDeclaration> (subroutineName, userSubroutineName,
-      kernelSubroutineName, parallelLoop)
+CPPHostSubroutine::CPPHostSubroutine (SgScopeStatement * moduleScope,
+    Subroutine <SgFunctionDeclaration> * calleeSubroutine,
+    CPPParallelLoop * parallelLoop) :
+  HostSubroutine <SgFunctionDeclaration> (calleeSubroutine, parallelLoop)
 {
   using SageBuilder::buildVoidType;
   using SageBuilder::buildDefiningFunctionDeclaration;

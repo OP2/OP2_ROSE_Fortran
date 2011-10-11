@@ -4,6 +4,7 @@
 
 #include <FortranKernelSubroutine.h>
 
+class FortranCUDAUserSubroutine;
 class FortranCUDAOpDatCardinalitiesDeclaration;
 class FortranCUDAModuleDeclarations;
 class FortranOpDatDimensionsDeclaration;
@@ -13,9 +14,9 @@ class FortranCUDAKernelSubroutine: public FortranKernelSubroutine
 {
   protected:
 
-    FortranCUDAOpDatCardinalitiesDeclaration * dataSizesDeclaration;
+    FortranCUDAOpDatCardinalitiesDeclaration * cardinalitiesDeclaration;
 
-    FortranOpDatDimensionsDeclaration * opDatDimensionsDeclaration;
+    FortranOpDatDimensionsDeclaration * dimensionsDeclaration;
 
     FortranCUDAModuleDeclarations * moduleDeclarations;
 
@@ -66,12 +67,12 @@ class FortranCUDAKernelSubroutine: public FortranKernelSubroutine
     void
     createCUDASharedVariableDeclarations ();
 
-    FortranCUDAKernelSubroutine (std::string const & subroutineName,
-        std::string const & userSubroutineName,
-        FortranParallelLoop * parallelLoop, SgScopeStatement * moduleScope,
+    FortranCUDAKernelSubroutine (SgScopeStatement * moduleScope,
+        FortranCUDAUserSubroutine * userSubroutine,
+        FortranParallelLoop * parallelLoop,
         FortranReductionSubroutines * reductionSubroutines,
-        FortranCUDAOpDatCardinalitiesDeclaration * dataSizesDeclaration,
-        FortranOpDatDimensionsDeclaration * opDatDimensionsDeclaration,
+        FortranCUDAOpDatCardinalitiesDeclaration * cardinalitiesDeclaration,
+        FortranOpDatDimensionsDeclaration * dimensionsDeclaration,
         FortranCUDAModuleDeclarations * moduleDeclarations);
 };
 

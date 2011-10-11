@@ -6,19 +6,11 @@
 #include <CPPOpenCLUserSubroutine.h>
 #include <CPPParallelLoop.h>
 #include <CPPProgramDeclarationsAndDefinitions.h>
-#include <CPPOpenCLDataSizesDeclarationDirectLoop.h>
-#include <CPPOpenCLDataSizesDeclarationIndirectLoop.h>
 
 namespace Libraries
 {
   std::string const OPENCL = "CL/cl.h";
 }
-
-/*
- * ======================================================
- * Private functions
- * ======================================================
- */
 
 CPPHostSubroutine *
 CPPOpenCLSubroutinesGeneration::createSubroutines ()
@@ -38,63 +30,28 @@ CPPOpenCLSubroutinesGeneration::createSubroutines ()
     CPPParallelLoop * parallelLoop =
         static_cast <CPPParallelLoop *> (it->second);
 
-    CPPOpenCLUserSubroutine * userDeviceSubroutine;
+    CPPOpenCLUserSubroutine * userDeviceSubroutine =
+        new CPPOpenCLUserSubroutine (moduleScope, parallelLoop, declarations);
 
     CPPOpenCLKernelSubroutine * kernelSubroutine;
 
     if (parallelLoop->isDirectLoop ())
     {
-      userDeviceSubroutine = new CPPOpenCLUserSubroutine (userSubroutineName,
-          moduleScope,
-          //initialiseConstantsSubroutine,
-          declarations, parallelLoop);
-
-      kernelSubroutine = new CPPOpenCLKernelSubroutineDirectLoop (
-          userSubroutineName, userDeviceSubroutine->getSubroutineName (),
-          parallelLoop, moduleScope, NULL,
-          //static_cast <CPPOpenCLDataSizesDeclarationDirectLoop *> (dataSizesDeclarations[userSubroutineName]),
-          dimensionsDeclarations[userSubroutineName]);
+      kernelSubroutine = new CPPOpenCLKernelSubroutineDirectLoop (moduleScope,
+          userDeviceSubroutine, parallelLoop, NULL);
 
       hostSubroutines[userSubroutineName]
-          = new CPPOpenCLHostSubroutineDirectLoop (
-              userSubroutineName,
-              userSubroutineName,
-              kernelSubroutine->getSubroutineName (),
-              parallelLoop,
-              moduleScope,
-              //initialiseConstantsSubroutine,
-              static_cast <CPPOpenCLDataSizesDeclarationDirectLoop *> (dataSizesDeclarations[userSubroutineName]),
-              dimensionsDeclarations[userSubroutineName]);
-      //static_cast <CPPOpenCLModuleDeclarations *> (moduleDeclarations[userSubroutineName]));
+          = new CPPOpenCLHostSubroutineDirectLoop (moduleScope,
+              kernelSubroutine, parallelLoop);
     }
     else
     {
-      userDeviceSubroutine = new CPPOpenCLUserSubroutine (userSubroutineName,
-          moduleScope,
-          //initialiseConstantsSubroutine, 
-          declarations, parallelLoop);
-
-      kernelSubroutine
-          = new CPPOpenCLKernelSubroutineIndirectLoop (
-              userSubroutineName,
-              userDeviceSubroutine->getSubroutineName (),
-              parallelLoop,
-              moduleScope,
-              NULL,
-              static_cast <CPPOpenCLDataSizesDeclarationIndirectLoop *> (dataSizesDeclarations[userSubroutineName]),
-              dimensionsDeclarations[userSubroutineName]);
+      kernelSubroutine = new CPPOpenCLKernelSubroutineIndirectLoop (
+          moduleScope, userDeviceSubroutine, parallelLoop, NULL);
 
       hostSubroutines[userSubroutineName]
-          = new CPPOpenCLHostSubroutineIndirectLoop (
-              userSubroutineName,
-              userSubroutineName,
-              kernelSubroutine->getSubroutineName (),
-              parallelLoop,
-              moduleScope,
-              //initialiseConstantsSubroutine,
-              static_cast <CPPOpenCLDataSizesDeclarationIndirectLoop *> (dataSizesDeclarations[userSubroutineName]),
-              dimensionsDeclarations[userSubroutineName]);
-      //static_cast <CPPOpenCLModuleDeclarationsIndirectLoop *> (moduleDeclarations[userSubroutineName]));
+          = new CPPOpenCLHostSubroutineIndirectLoop (moduleScope,
+              kernelSubroutine, parallelLoop);
     }
   }
   return NULL; //FIXME
@@ -123,12 +80,6 @@ CPPOpenCLSubroutinesGeneration::addLibraries ()
 
   appendStatement (test, moduleScope);
 }
-
-/*
- * ======================================================
- * Public functions
- * ======================================================
- */
 
 CPPOpenCLSubroutinesGeneration::CPPOpenCLSubroutinesGeneration (
     SgProject * project, CPPProgramDeclarationsAndDefinitions * declarations) :

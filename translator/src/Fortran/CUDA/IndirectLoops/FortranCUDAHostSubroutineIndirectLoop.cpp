@@ -11,12 +11,6 @@
 #include <CUDA.h>
 #include <Debug.h>
 
-/*
- * ======================================================
- * Private functions
- * ======================================================
- */
-
 SgStatement *
 FortranCUDAHostSubroutineIndirectLoop::createKernelFunctionCallStatement ()
 {
@@ -116,13 +110,14 @@ FortranCUDAHostSubroutineIndirectLoop::createKernelFunctionCallStatement ()
       buildVarRefExp (variableDeclarations->get (
           OP2::VariableNames::PlanFunction::blockOffset)));
 
-  SgExprStatement * callStatement = buildFunctionCallStmt (kernelSubroutineName
-      + "<<<" + RoseHelper::getFirstVariableName (variableDeclarations->get (
-      CUDA::blocksPerGrid)) + ", " + RoseHelper::getFirstVariableName (
-      variableDeclarations->get (CUDA::threadsPerBlock)) + ", "
-      + RoseHelper::getFirstVariableName (variableDeclarations->get (
-          CUDA::sharedMemorySize)) + ">>>", buildVoidType (), actualParameters,
-      subroutineScope);
+  SgExprStatement * callStatement = buildFunctionCallStmt (
+      calleeSubroutine->getSubroutineName () + "<<<"
+          + RoseHelper::getFirstVariableName (variableDeclarations->get (
+              CUDA::blocksPerGrid)) + ", " + RoseHelper::getFirstVariableName (
+          variableDeclarations->get (CUDA::threadsPerBlock)) + ", "
+          + RoseHelper::getFirstVariableName (variableDeclarations->get (
+              CUDA::sharedMemorySize)) + ">>>", buildVoidType (),
+      actualParameters, subroutineScope);
 
   return callStatement;
 }
@@ -306,7 +301,7 @@ FortranCUDAHostSubroutineIndirectLoop::createCardinalitiesInitialisationStatemen
         SgDotExp * dotExpression = buildDotExp (
             buildVarRefExp (variableDeclarations->get (
                 OP2::VariableNames::opDatCardinalities)), buildVarRefExp (
-                dataSizesDeclaration->getFieldDeclarations ()->get (
+                cardinalitiesDeclaration->getFieldDeclarations ()->get (
                     OP2::VariableNames::getLocalToGlobalMappingSizeName (i))));
 
         SgPntrArrRefExp * arrayIndexExpression = buildPntrArrRefExp (
@@ -330,8 +325,9 @@ FortranCUDAHostSubroutineIndirectLoop::createCardinalitiesInitialisationStatemen
     {
       SgDotExp * fieldSelectionExpression = buildDotExp (buildVarRefExp (
           variableDeclarations->get (OP2::VariableNames::opDatCardinalities)),
-          buildVarRefExp (dataSizesDeclaration->getFieldDeclarations ()->get (
-              OP2::VariableNames::getGlobalToLocalMappingSizeName (i))));
+          buildVarRefExp (
+              cardinalitiesDeclaration->getFieldDeclarations ()->get (
+                  OP2::VariableNames::getGlobalToLocalMappingSizeName (i))));
 
       SgExprStatement * assignmentStatement = buildAssignStatement (
           fieldSelectionExpression, buildVarRefExp (variableDeclarations->get (
@@ -369,8 +365,8 @@ FortranCUDAHostSubroutineIndirectLoop::createCardinalitiesInitialisationStatemen
   {
     SgDotExp * fieldSelectionExpression = buildDotExp (buildVarRefExp (
         variableDeclarations->get (OP2::VariableNames::opDatCardinalities)),
-        buildVarRefExp (
-            dataSizesDeclaration->getFieldDeclarations ()->get (*it)));
+        buildVarRefExp (cardinalitiesDeclaration->getFieldDeclarations ()->get (
+            *it)));
 
     SgExprStatement * assignmentStatement = buildAssignStatement (
         fieldSelectionExpression, buildVarRefExp (variableDeclarations->get (
@@ -708,11 +704,10 @@ FortranCUDAHostSubroutineIndirectLoop::createStatements ()
 void
 FortranCUDAHostSubroutineIndirectLoop::createLocalVariableDeclarations ()
 {
-  
   createOpDatDimensionsDeclaration ();
 
   createOpDatCardinalitiesDeclaration ();
-  
+
   createDataMarshallingLocalVariableDeclarations ();
 
   createCUDAKernelLocalVariableDeclarations ();
@@ -725,24 +720,15 @@ FortranCUDAHostSubroutineIndirectLoop::createLocalVariableDeclarations ()
   }
 }
 
-/*
- * ======================================================
- * Public functions
- * ======================================================
- */
-
 FortranCUDAHostSubroutineIndirectLoop::FortranCUDAHostSubroutineIndirectLoop (
-    std::string const & subroutineName,
-    std::string const & userSubroutineName,
-    std::string const & kernelSubroutineName,
-    FortranParallelLoop * parallelLoop,
     SgScopeStatement * moduleScope,
-    FortranCUDAOpDatCardinalitiesDeclarationIndirectLoop * dataSizesDeclaration,
-    FortranOpDatDimensionsDeclaration * opDatDimensionsDeclaration,
+    FortranKernelSubroutine * kernelSubroutine,
+    FortranParallelLoop * parallelLoop,
+    FortranCUDAOpDatCardinalitiesDeclarationIndirectLoop * cardinalitiesDeclaration,
+    FortranOpDatDimensionsDeclaration * dimensionsDeclaration,
     FortranCUDAModuleDeclarations * moduleDeclarations) :
-  FortranCUDAHostSubroutine (subroutineName, userSubroutineName,
-      kernelSubroutineName, parallelLoop, moduleScope, dataSizesDeclaration,
-      opDatDimensionsDeclaration, moduleDeclarations)
+  FortranCUDAHostSubroutine (moduleScope, kernelSubroutine, parallelLoop,
+      cardinalitiesDeclaration, dimensionsDeclaration, moduleDeclarations)
 {
   Debug::getInstance ()->debugMessage (
       "Creating host subroutine of indirect loop", Debug::CONSTRUCTOR_LEVEL,

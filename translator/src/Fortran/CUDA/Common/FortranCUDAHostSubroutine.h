@@ -4,6 +4,7 @@
 
 #include <FortranHostSubroutine.h>
 
+class FortranKernelSubroutine;
 class FortranCUDAOpDatCardinalitiesDeclaration;
 class FortranOpDatDimensionsDeclaration;
 class FortranCUDAModuleDeclarations;
@@ -12,9 +13,9 @@ class FortranCUDAHostSubroutine: public FortranHostSubroutine
 {
   protected:
 
-    FortranCUDAOpDatCardinalitiesDeclaration * dataSizesDeclaration;
+    FortranCUDAOpDatCardinalitiesDeclaration * cardinalitiesDeclaration;
 
-    FortranOpDatDimensionsDeclaration * opDatDimensionsDeclaration;
+    FortranOpDatDimensionsDeclaration * dimensionsDeclaration;
 
     FortranCUDAModuleDeclarations * moduleDeclarations;
 
@@ -55,12 +56,11 @@ class FortranCUDAHostSubroutine: public FortranHostSubroutine
     void
     createOpDatDimensionsDeclaration ();
 
-    FortranCUDAHostSubroutine (std::string const & subroutineName,
-        std::string const & userSubroutineName,
-        std::string const & kernelSubroutineName,
-        FortranParallelLoop * parallelLoop, SgScopeStatement * moduleScope,
-        FortranCUDAOpDatCardinalitiesDeclaration * dataSizesDeclaration,
-        FortranOpDatDimensionsDeclaration * opDatDimensionsDeclaration,
+    FortranCUDAHostSubroutine (SgScopeStatement * moduleScope,
+        FortranKernelSubroutine * kernelSubroutine,
+        FortranParallelLoop * parallelLoop,
+        FortranCUDAOpDatCardinalitiesDeclaration * cardinalitiesDeclaration,
+        FortranOpDatDimensionsDeclaration * dimensionsDeclaration,
         FortranCUDAModuleDeclarations * moduleDeclarations);
 };
 

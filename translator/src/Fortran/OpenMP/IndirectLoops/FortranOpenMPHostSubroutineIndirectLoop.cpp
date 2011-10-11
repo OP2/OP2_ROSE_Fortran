@@ -1,4 +1,7 @@
 #include <FortranOpenMPHostSubroutineIndirectLoop.h>
+#include <FortranParallelLoop.h>
+#include <FortranOpenMPKernelSubroutine.h>
+#include <FortranOpenMPModuleDeclarationsIndirectLoop.h>
 #include <FortranStatementsAndExpressionsBuilder.h>
 #include <FortranTypesBuilder.h>
 #include <RoseStatementsAndExpressionsBuilder.h>
@@ -102,9 +105,9 @@ FortranOpenMPHostSubroutineIndirectLoop::createKernelFunctionCallStatement ()
       buildVarRefExp (variableDeclarations->get (
           OP2::VariableNames::PlanFunction::blockOffset)));
 
-  SgExprStatement * callStatement =
-      buildFunctionCallStmt (kernelSubroutineName, buildVoidType (),
-          actualParameters, subroutineScope);
+  SgExprStatement * callStatement = buildFunctionCallStmt (
+      calleeSubroutine->getSubroutineName (), buildVoidType (),
+      actualParameters, subroutineScope);
 
   return callStatement;
 }
@@ -479,14 +482,15 @@ FortranOpenMPHostSubroutineIndirectLoop::createLocalVariableDeclarations ()
  */
 
 FortranOpenMPHostSubroutineIndirectLoop::FortranOpenMPHostSubroutineIndirectLoop (
-    std::string const & subroutineName, std::string const & userSubroutineName,
-    std::string const & kernelSubroutineName,
-    FortranParallelLoop * parallelLoop, SgScopeStatement * moduleScope,
+    SgScopeStatement * moduleScope,
+    FortranOpenMPKernelSubroutine * kernelSubroutine,
+    FortranParallelLoop * parallelLoop,
     FortranOpenMPModuleDeclarationsIndirectLoop * moduleDeclarations) :
-  FortranOpenMPHostSubroutine (subroutineName, userSubroutineName,
-      kernelSubroutineName, parallelLoop, moduleScope, moduleDeclarations)
+  FortranOpenMPHostSubroutine (moduleScope, kernelSubroutine, parallelLoop,
+      moduleDeclarations)
 {
-  Debug::getInstance ()->debugMessage ("<Host, Indirect, OpenMP>",
+  Debug::getInstance ()->debugMessage (
+      "OpenMP host subroutine creation for indirect loop",
       Debug::CONSTRUCTOR_LEVEL, __FILE__, __LINE__);
 
   createFormalParameterDeclarations ();

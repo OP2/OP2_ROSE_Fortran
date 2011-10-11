@@ -1,11 +1,10 @@
 #include <CPPKernelSubroutine.h>
 #include <CPPParallelLoop.h>
 
-CPPKernelSubroutine::CPPKernelSubroutine (std::string const & subroutineName,
-    std::string const & userSubroutineName, SgScopeStatement * moduleScope,
+CPPKernelSubroutine::CPPKernelSubroutine (SgScopeStatement * moduleScope,
+    Subroutine <SgFunctionDeclaration> * calleeSubroutine,
     CPPParallelLoop * parallelLoop) :
-  KernelSubroutine <SgFunctionDeclaration> (subroutineName, userSubroutineName,
-      parallelLoop)
+  KernelSubroutine <SgFunctionDeclaration> (calleeSubroutine, parallelLoop)
 {
   using SageBuilder::buildVoidType;
   using SageBuilder::buildDefiningFunctionDeclaration;

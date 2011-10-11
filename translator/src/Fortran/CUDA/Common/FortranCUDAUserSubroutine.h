@@ -12,10 +12,6 @@ class FortranCUDAUserSubroutine: public UserSubroutine <
 {
   private:
 
-    SgProcedureHeaderStatement * originalSubroutine;
-
-  private:
-
     void
     forceOutputOfCodeToFile ();
 
@@ -33,10 +29,9 @@ class FortranCUDAUserSubroutine: public UserSubroutine <
 
   public:
 
-    FortranCUDAUserSubroutine (std::string const & subroutineName,
-        SgScopeStatement * moduleScope,
-        FortranProgramDeclarationsAndDefinitions * declarations,
-        FortranParallelLoop * parallelLoop);
+    FortranCUDAUserSubroutine (SgScopeStatement * moduleScope,
+        FortranParallelLoop * parallelLoop,
+        FortranProgramDeclarationsAndDefinitions * declarations);
 };
 
 #endif

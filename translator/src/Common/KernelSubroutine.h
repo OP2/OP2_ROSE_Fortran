@@ -1,21 +1,19 @@
-
 #pragma once
 #ifndef KERNEL_SUBROUTINE_H
 #define KERNEL_SUBROUTINE_H
 
 #include <Subroutine.h>
+#include <ParallelLoop.h>
 
 template <typename TSubroutineHeader>
   class ReductionSubroutines;
-
-class ParallelLoop;
 
 template <typename TSubroutineHeader>
   class KernelSubroutine: public Subroutine <TSubroutineHeader>
   {
     protected:
 
-      std::string userSubroutineName;
+      Subroutine <TSubroutineHeader> * userSubroutine;
 
       ParallelLoop * parallelLoop;
 
@@ -32,11 +30,11 @@ template <typename TSubroutineHeader>
       virtual void
       createOpDatFormalParameterDeclarations () = 0;
 
-      KernelSubroutine (std::string const & subroutineName,
-          std::string const & userSubroutineName, ParallelLoop * parallelLoop) :
-        Subroutine <TSubroutineHeader> (subroutineName + "_kernel"),
-            userSubroutineName (userSubroutineName),
-            parallelLoop (parallelLoop)
+      KernelSubroutine (Subroutine <TSubroutineHeader> * userSubroutine,
+          ParallelLoop * parallelLoop) :
+        Subroutine <TSubroutineHeader> (parallelLoop->getUserSubroutineName ()
+            + "_kernel"), userSubroutine (userSubroutine), parallelLoop (
+            parallelLoop)
       {
       }
   };

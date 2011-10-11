@@ -1,11 +1,12 @@
-
 #pragma once
 #ifndef FORTRAN_OPENMP_HOST_SUBROUTINE_H
 #define FORTRAN_OPENMP_HOST_SUBROUTINE_H
 
 #include <FortranHostSubroutine.h>
-#include <FortranParallelLoop.h>
-#include <FortranOpenMPModuleDeclarations.h>
+
+class FortranParallelLoop;
+class FortranKernelSubroutine;
+class FortranOpenMPModuleDeclarations;
 
 class FortranOpenMPHostSubroutine: public FortranHostSubroutine
 {
@@ -30,10 +31,9 @@ class FortranOpenMPHostSubroutine: public FortranHostSubroutine
     void
     initialiseNumberOfThreadsStatements ();
 
-    FortranOpenMPHostSubroutine (std::string const & subroutineName,
-        std::string const & userSubroutineName,
-        std::string const & kernelSubroutineName,
-        FortranParallelLoop * parallelLoop, SgScopeStatement * moduleScope,
+    FortranOpenMPHostSubroutine (SgScopeStatement * moduleScope,
+        FortranKernelSubroutine * kernelSubroutine,
+        FortranParallelLoop * parallelLoop,
         FortranOpenMPModuleDeclarations * moduleDeclarations);
 };
 

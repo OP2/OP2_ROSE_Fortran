@@ -7,12 +7,6 @@
 #include <boost/algorithm/string/predicate.hpp>
 #include <rose.h>
 
-/*
- * ======================================================
- * Protected functions
- * ======================================================
- */
-
 void
 FortranHostSubroutine::createFormalParameterDeclarations ()
 {
@@ -41,8 +35,8 @@ FortranHostSubroutine::createFormalParameterDeclarations ()
       kernelVariableName,
       FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
           kernelVariableName, FortranTypesBuilder::getString (
-              userSubroutineName.length ()), subroutineScope, formalParameters,
-          1, INTENT_IN));
+              parallelLoop->getUserSubroutineName ().length ()),
+          subroutineScope, formalParameters, 1, INTENT_IN));
 
   /*
    * ======================================================
@@ -106,12 +100,10 @@ FortranHostSubroutine::createFormalParameterDeclarations ()
   }
 }
 
-FortranHostSubroutine::FortranHostSubroutine (
-    std::string const & subroutineName, std::string const & userSubroutineName,
-    std::string const & kernelSubroutineName,
-    FortranParallelLoop * parallelLoop, SgScopeStatement * moduleScope) :
-  HostSubroutine <SgProcedureHeaderStatement> (subroutineName,
-      userSubroutineName, kernelSubroutineName, parallelLoop)
+FortranHostSubroutine::FortranHostSubroutine (SgScopeStatement * moduleScope,
+    Subroutine <SgProcedureHeaderStatement> * calleeSubroutine,
+    FortranParallelLoop * parallelLoop) :
+  HostSubroutine <SgProcedureHeaderStatement> (calleeSubroutine, parallelLoop)
 {
   using SageBuilder::buildVoidType;
   using SageBuilder::buildProcedureHeaderStatement;

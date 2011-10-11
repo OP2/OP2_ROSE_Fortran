@@ -1,7 +1,3 @@
-/*
- * Written by Adam Betts and Carlo Bertolli
- */
-
 #pragma once
 #ifndef FORTRAN_OPENMP_SUBROUTINES_GENERATION_H
 #define FORTRAN_OPENMP_SUBROUTINES_GENERATION_H
@@ -30,7 +26,7 @@ class FortranOpenMPSubroutinesGeneration: public FortranSubroutinesGeneration
         FortranProgramDeclarationsAndDefinitions * declarations) :
       FortranSubroutinesGeneration (declarations, "openmp_subroutines.F95")
     {
-      generate();
+      generate ();
     }
 };
 

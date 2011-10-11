@@ -26,10 +26,9 @@ class CPPOpenCLUserSubroutine: public UserSubroutine <SgFunctionDeclaration,
 
   public:
 
-    CPPOpenCLUserSubroutine (std::string const & subroutineName,
-        SgScopeStatement * moduleScope,
-        CPPProgramDeclarationsAndDefinitions * declarations,
-        CPPParallelLoop * parallelLoop);
+    CPPOpenCLUserSubroutine (SgScopeStatement * moduleScope,
+        CPPParallelLoop * parallelLoop,
+        CPPProgramDeclarationsAndDefinitions * declarations);
 };
 
 #endif

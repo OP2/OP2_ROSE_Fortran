@@ -1,16 +1,6 @@
 #include <CPPOpenCLUserSubroutine.h>
 #include <CPPProgramDeclarationsAndDefinitions.h>
 #include <CPPParallelLoop.h>
-#include <CPPOpenCLStatementsAndExpressionsBuilder.h>
-#include <boost/algorithm/string/predicate.hpp>
-#include <Debug.h>
-#include <algorithm>
-
-/*
- * ======================================================
- * Private functions
- * ======================================================
- */
 
 void
 CPPOpenCLUserSubroutine::patchReferencesToConstants ()
@@ -32,20 +22,11 @@ CPPOpenCLUserSubroutine::createFormalParameterDeclarations ()
 {
 }
 
-/*
- * ======================================================
- * Public functions
- * ======================================================
- */
-
 CPPOpenCLUserSubroutine::CPPOpenCLUserSubroutine (
-    std::string const & subroutineName, SgScopeStatement * moduleScope,
-    CPPProgramDeclarationsAndDefinitions * declarations,
-    CPPParallelLoop * parallelLoop) :
+    SgScopeStatement * moduleScope, CPPParallelLoop * parallelLoop,
+    CPPProgramDeclarationsAndDefinitions * declarations) :
       UserSubroutine <SgFunctionDeclaration,
-          CPPProgramDeclarationsAndDefinitions> (subroutineName, declarations,
-          parallelLoop)
-//initialiseConstantsSubroutine( initialiseConstantsSubroutine )
+          CPPProgramDeclarationsAndDefinitions> (parallelLoop, declarations)
 {
   using SageBuilder::buildDefiningFunctionDeclaration;
   using SageBuilder::buildVoidType;

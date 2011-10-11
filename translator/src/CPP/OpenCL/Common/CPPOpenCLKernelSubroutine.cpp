@@ -1,33 +1,10 @@
 #include <CPPOpenCLKernelSubroutine.h>
 
-void
-CPPOpenCLKernelSubroutine::createReductionLoopStatements ()
-{
-  //FIXME
-}
-
-void
-CPPOpenCLKernelSubroutine::createLocalThreadDeclarations ()
-{
-  //FIXME
-}
-
-void
-CPPOpenCLKernelSubroutine::createAutoSharedDeclarations ()
-{
-  //FIXME
-}
-
 CPPOpenCLKernelSubroutine::CPPOpenCLKernelSubroutine (
-    std::string const & subroutineName, std::string const & userSubroutineName,
-    CPPParallelLoop * parallelLoop, SgScopeStatement * moduleScope,
-    CPPReductionSubroutines * reductionSubroutines,
-    CPPOpDatDimensionsDeclaration * opDatDimensionsDeclaration) :
-  CPPKernelSubroutine (subroutineName, userSubroutineName, moduleScope,
-      parallelLoop), opDatDimensionsDeclaration (opDatDimensionsDeclaration)
+    SgScopeStatement * moduleScope,
+    Subroutine <SgFunctionDeclaration> * userSubroutine,
+    CPPParallelLoop * parallelLoop,
+    CPPReductionSubroutines * reductionSubroutines) :
+  CPPKernelSubroutine (moduleScope, userSubroutine, parallelLoop)
 {
-  using SageInterface::addTextForUnparser;
-
-  addTextForUnparser (subroutineHeaderStatement, "__kernel ",
-      AstUnparseAttribute::e_before);
 }

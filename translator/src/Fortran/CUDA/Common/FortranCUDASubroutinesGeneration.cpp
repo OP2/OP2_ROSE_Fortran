@@ -18,12 +18,6 @@
 #include <Reduction.h>
 #include <boost/algorithm/string.hpp>
 
-/*
- * ======================================================
- * Private functions
- * ======================================================
- */
-
 void
 FortranCUDASubroutinesGeneration::createConstantDeclarations ()
 {
@@ -130,8 +124,7 @@ FortranCUDASubroutinesGeneration::createSubroutines ()
         static_cast <FortranParallelLoop *> (it->second);
 
     FortranCUDAUserSubroutine * userDeviceSubroutine =
-        new FortranCUDAUserSubroutine (userSubroutineName, moduleScope,
-            declarations, parallelLoop);
+        new FortranCUDAUserSubroutine (moduleScope, parallelLoop, declarations);
 
     FortranCUDAKernelSubroutine * kernelSubroutine;
 
@@ -139,10 +132,9 @@ FortranCUDASubroutinesGeneration::createSubroutines ()
     {
       kernelSubroutine
           = new FortranCUDAKernelSubroutineDirectLoop (
-              userSubroutineName,
-              userDeviceSubroutine->getSubroutineName (),
-              parallelLoop,
               moduleScope,
+              userDeviceSubroutine,
+              parallelLoop,
               reductionSubroutines,
               cardinalitiesDeclarations[userSubroutineName],
               dimensionsDeclarations[userSubroutineName],
@@ -150,11 +142,9 @@ FortranCUDASubroutinesGeneration::createSubroutines ()
 
       hostSubroutines[userSubroutineName]
           = new FortranCUDAHostSubroutineDirectLoop (
-              userSubroutineName,
-              userSubroutineName,
-              kernelSubroutine->getSubroutineName (),
-              parallelLoop,
               moduleScope,
+              kernelSubroutine,
+              parallelLoop,
               cardinalitiesDeclarations[userSubroutineName],
               dimensionsDeclarations[userSubroutineName],
               static_cast <FortranCUDAModuleDeclarations *> (moduleDeclarations[userSubroutineName]));
@@ -163,10 +153,9 @@ FortranCUDASubroutinesGeneration::createSubroutines ()
     {
       kernelSubroutine
           = new FortranCUDAKernelSubroutineIndirectLoop (
-              userSubroutineName,
-              userDeviceSubroutine->getSubroutineName (),
-              parallelLoop,
               moduleScope,
+              userDeviceSubroutine,
+              parallelLoop,
               reductionSubroutines,
               static_cast <FortranCUDAOpDatCardinalitiesDeclarationIndirectLoop *> (cardinalitiesDeclarations[userSubroutineName]),
               dimensionsDeclarations[userSubroutineName],
@@ -174,11 +163,9 @@ FortranCUDASubroutinesGeneration::createSubroutines ()
 
       hostSubroutines[userSubroutineName]
           = new FortranCUDAHostSubroutineIndirectLoop (
-              userSubroutineName,
-              userSubroutineName,
-              kernelSubroutine->getSubroutineName (),
-              parallelLoop,
               moduleScope,
+              kernelSubroutine,
+              parallelLoop,
               static_cast <FortranCUDAOpDatCardinalitiesDeclarationIndirectLoop *> (cardinalitiesDeclarations[userSubroutineName]),
               dimensionsDeclarations[userSubroutineName],
               static_cast <FortranCUDAModuleDeclarations *> (moduleDeclarations[userSubroutineName]));

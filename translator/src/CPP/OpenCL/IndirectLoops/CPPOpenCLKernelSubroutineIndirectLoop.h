@@ -4,13 +4,11 @@
 
 #include <CPPOpenCLKernelSubroutine.h>
 
-class CPPOpenCLDataSizesDeclarationIndirectLoop;
+class CPPOpenCLUserSubroutine;
 
 class CPPOpenCLKernelSubroutineIndirectLoop: public CPPOpenCLKernelSubroutine
 {
   private:
-
-    CPPOpenCLDataSizesDeclarationIndirectLoop * dataSizesDeclaration;
 
     std::map <std::string, unsigned int> positionOfNbytes;
 
@@ -60,12 +58,10 @@ class CPPOpenCLKernelSubroutineIndirectLoop: public CPPOpenCLKernelSubroutine
 
   public:
 
-    CPPOpenCLKernelSubroutineIndirectLoop (std::string const & subroutineName,
-        std::string const & userSubroutineName, CPPParallelLoop * parallelLoop,
-        SgScopeStatement * moduleScope,
-        CPPReductionSubroutines * reductionSubroutines,
-        CPPOpenCLDataSizesDeclarationIndirectLoop * dataSizesDeclaration,
-        CPPOpDatDimensionsDeclaration * opDatDimensionsDeclaration);
+    CPPOpenCLKernelSubroutineIndirectLoop (SgScopeStatement * moduleScope,
+        CPPOpenCLUserSubroutine * userSubroutine,
+        CPPParallelLoop * parallelLoop,
+        CPPReductionSubroutines * reductionSubroutines);
 
 };
 

@@ -9,12 +9,6 @@
 #include <Debug.h>
 #include <CUDA.h>
 
-/*
- * ======================================================
- * Private functions
- * ======================================================
- */
-
 SgStatement *
 FortranCUDAHostSubroutineDirectLoop::createKernelFunctionCallStatement ()
 {
@@ -97,9 +91,9 @@ FortranCUDAHostSubroutineDirectLoop::createKernelFunctionCallStatement ()
   //
   //  return SageBuilder::buildExprStatement(kernelCallExpression);
 
-  string const kernelLaunchString = kernelSubroutineName + "<<<"
-      + RoseHelper::getFirstVariableName (variableDeclarations->get (
-          CUDA::blocksPerGrid)) + ", " + RoseHelper::getFirstVariableName (
+  string const kernelLaunchString = calleeSubroutine->getSubroutineName ()
+      + "<<<" + RoseHelper::getFirstVariableName (variableDeclarations->get (
+      CUDA::blocksPerGrid)) + ", " + RoseHelper::getFirstVariableName (
       variableDeclarations->get (CUDA::threadsPerBlock)) + ", "
       + RoseHelper::getFirstVariableName (variableDeclarations->get (
           CUDA::sharedMemorySize)) + ">>>";
@@ -318,22 +312,14 @@ FortranCUDAHostSubroutineDirectLoop::createLocalVariableDeclarations ()
   }
 }
 
-/*
- * ======================================================
- * Public functions
- * ======================================================
- */
-
 FortranCUDAHostSubroutineDirectLoop::FortranCUDAHostSubroutineDirectLoop (
-    std::string const & subroutineName, std::string const & userSubroutineName,
-    std::string const & kernelSubroutineName,
-    FortranParallelLoop * parallelLoop, SgScopeStatement * moduleScope,
-    FortranCUDAOpDatCardinalitiesDeclaration * dataSizesDeclaration,
-    FortranOpDatDimensionsDeclaration * opDatDimensionsDeclaration,
+    SgScopeStatement * moduleScope, FortranKernelSubroutine * kernelSubroutine,
+    FortranParallelLoop * parallelLoop,
+    FortranCUDAOpDatCardinalitiesDeclaration * cardinalitiesDeclaration,
+    FortranOpDatDimensionsDeclaration * dimensionsDeclaration,
     FortranCUDAModuleDeclarations * moduleDeclarations) :
-  FortranCUDAHostSubroutine (subroutineName, userSubroutineName,
-      kernelSubroutineName, parallelLoop, moduleScope, dataSizesDeclaration,
-      opDatDimensionsDeclaration, moduleDeclarations)
+  FortranCUDAHostSubroutine (moduleScope, kernelSubroutine, parallelLoop,
+      cardinalitiesDeclaration, dimensionsDeclaration, moduleDeclarations)
 {
   Debug::getInstance ()->debugMessage (
       "Creating host subroutine of direct loop", Debug::CONSTRUCTOR_LEVEL,

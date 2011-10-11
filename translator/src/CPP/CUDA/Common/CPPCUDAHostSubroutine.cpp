@@ -1,4 +1,5 @@
 #include <CPPCUDAHostSubroutine.h>
+#include <CPPCUDAKernelSubroutine.h>
 
 void
 CPPCUDAHostSubroutine::createReductionEpilogueStatements ()
@@ -20,12 +21,9 @@ CPPCUDAHostSubroutine::createCUDAKernelLocalVariableDeclarations ()
 {
 }
 
-CPPCUDAHostSubroutine::CPPCUDAHostSubroutine (
-    std::string const & subroutineName, std::string const & userSubroutineName,
-    std::string const & kernelSubroutineName, CPPParallelLoop * parallelLoop,
-    SgScopeStatement * moduleScope) :
-  CPPHostSubroutine (subroutineName, userSubroutineName, kernelSubroutineName,
-      parallelLoop, moduleScope)
+CPPCUDAHostSubroutine::CPPCUDAHostSubroutine (SgScopeStatement * moduleScope,
+    CPPCUDAKernelSubroutine * calleeSubroutine, CPPParallelLoop * parallelLoop) :
+  CPPHostSubroutine (moduleScope, calleeSubroutine, parallelLoop)
 {
   subroutineHeaderStatement->get_functionModifier ().setCudaHost ();
 }

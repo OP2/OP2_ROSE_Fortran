@@ -1,4 +1,6 @@
 #include <CPPOpenCLKernelSubroutineIndirectLoop.h>
+#include <CPPOpenCLUserSubroutine.h>
+#include <CPPReductionSubroutines.h>
 #include <CPPOpenCLStatementsAndExpressionsBuilder.h>
 #include <CPPParallelLoop.h>
 #include <CommonNamespaces.h>
@@ -8,12 +10,6 @@
 #include <Plan.h>
 #include <Debug.h>
 #include <boost/lexical_cast.hpp>
-
-/*
- * ======================================================
- * Private functions
- * ======================================================
- */
 
 SgStatement *
 CPPOpenCLKernelSubroutineIndirectLoop::createUserSubroutineCallStatement ()
@@ -140,8 +136,8 @@ CPPOpenCLKernelSubroutineIndirectLoop::createUserSubroutineCallStatement ()
 
   userDeviceSubroutineParameters->append_expression (global_constants_ref);
 
-  return buildFunctionCallStmt (userSubroutineName, buildVoidType (),
-      userDeviceSubroutineParameters, subroutineScope);
+  return buildFunctionCallStmt (userSubroutine->getSubroutineName (),
+      buildVoidType (), userDeviceSubroutineParameters, subroutineScope);
 }
 
 void
@@ -1228,14 +1224,11 @@ CPPOpenCLKernelSubroutineIndirectLoop::createFormalParameterDeclarations ()
 }
 
 CPPOpenCLKernelSubroutineIndirectLoop::CPPOpenCLKernelSubroutineIndirectLoop (
-    std::string const & subroutineName, std::string const & userSubroutineName,
-    CPPParallelLoop * parallelLoop, SgScopeStatement * moduleScope,
-    CPPReductionSubroutines * reductionSubroutines,
-    CPPOpenCLDataSizesDeclarationIndirectLoop * dataSizesDeclaration,
-    CPPOpDatDimensionsDeclaration * opDatDimensionsDeclaration) :
-  CPPOpenCLKernelSubroutine (subroutineName, userSubroutineName, parallelLoop,
-      moduleScope, reductionSubroutines, opDatDimensionsDeclaration),
-      dataSizesDeclaration (dataSizesDeclaration)
+    SgScopeStatement * moduleScope, CPPOpenCLUserSubroutine * userSubroutine,
+    CPPParallelLoop * parallelLoop,
+    CPPReductionSubroutines * reductionSubroutines) :
+  CPPOpenCLKernelSubroutine (moduleScope, userSubroutine, parallelLoop,
+      reductionSubroutines)
 {
   Debug::getInstance ()->debugMessage ("<Kernel, Indirect, OpenCL>",
       Debug::CONSTRUCTOR_LEVEL, __FILE__, __LINE__);

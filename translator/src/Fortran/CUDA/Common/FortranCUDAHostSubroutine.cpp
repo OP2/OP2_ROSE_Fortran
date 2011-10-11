@@ -1,4 +1,5 @@
 #include <FortranCUDAHostSubroutine.h>
+#include <FortranKernelSubroutine.h>
 #include <FortranParallelLoop.h>
 #include <FortranCUDAOpDatCardinalitiesDeclaration.h>
 #include <FortranCUDAModuleDeclarations.h>
@@ -341,7 +342,7 @@ FortranCUDAHostSubroutine::createTransferOpDatStatements ()
       SgDotExp * dotExpression1 = buildDotExp (buildVarRefExp (
           variableDeclarations->get (OP2::VariableNames::opDatDimensions)),
           buildVarRefExp (
-              opDatDimensionsDeclaration->getOpDatDimensionField (i)));
+              dimensionsDeclaration->getOpDatDimensionField (i)));
 
       SgDotExp * dotExpression2 = buildDotExp (buildVarRefExp (
           variableDeclarations->get (OP2::VariableNames::getOpDatName (i))),
@@ -370,7 +371,7 @@ FortranCUDAHostSubroutine::createTransferOpDatStatements ()
         SgDotExp * dotExpression = buildDotExp (
             buildVarRefExp (variableDeclarations->get (
                 OP2::VariableNames::opDatCardinalities)), buildVarRefExp (
-                dataSizesDeclaration->getFieldDeclarations ()->get (
+                cardinalitiesDeclaration->getFieldDeclarations ()->get (
                     OP2::VariableNames::getOpDatCardinalityName (i))));
 
         SgExpression * rhsOfAssigment =
@@ -599,7 +600,7 @@ FortranCUDAHostSubroutine::createOpDatCardinalitiesDeclaration ()
   variableDeclarations->add (OP2::VariableNames::opDatCardinalities,
       FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
           OP2::VariableNames::opDatCardinalities,
-          dataSizesDeclaration->getType (), subroutineScope, 1, CUDA_DEVICE));
+          cardinalitiesDeclaration->getType (), subroutineScope, 1, CUDA_DEVICE));
 }
 
 void
@@ -612,21 +613,19 @@ FortranCUDAHostSubroutine::createOpDatDimensionsDeclaration ()
   variableDeclarations->add (OP2::VariableNames::opDatDimensions,
       FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
           OP2::VariableNames::opDatDimensions,
-          opDatDimensionsDeclaration->getType (), subroutineScope, 1,
+          dimensionsDeclaration->getType (), subroutineScope, 1,
           CUDA_DEVICE));
 }
 
 FortranCUDAHostSubroutine::FortranCUDAHostSubroutine (
-    std::string const & subroutineName, std::string const & userSubroutineName,
-    std::string const & kernelSubroutineName,
-    FortranParallelLoop * parallelLoop, SgScopeStatement * moduleScope,
+    SgScopeStatement * moduleScope, FortranKernelSubroutine * kernelSubroutine,
+    FortranParallelLoop * parallelLoop,
     FortranCUDAOpDatCardinalitiesDeclaration * dataSizesDeclaration,
     FortranOpDatDimensionsDeclaration * opDatDimensionsDeclaration,
     FortranCUDAModuleDeclarations * moduleDeclarations) :
-  FortranHostSubroutine (subroutineName, userSubroutineName,
-      kernelSubroutineName, parallelLoop, moduleScope), dataSizesDeclaration (
-      dataSizesDeclaration), opDatDimensionsDeclaration (
-      opDatDimensionsDeclaration), moduleDeclarations (moduleDeclarations)
+  FortranHostSubroutine (moduleScope, kernelSubroutine, parallelLoop),
+      cardinalitiesDeclaration (dataSizesDeclaration), dimensionsDeclaration (
+          opDatDimensionsDeclaration), moduleDeclarations (moduleDeclarations)
 {
   subroutineHeaderStatement->get_functionModifier ().setCudaHost ();
 }

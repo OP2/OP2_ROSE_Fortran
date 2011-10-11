@@ -4,6 +4,8 @@
 
 #include <CPPHostSubroutine.h>
 
+class CPPCUDAKernelSubroutine;
+
 class CPPCUDAHostSubroutine: public CPPHostSubroutine
 {
   protected:
@@ -20,10 +22,9 @@ class CPPCUDAHostSubroutine: public CPPHostSubroutine
     void
     createCUDAKernelLocalVariableDeclarations ();
 
-    CPPCUDAHostSubroutine (std::string const & subroutineName,
-        std::string const & userSubroutineName,
-        std::string const & kernelSubroutineName,
-        CPPParallelLoop * parallelLoop, SgScopeStatement * moduleScope);
+    CPPCUDAHostSubroutine (SgScopeStatement * moduleScope,
+        CPPCUDAKernelSubroutine * calleeSubroutine,
+        CPPParallelLoop * parallelLoop);
 };
 
 #endif

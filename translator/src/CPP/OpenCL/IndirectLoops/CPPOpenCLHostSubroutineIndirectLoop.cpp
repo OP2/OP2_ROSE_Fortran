@@ -1,18 +1,11 @@
 #include <CPPOpenCLHostSubroutineIndirectLoop.h>
 #include <CPPOpenCLStatementsAndExpressionsBuilder.h>
 #include <CPPParallelLoop.h>
-#include <CPPOpenCLDataSizesDeclaration.h>
 #include <CPPOpenCLModuleDeclarations.h>
 #include <RoseStatementsAndExpressionsBuilder.h>
 #include <CommonNamespaces.h>
 #include <RoseHelper.h>
 #include <Debug.h>
-
-/*
- * ======================================================
- * Private functions
- * ======================================================
- */
 
 SgStatement *
 CPPOpenCLHostSubroutineIndirectLoop::createKernelFunctionCallStatement ()
@@ -92,12 +85,14 @@ CPPOpenCLHostSubroutineIndirectLoop::createKernelFunctionCallStatement ()
       buildVarRefExp (variableDeclarations->get (
           OP2::VariableNames::PlanFunction::blockOffset)));
 
-  SgExprStatement * callStatement = buildFunctionCallStmt (kernelSubroutineName
-      + "<<<" + RoseHelper::getFirstVariableName (variableDeclarations->get (
-      OpenCL::CPP::blocksPerGrid)) + ", " + RoseHelper::getFirstVariableName (
-      variableDeclarations->get (OpenCL::CPP::threadsPerBlock)) + ", "
-      + RoseHelper::getFirstVariableName (variableDeclarations->get (
-          OpenCL::CPP::sharedMemorySize)) + ">>>", buildVoidType (),
+  SgExprStatement * callStatement = buildFunctionCallStmt (
+      calleeSubroutine->getSubroutineName () + "<<<"
+          + RoseHelper::getFirstVariableName (variableDeclarations->get (
+              OpenCL::CPP::blocksPerGrid)) + ", "
+          + RoseHelper::getFirstVariableName (variableDeclarations->get (
+              OpenCL::CPP::threadsPerBlock)) + ", "
+          + RoseHelper::getFirstVariableName (variableDeclarations->get (
+              OpenCL::CPP::sharedMemorySize)) + ">>>", buildVoidType (),
       actualParameters, subroutineScope);
 
   return callStatement;
@@ -252,26 +247,6 @@ CPPOpenCLHostSubroutineIndirectLoop::createPlanFunctionExecutionStatements ()
 
   appendStatement (tempStatement, subroutineScope);
 
-}
-
-void
-CPPOpenCLHostSubroutineIndirectLoop::createVariablesSizesInitialisationStatements ()
-{
-  using SageBuilder::buildEqualityOp;
-  using SageBuilder::buildBoolValExp;
-  using SageBuilder::buildBasicBlock;
-  using SageBuilder::buildDotExp;
-  using SageBuilder::buildVarRefExp;
-  using SageBuilder::buildAssignStatement;
-  using SageBuilder::buildPntrArrRefExp;
-  using SageBuilder::buildIntVal;
-  using SageInterface::appendStatement;
-  using std::string;
-  using std::vector;
-
-  Debug::getInstance ()->debugMessage (
-      "Creating statements to initialise variable sizes",
-      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 }
 
 void
@@ -465,8 +440,6 @@ CPPOpenCLHostSubroutineIndirectLoop::createStatements ()
     createReductionPrologueStatements ();
   }
 
-  createVariablesSizesInitialisationStatements ();
-
   createPlanFunctionExecutionStatements ();
 
   if (parallelLoop->isReductionRequired () == true)
@@ -486,24 +459,15 @@ CPPOpenCLHostSubroutineIndirectLoop::createLocalVariableDeclarations ()
   }
 }
 
-/*
- * ======================================================
- * Public functions
- * ======================================================
- */
-
 CPPOpenCLHostSubroutineIndirectLoop::CPPOpenCLHostSubroutineIndirectLoop (
-    std::string const & subroutineName, std::string const & userSubroutineName,
-    std::string const & kernelSubroutineName, CPPParallelLoop * parallelLoop,
     SgScopeStatement * moduleScope,
-    CPPOpenCLDataSizesDeclarationIndirectLoop * dataSizesDeclaration,
-    CPPOpDatDimensionsDeclaration * opDatDimensionsDeclaration) :
-  CPPOpenCLHostSubroutine (subroutineName, userSubroutineName,
-      kernelSubroutineName, parallelLoop, moduleScope)
+    CPPOpenCLKernelSubroutine * kernelSubroutine,
+    CPPParallelLoop * parallelLoop) :
+  CPPOpenCLHostSubroutine (moduleScope, kernelSubroutine, parallelLoop)
 {
   Debug::getInstance ()->debugMessage (
-      "Creating host subroutine of indirect loop", Debug::CONSTRUCTOR_LEVEL,
-      __FILE__, __LINE__);
+      "Creating OpenCL host subroutine for indirect loop",
+      Debug::CONSTRUCTOR_LEVEL, __FILE__, __LINE__);
 
   createFormalParameterDeclarations ();
 

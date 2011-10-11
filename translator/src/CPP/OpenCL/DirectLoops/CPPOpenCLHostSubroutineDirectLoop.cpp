@@ -1,17 +1,11 @@
 #include <CPPOpenCLHostSubroutineDirectLoop.h>
+#include <CPPOpenCLKernelSubroutineDirectLoop.h>
 #include <CPPParallelLoop.h>
 #include <CPPOpenCLReductionSubroutine.h>
 #include <RoseStatementsAndExpressionsBuilder.h>
 #include <RoseHelper.h>
 #include <Debug.h>
 #include <CommonNamespaces.h>
-
-using namespace SageBuilder;
-/*
- * ======================================================
- * Private functions
- * ======================================================
- */
 
 void
 CPPOpenCLHostSubroutineDirectLoop::createVariableSizesInitialisationStatements ()
@@ -31,7 +25,6 @@ CPPOpenCLHostSubroutineDirectLoop::createVariableSizesInitialisationStatements (
 SgStatement *
 CPPOpenCLHostSubroutineDirectLoop::createKernelFunctionCallStatement ()
 {
-
 }
 
 void
@@ -42,6 +35,8 @@ CPPOpenCLHostSubroutineDirectLoop::createOpenCLKernelInitialisationStatements ()
   using SageBuilder::buildIntVal;
   using SageBuilder::buildAssignStatement;
   using SageBuilder::buildMultiplyOp;
+  using SageBuilder::buildIntType;
+  using SageBuilder::buildSizeOfOp;
   using SageBuilder::buildExprListExp;
   using SageBuilder::buildFunctionCallExp;
   using SageInterface::appendStatement;
@@ -59,7 +54,7 @@ CPPOpenCLHostSubroutineDirectLoop::createOpenCLKernelInitialisationStatements ()
   SgExpression * nshared_ref = buildVarRefExp (variableDeclarations->get (
       OpenCL::CPP::sharedMemorySize));
   SgExpression * reduct_size_ref = buildVarRefExp (variableDeclarations->get (
-      ReductionSubroutine::reductionArraySize));
+      ""));
   SgExpression * offset_s_ref = buildVarRefExp (variableDeclarations->get (
       DirectLoop::CPP::KernelSubroutine::warpScratchpadSize));
 
@@ -275,26 +270,15 @@ CPPOpenCLHostSubroutineDirectLoop::createLocalVariableDeclarations ()
   }
 }
 
-/*
- * ======================================================
- * Public functions
- * ======================================================
- */
-
 CPPOpenCLHostSubroutineDirectLoop::CPPOpenCLHostSubroutineDirectLoop (
-    std::string const & subroutineName, std::string const & userSubroutineName,
-    std::string const & kernelSubroutineName, CPPParallelLoop * parallelLoop,
     SgScopeStatement * moduleScope,
-    //    CPPInitialiseConstantsSubroutine * initialiseConstantsSubroutine,
-    CPPOpenCLDataSizesDeclarationDirectLoop * dataSizesDeclaration,
-    CPPOpDatDimensionsDeclaration * opDatDimensionsDeclaration) :
-  //    CPPOpenCLModuleDeclarations * moduleDeclarations) :
-      CPPOpenCLHostSubroutine (subroutineName, userSubroutineName,
-          kernelSubroutineName, parallelLoop, moduleScope)
+    CPPOpenCLKernelSubroutine * kernelSubroutine,
+    CPPParallelLoop * parallelLoop) :
+  CPPOpenCLHostSubroutine (moduleScope, kernelSubroutine, parallelLoop)
 {
   Debug::getInstance ()->debugMessage (
-      "Creating host subroutine of direct loop", Debug::CONSTRUCTOR_LEVEL,
-      __FILE__, __LINE__);
+      "Creating OpenCL host subroutine for direct loop",
+      Debug::CONSTRUCTOR_LEVEL, __FILE__, __LINE__);
 
   createFormalParameterDeclarations ();
 

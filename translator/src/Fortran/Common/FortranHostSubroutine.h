@@ -7,6 +7,7 @@
 class SgProcedureHeaderStatement;
 class SgScopeStatement;
 class SgBasicBlock;
+class FortranKernelSubroutine;
 class FortranParallelLoop;
 
 class FortranHostSubroutine: public HostSubroutine <SgProcedureHeaderStatement>
@@ -19,10 +20,9 @@ class FortranHostSubroutine: public HostSubroutine <SgProcedureHeaderStatement>
     virtual void
     createFormalParameterDeclarations ();
 
-    FortranHostSubroutine (std::string const & subroutineName,
-        std::string const & userSubroutineName,
-        std::string const & kernelSubroutineName,
-        FortranParallelLoop * parallelLoop, SgScopeStatement * moduleScope);
+    FortranHostSubroutine (SgScopeStatement * moduleScope, Subroutine <
+        SgProcedureHeaderStatement> * calleeSubroutine,
+        FortranParallelLoop * parallelLoop);
 };
 
 #endif

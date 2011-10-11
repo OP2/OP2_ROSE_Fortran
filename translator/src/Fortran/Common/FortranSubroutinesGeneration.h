@@ -1,4 +1,3 @@
-
 #pragma once
 #ifndef FORTRAN_SUBROUTINES_GENERATION_H
 #define FORTRAN_SUBROUTINES_GENERATION_H
@@ -84,6 +83,15 @@ class FortranSubroutinesGeneration: public SubroutinesGeneration <
 
     /*
      * ======================================================
+     * Creates subroutines needed for reductions. This function
+     * is pure virtual so the target backend has to implement it
+     * ======================================================
+     */
+    virtual void
+    createReductionSubroutines () = 0;
+
+    /*
+     * ======================================================
      * Creates the module type and variable declarations. This
      * function is pure virtual so the target backend has to
      * implement it
@@ -109,9 +117,6 @@ class FortranSubroutinesGeneration: public SubroutinesGeneration <
      */
     void
     generate ();
-
-    virtual void
-    createReductionSubroutines () = 0;
 
   public:
 

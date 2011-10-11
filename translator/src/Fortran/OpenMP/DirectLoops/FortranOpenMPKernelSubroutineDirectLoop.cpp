@@ -71,8 +71,8 @@ FortranOpenMPKernelSubroutineDirectLoop::createUserSubroutineCallStatement ()
   }
 
   SgFunctionSymbol * userSubroutineSymbol =
-      FortranTypesBuilder::buildNewFortranSubroutine (userSubroutineName,
-          subroutineScope);
+      FortranTypesBuilder::buildNewFortranSubroutine (
+          userSubroutine->getSubroutineName (), subroutineScope);
 
   SgFunctionCallExp * userSubroutineCall = buildFunctionCallExp (
       userSubroutineSymbol, actualParameters);
@@ -174,12 +174,13 @@ FortranOpenMPKernelSubroutineDirectLoop::createFormalParameterDeclarations ()
  */
 
 FortranOpenMPKernelSubroutineDirectLoop::FortranOpenMPKernelSubroutineDirectLoop (
-    std::string const & subroutineName, std::string const & userSubroutineName,
-    FortranParallelLoop * parallelLoop, SgScopeStatement * moduleScope) :
-  FortranOpenMPKernelSubroutine (subroutineName, userSubroutineName,
-      parallelLoop, moduleScope)
+    SgScopeStatement * moduleScope,
+    Subroutine <SgProcedureHeaderStatement> * userSubroutine,
+    FortranParallelLoop * parallelLoop) :
+  FortranOpenMPKernelSubroutine (moduleScope, userSubroutine, parallelLoop)
 {
-  Debug::getInstance ()->debugMessage ("<Kernel, Direct, CUDA>",
+  Debug::getInstance ()->debugMessage (
+      "OpenMP kernel subroutine creation for direct loop",
       Debug::CONSTRUCTOR_LEVEL, __FILE__, __LINE__);
 
   createFormalParameterDeclarations ();

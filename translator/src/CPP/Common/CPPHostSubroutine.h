@@ -13,10 +13,9 @@ class CPPHostSubroutine: public HostSubroutine <SgFunctionDeclaration>
     virtual void
     createFormalParameterDeclarations ();
 
-    CPPHostSubroutine (std::string const & subroutineName,
-        std::string const & userSubroutineName,
-        std::string const & kernelSubroutineName,
-        CPPParallelLoop * parallelLoop, SgScopeStatement * moduleScope);
+    CPPHostSubroutine (SgScopeStatement * moduleScope, Subroutine <
+        SgFunctionDeclaration> * calleeSubroutine,
+        CPPParallelLoop * parallelLoop);
 };
 
 #endif

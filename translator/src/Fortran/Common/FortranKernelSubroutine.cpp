@@ -3,10 +3,11 @@
 #include <FortranParallelLoop.h>
 
 FortranKernelSubroutine::FortranKernelSubroutine (
-    std::string const & subroutineName, std::string const & userSubroutineName,
-    FortranParallelLoop * parallelLoop, SgScopeStatement * moduleScope) :
-  KernelSubroutine <SgProcedureHeaderStatement> (subroutineName,
-      userSubroutineName, parallelLoop)
+    SgScopeStatement * moduleScope,
+    Subroutine <SgProcedureHeaderStatement> * calleeSubroutine,
+    FortranParallelLoop * parallelLoop) :
+      KernelSubroutine <SgProcedureHeaderStatement> (calleeSubroutine,
+          parallelLoop)
 {
   using SageBuilder::buildVoidType;
   using SageBuilder::buildProcedureHeaderStatement;

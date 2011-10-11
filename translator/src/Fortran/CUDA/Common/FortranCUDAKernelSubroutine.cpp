@@ -1,4 +1,5 @@
 #include <FortranCUDAKernelSubroutine.h>
+#include <FortranCUDAUserSubroutine.h>
 #include <FortranParallelLoop.h>
 #include <FortranCUDAModuleDeclarations.h>
 #include <FortranReductionSubroutines.h>
@@ -398,16 +399,16 @@ FortranCUDAKernelSubroutine::createCUDASharedVariableDeclarations ()
 }
 
 FortranCUDAKernelSubroutine::FortranCUDAKernelSubroutine (
-    std::string const & subroutineName, std::string const & userSubroutineName,
-    FortranParallelLoop * parallelLoop, SgScopeStatement * moduleScope,
+    SgScopeStatement * moduleScope, FortranCUDAUserSubroutine * userSubroutine,
+    FortranParallelLoop * parallelLoop,
     FortranReductionSubroutines * reductionSubroutines,
-    FortranCUDAOpDatCardinalitiesDeclaration * dataSizesDeclaration,
-    FortranOpDatDimensionsDeclaration * opDatDimensionsDeclaration,
+    FortranCUDAOpDatCardinalitiesDeclaration * cardinalitiesDeclaration,
+    FortranOpDatDimensionsDeclaration * dimensionsDeclaration,
     FortranCUDAModuleDeclarations * moduleDeclarations) :
-  FortranKernelSubroutine (subroutineName, userSubroutineName, parallelLoop,
-      moduleScope), dataSizesDeclaration (dataSizesDeclaration),
-      opDatDimensionsDeclaration (opDatDimensionsDeclaration),
-      moduleDeclarations (moduleDeclarations)
+  FortranKernelSubroutine (moduleScope, userSubroutine, parallelLoop),
+      cardinalitiesDeclaration (cardinalitiesDeclaration),
+      dimensionsDeclaration (dimensionsDeclaration), moduleDeclarations (
+          moduleDeclarations)
 {
   this->reductionSubroutines = reductionSubroutines;
 

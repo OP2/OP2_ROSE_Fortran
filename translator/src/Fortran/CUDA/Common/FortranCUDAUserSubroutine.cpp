@@ -7,12 +7,6 @@
 #include <boost/algorithm/string/predicate.hpp>
 #include <algorithm>
 
-/*
- * ======================================================
- * Private functions
- * ======================================================
- */
-
 void
 FortranCUDAUserSubroutine::forceOutputOfCodeToFile ()
 {
@@ -59,7 +53,8 @@ FortranCUDAUserSubroutine::findOriginalSubroutine ()
   using std::vector;
 
   Debug::getInstance ()->debugMessage (
-      "Searching for original user subroutine '" + hostSubroutineName + "'",
+      "Searching for original user subroutine '"
+          + parallelLoop->getUserSubroutineName () + "'",
       Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
   for (vector <SgProcedureHeaderStatement *>::const_iterator it =
@@ -68,11 +63,12 @@ FortranCUDAUserSubroutine::findOriginalSubroutine ()
   {
     SgProcedureHeaderStatement * subroutine = *it;
 
-    if (iequals (hostSubroutineName, subroutine->get_name ().getString ()))
+    if (iequals (parallelLoop->getUserSubroutineName (),
+        subroutine->get_name ().getString ()))
     {
       Debug::getInstance ()->debugMessage ("Found user kernel '"
-          + hostSubroutineName + "'", Debug::OUTER_LOOP_LEVEL, __FILE__,
-          __LINE__);
+          + parallelLoop->getUserSubroutineName () + "'",
+          Debug::OUTER_LOOP_LEVEL, __FILE__, __LINE__);
 
       originalSubroutine = subroutine;
       break;
@@ -82,7 +78,7 @@ FortranCUDAUserSubroutine::findOriginalSubroutine ()
   if (originalSubroutine == NULL)
   {
     Debug::getInstance ()->errorMessage ("Unable to find user kernel '"
-        + hostSubroutineName + "'", __FILE__, __LINE__);
+        + parallelLoop->getUserSubroutineName () + "'", __FILE__, __LINE__);
   }
 }
 
@@ -214,19 +210,11 @@ FortranCUDAUserSubroutine::createFormalParameterDeclarations ()
 {
 }
 
-/*
- * ======================================================
- * Public functions
- * ======================================================
- */
-
 FortranCUDAUserSubroutine::FortranCUDAUserSubroutine (
-    std::string const & subroutineName, SgScopeStatement * moduleScope,
-    FortranProgramDeclarationsAndDefinitions * declarations,
-    FortranParallelLoop * parallelLoop) :
+    SgScopeStatement * moduleScope, FortranParallelLoop * parallelLoop,
+    FortranProgramDeclarationsAndDefinitions * declarations) :
   UserSubroutine <SgProcedureHeaderStatement,
-      FortranProgramDeclarationsAndDefinitions> (subroutineName, declarations,
-      parallelLoop)
+      FortranProgramDeclarationsAndDefinitions> (parallelLoop, declarations)
 {
   using SageBuilder::buildProcedureHeaderStatement;
   using SageBuilder::buildVoidType;

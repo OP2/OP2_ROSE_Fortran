@@ -3,18 +3,16 @@
 #define HOST_SUBROUTINE_H
 
 #include <Subroutine.h>
+#include <ParallelLoop.h>
 
 class SgStatement;
-class ParallelLoop;
 
 template <typename TSubroutineHeader>
   class HostSubroutine: public Subroutine <TSubroutineHeader>
   {
     protected:
 
-      std::string userSubroutineName;
-
-      std::string kernelSubroutineName;
+      Subroutine <TSubroutineHeader> * calleeSubroutine;
 
       ParallelLoop * parallelLoop;
 
@@ -54,12 +52,11 @@ template <typename TSubroutineHeader>
       virtual void
       createReductionLocalVariableDeclarations () = 0;
 
-      HostSubroutine (std::string const & subroutineName,
-          std::string const & userSubroutineName,
-          std::string const & kernelSubroutineName, ParallelLoop * parallelLoop) :
-        Subroutine <TSubroutineHeader> (subroutineName + "_host"),
-            userSubroutineName (userSubroutineName), kernelSubroutineName (
-                kernelSubroutineName), parallelLoop (parallelLoop)
+      HostSubroutine (Subroutine <TSubroutineHeader> * calleeSubroutine,
+          ParallelLoop * parallelLoop) :
+        Subroutine <TSubroutineHeader> (parallelLoop->getUserSubroutineName ()
+            + "_host"), calleeSubroutine (calleeSubroutine), parallelLoop (
+            parallelLoop)
       {
       }
   };

@@ -1,7 +1,10 @@
 #include <FortranOpenMPHostSubroutine.h>
-#include <CommonNamespaces.h>
+#include <FortranKernelSubroutine.h>
+#include <FortranParallelLoop.h>
+#include <FortranOpenMPModuleDeclarations.h>
 #include <FortranStatementsAndExpressionsBuilder.h>
 #include <FortranTypesBuilder.h>
+#include <CommonNamespaces.h>
 #include <OpenMP.h>
 
 /*
@@ -300,12 +303,10 @@ FortranOpenMPHostSubroutine::initialiseNumberOfThreadsStatements ()
 }
 
 FortranOpenMPHostSubroutine::FortranOpenMPHostSubroutine (
-    std::string const & subroutineName, std::string const & userSubroutineName,
-    std::string const & kernelSubroutineName,
-    FortranParallelLoop * parallelLoop, SgScopeStatement * moduleScope,
+    SgScopeStatement * moduleScope, FortranKernelSubroutine * kernelSubroutine,
+    FortranParallelLoop * parallelLoop,
     FortranOpenMPModuleDeclarations * moduleDeclarations) :
-  FortranHostSubroutine (subroutineName, userSubroutineName,
-      kernelSubroutineName, parallelLoop, moduleScope), moduleDeclarations (
-      moduleDeclarations)
+  FortranHostSubroutine (moduleScope, kernelSubroutine, parallelLoop),
+      moduleDeclarations (moduleDeclarations)
 {
 }

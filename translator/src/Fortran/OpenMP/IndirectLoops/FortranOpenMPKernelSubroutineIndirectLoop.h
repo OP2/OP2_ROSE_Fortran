@@ -1,4 +1,3 @@
-
 #pragma once
 #ifndef FORTRAN_OPENMP_KERNEL_SUBROUTINE_INDIRECT_LOOP_H
 #define FORTRAN_OPENMP_KERNEL_SUBROUTINE_INDIRECT_LOOP_H
@@ -32,10 +31,9 @@ class FortranOpenMPKernelSubroutineIndirectLoop: public FortranOpenMPKernelSubro
 
   public:
 
-    FortranOpenMPKernelSubroutineIndirectLoop (
-        std::string const & subroutineName,
-        std::string const & userSubroutineName,
-        FortranParallelLoop * parallelLoop, SgScopeStatement * moduleScope);
+    FortranOpenMPKernelSubroutineIndirectLoop (SgScopeStatement * moduleScope,
+        Subroutine <SgProcedureHeaderStatement> * userSubroutine,
+        FortranParallelLoop * parallelLoop);
 };
 
 #endif

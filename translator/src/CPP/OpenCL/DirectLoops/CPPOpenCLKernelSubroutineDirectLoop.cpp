@@ -1,5 +1,6 @@
 #include <CPPOpenCLKernelSubroutineDirectLoop.h>
 #include <CPPOpenCLStatementsAndExpressionsBuilder.h>
+#include <CPPOpenCLUserSubroutine.h>
 #include <CPPOpenCLReductionSubroutine.h>
 #include <CPPParallelLoop.h>
 #include <CPPReductionSubroutines.h>
@@ -7,12 +8,6 @@
 #include <CommonNamespaces.h>
 #include <RoseHelper.h>
 #include <Debug.h>
-
-/*
- * ======================================================
- * Private functions
- * ======================================================
- */
 
 SgStatement *
 CPPOpenCLKernelSubroutineDirectLoop::createUserSubroutineCallStatement ()
@@ -105,8 +100,8 @@ CPPOpenCLKernelSubroutineDirectLoop::createUserSubroutineCallStatement ()
 
   userDeviceSubroutineParameters->append_expression (global_constants_ref);
 
-  return buildFunctionCallStmt (userSubroutineName, buildVoidType (),
-      userDeviceSubroutineParameters, subroutineScope);
+  return buildFunctionCallStmt (userSubroutine->getSubroutineName (),
+      buildVoidType (), userDeviceSubroutineParameters, subroutineScope);
 }
 
 SgBasicBlock *
@@ -682,7 +677,6 @@ CPPOpenCLKernelSubroutineDirectLoop::createStatements ()
 
   if (parallelLoop->isReductionRequired () == true)
   {
-    createReductionLoopStatements ();
   }
 }
 
@@ -712,18 +706,6 @@ CPPOpenCLKernelSubroutineDirectLoop::createLocalVariableDeclarations ()
   {
     variableDeclarations->add (*it, buildVariableDeclaration (*it,
         buildIntType (), NULL, subroutineScope));
-  }
-
-  createLocalThreadDeclarations ();
-
-  createAutoSharedDeclarations ();
-
-  if (parallelLoop->isReductionRequired () == true)
-  {
-    variableDeclarations->add (ReductionSubroutine::offsetForReduction,
-        RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
-            ReductionSubroutine::offsetForReduction, buildIntType (),
-            subroutineScope));
   }
 }
 
@@ -768,22 +750,15 @@ CPPOpenCLKernelSubroutineDirectLoop::createFormalParameterDeclarations ()
           subroutineScope, formalParameters));
 }
 
-/*
- * ======================================================
- * Public functions
- * ======================================================
- */
-
 CPPOpenCLKernelSubroutineDirectLoop::CPPOpenCLKernelSubroutineDirectLoop (
-    std::string const & subroutineName, std::string const & userSubroutineName,
-    CPPParallelLoop * parallelLoop, SgScopeStatement * moduleScope,
-    CPPReductionSubroutines * reductionSubroutines,
-    CPPOpDatDimensionsDeclaration * opDatDimensionsDeclaration) :
-  CPPOpenCLKernelSubroutine (subroutineName, userSubroutineName, parallelLoop,
-      moduleScope, reductionSubroutines, opDatDimensionsDeclaration),
-      dataSizesDeclaration (dataSizesDeclaration)
+    SgScopeStatement * moduleScope, CPPOpenCLUserSubroutine * userSubroutine,
+    CPPParallelLoop * parallelLoop,
+    CPPReductionSubroutines * reductionSubroutines) :
+  CPPOpenCLKernelSubroutine (moduleScope, userSubroutine, parallelLoop,
+      reductionSubroutines)
 {
-  Debug::getInstance ()->debugMessage ("<Kernel, Direct, OpenCL>",
+  Debug::getInstance ()->debugMessage (
+      "Creating OpenCL kernel subroutine for direct loop",
       Debug::CONSTRUCTOR_LEVEL, __FILE__, __LINE__);
 
   createFormalParameterDeclarations ();

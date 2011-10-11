@@ -1,4 +1,3 @@
-
 #pragma once
 #ifndef FORTRAN_OPENMP_KERNEL_SUBROUTINE_H
 #define FORTRAN_OPENMP_KERNEL_SUBROUTINE_H
@@ -9,11 +8,10 @@ class FortranOpenMPKernelSubroutine: public FortranKernelSubroutine
 {
   protected:
 
-    FortranOpenMPKernelSubroutine (std::string const & subroutineName,
-        std::string const & userSubroutineName,
-        FortranParallelLoop * parallelLoop, SgScopeStatement * moduleScope) :
-      FortranKernelSubroutine (subroutineName, userSubroutineName,
-          parallelLoop, moduleScope)
+    FortranOpenMPKernelSubroutine (SgScopeStatement * moduleScope, Subroutine <
+        SgProcedureHeaderStatement> * userSubroutine,
+        FortranParallelLoop * parallelLoop) :
+      FortranKernelSubroutine (moduleScope, userSubroutine, parallelLoop)
     {
     }
 };

@@ -1,4 +1,5 @@
 #include <FortranCUDAKernelSubroutineDirectLoop.h>
+#include <FortranCUDAUserSubroutine.h>
 #include <FortranCUDAModuleDeclarations.h>
 #include <FortranCUDAOpDatCardinalitiesDeclaration.h>
 #include <FortranReductionSubroutines.h>
@@ -85,8 +86,8 @@ FortranCUDAKernelSubroutineDirectLoop::createUserSubroutineCallStatement ()
     }
   }
 
-  return buildFunctionCallStmt (userSubroutineName, buildVoidType (),
-      actualParameters, subroutineScope);
+  return buildFunctionCallStmt (userSubroutine->getSubroutineName (),
+      buildVoidType (), actualParameters, subroutineScope);
 }
 
 SgFortranDo *
@@ -123,7 +124,7 @@ FortranCUDAKernelSubroutineDirectLoop::createStageInFromDeviceMemoryToSharedMemo
 
   SgDotExp * dotExpression = buildDotExp (buildVarRefExp (
       variableDeclarations->get (OP2::VariableNames::opDatDimensions)),
-      buildVarRefExp (opDatDimensionsDeclaration->getOpDatDimensionField (
+      buildVarRefExp (dimensionsDeclaration->getOpDatDimensionField (
           OP_DAT_ArgumentGroup)));
 
   SgMultiplyOp * multiplyExpression1 = buildMultiplyOp (buildVarRefExp (
@@ -210,7 +211,7 @@ FortranCUDAKernelSubroutineDirectLoop::createStageInFromSharedMemoryToLocalMemor
 
   SgDotExp * dotExpression = buildDotExp (buildVarRefExp (
       variableDeclarations->get (OP2::VariableNames::opDatDimensions)),
-      buildVarRefExp (opDatDimensionsDeclaration->getOpDatDimensionField (
+      buildVarRefExp (dimensionsDeclaration->getOpDatDimensionField (
           OP_DAT_ArgumentGroup)));
 
   SgMultiplyOp * multiplyExpression4 = buildMultiplyOp (buildVarRefExp (
@@ -282,7 +283,7 @@ FortranCUDAKernelSubroutineDirectLoop::createStageOutFromSharedMemoryToDeviceMem
 
   SgDotExp * dotExpression = buildDotExp (buildVarRefExp (
       variableDeclarations->get (OP2::VariableNames::opDatDimensions)),
-      buildVarRefExp (opDatDimensionsDeclaration->getOpDatDimensionField (
+      buildVarRefExp (dimensionsDeclaration->getOpDatDimensionField (
           OP_DAT_ArgumentGroup)));
 
   SgMultiplyOp * multiplyExpression2 = buildMultiplyOp (buildVarRefExp (
@@ -369,7 +370,7 @@ FortranCUDAKernelSubroutineDirectLoop::createStageOutFromLocalMemoryToSharedMemo
 
   SgDotExp * dotExpression = buildDotExp (buildVarRefExp (
       variableDeclarations->get (OP2::VariableNames::opDatDimensions)),
-      buildVarRefExp (opDatDimensionsDeclaration->getOpDatDimensionField (
+      buildVarRefExp (dimensionsDeclaration->getOpDatDimensionField (
           OP_DAT_ArgumentGroup)));
 
   SgMultiplyOp * multiplyExpression1 = buildMultiplyOp (buildVarRefExp (
@@ -686,7 +687,7 @@ FortranCUDAKernelSubroutineDirectLoop::createOpDatFormalParameterDeclarations ()
           SgDotExp * dotExpression = buildDotExp (
               buildVarRefExp (variableDeclarations->get (
                   OP2::VariableNames::opDatCardinalities)), buildVarRefExp (
-                  dataSizesDeclaration->getFieldDeclarations ()->get (
+                  cardinalitiesDeclaration->getFieldDeclarations ()->get (
                       OP2::VariableNames::getOpDatCardinalityName (i))));
 
           SgSubtractOp * upperBoundExpression = buildSubtractOp (dotExpression,
@@ -764,8 +765,8 @@ FortranCUDAKernelSubroutineDirectLoop::createFormalParameterDeclarations ()
       OP2::VariableNames::opDatDimensions,
       FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
           OP2::VariableNames::opDatDimensions,
-          opDatDimensionsDeclaration->getType (), subroutineScope,
-          formalParameters, 1, CUDA_DEVICE));
+          dimensionsDeclaration->getType (), subroutineScope, formalParameters,
+          1, CUDA_DEVICE));
 
   /*
    * ======================================================
@@ -777,8 +778,8 @@ FortranCUDAKernelSubroutineDirectLoop::createFormalParameterDeclarations ()
       OP2::VariableNames::opDatCardinalities,
       FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
           OP2::VariableNames::opDatCardinalities,
-          dataSizesDeclaration->getType (), subroutineScope, formalParameters,
-          1, CUDA_DEVICE));
+          cardinalitiesDeclaration->getType (), subroutineScope,
+          formalParameters, 1, CUDA_DEVICE));
 
   /*
    * ======================================================
@@ -835,15 +836,15 @@ FortranCUDAKernelSubroutineDirectLoop::createFormalParameterDeclarations ()
  */
 
 FortranCUDAKernelSubroutineDirectLoop::FortranCUDAKernelSubroutineDirectLoop (
-    std::string const & subroutineName, std::string const & userSubroutineName,
-    FortranParallelLoop * parallelLoop, SgScopeStatement * moduleScope,
+    SgScopeStatement * moduleScope, FortranCUDAUserSubroutine * userSubroutine,
+    FortranParallelLoop * parallelLoop,
     FortranReductionSubroutines * reductionSubroutines,
-    FortranCUDAOpDatCardinalitiesDeclaration * dataSizesDeclaration,
-    FortranOpDatDimensionsDeclaration * opDatDimensionsDeclaration,
+    FortranCUDAOpDatCardinalitiesDeclaration * cardinalitiesDeclaration,
+    FortranOpDatDimensionsDeclaration * dimensionsDeclaration,
     FortranCUDAModuleDeclarations * moduleDeclarations) :
-  FortranCUDAKernelSubroutine (subroutineName, userSubroutineName,
-      parallelLoop, moduleScope, reductionSubroutines, dataSizesDeclaration,
-      opDatDimensionsDeclaration, moduleDeclarations)
+  FortranCUDAKernelSubroutine (moduleScope, userSubroutine, parallelLoop,
+      reductionSubroutines, cardinalitiesDeclaration, dimensionsDeclaration,
+      moduleDeclarations)
 {
   createFormalParameterDeclarations ();
 

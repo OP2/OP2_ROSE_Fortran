@@ -11,8 +11,8 @@ class CPPKernelSubroutine: public KernelSubroutine <SgFunctionDeclaration>
 
   protected:
 
-    CPPKernelSubroutine (std::string const & subroutineName,
-        std::string const & userSubroutineName, SgScopeStatement * moduleScope,
+    CPPKernelSubroutine (SgScopeStatement * moduleScope, Subroutine <
+        SgFunctionDeclaration> * calleeSubroutine,
         CPPParallelLoop * parallelLoop);
 };
 

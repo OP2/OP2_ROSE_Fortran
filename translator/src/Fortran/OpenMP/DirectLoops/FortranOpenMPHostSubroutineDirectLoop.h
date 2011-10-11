@@ -4,6 +4,7 @@
 
 #include <FortranOpenMPHostSubroutine.h>
 
+class FortranOpenMPKernelSubroutine;
 class FortranOpenMPModuleDeclarationsDirectLoop;
 
 class FortranOpenMPHostSubroutineDirectLoop: public FortranOpenMPHostSubroutine
@@ -33,10 +34,9 @@ class FortranOpenMPHostSubroutineDirectLoop: public FortranOpenMPHostSubroutine
 
   public:
 
-    FortranOpenMPHostSubroutineDirectLoop (std::string const & subroutineName,
-        std::string const & userSubroutineName,
-        std::string const & kernelSubroutineName,
-        FortranParallelLoop * parallelLoop, SgScopeStatement * moduleScope,
+    FortranOpenMPHostSubroutineDirectLoop (SgScopeStatement * moduleScope,
+        FortranOpenMPKernelSubroutine * kernelSubroutine,
+        FortranParallelLoop * parallelLoop,
         FortranOpenMPModuleDeclarationsDirectLoop * moduleDeclarations);
 };
 

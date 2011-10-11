@@ -1,53 +1,28 @@
-
 #pragma once
 #ifndef USER_SUBROUTINE_H
 #define USER_SUBROUTINE_H
 
 #include <Subroutine.h>
-
-class ParallelLoop;
+#include <ParallelLoop.h>
 
 template <typename TSubroutineHeader, typename TDeclarations>
   class UserSubroutine: public Subroutine <TSubroutineHeader>
   {
     protected:
 
-      /*
-       * ======================================================
-       * The name of the user subroutine on the host
-       * ======================================================
-       */
-
-      std::string hostSubroutineName;
-
       TDeclarations * declarations;
 
       ParallelLoop * parallelLoop;
 
+      TSubroutineHeader * originalSubroutine;
+
     protected:
 
-      UserSubroutine (
-          std::string const & subroutineName,
-          TDeclarations * declarations, 
-          ParallelLoop * parallelLoop ) :
-        Subroutine <TSubroutineHeader> (subroutineName + "_device"),
-        hostSubroutineName (subroutineName), 
-        declarations (declarations),
-        parallelLoop (parallelLoop)
+      UserSubroutine (ParallelLoop * parallelLoop, TDeclarations * declarations) :
+        Subroutine <TSubroutineHeader> (parallelLoop->getUserSubroutineName ()
+            + "_modified"), declarations (declarations), parallelLoop (
+            parallelLoop)
       {
-      }
-
-    public:
-
-      /*
-       * ======================================================
-       * The name of the user subroutine on the host
-       * ======================================================
-       */
-      std::string const &
-      getHostSubroutineName ()
-      {
-        return hostSubroutineName;
       }
   };
 

@@ -13,9 +13,9 @@ class FortranKernelSubroutine: public KernelSubroutine <
 {
   protected:
 
-    FortranKernelSubroutine (std::string const & subroutineName,
-        std::string const & userSubroutineName,
-        FortranParallelLoop * parallelLoop, SgScopeStatement * moduleScope);
+    FortranKernelSubroutine (SgScopeStatement * moduleScope, Subroutine <
+        SgProcedureHeaderStatement> * calleeSubroutine,
+        FortranParallelLoop * parallelLoop);
 };
 #endif
 
