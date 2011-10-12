@@ -1,7 +1,7 @@
-1 FAIL Test1.F95
-2 FAIL Test2.F95
-3 PASS Test3.F95
-4 PASS Test4.F95
-5 PASS Test5.F95
-6 PASS Test6.F95
-7 PASS Test7.F95
+1 4 Test1.F95
+2 5 Test2.F95
+3 0 Test3.F95
+4 0 Test4.F95
+5 0 Test5.F95
+6 0 Test6.F95
+7 0 Test7.F95

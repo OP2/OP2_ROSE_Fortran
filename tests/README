@@ -14,14 +14,23 @@ accessed OP_DATs.
 
 Therefore, find the appropriate directory then add a line to the file 'testsToRun' with the 
 following syntax:
-TestCase (PASS|FAIL) (TestFile)+ 
+TestCase ReturnValue (TestFile)+ 
 where TestCase is a positive integer
-      PASS|FAIL is the lexeme describing the expected result of the test
+      ReturnValue is the expected integer returned by the source-to-source translator
       TestFile is a C++/Fortran file associated with this test case
 
+The return value is needed to guard against false positives; that is, where a test case is
+intended to fail (return a non-zero integer) but in fact fails elsewhere.
+
 For instance:
-12 FAIL Test12.F95 
-says that test number 12 associated with Fortran file Test12.F95 is expected to fail.
+12 5 Test12.F95 
+says that test number 12 associated with Fortran file Test12.F95 is expected to fail (since
+the return value is not zero) and, more specifically, the source-to-source translator should 
+return error value 5. 
+
+10 0 Test1.cpp
+says that test number 10 associated with C++ file Test1.cpp is expected to pass (since the 
+return value is zero).
 
 ===================================== Running the tests ===================================
 To run the tests contained in a particular directory, use the 'runTests.py' Python script found 
