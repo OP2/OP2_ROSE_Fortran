@@ -362,63 +362,93 @@ main (int argc, char ** argv)
   catch (Exceptions::CUDA::GridDimensionException const & e)
   {
     std::cout << e.what () << std::endl;
+
+    return Exceptions::CUDA::GridDimensionException::returnValue;
   }
   catch (Exceptions::CUDA::SharedVariableTypeException const & e)
   {
     std::cout << e.what () << std::endl;
+
+    return Exceptions::CUDA::SharedVariableTypeException::returnValue;
   }
   catch (Exceptions::CUDA::ThreadBlockDimensionException const & e)
   {
     std::cout << e.what () << std::endl;
+
+    return Exceptions::CUDA::ThreadBlockDimensionException::returnValue;
   }
   catch (Exceptions::CommandLine::BackendException const & e)
   {
     std::cout << e.what () << std::endl;
+
+    return Exceptions::CommandLine::BackendException::returnValue;
   }
   catch (Exceptions::CommandLine::FrontendException const & e)
   {
     std::cout << e.what () << std::endl;
+
+    return Exceptions::CommandLine::FrontendException::returnValue;
   }
   catch (Exceptions::CommandLine::MutuallyExclusiveException const & e)
   {
     std::cout << e.what () << std::endl;
+
+    return Exceptions::CommandLine::MutuallyExclusiveException::returnValue;
   }
   catch (Exceptions::ParallelLoop::OpGblReadWriteException const & e)
   {
     std::cout << e.what () << std::endl;
+
+    return Exceptions::ParallelLoop::OpGblReadWriteException::returnValue;
   }
   catch (Exceptions::ParallelLoop::OpGblWriteException const & e)
   {
     std::cout << e.what () << std::endl;
+
+    return Exceptions::ParallelLoop::OpGblWriteException::returnValue;
   }
   catch (Exceptions::ParallelLoop::UnsupportedBaseTypeException const & e)
   {
     std::cout << e.what () << std::endl;
+
+    return Exceptions::ParallelLoop::UnsupportedBaseTypeException::returnValue;
   }
   catch (Exceptions::ParallelLoop::UnknownAccessException const & e)
   {
     std::cout << e.what () << std::endl;
+
+    return Exceptions::ParallelLoop::UnknownAccessException::returnValue;
   }
   catch (Exceptions::CodeGeneration::FortranVariableAttributeException const
       & e)
   {
     std::cout << e.what () << std::endl;
+
+    return Exceptions::CodeGeneration::FortranVariableAttributeException::returnValue;
   }
   catch (Exceptions::CodeGeneration::UnknownVariableException const & e)
   {
     std::cout << e.what () << std::endl;
+
+    return Exceptions::CodeGeneration::UnknownVariableException::returnValue;
   }
   catch (Exceptions::CodeGeneration::UnknownSubroutineException const & e)
   {
     std::cout << e.what () << std::endl;
+
+    return Exceptions::CodeGeneration::UnknownSubroutineException::returnValue;
   }
   catch (Exceptions::CodeGeneration::UnfoundStatementException const & e)
   {
     std::cout << e.what () << std::endl;
+
+    return Exceptions::CodeGeneration::UnfoundStatementException::returnValue;
   }
   catch (Exceptions::CodeGeneration::FileCreationException const & e)
   {
     std::cout << e.what () << std::endl;
+
+    return Exceptions::CodeGeneration::FileCreationException::returnValue;
   }
 
   Debug::getInstance ()->debugMessage ("Translation completed",
