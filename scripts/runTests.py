@@ -148,7 +148,7 @@ def generateCUDAMakefile (generatedFiles, testNum):
 
 	return CUDAMakefile.name
 
-def manageNewFiles (timeStamp):
+def manageNewFiles (timeStamp, testNum):
 	import re
 	from FormatFortranCode import FormatFortranCode	
 
@@ -270,7 +270,7 @@ def runTests ():
 			else:
 				if testResult == 0:				
 					debug.verboseMessage("Test case #%s passed" % (testNum))
-					manageNewFiles (timeStamp)
+					manageNewFiles (timeStamp, testNum)
 				else:
 					debug.verboseMessage("Test case #%s did NOT pass" % (testNum))
 			debug.verboseMessage("")
