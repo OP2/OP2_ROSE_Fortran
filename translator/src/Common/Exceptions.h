@@ -13,6 +13,10 @@ namespace Exceptions
     {
       public:
 
+        static unsigned int const returnValue = 1;
+
+      public:
+
         MutuallyExclusiveException (const std::string& msg) :
           std::runtime_error (msg)
         {
@@ -23,6 +27,10 @@ namespace Exceptions
     {
       public:
 
+        static unsigned int const returnValue = 2;
+
+      public:
+
         BackendException (const std::string& msg) :
           std::runtime_error (msg)
         {
@@ -31,6 +39,10 @@ namespace Exceptions
 
     class FrontendException: public std::runtime_error
     {
+      public:
+
+        static unsigned int const returnValue = 3;
+
       public:
 
         FrontendException (const std::string& msg) :
@@ -46,6 +58,10 @@ namespace Exceptions
     {
       public:
 
+        static unsigned int const returnValue = 4;
+
+      public:
+
         OpGblWriteException (const std::string& msg) :
           std::runtime_error (msg)
         {
@@ -54,6 +70,10 @@ namespace Exceptions
 
     class OpGblReadWriteException: public std::runtime_error
     {
+      public:
+
+        static unsigned int const returnValue = 5;
+
       public:
 
         OpGblReadWriteException (const std::string& msg) :
@@ -66,6 +86,10 @@ namespace Exceptions
     {
       public:
 
+        static unsigned int const returnValue = 6;
+
+      public:
+
         UnknownAccessException (const std::string& msg) :
           std::runtime_error (msg)
         {
@@ -74,6 +98,10 @@ namespace Exceptions
 
     class UnsupportedBaseTypeException: public std::runtime_error
     {
+      public:
+
+        static unsigned int const returnValue = 7;
+
       public:
 
         UnsupportedBaseTypeException (const std::string& msg) :
@@ -89,6 +117,10 @@ namespace Exceptions
     {
       public:
 
+        static unsigned int const returnValue = 8;
+
+      public:
+
         ThreadBlockDimensionException (const std::string& msg) :
           std::runtime_error (msg)
         {
@@ -97,6 +129,10 @@ namespace Exceptions
 
     class GridDimensionException: public std::runtime_error
     {
+      public:
+
+        static unsigned int const returnValue = 9;
+
       public:
 
         GridDimensionException (const std::string& msg) :
@@ -109,6 +145,10 @@ namespace Exceptions
     {
       public:
 
+        static unsigned int const returnValue = 10;
+
+      public:
+
         SharedVariableTypeException (const std::string& msg) :
           std::runtime_error (msg)
         {
@@ -117,6 +157,10 @@ namespace Exceptions
 
     class SharedMemorySizeException: public std::runtime_error
     {
+      public:
+
+        static unsigned int const returnValue = 11;
+
       public:
 
         SharedMemorySizeException (const std::string& msg) :
@@ -132,6 +176,10 @@ namespace Exceptions
     {
       public:
 
+        static unsigned int const returnValue = 12;
+
+      public:
+
         FileCreationException (const std::string& msg) :
           std::runtime_error (msg)
         {
@@ -140,6 +188,10 @@ namespace Exceptions
 
     class UnknownVariableException: public std::runtime_error
     {
+      public:
+
+        static unsigned int const returnValue = 13;
+
       public:
 
         UnknownVariableException (const std::string& msg) :
@@ -152,6 +204,10 @@ namespace Exceptions
     {
       public:
 
+        static unsigned int const returnValue = 14;
+
+      public:
+
         UnknownSubroutineException (const std::string& msg) :
           std::runtime_error (msg)
         {
@@ -162,6 +218,10 @@ namespace Exceptions
     {
       public:
 
+        static unsigned int const returnValue = 15;
+
+      public:
+
         UnfoundStatementException (const std::string& msg) :
           std::runtime_error (msg)
         {
@@ -170,6 +230,10 @@ namespace Exceptions
 
     class FortranVariableAttributeException: public std::runtime_error
     {
+      public:
+
+        static unsigned int const returnValue = 16;
+
       public:
 
         FortranVariableAttributeException (const std::string& msg) :

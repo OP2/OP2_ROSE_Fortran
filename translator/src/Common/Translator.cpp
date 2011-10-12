@@ -327,6 +327,11 @@ processUserSelections (SgProject * project)
 int
 main (int argc, char ** argv)
 {
+  using std::string;
+  using std::vector;
+  using std::cout;
+  using std::endl;
+
   addCommandLineOptions ();
 
   CommandLine::getInstance ()->parse (argc, argv);
@@ -339,7 +344,7 @@ main (int argc, char ** argv)
    * ======================================================
    */
 
-  std::vector <std::string> args;
+  vector <string> args;
 
   CommandLine::getInstance ()->getRoseArguments (args);
 
@@ -354,65 +359,66 @@ main (int argc, char ** argv)
   {
     processUserSelections (project);
   }
-  catch (Exceptions::CUDA::GridDimensionException & e)
+  catch (Exceptions::CUDA::GridDimensionException const & e)
   {
-
+    std::cout << e.what () << std::endl;
   }
-  catch (Exceptions::CUDA::SharedVariableTypeException & e)
+  catch (Exceptions::CUDA::SharedVariableTypeException const & e)
   {
-
+    std::cout << e.what () << std::endl;
   }
-  catch (Exceptions::CUDA::ThreadBlockDimensionException & e)
+  catch (Exceptions::CUDA::ThreadBlockDimensionException const & e)
   {
-
+    std::cout << e.what () << std::endl;
   }
-  catch (Exceptions::CommandLine::BackendException & e)
+  catch (Exceptions::CommandLine::BackendException const & e)
   {
-
+    std::cout << e.what () << std::endl;
   }
-  catch (Exceptions::CommandLine::FrontendException & e)
+  catch (Exceptions::CommandLine::FrontendException const & e)
   {
-
+    std::cout << e.what () << std::endl;
   }
-  catch (Exceptions::CommandLine::MutuallyExclusiveException & e)
+  catch (Exceptions::CommandLine::MutuallyExclusiveException const & e)
   {
-
+    std::cout << e.what () << std::endl;
   }
-  catch (Exceptions::ParallelLoop::OpGblReadWriteException & e)
+  catch (Exceptions::ParallelLoop::OpGblReadWriteException const & e)
   {
-
+    std::cout << e.what () << std::endl;
   }
-  catch (Exceptions::ParallelLoop::OpGblWriteException & e)
+  catch (Exceptions::ParallelLoop::OpGblWriteException const & e)
   {
-
+    std::cout << e.what () << std::endl;
   }
-  catch (Exceptions::ParallelLoop::UnsupportedBaseTypeException & e)
+  catch (Exceptions::ParallelLoop::UnsupportedBaseTypeException const & e)
   {
-
+    std::cout << e.what () << std::endl;
   }
-  catch (Exceptions::ParallelLoop::UnknownAccessException & e)
+  catch (Exceptions::ParallelLoop::UnknownAccessException const & e)
   {
-
+    std::cout << e.what () << std::endl;
   }
-  catch (Exceptions::CodeGeneration::FortranVariableAttributeException & e)
+  catch (Exceptions::CodeGeneration::FortranVariableAttributeException const
+      & e)
   {
-
+    std::cout << e.what () << std::endl;
   }
-  catch (Exceptions::CodeGeneration::UnknownVariableException & e)
+  catch (Exceptions::CodeGeneration::UnknownVariableException const & e)
   {
-
+    std::cout << e.what () << std::endl;
   }
-  catch (Exceptions::CodeGeneration::UnknownSubroutineException & e)
+  catch (Exceptions::CodeGeneration::UnknownSubroutineException const & e)
   {
-
+    std::cout << e.what () << std::endl;
   }
-  catch (Exceptions::CodeGeneration::UnfoundStatementException & e)
+  catch (Exceptions::CodeGeneration::UnfoundStatementException const & e)
   {
-
+    std::cout << e.what () << std::endl;
   }
-  catch (Exceptions::CodeGeneration::FileCreationException & e)
+  catch (Exceptions::CodeGeneration::FileCreationException const & e)
   {
-
+    std::cout << e.what () << std::endl;
   }
 
   Debug::getInstance ()->debugMessage ("Translation completed",

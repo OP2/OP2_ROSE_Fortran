@@ -3,12 +3,7 @@
 #include <CPPParallelLoop.h>
 #include <CPPHostSubroutine.h>
 #include <CPPProgramDeclarationsAndDefinitions.h>
-
-/*
- * ======================================================
- * Private functions
- * ======================================================
- */
+#include <Exceptions.h>
 
 void
 CPPSubroutinesGeneration::patchCallsToParallelLoops ()
@@ -88,8 +83,8 @@ CPPSubroutinesGeneration::createSourceFile ()
   }
   else
   {
-    Debug::getInstance ()->errorMessage ("Could not create dummy C++ file '"
-        + inputFileName + "'", __FILE__, __LINE__);
+    throw Exceptions::CodeGeneration::FileCreationException (
+        "Could not create dummy C++ file '" + inputFileName + "'");
   }
 
   /*
