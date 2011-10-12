@@ -123,10 +123,6 @@ class CPPImperialOpArgGblCall
     static int const index_OpAccess = 1;
 };
 
-/*
- * Oxford versions
- */
-
 class CPPOxfordOpDatDefinition: public OpDatDefinition
 {
     /*

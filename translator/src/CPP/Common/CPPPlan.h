@@ -6,15 +6,15 @@
 
 class CPPPlan: public Plan
 {
-  protected:
+  public:
 
     virtual SgBasicBlock *
-    createPlanFunctionParametersPreparationStatements (
-        ParallelLoop * parallelLoop,
-        ScopedVariableDeclarations * variableDeclarations);
+    createPlanFunctionParametersPreparationStatements ();
 
     virtual SgFunctionCallExp *
-    createPlanFunctionCallExpression (SgScopeStatement * subroutineScope,
+    createPlanFunctionCallExpression ();
+
+    CPPPlan (SgScopeStatement * subroutineScope, ParallelLoop * parallelLoop,
         ScopedVariableDeclarations * variableDeclarations);
 };
 

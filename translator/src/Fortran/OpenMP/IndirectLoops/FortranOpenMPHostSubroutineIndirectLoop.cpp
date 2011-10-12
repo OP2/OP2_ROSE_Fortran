@@ -9,12 +9,6 @@
 #include <Debug.h>
 #include <OpenMP.h>
 
-/*
- * ======================================================
- * Private functions
- * ======================================================
- */
-
 SgStatement *
 FortranOpenMPHostSubroutineIndirectLoop::createKernelFunctionCallStatement ()
 {
@@ -418,17 +412,14 @@ FortranOpenMPHostSubroutineIndirectLoop::createStatements ()
   using SageBuilder::buildVarRefExp;
   using SageInterface::appendStatement;
 
-  Debug::getInstance ()->debugMessage ("Creating statements",
-      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
-
   initialiseNumberOfThreadsStatements ();
 
-  appendStatement (createPlanFunctionParametersPreparationStatements (
-      (FortranParallelLoop *) parallelLoop, variableDeclarations),
+  appendStatement (
+      fortranPlan->createPlanFunctionParametersPreparationStatements (),
       subroutineScope);
 
   SgFunctionCallExp * planFunctionCallExpression =
-      createPlanFunctionCallExpression (subroutineScope, variableDeclarations);
+      fortranPlan->createPlanFunctionCallExpression ();
 
   SgExprStatement * assignmentStatement2 = buildAssignStatement (
       buildVarRefExp (moduleDeclarations->getCPlanReturnDeclaration ()),
@@ -438,13 +429,12 @@ FortranOpenMPHostSubroutineIndirectLoop::createStatements ()
 
   appendStatement (createTransferOpDatStatements (), subroutineScope);
 
-  appendStatement (createConvertPositionInPMapsStatements (
-      (FortranParallelLoop *) parallelLoop, subroutineScope,
-      variableDeclarations), subroutineScope);
+  appendStatement (fortranPlan->createConvertPositionInPMapsStatements (),
+      subroutineScope);
 
-  appendStatement (createConvertPlanFunctionParametersStatements (
-      (FortranParallelLoop *) parallelLoop, subroutineScope,
-      variableDeclarations), subroutineScope);
+  appendStatement (
+      fortranPlan->createConvertPlanFunctionParametersStatements (),
+      subroutineScope);
 
   if (parallelLoop->isReductionRequired ())
   {
@@ -475,12 +465,6 @@ FortranOpenMPHostSubroutineIndirectLoop::createLocalVariableDeclarations ()
   }
 }
 
-/*
- * ======================================================
- * Public functions
- * ======================================================
- */
-
 FortranOpenMPHostSubroutineIndirectLoop::FortranOpenMPHostSubroutineIndirectLoop (
     SgScopeStatement * moduleScope,
     FortranOpenMPKernelSubroutine * kernelSubroutine,
@@ -492,6 +476,9 @@ FortranOpenMPHostSubroutineIndirectLoop::FortranOpenMPHostSubroutineIndirectLoop
   Debug::getInstance ()->debugMessage (
       "OpenMP host subroutine creation for indirect loop",
       Debug::CONSTRUCTOR_LEVEL, __FILE__, __LINE__);
+
+  fortranPlan = new FortranPlan (subroutineScope, parallelLoop,
+      variableDeclarations);
 
   createFormalParameterDeclarations ();
 

@@ -1,16 +1,20 @@
 #include <CPPPlan.h>
 
 SgBasicBlock *
-CPPPlan::createPlanFunctionParametersPreparationStatements (
-    ParallelLoop * parallelLoop,
-    ScopedVariableDeclarations * variableDeclarations)
+CPPPlan::createPlanFunctionParametersPreparationStatements ()
 {
   return NULL;
 }
 
 SgFunctionCallExp *
-CPPPlan::createPlanFunctionCallExpression (SgScopeStatement * subroutineScope,
-    ScopedVariableDeclarations * variableDeclarations)
+CPPPlan::createPlanFunctionCallExpression ()
 {
   return NULL;
+}
+
+CPPPlan::CPPPlan (SgScopeStatement * subroutineScope,
+    ParallelLoop * parallelLoop,
+    ScopedVariableDeclarations * variableDeclarations):
+    Plan(subroutineScope, parallelLoop, variableDeclarations)
+{
 }

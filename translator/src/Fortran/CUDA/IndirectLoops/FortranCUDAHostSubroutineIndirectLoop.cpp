@@ -3,6 +3,7 @@
 #include <FortranOpDatDimensionsDeclaration.h>
 #include <FortranCUDAModuleDeclarations.h>
 #include <FortranCUDAOpDatCardinalitiesDeclarationIndirectLoop.h>
+#include <FortranPlan.h>
 #include <FortranTypesBuilder.h>
 #include <FortranStatementsAndExpressionsBuilder.h>
 #include <RoseStatementsAndExpressionsBuilder.h>
@@ -670,12 +671,12 @@ FortranCUDAHostSubroutineIndirectLoop::createStatements ()
   using SageBuilder::buildAssignStatement;
   using SageInterface::appendStatement;
 
-  appendStatement (createPlanFunctionParametersPreparationStatements (
-      (FortranParallelLoop *) parallelLoop, variableDeclarations),
+  appendStatement (
+      fortranPlan->createPlanFunctionParametersPreparationStatements (),
       subroutineScope);
 
   SgFunctionCallExp * planFunctionCallExpression =
-      createPlanFunctionCallExpression (subroutineScope, variableDeclarations);
+      fortranPlan-> createPlanFunctionCallExpression ();
 
   SgExprStatement * assignmentStatement1 = buildAssignStatement (
       buildVarRefExp (moduleDeclarations->getCPlanReturnDeclaration ()),
@@ -699,13 +700,12 @@ FortranCUDAHostSubroutineIndirectLoop::createStatements ()
 
   appendStatement (callStatement1, subroutineScope);
 
-  appendStatement (createConvertPositionInPMapsStatements (
-      (FortranParallelLoop *) parallelLoop, subroutineScope,
-      variableDeclarations), subroutineScope);
+  appendStatement (fortranPlan->createConvertPositionInPMapsStatements (),
+      subroutineScope);
 
-  appendStatement (createConvertPlanFunctionParametersStatements (
-      (FortranParallelLoop *) parallelLoop, subroutineScope,
-      variableDeclarations), subroutineScope);
+  appendStatement (
+      fortranPlan->createConvertPlanFunctionParametersStatements (),
+      subroutineScope);
 
   createCardinalitiesInitialisationStatements ();
 
@@ -747,8 +747,11 @@ FortranCUDAHostSubroutineIndirectLoop::FortranCUDAHostSubroutineIndirectLoop (
       cardinalitiesDeclaration, dimensionsDeclaration, moduleDeclarations)
 {
   Debug::getInstance ()->debugMessage (
-      "Creating host subroutine of indirect loop", Debug::CONSTRUCTOR_LEVEL,
-      __FILE__, __LINE__);
+      "CUDA host subroutine creation for indirect loop",
+      Debug::CONSTRUCTOR_LEVEL, __FILE__, __LINE__);
+
+  fortranPlan = new FortranPlan (subroutineScope, parallelLoop,
+      variableDeclarations);
 
   createFormalParameterDeclarations ();
 

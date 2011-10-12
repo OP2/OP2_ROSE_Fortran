@@ -3,13 +3,16 @@
 #define FORTRAN_CUDA_HOST_SUBROUTINE_INDIRECT_LOOP_H
 
 #include <FortranCUDAHostSubroutine.h>
-#include <FortranPlan.h>
 
+class FortranPlan;
 class FortranCUDAOpDatCardinalitiesDeclarationIndirectLoop;
 
-class FortranCUDAHostSubroutineIndirectLoop: public FortranCUDAHostSubroutine,
-    public FortranPlan
+class FortranCUDAHostSubroutineIndirectLoop: public FortranCUDAHostSubroutine
 {
+  private:
+
+    FortranPlan * fortranPlan;
+
   private:
 
     virtual SgStatement *

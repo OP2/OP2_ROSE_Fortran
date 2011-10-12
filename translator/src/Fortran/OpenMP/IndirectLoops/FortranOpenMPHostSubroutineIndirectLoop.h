@@ -5,12 +5,16 @@
 #include <FortranOpenMPHostSubroutine.h>
 #include <FortranPlan.h>
 
+class FortranPlan;
 class FortranOpenMPKernelSubroutine;
 class FortranOpenMPModuleDeclarationsIndirectLoop;
 
-class FortranOpenMPHostSubroutineIndirectLoop: public FortranOpenMPHostSubroutine,
-    public FortranPlan
+class FortranOpenMPHostSubroutineIndirectLoop: public FortranOpenMPHostSubroutine
 {
+  private:
+
+    FortranPlan * fortranPlan;
+
   private:
 
     void

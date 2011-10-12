@@ -8,9 +8,7 @@
 #include <Subroutine.h>
 
 SgBasicBlock *
-FortranPlan::createConvertPlanFunctionParametersStatements (
-    ParallelLoop * parallelLoop, SgScopeStatement * subroutineScope,
-    ScopedVariableDeclarations * variableDeclarations)
+FortranPlan::createConvertPlanFunctionParametersStatements ()
 {
   using SageBuilder::buildBasicBlock;
   using SageBuilder::buildMultiplyOp;
@@ -372,9 +370,7 @@ FortranPlan::createConvertPlanFunctionParametersStatements (
 }
 
 SgBasicBlock *
-FortranPlan::createConvertPositionInPMapsStatements (
-    ParallelLoop * parallelLoop, SgScopeStatement * subroutineScope,
-    ScopedVariableDeclarations * variableDeclarations)
+FortranPlan::createConvertPositionInPMapsStatements ()
 {
   using SageBuilder::buildBasicBlock;
   using SageBuilder::buildIntVal;
@@ -516,9 +512,7 @@ FortranPlan::createConvertPositionInPMapsStatements (
 }
 
 SgBasicBlock *
-FortranPlan::createPlanFunctionParametersPreparationStatements (
-    ParallelLoop * parallelLoop,
-    ScopedVariableDeclarations * variableDeclarations)
+FortranPlan::createPlanFunctionParametersPreparationStatements ()
 {
   using SageBuilder::buildBasicBlock;
   using SageBuilder::buildVarRefExp;
@@ -730,9 +724,7 @@ FortranPlan::createPlanFunctionParametersPreparationStatements (
 }
 
 SgFunctionCallExp *
-FortranPlan::createPlanFunctionCallExpression (
-    SgScopeStatement * subroutineScope,
-    ScopedVariableDeclarations * variableDeclarations)
+FortranPlan::createPlanFunctionCallExpression ()
 {
   using SageBuilder::buildExprListExp;
   using SageBuilder::buildVarRefExp;
@@ -785,3 +777,11 @@ FortranPlan::createPlanFunctionCallExpression (
 
   return functionCall;
 }
+
+FortranPlan::FortranPlan (SgScopeStatement * subroutineScope,
+    ParallelLoop * parallelLoop,
+    ScopedVariableDeclarations * variableDeclarations) :
+  Plan (subroutineScope, parallelLoop, variableDeclarations)
+{
+}
+

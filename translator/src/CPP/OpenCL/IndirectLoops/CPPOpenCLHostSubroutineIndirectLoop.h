@@ -3,13 +3,16 @@
 #define CPP_OPENCL_HOST_SUBROUTINE_INDIRECT_LOOP_H
 
 #include <CPPOpenCLHostSubroutine.h>
-#include <CPPPlan.h>
 
+class CPPPlan;
 class CPPOpenCLKernelSubroutineIndirectLoop;
 
-class CPPOpenCLHostSubroutineIndirectLoop: public CPPOpenCLHostSubroutine,
-    public CPPPlan
+class CPPOpenCLHostSubroutineIndirectLoop: public CPPOpenCLHostSubroutine
 {
+  private:
+
+    CPPPlan * plan;
+
   private:
 
     void

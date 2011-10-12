@@ -1,14 +1,3 @@
-/*
- * Written by Adam Betts and Carlo Bertolli
- *
- * This class contains functions which must be implemented
- * by any subroutine which includes a plan function.
- *
- * All of the virtual functions are pure to create an interface
- * as the generation of statements depends on the language (i.e.
- * C++ or Fortran).
- */
-
 #pragma once
 #ifndef PLAN_H
 #define PLAN_H
@@ -18,12 +7,20 @@
 class SgBasicBlock;
 class SgFunctionCallExp;
 class SgScopeStatement;
-class ScopedVariableDeclarations;
 class ParallelLoop;
+class ScopedVariableDeclarations;
 
 class Plan
 {
-  public:
+  protected:
+
+    SgScopeStatement * subroutineScope;
+
+    ParallelLoop * parallelLoop;
+
+    ScopedVariableDeclarations * variableDeclarations;
+
+  protected:
 
     /*
      * ======================================================
@@ -33,9 +30,7 @@ class Plan
      * ======================================================
      */
     virtual SgBasicBlock *
-    createPlanFunctionParametersPreparationStatements (
-        ParallelLoop * parallelLoop,
-        ScopedVariableDeclarations * variableDeclarations) = 0;
+    createPlanFunctionParametersPreparationStatements () = 0;
 
     /*
      * ======================================================
@@ -45,18 +40,14 @@ class Plan
      * ======================================================
      */
     virtual SgFunctionCallExp *
-    createPlanFunctionCallExpression (SgScopeStatement * subroutineScope,
-        ScopedVariableDeclarations * variableDeclarations) = 0;
+    createPlanFunctionCallExpression () = 0;
 
-    /*
-     * ======================================================
-     * The plan function returns a number of fields dictating
-     * how to execute over a particular set. This function
-     * creates statements to execute that plan
-     * ======================================================
-     */
-    virtual void
-    createPlanFunctionExecutionStatements () = 0;
+    Plan (SgScopeStatement * subroutineScope, ParallelLoop * parallelLoop,
+        ScopedVariableDeclarations * variableDeclarations) :
+      subroutineScope (subroutineScope), parallelLoop (parallelLoop),
+          variableDeclarations (variableDeclarations)
+    {
+    }
 };
 
 #endif

@@ -1,7 +1,48 @@
-To install the version of ROSE in this repository, run the 'build.py' script 
-contained in this directory as follows:
-'python build.py'
+================================== Installing ROSE ================================
+This directory contains several ROSE tarballs and several files modified by Imperial
+College in the ROSE distribution. These modified files are needed to compile our
+source-to-source translator. 
 
-The script requires the Boost libraries to be found in your LD_LIBRARY_PATH. 
+All installation and maintenance of the ROSE installation is controlled through the
+Python script 'build.py' found in this directory. To display all options, run
+'python build.py -h'
 
-See the ROSE documentation for more assistance.
+However, in general, to install a fresh ROSE revision from a tarball, run
+'python build.py -b'
+
+Note that ROSE requires particular versions of tools and certain environment variables
+to be set. See the ROSE documentataion for more assistance. The 'build.py' does some 
+environment verification. It is imperative that, when building ROSE from scratch, the 
+script can find the Boost libraries in your LD_LIBRARY_PATH (required by ROSE). 
+
+================================== Updating ROSE ================================
+Sometimes it is necessary to modify some of the ROSE source files in order to add
+functionality to our source-to-source translator. When doing so, here are the actions
+to take:
+1) Copy the specific source file to the directory 'ImperialModifications'. (Of course,
+   check first that the file is not already there.)
+
+2) Add to the file 'ImperialModifications/fileLocations.txt' the original DIRECTORY 
+   within the ROSE source tree to which the source file belongs. For example:
+   myFile.C=src/backend/unparser/FortranCodeGeneration
+
+3) Make changes to the file. ALWAYS delimit changes between the following comments:
+   // Imperial College changes
+   // END Imperial College changes
+   This facilitates tracking of modifications.
+   Also note that the ROSE installer disallows tabs in source files. Ensure that none
+   are present in your edits, otherwise the build is guaranteed to fail.
+
+4) Run 'python build.py -u'.
+   The script performs an MD5 checksum on the file contained in the 'ImperialModifications'
+   directory and the file contained in the ROSE source tree. If changes are detected, the
+   script forces a rebuild and re-installation of ROSE.
+
+======================================= Comments =====================================
+Note that this method is not future proof. In particular, there are likely to be problems 
+if the ROSE developers re-engineer the source files which we modify, as we effectively
+checkpoint the file from a particular revision. 
+
+This is the only solution we found to maintaining the ROSE distribution on git as there
+are problems with automake, even though we adhere strictly to all the guidelines given
+in the ROSE documentation.
