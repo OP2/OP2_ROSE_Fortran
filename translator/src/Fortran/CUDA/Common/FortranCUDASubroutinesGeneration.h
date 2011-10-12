@@ -41,7 +41,7 @@ class FortranCUDASubroutinesGeneration: public FortranSubroutinesGeneration
 
     FortranCUDASubroutinesGeneration (SgProject * project,
         FortranProgramDeclarationsAndDefinitions * declarations) :
-      FortranSubroutinesGeneration (declarations, "cuda_code.CUF")
+      FortranSubroutinesGeneration (declarations, "rose_cuda_code.F95", project)
     {
       generate ();
     }

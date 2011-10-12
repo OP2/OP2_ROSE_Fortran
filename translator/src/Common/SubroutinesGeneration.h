@@ -26,13 +26,6 @@ template <typename TDeclarations, typename THostSubroutine>
 
       /*
        * ======================================================
-       * The generated output files for each OP_PAR_LOOP
-       * ======================================================
-       */
-      std::vector <SgSourceFile *> generatedFiles;
-
-      /*
-       * ======================================================
        * The names of source files passed by the user which
        * are modified by our compiler
        * ======================================================
@@ -59,11 +52,11 @@ template <typename TDeclarations, typename THostSubroutine>
 
       /*
        * ======================================================
-       * The suffix of the file in which the new
-       * subroutines are output
+       * The name of the file in which the new subroutines are
+       * output
        * ======================================================
        */
-      std::string fileSuffix;
+      std::string newFileName;
 
       /*
        * ======================================================
@@ -75,47 +68,19 @@ template <typename TDeclarations, typename THostSubroutine>
 
     protected:
 
-      /*
-       * ======================================================
-       * Generates output files for each OP_PAR_LOOP
-       * ======================================================
-       */
-      void
-      unparse ()
-      {
-        using std::vector;
-
-        Debug::getInstance ()->debugMessage ("Generating new files",
-            Debug::VERBOSE_LEVEL, __FILE__, __LINE__);
-
-        for (vector <SgSourceFile *>::const_iterator it =
-            generatedFiles.begin (); it != generatedFiles.end (); ++it)
-        {
-          Debug::getInstance ()->debugMessage ("Unparsing to '"
-              + (*it)->getFileName () + "'", Debug::FUNCTION_LEVEL, __FILE__,
-              __LINE__);
-
-          /*
-           * ======================================================
-           * Unparse the created files after checking consistency
-           * of ASTs
-           * ======================================================
-           */
-          SgProject * project = (*it)->get_project ();
-
-          AstTests::runAllTests (project);
-
-          project->unparse ();
-        }
-      }
-
       SubroutinesGeneration (TDeclarations * declarations,
-          std::string const & fileSuffix) :
-        declarations (declarations), fileSuffix (fileSuffix)
+          std::string const & newFileName) :
+        declarations (declarations), newFileName (newFileName)
       {
       }
 
     public:
+
+      std::string const &
+      getFileName ()
+      {
+        return newFileName;
+      }
 
       bool
       isDirty (std::string const & fileName)

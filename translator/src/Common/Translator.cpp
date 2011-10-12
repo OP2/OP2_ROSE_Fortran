@@ -188,6 +188,7 @@ unparseOriginalSourceFiles (SgProject * project,
       virtual void
       visit (SgNode * node)
       {
+        using boost::iequals;
         using boost::filesystem::path;
         using boost::filesystem::system_complete;
 
@@ -201,6 +202,14 @@ unparseOriginalSourceFiles (SgProject * project,
           {
             Debug::getInstance ()->debugMessage ("Unparsing '" + p.filename ()
                 + "'", Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+
+            file->unparse ();
+          }
+          else if (iequals (p.filename (), generator->getFileName ()))
+          {
+            Debug::getInstance ()->debugMessage ("Unparsing generated file '"
+                + p.filename () + "'", Debug::FUNCTION_LEVEL, __FILE__,
+                __LINE__);
 
             file->unparse ();
           }

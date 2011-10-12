@@ -4,6 +4,7 @@
 
 #include <SubroutinesGeneration.h>
 
+class SgProject;
 class SgSourceFile;
 class SgModuleStatement;
 class FortranReductionSubroutines;
@@ -34,6 +35,8 @@ class FortranSubroutinesGeneration: public SubroutinesGeneration <
         dimensionsDeclarations;
 
     std::map <std::string, FortranModuleDeclarations *> moduleDeclarations;
+
+    SgProject * project;
 
   private:
 
@@ -122,7 +125,7 @@ class FortranSubroutinesGeneration: public SubroutinesGeneration <
 
     FortranSubroutinesGeneration (
         FortranProgramDeclarationsAndDefinitions * declarations,
-        std::string const & fileSuffix);
+        std::string const & fileSuffix, SgProject * project);
 };
 
 #endif
