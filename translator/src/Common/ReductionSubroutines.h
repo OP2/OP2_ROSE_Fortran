@@ -1,14 +1,10 @@
-/*
- * Written by Adam Betts and Carlo Bertolli
- */
-
 #pragma once
 #ifndef REDUCTION_SUBROUTINES_H
 #define REDUCTION_SUBROUTINES_H
 
-#include <rose.h>
 #include <Reduction.h>
-#include <Debug.h>
+#include <Exceptions.h>
+#include <rose.h>
 
 template <typename TSubroutineHeader>
   class ReductionSubroutines
@@ -41,8 +37,8 @@ template <typename TSubroutineHeader>
           }
         }
 
-        Debug::getInstance ()->errorMessage (
-            "Unable to find reduction subroutine for reduction", __FILE__, __LINE__);
+        throw Exceptions::CodeGeneration::UnknownSubroutineException (
+            "Unable to find reduction subroutine for reduction");
       }
 
       void

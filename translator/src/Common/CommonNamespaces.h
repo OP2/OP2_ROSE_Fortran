@@ -323,10 +323,10 @@ namespace OP2
     getPlanReturnVariableDeclarationName (std::string const & suffix);
 
     std::string
-    getAutosharedDeclarationName (SgType * type, unsigned int size);
+    getCUDASharedMemoryDeclarationName (SgType * type, unsigned int size);
 
     std::string
-    getAutosharedOffsetDeclarationName (SgType * type, unsigned int size);
+    getCUDASharedMemoryOffsetDeclarationName (SgType * type, unsigned int size);
 
     std::string
     getReductionArrayHostName (unsigned int OP_DAT_ArgumentGroup,

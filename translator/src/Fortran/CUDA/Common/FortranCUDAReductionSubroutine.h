@@ -1,10 +1,3 @@
-/*
- * Written by Carlo Bertolli and Adam Betts
- *
- * This class generates code implementing reduction of OP_GBL variables marked
- * with OP_INC, OP_MAX or OP_MIN access
- */
-
 #pragma once
 #ifndef FORTRAN_CUDA_REDUCTION_SUBROUTINE_H
 #define FORTRAN_CUDA_REDUCTION_SUBROUTINE_H
@@ -60,9 +53,8 @@ class FortranCUDAReductionSubroutine: public Subroutine <
 
   public:
 
-    FortranCUDAReductionSubroutine (
-        std::string const & subroutineAndVariableName,
-        SgScopeStatement * moduleScope, Reduction * reduction);
+    FortranCUDAReductionSubroutine (SgScopeStatement * moduleScope,
+        Reduction * reduction);
 };
 
 #endif

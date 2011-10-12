@@ -1,10 +1,3 @@
-/*
- * Written by Adam Betts and Carlo Bertolli
- *
- * Debug functionality provided by singleton pattern as we should only ever
- * create a single Debug class
- */
-
 #pragma once
 #ifndef DEBUG_H
 #define DEBUG_H
@@ -90,23 +83,6 @@ class Debug
     void
     debugMessage (std::string const & message, int const debugLevel,
         std::string const & filePath, int const lineNumber) const;
-
-    /*
-     * ======================================================
-     * Print this message then exit
-     * ======================================================
-     */
-    void
-    errorMessage (std::string const & message, std::string const & filePath,
-        int const lineNumber) const;
-
-    /*
-     * ======================================================
-     * Print a "HERE i" message
-     * ======================================================
-     */
-    void
-    hereMessage (unsigned int i) const;
 };
 
 #endif

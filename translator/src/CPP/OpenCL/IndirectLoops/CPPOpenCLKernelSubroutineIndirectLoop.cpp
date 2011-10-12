@@ -669,7 +669,7 @@ CPPOpenCLKernelSubroutineIndirectLoop::createInitialiseLocalVariablesStatements 
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
     string const autosharedVariableName =
-        OP2::VariableNames::getAutosharedDeclarationName (
+        OP2::VariableNames::getCUDASharedMemoryDeclarationName (
             parallelLoop->getOpDatBaseType (i),
             parallelLoop->getSizeOfOpDat (i));
 

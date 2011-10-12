@@ -2,13 +2,7 @@
 #include <FortranTypesBuilder.h>
 #include <CommonNamespaces.h>
 #include <RoseHelper.h>
-#include <Debug.h>
-
-/*
- * ======================================================
- * Private functions
- * ======================================================
- */
+#include <Exceptions.h>
 
 void
 FortranStatementsAndExpressionsBuilder::setFortranAttributes (
@@ -18,7 +12,7 @@ FortranStatementsAndExpressionsBuilder::setFortranAttributes (
   /*
    * ======================================================
    * The access modifier to the variable declaration is
-   * always undefined
+   * always undefined (not private, public, protected)
    * ======================================================
    */
 
@@ -80,18 +74,12 @@ FortranStatementsAndExpressionsBuilder::setFortranAttributes (
 
       default:
       {
-        Debug::getInstance ()->errorMessage ("Unhandled Fortran attribute",
-            __FILE__, __LINE__);
+        throw Exceptions::CodeGeneration::FortranVariableAttributeException (
+            "Unhandled Fortran attribute");
       }
     }
   }
 }
-
-/*
- * ======================================================
- * Public functions
- * ======================================================
- */
 
 SgFortranDo *
 FortranStatementsAndExpressionsBuilder::buildFortranDoStatement (

@@ -7,6 +7,7 @@
 #include <RoseHelper.h>
 #include <CommonNamespaces.h>
 #include <Debug.h>
+#include <Exceptions.h>
 #include <CUDA.h>
 
 SgStatement *
@@ -183,9 +184,8 @@ FortranCUDAHostSubroutineDirectLoop::createCUDAKernelInitialisationStatements ()
 
   if (sharedOpDatMemorySize == 0 && sharedReductionMemorySize == 0)
   {
-    Debug::getInstance ()->errorMessage (
-        "The shared memory size will be set to zero during kernel launch",
-        __FILE__, __LINE__);
+    throw Exceptions::CUDA::SharedMemorySizeException (
+        "The shared memory size will be set to zero during kernel launch");
   }
   else
   {

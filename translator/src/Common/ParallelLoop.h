@@ -1,10 +1,3 @@
-/*
- * Written by Adam Betts and Carlo Bertolli
- *
- * This class models an OP_PAR_LOOP call discovered in the
- * user-supplied code
- */
-
 #pragma once
 #ifndef PARALLEL_LOOP_H
 #define PARALLEL_LOOP_H

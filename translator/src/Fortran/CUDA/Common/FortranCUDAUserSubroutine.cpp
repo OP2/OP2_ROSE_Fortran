@@ -4,6 +4,7 @@
 #include <FortranStatementsAndExpressionsBuilder.h>
 #include <FortranTypesBuilder.h>
 #include <Debug.h>
+#include <Exceptions.h>
 #include <boost/algorithm/string/predicate.hpp>
 #include <algorithm>
 
@@ -77,8 +78,9 @@ FortranCUDAUserSubroutine::findOriginalSubroutine ()
 
   if (originalSubroutine == NULL)
   {
-    Debug::getInstance ()->errorMessage ("Unable to find user kernel '"
-        + parallelLoop->getUserSubroutineName () + "'", __FILE__, __LINE__);
+    throw Exceptions::CodeGeneration::UnknownSubroutineException (
+        "Unable to find user kernel '" + parallelLoop->getUserSubroutineName ()
+            + "'");
   }
 }
 

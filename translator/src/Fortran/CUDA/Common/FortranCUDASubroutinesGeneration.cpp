@@ -16,6 +16,7 @@
 #include <OP2Definitions.h>
 #include <RoseHelper.h>
 #include <Reduction.h>
+#include <Exceptions.h>
 #include <boost/algorithm/string.hpp>
 
 void
@@ -60,12 +61,6 @@ FortranCUDASubroutinesGeneration::createConstantDeclarations ()
 
       removeStatement (originalDeclaration);
     }
-    else
-    {
-      Debug::getInstance ()->errorMessage (
-          "Multiple variables in original declaration. Currently not supported",
-          __FILE__, __LINE__);
-    }
   }
 }
 
@@ -97,8 +92,7 @@ FortranCUDASubroutinesGeneration::createReductionSubroutines ()
       != reductionsNeeded.end (); ++it)
   {
     FortranCUDAReductionSubroutine * subroutine =
-        new FortranCUDAReductionSubroutine ((*it)->getSubroutineName (),
-            moduleScope, *it);
+        new FortranCUDAReductionSubroutine (moduleScope, *it);
 
     reductionSubroutines->addSubroutine (*it,
         subroutine->getSubroutineHeaderStatement ());

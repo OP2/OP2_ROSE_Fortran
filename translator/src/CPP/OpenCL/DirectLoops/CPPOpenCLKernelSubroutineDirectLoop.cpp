@@ -434,7 +434,7 @@ CPPOpenCLKernelSubroutineDirectLoop::createAutoSharedDisplacementInitialisationS
     if (parallelLoop->isDuplicateOpDat (i) == false)
     {
       string const autosharedVariableName =
-          OP2::VariableNames::getAutosharedDeclarationName (
+          OP2::VariableNames::getCUDASharedMemoryDeclarationName (
               parallelLoop->getOpDatBaseType (i), parallelLoop->getSizeOfOpDat (
                   i));
 

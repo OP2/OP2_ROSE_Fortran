@@ -113,27 +113,3 @@ Debug::debugMessage (std::string const & message, int const debugLevel,
     cout << debugPrefix + message + "." << endl;
   }
 }
-
-void
-Debug::errorMessage (std::string const & message, std::string const & filePath,
-    int const lineNumber) const
-{
-  using boost::lexical_cast;
-  using std::cerr;
-  using std::endl;
-  using std::string;
-
-  cerr << "[" + debugInstance->getFileName (filePath) + ":" + lexical_cast <
-      string> (lineNumber) + "] " + message + "." << endl;
-
-  exit (1);
-}
-
-void
-Debug::hereMessage (unsigned int i) const
-{
-  using boost::lexical_cast;
-  using std::string;
-
-  std::cout << "HERE " + lexical_cast <string> (i) << std::endl;
-}

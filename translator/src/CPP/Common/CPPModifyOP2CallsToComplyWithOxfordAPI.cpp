@@ -2,13 +2,8 @@
 #include <CPPProgramDeclarationsAndDefinitions.h>
 #include <CPPOP2Definitions.h>
 #include <Debug.h>
+#include <Exceptions.h>
 #include <CommonNamespaces.h>
-
-/*
- * ======================================================
- * Private functions
- * ======================================================
- */
 
 void
 CPPModifyOP2CallsToComplyWithOxfordAPI::patchOpArgGblCall (
@@ -176,8 +171,8 @@ CPPModifyOP2CallsToComplyWithOxfordAPI::patchOpArgGblCall (
   }
   else
   {
-    Debug::getInstance ()->errorMessage ("Cannot ascertain type of OP_CONST '"
-        + opConstVariableName + "'", __FILE__, __LINE__);
+    throw Exceptions::ParallelLoop::UnsupportedBaseTypeException (
+        "Cannot ascertain type of OP_CONST '" + opConstVariableName + "'");
   }
 }
 
@@ -258,9 +253,8 @@ CPPModifyOP2CallsToComplyWithOxfordAPI::patchOpArgDatCall (
   }
   else
   {
-    Debug::getInstance ()->errorMessage (
-        "Cannot ascertain base type of OP_DAT '" + opDatVariableName + "'",
-        __FILE__, __LINE__);
+    throw Exceptions::ParallelLoop::UnsupportedBaseTypeException (
+        "Cannot ascertain base type of OP_DAT '" + opDatVariableName + "'");
   }
 }
 
@@ -325,8 +319,8 @@ CPPModifyOP2CallsToComplyWithOxfordAPI::patchOpParLoopCall (
       }
       else
       {
-        Debug::getInstance ()->errorMessage ("Unknown function call '"
-            + functionCallName + "' in OP_PAR_LOOP", __FILE__, __LINE__);
+        throw Exceptions::CodeGeneration::UnknownSubroutineException (
+            "Unknown function call '" + functionCallName + "' in OP_PAR_LOOP");
       }
     }
   }
@@ -394,9 +388,8 @@ CPPModifyOP2CallsToComplyWithOxfordAPI::patchOpDeclareConstCall (
   }
   else
   {
-    Debug::getInstance ()->errorMessage (
-        "Cannot ascertain base type of OP_CONST '" + variableName + "'",
-        __FILE__, __LINE__);
+    throw Exceptions::ParallelLoop::UnsupportedBaseTypeException (
+        "Cannot ascertain base type of OP_CONST '" + variableName + "'");
   }
 }
 
@@ -461,8 +454,8 @@ CPPModifyOP2CallsToComplyWithOxfordAPI::patchOpDeclareDatCall (
   }
   else
   {
-    Debug::getInstance ()->errorMessage ("Cannot ascertain base type of data '"
-        + dataVariableName + "'", __FILE__, __LINE__);
+    throw Exceptions::ParallelLoop::UnsupportedBaseTypeException (
+        "Cannot ascertain base type of data '" + dataVariableName + "'");
   }
 
   /*
@@ -629,12 +622,6 @@ CPPModifyOP2CallsToComplyWithOxfordAPI::visit (SgNode * node)
     }
   }
 }
-
-/*
- * ======================================================
- * Public functions
- * ======================================================
- */
 
 CPPModifyOP2CallsToComplyWithOxfordAPI::CPPModifyOP2CallsToComplyWithOxfordAPI (
     SgProject * project, CPPProgramDeclarationsAndDefinitions * declarations) :

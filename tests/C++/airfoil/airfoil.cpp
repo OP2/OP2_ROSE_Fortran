@@ -162,31 +162,31 @@ int main(int argc, char **argv){
 
   // declare sets, pointers, datasets and global constants
 
-  op_set nodes  = op_decl_set(nnode);
-  op_set edges  = op_decl_set(nedge);
-  op_set bedges = op_decl_set(nbedge);
-  op_set cells  = op_decl_set(ncell);
+  op_set nodes  = op_decl_set(nnode,  "nodes");
+  op_set edges  = op_decl_set(nedge,  "edges");
+  op_set bedges = op_decl_set(nbedge, "bedges");
+  op_set cells  = op_decl_set(ncell,  "cells");
 
-  op_map pedge   = op_decl_map(edges, nodes,2,edge);
-  op_map pecell  = op_decl_map(edges, cells,2,ecell);
-  op_map pbedge  = op_decl_map(bedges,nodes,2,bedge);
-  op_map pbecell = op_decl_map(bedges,cells,1,becell);
-  op_map pcell   = op_decl_map(cells, nodes,4,cell);
+  op_map pedge   = op_decl_map(edges, nodes,2,edge,  "pedge");
+  op_map pecell  = op_decl_map(edges, cells,2,ecell, "pecell");
+  op_map pbedge  = op_decl_map(bedges,nodes,2,bedge, "pbedge");
+  op_map pbecell = op_decl_map(bedges,cells,1,becell,"pbecell");
+  op_map pcell   = op_decl_map(cells, nodes,4,cell,  "pcell");
 
-  op_dat p_bound = op_decl_dat(bedges,1,bound);
-  op_dat p_x     = op_decl_dat(nodes ,2,x);
-  op_dat p_q     = op_decl_dat(cells ,4,q);
-  op_dat p_qold  = op_decl_dat(cells ,4,qold);
-  op_dat p_adt   = op_decl_dat(cells ,1,adt);
-  op_dat p_res   = op_decl_dat(cells ,4,res);
+  op_dat p_bound = op_decl_dat(bedges,1,"int"  ,bound,"p_bound");
+  op_dat p_x     = op_decl_dat(nodes ,2,"float",x    ,"p_x");
+  op_dat p_q     = op_decl_dat(cells ,4,"float",q    ,"p_q");
+  op_dat p_qold  = op_decl_dat(cells ,4,"float",qold ,"p_qold");
+  op_dat p_adt   = op_decl_dat(cells ,1,"float",adt  ,"p_adt");
+  op_dat p_res   = op_decl_dat(cells ,4,"float",res  ,"p_res");
 
-  op_decl_const(1,&gam  );
-  op_decl_const(1,&gm1  );
-  op_decl_const(1,&cfl  );
-  op_decl_const(1,&eps  );
-  op_decl_const(1,&mach );
-  op_decl_const(1,&alpha);
-  op_decl_const(4,qinf  );
+  op_decl_const(1,"float",&gam  );
+  op_decl_const(1,"float",&gm1  );
+  op_decl_const(1,"float",&cfl  );
+  op_decl_const(1,"float",&eps  );
+  op_decl_const(1,"float",&mach );
+  op_decl_const(1,"float",&alpha);
+  op_decl_const(4,"float",qinf  );
 
   op_diagnostic_output();
 
@@ -198,9 +198,9 @@ int main(int argc, char **argv){
 
 //  save old flow solution
 
-    op_par_loop(save_soln, cells,
-                op_arg_dat(p_q,   -1,OP_ID, OP_READ ),
-                op_arg_dat(p_qold,-1,OP_ID, OP_WRITE));
+    op_par_loop(save_soln,"save_soln", cells,
+                op_arg_dat(p_q,   -1,OP_ID, 4,"float",OP_READ ),
+                op_arg_dat(p_qold,-1,OP_ID, 4,"float",OP_WRITE));
 
 //  predictor/corrector update loop
 
@@ -208,44 +208,44 @@ int main(int argc, char **argv){
 
 //    calculate area/timstep
 
-      op_par_loop(adt_calc,cells,
-                  op_arg_dat(p_x,   0,pcell, OP_READ ),
-                  op_arg_dat(p_x,   1,pcell, OP_READ ),
-                  op_arg_dat(p_x,   2,pcell, OP_READ ),
-                  op_arg_dat(p_x,   3,pcell, OP_READ ),
-                  op_arg_dat(p_q,  -1,OP_ID, OP_READ ),
-                  op_arg_dat(p_adt,-1,OP_ID, OP_WRITE));
+      op_par_loop(adt_calc,"adt_calc",cells,
+                  op_arg_dat(p_x,   0,pcell, 2,"float",OP_READ ),
+                  op_arg_dat(p_x,   1,pcell, 2,"float",OP_READ ),
+                  op_arg_dat(p_x,   2,pcell, 2,"float",OP_READ ),
+                  op_arg_dat(p_x,   3,pcell, 2,"float",OP_READ ),
+                  op_arg_dat(p_q,  -1,OP_ID, 4,"float",OP_READ ),
+                  op_arg_dat(p_adt,-1,OP_ID, 1,"float",OP_WRITE));
 
 //    calculate flux residual
 
-      op_par_loop(res_calc,edges,
-                  op_arg_dat(p_x,    0,pedge, OP_READ),
-                  op_arg_dat(p_x,    1,pedge, OP_READ),
-                  op_arg_dat(p_q,    0,pecell,OP_READ),
-                  op_arg_dat(p_q,    1,pecell,OP_READ),
-                  op_arg_dat(p_adt,  0,pecell,OP_READ),
-                  op_arg_dat(p_adt,  1,pecell,OP_READ),
-                  op_arg_dat(p_res,  0,pecell,OP_INC ),
-                  op_arg_dat(p_res,  1,pecell,OP_INC ));
+      op_par_loop(res_calc,"res_calc",edges,
+                  op_arg_dat(p_x,    0,pedge, 2,"float",OP_READ),
+                  op_arg_dat(p_x,    1,pedge, 2,"float",OP_READ),
+                  op_arg_dat(p_q,    0,pecell,4,"float",OP_READ),
+                  op_arg_dat(p_q,    1,pecell,4,"float",OP_READ),
+                  op_arg_dat(p_adt,  0,pecell,1,"float",OP_READ),
+                  op_arg_dat(p_adt,  1,pecell,1,"float",OP_READ),
+                  op_arg_dat(p_res,  0,pecell,4,"float",OP_INC ),
+                  op_arg_dat(p_res,  1,pecell,4,"float",OP_INC ));
 
-      op_par_loop(bres_calc,bedges,
-                  op_arg_dat(p_x,     0,pbedge, OP_READ),
-                  op_arg_dat(p_x,     1,pbedge, OP_READ),
-                  op_arg_dat(p_q,     0,pbecell,OP_READ),
-                  op_arg_dat(p_adt,   0,pbecell,OP_READ),
-                  op_arg_dat(p_res,   0,pbecell,OP_INC ),
-                  op_arg_dat(p_bound,-1,OP_ID  ,OP_READ));
+      op_par_loop(bres_calc,"bres_calc",bedges,
+                  op_arg_dat(p_x,     0,pbedge, 2,"float",OP_READ),
+                  op_arg_dat(p_x,     1,pbedge, 2,"float",OP_READ),
+                  op_arg_dat(p_q,     0,pbecell,4,"float",OP_READ),
+                  op_arg_dat(p_adt,   0,pbecell,1,"float",OP_READ),
+                  op_arg_dat(p_res,   0,pbecell,4,"float",OP_INC ),
+                  op_arg_dat(p_bound,-1,OP_ID  ,1,"int",  OP_READ));
 
 //    update flow field
 
       rms = 0.0;
 
-      op_par_loop(update,cells,
-                  op_arg_dat(p_qold,-1,OP_ID, OP_READ ),
-                  op_arg_dat(p_q,   -1,OP_ID, OP_WRITE),
-                  op_arg_dat(p_res, -1,OP_ID, OP_RW   ),
-                  op_arg_dat(p_adt, -1,OP_ID, OP_READ ),
-                  op_arg_gbl(&rms,OP_INC));
+      op_par_loop(update,"update",cells,
+                  op_arg_dat(p_qold,-1,OP_ID, 4,"float",OP_READ ),
+                  op_arg_dat(p_q,   -1,OP_ID, 4,"float",OP_WRITE),
+                  op_arg_dat(p_res, -1,OP_ID, 4,"float",OP_RW   ),
+                  op_arg_dat(p_adt, -1,OP_ID, 1,"float",OP_READ ),
+                  op_arg_gbl(&rms,1,"float",OP_INC));
     }
 
 //  print iteration history

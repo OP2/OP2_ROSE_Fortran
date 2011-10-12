@@ -488,8 +488,9 @@ FortranCUDAReductionSubroutine::createLocalVariableDeclarations ()
    * ======================================================
    */
 
-  autosharedVariableName = OP2::VariableNames::getAutosharedDeclarationName (
-      reduction->getBaseType (), reduction->getVariableSize ());
+  autosharedVariableName
+      = OP2::VariableNames::getCUDASharedMemoryDeclarationName (
+          reduction->getBaseType (), reduction->getVariableSize ());
 
   SgArrayType * arrayType = FortranTypesBuilder::getArray_RankOne (
       reduction->getBaseType (), 0, new SgAsteriskShapeExp (
@@ -581,16 +582,9 @@ FortranCUDAReductionSubroutine::createFormalParameterDeclarations ()
           subroutineScope, formalParameters, 1, VALUE));
 }
 
-/*
- * ======================================================
- * Public functions
- * ======================================================
- */
-
 FortranCUDAReductionSubroutine::FortranCUDAReductionSubroutine (
-    std::string const & subroutineAndVariableName,
     SgScopeStatement * moduleScope, Reduction * reduction) :
-  Subroutine <SgProcedureHeaderStatement> (subroutineAndVariableName),
+  Subroutine <SgProcedureHeaderStatement> (reduction->getSubroutineName ()),
       reduction (reduction)
 {
   using SageBuilder::buildProcedureHeaderStatement;

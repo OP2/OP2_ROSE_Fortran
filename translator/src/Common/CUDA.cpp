@@ -1,7 +1,9 @@
 #include <CUDA.h>
 #include <FortranTypesBuilder.h>
 #include <Debug.h>
+#include <Exceptions.h>
 #include <rose.h>
+#include <boost/lexical_cast.hpp>
 
 namespace
 {
@@ -13,6 +15,7 @@ namespace
 SgDotExp *
 CUDA::getThreadId (THREAD_BLOCK_DIMENSION dimension, SgScopeStatement * scope)
 {
+  using boost::lexical_cast;
   using SageBuilder::buildOpaqueVarRefExp;
   using SageBuilder::buildDotExp;
   using std::string;
@@ -41,8 +44,9 @@ CUDA::getThreadId (THREAD_BLOCK_DIMENSION dimension, SgScopeStatement * scope)
 
     default:
     {
-      Debug::getInstance ()->errorMessage ("Unknown dimension", __FILE__,
-          __LINE__);
+      throw Exceptions::CUDA::ThreadBlockDimensionException (
+          "Unknown thread block dimension '"
+              + lexical_cast <string> (dimension) + "'");
     }
   }
 }
@@ -50,6 +54,7 @@ CUDA::getThreadId (THREAD_BLOCK_DIMENSION dimension, SgScopeStatement * scope)
 SgDotExp *
 CUDA::getBlockId (GRID_DIMENSION dimension, SgScopeStatement * scope)
 {
+  using boost::lexical_cast;
   using SageBuilder::buildOpaqueVarRefExp;
   using SageBuilder::buildDotExp;
   using std::string;
@@ -72,8 +77,9 @@ CUDA::getBlockId (GRID_DIMENSION dimension, SgScopeStatement * scope)
 
     default:
     {
-      Debug::getInstance ()->errorMessage ("Unknown dimension", __FILE__,
-          __LINE__);
+
+      throw Exceptions::CUDA::GridDimensionException (
+          "Unknown grid dimension '" + lexical_cast <string> (dimension) + "'");
     }
   }
 }
@@ -82,6 +88,7 @@ SgDotExp *
 CUDA::getThreadBlockDimension (THREAD_BLOCK_DIMENSION dimension,
     SgScopeStatement * scope)
 {
+  using boost::lexical_cast;
   using SageBuilder::buildOpaqueVarRefExp;
   using SageBuilder::buildDotExp;
   using std::string;
@@ -110,8 +117,9 @@ CUDA::getThreadBlockDimension (THREAD_BLOCK_DIMENSION dimension,
 
     default:
     {
-      Debug::getInstance ()->errorMessage ("Unknown dimension", __FILE__,
-          __LINE__);
+      throw Exceptions::CUDA::ThreadBlockDimensionException (
+          "Unknown thread block dimension '"
+              + lexical_cast <string> (dimension) + "'");
     }
   }
 }
@@ -119,6 +127,7 @@ CUDA::getThreadBlockDimension (THREAD_BLOCK_DIMENSION dimension,
 SgDotExp *
 CUDA::getGridDimension (GRID_DIMENSION dimension, SgScopeStatement * scope)
 {
+  using boost::lexical_cast;
   using SageBuilder::buildOpaqueVarRefExp;
   using SageBuilder::buildDotExp;
   using std::string;
@@ -141,8 +150,9 @@ CUDA::getGridDimension (GRID_DIMENSION dimension, SgScopeStatement * scope)
 
     default:
     {
-      Debug::getInstance ()->errorMessage ("Unknown dimension", __FILE__,
-          __LINE__);
+      throw Exceptions::CUDA::GridDimensionException (
+          "Unknown thread block dimension '"
+              + lexical_cast <string> (dimension) + "'");
     }
   }
 }

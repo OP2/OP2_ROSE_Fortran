@@ -1,14 +1,12 @@
 /*
- * Written by Adam Betts and Carlo Bertolli
- *
  * This class models the engine which controls subroutine
  * generation. It has 2 template parameters:
  *
  * 1) TDeclarations: the declarations found in the program
  * under analysis which are of interest to our compiler
  *
- * 2) THostSubroutine: the host subroutine for a particular
- * language
+ * 2) THostSubroutine: the type of the header statement for
+ * a subroutine in the target language (e.g. C++, Fortran)
  */
 
 #pragma once

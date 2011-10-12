@@ -1,5 +1,5 @@
 #include <ScopedVariableDeclarations.h>
-#include <Debug.h>
+#include <Exceptions.h>
 #include <rose.h>
 
 bool
@@ -13,8 +13,8 @@ ScopedVariableDeclarations::get (std::string const & variableName)
 {
   if (theDeclarations.count (variableName) == 0)
   {
-    Debug::getInstance ()->errorMessage ("Unable to find '" + variableName
-        + "' in variable declarations", __FILE__, __LINE__);
+    Exceptions::CodeGeneration::UnknownVariableException ("Unable to find '"
+        + variableName + "' in variable declarations");
   }
 
   return theDeclarations[variableName];

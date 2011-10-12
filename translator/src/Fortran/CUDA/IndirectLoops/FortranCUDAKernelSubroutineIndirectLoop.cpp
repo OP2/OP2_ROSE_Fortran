@@ -67,7 +67,7 @@ FortranCUDAKernelSubroutineIndirectLoop::createUserSubroutineCallStatement ()
             __FILE__, __LINE__);
 
         string const autosharedVariableName =
-            OP2::VariableNames::getAutosharedDeclarationName (
+            OP2::VariableNames::getCUDASharedMemoryDeclarationName (
                 parallelLoop->getOpDatBaseType (i),
                 parallelLoop->getSizeOfOpDat (i));
 
@@ -105,7 +105,7 @@ FortranCUDAKernelSubroutineIndirectLoop::createUserSubroutineCallStatement ()
             Debug::OUTER_LOOP_LEVEL, __FILE__, __LINE__);
 
         string const autosharedVariableName =
-            OP2::VariableNames::getAutosharedDeclarationName (
+            OP2::VariableNames::getCUDASharedMemoryDeclarationName (
                 parallelLoop->getOpDatBaseType (i),
                 parallelLoop->getSizeOfOpDat (i));
 
@@ -235,7 +235,7 @@ FortranCUDAKernelSubroutineIndirectLoop::createPointeredIncrementsOrWritesStatem
           || parallelLoop->isIncremented (i))
       {
         string const autosharedVariableName =
-            OP2::VariableNames::getAutosharedDeclarationName (
+            OP2::VariableNames::getCUDASharedMemoryDeclarationName (
                 parallelLoop->getOpDatBaseType (i),
                 parallelLoop->getSizeOfOpDat (i));
         /*
@@ -422,7 +422,7 @@ FortranCUDAKernelSubroutineIndirectLoop::createInnerExecutionLoopStatements (
     if (parallelLoop->isIndirect (i) && parallelLoop->isIncremented (i))
     {
       string const autosharedVariableName =
-          OP2::VariableNames::getAutosharedDeclarationName (
+          OP2::VariableNames::getCUDASharedMemoryDeclarationName (
               parallelLoop->getOpDatBaseType (i), parallelLoop->getSizeOfOpDat (
                   i));
 
@@ -748,7 +748,7 @@ FortranCUDAKernelSubroutineIndirectLoop::createAutoSharedWhileLoopStatements ()
       if (parallelLoop->isIndirect (i))
       {
         string const autosharedVariableName =
-            OP2::VariableNames::getAutosharedDeclarationName (
+            OP2::VariableNames::getCUDASharedMemoryDeclarationName (
                 parallelLoop->getOpDatBaseType (i),
                 parallelLoop->getSizeOfOpDat (i));
 

@@ -1,5 +1,6 @@
 #include <Reduction.h>
 #include <Debug.h>
+#include <Exceptions.h>
 #include <rose.h>
 #include <boost/lexical_cast.hpp>
 
@@ -33,9 +34,8 @@ Reduction::getSubroutineName () const
   }
   else
   {
-    Debug::getInstance ()->errorMessage (
-        "Error: base type of reduction variable is not supported", __FILE__,
-        __LINE__);
+    Exceptions::ParallelLoop::UnsupportedBaseTypeException (
+        "Base type of reduction variable is not supported");
   }
 
   name += lexical_cast <string> (variableSize);
@@ -76,8 +76,7 @@ Reduction::isEquivalent (Reduction * reduction)
   return reduction->hashKey () == hashKey ();
 }
 
-Reduction::
-Reduction (SgType * baseType, unsigned int variableSize) :
-baseType (baseType), variableSize (variableSize)
+Reduction::Reduction (SgType * baseType, unsigned int variableSize) :
+  baseType (baseType), variableSize (variableSize)
 {
 }

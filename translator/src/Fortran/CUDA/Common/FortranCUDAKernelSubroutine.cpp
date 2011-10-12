@@ -12,12 +12,6 @@
 #include <CommonNamespaces.h>
 #include <CUDA.h>
 
-/*
- * ======================================================
- * Protected functions
- * ======================================================
- */
-
 SgExpression *
 FortranCUDAKernelSubroutine::createUserKernelOpGlobalActualParameterExpression (
     unsigned int OP_DAT_ArgumentGroup)
@@ -260,11 +254,8 @@ FortranCUDAKernelSubroutine::createReductionEpilogueStatements ()
       {
         reductionType = buildIntVal (MINIMUM);
       }
-      else
-      {
-        Debug::getInstance ()->errorMessage ("Unhandled type of reduction",
-            __FILE__, __LINE__);
-      }
+
+      ROSE_ASSERT (reductionType != NULL);
 
       SgExprListExp * actualParameters = buildExprListExp (
           parameterExpression1, parameterExpression2, buildVarRefExp (
@@ -351,7 +342,7 @@ FortranCUDAKernelSubroutine::createCUDASharedVariableDeclarations ()
       if (parallelLoop->isGlobal (i) == false)
       {
         string const autosharedVariableName =
-            OP2::VariableNames::getAutosharedDeclarationName (
+            OP2::VariableNames::getCUDASharedMemoryDeclarationName (
                 parallelLoop->getOpDatBaseType (i),
                 parallelLoop->getSizeOfOpDat (i));
 
@@ -377,7 +368,7 @@ FortranCUDAKernelSubroutine::createCUDASharedVariableDeclarations ()
           autosharedNames.push_back (autosharedVariableName);
 
           string const autosharedOffsetVariableName =
-              OP2::VariableNames::getAutosharedOffsetDeclarationName (
+              OP2::VariableNames::getCUDASharedMemoryOffsetDeclarationName (
                   parallelLoop->getOpDatBaseType (i),
                   parallelLoop->getSizeOfOpDat (i));
 

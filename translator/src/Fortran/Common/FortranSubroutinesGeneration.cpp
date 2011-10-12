@@ -12,12 +12,6 @@ namespace
   std::string const & moduleName = "GENERATED_MODULE";
 }
 
-/*
- * ======================================================
- * Private functions
- * ======================================================
- */
-
 void
 FortranSubroutinesGeneration::fixUseStatement (SgUseStatement * useStatement,
     std::string const & userSubroutineName)
@@ -119,8 +113,8 @@ FortranSubroutinesGeneration::patchCallsToParallelLoops ()
 
     if (lastDeclarationStatement == NULL)
     {
-      Debug::getInstance ()->errorMessage (
-          "Could not find declaration statements", __FILE__, __LINE__);
+      throw Exceptions::CodeGeneration::UnfoundStatementException (
+          "Could not find declaration statements");
     }
 
     /*
@@ -140,8 +134,8 @@ FortranSubroutinesGeneration::patchCallsToParallelLoops ()
 
     if (lastUseStatement == NULL)
     {
-      Debug::getInstance ()->errorMessage (
-          "Could not find last 'use' statement", __FILE__, __LINE__);
+      throw Exceptions::CodeGeneration::UnfoundStatementException (
+          "Could not find last 'use' statement");
     }
 
     if (find (dirtyFiles.begin (), dirtyFiles.end (),
@@ -297,9 +291,8 @@ FortranSubroutinesGeneration::createSourceFile ()
   }
   else
   {
-    Debug::getInstance ()->errorMessage (
-        "Could not create dummy Fortran file '" + inputFileName + "'",
-        __FILE__, __LINE__);
+    throw Exceptions::CodeGeneration::FileCreationException (
+        "Could not create dummy Fortran file '" + inputFileName + "'");
   }
 
   /*

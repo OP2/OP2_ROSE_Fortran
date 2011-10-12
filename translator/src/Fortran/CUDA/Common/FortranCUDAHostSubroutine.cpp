@@ -11,12 +11,6 @@
 #include <CommonNamespaces.h>
 #include <CUDA.h>
 
-/*
- * ======================================================
- * Protected functions
- * ======================================================
- */
-
 void
 FortranCUDAHostSubroutine::createReductionPrologueStatements ()
 {
@@ -187,11 +181,8 @@ FortranCUDAHostSubroutine::createReductionEpilogueStatements ()
           reductionComputationExpression = buildFunctionCallExp (
               maxFunctionSymbol, actualParameters);
         }
-        else
-        {
-          Debug::getInstance ()->errorMessage ("Unknown reduction operation",
-              __FILE__, __LINE__);
-        }
+
+        ROSE_ASSERT (reductionComputationExpression != NULL);
 
         SgExprStatement * assignmentStatement3 = buildAssignStatement (
             buildVarRefExp (variableDeclarations->get (

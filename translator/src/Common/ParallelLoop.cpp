@@ -2,6 +2,7 @@
 #include <OP2Definitions.h>
 #include <Reduction.h>
 #include <Debug.h>
+#include <Exceptions.h>
 #include <rose.h>
 #include <boost/lexical_cast.hpp>
 
@@ -37,19 +38,17 @@ ParallelLoop::checkArguments ()
     {
       if (OpDatAccessDescriptors[i] == RW_ACCESS)
       {
-        Debug::getInstance ()->errorMessage (
+        throw Exceptions::ParallelLoop::OpGblReadWriteException (
             "The READ/WRITE access descriptor of OP_GBL (in argument group "
                 + lexical_cast <string> (i)
-                + ") is not supported as its semantics are undefined",
-            __FILE__, __LINE__);
+                + ") is not supported as its semantics are undefined");
       }
       else if (OpDatAccessDescriptors[i] == WRITE_ACCESS)
       {
-        Debug::getInstance ()->errorMessage (
+        throw Exceptions::ParallelLoop::OpGblWriteException (
             "The WRITE access descriptor of OP_GBL (in argument group "
                 + lexical_cast <string> (i)
-                + ") is not supported as its semantics are undefined",
-            __FILE__, __LINE__);
+                + ") is not supported as its semantics are undefined");
       }
     }
   }

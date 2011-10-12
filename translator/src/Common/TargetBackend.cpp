@@ -1,5 +1,6 @@
 #include <TargetBackend.h>
 #include <Debug.h>
+#include <Exceptions.h>
 
 std::string
 TargetBackend::toString (BACKEND_VALUE backend)
@@ -23,8 +24,8 @@ TargetBackend::toString (BACKEND_VALUE backend)
 
     default:
     {
-      Debug::getInstance ()->errorMessage ("Unknown backend selected",
-          __FILE__, __LINE__);
+      throw Exceptions::CommandLine::BackendException (
+          "Unknown backend selected");
     }
   }
 }

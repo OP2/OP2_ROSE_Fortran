@@ -3,15 +3,10 @@
 #include <FortranParallelLoop.h>
 #include <CommonNamespaces.h>
 #include <Globals.h>
+#include <Exceptions.h>
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/filesystem.hpp>
-
-/*
- * ======================================================
- * Private functions
- * ======================================================
- */
 
 void
 FortranProgramDeclarationsAndDefinitions::handleOpGblDeclaration (
@@ -87,8 +82,8 @@ FortranProgramDeclarationsAndDefinitions::handleOpDatDeclaration (
 
     if (isSgArrayType (opDatDeclaration->getPrimitiveType ()) == NULL)
     {
-      Debug::getInstance ()->errorMessage ("OP_DAT '" + variableName
-          + "' is not an array", __FILE__, __LINE__);
+      Exceptions::ParallelLoop::UnsupportedBaseTypeException ("OP_DAT '"
+          + variableName + "' is not an array");
     }
   }
   else
@@ -156,9 +151,9 @@ FortranProgramDeclarationsAndDefinitions::setParallelLoopAccessDescriptor (
   }
   else
   {
-    Debug::getInstance ()->errorMessage ("Unknown access descriptor: '"
-        + accessValue + "' for OP_DAT argument #" + lexical_cast <string> (
-        OP_DAT_ArgumentGroup), __FILE__, __LINE__);
+    throw Exceptions::ParallelLoop::UnknownAccessException (
+        "Unknown access descriptor: '" + accessValue + "' for OP_DAT argument "
+            + lexical_cast <string> (OP_DAT_ArgumentGroup));
   }
 }
 
@@ -419,14 +414,6 @@ FortranProgramDeclarationsAndDefinitions::visit (SgNode * node)
           FortranOpDatDefinition * opDatDeclaration =
               new FortranOpDatDefinition (actualArguments);
 
-          if (isSgArrayType (opDatDeclaration->getPrimitiveType ()) == NULL)
-          {
-            Debug::getInstance ()->errorMessage ("OP_DAT variable '"
-                + opDatDeclaration->getVariableName ()
-                + "' is not an array type. Currently not supported.", __FILE__,
-                __LINE__);
-          }
-
           OpDatDefinitions[opDatDeclaration->getVariableName ()]
               = opDatDeclaration;
         }
@@ -548,12 +535,6 @@ FortranProgramDeclarationsAndDefinitions::visit (SgNode * node)
     }
   }
 }
-
-/*
- * ======================================================
- * Public functions
- * ======================================================
- */
 
 FortranProgramDeclarationsAndDefinitions::FortranProgramDeclarationsAndDefinitions (
     SgProject * project)

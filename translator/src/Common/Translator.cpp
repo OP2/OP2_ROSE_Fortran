@@ -4,6 +4,7 @@
 #include <TargetBackend.h>
 #include <Debug.h>
 #include <Globals.h>
+#include <Exceptions.h>
 #include <UDrawGraph.h>
 #include <FortranProgramDeclarationsAndDefinitions.h>
 #include <FortranCUDASubroutinesGeneration.h>
@@ -80,25 +81,22 @@ class OpenCLOption: public CommandLineOption
     }
 };
 
-void
+CPPSubroutinesGeneration *
 handleCPPProject (SgProject * project)
 {
-  CPPProgramDeclarationsAndDefinitions * declarations =
-      new CPPProgramDeclarationsAndDefinitions (project);
+  CPPSubroutinesGeneration * generator;
 
   switch (Globals::getInstance ()->getTargetBackend ())
   {
     case TargetBackend::CUDA:
     {
-      new CPPCUDASubroutinesGeneration (project, declarations);
+      Debug::getInstance ()->debugMessage ("CUDA code generation selected",
+          Debug::VERBOSE_LEVEL, __FILE__, __LINE__);
 
-      break;
-    }
+      CPPProgramDeclarationsAndDefinitions * declarations =
+          new CPPProgramDeclarationsAndDefinitions (project);
 
-    case TargetBackend::OPENMP:
-    {
-      Debug::getInstance ()->errorMessage (
-          "OpenMP code generation not yet supported in C++", __FILE__, __LINE__);
+      generator = new CPPCUDASubroutinesGeneration (project, declarations);
 
       break;
     }
@@ -108,19 +106,22 @@ handleCPPProject (SgProject * project)
       Debug::getInstance ()->debugMessage ("OpenCL code generation selected",
           Debug::VERBOSE_LEVEL, __FILE__, __LINE__);
 
-      new CPPOpenCLSubroutinesGeneration (project, declarations);
+      CPPProgramDeclarationsAndDefinitions * declarations =
+          new CPPProgramDeclarationsAndDefinitions (project);
+
+      generator = new CPPOpenCLSubroutinesGeneration (project, declarations);
 
       break;
     }
 
     default:
     {
-      Debug::getInstance ()->errorMessage ("Unknown backend selected",
-          __FILE__, __LINE__);
-
-      break;
+      throw Exceptions::CommandLine::BackendException (
+          "Unknown/unsupported backend selected");
     }
   }
+
+  return generator;
 }
 
 FortranSubroutinesGeneration *
@@ -157,24 +158,10 @@ handleFortranProject (SgProject * project)
       break;
     }
 
-    case TargetBackend::OPENCL:
-    {
-      Debug::getInstance ()->errorMessage (
-          "OpenCL code generation not yet supported in Fortran", __FILE__,
-          __LINE__);
-
-      FortranProgramDeclarationsAndDefinitions * declarations =
-          new FortranProgramDeclarationsAndDefinitions (project);
-
-      break;
-    }
-
     default:
     {
-      Debug::getInstance ()->errorMessage ("Unknown backend selected",
-          __FILE__, __LINE__);
-
-      break;
+      throw Exceptions::CommandLine::BackendException (
+          "Unknown/unsupported backend selected");
     }
   }
 
@@ -188,6 +175,7 @@ unparseOriginalSourceFiles (SgProject * project,
   class TreeVisitor: public AstSimpleProcessing
   {
     private:
+
       FortranSubroutinesGeneration * generator;
 
     public:
@@ -242,6 +230,7 @@ checkBackendOption ()
     vector <TargetBackend::BACKEND_VALUE> values;
     values.push_back (TargetBackend::CUDA);
     values.push_back (TargetBackend::OPENMP);
+    values.push_back (TargetBackend::OPENCL);
 
     string backendsString;
 
@@ -257,9 +246,9 @@ checkBackendOption ()
       }
     }
 
-    Debug::getInstance ()->errorMessage (
+    Exceptions::CommandLine::BackendException (
         "You have not selected a target backend on the command-line. Supported backends are: "
-            + backendsString, __FILE__, __LINE__);
+            + backendsString);
   }
 }
 
@@ -297,11 +286,10 @@ processUserSelections (SgProject * project)
       if (Globals::getInstance ()->getTargetBackend ()
           != TargetBackend::UNKNOWN)
       {
-        Debug::getInstance ()->errorMessage (
+        throw Exceptions::CommandLine::MutuallyExclusiveException (
             "You have selected to generate code for " + toString (
                 Globals::getInstance ()->getTargetBackend ())
-                + " and replace all OP2 calls with the Oxford-compliant API. These options are mutually exclusive",
-            __FILE__, __LINE__);
+                + " and replace all OP2 calls with calls complying with the Oxford API. These options are mutually exclusive");
       }
 
       CPPProgramDeclarationsAndDefinitions * declarations =
@@ -315,9 +303,7 @@ processUserSelections (SgProject * project)
     {
       checkBackendOption ();
 
-      //handleCPPProject (project);
-
-      project->unparse ();
+      CPPSubroutinesGeneration * generator = handleCPPProject (project);
     }
   }
   else if (project->get_Fortran_only () == true)
@@ -333,9 +319,8 @@ processUserSelections (SgProject * project)
   }
   else
   {
-    Debug::getInstance ()->errorMessage (
-        "The translator does not supported the programming language of the given files",
-        __FILE__, __LINE__);
+    throw Exceptions::CommandLine::FrontendException (
+        "The translator does not supported the programming language of the given files");
   }
 }
 
@@ -365,7 +350,70 @@ main (int argc, char ** argv)
   Debug::getInstance ()->debugMessage ("Translation starting",
       Debug::VERBOSE_LEVEL, __FILE__, __LINE__);
 
-  processUserSelections (project);
+  try
+  {
+    processUserSelections (project);
+  }
+  catch (Exceptions::CUDA::GridDimensionException & e)
+  {
+
+  }
+  catch (Exceptions::CUDA::SharedVariableTypeException & e)
+  {
+
+  }
+  catch (Exceptions::CUDA::ThreadBlockDimensionException & e)
+  {
+
+  }
+  catch (Exceptions::CommandLine::BackendException & e)
+  {
+
+  }
+  catch (Exceptions::CommandLine::FrontendException & e)
+  {
+
+  }
+  catch (Exceptions::CommandLine::MutuallyExclusiveException & e)
+  {
+
+  }
+  catch (Exceptions::ParallelLoop::OpGblReadWriteException & e)
+  {
+
+  }
+  catch (Exceptions::ParallelLoop::OpGblWriteException & e)
+  {
+
+  }
+  catch (Exceptions::ParallelLoop::UnsupportedBaseTypeException & e)
+  {
+
+  }
+  catch (Exceptions::ParallelLoop::UnknownAccessException & e)
+  {
+
+  }
+  catch (Exceptions::CodeGeneration::FortranVariableAttributeException & e)
+  {
+
+  }
+  catch (Exceptions::CodeGeneration::UnknownVariableException & e)
+  {
+
+  }
+  catch (Exceptions::CodeGeneration::UnknownSubroutineException & e)
+  {
+
+  }
+  catch (Exceptions::CodeGeneration::UnfoundStatementException & e)
+  {
+
+  }
+  catch (Exceptions::CodeGeneration::FileCreationException & e)
+  {
+
+  }
 
   Debug::getInstance ()->debugMessage ("Translation completed",
       Debug::VERBOSE_LEVEL, __FILE__, __LINE__);

@@ -3,7 +3,7 @@
 #include <boost/crc.hpp>
 #include <FortranTypesBuilder.h>
 #include <rose.h>
-#include <Debug.h>
+#include <Exceptions.h>
 
 namespace
 {
@@ -231,7 +231,7 @@ OP2::VariableNames::getPlanReturnVariableDeclarationName (
 }
 
 std::string
-OP2::VariableNames::getAutosharedDeclarationName (SgType * type,
+OP2::VariableNames::getCUDASharedMemoryDeclarationName (SgType * type,
     unsigned int size)
 {
   using boost::lexical_cast;
@@ -251,15 +251,14 @@ OP2::VariableNames::getAutosharedDeclarationName (SgType * type,
     }
     default:
     {
-      Debug::getInstance ()->errorMessage (
-          "Unsupported type for autoshared variable: '" + type->class_name ()
-              + "'", __FILE__, __LINE__);
+      throw Exceptions::CUDA::SharedVariableTypeException (
+          "Unsupported type for autoshared variable: '" + type->class_name ());
     }
   }
 }
 
 std::string
-OP2::VariableNames::getAutosharedOffsetDeclarationName (SgType * type,
+OP2::VariableNames::getCUDASharedMemoryOffsetDeclarationName (SgType * type,
     unsigned int size)
 {
   using boost::lexical_cast;
@@ -273,15 +272,16 @@ OP2::VariableNames::getAutosharedOffsetDeclarationName (SgType * type,
     {
       return autosharedOffset + "Integer" + lexical_cast <string> (size);
     }
+
     case V_SgTypeFloat:
     {
       return autosharedOffset + "Float" + lexical_cast <string> (size);
     }
+
     default:
     {
-      Debug::getInstance ()->errorMessage (
-          "Unsupported type for autoshared variable: '" + type->class_name ()
-              + "'", __FILE__, __LINE__);
+      throw Exceptions::CUDA::SharedVariableTypeException (
+          "Unsupported type for autoshared variable: '" + type->class_name ());
     }
   }
 }
