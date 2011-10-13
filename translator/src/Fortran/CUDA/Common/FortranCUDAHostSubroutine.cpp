@@ -35,15 +35,6 @@ FortranCUDAHostSubroutine::createReductionPrologueStatements ()
   {
     if (parallelLoop->isReductionRequired (i))
     {
-      SgExprListExp * allocateParameters = buildExprListExp (
-          buildPntrArrRefExp (buildVarRefExp (
-              moduleDeclarations->getReductionArrayHostDeclaration (i)),
-              buildVarRefExp (variableDeclarations->get (
-                  OP2::VariableNames::getReductionCardinalityName (i)))));
-
-      FortranStatementsAndExpressionsBuilder::appendAllocateStatement (
-          allocateParameters, subroutineScope);
-
       SgMultiplyOp * multiplyExpression1 = buildMultiplyOp (buildVarRefExp (
           variableDeclarations->get (CUDA::blocksPerGrid)), buildIntVal (
           parallelLoop->getOpDatDimension (i)));
@@ -54,6 +45,15 @@ FortranCUDAHostSubroutine::createReductionPrologueStatements ()
           multiplyExpression1);
 
       appendStatement (assignmentStatement1, subroutineScope);
+
+      SgExprListExp * allocateParameters = buildExprListExp (
+          buildPntrArrRefExp (buildVarRefExp (
+              moduleDeclarations->getReductionArrayHostDeclaration (i)),
+              buildVarRefExp (variableDeclarations->get (
+                  OP2::VariableNames::getReductionCardinalityName (i)))));
+
+      FortranStatementsAndExpressionsBuilder::appendAllocateStatement (
+          allocateParameters, subroutineScope);
 
       SgPntrArrRefExp * arrayIndexExpression1 = buildPntrArrRefExp (
           buildVarRefExp (moduleDeclarations->getReductionArrayHostDeclaration (
