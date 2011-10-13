@@ -35,13 +35,22 @@ FortranCUDAHostSubroutine::createReductionPrologueStatements ()
   {
     if (parallelLoop->isReductionRequired (i))
     {
+      SgExprListExp * allocateParameters = buildExprListExp (buildVarRefExp (
+          moduleDeclarations->getReductionArrayHostDeclaration (i)),
+          buildVarRefExp (variableDeclarations->get (
+              OP2::VariableNames::getReductionCardinalityName (i))));
+
+      FortranStatementsAndExpressionsBuilder::appendAllocateStatement (
+          allocateParameters, subroutineScope);
+
       SgMultiplyOp * multiplyExpression1 = buildMultiplyOp (buildVarRefExp (
           variableDeclarations->get (CUDA::blocksPerGrid)), buildIntVal (
           parallelLoop->getOpDatDimension (i)));
 
       SgExprStatement * assignmentStatement1 = buildAssignStatement (
           buildVarRefExp (variableDeclarations->get (
-              OP2::VariableNames::reductionCardinality)), multiplyExpression1);
+              OP2::VariableNames::getReductionCardinalityName (i))),
+          multiplyExpression1);
 
       appendStatement (assignmentStatement1, subroutineScope);
 
@@ -72,8 +81,8 @@ FortranCUDAHostSubroutine::createReductionPrologueStatements ()
       SgFortranDo * loopStatement =
           FortranStatementsAndExpressionsBuilder::buildFortranDoStatement (
               loopInitialization, buildVarRefExp (variableDeclarations->get (
-                  OP2::VariableNames::reductionCardinality)), buildIntVal (1),
-              loopBody);
+                  OP2::VariableNames::getReductionCardinalityName (i))),
+              buildIntVal (1), loopBody);
 
       appendStatement (loopStatement, subroutineScope);
 
@@ -201,10 +210,19 @@ FortranCUDAHostSubroutine::createReductionEpilogueStatements ()
             FortranStatementsAndExpressionsBuilder::buildFortranDoStatement (
                 outerLoopInitialization, buildVarRefExp (
                     variableDeclarations->get (
-                        OP2::VariableNames::reductionCardinality)),
+                        OP2::VariableNames::getReductionCardinalityName (i))),
                 buildIntVal (1), outerLoopBody);
 
         appendStatement (outerLoopStatement, subroutineScope);
+
+        SgExprListExp * deallocateParameters = buildExprListExp (
+            buildVarRefExp (
+                moduleDeclarations->getReductionArrayHostDeclaration (i)),
+            buildVarRefExp (variableDeclarations->get (
+                OP2::VariableNames::getReductionCardinalityName (i))));
+
+        FortranStatementsAndExpressionsBuilder::appendDeallocateStatement (
+            deallocateParameters, subroutineScope);
       }
     }
   }
@@ -230,10 +248,19 @@ FortranCUDAHostSubroutine::createReductionLocalVariableDeclarations ()
           CommonVariableNames::iterationCounter2,
           FortranTypesBuilder::getFourByteInteger (), subroutineScope));
 
-  variableDeclarations->add (OP2::VariableNames::reductionCardinality,
-      FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
-          OP2::VariableNames::reductionCardinality,
-          FortranTypesBuilder::getFourByteInteger (), subroutineScope));
+  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
+  {
+    if (parallelLoop->isReductionRequired (i))
+    {
+      string const & variableName =
+          OP2::VariableNames::getReductionCardinalityName (i);
+
+      variableDeclarations->add (variableName,
+          FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
+              variableName, FortranTypesBuilder::getFourByteInteger (),
+              subroutineScope));
+    }
+  }
 }
 
 SgExpression *

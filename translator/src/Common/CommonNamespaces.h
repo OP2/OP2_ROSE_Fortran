@@ -68,7 +68,6 @@ namespace OP2
     std::string const nelems2 = "nelems2";
     std::string const opDatCardinalities = "opDatCardinalities";
     std::string const opDatDimensions = "opDatDimensions";
-    std::string const reductionCardinality = "reductionCardinality";
     std::string const reductionResult = "reductionResult";
     std::string const reductionSharedMemorySize = "reductionSharedMemorySize";
     std::string const set = "set";
@@ -141,7 +140,7 @@ namespace OP2
      * name of the user subroutine
      * ======================================================
      */
-    std::string
+    std::string const
     getUserSubroutineName ();
 
     /*
@@ -150,7 +149,7 @@ namespace OP2
      * OP_SET
      * ======================================================
      */
-    std::string
+    std::string const
     getOpSetName ();
 
     /*
@@ -159,7 +158,7 @@ namespace OP2
      * argument group
      * ======================================================
      */
-    std::string
+    std::string const
     getOpDatName (unsigned int OP_DAT_ArgumentGroup);
 
     /*
@@ -168,7 +167,7 @@ namespace OP2
      * argument group on the host
      * ======================================================
      */
-    std::string
+    std::string const
     getOpDatHostName (unsigned int OP_DAT_ArgumentGroup);
 
     /*
@@ -177,7 +176,7 @@ namespace OP2
      * OP_DAT argument group
      * ======================================================
      */
-    std::string
+    std::string const
     getOpDatSharedName (unsigned int OP_DAT_ArgumentGroup);
 
     /*
@@ -186,7 +185,7 @@ namespace OP2
      * OP_DAT argument group
      * ======================================================
      */
-    std::string
+    std::string const
     getOpDatLocalName (unsigned int OP_DAT_ArgumentGroup);
 
     /*
@@ -195,7 +194,7 @@ namespace OP2
      * OP_DAT argument group
      * ======================================================
      */
-    std::string
+    std::string const
     getOpDatGlobalName (unsigned int OP_DAT_ArgumentGroup);
 
     /*
@@ -204,7 +203,7 @@ namespace OP2
      * OP_DAT argument group
      * ======================================================
      */
-    std::string
+    std::string const
     getOpDatSharedName (unsigned int OP_DAT_ArgumentGroup);
 
     /*
@@ -213,7 +212,7 @@ namespace OP2
      * an OP_DAT in this OP_DAT argument group
      * ======================================================
      */
-    std::string
+    std::string const
     getOpDatCardinalityName (unsigned int OP_DAT_ArgumentGroup);
 
     /*
@@ -222,7 +221,7 @@ namespace OP2
      * in this OP_DAT argument group
      * ======================================================
      */
-    std::string
+    std::string const
     getOpDatDeviceName (unsigned int OP_DAT_ArgumentGroup);
 
     /*
@@ -231,7 +230,7 @@ namespace OP2
      * in this OP_DAT argument group
      * ======================================================
      */
-    std::string
+    std::string const
     getOpDatDimensionName (unsigned int OP_DAT_ArgumentGroup);
 
     /*
@@ -240,7 +239,7 @@ namespace OP2
      * OP_DAT argument group
      * ======================================================
      */
-    std::string
+    std::string const
     getOpIndirectionName (unsigned int OP_DAT_ArgumentGroup);
 
     /*
@@ -249,7 +248,7 @@ namespace OP2
      * argument group
      * ======================================================
      */
-    std::string
+    std::string const
     getOpMapName (unsigned int OP_DAT_ArgumentGroup);
 
     /*
@@ -258,7 +257,7 @@ namespace OP2
      * argument group
      * ======================================================
      */
-    std::string
+    std::string const
     getOpAccessName (unsigned int OP_DAT_ArgumentGroup);
 
     /*
@@ -267,7 +266,7 @@ namespace OP2
      * in this OP_DAT argument group
      * ======================================================
      */
-    std::string
+    std::string const
     getCToFortranVariableName (unsigned int OP_DAT_ArgumentGroup);
 
     /*
@@ -281,10 +280,10 @@ namespace OP2
      * function according to Mike Giles documentation
      * ======================================================
      */
-    std::string
+    std::string const
     getLocalToGlobalMappingName (unsigned int OP_DAT_ArgumentGroup);
 
-    std::string
+    std::string const
     getLocalToGlobalMappingSizeName (unsigned int OP_DAT_ArgumentGroup);
 
     /*
@@ -298,43 +297,46 @@ namespace OP2
      * according to Mike Giles documentation
      * ======================================================
      */
-    std::string
+    std::string const
     getGlobalToLocalMappingName (unsigned int OP_DAT_ArgumentGroup);
 
-    std::string
+    std::string const
     getGlobalToLocalMappingSizeName (unsigned int OP_DAT_ArgumentGroup);
 
-    std::string
+    std::string const
     getNumberOfBytesVariableName (unsigned int OP_DAT_ArgumentGroup);
 
-    std::string
+    std::string const
     getRoundUpVariableName (unsigned int OP_DAT_ArgumentGroup);
 
-    std::string
+    std::string const
     getIncrementAccessMapName (unsigned int OP_DAT_ArgumentGroup);
 
-    std::string
+    std::string const
     getOpIndirectionSharedName (unsigned int OP_DAT_ArgumentGroup);
 
-    std::string
+    std::string const
     getIndirectionArgumentSizeName (unsigned int OP_DAT_ArgumentGroup);
 
-    std::string
+    std::string const
     getPlanReturnVariableDeclarationName (std::string const & suffix);
 
-    std::string
+    std::string const
     getCUDASharedMemoryDeclarationName (SgType * type, unsigned int size);
 
-    std::string
+    std::string const
     getCUDASharedMemoryOffsetDeclarationName (SgType * type, unsigned int size);
 
-    std::string
+    std::string const
     getReductionArrayHostName (unsigned int OP_DAT_ArgumentGroup,
         std::string const & suffix);
 
-    std::string
+    std::string const
     getReductionArrayDeviceName (unsigned int OP_DAT_ArgumentGroup,
         std::string const & suffix);
+
+    std::string const
+    getReductionCardinalityName (unsigned int OP_DAT_ArgumentGroup);
   }
 }
 

@@ -1460,6 +1460,8 @@ FortranCUDAKernelSubroutineIndirectLoop::createStatements ()
 {
   createThreadZeroStatements ();
 
+  createInitialiseCUDAStageInVariablesStatements ();
+
   createInitialiseLocalVariablesStatements ();
 
   createAutoSharedWhileLoopStatements ();

@@ -12,12 +12,6 @@
 #include <CommonNamespaces.h>
 #include <CUDA.h>
 
-/*
- * ======================================================
- * Private functions
- * ======================================================
- */
-
 SgStatement *
 FortranCUDAKernelSubroutineDirectLoop::createUserSubroutineCallStatement ()
 {
@@ -710,6 +704,8 @@ FortranCUDAKernelSubroutineDirectLoop::createOpDatFormalParameterDeclarations ()
 void
 FortranCUDAKernelSubroutineDirectLoop::createStatements ()
 {
+  createInitialiseCUDAStageInVariablesStatements ();
+
   createThreadIDInitialisationStatement ();
 
   createInitialiseOffsetIntoCUDASharedVariableStatements ();
@@ -828,12 +824,6 @@ FortranCUDAKernelSubroutineDirectLoop::createFormalParameterDeclarations ()
           FortranTypesBuilder::getFourByteInteger (), subroutineScope,
           formalParameters, 1, VALUE));
 }
-
-/*
- * ======================================================
- * Public functions
- * ======================================================
- */
 
 FortranCUDAKernelSubroutineDirectLoop::FortranCUDAKernelSubroutineDirectLoop (
     SgScopeStatement * moduleScope, FortranCUDAUserSubroutine * userSubroutine,
