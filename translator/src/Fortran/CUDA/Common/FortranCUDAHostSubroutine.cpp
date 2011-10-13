@@ -35,10 +35,11 @@ FortranCUDAHostSubroutine::createReductionPrologueStatements ()
   {
     if (parallelLoop->isReductionRequired (i))
     {
-      SgExprListExp * allocateParameters = buildExprListExp (buildVarRefExp (
-          moduleDeclarations->getReductionArrayHostDeclaration (i)),
-          buildVarRefExp (variableDeclarations->get (
-              OP2::VariableNames::getReductionCardinalityName (i))));
+      SgExprListExp * allocateParameters = buildExprListExp (
+          buildPntrArrRefExp (buildVarRefExp (
+              moduleDeclarations->getReductionArrayHostDeclaration (i)),
+              buildVarRefExp (variableDeclarations->get (
+                  OP2::VariableNames::getReductionCardinalityName (i)))));
 
       FortranStatementsAndExpressionsBuilder::appendAllocateStatement (
           allocateParameters, subroutineScope);
@@ -216,10 +217,10 @@ FortranCUDAHostSubroutine::createReductionEpilogueStatements ()
         appendStatement (outerLoopStatement, subroutineScope);
 
         SgExprListExp * deallocateParameters = buildExprListExp (
-            buildVarRefExp (
+            buildPntrArrRefExp (buildVarRefExp (
                 moduleDeclarations->getReductionArrayHostDeclaration (i)),
-            buildVarRefExp (variableDeclarations->get (
-                OP2::VariableNames::getReductionCardinalityName (i))));
+                buildVarRefExp (variableDeclarations->get (
+                    OP2::VariableNames::getReductionCardinalityName (i)))));
 
         FortranStatementsAndExpressionsBuilder::appendDeallocateStatement (
             deallocateParameters, subroutineScope);
