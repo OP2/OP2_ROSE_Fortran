@@ -38,7 +38,7 @@ program Test3
                      & deviceData, -1, OP_ID,  OP_WRITE, &
                      & global,     -1, OP_GBL, OP_READ)
 
-  call op_fetch_data ()
+  call op_fetch_data (deviceData)
 
   print *, "After kernel execution"
   do i = 1, 4 * setCardinality
