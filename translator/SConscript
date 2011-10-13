@@ -1,4 +1,6 @@
 import os
+from multiprocessing import cpu_count
+from math import floor
 from os import environ
 
 # Make sure that these environment variables exist
@@ -54,6 +56,13 @@ env = Environment (CPPPATH=includeDirectories,
 # The target binary directory and name
 binDir = 'bin'
 target = 'translator'
+
+# Compile faster options
+if cpu_count() > 1:
+	env.SetOption('num_jobs', floor((cpu_count() * 3)/2))
+
+env.Decider('MD5-timestamp')
+env.SetOption('implicit_cache', 1)
 
 # Compile command with library dependencies and library paths
 
