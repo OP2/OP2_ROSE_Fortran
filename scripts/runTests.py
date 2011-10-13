@@ -99,7 +99,7 @@ def generateCUDAMakefile (generatedFiles, testNum):
 	   
 	# Makefile variables
 	CUDAMakefile.write("FC      = pgfortran\n")
-	CUDAMakefile.write("FC_OPT  = -Mcuda=cuda3.1 -fast -O2 -Mcuda=ptxinfo -Minform=inform\n")
+	CUDAMakefile.write("FC_OPT  = -Mcuda=cuda3.1 -fast -O2 -Mcuda=ptxinfo -Minform=inform -C -Mchkptr\n")
 	CUDAMakefile.write("OUT     = %s\n" % (executableName))
 	CUDAMakefile.write("%s = \n\n" % (op2Directory))
 
