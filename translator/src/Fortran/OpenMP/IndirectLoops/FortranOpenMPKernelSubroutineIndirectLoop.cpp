@@ -8,12 +8,6 @@
 #include <Plan.h>
 #include <OpenMP.h>
 
-/*
- * ======================================================
- * Private functions
- * ======================================================
- */
-
 SgStatement *
 FortranOpenMPKernelSubroutineIndirectLoop::createUserSubroutineCallStatement ()
 {

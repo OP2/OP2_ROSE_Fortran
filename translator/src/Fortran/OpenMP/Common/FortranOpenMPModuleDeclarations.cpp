@@ -5,12 +5,6 @@
 #include <Debug.h>
 #include <rose.h>
 
-/*
- * ======================================================
- * Private functions
- * ======================================================
- */
-
 void
 FortranOpenMPModuleDeclarations::createOpDatDeclarations ()
 {

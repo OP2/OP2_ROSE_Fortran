@@ -7,12 +7,6 @@
 #include <CommonNamespaces.h>
 #include <rose.h>
 
-/*
- * ======================================================
- * Private functions
- * ======================================================
- */
-
 void
 FortranOpenMPModuleDeclarationsIndirectLoop::createOpDatSizeDeclarations ()
 {
@@ -29,7 +23,8 @@ FortranOpenMPModuleDeclarationsIndirectLoop::createOpDatSizeDeclarations ()
   {
     if (parallelLoop->isDuplicateOpDat (i) == false)
     {
-      string const & variableName = OP2::VariableNames::getOpDatCardinalityName (i);
+      string const & variableName =
+          OP2::VariableNames::getOpDatCardinalityName (i);
 
       variableDeclarations->add (variableName,
           FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
@@ -256,8 +251,8 @@ SgVariableDeclaration *
 FortranOpenMPModuleDeclarationsIndirectLoop::getGlobalOpDatSizeDeclaration (
     unsigned int OP_DAT_ArgumentGroup)
 {
-  return variableDeclarations->get (OP2::VariableNames::getOpDatCardinalityName (
-      OP_DAT_ArgumentGroup));
+  return variableDeclarations->get (
+      OP2::VariableNames::getOpDatCardinalityName (OP_DAT_ArgumentGroup));
 }
 
 SgVariableDeclaration *
