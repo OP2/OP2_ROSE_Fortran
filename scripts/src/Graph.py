@@ -1,10 +1,3 @@
-# Written by Adam Betts
-#
-# Very simple graph API to add dependencies between
-# Fortran modules 
-
-from Vertex import Vertex
-
 class Graph():    
     dummyFileName = "dummy" 
     
@@ -18,6 +11,8 @@ class Graph():
         return vertices
         
     def addVertex (self, fileName):
+	from Vertex import Vertex
+
         v = Vertex(fileName)
         self.vertices[fileName] = v
         
@@ -31,6 +26,8 @@ class Graph():
         s.addPredecessor(predName)
     
     def addDummyStartVertex (self):
+	from Vertex import Vertex
+
         dummyv = Vertex(Graph.dummyFileName)
         self.vertices[Graph.dummyFileName] = dummyv
         

@@ -83,7 +83,7 @@ CPPOpenCLSubroutinesGeneration::addLibraries ()
 
 CPPOpenCLSubroutinesGeneration::CPPOpenCLSubroutinesGeneration (
     SgProject * project, CPPProgramDeclarationsAndDefinitions * declarations) :
-  CPPSubroutinesGeneration (declarations, ".cpp")
+  CPPSubroutinesGeneration (project, declarations, "rose_opencl_code.cpp")
 {
   generate ();
 }

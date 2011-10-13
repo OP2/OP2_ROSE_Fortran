@@ -22,9 +22,6 @@ class CPPSubroutinesGeneration: public SubroutinesGeneration <
     void
     patchCallsToParallelLoops ();
 
-    SgSourceFile &
-    createSourceFile ();
-
     /*
      * ======================================================
      * Adds the relevant library 'use' statements to the
@@ -40,16 +37,9 @@ class CPPSubroutinesGeneration: public SubroutinesGeneration <
 
   public:
 
-    CPPSubroutinesGeneration (
+    CPPSubroutinesGeneration (SgProject * project,
         CPPProgramDeclarationsAndDefinitions * declarations,
-        std::string const & fileSuffix) :
-      SubroutinesGeneration <CPPProgramDeclarationsAndDefinitions,
-          CPPHostSubroutine> (declarations, fileSuffix)
-    {
-      //SgSourceFile & sourceFile = createSourceFile ();
-
-      //moduleScope = sourceFile.get_globalScope ();
-    }
+        std::string const & newFileName);
 };
 
 #endif

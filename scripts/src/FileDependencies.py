@@ -1,45 +1,46 @@
-import glob
-import os
-import re
-from Graph import Graph
+class FortranDependencies ():
+	def __init__ (self, files):
+		from Graph import Graph
 
-def getBaseFileName (fileName):
-    lastDirectorySeparator = fileName.rfind(os.sep) 
-    fileExtensionCharacter = fileName.rfind('.')
-    return fileName[lastDirectorySeparator+1:fileExtensionCharacter]
+        	self.files = files
 
-def determineModuleDependencies (fileList):
-	# The graph models the dependencies and is returned by this function
-	g = Graph()
+		# The graph models the dependencies and is returned by this function
+		self.g = Graph()
 
-	# Mapping from a module name to its file name
-	moduleNameToFileName = {}
-    
-	module_line_regex = re.compile("^\s*module\s+(\S+)\s*$", re.IGNORECASE)
-	program_line_regex = re.compile("^\s*program\s+(\S+)\s*$", re.IGNORECASE)
-	use_line_regex = re.compile("^\s*use", re.IGNORECASE)              
+		self.__compute__()
 
-	for fileName in fileList:      
-		g.addVertex(fileName)
-		f = open(fileName)  
+	def getDependencyGraph (self):
+		return self.g
 
-        	for line in f:
-			if module_line_regex.search(line) or program_line_regex.search(line):
-				lexemes    = line.split()
-				moduleName = lexemes[len(lexemes) - 1]
-				moduleNameToFileName[moduleName] = fileName
-				print("Module '%s' in file '%s'" % (moduleName, fileName))
-		f.close()
-        
-	for fileName in fileList:
-		f = open(fileName)	
-		for line in f:
-			if use_line_regex.search(line):
-			        lexemes = line.split()
-			        moduleName = lexemes[len(lexemes) - 1]
-				if moduleName in moduleNameToFileName:
-					print("Adding edge %s to %s" % (moduleNameToFileName[moduleName], fileName))
-					g.addEdge(moduleNameToFileName[moduleName], fileName)            
-		f.close()
+	def __compute__ (self):
+		from re import IGNORECASE, compile
 
-	return g
+		# Mapping from a module name to its file name
+		moduleNameToFileName = {}
+	    
+		module_line_regex = compile("^\s*module\s+(\S+)\s*$", IGNORECASE)
+		program_line_regex = compile("^\s*program\s+(\S+)\s*$", IGNORECASE)
+		use_line_regex = compile("^\s*use", IGNORECASE)              
+
+		for fileName in self.files:      
+			self.g.addVertex(fileName)
+
+			f = open(fileName)  
+			for line in f:
+				if module_line_regex.search(line) or program_line_regex.search(line):
+					lexemes    = line.split()
+					moduleName = lexemes[len(lexemes) - 1]
+					moduleNameToFileName[moduleName] = fileName
+					print("Module '%s' in file '%s'" % (moduleName, fileName))
+			f.close()
+		
+		for fileName in self.files:
+			f = open(fileName)	
+			for line in f:
+				if use_line_regex.search(line):
+					lexemes = line.split()
+					moduleName = lexemes[len(lexemes) - 1]
+					if moduleName in moduleNameToFileName:
+						print("Adding edge %s to %s" % (moduleNameToFileName[moduleName], fileName))
+						self.g.addEdge(moduleNameToFileName[moduleName], fileName)            
+			f.close()

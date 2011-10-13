@@ -11,12 +11,6 @@
 
 CommandLine * CommandLine::globalsInstance = NULL;
 
-/*
- * ======================================================
- * Private functions
- * ======================================================
- */
-
 void
 CommandLine::addHelpOption ()
 {
@@ -85,12 +79,6 @@ CommandLine::CommandLine ()
 
   addDebugOption ();
 }
-
-/*
- * ======================================================
- * Public functions
- * ======================================================
- */
 
 void
 CommandLine::outputOptions ()

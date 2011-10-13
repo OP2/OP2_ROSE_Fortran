@@ -24,8 +24,8 @@ class FortranOpenMPSubroutinesGeneration: public FortranSubroutinesGeneration
 
     FortranOpenMPSubroutinesGeneration (SgProject * project,
         FortranProgramDeclarationsAndDefinitions * declarations) :
-      FortranSubroutinesGeneration (declarations, "openmp_subroutines.F95",
-          project)
+      FortranSubroutinesGeneration (project, declarations,
+          "rose_openmp_code.F95")
     {
       generate ();
     }

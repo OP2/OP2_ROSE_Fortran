@@ -7,12 +7,6 @@
 #include <CommonNamespaces.h>
 #include <OpenMP.h>
 
-/*
- * ======================================================
- * Protected functions
- * ======================================================
- */
-
 void
 FortranOpenMPHostSubroutine::createReductionEpilogueStatements ()
 {

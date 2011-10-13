@@ -6,12 +6,6 @@
 
 Debug * Debug::debugInstance = NULL;
 
-/*
- * ======================================================
- * Private functions
- * ======================================================
- */
-
 std::string
 Debug::getFileName (std::string const & filePath)
 {
@@ -22,12 +16,6 @@ Debug::Debug ()
 {
   debugLevel = 0;
 }
-
-/*
- * ======================================================
- * Public functions
- * ======================================================
- */
 
 Debug *
 Debug::getInstance ()

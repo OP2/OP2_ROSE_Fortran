@@ -239,7 +239,7 @@ FortranSubroutinesGeneration::addContains ()
 }
 
 SgModuleStatement *
-FortranSubroutinesGeneration::createFortranModule (SgSourceFile & sourceFile)
+FortranSubroutinesGeneration::createFortranModule ()
 {
   using std::string;
   using std::vector;
@@ -248,7 +248,7 @@ FortranSubroutinesGeneration::createFortranModule (SgSourceFile & sourceFile)
   Debug::getInstance ()->debugMessage ("Creating Fortran module",
       Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
-  SgGlobal * globalScope = sourceFile.get_globalScope ();
+  SgGlobal * globalScope = sourceFile->get_globalScope ();
 
   SgModuleStatement * moduleStatement =
       FortranTypesBuilder::buildModuleDeclaration (moduleName, globalScope);
@@ -262,53 +262,10 @@ FortranSubroutinesGeneration::createFortranModule (SgSourceFile & sourceFile)
   return moduleStatement;
 }
 
-SgSourceFile &
-FortranSubroutinesGeneration::createSourceFile ()
-{
-  using SageBuilder::buildFile;
-  using std::string;
-
-  Debug::getInstance ()->debugMessage ("Generating file '" + newFileName + "'",
-      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
-
-  FILE * inputFile = fopen (newFileName.c_str (), "w+");
-  if (inputFile != NULL)
-  {
-    Debug::getInstance ()->debugMessage ("Creating dummy source file '"
-        + newFileName + "'", Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
-
-    fclose (inputFile);
-  }
-  else
-  {
-    throw Exceptions::CodeGeneration::FileCreationException (
-        "Could not create Fortran file '" + newFileName + "'");
-  }
-
-  SgSourceFile * sourceFile = isSgSourceFile (buildFile (newFileName,
-      newFileName, project));
-
-  sourceFile->set_F95_only (true);
-
-  sourceFile->set_fortran_implicit_none (true);
-
-  sourceFile->set_outputFormat (SgFile::e_free_form_output_format);
-
-  return *sourceFile;
-}
-
-/*
- * ======================================================
- * Public functions
- * ======================================================
- */
-
 void
 FortranSubroutinesGeneration::generate ()
 {
-  SgSourceFile & sourceFile = createSourceFile ();
-
-  SgModuleStatement * moduleStatement = createFortranModule (sourceFile);
+  SgModuleStatement * moduleStatement = createFortranModule ();
 
   moduleScope = moduleStatement->get_definition ();
 
@@ -326,10 +283,11 @@ FortranSubroutinesGeneration::generate ()
 }
 
 FortranSubroutinesGeneration::FortranSubroutinesGeneration (
+    SgProject * project,
     FortranProgramDeclarationsAndDefinitions * declarations,
-    std::string const & fileSuffix, SgProject * project) :
+    std::string const & newFileName) :
   SubroutinesGeneration <FortranProgramDeclarationsAndDefinitions,
-      FortranHostSubroutine> (declarations, fileSuffix), project (project)
+      FortranHostSubroutine> (project, declarations, newFileName)
 {
   reductionSubroutines = new FortranReductionSubroutines ();
 }

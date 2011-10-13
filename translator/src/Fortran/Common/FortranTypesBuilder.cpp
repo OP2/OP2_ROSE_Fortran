@@ -15,12 +15,6 @@ SgTypeInt * FortranTypesBuilder::eightByteIntegerType;
 SgTypeFloat * FortranTypesBuilder::singlePrecisionFloatType;
 SgTypeFloat * FortranTypesBuilder::doublePrecisionFloatType;
 
-/*
- * ======================================================
- * Private functions
- * ======================================================
- */
-
 SgFunctionSymbol *
 FortranTypesBuilder::buildFunctionDeclaration (
     std::string const & functionName, SgScopeStatement * scope)
@@ -67,12 +61,6 @@ FortranTypesBuilder::completeNewDeclaration (
   SgClassSymbol * classSymbol = new SgClassSymbol (classDeclaration);
   scope->insert_symbol (classDeclaration->get_name (), classSymbol);
 }
-
-/*
- * ======================================================
- * Public functions
- * ======================================================
- */
 
 SgTypeBool *
 FortranTypesBuilder::getLogical ()

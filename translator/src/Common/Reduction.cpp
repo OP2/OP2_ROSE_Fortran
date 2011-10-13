@@ -56,14 +56,11 @@ Reduction::hashKey ()
   {
     key += 2;
   }
-
-  /*
-   * ======================================================
-   * If the key is still zero then the base type of the
-   * OP_DAT is not supported
-   * ======================================================
-   */
-  ROSE_ASSERT (key > 0);
+  else
+  {
+    Exceptions::ParallelLoop::UnsupportedBaseTypeException (
+        "Base type of reduction variable is not supported");
+  }
 
   key += variableSize;
 

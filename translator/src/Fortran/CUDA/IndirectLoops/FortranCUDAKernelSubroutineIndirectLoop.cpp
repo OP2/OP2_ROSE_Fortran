@@ -13,12 +13,6 @@
 #include <Debug.h>
 #include <boost/lexical_cast.hpp>
 
-/*
- * ======================================================
- * Private functions
- * ======================================================
- */
-
 SgStatement *
 FortranCUDAKernelSubroutineIndirectLoop::createUserSubroutineCallStatement ()
 {

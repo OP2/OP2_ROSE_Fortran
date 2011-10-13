@@ -1,9 +1,3 @@
-/*
- * Written by Adam Betts and Carlo Bertolli
- *
- * Generates subroutines for CUDA Fortran
- */
-
 #pragma once
 #ifndef FORTRAN_CUDA_SUBROUTINES_GENERATION_H
 #define FORTRAN_CUDA_SUBROUTINES_GENERATION_H
@@ -41,7 +35,8 @@ class FortranCUDASubroutinesGeneration: public FortranSubroutinesGeneration
 
     FortranCUDASubroutinesGeneration (SgProject * project,
         FortranProgramDeclarationsAndDefinitions * declarations) :
-      FortranSubroutinesGeneration (declarations, "rose_cuda_code.F95", project)
+          FortranSubroutinesGeneration (project, declarations,
+              "rose_cuda_code.F95")
     {
       generate ();
     }

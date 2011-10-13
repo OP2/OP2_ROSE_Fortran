@@ -14,6 +14,6 @@ CPPCUDASubroutinesGeneration::addLibraries ()
 
 CPPCUDASubroutinesGeneration::CPPCUDASubroutinesGeneration (
     SgProject * project, CPPProgramDeclarationsAndDefinitions * declarations) :
-  CPPSubroutinesGeneration (declarations, ".CUF")
+  CPPSubroutinesGeneration (project, declarations, "rose_cuda_code.cpp")
 {
 }

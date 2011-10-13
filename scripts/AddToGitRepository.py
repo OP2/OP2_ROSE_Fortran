@@ -6,7 +6,6 @@ import sys
 # Add the 'src' directory to the module search and PYTHONPATH
 sys.path.append(sys.path[0] + os.sep + "src")
 
-from subprocess import Popen, PIPE
 from optparse import OptionParser
 from sys import argv
 from Debug import Debug
@@ -49,6 +48,8 @@ added  = []
 inRepo = []
 
 def add ():
+	from subprocess import Popen, PIPE
+
 	absolutePath = os.path.abspath(os.curdir + os.sep + opts.dir)
 	debug.verboseMessage("Walking directory '" + absolutePath + "'")
 

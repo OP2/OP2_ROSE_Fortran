@@ -9,12 +9,6 @@
 #include <boost/lexical_cast.hpp>
 #include <rose.h>
 
-/*
- * ======================================================
- * Private functions
- * ======================================================
- */
-
 void
 FortranOpDatDimensionsDeclaration::addFields ()
 {
@@ -68,12 +62,6 @@ FortranOpDatDimensionsDeclaration::addTypeDeclaration ()
 
   appendStatement (typeStatement, moduleScope);
 }
-
-/*
- * ======================================================
- * Public functions
- * ======================================================
- */
 
 SgClassType *
 FortranOpDatDimensionsDeclaration::getType ()

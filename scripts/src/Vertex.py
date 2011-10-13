@@ -1,7 +1,3 @@
-# Written by Adam Betts
-#
-# Very simple vertex API for graphs 
-
 class Vertex():
     def __init__ (self, fileName):
         self.fileName = fileName

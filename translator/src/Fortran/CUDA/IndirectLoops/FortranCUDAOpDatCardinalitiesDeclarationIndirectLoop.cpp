@@ -6,12 +6,6 @@
 #include <CommonNamespaces.h>
 #include <rose.h>
 
-/*
- * ======================================================
- * Public functions
- * ======================================================
- */
-
 void
 FortranCUDAOpDatCardinalitiesDeclarationIndirectLoop::addIndirectLoopFields ()
 {

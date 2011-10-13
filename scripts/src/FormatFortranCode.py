@@ -1,6 +1,3 @@
-import re
-import os
-
 class FormatFortranCode():
 
 	def __init__ (self, files, maxLineLength=120):		
@@ -39,18 +36,22 @@ class FormatFortranCode():
 			f.write("\n")
 	
 	def __format__ (self):
-		end_regex        = re.compile("\s*end\s", re.IGNORECASE)
-		subroutine_regex = re.compile("\ssubroutine\s", re.IGNORECASE)	
-		do_regex         = re.compile("\s*do\s", re.IGNORECASE)
-		select_regex     = re.compile("\s*select\s", re.IGNORECASE)
-		module_regex     = re.compile("\s*module\s", re.IGNORECASE)
-		program_regex    = re.compile("\s*program\s", re.IGNORECASE)
+		import os
+
+		from re import IGNORECASE, compile
+
+		end_regex        = compile("\s*end\s", IGNORECASE)
+		subroutine_regex = compile("\ssubroutine\s", IGNORECASE)	
+		do_regex         = compile("\s*do\s", IGNORECASE)
+		select_regex     = compile("\s*select\s", IGNORECASE)
+		module_regex     = compile("\s*module\s", IGNORECASE)
+		program_regex    = compile("\s*program\s", IGNORECASE)
 		# Have to match any character before the 'IF' because it can be on the same line as a 'CASE' statement
-		if_regex         = re.compile(".*if\s", re.IGNORECASE) 
-		type_regex       = re.compile("\s*type\s", re.IGNORECASE)
-		call_regex       = re.compile("\s*call\s", re.IGNORECASE)
-		implicit_regex   = re.compile("\s*implicit none\s", re.IGNORECASE)
-		contains_regex   = re.compile("\s*contains\s", re.IGNORECASE)
+		if_regex         = compile(".*if\s", IGNORECASE) 
+		type_regex       = compile("\s*type\s", IGNORECASE)
+		call_regex       = compile("\s*call\s", IGNORECASE)
+		implicit_regex   = compile("\s*implicit none\s", IGNORECASE)
+		contains_regex   = compile("\s*contains\s", IGNORECASE)
 
 		for fileName in self.files:
 			moduleOrProgramFound = False
@@ -87,7 +88,7 @@ class FormatFortranCode():
 					indent = indent + 2	
 					newLineNeeded = True
 
-				elif not re.compile("\n").match(line):
+				elif not compile("\n").match(line):
 					if implicit_regex.match(line) or contains_regex.match(line):
 						if not newLineNeeded:
 							f2.write("\n")

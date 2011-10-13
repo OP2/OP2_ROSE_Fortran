@@ -7,12 +7,6 @@
 #include <CommonNamespaces.h>
 #include <rose.h>
 
-/*
- * ======================================================
- * Private functions
- * ======================================================
- */
-
 void
 FortranModuleDeclarations::createCPlanReturnDeclaration ()
 {
@@ -30,12 +24,6 @@ FortranModuleDeclarations::createCPlanReturnDeclaration ()
           variableName, c_ptrType, moduleScope));
 }
 
-/*
- * ======================================================
- * Protected functions
- * ======================================================
- */
-
 FortranModuleDeclarations::FortranModuleDeclarations (
     FortranParallelLoop * parallelLoop, SgScopeStatement * moduleScope) :
   parallelLoop (parallelLoop), moduleScope (moduleScope)
@@ -47,12 +35,6 @@ FortranModuleDeclarations::FortranModuleDeclarations (
     createCPlanReturnDeclaration ();
   }
 }
-
-/*
- * ======================================================
- * Public functions
- * ======================================================
- */
 
 SgVariableDeclaration *
 FortranModuleDeclarations::getCPlanReturnDeclaration ()

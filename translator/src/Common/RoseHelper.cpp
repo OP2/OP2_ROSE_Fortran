@@ -1,18 +1,6 @@
 #include <RoseHelper.h>
 
-/*
- * ======================================================
- * Allocation of class-wide static variables
- * ======================================================
- */
-
 Sg_File_Info * RoseHelper::fileInfo;
-
-/*
- * ======================================================
- * Public functions
- * ======================================================
- */
 
 Sg_File_Info *
 RoseHelper::getFileInfo ()

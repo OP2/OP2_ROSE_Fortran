@@ -134,7 +134,7 @@ FortranCUDAUserSubroutine::createStatements ()
 
         for (SgInitializedNamePtrList::iterator paramIt =
             originalParameters->get_args ().begin (); paramIt
-            != originalParameters->get_args ().end (); ++paramIt)
+            != originalParameters->get_args ().end (); ++paramIt, ++OP_DAT_ArgumentGroup)
         {
           string const formalParamterName =
               (*paramIt)->get_name ().getString ();
@@ -181,8 +181,6 @@ FortranCUDAUserSubroutine::createStatements ()
                           variableName, type, subroutineScope,
                           formalParameters, 1, CUDA_DEVICE);
             }
-
-            ++OP_DAT_ArgumentGroup;
           }
         }
 

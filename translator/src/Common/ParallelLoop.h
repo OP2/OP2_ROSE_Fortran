@@ -346,6 +346,15 @@ class ParallelLoop
 
     std::string
     getUserSubroutineName ();
+
+    /*
+     * ======================================================
+     * Get information describing the properties of this
+     * OP_DAT argument group
+     * ======================================================
+     */
+    std::string const
+    getOpDatInformation (unsigned int OP_DAT_ArgumentGroup);
 };
 
 #endif

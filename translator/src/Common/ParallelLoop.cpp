@@ -6,12 +6,6 @@
 #include <rose.h>
 #include <boost/lexical_cast.hpp>
 
-/*
- * ======================================================
- * Protected functions
- * ======================================================
- */
-
 ParallelLoop::ParallelLoop (SgFunctionCallExp * functionCallExpression,
     std::string fileName) :
   functionCallExpression (functionCallExpression), fileName (fileName)
@@ -19,12 +13,6 @@ ParallelLoop::ParallelLoop (SgFunctionCallExp * functionCallExpression,
   Debug::getInstance ()->debugMessage ("Parallel loop created in file '"
       + fileName + "'", Debug::CONSTRUCTOR_LEVEL, __FILE__, __LINE__);
 }
-
-/*
- * ======================================================
- * Private functions
- * ======================================================
- */
 
 void
 ParallelLoop::checkArguments ()
@@ -431,4 +419,54 @@ ParallelLoop::getUserSubroutineName ()
       actualArguments.front ());
 
   return functionRefExpression->getAssociatedFunctionDeclaration ()->get_name ().getString ();
+}
+
+std::string const
+ParallelLoop::getOpDatInformation (unsigned int OP_DAT_ArgumentGroup)
+{
+  using boost::lexical_cast;
+  using std::string;
+
+  string data = "OP_DAT " + lexical_cast <string> (OP_DAT_ArgumentGroup) + " ";
+
+  if (isRead (OP_DAT_ArgumentGroup))
+  {
+    data += "is read";
+  }
+  else if (isWritten (OP_DAT_ArgumentGroup))
+  {
+    data += "is written";
+  }
+  else if (isReadAndWritten (OP_DAT_ArgumentGroup))
+  {
+    data += "is read/written";
+  }
+  else if (isMinimised (OP_DAT_ArgumentGroup))
+  {
+    data += "is minimised";
+  }
+  else if (isMaximised (OP_DAT_ArgumentGroup))
+  {
+    data += "is maximised";
+  }
+
+  if (isGlobal (OP_DAT_ArgumentGroup))
+  {
+    data += ", OP_GBL ";
+  }
+  else
+  {
+    data += ", OP_DAT";
+  }
+
+  if (isSgArrayType (OpDatTypes[OP_DAT_ArgumentGroup]))
+  {
+    data += ", ARRAY";
+  }
+  else
+  {
+    data += ", SCALAR";
+  }
+
+  return data;
 }

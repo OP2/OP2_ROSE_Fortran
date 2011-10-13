@@ -4,14 +4,9 @@
 
 #include <CPPSubroutinesGeneration.h>
 
-class CPPOpenCLDataSizesDeclaration;
-
 class CPPOpenCLSubroutinesGeneration: public CPPSubroutinesGeneration
 {
   private:
-
-    std::map <std::string, CPPOpenCLDataSizesDeclaration *>
-        dataSizesDeclarations;
 
     virtual CPPHostSubroutine *
     createSubroutines ();

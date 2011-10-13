@@ -54,48 +54,23 @@ CPPSubroutinesGeneration::patchCallsToParallelLoops ()
   }
 }
 
-SgSourceFile &
-CPPSubroutinesGeneration::createSourceFile ()
-{
-  using SageBuilder::buildFile;
-  using std::string;
-
-  Debug::getInstance ()->debugMessage ("Generating file '" + newFileName + "'",
-      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
-
-  FILE * inputFile = fopen (newFileName.c_str (), "w+");
-  if (inputFile != NULL)
-  {
-    Debug::getInstance ()->debugMessage ("Creating dummy source file '"
-        + newFileName + "'", Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
-
-    fclose (inputFile);
-  }
-  else
-  {
-    throw Exceptions::CodeGeneration::FileCreationException (
-        "Could not create dummy Fortran file '" + newFileName + "'");
-  }
-
-  SgSourceFile * sourceFile = isSgSourceFile (buildFile (newFileName,
-      newFileName, NULL));
-
-  sourceFile->set_Cxx_only (true);
-
-  return *sourceFile;
-}
-
 void
 CPPSubroutinesGeneration::generate ()
 {
-  SgSourceFile & sourceFile = createSourceFile ();
-
-  moduleScope = sourceFile.get_globalScope ();
+  moduleScope = sourceFile->get_globalScope ();
 
   addLibraries ();
 
   createSubroutines ();
 
   patchCallsToParallelLoops ();
+}
+
+CPPSubroutinesGeneration::CPPSubroutinesGeneration (SgProject * project,
+    CPPProgramDeclarationsAndDefinitions * declarations,
+    std::string const & newFileName) :
+  SubroutinesGeneration <CPPProgramDeclarationsAndDefinitions,
+      CPPHostSubroutine> (project, declarations, newFileName)
+{
 }
 

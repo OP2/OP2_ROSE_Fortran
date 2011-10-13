@@ -17,6 +17,7 @@
 #include <map>
 #include <string>
 #include <Debug.h>
+#include <Exceptions.h>
 #include <rose.h>
 
 template <typename TDeclarations, typename THostSubroutine>
@@ -26,11 +27,12 @@ template <typename TDeclarations, typename THostSubroutine>
 
       /*
        * ======================================================
-       * The names of source files passed by the user which
-       * are modified by our compiler
+       * The project to which the generated file should be
+       * attached
        * ======================================================
        */
-      std::vector <std::string> dirtyFiles;
+
+      SgProject * project;
 
       /*
        * ======================================================
@@ -40,15 +42,8 @@ template <typename TDeclarations, typename THostSubroutine>
        * processed
        * ======================================================
        */
-      TDeclarations * declarations;
 
-      /*
-       * ======================================================
-       * A mapping from a user subroutine name to its
-       * generated host subroutine
-       * ======================================================
-       */
-      std::map <std::string, THostSubroutine *> hostSubroutines;
+      TDeclarations * declarations;
 
       /*
        * ======================================================
@@ -56,7 +51,35 @@ template <typename TDeclarations, typename THostSubroutine>
        * output
        * ======================================================
        */
+
       std::string newFileName;
+
+      /*
+       * ======================================================
+       * The actual file internal to ROSE which contains the
+       * generated code
+       * ======================================================
+       */
+
+      SgSourceFile * sourceFile;
+
+      /*
+       * ======================================================
+       * A mapping from a user subroutine name to its
+       * generated host subroutine
+       * ======================================================
+       */
+
+      std::map <std::string, THostSubroutine *> hostSubroutines;
+
+      /*
+       * ======================================================
+       * The names of source files passed by the user which
+       * are modified by our compiler
+       * ======================================================
+       */
+
+      std::vector <std::string> dirtyFiles;
 
       /*
        * ======================================================
@@ -64,14 +87,46 @@ template <typename TDeclarations, typename THostSubroutine>
        * is output
        * ======================================================
        */
+
       SgScopeStatement * moduleScope;
+
+    private:
+
+      void
+      createSourceFile ()
+      {
+        using SageBuilder::buildFile;
+        using std::string;
+
+        Debug::getInstance ()->debugMessage ("Generating file '" + newFileName
+            + "'", Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+
+        FILE * inputFile = fopen (newFileName.c_str (), "w+");
+        if (inputFile != NULL)
+        {
+          Debug::getInstance ()->debugMessage ("Creating source file '"
+              + newFileName + "'", Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+
+          fclose (inputFile);
+        }
+        else
+        {
+          throw Exceptions::CodeGeneration::FileCreationException (
+              "Could not create source file '" + newFileName + "'");
+        }
+
+        sourceFile = isSgSourceFile (buildFile (newFileName, newFileName,
+            project));
+      }
 
     protected:
 
-      SubroutinesGeneration (TDeclarations * declarations,
+      SubroutinesGeneration (SgProject * project, TDeclarations * declarations,
           std::string const & newFileName) :
-        declarations (declarations), newFileName (newFileName)
+        project (project), declarations (declarations), newFileName (
+            newFileName)
       {
+        createSourceFile ();
       }
 
     public:

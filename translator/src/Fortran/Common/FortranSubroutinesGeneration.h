@@ -36,8 +36,6 @@ class FortranSubroutinesGeneration: public SubroutinesGeneration <
 
     std::map <std::string, FortranModuleDeclarations *> moduleDeclarations;
 
-    SgProject * project;
-
   private:
 
     void
@@ -62,16 +60,7 @@ class FortranSubroutinesGeneration: public SubroutinesGeneration <
      * ======================================================
      */
     SgModuleStatement *
-    createFortranModule (SgSourceFile & sourceFile);
-
-    /*
-     * ======================================================
-     * Creates the Fortran source file to be unparsed
-     * that contains the generated subroutines and declarations
-     * ======================================================
-     */
-    SgSourceFile &
-    createSourceFile ();
+    createFortranModule ();
 
   protected:
 
@@ -123,9 +112,9 @@ class FortranSubroutinesGeneration: public SubroutinesGeneration <
 
   public:
 
-    FortranSubroutinesGeneration (
+    FortranSubroutinesGeneration (SgProject * project,
         FortranProgramDeclarationsAndDefinitions * declarations,
-        std::string const & fileSuffix, SgProject * project);
+        std::string const & newFileName);
 };
 
 #endif
