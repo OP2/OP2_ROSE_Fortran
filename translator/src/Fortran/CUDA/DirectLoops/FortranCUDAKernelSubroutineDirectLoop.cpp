@@ -762,6 +762,32 @@ FortranCUDAKernelSubroutineDirectLoop::createOpDatFormalParameterDeclarations ()
 void
 FortranCUDAKernelSubroutineDirectLoop::createFormalParameterDeclarations ()
 {
+  /*
+   * ======================================================
+   * OP_DAT dimensions
+   * ======================================================
+   */
+
+  variableDeclarations->add (
+      OP2::VariableNames::opDatDimensions,
+      FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
+          OP2::VariableNames::opDatDimensions,
+          dimensionsDeclaration->getType (), subroutineScope, formalParameters,
+          1, CUDA_DEVICE));
+
+  /*
+   * ======================================================
+   * OP_DAT cardinalities
+   * ======================================================
+   */
+
+  variableDeclarations->add (
+      OP2::VariableNames::opDatCardinalities,
+      FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
+          OP2::VariableNames::opDatCardinalities,
+          cardinalitiesDeclaration->getType (), subroutineScope,
+          formalParameters, 1, CUDA_DEVICE));
+
   createOpDatFormalParameterDeclarations ();
 
   /*
@@ -802,32 +828,6 @@ FortranCUDAKernelSubroutineDirectLoop::createFormalParameterDeclarations ()
           OP2::VariableNames::sharedMemoryOffset,
           FortranTypesBuilder::getFourByteInteger (), subroutineScope,
           formalParameters, 1, VALUE));
-
-  /*
-   * ======================================================
-   * OP_DAT dimensions
-   * ======================================================
-   */
-
-  variableDeclarations->add (
-      OP2::VariableNames::opDatDimensions,
-      FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
-          OP2::VariableNames::opDatDimensions,
-          dimensionsDeclaration->getType (), subroutineScope, formalParameters,
-          1, CUDA_DEVICE));
-
-  /*
-   * ======================================================
-   * OP_DAT cardinalities
-   * ======================================================
-   */
-
-  variableDeclarations->add (
-      OP2::VariableNames::opDatCardinalities,
-      FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
-          OP2::VariableNames::opDatCardinalities,
-          cardinalitiesDeclaration->getType (), subroutineScope,
-          formalParameters, 1, CUDA_DEVICE));
 }
 
 FortranCUDAKernelSubroutineDirectLoop::FortranCUDAKernelSubroutineDirectLoop (

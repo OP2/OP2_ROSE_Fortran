@@ -27,6 +27,12 @@ FortranCUDAHostSubroutineDirectLoop::createKernelFunctionCallStatement ()
 
   SgExprListExp * actualParameters = buildExprListExp ();
 
+  actualParameters->append_expression (buildVarRefExp (
+      variableDeclarations->get (OP2::VariableNames::opDatDimensions)));
+
+  actualParameters->append_expression (buildVarRefExp (
+      variableDeclarations->get (OP2::VariableNames::opDatCardinalities)));
+
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
     if (parallelLoop->isDuplicateOpDat (i) == false)
@@ -72,12 +78,6 @@ FortranCUDAHostSubroutineDirectLoop::createKernelFunctionCallStatement ()
 
   actualParameters->append_expression (buildVarRefExp (
       variableDeclarations->get (OP2::VariableNames::sharedMemoryOffset)));
-
-  actualParameters->append_expression (buildVarRefExp (
-      variableDeclarations->get (OP2::VariableNames::opDatDimensions)));
-
-  actualParameters->append_expression (buildVarRefExp (
-      variableDeclarations->get (OP2::VariableNames::opDatCardinalities)));
 
   SgCudaKernelExecConfig * kernelConfiguration = new SgCudaKernelExecConfig (
       RoseHelper::getFileInfo (), buildVarRefExp (variableDeclarations->get (
