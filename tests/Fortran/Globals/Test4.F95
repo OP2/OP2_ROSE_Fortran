@@ -44,6 +44,7 @@ program Test4
                      & deviceData, -1, OP_ID,  OP_WRITE, &
                      & global,     -1, OP_GBL, OP_READ)
 
+  print *, "After kernel execution"
   do i = 1, 4 * setCardinality
     print *, "hostData(", i, ")", hostData(i)
   end do

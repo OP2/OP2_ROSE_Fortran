@@ -26,11 +26,13 @@ program Test6
   call op_decl_gbl ( hostGlobal1, global1 )
   call op_decl_gbl ( hostGlobal2, global2 )
   
+  print *, "Reduction result before kernel = ", hostGlobal1
+
   call op_par_loop_2 ( integer4Scalar_integer4Scalar_max, set, &
                      & global1, -1, OP_GBL, OP_MAX, &
                      & global2, -1, OP_GBL, OP_READ)
 
-  print *, hostGlobal1
+  print *, "Reduction result after kernel = ", hostGlobal1
 
 end program Test6
 
