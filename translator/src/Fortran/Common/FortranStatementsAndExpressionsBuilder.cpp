@@ -176,28 +176,44 @@ FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParamet
 
 void
 FortranStatementsAndExpressionsBuilder::appendAllocateStatement (
-    SgExprListExp * allocateParameters, SgScopeStatement * scope)
+    SgVarRefExp * arrayReference, SgExpression * lowerBound,
+    SgExpression * upperBound, SgScopeStatement * scope)
 {
+  using SageBuilder::buildExprListExp;
+  using SageBuilder::buildPntrArrRefExp;
+  using SageBuilder::buildIntVal;
   using SageInterface::appendStatement;
+
+  SgSubscriptExpression * subscriptExpression = new SgSubscriptExpression (
+      RoseHelper::getFileInfo (), lowerBound, upperBound, buildIntVal (0));
+  subscriptExpression->set_endOfConstruct (RoseHelper::getFileInfo ());
+
+  SgPntrArrRefExp * arrayExpression = buildPntrArrRefExp (arrayReference,
+      subscriptExpression);
+
+  SgExprListExp * actualParameters = buildExprListExp (arrayExpression);
 
   SgAllocateStatement * allocateStatement = new SgAllocateStatement (
       RoseHelper::getFileInfo ());
   allocateStatement->set_endOfConstruct (RoseHelper::getFileInfo ());
-  allocateStatement->set_expr_list (allocateParameters);
+  allocateStatement->set_expr_list (actualParameters);
 
   appendStatement (allocateStatement, scope);
 }
 
 void
 FortranStatementsAndExpressionsBuilder::appendDeallocateStatement (
-    SgExprListExp * deallocateParameters, SgScopeStatement * scope)
+    SgVarRefExp * arrayReference, SgScopeStatement * scope)
 {
+  using SageBuilder::buildExprListExp;
   using SageInterface::appendStatement;
+
+  SgExprListExp * actualParameters = buildExprListExp (arrayReference);
 
   SgDeallocateStatement * deallocateStatement = new SgDeallocateStatement (
       RoseHelper::getFileInfo ());
   deallocateStatement->set_endOfConstruct (RoseHelper::getFileInfo ());
-  deallocateStatement->set_expr_list (deallocateParameters);
+  deallocateStatement->set_expr_list (actualParameters);
 
   appendStatement (deallocateStatement, scope);
 }

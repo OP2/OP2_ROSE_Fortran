@@ -19,6 +19,7 @@ FortranCUDAHostSubroutine::createReductionPrologueStatements ()
   using SageBuilder::buildAssignStatement;
   using SageBuilder::buildIntVal;
   using SageBuilder::buildMultiplyOp;
+  using SageBuilder::buildSubtractOp;
   using SageBuilder::buildExprListExp;
   using SageBuilder::buildFunctionCallExp;
   using SageBuilder::buildPntrArrRefExp;
@@ -46,14 +47,14 @@ FortranCUDAHostSubroutine::createReductionPrologueStatements ()
 
       appendStatement (assignmentStatement1, subroutineScope);
 
-      SgExprListExp * allocateParameters = buildExprListExp (
-          buildPntrArrRefExp (buildVarRefExp (
-              moduleDeclarations->getReductionArrayHostDeclaration (i)),
-              buildVarRefExp (variableDeclarations->get (
-                  OP2::VariableNames::getReductionCardinalityName (i)))));
+      SgSubtractOp * upperBoundExpression1 = buildSubtractOp (buildVarRefExp (
+          variableDeclarations->get (
+              OP2::VariableNames::getReductionCardinalityName (i))),
+          buildIntVal (1));
 
       FortranStatementsAndExpressionsBuilder::appendAllocateStatement (
-          allocateParameters, subroutineScope);
+          buildVarRefExp (moduleDeclarations->getReductionArrayHostDeclaration (
+              i)), buildIntVal (0), upperBoundExpression1, subroutineScope);
 
       SgPntrArrRefExp * arrayIndexExpression1 = buildPntrArrRefExp (
           buildVarRefExp (moduleDeclarations->getReductionArrayHostDeclaration (
@@ -75,14 +76,18 @@ FortranCUDAHostSubroutine::createReductionPrologueStatements ()
 
       SgBasicBlock * loopBody = buildBasicBlock (assignmentStatement2);
 
-      SgAssignOp * loopInitialization = buildAssignOp (buildVarRefExp (
+      SgAssignOp * loopInitialiserExpression = buildAssignOp (buildVarRefExp (
           variableDeclarations->get (CommonVariableNames::iterationCounter1)),
           buildIntVal (0));
 
+      SgSubtractOp * upperBoundExpression2 = buildSubtractOp (buildVarRefExp (
+          variableDeclarations->get (
+              OP2::VariableNames::getReductionCardinalityName (i))),
+          buildIntVal (1));
+
       SgFortranDo * loopStatement =
           FortranStatementsAndExpressionsBuilder::buildFortranDoStatement (
-              loopInitialization, buildVarRefExp (variableDeclarations->get (
-                  OP2::VariableNames::getReductionCardinalityName (i))),
+              loopInitialiserExpression, upperBoundExpression2,
               buildIntVal (1), loopBody);
 
       appendStatement (loopStatement, subroutineScope);
@@ -112,6 +117,7 @@ FortranCUDAHostSubroutine::createReductionEpilogueStatements ()
   using SageBuilder::buildBasicBlock;
   using SageBuilder::buildExprListExp;
   using SageBuilder::buildFunctionCallExp;
+  using SageBuilder::buildSubtractOp;
   using SageInterface::appendStatement;
   using std::string;
 
@@ -199,31 +205,30 @@ FortranCUDAHostSubroutine::createReductionEpilogueStatements ()
                 OP2::VariableNames::getOpDatHostName (i))),
             reductionComputationExpression);
 
-        SgBasicBlock * outerLoopBody = buildBasicBlock ();
+        SgBasicBlock * loopBody = buildBasicBlock ();
 
-        appendStatement (assignmentStatement3, outerLoopBody);
+        appendStatement (assignmentStatement3, loopBody);
 
-        SgExpression * outerLoopInitialization = buildAssignOp (
+        SgAssignOp * loopInitialiserExpression = buildAssignOp (
             buildVarRefExp (variableDeclarations->get (
                 CommonVariableNames::iterationCounter1)), buildIntVal (0));
 
-        SgFortranDo * outerLoopStatement =
+        SgSubtractOp * upperBoundExpression = buildSubtractOp (buildVarRefExp (
+            variableDeclarations->get (
+                OP2::VariableNames::getReductionCardinalityName (i))),
+            buildIntVal (1));
+
+        SgFortranDo * loopStatement =
             FortranStatementsAndExpressionsBuilder::buildFortranDoStatement (
-                outerLoopInitialization, buildVarRefExp (
-                    variableDeclarations->get (
-                        OP2::VariableNames::getReductionCardinalityName (i))),
-                buildIntVal (1), outerLoopBody);
+                loopInitialiserExpression, upperBoundExpression,
+                buildIntVal (1), loopBody);
 
-        appendStatement (outerLoopStatement, subroutineScope);
-
-        SgExprListExp * deallocateParameters = buildExprListExp (
-            buildPntrArrRefExp (buildVarRefExp (
-                moduleDeclarations->getReductionArrayHostDeclaration (i)),
-                buildVarRefExp (variableDeclarations->get (
-                    OP2::VariableNames::getReductionCardinalityName (i)))));
+        appendStatement (loopStatement, subroutineScope);
 
         FortranStatementsAndExpressionsBuilder::appendDeallocateStatement (
-            deallocateParameters, subroutineScope);
+            buildVarRefExp (
+                moduleDeclarations->getReductionArrayHostDeclaration (i)),
+            subroutineScope);
       }
     }
   }

@@ -299,9 +299,8 @@ FortranProgramDeclarationsAndDefinitions::visit (SgNode * node)
 
     currentSourceFile = p.filename ();
 
-    Debug::getInstance ()->debugMessage ("Given source file '"
-        + currentSourceFile + "' detected", Debug::OUTER_LOOP_LEVEL, __FILE__,
-        __LINE__ );
+    Debug::getInstance ()->debugMessage ("Source file '" + currentSourceFile
+        + "' detected", Debug::OUTER_LOOP_LEVEL, __FILE__, __LINE__ );
   }
   else if (Globals::getInstance ()->isInputFile (currentSourceFile))
   {

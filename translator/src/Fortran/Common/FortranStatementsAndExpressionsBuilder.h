@@ -10,7 +10,7 @@ class SgFortranDo;
 class SgExpression;
 class SgBasicBlock;
 class SgScopeStatement;
-class SgExprListExp;
+class SgVarRefExp;
 class SgImplicitStatement;
 class SgAggregateInitializer;
 class SgFunctionParameterList;
@@ -83,7 +83,8 @@ class FortranStatementsAndExpressionsBuilder
      * ======================================================
      */
     static void
-    appendAllocateStatement (SgExprListExp * allocateParameters,
+    appendAllocateStatement (SgVarRefExp * arrayReference,
+        SgExpression * lowerBound, SgExpression * upperBound,
         SgScopeStatement * scope);
 
     /*
@@ -92,7 +93,7 @@ class FortranStatementsAndExpressionsBuilder
      * ======================================================
      */
     static void
-    appendDeallocateStatement (SgExprListExp * deallocateParameters,
+    appendDeallocateStatement (SgVarRefExp * arrayReference,
         SgScopeStatement * scope);
 
     /*

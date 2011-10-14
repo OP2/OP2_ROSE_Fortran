@@ -2,12 +2,7 @@
 #include <CPPOP2Definitions.h>
 #include <CPPParallelLoop.h>
 #include <CommonNamespaces.h>
-
-/*
- * ======================================================
- * Private functions
- * ======================================================
- */
+#include <boost/filesystem.hpp>
 
 void
 CPPProgramDeclarationsAndDefinitions::detectAndHandleOP2Definition (
@@ -78,11 +73,26 @@ CPPProgramDeclarationsAndDefinitions::detectAndHandleOP2Definition (
 void
 CPPProgramDeclarationsAndDefinitions::visit (SgNode * node)
 {
+  using boost::filesystem::path;
+  using boost::filesystem::system_complete;
   using boost::iequals;
   using std::string;
 
   switch (node->variantT ())
   {
+    case V_SgSourceFile:
+    {
+      SgSourceFile * sourceFile = isSgSourceFile (node);
+
+      path p = system_complete (path (sourceFile->getFileName ()));
+
+      currentSourceFile = p.filename ();
+
+      Debug::getInstance ()->debugMessage ("Source file '" + currentSourceFile
+          + "' detected", Debug::OUTER_LOOP_LEVEL, __FILE__, __LINE__ );
+
+      break;
+    }
     case V_SgVariableDeclaration:
     {
       SgVariableDeclaration * variableDeclaration = isSgVariableDeclaration (
@@ -217,12 +227,6 @@ CPPProgramDeclarationsAndDefinitions::visit (SgNode * node)
     }
   }
 }
-
-/*
- * ======================================================
- * Public functions
- * ======================================================
- */
 
 CPPProgramDeclarationsAndDefinitions::CPPProgramDeclarationsAndDefinitions (
     SgProject * project)
