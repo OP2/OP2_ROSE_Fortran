@@ -56,6 +56,11 @@ FortranCUDAHostSubroutine::createReductionPrologueStatements ()
           buildVarRefExp (moduleDeclarations->getReductionArrayHostDeclaration (
               i)), buildIntVal (0), upperBoundExpression1, subroutineScope);
 
+      FortranStatementsAndExpressionsBuilder::appendAllocateStatement (
+          buildVarRefExp (
+              moduleDeclarations->getReductionArrayDeviceDeclaration (i)),
+          buildIntVal (0), upperBoundExpression1, subroutineScope);
+
       SgPntrArrRefExp * arrayIndexExpression1 = buildPntrArrRefExp (
           buildVarRefExp (moduleDeclarations->getReductionArrayHostDeclaration (
               i)), buildVarRefExp (variableDeclarations->get (
@@ -228,6 +233,11 @@ FortranCUDAHostSubroutine::createReductionEpilogueStatements ()
         FortranStatementsAndExpressionsBuilder::appendDeallocateStatement (
             buildVarRefExp (
                 moduleDeclarations->getReductionArrayHostDeclaration (i)),
+            subroutineScope);
+
+        FortranStatementsAndExpressionsBuilder::appendDeallocateStatement (
+            buildVarRefExp (
+                moduleDeclarations->getReductionArrayDeviceDeclaration (i)),
             subroutineScope);
       }
     }

@@ -185,7 +185,7 @@ FortranStatementsAndExpressionsBuilder::appendAllocateStatement (
   using SageInterface::appendStatement;
 
   SgSubscriptExpression * subscriptExpression = new SgSubscriptExpression (
-      RoseHelper::getFileInfo (), lowerBound, upperBound, buildIntVal (0));
+      RoseHelper::getFileInfo (), lowerBound, upperBound, buildIntVal (1));
   subscriptExpression->set_endOfConstruct (RoseHelper::getFileInfo ());
 
   SgPntrArrRefExp * arrayExpression = buildPntrArrRefExp (arrayReference,
