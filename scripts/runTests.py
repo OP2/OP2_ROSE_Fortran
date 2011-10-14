@@ -145,6 +145,7 @@ def manageNewFiles (timeStamp, testNum):
 	from re import compile, IGNORECASE
 	from FormatFortranCode import FormatFortranCode
 	from glob import glob
+	from shutil import move
 
 	cuda_regex = compile(".*cuda.*", IGNORECASE)
 
@@ -172,7 +173,7 @@ def manageNewFiles (timeStamp, testNum):
 		else:
 			destName += f[-4:]
 		debug.verboseMessage("Keeping file '%s'" % (destName))
-		os.rename(f, destName)
+		move(f, destName)
 		renamedFiles.append(destName)
 
 	makefile = generateCUDAMakefile(renamedFiles, testNum)
