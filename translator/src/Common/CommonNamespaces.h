@@ -328,12 +328,10 @@ namespace OP2
     getCUDASharedMemoryOffsetDeclarationName (SgType * type, unsigned int size);
 
     std::string const
-    getReductionArrayHostName (unsigned int OP_DAT_ArgumentGroup,
-        std::string const & suffix);
+    getReductionArrayHostName (unsigned int OP_DAT_ArgumentGroup);
 
     std::string const
-    getReductionArrayDeviceName (unsigned int OP_DAT_ArgumentGroup,
-        std::string const & suffix);
+    getReductionArrayDeviceName (unsigned int OP_DAT_ArgumentGroup);
 
     std::string const
     getReductionCardinalityName (unsigned int OP_DAT_ArgumentGroup);
@@ -423,23 +421,6 @@ namespace OpenCL
     std::string const globalModifier = "__global";
     std::string const constantModifier = "__constant";
 
-  }
-}
-
-namespace SubroutineCalls
-{
-  namespace Fortran
-  {
-    /*
-     * ======================================================
-     * Returns a statement which represents a C-to-Fortran
-     * pointer conversion
-     * ======================================================
-     */
-    SgStatement *
-    createCToFortranPointerCallStatement (SgScopeStatement * scope,
-        SgExpression * parameter1, SgExpression * parameter2,
-        SgExpression * parameter3 = NULL);
   }
 }
 

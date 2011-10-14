@@ -9,12 +9,6 @@
 #include <Debug.h>
 #include <OpenMP.h>
 
-/*
- * ======================================================
- * Private functions
- * ======================================================
- */
-
 SgStatement *
 FortranOpenMPHostSubroutineDirectLoop::createKernelFunctionCallStatement ()
 {
@@ -182,26 +176,10 @@ FortranOpenMPHostSubroutineDirectLoop::createTransferOpDatStatements ()
       SgVarRefExp * parameterExpression2 = buildVarRefExp (
           moduleDeclarations->getGlobalOpDatDeclaration (i));
 
-      SgDotExp * parameterExpression3;
-
-      if (parallelLoop->isReductionRequired (i) == false)
-      {
-        parameterExpression3 = buildDotExp (buildVarRefExp (
-            variableDeclarations->get (OP2::VariableNames::getOpSetName ())),
-            buildOpaqueVarRefExp (OP2::VariableNames::size, block));
-      }
-      else
-      {
-        parameterExpression3 = buildDotExp (buildVarRefExp (
-            variableDeclarations->get (OP2::VariableNames::getOpDatName (i))),
-            buildOpaqueVarRefExp (OP2::VariableNames::dimension, block));
-      }
-
-      SgStatement * callStatement =
-          SubroutineCalls::Fortran::createCToFortranPointerCallStatement (
-              subroutineScope, parameterExpression1, parameterExpression2,
-              buildOpaqueVarRefExp ("(/"
-                  + parameterExpression3->unparseToString () + "/)", block));
+      SgStatement
+          * callStatement =
+              FortranStatementsAndExpressionsBuilder::createCToFortranPointerCallStatement (
+                  subroutineScope, parameterExpression1, parameterExpression2);
 
       appendStatement (callStatement, block);
     }
@@ -299,12 +277,6 @@ FortranOpenMPHostSubroutineDirectLoop::createLocalVariableDeclarations ()
     createReductionLocalVariableDeclarations ();
   }
 }
-
-/*
- * ======================================================
- * Public functions
- * ======================================================
- */
 
 FortranOpenMPHostSubroutineDirectLoop::FortranOpenMPHostSubroutineDirectLoop (
     SgScopeStatement * moduleScope,

@@ -27,17 +27,23 @@ FortranCUDAHostSubroutineDirectLoop::createKernelFunctionCallStatement ()
 
   SgExprListExp * actualParameters = buildExprListExp ();
 
-  actualParameters->append_expression (buildVarRefExp (
-      variableDeclarations->get (OP2::VariableNames::opDatDimensions)));
-
-  actualParameters->append_expression (buildVarRefExp (
-      variableDeclarations->get (OP2::VariableNames::opDatCardinalities)));
-
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
     if (parallelLoop->isDuplicateOpDat (i) == false)
     {
-      if (parallelLoop->isRead (i))
+      if (parallelLoop->isReductionRequired (i))
+      {
+        actualParameters->append_expression (buildVarRefExp (
+            variableDeclarations->get (
+                OP2::VariableNames::getReductionArrayDeviceName (i))));
+      }
+      else if (parallelLoop->isDirect (i))
+      {
+        actualParameters->append_expression (buildVarRefExp (
+            variableDeclarations->get (OP2::VariableNames::getOpDatDeviceName (
+                i))));
+      }
+      else if (parallelLoop->isRead (i))
       {
         if (parallelLoop->isGlobalScalar (i))
         {
@@ -51,12 +57,6 @@ FortranCUDAHostSubroutineDirectLoop::createKernelFunctionCallStatement ()
               variableDeclarations->get (
                   OP2::VariableNames::getOpDatDeviceName (i))));
         }
-      }
-      else if (parallelLoop->isDirect (i) || parallelLoop->isIndirect (i))
-      {
-        actualParameters->append_expression (buildVarRefExp (
-            variableDeclarations->get (OP2::VariableNames::getOpDatDeviceName (
-                i))));
       }
     }
   }
@@ -72,6 +72,12 @@ FortranCUDAHostSubroutineDirectLoop::createKernelFunctionCallStatement ()
 
   actualParameters->append_expression (buildVarRefExp (
       variableDeclarations->get (OP2::VariableNames::sharedMemoryOffset)));
+
+  actualParameters->append_expression (buildVarRefExp (
+      variableDeclarations->get (OP2::VariableNames::opDatDimensions)));
+
+  actualParameters->append_expression (buildVarRefExp (
+      variableDeclarations->get (OP2::VariableNames::opDatCardinalities)));
 
   SgCudaKernelExecConfig * kernelConfiguration = new SgCudaKernelExecConfig (
       RoseHelper::getFileInfo (), buildVarRefExp (variableDeclarations->get (

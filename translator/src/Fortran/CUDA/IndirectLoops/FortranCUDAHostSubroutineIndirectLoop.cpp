@@ -691,12 +691,13 @@ FortranCUDAHostSubroutineIndirectLoop::createStatements ()
     createReductionPrologueStatements ();
   }
 
-  SgStatement * callStatement1 =
-      SubroutineCalls::Fortran::createCToFortranPointerCallStatement (
-          subroutineScope, buildVarRefExp (
-              moduleDeclarations->getCPlanReturnDeclaration ()),
-          buildVarRefExp (variableDeclarations->get (
-              OP2::VariableNames::PlanFunction::actualPlan)));
+  SgStatement
+      * callStatement1 =
+          FortranStatementsAndExpressionsBuilder::createCToFortranPointerCallStatement (
+              subroutineScope, buildVarRefExp (
+                  moduleDeclarations->getCPlanReturnDeclaration ()),
+              buildVarRefExp (variableDeclarations->get (
+                  OP2::VariableNames::PlanFunction::actualPlan)));
 
   appendStatement (callStatement1, subroutineScope);
 

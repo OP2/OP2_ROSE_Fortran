@@ -45,33 +45,9 @@ FortranModuleDeclarations::getCPlanReturnDeclaration ()
 }
 
 SgVariableDeclaration *
-FortranModuleDeclarations::getReductionArrayHostDeclaration (
-    unsigned int OP_DAT_ArgumentGroup)
-{
-  return variableDeclarations->get (
-      OP2::VariableNames::getReductionArrayHostName (OP_DAT_ArgumentGroup,
-          parallelLoop->getUserSubroutineName ()));
-}
-
-SgVariableDeclaration *
-FortranModuleDeclarations::getReductionArrayDeviceDeclaration (
-    unsigned int OP_DAT_ArgumentGroup)
-{
-  return variableDeclarations->get (
-      OP2::VariableNames::getReductionArrayDeviceName (OP_DAT_ArgumentGroup,
-          parallelLoop->getUserSubroutineName ()));
-}
-
-SgVariableDeclaration *
 FortranModuleDeclarations::getGlobalOpDatDeclaration (
     unsigned int OP_DAT_ArgumentGroup)
 {
   return variableDeclarations->get (OP2::VariableNames::getOpDatGlobalName (
       OP_DAT_ArgumentGroup));
-}
-
-ScopedVariableDeclarations *
-FortranModuleDeclarations::getAllDeclarations ()
-{
-  return variableDeclarations;
 }

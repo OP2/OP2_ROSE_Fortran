@@ -1,9 +1,3 @@
-/*
- * Written by Adam Betts and Carlo Bertolli
- *
- * This class models module-scope declarations in Fortran
- */
-
 #pragma once
 #ifndef FORTRAN_MODULE_DECLARATIONS_H
 #define FORTRAN_MODULE_DECLARATIONS_H
@@ -56,16 +50,7 @@ class FortranModuleDeclarations
     getCPlanReturnDeclaration ();
 
     SgVariableDeclaration *
-    getReductionArrayHostDeclaration (unsigned int OP_DAT_ArgumentGroup);
-
-    SgVariableDeclaration *
-    getReductionArrayDeviceDeclaration (unsigned int OP_DAT_ArgumentGroup);
-
-    SgVariableDeclaration *
     getGlobalOpDatDeclaration (unsigned int OP_DAT_ArgumentGroup);
-
-    ScopedVariableDeclarations *
-    getAllDeclarations ();
 };
 
 #endif

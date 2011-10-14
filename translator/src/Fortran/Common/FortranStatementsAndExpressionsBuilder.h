@@ -15,6 +15,7 @@ class SgImplicitStatement;
 class SgAggregateInitializer;
 class SgFunctionParameterList;
 class SgType;
+class SgExprStatement;
 
 class FortranStatementsAndExpressionsBuilder
 {
@@ -28,9 +29,10 @@ class FortranStatementsAndExpressionsBuilder
 
     /*
      * ======================================================
-     * Builds a Fortran 'do' construct
+     * Builds a Fortran 'do' statement
      * ======================================================
      */
+
     static SgFortranDo
         *
         buildFortranDoStatement (SgExpression * initialization,
@@ -43,6 +45,7 @@ class FortranStatementsAndExpressionsBuilder
      * declaration assumed to be an integer
      * ======================================================
      */
+
     static SgAggregateInitializer *
     buildShapeExpression (SgVariableDeclaration * variableDeclaration);
 
@@ -56,6 +59,7 @@ class FortranStatementsAndExpressionsBuilder
      * dictates how many such attributes have been attached.
      * ======================================================
      */
+
     static SgVariableDeclaration *
     appendVariableDeclaration (std::string const & variableName, SgType * type,
         SgScopeStatement * scope, int remainingArguments = 0, ...);
@@ -71,6 +75,7 @@ class FortranStatementsAndExpressionsBuilder
      * dictates how many such attributes have been attached.
      * ======================================================
      */
+
     static SgVariableDeclaration *
     appendVariableDeclarationAsFormalParameter (
         std::string const & variableName, SgType * type,
@@ -82,6 +87,7 @@ class FortranStatementsAndExpressionsBuilder
      * Appends an allocate statement to the given scope
      * ======================================================
      */
+
     static void
     appendAllocateStatement (SgVarRefExp * arrayReference,
         SgExpression * lowerBound, SgExpression * upperBound,
@@ -92,6 +98,7 @@ class FortranStatementsAndExpressionsBuilder
      * Appends a deallocate statement to the given scope
      * ======================================================
      */
+
     static void
     appendDeallocateStatement (SgVarRefExp * arrayReference,
         SgScopeStatement * scope);
@@ -101,8 +108,21 @@ class FortranStatementsAndExpressionsBuilder
      * Builds the 'IMPLICIT NONE' statement
      * ======================================================
      */
+
     static SgImplicitStatement *
     buildImplicitNoneStatement ();
+
+    /*
+     * ======================================================
+     * Returns a statement which represents a C-to-Fortran
+     * pointer conversion
+     * ======================================================
+     */
+
+    static SgExprStatement *
+    createCToFortranPointerCallStatement (SgScopeStatement * scope,
+        SgExpression * parameter1, SgExpression * parameter2,
+        SgExpression * parameter3 = NULL);
 };
 
 #endif

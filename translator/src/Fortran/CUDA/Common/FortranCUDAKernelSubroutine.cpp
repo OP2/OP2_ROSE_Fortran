@@ -220,8 +220,8 @@ FortranCUDAKernelSubroutine::createReductionEpilogueStatements ()
       subscriptExpression->set_endOfConstruct (RoseHelper::getFileInfo ());
 
       SgPntrArrRefExp * parameterExpression1 = buildPntrArrRefExp (
-          buildVarRefExp (
-              moduleDeclarations->getReductionArrayDeviceDeclaration (i)),
+          buildVarRefExp (variableDeclarations->get (
+              OP2::VariableNames::getReductionArrayDeviceName (i))),
           subscriptExpression);
 
       /*

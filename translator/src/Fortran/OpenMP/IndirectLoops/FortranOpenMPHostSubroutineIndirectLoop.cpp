@@ -297,14 +297,15 @@ FortranOpenMPHostSubroutineIndirectLoop::createTransferOpDatStatements ()
       SgVarRefExp * parameterExpression2 = buildVarRefExp (
           moduleDeclarations->getGlobalOpDatDeclaration (i));
 
-      SgVarRefExp * parameterExpression3 = buildVarRefExp (
-          moduleDeclarationsIndirectLoop->getGlobalOpDatSizeDeclaration (i));
-
-      SgStatement * callStatement =
-          SubroutineCalls::Fortran::createCToFortranPointerCallStatement (
-              subroutineScope, parameterExpression1, parameterExpression2,
-              buildOpaqueVarRefExp ("(/"
-                  + parameterExpression3->unparseToString () + "/)", block));
+      SgStatement
+          * callStatement =
+              FortranStatementsAndExpressionsBuilder::createCToFortranPointerCallStatement (
+                  subroutineScope,
+                  parameterExpression1,
+                  parameterExpression2,
+                  FortranStatementsAndExpressionsBuilder::buildShapeExpression (
+                      moduleDeclarationsIndirectLoop->getGlobalOpDatSizeDeclaration (
+                          i)));
 
       appendStatement (callStatement, block);
     }

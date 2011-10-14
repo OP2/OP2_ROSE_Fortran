@@ -632,76 +632,6 @@ FortranCUDAKernelSubroutineDirectLoop::createThreadIDInitialisationStatement ()
 }
 
 void
-FortranCUDAKernelSubroutineDirectLoop::createOpDatFormalParameterDeclarations ()
-{
-  using SageBuilder::buildSubtractOp;
-  using SageBuilder::buildIntVal;
-  using SageBuilder::buildVarRefExp;
-  using SageBuilder::buildArrayType;
-  using SageBuilder::buildExprListExp;
-  using SageBuilder::buildDotExp;
-  using std::string;
-
-  Debug::getInstance ()->debugMessage (
-      "Creating OP_DAT formal parameter declarations", Debug::FUNCTION_LEVEL,
-      __FILE__, __LINE__);
-
-  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
-  {
-    if (parallelLoop->isDuplicateOpDat (i) == false)
-    {
-      if (parallelLoop->isReductionRequired (i) == false)
-      {
-        string const & variableName = OP2::VariableNames::getOpDatName (i);
-
-        if (parallelLoop->isGlobal (i) && parallelLoop->isRead (i))
-        {
-          if (parallelLoop->isGlobalScalar (i))
-          {
-            variableDeclarations->add (
-                variableName,
-                FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
-                    variableName, parallelLoop->getOpDatBaseType (i),
-                    subroutineScope, formalParameters, 1, VALUE));
-          }
-          else
-          {
-            variableDeclarations->add (
-                variableName,
-                FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
-                    variableName,
-                    FortranTypesBuilder::getArray_RankOne_WithLowerAndUpperBounds (
-                        parallelLoop->getOpDatBaseType (i), buildIntVal (0),
-                        buildIntVal (parallelLoop->getOpDatDimension (i) - 1)),
-                    subroutineScope, formalParameters, 1, CUDA_DEVICE));
-          }
-        }
-        else
-        {
-          SgDotExp * dotExpression = buildDotExp (
-              buildVarRefExp (variableDeclarations->get (
-                  OP2::VariableNames::opDatCardinalities)), buildVarRefExp (
-                  cardinalitiesDeclaration->getFieldDeclarations ()->get (
-                      OP2::VariableNames::getOpDatCardinalityName (i))));
-
-          SgSubtractOp * upperBoundExpression = buildSubtractOp (dotExpression,
-              buildIntVal (1));
-
-          variableDeclarations->add (
-              variableName,
-              FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
-                  variableName,
-                  FortranTypesBuilder::getArray_RankOne_WithLowerAndUpperBounds (
-                      parallelLoop->getOpDatBaseType (i), buildIntVal (0),
-                      upperBoundExpression), subroutineScope, formalParameters,
-                  1, CUDA_DEVICE));
-        }
-      }
-    }
-  }
-}
-
-void
 FortranCUDAKernelSubroutineDirectLoop::createStatements ()
 {
   createInitialiseCUDAStageInVariablesStatements ();
@@ -749,40 +679,89 @@ FortranCUDAKernelSubroutineDirectLoop::createLocalVariableDeclarations ()
 }
 
 void
+FortranCUDAKernelSubroutineDirectLoop::createOpDatFormalParameterDeclarations ()
+{
+  using SageBuilder::buildSubtractOp;
+  using SageBuilder::buildIntVal;
+  using SageBuilder::buildVarRefExp;
+  using SageBuilder::buildArrayType;
+  using SageBuilder::buildExprListExp;
+  using SageBuilder::buildDotExp;
+  using std::string;
+
+  Debug::getInstance ()->debugMessage (
+      "Creating OP_DAT formal parameter declarations", Debug::FUNCTION_LEVEL,
+      __FILE__, __LINE__);
+
+  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
+  {
+    if (parallelLoop->isDuplicateOpDat (i) == false)
+    {
+      if (parallelLoop->isReductionRequired (i))
+      {
+        string const & variableName =
+            OP2::VariableNames::getReductionArrayDeviceName (i);
+
+        variableDeclarations->add (
+            variableName,
+            FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
+                variableName, FortranTypesBuilder::getArray_RankOne (
+                    parallelLoop->getOpDatBaseType (i)), subroutineScope,
+                formalParameters, 1, CUDA_DEVICE));
+      }
+      else if (parallelLoop->isDirect (i))
+      {
+        string const & variableName = OP2::VariableNames::getOpDatName (i);
+
+        SgDotExp * dotExpression = buildDotExp (
+            buildVarRefExp (variableDeclarations->get (
+                OP2::VariableNames::opDatCardinalities)), buildVarRefExp (
+                cardinalitiesDeclaration->getFieldDeclarations ()->get (
+                    OP2::VariableNames::getOpDatCardinalityName (i))));
+
+        SgSubtractOp * upperBoundExpression = buildSubtractOp (dotExpression,
+            buildIntVal (1));
+
+        variableDeclarations->add (
+            variableName,
+            FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
+                variableName,
+                FortranTypesBuilder::getArray_RankOne_WithLowerAndUpperBounds (
+                    parallelLoop->getOpDatBaseType (i), buildIntVal (0),
+                    upperBoundExpression), subroutineScope, formalParameters,
+                1, CUDA_DEVICE));
+      }
+      else if (parallelLoop->isRead (i))
+      {
+        string const & variableName = OP2::VariableNames::getOpDatName (i);
+
+        if (parallelLoop->isGlobalScalar (i))
+        {
+          variableDeclarations->add (
+              variableName,
+              FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
+                  variableName, parallelLoop->getOpDatBaseType (i),
+                  subroutineScope, formalParameters, 1, VALUE));
+        }
+        else
+        {
+          variableDeclarations->add (
+              variableName,
+              FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
+                  variableName,
+                  FortranTypesBuilder::getArray_RankOne_WithLowerAndUpperBounds (
+                      parallelLoop->getOpDatBaseType (i), buildIntVal (0),
+                      buildIntVal (parallelLoop->getOpDatDimension (i) - 1)),
+                  subroutineScope, formalParameters, 1, CUDA_DEVICE));
+        }
+      }
+    }
+  }
+}
+
+void
 FortranCUDAKernelSubroutineDirectLoop::createFormalParameterDeclarations ()
 {
-  /*
-   * ======================================================
-   * OP_DAT dimensions struct
-   * ======================================================
-   */
-
-  variableDeclarations->add (
-      OP2::VariableNames::opDatDimensions,
-      FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
-          OP2::VariableNames::opDatDimensions,
-          dimensionsDeclaration->getType (), subroutineScope, formalParameters,
-          1, CUDA_DEVICE));
-
-  /*
-   * ======================================================
-   * OP_DAT cardinalities struct
-   * ======================================================
-   */
-
-  variableDeclarations->add (
-      OP2::VariableNames::opDatCardinalities,
-      FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
-          OP2::VariableNames::opDatCardinalities,
-          cardinalitiesDeclaration->getType (), subroutineScope,
-          formalParameters, 1, CUDA_DEVICE));
-
-  /*
-   * ======================================================
-   * OP_DATs
-   * ======================================================
-   */
-
   createOpDatFormalParameterDeclarations ();
 
   /*
@@ -823,6 +802,32 @@ FortranCUDAKernelSubroutineDirectLoop::createFormalParameterDeclarations ()
           OP2::VariableNames::sharedMemoryOffset,
           FortranTypesBuilder::getFourByteInteger (), subroutineScope,
           formalParameters, 1, VALUE));
+
+  /*
+   * ======================================================
+   * OP_DAT dimensions
+   * ======================================================
+   */
+
+  variableDeclarations->add (
+      OP2::VariableNames::opDatDimensions,
+      FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
+          OP2::VariableNames::opDatDimensions,
+          dimensionsDeclaration->getType (), subroutineScope, formalParameters,
+          1, CUDA_DEVICE));
+
+  /*
+   * ======================================================
+   * OP_DAT cardinalities
+   * ======================================================
+   */
+
+  variableDeclarations->add (
+      OP2::VariableNames::opDatCardinalities,
+      FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
+          OP2::VariableNames::opDatCardinalities,
+          cardinalitiesDeclaration->getType (), subroutineScope,
+          formalParameters, 1, CUDA_DEVICE));
 }
 
 FortranCUDAKernelSubroutineDirectLoop::FortranCUDAKernelSubroutineDirectLoop (

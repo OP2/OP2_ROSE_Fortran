@@ -303,38 +303,22 @@ OP2::VariableNames::getCUDASharedMemoryOffsetDeclarationName (SgType * type,
 
 std::string const
 OP2::VariableNames::getReductionArrayHostName (
-    unsigned int OP_DAT_ArgumentGroup, std::string const & suffix)
+    unsigned int OP_DAT_ArgumentGroup)
 {
   using boost::lexical_cast;
   using std::string;
 
-  string const prefix = "reductionArrayHost" + lexical_cast <string> (
-      OP_DAT_ArgumentGroup);
-
-  if (prefix.length () + suffix.length () > 30)
-  {
-    return prefix + getNewSuffix (suffix);
-  }
-
-  return prefix + suffix;
+  return "reductionArrayHost" + lexical_cast <string> (OP_DAT_ArgumentGroup);
 }
 
 std::string const
 OP2::VariableNames::getReductionArrayDeviceName (
-    unsigned int OP_DAT_ArgumentGroup, std::string const & suffix)
+    unsigned int OP_DAT_ArgumentGroup)
 {
   using boost::lexical_cast;
   using std::string;
 
-  string const prefix = "reductionArrayDevice" + lexical_cast <string> (
-      OP_DAT_ArgumentGroup);
-
-  if (prefix.length () + suffix.length () > 30)
-  {
-    return prefix + getNewSuffix (suffix);
-  }
-
-  return prefix + suffix;
+  return "reductionArrayDevice" + lexical_cast <string> (OP_DAT_ArgumentGroup);
 }
 
 std::string const
@@ -345,26 +329,4 @@ OP2::VariableNames::getReductionCardinalityName (
   using std::string;
 
   return "reductionCardinality" + lexical_cast <string> (OP_DAT_ArgumentGroup);
-}
-
-SgStatement *
-SubroutineCalls::Fortran::createCToFortranPointerCallStatement (
-    SgScopeStatement * scope, SgExpression * parameter1,
-    SgExpression * parameter2, SgExpression * parameter3)
-{
-  using SageBuilder::buildFunctionCallExp;
-  using SageBuilder::buildExprListExp;
-  using SageBuilder::buildExprStatement;
-  using SageInterface::appendStatement;
-
-  SgFunctionSymbol * functionSymbol =
-      FortranTypesBuilder::buildNewFortranSubroutine ("c_f_pointer", scope);
-
-  SgExprListExp * actualParameters = buildExprListExp (parameter1, parameter2,
-      parameter3);
-
-  SgFunctionCallExp * subroutineCall = buildFunctionCallExp (functionSymbol,
-      actualParameters);
-
-  return buildExprStatement (subroutineCall);
 }
