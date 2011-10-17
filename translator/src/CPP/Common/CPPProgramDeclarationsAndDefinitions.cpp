@@ -61,20 +61,6 @@ CPPProgramDeclarationsAndDefinitions::setParallelLoopMappingDescriptor (
 {
   using boost::iequals;
 
-  if (iequals (mappingValue, OP2::OP_ID))
-  {
-    Debug::getInstance ()->debugMessage ("...DIRECT mapping descriptor",
-        Debug::OUTER_LOOP_LEVEL, __FILE__, __LINE__);
-
-    parallelLoop->setOpMapValue (OP_DAT_ArgumentGroup, DIRECT);
-  }
-  else
-  {
-    Debug::getInstance ()->debugMessage ("...INDIRECT mapping descriptor",
-        Debug::OUTER_LOOP_LEVEL, __FILE__, __LINE__);
-
-    parallelLoop->setOpMapValue (OP_DAT_ArgumentGroup, INDIRECT);
-  }
 }
 
 void
@@ -205,14 +191,22 @@ CPPProgramDeclarationsAndDefinitions::handleImperialOpDatArgument (
   setParallelLoopAccessDescriptor (parallelLoop, actualArguments,
       OP_DAT_ArgumentGroup, CPPImperialOpArgDatCall::indexAccessDescriptor);
 
-  SgVarRefExp * opMapReference = isSgVarRefExp (
-      actualArguments->get_expressions ()[CPPImperialOpArgDatCall::indexOpMap]);
+  if (isSgVarRefExp (
+      actualArguments->get_expressions ()[CPPImperialOpArgDatCall::indexOpMap])
+      == NULL)
+  {
+    Debug::getInstance ()->debugMessage ("...DIRECT mapping descriptor",
+        Debug::OUTER_LOOP_LEVEL, __FILE__, __LINE__);
 
-  string const mappingValue =
-      opMapReference->get_symbol ()->get_name ().getString ();
+    parallelLoop->setOpMapValue (OP_DAT_ArgumentGroup, DIRECT);
+  }
+  else
+  {
+    Debug::getInstance ()->debugMessage ("...INDIRECT mapping descriptor",
+        Debug::OUTER_LOOP_LEVEL, __FILE__, __LINE__);
 
-  setParallelLoopMappingDescriptor (parallelLoop, mappingValue,
-      OP_DAT_ArgumentGroup);
+    parallelLoop->setOpMapValue (OP_DAT_ArgumentGroup, INDIRECT);
+  }
 }
 
 void
@@ -239,14 +233,22 @@ CPPProgramDeclarationsAndDefinitions::handleOxfordOpDatArgument (
   setParallelLoopAccessDescriptor (parallelLoop, actualArguments,
       OP_DAT_ArgumentGroup, CPPOxfordOpArgDatCall::indexAccessDescriptor);
 
-  SgVarRefExp * opMapReference = isSgVarRefExp (
-      actualArguments->get_expressions ()[CPPOxfordOpArgDatCall::indexOpMap]);
+  if (isSgVarRefExp (
+      actualArguments->get_expressions ()[CPPImperialOpArgDatCall::indexOpMap])
+      == NULL)
+  {
+    Debug::getInstance ()->debugMessage ("...DIRECT mapping descriptor",
+        Debug::OUTER_LOOP_LEVEL, __FILE__, __LINE__);
 
-  string const mappingValue =
-      opMapReference->get_symbol ()->get_name ().getString ();
+    parallelLoop->setOpMapValue (OP_DAT_ArgumentGroup, DIRECT);
+  }
+  else
+  {
+    Debug::getInstance ()->debugMessage ("...INDIRECT mapping descriptor",
+        Debug::OUTER_LOOP_LEVEL, __FILE__, __LINE__);
 
-  setParallelLoopMappingDescriptor (parallelLoop, mappingValue,
-      OP_DAT_ArgumentGroup);
+    parallelLoop->setOpMapValue (OP_DAT_ArgumentGroup, INDIRECT);
+  }
 }
 
 void

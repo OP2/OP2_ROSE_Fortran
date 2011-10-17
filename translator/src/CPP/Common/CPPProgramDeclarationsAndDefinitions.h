@@ -25,10 +25,6 @@ class CPPProgramDeclarationsAndDefinitions: public ProgramDeclarationsAndDefinit
         std::string const & variableName, int OP_DAT_ArgumentGroup);
 
     void
-    setParallelLoopMappingDescriptor (CPPParallelLoop * parallelLoop,
-        std::string const & mappingValue, unsigned int OP_DAT_ArgumentGroup);
-
-    void
     setParallelLoopAccessDescriptor (CPPParallelLoop * parallelLoop,
         SgExprListExp * actualArguments, unsigned int OP_DAT_ArgumentGroup,
         unsigned int argumentPosition);
