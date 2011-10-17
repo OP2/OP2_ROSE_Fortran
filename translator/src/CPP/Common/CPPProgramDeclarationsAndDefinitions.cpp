@@ -269,40 +269,45 @@ CPPProgramDeclarationsAndDefinitions::analyseParallelLoopArguments (
      * ======================================================
      */
 
-    SgFunctionCallExp * opArgDatCall = isSgFunctionCallExp (
+    SgFunctionCallExp * opDatCall = isSgFunctionCallExp (
         actualArguments->get_expressions ()[argument]);
 
-    if (opArgDatCall != NULL)
+    if (opDatCall != NULL)
     {
-      SgExprListExp * opDatActualArguments = opArgDatCall->get_args ();
+      SgExprListExp * opDatActualArguments = opDatCall->get_args ();
 
-      if (opDatActualArguments->get_expressions ().size ()
-          == CPPImperialOpArgDatCall::getNumberOfExpectedArguments ())
+      if (iequals (
+          opDatCall->getAssociatedFunctionSymbol ()->get_name ().getString (),
+          OP2::OP_ARG_DAT))
       {
-        handleImperialOpDatArgument (parallelLoop, opDatActualArguments,
-            OP_DAT_ArgumentGroup);
+        if (opDatActualArguments->get_expressions ().size ()
+            == CPPImperialOpArgDatCall::getNumberOfExpectedArguments ())
+        {
+          handleImperialOpDatArgument (parallelLoop, opDatActualArguments,
+              OP_DAT_ArgumentGroup);
+        }
+        else
+        {
+          handleOxfordOpDatArgument (parallelLoop, opDatActualArguments,
+              OP_DAT_ArgumentGroup);
+        }
       }
-      else if (opDatActualArguments->get_expressions ().size ()
-          == CPPOxfordOpArgGblCall::getNumberOfExpectedArguments ())
+      else
       {
-        handleImperialOpGblArgument (parallelLoop, opDatActualArguments,
-            OP_DAT_ArgumentGroup);
-
         parallelLoop->setOpMapValue (OP_DAT_ArgumentGroup, GLOBAL);
-      }
-      else if (opDatActualArguments->get_expressions ().size ()
-          == CPPOxfordOpArgDatCall::getNumberOfExpectedArguments ())
-      {
-        handleOxfordOpDatArgument (parallelLoop, opDatActualArguments,
-            OP_DAT_ArgumentGroup);
-      }
-      else if (opDatActualArguments->get_expressions ().size ()
-          == CPPImperialOpArgGblCall::getNumberOfExpectedArguments ())
-      {
-        handleOxfordOpGblArgument (parallelLoop, opDatActualArguments,
-            OP_DAT_ArgumentGroup);
 
-        parallelLoop->setOpMapValue (OP_DAT_ArgumentGroup, GLOBAL);
+        if (opDatActualArguments->get_expressions ().size ()
+            == CPPOxfordOpArgGblCall::getNumberOfExpectedArguments ())
+        {
+          handleImperialOpGblArgument (parallelLoop, opDatActualArguments,
+              OP_DAT_ArgumentGroup);
+        }
+        else if (opDatActualArguments->get_expressions ().size ()
+            == CPPImperialOpArgGblCall::getNumberOfExpectedArguments ())
+        {
+          handleOxfordOpGblArgument (parallelLoop, opDatActualArguments,
+              OP_DAT_ArgumentGroup);
+        }
       }
 
       OP_DAT_ArgumentGroup++;
