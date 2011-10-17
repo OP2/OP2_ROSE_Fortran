@@ -6,31 +6,17 @@
 
 class CPPProgramDeclarationsAndDefinitions;
 class CPPHostSubroutine;
-class CPPOpDatDimensionsDeclaration;
 
 class CPPSubroutinesGeneration: public SubroutinesGeneration <
     CPPProgramDeclarationsAndDefinitions, CPPHostSubroutine>
 {
   protected:
 
-    std::map <std::string, CPPOpDatDimensionsDeclaration *>
-        dimensionsDeclarations;
-
-    virtual CPPHostSubroutine *
+    virtual void
     createSubroutines () = 0;
 
     void
     patchCallsToParallelLoops ();
-
-    /*
-     * ======================================================
-     * Adds the relevant library 'use' statements to the
-     * generated module. This function is pure virtual as the
-     * needed libraries are backend specific
-     * ======================================================
-     */
-    virtual void
-    addLibraries () = 0;
 
     void
     generate ();

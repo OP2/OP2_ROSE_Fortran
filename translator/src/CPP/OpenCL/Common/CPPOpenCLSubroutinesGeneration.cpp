@@ -12,7 +12,7 @@ namespace Libraries
   std::string const OPENCL = "CL/cl.h";
 }
 
-CPPHostSubroutine *
+void
 CPPOpenCLSubroutinesGeneration::createSubroutines ()
 {
   using std::string;
@@ -54,7 +54,6 @@ CPPOpenCLSubroutinesGeneration::createSubroutines ()
               kernelSubroutine, parallelLoop);
     }
   }
-  return NULL; //FIXME
 }
 
 void

@@ -8,11 +8,8 @@ class CPPCUDASubroutinesGeneration: public CPPSubroutinesGeneration
 {
   private:
 
-    virtual CPPHostSubroutine *
-    createSubroutines ();
-    
     virtual void
-    addLibraries ();
+    createSubroutines ();
 
   public:
 

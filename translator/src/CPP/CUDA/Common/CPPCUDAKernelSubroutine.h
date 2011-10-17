@@ -1,4 +1,3 @@
-
 #pragma once
 #ifndef CPP_CUDA_KERNEL_SUBROUTINE_H
 #define CPP_CUDA_KERNEL_SUBROUTINE_H

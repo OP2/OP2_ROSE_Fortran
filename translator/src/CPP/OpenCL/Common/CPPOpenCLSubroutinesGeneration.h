@@ -8,7 +8,7 @@ class CPPOpenCLSubroutinesGeneration: public CPPSubroutinesGeneration
 {
   private:
 
-    virtual CPPHostSubroutine *
+    virtual void
     createSubroutines ();
 
     virtual void

@@ -59,11 +59,7 @@ CPPSubroutinesGeneration::generate ()
 {
   moduleScope = sourceFile->get_globalScope ();
 
-  addLibraries ();
-
   createSubroutines ();
-
-  patchCallsToParallelLoops ();
 }
 
 CPPSubroutinesGeneration::CPPSubroutinesGeneration (SgProject * project,

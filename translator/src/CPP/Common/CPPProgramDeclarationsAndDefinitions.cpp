@@ -297,13 +297,12 @@ CPPProgramDeclarationsAndDefinitions::analyseParallelLoopArguments (
         parallelLoop->setOpMapValue (OP_DAT_ArgumentGroup, GLOBAL);
 
         if (opDatActualArguments->get_expressions ().size ()
-            == CPPOxfordOpArgGblCall::getNumberOfExpectedArguments ())
+            == CPPImperialOpArgGblCall::getNumberOfExpectedArguments ())
         {
           handleImperialOpGblArgument (parallelLoop, opDatActualArguments,
               OP_DAT_ArgumentGroup);
         }
-        else if (opDatActualArguments->get_expressions ().size ()
-            == CPPImperialOpArgGblCall::getNumberOfExpectedArguments ())
+        else
         {
           handleOxfordOpGblArgument (parallelLoop, opDatActualArguments,
               OP_DAT_ArgumentGroup);
