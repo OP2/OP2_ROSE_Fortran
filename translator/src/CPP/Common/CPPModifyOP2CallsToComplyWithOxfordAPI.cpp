@@ -18,7 +18,7 @@ CPPModifyOP2CallsToComplyWithOxfordAPI::patchOpArgGblCall (
       Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
   SgAddressOfOp * addressOfOperator = isSgAddressOfOp (
-      actualArguments[CPPImperialOpArgGblCall::index_OpDatName]);
+      actualArguments[CPPImperialOpArgGblCall::indexOpDat]);
 
   string opConstVariableName;
 
@@ -35,8 +35,7 @@ CPPModifyOP2CallsToComplyWithOxfordAPI::patchOpArgGblCall (
   else
   {
     opConstVariableName
-        = isSgVarRefExp (
-            actualArguments[CPPImperialOpArgGblCall::index_OpDatName])->get_symbol ()->get_name ().getString ();
+        = isSgVarRefExp (actualArguments[CPPImperialOpArgGblCall::indexOpDat])->get_symbol ()->get_name ().getString ();
   }
 
   if (declarations->isTypeShort (opConstVariableName))
@@ -190,7 +189,7 @@ CPPModifyOP2CallsToComplyWithOxfordAPI::patchOpArgDatCall (
       Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
   SgVarRefExp * opDatReference = isSgVarRefExp (
-      actualArguments[CPPImperialOpArgDatCall::index_OpDatName]);
+      actualArguments[CPPImperialOpArgDatCall::indexOpDat]);
 
   ROSE_ASSERT (opDatReference != NULL);
 
@@ -338,7 +337,7 @@ CPPModifyOP2CallsToComplyWithOxfordAPI::patchOpDeclareConstCall (
       Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
   SgAddressOfOp * addressOfOperator = isSgAddressOfOp (
-      actualArguments[CPPImperialOpConstDefinition::index_OpDatName]);
+      actualArguments[CPPImperialOpConstDefinition::indexData]);
 
   string variableName;
 
@@ -355,7 +354,7 @@ CPPModifyOP2CallsToComplyWithOxfordAPI::patchOpDeclareConstCall (
   {
     variableName
         = isSgVarRefExp (
-            actualArguments[CPPImperialOpConstDefinition::index_OpDatName])->get_symbol ()->get_name ().getString ();
+            actualArguments[CPPImperialOpConstDefinition::indexData])->get_symbol ()->get_name ().getString ();
   }
 
   /*
@@ -427,7 +426,7 @@ CPPModifyOP2CallsToComplyWithOxfordAPI::patchOpDeclareDatCall (
   string const
       dataVariableName =
           isSgVarRefExp (
-              actualArguments[CPPImperialOpDatDefinition::index_data])->get_symbol ()->get_name ().getString ();
+              actualArguments[CPPImperialOpDatDefinition::indexDataArray])->get_symbol ()->get_name ().getString ();
 
   vector <SgExpression *>::iterator positionOfDataType =
       actualArguments.begin () + 2;

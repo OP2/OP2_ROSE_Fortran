@@ -22,17 +22,17 @@ class FortranProgramDeclarationsAndDefinitions: public ProgramDeclarationsAndDef
   private:
 
     void
-    handleOpGblDeclaration (FortranParallelLoop * parallelLoop,
+    setOpGblProperties (FortranParallelLoop * parallelLoop,
         std::string const & variableName, int opDatArgumentGroup);
 
     void
-    handleOpDatDeclaration (FortranParallelLoop * parallelLoop,
+    setOpDatProperties (FortranParallelLoop * parallelLoop,
         std::string const & variableName, int opDatArgumentGroup);
 
     void
     setParallelLoopAccessDescriptor (FortranParallelLoop * parallelLoop,
-        SgExprListExp * actualArguments,
-        unsigned int OP_DAT_ArgumentGroup, unsigned int argumentPosition);
+        SgExprListExp * actualArguments, unsigned int OP_DAT_ArgumentGroup,
+        unsigned int argumentPosition);
 
     void
     analyseParallelLoopArguments (FortranParallelLoop * parallelLoop,

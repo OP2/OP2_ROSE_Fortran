@@ -24,6 +24,7 @@ namespace OP2
    * ======================================================
    */
 
+  std::string const OP_ACCESS = "op_access";
   std::string const OP_SET = "op_set";
   std::string const OP_DAT = "op_dat";
   std::string const OP_DAT_GBL = "op_dat_gbl";

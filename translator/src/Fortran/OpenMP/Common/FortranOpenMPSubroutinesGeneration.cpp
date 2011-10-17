@@ -156,8 +156,8 @@ FortranOpenMPSubroutinesGeneration::addLibraries ()
       __FILE__, __LINE__);
 
   vector <string> libs;
-  libs.push_back (Libraries::OP2_C);
-  libs.push_back (Libraries::OMP_LIB);
+  libs.push_back ("OP2_C");
+  libs.push_back ("OMP_LIB");
 
   for (vector <string>::const_iterator it = libs.begin (); it != libs.end (); ++it)
   {
@@ -168,7 +168,7 @@ FortranOpenMPSubroutinesGeneration::addLibraries ()
 
     appendStatement (useStatement, moduleScope);
 
-    if (iequals (*it, Libraries::OMP_LIB))
+    if (iequals (*it, "OMP_LIB"))
     {
       addTextForUnparser (useStatement, "#ifdef _OPENMP\n",
           AstUnparseAttribute::e_before);

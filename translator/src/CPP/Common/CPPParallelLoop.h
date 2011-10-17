@@ -6,7 +6,7 @@
 
 class CPPParallelLoop: public ParallelLoop
 {
-  private:
+  public:
 
     /*
      * ======================================================
@@ -16,9 +16,9 @@ class CPPParallelLoop: public ParallelLoop
      * OP_PAR_LOOP_<N>
      *   (nameOfUserSubroutine,
      *    OP_SET,
-     *    OP_DAT,
+     *    OP_ARG_DAT/OP_ARG_GBL,
      *    ...
-     *    OP_DAT_N)
+     *    OP_ARG_DAT/OP_ARG_GBL)
      * ======================================================
      */
 

@@ -252,10 +252,11 @@ FortranCUDASubroutinesGeneration::addLibraries ()
       __FILE__, __LINE__);
 
   vector <string> libs;
-  libs.push_back (Libraries::ISO_C_BINDING);
-  libs.push_back (Libraries::OP2_C);
-  libs.push_back (Libraries::cudaConfigurationParams);
-  libs.push_back (Libraries::CUDAFOR);
+
+  libs.push_back ("ISO_C_BINDING");
+  libs.push_back ("OP2_C");
+  libs.push_back ("CUDAFOR");
+  libs.push_back ("CUDACONFIGURATIONPARAMS");
 
   for (vector <string>::const_iterator it = libs.begin (); it != libs.end (); ++it)
   {

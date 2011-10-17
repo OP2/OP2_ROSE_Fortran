@@ -41,7 +41,7 @@ void
 op_decl_const (int, char *, T *);
 
 op_arg
-op_arg_dat(op_dat, int, op_map, int, char *,  op_access);
+op_arg_dat(op_dat, int, op_map, int, char *, op_access);
 
 template <typename T>
 op_arg

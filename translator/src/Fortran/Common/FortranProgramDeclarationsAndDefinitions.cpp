@@ -9,9 +9,9 @@
 #include <boost/filesystem.hpp>
 
 void
-FortranProgramDeclarationsAndDefinitions::handleOpGblDeclaration (
+FortranProgramDeclarationsAndDefinitions::setOpGblProperties (
     FortranParallelLoop * parallelLoop, std::string const & variableName,
-    int opDatArgumentGroup)
+    int OP_DAT_ArgumentGroup)
 {
   OpGblDefinition * opGblDeclaration = getOpGblDefinition (variableName);
 
@@ -30,7 +30,7 @@ FortranProgramDeclarationsAndDefinitions::handleOpGblDeclaration (
      * ======================================================
      */
 
-    parallelLoop->setOpDatDimension (opDatArgumentGroup, 1);
+    parallelLoop->setOpDatDimension (OP_DAT_ArgumentGroup, 1);
   }
   else
   {
@@ -38,24 +38,24 @@ FortranProgramDeclarationsAndDefinitions::handleOpGblDeclaration (
         + "' has been declared through OP_DECL_GBL", Debug::FUNCTION_LEVEL,
         __FILE__, __LINE__);
 
-    parallelLoop->setOpDatDimension (opDatArgumentGroup,
+    parallelLoop->setOpDatDimension (OP_DAT_ArgumentGroup,
         opGblDeclaration->getDimension ());
   }
 
   parallelLoop->setUniqueOpDat (variableName);
 
-  parallelLoop->setOpDatType (opDatArgumentGroup,
+  parallelLoop->setOpDatType (OP_DAT_ArgumentGroup,
       opGblDeclaration->getPrimitiveType ());
 
-  parallelLoop->setOpDatVariableName (opDatArgumentGroup, variableName);
+  parallelLoop->setOpDatVariableName (OP_DAT_ArgumentGroup, variableName);
 
-  parallelLoop->setDuplicateOpDat (opDatArgumentGroup, false);
+  parallelLoop->setDuplicateOpDat (OP_DAT_ArgumentGroup, false);
 }
 
 void
-FortranProgramDeclarationsAndDefinitions::handleOpDatDeclaration (
+FortranProgramDeclarationsAndDefinitions::setOpDatProperties (
     FortranParallelLoop * parallelLoop, std::string const & variableName,
-    int opDatArgumentGroup)
+    int OP_DAT_ArgumentGroup)
 {
   using boost::lexical_cast;
   using std::string;
@@ -66,19 +66,19 @@ FortranProgramDeclarationsAndDefinitions::handleOpDatDeclaration (
       + "' has been declared through OP_DECL_DAT", Debug::FUNCTION_LEVEL,
       __FILE__, __LINE__);
 
-  parallelLoop->setOpDatType (opDatArgumentGroup,
+  parallelLoop->setOpDatType (OP_DAT_ArgumentGroup,
       opDatDeclaration->getPrimitiveType ());
 
-  parallelLoop->setOpDatDimension (opDatArgumentGroup,
+  parallelLoop->setOpDatDimension (OP_DAT_ArgumentGroup,
       opDatDeclaration->getDimension ());
 
-  parallelLoop->setOpDatVariableName (opDatArgumentGroup, variableName);
+  parallelLoop->setOpDatVariableName (OP_DAT_ArgumentGroup, variableName);
 
   if (parallelLoop->isUniqueOpDat (variableName))
   {
     parallelLoop->setUniqueOpDat (variableName);
 
-    parallelLoop->setDuplicateOpDat (opDatArgumentGroup, false);
+    parallelLoop->setDuplicateOpDat (OP_DAT_ArgumentGroup, false);
 
     if (isSgArrayType (opDatDeclaration->getPrimitiveType ()) == NULL)
     {
@@ -88,7 +88,7 @@ FortranProgramDeclarationsAndDefinitions::handleOpDatDeclaration (
   }
   else
   {
-    parallelLoop->setDuplicateOpDat (opDatArgumentGroup, true);
+    parallelLoop->setDuplicateOpDat (OP_DAT_ArgumentGroup, true);
   }
 }
 
@@ -247,13 +247,13 @@ FortranProgramDeclarationsAndDefinitions::analyseParallelLoopArguments (
       Debug::getInstance ()->debugMessage ("...GLOBAL mapping descriptor",
           Debug::OUTER_LOOP_LEVEL, __FILE__, __LINE__);
 
-      handleOpGblDeclaration (parallelLoop, opDatName, opDatArgumentGroup);
+      setOpGblProperties (parallelLoop, opDatName, opDatArgumentGroup);
 
       parallelLoop->setOpMapValue (opDatArgumentGroup, GLOBAL);
     }
     else
     {
-      handleOpDatDeclaration (parallelLoop, opDatName, opDatArgumentGroup);
+      setOpDatProperties (parallelLoop, opDatName, opDatArgumentGroup);
 
       if (iequals (mappingValue, OP2::OP_ID))
       {
