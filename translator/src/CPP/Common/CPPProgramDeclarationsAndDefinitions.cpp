@@ -55,15 +55,6 @@ CPPProgramDeclarationsAndDefinitions::setOpDatProperties (
 }
 
 void
-CPPProgramDeclarationsAndDefinitions::setParallelLoopMappingDescriptor (
-    CPPParallelLoop * parallelLoop, std::string const & mappingValue,
-    unsigned int OP_DAT_ArgumentGroup)
-{
-  using boost::iequals;
-
-}
-
-void
 CPPProgramDeclarationsAndDefinitions::setParallelLoopAccessDescriptor (
     CPPParallelLoop * parallelLoop, SgExprListExp * actualArguments,
     unsigned int OP_DAT_ArgumentGroup, unsigned int argumentPosition)
