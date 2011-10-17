@@ -7,11 +7,6 @@
 #include <RoseHelper.h>
 #include <boost/algorithm/string/predicate.hpp>
 
-namespace
-{
-  std::string const & moduleName = "GENERATED_MODULE";
-}
-
 void
 FortranSubroutinesGeneration::fixUseStatement (SgUseStatement * useStatement,
     std::string const & userSubroutineName)
@@ -46,7 +41,8 @@ FortranSubroutinesGeneration::fixUseStatement (SgUseStatement * useStatement,
 }
 
 void
-FortranSubroutinesGeneration::patchCallsToParallelLoops ()
+FortranSubroutinesGeneration::patchCallsToParallelLoops (
+    std::string const & moduleName)
 {
   using SageBuilder::buildAssignInitializer;
   using SageBuilder::buildStringVal;
@@ -239,7 +235,8 @@ FortranSubroutinesGeneration::addContains ()
 }
 
 SgModuleStatement *
-FortranSubroutinesGeneration::createFortranModule ()
+FortranSubroutinesGeneration::createFortranModule (
+    std::string const & moduleName)
 {
   using std::string;
   using std::vector;
@@ -265,7 +262,11 @@ FortranSubroutinesGeneration::createFortranModule ()
 void
 FortranSubroutinesGeneration::generate ()
 {
-  SgModuleStatement * moduleStatement = createFortranModule ();
+  using std::string;
+
+  string const & moduleName = "GENERATED_MODULE";
+
+  SgModuleStatement * moduleStatement = createFortranModule (moduleName);
 
   moduleScope = moduleStatement->get_definition ();
 
@@ -279,7 +280,7 @@ FortranSubroutinesGeneration::generate ()
 
   createSubroutines ();
 
-  patchCallsToParallelLoops ();
+  patchCallsToParallelLoops (moduleName);
 }
 
 FortranSubroutinesGeneration::FortranSubroutinesGeneration (

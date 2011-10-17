@@ -9,21 +9,6 @@ namespace
 {
   std::string const OpDatPrefix = "opDat";
   std::string const Size = "Size";
-
-  std::string const
-  getNewSuffix (std::string const & suffix)
-  {
-    using boost::lexical_cast;
-    using std::string;
-
-    boost::crc_32_type result;
-
-    result.process_bytes (suffix.c_str (), suffix.length ());
-
-    string const newSuffix = lexical_cast <string> (result.checksum ());
-
-    return newSuffix;
-  }
 }
 
 std::string const

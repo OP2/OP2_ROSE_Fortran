@@ -151,7 +151,7 @@ FortranCUDAKernelSubroutine::createInitialiseCUDAStageInVariablesStatements ()
 
           SgPntrArrRefExp * arrayIndexExpression2 = buildPntrArrRefExp (
               buildVarRefExp (variableDeclarations->get (
-                  OP2::VariableNames::getOpDatLocalName (i))), addExpression);
+                  OP2::VariableNames::getOpDatName(i))), addExpression);
 
           SgExprStatement * assignmentStatement = buildAssignStatement (
               arrayIndexExpression1, arrayIndexExpression2);

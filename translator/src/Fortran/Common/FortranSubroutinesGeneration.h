@@ -14,19 +14,9 @@ class FortranHostSubroutine;
 class FortranParallelLoop;
 class FortranProgramDeclarationsAndDefinitions;
 
-namespace Libraries
-{
-  std::string const ISO_C_BINDING = "ISO_C_BINDING";
-  std::string const OP2_C = "OP2_C";
-  std::string const CUDAFOR = "CUDAFOR";
-  std::string const OMP_LIB = "OMP_LIB";
-  std::string const cudaConfigurationParams = "cudaConfigurationParams";
-}
-
 class FortranSubroutinesGeneration: public SubroutinesGeneration <
     FortranProgramDeclarationsAndDefinitions, FortranHostSubroutine>
 {
-
   protected:
 
     FortranReductionSubroutines * reductionSubroutines;
@@ -43,7 +33,7 @@ class FortranSubroutinesGeneration: public SubroutinesGeneration <
         std::string const & userSubroutineName);
 
     void
-    patchCallsToParallelLoops ();
+    patchCallsToParallelLoops (std::string const & moduleName);
 
     /*
      * ======================================================
@@ -60,7 +50,7 @@ class FortranSubroutinesGeneration: public SubroutinesGeneration <
      * ======================================================
      */
     SgModuleStatement *
-    createFortranModule ();
+    createFortranModule (std::string const & moduleName);
 
   protected:
 
