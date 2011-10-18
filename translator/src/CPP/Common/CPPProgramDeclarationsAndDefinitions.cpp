@@ -42,10 +42,10 @@ CPPProgramDeclarationsAndDefinitions::setOpDatProperties (
 
     parallelLoop->setDuplicateOpDat (OP_DAT_ArgumentGroup, false);
 
-    if (isSgArrayType (opDatDeclaration->getPrimitiveType ()) == NULL)
+    if (isSgPointerType (opDatDeclaration->getPrimitiveType ()) == NULL)
     {
-      Exceptions::ParallelLoop::UnsupportedBaseTypeException ("OP_DAT '"
-          + variableName + "' is not an array");
+      throw new Exceptions::ParallelLoop::UnsupportedBaseTypeException (
+          "OP_DAT '" + variableName + "' is not a pointer");
     }
   }
   else
@@ -312,6 +312,8 @@ CPPProgramDeclarationsAndDefinitions::analyseParallelLoopArguments (
       OP_DAT_ArgumentGroup++;
     }
   }
+
+  parallelLoop->setNumberOfOpDatArgumentGroups (OP_DAT_ArgumentGroup - 1);
 }
 
 void
@@ -493,14 +495,16 @@ CPPProgramDeclarationsAndDefinitions::visit (SgNode * node)
       break;
     }
 
-    case V_SgFunctionDefinition:
+    case V_SgFunctionDeclaration:
     {
-      SgFunctionDefinition * functionDeclaration =
-          isSgFunctionDefinition (node);
+      SgFunctionDeclaration * functionDeclaration = isSgFunctionDeclaration (
+          node);
 
-      Debug::getInstance ()->debugMessage ("Found definition: "
-          + functionDeclaration->get_declaration ()->get_name ().getString (),
+      Debug::getInstance ()->debugMessage ("Found declaration: "
+          + functionDeclaration->get_name ().getString (),
           Debug::INNER_LOOP_LEVEL, __FILE__, __LINE__);
+
+      subroutinesInSourceCode.push_back (functionDeclaration);
 
       break;
     }

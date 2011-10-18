@@ -2,6 +2,7 @@
 #include <CPPParallelLoop.h>
 #include <CPPProgramDeclarationsAndDefinitions.h>
 #include <CPPCUDAKernelSubroutine.h>
+#include <CPPCUDAKernelSubroutineDirectLoop.h>
 #include <CPPCUDAUserSubroutine.h>
 
 void
@@ -29,6 +30,8 @@ CPPCUDASubroutinesGeneration::createSubroutines ()
 
     if (parallelLoop->isDirectLoop ())
     {
+      kernelSubroutine = new CPPCUDAKernelSubroutineDirectLoop (moduleScope,
+          userDeviceSubroutine, parallelLoop);
     }
     else
     {

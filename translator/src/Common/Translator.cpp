@@ -169,7 +169,66 @@ handleFortranProject (SgProject * project)
 }
 
 void
-unparseOriginalSourceFiles (SgProject * project,
+unparseSourceFiles (SgProject * project, CPPSubroutinesGeneration * generator)
+{
+  class TreeVisitor: public AstSimpleProcessing
+  {
+    private:
+
+      CPPSubroutinesGeneration * generator;
+
+    public:
+
+      TreeVisitor (CPPSubroutinesGeneration * generator) :
+        generator (generator)
+      {
+      }
+
+      virtual void
+      visit (SgNode * node)
+      {
+        using boost::iequals;
+        using boost::filesystem::path;
+        using boost::filesystem::system_complete;
+
+        SgSourceFile * file = isSgSourceFile (node);
+        if (file != NULL)
+        {
+          path p = system_complete (
+              path (isSgSourceFile (node)->getFileName ()));
+
+          if (generator->isDirty (p.filename ()))
+          {
+            Debug::getInstance ()->debugMessage ("Unparsing '" + p.filename ()
+                + "'", Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+
+            file->unparse ();
+          }
+          else if (iequals (p.filename (), generator->getFileName ()))
+          {
+            Debug::getInstance ()->debugMessage ("Unparsing generated file '"
+                + p.filename () + "'", Debug::FUNCTION_LEVEL, __FILE__,
+                __LINE__);
+
+            file->unparse ();
+          }
+          else
+          {
+            Debug::getInstance ()->debugMessage ("File '" + p.filename ()
+                + "' remains unchanged", Debug::FUNCTION_LEVEL, __FILE__,
+                __LINE__);
+          }
+        }
+      }
+  };
+
+  TreeVisitor * visitor = new TreeVisitor (generator);
+
+  visitor->traverse (project, preorder);
+}
+
+void
+unparseSourceFiles (SgProject * project,
     FortranSubroutinesGeneration * generator)
 {
   class TreeVisitor: public AstSimpleProcessing
@@ -313,6 +372,8 @@ processUserSelections (SgProject * project)
       checkBackendOption ();
 
       CPPSubroutinesGeneration * generator = handleCPPProject (project);
+
+      unparseSourceFiles (project, generator);
     }
   }
   else if (project->get_Fortran_only () == true)
@@ -324,7 +385,7 @@ processUserSelections (SgProject * project)
 
     FortranSubroutinesGeneration * generator = handleFortranProject (project);
 
-    unparseOriginalSourceFiles (project, generator);
+    unparseSourceFiles (project, generator);
   }
   else
   {

@@ -172,7 +172,7 @@ FortranProgramDeclarationsAndDefinitions::analyseParallelLoopArguments (
       "Analysing OP_PAR_LOOP actual arguments", Debug::FUNCTION_LEVEL,
       __FILE__, __LINE__);
 
-  unsigned int opDatArgumentGroup = 1;
+  unsigned int OP_DAT_ArgumentGroup = 1;
 
   for (unsigned int offset = parallelLoop->NUMBER_OF_NON_OP_DAT_ARGUMENTS; offset
       < actualArguments->get_expressions ().size (); offset
@@ -247,13 +247,13 @@ FortranProgramDeclarationsAndDefinitions::analyseParallelLoopArguments (
       Debug::getInstance ()->debugMessage ("...GLOBAL mapping descriptor",
           Debug::OUTER_LOOP_LEVEL, __FILE__, __LINE__);
 
-      setOpGblProperties (parallelLoop, opDatName, opDatArgumentGroup);
+      setOpGblProperties (parallelLoop, opDatName, OP_DAT_ArgumentGroup);
 
-      parallelLoop->setOpMapValue (opDatArgumentGroup, GLOBAL);
+      parallelLoop->setOpMapValue (OP_DAT_ArgumentGroup, GLOBAL);
     }
     else
     {
-      setOpDatProperties (parallelLoop, opDatName, opDatArgumentGroup);
+      setOpDatProperties (parallelLoop, opDatName, OP_DAT_ArgumentGroup);
 
       if (iequals (mappingValue, OP2::OP_ID))
       {
@@ -266,22 +266,24 @@ FortranProgramDeclarationsAndDefinitions::analyseParallelLoopArguments (
         Debug::getInstance ()->debugMessage ("...DIRECT mapping descriptor",
             Debug::OUTER_LOOP_LEVEL, __FILE__, __LINE__);
 
-        parallelLoop->setOpMapValue (opDatArgumentGroup, DIRECT);
+        parallelLoop->setOpMapValue (OP_DAT_ArgumentGroup, DIRECT);
       }
       else
       {
         Debug::getInstance ()->debugMessage ("...INDIRECT mapping descriptor",
             Debug::OUTER_LOOP_LEVEL, __FILE__, __LINE__);
 
-        parallelLoop->setOpMapValue (opDatArgumentGroup, INDIRECT);
+        parallelLoop->setOpMapValue (OP_DAT_ArgumentGroup, INDIRECT);
       }
     }
 
     setParallelLoopAccessDescriptor (parallelLoop, actualArguments,
-        opDatArgumentGroup, offset + parallelLoop->POSITION_OF_ACCESS);
+        OP_DAT_ArgumentGroup, offset + parallelLoop->POSITION_OF_ACCESS);
 
-    opDatArgumentGroup++;
+    OP_DAT_ArgumentGroup++;
   }
+
+  parallelLoop->setNumberOfOpDatArgumentGroups (OP_DAT_ArgumentGroup - 1);
 }
 
 void

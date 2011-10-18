@@ -20,7 +20,7 @@ CUDA::getThreadId (THREAD_BLOCK_DIMENSION dimension, SgScopeStatement * scope)
   using SageBuilder::buildDotExp;
   using std::string;
 
-  string const threadidx = "threadidx";
+  string const threadidx = "threadIdx";
 
   switch (dimension)
   {
@@ -59,7 +59,7 @@ CUDA::getBlockId (GRID_DIMENSION dimension, SgScopeStatement * scope)
   using SageBuilder::buildDotExp;
   using std::string;
 
-  string const blockidx = "blockidx";
+  string const blockidx = "blockIdx";
 
   switch (dimension)
   {
@@ -93,7 +93,7 @@ CUDA::getThreadBlockDimension (THREAD_BLOCK_DIMENSION dimension,
   using SageBuilder::buildDotExp;
   using std::string;
 
-  string const blockdim = "blockdim";
+  string const blockdim = "blockDim";
 
   switch (dimension)
   {
@@ -132,7 +132,7 @@ CUDA::getGridDimension (GRID_DIMENSION dimension, SgScopeStatement * scope)
   using SageBuilder::buildDotExp;
   using std::string;
 
-  string const griddim = "griddim";
+  string const griddim = "gridDim";
 
   switch (dimension)
   {

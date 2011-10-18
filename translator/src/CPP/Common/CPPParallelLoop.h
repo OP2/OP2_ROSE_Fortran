@@ -22,18 +22,7 @@ class CPPParallelLoop: public ParallelLoop
      * ======================================================
      */
 
-    /*
-     * ======================================================
-     * There are 2 non-OP_DAT arguments, namely
-     * 'nameOfUserSubroutine' and 'OP_SET'
-     * ======================================================
-     */
-    static unsigned int const NUMBER_OF_NON_OP_DAT_ARGUMENTS = 2;
-
   public:
-
-    virtual unsigned int
-    getNumberOfOpDatArgumentGroups ();
 
     CPPParallelLoop (SgFunctionCallExp * functionCallExpression,
         std::string fileName);

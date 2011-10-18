@@ -104,7 +104,5 @@ RoseStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter 
   formalParameters->append_arg (
       *(variableDeclaration->get_variables ().begin ()));
 
-  appendStatement (variableDeclaration, scope);
-
   return variableDeclaration;
 }

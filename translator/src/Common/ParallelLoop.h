@@ -114,6 +114,13 @@ class ParallelLoop
      */
     std::string userSubroutineName;
 
+    /*
+     * ======================================================
+     * The number of OP_DAT argument groups
+     * ======================================================
+     */
+    unsigned int numberOfOpDats;
+
   protected:
 
     ParallelLoop (SgFunctionCallExp * functionCallExpression,
@@ -123,11 +130,19 @@ class ParallelLoop
 
     /*
      * ======================================================
+     * Set the number of OP_DAT argument groups
+     * ======================================================
+     */
+    void
+    setNumberOfOpDatArgumentGroups (unsigned int numberOfOpDats);
+
+    /*
+     * ======================================================
      * How many OP_DAT argument groups are there?
      * ======================================================
      */
-    virtual unsigned int
-    getNumberOfOpDatArgumentGroups () = 0;
+    unsigned int
+    getNumberOfOpDatArgumentGroups ();
 
     /*
      * ======================================================

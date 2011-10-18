@@ -83,8 +83,7 @@ class CPPCUDAKernelSubroutineDirectLoop: public CPPCUDAKernelSubroutine
   public:
 
     CPPCUDAKernelSubroutineDirectLoop (SgScopeStatement * moduleScope,
-        CPPCUDAUserSubroutine * userSubroutine, CPPParallelLoop * parallelLoop,
-        CPPReductionSubroutines * reductionSubroutines);
+        CPPCUDAUserSubroutine * userSubroutine, CPPParallelLoop * parallelLoop);
 };
 
 #endif

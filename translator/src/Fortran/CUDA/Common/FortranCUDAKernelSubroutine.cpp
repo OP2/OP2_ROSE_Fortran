@@ -151,7 +151,7 @@ FortranCUDAKernelSubroutine::createInitialiseCUDAStageInVariablesStatements ()
 
           SgPntrArrRefExp * arrayIndexExpression2 = buildPntrArrRefExp (
               buildVarRefExp (variableDeclarations->get (
-                  OP2::VariableNames::getOpDatName(i))), addExpression);
+                  OP2::VariableNames::getOpDatName (i))), addExpression);
 
           SgExprStatement * assignmentStatement = buildAssignStatement (
               arrayIndexExpression1, arrayIndexExpression2);
@@ -287,11 +287,6 @@ FortranCUDAKernelSubroutine::createReductionEpilogueStatements ()
 void
 FortranCUDAKernelSubroutine::createCUDAStageInVariablesVariableDeclarations ()
 {
-  using SageBuilder::buildIntVal;
-  using SageBuilder::buildArrayType;
-  using SageBuilder::buildVariableDeclaration;
-  using SageBuilder::buildExprListExp;
-  using SageInterface::appendStatement;
   using std::string;
 
   Debug::getInstance ()->debugMessage ("Creating local thread variables",

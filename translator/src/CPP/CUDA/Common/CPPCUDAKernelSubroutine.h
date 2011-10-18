@@ -48,8 +48,7 @@ class CPPCUDAKernelSubroutine: public CPPKernelSubroutine
     createCUDASharedVariableDeclarations ();
 
     CPPCUDAKernelSubroutine (SgScopeStatement * moduleScope,
-        CPPCUDAUserSubroutine * userSubroutine, CPPParallelLoop * parallelLoop,
-        CPPReductionSubroutines * reductionSubroutines);
+        CPPCUDAUserSubroutine * userSubroutine, CPPParallelLoop * parallelLoop);
 
 };
 

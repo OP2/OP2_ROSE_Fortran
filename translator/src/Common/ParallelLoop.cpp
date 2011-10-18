@@ -15,6 +15,18 @@ ParallelLoop::ParallelLoop (SgFunctionCallExp * functionCallExpression,
 }
 
 void
+ParallelLoop::setNumberOfOpDatArgumentGroups (unsigned int numberOfOpDats)
+{
+  this->numberOfOpDats = numberOfOpDats;
+}
+
+unsigned int
+ParallelLoop::getNumberOfOpDatArgumentGroups ()
+{
+  return numberOfOpDats;
+}
+
+void
 ParallelLoop::checkArguments ()
 {
   using boost::lexical_cast;
@@ -92,9 +104,16 @@ ParallelLoop::getOpDatBaseType (unsigned int OP_DAT_ArgumentGroup)
 
   SgArrayType * isArrayType = isSgArrayType (OpDatTypes[OP_DAT_ArgumentGroup]);
 
+  SgPointerType * isPointerType = isSgPointerType (
+      OpDatTypes[OP_DAT_ArgumentGroup]);
+
   if (isArrayType != NULL)
   {
     return isArrayType->get_base_type ();
+  }
+  else if (isPointerType != NULL)
+  {
+    return isPointerType->get_base_type ();
   }
   else
   {
@@ -290,9 +309,39 @@ ParallelLoop::getSizeOfOpDat (unsigned int OP_DAT_ArgumentGroup)
 {
   SgType * baseType = getOpDatBaseType (OP_DAT_ArgumentGroup);
 
-  SgIntVal * baseSize = isSgIntVal (baseType->get_type_kind ());
+  if (baseType->get_type_kind () == NULL)
+  {
+    if (isSgTypeShort (baseType))
+    {
+      return 2;
+    }
+    else if (isSgTypeInt (baseType))
+    {
+      return 4;
+    }
+    else if (isSgTypeLong (baseType))
+    {
+      return 8;
+    }
+    else if (isSgTypeFloat (baseType))
+    {
+      return 4;
+    }
+    else if (isSgTypeDouble (baseType))
+    {
+      return 8;
+    }
+    else
+    {
+      throw new Exceptions::ParallelLoop::UnsupportedBaseTypeException ("");
+    }
+  }
+  else
+  {
+    SgIntVal * baseSize = isSgIntVal (baseType->get_type_kind ());
 
-  return baseSize->get_value ();
+    return baseSize->get_value ();
+  }
 }
 
 unsigned int
