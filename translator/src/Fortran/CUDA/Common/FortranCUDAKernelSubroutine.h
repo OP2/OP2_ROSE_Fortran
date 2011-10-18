@@ -33,15 +33,6 @@ class FortranCUDAKernelSubroutine: public FortranKernelSubroutine
 
     /*
      * ======================================================
-     * Creates the statements which initialises the variables
-     * used to stage in data from device->shared->stack memory
-     * ======================================================
-     */
-    void
-    createInitialiseCUDAStageInVariablesStatements ();
-
-    /*
-     * ======================================================
      * Creates the statements executed after the call to the
      * user subroutine to perform the thread-block reduction
      * ======================================================

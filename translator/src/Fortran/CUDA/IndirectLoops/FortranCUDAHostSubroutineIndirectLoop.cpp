@@ -33,9 +33,25 @@ FortranCUDAHostSubroutineIndirectLoop::createKernelFunctionCallStatement ()
   actualParameters->append_expression (buildVarRefExp (
       variableDeclarations->get (OP2::VariableNames::opDatCardinalities)));
 
+  Debug::getInstance ()->debugMessage ("Adding OP_DAT parameters",
+      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+
+  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
+  {
+    if (parallelLoop->isDuplicateOpDat (i) == false)
+    {
+      if (parallelLoop->isIndirect (i) || parallelLoop->isDirect (i))
+      {
+        actualParameters->append_expression (buildVarRefExp (
+            variableDeclarations->get (OP2::VariableNames::getOpDatDeviceName (
+                i))));
+      }
+    }
+  }
+
   Debug::getInstance ()->debugMessage (
-      "Adding OP_DAT parameters with indirect access", Debug::FUNCTION_LEVEL,
-      __FILE__, __LINE__);
+      "Adding local to global memory remapping parameters",
+      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
@@ -43,10 +59,6 @@ FortranCUDAHostSubroutineIndirectLoop::createKernelFunctionCallStatement ()
     {
       if (parallelLoop->isIndirect (i))
       {
-        actualParameters->append_expression (buildVarRefExp (
-            variableDeclarations->get (OP2::VariableNames::getOpDatDeviceName (
-                i))));
-
         actualParameters->append_expression (buildVarRefExp (
             variableDeclarations->get (
                 OP2::VariableNames::getLocalToGlobalMappingName (i))));
@@ -77,18 +89,6 @@ FortranCUDAHostSubroutineIndirectLoop::createKernelFunctionCallStatement ()
     {
       if (parallelLoop->isRead (i))
       {
-        if (parallelLoop->isGlobalScalar (i))
-        {
-          actualParameters->append_expression (buildVarRefExp (
-              variableDeclarations->get (OP2::VariableNames::getOpDatHostName (
-                  i))));
-        }
-        else
-        {
-          actualParameters->append_expression (buildVarRefExp (
-              variableDeclarations->get (
-                  OP2::VariableNames::getOpDatDeviceName (i))));
-        }
       }
     }
   }

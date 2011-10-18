@@ -634,8 +634,6 @@ FortranCUDAKernelSubroutineDirectLoop::createThreadIDInitialisationStatement ()
 void
 FortranCUDAKernelSubroutineDirectLoop::createStatements ()
 {
-  createInitialiseCUDAStageInVariablesStatements ();
-
   createThreadIDInitialisationStatement ();
 
   createInitialiseOffsetIntoCUDASharedVariableStatements ();
