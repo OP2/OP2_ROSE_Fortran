@@ -121,6 +121,8 @@ def outputStdout (stdoutLines):
 
 # Runs the compiler
 def compile ():
+	from string import split
+
 	allBackends       = (opts.cuda, opts.openmp, opts.opencl)
 	backendsSelected  = [] 
 
@@ -137,26 +139,29 @@ def compile ():
 	if not os.path.isfile(configFile):
 		debug.exitMessage("Unable to find configuration file '%s' with the path to source-to-source translator and files to translate." % (configFile))
 
-	translatorPath = None
+	translatorEnvVariable = 'IMPERIAL_TRANSLATOR_HOME'
+	translatorHome        = split(os.environ.get(translatorEnvVariable), os.pathsep)[0]
+
+	if translatorHome is None:
+		debug.exitMessage("Unable to find the root directory of the source-to-source translator. Please set environment variable '%s'" % translatorEnvVariable)
+	elif not os.path.isdir(translatorHome):
+		debug.exitMessage("The source-to-source translator path '%s' is not a directory" % (translatorHome))
+
+	translatorPath = translatorHome + os.sep + 'translator' + os.sep + 'bin' + os.sep + 'translator'
+	op2Path        = translatorHome + os.sep + 'support' + os.sep + 'Fortran'
+
 	filesToCompile = []
 
 	for line in open(configFile, 'r'):
 		line = line.strip()
 		words = line.split('=')
-		if line.startswith('translator'):
-			translatorPath = words[1].strip()
-			if not os.path.isfile(translatorPath):
-				debug.exitMessage("'" + translatorPath + "' does not exist.")
-		elif line.startswith('files'):
+		if line.startswith('files'):
 			files = words[1].strip().split(' ')
 			for f in files:
 				f = f.strip()
 				filesToCompile.append(f)
 				if not os.path.isfile(f):
 					debug.exitMessage("File '" + f + "' does not exist.")
-
-	if translatorPath is None:
-		debug.exitMessage("You did not specify a path to the translator. Use 'translator=<path/to/translator>' in the configuration file.")
 
 	if not filesToCompile:
 		debug.exitMessage("You did not specify which files need to compiled. Use files=<list/of/files> in the configuration file.")
@@ -169,6 +174,10 @@ def compile ():
 		cmd += openmpFlag + ' '
 	elif opts.opencl:
 		cmd += openclFlag + ' '
+
+	auxiliaryFiles = ['ISO_C_BINDING.F95', 'OP2.F95']
+	for f in auxiliaryFiles:
+		cmd += op2Path + os.sep + f + ' '
 
 	for f in filesToCompile:
 		cmd += f + ' '

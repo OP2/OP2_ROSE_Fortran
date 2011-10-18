@@ -71,7 +71,7 @@ use, intrinsic :: ISO_C_BINDING
   ! read set sizes from input file (input is subdivided in two routines as we cannot allocate arrays in subroutines in
   ! fortran 90)
   call getSetSizes ( nnode, ncell, nedge, nbedge )
-	
+
   ! allocate sets (cannot allocate in subroutine in F90)
   allocate ( cell ( 4 * ncell ) )
   allocate ( edge ( 2 * nedge ) )
@@ -79,7 +79,7 @@ use, intrinsic :: ISO_C_BINDING
   allocate ( bedge ( 2 * nbedge ) )
   allocate ( becell ( nbedge ) )
   allocate ( bound ( nbedge ) )
-		
+
   allocate ( x ( 2 * nnode ) )
   allocate ( q ( 4 * ncell ) )
   allocate ( qold ( 4 * ncell ) )
@@ -91,14 +91,14 @@ use, intrinsic :: ISO_C_BINDING
 
   ! set constants and initialise flow field and residual
   call initialise_flow_field ( ncell, q, res )
-	
+
   do iter = 1, 4*ncell
     res(iter) = 0.0
   end do 
 
   ! OP initialisation
   call op_init()
-	
+
   ! declare sets, pointers, datasets and global constants (for now, no new partition info)
   call op_decl_set ( nnode, nodes, nodesName )
   call op_decl_set ( nedge, edges, edgesName )
@@ -111,13 +111,13 @@ use, intrinsic :: ISO_C_BINDING
   call op_decl_map ( bedges, cells, 1, becell, pbecell, pecellName )
   call op_decl_map ( cells, nodes, 4, cell, pcell, pcellName )
 
-  call op_decl_dat ( bedges, 1, bound, p_bound, boundName )	
+  call op_decl_dat ( bedges, 1, bound, p_bound, boundName )
   call op_decl_dat ( nodes, 2, x, p_x, xName )
   call op_decl_dat ( cells, 4, q, p_q, qName )
   call op_decl_dat ( cells, 4, qold, p_qold, qoldName )
   call op_decl_dat ( cells, 1, adt, p_adt, adtName )
   call op_decl_dat ( cells, 4, res, p_res, resName )
-	
+
   call op_decl_gbl ( rms, p_rms )
 
   call op_decl_const (1, gam)
@@ -129,7 +129,7 @@ use, intrinsic :: ISO_C_BINDING
   call op_decl_const (4, qinf)
 
   ! main time-marching loop
-	
+
   do niter = 1, iterationNumber
 
     ! save old flow solution
@@ -138,9 +138,9 @@ use, intrinsic :: ISO_C_BINDING
                        & p_q,    -1, OP_ID, OP_READ, &
                        & p_qold, -1, OP_ID, OP_WRITE &
                        & )
-	
+
     ! predictor/corrector update loop
-				
+
     do k = 1, 2
 
       ! calculate area/timstep
@@ -167,17 +167,17 @@ use, intrinsic :: ISO_C_BINDING
                          & p_adt,  2, pecell, OP_READ, &
                          & p_res,  1, pecell, OP_INC,  &
                          & p_res,  2, pecell, OP_INC   &
-			 & )
+                         &)
 
 
       call op_par_loop_6 ( bres_calc, bedges, &
-			  & p_x,      1, pbedge,  OP_READ, &
-			  & p_x,      2, pbedge,  OP_READ, &
-			  & p_q,      1, pbecell, OP_READ, &
-			  & p_adt,    1, pbecell, OP_READ, &
-			  & p_res,    1, pbecell, OP_INC,  &
-                          & p_bound,  -1, OP_ID, OP_READ  &
-			  & )
+                          & p_x,      1, pbedge,  OP_READ, &
+                          & p_x,      2, pbedge,  OP_READ, &
+                          & p_q,      1, pbecell, OP_READ, &
+                          & p_adt,    1, pbecell, OP_READ, &
+                          & p_res,    1, pbecell, OP_INC,  &
+                          & p_bound,  -1, OP_ID, OP_READ   &
+                          & )
 
       ! update flow field
       
@@ -196,7 +196,7 @@ use, intrinsic :: ISO_C_BINDING
 
     ncellr = real ( ncell )
     rms = sqrt ( rms / ncellr )
-	
+
   end do ! external loop
 
 ! uncomment the following statements to get the result of the airfoil written in a file
