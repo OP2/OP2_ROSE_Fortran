@@ -41,7 +41,7 @@ class FortranCUDAKernelSubroutineIndirectLoop: public FortranCUDAKernelSubroutin
     createPointeredIncrementsOrWritesStatements ();
 
     void
-    createAutoSharedWhileLoopStatements ();
+    createInitialiseCUDASharedVariablesStatements ();
 
     void
     createInitialiseLocalVariablesStatements ();

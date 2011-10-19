@@ -755,7 +755,7 @@ FortranCUDAKernelSubroutineIndirectLoop::createExecutionLoopStatements ()
 }
 
 void
-FortranCUDAKernelSubroutineIndirectLoop::createAutoSharedWhileLoopStatements ()
+FortranCUDAKernelSubroutineIndirectLoop::createInitialiseCUDASharedVariablesStatements ()
 {
   using SageBuilder::buildVarRefExp;
   using SageBuilder::buildOpaqueVarRefExp;
@@ -1134,6 +1134,9 @@ FortranCUDAKernelSubroutineIndirectLoop::createThreadZeroStatements ()
   using SageBuilder::buildDivideOp;
   using SageInterface::appendStatement;
 
+  Debug::getInstance ()->debugMessage ("Creating thread zero statements",
+      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+
   /*
    * ======================================================
    * The body of the if statement
@@ -1308,6 +1311,10 @@ FortranCUDAKernelSubroutineIndirectLoop::createPlanFormalParameterDeclarations (
   using std::string;
   using std::vector;
 
+  Debug::getInstance ()->debugMessage (
+      "Creating plan formal parameter declarations", Debug::FUNCTION_LEVEL,
+      __FILE__, __LINE__);
+
   vector <string> fourByteIntegerArrayVariables;
 
   fourByteIntegerArrayVariables.push_back (
@@ -1381,13 +1388,12 @@ FortranCUDAKernelSubroutineIndirectLoop::createOpDatFormalParameterDeclarations 
   using std::string;
 
   Debug::getInstance ()->debugMessage ("Creating OP_DAT formal parameters",
-      Debug::INNER_LOOP_LEVEL, __FILE__, __LINE__);
+      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
     if (parallelLoop->isDuplicateOpDat (i) == false)
     {
-
       string const variableName = OP2::VariableNames::getOpDatName (i);
 
       if (parallelLoop->isIndirect (i) || parallelLoop->isDirect (i))
@@ -1412,11 +1418,40 @@ FortranCUDAKernelSubroutineIndirectLoop::createOpDatFormalParameterDeclarations 
       }
       else if (parallelLoop->isReductionRequired (i))
       {
+        string const & variableName =
+            OP2::VariableNames::getReductionArrayDeviceName (i);
 
+        variableDeclarations->add (
+            variableName,
+            FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
+                variableName, FortranTypesBuilder::getArray_RankOne (
+                    parallelLoop->getOpDatBaseType (i)), subroutineScope,
+                formalParameters, 1, CUDA_DEVICE));
       }
       else if (parallelLoop->isRead (i))
       {
+        string const & variableName = OP2::VariableNames::getOpDatName (i);
 
+        if (parallelLoop->isArray (i))
+        {
+          variableDeclarations->add (
+              variableName,
+              FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
+                  variableName,
+                  FortranTypesBuilder::getArray_RankOne_WithLowerAndUpperBounds (
+                      parallelLoop->getOpDatBaseType (i), buildIntVal (0),
+                      buildIntVal (parallelLoop->getOpDatDimension (i) - 1)),
+                  subroutineScope, formalParameters, 1, CUDA_DEVICE));
+        }
+        else
+        {
+          variableDeclarations->add (
+              variableName,
+              FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
+                  variableName, parallelLoop->getOpDatBaseType (i),
+                  subroutineScope, formalParameters, 1, VALUE));
+
+        }
       }
     }
   }
@@ -1482,7 +1517,7 @@ FortranCUDAKernelSubroutineIndirectLoop::createStatements ()
 
   createInitialiseLocalVariablesStatements ();
 
-  createAutoSharedWhileLoopStatements ();
+  createInitialiseCUDASharedVariablesStatements ();
 
   createExecutionLoopStatements ();
 
@@ -1495,6 +1530,9 @@ FortranCUDAKernelSubroutineIndirectLoop::createLocalVariableDeclarations ()
   using boost::lexical_cast;
   using std::string;
   using std::vector;
+
+  Debug::getInstance ()->debugMessage ("Creating local variable declarations",
+      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
   createCUDAStageInVariablesVariableDeclarations ();
 
@@ -1608,6 +1646,10 @@ FortranCUDAKernelSubroutineIndirectLoop::createLocalVariableDeclarations ()
 void
 FortranCUDAKernelSubroutineIndirectLoop::createFormalParameterDeclarations ()
 {
+  Debug::getInstance ()->debugMessage (
+      "Creating formal parameter declarations", Debug::FUNCTION_LEVEL,
+      __FILE__, __LINE__);
+
   variableDeclarations->add (
       OP2::VariableNames::opDatDimensions,
       FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (

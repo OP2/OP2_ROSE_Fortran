@@ -13,8 +13,8 @@ ScopedVariableDeclarations::get (std::string const & variableName)
 {
   if (theDeclarations.count (variableName) == 0)
   {
-    Exceptions::CodeGeneration::UnknownVariableException ("Unable to find '"
-        + variableName + "' in variable declarations");
+    throw Exceptions::CodeGeneration::UnknownVariableException (
+        "Unable to find '" + variableName + "' in variable declarations");
   }
 
   return theDeclarations[variableName];

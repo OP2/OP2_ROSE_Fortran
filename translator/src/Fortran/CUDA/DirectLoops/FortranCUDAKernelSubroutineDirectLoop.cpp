@@ -805,6 +805,10 @@ FortranCUDAKernelSubroutineDirectLoop::createOpDatFormalParameterDeclarations ()
 void
 FortranCUDAKernelSubroutineDirectLoop::createFormalParameterDeclarations ()
 {
+  Debug::getInstance ()->debugMessage (
+      "Creating formal parameter declarations", Debug::FUNCTION_LEVEL,
+      __FILE__, __LINE__);
+
   /*
    * ======================================================
    * OP_DAT dimensions
