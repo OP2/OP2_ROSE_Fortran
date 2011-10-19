@@ -156,7 +156,8 @@ FortranCUDAUserSubroutine::createStatements ()
                           variableName, type, subroutineScope,
                           formalParameters, 1, CUDA_SHARED);
             }
-            else if (parallelLoop->isArray (OP_DAT_ArgumentGroup) == false
+            else if (parallelLoop->isGlobal (OP_DAT_ArgumentGroup)
+                && parallelLoop->isArray (OP_DAT_ArgumentGroup) == false
                 && parallelLoop->isRead (OP_DAT_ArgumentGroup))
             {
               Debug::getInstance ()->debugMessage ("'" + variableName

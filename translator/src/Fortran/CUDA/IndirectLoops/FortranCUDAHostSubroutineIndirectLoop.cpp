@@ -40,11 +40,32 @@ FortranCUDAHostSubroutineIndirectLoop::createKernelFunctionCallStatement ()
   {
     if (parallelLoop->isDuplicateOpDat (i) == false)
     {
-      if (parallelLoop->isIndirect (i) || parallelLoop->isDirect (i))
+      if (parallelLoop->isReductionRequired (i))
+      {
+        actualParameters->append_expression (buildVarRefExp (
+            variableDeclarations->get (
+                OP2::VariableNames::getReductionArrayDeviceName (i))));
+      }
+      else if (parallelLoop->isIndirect (i) || parallelLoop->isDirect (i))
       {
         actualParameters->append_expression (buildVarRefExp (
             variableDeclarations->get (OP2::VariableNames::getOpDatDeviceName (
                 i))));
+      }
+      else if (parallelLoop->isRead (i))
+      {
+        if (parallelLoop->isArray (i))
+        {
+          actualParameters->append_expression (buildVarRefExp (
+              variableDeclarations->get (
+                  OP2::VariableNames::getOpDatDeviceName (i))));
+        }
+        else
+        {
+          actualParameters->append_expression (buildVarRefExp (
+              variableDeclarations->get (OP2::VariableNames::getOpDatHostName (
+                  i))));
+        }
       }
     }
   }
@@ -77,19 +98,6 @@ FortranCUDAHostSubroutineIndirectLoop::createKernelFunctionCallStatement ()
       actualParameters->append_expression (buildVarRefExp (
           variableDeclarations->get (
               OP2::VariableNames::getGlobalToLocalMappingName (i))));
-    }
-  }
-
-  Debug::getInstance ()->debugMessage ("Adding direct and global parameters",
-      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
-
-  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
-  {
-    if (parallelLoop->isDuplicateOpDat (i) == false)
-    {
-      if (parallelLoop->isRead (i))
-      {
-      }
     }
   }
 
