@@ -19,7 +19,7 @@ FortranParallelLoop::isCardinalityDeclarationNeeded (
    */
 
   return isDirect (OP_DAT_ArgumentGroup) || isIndirect (OP_DAT_ArgumentGroup)
-      || isReductionRequired (OP_DAT_ArgumentGroup) || (isGlobalArray (
+      || isReductionRequired (OP_DAT_ArgumentGroup) || (isArray (
       OP_DAT_ArgumentGroup) && isRead (OP_DAT_ArgumentGroup));
 }
 

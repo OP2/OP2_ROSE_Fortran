@@ -51,17 +51,17 @@ FortranCUDAHostSubroutineDirectLoop::createKernelFunctionCallStatement ()
       }
       else if (parallelLoop->isRead (i))
       {
-        if (parallelLoop->isGlobalScalar (i))
-        {
-          actualParameters->append_expression (buildVarRefExp (
-              variableDeclarations->get (OP2::VariableNames::getOpDatHostName (
-                  i))));
-        }
-        else
+        if (parallelLoop->isArray (i))
         {
           actualParameters->append_expression (buildVarRefExp (
               variableDeclarations->get (
                   OP2::VariableNames::getOpDatDeviceName (i))));
+        }
+        else
+        {
+          actualParameters->append_expression (buildVarRefExp (
+              variableDeclarations->get (OP2::VariableNames::getOpDatHostName (
+                  i))));
         }
       }
     }

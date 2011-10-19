@@ -25,6 +25,9 @@ FortranCUDAKernelSubroutineIndirectLoop::createUserSubroutineCallStatement ()
   using SageBuilder::buildPntrArrRefExp;
   using SageBuilder::buildAddOp;
   using SageBuilder::buildMultiplyOp;
+  using SageBuilder::buildSubtractOp;
+  using SageBuilder::buildOpaqueVarRefExp;
+  using SageBuilder::buildDotExp;
   using std::string;
   using std::vector;
 
@@ -38,12 +41,7 @@ FortranCUDAKernelSubroutineIndirectLoop::createUserSubroutineCallStatement ()
   {
     SgExpression * parameterExpression;
 
-    if (parallelLoop->isGlobal (i))
-    {
-      parameterExpression = createUserKernelOpGlobalActualParameterExpression (
-          i);
-    }
-    else if (parallelLoop->isIndirect (i))
+    if (parallelLoop->isIndirect (i))
     {
       if (parallelLoop->isIncremented (i))
       {
@@ -186,6 +184,52 @@ FortranCUDAKernelSubroutineIndirectLoop::createUserSubroutineCallStatement ()
       parameterExpression = buildPntrArrRefExp (buildVarRefExp (
           variableDeclarations->get (OP2::VariableNames::getOpDatName (i))),
           arraySubscriptExpression);
+    }
+    else if (parallelLoop->isReductionRequired (i))
+    {
+      parameterExpression = buildVarRefExp (variableDeclarations->get (
+          OP2::VariableNames::getOpDatLocalName (i)));
+    }
+    else if (parallelLoop->isGlobal (i))
+    {
+      Debug::getInstance ()->debugMessage ("Read argument",
+          Debug::HIGHEST_DEBUG_LEVEL, __FILE__, __LINE__);
+
+      if (parallelLoop->isArray (i) == false)
+      {
+        Debug::getInstance ()->debugMessage (
+            "OP_GBL with read access (Scalar)", Debug::HIGHEST_DEBUG_LEVEL,
+            __FILE__, __LINE__);
+
+        parameterExpression = buildVarRefExp (variableDeclarations->get (
+            OP2::VariableNames::getOpDatName (i)));
+      }
+      else
+      {
+        Debug::getInstance ()->debugMessage ("OP_GBL with read access (Array)",
+            Debug::HIGHEST_DEBUG_LEVEL, __FILE__, __LINE__);
+
+        string const variableName =
+            OP2::VariableNames::getOpDatCardinalityName (i);
+
+        SgDotExp * dotExpression = buildDotExp (
+            buildVarRefExp (variableDeclarations->get (
+                OP2::VariableNames::opDatCardinalities)), buildOpaqueVarRefExp (
+                variableName, subroutineScope));
+
+        SgSubtractOp * subtractExpression = buildSubtractOp (dotExpression,
+            buildIntVal (1));
+
+        SgSubscriptExpression * subscriptExpression =
+            new SgSubscriptExpression (RoseHelper::getFileInfo (), buildIntVal (
+                0), subtractExpression, buildIntVal (1));
+
+        subscriptExpression->set_endOfConstruct (RoseHelper::getFileInfo ());
+
+        parameterExpression = buildPntrArrRefExp (buildVarRefExp (
+            variableDeclarations->get (OP2::VariableNames::getOpDatName (i))),
+            subscriptExpression);
+      }
     }
 
     ROSE_ASSERT (parameterExpression != NULL);

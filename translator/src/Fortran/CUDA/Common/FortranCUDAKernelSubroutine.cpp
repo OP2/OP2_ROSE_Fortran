@@ -12,84 +12,6 @@
 #include <CommonNamespaces.h>
 #include <CUDA.h>
 
-SgExpression *
-FortranCUDAKernelSubroutine::createUserKernelOpGlobalActualParameterExpression (
-    unsigned int OP_DAT_ArgumentGroup)
-{
-  using SageBuilder::buildSubtractOp;
-  using SageBuilder::buildIntVal;
-  using SageBuilder::buildOpaqueVarRefExp;
-  using SageBuilder::buildDotExp;
-  using SageBuilder::buildVarRefExp;
-  using SageBuilder::buildPntrArrRefExp;
-  using std::string;
-
-  SgExpression * parameterExpression;
-
-  if (parallelLoop->isRead (OP_DAT_ArgumentGroup))
-  {
-    if (parallelLoop->isGlobalScalar (OP_DAT_ArgumentGroup))
-    {
-      Debug::getInstance ()->debugMessage ("OP_GBL with read access (Scalar)",
-          Debug::HIGHEST_DEBUG_LEVEL, __FILE__, __LINE__);
-
-      parameterExpression = buildVarRefExp (variableDeclarations->get (
-          OP2::VariableNames::getOpDatName (OP_DAT_ArgumentGroup)));
-    }
-    else
-    {
-      Debug::getInstance ()->debugMessage ("OP_GBL with read access (Array)",
-          Debug::HIGHEST_DEBUG_LEVEL, __FILE__, __LINE__);
-
-      string const variableName = OP2::VariableNames::getOpDatCardinalityName (
-          OP_DAT_ArgumentGroup);
-
-      SgDotExp * dotExpression = buildDotExp (buildVarRefExp (
-          variableDeclarations->get (OP2::VariableNames::opDatCardinalities)),
-          buildOpaqueVarRefExp (variableName, subroutineScope));
-
-      SgSubtractOp * subtractExpression = buildSubtractOp (dotExpression,
-          buildIntVal (1));
-
-      SgSubscriptExpression * subscriptExpression = new SgSubscriptExpression (
-          RoseHelper::getFileInfo (), buildIntVal (0), subtractExpression,
-          buildIntVal (1));
-
-      subscriptExpression->set_endOfConstruct (RoseHelper::getFileInfo ());
-
-      parameterExpression = buildPntrArrRefExp (buildVarRefExp (
-          variableDeclarations->get (OP2::VariableNames::getOpDatName (
-              OP_DAT_ArgumentGroup))), subscriptExpression);
-    }
-  }
-  else if (parallelLoop->isIncremented (OP_DAT_ArgumentGroup))
-  {
-    Debug::getInstance ()->debugMessage ("OP_GBL with increment access",
-        Debug::OUTER_LOOP_LEVEL, __FILE__, __LINE__);
-
-    parameterExpression = buildVarRefExp (variableDeclarations->get (
-        OP2::VariableNames::getOpDatLocalName (OP_DAT_ArgumentGroup)));
-  }
-  else if (parallelLoop->isMaximised (OP_DAT_ArgumentGroup))
-  {
-    Debug::getInstance ()->debugMessage ("OP_GBL with maximum access",
-        Debug::OUTER_LOOP_LEVEL, __FILE__, __LINE__);
-
-    parameterExpression = buildVarRefExp (variableDeclarations->get (
-        OP2::VariableNames::getOpDatLocalName (OP_DAT_ArgumentGroup)));
-  }
-  else if (parallelLoop->isMinimised (OP_DAT_ArgumentGroup))
-  {
-    Debug::getInstance ()->debugMessage ("OP_GBL with minimum access",
-        Debug::OUTER_LOOP_LEVEL, __FILE__, __LINE__);
-
-    parameterExpression = buildVarRefExp (variableDeclarations->get (
-        OP2::VariableNames::getOpDatLocalName (OP_DAT_ArgumentGroup)));
-  }
-
-  return parameterExpression;
-}
-
 void
 FortranCUDAKernelSubroutine::createReductionEpilogueStatements ()
 {
@@ -211,7 +133,7 @@ FortranCUDAKernelSubroutine::createCUDAStageInVariablesVariableDeclarations ()
 
     if (parallelLoop->isCUDAStageInVariableDeclarationNeeded (i))
     {
-      if (parallelLoop->isGlobalScalar (i))
+      if (parallelLoop->isGlobal (i) && parallelLoop->isArray (i) == false)
       {
         variableDeclarations->add (variableName,
             FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (

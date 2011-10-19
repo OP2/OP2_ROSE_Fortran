@@ -21,14 +21,7 @@ FortranOpDatDimensionsDeclaration::addFields ()
 
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
-    /*
-     * ======================================================
-     * We do NOT need a dimensions field when OP_GBL data
-     * is read
-     * ======================================================
-     */
-
-    if (parallelLoop->isGlobalRead (i) == false)
+    if (parallelLoop->isDirect (i) || parallelLoop->isIndirect (i))
     {
       Debug::getInstance ()->debugMessage (
           "Adding dimensions field for OP_DAT " + lexical_cast <string> (i),

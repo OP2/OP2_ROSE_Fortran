@@ -631,13 +631,6 @@ CPPCUDAKernelSubroutineDirectLoop::createOpDatFormalParameterDeclarations ()
       else if (parallelLoop->isRead (i))
       {
         string const & variableName = OP2::VariableNames::getOpDatName (i);
-
-        if (parallelLoop->isGlobalScalar (i))
-        {
-        }
-        else
-        {
-        }
       }
     }
   }

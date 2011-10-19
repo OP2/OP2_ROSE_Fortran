@@ -22,6 +22,9 @@ FortranCUDAKernelSubroutineDirectLoop::createUserSubroutineCallStatement ()
   using SageBuilder::buildExprListExp;
   using SageBuilder::buildPntrArrRefExp;
   using SageBuilder::buildVarRefExp;
+  using SageBuilder::buildSubtractOp;
+  using SageBuilder::buildOpaqueVarRefExp;
+  using SageBuilder::buildDotExp;
   using std::string;
   using std::vector;
 
@@ -35,17 +38,9 @@ FortranCUDAKernelSubroutineDirectLoop::createUserSubroutineCallStatement ()
   {
     SgExpression * parameterExpression;
 
-    if (parallelLoop->isGlobal (i))
+    if (parallelLoop->isDirect (i))
     {
-      Debug::getInstance ()->debugMessage ("OP_GBL",
-          Debug::HIGHEST_DEBUG_LEVEL, __FILE__, __LINE__);
-
-      actualParameters->append_expression (
-          createUserKernelOpGlobalActualParameterExpression (i));
-    }
-    else if (parallelLoop->isDirect (i))
-    {
-      Debug::getInstance ()->debugMessage ("Direct OP_DAT",
+      Debug::getInstance ()->debugMessage ("Direct argument",
           Debug::OUTER_LOOP_LEVEL, __FILE__, __LINE__);
 
       if (parallelLoop->getOpDatDimension (i) == 1)
@@ -76,6 +71,55 @@ FortranCUDAKernelSubroutineDirectLoop::createUserSubroutineCallStatement ()
         actualParameters->append_expression (buildVarRefExp (
             variableDeclarations->get (
                 OP2::VariableNames::getOpDatLocalName (i))));
+      }
+    }
+    else if (parallelLoop->isReductionRequired (i))
+    {
+      Debug::getInstance ()->debugMessage ("Reduction argument",
+          Debug::OUTER_LOOP_LEVEL, __FILE__, __LINE__);
+
+      parameterExpression = buildVarRefExp (variableDeclarations->get (
+          OP2::VariableNames::getOpDatLocalName (i)));
+    }
+    else if (parallelLoop->isGlobal (i))
+    {
+      Debug::getInstance ()->debugMessage ("Read argument",
+          Debug::HIGHEST_DEBUG_LEVEL, __FILE__, __LINE__);
+
+      if (parallelLoop->isArray (i) == false)
+      {
+        Debug::getInstance ()->debugMessage (
+            "OP_GBL with read access (Scalar)", Debug::HIGHEST_DEBUG_LEVEL,
+            __FILE__, __LINE__);
+
+        parameterExpression = buildVarRefExp (variableDeclarations->get (
+            OP2::VariableNames::getOpDatName (i)));
+      }
+      else
+      {
+        Debug::getInstance ()->debugMessage ("OP_GBL with read access (Array)",
+            Debug::HIGHEST_DEBUG_LEVEL, __FILE__, __LINE__);
+
+        string const variableName =
+            OP2::VariableNames::getOpDatCardinalityName (i);
+
+        SgDotExp * dotExpression = buildDotExp (
+            buildVarRefExp (variableDeclarations->get (
+                OP2::VariableNames::opDatCardinalities)), buildOpaqueVarRefExp (
+                variableName, subroutineScope));
+
+        SgSubtractOp * subtractExpression = buildSubtractOp (dotExpression,
+            buildIntVal (1));
+
+        SgSubscriptExpression * subscriptExpression =
+            new SgSubscriptExpression (RoseHelper::getFileInfo (), buildIntVal (
+                0), subtractExpression, buildIntVal (1));
+
+        subscriptExpression->set_endOfConstruct (RoseHelper::getFileInfo ());
+
+        parameterExpression = buildPntrArrRefExp (buildVarRefExp (
+            variableDeclarations->get (OP2::VariableNames::getOpDatName (i))),
+            subscriptExpression);
       }
     }
   }
@@ -458,8 +502,8 @@ FortranCUDAKernelSubroutineDirectLoop::createExecutionLoopStatements ()
 
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
-    if (parallelLoop->isGlobal (i) == false && parallelLoop->isRead (i)
-        && parallelLoop->getOpDatDimension (i) != 1)
+    if (parallelLoop->isGlobal (i) == false && parallelLoop->isWritten (i)
+        == false && parallelLoop->getOpDatDimension (i) != 1)
     {
       Debug::getInstance ()->debugMessage (
           "Creating statements to stage in from device memory to shared memory for OP_DAT "
@@ -483,8 +527,8 @@ FortranCUDAKernelSubroutineDirectLoop::createExecutionLoopStatements ()
 
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
-    if (parallelLoop->isGlobal (i) == false && parallelLoop->isWritten (i)
-        && parallelLoop->getOpDatDimension (i) != 1)
+    if (parallelLoop->isGlobal (i) == false && parallelLoop->isRead (i)
+        == false && parallelLoop->getOpDatDimension (i) != 1)
     {
       Debug::getInstance ()->debugMessage (
           "Creating statements to stage out from local memory to shared memory for OP_DAT "
@@ -733,15 +777,7 @@ FortranCUDAKernelSubroutineDirectLoop::createOpDatFormalParameterDeclarations ()
       {
         string const & variableName = OP2::VariableNames::getOpDatName (i);
 
-        if (parallelLoop->isGlobalScalar (i))
-        {
-          variableDeclarations->add (
-              variableName,
-              FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
-                  variableName, parallelLoop->getOpDatBaseType (i),
-                  subroutineScope, formalParameters, 1, VALUE));
-        }
-        else
+        if (parallelLoop->isArray (i))
         {
           variableDeclarations->add (
               variableName,
@@ -751,6 +787,15 @@ FortranCUDAKernelSubroutineDirectLoop::createOpDatFormalParameterDeclarations ()
                       parallelLoop->getOpDatBaseType (i), buildIntVal (0),
                       buildIntVal (parallelLoop->getOpDatDimension (i) - 1)),
                   subroutineScope, formalParameters, 1, CUDA_DEVICE));
+        }
+        else
+        {
+          variableDeclarations->add (
+              variableName,
+              FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
+                  variableName, parallelLoop->getOpDatBaseType (i),
+                  subroutineScope, formalParameters, 1, VALUE));
+
         }
       }
     }

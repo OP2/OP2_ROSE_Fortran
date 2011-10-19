@@ -343,15 +343,7 @@ FortranCUDAHostSubroutine::createRHSOfInitialiseOpDatCardinalityStatement (
   }
   else if (parallelLoop->isReductionRequired (OP_DAT_ArgumentGroup))
   {
-    if (parallelLoop->isGlobalScalar (OP_DAT_ArgumentGroup))
-    {
-      SgDotExp * dotExpression = buildDotExp (buildVarRefExp (
-          variableDeclarations->get (OP2::VariableNames::getOpSetName ())),
-          buildOpaqueVarRefExp (OP2::VariableNames::size, scope));
-
-      return dotExpression;
-    }
-    else
+    if (parallelLoop->isArray (OP_DAT_ArgumentGroup))
     {
       SgDotExp * dotExpression1 = buildDotExp (buildVarRefExp (
           variableDeclarations->get (OP2::VariableNames::getOpDatName (
@@ -367,8 +359,16 @@ FortranCUDAHostSubroutine::createRHSOfInitialiseOpDatCardinalityStatement (
 
       return multiplyExpression;
     }
+    else
+    {
+      SgDotExp * dotExpression = buildDotExp (buildVarRefExp (
+          variableDeclarations->get (OP2::VariableNames::getOpSetName ())),
+          buildOpaqueVarRefExp (OP2::VariableNames::size, scope));
+
+      return dotExpression;
+    }
   }
-  else if (parallelLoop->isGlobalArray (OP_DAT_ArgumentGroup)
+  else if (parallelLoop->isArray (OP_DAT_ArgumentGroup)
       && parallelLoop->isRead (OP_DAT_ArgumentGroup))
   {
     SgDotExp * dotExpression = buildDotExp (buildVarRefExp (
@@ -403,7 +403,7 @@ FortranCUDAHostSubroutine::createTransferOpDatStatements ()
 
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
-    if (parallelLoop->isGlobalRead (i) == false)
+    if (parallelLoop->isDirect (i) || parallelLoop->isIndirect (i))
     {
       SgDotExp * dotExpression1 = buildDotExp (buildVarRefExp (
           variableDeclarations->get (OP2::VariableNames::opDatDimensions)),
@@ -484,7 +484,7 @@ FortranCUDAHostSubroutine::createTransferOpDatStatements ()
   {
     if (parallelLoop->isDuplicateOpDat (i) == false)
     {
-      if (parallelLoop->isGlobalScalar (i))
+      if (parallelLoop->isGlobal (i) && parallelLoop->isArray (i) == false)
       {
         Debug::getInstance ()->debugMessage ("Global scalar conversion",
             Debug::HIGHEST_DEBUG_LEVEL, __FILE__, __LINE__);
@@ -588,7 +588,7 @@ FortranCUDAHostSubroutine::createDataMarshallingDeclarations ()
     {
       if (parallelLoop->isGlobal (i))
       {
-        if (parallelLoop->isGlobalScalar (i))
+        if (parallelLoop->isArray (i) == false)
         {
           string const & variableName =
               OP2::VariableNames::getOpDatHostName (i);

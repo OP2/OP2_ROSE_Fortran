@@ -96,6 +96,12 @@ ParallelLoop::getOpDatType (unsigned int OP_DAT_ArgumentGroup)
   return OpDatTypes[OP_DAT_ArgumentGroup];
 }
 
+bool
+ParallelLoop::isArray (unsigned int OP_DAT_ArgumentGroup)
+{
+  return isSgArrayType (OpDatTypes[OP_DAT_ArgumentGroup]);
+}
+
 SgType *
 ParallelLoop::getOpDatBaseType (unsigned int OP_DAT_ArgumentGroup)
 {
@@ -171,35 +177,6 @@ ParallelLoop::isGlobal (unsigned int OP_DAT_ArgumentGroup)
   return OpDatMappingDescriptors[OP_DAT_ArgumentGroup] == GLOBAL;
 }
 
-bool
-ParallelLoop::isGlobalScalar (unsigned int OP_DAT_ArgumentGroup)
-{
-  /*
-   * ======================================================
-   * Global scalar has the following properties:
-   * 1) GLOBAL mapping descriptor
-   * 2) Base type NOT an array
-   * ======================================================
-   */
-
-  return OpDatMappingDescriptors[OP_DAT_ArgumentGroup] == GLOBAL
-      && isSgArrayType (OpDatTypes[OP_DAT_ArgumentGroup]) == NULL;
-}
-
-bool
-ParallelLoop::isGlobalArray (unsigned int OP_DAT_ArgumentGroup)
-{
-  return OpDatMappingDescriptors[OP_DAT_ArgumentGroup] == GLOBAL
-      && isSgArrayType (OpDatTypes[OP_DAT_ArgumentGroup]);
-}
-
-bool
-ParallelLoop::isGlobalRead (unsigned int OP_DAT_ArgumentGroup)
-{
-  return OpDatMappingDescriptors[OP_DAT_ArgumentGroup] == GLOBAL
-      && OpDatAccessDescriptors[OP_DAT_ArgumentGroup] == READ_ACCESS;
-}
-
 void
 ParallelLoop::setOpAccessValue (unsigned int OP_DAT_ArgumentGroup,
     ACCESS_CODE_VALUE value)
@@ -263,7 +240,7 @@ ParallelLoop::getNumberOfDifferentIndirectOpDats ()
   int count = 0;
   for (unsigned int i = 1; i <= getNumberOfOpDatArgumentGroups (); ++i)
   {
-    if (OpDatMappingDescriptors[i] == INDIRECT && isDuplicateOpDat (i) == false)
+    if (isIndirect (i) && isDuplicateOpDat (i) == false)
     {
       count++;
     }
@@ -275,7 +252,8 @@ bool
 ParallelLoop::isReductionRequired (int OP_DAT_ArgumentGroup)
 {
   return OpDatMappingDescriptors[OP_DAT_ArgumentGroup] == GLOBAL
-      && OpDatAccessDescriptors[OP_DAT_ArgumentGroup] != READ_ACCESS;
+      && (isMaximised (OP_DAT_ArgumentGroup) || isMinimised (
+          OP_DAT_ArgumentGroup) || isIncremented (OP_DAT_ArgumentGroup));
 }
 
 bool
@@ -408,23 +386,11 @@ ParallelLoop::getReductionTuple (unsigned int OP_DAT_ArgumentGroup)
 {
   ROSE_ASSERT (isReductionRequired (OP_DAT_ArgumentGroup));
 
-  SgType * baseType;
+  SgType * baseType = getOpDatBaseType (OP_DAT_ArgumentGroup);
 
-  if (isGlobalScalar (OP_DAT_ArgumentGroup))
-  {
-    baseType = getOpDatType (OP_DAT_ArgumentGroup);
-  }
-  else
-  {
-    SgArrayType * arrayType = isSgArrayType (
-        getOpDatType (OP_DAT_ArgumentGroup));
+  unsigned int baseSize = getSizeOfOpDat (OP_DAT_ArgumentGroup);
 
-    baseType = arrayType->get_base_type ();
-  }
-
-  SgIntVal * baseSize = isSgIntVal (baseType->get_type_kind ());
-
-  return new Reduction (baseType, baseSize->get_value ());
+  return new Reduction (baseType, baseSize);
 }
 
 void

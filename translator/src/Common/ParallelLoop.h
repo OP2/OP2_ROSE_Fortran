@@ -182,6 +182,9 @@ class ParallelLoop
     SgType *
     getOpDatType (unsigned int OP_DAT_ArgumentGroup);
 
+    bool
+    isArray (unsigned int OP_DAT_ArgumentGroup);
+
     /*
      * ======================================================
      * What is the base type of the (assumed) array type wrapped
@@ -229,15 +232,6 @@ class ParallelLoop
 
     bool
     isGlobal (unsigned int OP_DAT_ArgumentGroup);
-
-    bool
-    isGlobalScalar (unsigned int OP_DAT_ArgumentGroup);
-
-    bool
-    isGlobalArray (unsigned int OP_DAT_ArgumentGroup);
-
-    bool
-    isGlobalRead (unsigned int OP_DAT_ArgumentGroup);
 
     void
     setOpAccessValue (unsigned int OP_DAT_ArgumentGroup,

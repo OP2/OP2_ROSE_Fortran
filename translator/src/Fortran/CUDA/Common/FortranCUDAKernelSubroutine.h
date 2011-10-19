@@ -24,15 +24,6 @@ class FortranCUDAKernelSubroutine: public FortranKernelSubroutine
 
     /*
      * ======================================================
-     * For this OP_GBL, create the expression
-     * ======================================================
-     */
-    SgExpression *
-    createUserKernelOpGlobalActualParameterExpression (
-        unsigned int OP_DAT_ArgumentGroup);
-
-    /*
-     * ======================================================
      * Creates the statements executed after the call to the
      * user subroutine to perform the thread-block reduction
      * ======================================================

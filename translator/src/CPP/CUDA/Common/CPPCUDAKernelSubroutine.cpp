@@ -29,7 +29,7 @@ CPPCUDAKernelSubroutine::createCUDAStageInVariablesVariableDeclarations ()
 
     if (parallelLoop->isCUDAStageInVariableDeclarationNeeded (i))
     {
-      if (parallelLoop->isGlobalScalar (i))
+      if (parallelLoop->isGlobal (i) && parallelLoop->isArray (i) == false)
       {
       }
       else
