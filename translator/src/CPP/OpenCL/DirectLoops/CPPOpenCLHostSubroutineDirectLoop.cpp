@@ -1,7 +1,6 @@
 #include <CPPOpenCLHostSubroutineDirectLoop.h>
 #include <CPPOpenCLKernelSubroutineDirectLoop.h>
 #include <CPPParallelLoop.h>
-#include <CPPOpenCLReductionSubroutine.h>
 #include <RoseStatementsAndExpressionsBuilder.h>
 #include <RoseHelper.h>
 #include <Debug.h>
@@ -53,10 +52,6 @@ CPPOpenCLHostSubroutineDirectLoop::createOpenCLKernelInitialisationStatements ()
       OpenCL::CPP::totalThreads));
   SgExpression * nshared_ref = buildVarRefExp (variableDeclarations->get (
       OpenCL::CPP::sharedMemorySize));
-  SgExpression * reduct_size_ref = buildVarRefExp (variableDeclarations->get (
-      ""));
-  SgExpression * offset_s_ref = buildVarRefExp (variableDeclarations->get (
-      DirectLoop::CPP::KernelSubroutine::warpScratchpadSize));
 
   /*
    * ======================================================
@@ -141,45 +136,6 @@ CPPOpenCLHostSubroutineDirectLoop::createOpenCLKernelInitialisationStatements ()
       }
     }
   }
-
-  /*
-   * ======================================================
-   * offset_s = nshared * OP_WARP_SIZE
-   * ======================================================
-   */
-
-  tempStatement = buildAssignStatement (offset_s_ref, buildMultiplyOp (
-      nshared_ref, buildOpaqueVarRefExp (OPWarpSizeVariableName,
-          subroutineScope)));
-
-  appendStatement (tempStatement, subroutineScope);
-
-  if (parallelLoop->isReductionRequired ())
-  {
-    /*
-     * ======================================================
-     * nshared = MAX(nshared*nthreads, reduct_size*nthreads)
-     * ======================================================
-     */
-    tempStatement = buildAssignStatement (nshared_ref, buildFunctionCallExp (
-        maxFunctionName, buildIntType (), buildExprListExp (buildMultiplyOp (
-            nshared_ref, nthreads_ref), buildMultiplyOp (reduct_size_ref,
-            nthreads_ref))));
-
-    appendStatement (tempStatement, subroutineScope);
-  }
-  else
-  {
-    /*
-     * ======================================================
-     * nshared = nshared * nthreads
-     * ======================================================
-     */
-    tempStatement = buildAssignStatement (nshared_ref, buildMultiplyOp (
-        nshared_ref, nthreads_ref));
-
-    appendStatement (tempStatement, subroutineScope);
-  }
 }
 
 void
@@ -194,31 +150,6 @@ CPPOpenCLHostSubroutineDirectLoop::createOpenCLKernelLocalVariableDeclarationsFo
   Debug::getInstance ()->debugMessage (
       "Creating OpenCL configuration parameters", Debug::FUNCTION_LEVEL,
       __FILE__, __LINE__);
-
-  SgVariableDeclaration * variableDeclaration1 = buildVariableDeclaration (
-      DirectLoop::CPP::KernelSubroutine::offsetInThreadBlock, buildIntType (),
-      buildAssignInitializer (buildIntVal (0), buildIntType ()),
-      subroutineScope);
-
-  variableDeclarations->add (
-      DirectLoop::CPP::KernelSubroutine::offsetInThreadBlock,
-      variableDeclaration1);
-
-  variableDeclaration1->get_declarationModifier ().get_accessModifier ().setUndefined ();
-
-  appendStatement (variableDeclaration1, subroutineScope);
-
-  SgVariableDeclaration * variableDeclaration2 = buildVariableDeclaration (
-      DirectLoop::CPP::KernelSubroutine::warpSize, buildIntType (),
-      buildAssignInitializer (buildIntVal (0), buildIntType ()),
-      subroutineScope);
-
-  variableDeclarations->add (DirectLoop::CPP::KernelSubroutine::warpSize,
-      variableDeclaration2);
-
-  variableDeclaration2->get_declarationModifier ().get_accessModifier ().setUndefined ();
-
-  appendStatement (variableDeclaration2, subroutineScope);
 }
 
 void
@@ -258,15 +189,11 @@ CPPOpenCLHostSubroutineDirectLoop::createStatements ()
 void
 CPPOpenCLHostSubroutineDirectLoop::createLocalVariableDeclarations ()
 {
-  //createDataMarshallingLocalVariableDeclarations ();
-
-  //createOpenCLKernelLocalVariableDeclarations ();
-
   createOpenCLKernelLocalVariableDeclarationsForDirectLoop ();
 
   if (parallelLoop->isReductionRequired () == true)
   {
-    createReductionLocalVariableDeclarations ();
+    createReductionDeclarations ();
   }
 }
 

@@ -17,7 +17,7 @@ class CPPOpenCLHostSubroutine: public CPPHostSubroutine
     createReductionPrologueStatements ();
 
     virtual void
-    createReductionLocalVariableDeclarations ();
+    createReductionDeclarations ();
 
     CPPOpenCLHostSubroutine (SgScopeStatement * moduleScope,
         CPPOpenCLKernelSubroutine * kernelSubroutine,

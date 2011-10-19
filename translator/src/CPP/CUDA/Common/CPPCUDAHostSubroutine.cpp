@@ -12,12 +12,12 @@ CPPCUDAHostSubroutine::createReductionPrologueStatements ()
 }
 
 void
-CPPCUDAHostSubroutine::createReductionLocalVariableDeclarations ()
+CPPCUDAHostSubroutine::createReductionDeclarations ()
 {
 }
 
 void
-CPPCUDAHostSubroutine::createCUDAKernelLocalVariableDeclarations ()
+CPPCUDAHostSubroutine::createCUDAConfigurationLaunchDeclarations ()
 {
 }
 

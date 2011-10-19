@@ -339,48 +339,6 @@ namespace OP2
   }
 }
 
-namespace IndirectLoop
-{
-  namespace CPP
-  {
-    namespace VariablePrefixes
-    {
-      std::string const numberOfBytes = "nBytes";
-      std::string const roundUp = "roundUp";
-    }
-
-    namespace KernelSubroutine
-    {
-      namespace VariableNames
-      {
-        std::string const blockID = "blockId";
-        std::string const blockOffsetShared = "offset_b";
-        std::string const moduled = "moduled";
-        std::string const moduloResult = "moduloResult";
-      }
-    }
-  }
-}
-
-namespace DirectLoop
-{
-  namespace CPP
-  {
-    namespace KernelSubroutine
-    {
-      std::string const setSize = "set_size";
-      std::string const warpScratchpadSize = "offset_s";
-      std::string const warpSize = "OP_WARPSIZE";
-      std::string const setElementCounter = "n";
-      std::string const dataPerElementCounter = "m";
-      std::string const threadIDModulus = "tid";
-      std::string const offsetInThreadBlock = "offset";
-      std::string const remainingElements = "nelems";
-      std::string const autosharedDisplacement = "autosharedDisplacement";
-    }
-  }
-}
-
 namespace OpenCL
 {
   /*

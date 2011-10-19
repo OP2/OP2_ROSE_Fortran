@@ -26,7 +26,7 @@ class FortranOpenMPHostSubroutine: public FortranHostSubroutine
     createReductionPrologueStatements ();
 
     virtual void
-    createReductionLocalVariableDeclarations ();
+    createReductionDeclarations ();
 
     void
     initialiseNumberOfThreadsStatements ();

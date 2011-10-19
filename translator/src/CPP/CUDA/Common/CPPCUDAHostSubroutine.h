@@ -17,10 +17,10 @@ class CPPCUDAHostSubroutine: public CPPHostSubroutine
     createReductionPrologueStatements ();
 
     virtual void
-    createReductionLocalVariableDeclarations ();
+    createReductionDeclarations ();
 
     void
-    createCUDAKernelLocalVariableDeclarations ();
+    createCUDAConfigurationLaunchDeclarations ();
 
     CPPCUDAHostSubroutine (SgScopeStatement * moduleScope,
         CPPCUDAKernelSubroutine * calleeSubroutine,

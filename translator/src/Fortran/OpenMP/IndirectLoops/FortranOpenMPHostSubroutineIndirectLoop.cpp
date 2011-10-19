@@ -462,7 +462,7 @@ FortranOpenMPHostSubroutineIndirectLoop::createLocalVariableDeclarations ()
 
   if (parallelLoop->isReductionRequired ())
   {
-    createReductionLocalVariableDeclarations ();
+    createReductionDeclarations ();
   }
 }
 

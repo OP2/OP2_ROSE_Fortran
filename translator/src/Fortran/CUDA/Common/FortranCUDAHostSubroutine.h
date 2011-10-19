@@ -28,7 +28,7 @@ class FortranCUDAHostSubroutine: public FortranHostSubroutine
     createReductionPrologueStatements ();
 
     virtual void
-    createReductionLocalVariableDeclarations ();
+    createReductionDeclarations ();
 
     /*
      * ======================================================
@@ -45,10 +45,10 @@ class FortranCUDAHostSubroutine: public FortranHostSubroutine
     createTransferOpDatStatements ();
 
     void
-    createCUDAKernelLocalVariableDeclarations ();
+    createCUDAConfigurationLaunchDeclarations ();
 
     void
-    createDataMarshallingLocalVariableDeclarations ();
+    createDataMarshallingDeclarations ();
 
     void
     createOpDatCardinalitiesDeclaration ();

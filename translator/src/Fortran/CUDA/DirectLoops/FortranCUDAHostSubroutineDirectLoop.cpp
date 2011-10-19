@@ -238,7 +238,7 @@ FortranCUDAHostSubroutineDirectLoop::createCUDAKernelInitialisationStatements ()
 }
 
 void
-FortranCUDAHostSubroutineDirectLoop::createCUDAKernelLocalVariableDeclarationsForDirectLoop ()
+FortranCUDAHostSubroutineDirectLoop::createCUDAKernelActualParameterDeclarations ()
 {
   Debug::getInstance ()->debugMessage (
       "Creating CUDA configuration parameters", Debug::FUNCTION_LEVEL,
@@ -292,15 +292,15 @@ FortranCUDAHostSubroutineDirectLoop::createLocalVariableDeclarations ()
 
   createOpDatCardinalitiesDeclaration ();
 
-  createDataMarshallingLocalVariableDeclarations ();
+  createDataMarshallingDeclarations ();
 
-  createCUDAKernelLocalVariableDeclarations ();
+  createCUDAConfigurationLaunchDeclarations ();
 
-  createCUDAKernelLocalVariableDeclarationsForDirectLoop ();
+  createCUDAKernelActualParameterDeclarations ();
 
   if (parallelLoop->isReductionRequired () == true)
   {
-    createReductionLocalVariableDeclarations ();
+    createReductionDeclarations ();
   }
 }
 

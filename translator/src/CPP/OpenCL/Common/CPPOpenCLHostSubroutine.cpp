@@ -13,7 +13,7 @@ CPPOpenCLHostSubroutine::createReductionPrologueStatements ()
 }
 
 void
-CPPOpenCLHostSubroutine::createReductionLocalVariableDeclarations ()
+CPPOpenCLHostSubroutine::createReductionDeclarations ()
 {
 }
 

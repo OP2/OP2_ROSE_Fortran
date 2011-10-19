@@ -247,7 +247,7 @@ FortranCUDAHostSubroutine::createReductionEpilogueStatements ()
 }
 
 void
-FortranCUDAHostSubroutine::createReductionLocalVariableDeclarations ()
+FortranCUDAHostSubroutine::createReductionDeclarations ()
 {
   using boost::lexical_cast;
   using std::string;
@@ -546,7 +546,7 @@ FortranCUDAHostSubroutine::createTransferOpDatStatements ()
 }
 
 void
-FortranCUDAHostSubroutine::createDataMarshallingLocalVariableDeclarations ()
+FortranCUDAHostSubroutine::createDataMarshallingDeclarations ()
 {
   using boost::lexical_cast;
   using SageBuilder::buildPointerType;
@@ -628,10 +628,10 @@ FortranCUDAHostSubroutine::createDataMarshallingLocalVariableDeclarations ()
 }
 
 void
-FortranCUDAHostSubroutine::createCUDAKernelLocalVariableDeclarations ()
+FortranCUDAHostSubroutine::createCUDAConfigurationLaunchDeclarations ()
 {
   Debug::getInstance ()->debugMessage (
-      "Creating CUDA kernel local variable declarations",
+      "Creating CUDA configuration launch local variable declarations",
       Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
   variableDeclarations->add (CUDA::blocksPerGrid,

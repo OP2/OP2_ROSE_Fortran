@@ -50,7 +50,7 @@ template <typename TSubroutineHeader>
        * ======================================================
        */
       virtual void
-      createReductionLocalVariableDeclarations () = 0;
+      createReductionDeclarations () = 0;
 
       HostSubroutine (Subroutine <TSubroutineHeader> * calleeSubroutine,
           ParallelLoop * parallelLoop) :

@@ -3,6 +3,7 @@
 #include <CPPProgramDeclarationsAndDefinitions.h>
 #include <CPPCUDAKernelSubroutine.h>
 #include <CPPCUDAKernelSubroutineDirectLoop.h>
+#include <CPPCUDAHostSubroutineDirectLoop.h>
 #include <CPPCUDAUserSubroutine.h>
 
 void
@@ -32,6 +33,10 @@ CPPCUDASubroutinesGeneration::createSubroutines ()
     {
       kernelSubroutine = new CPPCUDAKernelSubroutineDirectLoop (moduleScope,
           userDeviceSubroutine, parallelLoop);
+
+      hostSubroutines[userSubroutineName]
+          = new CPPCUDAHostSubroutineDirectLoop (moduleScope, kernelSubroutine,
+              parallelLoop);
     }
     else
     {

@@ -201,7 +201,7 @@ FortranOpenMPHostSubroutine::createReductionPrologueStatements ()
 }
 
 void
-FortranOpenMPHostSubroutine::createReductionLocalVariableDeclarations ()
+FortranOpenMPHostSubroutine::createReductionDeclarations ()
 {
   using SageBuilder::buildMultiplyOp;
   using SageBuilder::buildAddOp;

@@ -10,22 +10,11 @@ class FortranCUDAHostSubroutineDirectLoop: public FortranCUDAHostSubroutine
 {
   private:
 
-    /*
-     * ======================================================
-     * Initialises CUDA-specific variables
-     * ======================================================
-     */
     void
     createCUDAKernelInitialisationStatements ();
 
-    /*
-     * ======================================================
-     * Creates the additional CUDA-specific variables and
-     * initialises them inside the host subroutine
-     * ======================================================
-     */
     void
-    createCUDAKernelLocalVariableDeclarationsForDirectLoop ();
+    createCUDAKernelActualParameterDeclarations ();
 
     virtual SgStatement *
     createKernelFunctionCallStatement ();

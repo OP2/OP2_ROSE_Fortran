@@ -725,15 +725,15 @@ FortranCUDAHostSubroutineIndirectLoop::createLocalVariableDeclarations ()
 
   createOpDatCardinalitiesDeclaration ();
 
-  createDataMarshallingLocalVariableDeclarations ();
+  createDataMarshallingDeclarations ();
 
-  createCUDAKernelLocalVariableDeclarations ();
+  createCUDAConfigurationLaunchDeclarations ();
 
   createExecutionPlanDeclarations ();
 
   if (parallelLoop->isReductionRequired () == true)
   {
-    createReductionLocalVariableDeclarations ();
+    createReductionDeclarations ();
   }
 }
 

@@ -19,6 +19,9 @@ class CPPCUDAHostSubroutineDirectLoop: public CPPCUDAHostSubroutine
     virtual void
     createStatements ();
 
+    void
+    createCUDAKernelActualParameterDeclarations ();
+
     virtual void
     createLocalVariableDeclarations ();
 

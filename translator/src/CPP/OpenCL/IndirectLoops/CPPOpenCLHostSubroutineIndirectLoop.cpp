@@ -1,8 +1,6 @@
 #include <CPPOpenCLHostSubroutineIndirectLoop.h>
 #include <CPPPlan.h>
-#include <CPPOpenCLStatementsAndExpressionsBuilder.h>
 #include <CPPParallelLoop.h>
-#include <CPPOpenCLModuleDeclarations.h>
 #include <RoseStatementsAndExpressionsBuilder.h>
 #include <CommonNamespaces.h>
 #include <RoseHelper.h>
@@ -226,10 +224,6 @@ CPPOpenCLHostSubroutineIndirectLoop::createPlanFunctionExecutionStatements ()
   appendStatement (tempStatement, loopBody1);
 
   appendStatement (createKernelFunctionCallStatement (), loopBody1);
-
-  appendStatement (
-      CPPOpenCLStatementsAndExpressionsBuilder::generateBarrierStatement (),
-      loopBody1);
 
   /* 
    * ======================================================
@@ -456,7 +450,7 @@ CPPOpenCLHostSubroutineIndirectLoop::createLocalVariableDeclarations ()
 
   if (parallelLoop->isReductionRequired () == true)
   {
-    createReductionLocalVariableDeclarations ();
+    createReductionDeclarations ();
   }
 }
 

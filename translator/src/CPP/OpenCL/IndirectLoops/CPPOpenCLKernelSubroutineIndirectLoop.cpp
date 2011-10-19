@@ -1,7 +1,5 @@
 #include <CPPOpenCLKernelSubroutineIndirectLoop.h>
 #include <CPPOpenCLUserSubroutine.h>
-#include <CPPReductionSubroutines.h>
-#include <CPPOpenCLStatementsAndExpressionsBuilder.h>
 #include <CPPParallelLoop.h>
 #include <CommonNamespaces.h>
 #include <RoseHelper.h>
@@ -38,8 +36,6 @@ CPPOpenCLKernelSubroutineIndirectLoop::createUserSubroutineCallStatement ()
 
   SgExpression * n_ref = buildVarRefExp (variableDeclarations->get (
       CommonVariableNames::iterationCounter1));
-  SgExpression * offset_b_ref = buildVarRefExp (variableDeclarations->get (
-      IndirectLoop::CPP::KernelSubroutine::VariableNames::blockOffsetShared));
 
   SgExprListExp * userDeviceSubroutineParameters = buildExprListExp ();
 
@@ -107,24 +103,12 @@ CPPOpenCLKernelSubroutineIndirectLoop::createUserSubroutineCallStatement ()
         Debug::getInstance ()->debugMessage (
             "Indirect OP_DAT with read/write access", Debug::OUTER_LOOP_LEVEL,
             __FILE__, __LINE__);
-        /*
-         * ind_argX_s + ARG_maps[n+offset_b]*DIM
-         */
-        parameterExpression = buildAddOp (ind_argN_s,
-            buildMultiplyOp (buildPntrArrRefExp (argN_maps_ref, buildAddOp (
-                n_ref, offset_b_ref)), dimN_val));
       }
     }
     else if (parallelLoop->isDirect (i))
     {
       Debug::getInstance ()->debugMessage ("Direct OP_DAT",
           Debug::OUTER_LOOP_LEVEL, __FILE__, __LINE__);
-
-      /*
-       * ARG + (n+offset_b) * DIM
-       */
-      parameterExpression = buildAddOp (argN_ref, buildMultiplyOp (buildAddOp (
-          n_ref, offset_b_ref), dimN_val));
     }
 
     userDeviceSubroutineParameters->append_expression (parameterExpression);
@@ -188,60 +172,8 @@ CPPOpenCLKernelSubroutineIndirectLoop::createPointeredIncrementsOrWritesStatemen
         SgExpression * dimN_val = buildIntVal (parallelLoop->getOpDatDimension (
             i));
 
-        SgStatement
-            * initialisationExpression =
-                buildExprStatement (
-                    buildAssignOp (
-                        n_ref,
-                        CPPOpenCLStatementsAndExpressionsBuilder::generateGetLocalId ()));
-
         SgStatement * testExpression = buildExprStatement (buildLessThanOp (
             n_ref, buildMultiplyOp (ind_argN_size_ref, dimN_val)));
-
-        SgExpression * incrementExpression = buildPlusAssignOp (n_ref,
-            CPPOpenCLStatementsAndExpressionsBuilder::generateGetLocalSize ());
-
-        SgBasicBlock * loopBody = buildBasicBlock ();
-
-        SgForStatement * loopStatement = buildForStatement (
-            initialisationExpression, testExpression, incrementExpression,
-            loopBody);
-
-        SgStatement * assignStatement;
-
-        if (parallelLoop->isIncremented (i))
-        {
-          /*
-           * ======================================================
-           * Increment Statement
-           * ======================================================
-           */
-
-          assignStatement
-              = buildExprStatement (buildPlusAssignOp (buildPntrArrRefExp (
-                  argN_ref, buildAddOp (buildModOp (n_ref, dimN_val),
-                      buildMultiplyOp (buildPntrArrRefExp (argN_maps_ref,
-                          buildDivideOp (n_ref, dimN_val)), dimN_val)))));
-        }
-        else if (parallelLoop->isWritten (i) || parallelLoop->isReadAndWritten (
-            i))
-        {
-          /*
-           * ======================================================
-           * Write or Read/Write Statement
-           * ======================================================
-           */
-          assignStatement
-              = buildExprStatement (buildAssignOp (buildPntrArrRefExp (
-                  argN_ref, buildAddOp (buildModOp (n_ref, dimN_val),
-                      buildMultiplyOp (buildPntrArrRefExp (argN_maps_ref,
-                          buildDivideOp (n_ref, dimN_val)), dimN_val)))));
-        }
-
-        appendStatement (assignStatement, loopBody);
-
-        appendStatement (loopStatement, subroutineScope);
-
       }
       pindOffsOffset++;
     }
@@ -351,50 +283,12 @@ CPPOpenCLKernelSubroutineIndirectLoop::createInnerExecutionLoopStatements (
 
     }
   }
-
-  SgStatement * barrier =
-      CPPOpenCLStatementsAndExpressionsBuilder::generateBarrierStatement (
-          subroutineScope);
-
-  appendStatement (barrier, outerLoopBody);
 }
 
 void
 CPPOpenCLKernelSubroutineIndirectLoop::createIncrementAdjustmentStatements (
     SgScopeStatement * scope)
 {
-  using SageBuilder::buildVarRefExp;
-  using SageBuilder::buildAssignStatement;
-  using SageBuilder::buildPntrArrRefExp;
-  using SageBuilder::buildAddOp;
-  using SageInterface::appendStatement;
-
-  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
-  {
-    if (parallelLoop->isIndirect (i) && parallelLoop->isIncremented (i))
-    {
-      SgAddOp
-          * addExpression =
-              buildAddOp (
-                  buildVarRefExp (variableDeclarations->get (
-                      CommonVariableNames::iterationCounter1)),
-                  buildVarRefExp (
-                      variableDeclarations->get (
-                          IndirectLoop::CPP::KernelSubroutine::VariableNames::blockOffsetShared)));
-
-      SgPntrArrRefExp * arrayExpression = buildPntrArrRefExp (buildVarRefExp (
-          variableDeclarations->get (
-              OP2::VariableNames::getGlobalToLocalMappingName (i))),
-          addExpression);
-
-      SgExprStatement * assignmentStatement = buildAssignStatement (
-          buildVarRefExp (variableDeclarations->get (
-              OP2::VariableNames::getIncrementAccessMapName (i))),
-          arrayExpression);
-
-      appendStatement (assignmentStatement, scope);
-    }
-  }
 }
 
 void
@@ -485,158 +379,11 @@ CPPOpenCLKernelSubroutineIndirectLoop::createExecutionLoopStatements ()
       OP2::VariableNames::colour2));
   SgExpression * nelem_ref = buildVarRefExp (variableDeclarations->get (
       OP2::VariableNames::nelems));
-  SgExpression * offset_b_ref = buildVarRefExp (variableDeclarations->get (
-      IndirectLoop::CPP::KernelSubroutine::VariableNames::blockOffsetShared));
-
-  /*
-   * ======================================================
-   * for loop construction
-   * ======================================================
-   */
-
-  SgStatement * initialisationExpression = buildAssignStatement (n_ref,
-      CPPOpenCLStatementsAndExpressionsBuilder::generateGetLocalId ());
-
-  SgStatement * testExpression = buildExprStatement (buildLessThanOp (n_ref,
-      nelems2_ref));
-
-  SgExpression * incrementExpression = buildPlusAssignOp (n_ref,
-      CPPOpenCLStatementsAndExpressionsBuilder::generateGetLocalSize ());
-
-  SgBasicBlock * loopBody = buildBasicBlock ();
-
-  SgStatement * loopStatement = buildForStatement (initialisationExpression,
-      testExpression, incrementExpression, loopBody);
-
-  appendStatement (loopStatement, subroutineScope);
-  /*
-   * ======================================================
-   * Initialise inner loop counter
-   * ======================================================
-   */
-
-  SgExprStatement * assignmentStatement2 = buildAssignStatement (col2_ref,
-      buildIntVal (-1));
-
-  appendStatement (assignmentStatement2, loopBody);
-
-  SgExpression * ifGuardExpression = buildLessThanOp (n_ref, nelem_ref);
-
-  SgBasicBlock * ifBody = buildBasicBlock ();
-
-  SgIfStmt * ifStatement =
-      RoseStatementsAndExpressionsBuilder::buildIfStatementWithEmptyElse (
-          ifGuardExpression, ifBody);
-
-  appendStatement (ifStatement, loopBody);
-
-  createInitialiseLocalOpDatStatements (ifBody);
-
-  appendStatement (createUserSubroutineCallStatement (), ifBody);
-
-  SgStatement * assignmentStatement3 = buildAssignStatement (col2_ref,
-      buildPntrArrRefExp (colors_ref, buildAddOp (n_ref, offset_b_ref)));
-
-  appendStatement (assignmentStatement3, ifBody);
-
-  createIncrementAdjustmentStatements (loopBody);
-
-  createInnerExecutionLoopStatements (loopBody);
 }
 
 void
 CPPOpenCLKernelSubroutineIndirectLoop::createAutoSharedWhileLoopStatements ()
 {
-  using SageBuilder::buildVarRefExp;
-  using SageBuilder::buildOpaqueVarRefExp;
-  using SageBuilder::buildPntrArrRefExp;
-  using SageBuilder::buildDotExp;
-  using SageBuilder::buildAssignOp;
-  using SageBuilder::buildAssignStatement;
-  using SageBuilder::buildExprStatement;
-  using SageBuilder::buildMultiplyOp;
-  using SageBuilder::buildDivideOp;
-  using SageBuilder::buildAddOp;
-  using SageBuilder::buildSubtractOp;
-  using SageBuilder::buildIntVal;
-  using SageBuilder::buildLessThanOp;
-  using SageBuilder::buildBasicBlock;
-  using SageBuilder::buildWhileStmt;
-  using SageBuilder::buildExprListExp;
-  using SageBuilder::buildFunctionCallExp;
-  using SageBuilder::buildPlusAssignOp;
-  using SageBuilder::buildForStatement;
-  using SageBuilder::buildModOp;
-  using SageInterface::appendStatement;
-
-  SgExpression * n_ref = buildVarRefExp (variableDeclarations->get (
-      DirectLoop::CPP::KernelSubroutine::setElementCounter));
-
-  unsigned int pindOffsOffset = 0;
-
-  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
-  {
-    SgExpression * ind_argN_ref = buildVarRefExp (variableDeclarations->get (
-        OP2::VariableNames::getOpIndirectionName (i)));
-    SgExpression * ind_argN_map_ref = buildVarRefExp (
-        variableDeclarations->get (
-            OP2::VariableNames::getIncrementAccessMapName (i)));
-    SgExpression * ind_argN_maps_ref = buildVarRefExp (
-        variableDeclarations->get (
-            OP2::VariableNames::getLocalToGlobalMappingName (i)));
-    SgExpression * ind_argN_s_ref = buildVarRefExp (variableDeclarations->get (
-        OP2::VariableNames::getOpIndirectionSharedName (i)));
-    SgExpression * ind_argN_size_ref = buildVarRefExp (
-        variableDeclarations->get (
-            OP2::VariableNames::getIndirectionArgumentSizeName (i)));
-    SgExpression * dimN_val = buildIntVal (parallelLoop->getOpDatDimension (i));
-
-    if (parallelLoop->isDuplicateOpDat (i) == false
-        && parallelLoop->isIndirect (i))
-    {
-
-      SgStatement * initialisationExpression = buildExprStatement (
-          buildAssignOp (n_ref,
-              CPPOpenCLStatementsAndExpressionsBuilder::generateGetLocalId ()));
-
-      SgStatement * testExpression = buildExprStatement (buildLessThanOp (
-          n_ref, buildMultiplyOp (ind_argN_size_ref, dimN_val)));
-
-      SgExpression * incrementExpression = buildPlusAssignOp (n_ref,
-          CPPOpenCLStatementsAndExpressionsBuilder::generateGetLocalSize ());
-
-      SgBasicBlock * loopBody = buildBasicBlock ();
-
-      SgForStatement * forStatement = buildForStatement (
-          initialisationExpression, testExpression, incrementExpression,
-          loopBody);
-
-      appendStatement (forStatement, subroutineScope);
-
-      SgStatement * assignStatement;
-
-      if (parallelLoop->isIncremented (i))
-      {
-        assignStatement = buildAssignStatement (buildPntrArrRefExp (
-            ind_argN_s_ref, n_ref), buildIntVal (0)); //FIXME 0.0f?
-      }
-      else
-      {
-        assignStatement = buildAssignStatement (buildPntrArrRefExp (
-            ind_argN_s_ref, n_ref), buildPntrArrRefExp (ind_argN_ref,
-            buildAddOp (buildModOp (n_ref, dimN_val), buildMultiplyOp (
-                buildPntrArrRefExp (ind_argN_map_ref, buildDivideOp (n_ref,
-                    dimN_val)), dimN_val))));
-      }
-
-      appendStatement (assignStatement, loopBody);
-    }
-  }
-
-  SgStatement * subroutineCall =
-      CPPOpenCLStatementsAndExpressionsBuilder::generateBarrierStatement ();
-
-  appendStatement (subroutineCall, subroutineScope);
 }
 
 void
@@ -744,8 +491,6 @@ CPPOpenCLKernelSubroutineIndirectLoop::createThreadZeroStatements ()
       OP2::VariableNames::nelems));
   SgExpression * nelems_ref = buildVarRefExp (variableDeclarations->get (
       OP2::VariableNames::PlanFunction::pnelems));
-  SgExpression * offset_b_ref = buildVarRefExp (variableDeclarations->get (
-      IndirectLoop::CPP::KernelSubroutine::VariableNames::blockOffsetShared));
   SgExpression * offset_ref = buildVarRefExp (variableDeclarations->get (
       OP2::VariableNames::PlanFunction::poffset));
   SgExpression * nelems2_ref = buildVarRefExp (variableDeclarations->get (
@@ -769,29 +514,6 @@ CPPOpenCLKernelSubroutineIndirectLoop::createThreadZeroStatements ()
    * ======================================================
    */
 
-  SgEqualityOp * ifGuardExpression = buildEqualityOp (
-      CPPOpenCLStatementsAndExpressionsBuilder::generateGetLocalId (),
-      buildIntVal (0));
-
-  SgIfStmt * ifStatement =
-      RoseStatementsAndExpressionsBuilder::buildIfStatementWithEmptyElse (
-          ifGuardExpression, ifBlock);
-
-  appendStatement (ifStatement, subroutineScope);
-
-  /*
-   * ======================================================
-   * 1st statement: blockId = blkmap[ get_group_id(0) + block_offset ]
-   * ======================================================
-   */
-
-  SgStatement * statement1 = buildAssignStatement (blockId_ref,
-      buildPntrArrRefExp (blkmap_ref, buildAddOp (
-          CPPOpenCLStatementsAndExpressionsBuilder::generateGetGroupId (),
-          block_offset_ref)));
-
-  appendStatement (statement1, ifBlock);
-
   /*
    * ======================================================
    * 2nd statement: nelem = nelems[ blockId ]
@@ -802,37 +524,6 @@ CPPOpenCLKernelSubroutineIndirectLoop::createThreadZeroStatements ()
       buildPntrArrRefExp (nelems_ref, blockId_ref));
 
   appendStatement (statement2, ifBlock);
-
-  /*
-   * ======================================================
-   * 3rd statement: offset_b = offset[ blockId ]
-   * ======================================================
-   */
-
-  SgStatement * statement3 = buildAssignStatement (offset_b_ref,
-      buildPntrArrRefExp (offset_ref, blockId_ref));
-
-  appendStatement (statement3, ifBlock);
-
-  /*
-   * ======================================================
-   * 4th statement: assignment of nelems2
-   * ======================================================
-   */
-
-  SgStatement
-      * statement4 =
-          buildAssignStatement (
-              nelems2_ref,
-              buildMultiplyOp (
-                  CPPOpenCLStatementsAndExpressionsBuilder::generateGetLocalSize (),
-                  buildAddOp (
-                      buildIntVal (1),
-                      buildDivideOp (
-                          buildSubtractOp (nelem_ref, buildIntVal (1)),
-                          CPPOpenCLStatementsAndExpressionsBuilder::generateGetLocalSize ()))));
-
-  appendStatement (statement4, ifBlock);
 
   /*
    * ======================================================
@@ -928,11 +619,6 @@ CPPOpenCLKernelSubroutineIndirectLoop::createThreadZeroStatements ()
       ++pindSizesArrayOffset;
     }
   }
-
-  SgStatement * subroutineCall =
-      CPPOpenCLStatementsAndExpressionsBuilder::generateBarrierStatement ();
-
-  appendStatement (subroutineCall, subroutineScope);
 }
 
 void
@@ -1158,9 +844,6 @@ CPPOpenCLKernelSubroutineIndirectLoop::createLocalVariableDeclarations ()
 
   sharedFourByteIntegerVariables.push_back (OP2::VariableNames::blockID);
 
-  sharedFourByteIntegerVariables.push_back (
-      IndirectLoop::CPP::KernelSubroutine::VariableNames::blockOffsetShared);
-
   sharedFourByteIntegerVariables.push_back (OP2::VariableNames::numberOfColours);
 
   sharedFourByteIntegerVariables.push_back (OP2::VariableNames::nelems);
@@ -1187,12 +870,6 @@ CPPOpenCLKernelSubroutineIndirectLoop::createLocalVariableDeclarations ()
   integerVariables.push_back (CommonVariableNames::iterationCounter2);
 
   integerVariables.push_back (CommonVariableNames::upperBound);
-
-  integerVariables.push_back (
-      IndirectLoop::CPP::KernelSubroutine::VariableNames::moduloResult);
-
-  integerVariables.push_back (
-      IndirectLoop::CPP::KernelSubroutine::VariableNames::moduled);
 
   integerVariables.push_back (OP2::VariableNames::nbytes);
 
