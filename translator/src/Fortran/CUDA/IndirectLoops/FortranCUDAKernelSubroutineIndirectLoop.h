@@ -71,8 +71,8 @@ class FortranCUDAKernelSubroutineIndirectLoop: public FortranCUDAKernelSubroutin
             FortranCUDAUserSubroutine * userSubroutine,
             FortranParallelLoop * parallelLoop,
             FortranReductionSubroutines * reductionSubroutines,
-            FortranCUDAOpDatCardinalitiesDeclarationIndirectLoop * dataSizesDeclaration,
-            FortranOpDatDimensionsDeclaration * opDatDimensionsDeclaration,
+            FortranCUDAOpDatCardinalitiesDeclarationIndirectLoop * cardinalitiesDeclaration,
+            FortranOpDatDimensionsDeclaration * dimensionsDeclaration,
             FortranCUDAModuleDeclarations * moduleDeclarations);
 };
 

@@ -26,7 +26,6 @@ FortranCUDAKernelSubroutineIndirectLoop::createUserSubroutineCallStatement ()
   using SageBuilder::buildAddOp;
   using SageBuilder::buildMultiplyOp;
   using SageBuilder::buildSubtractOp;
-  using SageBuilder::buildOpaqueVarRefExp;
   using SageBuilder::buildDotExp;
   using std::string;
   using std::vector;
@@ -209,13 +208,11 @@ FortranCUDAKernelSubroutineIndirectLoop::createUserSubroutineCallStatement ()
         Debug::getInstance ()->debugMessage ("OP_GBL with read access (Array)",
             Debug::HIGHEST_DEBUG_LEVEL, __FILE__, __LINE__);
 
-        string const variableName =
-            OP2::VariableNames::getOpDatCardinalityName (i);
-
         SgDotExp * dotExpression = buildDotExp (
             buildVarRefExp (variableDeclarations->get (
-                OP2::VariableNames::opDatCardinalities)), buildOpaqueVarRefExp (
-                variableName, subroutineScope));
+                OP2::VariableNames::opDatCardinalities)), buildVarRefExp (
+                cardinalitiesDeclaration->getFieldDeclarations ()->get (
+                    OP2::VariableNames::getOpDatCardinalityName (i))));
 
         SgSubtractOp * subtractExpression = buildSubtractOp (dotExpression,
             buildIntVal (1));
@@ -244,7 +241,6 @@ FortranCUDAKernelSubroutineIndirectLoop::createUserSubroutineCallStatement ()
 void
 FortranCUDAKernelSubroutineIndirectLoop::createPointeredIncrementsOrWritesStatements ()
 {
-  using SageBuilder::buildOpaqueVarRefExp;
   using SageBuilder::buildDotExp;
   using SageBuilder::buildVarRefExp;
   using SageBuilder::buildIntVal;

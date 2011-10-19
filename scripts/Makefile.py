@@ -95,23 +95,19 @@ debug = Debug(opts.verbose)
 # Cleans out files generated during the compilation process
 def clean ():
 	filesToRemove = []
-	filesToRemove.extend(glob.glob('BLANK*.[fF?]*'))
-	filesToRemove.extend(glob.glob('[!^BLANK]*_postprocessed.[fF?]*'))
+	filesToRemove.extend(glob.glob('*_postprocessed.[fF?]*'))
 	filesToRemove.extend(glob.glob('*.rmod'))
 	filesToRemove.extend(glob.glob('*.mod'))
 	filesToRemove.extend(glob.glob('hs_err_pid*.log'))
 	filesToRemove.extend(glob.glob('~*'))
 
-	if opts.cuda:
-		filesToRemove.extend(glob.glob('rose*.[fF?]*'))
-		filesToRemove.extend(glob.glob('rose*.CUF'))
-	
-	if opts.openmp:			
-		filesToRemove.extend(glob.glob('rose*.[fF?]*'))
+	if opts.cuda or opts.openmp:
+		filesToRemove.extend(glob.glob('rose*.[fF?]*')) 
 
 	for file in filesToRemove:
-		debug.verboseMessage("Removing file: '" + file + "'") 
-		os.remove(file)
+		if os.path.exists(file):
+			debug.verboseMessage("Removing file: '" + file + "'") 
+			os.remove(file)
 
 def outputStdout (stdoutLines):
 	print('==================================== STANDARD OUTPUT ===========================================')
