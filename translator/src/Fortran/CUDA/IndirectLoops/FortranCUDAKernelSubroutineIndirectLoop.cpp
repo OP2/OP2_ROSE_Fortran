@@ -779,6 +779,10 @@ FortranCUDAKernelSubroutineIndirectLoop::createAutoSharedWhileLoopStatements ()
 
   unsigned int pindOffsOffset = 0;
 
+  
+  Debug::getInstance ()->debugMessage ("Creating Autoshared While-Loop Statements",
+    Debug::HIGHEST_DEBUG_LEVEL, __FILE__, __LINE__);
+  
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
     if (parallelLoop->isDuplicateOpDat (i) == false)
@@ -796,6 +800,9 @@ FortranCUDAKernelSubroutineIndirectLoop::createAutoSharedWhileLoopStatements ()
          * ======================================================
          */
 
+        Debug::getInstance ()->debugMessage ("Initialise the lower bound of the while loop",
+          Debug::HIGHEST_DEBUG_LEVEL, __FILE__, __LINE__);
+
         SgSubtractOp * subtractExpression1 = buildSubtractOp (
             CUDA::getThreadId (THREAD_X, subroutineScope), buildIntVal (1));
 
@@ -811,6 +818,10 @@ FortranCUDAKernelSubroutineIndirectLoop::createAutoSharedWhileLoopStatements ()
          * ======================================================
          */
 
+        Debug::getInstance ()->debugMessage ("Initialise the upper bound of the while loop",
+          Debug::HIGHEST_DEBUG_LEVEL, __FILE__, __LINE__);
+
+        
         SgDotExp * dotExpression2 = buildDotExp (buildVarRefExp (
             variableDeclarations->get (OP2::VariableNames::opDatDimensions)),
             buildVarRefExp (dimensionsDeclaration->getOpDatDimensionField (i)));
@@ -832,6 +843,10 @@ FortranCUDAKernelSubroutineIndirectLoop::createAutoSharedWhileLoopStatements ()
          * ======================================================
          */
 
+        Debug::getInstance ()->debugMessage ("While loop body",
+          Debug::HIGHEST_DEBUG_LEVEL, __FILE__, __LINE__);
+        
+        
         SgBasicBlock * loopBody = buildBasicBlock ();
 
         /*
@@ -840,6 +855,10 @@ FortranCUDAKernelSubroutineIndirectLoop::createAutoSharedWhileLoopStatements ()
          * ======================================================
          */
 
+        Debug::getInstance ()->debugMessage ("Statement to calculate modulus",
+          Debug::HIGHEST_DEBUG_LEVEL, __FILE__, __LINE__);
+        
+        
         if (parallelLoop->isIncremented (i) == false)
         {
           SgFunctionSymbol * modFunctionSymbol =
@@ -869,6 +888,9 @@ FortranCUDAKernelSubroutineIndirectLoop::createAutoSharedWhileLoopStatements ()
            * Statement to index autoshared array
            * ======================================================
            */
+        Debug::getInstance ()->debugMessage ("Statement to index autoshared array",
+          Debug::HIGHEST_DEBUG_LEVEL, __FILE__, __LINE__);
+          
           SgAddOp * addExpression4a = buildAddOp (buildVarRefExp (
               variableDeclarations->get (
                   OP2::VariableNames::getNumberOfBytesVariableName (i))),
@@ -909,22 +931,39 @@ FortranCUDAKernelSubroutineIndirectLoop::createAutoSharedWhileLoopStatements ()
           SgAddOp * addExpression4d = buildAddOp (buildIntVal (0),
               addExpression4c);
 
+        Debug::getInstance ()->debugMessage ("Building arrayIndexExpression4c",
+          Debug::HIGHEST_DEBUG_LEVEL, __FILE__, __LINE__);
+
+              
           SgPntrArrRefExp * arrayIndexExpression4c = buildPntrArrRefExp (
               buildVarRefExp (variableDeclarations->get (
                   OP2::VariableNames::getLocalToGlobalMappingName (i))),
               addExpression4d);
 
+        Debug::getInstance ()->debugMessage ("Building multiplyExpression4b ",
+          Debug::HIGHEST_DEBUG_LEVEL, __FILE__, __LINE__);
+              
+              
           SgMultiplyOp * multiplyExpression4b = buildMultiplyOp (
               arrayIndexExpression4c, dotExpression4);
 
+        Debug::getInstance ()->debugMessage ("Building addExpression4e",
+          Debug::HIGHEST_DEBUG_LEVEL, __FILE__, __LINE__);
+              
           SgAddOp * addExpression4e = buildAddOp (buildVarRefExp (
               variableDeclarations->get (OP2::VariableNames::moduloResult)),
               multiplyExpression4b);
 
+        Debug::getInstance ()->debugMessage ("Building addExpression4d",
+          Debug::HIGHEST_DEBUG_LEVEL, __FILE__, __LINE__);
+                      
           SgPntrArrRefExp * arrayIndexExpression4d = buildPntrArrRefExp (
               buildVarRefExp (variableDeclarations->get (
                   OP2::VariableNames::getOpDatName (i))), addExpression4e);
 
+        Debug::getInstance ()->debugMessage ("Building assignmentStatement4 ",
+          Debug::HIGHEST_DEBUG_LEVEL, __FILE__, __LINE__);
+                  
           SgExprStatement * assignmentStatement4 = buildAssignStatement (
               arrayIndexExpression4a, arrayIndexExpression4d);
 
