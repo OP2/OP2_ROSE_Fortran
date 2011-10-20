@@ -6,9 +6,7 @@ import sys
 # Add the 'src' directory to the module search and PYTHONPATH
 sys.path.append(sys.path[0] + os.sep + "src")
 	
-import glob
 from optparse import OptionParser
-from subprocess import Popen, PIPE
 from Debug import Debug
 
 # The command-line parser and its options
@@ -81,28 +79,23 @@ parser.add_option("-f",
 		 metavar="<INT>",
                  help="Format the generated code.")
 
-parser.add_option("-M",
-                 "--makefile",
-                 action="store_true",
-                 dest="makefile",
-                 help="Generate a Makefile for the target backend.",
-                 default=False)
-
 (opts, args) = parser.parse_args(sys.argv[1:])
 
 debug = Debug(opts.verbose)
 
 # Cleans out files generated during the compilation process
 def clean ():
+	from glob import glob
+
 	filesToRemove = []
-	filesToRemove.extend(glob.glob('*_postprocessed.[fF?]*'))
-	filesToRemove.extend(glob.glob('*.rmod'))
-	filesToRemove.extend(glob.glob('*.mod'))
-	filesToRemove.extend(glob.glob('hs_err_pid*.log'))
-	filesToRemove.extend(glob.glob('~*'))
+	filesToRemove.extend(glob('*_postprocessed.[fF?]*'))
+	filesToRemove.extend(glob('*.rmod'))
+	filesToRemove.extend(glob('*.mod'))
+	filesToRemove.extend(glob('hs_err_pid*.log'))
+	filesToRemove.extend(glob('~*'))
 
 	if opts.cuda or opts.openmp:
-		filesToRemove.extend(glob.glob('rose*.[fF?]*')) 
+		filesToRemove.extend(glob('rose*.[fF?]*')) 
 
 	for file in filesToRemove:
 		if os.path.exists(file):
@@ -117,6 +110,7 @@ def outputStdout (stdoutLines):
 
 # Runs the compiler
 def compile ():
+	from subprocess import Popen, PIPE
 	from string import split
 
 	allBackends       = (opts.cuda, opts.openmp, opts.opencl)
@@ -206,91 +200,6 @@ def compile ():
 	if opts.debug > 0:
 		outputStdout (stdoutLines)
 
-def generateBackendMakefile (files):
-	from FileDependencies import getBaseFileName, determineModuleDependencies
-	from Graph import Graph
-
-	debug.verboseMessage("Generating Makefile for backend")
-
-	# Work out the dependencies between modules 
-	g = determineModuleDependencies(files)
-
-	# Create the Makefile  
-	CUDAMakefile = open("Makefile.CUDA", "w")
-	   
-	# Makefile variables
-	CUDAMakefile.write("CC      = pgcc\n")
-	CUDAMakefile.write("FC      = pgfortran\n")
-	CUDAMakefile.write("LD      = $(FC)\n")
-	CUDAMakefile.write("DEBUG   = -g\n")
-	CUDAMakefile.write("LDFLAGS = -Mcuda=cuda3.1 -g\n")
-	CUDAMakefile.write("OUT     = airfoil_cuda\n\n")
-
-	# PHONY targets
-	CUDAMakefile.write("# Phony targets\n")
-	CUDAMakefile.write(".PHONY: all clean\n\n")
-	CUDAMakefile.write("all: $(OUT)\n\n")
-	CUDAMakefile.write("clean:\n\t")
-	CUDAMakefile.write("rm -f *.o *.mod *.MOD $(OUT)\n\n")
-
-	# Object files to be created
-	CUDAMakefile.write("# C, Fortran, and CUDA Fortran object files\n")
-	CUDAMakefile.write("C_OBJS       := $(patsubst %.c,%.o,$(wildcard *.c))\n")
-	CUDAMakefile.write("FORTRAN_OBJS := $(patsubst %.F95,%.o,$(wildcard *.F95))\n")
-	CUDAMakefile.write("CUDA_OBJS    := $(patsubst %.CUF,%.o,$(wildcard *.CUF))\n\n")
-
-	# File suffixes to recognise
-	CUDAMakefile.write("# Clear out all suffixes\n")
-	CUDAMakefile.write(".SUFFIXES:\n")
-	CUDAMakefile.write("# List only suffixes we use\n")
-	CUDAMakefile.write(".SUFFIXES: .o .c .F95 .CUF\n\n")
-
-	# New suffix rules to generate object files from .F95, .CUF, .c files
-	CUDAMakefile.write("# Suffix rules\n")
-	CUDAMakefile.write(".c.o:\n\t")
-	CUDAMakefile.write("@echo \"\\n===== BUILDING OBJECT FILE $@ =====\"\n\t")
-	CUDAMakefile.write("$(CC) $(DEBUG) -c $< -o $@\n\n")
-
-	CUDAMakefile.write(".F95.o:\n\t")
-	CUDAMakefile.write("@echo \"\\n===== BUILDING OBJECT FILE $@ =====\"\n\t")
-	CUDAMakefile.write("$(FC) $(DEBUG) -c $< -o $@\n\n")
-
-	CUDAMakefile.write(".CUF.o:\n\t")
-	CUDAMakefile.write("@echo \"\\n===== BUILDING OBJECT FILE $@ =====\"\n\t")
-	CUDAMakefile.write("$(FC) $(DEBUG) -c $< -o $@\n\n")
-
-	# How to link object files together
-	CUDAMakefile.write("# Link target\n")
-	CUDAMakefile.write("$(OUT): $(C_OBJS) $(FORTRAN_OBJS) $(CUDA_OBJS)\n\t")
-	CUDAMakefile.write("@echo \"\\n===== LINKING $(OUT) =====\"\n\t")
-	CUDAMakefile.write("$(FC) $(LDFLAGS) $(DEBUG) $(C_OBJS) $(FORTRAN_OBJS) $(CUDA_OBJS) -o $(OUT)\n\n")
-
-	# The Fortran and CUDA object files depend on the C object files
-	CUDAMakefile.write("# Dependencies\n")
-	CUDAMakefile.write("$(FORTRAN_OBJS) $(CUDA_OBJS): $(C_OBJS)\n\n")
-
-	CUDAMakefile.write("# Per-file dependencies\n")
-	# Loop through each vertex in the graph
-	for v in g.getVertices():
-	    dependencies = []
-	    # Discover non-dummy dependencies in the graph. This is 
-	    # because we currently add a dummy start vertex to the graph
-	    # and connect it to every vertex without predecessors.
-	    # (This is needed for the topological sort.)
-	    for p in v.getPredecessors():
-		if p != Graph.dummyFileName:
-		    dependencies.append(p)
-		            
-	    if len(dependencies) > 0:
-		CUDAMakefile.write(getBaseFileName(v.getFileName()) + ".o: ")
-		for d in dependencies:
-		    CUDAMakefile.write(getBaseFileName(d) + ".o ")
-		CUDAMakefile.write("\n\n")
-
-	CUDAMakefile.close()
-
-	return CUDAMakefile.name
-
 if opts.clean:
 	clean()
 
@@ -299,17 +208,24 @@ if opts.format:
 		debug.exitMessage("Formatting length must be positive number greater than or equal to 40. Currently set to " + str(opts.format))
 
 if opts.compile:
+	from FormatFortranCode import FormatFortranCode
+	from glob import glob
+	from shutil import move
+
 	compile()
 
 	# The files generated by our compiler
-	files = glob.glob(os.getcwd() + os.sep + "rose_*")
+	files = glob(os.getcwd() + os.sep + "rose_*")
 	
 	if opts.format > 0:
-		from FormatFortranCode import FormatFortranCode			
-		f = FormatFortranCode (files, opts.format) 
-	
-	if opts.makefile:
-		files.append (generateBackendMakefile (files))
+		f = FormatFortranCode (files, opts.format)
+
+	generatedCodeName = "rose_cuda_code.F95"
+	for f in files:
+		if os.path.basename(f) == generatedCodeName:
+			destinationName = os.path.dirname(f) + os.sep + generatedCodeName[:-4] + ".CUF" 
+			debug.verboseMessage("Moving '%s' into '%s'" % (f, destinationName))
+			move(f, destinationName)
 
 if not opts.clean and not opts.compile:
 	debug.exitMessage("No actions selected. Use %s for options." % helpShortFlag)
