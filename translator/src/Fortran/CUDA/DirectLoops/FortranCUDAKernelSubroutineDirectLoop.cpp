@@ -59,18 +59,17 @@ FortranCUDAKernelSubroutineDirectLoop::createUserSubroutineCallStatement ()
         arraySubscriptExpression->set_endOfConstruct (
             RoseHelper::getFileInfo ());
 
-        SgPntrArrRefExp * parameterExpression = buildPntrArrRefExp (
+        parameterExpression = buildPntrArrRefExp (
             buildVarRefExp (variableDeclarations->get (
                 OP2::VariableNames::getOpDatName (i))),
             arraySubscriptExpression);
 
-        actualParameters->append_expression (parameterExpression);
       }
       else
       {
-        actualParameters->append_expression (buildVarRefExp (
+        parameterExpression = buildVarRefExp (
             variableDeclarations->get (
-                OP2::VariableNames::getOpDatLocalName (i))));
+                OP2::VariableNames::getOpDatLocalName (i)));
       }
     }
     else if (parallelLoop->isReductionRequired (i))
@@ -122,6 +121,11 @@ FortranCUDAKernelSubroutineDirectLoop::createUserSubroutineCallStatement ()
             subscriptExpression);
       }
     }
+    
+    ROSE_ASSERT (parameterExpression != NULL);
+
+    actualParameters->append_expression (parameterExpression);
+    
   }
 
   return buildFunctionCallStmt (userSubroutine->getSubroutineName (),

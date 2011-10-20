@@ -142,7 +142,7 @@ FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
       fortranAttributes);
 
   va_end (fortranAttributes);
-
+  
   return variableDeclaration;
 }
 
@@ -200,6 +200,7 @@ FortranStatementsAndExpressionsBuilder::appendAllocateStatement (
 
   appendStatement (allocateStatement, scope);
 }
+
 
 void
 FortranStatementsAndExpressionsBuilder::appendDeallocateStatement (

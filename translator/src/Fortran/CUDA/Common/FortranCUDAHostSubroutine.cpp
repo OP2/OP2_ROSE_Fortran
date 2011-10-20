@@ -590,9 +590,9 @@ FortranCUDAHostSubroutine::createTransferOpDatStatements ()
             SgVarRefExp * upperBound = buildVarRefExp (
                 variableDeclarations->get (
                     OP2::VariableNames::getOpDatCardinalityName (i)));
-
+                              
             FortranStatementsAndExpressionsBuilder::appendAllocateStatement (
-                arrayExpression, lowerBound, upperBound, subroutineScope);
+                arrayExpression, SageBuilder::buildIntVal(1), upperBound, block);
 
             SgExprStatement * assignmentStatement1 = buildAssignStatement (
                 buildVarRefExp (variableDeclarations->get (
@@ -600,7 +600,7 @@ FortranCUDAHostSubroutine::createTransferOpDatStatements ()
                 buildVarRefExp (variableDeclarations->get (
                     OP2::VariableNames::getOpDatHostName (i))));
 
-            appendStatement (assignmentStatement1, subroutineScope);
+            appendStatement (assignmentStatement1, block);
           }
           else
           {
@@ -702,6 +702,10 @@ FortranCUDAHostSubroutine::createDataMarshallingDeclarations ()
             string const & variableNameOnDevice =
                 OP2::VariableNames::getOpDatDeviceName (i);
 
+            Debug::getInstance ()->debugMessage (
+              "Creating device array with name " + variableNameOnDevice,
+              Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+                
             variableDeclarations->add (
                 variableNameOnDevice,
                 FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
@@ -711,7 +715,11 @@ FortranCUDAHostSubroutine::createDataMarshallingDeclarations ()
                     2, CUDA_DEVICE, ALLOCATABLE));
 
             string const & variableNameOnHost =
-                OP2::VariableNames::getOpDatDeviceName (i);
+                OP2::VariableNames::getOpDatHostName (i);
+
+            Debug::getInstance ()->debugMessage (
+              "Creating host array with name " + variableNameOnHost,
+              Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
             variableDeclarations->add (
                 variableNameOnHost,
