@@ -48,43 +48,6 @@ FortranCUDAUserSubroutine::forceOutputOfCodeToFile ()
 }
 
 void
-FortranCUDAUserSubroutine::findOriginalSubroutine ()
-{
-  using boost::iequals;
-  using std::vector;
-
-  Debug::getInstance ()->debugMessage (
-      "Searching for original user subroutine '"
-          + parallelLoop->getUserSubroutineName () + "'",
-      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
-
-  for (vector <SgProcedureHeaderStatement *>::const_iterator it =
-      declarations->firstSubroutineInSourceCode (); it
-      != declarations->lastSubroutineInSourceCode (); ++it)
-  {
-    SgProcedureHeaderStatement * subroutine = *it;
-
-    if (iequals (parallelLoop->getUserSubroutineName (),
-        subroutine->get_name ().getString ()))
-    {
-      Debug::getInstance ()->debugMessage ("Found user kernel '"
-          + parallelLoop->getUserSubroutineName () + "'",
-          Debug::OUTER_LOOP_LEVEL, __FILE__, __LINE__);
-
-      originalSubroutine = subroutine;
-      break;
-    }
-  }
-
-  if (originalSubroutine == NULL)
-  {
-    throw Exceptions::CodeGeneration::UnknownSubroutineException (
-        "Unable to find user kernel '" + parallelLoop->getUserSubroutineName ()
-            + "'");
-  }
-}
-
-void
 FortranCUDAUserSubroutine::createStatements ()
 {
   using boost::iequals;
@@ -173,8 +136,9 @@ FortranCUDAUserSubroutine::createStatements ()
             else
             {
               Debug::getInstance ()->debugMessage ("'" + variableName
-                  + "' is a formal parameter", Debug::HIGHEST_DEBUG_LEVEL,
-                  __FILE__, __LINE__);
+                  + "' is a formal parameter "
+                  + parallelLoop->getOpDatInformation (OP_DAT_ArgumentGroup),
+                  Debug::HIGHEST_DEBUG_LEVEL, __FILE__, __LINE__);
 
               SgVariableDeclaration
                   * variableDeclaration =
@@ -231,7 +195,8 @@ FortranCUDAUserSubroutine::FortranCUDAUserSubroutine (
 
   subroutineScope = subroutineHeaderStatement->get_definition ()->get_body ();
 
-  findOriginalSubroutine ();
+  originalSubroutine = declarations->getSubroutine (
+      parallelLoop->getUserSubroutineName ());
 
   createStatements ();
 

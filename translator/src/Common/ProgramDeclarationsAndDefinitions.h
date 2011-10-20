@@ -15,6 +15,7 @@
 #include <vector>
 #include <boost/algorithm/string.hpp>
 #include <Debug.h>
+#include <Exceptions.h>
 
 class ParallelLoop;
 class OpSetDefinition;
@@ -34,7 +35,7 @@ template <typename TSubroutineHeader>
        * of the input files
        * ======================================================
        */
-      std::vector <TSubroutineHeader *> subroutinesInSourceCode;
+      std::map <std::string, TSubroutineHeader *> subroutinesInSourceCode;
 
       /*
        * ======================================================
@@ -361,16 +362,32 @@ template <typename TSubroutineHeader>
         return declarations[variableName];
       }
 
-      typename std::vector <TSubroutineHeader *>::const_iterator
-      firstSubroutineInSourceCode ()
+      TSubroutineHeader *
+      getSubroutine (std::string subroutineName)
       {
-        return subroutinesInSourceCode.begin ();
+        using std::map;
+        using std::string;
+
+        typename map <string, TSubroutineHeader *>::const_iterator it =
+            subroutinesInSourceCode.find (subroutineName);
+
+        if (it == subroutinesInSourceCode.end ())
+        {
+          throw Exceptions::CodeGeneration::UnknownSubroutineException (
+              "Unable to find subroutine '" + subroutineName + "'");
+        }
+        else
+        {
+          return it->second;
+        }
       }
 
-      typename std::vector <TSubroutineHeader *>::const_iterator
-      lastSubroutineInSourceCode ()
+      SgType *
+      getUserKernelFormalParameterType (unsigned int argumentPosition,
+          std::string const subroutineName)
       {
-        return subroutinesInSourceCode.end ();
+        return subroutinesInSourceCode[subroutineName]->get_args ()[argumentPosition
+            - 1]->get_type ();
       }
 
       typename std::map <std::string, ParallelLoop *>::const_iterator

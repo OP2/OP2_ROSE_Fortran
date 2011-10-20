@@ -26,11 +26,13 @@ CPPHostSubroutine::createFormalParameterDeclarations ()
   string const & kernelVariableName =
       OP2::VariableNames::getUserSubroutineName ();
 
-  variableDeclarations->add (
-      kernelVariableName,
-      RoseStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
-          kernelVariableName, buildPointerType (buildCharType ()),
-          subroutineScope, formalParameters));
+  SgVariableDeclaration
+      * kernelVariableNameDeclaration =
+          RoseStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
+              kernelVariableName, buildPointerType (buildCharType ()),
+              subroutineScope, formalParameters);
+
+  variableDeclarations->add (kernelVariableName, kernelVariableNameDeclaration);
 
   /*
    * ======================================================

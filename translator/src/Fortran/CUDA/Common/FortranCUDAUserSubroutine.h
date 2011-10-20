@@ -15,9 +15,6 @@ class FortranCUDAUserSubroutine: public UserSubroutine <
     void
     forceOutputOfCodeToFile ();
 
-    void
-    findOriginalSubroutine ();
-
     virtual void
     createStatements ();
 

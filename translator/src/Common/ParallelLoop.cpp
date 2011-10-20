@@ -102,6 +102,12 @@ ParallelLoop::isArray (unsigned int OP_DAT_ArgumentGroup)
   return isSgArrayType (OpDatTypes[OP_DAT_ArgumentGroup]);
 }
 
+bool
+ParallelLoop::isPointer (unsigned int OP_DAT_ArgumentGroup)
+{
+  return isSgPointerType (OpDatTypes[OP_DAT_ArgumentGroup]);
+}
+
 SgType *
 ParallelLoop::getOpDatBaseType (unsigned int OP_DAT_ArgumentGroup)
 {
@@ -311,7 +317,7 @@ ParallelLoop::getSizeOfOpDat (unsigned int OP_DAT_ArgumentGroup)
     }
     else
     {
-      throw new Exceptions::ParallelLoop::UnsupportedBaseTypeException ("");
+      throw Exceptions::ParallelLoop::UnsupportedBaseTypeException ("");
     }
   }
   else

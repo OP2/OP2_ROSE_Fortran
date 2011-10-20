@@ -393,8 +393,8 @@ CPPCUDAKernelSubroutineDirectLoop::createExecutionLoopStatements ()
 
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
-    if (parallelLoop->isGlobal (i) == false && parallelLoop->isRead (i)
-        && parallelLoop->getOpDatDimension (i) != 1)
+    if (parallelLoop->isGlobal (i) == false && parallelLoop->isWritten (i)
+        == false && parallelLoop->getOpDatDimension (i) != 1)
     {
       Debug::getInstance ()->debugMessage (
           "Creating statements to stage in from device memory to shared memory for OP_DAT "
@@ -418,8 +418,8 @@ CPPCUDAKernelSubroutineDirectLoop::createExecutionLoopStatements ()
 
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
-    if (parallelLoop->isGlobal (i) == false && parallelLoop->isWritten (i)
-        && parallelLoop->getOpDatDimension (i) != 1)
+    if (parallelLoop->isGlobal (i) == false && parallelLoop->isRead (i)
+        == false && parallelLoop->getOpDatDimension (i) != 1)
     {
       Debug::getInstance ()->debugMessage (
           "Creating statements to stage out from local memory to shared memory for OP_DAT "
@@ -557,6 +557,8 @@ void
 CPPCUDAKernelSubroutineDirectLoop::createStatements ()
 {
   createThreadIDInitialisationStatement ();
+
+  createReductionPrologueStatements ();
 
   createInitialiseOffsetIntoCUDASharedVariableStatements ();
 

@@ -9,8 +9,136 @@ CPPCUDAKernelSubroutine::createInitialiseCUDAStageInVariablesStatements ()
 }
 
 void
+CPPCUDAKernelSubroutine::createReductionPrologueStatements ()
+{
+  using SageBuilder::buildBasicBlock;
+  using SageBuilder::buildIntVal;
+  using SageBuilder::buildFloatVal;
+  using SageBuilder::buildVarRefExp;
+  using SageBuilder::buildAssignStatement;
+  using SageBuilder::buildForStatement;
+  using SageBuilder::buildExprStatement;
+  using SageBuilder::buildPlusPlusOp;
+  using SageBuilder::buildLessThanOp;
+  using SageBuilder::buildPntrArrRefExp;
+  using SageBuilder::buildAssignOp;
+  using SageInterface::appendStatement;
+  using std::string;
+
+  Debug::getInstance ()->debugMessage (
+      "Creating reduction prologue statements", Debug::FUNCTION_LEVEL,
+      __FILE__, __LINE__);
+
+  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
+  {
+    if (parallelLoop->isReductionRequired (i))
+    {
+      SgBasicBlock * loopBody = buildBasicBlock ();
+
+      SgPntrArrRefExp * arrayExpression = buildPntrArrRefExp (
+          buildVarRefExp (variableDeclarations->get (
+              OP2::VariableNames::getOpDatLocalName (i))),
+          buildVarRefExp (variableDeclarations->get (
+              CommonVariableNames::iterationCounter1)));
+
+      SgExpression * rhsExpression;
+
+      if (isSgTypeInt (parallelLoop->getOpDatBaseType (i)))
+      {
+        rhsExpression = buildIntVal (0);
+      }
+      else
+      {
+        ROSE_ASSERT (isSgTypeFloat(parallelLoop->getOpDatBaseType(i)));
+
+        rhsExpression = buildFloatVal (0);
+      }
+
+      SgExprStatement * assignmentStatement = buildAssignStatement (
+          arrayExpression, rhsExpression);
+
+      appendStatement (assignmentStatement, loopBody);
+
+      SgAssignOp * initializationExpression = buildAssignOp (buildVarRefExp (
+          variableDeclarations->get (CommonVariableNames::iterationCounter1)),
+          buildIntVal (0));
+
+      SgLessThanOp * upperBoundExpression = buildLessThanOp (buildVarRefExp (
+          variableDeclarations->get (CommonVariableNames::iterationCounter1)),
+          buildIntVal (parallelLoop->getOpDatDimension (i)));
+
+      SgPlusPlusOp * strideExpression = buildPlusPlusOp (buildVarRefExp (
+          variableDeclarations->get (CommonVariableNames::iterationCounter1)));
+
+      SgForStatement * forStatement = buildForStatement (buildExprStatement (
+          initializationExpression), buildExprStatement (upperBoundExpression),
+          strideExpression, loopBody);
+
+      appendStatement (forStatement, subroutineScope);
+    }
+  }
+}
+
+void
 CPPCUDAKernelSubroutine::createReductionEpilogueStatements ()
 {
+  Debug::getInstance ()->debugMessage (
+      "Creating reduction epilogue statements", Debug::FUNCTION_LEVEL,
+      __FILE__, __LINE__);
+
+  using SageBuilder::buildBasicBlock;
+  using SageBuilder::buildIntVal;
+  using SageBuilder::buildFloatVal;
+  using SageBuilder::buildVarRefExp;
+  using SageBuilder::buildAssignStatement;
+  using SageBuilder::buildForStatement;
+  using SageBuilder::buildExprStatement;
+  using SageBuilder::buildPlusPlusOp;
+  using SageBuilder::buildLessThanOp;
+  using SageBuilder::buildPntrArrRefExp;
+  using SageBuilder::buildAssignOp;
+  using SageInterface::appendStatement;
+  using std::string;
+
+  Debug::getInstance ()->debugMessage (
+      "Creating reduction prologue statements", Debug::FUNCTION_LEVEL,
+      __FILE__, __LINE__);
+
+  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
+  {
+    if (parallelLoop->isReductionRequired (i))
+    {
+      SgBasicBlock * loopBody = buildBasicBlock ();
+
+      SgPntrArrRefExp * arrayExpression = buildPntrArrRefExp (
+          buildVarRefExp (variableDeclarations->get (
+              OP2::VariableNames::getOpDatLocalName (i))),
+          buildVarRefExp (variableDeclarations->get (
+              CommonVariableNames::iterationCounter1)));
+
+      SgExprStatement * assignmentStatement = buildAssignStatement (
+          arrayExpression, buildIntVal (1));
+
+      appendStatement (assignmentStatement, loopBody);
+
+      SgAssignOp * initializationExpression = buildAssignOp (buildVarRefExp (
+          variableDeclarations->get (CommonVariableNames::iterationCounter1)),
+          buildIntVal (0));
+
+      SgLessThanOp * upperBoundExpression = buildLessThanOp (buildVarRefExp (
+          variableDeclarations->get (CommonVariableNames::iterationCounter1)),
+          buildIntVal (parallelLoop->getOpDatDimension (i)));
+
+      SgPlusPlusOp * strideExpression = buildPlusPlusOp (buildVarRefExp (
+          variableDeclarations->get (CommonVariableNames::iterationCounter1)));
+
+      SgForStatement * forStatement = buildForStatement (buildExprStatement (
+          initializationExpression), buildExprStatement (upperBoundExpression),
+          strideExpression, loopBody);
+
+      appendStatement (forStatement, subroutineScope);
+    }
+  }
 }
 
 void
@@ -29,8 +157,23 @@ CPPCUDAKernelSubroutine::createCUDAStageInVariablesVariableDeclarations ()
 
     if (parallelLoop->isCUDAStageInVariableDeclarationNeeded (i))
     {
-      if (parallelLoop->isGlobal (i) && parallelLoop->isArray (i) == false)
+      if (parallelLoop->isReductionRequired (i))
       {
+        if (parallelLoop->isArray (i) || parallelLoop->isPointer (i))
+        {
+          variableDeclarations ->add (variableName,
+              RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
+                  variableName, buildArrayType (parallelLoop->getOpDatBaseType (
+                      i), buildIntVal (parallelLoop->getOpDatDimension (i))),
+                  subroutineScope));
+        }
+        else
+        {
+          variableDeclarations ->add (variableName,
+              RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
+                  variableName, parallelLoop->getOpDatBaseType (i),
+                  subroutineScope));
+        }
       }
       else
       {

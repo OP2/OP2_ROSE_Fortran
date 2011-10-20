@@ -12,6 +12,7 @@ CPPProgramDeclarationsAndDefinitions::setOpGblProperties (
     CPPParallelLoop * parallelLoop, std::string const & variableName,
     int OP_DAT_ArgumentGroup)
 {
+
 }
 
 void
@@ -137,6 +138,17 @@ CPPProgramDeclarationsAndDefinitions::handleImperialOpGblArgument (
           OP_DAT_ArgumentGroup) + "' (Imperial API)", Debug::FUNCTION_LEVEL,
       __FILE__, __LINE__);
 
+  SgVarRefExp
+      * opGblReference =
+          isSgVarRefExp (
+              isSgAddressOfOp (
+                  actualArguments->get_expressions ()[CPPImperialOpArgGblCall::indexOpDat])->get_operand ());
+
+  string const opGblName =
+      opGblReference->get_symbol ()->get_name ().getString ();
+
+  setOpGblProperties (parallelLoop, opGblName, OP_DAT_ArgumentGroup);
+
   setParallelLoopAccessDescriptor (parallelLoop, actualArguments,
       OP_DAT_ArgumentGroup, CPPImperialOpArgGblCall::indexAccessDescriptor);
 }
@@ -153,6 +165,29 @@ CPPProgramDeclarationsAndDefinitions::handleOxfordOpGblArgument (
       "Setting properties of OP_GBL argument '" + lexical_cast <string> (
           OP_DAT_ArgumentGroup) + "' (Oxford API)", Debug::FUNCTION_LEVEL,
       __FILE__, __LINE__);
+
+  SgAddressOfOp * addressOfOp = isSgAddressOfOp (
+      actualArguments->get_expressions ()[CPPOxfordOpArgGblCall::indexOpDat]);
+
+  SgVarRefExp * opGblReference = isSgVarRefExp (addressOfOp->get_operand ());
+
+  string const opGblName =
+      opGblReference->get_symbol ()->get_name ().getString ();
+
+  parallelLoop->setOpDatDimension (
+      OP_DAT_ArgumentGroup,
+      isSgIntVal (
+          actualArguments->get_expressions ()[CPPOxfordOpArgGblCall::indexDimension])->get_value ());
+
+  parallelLoop->setUniqueOpDat (opGblName);
+
+  parallelLoop->setOpDatType (OP_DAT_ArgumentGroup,
+      getUserKernelFormalParameterType (OP_DAT_ArgumentGroup,
+          parallelLoop->getUserSubroutineName ()));
+
+  parallelLoop->setOpDatVariableName (OP_DAT_ArgumentGroup, opGblName);
+
+  parallelLoop->setDuplicateOpDat (OP_DAT_ArgumentGroup, false);
 
   setParallelLoopAccessDescriptor (parallelLoop, actualArguments,
       OP_DAT_ArgumentGroup, CPPOxfordOpArgGblCall::indexAccessDescriptor);
@@ -471,26 +506,6 @@ CPPProgramDeclarationsAndDefinitions::visit (SgNode * node)
         detectAndHandleOP2Definition (variableDeclaration, variableName,
             isSgTypedefType (type));
       }
-      else if (isSgPointerType (type) != NULL)
-      {
-        Debug::getInstance ()->debugMessage ("'" + variableName
-            + "' is a pointer", Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
-
-        handleBaseTypeDeclaration (isSgPointerType (type)->get_base_type (),
-            variableName);
-      }
-      else if (isSgArrayType (type) != NULL)
-      {
-        Debug::getInstance ()->debugMessage ("'" + variableName
-            + "' is a array", Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
-
-        handleBaseTypeDeclaration (isSgArrayType (type)->get_base_type (),
-            variableName);
-      }
-      else
-      {
-        handleBaseTypeDeclaration (type, variableName);
-      }
 
       break;
     }
@@ -500,11 +515,13 @@ CPPProgramDeclarationsAndDefinitions::visit (SgNode * node)
       SgFunctionDeclaration * functionDeclaration = isSgFunctionDeclaration (
           node);
 
-      Debug::getInstance ()->debugMessage ("Found declaration: "
-          + functionDeclaration->get_name ().getString (),
-          Debug::INNER_LOOP_LEVEL, __FILE__, __LINE__);
+      string const functionName = functionDeclaration->get_name ().getString ();
 
-      subroutinesInSourceCode.push_back (functionDeclaration);
+      Debug::getInstance ()->debugMessage (
+          "Found declaration: " + functionName, Debug::INNER_LOOP_LEVEL,
+          __FILE__, __LINE__);
+
+      subroutinesInSourceCode[functionName] = functionDeclaration;
 
       break;
     }
@@ -553,7 +570,7 @@ CPPProgramDeclarationsAndDefinitions::visit (SgNode * node)
           }
           else
           {
-            throw new Exceptions::ParallelLoop::UnknownAccessException (
+            throw Exceptions::ParallelLoop::UnknownAccessException (
                 "Unhandled access descriptor '" + enumField + "'");
           }
 

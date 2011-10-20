@@ -314,7 +314,7 @@ checkBackendOption ()
       }
     }
 
-    Exceptions::CommandLine::BackendException (
+    throw Exceptions::CommandLine::BackendException (
         "You have not selected a target backend on the command-line. Supported backends are: "
             + backendsString);
   }

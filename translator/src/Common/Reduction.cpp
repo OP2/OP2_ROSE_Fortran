@@ -34,7 +34,7 @@ Reduction::getSubroutineName () const
   }
   else
   {
-    Exceptions::ParallelLoop::UnsupportedBaseTypeException (
+    throw Exceptions::ParallelLoop::UnsupportedBaseTypeException (
         "Base type of reduction variable is not supported");
   }
 
@@ -58,7 +58,7 @@ Reduction::hashKey ()
   }
   else
   {
-    Exceptions::ParallelLoop::UnsupportedBaseTypeException (
+    throw Exceptions::ParallelLoop::UnsupportedBaseTypeException (
         "Base type of reduction variable is not supported");
   }
 

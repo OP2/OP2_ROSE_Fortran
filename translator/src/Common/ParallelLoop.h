@@ -185,6 +185,9 @@ class ParallelLoop
     bool
     isArray (unsigned int OP_DAT_ArgumentGroup);
 
+    bool
+    isPointer (unsigned int OP_DAT_ArgumentGroup);
+
     /*
      * ======================================================
      * What is the base type of the (assumed) array type wrapped

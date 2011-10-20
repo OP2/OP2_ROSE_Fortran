@@ -22,6 +22,16 @@ class CPPCUDAKernelSubroutine: public CPPKernelSubroutine
 
     /*
      * ======================================================
+     * Creates the statements executed before the call to the
+     * user subroutine to initialise the local thread variables
+     * to zero
+     * ======================================================
+     */
+    void
+    createReductionPrologueStatements ();
+
+    /*
+     * ======================================================
      * Creates the statements executed after the call to the
      * user subroutine to perform the thread-block reduction
      * ======================================================

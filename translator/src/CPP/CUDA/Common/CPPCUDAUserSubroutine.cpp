@@ -44,43 +44,6 @@ CPPCUDAUserSubroutine::forceOutputOfCodeToFile ()
 }
 
 void
-CPPCUDAUserSubroutine::findOriginalSubroutine ()
-{
-  using boost::iequals;
-  using std::vector;
-
-  Debug::getInstance ()->debugMessage (
-      "Searching for original user subroutine '"
-          + parallelLoop->getUserSubroutineName () + "'",
-      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
-
-  for (vector <SgFunctionDeclaration *>::const_iterator it =
-      declarations->firstSubroutineInSourceCode (); it
-      != declarations->lastSubroutineInSourceCode (); ++it)
-  {
-    SgFunctionDeclaration * subroutine = *it;
-
-    if (iequals (parallelLoop->getUserSubroutineName (),
-        subroutine->get_name ().getString ()))
-    {
-      Debug::getInstance ()->debugMessage ("Found user kernel '"
-          + parallelLoop->getUserSubroutineName () + "'",
-          Debug::OUTER_LOOP_LEVEL, __FILE__, __LINE__);
-
-      originalSubroutine = subroutine;
-      break;
-    }
-  }
-
-  if (originalSubroutine == NULL)
-  {
-    throw Exceptions::CodeGeneration::UnknownSubroutineException (
-        "Unable to find user kernel '" + parallelLoop->getUserSubroutineName ()
-            + "'");
-  }
-}
-
-void
 CPPCUDAUserSubroutine::createStatements ()
 {
   using boost::iequals;
@@ -148,7 +111,8 @@ CPPCUDAUserSubroutine::CPPCUDAUserSubroutine (SgScopeStatement * moduleScope,
 
   subroutineScope = subroutineHeaderStatement->get_definition ()->get_body ();
 
-  findOriginalSubroutine ();
+  originalSubroutine = declarations->getSubroutine (
+      parallelLoop->getUserSubroutineName ());
 
   createStatements ();
 

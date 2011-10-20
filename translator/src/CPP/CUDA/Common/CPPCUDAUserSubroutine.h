@@ -15,9 +15,6 @@ class CPPCUDAUserSubroutine: public UserSubroutine <SgFunctionDeclaration,
     void
     forceOutputOfCodeToFile ();
 
-    void
-    findOriginalSubroutine ();
-
     virtual void
     createStatements ();
 

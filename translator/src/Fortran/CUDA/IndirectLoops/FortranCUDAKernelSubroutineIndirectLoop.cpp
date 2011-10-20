@@ -927,39 +927,21 @@ FortranCUDAKernelSubroutineIndirectLoop::createInitialiseCUDASharedVariablesStat
           SgAddOp * addExpression4d = buildAddOp (buildIntVal (0),
               addExpression4c);
 
-          Debug::getInstance ()->debugMessage (
-              "Building arrayIndexExpression4c", Debug::HIGHEST_DEBUG_LEVEL,
-              __FILE__, __LINE__);
-
           SgPntrArrRefExp * arrayIndexExpression4c = buildPntrArrRefExp (
               buildVarRefExp (variableDeclarations->get (
                   OP2::VariableNames::getLocalToGlobalMappingName (i))),
               addExpression4d);
 
-          Debug::getInstance ()->debugMessage (
-              "Building multiplyExpression4b ", Debug::HIGHEST_DEBUG_LEVEL,
-              __FILE__, __LINE__);
-
           SgMultiplyOp * multiplyExpression4b = buildMultiplyOp (
               arrayIndexExpression4c, dotExpression4);
-
-          Debug::getInstance ()->debugMessage ("Building addExpression4e",
-              Debug::HIGHEST_DEBUG_LEVEL, __FILE__, __LINE__);
 
           SgAddOp * addExpression4e = buildAddOp (buildVarRefExp (
               variableDeclarations->get (OP2::VariableNames::moduloResult)),
               multiplyExpression4b);
 
-          Debug::getInstance ()->debugMessage ("Building addExpression4d",
-              Debug::HIGHEST_DEBUG_LEVEL, __FILE__, __LINE__);
-
           SgPntrArrRefExp * arrayIndexExpression4d = buildPntrArrRefExp (
               buildVarRefExp (variableDeclarations->get (
                   OP2::VariableNames::getOpDatName (i))), addExpression4e);
-
-          Debug::getInstance ()->debugMessage (
-              "Building assignmentStatement4 ", Debug::HIGHEST_DEBUG_LEVEL,
-              __FILE__, __LINE__);
 
           SgExprStatement * assignmentStatement4 = buildAssignStatement (
               arrayIndexExpression4a, arrayIndexExpression4d);

@@ -1,11 +1,3 @@
-/*
- * Written by Adam Betts and Carlo Bertolli
- *
- * This class models the kernel subroutine for an indirect loop.
- * Its declarations and statements do the following:
- *
- */
-
 #pragma once
 #ifndef FORTRAN_CUDA_KERNEL_SUBROUTINE_INDIRECT_LOOP_H
 #define FORTRAN_CUDA_KERNEL_SUBROUTINE_INDIRECT_LOOP_H

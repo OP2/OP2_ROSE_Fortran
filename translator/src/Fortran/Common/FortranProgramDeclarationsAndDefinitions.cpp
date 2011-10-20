@@ -82,7 +82,7 @@ FortranProgramDeclarationsAndDefinitions::setOpDatProperties (
 
     if (isSgArrayType (opDatDeclaration->getPrimitiveType ()) == NULL)
     {
-      Exceptions::ParallelLoop::UnsupportedBaseTypeException ("OP_DAT '"
+      throw Exceptions::ParallelLoop::UnsupportedBaseTypeException ("OP_DAT '"
           + variableName + "' is not an array");
     }
   }
@@ -343,10 +343,10 @@ FortranProgramDeclarationsAndDefinitions::visit (SgNode * node)
         SgProcedureHeaderStatement * procedureHeaderStatement =
             isSgProcedureHeaderStatement (node);
 
-        subroutinesInSourceCode.push_back (procedureHeaderStatement);
+        string const subroutineName =
+            procedureHeaderStatement->get_name ().getString ();
 
-        subroutineToFileName[procedureHeaderStatement->get_name ().getString ()]
-            = currentSourceFile;
+        subroutinesInSourceCode[subroutineName] = procedureHeaderStatement;
 
         Debug::getInstance ()->debugMessage (
             "Found procedure header statement '"

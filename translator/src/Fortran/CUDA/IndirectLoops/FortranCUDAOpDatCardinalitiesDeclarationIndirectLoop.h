@@ -1,7 +1,3 @@
-/*
- * Written by Adam Betts and Carlo Bertolli
- */
-
 #pragma once
 #ifndef FORTRAN_CUDA_DATA_SIZES_DECLARATION_INDIRECT_LOOP_H
 #define FORTRAN_CUDA_DATA_SIZES_DECLARATION_INDIRECT_LOOP_H

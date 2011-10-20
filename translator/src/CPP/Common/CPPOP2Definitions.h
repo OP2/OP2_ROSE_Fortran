@@ -357,7 +357,7 @@ class CPPOxfordOpArgGblCall
 
   public:
 
-    static int const indexOpDatName = 0;
+    static int const indexOpDat = 0;
 
     static int const indexDimension = 1;
 
