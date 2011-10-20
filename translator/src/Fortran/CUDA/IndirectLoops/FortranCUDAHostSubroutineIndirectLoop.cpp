@@ -720,10 +720,12 @@ FortranCUDAHostSubroutineIndirectLoop::createStatements ()
 
   createPlanFunctionExecutionStatements ();
 
-  if (parallelLoop->isReductionRequired () == true)
+  if (parallelLoop->isReductionRequired ())
   {
     createReductionEpilogueStatements ();
   }
+
+  createDeallocateStatements ();
 }
 
 void

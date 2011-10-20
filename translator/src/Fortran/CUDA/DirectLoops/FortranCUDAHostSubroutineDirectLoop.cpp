@@ -283,6 +283,8 @@ FortranCUDAHostSubroutineDirectLoop::createStatements ()
   {
     createReductionEpilogueStatements ();
   }
+
+  createDeallocateStatements ();
 }
 
 void

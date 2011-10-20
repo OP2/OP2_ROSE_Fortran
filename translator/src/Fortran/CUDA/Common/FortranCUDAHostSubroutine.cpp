@@ -381,6 +381,36 @@ FortranCUDAHostSubroutine::createRHSOfInitialiseOpDatCardinalityStatement (
 }
 
 SgBasicBlock *
+FortranCUDAHostSubroutine::createDeallocateStatements ()
+{
+  using SageBuilder::buildBasicBlock;
+  using SageBuilder::buildVarRefExp;
+  using SageInterface::appendStatement;
+
+  Debug::getInstance ()->debugMessage (
+      "Creating statements to deallocate global arrays which are read",
+      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+
+  SgBasicBlock * block = buildBasicBlock ();
+
+  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
+  {
+    if (parallelLoop->isDuplicateOpDat (i) == false)
+    {
+      if (parallelLoop->isGlobal (i) && parallelLoop->isArray (i)
+          && parallelLoop->isRead (i))
+      {
+        FortranStatementsAndExpressionsBuilder::appendDeallocateStatement (
+            buildVarRefExp (variableDeclarations->get (
+                OP2::VariableNames::getOpDatDeviceName (i))), block);
+      }
+    }
+  }
+
+  return block;
+}
+
+SgBasicBlock *
 FortranCUDAHostSubroutine::createTransferOpDatStatements ()
 {
   using SageBuilder::buildBasicBlock;
@@ -389,6 +419,7 @@ FortranCUDAHostSubroutine::createTransferOpDatStatements ()
   using SageBuilder::buildVarRefExp;
   using SageBuilder::buildOpaqueVarRefExp;
   using SageBuilder::buildAssignStatement;
+  using SageBuilder::buildIntVal;
   using SageInterface::appendStatement;
 
   Debug::getInstance ()->debugMessage (
@@ -484,28 +515,7 @@ FortranCUDAHostSubroutine::createTransferOpDatStatements ()
   {
     if (parallelLoop->isDuplicateOpDat (i) == false)
     {
-      if (parallelLoop->isGlobal (i) && parallelLoop->isArray (i) == false)
-      {
-        Debug::getInstance ()->debugMessage ("Global scalar conversion",
-            Debug::HIGHEST_DEBUG_LEVEL, __FILE__, __LINE__);
-
-        SgDotExp * parameterExpression1A = buildDotExp (buildVarRefExp (
-            variableDeclarations->get (OP2::VariableNames::getOpDatName (i))),
-            buildOpaqueVarRefExp (OP2::VariableNames::dataOnHost, block));
-
-        SgVarRefExp * parameterExpression1B =
-            buildVarRefExp (variableDeclarations->get (
-                OP2::VariableNames::getOpDatHostName (i)));
-
-        SgStatement
-            * callStatementA =
-                FortranStatementsAndExpressionsBuilder::createCToFortranPointerCallStatement (
-                    subroutineScope, parameterExpression1A,
-                    parameterExpression1B);
-
-        appendStatement (callStatementA, block);
-      }
-      else
+      if (parallelLoop->isDirect (i) || parallelLoop->isIndirect (i))
       {
         /*
          * ======================================================
@@ -538,6 +548,83 @@ FortranCUDAHostSubroutine::createTransferOpDatStatements ()
                     parameterExpression2A, parameterExpression3A);
 
         appendStatement (callStatementA, block);
+
+      }
+      else if (parallelLoop->isReductionRequired (i) == false)
+      {
+        if (parallelLoop->isRead (i))
+        {
+          if (parallelLoop->isArray (i))
+          {
+            Debug::getInstance ()->debugMessage ("Global array conversion",
+                Debug::HIGHEST_DEBUG_LEVEL, __FILE__, __LINE__);
+
+            SgDotExp * parameterExpression1A = buildDotExp (
+                buildVarRefExp (variableDeclarations->get (
+                    OP2::VariableNames::getOpDatName (i))),
+                buildOpaqueVarRefExp (OP2::VariableNames::dataOnHost, block));
+
+            SgVarRefExp * parameterExpression1B = buildVarRefExp (
+                variableDeclarations->get (
+                    OP2::VariableNames::getOpDatHostName (i)));
+
+            SgAggregateInitializer * parameterExpression1C =
+                FortranStatementsAndExpressionsBuilder::buildShapeExpression (
+                    variableDeclarations->get (
+                        OP2::VariableNames::getOpDatCardinalityName (i)));
+
+            SgStatement
+                * callStatementA =
+                    FortranStatementsAndExpressionsBuilder::createCToFortranPointerCallStatement (
+                        subroutineScope, parameterExpression1A,
+                        parameterExpression1B, parameterExpression1C);
+
+            appendStatement (callStatementA, block);
+
+            SgVarRefExp * arrayExpression = buildVarRefExp (
+                variableDeclarations->get (
+                    OP2::VariableNames::getOpDatDeviceName (i)));
+
+            SgIntVal * lowerBound = buildIntVal (0);
+
+            SgVarRefExp * upperBound = buildVarRefExp (
+                variableDeclarations->get (
+                    OP2::VariableNames::getOpDatCardinalityName (i)));
+
+            FortranStatementsAndExpressionsBuilder::appendAllocateStatement (
+                arrayExpression, lowerBound, upperBound, subroutineScope);
+
+            SgExprStatement * assignmentStatement1 = buildAssignStatement (
+                buildVarRefExp (variableDeclarations->get (
+                    OP2::VariableNames::getOpDatDeviceName (i))),
+                buildVarRefExp (variableDeclarations->get (
+                    OP2::VariableNames::getOpDatHostName (i))));
+
+            appendStatement (assignmentStatement1, subroutineScope);
+          }
+          else
+          {
+            Debug::getInstance ()->debugMessage ("Global scalar conversion",
+                Debug::HIGHEST_DEBUG_LEVEL, __FILE__, __LINE__);
+
+            SgDotExp * parameterExpression1A = buildDotExp (
+                buildVarRefExp (variableDeclarations->get (
+                    OP2::VariableNames::getOpDatName (i))),
+                buildOpaqueVarRefExp (OP2::VariableNames::dataOnHost, block));
+
+            SgVarRefExp * parameterExpression1B = buildVarRefExp (
+                variableDeclarations->get (
+                    OP2::VariableNames::getOpDatHostName (i)));
+
+            SgStatement
+                * callStatementA =
+                    FortranStatementsAndExpressionsBuilder::createCToFortranPointerCallStatement (
+                        subroutineScope, parameterExpression1A,
+                        parameterExpression1B);
+
+            appendStatement (callStatementA, block);
+          }
+        }
       }
     }
   }
@@ -586,34 +673,12 @@ FortranCUDAHostSubroutine::createDataMarshallingDeclarations ()
   {
     if (parallelLoop->isDuplicateOpDat (i) == false)
     {
-      if (parallelLoop->isGlobal (i))
+      if (parallelLoop->isDirect (i) || parallelLoop->isIndirect (i))
       {
-        if (parallelLoop->isArray (i) == false)
-        {
-          string const & variableName =
-              OP2::VariableNames::getOpDatHostName (i);
+        Debug::getInstance ()->debugMessage (
+            "Creating device array for OP_DAT " + lexical_cast <string> (i),
+            Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
-          variableDeclarations->add (
-              variableName,
-              FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
-                  variableName, buildPointerType (
-                      parallelLoop->getOpDatBaseType (i)), subroutineScope));
-        }
-        else
-        {
-          string const & variableName = OP2::VariableNames::getOpDatDeviceName (
-              i);
-
-          variableDeclarations->add (
-              variableName,
-              FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
-                  variableName, FortranTypesBuilder::getArray_RankOne (
-                      parallelLoop->getOpDatBaseType (i)), subroutineScope, 2,
-                  CUDA_DEVICE, ALLOCATABLE));
-        }
-      }
-      else
-      {
         string const & variableName =
             OP2::VariableNames::getOpDatDeviceName (i);
 
@@ -622,6 +687,52 @@ FortranCUDAHostSubroutine::createDataMarshallingDeclarations ()
                 variableName, FortranTypesBuilder::getArray_RankOne (
                     parallelLoop->getOpDatBaseType (i)), subroutineScope, 2,
                 CUDA_DEVICE, ALLOCATABLE));
+      }
+      else if (parallelLoop->isReductionRequired (i) == false)
+      {
+        if (parallelLoop->isRead (i))
+        {
+          if (parallelLoop->isArray (i))
+          {
+            Debug::getInstance ()->debugMessage (
+                "Creating host and device arrays for OP_GBL read "
+                    + lexical_cast <string> (i), Debug::FUNCTION_LEVEL,
+                __FILE__, __LINE__);
+
+            string const & variableNameOnDevice =
+                OP2::VariableNames::getOpDatDeviceName (i);
+
+            variableDeclarations->add (
+                variableNameOnDevice,
+                FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
+                    variableNameOnDevice,
+                    FortranTypesBuilder::getArray_RankOne (
+                        parallelLoop->getOpDatBaseType (i)), subroutineScope,
+                    2, CUDA_DEVICE, ALLOCATABLE));
+
+            string const & variableNameOnHost =
+                OP2::VariableNames::getOpDatDeviceName (i);
+
+            variableDeclarations->add (
+                variableNameOnHost,
+                FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
+                    variableNameOnHost, buildPointerType (
+                        FortranTypesBuilder::getArray_RankOne (
+                            parallelLoop->getOpDatBaseType (i))),
+                    subroutineScope));
+          }
+          else
+          {
+            string const & variableName = OP2::VariableNames::getOpDatHostName (
+                i);
+
+            variableDeclarations->add (
+                variableName,
+                FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
+                    variableName, buildPointerType (
+                        parallelLoop->getOpDatBaseType (i)), subroutineScope));
+          }
+        }
       }
     }
   }

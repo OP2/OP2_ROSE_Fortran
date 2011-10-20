@@ -1173,8 +1173,8 @@ FortranCUDAKernelSubroutineIndirectLoop::createThreadZeroStatements ()
    * ======================================================
    */
 
-  SgSubtractOp * subtractExpression1 = buildSubtractOp (CUDA::getThreadId (
-      THREAD_X, subroutineScope), buildIntVal (1));
+  SgSubtractOp * subtractExpression1 = buildSubtractOp (CUDA::getBlockId (
+      BLOCK_X, subroutineScope), buildIntVal (1));
 
   SgAddOp * arrayIndexExpression1 = buildAddOp (subtractExpression1,
       buildVarRefExp (variableDeclarations->get (

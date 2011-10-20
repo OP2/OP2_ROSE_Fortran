@@ -44,6 +44,9 @@ class FortranCUDAHostSubroutine: public FortranHostSubroutine
     virtual SgBasicBlock *
     createTransferOpDatStatements ();
 
+    SgBasicBlock *
+    createDeallocateStatements ();
+
     void
     createCUDAConfigurationLaunchDeclarations ();
 
