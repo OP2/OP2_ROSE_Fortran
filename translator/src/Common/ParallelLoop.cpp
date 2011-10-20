@@ -480,9 +480,13 @@ ParallelLoop::getOpDatInformation (unsigned int OP_DAT_ArgumentGroup)
     data += ", OP_DAT";
   }
 
-  if (isSgArrayType (OpDatTypes[OP_DAT_ArgumentGroup]))
+  if (isArray (OP_DAT_ArgumentGroup))
   {
     data += ", ARRAY";
+  }
+  else if (isPointer (OP_DAT_ArgumentGroup))
+  {
+    data += ", POINTER";
   }
   else
   {

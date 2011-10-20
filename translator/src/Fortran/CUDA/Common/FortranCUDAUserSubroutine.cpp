@@ -120,7 +120,7 @@ FortranCUDAUserSubroutine::createStatements ()
                           formalParameters, 1, CUDA_SHARED);
             }
             else if (parallelLoop->isGlobal (OP_DAT_ArgumentGroup)
-                && parallelLoop->isArray (OP_DAT_ArgumentGroup) == false
+                && !parallelLoop->isArray (OP_DAT_ArgumentGroup)
                 && parallelLoop->isRead (OP_DAT_ArgumentGroup))
             {
               Debug::getInstance ()->debugMessage ("'" + variableName
