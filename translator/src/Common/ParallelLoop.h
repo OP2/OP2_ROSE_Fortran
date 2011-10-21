@@ -277,6 +277,15 @@ class ParallelLoop
 
     /*
      * ======================================================
+     * Does this parallel loop have OP_DATs with increment
+     * arguments?
+     * ======================================================
+     */
+    bool
+    hasIncrementedOpDats ();
+
+    /*
+     * ======================================================
      * Does the OP_DAT in this argument group require a reduction?
      * ======================================================
      */

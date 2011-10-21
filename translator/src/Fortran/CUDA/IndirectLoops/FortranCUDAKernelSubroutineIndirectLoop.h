@@ -17,29 +17,38 @@ class FortranCUDAKernelSubroutineIndirectLoop: public FortranCUDAKernelSubroutin
     virtual SgStatement *
     createUserSubroutineCallStatement ();
 
+    SgBasicBlock *
+    createIncrementAndWriteAccessEpilogueStatements ();
+
+    SgBasicBlock *
+    createStageOutFromLocalMemoryToSharedMemoryStatements ();
+
+    SgBasicBlock *
+    createIncrementAdjustmentStatements ();
+
+    SgBasicBlock *
+    createInitialiseIncrementAccessStatements ();
+
     virtual void
     createExecutionLoopStatements ();
 
-    void
-    createInnerExecutionLoopStatements (SgScopeStatement * scope);
-
-    void
-    createIncrementAdjustmentStatements (SgScopeStatement * scope);
-
-    void
-    createInitialiseLocalOpDatStatements (SgScopeStatement * scope);
-
-    void
-    createPointeredIncrementsOrWritesStatements ();
-
-    void
+    SgBasicBlock *
     createInitialiseCUDASharedVariablesStatements ();
 
-    void
-    createInitialiseLocalVariablesStatements ();
+    SgBasicBlock *
+    createIncrementAccessThreadZeroStatements ();
+
+    SgIfStmt *
+    createThreadZeroStatements ();
+
+    SgBasicBlock *
+    createInitialiseBytesPerOpDatStatements ();
 
     void
-    createThreadZeroStatements ();
+    createIncrementAccessLocalVariableDeclarations ();
+
+    void
+    createExecutionLocalVariableDeclarations ();
 
     void
     createPlanFormalParameterDeclarations ();

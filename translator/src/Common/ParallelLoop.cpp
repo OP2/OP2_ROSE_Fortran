@@ -255,6 +255,19 @@ ParallelLoop::getNumberOfDifferentIndirectOpDats ()
 }
 
 bool
+ParallelLoop::hasIncrementedOpDats ()
+{
+  for (unsigned int i = 1; i <= getNumberOfOpDatArgumentGroups (); ++i)
+  {
+    if (isIncremented(i))
+    {
+      return true;
+    }
+  }
+  return false;
+}
+
+bool
 ParallelLoop::isReductionRequired (int OP_DAT_ArgumentGroup)
 {
   return OpDatMappingDescriptors[OP_DAT_ArgumentGroup] == GLOBAL

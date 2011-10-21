@@ -200,7 +200,7 @@ OP2::VariableNames::getIncrementAccessMapName (
   using boost::lexical_cast;
   using std::string;
 
-  return "argMap" + lexical_cast <string> (OP_DAT_ArgumentGroup);
+  return OpDatPrefix + lexical_cast <string> (OP_DAT_ArgumentGroup);
 }
 
 std::string const
@@ -210,7 +210,8 @@ OP2::VariableNames::getOpIndirectionSharedName (
   using boost::lexical_cast;
   using std::string;
 
-  return "ind_arg" + lexical_cast <string> (OP_DAT_ArgumentGroup) + "_s";
+  return "ind" + OpDatPrefix + lexical_cast <string> (OP_DAT_ArgumentGroup)
+      + "_s";
 }
 
 std::string const
@@ -220,7 +221,7 @@ OP2::VariableNames::getIndirectionArgumentSizeName (
   using boost::lexical_cast;
   using std::string;
 
-  return "ind_arg" + lexical_cast <string> (OP_DAT_ArgumentGroup);
+  return "ind" + OpDatPrefix + lexical_cast <string> (OP_DAT_ArgumentGroup);
 }
 
 std::string const

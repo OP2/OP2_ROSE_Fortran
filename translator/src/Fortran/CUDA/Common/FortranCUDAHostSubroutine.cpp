@@ -550,7 +550,36 @@ FortranCUDAHostSubroutine::createTransferOpDatStatements ()
         appendStatement (callStatementA, block);
 
       }
-      else if (parallelLoop->isReductionRequired (i) == false)
+      else if (parallelLoop->isReductionRequired (i))
+      {
+        if (parallelLoop->isArray (i))
+        {
+
+        }
+        else
+        {
+          Debug::getInstance ()->debugMessage ("Global scalar conversion",
+              Debug::HIGHEST_DEBUG_LEVEL, __FILE__, __LINE__);
+
+          SgDotExp * parameterExpression1A = buildDotExp (
+              buildVarRefExp (variableDeclarations->get (
+                  OP2::VariableNames::getOpDatName (i))), buildOpaqueVarRefExp (
+                  OP2::VariableNames::dataOnHost, block));
+
+          SgVarRefExp * parameterExpression1B = buildVarRefExp (
+              variableDeclarations->get (OP2::VariableNames::getOpDatHostName (
+                  i)));
+
+          SgStatement
+              * callStatementA =
+                  FortranStatementsAndExpressionsBuilder::createCToFortranPointerCallStatement (
+                      subroutineScope, parameterExpression1A,
+                      parameterExpression1B);
+
+          appendStatement (callStatementA, block);
+        }
+      }
+      else
       {
         if (parallelLoop->isRead (i))
         {
@@ -590,9 +619,10 @@ FortranCUDAHostSubroutine::createTransferOpDatStatements ()
             SgVarRefExp * upperBound = buildVarRefExp (
                 variableDeclarations->get (
                     OP2::VariableNames::getOpDatCardinalityName (i)));
-                              
+
             FortranStatementsAndExpressionsBuilder::appendAllocateStatement (
-                arrayExpression, SageBuilder::buildIntVal(1), upperBound, block);
+                arrayExpression, SageBuilder::buildIntVal (1), upperBound,
+                block);
 
             SgExprStatement * assignmentStatement1 = buildAssignStatement (
                 buildVarRefExp (variableDeclarations->get (
@@ -688,7 +718,42 @@ FortranCUDAHostSubroutine::createDataMarshallingDeclarations ()
                     parallelLoop->getOpDatBaseType (i)), subroutineScope, 2,
                 CUDA_DEVICE, ALLOCATABLE));
       }
-      else if (parallelLoop->isReductionRequired (i) == false)
+      else if (parallelLoop->isReductionRequired (i))
+      {
+        if (parallelLoop->isArray (i))
+        {
+          Debug::getInstance ()->debugMessage (
+              "Creating device array for array REDUCTION "
+                  + lexical_cast <string> (i), Debug::FUNCTION_LEVEL,
+              __FILE__, __LINE__);
+
+          string const & variableName =
+              OP2::VariableNames::getOpDatDeviceName (i);
+
+          variableDeclarations->add (variableName,
+              FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
+                  variableName, FortranTypesBuilder::getArray_RankOne (
+                      parallelLoop->getOpDatBaseType (i)), subroutineScope, 2,
+                  CUDA_DEVICE, ALLOCATABLE));
+        }
+        else
+        {
+          Debug::getInstance ()->debugMessage (
+              "Creating host scalar pointer for scalar REDUCTION "
+                  + lexical_cast <string> (i), Debug::FUNCTION_LEVEL,
+              __FILE__, __LINE__);
+
+          string const & variableName = OP2::VariableNames::getOpDatHostName (
+              i);
+
+          variableDeclarations->add (
+              variableName,
+              FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
+                  variableName, buildPointerType (
+                      parallelLoop->getOpDatBaseType (i)), subroutineScope));
+        }
+      }
+      else
       {
         if (parallelLoop->isRead (i))
         {
@@ -703,9 +768,9 @@ FortranCUDAHostSubroutine::createDataMarshallingDeclarations ()
                 OP2::VariableNames::getOpDatDeviceName (i);
 
             Debug::getInstance ()->debugMessage (
-              "Creating device array with name " + variableNameOnDevice,
-              Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
-                
+                "Creating device array with name " + variableNameOnDevice,
+                Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+
             variableDeclarations->add (
                 variableNameOnDevice,
                 FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
@@ -718,8 +783,8 @@ FortranCUDAHostSubroutine::createDataMarshallingDeclarations ()
                 OP2::VariableNames::getOpDatHostName (i);
 
             Debug::getInstance ()->debugMessage (
-              "Creating host array with name " + variableNameOnHost,
-              Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+                "Creating host array with name " + variableNameOnHost,
+                Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
             variableDeclarations->add (
                 variableNameOnHost,
