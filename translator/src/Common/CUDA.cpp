@@ -15,9 +15,8 @@ namespace
 SgDotExp *
 CUDA::getThreadId (THREAD_BLOCK_DIMENSION dimension, SgScopeStatement * scope)
 {
+  using namespace SageBuilder;
   using boost::lexical_cast;
-  using SageBuilder::buildOpaqueVarRefExp;
-  using SageBuilder::buildDotExp;
   using std::string;
 
   string const threadidx = "threadIdx";
@@ -54,9 +53,8 @@ CUDA::getThreadId (THREAD_BLOCK_DIMENSION dimension, SgScopeStatement * scope)
 SgDotExp *
 CUDA::getBlockId (GRID_DIMENSION dimension, SgScopeStatement * scope)
 {
+  using namespace SageBuilder;
   using boost::lexical_cast;
-  using SageBuilder::buildOpaqueVarRefExp;
-  using SageBuilder::buildDotExp;
   using std::string;
 
   string const blockidx = "blockIdx";
@@ -88,9 +86,8 @@ SgDotExp *
 CUDA::getThreadBlockDimension (THREAD_BLOCK_DIMENSION dimension,
     SgScopeStatement * scope)
 {
+  using namespace SageBuilder;
   using boost::lexical_cast;
-  using SageBuilder::buildOpaqueVarRefExp;
-  using SageBuilder::buildDotExp;
   using std::string;
 
   string const blockdim = "blockDim";
@@ -127,9 +124,8 @@ CUDA::getThreadBlockDimension (THREAD_BLOCK_DIMENSION dimension,
 SgDotExp *
 CUDA::getGridDimension (GRID_DIMENSION dimension, SgScopeStatement * scope)
 {
+  using namespace SageBuilder;
   using boost::lexical_cast;
-  using SageBuilder::buildOpaqueVarRefExp;
-  using SageBuilder::buildDotExp;
   using std::string;
 
   string const griddim = "gridDim";
@@ -157,42 +153,76 @@ CUDA::getGridDimension (GRID_DIMENSION dimension, SgScopeStatement * scope)
   }
 }
 
-SgFunctionCallExp *
-CUDA::createDeviceThreadSynchronisationCallStatement (SgScopeStatement * scope)
+SgVarRefExp *
+CUDA::getWarpSizeReference (SgScopeStatement * scope)
 {
-  using SageBuilder::buildFunctionCallExp;
-  using SageBuilder::buildExprListExp;
+  using namespace SageBuilder;
+
+  return buildOpaqueVarRefExp ("warpSize", scope);
+}
+
+SgFunctionCallExp *
+CUDA::createDeviceThreadSynchronisationCallStatement (SgScopeStatement * scope,
+    bool Fortran)
+{
+  using namespace SageBuilder;
   using std::string;
 
-  string const functionName = "syncthreads";
+  string functionName;
 
-  SgFunctionSymbol * functionSymbol =
-      FortranTypesBuilder::buildNewFortranSubroutine (functionName, scope);
+  SgFunctionCallExp * subroutineCall;
 
-  SgExprListExp * actualParameters = buildExprListExp ();
+  if (Fortran)
+  {
+    functionName = "syncthreads";
 
-  SgFunctionCallExp * subroutineCall = buildFunctionCallExp (functionSymbol,
-      actualParameters);
+    SgFunctionSymbol * functionSymbol =
+        FortranTypesBuilder::buildNewFortranSubroutine (functionName, scope);
+
+    SgExprListExp * actualParameters = buildExprListExp ();
+
+    subroutineCall = buildFunctionCallExp (functionSymbol, actualParameters);
+  }
+  else
+  {
+    functionName = "__syncthreads";
+
+    subroutineCall = buildFunctionCallExp (functionName, buildVoidType (),
+        buildExprListExp (), scope);
+  }
 
   return subroutineCall;
 }
 
 SgFunctionCallExp *
-CUDA::createHostThreadSynchronisationCallStatement (SgScopeStatement * scope)
+CUDA::createHostThreadSynchronisationCallStatement (SgScopeStatement * scope,
+    bool Fortran)
 {
-  using SageBuilder::buildFunctionCallExp;
-  using SageBuilder::buildExprListExp;
+  using namespace SageBuilder;
   using std::string;
 
-  string const functionName = "cudaThreadSynchronize";
+  string functionName;
 
-  SgFunctionSymbol * functionSymbol =
-      FortranTypesBuilder::buildNewFortranFunction (functionName, scope);
+  SgFunctionCallExp * subroutineCall;
 
-  SgExprListExp * actualParameters = buildExprListExp ();
+  if (Fortran)
+  {
+    functionName = "cudaThreadSynchronize";
 
-  SgFunctionCallExp * subroutineCall = buildFunctionCallExp (functionSymbol,
-      actualParameters);
+    SgFunctionSymbol * functionSymbol =
+        FortranTypesBuilder::buildNewFortranFunction (functionName, scope);
+
+    SgExprListExp * actualParameters = buildExprListExp ();
+
+    subroutineCall = buildFunctionCallExp (functionSymbol, actualParameters);
+  }
+  else
+  {
+    functionName = "__cudaThreadSynchronize";
+
+    subroutineCall = buildFunctionCallExp (functionName, buildVoidType (),
+        buildExprListExp (), scope);
+  }
 
   return subroutineCall;
 }

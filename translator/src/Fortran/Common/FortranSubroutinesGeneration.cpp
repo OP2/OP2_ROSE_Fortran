@@ -11,9 +11,8 @@ void
 FortranSubroutinesGeneration::fixUseStatement (SgUseStatement * useStatement,
     std::string const & userSubroutineName)
 {
+  using namespace SageInterface;
   using boost::iequals;
-  using SageInterface::getPreviousStatement;
-  using SageInterface::removeStatement;
 
   std::string const & moduleNameToRemove = declarations->getModuleNameForFile (
       declarations->getFileNameForSubroutine (userSubroutineName));
@@ -44,16 +43,8 @@ void
 FortranSubroutinesGeneration::patchCallsToParallelLoops (
     std::string const & moduleName)
 {
-  using SageBuilder::buildAssignInitializer;
-  using SageBuilder::buildStringVal;
-  using SageBuilder::buildFunctionRefExp;
-  using SageBuilder::buildVarRefExp;
-  using SageBuilder::buildVariableDeclaration;
-  using SageInterface::getScope;
-  using SageInterface::getEnclosingFileNode;
-  using SageInterface::insertStatementAfter;
-  using SageInterface::getPreviousStatement;
-  using SageInterface::findLastDeclarationStatement;
+  using namespace SageBuilder;
+  using namespace SageInterface;
   using std::map;
   using std::string;
   using std::find;
@@ -224,7 +215,7 @@ FortranSubroutinesGeneration::patchCallsToParallelLoops (
 void
 FortranSubroutinesGeneration::addContains ()
 {
-  using SageInterface::appendStatement;
+  using namespace SageInterface;
 
   SgContainsStatement * containsStatement = new SgContainsStatement (
       RoseHelper::getFileInfo ());
@@ -238,9 +229,9 @@ SgModuleStatement *
 FortranSubroutinesGeneration::createFortranModule (
     std::string const & moduleName)
 {
+  using namespace SageInterface;
   using std::string;
   using std::vector;
-  using SageInterface::appendStatement;
 
   Debug::getInstance ()->debugMessage ("Creating Fortran module",
       Debug::FUNCTION_LEVEL, __FILE__, __LINE__);

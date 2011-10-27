@@ -9,9 +9,8 @@ FortranKernelSubroutine::FortranKernelSubroutine (
       KernelSubroutine <SgProcedureHeaderStatement> (calleeSubroutine,
           parallelLoop)
 {
-  using SageBuilder::buildVoidType;
-  using SageBuilder::buildProcedureHeaderStatement;
-  using SageInterface::appendStatement;
+  using namespace SageBuilder;
+  using namespace SageInterface;
 
   subroutineHeaderStatement = buildProcedureHeaderStatement (
       this->subroutineName.c_str (), buildVoidType (), formalParameters,

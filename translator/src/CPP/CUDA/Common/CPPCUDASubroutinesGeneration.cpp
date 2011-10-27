@@ -5,12 +5,51 @@
 #include <CPPCUDAKernelSubroutineDirectLoop.h>
 #include <CPPCUDAHostSubroutineDirectLoop.h>
 #include <CPPCUDAUserSubroutine.h>
+#include <CPPCUDAReductionSubroutines.h>
+#include <CPPCUDAReductionSubroutine.h>
+
+void
+CPPCUDASubroutinesGeneration::createReductionSubroutines ()
+{
+  using boost::lexical_cast;
+  using std::string;
+  using std::map;
+  using std::vector;
+
+  Debug::getInstance ()->debugMessage ("Creating reduction subroutines",
+      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+
+  vector <Reduction *> reductionsNeeded;
+
+  for (map <string, ParallelLoop *>::const_iterator it =
+      declarations->firstParallelLoop (); it
+      != declarations->lastParallelLoop (); ++it)
+  {
+    string const userSubroutineName = it->first;
+
+    ParallelLoop * parallelLoop = it->second;
+
+    parallelLoop->getReductionsNeeded (reductionsNeeded);
+  }
+
+  for (vector <Reduction *>::const_iterator it = reductionsNeeded.begin (); it
+      != reductionsNeeded.end (); ++it)
+  {
+    CPPCUDAReductionSubroutine * subroutine = new CPPCUDAReductionSubroutine (
+        moduleScope, *it);
+
+    reductionSubroutines->addSubroutine (*it,
+        subroutine->getSubroutineHeaderStatement ());
+  }
+}
 
 void
 CPPCUDASubroutinesGeneration::createSubroutines ()
 {
   using std::string;
   using std::map;
+
+  createReductionSubroutines ();
 
   for (map <string, ParallelLoop *>::const_iterator it =
       declarations->firstParallelLoop (); it
@@ -32,7 +71,7 @@ CPPCUDASubroutinesGeneration::createSubroutines ()
     if (parallelLoop->isDirectLoop ())
     {
       kernelSubroutine = new CPPCUDAKernelSubroutineDirectLoop (moduleScope,
-          userDeviceSubroutine, parallelLoop);
+          userDeviceSubroutine, parallelLoop, reductionSubroutines);
 
       hostSubroutines[userSubroutineName]
           = new CPPCUDAHostSubroutineDirectLoop (moduleScope, kernelSubroutine,
@@ -48,5 +87,7 @@ CPPCUDASubroutinesGeneration::CPPCUDASubroutinesGeneration (
     SgProject * project, CPPProgramDeclarationsAndDefinitions * declarations) :
   CPPSubroutinesGeneration (project, declarations, "rose_cuda_code.cpp")
 {
+  reductionSubroutines = new CPPCUDAReductionSubroutines ();
+
   generate ();
 }

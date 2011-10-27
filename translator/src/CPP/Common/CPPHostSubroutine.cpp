@@ -7,10 +7,7 @@
 void
 CPPHostSubroutine::createFormalParameterDeclarations ()
 {
-  using SageBuilder::buildClassDeclaration;
-  using SageBuilder::buildCharType;
-  using SageBuilder::buildPointerType;
-  using SageBuilder::buildIntType;
+  using namespace SageBuilder;
   using std::string;
 
   Debug::getInstance ()->debugMessage (
@@ -73,9 +70,8 @@ CPPHostSubroutine::CPPHostSubroutine (SgScopeStatement * moduleScope,
     CPPParallelLoop * parallelLoop) :
   HostSubroutine <SgFunctionDeclaration> (calleeSubroutine, parallelLoop)
 {
-  using SageBuilder::buildVoidType;
-  using SageBuilder::buildDefiningFunctionDeclaration;
-  using SageInterface::appendStatement;
+  using namespace SageBuilder;
+  using namespace SageInterface;
 
   subroutineHeaderStatement = buildDefiningFunctionDeclaration (
       this->subroutineName.c_str (), buildVoidType (), formalParameters,

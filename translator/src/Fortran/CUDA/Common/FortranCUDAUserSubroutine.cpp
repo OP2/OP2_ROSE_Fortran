@@ -50,8 +50,8 @@ FortranCUDAUserSubroutine::forceOutputOfCodeToFile ()
 void
 FortranCUDAUserSubroutine::createStatements ()
 {
+  using namespace SageInterface;
   using boost::iequals;
-  using SageInterface::appendStatement;
   using std::string;
   using std::vector;
 

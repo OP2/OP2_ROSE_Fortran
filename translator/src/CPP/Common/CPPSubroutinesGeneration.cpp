@@ -7,10 +7,10 @@
 void
 CPPSubroutinesGeneration::patchCallsToParallelLoops ()
 {
+  using namespace SageBuilder;
   using std::map;
   using std::string;
   using std::vector;
-  using SageBuilder::buildFunctionRefExp;
 
   Debug::getInstance ()->debugMessage ("Patching calls to OP_PAR_LOOPs",
       Debug::FUNCTION_LEVEL, __FILE__, __LINE__);

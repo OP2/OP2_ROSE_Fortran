@@ -10,16 +10,8 @@
 void
 FortranOpenMPHostSubroutine::createReductionEpilogueStatements ()
 {
-  using SageBuilder::buildIntVal;
-  using SageBuilder::buildBasicBlock;
-  using SageBuilder::buildAssignOp;
-  using SageBuilder::buildAssignStatement;
-  using SageBuilder::buildAddOp;
-  using SageBuilder::buildMultiplyOp;
-  using SageBuilder::buildSubtractOp;
-  using SageBuilder::buildVarRefExp;
-  using SageBuilder::buildPntrArrRefExp;
-  using SageInterface::appendStatement;
+  using namespace SageBuilder;
+  using namespace SageInterface;
 
   Debug::getInstance ()->debugMessage (
       "Creating reduction epilogue statements", Debug::FUNCTION_LEVEL,
@@ -39,41 +31,41 @@ FortranOpenMPHostSubroutine::createReductionEpilogueStatements ()
         && parallelLoop->isReductionRequired (i))
     {
       SgAssignOp * innerLoopInitializationExpression = buildAssignOp (
-          buildVarRefExp (variableDeclarations->get (
-              CommonVariableNames::iterationCounter2)), buildIntVal (0));
+          variableDeclarations->getReference (
+              CommonVariableNames::iterationCounter2), buildIntVal (0));
 
       SgSubtractOp * innerLoopUpperBoundExpression = buildSubtractOp (
           buildIntVal (parallelLoop->getOpDatDimension (i)), buildIntVal (1));
 
       SgBasicBlock * innerLoopBody = buildBasicBlock ();
 
-      SgMultiplyOp * multiplyExpression1 = buildMultiplyOp (buildVarRefExp (
-          variableDeclarations->get (CommonVariableNames::iterationCounter1)),
-          buildIntVal (64));
+      SgMultiplyOp * multiplyExpression1 = buildMultiplyOp (
+          variableDeclarations->getReference (
+              CommonVariableNames::iterationCounter1), buildIntVal (64));
 
-      SgAddOp * addExpression1 = buildAddOp (buildVarRefExp (
-          variableDeclarations->get (CommonVariableNames::iterationCounter2)),
-          multiplyExpression1);
+      SgAddOp * addExpression1 = buildAddOp (
+          variableDeclarations->getReference (
+              CommonVariableNames::iterationCounter2), multiplyExpression1);
 
       SgPntrArrRefExp * arrayIndexExpression1 = buildPntrArrRefExp (
-          buildVarRefExp (variableDeclarations->get (
-              OP2::VariableNames::getOpDatLocalName (i))), addExpression1);
+          variableDeclarations->getReference (
+              OP2::VariableNames::getOpDatLocalName (i)), addExpression1);
 
       SgAddOp * addExpression2 = buildAddOp (buildIntVal (
-          parallelLoop->getOpDatDimension (i)), buildVarRefExp (
-          variableDeclarations->get (CommonVariableNames::iterationCounter2)));
+          parallelLoop->getOpDatDimension (i)),
+          variableDeclarations->getReference (
+              CommonVariableNames::iterationCounter2));
 
       SgPntrArrRefExp * arrayIndexExpression2 = buildPntrArrRefExp (
-          buildVarRefExp (moduleDeclarations->getGlobalOpDatDeclaration (i)),
-          addExpression2);
+          moduleDeclarations->getGlobalOpDatDeclaration (i), addExpression2);
 
       SgAddOp * addExpression3 = buildAddOp (buildIntVal (
-          parallelLoop->getOpDatDimension (i)), buildVarRefExp (
-          variableDeclarations->get (CommonVariableNames::iterationCounter2)));
+          parallelLoop->getOpDatDimension (i)),
+          variableDeclarations->getReference (
+              CommonVariableNames::iterationCounter2));
 
       SgPntrArrRefExp * arrayIndexExpression3 = buildPntrArrRefExp (
-          buildVarRefExp (moduleDeclarations->getGlobalOpDatDeclaration (i)),
-          addExpression3);
+          moduleDeclarations->getGlobalOpDatDeclaration (i), addExpression3);
 
       SgExprStatement * assignmentStatement = buildAssignStatement (
           arrayIndexExpression3, buildAddOp (arrayIndexExpression1,
@@ -97,11 +89,11 @@ FortranOpenMPHostSubroutine::createReductionEpilogueStatements ()
    */
 
   SgAssignOp * outerLoopInitializationExpression = buildAssignOp (
-      buildVarRefExp (variableDeclarations->get (
-          CommonVariableNames::iterationCounter1)), buildIntVal (0));
+      variableDeclarations->getReference (
+          CommonVariableNames::iterationCounter1), buildIntVal (0));
 
   SgSubtractOp * outerLoopUpperBoundExpression = buildSubtractOp (
-      buildVarRefExp (variableDeclarations->get (OpenMP::numberOfThreads)),
+      variableDeclarations->getReference (OpenMP::numberOfThreads),
       buildIntVal (1));
 
   SgFortranDo * outerLoopStatement =
@@ -115,16 +107,8 @@ FortranOpenMPHostSubroutine::createReductionEpilogueStatements ()
 void
 FortranOpenMPHostSubroutine::createReductionPrologueStatements ()
 {
-  using SageBuilder::buildIntVal;
-  using SageBuilder::buildBasicBlock;
-  using SageBuilder::buildAssignOp;
-  using SageBuilder::buildAssignStatement;
-  using SageBuilder::buildAddOp;
-  using SageBuilder::buildMultiplyOp;
-  using SageBuilder::buildSubtractOp;
-  using SageBuilder::buildVarRefExp;
-  using SageBuilder::buildPntrArrRefExp;
-  using SageInterface::appendStatement;
+  using namespace SageBuilder;
+  using namespace SageInterface;
 
   Debug::getInstance ()->debugMessage (
       "Creating reduction prologue statements", Debug::FUNCTION_LEVEL,
@@ -144,25 +128,24 @@ FortranOpenMPHostSubroutine::createReductionPrologueStatements ()
         && parallelLoop->isReductionRequired (i))
     {
       SgAssignOp * innerLoopInitializationExpression = buildAssignOp (
-          buildVarRefExp (variableDeclarations->get (
-              CommonVariableNames::iterationCounter2)), buildIntVal (0));
+          variableDeclarations->getReference (
+              CommonVariableNames::iterationCounter2), buildIntVal (0));
 
       SgSubtractOp * innerLoopUpperBoundExpression = buildSubtractOp (
           buildIntVal (parallelLoop->getOpDatDimension (i)), buildIntVal (1));
 
       SgBasicBlock * innerLoopBody = buildBasicBlock ();
 
-      SgMultiplyOp * multiplyExpression = buildMultiplyOp (buildVarRefExp (
-          variableDeclarations->get (CommonVariableNames::iterationCounter1)),
-          buildIntVal (64));
+      SgMultiplyOp * multiplyExpression = buildMultiplyOp (
+          variableDeclarations->getReference (
+              CommonVariableNames::iterationCounter1), buildIntVal (64));
 
-      SgAddOp * addExpression = buildAddOp (buildVarRefExp (
-          variableDeclarations->get (CommonVariableNames::iterationCounter2)),
-          multiplyExpression);
+      SgAddOp * addExpression = buildAddOp (variableDeclarations->getReference (
+          CommonVariableNames::iterationCounter2), multiplyExpression);
 
       SgPntrArrRefExp * arrayIndexExpression = buildPntrArrRefExp (
-          buildVarRefExp (variableDeclarations->get (
-              OP2::VariableNames::getOpDatLocalName (i))), addExpression);
+          variableDeclarations->getReference (
+              OP2::VariableNames::getOpDatLocalName (i)), addExpression);
 
       SgExprStatement * assignmentStatement = buildAssignStatement (
           arrayIndexExpression, buildIntVal (0));
@@ -185,11 +168,11 @@ FortranOpenMPHostSubroutine::createReductionPrologueStatements ()
    */
 
   SgAssignOp * outerLoopInitializationExpression = buildAssignOp (
-      buildVarRefExp (variableDeclarations->get (
-          CommonVariableNames::iterationCounter1)), buildIntVal (0));
+      variableDeclarations->getReference (
+          CommonVariableNames::iterationCounter1), buildIntVal (0));
 
   SgSubtractOp * outerLoopUpperBoundExpression = buildSubtractOp (
-      buildVarRefExp (variableDeclarations->get (OpenMP::numberOfThreads)),
+      variableDeclarations->getReference (OpenMP::numberOfThreads),
       buildIntVal (1));
 
   SgFortranDo * outerLoopStatement =
@@ -203,10 +186,7 @@ FortranOpenMPHostSubroutine::createReductionPrologueStatements ()
 void
 FortranOpenMPHostSubroutine::createReductionDeclarations ()
 {
-  using SageBuilder::buildMultiplyOp;
-  using SageBuilder::buildAddOp;
-  using SageBuilder::buildSubtractOp;
-  using SageBuilder::buildIntVal;
+  using namespace SageBuilder;
   using std::string;
 
   Debug::getInstance ()->debugMessage (
@@ -254,14 +234,8 @@ FortranOpenMPHostSubroutine::createReductionDeclarations ()
 void
 FortranOpenMPHostSubroutine::initialiseNumberOfThreadsStatements ()
 {
-  using SageBuilder::buildFunctionCallExp;
-  using SageBuilder::buildExprListExp;
-  using SageBuilder::buildExprStatement;
-  using SageBuilder::buildVarRefExp;
-  using SageBuilder::buildIntVal;
-  using SageBuilder::buildAssignStatement;
-  using SageInterface::appendStatement;
-  using SageInterface::addTextForUnparser;
+  using namespace SageBuilder;
+  using namespace SageInterface;
 
   Debug::getInstance ()->debugMessage (
       "Creating statements to initialise number of threads",
@@ -275,13 +249,13 @@ FortranOpenMPHostSubroutine::initialiseNumberOfThreadsStatements ()
       buildExprListExp ());
 
   SgExprStatement * assignmentStatement1 = buildAssignStatement (
-      buildVarRefExp (variableDeclarations->get (OpenMP::numberOfThreads)),
+      variableDeclarations->getReference (OpenMP::numberOfThreads),
       functionCall);
 
   appendStatement (assignmentStatement1, subroutineScope);
 
   SgExprStatement * assignmentStatement2 = buildAssignStatement (
-      buildVarRefExp (variableDeclarations->get (OpenMP::numberOfThreads)),
+      variableDeclarations->getReference (OpenMP::numberOfThreads),
       buildIntVal (1));
 
   appendStatement (assignmentStatement2, subroutineScope);

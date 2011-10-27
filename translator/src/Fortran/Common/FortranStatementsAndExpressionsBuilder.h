@@ -47,7 +47,7 @@ class FortranStatementsAndExpressionsBuilder
      */
 
     static SgAggregateInitializer *
-    buildShapeExpression (SgVariableDeclaration * variableDeclaration);
+    buildShapeExpression (SgVarRefExp * variableReference);
 
     /*
      * ======================================================

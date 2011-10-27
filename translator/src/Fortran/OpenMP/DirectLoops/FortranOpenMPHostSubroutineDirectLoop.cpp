@@ -12,14 +12,7 @@
 SgStatement *
 FortranOpenMPHostSubroutineDirectLoop::createKernelFunctionCallStatement ()
 {
-  using SageBuilder::buildIntVal;
-  using SageBuilder::buildMultiplyOp;
-  using SageBuilder::buildExprListExp;
-  using SageBuilder::buildVarRefExp;
-  using SageBuilder::buildFunctionCallExp;
-  using SageBuilder::buildExprStatement;
-  using SageBuilder::buildPntrArrRefExp;
-  using SageBuilder::buildNullExpression;
+  using namespace SageBuilder;
 
   SgExprListExp * actualParameters = buildExprListExp ();
 
@@ -29,13 +22,14 @@ FortranOpenMPHostSubroutineDirectLoop::createKernelFunctionCallStatement ()
     {
       if (parallelLoop->isReductionRequired (i) == false)
       {
-        actualParameters->append_expression (buildVarRefExp (
-            moduleDeclarations->getGlobalOpDatDeclaration (i)));
+        actualParameters->append_expression (
+            moduleDeclarations->getGlobalOpDatDeclaration (i));
       }
       else
       {
-        SgMultiplyOp * multiplyExpression = buildMultiplyOp (buildVarRefExp (
-            variableDeclarations->get (OpenMP::threadIndex)), buildIntVal (64));
+        SgMultiplyOp * multiplyExpression = buildMultiplyOp (
+            variableDeclarations->getReference (OpenMP::threadIndex),
+            buildIntVal (64));
 
         SgSubscriptExpression * arraySubscriptExpression =
             new SgSubscriptExpression (RoseHelper::getFileInfo (),
@@ -45,8 +39,8 @@ FortranOpenMPHostSubroutineDirectLoop::createKernelFunctionCallStatement ()
             RoseHelper::getFileInfo ());
 
         SgPntrArrRefExp * parameterExpression = buildPntrArrRefExp (
-            buildVarRefExp (variableDeclarations->get (
-                OP2::VariableNames::getOpDatLocalName (i))), buildExprListExp (
+            variableDeclarations->getReference (
+                OP2::VariableNames::getOpDatLocalName (i)), buildExprListExp (
                 arraySubscriptExpression));
 
         actualParameters->append_expression (parameterExpression);
@@ -54,11 +48,11 @@ FortranOpenMPHostSubroutineDirectLoop::createKernelFunctionCallStatement ()
     }
   }
 
-  actualParameters->append_expression (buildVarRefExp (
-      variableDeclarations->get (OpenMP::sliceStart)));
+  actualParameters->append_expression (variableDeclarations->getReference (
+      OpenMP::sliceStart));
 
-  actualParameters->append_expression (buildVarRefExp (
-      variableDeclarations->get (OpenMP::sliceEnd)));
+  actualParameters->append_expression (variableDeclarations->getReference (
+      OpenMP::sliceEnd));
 
   SgFunctionSymbol * kernelSymbol =
       FortranTypesBuilder::buildNewFortranSubroutine (
@@ -73,61 +67,51 @@ FortranOpenMPHostSubroutineDirectLoop::createKernelFunctionCallStatement ()
 void
 FortranOpenMPHostSubroutineDirectLoop::createKernelDoLoop ()
 {
-  using SageBuilder::buildBasicBlock;
-  using SageBuilder::buildAssignStatement;
-  using SageBuilder::buildAssignOp;
-  using SageBuilder::buildSubtractOp;
-  using SageBuilder::buildMultiplyOp;
-  using SageBuilder::buildDivideOp;
-  using SageBuilder::buildAddOp;
-  using SageBuilder::buildDotExp;
-  using SageBuilder::buildVarRefExp;
-  using SageBuilder::buildOpaqueVarRefExp;
-  using SageBuilder::buildIntVal;
-  using SageInterface::appendStatement;
-  using SageInterface::addTextForUnparser;
+  using namespace SageBuilder;
+  using namespace SageInterface;
 
   Debug::getInstance ()->debugMessage ("Creating kernel do loop",
       Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
-  SgAssignOp * initializationExpression = buildAssignOp (buildVarRefExp (
-      variableDeclarations->get (OpenMP::threadIndex)), buildIntVal (0));
+  SgAssignOp * initializationExpression =
+      buildAssignOp (variableDeclarations->getReference (OpenMP::threadIndex),
+          buildIntVal (0));
 
-  SgSubtractOp * upperBoundExpression = buildSubtractOp (buildVarRefExp (
-      variableDeclarations->get (OpenMP::numberOfThreads)), buildIntVal (1));
+  SgSubtractOp * upperBoundExpression = buildSubtractOp (
+      variableDeclarations->getReference (OpenMP::numberOfThreads),
+      buildIntVal (1));
 
   SgBasicBlock * loopBody = buildBasicBlock ();
 
-  SgDotExp * dotExpression1 = buildDotExp (buildVarRefExp (
-      variableDeclarations->get (OP2::VariableNames::getOpSetName ())),
-      buildOpaqueVarRefExp (OP2::VariableNames::size, subroutineScope));
+  SgDotExp * dotExpression1 = buildDotExp (variableDeclarations->getReference (
+      OP2::VariableNames::getOpSetName ()), buildOpaqueVarRefExp (
+      OP2::VariableNames::size, subroutineScope));
 
   SgMultiplyOp * multiplyExpression1 = buildMultiplyOp (dotExpression1,
-      buildVarRefExp (variableDeclarations->get (OpenMP::threadIndex)));
+      variableDeclarations->getReference (OpenMP::threadIndex));
 
   SgDivideOp * divideExpression1 = buildDivideOp (multiplyExpression1,
-      buildVarRefExp (variableDeclarations->get (OpenMP::numberOfThreads)));
+      variableDeclarations->getReference (OpenMP::numberOfThreads));
 
   SgExprStatement * assignmentStatement1 = buildAssignStatement (
-      buildVarRefExp (variableDeclarations->get (OpenMP::sliceStart)),
+      variableDeclarations->getReference (OpenMP::sliceStart),
       divideExpression1);
 
-  SgDotExp * dotExpression2 = buildDotExp (buildVarRefExp (
-      variableDeclarations->get (OP2::VariableNames::getOpSetName ())),
-      buildOpaqueVarRefExp (OP2::VariableNames::size, subroutineScope));
+  SgDotExp * dotExpression2 = buildDotExp (variableDeclarations->getReference (
+      OP2::VariableNames::getOpSetName ()), buildOpaqueVarRefExp (
+      OP2::VariableNames::size, subroutineScope));
 
-  SgAddOp * addExpression2 = buildAddOp (buildVarRefExp (
-      variableDeclarations->get (OpenMP::threadIndex)), buildIntVal (1));
+  SgAddOp * addExpression2 = buildAddOp (variableDeclarations->getReference (
+      OpenMP::threadIndex), buildIntVal (1));
 
   SgMultiplyOp * multiplyExpression2 = buildMultiplyOp (dotExpression2,
       addExpression2);
 
   SgDivideOp * divideExpression2 = buildDivideOp (multiplyExpression2,
-      buildVarRefExp (variableDeclarations->get (OpenMP::numberOfThreads)));
+      variableDeclarations->getReference (OpenMP::numberOfThreads));
 
   SgExprStatement * assignmentStatement2 = buildAssignStatement (
-      buildVarRefExp (variableDeclarations->get (OpenMP::sliceEnd)),
-      divideExpression2);
+      variableDeclarations->getReference (OpenMP::sliceEnd), divideExpression2);
 
   loopBody->append_statement (assignmentStatement1);
 
@@ -153,11 +137,8 @@ FortranOpenMPHostSubroutineDirectLoop::createKernelDoLoop ()
 SgBasicBlock *
 FortranOpenMPHostSubroutineDirectLoop::createTransferOpDatStatements ()
 {
-  using SageBuilder::buildBasicBlock;
-  using SageBuilder::buildVarRefExp;
-  using SageBuilder::buildOpaqueVarRefExp;
-  using SageBuilder::buildDotExp;
-  using SageInterface::appendStatement;
+  using namespace SageBuilder;
+  using namespace SageInterface;
 
   Debug::getInstance ()->debugMessage (
       "Creating statements to transfer OP_DAT", Debug::FUNCTION_LEVEL,
@@ -169,12 +150,13 @@ FortranOpenMPHostSubroutineDirectLoop::createTransferOpDatStatements ()
   {
     if (parallelLoop->isDuplicateOpDat (i) == false)
     {
-      SgDotExp * parameterExpression1 = buildDotExp (buildVarRefExp (
-          variableDeclarations->get (OP2::VariableNames::getOpDatName (i))),
-          buildOpaqueVarRefExp (OP2::VariableNames::dataOnHost, block));
+      SgDotExp * parameterExpression1 =
+          buildDotExp (variableDeclarations->getReference (
+              OP2::VariableNames::getOpDatName (i)), buildOpaqueVarRefExp (
+              OP2::VariableNames::dataOnHost, block));
 
-      SgVarRefExp * parameterExpression2 = buildVarRefExp (
-          moduleDeclarations->getGlobalOpDatDeclaration (i));
+      SgVarRefExp * parameterExpression2 =
+          moduleDeclarations->getGlobalOpDatDeclaration (i);
 
       SgStatement
           * callStatement =
@@ -191,30 +173,27 @@ FortranOpenMPHostSubroutineDirectLoop::createTransferOpDatStatements ()
 void
 FortranOpenMPHostSubroutineDirectLoop::initialiseThreadVariablesStatements ()
 {
-  using SageBuilder::buildVarRefExp;
-  using SageBuilder::buildIntVal;
-  using SageBuilder::buildAssignStatement;
-  using SageInterface::appendStatement;
+  using namespace SageBuilder;
+  using namespace SageInterface;
 
   Debug::getInstance ()->debugMessage (
       "Creating statements to initialise thread variables",
       Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
   SgExprStatement * assignmentStatement1 = buildAssignStatement (
-      buildVarRefExp (variableDeclarations->get (OpenMP::threadIndex)),
+      variableDeclarations->getReference (OpenMP::threadIndex),
       buildIntVal (-1));
 
   appendStatement (assignmentStatement1, subroutineScope);
 
-  SgExprStatement * assignmentStatement2 = buildAssignStatement (
-      buildVarRefExp (variableDeclarations->get (OpenMP::sliceStart)),
-      buildIntVal (-1));
+  SgExprStatement * assignmentStatement2 =
+      buildAssignStatement (variableDeclarations->getReference (
+          OpenMP::sliceStart), buildIntVal (-1));
 
   appendStatement (assignmentStatement2, subroutineScope);
 
   SgExprStatement * assignmentStatement3 = buildAssignStatement (
-      buildVarRefExp (variableDeclarations->get (OpenMP::sliceEnd)),
-      buildIntVal (-1));
+      variableDeclarations->getReference (OpenMP::sliceEnd), buildIntVal (-1));
 
   appendStatement (assignmentStatement3, subroutineScope);
 }

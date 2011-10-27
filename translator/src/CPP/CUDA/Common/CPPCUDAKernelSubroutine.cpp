@@ -1,5 +1,6 @@
 #include <CPPCUDAKernelSubroutine.h>
 #include <CPPCUDAUserSubroutine.h>
+#include <CPPCUDAReductionSubroutines.h>
 #include <RoseStatementsAndExpressionsBuilder.h>
 #include <CommonNamespaces.h>
 
@@ -11,18 +12,8 @@ CPPCUDAKernelSubroutine::createInitialiseCUDAStageInVariablesStatements ()
 void
 CPPCUDAKernelSubroutine::createReductionPrologueStatements ()
 {
-  using SageBuilder::buildBasicBlock;
-  using SageBuilder::buildIntVal;
-  using SageBuilder::buildFloatVal;
-  using SageBuilder::buildVarRefExp;
-  using SageBuilder::buildAssignStatement;
-  using SageBuilder::buildForStatement;
-  using SageBuilder::buildExprStatement;
-  using SageBuilder::buildPlusPlusOp;
-  using SageBuilder::buildLessThanOp;
-  using SageBuilder::buildPntrArrRefExp;
-  using SageBuilder::buildAssignOp;
-  using SageInterface::appendStatement;
+  using namespace SageBuilder;
+  using namespace SageInterface;
   using std::string;
 
   Debug::getInstance ()->debugMessage (
@@ -36,10 +27,10 @@ CPPCUDAKernelSubroutine::createReductionPrologueStatements ()
       SgBasicBlock * loopBody = buildBasicBlock ();
 
       SgPntrArrRefExp * arrayExpression = buildPntrArrRefExp (
-          buildVarRefExp (variableDeclarations->get (
-              OP2::VariableNames::getOpDatLocalName (i))),
-          buildVarRefExp (variableDeclarations->get (
-              CommonVariableNames::iterationCounter1)));
+          variableDeclarations->getReference (
+              OP2::VariableNames::getOpDatLocalName (i)),
+          variableDeclarations->getReference (
+              CommonVariableNames::iterationCounter1));
 
       SgExpression * rhsExpression;
 
@@ -59,16 +50,18 @@ CPPCUDAKernelSubroutine::createReductionPrologueStatements ()
 
       appendStatement (assignmentStatement, loopBody);
 
-      SgAssignOp * initializationExpression = buildAssignOp (buildVarRefExp (
-          variableDeclarations->get (CommonVariableNames::iterationCounter1)),
-          buildIntVal (0));
+      SgAssignOp * initializationExpression = buildAssignOp (
+          variableDeclarations->getReference (
+              CommonVariableNames::iterationCounter1), buildIntVal (0));
 
-      SgLessThanOp * upperBoundExpression = buildLessThanOp (buildVarRefExp (
-          variableDeclarations->get (CommonVariableNames::iterationCounter1)),
-          buildIntVal (parallelLoop->getOpDatDimension (i)));
+      SgLessThanOp * upperBoundExpression = buildLessThanOp (
+          variableDeclarations->getReference (
+              CommonVariableNames::iterationCounter1), buildIntVal (
+              parallelLoop->getOpDatDimension (i)));
 
-      SgPlusPlusOp * strideExpression = buildPlusPlusOp (buildVarRefExp (
-          variableDeclarations->get (CommonVariableNames::iterationCounter1)));
+      SgPlusPlusOp * strideExpression = buildPlusPlusOp (
+          variableDeclarations->getReference (
+              CommonVariableNames::iterationCounter1));
 
       SgForStatement * forStatement = buildForStatement (buildExprStatement (
           initializationExpression), buildExprStatement (upperBoundExpression),
@@ -82,23 +75,13 @@ CPPCUDAKernelSubroutine::createReductionPrologueStatements ()
 void
 CPPCUDAKernelSubroutine::createReductionEpilogueStatements ()
 {
+  using namespace SageBuilder;
+  using namespace SageInterface;
+  using std::string;
+
   Debug::getInstance ()->debugMessage (
       "Creating reduction epilogue statements", Debug::FUNCTION_LEVEL,
       __FILE__, __LINE__);
-
-  using SageBuilder::buildBasicBlock;
-  using SageBuilder::buildIntVal;
-  using SageBuilder::buildFloatVal;
-  using SageBuilder::buildVarRefExp;
-  using SageBuilder::buildAssignStatement;
-  using SageBuilder::buildForStatement;
-  using SageBuilder::buildExprStatement;
-  using SageBuilder::buildPlusPlusOp;
-  using SageBuilder::buildLessThanOp;
-  using SageBuilder::buildPntrArrRefExp;
-  using SageBuilder::buildAssignOp;
-  using SageInterface::appendStatement;
-  using std::string;
 
   Debug::getInstance ()->debugMessage (
       "Creating reduction prologue statements", Debug::FUNCTION_LEVEL,
@@ -111,26 +94,28 @@ CPPCUDAKernelSubroutine::createReductionEpilogueStatements ()
       SgBasicBlock * loopBody = buildBasicBlock ();
 
       SgPntrArrRefExp * arrayExpression = buildPntrArrRefExp (
-          buildVarRefExp (variableDeclarations->get (
-              OP2::VariableNames::getOpDatLocalName (i))),
-          buildVarRefExp (variableDeclarations->get (
-              CommonVariableNames::iterationCounter1)));
+          variableDeclarations->getReference (
+              OP2::VariableNames::getOpDatLocalName (i)),
+          variableDeclarations->getReference (
+              CommonVariableNames::iterationCounter1));
 
       SgExprStatement * assignmentStatement = buildAssignStatement (
           arrayExpression, buildIntVal (1));
 
       appendStatement (assignmentStatement, loopBody);
 
-      SgAssignOp * initializationExpression = buildAssignOp (buildVarRefExp (
-          variableDeclarations->get (CommonVariableNames::iterationCounter1)),
-          buildIntVal (0));
+      SgAssignOp * initializationExpression = buildAssignOp (
+          variableDeclarations->getReference (
+              CommonVariableNames::iterationCounter1), buildIntVal (0));
 
-      SgLessThanOp * upperBoundExpression = buildLessThanOp (buildVarRefExp (
-          variableDeclarations->get (CommonVariableNames::iterationCounter1)),
-          buildIntVal (parallelLoop->getOpDatDimension (i)));
+      SgLessThanOp * upperBoundExpression = buildLessThanOp (
+          variableDeclarations->getReference (
+              CommonVariableNames::iterationCounter1), buildIntVal (
+              parallelLoop->getOpDatDimension (i)));
 
-      SgPlusPlusOp * strideExpression = buildPlusPlusOp (buildVarRefExp (
-          variableDeclarations->get (CommonVariableNames::iterationCounter1)));
+      SgPlusPlusOp * strideExpression = buildPlusPlusOp (
+          variableDeclarations->getReference (
+              CommonVariableNames::iterationCounter1));
 
       SgForStatement * forStatement = buildForStatement (buildExprStatement (
           initializationExpression), buildExprStatement (upperBoundExpression),
@@ -144,8 +129,7 @@ CPPCUDAKernelSubroutine::createReductionEpilogueStatements ()
 void
 CPPCUDAKernelSubroutine::createCUDAStageInVariablesVariableDeclarations ()
 {
-  using SageBuilder::buildIntVal;
-  using SageBuilder::buildArrayType;
+  using namespace SageBuilder;
   using std::string;
 
   Debug::getInstance ()->debugMessage ("Creating local thread variables",
@@ -190,8 +174,7 @@ CPPCUDAKernelSubroutine::createCUDAStageInVariablesVariableDeclarations ()
 void
 CPPCUDAKernelSubroutine::createCUDASharedVariableDeclarations ()
 {
-  using SageBuilder::buildIntType;
-  using SageBuilder::buildArrayType;
+  using namespace SageBuilder;
   using std::find;
   using std::vector;
   using std::string;
@@ -256,8 +239,11 @@ CPPCUDAKernelSubroutine::createCUDASharedVariableDeclarations ()
 
 CPPCUDAKernelSubroutine::CPPCUDAKernelSubroutine (
     SgScopeStatement * moduleScope, CPPCUDAUserSubroutine * userSubroutine,
-    CPPParallelLoop * parallelLoop) :
+    CPPParallelLoop * parallelLoop,
+    CPPCUDAReductionSubroutines * reductionSubroutines) :
   CPPKernelSubroutine (moduleScope, userSubroutine, parallelLoop)
 {
+  this->reductionSubroutines = reductionSubroutines;
+
   subroutineHeaderStatement->get_functionModifier ().setCudaKernel ();
 }

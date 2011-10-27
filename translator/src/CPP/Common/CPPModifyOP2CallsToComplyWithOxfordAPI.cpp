@@ -9,8 +9,7 @@ void
 CPPModifyOP2CallsToComplyWithOxfordAPI::patchOpArgGblCall (
     SgExpressionPtrList & actualArguments)
 {
-  using SageBuilder::buildStringVal;
-  using SageBuilder::buildIntVal;
+  using namespace SageBuilder;
   using std::string;
   using std::vector;
 
@@ -179,9 +178,8 @@ void
 CPPModifyOP2CallsToComplyWithOxfordAPI::patchOpArgDatCall (
     SgExpressionPtrList & actualArguments)
 {
+  using namespace SageBuilder;
   using boost::iequals;
-  using SageBuilder::buildStringVal;
-  using SageBuilder::buildIntVal;
   using std::string;
   using std::vector;
 
@@ -261,8 +259,8 @@ void
 CPPModifyOP2CallsToComplyWithOxfordAPI::patchOpParLoopCall (
     SgExpressionPtrList & actualArguments)
 {
+  using namespace SageBuilder;
   using boost::iequals;
-  using SageBuilder::buildStringVal;
   using std::string;
   using std::vector;
 
@@ -329,7 +327,7 @@ void
 CPPModifyOP2CallsToComplyWithOxfordAPI::patchOpDeclareConstCall (
     SgExpressionPtrList & actualArguments)
 {
-  using SageBuilder::buildStringVal;
+  using namespace SageBuilder;
   using std::string;
   using std::vector;
 
@@ -396,7 +394,7 @@ void
 CPPModifyOP2CallsToComplyWithOxfordAPI::patchOpDeclareDatCall (
     SgVariableDeclaration * variableDeclaration, std::string const variableName)
 {
-  using SageBuilder::buildStringVal;
+  using namespace SageBuilder;
   using std::vector;
   using std::string;
 
@@ -474,7 +472,7 @@ void
 CPPModifyOP2CallsToComplyWithOxfordAPI::patchOpDeclareMapCall (
     SgVariableDeclaration * variableDeclaration, std::string const variableName)
 {
-  using SageBuilder::buildStringVal;
+  using namespace SageBuilder;
   using std::vector;
 
   Debug::getInstance ()->debugMessage ("Patching call to OP_DECL_MAP",
@@ -509,7 +507,7 @@ void
 CPPModifyOP2CallsToComplyWithOxfordAPI::patchOpDeclareSetCall (
     SgVariableDeclaration * variableDeclaration, std::string const variableName)
 {
-  using SageBuilder::buildStringVal;
+  using namespace SageBuilder;
   using std::vector;
 
   Debug::getInstance ()->debugMessage ("Patching call to OP_DECL_SET",

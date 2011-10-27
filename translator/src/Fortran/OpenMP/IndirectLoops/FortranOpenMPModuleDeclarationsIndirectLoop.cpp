@@ -10,9 +10,8 @@
 void
 FortranOpenMPModuleDeclarationsIndirectLoop::createOpDatSizeDeclarations ()
 {
-  using SageBuilder::buildVariableDeclaration;
-  using SageBuilder::buildPointerType;
-  using SageInterface::appendStatement;
+  using namespace SageBuilder;
+  using namespace SageInterface;
   using std::string;
 
   Debug::getInstance ()->debugMessage (
@@ -37,9 +36,8 @@ FortranOpenMPModuleDeclarationsIndirectLoop::createOpDatSizeDeclarations ()
 void
 FortranOpenMPModuleDeclarationsIndirectLoop::createExecutionPlanDeclarations ()
 {
-  using SageBuilder::buildPointerType;
-  using SageBuilder::buildVariableDeclaration;
-  using SageInterface::appendStatement;
+  using namespace SageBuilder;
+  using namespace SageInterface;
   using std::map;
   using std::string;
   using std::vector;
@@ -69,12 +67,6 @@ FortranOpenMPModuleDeclarationsIndirectLoop::createExecutionPlanDeclarations ()
       FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
           OP2::VariableNames::PlanFunction::actualPlan, buildPointerType (
               op_planType), moduleScope));
-
-  /*
-   * ======================================================
-   * Create pointer to the
-   * ======================================================
-   */
 
   variableDeclarations->add (OP2::VariableNames::PlanFunction::pindMaps,
       FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
@@ -241,57 +233,51 @@ FortranOpenMPModuleDeclarationsIndirectLoop::createExecutionPlanDeclarations ()
   }
 }
 
-/*
- * ======================================================
- * Public functions
- * ======================================================
- */
-
-SgVariableDeclaration *
+SgVarRefExp *
 FortranOpenMPModuleDeclarationsIndirectLoop::getGlobalOpDatSizeDeclaration (
     unsigned int OP_DAT_ArgumentGroup)
 {
-  return variableDeclarations->get (
+  return variableDeclarations->getReference (
       OP2::VariableNames::getOpDatCardinalityName (OP_DAT_ArgumentGroup));
 }
 
-SgVariableDeclaration *
+SgVarRefExp *
 FortranOpenMPModuleDeclarationsIndirectLoop::getGlobalToLocalMappingDeclaration (
     unsigned int OP_DAT_ArgumentGroup)
 {
-  return variableDeclarations->get (
+  return variableDeclarations->getReference (
       OP2::VariableNames::getGlobalToLocalMappingName (OP_DAT_ArgumentGroup));
 }
 
-SgVariableDeclaration *
+SgVarRefExp *
 FortranOpenMPModuleDeclarationsIndirectLoop::getGlobalToLocalMappingSizeDeclaration (
     unsigned int OP_DAT_ArgumentGroup)
 {
-  return variableDeclarations->get (
+  return variableDeclarations->getReference (
       OP2::VariableNames::getGlobalToLocalMappingSizeName (OP_DAT_ArgumentGroup));
 }
 
-SgVariableDeclaration *
+SgVarRefExp *
 FortranOpenMPModuleDeclarationsIndirectLoop::getLocalToGlobalMappingDeclaration (
     unsigned int OP_DAT_ArgumentGroup)
 {
-  return variableDeclarations->get (
+  return variableDeclarations->getReference (
       OP2::VariableNames::getLocalToGlobalMappingName (OP_DAT_ArgumentGroup));
 }
 
-SgVariableDeclaration *
+SgVarRefExp *
 FortranOpenMPModuleDeclarationsIndirectLoop::getLocalToGlobalMappingSizeDeclaration (
     unsigned int OP_DAT_ArgumentGroup)
 {
-  return variableDeclarations->get (
+  return variableDeclarations->getReference (
       OP2::VariableNames::getLocalToGlobalMappingSizeName (OP_DAT_ArgumentGroup));
 }
 
-SgVariableDeclaration *
+SgVarRefExp *
 FortranOpenMPModuleDeclarationsIndirectLoop::getPlanFunctionDeclaration (
     std::string const & variableName)
 {
-  return variableDeclarations->get (variableName);
+  return variableDeclarations->getReference (variableName);
 }
 
 FortranOpenMPModuleDeclarationsIndirectLoop::FortranOpenMPModuleDeclarationsIndirectLoop (

@@ -10,10 +10,9 @@
 void
 FortranHostSubroutine::createFormalParameterDeclarations ()
 {
+  using namespace SageBuilder;
+  using namespace SageInterface;
   using boost::iequals;
-  using SageBuilder::buildVariableDeclaration;
-  using SageBuilder::buildIntType;
-  using SageInterface::appendStatement;
   using std::vector;
   using std::string;
   using std::map;
@@ -105,9 +104,8 @@ FortranHostSubroutine::FortranHostSubroutine (SgScopeStatement * moduleScope,
     FortranParallelLoop * parallelLoop) :
   HostSubroutine <SgProcedureHeaderStatement> (calleeSubroutine, parallelLoop)
 {
-  using SageBuilder::buildVoidType;
-  using SageBuilder::buildProcedureHeaderStatement;
-  using SageInterface::appendStatement;
+  using namespace SageBuilder;
+  using namespace SageInterface;
 
   subroutineHeaderStatement = buildProcedureHeaderStatement (
       this->subroutineName.c_str (), buildVoidType (), formalParameters,

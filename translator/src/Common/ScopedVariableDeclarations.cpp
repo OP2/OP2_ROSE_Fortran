@@ -2,22 +2,18 @@
 #include <Exceptions.h>
 #include <rose.h>
 
-bool
-ScopedVariableDeclarations::exists (std::string const & variableName)
+SgVarRefExp *
+ScopedVariableDeclarations::getReference (std::string const & variableName)
 {
-  return theDeclarations.find (variableName) != theDeclarations.end ();
-}
+  using namespace SageBuilder;
 
-SgVariableDeclaration *
-ScopedVariableDeclarations::get (std::string const & variableName)
-{
   if (theDeclarations.count (variableName) == 0)
   {
     throw Exceptions::CodeGeneration::UnknownVariableException (
         "Unable to find '" + variableName + "' in variable declarations");
   }
 
-  return theDeclarations[variableName];
+  return buildVarRefExp (theDeclarations[variableName]);
 }
 
 void

@@ -20,13 +20,11 @@ class FortranCUDAReductionSubroutine: public Subroutine <
 
     /*
      * ======================================================
-     * There is one autoshared variable per reduction
-     * subroutine. This stores the name of that variable.
-     * The name is constructed from the base type of the OP_DAT
-     * variable and the size of the OP_DAT base type
+     * There is one shared memory variable per reduction
+     * subroutine. This stores the name of that variable
      * ======================================================
      */
-    std::string autosharedVariableName;
+    std::string sharedVariableName;
 
   private:
 

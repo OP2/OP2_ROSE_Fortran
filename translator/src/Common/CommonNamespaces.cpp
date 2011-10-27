@@ -181,7 +181,7 @@ OP2::VariableNames::getNumberOfBytesVariableName (
   using boost::lexical_cast;
   using std::string;
 
-  return "nBytes" + lexical_cast <string> (OP_DAT_ArgumentGroup);
+  return OpDatPrefix + lexical_cast <string> (OP_DAT_ArgumentGroup) + "nBytes";
 }
 
 std::string const
@@ -190,7 +190,7 @@ OP2::VariableNames::getRoundUpVariableName (unsigned int OP_DAT_ArgumentGroup)
   using boost::lexical_cast;
   using std::string;
 
-  return "roundUp" + lexical_cast <string> (OP_DAT_ArgumentGroup);
+  return OpDatPrefix + lexical_cast <string> (OP_DAT_ArgumentGroup) + "RoundUp";
 }
 
 std::string const
@@ -200,7 +200,7 @@ OP2::VariableNames::getIncrementAccessMapName (
   using boost::lexical_cast;
   using std::string;
 
-  return OpDatPrefix + lexical_cast <string> (OP_DAT_ArgumentGroup);
+  return OpDatPrefix + lexical_cast <string> (OP_DAT_ArgumentGroup) + "Map";
 }
 
 std::string const
@@ -210,8 +210,8 @@ OP2::VariableNames::getOpIndirectionSharedName (
   using boost::lexical_cast;
   using std::string;
 
-  return "ind" + OpDatPrefix + lexical_cast <string> (OP_DAT_ArgumentGroup)
-      + "_s";
+  return OpDatPrefix + lexical_cast <string> (OP_DAT_ArgumentGroup)
+      + "SharedIndirection";
 }
 
 std::string const
@@ -221,7 +221,8 @@ OP2::VariableNames::getIndirectionArgumentSizeName (
   using boost::lexical_cast;
   using std::string;
 
-  return "ind" + OpDatPrefix + lexical_cast <string> (OP_DAT_ArgumentGroup);
+  return OpDatPrefix + lexical_cast <string> (OP_DAT_ArgumentGroup)
+      + "SharedIndirectionSize";
 }
 
 std::string const
@@ -238,22 +239,51 @@ OP2::VariableNames::getCUDASharedMemoryDeclarationName (SgType * type,
   using boost::lexical_cast;
   using std::string;
 
-  std::string const autoshared = "shared";
+  std::string const prefix = "shared";
 
   switch (type->variantT ())
   {
     case V_SgTypeInt:
     {
-      return autoshared + "Integer" + lexical_cast <string> (size);
+      return prefix + "Integer" + lexical_cast <string> (size);
     }
     case V_SgTypeFloat:
     {
-      return autoshared + "Float" + lexical_cast <string> (size);
+      return prefix + "Float" + lexical_cast <string> (size);
     }
     default:
     {
       throw Exceptions::CUDA::SharedVariableTypeException (
-          "Unsupported type for autoshared variable: '" + type->class_name ());
+          "Unsupported type for shared memory variable: '"
+              + type->class_name ());
+    }
+  }
+}
+
+std::string const
+OP2::VariableNames::getCUDAVolatileSharedMemoryDeclarationName (SgType * type,
+    unsigned int size)
+{
+  using boost::lexical_cast;
+  using std::string;
+
+  std::string const prefix = "volatileShared";
+
+  switch (type->variantT ())
+  {
+    case V_SgTypeInt:
+    {
+      return prefix + "Integer" + lexical_cast <string> (size);
+    }
+    case V_SgTypeFloat:
+    {
+      return prefix + "Float" + lexical_cast <string> (size);
+    }
+    default:
+    {
+      throw Exceptions::CUDA::SharedVariableTypeException (
+          "Unsupported type for shared memory variable: '"
+              + type->class_name ());
     }
   }
 }
@@ -265,24 +295,25 @@ OP2::VariableNames::getCUDASharedMemoryOffsetDeclarationName (SgType * type,
   using boost::lexical_cast;
   using std::string;
 
-  std::string const autosharedOffset = "sharedOffset";
+  std::string const prefix = "sharedOffset";
 
   switch (type->variantT ())
   {
     case V_SgTypeInt:
     {
-      return autosharedOffset + "Integer" + lexical_cast <string> (size);
+      return prefix + "Integer" + lexical_cast <string> (size);
     }
 
     case V_SgTypeFloat:
     {
-      return autosharedOffset + "Float" + lexical_cast <string> (size);
+      return prefix + "Float" + lexical_cast <string> (size);
     }
 
     default:
     {
       throw Exceptions::CUDA::SharedVariableTypeException (
-          "Unsupported type for autoshared variable: '" + type->class_name ());
+          "Unsupported type for shared memory variable: '"
+              + type->class_name ());
     }
   }
 }

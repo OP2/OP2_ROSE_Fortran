@@ -9,7 +9,7 @@
 void
 FortranCUDAOpDatCardinalitiesDeclarationIndirectLoop::addIndirectLoopFields ()
 {
-  using SageBuilder::buildVariableDeclaration;
+  using namespace SageBuilder;
   using std::string;
   using std::vector;
 

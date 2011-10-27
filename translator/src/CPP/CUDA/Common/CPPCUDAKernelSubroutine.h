@@ -5,7 +5,7 @@
 #include <CPPKernelSubroutine.h>
 
 class CPPCUDAUserSubroutine;
-class CPPReductionSubroutines;
+class CPPCUDAReductionSubroutines;
 
 class CPPCUDAKernelSubroutine: public CPPKernelSubroutine
 {
@@ -58,7 +58,8 @@ class CPPCUDAKernelSubroutine: public CPPKernelSubroutine
     createCUDASharedVariableDeclarations ();
 
     CPPCUDAKernelSubroutine (SgScopeStatement * moduleScope,
-        CPPCUDAUserSubroutine * userSubroutine, CPPParallelLoop * parallelLoop);
+        CPPCUDAUserSubroutine * userSubroutine, CPPParallelLoop * parallelLoop,
+        CPPCUDAReductionSubroutines * reductionSubroutines);
 
 };
 

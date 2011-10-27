@@ -22,9 +22,9 @@
 void
 FortranCUDASubroutinesGeneration::createConstantDeclarations ()
 {
+  using namespace SageInterface;
   using boost::lexical_cast;
   using boost::iequals;
-  using SageInterface::removeStatement;
   using std::map;
   using std::string;
   using std::vector;
@@ -243,9 +243,9 @@ FortranCUDASubroutinesGeneration::createModuleDeclarations ()
 void
 FortranCUDASubroutinesGeneration::addLibraries ()
 {
+  using namespace SageInterface;
   using std::string;
   using std::vector;
-  using SageInterface::appendStatement;
 
   Debug::getInstance ()->debugMessage (
       "Adding 'use' statements to CUDA module", Debug::FUNCTION_LEVEL,

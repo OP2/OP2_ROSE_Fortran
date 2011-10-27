@@ -6,9 +6,8 @@ CPPKernelSubroutine::CPPKernelSubroutine (SgScopeStatement * moduleScope,
     CPPParallelLoop * parallelLoop) :
   KernelSubroutine <SgFunctionDeclaration> (calleeSubroutine, parallelLoop)
 {
-  using SageBuilder::buildVoidType;
-  using SageBuilder::buildDefiningFunctionDeclaration;
-  using SageInterface::appendStatement;
+  using namespace SageBuilder;
+  using namespace SageInterface;
 
   subroutineHeaderStatement = buildDefiningFunctionDeclaration (
       this->subroutineName.c_str (), buildVoidType (), formalParameters,

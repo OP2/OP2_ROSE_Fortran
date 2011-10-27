@@ -12,9 +12,9 @@
 void
 FortranOpDatDimensionsDeclaration::addFields ()
 {
+  using namespace SageBuilder;
+  using namespace SageInterface;
   using boost::lexical_cast;
-  using SageInterface::appendStatement;
-  using SageBuilder::buildVariableDeclaration;
   using std::string;
 
   fieldDeclarations = new ScopedVariableDeclarations ();
@@ -46,7 +46,7 @@ FortranOpDatDimensionsDeclaration::addFields ()
 void
 FortranOpDatDimensionsDeclaration::addTypeDeclaration ()
 {
-  using SageInterface::appendStatement;
+  using namespace SageInterface;
 
   typeStatement = RoseStatementsAndExpressionsBuilder::buildTypeDeclaration (
       parallelLoop->getUserSubroutineName () + "_opDatDimensions", moduleScope);
@@ -62,12 +62,12 @@ FortranOpDatDimensionsDeclaration::getType ()
   return typeStatement->get_type ();
 }
 
-SgVariableDeclaration *
+SgVarRefExp *
 FortranOpDatDimensionsDeclaration::getOpDatDimensionField (
     unsigned int OP_DAT_ArgumentGroup)
 {
-  return fieldDeclarations->get (OP2::VariableNames::getOpDatDimensionName (
-      OP_DAT_ArgumentGroup));
+  return fieldDeclarations->getReference (
+      OP2::VariableNames::getOpDatDimensionName (OP_DAT_ArgumentGroup));
 }
 
 FortranOpDatDimensionsDeclaration::FortranOpDatDimensionsDeclaration (

@@ -14,6 +14,7 @@
 class SgScopeStatement;
 class SgDotExp;
 class SgFunctionCallExp;
+class SgVarRefExp;
 
 enum GRID_DIMENSION
 {
@@ -71,12 +72,12 @@ namespace CUDA
 
   /*
    * ======================================================
-   * Returns a function call expression for thread
-   * synchronisation to be called from a device subroutine
+   * Returns an opaque variable reference to the warp size
+   * variable
    * ======================================================
    */
-  SgFunctionCallExp *
-  createDeviceThreadSynchronisationCallStatement (SgScopeStatement * scope);
+  SgVarRefExp *
+  getWarpSizeReference (SgScopeStatement * scope);
 
   /*
    * ======================================================
@@ -85,7 +86,18 @@ namespace CUDA
    * ======================================================
    */
   SgFunctionCallExp *
-  createHostThreadSynchronisationCallStatement (SgScopeStatement * scope);
+  createDeviceThreadSynchronisationCallStatement (SgScopeStatement * scope,
+      bool Fortran = true);
+
+  /*
+   * ======================================================
+   * Returns a function call expression for thread
+   * synchronisation to be called from a device subroutine
+   * ======================================================
+   */
+  SgFunctionCallExp *
+  createHostThreadSynchronisationCallStatement (SgScopeStatement * scope,
+      bool Fortran = true);
 }
 
 #endif

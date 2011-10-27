@@ -1,4 +1,3 @@
-
 #pragma once
 #ifndef FORTRAN_CUDA_OPENMP_MODULE_DECLARATIONS_INDIRECT_LOOP_H
 #define FORTRAN_CUDA_OPENMP_MODULE_DECLARATIONS_INDIRECT_LOOP_H
@@ -17,22 +16,22 @@ class FortranOpenMPModuleDeclarationsIndirectLoop: public FortranOpenMPModuleDec
 
   public:
 
-    SgVariableDeclaration *
+    SgVarRefExp *
     getGlobalOpDatSizeDeclaration (unsigned int OP_DAT_ArgumentGroup);
 
-    SgVariableDeclaration *
+    SgVarRefExp *
     getGlobalToLocalMappingDeclaration (unsigned int OP_DAT_ArgumentGroup);
 
-    SgVariableDeclaration *
+    SgVarRefExp *
     getGlobalToLocalMappingSizeDeclaration (unsigned int OP_DAT_ArgumentGroup);
 
-    SgVariableDeclaration *
+    SgVarRefExp *
     getLocalToGlobalMappingDeclaration (unsigned int OP_DAT_ArgumentGroup);
 
-    SgVariableDeclaration *
+    SgVarRefExp *
     getLocalToGlobalMappingSizeDeclaration (unsigned int OP_DAT_ArgumentGroup);
 
-    SgVariableDeclaration *
+    SgVarRefExp *
     getPlanFunctionDeclaration (std::string const & variableName);
 
     FortranOpenMPModuleDeclarationsIndirectLoop (

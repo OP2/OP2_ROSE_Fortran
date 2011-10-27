@@ -19,9 +19,7 @@ SgFunctionSymbol *
 FortranTypesBuilder::buildFunctionDeclaration (
     std::string const & functionName, SgScopeStatement * scope)
 {
-  using SageBuilder::buildFunctionType;
-  using SageBuilder::buildFunctionRefExp;
-  using SageBuilder::buildVoidType;
+  using namespace SageBuilder;
 
   SgFunctionType * functionType = buildFunctionType (buildVoidType (),
       new SgFunctionParameterTypeList ());
@@ -141,7 +139,7 @@ SgArrayType *
 FortranTypesBuilder::getArray_RankOne (SgType * baseType, int lowerBound,
     int upperBound)
 {
-  using SageBuilder::buildExprListExp;
+  using namespace SageBuilder;
 
   SgExpression * lowerBoundExpression;
   SgExpression * upperBoundExpression;
@@ -189,9 +187,7 @@ SgArrayType *
 FortranTypesBuilder::getArrayTypePlainDimension (SgType * baseType,
     int dimension)
 {
-  using SageBuilder::buildArrayType;
-  using SageBuilder::buildIntVal;
-  using SageBuilder::buildExprListExp;
+  using namespace SageBuilder;
 
   SgArrayType * returnedType = buildArrayType (baseType);
   SgExpression * dimensionExpression = buildIntVal (dimension);
@@ -205,7 +201,7 @@ SgArrayType *
 FortranTypesBuilder::getArray_RankOne (SgType * baseType, int lowerBound,
     SgExpression * upperBoundExpression)
 {
-  using SageBuilder::buildExprListExp;
+  using namespace SageBuilder;
 
   SgExpression * lowerBoundExpression;
 
@@ -248,7 +244,7 @@ SgArrayType *
 FortranTypesBuilder::getArray_RankOne_WithLowerBound (SgType * baseType,
     SgExpression * lowerBoundExpression)
 {
-  using SageBuilder::buildExprListExp;
+  using namespace SageBuilder;
 
   lowerBoundExpression->set_endOfConstruct (RoseHelper::getFileInfo ());
 
@@ -276,7 +272,7 @@ SgArrayType *
 FortranTypesBuilder::getArray_RankOne_WithUpperBound (SgType * baseType,
     SgExpression * upperBoundExpression)
 {
-  using SageBuilder::buildExprListExp;
+  using namespace SageBuilder;
 
   upperBoundExpression->set_endOfConstruct (RoseHelper::getFileInfo ());
 
@@ -305,7 +301,7 @@ FortranTypesBuilder::getArray_RankOne_WithLowerAndUpperBounds (
     SgType * baseType, SgExpression * lowerBoundExpression,
     SgExpression * upperBoundExpression)
 {
-  using SageBuilder::buildExprListExp;
+  using namespace SageBuilder;
 
   lowerBoundExpression->set_endOfConstruct (RoseHelper::getFileInfo ());
 
@@ -356,8 +352,8 @@ FortranTypesBuilder::buildModuleDeclaration (std::string const & moduleName,
   completeNewDeclaration (classDefinition, classDeclaration,
       nonDefiningClassDeclaration, scope);
 
-  nonDefiningClassDeclaration->get_declarationModifier().get_accessModifier().setUndefined();
-  classDeclaration->get_declarationModifier().get_accessModifier().setUndefined();
+  nonDefiningClassDeclaration->get_declarationModifier ().get_accessModifier ().setUndefined ();
+  classDeclaration->get_declarationModifier ().get_accessModifier ().setUndefined ();
   classDefinition->get_declaration ()->get_declarationModifier ().get_accessModifier ().setUndefined ();
 
   return classDeclaration;

@@ -87,7 +87,7 @@ subroutine adt_calc ( x1, x2, x3, x4, q, adt ) BIND(C)
 	real(8), dimension(*) :: x3
 	real(8), dimension(*) :: x4
 	real(8), dimension(*) :: q
-	real(8), dimension(*) :: adt
+	real(8) :: adt
 
 	! local variables
 	real(8) :: dx, dy, ri, u, v, c
@@ -113,9 +113,9 @@ subroutine adt_calc ( x1, x2, x3, x4, q, adt ) BIND(C)
 
 	dx = x1(1) - x4(1)
 	dy = x1(2) - x4(2)
-	adt(1) = adt(1) + abs ( u * dy - v * dx ) + c * sqrt ( dx*dx + dy*dy )
+	adt = adt + abs ( u * dy - v * dx ) + c * sqrt ( dx*dx + dy*dy )
 
-	adt(1) = adt(1) / cfl
+	adt = adt / cfl
 
 end subroutine adt_calc
 
@@ -237,7 +237,7 @@ subroutine update ( qold, q, res, adt, rms ) BIND(C)
 	real(8), dimension(*) :: q
 	real(8), dimension(*) :: res
 	real(8), dimension(*) :: adt
-	real(8), dimension(*) :: rms
+	real(8)  :: rms
 	
   real(8) :: del, adti
 
@@ -249,7 +249,7 @@ subroutine update ( qold, q, res, adt, rms ) BIND(C)
 		del = adti * res(i)
 		q(i) = qold(i) - del
 		res(i) = 0.0
-		rms(1) = rms(1) + del * del
+		rms = rms + del * del
 	end do
 
 end subroutine update

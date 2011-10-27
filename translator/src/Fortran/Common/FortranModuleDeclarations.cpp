@@ -36,18 +36,18 @@ FortranModuleDeclarations::FortranModuleDeclarations (
   }
 }
 
-SgVariableDeclaration *
+SgVarRefExp *
 FortranModuleDeclarations::getCPlanReturnDeclaration ()
 {
-  return variableDeclarations->get (
+  return variableDeclarations->getReference (
       OP2::VariableNames::getPlanReturnVariableDeclarationName (
           parallelLoop->getUserSubroutineName ()));
 }
 
-SgVariableDeclaration *
+SgVarRefExp *
 FortranModuleDeclarations::getGlobalOpDatDeclaration (
     unsigned int OP_DAT_ArgumentGroup)
 {
-  return variableDeclarations->get (OP2::VariableNames::getOpDatGlobalName (
-      OP_DAT_ArgumentGroup));
+  return variableDeclarations->getReference (
+      OP2::VariableNames::getOpDatGlobalName (OP_DAT_ArgumentGroup));
 }

@@ -69,7 +69,9 @@ namespace OP2
     std::string const nelems2 = "nelems2";
     std::string const opDatCardinalities = "opDatCardinalities";
     std::string const opDatDimensions = "opDatDimensions";
+    std::string const reductionInput = "inputValue";
     std::string const reductionResult = "reductionResult";
+    std::string const reductionOperation = "reductionOperation";
     std::string const reductionSharedMemorySize = "reductionSharedMemorySize";
     std::string const set = "set";
     std::string const size = "size";
@@ -324,6 +326,10 @@ namespace OP2
 
     std::string const
     getCUDASharedMemoryDeclarationName (SgType * type, unsigned int size);
+
+    std::string const
+    getCUDAVolatileSharedMemoryDeclarationName (SgType * type,
+        unsigned int size);
 
     std::string const
     getCUDASharedMemoryOffsetDeclarationName (SgType * type, unsigned int size);

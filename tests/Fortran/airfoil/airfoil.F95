@@ -134,6 +134,7 @@ use, intrinsic :: ISO_C_BINDING
 
     ! save old flow solution
 
+    print *, "save_soln"
     call op_par_loop_2 ( save_soln, cells, &
                        & p_q,    -1, OP_ID, OP_READ, &
                        & p_qold, -1, OP_ID, OP_WRITE &
@@ -144,7 +145,7 @@ use, intrinsic :: ISO_C_BINDING
     do k = 1, 2
 
       ! calculate area/timstep
-
+      print *, "adt_calc"
       call op_par_loop_6 ( adt_calc, cells, &
                          & p_x,   1, pcell, OP_READ, &
                          & p_x,   2, pcell, OP_READ, &
@@ -158,6 +159,7 @@ use, intrinsic :: ISO_C_BINDING
 
       ! calculate flux residual
 
+      print *, "res_calc"
       call op_par_loop_8 ( res_calc, edges, &
                          & p_x,    1, pedge,  OP_READ, &
                          & p_x,    2, pedge,  OP_READ, &
@@ -170,6 +172,7 @@ use, intrinsic :: ISO_C_BINDING
                          &)
 
 
+      print *, "bres_calc"
       call op_par_loop_6 ( bres_calc, bedges, &
                           & p_x,      1, pbedge,  OP_READ, &
                           & p_x,      2, pbedge,  OP_READ, &
@@ -183,6 +186,7 @@ use, intrinsic :: ISO_C_BINDING
       
       rms = 0.0
 
+      print *, "update"
       call op_par_loop_5 ( update, cells, &
                          & p_qold, -1, OP_ID,  OP_READ,  &
                          & p_q,    -1, OP_ID,  OP_WRITE, &

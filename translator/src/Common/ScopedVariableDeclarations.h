@@ -12,6 +12,7 @@
 #include <string>
 
 class SgVariableDeclaration;
+class SgVarRefExp;
 
 class ScopedVariableDeclarations
 {
@@ -21,11 +22,8 @@ class ScopedVariableDeclarations
 
   public:
 
-    bool
-    exists (std::string const & variableName);
-
-    SgVariableDeclaration *
-    get (std::string const & variableName);
+    SgVarRefExp *
+    getReference (std::string const & variableName);
 
     void
     add (std::string const & variableName, SgVariableDeclaration * declaration);

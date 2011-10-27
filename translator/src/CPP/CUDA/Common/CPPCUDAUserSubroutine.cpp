@@ -46,8 +46,8 @@ CPPCUDAUserSubroutine::forceOutputOfCodeToFile ()
 void
 CPPCUDAUserSubroutine::createStatements ()
 {
+  using namespace SageInterface;
   using boost::iequals;
-  using SageInterface::appendStatement;
   using std::string;
   using std::vector;
 
@@ -97,9 +97,8 @@ CPPCUDAUserSubroutine::CPPCUDAUserSubroutine (SgScopeStatement * moduleScope,
       UserSubroutine <SgFunctionDeclaration,
           CPPProgramDeclarationsAndDefinitions> (parallelLoop, declarations)
 {
-  using SageBuilder::buildDefiningFunctionDeclaration;
-  using SageBuilder::buildVoidType;
-  using SageInterface::appendStatement;
+  using namespace SageBuilder;
+  using namespace SageInterface;
 
   subroutineHeaderStatement = buildDefiningFunctionDeclaration (
       this->subroutineName.c_str (), buildVoidType (), formalParameters,

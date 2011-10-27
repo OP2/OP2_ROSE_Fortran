@@ -7,7 +7,7 @@
 class ScopedVariableDeclarations;
 class FortranParallelLoop;
 class SgScopeStatement;
-class SgVariableDeclaration;
+class SgVarRefExp;
 
 class FortranModuleDeclarations
 {
@@ -46,10 +46,10 @@ class FortranModuleDeclarations
 
   public:
 
-    SgVariableDeclaration *
+    SgVarRefExp *
     getCPlanReturnDeclaration ();
 
-    SgVariableDeclaration *
+    SgVarRefExp *
     getGlobalOpDatDeclaration (unsigned int OP_DAT_ArgumentGroup);
 };
 

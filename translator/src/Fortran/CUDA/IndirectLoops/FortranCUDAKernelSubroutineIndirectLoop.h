@@ -5,12 +5,13 @@
 #include <FortranCUDAKernelSubroutine.h>
 
 class FortranCUDAOpDatCardinalitiesDeclarationIndirectLoop;
+class SgVariableDeclaration;
 
 class FortranCUDAKernelSubroutineIndirectLoop: public FortranCUDAKernelSubroutine
 {
   private:
 
-    std::map <std::string, unsigned int> positionOfNbytes;
+    std::map <std::string, SgVariableDeclaration *> numberOfBytesDeclarations;
 
   private:
 

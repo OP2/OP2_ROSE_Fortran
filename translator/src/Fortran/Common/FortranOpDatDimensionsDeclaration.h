@@ -1,12 +1,3 @@
-/*
- * Written by Adam Betts and Carlo Bertolli
- *
- * This class models a variable declaration: it includes
- * fields for the sizes of each OP_DAT dimension.
- * These size fields allow OP_DAT dimensions to be passed
- * as variables as opposed to constants
- */
-
 #pragma once
 #ifndef FORTRAN_OP_DAT_DIMENSIONS_DECLARATION_H
 #define FORTRAN_OP_DAT_DIMENSIONS_DECLARATION_H
@@ -14,7 +5,7 @@
 class SgClassType;
 class SgScopeStatement;
 class SgDerivedTypeStatement;
-class SgVariableDeclaration;
+class SgVarRefExp;
 class FortranParallelLoop;
 class ScopedVariableDeclarations;
 
@@ -71,11 +62,11 @@ class FortranOpDatDimensionsDeclaration
 
     /*
      * ======================================================
-     * Get the field declaration representing the dimension
+     * Get a reference to the field representing the dimension
      * of an OP_DAT
      * ======================================================
      */
-    SgVariableDeclaration *
+    SgVarRefExp *
     getOpDatDimensionField (unsigned int OP_DAT_ArgumentGroup);
 
     FortranOpDatDimensionsDeclaration (FortranParallelLoop * parallelLoop,

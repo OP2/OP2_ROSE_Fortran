@@ -15,19 +15,8 @@
 void
 FortranCUDAKernelSubroutine::createReductionEpilogueStatements ()
 {
-  using SageBuilder::buildIntVal;
-  using SageBuilder::buildAssignOp;
-  using SageBuilder::buildExprListExp;
-  using SageBuilder::buildFunctionCallExp;
-  using SageBuilder::buildExprStatement;
-  using SageBuilder::buildOpaqueVarRefExp;
-  using SageBuilder::buildDotExp;
-  using SageBuilder::buildPntrArrRefExp;
-  using SageBuilder::buildSubtractOp;
-  using SageBuilder::buildMultiplyOp;
-  using SageBuilder::buildAddOp;
-  using SageBuilder::buildVarRefExp;
-  using SageInterface::appendStatement;
+  using namespace SageBuilder;
+  using namespace SageInterface;
   using std::string;
 
   Debug::getInstance ()->debugMessage ("Adding reduction subroutine call",
@@ -55,8 +44,8 @@ FortranCUDAKernelSubroutine::createReductionEpilogueStatements ()
       subscriptExpression->set_endOfConstruct (RoseHelper::getFileInfo ());
 
       SgPntrArrRefExp * parameterExpression1 = buildPntrArrRefExp (
-          buildVarRefExp (variableDeclarations->get (
-              OP2::VariableNames::getReductionArrayDeviceName (i))),
+          variableDeclarations->getReference (
+              OP2::VariableNames::getReductionArrayDeviceName (i)),
           subscriptExpression);
 
       /*
@@ -65,9 +54,8 @@ FortranCUDAKernelSubroutine::createReductionEpilogueStatements ()
        * ======================================================
        */
 
-      SgExpression * parameterExpression2 =
-          buildVarRefExp (variableDeclarations->get (
-              OP2::VariableNames::getOpDatLocalName (i)));
+      SgExpression * parameterExpression2 = variableDeclarations->getReference (
+          OP2::VariableNames::getOpDatLocalName (i));
 
       /*
        * ======================================================
@@ -93,8 +81,8 @@ FortranCUDAKernelSubroutine::createReductionEpilogueStatements ()
       ROSE_ASSERT (reductionType != NULL);
 
       SgExprListExp * actualParameters = buildExprListExp (
-          parameterExpression1, parameterExpression2, buildVarRefExp (
-              variableDeclarations->get (OP2::VariableNames::warpSize)),
+          parameterExpression1, parameterExpression2,
+          variableDeclarations->getReference (OP2::VariableNames::warpSize),
           reductionType);
 
       /*

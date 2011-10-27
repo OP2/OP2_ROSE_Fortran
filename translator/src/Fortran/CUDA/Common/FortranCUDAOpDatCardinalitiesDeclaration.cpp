@@ -11,8 +11,8 @@
 void
 FortranCUDAOpDatCardinalitiesDeclaration::addFields ()
 {
+  using namespace SageBuilder;
   using boost::lexical_cast;
-  using SageBuilder::buildVariableDeclaration;
   using std::string;
 
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
@@ -26,7 +26,8 @@ FortranCUDAOpDatCardinalitiesDeclaration::addFields ()
                 + lexical_cast <string> (i), Debug::HIGHEST_DEBUG_LEVEL,
             __FILE__, __LINE__);
 
-        string const & variableName = OP2::VariableNames::getOpDatCardinalityName (i);
+        string const & variableName =
+            OP2::VariableNames::getOpDatCardinalityName (i);
 
         SgVariableDeclaration * fieldDeclaration = buildVariableDeclaration (
             variableName, FortranTypesBuilder::getFourByteInteger (), NULL,
@@ -59,7 +60,7 @@ FortranCUDAOpDatCardinalitiesDeclaration::FortranCUDAOpDatCardinalitiesDeclarati
     FortranParallelLoop * parallelLoop, SgScopeStatement * moduleScope) :
   parallelLoop (parallelLoop), moduleScope (moduleScope)
 {
-  using SageInterface::appendStatement;
+  using namespace SageInterface;
 
   fieldDeclarations = new ScopedVariableDeclarations ();
 

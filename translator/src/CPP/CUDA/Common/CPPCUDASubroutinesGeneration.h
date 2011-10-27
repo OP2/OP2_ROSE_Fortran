@@ -4,9 +4,18 @@
 
 #include <CPPSubroutinesGeneration.h>
 
+class CPPCUDAReductionSubroutines;
+
 class CPPCUDASubroutinesGeneration: public CPPSubroutinesGeneration
 {
   private:
+
+    CPPCUDAReductionSubroutines * reductionSubroutines;
+
+  private:
+
+    void
+    createReductionSubroutines ();
 
     virtual void
     createSubroutines ();

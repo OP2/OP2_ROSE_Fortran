@@ -7,24 +7,10 @@
 #include <CommonNamespaces.h>
 #include <OpenMP.h>
 
-/*
- * ======================================================
- * Private functions
- * ======================================================
- */
-
 SgStatement *
 FortranOpenMPKernelSubroutineDirectLoop::createUserSubroutineCallStatement ()
 {
-  using SageBuilder::buildExprListExp;
-  using SageBuilder::buildVarRefExp;
-  using SageBuilder::buildFunctionCallExp;
-  using SageBuilder::buildExprStatement;
-  using SageBuilder::buildMultiplyOp;
-  using SageBuilder::buildAddOp;
-  using SageBuilder::buildSubtractOp;
-  using SageBuilder::buildIntVal;
-  using SageBuilder::buildPntrArrRefExp;
+  using namespace SageBuilder;
 
   SgExprListExp * actualParameters = buildExprListExp ();
 
@@ -34,13 +20,13 @@ FortranOpenMPKernelSubroutineDirectLoop::createUserSubroutineCallStatement ()
     {
       if (parallelLoop->isReductionRequired (i) == false)
       {
-        SgMultiplyOp * multiplyExpression1 = buildMultiplyOp (buildVarRefExp (
-            variableDeclarations->get (OpenMP::sliceIterator)), buildIntVal (
-            parallelLoop->getOpDatDimension (i)));
+        SgMultiplyOp * multiplyExpression1 = buildMultiplyOp (
+            variableDeclarations->getReference (OpenMP::sliceIterator),
+            buildIntVal (parallelLoop->getOpDatDimension (i)));
 
-        SgMultiplyOp * multiplyExpression2 = buildMultiplyOp (buildVarRefExp (
-            variableDeclarations->get (OpenMP::sliceIterator)), buildIntVal (
-            parallelLoop->getOpDatDimension (i)));
+        SgMultiplyOp * multiplyExpression2 = buildMultiplyOp (
+            variableDeclarations->getReference (OpenMP::sliceIterator),
+            buildIntVal (parallelLoop->getOpDatDimension (i)));
 
         SgAddOp * addExpression2 = buildAddOp (multiplyExpression2,
             buildIntVal (parallelLoop->getOpDatDimension (i)));
@@ -56,16 +42,17 @@ FortranOpenMPKernelSubroutineDirectLoop::createUserSubroutineCallStatement ()
             RoseHelper::getFileInfo ());
 
         SgPntrArrRefExp * parameterExpression = buildPntrArrRefExp (
-            buildVarRefExp (variableDeclarations->get (
-                OP2::VariableNames::getOpDatName (i))), buildExprListExp (
+            variableDeclarations->getReference (
+                OP2::VariableNames::getOpDatName (i)), buildExprListExp (
                 arraySubscriptExpression));
 
         actualParameters->append_expression (parameterExpression);
       }
       else
       {
-        actualParameters->append_expression (buildVarRefExp (
-            variableDeclarations->get (OP2::VariableNames::getOpDatName (i))));
+        actualParameters->append_expression (
+            variableDeclarations->getReference (
+                OP2::VariableNames::getOpDatName (i)));
       }
     }
   }
@@ -83,19 +70,15 @@ FortranOpenMPKernelSubroutineDirectLoop::createUserSubroutineCallStatement ()
 void
 FortranOpenMPKernelSubroutineDirectLoop::createExecutionLoopStatements ()
 {
-  using SageBuilder::buildBasicBlock;
-  using SageBuilder::buildSubtractOp;
-  using SageBuilder::buildVarRefExp;
-  using SageBuilder::buildAssignOp;
-  using SageBuilder::buildIntVal;
-  using SageInterface::appendStatement;
+  using namespace SageBuilder;
+  using namespace SageInterface;
 
-  SgAssignOp * initializationExpression = buildAssignOp (buildVarRefExp (
-      variableDeclarations->get (OpenMP::sliceIterator)), buildVarRefExp (
-      variableDeclarations->get (OpenMP::sliceStart)));
+  SgAssignOp * initializationExpression = buildAssignOp (
+      variableDeclarations->getReference (OpenMP::sliceIterator),
+      variableDeclarations->getReference (OpenMP::sliceStart));
 
-  SgSubtractOp * upperBoundExpression = buildSubtractOp (buildVarRefExp (
-      variableDeclarations->get (OpenMP::sliceEnd)), buildIntVal (1));
+  SgSubtractOp * upperBoundExpression = buildSubtractOp (
+      variableDeclarations->getReference (OpenMP::sliceEnd), buildIntVal (1));
 
   SgBasicBlock * loopBody = buildBasicBlock ();
 
@@ -112,7 +95,7 @@ FortranOpenMPKernelSubroutineDirectLoop::createExecutionLoopStatements ()
 void
 FortranOpenMPKernelSubroutineDirectLoop::createOpDatFormalParameterDeclarations ()
 {
-  using SageBuilder::buildIntVal;
+  using namespace SageBuilder;
 
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
@@ -166,12 +149,6 @@ FortranOpenMPKernelSubroutineDirectLoop::createFormalParameterDeclarations ()
           OpenMP::sliceEnd, FortranTypesBuilder::getFourByteInteger (),
           subroutineScope, formalParameters));
 }
-
-/*
- * ======================================================
- * Public functions
- * ======================================================
- */
 
 FortranOpenMPKernelSubroutineDirectLoop::FortranOpenMPKernelSubroutineDirectLoop (
     SgScopeStatement * moduleScope,

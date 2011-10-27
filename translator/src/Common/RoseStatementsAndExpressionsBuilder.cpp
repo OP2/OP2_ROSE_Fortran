@@ -6,8 +6,8 @@ SgIfStmt *
 RoseStatementsAndExpressionsBuilder::buildIfStatementWithEmptyElse (
     SgExpression * ifGuard, SgScopeStatement * thenBlock)
 {
-  using SageBuilder::buildExprStatement;
-  using SageInterface::setOneSourcePositionForTransformation;
+  using namespace SageBuilder;
+  using namespace SageInterface;
 
   SgStatement * ifGuardStatement = buildExprStatement (ifGuard);
 
@@ -79,8 +79,8 @@ SgVariableDeclaration *
 RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
     std::string const & variableName, SgType * type, SgScopeStatement * scope)
 {
-  using SageBuilder::buildVariableDeclaration;
-  using SageInterface::appendStatement;
+  using namespace SageBuilder;
+  using namespace SageInterface;
 
   SgVariableDeclaration * variableDeclaration = buildVariableDeclaration (
       variableName, type, NULL, scope);
@@ -95,8 +95,8 @@ RoseStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter 
     std::string const & variableName, SgType * type, SgScopeStatement * scope,
     SgFunctionParameterList * formalParameters)
 {
-  using SageBuilder::buildVariableDeclaration;
-  using SageInterface::appendStatement;
+  using namespace SageBuilder;
+  using namespace SageInterface;
 
   SgVariableDeclaration * variableDeclaration = buildVariableDeclaration (
       variableName, type, NULL, scope);

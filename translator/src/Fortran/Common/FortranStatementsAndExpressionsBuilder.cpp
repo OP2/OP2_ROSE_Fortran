@@ -86,7 +86,7 @@ FortranStatementsAndExpressionsBuilder::buildFortranDoStatement (
     SgExpression * initialization, SgExpression * bound,
     SgExpression * increment, SgBasicBlock * loopBody)
 {
-  using SageInterface::setOneSourcePositionForTransformation;
+  using namespace SageInterface;
 
   SgFortranDo * fortranDoStatement = new SgFortranDo (initialization, bound,
       increment, loopBody);
@@ -105,15 +105,11 @@ FortranStatementsAndExpressionsBuilder::buildFortranDoStatement (
 
 SgAggregateInitializer *
 FortranStatementsAndExpressionsBuilder::buildShapeExpression (
-    SgVariableDeclaration * variableDeclaration)
+    SgVarRefExp * variableReference)
 {
-  using SageBuilder::buildExprListExp;
-  using SageBuilder::buildIntType;
-  using SageBuilder::buildVarRefExp;
-  using SageBuilder::buildAggregateInitializer;
+  using namespace SageBuilder;
 
-  SgExprListExp * parameters = buildExprListExp (buildVarRefExp (
-      variableDeclaration));
+  SgExprListExp * parameters = buildExprListExp (variableReference);
 
   SgAggregateInitializer * shapeExpression = buildAggregateInitializer (
       parameters, buildIntType ());
@@ -126,8 +122,8 @@ FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
     std::string const & variableName, SgType * type, SgScopeStatement * scope,
     int remainingArguments, ...)
 {
-  using SageBuilder::buildVariableDeclaration;
-  using SageInterface::appendStatement;
+  using namespace SageBuilder;
+  using namespace SageInterface;
 
   SgVariableDeclaration * variableDeclaration = buildVariableDeclaration (
       variableName, type, NULL, scope);
@@ -142,7 +138,7 @@ FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
       fortranAttributes);
 
   va_end (fortranAttributes);
-  
+
   return variableDeclaration;
 }
 
@@ -151,8 +147,8 @@ FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParamet
     std::string const & variableName, SgType * type, SgScopeStatement * scope,
     SgFunctionParameterList * formalParameters, int remainingArguments, ...)
 {
-  using SageBuilder::buildVariableDeclaration;
-  using SageInterface::appendStatement;
+  using namespace SageBuilder;
+  using namespace SageInterface;
 
   SgVariableDeclaration * variableDeclaration = buildVariableDeclaration (
       variableName, type, NULL, scope);
@@ -179,10 +175,8 @@ FortranStatementsAndExpressionsBuilder::appendAllocateStatement (
     SgVarRefExp * arrayReference, SgExpression * lowerBound,
     SgExpression * upperBound, SgScopeStatement * scope)
 {
-  using SageBuilder::buildExprListExp;
-  using SageBuilder::buildPntrArrRefExp;
-  using SageBuilder::buildIntVal;
-  using SageInterface::appendStatement;
+  using namespace SageBuilder;
+  using namespace SageInterface;
 
   SgSubscriptExpression * subscriptExpression = new SgSubscriptExpression (
       RoseHelper::getFileInfo (), lowerBound, upperBound, buildIntVal (1));
@@ -201,13 +195,12 @@ FortranStatementsAndExpressionsBuilder::appendAllocateStatement (
   appendStatement (allocateStatement, scope);
 }
 
-
 void
 FortranStatementsAndExpressionsBuilder::appendDeallocateStatement (
     SgVarRefExp * arrayReference, SgScopeStatement * scope)
 {
-  using SageBuilder::buildExprListExp;
-  using SageInterface::appendStatement;
+  using namespace SageBuilder;
+  using namespace SageInterface;
 
   SgExprListExp * actualParameters = buildExprListExp (arrayReference);
 
@@ -236,10 +229,8 @@ FortranStatementsAndExpressionsBuilder::createCToFortranPointerCallStatement (
     SgScopeStatement * scope, SgExpression * parameter1,
     SgExpression * parameter2, SgExpression * parameter3)
 {
-  using SageBuilder::buildFunctionCallExp;
-  using SageBuilder::buildExprListExp;
-  using SageBuilder::buildExprStatement;
-  using SageInterface::appendStatement;
+  using namespace SageBuilder;
+  using namespace SageInterface;
 
   SgFunctionSymbol * functionSymbol =
       FortranTypesBuilder::buildNewFortranSubroutine ("c_f_pointer", scope);
