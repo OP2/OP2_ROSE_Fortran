@@ -8,7 +8,8 @@ class CPPCUDAKernelSubroutineIndirectLoop: public CPPCUDAKernelSubroutine
 {
   private:
 
-    std::map <std::string, SgVariableDeclaration *> numberOfBytesDeclarations;
+    std::map <std::string, SgVariableDeclaration *>
+        indirectOpDatSharedMemoryDeclarations;
 
   private:
 
@@ -20,9 +21,6 @@ class CPPCUDAKernelSubroutineIndirectLoop: public CPPCUDAKernelSubroutine
 
     SgBasicBlock *
     createStageOutFromLocalMemoryToSharedMemoryStatements ();
-
-    SgBasicBlock *
-    createIncrementAdjustmentStatements ();
 
     SgBasicBlock *
     createInitialiseIncrementAccessStatements ();
