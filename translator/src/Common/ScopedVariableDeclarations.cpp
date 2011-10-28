@@ -20,6 +20,12 @@ void
 ScopedVariableDeclarations::add (std::string const & variableName,
     SgVariableDeclaration * declaration)
 {
+  if (theDeclarations.count (variableName) != 0)
+  {
+    throw Exceptions::CodeGeneration::DuplicateVariableException ("'"
+        + variableName + "' has already been declared");
+  }
+
   theDeclarations[variableName] = declaration;
 }
 

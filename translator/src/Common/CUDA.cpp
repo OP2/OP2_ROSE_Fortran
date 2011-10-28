@@ -1,6 +1,7 @@
 #include <CUDA.h>
 #include <FortranTypesBuilder.h>
 #include <Debug.h>
+#include <Globals.h>
 #include <Exceptions.h>
 #include <rose.h>
 #include <boost/lexical_cast.hpp>
@@ -162,67 +163,105 @@ CUDA::getWarpSizeReference (SgScopeStatement * scope)
 }
 
 SgFunctionCallExp *
-CUDA::createDeviceThreadSynchronisationCallStatement (SgScopeStatement * scope,
-    bool Fortran)
+CUDA::createDeviceThreadSynchronisationCallStatement (SgScopeStatement * scope)
 {
   using namespace SageBuilder;
-  using std::string;
 
-  string functionName;
-
-  SgFunctionCallExp * subroutineCall;
-
-  if (Fortran)
+  switch (Globals::getInstance ()->getHostLanguage ())
   {
-    functionName = "syncthreads";
+    case TargetLanguage::FORTRAN:
+    {
+      SgFunctionSymbol * functionSymbol =
+          FortranTypesBuilder::buildNewFortranSubroutine ("syncthreads", scope);
 
-    SgFunctionSymbol * functionSymbol =
-        FortranTypesBuilder::buildNewFortranSubroutine (functionName, scope);
-
-    SgExprListExp * actualParameters = buildExprListExp ();
-
-    subroutineCall = buildFunctionCallExp (functionSymbol, actualParameters);
+      return buildFunctionCallExp (functionSymbol, buildExprListExp ());
+    }
+    case TargetLanguage::CPP:
+    {
+      return buildFunctionCallExp ("__syncthreads", buildVoidType (),
+          buildExprListExp (), scope);
+    }
+    default:
+    {
+      throw Exceptions::CommandLine::LanguageException ("Unknown host language");
+    }
   }
-  else
-  {
-    functionName = "__syncthreads";
-
-    subroutineCall = buildFunctionCallExp (functionName, buildVoidType (),
-        buildExprListExp (), scope);
-  }
-
-  return subroutineCall;
 }
 
 SgFunctionCallExp *
-CUDA::createHostThreadSynchronisationCallStatement (SgScopeStatement * scope,
-    bool Fortran)
+CUDA::createHostThreadSynchronisationCallStatement (SgScopeStatement * scope)
 {
   using namespace SageBuilder;
-  using std::string;
 
-  string functionName;
-
-  SgFunctionCallExp * subroutineCall;
-
-  if (Fortran)
+  switch (Globals::getInstance ()->getHostLanguage ())
   {
-    functionName = "cudaThreadSynchronize";
+    case TargetLanguage::FORTRAN:
+    {
+      SgFunctionSymbol * functionSymbol =
+          FortranTypesBuilder::buildNewFortranFunction (
+              "cudaThreadSynchronize", scope);
 
-    SgFunctionSymbol * functionSymbol =
-        FortranTypesBuilder::buildNewFortranFunction (functionName, scope);
-
-    SgExprListExp * actualParameters = buildExprListExp ();
-
-    subroutineCall = buildFunctionCallExp (functionSymbol, actualParameters);
+      return buildFunctionCallExp (functionSymbol, buildExprListExp ());
+    }
+    case TargetLanguage::CPP:
+    {
+      return buildFunctionCallExp ("__cudaThreadSynchronize", buildVoidType (),
+          buildExprListExp (), scope);
+    }
+    default:
+    {
+      throw Exceptions::CommandLine::LanguageException ("Unknown host language");
+    }
   }
-  else
-  {
-    functionName = "__cudaThreadSynchronize";
+}
 
-    subroutineCall = buildFunctionCallExp (functionName, buildVoidType (),
-        buildExprListExp (), scope);
-  }
+SgFunctionCallExp *
+CUDA::CPPRuntimeSupport::getReallocateReductionArraysCallStatement (
+    SgScopeStatement * scope, SgVarRefExp * reductionBytesReference)
+{
+  using namespace SageBuilder;
 
-  return subroutineCall;
+  SgExprListExp * actualParameters = buildExprListExp (reductionBytesReference);
+
+  return buildFunctionCallExp ("reallocReductArrays", buildVoidType (),
+      actualParameters, scope);
+}
+
+SgFunctionCallExp *
+CUDA::CPPRuntimeSupport::getMoveReductionArraysFromHostToDeviceCallStatement (
+    SgScopeStatement * scope, SgVarRefExp * reductionBytesReference)
+{
+  using namespace SageBuilder;
+
+  SgExprListExp * actualParameters = buildExprListExp (reductionBytesReference);
+
+  return buildFunctionCallExp ("mvReductArraysToDevice", buildVoidType (),
+      actualParameters, scope);
+}
+
+SgFunctionCallExp *
+CUDA::CPPRuntimeSupport::getMoveReductionArraysFromDeviceToHostCallStatement (
+    SgScopeStatement * scope, SgVarRefExp * reductionBytesReference)
+{
+  using namespace SageBuilder;
+
+  SgExprListExp * actualParameters = buildExprListExp (reductionBytesReference);
+
+  return buildFunctionCallExp ("mvReductArraysToHost", buildVoidType (),
+      actualParameters, scope);
+}
+
+SgFunctionCallExp *
+CUDA::CPPRuntimeSupport::getCUDASafeHostThreadSynchronisationCallStatement (
+    SgScopeStatement * scope)
+{
+  using namespace SageBuilder;
+
+  SgFunctionCallExp * threadSynchCall =
+      CUDA::createHostThreadSynchronisationCallStatement (scope);
+
+  SgExprListExp * actualParameters = buildExprListExp (threadSynchCall);
+
+  return buildFunctionCallExp ("cutilSafeCall", buildVoidType (),
+      actualParameters, scope);
 }

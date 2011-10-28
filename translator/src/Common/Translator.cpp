@@ -40,7 +40,7 @@ class CUDAOption: public CommandLineOption
     virtual void
     run ()
     {
-      Globals::getInstance ()->setTargetBackend (TargetBackend::CUDA);
+      Globals::getInstance ()->setTargetBackend (TargetLanguage::CUDA);
     }
 
     CUDAOption (std::string helpMessage, std::string longOption) :
@@ -56,7 +56,7 @@ class OpenMPOption: public CommandLineOption
     virtual void
     run ()
     {
-      Globals::getInstance ()->setTargetBackend (TargetBackend::OPENMP);
+      Globals::getInstance ()->setTargetBackend (TargetLanguage::OPENMP);
     }
 
     OpenMPOption (std::string helpMessage, std::string longOption) :
@@ -72,7 +72,7 @@ class OpenCLOption: public CommandLineOption
     virtual void
     run ()
     {
-      Globals::getInstance ()->setTargetBackend (TargetBackend::OPENCL);
+      Globals::getInstance ()->setTargetBackend (TargetLanguage::OPENCL);
     }
 
     OpenCLOption (std::string helpMessage, std::string longOption) :
@@ -88,7 +88,7 @@ handleCPPProject (SgProject * project)
 
   switch (Globals::getInstance ()->getTargetBackend ())
   {
-    case TargetBackend::CUDA:
+    case TargetLanguage::CUDA:
     {
       Debug::getInstance ()->debugMessage ("CUDA code generation selected",
           Debug::VERBOSE_LEVEL, __FILE__, __LINE__);
@@ -101,7 +101,7 @@ handleCPPProject (SgProject * project)
       break;
     }
 
-    case TargetBackend::OPENCL:
+    case TargetLanguage::OPENCL:
     {
       Debug::getInstance ()->debugMessage ("OpenCL code generation selected",
           Debug::VERBOSE_LEVEL, __FILE__, __LINE__);
@@ -116,7 +116,7 @@ handleCPPProject (SgProject * project)
 
     default:
     {
-      throw Exceptions::CommandLine::BackendException (
+      throw Exceptions::CommandLine::LanguageException (
           "Unknown/unsupported backend selected");
     }
   }
@@ -131,7 +131,7 @@ handleFortranProject (SgProject * project)
 
   switch (Globals::getInstance ()->getTargetBackend ())
   {
-    case TargetBackend::CUDA:
+    case TargetLanguage::CUDA:
     {
       Debug::getInstance ()->debugMessage ("CUDA code generation selected",
           Debug::VERBOSE_LEVEL, __FILE__, __LINE__);
@@ -144,7 +144,7 @@ handleFortranProject (SgProject * project)
       break;
     }
 
-    case TargetBackend::OPENMP:
+    case TargetLanguage::OPENMP:
     {
       Debug::getInstance ()->debugMessage ("OpenMP code generation selected",
           Debug::VERBOSE_LEVEL, __FILE__, __LINE__);
@@ -160,7 +160,7 @@ handleFortranProject (SgProject * project)
 
     default:
     {
-      throw Exceptions::CommandLine::BackendException (
+      throw Exceptions::CommandLine::LanguageException (
           "Unknown/unsupported backend selected");
     }
   }
@@ -293,20 +293,21 @@ checkBackendOption ()
   using std::vector;
   using std::string;
 
-  if (Globals::getInstance ()->getTargetBackend () == TargetBackend::UNKNOWN)
+  if (Globals::getInstance ()->getTargetBackend ()
+      == TargetLanguage::UNKNOWN_BACKEND)
   {
-    vector <TargetBackend::BACKEND_VALUE> values;
-    values.push_back (TargetBackend::CUDA);
-    values.push_back (TargetBackend::OPENMP);
-    values.push_back (TargetBackend::OPENCL);
+    vector <TargetLanguage::BACKEND> values;
+    values.push_back (TargetLanguage::CUDA);
+    values.push_back (TargetLanguage::OPENMP);
+    values.push_back (TargetLanguage::OPENCL);
 
     string backendsString;
 
     unsigned int i = 1;
-    for (vector <TargetBackend::BACKEND_VALUE>::iterator it = values.begin (); it
+    for (vector <TargetLanguage::BACKEND>::iterator it = values.begin (); it
         != values.end (); ++it, ++i)
     {
-      backendsString += TargetBackend::toString (*it);
+      backendsString += TargetLanguage::toString (*it);
 
       if (i < values.size ())
       {
@@ -314,7 +315,7 @@ checkBackendOption ()
       }
     }
 
-    throw Exceptions::CommandLine::BackendException (
+    throw Exceptions::CommandLine::LanguageException (
         "You have not selected a target backend on the command-line. Supported backends are: "
             + backendsString);
   }
@@ -324,13 +325,15 @@ void
 addCommandLineOptions ()
 {
   CommandLine::getInstance ()->addOption (new CUDAOption ("Generate CUDA code",
-      TargetBackend::toString (TargetBackend::CUDA)));
+      TargetLanguage::toString (TargetLanguage::CUDA)));
 
-  CommandLine::getInstance ()->addOption (new OpenMPOption (
-      "Generate OpenMP code", TargetBackend::toString (TargetBackend::OPENMP)));
+  CommandLine::getInstance ()->addOption (
+      new OpenMPOption ("Generate OpenMP code", TargetLanguage::toString (
+          TargetLanguage::OPENMP)));
 
-  CommandLine::getInstance ()->addOption (new OpenCLOption (
-      "Generate OpenCL code", TargetBackend::toString (TargetBackend::OPENCL)));
+  CommandLine::getInstance ()->addOption (
+      new OpenCLOption ("Generate OpenCL code", TargetLanguage::toString (
+          TargetLanguage::OPENCL)));
 
   CommandLine::getInstance ()->addOption (new OxfordOption (
       "Refactor OP2 calls to comply with Oxford API", "oxford"));
@@ -344,15 +347,17 @@ processUserSelections (SgProject * project)
   using std::string;
   using std::vector;
 
-  if (project->get_Cxx_only () == true)
+  if (project->get_Cxx_only ())
   {
     Debug::getInstance ()->debugMessage ("C++ project detected",
         Debug::VERBOSE_LEVEL, __FILE__, __LINE__);
 
+    Globals::getInstance ()->setHostLanguage (TargetLanguage::CPP);
+
     if (Globals::getInstance ()->renderOxfordAPICalls ())
     {
       if (Globals::getInstance ()->getTargetBackend ()
-          != TargetBackend::UNKNOWN)
+          != TargetLanguage::UNKNOWN_BACKEND)
       {
         throw Exceptions::CommandLine::MutuallyExclusiveException (
             "You have selected to generate code for " + toString (
@@ -376,10 +381,12 @@ processUserSelections (SgProject * project)
       unparseSourceFiles (project, generator);
     }
   }
-  else if (project->get_Fortran_only () == true)
+  else if (project->get_Fortran_only ())
   {
     Debug::getInstance ()->debugMessage ("Fortran project detected",
         Debug::VERBOSE_LEVEL, __FILE__, __LINE__);
+
+    Globals::getInstance ()->setHostLanguage (TargetLanguage::FORTRAN);
 
     checkBackendOption ();
 
@@ -389,7 +396,7 @@ processUserSelections (SgProject * project)
   }
   else
   {
-    throw Exceptions::CommandLine::FrontendException (
+    throw Exceptions::CommandLine::LanguageException (
         "The translator does not supported the programming language of the given files");
   }
 }
@@ -402,31 +409,31 @@ main (int argc, char ** argv)
   using std::cout;
   using std::endl;
 
-  addCommandLineOptions ();
-
-  CommandLine::getInstance ()->parse (argc, argv);
-
-  /*
-   * ======================================================
-   * Pass the pre-processed command-line arguments and NOT
-   * 'argc' and 'argv', otherwise ROSE will complain it does
-   * not recognise particular options
-   * ======================================================
-   */
-
-  vector <string> args;
-
-  CommandLine::getInstance ()->getRoseArguments (args);
-
-  SgProject * project = frontend (args);
-
-  ROSE_ASSERT (project != NULL);
-
-  Debug::getInstance ()->debugMessage ("Translation starting",
-      Debug::VERBOSE_LEVEL, __FILE__, __LINE__);
-
   try
   {
+    addCommandLineOptions ();
+
+    CommandLine::getInstance ()->parse (argc, argv);
+
+    /*
+     * ======================================================
+     * Pass the pre-processed command-line arguments and NOT
+     * 'argc' and 'argv', otherwise ROSE will complain it does
+     * not recognise particular options
+     * ======================================================
+     */
+
+    vector <string> args;
+
+    CommandLine::getInstance ()->getRoseArguments (args);
+
+    SgProject * project = frontend (args);
+
+    ROSE_ASSERT (project != NULL);
+
+    Debug::getInstance ()->debugMessage ("Translation starting",
+        Debug::VERBOSE_LEVEL, __FILE__, __LINE__);
+
     processUserSelections (project);
   }
   catch (Exceptions::CUDA::GridDimensionException const & e)
@@ -447,17 +454,11 @@ main (int argc, char ** argv)
 
     return Exceptions::CUDA::ThreadBlockDimensionException::returnValue;
   }
-  catch (Exceptions::CommandLine::BackendException const & e)
+  catch (Exceptions::CommandLine::LanguageException const & e)
   {
     std::cout << e.what () << std::endl;
 
-    return Exceptions::CommandLine::BackendException::returnValue;
-  }
-  catch (Exceptions::CommandLine::FrontendException const & e)
-  {
-    std::cout << e.what () << std::endl;
-
-    return Exceptions::CommandLine::FrontendException::returnValue;
+    return Exceptions::CommandLine::LanguageException::returnValue;
   }
   catch (Exceptions::CommandLine::MutuallyExclusiveException const & e)
   {
@@ -501,6 +502,12 @@ main (int argc, char ** argv)
     std::cout << e.what () << std::endl;
 
     return Exceptions::CodeGeneration::UnknownVariableException::returnValue;
+  }
+  catch (Exceptions::CodeGeneration::DuplicateVariableException const & e)
+  {
+    std::cout << e.what () << std::endl;
+
+    return Exceptions::CodeGeneration::DuplicateVariableException::returnValue;
   }
   catch (Exceptions::CodeGeneration::UnknownSubroutineException const & e)
   {

@@ -11,6 +11,37 @@ namespace
   std::string const Size = "Size";
 }
 
+SgFunctionCallExp *
+OP2::CPPMacroSupport::createRoundUpCallStatement (SgScopeStatement * scope,
+    SgExpression * parameterExpression)
+{
+  using namespace SageBuilder;
+  using std::string;
+
+  SgExprListExp * actualParameters = buildExprListExp (parameterExpression);
+
+  string const functionName = "ROUND_UP";
+
+  return buildFunctionCallExp (functionName, buildVoidType (),
+      actualParameters, scope);
+}
+
+SgFunctionCallExp *
+OP2::CPPMacroSupport::createMaxCallStatement (SgScopeStatement * scope,
+    SgExpression * parameterExpression1, SgExpression * parameterExpression2)
+{
+  using namespace SageBuilder;
+  using std::string;
+
+  SgExprListExp * actualParameters = buildExprListExp (parameterExpression1,
+      parameterExpression2);
+
+  string const functionName = "MAX";
+
+  return buildFunctionCallExp (functionName, buildVoidType (),
+      actualParameters, scope);
+}
+
 std::string const
 OP2::VariableNames::getUserSubroutineName ()
 {
@@ -204,7 +235,7 @@ OP2::VariableNames::getIncrementAccessMapName (
 }
 
 std::string const
-OP2::VariableNames::getOpIndirectionSharedName (
+OP2::VariableNames::getIndirectionCUDASharedMemoryName (
     unsigned int OP_DAT_ArgumentGroup)
 {
   using boost::lexical_cast;
@@ -223,6 +254,16 @@ OP2::VariableNames::getIndirectionArgumentSizeName (
 
   return OpDatPrefix + lexical_cast <string> (OP_DAT_ArgumentGroup)
       + "SharedIndirectionSize";
+}
+
+std::string const
+OP2::VariableNames::getIndirectionMapName (unsigned int OP_DAT_ArgumentGroup)
+{
+  using boost::lexical_cast;
+  using std::string;
+
+  return OpDatPrefix + lexical_cast <string> (OP_DAT_ArgumentGroup)
+      + "IndirectionMap";
 }
 
 std::string const

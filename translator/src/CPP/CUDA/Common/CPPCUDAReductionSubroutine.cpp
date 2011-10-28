@@ -523,8 +523,8 @@ CPPCUDAReductionSubroutine::createFirstRoundOfReduceStatements ()
   SgBasicBlock * loopBody = buildBasicBlock ();
 
   appendStatement (buildExprStatement (
-      CUDA::createDeviceThreadSynchronisationCallStatement (subroutineScope,
-          false)), loopBody);
+      CUDA::createDeviceThreadSynchronisationCallStatement (subroutineScope)),
+      loopBody);
 
   appendStatement (ifStatement, loopBody);
 
@@ -598,16 +598,16 @@ CPPCUDAReductionSubroutine::createStatements ()
   createInitialisationStatements ();
 
   appendStatement (buildExprStatement (
-      CUDA::createDeviceThreadSynchronisationCallStatement (subroutineScope,
-          false)), subroutineScope);
+      CUDA::createDeviceThreadSynchronisationCallStatement (subroutineScope)),
+      subroutineScope);
 
   createSharedVariableInitialisationStatements ();
 
   createFirstRoundOfReduceStatements ();
 
   appendStatement (buildExprStatement (
-      CUDA::createDeviceThreadSynchronisationCallStatement (subroutineScope,
-          false)), subroutineScope);
+      CUDA::createDeviceThreadSynchronisationCallStatement (subroutineScope)),
+      subroutineScope);
 
   SgExprStatement * assignmentStatement1 = buildAssignStatement (
       variableDeclarations->getReference (volatileSharedVariableName),

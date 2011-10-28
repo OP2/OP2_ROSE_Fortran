@@ -2,6 +2,7 @@
 #include <CPPCUDAUserSubroutine.h>
 #include <CPPCUDAReductionSubroutines.h>
 #include <RoseStatementsAndExpressionsBuilder.h>
+#include <CUDA.h>
 #include <CommonNamespaces.h>
 
 void
@@ -93,16 +94,69 @@ CPPCUDAKernelSubroutine::createReductionEpilogueStatements ()
     {
       SgBasicBlock * loopBody = buildBasicBlock ();
 
-      SgPntrArrRefExp * arrayExpression = buildPntrArrRefExp (
+      SgPntrArrRefExp * arrayExpression1 = buildPntrArrRefExp (
           variableDeclarations->getReference (
               OP2::VariableNames::getOpDatLocalName (i)),
           variableDeclarations->getReference (
               CommonVariableNames::iterationCounter1));
 
-      SgExprStatement * assignmentStatement = buildAssignStatement (
-          arrayExpression, buildIntVal (1));
+      SgMultiplyOp * multiplyExpression = buildMultiplyOp (CUDA::getBlockId (
+          BLOCK_X, subroutineScope), buildIntVal (
+          parallelLoop->getOpDatDimension (i)));
 
-      appendStatement (assignmentStatement, loopBody);
+      SgAddOp * addExpression = buildAddOp (variableDeclarations->getReference (
+          CommonVariableNames::iterationCounter1), multiplyExpression);
+
+      SgPntrArrRefExp * arrayExpression2 = buildPntrArrRefExp (
+          variableDeclarations->getReference (
+              OP2::VariableNames::getReductionArrayDeviceName (i)),
+          addExpression);
+
+      SgAddressOfOp * addressExpression = buildAddressOfOp (arrayExpression2);
+
+      /*
+       * ======================================================
+       * Reduction operation parameter
+       * ======================================================
+       */
+
+      SgIntVal * reductionType;
+
+      if (parallelLoop->isIncremented (i))
+      {
+        reductionType = buildIntVal (INCREMENT);
+      }
+      else if (parallelLoop->isMaximised (i))
+      {
+        reductionType = buildIntVal (MAXIMUM);
+      }
+      else if (parallelLoop->isMinimised (i))
+      {
+        reductionType = buildIntVal (MINIMUM);
+      }
+
+      ROSE_ASSERT (reductionType != NULL);
+
+      /*
+       * ======================================================
+       * Create reduction function call
+       * ======================================================
+       */
+
+      SgExprListExp * actualParameters = buildExprListExp (addressExpression,
+          arrayExpression1, reductionType);
+
+      SgFunctionSymbol * reductionFunctionSymbol =
+          isSgFunctionSymbol (
+              reductionSubroutines->getHeader (parallelLoop->getReductionTuple (
+                  i))->get_symbol_from_symbol_table ());
+
+      ROSE_ASSERT (reductionFunctionSymbol != NULL);
+
+      SgFunctionCallExp * reductionFunctionCall = buildFunctionCallExp (
+          reductionFunctionSymbol, actualParameters);
+
+      appendStatement (buildExprStatement (reductionFunctionCall), loopBody);
 
       SgAssignOp * initializationExpression = buildAssignOp (
           variableDeclarations->getReference (
@@ -189,7 +243,8 @@ CPPCUDAKernelSubroutine::createCUDASharedVariableDeclarations ()
   {
     if (parallelLoop->isDuplicateOpDat (i) == false)
     {
-      if (parallelLoop->isGlobal (i) == false)
+      if (parallelLoop->isIndirect (i) || (parallelLoop->isDirect (i)
+          && parallelLoop->getOpDatDimension (i) > 1))
       {
         string const autosharedVariableName =
             OP2::VariableNames::getCUDASharedMemoryDeclarationName (
@@ -216,21 +271,24 @@ CPPCUDAKernelSubroutine::createCUDASharedVariableDeclarations ()
 
           autosharedNames.push_back (autosharedVariableName);
 
-          string const autosharedOffsetVariableName =
-              OP2::VariableNames::getCUDASharedMemoryOffsetDeclarationName (
-                  parallelLoop->getOpDatBaseType (i),
-                  parallelLoop->getSizeOfOpDat (i));
+          if (parallelLoop->isDirectLoop ())
+          {
+            string const autosharedOffsetVariableName =
+                OP2::VariableNames::getCUDASharedMemoryOffsetDeclarationName (
+                    parallelLoop->getOpDatBaseType (i),
+                    parallelLoop->getSizeOfOpDat (i));
 
-          Debug::getInstance ()->debugMessage (
-              "Creating offset declaration with name '"
-                  + autosharedOffsetVariableName + "' for OP_DAT '"
-                  + parallelLoop->getOpDatVariableName (i) + "'",
-              Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+            Debug::getInstance ()->debugMessage (
+                "Creating offset declaration with name '"
+                    + autosharedOffsetVariableName + "' for OP_DAT '"
+                    + parallelLoop->getOpDatVariableName (i) + "'",
+                Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
-          variableDeclarations->add (autosharedOffsetVariableName,
-              RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
-                  autosharedOffsetVariableName, buildIntType (),
-                  subroutineScope));
+            variableDeclarations->add (autosharedOffsetVariableName,
+                RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
+                    autosharedOffsetVariableName, buildIntType (),
+                    subroutineScope));
+          }
         }
       }
     }

@@ -23,7 +23,7 @@ namespace Exceptions
         }
     };
 
-    class BackendException: public std::runtime_error
+    class LanguageException: public std::runtime_error
     {
       public:
 
@@ -31,21 +31,7 @@ namespace Exceptions
 
       public:
 
-        BackendException (const std::string& msg) :
-          std::runtime_error (msg)
-        {
-        }
-    };
-
-    class FrontendException: public std::runtime_error
-    {
-      public:
-
-        static unsigned int const returnValue = 3;
-
-      public:
-
-        FrontendException (const std::string& msg) :
+        LanguageException (const std::string& msg) :
           std::runtime_error (msg)
         {
         }
@@ -200,11 +186,25 @@ namespace Exceptions
         }
     };
 
-    class UnknownSubroutineException: public std::runtime_error
+    class DuplicateVariableException: public std::runtime_error
     {
       public:
 
         static unsigned int const returnValue = 14;
+
+      public:
+
+        DuplicateVariableException (const std::string& msg) :
+          std::runtime_error (msg)
+        {
+        }
+    };
+
+    class UnknownSubroutineException: public std::runtime_error
+    {
+      public:
+
+        static unsigned int const returnValue = 15;
 
       public:
 
@@ -218,7 +218,7 @@ namespace Exceptions
     {
       public:
 
-        static unsigned int const returnValue = 15;
+        static unsigned int const returnValue = 16;
 
       public:
 
@@ -232,7 +232,7 @@ namespace Exceptions
     {
       public:
 
-        static unsigned int const returnValue = 16;
+        static unsigned int const returnValue = 17;
 
       public:
 

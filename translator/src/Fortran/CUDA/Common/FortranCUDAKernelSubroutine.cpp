@@ -80,16 +80,16 @@ FortranCUDAKernelSubroutine::createReductionEpilogueStatements ()
 
       ROSE_ASSERT (reductionType != NULL);
 
-      SgExprListExp * actualParameters = buildExprListExp (
-          parameterExpression1, parameterExpression2,
-          variableDeclarations->getReference (OP2::VariableNames::warpSize),
-          reductionType);
-
       /*
        * ======================================================
        * Create reduction function call
        * ======================================================
        */
+
+      SgExprListExp * actualParameters = buildExprListExp (
+          parameterExpression1, parameterExpression2,
+          variableDeclarations->getReference (OP2::VariableNames::warpSize),
+          reductionType);
 
       SgFunctionSymbol * reductionFunctionSymbol =
           isSgFunctionSymbol (
@@ -157,7 +157,8 @@ FortranCUDAKernelSubroutine::createCUDASharedVariableDeclarations ()
   {
     if (parallelLoop->isDuplicateOpDat (i) == false)
     {
-      if (parallelLoop->isGlobal (i) == false)
+      if (parallelLoop->isIndirect (i) || (parallelLoop->isDirect (i)
+          && parallelLoop->getOpDatDimension (i) > 1))
       {
         string const autosharedVariableName =
             OP2::VariableNames::getCUDASharedMemoryDeclarationName (

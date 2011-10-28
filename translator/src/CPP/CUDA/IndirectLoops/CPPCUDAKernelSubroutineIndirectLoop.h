@@ -8,36 +8,51 @@ class CPPCUDAKernelSubroutineIndirectLoop: public CPPCUDAKernelSubroutine
 {
   private:
 
-    std::map <std::string, unsigned int> positionOfNbytes;
+    std::map <std::string, SgVariableDeclaration *> numberOfBytesDeclarations;
 
   private:
 
     virtual SgStatement *
     createUserSubroutineCallStatement ();
 
+    SgBasicBlock *
+    createIncrementAndWriteAccessEpilogueStatements ();
+
+    SgBasicBlock *
+    createStageOutFromLocalMemoryToSharedMemoryStatements ();
+
+    SgBasicBlock *
+    createIncrementAdjustmentStatements ();
+
+    SgBasicBlock *
+    createInitialiseIncrementAccessStatements ();
+
     virtual void
     createExecutionLoopStatements ();
 
-    void
-    createInnerExecutionLoopStatements (SgScopeStatement * scope);
-
-    void
-    createIncrementAdjustmentStatements (SgScopeStatement * scope);
-
-    void
-    createInitialiseLocalOpDatStatements (SgScopeStatement * scope);
-
-    void
-    createPointeredIncrementsOrWritesStatements ();
-
-    void
+    SgBasicBlock *
     createInitialiseCUDASharedVariablesStatements ();
 
-    void
-    createInitialiseLocalVariablesStatements ();
+    SgBasicBlock *
+    createSetIndirectionMapPointerStatements ();
+
+    SgBasicBlock *
+    createSetOpDatSharedMemoryPointerStatements ();
+
+    SgBasicBlock *
+    createSetNumberOfIndirectElementsPerBlockStatements ();
+
+    SgBasicBlock *
+    createIncrementAccessThreadZeroStatements ();
+
+    SgIfStmt *
+    createThreadZeroStatements ();
 
     void
-    createThreadZeroStatements ();
+    createIncrementAccessLocalVariableDeclarations ();
+
+    void
+    createExecutionLocalVariableDeclarations ();
 
     void
     createPlanFormalParameterDeclarations ();

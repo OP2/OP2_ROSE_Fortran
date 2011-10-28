@@ -18,7 +18,9 @@ class Globals
 
     static Globals * globalsInstance;
 
-    TargetBackend::BACKEND_VALUE backend;
+    TargetLanguage::FRONTEND frontend;
+
+    TargetLanguage::BACKEND backend;
 
     bool oxfordOption;
 
@@ -49,18 +51,34 @@ class Globals
 
     /*
      * ======================================================
+     * Set the host language
+     * ======================================================
+     */
+    void
+    setHostLanguage (TargetLanguage::FRONTEND frontend);
+
+    /*
+     * ======================================================
+     * What is the host language?
+     * ======================================================
+     */
+    TargetLanguage::FRONTEND
+    getHostLanguage () const;
+
+    /*
+     * ======================================================
      * Set which type of code should be generated
      * ======================================================
      */
     void
-    setTargetBackend (TargetBackend::BACKEND_VALUE backend);
+    setTargetBackend (TargetLanguage::BACKEND backend);
 
     /*
      * ======================================================
      * What type of code should be generated?
      * ======================================================
      */
-    TargetBackend::BACKEND_VALUE
+    TargetLanguage::BACKEND
     getTargetBackend () const;
 
     void

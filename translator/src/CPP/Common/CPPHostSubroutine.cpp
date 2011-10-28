@@ -60,7 +60,7 @@ CPPHostSubroutine::createFormalParameterDeclarations ()
         opDatvariableName,
         RoseStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
             opDatvariableName, FortranTypesBuilder::buildClassDeclaration (
-                OP2::OP_DAT, subroutineScope)->get_type (), subroutineScope,
+                OP2::OP_ARG, subroutineScope)->get_type (), subroutineScope,
             formalParameters));
   }
 }

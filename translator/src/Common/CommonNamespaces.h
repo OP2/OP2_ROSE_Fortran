@@ -1,13 +1,6 @@
-/*
- * Written by Adam Betts and Carlo Bertolli
- *  
- * Various public namespaces used in the compiler to declare and reference
- * variable names
- */
-
 #pragma once
-#ifndef COMMON_NAMESPACES_H
-#define COMMON_NAMESPACES_H
+#ifndef OP2_NAMESPACES_H
+#define OP2_NAMESPACES_H
 
 #include <string>
 
@@ -15,6 +8,7 @@ class SgType;
 class SgStatement;
 class SgExpression;
 class SgScopeStatement;
+class SgFunctionCallExp;
 
 namespace OP2
 {
@@ -25,11 +19,19 @@ namespace OP2
    */
 
   std::string const OP_ACCESS = "op_access";
-  std::string const OP_SET = "op_set";
+  std::string const OP_ARG = "op_arg";
+  std::string const OP_ARG_DAT = "op_arg_dat";
+  std::string const OP_ARG_GBL = "op_arg_gbl";
   std::string const OP_DAT = "op_dat";
   std::string const OP_DAT_GBL = "op_dat_gbl";
-  std::string const OP_MAP = "op_map";
+  std::string const OP_DECL_SET = "op_decl_set";
+  std::string const OP_DECL_MAP = "op_decl_map";
+  std::string const OP_DECL_DAT = "op_decl_dat";
+  std::string const OP_DECL_GBL = "op_decl_gbl";
+  std::string const OP_DECL_CONST = "op_decl_const";
   std::string const OP_GBL = "op_gbl";
+  std::string const OP_SET = "op_set";
+  std::string const OP_MAP = "op_map";
   std::string const OP_ID = "op_id";
   std::string const OP_READ = "op_read";
   std::string const OP_WRITE = "op_write";
@@ -38,13 +40,32 @@ namespace OP2
   std::string const OP_MAX = "op_max";
   std::string const OP_MIN = "op_min";
   std::string const OP_PAR_LOOP = "op_par_loop";
-  std::string const OP_DECL_SET = "op_decl_set";
-  std::string const OP_DECL_MAP = "op_decl_map";
-  std::string const OP_DECL_DAT = "op_decl_dat";
-  std::string const OP_DECL_GBL = "op_decl_gbl";
-  std::string const OP_DECL_CONST = "op_decl_const";
-  std::string const OP_ARG_DAT = "op_arg_dat";
-  std::string const OP_ARG_GBL = "op_arg_gbl";
+
+  namespace CPPMacroSupport
+  {
+    /*
+     * ======================================================
+     * Returns a function call expression to the ROUND_UP
+     * macro provided in the OP2 header files
+     * ======================================================
+     */
+
+    SgFunctionCallExp *
+    createRoundUpCallStatement (SgScopeStatement * scope,
+        SgExpression * parameterExpression);
+
+    /*
+     * ======================================================
+     * Returns a function call expression to the MAX
+     * macro provided in the OP2 header files
+     * ======================================================
+     */
+
+    SgFunctionCallExp *
+    createMaxCallStatement (SgScopeStatement * scope,
+        SgExpression * parameterExpression1,
+        SgExpression * parameterExpression2);
+  }
 
   namespace VariableNames
   {
@@ -72,6 +93,7 @@ namespace OP2
     std::string const reductionInput = "inputValue";
     std::string const reductionResult = "reductionResult";
     std::string const reductionOperation = "reductionOperation";
+    std::string const reductionBytes = "reductionBytes";
     std::string const reductionSharedMemorySize = "reductionSharedMemorySize";
     std::string const set = "set";
     std::string const size = "size";
@@ -316,10 +338,13 @@ namespace OP2
     getIncrementAccessMapName (unsigned int OP_DAT_ArgumentGroup);
 
     std::string const
-    getOpIndirectionSharedName (unsigned int OP_DAT_ArgumentGroup);
+    getIndirectionCUDASharedMemoryName (unsigned int OP_DAT_ArgumentGroup);
 
     std::string const
     getIndirectionArgumentSizeName (unsigned int OP_DAT_ArgumentGroup);
+
+    std::string const
+    getIndirectionMapName (unsigned int OP_DAT_ArgumentGroup);
 
     std::string const
     getPlanReturnVariableDeclarationName (std::string const & suffix);
@@ -342,50 +367,6 @@ namespace OP2
 
     std::string const
     getReductionCardinalityName (unsigned int OP_DAT_ArgumentGroup);
-  }
-}
-
-namespace OpenCL
-{
-  /*
-   * ======================================================
-   * The names used in the OpenCL libraries
-   * ======================================================
-   */
-
-  namespace CPP
-  {
-    std::string const getGroupId = "get_group_id";
-    std::string const getGroupSize = "get_group_size";
-    std::string const getLocalSize = "get_local_size";
-    std::string const getLocalId = "get_local_id";
-    std::string const getNumGroups = "get_num_groups";
-    std::string const getGlobalId = "get_global_id";
-    std::string const getGlobalSize = "get_global_size";
-    std::string const cudaThreadSynchronize = "cudaThreadSynchronize";
-    std::string const blocksPerGrid = "nblocks";
-    std::string const totalThreads = "nthreadstot";
-    std::string const sharedMemorySize = "nshared";
-    std::string const threadsPerBlock = "nthreads";
-    std::string const barrier = "barrier";
-    std::string const argumentCounterVariable = "argCnt";
-    //std::string const syncthreads = "barrier( CLK_LOCAL_MEM_FENCE )";
-    std::string const threadSynchRet = "threadSynchRet";
-    std::string const kernel = "hKernel";
-    std::string const errVar = "ciErrNum";
-    std::string const pointerType = "cl_mem";
-    std::string const commanQueue = "cqCommandQueue";
-    std::string const setKernelArg = "clSetKernelArg";
-    std::string const enqueueKernel = "clEnqueueNDRangeKernel";
-    std::string const getKernel = "getKernel";
-    std::string const kernelType = "cl_kernel";
-    std::string const constants = "constants";
-    std::string const globalConstants = "globalConstants";
-    std::string const globalConstantsType = "global_constants_t";
-    std::string const localModifier = "__local";
-    std::string const globalModifier = "__global";
-    std::string const constantModifier = "__constant";
-
   }
 }
 

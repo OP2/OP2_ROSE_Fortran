@@ -248,6 +248,10 @@ FortranCUDAKernelSubroutineIndirectLoop::createIncrementAndWriteAccessEpilogueSt
   using namespace SageInterface;
   using std::string;
 
+  Debug::getInstance ()->debugMessage (
+      "Creating increment and write access epilogue statements",
+      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+
   SgBasicBlock * block = buildBasicBlock ();
 
   unsigned int pindOffsOffset = 0;
@@ -433,7 +437,8 @@ FortranCUDAKernelSubroutineIndirectLoop::createStageOutFromLocalMemoryToSharedMe
   using namespace SageInterface;
   using std::string;
 
-  Debug::getInstance ()->debugMessage ("Creating inner loop statements",
+  Debug::getInstance ()->debugMessage (
+      "Creating stage out from local memory to shared memory statements",
       Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
   SgBasicBlock * block = buildBasicBlock ();
@@ -993,7 +998,7 @@ FortranCUDAKernelSubroutineIndirectLoop::createIncrementAccessThreadZeroStatemen
   using namespace SageInterface;
 
   Debug::getInstance ()->debugMessage (
-      "Creating thread zero statements for increment access OP_DATs",
+      "Creating thread zero statements for incremented OP_DATs",
       Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
   SgBasicBlock * block = buildBasicBlock ();
@@ -1599,8 +1604,6 @@ FortranCUDAKernelSubroutineIndirectLoop::createOpDatFormalParameterDeclarations 
   {
     if (parallelLoop->isDuplicateOpDat (i) == false)
     {
-      string const variableName = OP2::VariableNames::getOpDatName (i);
-
       if (parallelLoop->isReductionRequired (i))
       {
         string const & variableName =
@@ -1615,6 +1618,8 @@ FortranCUDAKernelSubroutineIndirectLoop::createOpDatFormalParameterDeclarations 
       }
       else if (parallelLoop->isIndirect (i) || parallelLoop->isDirect (i))
       {
+        string const variableName = OP2::VariableNames::getOpDatName (i);
+
         SgDotExp * dotExpression = buildDotExp (
             variableDeclarations->getReference (
                 OP2::VariableNames::opDatCardinalities),
@@ -1667,6 +1672,9 @@ FortranCUDAKernelSubroutineIndirectLoop::createOpDatFormalParameterDeclarations 
     {
       if (parallelLoop->isIndirect (i))
       {
+        string const & variableName =
+            OP2::VariableNames::getLocalToGlobalMappingName (i);
+
         SgDotExp * dotExpression2 = buildDotExp (
             variableDeclarations->getReference (
                 OP2::VariableNames::opDatCardinalities),
@@ -1676,10 +1684,10 @@ FortranCUDAKernelSubroutineIndirectLoop::createOpDatFormalParameterDeclarations 
         SgSubtractOp * upperBoundExpression2 = buildSubtractOp (dotExpression2,
             buildIntVal (1));
 
-        variableDeclarations->add (
-            OP2::VariableNames::getLocalToGlobalMappingName (i),
+        variableDeclarations ->add (
+            variableName,
             FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
-                OP2::VariableNames::getLocalToGlobalMappingName (i),
+                variableName,
                 FortranTypesBuilder::getArray_RankOne_WithLowerAndUpperBounds (
                     FortranTypesBuilder::getFourByteInteger (),
                     buildIntVal (0), upperBoundExpression2), subroutineScope,
@@ -1692,6 +1700,9 @@ FortranCUDAKernelSubroutineIndirectLoop::createOpDatFormalParameterDeclarations 
   {
     if (parallelLoop->isIndirect (i))
     {
+      string const & variableName =
+          OP2::VariableNames::getGlobalToLocalMappingName (i);
+
       SgIntVal * lowerBoundExpression = buildIntVal (0);
 
       SgDotExp * dotExpression = buildDotExp (
@@ -1704,9 +1715,9 @@ FortranCUDAKernelSubroutineIndirectLoop::createOpDatFormalParameterDeclarations 
           buildIntVal (1));
 
       variableDeclarations->add (
-          OP2::VariableNames::getGlobalToLocalMappingName (i),
+          variableName,
           FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
-              OP2::VariableNames::getGlobalToLocalMappingName (i),
+              variableName,
               FortranTypesBuilder::getArray_RankOne_WithLowerAndUpperBounds (
                   FortranTypesBuilder::getTwoByteInteger (),
                   lowerBoundExpression, upperBoundExpression), subroutineScope,

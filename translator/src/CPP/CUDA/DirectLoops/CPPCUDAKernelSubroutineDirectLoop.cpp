@@ -61,11 +61,6 @@ CPPCUDAKernelSubroutineDirectLoop::createStageInFromDeviceMemoryToSharedMemorySt
           parallelLoop->getOpDatBaseType (OP_DAT_ArgumentGroup),
           parallelLoop->getSizeOfOpDat (OP_DAT_ArgumentGroup));
 
-  string const autosharedOffsetVariableName =
-      OP2::VariableNames::getCUDASharedMemoryOffsetDeclarationName (
-          parallelLoop->getOpDatBaseType (OP_DAT_ArgumentGroup),
-          parallelLoop->getSizeOfOpDat (OP_DAT_ArgumentGroup));
-
   SgMultiplyOp * multiplyExpression1 = buildMultiplyOp (
       variableDeclarations->getReference (
           CommonVariableNames::iterationCounter2),
@@ -123,11 +118,6 @@ CPPCUDAKernelSubroutineDirectLoop::createStageInFromSharedMemoryToLocalMemorySta
           parallelLoop->getOpDatBaseType (OP_DAT_ArgumentGroup),
           parallelLoop->getSizeOfOpDat (OP_DAT_ArgumentGroup));
 
-  string const autosharedOffsetVariableName =
-      OP2::VariableNames::getCUDASharedMemoryOffsetDeclarationName (
-          parallelLoop->getOpDatBaseType (OP_DAT_ArgumentGroup),
-          parallelLoop->getSizeOfOpDat (OP_DAT_ArgumentGroup));
-
   SgMultiplyOp * multiplyExpression1 = buildMultiplyOp (
       variableDeclarations->getReference (OP2::VariableNames::threadID),
       buildIntVal (parallelLoop->getOpDatDimension (OP_DAT_ArgumentGroup)));
@@ -177,11 +167,6 @@ CPPCUDAKernelSubroutineDirectLoop::createStageOutFromSharedMemoryToDeviceMemoryS
 
   string const autosharedVariableName =
       OP2::VariableNames::getCUDASharedMemoryDeclarationName (
-          parallelLoop->getOpDatBaseType (OP_DAT_ArgumentGroup),
-          parallelLoop->getSizeOfOpDat (OP_DAT_ArgumentGroup));
-
-  string const autosharedOffsetVariableName =
-      OP2::VariableNames::getCUDASharedMemoryOffsetDeclarationName (
           parallelLoop->getOpDatBaseType (OP_DAT_ArgumentGroup),
           parallelLoop->getSizeOfOpDat (OP_DAT_ArgumentGroup));
 
@@ -239,11 +224,6 @@ CPPCUDAKernelSubroutineDirectLoop::createStageOutFromLocalMemoryToSharedMemorySt
 
   string const autosharedVariableName =
       OP2::VariableNames::getCUDASharedMemoryDeclarationName (
-          parallelLoop->getOpDatBaseType (OP_DAT_ArgumentGroup),
-          parallelLoop->getSizeOfOpDat (OP_DAT_ArgumentGroup));
-
-  string const autosharedOffsetVariableName =
-      OP2::VariableNames::getCUDASharedMemoryOffsetDeclarationName (
           parallelLoop->getOpDatBaseType (OP_DAT_ArgumentGroup),
           parallelLoop->getSizeOfOpDat (OP_DAT_ArgumentGroup));
 
@@ -329,7 +309,7 @@ CPPCUDAKernelSubroutineDirectLoop::createExecutionLoopStatements ()
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
     if (parallelLoop->isGlobal (i) == false && parallelLoop->isWritten (i)
-        == false && parallelLoop->getOpDatDimension (i) != 1)
+        == false && parallelLoop->getOpDatDimension (i) > 1)
     {
       Debug::getInstance ()->debugMessage (
           "Creating statements to stage in from device memory to shared memory for OP_DAT "
@@ -354,7 +334,7 @@ CPPCUDAKernelSubroutineDirectLoop::createExecutionLoopStatements ()
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
     if (parallelLoop->isGlobal (i) == false && parallelLoop->isRead (i)
-        == false && parallelLoop->getOpDatDimension (i) != 1)
+        == false && parallelLoop->getOpDatDimension (i) > 1)
     {
       Debug::getInstance ()->debugMessage (
           "Creating statements to stage out from local memory to shared memory for OP_DAT "
@@ -424,7 +404,7 @@ CPPCUDAKernelSubroutineDirectLoop::createInitialiseOffsetIntoCUDASharedVariableS
   {
     if (parallelLoop->isDuplicateOpDat (i) == false)
     {
-      if (parallelLoop->isGlobal (i) == false)
+      if (parallelLoop->isDirect (i) && parallelLoop->getOpDatDimension (i) > 1)
       {
         string const autosharedVariableName =
             OP2::VariableNames::getCUDASharedMemoryDeclarationName (
@@ -514,27 +494,34 @@ CPPCUDAKernelSubroutineDirectLoop::createLocalVariableDeclarations ()
 
   createCUDASharedVariableDeclarations ();
 
-  vector <string> fourByteIntegers;
+  variableDeclarations->add (CommonVariableNames::iterationCounter1,
+      RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
+          CommonVariableNames::iterationCounter1, buildIntType (),
+          subroutineScope));
 
-  fourByteIntegers.push_back (CommonVariableNames::iterationCounter1);
-  fourByteIntegers.push_back (CommonVariableNames::iterationCounter2);
-  fourByteIntegers.push_back (OP2::VariableNames::localOffset);
-  fourByteIntegers.push_back (OP2::VariableNames::nelems);
-  fourByteIntegers.push_back (OP2::VariableNames::threadID);
+  variableDeclarations->add (CommonVariableNames::iterationCounter2,
+      RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
+          CommonVariableNames::iterationCounter2, buildIntType (),
+          subroutineScope));
 
-  for (vector <string>::iterator it = fourByteIntegers.begin (); it
-      != fourByteIntegers.end (); ++it)
-  {
-    variableDeclarations->add (*it,
-        RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (*it,
-            buildIntType (), subroutineScope));
-  }
+  variableDeclarations->add (OP2::VariableNames::localOffset,
+      RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
+          OP2::VariableNames::localOffset, buildIntType (), subroutineScope));
+
+  variableDeclarations->add (OP2::VariableNames::nelems,
+      RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
+          OP2::VariableNames::nelems, buildIntType (), subroutineScope));
+
+  variableDeclarations->add (OP2::VariableNames::threadID,
+      RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
+          OP2::VariableNames::threadID, buildIntType (), subroutineScope));
 }
 
 void
 CPPCUDAKernelSubroutineDirectLoop::createOpDatFormalParameterDeclarations ()
 {
   using namespace SageBuilder;
+  using boost::lexical_cast;
   using std::string;
 
   Debug::getInstance ()->debugMessage (
@@ -549,9 +536,26 @@ CPPCUDAKernelSubroutineDirectLoop::createOpDatFormalParameterDeclarations ()
       {
         string const & variableName =
             OP2::VariableNames::getReductionArrayDeviceName (i);
+
+        if (parallelLoop->isPointer (i))
+        {
+
+          Debug::getInstance ()->debugMessage ("Reduction: pointer type",
+              Debug::HIGHEST_DEBUG_LEVEL, __FILE__, __LINE__);
+
+          variableDeclarations->add (
+              variableName,
+              RoseStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
+                  variableName, buildPointerType (
+                      parallelLoop->getOpDatBaseType (i)), subroutineScope,
+                  formalParameters));
+        }
       }
       else if (parallelLoop->isDirect (i))
       {
+        Debug::getInstance ()->debugMessage ("OP_DAT: direct",
+            Debug::HIGHEST_DEBUG_LEVEL, __FILE__, __LINE__);
+
         string const & variableName = OP2::VariableNames::getOpDatName (i);
 
         variableDeclarations->add (
@@ -562,6 +566,9 @@ CPPCUDAKernelSubroutineDirectLoop::createOpDatFormalParameterDeclarations ()
       }
       else if (parallelLoop->isRead (i))
       {
+        Debug::getInstance ()->debugMessage ("Read",
+            Debug::HIGHEST_DEBUG_LEVEL, __FILE__, __LINE__);
+
         string const & variableName = OP2::VariableNames::getOpDatName (i);
       }
     }
@@ -607,6 +614,10 @@ CPPCUDAKernelSubroutineDirectLoop::CPPCUDAKernelSubroutineDirectLoop (
   CPPCUDAKernelSubroutine (moduleScope, userSubroutine, parallelLoop,
       reductionSubroutines)
 {
+  Debug::getInstance ()->debugMessage (
+      "Creating kernel subroutine of direct loop", Debug::CONSTRUCTOR_LEVEL,
+      __FILE__, __LINE__);
+
   createFormalParameterDeclarations ();
 
   createLocalVariableDeclarations ();

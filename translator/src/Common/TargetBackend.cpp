@@ -3,7 +3,30 @@
 #include <Exceptions.h>
 
 std::string
-TargetBackend::toString (BACKEND_VALUE backend)
+TargetLanguage::toString (FRONTEND frontend)
+{
+  switch (frontend)
+  {
+    case FORTRAN:
+    {
+      return "Fortran";
+    }
+
+    case CPP:
+    {
+      return "C++";
+    }
+
+    default:
+    {
+      throw Exceptions::CommandLine::LanguageException (
+          "Unknown frontend language selected");
+    }
+  }
+}
+
+std::string
+TargetLanguage::toString (BACKEND backend)
 {
   switch (backend)
   {
@@ -24,8 +47,8 @@ TargetBackend::toString (BACKEND_VALUE backend)
 
     default:
     {
-      throw Exceptions::CommandLine::BackendException (
-          "Unknown backend selected");
+      throw Exceptions::CommandLine::LanguageException (
+          "Unknown backend language selected");
     }
   }
 }

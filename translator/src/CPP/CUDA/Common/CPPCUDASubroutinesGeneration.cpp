@@ -4,6 +4,8 @@
 #include <CPPCUDAKernelSubroutine.h>
 #include <CPPCUDAKernelSubroutineDirectLoop.h>
 #include <CPPCUDAHostSubroutineDirectLoop.h>
+#include <CPPCUDAKernelSubroutineIndirectLoop.h>
+#include <CPPCUDAHostSubroutineIndirectLoop.h>
 #include <CPPCUDAUserSubroutine.h>
 #include <CPPCUDAReductionSubroutines.h>
 #include <CPPCUDAReductionSubroutine.h>
@@ -79,6 +81,12 @@ CPPCUDASubroutinesGeneration::createSubroutines ()
     }
     else
     {
+      kernelSubroutine = new CPPCUDAKernelSubroutineIndirectLoop (moduleScope,
+          userDeviceSubroutine, parallelLoop, reductionSubroutines);
+
+      hostSubroutines[userSubroutineName]
+          = new CPPCUDAHostSubroutineIndirectLoop (moduleScope,
+              kernelSubroutine, parallelLoop);
     }
   }
 }

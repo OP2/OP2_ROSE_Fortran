@@ -9,10 +9,13 @@ Globals::Globals ()
 {
   /*
    * ======================================================
-   * Assume that the target backend is unknown
+   * Assume that the frontend and backend are unknown
    * ======================================================
    */
-  backend = TargetBackend::UNKNOWN;
+
+  frontend = TargetLanguage::UNKNOWN_FRONTEND;
+
+  backend = TargetLanguage::UNKNOWN_BACKEND;
 
   /*
    * ======================================================
@@ -41,12 +44,24 @@ Globals::getInstance ()
 }
 
 void
-Globals::setTargetBackend (TargetBackend::BACKEND_VALUE backend)
+Globals::setHostLanguage (TargetLanguage::FRONTEND frontend)
+{
+  this->frontend = frontend;
+}
+
+TargetLanguage::FRONTEND
+Globals::getHostLanguage () const
+{
+  return frontend;
+}
+
+void
+Globals::setTargetBackend (TargetLanguage::BACKEND backend)
 {
   this->backend = backend;
 }
 
-TargetBackend::BACKEND_VALUE
+TargetLanguage::BACKEND
 Globals::getTargetBackend () const
 {
   return backend;
