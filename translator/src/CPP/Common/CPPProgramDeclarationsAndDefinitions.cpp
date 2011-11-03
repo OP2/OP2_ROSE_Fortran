@@ -169,7 +169,17 @@ CPPProgramDeclarationsAndDefinitions::handleOxfordOpGblArgument (
   SgAddressOfOp * addressOfOp = isSgAddressOfOp (
       actualArguments->get_expressions ()[CPPOxfordOpArgGblCall::indexOpDat]);
 
-  SgVarRefExp * opGblReference = isSgVarRefExp (addressOfOp->get_operand ());
+  SgVarRefExp * opGblReference;
+
+  if (addressOfOp == NULL)
+  {
+    opGblReference = isSgVarRefExp (
+        actualArguments->get_expressions ()[CPPOxfordOpArgGblCall::indexOpDat]);
+  }
+  else
+  {
+    opGblReference = isSgVarRefExp (addressOfOp->get_operand ());
+  }
 
   string const opGblName =
       opGblReference->get_symbol ()->get_name ().getString ();

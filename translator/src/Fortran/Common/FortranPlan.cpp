@@ -12,6 +12,7 @@ FortranPlan::createConvertPlanFunctionParametersStatements ()
 {
   using namespace SageBuilder;
   using namespace SageInterface;
+  using namespace OP2::VariableNames;
 
   Debug::getInstance ()->debugMessage (
       "Creating statements to convert plan function parameters",
@@ -26,21 +27,18 @@ FortranPlan::createConvertPlanFunctionParametersStatements ()
    */
 
   SgDotExp * parameterExpressionE1 = buildDotExp (
-      variableDeclarations->getReference (
-          OP2::VariableNames::PlanFunction::actualPlan), buildOpaqueVarRefExp (
-          OP2::VariableNames::PlanFunction::ind_maps, block));
+      variableDeclarations->getReference (PlanFunction::actualPlan),
+      buildOpaqueVarRefExp (PlanFunction::ind_maps, block));
 
   SgAggregateInitializer * parameterExpressionE3 =
       FortranStatementsAndExpressionsBuilder::buildShapeExpression (
-          variableDeclarations->getReference (
-              OP2::VariableNames::PlanFunction::indsNumber));
+          variableDeclarations->getReference (PlanFunction::indsNumber));
 
   SgStatement
       * callStatementE =
           FortranStatementsAndExpressionsBuilder::createCToFortranPointerCallStatement (
               subroutineScope, parameterExpressionE1,
-              variableDeclarations->getReference (
-                  OP2::VariableNames::PlanFunction::pindMaps),
+              variableDeclarations->getReference (PlanFunction::pindMaps),
               parameterExpressionE3);
 
   appendStatement (callStatementE, block);
@@ -52,21 +50,18 @@ FortranPlan::createConvertPlanFunctionParametersStatements ()
    */
 
   SgDotExp * parameterExpressionF1 = buildDotExp (
-      variableDeclarations->getReference (
-          OP2::VariableNames::PlanFunction::actualPlan),
-      variableDeclarations->getReference (
-          OP2::VariableNames::PlanFunction::ncolblk));
+      variableDeclarations->getReference (PlanFunction::actualPlan),
+      variableDeclarations->getReference (PlanFunction::ncolblk));
 
   SgDotExp * parameterExpressionF3 = buildDotExp (
-      variableDeclarations->getReference (OP2::VariableNames::getOpSetName ()),
-      buildOpaqueVarRefExp (OP2::VariableNames::size, block));
+      variableDeclarations->getReference (getOpSetName ()),
+      buildOpaqueVarRefExp (size, block));
 
   SgStatement
       * callStatementF =
           FortranStatementsAndExpressionsBuilder::createCToFortranPointerCallStatement (
               subroutineScope, parameterExpressionF1,
-              variableDeclarations->getReference (
-                  OP2::VariableNames::PlanFunction::ncolblk),
+              variableDeclarations->getReference (PlanFunction::ncolblk),
               parameterExpressionF3);
 
   appendStatement (callStatementF, block);
@@ -78,38 +73,31 @@ FortranPlan::createConvertPlanFunctionParametersStatements ()
    */
 
   SgExpression * dotExpressionG = buildDotExp (
-      variableDeclarations->getReference (
-          OP2::VariableNames::PlanFunction::actualPlan), buildOpaqueVarRefExp (
-          OP2::VariableNames::PlanFunction::nblocks, block));
+      variableDeclarations->getReference (PlanFunction::actualPlan),
+      buildOpaqueVarRefExp (PlanFunction::nblocks, block));
 
   SgMultiplyOp * multiplyExpressionG = buildMultiplyOp (dotExpressionG,
-      variableDeclarations->getReference (
-          OP2::VariableNames::PlanFunction::indsNumber));
+      variableDeclarations->getReference (PlanFunction::indsNumber));
 
-  SgExprStatement
-      * assignmentStatementG = buildAssignStatement (
-          variableDeclarations->getReference (
-              OP2::VariableNames::PlanFunction::pindSizesSize),
-          multiplyExpressionG);
+  SgExprStatement * assignmentStatementG = buildAssignStatement (
+      variableDeclarations->getReference (PlanFunction::pindSizesSize),
+      multiplyExpressionG);
 
   appendStatement (assignmentStatementG, block);
 
   SgDotExp * parameterExpressionG1 = buildDotExp (
-      variableDeclarations->getReference (
-          OP2::VariableNames::PlanFunction::actualPlan), buildOpaqueVarRefExp (
-          OP2::VariableNames::PlanFunction::ind_sizes, block));
+      variableDeclarations->getReference (PlanFunction::actualPlan),
+      buildOpaqueVarRefExp (PlanFunction::ind_sizes, block));
 
   SgAggregateInitializer * parameterExpressionG3 =
       FortranStatementsAndExpressionsBuilder::buildShapeExpression (
-          variableDeclarations->getReference (
-              OP2::VariableNames::PlanFunction::pindSizesSize));
+          variableDeclarations->getReference (PlanFunction::pindSizesSize));
 
   SgStatement
       * callStatementG =
           FortranStatementsAndExpressionsBuilder::createCToFortranPointerCallStatement (
               subroutineScope, parameterExpressionG1,
-              variableDeclarations->getReference (
-                  OP2::VariableNames::PlanFunction::pindSizes),
+              variableDeclarations->getReference (PlanFunction::pindSizes),
               parameterExpressionG3);
 
   appendStatement (callStatementG, block);
@@ -121,29 +109,24 @@ FortranPlan::createConvertPlanFunctionParametersStatements ()
    */
 
   SgExprStatement * assignmentStatementH = buildAssignStatement (
-      variableDeclarations->getReference (
-          OP2::VariableNames::PlanFunction::pindOffsSize),
-      variableDeclarations->getReference (
-          OP2::VariableNames::PlanFunction::pindSizesSize));
+      variableDeclarations->getReference (PlanFunction::pindOffsSize),
+      variableDeclarations->getReference (PlanFunction::pindSizesSize));
 
   appendStatement (assignmentStatementH, block);
 
   SgDotExp * parameterExpressionH1 = buildDotExp (
-      variableDeclarations->getReference (
-          OP2::VariableNames::PlanFunction::actualPlan), buildOpaqueVarRefExp (
-          OP2::VariableNames::PlanFunction::ind_offs, block));
+      variableDeclarations->getReference (PlanFunction::actualPlan),
+      buildOpaqueVarRefExp (PlanFunction::ind_offs, block));
 
   SgAggregateInitializer * parameterExpressionH3 =
       FortranStatementsAndExpressionsBuilder::buildShapeExpression (
-          variableDeclarations->getReference (
-              OP2::VariableNames::PlanFunction::pindOffsSize));
+          variableDeclarations->getReference (PlanFunction::pindOffsSize));
 
   SgStatement
       * callStatementH =
           FortranStatementsAndExpressionsBuilder::createCToFortranPointerCallStatement (
               subroutineScope, parameterExpressionH1,
-              variableDeclarations->getReference (
-                  OP2::VariableNames::PlanFunction::pindOffs),
+              variableDeclarations->getReference (PlanFunction::pindOffs),
               parameterExpressionH3);
 
   appendStatement (callStatementH, block);
@@ -155,32 +138,28 @@ FortranPlan::createConvertPlanFunctionParametersStatements ()
    */
 
   SgExpression * dotExpressionI = buildDotExp (
-      variableDeclarations->getReference (
-          OP2::VariableNames::PlanFunction::actualPlan), buildOpaqueVarRefExp (
-          OP2::VariableNames::PlanFunction::nblocks, block));
+      variableDeclarations->getReference (PlanFunction::actualPlan),
+      buildOpaqueVarRefExp (PlanFunction::nblocks, block));
 
   SgExprStatement * assignmentStatementI = buildAssignStatement (
-      variableDeclarations->getReference (
-          OP2::VariableNames::PlanFunction::pblkMapSize), dotExpressionI);
+      variableDeclarations->getReference (PlanFunction::pblkMapSize),
+      dotExpressionI);
 
   appendStatement (assignmentStatementI, block);
 
   SgDotExp * parameterExpressionI1 = buildDotExp (
-      variableDeclarations->getReference (
-          OP2::VariableNames::PlanFunction::actualPlan), buildOpaqueVarRefExp (
-          OP2::VariableNames::PlanFunction::blkmap, block));
+      variableDeclarations->getReference (PlanFunction::actualPlan),
+      buildOpaqueVarRefExp (PlanFunction::blkmap, block));
 
   SgAggregateInitializer * parameterExpressionI3 =
       FortranStatementsAndExpressionsBuilder::buildShapeExpression (
-          variableDeclarations->getReference (
-              OP2::VariableNames::PlanFunction::pblkMapSize));
+          variableDeclarations->getReference (PlanFunction::pblkMapSize));
 
   SgStatement
       * callStatementI =
           FortranStatementsAndExpressionsBuilder::createCToFortranPointerCallStatement (
               subroutineScope, parameterExpressionI1,
-              variableDeclarations->getReference (
-                  OP2::VariableNames::PlanFunction::pblkMap),
+              variableDeclarations->getReference (PlanFunction::pblkMap),
               parameterExpressionI3);
 
   appendStatement (callStatementI, block);
@@ -192,32 +171,28 @@ FortranPlan::createConvertPlanFunctionParametersStatements ()
    */
 
   SgExpression * dotExpressionJ = buildDotExp (
-      variableDeclarations->getReference (
-          OP2::VariableNames::PlanFunction::actualPlan), buildOpaqueVarRefExp (
-          OP2::VariableNames::PlanFunction::nblocks, block));
+      variableDeclarations->getReference (PlanFunction::actualPlan),
+      buildOpaqueVarRefExp (PlanFunction::nblocks, block));
 
   SgExprStatement * assignmentStatementJ = buildAssignStatement (
-      variableDeclarations->getReference (
-          OP2::VariableNames::PlanFunction::poffsetSize), dotExpressionJ);
+      variableDeclarations->getReference (PlanFunction::poffsetSize),
+      dotExpressionJ);
 
   appendStatement (assignmentStatementJ, block);
 
   SgDotExp * parameterExpressionJ1 = buildDotExp (
-      variableDeclarations->getReference (
-          OP2::VariableNames::PlanFunction::actualPlan), buildOpaqueVarRefExp (
-          OP2::VariableNames::PlanFunction::offset, block));
+      variableDeclarations->getReference (PlanFunction::actualPlan),
+      buildOpaqueVarRefExp (PlanFunction::offset, block));
 
   SgAggregateInitializer * parameterExpressionJ3 =
       FortranStatementsAndExpressionsBuilder::buildShapeExpression (
-          variableDeclarations->getReference (
-              OP2::VariableNames::PlanFunction::poffsetSize));
+          variableDeclarations->getReference (PlanFunction::poffsetSize));
 
   SgStatement
       * callStatementJ =
           FortranStatementsAndExpressionsBuilder::createCToFortranPointerCallStatement (
               subroutineScope, parameterExpressionJ1,
-              variableDeclarations->getReference (
-                  OP2::VariableNames::PlanFunction::poffset),
+              variableDeclarations->getReference (PlanFunction::poffset),
               parameterExpressionJ3);
 
   appendStatement (callStatementJ, block);
@@ -229,32 +204,28 @@ FortranPlan::createConvertPlanFunctionParametersStatements ()
    */
 
   SgExpression * dotExpressionK = buildDotExp (
-      variableDeclarations->getReference (
-          OP2::VariableNames::PlanFunction::actualPlan), buildOpaqueVarRefExp (
-          OP2::VariableNames::PlanFunction::nblocks, block));
+      variableDeclarations->getReference (PlanFunction::actualPlan),
+      buildOpaqueVarRefExp (PlanFunction::nblocks, block));
 
   SgExprStatement * assignmentStatementK = buildAssignStatement (
-      variableDeclarations->getReference (
-          OP2::VariableNames::PlanFunction::pnelemsSize), dotExpressionK);
+      variableDeclarations->getReference (PlanFunction::pnelemsSize),
+      dotExpressionK);
 
   appendStatement (assignmentStatementK, block);
 
   SgDotExp * parameterExpressionK1 = buildDotExp (
-      variableDeclarations->getReference (
-          OP2::VariableNames::PlanFunction::actualPlan), buildOpaqueVarRefExp (
-          OP2::VariableNames::PlanFunction::nelems, block));
+      variableDeclarations->getReference (PlanFunction::actualPlan),
+      buildOpaqueVarRefExp (PlanFunction::nelems, block));
 
   SgAggregateInitializer * parameterExpressionK3 =
       FortranStatementsAndExpressionsBuilder::buildShapeExpression (
-          variableDeclarations->getReference (
-              OP2::VariableNames::PlanFunction::pnelemsSize));
+          variableDeclarations->getReference (PlanFunction::pnelemsSize));
 
   SgStatement
       * callStatementK =
           FortranStatementsAndExpressionsBuilder::createCToFortranPointerCallStatement (
               subroutineScope, parameterExpressionK1,
-              variableDeclarations->getReference (
-                  OP2::VariableNames::PlanFunction::pnelems),
+              variableDeclarations->getReference (PlanFunction::pnelems),
               parameterExpressionK3);
 
   appendStatement (callStatementK, block);
@@ -266,32 +237,28 @@ FortranPlan::createConvertPlanFunctionParametersStatements ()
    */
 
   SgExpression * dotExpressionL = buildDotExp (
-      variableDeclarations->getReference (
-          OP2::VariableNames::PlanFunction::actualPlan), buildOpaqueVarRefExp (
-          OP2::VariableNames::PlanFunction::nblocks, block));
+      variableDeclarations->getReference (PlanFunction::actualPlan),
+      buildOpaqueVarRefExp (PlanFunction::nblocks, block));
 
   SgExprStatement * assignmentStatementL = buildAssignStatement (
-      variableDeclarations->getReference (
-          OP2::VariableNames::PlanFunction::pnthrcolSize), dotExpressionL);
+      variableDeclarations->getReference (PlanFunction::pnthrcolSize),
+      dotExpressionL);
 
   appendStatement (assignmentStatementL, block);
 
   SgDotExp * parameterExpressionL1 = buildDotExp (
-      variableDeclarations->getReference (
-          OP2::VariableNames::PlanFunction::actualPlan), buildOpaqueVarRefExp (
-          OP2::VariableNames::PlanFunction::nthrcol, block));
+      variableDeclarations->getReference (PlanFunction::actualPlan),
+      buildOpaqueVarRefExp (PlanFunction::nthrcol, block));
 
   SgAggregateInitializer * parameterExpressionL3 =
       FortranStatementsAndExpressionsBuilder::buildShapeExpression (
-          variableDeclarations->getReference (
-              OP2::VariableNames::PlanFunction::pnthrcolSize));
+          variableDeclarations->getReference (PlanFunction::pnthrcolSize));
 
   SgStatement
       * callStatementL =
           FortranStatementsAndExpressionsBuilder::createCToFortranPointerCallStatement (
               subroutineScope, parameterExpressionL1,
-              variableDeclarations->getReference (
-                  OP2::VariableNames::PlanFunction::pnthrcol),
+              variableDeclarations->getReference (PlanFunction::pnthrcol),
               parameterExpressionL3);
 
   appendStatement (callStatementL, block);
@@ -303,30 +270,25 @@ FortranPlan::createConvertPlanFunctionParametersStatements ()
    */
 
   SgExprStatement * assignmentStatementM = buildAssignStatement (
-      variableDeclarations->getReference (
-          OP2::VariableNames::PlanFunction::pthrcolSize), buildDotExp (
-          variableDeclarations->getReference (
-              OP2::VariableNames::getOpSetName ()), buildOpaqueVarRefExp (
-              OP2::VariableNames::size, block)));
+      variableDeclarations->getReference (PlanFunction::pthrcolSize),
+      buildDotExp (variableDeclarations->getReference (getOpSetName ()),
+          buildOpaqueVarRefExp (size, block)));
 
   appendStatement (assignmentStatementM, block);
 
   SgDotExp * parameterExpressionM1 = buildDotExp (
-      variableDeclarations->getReference (
-          OP2::VariableNames::PlanFunction::actualPlan), buildOpaqueVarRefExp (
-          OP2::VariableNames::PlanFunction::thrcol, block));
+      variableDeclarations->getReference (PlanFunction::actualPlan),
+      buildOpaqueVarRefExp (PlanFunction::thrcol, block));
 
   SgAggregateInitializer * parameterExpressionM3 =
       FortranStatementsAndExpressionsBuilder::buildShapeExpression (
-          variableDeclarations->getReference (
-              OP2::VariableNames::PlanFunction::pthrcolSize));
+          variableDeclarations->getReference (PlanFunction::pthrcolSize));
 
   SgStatement
       * callStatementM =
           FortranStatementsAndExpressionsBuilder::createCToFortranPointerCallStatement (
               subroutineScope, parameterExpressionM1,
-              variableDeclarations->getReference (
-                  OP2::VariableNames::PlanFunction::pthrcol),
+              variableDeclarations->getReference (PlanFunction::pthrcol),
               parameterExpressionM3);
 
   appendStatement (callStatementM, block);
@@ -346,22 +308,19 @@ FortranPlan::createConvertPlanFunctionParametersStatements ()
       if (parallelLoop->isIndirect (i))
       {
         SgPntrArrRefExp * parameterExpressionN1 = buildPntrArrRefExp (
-            variableDeclarations->getReference (
-                OP2::VariableNames::PlanFunction::pindMaps), buildIntVal (
-                countIndirectArgs));
+            variableDeclarations->getReference (PlanFunction::pindMaps),
+            buildIntVal (countIndirectArgs));
 
         SgPntrArrRefExp * parameterExpressionN3 = buildPntrArrRefExp (
-            variableDeclarations->getReference (
-                OP2::VariableNames::PlanFunction::pnindirect), buildIntVal (
-                countIndirectArgs));
+            variableDeclarations->getReference (PlanFunction::pnindirect),
+            buildIntVal (countIndirectArgs));
 
         SgStatement
             * callStatementN =
                 FortranStatementsAndExpressionsBuilder::createCToFortranPointerCallStatement (
                     subroutineScope, parameterExpressionN1,
                     variableDeclarations->getReference (
-                        OP2::VariableNames::getLocalToGlobalMappingName (i)),
-                    parameterExpressionN3);
+                        getLocalToGlobalMappingName (i)), parameterExpressionN3);
 
         appendStatement (callStatementN, block);
 
@@ -378,6 +337,7 @@ FortranPlan::createConvertPositionInPMapsStatements ()
 {
   using namespace SageBuilder;
   using namespace SageInterface;
+  using namespace OP2::VariableNames;
 
   Debug::getInstance ()->debugMessage (
       "Creating statements in Fortran plan to convert positions in PMaps",
@@ -392,21 +352,18 @@ FortranPlan::createConvertPositionInPMapsStatements ()
    */
 
   SgDotExp * parameterExpressionB1 = buildDotExp (
-      variableDeclarations->getReference (
-          OP2::VariableNames::PlanFunction::actualPlan), buildOpaqueVarRefExp (
-          OP2::VariableNames::PlanFunction::nindirect, block));
+      variableDeclarations->getReference (PlanFunction::actualPlan),
+      buildOpaqueVarRefExp (PlanFunction::nindirect, block));
 
   SgAggregateInitializer * parameterExpressionB3 =
       FortranStatementsAndExpressionsBuilder::buildShapeExpression (
-          variableDeclarations->getReference (
-              OP2::VariableNames::PlanFunction::indsNumber));
+          variableDeclarations->getReference (PlanFunction::indsNumber));
 
   SgStatement
       * callStatementB =
           FortranStatementsAndExpressionsBuilder::createCToFortranPointerCallStatement (
               subroutineScope, parameterExpressionB1,
-              variableDeclarations->getReference (
-                  OP2::VariableNames::PlanFunction::pnindirect),
+              variableDeclarations->getReference (PlanFunction::pnindirect),
               parameterExpressionB3);
 
   appendStatement (callStatementB, block);
@@ -418,21 +375,18 @@ FortranPlan::createConvertPositionInPMapsStatements ()
    */
 
   SgDotExp * parameterExpressionC1 = buildDotExp (
-      variableDeclarations->getReference (
-          OP2::VariableNames::PlanFunction::actualPlan), buildOpaqueVarRefExp (
-          OP2::VariableNames::PlanFunction::maps, block));
+      variableDeclarations->getReference (PlanFunction::actualPlan),
+      buildOpaqueVarRefExp (PlanFunction::maps, block));
 
   SgAggregateInitializer * parameterExpressionC3 =
       FortranStatementsAndExpressionsBuilder::buildShapeExpression (
-          variableDeclarations->getReference (
-              OP2::VariableNames::PlanFunction::argsNumber));
+          variableDeclarations->getReference (PlanFunction::argsNumber));
 
   SgStatement
       * callStatementC =
           FortranStatementsAndExpressionsBuilder::createCToFortranPointerCallStatement (
               subroutineScope, parameterExpressionC1,
-              variableDeclarations->getReference (
-                  OP2::VariableNames::PlanFunction::pmaps),
+              variableDeclarations->getReference (PlanFunction::pmaps),
               parameterExpressionC3);
 
   appendStatement (callStatementC, block);
@@ -456,28 +410,26 @@ FortranPlan::createConvertPositionInPMapsStatements ()
       SgBasicBlock * ifBody = buildBasicBlock ();
 
       SgDotExp * dotExpression1 = buildDotExp (
-          variableDeclarations->getReference (
-              OP2::VariableNames::getOpSetName ()), buildOpaqueVarRefExp (
-              OP2::VariableNames::size, block));
+          variableDeclarations->getReference (getOpSetName ()),
+          buildOpaqueVarRefExp (size, block));
 
       SgExprStatement * statement1 = buildAssignStatement (
-          variableDeclarations->getReference (
-              OP2::VariableNames::getGlobalToLocalMappingSizeName (i)),
-          dotExpression1);
+          variableDeclarations->getReference (getGlobalToLocalMappingSizeName (
+              i)), dotExpression1);
 
       appendStatement (statement1, ifBody);
 
       SgPntrArrRefExp * parameterExpression1 = buildPntrArrRefExp (
-          variableDeclarations->getReference (
-              OP2::VariableNames::PlanFunction::pmaps), buildIntVal (i));
+          variableDeclarations->getReference (PlanFunction::pmaps),
+          buildIntVal (i));
 
       SgVarRefExp * parameterExpression2 = variableDeclarations->getReference (
-          OP2::VariableNames::getGlobalToLocalMappingName (i));
+          getGlobalToLocalMappingName (i));
 
       SgAggregateInitializer * parameterExpression3 =
           FortranStatementsAndExpressionsBuilder::buildShapeExpression (
               variableDeclarations->getReference (
-                  OP2::VariableNames::getGlobalToLocalMappingSizeName (i)));
+                  getGlobalToLocalMappingSizeName (i)));
 
       SgStatement
           * statement2 =
@@ -494,8 +446,8 @@ FortranPlan::createConvertPositionInPMapsStatements ()
        */
 
       SgExpression * arrayIndexExpression = buildPntrArrRefExp (
-          variableDeclarations->getReference (
-              OP2::VariableNames::PlanFunction::inds), buildIntVal (i));
+          variableDeclarations->getReference (PlanFunction::inds), buildIntVal (
+              i));
 
       SgExpression * ifGuardExpression = buildGreaterOrEqualOp (
           arrayIndexExpression, buildIntVal (0));
@@ -516,8 +468,7 @@ FortranPlan::createPlanFunctionParametersPreparationStatements ()
 {
   using namespace SageBuilder;
   using namespace SageInterface;
-  using std::map;
-  using std::string;
+  using namespace OP2::VariableNames;
 
   Debug::getInstance ()->debugMessage (
       "Creating statements to prepare plan function parameters",
@@ -528,12 +479,12 @@ FortranPlan::createPlanFunctionParametersPreparationStatements ()
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
     SgDotExp * dotExpression = buildDotExp (variableDeclarations->getReference (
-        OP2::VariableNames::getOpDatName (i)), buildOpaqueVarRefExp (
-        OP2::VariableNames::index, block));
+        getOpDatName (i)), buildOpaqueVarRefExp (OP2::VariableNames::index,
+        block));
 
     SgPntrArrRefExp * arrayIndexExpression = buildPntrArrRefExp (
-        variableDeclarations->getReference (
-            OP2::VariableNames::PlanFunction::args), buildIntVal (i));
+        variableDeclarations->getReference (PlanFunction::args),
+        buildIntVal (i));
 
     SgExprStatement * assignmentStatement = buildAssignStatement (
         arrayIndexExpression, dotExpression);
@@ -544,12 +495,12 @@ FortranPlan::createPlanFunctionParametersPreparationStatements ()
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
     SgExpression * arrayIndexExpression = buildPntrArrRefExp (
-        variableDeclarations->getReference (
-            OP2::VariableNames::PlanFunction::idxs), buildIntVal (i));
+        variableDeclarations->getReference (PlanFunction::idxs),
+        buildIntVal (i));
 
     SgExprStatement * assignmentStatement = buildAssignStatement (
         arrayIndexExpression, variableDeclarations->getReference (
-            OP2::VariableNames::getOpIndirectionName (i)));
+            getOpIndirectionName (i)));
 
     appendStatement (assignmentStatement, block);
   }
@@ -561,7 +512,8 @@ FortranPlan::createPlanFunctionParametersPreparationStatements ()
    */
   SgExpression * initializationExpression = buildAssignOp (
       variableDeclarations->getReference (
-          CommonVariableNames::iterationCounter1), buildIntVal (1));
+          CommonVariableNames::getIterationCounterVariableName (1)),
+      buildIntVal (1));
 
   /*
    * ======================================================
@@ -578,10 +530,9 @@ FortranPlan::createPlanFunctionParametersPreparationStatements ()
    * ======================================================
    */
   SgPntrArrRefExp * arrayIndexExpression1 = buildPntrArrRefExp (
+      variableDeclarations->getReference (PlanFunction::idxs),
       variableDeclarations->getReference (
-          OP2::VariableNames::PlanFunction::idxs),
-      variableDeclarations->getReference (
-          CommonVariableNames::iterationCounter1));
+          CommonVariableNames::getIterationCounterVariableName (1)));
 
   SgSubtractOp * subtractExpression1 = buildSubtractOp (arrayIndexExpression1,
       buildIntVal (1));
@@ -610,12 +561,12 @@ FortranPlan::createPlanFunctionParametersPreparationStatements ()
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
     SgDotExp * dotExpression = buildDotExp (variableDeclarations->getReference (
-        OP2::VariableNames::getOpMapName (i)), buildOpaqueVarRefExp (
-        OP2::VariableNames::index, block));
+        getOpMapName (i)), buildOpaqueVarRefExp (OP2::VariableNames::index,
+        block));
 
     SgPntrArrRefExp * arrayIndexExpression = buildPntrArrRefExp (
-        variableDeclarations->getReference (
-            OP2::VariableNames::PlanFunction::maps), buildIntVal (i));
+        variableDeclarations->getReference (PlanFunction::maps),
+        buildIntVal (i));
 
     SgExprStatement * assignmentStatement = buildAssignStatement (
         arrayIndexExpression, dotExpression);
@@ -626,12 +577,12 @@ FortranPlan::createPlanFunctionParametersPreparationStatements ()
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
     SgPntrArrRefExp * arrayIndexExpression = buildPntrArrRefExp (
-        variableDeclarations->getReference (
-            OP2::VariableNames::PlanFunction::accesses), buildIntVal (i));
+        variableDeclarations->getReference (PlanFunction::accesses),
+        buildIntVal (i));
 
     SgExprStatement * assignmentStatement = buildAssignStatement (
         arrayIndexExpression, variableDeclarations->getReference (
-            OP2::VariableNames::getOpAccessName (i)));
+            getOpAccessName (i)));
 
     appendStatement (assignmentStatement, block);
   }
@@ -644,7 +595,7 @@ FortranPlan::createPlanFunctionParametersPreparationStatements ()
    */
   int const undefinedIndex = -2;
 
-  map <string, int> indexValues;
+  std::map <std::string, int> indexValues;
 
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
@@ -665,8 +616,8 @@ FortranPlan::createPlanFunctionParametersPreparationStatements ()
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
     SgPntrArrRefExp * arrayIndexExpression = buildPntrArrRefExp (
-        variableDeclarations->getReference (
-            OP2::VariableNames::PlanFunction::inds), buildIntVal (i));
+        variableDeclarations->getReference (PlanFunction::inds),
+        buildIntVal (i));
 
     SgExprStatement * assignmentStatement;
 
@@ -697,16 +648,14 @@ FortranPlan::createPlanFunctionParametersPreparationStatements ()
   }
 
   SgExprStatement * assignmentStatement2 = buildAssignStatement (
-      variableDeclarations->getReference (
-          OP2::VariableNames::PlanFunction::argsNumber), buildIntVal (
-          parallelLoop->getNumberOfOpDatArgumentGroups ()));
+      variableDeclarations->getReference (PlanFunction::argsNumber),
+      buildIntVal (parallelLoop->getNumberOfOpDatArgumentGroups ()));
 
   appendStatement (assignmentStatement2, block);
 
   SgExprStatement * assignmentStatement3 = buildAssignStatement (
-      variableDeclarations->getReference (
-          OP2::VariableNames::PlanFunction::indsNumber), buildIntVal (
-          parallelLoop->getNumberOfDistinctIndirectOpDatArguments ()));
+      variableDeclarations->getReference (PlanFunction::indsNumber),
+      buildIntVal (parallelLoop->getNumberOfDistinctIndirectOpDatArguments ()));
 
   appendStatement (assignmentStatement3, block);
 
@@ -718,45 +667,46 @@ FortranPlan::createPlanFunctionCallExpression ()
 {
   using namespace SageBuilder;
   using namespace SageInterface;
+  using namespace OP2::VariableNames;
 
   Debug::getInstance ()->debugMessage ("Creating plan function call statement",
       Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
   SgVarRefExp * parameter1 = variableDeclarations->getReference (
-      OP2::VariableNames::getUserSubroutineName ());
+      getUserSubroutineName ());
 
   SgDotExp * parameter2 = buildDotExp (variableDeclarations->getReference (
-      OP2::VariableNames::getOpSetName ()), buildOpaqueVarRefExp (
-      OP2::VariableNames::index, subroutineScope));
+      getOpSetName ()), buildOpaqueVarRefExp (OP2::VariableNames::index,
+      subroutineScope));
 
   SgVarRefExp * parameter3 = variableDeclarations->getReference (
-      OP2::VariableNames::PlanFunction::argsNumber);
+      PlanFunction::argsNumber);
 
   SgVarRefExp * parameter4 = variableDeclarations->getReference (
-      OP2::VariableNames::PlanFunction::args);
+      PlanFunction::args);
 
   SgVarRefExp * parameter5 = variableDeclarations->getReference (
-      OP2::VariableNames::PlanFunction::idxs);
+      PlanFunction::idxs);
 
   SgVarRefExp * parameter6 = variableDeclarations->getReference (
-      OP2::VariableNames::PlanFunction::maps);
+      PlanFunction::maps);
 
   SgVarRefExp * parameter7 = variableDeclarations->getReference (
-      OP2::VariableNames::PlanFunction::accesses);
+      PlanFunction::accesses);
 
   SgVarRefExp * parameter8 = variableDeclarations->getReference (
-      OP2::VariableNames::PlanFunction::indsNumber);
+      PlanFunction::indsNumber);
 
   SgVarRefExp * parameter9 = variableDeclarations->getReference (
-      OP2::VariableNames::PlanFunction::inds);
+      PlanFunction::inds);
 
   SgExprListExp * actualParameters = buildExprListExp (parameter1, parameter2,
       parameter3, parameter4, parameter5, parameter6, parameter7, parameter8,
       parameter9);
 
   SgFunctionSymbol * functionSymbol =
-      FortranTypesBuilder::buildNewFortranFunction (
-          OP2::VariableNames::PlanFunction::cplan, subroutineScope);
+      FortranTypesBuilder::buildNewFortranFunction (PlanFunction::cplan,
+          subroutineScope);
 
   SgFunctionCallExp * functionCall = buildFunctionCallExp (functionSymbol,
       actualParameters);

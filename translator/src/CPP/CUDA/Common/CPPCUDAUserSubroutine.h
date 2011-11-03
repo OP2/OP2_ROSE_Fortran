@@ -2,28 +2,10 @@
 #ifndef CPP_CUDA_USER_SUBROUTINE_H
 #define CPP_CUDA_USER_SUBROUTINE_H
 
-#include <UserSubroutine.h>
+#include <CPPUserSubroutine.h>
 
-class CPPParallelLoop;
-class CPPProgramDeclarationsAndDefinitions;
-
-class CPPCUDAUserSubroutine: public UserSubroutine <SgFunctionDeclaration,
-    CPPProgramDeclarationsAndDefinitions>
+class CPPCUDAUserSubroutine: public CPPUserSubroutine
 {
-  private:
-
-    void
-    forceOutputOfCodeToFile ();
-
-    virtual void
-    createStatements ();
-
-    virtual void
-    createLocalVariableDeclarations ();
-
-    virtual void
-    createFormalParameterDeclarations ();
-
   public:
 
     CPPCUDAUserSubroutine (SgScopeStatement * moduleScope,

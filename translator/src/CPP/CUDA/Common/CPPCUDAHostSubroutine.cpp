@@ -26,15 +26,17 @@ CPPCUDAHostSubroutine::createReductionDeclarations ()
       "Creating local variable declarations needed for reduction",
       Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
-  variableDeclarations->add (CommonVariableNames::iterationCounter1,
+  variableDeclarations->add (
+      CommonVariableNames::getIterationCounterVariableName (1),
       RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
-          CommonVariableNames::iterationCounter1, buildIntType (),
-          subroutineScope));
+          CommonVariableNames::getIterationCounterVariableName (1),
+          buildIntType (), subroutineScope));
 
-  variableDeclarations->add (CommonVariableNames::iterationCounter2,
+  variableDeclarations->add (
+      CommonVariableNames::getIterationCounterVariableName (2),
       RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
-          CommonVariableNames::iterationCounter2, buildIntType (),
-          subroutineScope));
+          CommonVariableNames::getIterationCounterVariableName (2),
+          buildIntType (), subroutineScope));
 
   variableDeclarations->add (OP2::VariableNames::reductionBytes,
       RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (

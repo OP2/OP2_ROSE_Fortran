@@ -12,6 +12,7 @@
 #include <CPPModifyOP2CallsToComplyWithOxfordAPI.h>
 #include <CPPProgramDeclarationsAndDefinitions.h>
 #include <CPPCUDASubroutinesGeneration.h>
+#include <CPPOpenMPSubroutinesGeneration.h>
 #include <CPPOpenCLSubroutinesGeneration.h>
 #include <boost/algorithm/string.hpp>
 #include <boost/filesystem.hpp>
@@ -97,6 +98,19 @@ handleCPPProject (SgProject * project)
           new CPPProgramDeclarationsAndDefinitions (project);
 
       generator = new CPPCUDASubroutinesGeneration (project, declarations);
+
+      break;
+    }
+
+    case TargetLanguage::OPENMP:
+    {
+      Debug::getInstance ()->debugMessage ("OpenMP code generation selected",
+          Debug::VERBOSE_LEVEL, __FILE__, __LINE__);
+
+      CPPProgramDeclarationsAndDefinitions * declarations =
+          new CPPProgramDeclarationsAndDefinitions (project);
+
+      generator = new CPPOpenMPSubroutinesGeneration (project, declarations);
 
       break;
     }

@@ -15,13 +15,6 @@
 #include <Debug.h>
 #include <rose.h>
 
-namespace CommonVariableNames
-{
-  std::string const iterationCounter1 = "i1";
-  std::string const iterationCounter2 = "i2";
-  std::string const upperBound = "bound";
-}
-
 template <typename TSubroutineHeader>
   class Subroutine
   {
@@ -73,6 +66,7 @@ template <typename TSubroutineHeader>
        * Every created subroutine has a number of statements
        * ======================================================
        */
+
       virtual void
       createStatements () = 0;
 
@@ -81,6 +75,7 @@ template <typename TSubroutineHeader>
        * Every created subroutine has local variable declarations
        * ======================================================
        */
+
       virtual void
       createLocalVariableDeclarations () = 0;
 
@@ -89,6 +84,7 @@ template <typename TSubroutineHeader>
        * Every created subroutine has formal parameters
        * ======================================================
        */
+
       virtual void
       createFormalParameterDeclarations () = 0;
 
@@ -98,6 +94,7 @@ template <typename TSubroutineHeader>
        * create
        * ======================================================
        */
+
       Subroutine (std::string const & subroutineName)
       {
         using boost::lexical_cast;
@@ -136,6 +133,7 @@ template <typename TSubroutineHeader>
        * internally by ROSE in its abstract syntax tree
        * ======================================================
        */
+
       TSubroutineHeader *
       getSubroutineHeaderStatement ()
       {
@@ -147,6 +145,7 @@ template <typename TSubroutineHeader>
        * What is the name of the subroutine?
        * ======================================================
        */
+
       std::string const &
       getSubroutineName () const
       {
@@ -158,6 +157,7 @@ template <typename TSubroutineHeader>
        * Returns the variable declarations in this subroutine
        * ======================================================
        */
+
       ScopedVariableDeclarations *
       getVariableDeclarations ()
       {

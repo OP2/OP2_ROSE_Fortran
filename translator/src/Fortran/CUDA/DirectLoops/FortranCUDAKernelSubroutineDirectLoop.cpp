@@ -38,14 +38,14 @@ FortranCUDAKernelSubroutineDirectLoop::createUserSubroutineCallStatement ()
       {
         SgAddOp * addExpression = buildAddOp (
             variableDeclarations->getReference (
-                CommonVariableNames::iterationCounter1), buildIntVal (
-                parallelLoop->getOpDatDimension (i) - 1));
+                CommonVariableNames::getIterationCounterVariableName (1)),
+            buildIntVal (parallelLoop->getOpDatDimension (i) - 1));
 
         SgSubscriptExpression * arraySubscriptExpression =
             new SgSubscriptExpression (RoseHelper::getFileInfo (),
                 variableDeclarations->getReference (
-                    CommonVariableNames::iterationCounter1), addExpression,
-                buildIntVal (1));
+                    CommonVariableNames::getIterationCounterVariableName (1)),
+                addExpression, buildIntVal (1));
 
         arraySubscriptExpression->set_endOfConstruct (
             RoseHelper::getFileInfo ());
@@ -141,7 +141,8 @@ FortranCUDAKernelSubroutineDirectLoop::createStageInFromDeviceMemoryToSharedMemo
 
   SgAssignOp * initialisationExpression = buildAssignOp (
       variableDeclarations->getReference (
-          CommonVariableNames::iterationCounter2), buildIntVal (0));
+          CommonVariableNames::getIterationCounterVariableName (2)),
+      buildIntVal (0));
 
   SgDotExp * dotExpression = buildDotExp (variableDeclarations->getReference (
       OP2::VariableNames::opDatDimensions),
@@ -149,7 +150,7 @@ FortranCUDAKernelSubroutineDirectLoop::createStageInFromDeviceMemoryToSharedMemo
 
   SgMultiplyOp * multiplyExpression1 = buildMultiplyOp (
       variableDeclarations->getReference (
-          CommonVariableNames::iterationCounter2),
+          CommonVariableNames::getIterationCounterVariableName (2)),
       variableDeclarations->getReference (OP2::VariableNames::nelems));
 
   SgAddOp * addExpression1 = buildAddOp (variableDeclarations->getReference (
@@ -160,7 +161,7 @@ FortranCUDAKernelSubroutineDirectLoop::createStageInFromDeviceMemoryToSharedMemo
 
   SgMultiplyOp * multiplyExpression2 = buildMultiplyOp (
       variableDeclarations->getReference (
-          CommonVariableNames::iterationCounter2),
+          CommonVariableNames::getIterationCounterVariableName (2)),
       variableDeclarations->getReference (OP2::VariableNames::nelems));
 
   SgMultiplyOp * multiplyExpression3 = buildMultiplyOp (
@@ -217,7 +218,8 @@ FortranCUDAKernelSubroutineDirectLoop::createStageInFromSharedMemoryToLocalMemor
 
   SgAssignOp * initialisationExpression = buildAssignOp (
       variableDeclarations->getReference (
-          CommonVariableNames::iterationCounter2), buildIntVal (0));
+          CommonVariableNames::getIterationCounterVariableName (2)),
+      buildIntVal (0));
 
   SgDotExp * dotExpression = buildDotExp (variableDeclarations->getReference (
       OP2::VariableNames::opDatDimensions),
@@ -228,7 +230,8 @@ FortranCUDAKernelSubroutineDirectLoop::createStageInFromSharedMemoryToLocalMemor
       dotExpression);
 
   SgAddOp * addExpression5 = buildAddOp (variableDeclarations->getReference (
-      CommonVariableNames::iterationCounter2), multiplyExpression4);
+      CommonVariableNames::getIterationCounterVariableName (2)),
+      multiplyExpression4);
 
   SgAddOp * addExpression6 = buildAddOp (variableDeclarations->getReference (
       autosharedOffsetVariableName), addExpression5);
@@ -237,7 +240,7 @@ FortranCUDAKernelSubroutineDirectLoop::createStageInFromSharedMemoryToLocalMemor
       variableDeclarations->getReference (
           OP2::VariableNames::getOpDatLocalName (OP_DAT_ArgumentGroup)),
       variableDeclarations->getReference (
-          CommonVariableNames::iterationCounter2));
+          CommonVariableNames::getIterationCounterVariableName (2)));
 
   SgPntrArrRefExp * arrayExpression4 = buildPntrArrRefExp (
       variableDeclarations->getReference (autosharedVariableName),
@@ -279,7 +282,8 @@ FortranCUDAKernelSubroutineDirectLoop::createStageOutFromSharedMemoryToDeviceMem
 
   SgExpression * loopInitializationExpression = buildAssignOp (
       variableDeclarations->getReference (
-          CommonVariableNames::iterationCounter2), buildIntVal (0));
+          CommonVariableNames::getIterationCounterVariableName (2)),
+      buildIntVal (0));
 
   SgDotExp * dotExpression = buildDotExp (variableDeclarations->getReference (
       OP2::VariableNames::opDatDimensions),
@@ -287,7 +291,7 @@ FortranCUDAKernelSubroutineDirectLoop::createStageOutFromSharedMemoryToDeviceMem
 
   SgMultiplyOp * multiplyExpression2 = buildMultiplyOp (
       variableDeclarations->getReference (
-          CommonVariableNames::iterationCounter2),
+          CommonVariableNames::getIterationCounterVariableName (2)),
       variableDeclarations->getReference (OP2::VariableNames::nelems));
 
   SgMultiplyOp * multiplyExpression3 = buildMultiplyOp (
@@ -302,7 +306,7 @@ FortranCUDAKernelSubroutineDirectLoop::createStageOutFromSharedMemoryToDeviceMem
 
   SgMultiplyOp * multiplyExpression4 = buildMultiplyOp (
       variableDeclarations->getReference (
-          CommonVariableNames::iterationCounter2),
+          CommonVariableNames::getIterationCounterVariableName (2)),
       variableDeclarations->getReference (OP2::VariableNames::nelems));
 
   SgAddOp * addExpression5 = buildAddOp (variableDeclarations->getReference (
@@ -355,7 +359,8 @@ FortranCUDAKernelSubroutineDirectLoop::createStageOutFromLocalMemoryToSharedMemo
 
   SgExpression * loopInitializationExpression = buildAssignOp (
       variableDeclarations->getReference (
-          CommonVariableNames::iterationCounter2), buildIntVal (0));
+          CommonVariableNames::getIterationCounterVariableName (2)),
+      buildIntVal (0));
 
   SgDotExp * dotExpression = buildDotExp (variableDeclarations->getReference (
       OP2::VariableNames::opDatDimensions),
@@ -366,7 +371,8 @@ FortranCUDAKernelSubroutineDirectLoop::createStageOutFromLocalMemoryToSharedMemo
       dotExpression);
 
   SgAddOp * addExpression1 = buildAddOp (variableDeclarations->getReference (
-      CommonVariableNames::iterationCounter2), multiplyExpression1);
+      CommonVariableNames::getIterationCounterVariableName (2)),
+      multiplyExpression1);
 
   SgAddOp * addExpression2 = buildAddOp (variableDeclarations->getReference (
       autosharedOffsetVariableName), addExpression1);
@@ -375,7 +381,7 @@ FortranCUDAKernelSubroutineDirectLoop::createStageOutFromLocalMemoryToSharedMemo
       variableDeclarations->getReference (
           OP2::VariableNames::getOpDatLocalName (OP_DAT_ArgumentGroup)),
       variableDeclarations->getReference (
-          CommonVariableNames::iterationCounter2));
+          CommonVariableNames::getIterationCounterVariableName (2)));
 
   SgPntrArrRefExp * arrayExpression2 = buildPntrArrRefExp (
       variableDeclarations->getReference (autosharedVariableName),
@@ -412,7 +418,7 @@ FortranCUDAKernelSubroutineDirectLoop::createExecutionLoopStatements ()
 
   SgSubtractOp * subtractExpression1 = buildSubtractOp (
       variableDeclarations->getReference (
-          CommonVariableNames::iterationCounter1),
+          CommonVariableNames::getIterationCounterVariableName (1)),
       variableDeclarations->getReference (OP2::VariableNames::threadID));
 
   SgExprStatement * assignmentStatement1 = buildAssignStatement (
@@ -503,7 +509,8 @@ FortranCUDAKernelSubroutineDirectLoop::createExecutionLoopStatements ()
 
   SgExpression * initialisationExpression = buildAssignOp (
       variableDeclarations->getReference (
-          CommonVariableNames::iterationCounter1), addExpression);
+          CommonVariableNames::getIterationCounterVariableName (1)),
+      addExpression);
 
   SgMultiplyOp * strideExpression = buildMultiplyOp (
       CUDA::getThreadBlockDimension (THREAD_X, subroutineScope),
@@ -637,8 +644,10 @@ FortranCUDAKernelSubroutineDirectLoop::createLocalVariableDeclarations ()
 
   vector <string> fourByteIntegers;
 
-  fourByteIntegers.push_back (CommonVariableNames::iterationCounter1);
-  fourByteIntegers.push_back (CommonVariableNames::iterationCounter2);
+  fourByteIntegers.push_back (
+      CommonVariableNames::getIterationCounterVariableName (1));
+  fourByteIntegers.push_back (
+      CommonVariableNames::getIterationCounterVariableName (2));
   fourByteIntegers.push_back (OP2::VariableNames::localOffset);
   fourByteIntegers.push_back (OP2::VariableNames::nelems);
   fourByteIntegers.push_back (OP2::VariableNames::threadID);

@@ -370,4 +370,27 @@ namespace OP2
   }
 }
 
+namespace CommonVariableNames
+{
+  /*
+   * ======================================================
+   * Get a for loop counter variable name with this integer
+   * suffix
+   * ======================================================
+   */
+
+  std::string const
+  getIterationCounterVariableName (unsigned int n);
+
+  /*
+   * ======================================================
+   * Get an upper bound variable name with this integer
+   * suffix
+   * ======================================================
+   */
+
+  std::string const
+  getUpperBoundVariableName (unsigned int n);
+}
+
 #endif

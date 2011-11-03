@@ -292,6 +292,10 @@ OP2::VariableNames::getCUDASharedMemoryDeclarationName (SgType * type,
     {
       return prefix + "Float" + lexical_cast <string> (size);
     }
+    case V_SgTypeDouble:
+    {
+      return prefix + "Double" + lexical_cast <string> (size);
+    }
     default:
     {
       throw Exceptions::CUDA::SharedVariableTypeException (
@@ -320,6 +324,10 @@ OP2::VariableNames::getCUDAVolatileSharedMemoryDeclarationName (SgType * type,
     {
       return prefix + "Float" + lexical_cast <string> (size);
     }
+    case V_SgTypeDouble:
+    {
+      return prefix + "Double" + lexical_cast <string> (size);
+    }
     default:
     {
       throw Exceptions::CUDA::SharedVariableTypeException (
@@ -344,12 +352,14 @@ OP2::VariableNames::getCUDASharedMemoryOffsetDeclarationName (SgType * type,
     {
       return prefix + "Integer" + lexical_cast <string> (size);
     }
-
     case V_SgTypeFloat:
     {
       return prefix + "Float" + lexical_cast <string> (size);
     }
-
+    case V_SgTypeDouble:
+    {
+      return prefix + "Double" + lexical_cast <string> (size);
+    }
     default:
     {
       throw Exceptions::CUDA::SharedVariableTypeException (
@@ -387,4 +397,22 @@ OP2::VariableNames::getReductionCardinalityName (
   using std::string;
 
   return "reductionCardinality" + lexical_cast <string> (OP_DAT_ArgumentGroup);
+}
+
+std::string const
+CommonVariableNames::getIterationCounterVariableName (unsigned int n)
+{
+  using boost::lexical_cast;
+  using std::string;
+
+  return "i" + lexical_cast <string> (n);
+}
+
+std::string const
+CommonVariableNames::getUpperBoundVariableName (unsigned int n)
+{
+  using boost::lexical_cast;
+  using std::string;
+
+  return "n" + lexical_cast <string> (n);
 }

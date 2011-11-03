@@ -40,7 +40,8 @@ CPPCUDAKernelSubroutineIndirectLoop::createUserSubroutineCallStatement ()
             Debug::OUTER_LOOP_LEVEL, __FILE__, __LINE__);
 
         SgAddOp * addExpression1 = buildAddOp (
-            variableDeclarations->getReference (iterationCounter1),
+            variableDeclarations->getReference (
+                getIterationCounterVariableName (1)),
             variableDeclarations->getReference (sharedMemoryOffset));
 
         SgPntrArrRefExp * arrayExpression1 =
@@ -60,8 +61,8 @@ CPPCUDAKernelSubroutineIndirectLoop::createUserSubroutineCallStatement ()
           Debug::OUTER_LOOP_LEVEL, __FILE__, __LINE__);
 
       SgAddOp * addExpression1 = buildAddOp (
-          variableDeclarations->getReference (iterationCounter1),
-          variableDeclarations->getReference (sharedMemoryOffset));
+          variableDeclarations->getReference (getIterationCounterVariableName (
+              1)), variableDeclarations->getReference (sharedMemoryOffset));
 
       SgMultiplyOp * multiplyExpression1 = buildMultiplyOp (addExpression1,
           buildIntVal (parallelLoop->getOpDatDimension (i)));
@@ -82,8 +83,16 @@ CPPCUDAKernelSubroutineIndirectLoop::createUserSubroutineCallStatement ()
       Debug::getInstance ()->debugMessage ("Global with read access",
           Debug::OUTER_LOOP_LEVEL, __FILE__, __LINE__);
 
-      parameterExpression = variableDeclarations->getReference (
-          getOpDatLocalName (i));
+      if (parallelLoop->isPointer (i) || parallelLoop->isArray (i))
+      {
+        parameterExpression = variableDeclarations->getReference (
+            getOpDatLocalName (i));
+      }
+      else
+      {
+        parameterExpression = variableDeclarations->getReference (getOpDatName (
+            i));
+      }
     }
 
     ROSE_ASSERT (parameterExpression != NULL);
@@ -127,8 +136,9 @@ CPPCUDAKernelSubroutineIndirectLoop::createIncrementAndWriteAccessEpilogueStatem
           SgBasicBlock * loopBody = buildBasicBlock ();
 
           SgDivideOp * divideExpression1 = buildDivideOp (
-              variableDeclarations->getReference (iterationCounter1),
-              buildIntVal (parallelLoop->getOpDatDimension (i)));
+              variableDeclarations->getReference (
+                  getIterationCounterVariableName (1)), buildIntVal (
+                  parallelLoop->getOpDatDimension (i)));
 
           SgPntrArrRefExp * arrayExpression1a = buildPntrArrRefExp (
               variableDeclarations->getReference (getIndirectionMapName (i)),
@@ -139,8 +149,9 @@ CPPCUDAKernelSubroutineIndirectLoop::createIncrementAndWriteAccessEpilogueStatem
                   i)));
 
           SgModOp * modulusExpression1 = buildModOp (
-              variableDeclarations->getReference (iterationCounter1),
-              buildIntVal (parallelLoop->getOpDatDimension (i)));
+              variableDeclarations->getReference (
+                  getIterationCounterVariableName (1)), buildIntVal (
+                  parallelLoop->getOpDatDimension (i)));
 
           SgAddOp * addExpression1 = buildAddOp (modulusExpression1,
               multiplyExpression1);
@@ -152,7 +163,8 @@ CPPCUDAKernelSubroutineIndirectLoop::createIncrementAndWriteAccessEpilogueStatem
           SgPntrArrRefExp * arrayExpression1c = buildPntrArrRefExp (
               variableDeclarations->getReference (
                   getIndirectionCUDASharedMemoryName (i)),
-              variableDeclarations->getReference (iterationCounter1));
+              variableDeclarations->getReference (
+                  getIterationCounterVariableName (1)));
 
           if (parallelLoop->isIncremented (i))
           {
@@ -177,8 +189,9 @@ CPPCUDAKernelSubroutineIndirectLoop::createIncrementAndWriteAccessEpilogueStatem
            */
 
           SgExprStatement * initialisationExpression = buildAssignStatement (
-              variableDeclarations->getReference (iterationCounter1),
-              CUDA::getThreadId (THREAD_X, subroutineScope));
+              variableDeclarations->getReference (
+                  getIterationCounterVariableName (1)), CUDA::getThreadId (
+                  THREAD_X, subroutineScope));
 
           SgMultiplyOp * multiplyExpression = buildMultiplyOp (
               variableDeclarations->getReference (
@@ -186,11 +199,12 @@ CPPCUDAKernelSubroutineIndirectLoop::createIncrementAndWriteAccessEpilogueStatem
                   parallelLoop->getOpDatDimension (i)));
 
           SgLessThanOp * upperBoundExpression = buildLessThanOp (
-              variableDeclarations->getReference (iterationCounter1),
-              multiplyExpression);
+              variableDeclarations->getReference (
+                  getIterationCounterVariableName (1)), multiplyExpression);
 
           SgPlusAssignOp * strideExpression = buildPlusAssignOp (
-              variableDeclarations->getReference (iterationCounter1),
+              variableDeclarations->getReference (
+                  getIterationCounterVariableName (1)),
               CUDA::getThreadBlockDimension (THREAD_X, subroutineScope));
 
           SgForStatement * forStatement = buildForStatement (
@@ -230,8 +244,8 @@ CPPCUDAKernelSubroutineIndirectLoop::createStageOutFromLocalMemoryToSharedMemory
       SgBasicBlock * innerLoopBody = buildBasicBlock ();
 
       SgAddOp * addExpression1 = buildAddOp (
-          variableDeclarations->getReference (iterationCounter1),
-          variableDeclarations->getReference (sharedMemoryOffset));
+          variableDeclarations->getReference (getIterationCounterVariableName (
+              1)), variableDeclarations->getReference (sharedMemoryOffset));
 
       SgPntrArrRefExp * arrayExpression1 = buildPntrArrRefExp (
           variableDeclarations->getReference (getGlobalToLocalMappingName (i)),
@@ -241,8 +255,8 @@ CPPCUDAKernelSubroutineIndirectLoop::createStageOutFromLocalMemoryToSharedMemory
           buildIntVal (parallelLoop->getOpDatDimension (i)));
 
       SgAddOp * addExpression2 = buildAddOp (
-          variableDeclarations->getReference (iterationCounter2),
-          multiplyExpression1);
+          variableDeclarations->getReference (getIterationCounterVariableName (
+              2)), multiplyExpression1);
 
       SgPntrArrRefExp * arrayExpression2 = buildPntrArrRefExp (
           variableDeclarations->getReference (
@@ -250,7 +264,8 @@ CPPCUDAKernelSubroutineIndirectLoop::createStageOutFromLocalMemoryToSharedMemory
 
       SgPntrArrRefExp * arrayExpression3 = buildPntrArrRefExp (
           variableDeclarations->getReference (getOpDatLocalName (i)),
-          variableDeclarations->getReference (iterationCounter2));
+          variableDeclarations->getReference (getIterationCounterVariableName (
+              2)));
 
       SgExprStatement * assignmentStatement = buildAssignStatement (
           arrayExpression2, arrayExpression3);
@@ -259,14 +274,15 @@ CPPCUDAKernelSubroutineIndirectLoop::createStageOutFromLocalMemoryToSharedMemory
 
       SgExprStatement * innerLoopInitialisationExpression =
           buildAssignStatement (variableDeclarations->getReference (
-              iterationCounter2), buildIntVal (0));
+              getIterationCounterVariableName (2)), buildIntVal (0));
 
       SgLessThanOp * innerLoopUpperBoundExpression = buildLessThanOp (
-          variableDeclarations->getReference (iterationCounter2), buildIntVal (
-              parallelLoop->getOpDatDimension (i)));
+          variableDeclarations->getReference (getIterationCounterVariableName (
+              2)), buildIntVal (parallelLoop->getOpDatDimension (i)));
 
       SgPlusPlusOp * innerLoopstrideExpression = buildPlusPlusOp (
-          variableDeclarations->getReference (iterationCounter2));
+          variableDeclarations->getReference (getIterationCounterVariableName (
+              2)));
 
       SgForStatement * innerLoopStatement = buildForStatement (
           innerLoopInitialisationExpression, buildExprStatement (
@@ -340,12 +356,20 @@ CPPCUDAKernelSubroutineIndirectLoop::createInitialiseIncrementAccessStatements (
 
       SgPntrArrRefExp * arrayExpression = buildPntrArrRefExp (
           variableDeclarations->getReference (getOpDatLocalName (i)),
-          variableDeclarations->getReference (iterationCounter2));
+          variableDeclarations->getReference (getIterationCounterVariableName (
+              2)));
 
       if (isSgTypeFloat (parallelLoop->getOpDatBaseType (i)))
       {
         SgExprStatement * assignmentStatement = buildAssignStatement (
             arrayExpression, buildFloatVal (0));
+
+        appendStatement (assignmentStatement, loopBody);
+      }
+      else if (isSgTypeDouble (parallelLoop->getOpDatBaseType (i)))
+      {
+        SgExprStatement * assignmentStatement = buildAssignStatement (
+            arrayExpression, buildDoubleVal (0));
 
         appendStatement (assignmentStatement, loopBody);
       }
@@ -358,15 +382,16 @@ CPPCUDAKernelSubroutineIndirectLoop::createInitialiseIncrementAccessStatements (
       }
 
       SgExprStatement * initialisationExpression = buildAssignStatement (
-          variableDeclarations->getReference (iterationCounter2), buildIntVal (
-              0));
+          variableDeclarations->getReference (getIterationCounterVariableName (
+              2)), buildIntVal (0));
 
       SgLessThanOp * upperBoundExpression = buildLessThanOp (
-          variableDeclarations->getReference (iterationCounter2), buildIntVal (
-              parallelLoop->getOpDatDimension (i)));
+          variableDeclarations->getReference (getIterationCounterVariableName (
+              2)), buildIntVal (parallelLoop->getOpDatDimension (i)));
 
       SgPlusPlusOp * strideExpression = buildPlusPlusOp (
-          variableDeclarations->getReference (iterationCounter2));
+          variableDeclarations->getReference (getIterationCounterVariableName (
+              2)));
 
       SgForStatement * forLoopStatement = buildForStatement (
           initialisationExpression, buildExprStatement (upperBoundExpression),
@@ -394,11 +419,11 @@ CPPCUDAKernelSubroutineIndirectLoop::createExecutionLoopStatements ()
   SgBasicBlock * loopBody = buildBasicBlock ();
 
   SgExprStatement * initialisationExpression = buildAssignStatement (
-      variableDeclarations->getReference (iterationCounter1),
+      variableDeclarations->getReference (getIterationCounterVariableName (1)),
       CUDA::getThreadId (THREAD_X, subroutineScope));
 
   SgPlusAssignOp * strideExpression = buildPlusAssignOp (
-      variableDeclarations->getReference (iterationCounter1),
+      variableDeclarations->getReference (getIterationCounterVariableName (1)),
       CUDA::getThreadBlockDimension (THREAD_X, subroutineScope));
 
   SgLessThanOp * upperBoundExpression;
@@ -419,8 +444,8 @@ CPPCUDAKernelSubroutineIndirectLoop::createExecutionLoopStatements ()
     appendStatement (createUserSubroutineCallStatement (), ifBody);
 
     SgAddOp * addExpression1 = buildAddOp (variableDeclarations->getReference (
-        iterationCounter1), variableDeclarations->getReference (
-        sharedMemoryOffset));
+        getIterationCounterVariableName (1)),
+        variableDeclarations->getReference (sharedMemoryOffset));
 
     SgPntrArrRefExp * arrayExpression1 = buildPntrArrRefExp (
         variableDeclarations->getReference (PlanFunction::pthrcol),
@@ -431,9 +456,10 @@ CPPCUDAKernelSubroutineIndirectLoop::createExecutionLoopStatements ()
 
     appendStatement (assignmentStatement2, ifBody);
 
-    SgExpression * ifGuardExpression = buildLessThanOp (
-        variableDeclarations->getReference (iterationCounter1),
-        variableDeclarations->getReference (nelems));
+    SgExpression * ifGuardExpression =
+        buildLessThanOp (variableDeclarations->getReference (
+            getIterationCounterVariableName (1)),
+            variableDeclarations->getReference (nelems));
 
     SgIfStmt * ifStatement =
         RoseStatementsAndExpressionsBuilder::buildIfStatementWithEmptyElse (
@@ -446,14 +472,16 @@ CPPCUDAKernelSubroutineIndirectLoop::createExecutionLoopStatements ()
         loopBody);
 
     upperBoundExpression = buildLessThanOp (variableDeclarations->getReference (
-        iterationCounter1), variableDeclarations->getReference (nelems2));
+        getIterationCounterVariableName (1)),
+        variableDeclarations->getReference (nelems2));
   }
   else
   {
     appendStatement (createUserSubroutineCallStatement (), loopBody);
 
     upperBoundExpression = buildLessThanOp (variableDeclarations->getReference (
-        iterationCounter1), variableDeclarations->getReference (nelems));
+        getIterationCounterVariableName (1)),
+        variableDeclarations->getReference (nelems));
   }
 
   SgForStatement * forLoopStatement = buildForStatement (
@@ -497,12 +525,20 @@ CPPCUDAKernelSubroutineIndirectLoop::createInitialiseCUDASharedVariablesStatemen
           SgPntrArrRefExp * arrayExpression = buildPntrArrRefExp (
               variableDeclarations->getReference (
                   getIndirectionCUDASharedMemoryName (i)),
-              variableDeclarations->getReference (iterationCounter1));
+              variableDeclarations->getReference (
+                  getIterationCounterVariableName (1)));
 
           if (isSgTypeFloat (parallelLoop->getOpDatBaseType (i)))
           {
             SgExprStatement * assignmentStatement = buildAssignStatement (
                 arrayExpression, buildFloatVal (0.0));
+
+            appendStatement (assignmentStatement, loopBody);
+          }
+          else if (isSgTypeDouble (parallelLoop->getOpDatBaseType (i)))
+          {
+            SgExprStatement * assignmentStatement = buildAssignStatement (
+                arrayExpression, buildDoubleVal (0));
 
             appendStatement (assignmentStatement, loopBody);
           }
@@ -517,8 +553,9 @@ CPPCUDAKernelSubroutineIndirectLoop::createInitialiseCUDASharedVariablesStatemen
         else
         {
           SgDivideOp * divideExpression = buildDivideOp (
-              variableDeclarations->getReference (iterationCounter1),
-              buildIntVal (parallelLoop->getOpDatDimension (i)));
+              variableDeclarations->getReference (
+                  getIterationCounterVariableName (1)), buildIntVal (
+                  parallelLoop->getOpDatDimension (i)));
 
           SgPntrArrRefExp * arrayExpression1 = buildPntrArrRefExp (
               variableDeclarations->getReference (getIndirectionMapName (i)),
@@ -529,8 +566,9 @@ CPPCUDAKernelSubroutineIndirectLoop::createInitialiseCUDASharedVariablesStatemen
                   parallelLoop->getOpDatDimension (i)));
 
           SgModOp * modulusExpression = buildModOp (
-              variableDeclarations->getReference (iterationCounter1),
-              buildIntVal (parallelLoop->getOpDatDimension (i)));
+              variableDeclarations->getReference (
+                  getIterationCounterVariableName (1)), buildIntVal (
+                  parallelLoop->getOpDatDimension (i)));
 
           SgAddOp * addExpression = buildAddOp (modulusExpression,
               multiplyExpression);
@@ -542,7 +580,8 @@ CPPCUDAKernelSubroutineIndirectLoop::createInitialiseCUDASharedVariablesStatemen
           SgPntrArrRefExp * arrayExpression3 = buildPntrArrRefExp (
               variableDeclarations->getReference (
                   getIndirectionCUDASharedMemoryName (i)),
-              variableDeclarations->getReference (iterationCounter1));
+              variableDeclarations->getReference (
+                  getIterationCounterVariableName (1)));
 
           SgExprStatement * assignmentStatement = buildAssignStatement (
               arrayExpression3, arrayExpression2);
@@ -557,19 +596,21 @@ CPPCUDAKernelSubroutineIndirectLoop::createInitialiseCUDASharedVariablesStatemen
          */
 
         SgExprStatement * initialisationExpression = buildAssignStatement (
-            variableDeclarations->getReference (iterationCounter1),
-            CUDA::getThreadId (THREAD_X, subroutineScope));
+            variableDeclarations->getReference (
+                getIterationCounterVariableName (1)), CUDA::getThreadId (
+                THREAD_X, subroutineScope));
 
         SgMultiplyOp * multiplyExpression = buildMultiplyOp (
             variableDeclarations->getReference (getIndirectionArgumentSizeName (
                 i)), buildIntVal (parallelLoop->getOpDatDimension (i)));
 
         SgLessThanOp * upperBoundExpression = buildLessThanOp (
-            variableDeclarations->getReference (iterationCounter1),
-            multiplyExpression);
+            variableDeclarations->getReference (
+                getIterationCounterVariableName (1)), multiplyExpression);
 
         SgPlusAssignOp * strideExpression = buildPlusAssignOp (
-            variableDeclarations->getReference (iterationCounter1),
+            variableDeclarations->getReference (
+                getIterationCounterVariableName (1)),
             CUDA::getThreadBlockDimension (THREAD_X, subroutineScope));
 
         SgForStatement * forStatement = buildForStatement (
@@ -1025,9 +1066,10 @@ CPPCUDAKernelSubroutineIndirectLoop::createIncrementAccessLocalVariableDeclarati
       RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (colour2,
           buildIntType (), subroutineScope));
 
-  variableDeclarations ->add (iterationCounter2,
+  variableDeclarations ->add (
+      getIterationCounterVariableName (2),
       RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
-          iterationCounter2, buildIntType (), subroutineScope));
+          getIterationCounterVariableName (2), buildIntType (), subroutineScope));
 }
 
 void
@@ -1069,13 +1111,14 @@ CPPCUDAKernelSubroutineIndirectLoop::createExecutionLocalVariableDeclarations ()
       RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (blockID,
           buildIntType (), subroutineScope));
 
-  variableDeclarations ->add (iterationCounter1,
+  variableDeclarations ->add (
+      getIterationCounterVariableName (1),
       RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
-          iterationCounter1, buildIntType (), subroutineScope));
+          getIterationCounterVariableName (1), buildIntType (), subroutineScope));
 
-  variableDeclarations ->add (upperBound,
+  variableDeclarations ->add (getUpperBoundVariableName(1),
       RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
-          upperBound, buildIntType (), subroutineScope));
+          getUpperBoundVariableName (1), buildIntType (), subroutineScope));
 }
 
 void

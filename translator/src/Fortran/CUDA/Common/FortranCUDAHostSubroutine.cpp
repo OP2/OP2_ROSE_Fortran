@@ -16,6 +16,8 @@ FortranCUDAHostSubroutine::createReductionPrologueStatements ()
 {
   using namespace SageBuilder;
   using namespace SageInterface;
+  using namespace OP2::VariableNames;
+  using namespace CommonVariableNames;
 
   Debug::getInstance ()->debugMessage (
       "Creating reduction prologue statements", Debug::FUNCTION_LEVEL,
@@ -30,32 +32,27 @@ FortranCUDAHostSubroutine::createReductionPrologueStatements ()
           buildIntVal (parallelLoop->getOpDatDimension (i)));
 
       SgExprStatement * assignmentStatement1 = buildAssignStatement (
-          variableDeclarations->getReference (
-              OP2::VariableNames::getReductionCardinalityName (i)),
+          variableDeclarations->getReference (getReductionCardinalityName (i)),
           multiplyExpression1);
 
       appendStatement (assignmentStatement1, subroutineScope);
 
       SgSubtractOp * upperBoundExpression1 = buildSubtractOp (
-          variableDeclarations->getReference (
-              OP2::VariableNames::getReductionCardinalityName (i)),
+          variableDeclarations->getReference (getReductionCardinalityName (i)),
           buildIntVal (1));
 
       FortranStatementsAndExpressionsBuilder::appendAllocateStatement (
-          variableDeclarations->getReference (
-              OP2::VariableNames::getReductionArrayHostName (i)), buildIntVal (
-              0), upperBoundExpression1, subroutineScope);
+          variableDeclarations->getReference (getReductionArrayHostName (i)),
+          buildIntVal (0), upperBoundExpression1, subroutineScope);
 
       FortranStatementsAndExpressionsBuilder::appendAllocateStatement (
-          variableDeclarations->getReference (
-              OP2::VariableNames::getReductionArrayDeviceName (i)),
+          variableDeclarations->getReference (getReductionArrayDeviceName (i)),
           buildIntVal (0), upperBoundExpression1, subroutineScope);
 
       SgPntrArrRefExp * arrayIndexExpression1 = buildPntrArrRefExp (
-          variableDeclarations->getReference (
-              OP2::VariableNames::getReductionArrayHostName (i)),
-          variableDeclarations->getReference (
-              CommonVariableNames::iterationCounter1));
+          variableDeclarations->getReference (getReductionArrayHostName (i)),
+          variableDeclarations->getReference (getIterationCounterVariableName (
+              1)));
 
       SgExprStatement * assignmentStatement2;
 
@@ -73,12 +70,11 @@ FortranCUDAHostSubroutine::createReductionPrologueStatements ()
       SgBasicBlock * loopBody = buildBasicBlock (assignmentStatement2);
 
       SgAssignOp * loopInitialiserExpression = buildAssignOp (
-          variableDeclarations->getReference (
-              CommonVariableNames::iterationCounter1), buildIntVal (0));
+          variableDeclarations->getReference (getIterationCounterVariableName (
+              1)), buildIntVal (0));
 
       SgSubtractOp * upperBoundExpression2 = buildSubtractOp (
-          variableDeclarations->getReference (
-              OP2::VariableNames::getReductionCardinalityName (i)),
+          variableDeclarations->getReference (getReductionCardinalityName (i)),
           buildIntVal (1));
 
       SgFortranDo * loopStatement =
@@ -89,10 +85,8 @@ FortranCUDAHostSubroutine::createReductionPrologueStatements ()
       appendStatement (loopStatement, subroutineScope);
 
       SgExprStatement * assignmentStatement3 = buildAssignStatement (
-          variableDeclarations->getReference (
-              OP2::VariableNames::getReductionArrayDeviceName (i)),
-          variableDeclarations->getReference (
-              OP2::VariableNames::getReductionArrayHostName (i)));
+          variableDeclarations->getReference (getReductionArrayDeviceName (i)),
+          variableDeclarations->getReference (getReductionArrayHostName (i)));
 
       appendStatement (assignmentStatement3, subroutineScope);
     }
@@ -104,6 +98,8 @@ FortranCUDAHostSubroutine::createReductionEpilogueStatements ()
 {
   using namespace SageBuilder;
   using namespace SageInterface;
+  using namespace OP2::VariableNames;
+  using namespace CommonVariableNames;
   using boost::lexical_cast;
   using std::string;
 
@@ -128,11 +124,11 @@ FortranCUDAHostSubroutine::createReductionEpilogueStatements ()
          * ======================================================
          */
 
-        SgExprStatement * assignmentStatement1 = buildAssignStatement (
-            variableDeclarations->getReference (
-                OP2::VariableNames::getReductionArrayHostName (i)),
-            variableDeclarations->getReference (
-                OP2::VariableNames::getReductionArrayDeviceName (i)));
+        SgExprStatement * assignmentStatement1 =
+            buildAssignStatement (variableDeclarations->getReference (
+                getReductionArrayHostName (i)),
+                variableDeclarations->getReference (
+                    getReductionArrayDeviceName (i)));
 
         appendStatement (assignmentStatement1, subroutineScope);
 
@@ -144,18 +140,16 @@ FortranCUDAHostSubroutine::createReductionEpilogueStatements ()
          */
 
         SgPntrArrRefExp * arrayIndexExpression1 = buildPntrArrRefExp (
+            variableDeclarations->getReference (getReductionArrayHostName (i)),
             variableDeclarations->getReference (
-                OP2::VariableNames::getReductionArrayHostName (i)),
-            variableDeclarations->getReference (
-                CommonVariableNames::iterationCounter1));
+                getIterationCounterVariableName (1)));
 
         SgExpression * reductionComputationExpression;
 
         if (parallelLoop->isIncremented (i))
         {
           reductionComputationExpression = buildAddOp (arrayIndexExpression1,
-              variableDeclarations->getReference (
-                  OP2::VariableNames::getOpDatHostName (i)));
+              variableDeclarations->getReference (getOpDatHostName (i)));
         }
         else if (parallelLoop->isMaximised (i))
         {
@@ -165,7 +159,7 @@ FortranCUDAHostSubroutine::createReductionEpilogueStatements ()
 
           SgExprListExp * actualParameters = buildExprListExp (
               arrayIndexExpression1, variableDeclarations->getReference (
-                  OP2::VariableNames::getOpDatHostName (i)));
+                  getOpDatHostName (i)));
 
           reductionComputationExpression = buildFunctionCallExp (
               maxFunctionSymbol, actualParameters);
@@ -178,7 +172,7 @@ FortranCUDAHostSubroutine::createReductionEpilogueStatements ()
 
           SgExprListExp * actualParameters = buildExprListExp (
               arrayIndexExpression1, variableDeclarations->getReference (
-                  OP2::VariableNames::getOpDatHostName (i)));
+                  getOpDatHostName (i)));
 
           reductionComputationExpression = buildFunctionCallExp (
               maxFunctionSymbol, actualParameters);
@@ -187,8 +181,7 @@ FortranCUDAHostSubroutine::createReductionEpilogueStatements ()
         ROSE_ASSERT (reductionComputationExpression != NULL);
 
         SgExprStatement * assignmentStatement3 = buildAssignStatement (
-            variableDeclarations->getReference (
-                OP2::VariableNames::getOpDatHostName (i)),
+            variableDeclarations->getReference (getOpDatHostName (i)),
             reductionComputationExpression);
 
         SgBasicBlock * loopBody = buildBasicBlock ();
@@ -197,12 +190,11 @@ FortranCUDAHostSubroutine::createReductionEpilogueStatements ()
 
         SgAssignOp * loopInitialiserExpression = buildAssignOp (
             variableDeclarations->getReference (
-                CommonVariableNames::iterationCounter1), buildIntVal (0));
+                getIterationCounterVariableName (1)), buildIntVal (0));
 
-        SgSubtractOp * upperBoundExpression = buildSubtractOp (
-            variableDeclarations->getReference (
-                OP2::VariableNames::getReductionCardinalityName (i)),
-            buildIntVal (1));
+        SgSubtractOp * upperBoundExpression =
+            buildSubtractOp (variableDeclarations->getReference (
+                getReductionCardinalityName (i)), buildIntVal (1));
 
         SgFortranDo * loopStatement =
             FortranStatementsAndExpressionsBuilder::buildFortranDoStatement (
@@ -212,13 +204,11 @@ FortranCUDAHostSubroutine::createReductionEpilogueStatements ()
         appendStatement (loopStatement, subroutineScope);
 
         FortranStatementsAndExpressionsBuilder::appendDeallocateStatement (
-            variableDeclarations->getReference (
-                OP2::VariableNames::getReductionArrayHostName (i)),
+            variableDeclarations->getReference (getReductionArrayHostName (i)),
             subroutineScope);
 
         FortranStatementsAndExpressionsBuilder::appendDeallocateStatement (
-            variableDeclarations->getReference (
-                OP2::VariableNames::getReductionArrayDeviceName (i)),
+            variableDeclarations->getReference (getReductionArrayDeviceName (i)),
             subroutineScope);
       }
     }
@@ -228,6 +218,8 @@ FortranCUDAHostSubroutine::createReductionEpilogueStatements ()
 void
 FortranCUDAHostSubroutine::createReductionDeclarations ()
 {
+  using namespace OP2::VariableNames;
+  using namespace CommonVariableNames;
   using boost::lexical_cast;
   using std::string;
 
@@ -235,22 +227,21 @@ FortranCUDAHostSubroutine::createReductionDeclarations ()
       "Creating local variable declarations needed for reduction",
       Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
-  variableDeclarations->add (CommonVariableNames::iterationCounter1,
+  variableDeclarations->add (getIterationCounterVariableName (1),
       FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
-          CommonVariableNames::iterationCounter1,
+          getIterationCounterVariableName (1),
           FortranTypesBuilder::getFourByteInteger (), subroutineScope));
 
-  variableDeclarations->add (CommonVariableNames::iterationCounter2,
+  variableDeclarations->add (getIterationCounterVariableName (2),
       FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
-          CommonVariableNames::iterationCounter2,
+          getIterationCounterVariableName (2),
           FortranTypesBuilder::getFourByteInteger (), subroutineScope));
 
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
     if (parallelLoop->isReductionRequired (i))
     {
-      string const reductionArrayHostName =
-          OP2::VariableNames::getReductionArrayHostName (i);
+      string const reductionArrayHostName = getReductionArrayHostName (i);
 
       Debug::getInstance ()->debugMessage ("Creating host reduction array '"
           + reductionArrayHostName + "'", Debug::HIGHEST_DEBUG_LEVEL, __FILE__,
@@ -264,8 +255,7 @@ FortranCUDAHostSubroutine::createReductionDeclarations ()
 
       variableDeclarations->add (reductionArrayHostName, reductionArrayHost);
 
-      string const reductionArrayDeviceName =
-          OP2::VariableNames::getReductionArrayDeviceName (i);
+      string const reductionArrayDeviceName = getReductionArrayDeviceName (i);
 
       Debug::getInstance ()->debugMessage ("Creating device reduction array '"
           + reductionArrayDeviceName + "'", Debug::HIGHEST_DEBUG_LEVEL,
@@ -279,8 +269,7 @@ FortranCUDAHostSubroutine::createReductionDeclarations ()
 
       variableDeclarations->add (reductionArrayDeviceName, reductionArrayDevice);
 
-      string const & reductionCardinalityName =
-          OP2::VariableNames::getReductionCardinalityName (i);
+      string const & reductionCardinalityName = getReductionCardinalityName (i);
 
       variableDeclarations->add (reductionCardinalityName,
           FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
@@ -295,22 +284,21 @@ FortranCUDAHostSubroutine::createRHSOfInitialiseOpDatCardinalityStatement (
     SgScopeStatement * scope, unsigned int OP_DAT_ArgumentGroup)
 {
   using namespace SageBuilder;
+  using namespace OP2::VariableNames;
 
   if (parallelLoop->isDirect (OP_DAT_ArgumentGroup)
       || parallelLoop->isIndirect (OP_DAT_ArgumentGroup))
   {
-    SgDotExp * dotExpression1 = buildDotExp (
-        variableDeclarations->getReference (OP2::VariableNames::getOpDatName (
-            OP_DAT_ArgumentGroup)), buildOpaqueVarRefExp (
-            OP2::VariableNames::dimension, scope));
+    SgDotExp * dotExpression1 =
+        buildDotExp (variableDeclarations->getReference (getOpDatName (
+            OP_DAT_ArgumentGroup)), buildOpaqueVarRefExp (dimension, scope));
 
-    SgDotExp * dotExpression2 = buildDotExp (
-        variableDeclarations->getReference (OP2::VariableNames::getOpDatName (
-            OP_DAT_ArgumentGroup)), buildOpaqueVarRefExp (
-            OP2::VariableNames::set, scope));
+    SgDotExp * dotExpression2 =
+        buildDotExp (variableDeclarations->getReference (getOpDatName (
+            OP_DAT_ArgumentGroup)), buildOpaqueVarRefExp (set, scope));
 
     SgDotExp * dotExpression3 = buildDotExp (dotExpression2,
-        buildOpaqueVarRefExp (OP2::VariableNames::size, scope));
+        buildOpaqueVarRefExp (size, scope));
 
     SgExpression * multiplyExpression = buildMultiplyOp (dotExpression1,
         dotExpression3);
@@ -322,14 +310,12 @@ FortranCUDAHostSubroutine::createRHSOfInitialiseOpDatCardinalityStatement (
     if (parallelLoop->isArray (OP_DAT_ArgumentGroup))
     {
       SgDotExp * dotExpression1 = buildDotExp (
-          variableDeclarations->getReference (OP2::VariableNames::getOpDatName (
-              OP_DAT_ArgumentGroup)), buildOpaqueVarRefExp (
-              OP2::VariableNames::dimension, scope));
+          variableDeclarations->getReference (getOpDatName (
+              OP_DAT_ArgumentGroup)), buildOpaqueVarRefExp (dimension, scope));
 
       SgDotExp * dotExpression2 = buildDotExp (
-          variableDeclarations->getReference (
-              OP2::VariableNames::getOpSetName ()), buildOpaqueVarRefExp (
-              OP2::VariableNames::size, scope));
+          variableDeclarations->getReference (getOpSetName ()),
+          buildOpaqueVarRefExp (size, scope));
 
       SgExpression * multiplyExpression = buildMultiplyOp (dotExpression1,
           dotExpression2);
@@ -339,9 +325,8 @@ FortranCUDAHostSubroutine::createRHSOfInitialiseOpDatCardinalityStatement (
     else
     {
       SgDotExp * dotExpression = buildDotExp (
-          variableDeclarations->getReference (
-              OP2::VariableNames::getOpSetName ()), buildOpaqueVarRefExp (
-              OP2::VariableNames::size, scope));
+          variableDeclarations->getReference (getOpSetName ()),
+          buildOpaqueVarRefExp (size, scope));
 
       return dotExpression;
     }
@@ -350,8 +335,8 @@ FortranCUDAHostSubroutine::createRHSOfInitialiseOpDatCardinalityStatement (
       && parallelLoop->isRead (OP_DAT_ArgumentGroup))
   {
     SgDotExp * dotExpression = buildDotExp (variableDeclarations->getReference (
-        OP2::VariableNames::getOpDatName (OP_DAT_ArgumentGroup)),
-        buildOpaqueVarRefExp (OP2::VariableNames::dimension, scope));
+        getOpDatName (OP_DAT_ArgumentGroup)), buildOpaqueVarRefExp (dimension,
+        scope));
 
     return dotExpression;
   }
@@ -362,6 +347,7 @@ FortranCUDAHostSubroutine::createDeallocateStatements ()
 {
   using namespace SageBuilder;
   using namespace SageInterface;
+  using namespace OP2::VariableNames;
 
   Debug::getInstance ()->debugMessage (
       "Creating statements to deallocate global arrays which are read",
@@ -377,8 +363,7 @@ FortranCUDAHostSubroutine::createDeallocateStatements ()
           && parallelLoop->isRead (i))
       {
         FortranStatementsAndExpressionsBuilder::appendDeallocateStatement (
-            variableDeclarations->getReference (
-                OP2::VariableNames::getOpDatDeviceName (i)), block);
+            variableDeclarations->getReference (getOpDatDeviceName (i)), block);
       }
     }
   }
@@ -391,6 +376,7 @@ FortranCUDAHostSubroutine::createTransferOpDatStatements ()
 {
   using namespace SageBuilder;
   using namespace SageInterface;
+  using namespace OP2::VariableNames;
 
   Debug::getInstance ()->debugMessage (
       "Creating statements to transfer OP_DATs onto device",
@@ -407,13 +393,12 @@ FortranCUDAHostSubroutine::createTransferOpDatStatements ()
     if (parallelLoop->isDirect (i) || parallelLoop->isIndirect (i))
     {
       SgDotExp * dotExpression1 = buildDotExp (
-          variableDeclarations->getReference (
-              OP2::VariableNames::opDatDimensions),
+          variableDeclarations->getReference (opDatDimensions),
           dimensionsDeclaration->getOpDatDimensionField (i));
 
       SgDotExp * dotExpression2 = buildDotExp (
-          variableDeclarations->getReference (OP2::VariableNames::getOpDatName (
-              i)), buildOpaqueVarRefExp (OP2::VariableNames::dimension, block));
+          variableDeclarations->getReference (getOpDatName (i)),
+          buildOpaqueVarRefExp (dimension, block));
 
       SgExprStatement * assignmentStatement = buildAssignStatement (
           dotExpression1, dotExpression2);
@@ -436,10 +421,9 @@ FortranCUDAHostSubroutine::createTransferOpDatStatements ()
       if (fortranParallelLoop->isCardinalityDeclarationNeeded (i))
       {
         SgDotExp * dotExpression = buildDotExp (
-            variableDeclarations->getReference (
-                OP2::VariableNames::opDatCardinalities),
+            variableDeclarations->getReference (opDatCardinalities),
             cardinalitiesDeclaration->getFieldDeclarations ()->getReference (
-                OP2::VariableNames::getOpDatCardinalityName (i)));
+                getOpDatCardinalityName (i)));
 
         SgExpression * rhsOfAssigment =
             createRHSOfInitialiseOpDatCardinalityStatement (block, i);
@@ -469,8 +453,7 @@ FortranCUDAHostSubroutine::createTransferOpDatStatements ()
             createRHSOfInitialiseOpDatCardinalityStatement (block, i);
 
         SgExprStatement * assignmentStatement = buildAssignStatement (
-            variableDeclarations->getReference (
-                OP2::VariableNames::getOpDatCardinalityName (i)),
+            variableDeclarations->getReference (getOpDatCardinalityName (i)),
             rhsOfAssigment);
 
         appendStatement (assignmentStatement, block);
@@ -500,18 +483,17 @@ FortranCUDAHostSubroutine::createTransferOpDatStatements ()
             Debug::HIGHEST_DEBUG_LEVEL, __FILE__, __LINE__);
 
         SgDotExp * parameterExpression1A = buildDotExp (
-            variableDeclarations->getReference (
-                OP2::VariableNames::getOpDatName (i)), buildOpaqueVarRefExp (
-                OP2::VariableNames::dataOnDevice, block));
+            variableDeclarations->getReference (getOpDatName (i)),
+            buildOpaqueVarRefExp (dataOnDevice, block));
 
         SgVarRefExp * parameterExpression2A =
-            variableDeclarations->getReference (
-                OP2::VariableNames::getOpDatDeviceName (i));
+            variableDeclarations->getReference (getOpDatDeviceName (i));
 
-        SgAggregateInitializer * parameterExpression3A =
-            FortranStatementsAndExpressionsBuilder::buildShapeExpression (
-                variableDeclarations->getReference (
-                    OP2::VariableNames::getOpDatCardinalityName (i)));
+        SgAggregateInitializer
+            * parameterExpression3A =
+                FortranStatementsAndExpressionsBuilder::buildShapeExpression (
+                    variableDeclarations->getReference (
+                        getOpDatCardinalityName (i)));
 
         SgStatement
             * callStatementA =
@@ -534,13 +516,11 @@ FortranCUDAHostSubroutine::createTransferOpDatStatements ()
               Debug::HIGHEST_DEBUG_LEVEL, __FILE__, __LINE__);
 
           SgDotExp * parameterExpression1A = buildDotExp (
-              variableDeclarations->getReference (
-                  OP2::VariableNames::getOpDatName (i)), buildOpaqueVarRefExp (
-                  OP2::VariableNames::dataOnHost, block));
+              variableDeclarations->getReference (getOpDatName (i)),
+              buildOpaqueVarRefExp (dataOnHost, block));
 
           SgVarRefExp * parameterExpression1B =
-              variableDeclarations->getReference (
-                  OP2::VariableNames::getOpDatHostName (i));
+              variableDeclarations->getReference (getOpDatHostName (i));
 
           SgStatement
               * callStatementA =
@@ -561,18 +541,16 @@ FortranCUDAHostSubroutine::createTransferOpDatStatements ()
                 Debug::HIGHEST_DEBUG_LEVEL, __FILE__, __LINE__);
 
             SgDotExp * parameterExpression1A = buildDotExp (
-                variableDeclarations->getReference (
-                    OP2::VariableNames::getOpDatName (i)),
-                buildOpaqueVarRefExp (OP2::VariableNames::dataOnHost, block));
+                variableDeclarations->getReference (getOpDatName (i)),
+                buildOpaqueVarRefExp (dataOnHost, block));
 
             SgVarRefExp * parameterExpression1B =
-                variableDeclarations->getReference (
-                    OP2::VariableNames::getOpDatHostName (i));
+                variableDeclarations->getReference (getOpDatHostName (i));
 
             SgAggregateInitializer * parameterExpression1C =
                 FortranStatementsAndExpressionsBuilder::buildShapeExpression (
                     variableDeclarations->getReference (
-                        OP2::VariableNames::getOpDatCardinalityName (i)));
+                        getOpDatCardinalityName (i)));
 
             SgStatement
                 * callStatementA =
@@ -583,22 +561,20 @@ FortranCUDAHostSubroutine::createTransferOpDatStatements ()
             appendStatement (callStatementA, block);
 
             SgVarRefExp * arrayExpression = variableDeclarations->getReference (
-                OP2::VariableNames::getOpDatDeviceName (i));
+                getOpDatDeviceName (i));
 
             SgIntVal * lowerBound = buildIntVal (0);
 
             SgVarRefExp * upperBound = variableDeclarations->getReference (
-                OP2::VariableNames::getOpDatCardinalityName (i));
+                getOpDatCardinalityName (i));
 
             FortranStatementsAndExpressionsBuilder::appendAllocateStatement (
                 arrayExpression, SageBuilder::buildIntVal (1), upperBound,
                 block);
 
             SgExprStatement * assignmentStatement1 = buildAssignStatement (
-                variableDeclarations->getReference (
-                    OP2::VariableNames::getOpDatDeviceName (i)),
-                variableDeclarations->getReference (
-                    OP2::VariableNames::getOpDatHostName (i)));
+                variableDeclarations->getReference (getOpDatDeviceName (i)),
+                variableDeclarations->getReference (getOpDatHostName (i)));
 
             appendStatement (assignmentStatement1, block);
           }
@@ -608,13 +584,11 @@ FortranCUDAHostSubroutine::createTransferOpDatStatements ()
                 Debug::HIGHEST_DEBUG_LEVEL, __FILE__, __LINE__);
 
             SgDotExp * parameterExpression1A = buildDotExp (
-                variableDeclarations->getReference (
-                    OP2::VariableNames::getOpDatName (i)),
-                buildOpaqueVarRefExp (OP2::VariableNames::dataOnHost, block));
+                variableDeclarations->getReference (getOpDatName (i)),
+                buildOpaqueVarRefExp (dataOnHost, block));
 
             SgVarRefExp * parameterExpression1B =
-                variableDeclarations->getReference (
-                    OP2::VariableNames::getOpDatHostName (i));
+                variableDeclarations->getReference (getOpDatHostName (i));
 
             SgStatement
                 * callStatementA =
@@ -637,6 +611,7 @@ FortranCUDAHostSubroutine::createDataMarshallingDeclarations ()
 {
   using namespace SageBuilder;
   using namespace SageInterface;
+  using namespace OP2::VariableNames;
   using boost::lexical_cast;
   using std::string;
 
@@ -658,8 +633,7 @@ FortranCUDAHostSubroutine::createDataMarshallingDeclarations ()
                 + lexical_cast <string> (i), Debug::HIGHEST_DEBUG_LEVEL,
             __FILE__, __LINE__);
 
-        string const & variableName =
-            OP2::VariableNames::getOpDatCardinalityName (i);
+        string const & variableName = getOpDatCardinalityName (i);
 
         variableDeclarations->add (variableName,
             FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
@@ -679,8 +653,7 @@ FortranCUDAHostSubroutine::createDataMarshallingDeclarations ()
             "Creating device array for OP_DAT " + lexical_cast <string> (i),
             Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
-        string const & variableName =
-            OP2::VariableNames::getOpDatDeviceName (i);
+        string const & variableName = getOpDatDeviceName (i);
 
         variableDeclarations->add (variableName,
             FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
@@ -696,8 +669,7 @@ FortranCUDAHostSubroutine::createDataMarshallingDeclarations ()
               "Creating device array for array REDUCTION " + lexical_cast <
                   string> (i), Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
-          string const & variableName = OP2::VariableNames::getOpDatDeviceName (
-              i);
+          string const & variableName = getOpDatDeviceName (i);
 
           variableDeclarations->add (
               variableName,
@@ -713,8 +685,7 @@ FortranCUDAHostSubroutine::createDataMarshallingDeclarations ()
                   + lexical_cast <string> (i), Debug::FUNCTION_LEVEL, __FILE__,
               __LINE__);
 
-          string const & variableName =
-              OP2::VariableNames::getOpDatHostName (i);
+          string const & variableName = getOpDatHostName (i);
 
           variableDeclarations->add (
               variableName,
@@ -734,8 +705,7 @@ FortranCUDAHostSubroutine::createDataMarshallingDeclarations ()
                     + lexical_cast <string> (i), Debug::FUNCTION_LEVEL,
                 __FILE__, __LINE__);
 
-            string const & variableNameOnDevice =
-                OP2::VariableNames::getOpDatDeviceName (i);
+            string const & variableNameOnDevice = getOpDatDeviceName (i);
 
             Debug::getInstance ()->debugMessage (
                 "Creating device array with name " + variableNameOnDevice,
@@ -749,8 +719,7 @@ FortranCUDAHostSubroutine::createDataMarshallingDeclarations ()
                         parallelLoop->getOpDatBaseType (i)), subroutineScope,
                     2, CUDA_DEVICE, ALLOCATABLE));
 
-            string const & variableNameOnHost =
-                OP2::VariableNames::getOpDatHostName (i);
+            string const & variableNameOnHost = getOpDatHostName (i);
 
             Debug::getInstance ()->debugMessage (
                 "Creating host array with name " + variableNameOnHost,
@@ -766,8 +735,7 @@ FortranCUDAHostSubroutine::createDataMarshallingDeclarations ()
           }
           else
           {
-            string const & variableName = OP2::VariableNames::getOpDatHostName (
-                i);
+            string const & variableName = getOpDatHostName (i);
 
             variableDeclarations->add (
                 variableName,
@@ -812,28 +780,31 @@ FortranCUDAHostSubroutine::createCUDAConfigurationLaunchDeclarations ()
 void
 FortranCUDAHostSubroutine::createOpDatCardinalitiesDeclaration ()
 {
+  using namespace OP2::VariableNames;
+
   Debug::getInstance ()->debugMessage (
       "Generating OP_DAT cardinalities declaration ", Debug::FUNCTION_LEVEL,
       __FILE__, __LINE__);
 
-  variableDeclarations->add (
-      OP2::VariableNames::opDatCardinalities,
+  variableDeclarations->add (opDatCardinalities,
       FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
-          OP2::VariableNames::opDatCardinalities,
-          cardinalitiesDeclaration->getType (), subroutineScope, 1, CUDA_DEVICE));
+          opDatCardinalities, cardinalitiesDeclaration->getType (),
+          subroutineScope, 1, CUDA_DEVICE));
 }
 
 void
 FortranCUDAHostSubroutine::createOpDatDimensionsDeclaration ()
 {
+  using namespace OP2::VariableNames;
+
   Debug::getInstance ()->debugMessage (
       "Generating OP_DAT dimensions declaration", Debug::FUNCTION_LEVEL,
       __FILE__, __LINE__);
 
-  variableDeclarations->add (OP2::VariableNames::opDatDimensions,
+  variableDeclarations->add (opDatDimensions,
       FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
-          OP2::VariableNames::opDatDimensions,
-          dimensionsDeclaration->getType (), subroutineScope, 1, CUDA_DEVICE));
+          opDatDimensions, dimensionsDeclaration->getType (), subroutineScope,
+          1, CUDA_DEVICE));
 }
 
 FortranCUDAHostSubroutine::FortranCUDAHostSubroutine (

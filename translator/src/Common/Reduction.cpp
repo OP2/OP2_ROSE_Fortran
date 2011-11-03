@@ -32,6 +32,10 @@ Reduction::getSubroutineName () const
   {
     name += "Float";
   }
+  else if (isSgTypeDouble (baseType) != NULL)
+  {
+    name += "Double";
+  }
   else
   {
     throw Exceptions::ParallelLoop::UnsupportedBaseTypeException (

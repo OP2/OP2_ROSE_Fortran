@@ -539,7 +539,8 @@ FortranCUDAHostSubroutineIndirectLoop::createExecutionPlanDeclarations ()
 
   fourByteIntegerVariables.push_back (OP2::VariableNames::colour1);
 
-  fourByteIntegerVariables.push_back (CommonVariableNames::iterationCounter1);
+  fourByteIntegerVariables.push_back (
+      CommonVariableNames::getIterationCounterVariableName (1));
 
   fourByteIntegerVariables.push_back (
       OP2::VariableNames::PlanFunction::argsNumber);

@@ -168,7 +168,8 @@ FortranCUDAReductionSubroutine::createReductionStatements ()
       variableDeclarations->getReference (threadID));
 
   SgAddOp * addExpressionA1 = buildAddOp (variableDeclarations->getReference (
-      threadID), variableDeclarations->getReference (iterationCounter1));
+      threadID), variableDeclarations->getReference (
+      getIterationCounterVariableName (1)));
 
   SgPntrArrRefExp * arrayIndexExpressionA2 = buildPntrArrRefExp (
       variableDeclarations->getReference (sharedVariableName), addExpressionA1);
@@ -195,7 +196,8 @@ FortranCUDAReductionSubroutine::createReductionStatements ()
       variableDeclarations->getReference (threadID));
 
   SgAddOp * addExpressionB1 = buildAddOp (variableDeclarations->getReference (
-      threadID), variableDeclarations->getReference (iterationCounter1));
+      threadID), variableDeclarations->getReference (
+      getIterationCounterVariableName (1)));
 
   SgPntrArrRefExp * arrayIndexExpressionB2 = buildPntrArrRefExp (
       variableDeclarations->getReference (sharedVariableName), addExpressionB1);
@@ -228,7 +230,8 @@ FortranCUDAReductionSubroutine::createReductionStatements ()
       variableDeclarations->getReference (threadID));
 
   SgAddOp * addExpressionC1 = buildAddOp (variableDeclarations->getReference (
-      threadID), variableDeclarations->getReference (iterationCounter1));
+      threadID), variableDeclarations->getReference (
+      getIterationCounterVariableName (1)));
 
   SgPntrArrRefExp * arrayIndexExpressionC2 = buildPntrArrRefExp (
       variableDeclarations->getReference (sharedVariableName), addExpressionC1);
@@ -279,7 +282,7 @@ FortranCUDAReductionSubroutine::createReductionStatements ()
 
   SgExpression * ifGuardExpression = buildLessThanOp (
       variableDeclarations->getReference (threadID),
-      variableDeclarations->getReference (iterationCounter1));
+      variableDeclarations->getReference (getIterationCounterVariableName (1)));
 
   SgIfStmt * ifStatement =
       RoseStatementsAndExpressionsBuilder::buildIfStatementWithEmptyElse (
@@ -292,7 +295,8 @@ FortranCUDAReductionSubroutine::createReductionStatements ()
    */
 
   SgExprListExp * actualParametersItCountReassign = buildExprListExp (
-      variableDeclarations->getReference (iterationCounter1), buildIntVal (-1));
+      variableDeclarations->getReference (getIterationCounterVariableName (1)),
+      buildIntVal (-1));
 
   SgFunctionSymbol * shiftFunctionSymbol =
       FortranTypesBuilder::buildNewFortranFunction ("ishft", subroutineScope);
@@ -300,9 +304,9 @@ FortranCUDAReductionSubroutine::createReductionStatements ()
   SgFunctionCallExp * shiftFunctionCall = buildFunctionCallExp (
       shiftFunctionSymbol, actualParametersItCountReassign);
 
-  SgExprStatement * reassignIterationCounter =
-      buildAssignStatement (variableDeclarations->getReference (
-          iterationCounter1), shiftFunctionCall);
+  SgExprStatement * reassignIterationCounter = buildAssignStatement (
+      variableDeclarations->getReference (getIterationCounterVariableName (1)),
+      shiftFunctionCall);
 
   SgBasicBlock * whileLoopBody = buildBasicBlock ();
 
@@ -315,7 +319,8 @@ FortranCUDAReductionSubroutine::createReductionStatements ()
   appendStatement (reassignIterationCounter, whileLoopBody);
 
   SgExpression * upperBoundExpression = buildGreaterThanOp (
-      variableDeclarations->getReference (iterationCounter1), buildIntVal (0));
+      variableDeclarations->getReference (getIterationCounterVariableName (1)),
+      buildIntVal (0));
 
   SgWhileStmt * whileLoopStatement = buildWhileStmt (upperBoundExpression,
       whileLoopBody);
@@ -382,9 +387,9 @@ FortranCUDAReductionSubroutine::createInitialisationStatements ()
   SgFunctionCallExp * shiftFunctionCall = buildFunctionCallExp (
       shiftFunctionSymbol, actualParameters);
 
-  SgExprStatement * assignStatement2 =
-      buildAssignStatement (variableDeclarations->getReference (
-          iterationCounter1), shiftFunctionCall);
+  SgExprStatement * assignStatement2 = buildAssignStatement (
+      variableDeclarations->getReference (getIterationCounterVariableName (1)),
+      shiftFunctionCall);
 
   appendStatement (assignStatement2, subroutineScope);
 }
@@ -453,10 +458,10 @@ FortranCUDAReductionSubroutine::createLocalVariableDeclarations ()
    * ======================================================
    */
 
-  variableDeclarations->add (iterationCounter1,
+  variableDeclarations->add (getIterationCounterVariableName (1),
       FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
-          iterationCounter1, FortranTypesBuilder::getFourByteInteger (),
-          subroutineScope));
+          getIterationCounterVariableName (1),
+          FortranTypesBuilder::getFourByteInteger (), subroutineScope));
 
   variableDeclarations->add (
       threadID,

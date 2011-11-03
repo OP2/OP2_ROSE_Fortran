@@ -17,6 +17,7 @@ FortranCUDAKernelSubroutine::createReductionEpilogueStatements ()
 {
   using namespace SageBuilder;
   using namespace SageInterface;
+  using namespace OP2::VariableNames;
   using std::string;
 
   Debug::getInstance ()->debugMessage ("Adding reduction subroutine call",
@@ -44,8 +45,7 @@ FortranCUDAKernelSubroutine::createReductionEpilogueStatements ()
       subscriptExpression->set_endOfConstruct (RoseHelper::getFileInfo ());
 
       SgPntrArrRefExp * parameterExpression1 = buildPntrArrRefExp (
-          variableDeclarations->getReference (
-              OP2::VariableNames::getReductionArrayDeviceName (i)),
+          variableDeclarations->getReference (getReductionArrayDeviceName (i)),
           subscriptExpression);
 
       /*
@@ -55,7 +55,7 @@ FortranCUDAKernelSubroutine::createReductionEpilogueStatements ()
        */
 
       SgExpression * parameterExpression2 = variableDeclarations->getReference (
-          OP2::VariableNames::getOpDatLocalName (i));
+          getOpDatLocalName (i));
 
       /*
        * ======================================================
@@ -88,8 +88,7 @@ FortranCUDAKernelSubroutine::createReductionEpilogueStatements ()
 
       SgExprListExp * actualParameters = buildExprListExp (
           parameterExpression1, parameterExpression2,
-          variableDeclarations->getReference (OP2::VariableNames::warpSize),
-          reductionType);
+          variableDeclarations->getReference (warpSize), reductionType);
 
       SgFunctionSymbol * reductionFunctionSymbol =
           isSgFunctionSymbol (
@@ -110,6 +109,7 @@ FortranCUDAKernelSubroutine::createReductionEpilogueStatements ()
 void
 FortranCUDAKernelSubroutine::createCUDAStageInVariablesVariableDeclarations ()
 {
+  using namespace OP2::VariableNames;
   using std::string;
 
   Debug::getInstance ()->debugMessage ("Creating local thread variables",
@@ -117,7 +117,7 @@ FortranCUDAKernelSubroutine::createCUDAStageInVariablesVariableDeclarations ()
 
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
-    string const & variableName = OP2::VariableNames::getOpDatLocalName (i);
+    string const & variableName = getOpDatLocalName (i);
 
     if (parallelLoop->isCUDAStageInVariableDeclarationNeeded (i))
     {
@@ -143,6 +143,7 @@ FortranCUDAKernelSubroutine::createCUDAStageInVariablesVariableDeclarations ()
 void
 FortranCUDAKernelSubroutine::createCUDASharedVariableDeclarations ()
 {
+  using namespace OP2::VariableNames;
   using std::find;
   using std::vector;
   using std::string;
@@ -161,9 +162,8 @@ FortranCUDAKernelSubroutine::createCUDASharedVariableDeclarations ()
           && parallelLoop->getOpDatDimension (i) > 1))
       {
         string const autosharedVariableName =
-            OP2::VariableNames::getCUDASharedMemoryDeclarationName (
-                parallelLoop->getOpDatBaseType (i),
-                parallelLoop->getSizeOfOpDat (i));
+            getCUDASharedMemoryDeclarationName (parallelLoop->getOpDatBaseType (
+                i), parallelLoop->getSizeOfOpDat (i));
 
         if (find (autosharedNames.begin (), autosharedNames.end (),
             autosharedVariableName) == autosharedNames.end ())
@@ -187,7 +187,7 @@ FortranCUDAKernelSubroutine::createCUDASharedVariableDeclarations ()
           autosharedNames.push_back (autosharedVariableName);
 
           string const autosharedOffsetVariableName =
-              OP2::VariableNames::getCUDASharedMemoryOffsetDeclarationName (
+              getCUDASharedMemoryOffsetDeclarationName (
                   parallelLoop->getOpDatBaseType (i),
                   parallelLoop->getSizeOfOpDat (i));
 

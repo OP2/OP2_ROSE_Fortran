@@ -24,7 +24,10 @@ op_map const OP_ID;
 op_map const OP_GBL;
 
 void 
-op_init(int, char **, int);
+op_init (int, char **, int);
+
+void
+op_exit ();
 
 op_set 
 op_decl_set (int, char *);
@@ -34,18 +37,21 @@ op_decl_map (op_set, op_set, int, int *, char *);
 
 template <typename T>
 op_dat 
-op_decl_dat (op_set, int, char *, T *, char *);
+op_decl_dat (op_set, int, char *, T, char *);
 
 template <typename T>
 void
-op_decl_const (int, char *, T *);
+op_decl_const (int, char *, T);
+
+void
+op_fetch_data (op_dat);
 
 op_arg
 op_arg_dat(op_dat, int, op_map, int, char *, op_access);
 
 template <typename T>
 op_arg
-op_arg_gbl(T *, int, char *, op_access);
+op_arg_gbl(T, int, char *, op_access);
 
 void
 op_diagnostic_output();
@@ -56,7 +62,7 @@ op_timing_output();
 // 1 OP_ARG
 template <typename T1>
 void
-op_par_loop (void (*kernel) (T1 *), 
+op_par_loop (void (*kernel) (T1), 
              char *,
              op_set, 
              op_arg);
@@ -64,7 +70,7 @@ op_par_loop (void (*kernel) (T1 *),
 // 2 OP_ARG
 template <typename T1, typename T2>
 void
-op_par_loop (void (*kernel) (T1 *, T2 *), 
+op_par_loop (void (*kernel) (T1, T2), 
              char *,
              op_set, 
              op_arg, 
@@ -73,7 +79,7 @@ op_par_loop (void (*kernel) (T1 *, T2 *),
 // 3 OP_ARG
 template <typename T1, typename T2, typename T3>
 void
-op_par_loop (void (*kernel) (T1 *, T2 *, T3 *), 
+op_par_loop (void (*kernel) (T1, T2, T3), 
              char *,
              op_set, 
              op_arg, 
@@ -83,7 +89,7 @@ op_par_loop (void (*kernel) (T1 *, T2 *, T3 *),
 // 4 OP_ARG
 template <typename T1, typename T2, typename T3, typename T4>
 void
-op_par_loop (void (*kernel) (T1 *, T2 *, T3 *, T4 *), 
+op_par_loop (void (*kernel) (T1, T2, T3, T4), 
              char *,
              op_set, 
              op_arg, 
@@ -94,7 +100,7 @@ op_par_loop (void (*kernel) (T1 *, T2 *, T3 *, T4 *),
 // 5 OP_ARG
 template <typename T1, typename T2, typename T3, typename T4, typename T5>
 void
-op_par_loop (void (*kernel) (T1 *, T2 *, T3 *, T4 *, T5 *), 
+op_par_loop (void (*kernel) (T1, T2, T3, T4, T5), 
              char *,
              op_set, 
              op_arg, 
@@ -106,7 +112,7 @@ op_par_loop (void (*kernel) (T1 *, T2 *, T3 *, T4 *, T5 *),
 // 6 OP_ARG
 template <typename T1, typename T2, typename T3, typename T4, typename T5, typename T6>
 void
-op_par_loop (void (*kernel) (T1 *, T2 *, T3 *, T4 *, T5 *, T6 *), 
+op_par_loop (void (*kernel) (T1, T2, T3, T4, T5, T6), 
              char *,
              op_set, 
              op_arg, 
@@ -119,7 +125,7 @@ op_par_loop (void (*kernel) (T1 *, T2 *, T3 *, T4 *, T5 *, T6 *),
 // 7 OP_ARG
 template <typename T1, typename T2, typename T3, typename T4, typename T5, typename T6, typename T7>
 void
-op_par_loop (void (*kernel) (T1 *, T2 *, T3 *, T4 *, T5 *, T6 *, T7 *), 
+op_par_loop (void (*kernel) (T1, T2, T3, T4, T5, T6, T7), 
              char *,
              op_set, 
              op_arg, 
@@ -133,7 +139,7 @@ op_par_loop (void (*kernel) (T1 *, T2 *, T3 *, T4 *, T5 *, T6 *, T7 *),
 // 8 OP_ARG
 template <typename T1, typename T2, typename T3, typename T4, typename T5, typename T6, typename T7, typename T8>
 void
-op_par_loop (void (*kernel) (T1 *, T2 *, T3 *, T4 *, T5 *, T6 *, T7 *, T8 *), 
+op_par_loop (void (*kernel) (T1, T2, T3, T4, T5, T6, T7, T8), 
              char *,
              op_set, 
              op_arg, 
@@ -148,7 +154,7 @@ op_par_loop (void (*kernel) (T1 *, T2 *, T3 *, T4 *, T5 *, T6 *, T7 *, T8 *),
 // 9 OP_ARG
 template <typename T1, typename T2, typename T3, typename T4, typename T5, typename T6, typename T7, typename T8, typename T9>
 void
-op_par_loop (void (*kernel) (T1 *, T2 *, T3 *, T4 *, T5 *, T6 *, T7 *, T8 *, T9 *), 
+op_par_loop (void (*kernel) (T1, T2, T3, T4, T5, T6, T7, T8, T9), 
              char *,
              op_set, 
              op_arg, 
@@ -164,7 +170,7 @@ op_par_loop (void (*kernel) (T1 *, T2 *, T3 *, T4 *, T5 *, T6 *, T7 *, T8 *, T9 
 // 10 OP_ARG
 template <typename T1, typename T2, typename T3, typename T4, typename T5, typename T6, typename T7, typename T8, typename T9, typename T10>
 void
-op_par_loop (void (*kernel) (T1 *, T2 *, T3 *, T4 *, T5 *, T6 *, T7 *, T8 *, T9 *, T10 *), 
+op_par_loop (void (*kernel) (T1, T2, T3, T4, T5, T6, T7, T8, T9, T10), 
              char *,
              op_set, 
              op_arg, 

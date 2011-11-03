@@ -245,7 +245,7 @@ int main(int argc, char **argv){
                   op_arg_dat(p_q,   -1,OP_ID, 4,"float",OP_WRITE),
                   op_arg_dat(p_res, -1,OP_ID, 4,"float",OP_RW   ),
                   op_arg_dat(p_adt, -1,OP_ID, 1,"float",OP_READ ),
-                  op_arg_gbl(&rms,1,"float",OP_INC));
+                  op_arg_gbl(rms,1,"float",OP_INC));
     }
 
 //  print iteration history

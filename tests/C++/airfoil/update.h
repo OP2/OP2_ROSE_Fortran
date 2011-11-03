@@ -1,4 +1,4 @@
-inline void update(float *qold, float *q, float *res, float *adt, float *rms){
+inline void update(float *qold, float *q, float *res, float *adt, float rms){
   float del, adti;
 
   adti = 1.0f/(*adt);
@@ -7,6 +7,6 @@ inline void update(float *qold, float *q, float *res, float *adt, float *rms){
     del    = adti*res[n];
     q[n]   = qold[n] - del;
     res[n] = 0.0f;
-    *rms  += del*del;
+    rms  += del*del;
   }
 }
