@@ -40,6 +40,8 @@ namespace OP2
   std::string const OP_MAX = "op_max";
   std::string const OP_MIN = "op_min";
   std::string const OP_PAR_LOOP = "op_par_loop";
+  std::string const OP_PLAN = "op_plan";
+  std::string const OP_PLAN_GET = "op_plan_get";
 
   namespace CPPMacroSupport
   {
@@ -90,6 +92,7 @@ namespace OP2
     std::string const nelems2 = "nelems2";
     std::string const opDatCardinalities = "opDatCardinalities";
     std::string const opDatDimensions = "opDatDimensions";
+    std::string const partitionSize = "partitionSize";
     std::string const reductionInput = "inputValue";
     std::string const reductionResult = "reductionResult";
     std::string const reductionOperation = "reductionOperation";
