@@ -1,15 +1,17 @@
-#pragma once
-#ifndef CPP_CUDA_USER_SUBROUTINE_H
-#define CPP_CUDA_USER_SUBROUTINE_H
+#ifndef FORTRAN_CUDA_USER_SUBROUTINE_H
+#define FORTRAN_CUDA_USER_SUBROUTINE_H
 
 #include <UserSubroutine.h>
+#include <CPPInitialiseConstantsSubroutine.h>
+#include <CPPParallelLoop.h>
 
-class CPPParallelLoop;
-class CPPProgramDeclarationsAndDefinitions;
-
-class CPPOpenCLUserSubroutine: public UserSubroutine <SgFunctionDeclaration,
-    CPPProgramDeclarationsAndDefinitions>
+class CPPOpenCLUserSubroutine:
+  public UserSubroutine <SgFunctionDeclaration, CPPProgramDeclarationsAndDefinitions>
 {
+  private:
+
+    CPPInitialiseConstantsSubroutine * initialiseConstantsSubroutine;
+
   private:
 
     void
@@ -26,9 +28,12 @@ class CPPOpenCLUserSubroutine: public UserSubroutine <SgFunctionDeclaration,
 
   public:
 
-    CPPOpenCLUserSubroutine (SgScopeStatement * moduleScope,
-        CPPParallelLoop * parallelLoop,
-        CPPProgramDeclarationsAndDefinitions * declarations);
+        CPPOpenCLUserSubroutine (
+            std::string const & subroutineName,
+            SgScopeStatement * moduleScope,
+            //CPPInitialiseConstantsSubroutine * initialiseConstantsSubroutine,
+            CPPProgramDeclarationsAndDefinitions * declarations,
+            CPPParallelLoop * parallelLoop);
 };
 
 #endif

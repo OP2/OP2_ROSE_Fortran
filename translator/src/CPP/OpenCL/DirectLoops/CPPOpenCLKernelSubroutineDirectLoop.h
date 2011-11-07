@@ -1,13 +1,22 @@
-#pragma once
+/*
+ * Written by Adam Betts and Carlo Bertolli
+ *
+ * This class models the kernel subroutine for a direct loop
+ */
+
 #ifndef CPP_OPENCL_KERNEL_SUBROUTINE_DIRECT_LOOP_H
 #define CPP_OPENCL_KERNEL_SUBROUTINE_DIRECT_LOOP_H
 
 #include <CPPOpenCLKernelSubroutine.h>
+#include <CPPOpenCLDataSizesDeclarationDirectLoop.h>
+#include <CPPOpDatDimensionsDeclaration.h>
 
-class CPPOpenCLUserSubroutine;
-
-class CPPOpenCLKernelSubroutineDirectLoop: public CPPOpenCLKernelSubroutine
+class CPPOpenCLKernelSubroutineDirectLoop: 
+  public CPPOpenCLKernelSubroutine
 {
+  private:
+
+    CPPOpenCLDataSizesDeclarationDirectLoop * dataSizesDeclaration;
 
   private:
 
@@ -43,7 +52,7 @@ class CPPOpenCLKernelSubroutineDirectLoop: public CPPOpenCLKernelSubroutine
 
     virtual void
     createOpDatFormalParameterDeclarations ();
-
+    
     void
     createInitialiseLocalThreadVariablesStatements ();
 
@@ -58,10 +67,13 @@ class CPPOpenCLKernelSubroutineDirectLoop: public CPPOpenCLKernelSubroutine
 
   public:
 
-    CPPOpenCLKernelSubroutineDirectLoop (SgScopeStatement * moduleScope,
-        CPPOpenCLUserSubroutine * userSubroutine,
-        CPPParallelLoop * parallelLoop,
-        CPPReductionSubroutines * reductionSubroutines);
+    CPPOpenCLKernelSubroutineDirectLoop (
+        std::string const & subroutineName, 
+        std::string const & userSubroutineName,
+        CPPParallelLoop * parallelLoop, 
+        SgScopeStatement * moduleScope,
+        CPPReductionSubroutines * reductionSubroutines,
+        CPPOpDatDimensionsDeclaration * opDatDimensionsDeclaration);
 };
 
 #endif
