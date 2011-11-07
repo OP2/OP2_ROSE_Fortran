@@ -6,6 +6,7 @@ import re
 import string
 import shutil
 import hashlib
+import platform
 
 from optparse import OptionParser
 from subprocess import Popen, PIPE
@@ -81,8 +82,16 @@ def checkEnvironment ():
 				debug.verboseMessage("g++ version %s passes" % token)
 				break
 
-def getBoostPath ():	
-	LD_LIBRARY_PATH = string.split(os.environ.get("LD_LIBRARY_PATH"), os.pathsep)
+def getBoostPath ():
+	osLibraryPathString = None
+	if platform.system() == "Darwin":
+		debug.verboseMessage("Darwin OS detected")
+		osLibraryPathString = "DYLD_LIBRARY_PATH"
+	else:
+		debug.verboseMessage("Linux OS assumed")
+		osLibraryPathString = "LD_LIBRARY_PATH"	
+
+	LD_LIBRARY_PATH = string.split(os.environ.get(osLibraryPathString), os.pathsep)
 	boostDirectory  = None
 	boostPattern    = re.compile("boost")
 	
@@ -91,7 +100,7 @@ def getBoostPath ():
 			boostDirectory = path
 
 	if boostDirectory is None:
-		debug.exitMessage("Unable to find BOOST in your LD_LIBRARY_PATH")
+		debug.exitMessage("Unable to find BOOST in your Library Path '%s'" % osLibraryPathString)
 	
 	return boostDirectory
 
