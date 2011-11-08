@@ -1,4 +1,5 @@
 #include <CPPCUDAHostSubroutineIndirectLoop.h>
+#include <CPPModuleDeclarations.h>
 
 SgStatement *
 CPPCUDAHostSubroutineIndirectLoop::createKernelFunctionCallStatement ()
@@ -29,8 +30,9 @@ CPPCUDAHostSubroutineIndirectLoop::createLocalVariableDeclarations ()
 
 CPPCUDAHostSubroutineIndirectLoop::CPPCUDAHostSubroutineIndirectLoop (
     SgScopeStatement * moduleScope, CPPCUDAKernelSubroutine * calleeSubroutine,
-    CPPParallelLoop * parallelLoop) :
-  CPPCUDAHostSubroutine (moduleScope, calleeSubroutine, parallelLoop)
+    CPPParallelLoop * parallelLoop, CPPModuleDeclarations * moduleDeclarations) :
+  CPPCUDAHostSubroutine (moduleScope, calleeSubroutine, parallelLoop,
+      moduleDeclarations)
 {
   Debug::getInstance ()->debugMessage (
       "Creating host subroutine of indirect loop", Debug::CONSTRUCTOR_LEVEL,

@@ -5,9 +5,14 @@
 #include <CPPHostSubroutine.h>
 
 class CPPCUDAKernelSubroutine;
+class CPPModuleDeclarations;
 
 class CPPCUDAHostSubroutine: public CPPHostSubroutine
 {
+  protected:
+
+    CPPModuleDeclarations * moduleDeclarations;
+
   protected:
 
     virtual void
@@ -24,7 +29,8 @@ class CPPCUDAHostSubroutine: public CPPHostSubroutine
 
     CPPCUDAHostSubroutine (SgScopeStatement * moduleScope,
         CPPCUDAKernelSubroutine * calleeSubroutine,
-        CPPParallelLoop * parallelLoop);
+        CPPParallelLoop * parallelLoop,
+        CPPModuleDeclarations * moduleDeclarations);
 };
 
 #endif

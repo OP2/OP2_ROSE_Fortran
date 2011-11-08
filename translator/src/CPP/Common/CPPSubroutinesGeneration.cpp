@@ -3,6 +3,7 @@
 #include <CPPHostSubroutine.h>
 #include <CPPProgramDeclarationsAndDefinitions.h>
 #include <CPPReductionSubroutines.h>
+#include <CPPModuleDeclarations.h>
 #include <Exceptions.h>
 
 void
@@ -59,6 +60,8 @@ CPPSubroutinesGeneration::generate ()
   moduleScope = sourceFile->get_globalScope ();
 
   addHeaderIncludes ();
+
+  moduleDeclarations = new CPPModuleDeclarations (moduleScope, declarations);
 
   createSubroutines ();
 }

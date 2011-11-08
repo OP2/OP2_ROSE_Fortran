@@ -265,3 +265,21 @@ CUDA::CPPRuntimeSupport::getCUDASafeHostThreadSynchronisationCallStatement (
   return buildFunctionCallExp ("cutilSafeCall", buildVoidType (),
       actualParameters, scope);
 }
+
+SgVarRefExp *
+CUDA::CPPRuntimeSupport::getPointerToMemoryAllocatedForHostReductionArray (
+    SgScopeStatement * scope)
+{
+  using namespace SageBuilder;
+
+  return buildOpaqueVarRefExp ("OP_reduct_h", scope);
+}
+
+SgVarRefExp *
+CUDA::CPPRuntimeSupport::getPointerToMemoryAllocatedForDeviceReductionArray (
+    SgScopeStatement * scope)
+{
+  using namespace SageBuilder;
+
+  return buildOpaqueVarRefExp ("OP_reduct_d", scope);
+}

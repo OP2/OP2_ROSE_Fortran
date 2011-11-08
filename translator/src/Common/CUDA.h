@@ -32,7 +32,6 @@ namespace CUDA
    * threadIdx.x, threadIdx.y, or threadIdx.z
    * ======================================================
    */
-
   SgDotExp *
   getThreadId (THREAD_BLOCK_DIMENSION dimension, SgScopeStatement * scope);
 
@@ -42,7 +41,6 @@ namespace CUDA
    * blockIdx.x or blockIdx.y
    * ======================================================
    */
-
   SgDotExp *
   getBlockId (GRID_DIMENSION dimension, SgScopeStatement * scope);
 
@@ -52,7 +50,6 @@ namespace CUDA
    * blockDim.x, blockDim.y, or blockDim.z
    * ======================================================
    */
-
   SgDotExp *
   getThreadBlockDimension (THREAD_BLOCK_DIMENSION dimension,
       SgScopeStatement * scope);
@@ -63,7 +60,6 @@ namespace CUDA
    * gridDim.x or gridDim.y
    * ======================================================
    */
-
   SgDotExp *
   getGridDimension (GRID_DIMENSION dimension, SgScopeStatement * scope);
 
@@ -73,7 +69,6 @@ namespace CUDA
    * variable
    * ======================================================
    */
-
   SgVarRefExp *
   getWarpSizeReference (SgScopeStatement * scope);
 
@@ -83,7 +78,6 @@ namespace CUDA
    * synchronisation to be called from a device subroutine
    * ======================================================
    */
-
   SgFunctionCallExp *
   createDeviceThreadSynchronisationCallStatement (SgScopeStatement * scope);
 
@@ -93,7 +87,6 @@ namespace CUDA
    * synchronisation to be called from a host subroutine
    * ======================================================
    */
-
   SgFunctionCallExp *
   createHostThreadSynchronisationCallStatement (SgScopeStatement * scope);
 
@@ -105,7 +98,6 @@ namespace CUDA
      * support function which allocates reduction arrays
      * ======================================================
      */
-
     SgFunctionCallExp *
     getReallocateReductionArraysCallStatement (SgScopeStatement * scope,
         SgVarRefExp * reductionBytesReference);
@@ -117,7 +109,6 @@ namespace CUDA
      * to device
      * ======================================================
      */
-
     SgFunctionCallExp *
     getMoveReductionArraysFromHostToDeviceCallStatement (
         SgScopeStatement * scope, SgVarRefExp * reductionBytesReference);
@@ -129,7 +120,6 @@ namespace CUDA
      * to device
      * ======================================================
      */
-
     SgFunctionCallExp *
     getMoveReductionArraysFromDeviceToHostCallStatement (
         SgScopeStatement * scope, SgVarRefExp * reductionBytesReference);
@@ -141,11 +131,33 @@ namespace CUDA
      * which itself is wrapped in CUDA safe call function call
      * ======================================================
      */
-
     SgFunctionCallExp
         *
         getCUDASafeHostThreadSynchronisationCallStatement (
             SgScopeStatement * scope);
+
+    /*
+     * ======================================================
+     * Returns a reference to the pointer which is returned
+     * after allocating a reduction array on the host through
+     * malloc (these are macros provided in the OP2 run-time
+     * support)
+     * ======================================================
+     */
+    SgVarRefExp *
+    getPointerToMemoryAllocatedForHostReductionArray (SgScopeStatement * scope);
+
+    /*
+     * ======================================================
+     * Returns a reference to the pointer which is returned
+     * after allocating a reduction array on the device through
+     * CUDA malloc (these are macros provided in the OP2 run-time
+     * support)
+     * ======================================================
+     */
+    SgVarRefExp *
+    getPointerToMemoryAllocatedForDeviceReductionArray (
+        SgScopeStatement * scope);
   }
 }
 

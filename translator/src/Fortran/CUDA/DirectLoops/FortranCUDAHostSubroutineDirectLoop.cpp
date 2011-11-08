@@ -249,6 +249,9 @@ FortranCUDAHostSubroutineDirectLoop::createStatements ()
   using namespace SageBuilder;
   using namespace SageInterface;
 
+  Debug::getInstance ()->debugMessage ("Creating statements",
+      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+
   createCUDAKernelInitialisationStatements ();
 
   appendStatement (createTransferOpDatStatements (), subroutineScope);
@@ -277,6 +280,9 @@ FortranCUDAHostSubroutineDirectLoop::createStatements ()
 void
 FortranCUDAHostSubroutineDirectLoop::createLocalVariableDeclarations ()
 {
+  Debug::getInstance ()->debugMessage ("Creating local variable declarations",
+      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+
   createOpDatDimensionsDeclaration ();
 
   createOpDatCardinalitiesDeclaration ();

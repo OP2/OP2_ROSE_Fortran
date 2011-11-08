@@ -1,41 +1,191 @@
 #include <CPPCUDAHostSubroutineDirectLoop.h>
 #include <CPPParallelLoop.h>
 #include <CPPKernelSubroutine.h>
+#include <CPPModuleDeclarations.h>
 #include <RoseStatementsAndExpressionsBuilder.h>
+#include <RoseHelper.h>
 #include <CommonNamespaces.h>
-
-void
-CPPCUDAHostSubroutineDirectLoop::createCUDAKernelInitialisationStatements ()
-{
-}
+#include <CUDA.h>
 
 SgStatement *
 CPPCUDAHostSubroutineDirectLoop::createKernelFunctionCallStatement ()
 {
+  using namespace SageBuilder;
+  using namespace OP2::VariableNames;
+
+  Debug::getInstance ()->debugMessage (
+      "Creating statement to call CUDA kernel", Debug::FUNCTION_LEVEL,
+      __FILE__, __LINE__);
+
+  SgExprListExp * actualParameters = buildExprListExp ();
+
+  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
+  {
+    if (parallelLoop->isDuplicateOpDat (i) == false)
+    {
+      if (parallelLoop->isDirect (i) || parallelLoop->isReductionRequired (i))
+      {
+        SgDotExp * dotExpression = buildDotExp (
+            variableDeclarations->getReference (getOpDatName (i)),
+            buildOpaqueVarRefExp (dataOnDevice, subroutineScope));
+
+        SgCastExp * castExpression = buildCastExp (dotExpression,
+            buildPointerType (parallelLoop->getOpDatBaseType (i)));
+
+        actualParameters->append_expression (castExpression);
+      }
+    }
+  }
+
+  actualParameters->append_expression (variableDeclarations->getReference (
+      sharedMemoryOffset));
+
+  SgArrowExp * arrowExpression = buildArrowExp (
+      variableDeclarations->getReference (getOpSetName ()),
+      buildOpaqueVarRefExp (size, subroutineScope));
+
+  actualParameters->append_expression (arrowExpression);
+
+  SgCudaKernelExecConfig * kernelConfiguration = new SgCudaKernelExecConfig (
+      RoseHelper::getFileInfo (), variableDeclarations->getReference (
+          CUDA::blocksPerGrid), variableDeclarations->getReference (
+          CUDA::threadsPerBlock), variableDeclarations->getReference (
+          CUDA::sharedMemorySize));
+
+  kernelConfiguration->set_endOfConstruct (RoseHelper::getFileInfo ());
+
+  SgCudaKernelCallExp * kernelCallExpression = new SgCudaKernelCallExp (
+      RoseHelper::getFileInfo (), buildFunctionRefExp (
+          calleeSubroutine->getSubroutineName (), subroutineScope),
+      actualParameters, kernelConfiguration);
+
+  kernelCallExpression->set_endOfConstruct (RoseHelper::getFileInfo ());
+
+  return buildExprStatement (kernelCallExpression);
+}
+
+void
+CPPCUDAHostSubroutineDirectLoop::createCUDAKernelInitialisationStatements ()
+{
+  using namespace SageBuilder;
+  using namespace SageInterface;
+  using namespace OP2::VariableNames;
+  using namespace OP2::CPPMacroSupport;
+
+  Debug::getInstance ()->debugMessage (
+      "Creating CUDA kernel initialisation statements", Debug::FUNCTION_LEVEL,
+      __FILE__, __LINE__);
+
+  SgExprStatement * assignmentStatement1 = buildAssignStatement (
+      variableDeclarations->getReference (CUDA::blocksPerGrid), buildIntVal (
+          200));
+
+  appendStatement (assignmentStatement1, subroutineScope);
+
+  SgExprStatement * assignmentStatement2 = buildAssignStatement (
+      variableDeclarations->getReference (CUDA::threadsPerBlock),
+      moduleDeclarations->getBlockSizeReference (
+          parallelLoop->getUserSubroutineName ()));
+
+  appendStatement (assignmentStatement2, subroutineScope);
+
+  SgExprStatement * assignmentStatement3 = buildAssignStatement (
+      variableDeclarations->getReference (CUDA::sharedMemorySize), buildIntVal (
+          0));
+
+  appendStatement (assignmentStatement3, subroutineScope);
+
+  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
+  {
+    if (parallelLoop->isDuplicateOpDat (i) == false)
+    {
+      if (parallelLoop->isDirect (i))
+      {
+        SgSizeOfOp * sizeOfExpression = buildSizeOfOp (
+            parallelLoop->getOpDatBaseType (i));
+
+        SgMultiplyOp * multiplyExpression = buildMultiplyOp (sizeOfExpression,
+            buildIntVal (parallelLoop->getSizeOfOpDat (i)));
+
+        SgFunctionCallExp * maxCallExpression = createMaxCallStatement (
+            subroutineScope, variableDeclarations->getReference (
+                CUDA::sharedMemorySize), multiplyExpression);
+
+        SgExprStatement * assignmentStatement = buildAssignStatement (
+            variableDeclarations->getReference (CUDA::sharedMemorySize),
+            maxCallExpression);
+
+        appendStatement (assignmentStatement, subroutineScope);
+      }
+    }
+  }
+
+  SgMultiplyOp * multiplyExpression4 = buildMultiplyOp (
+      variableDeclarations->getReference (CUDA::sharedMemorySize),
+      buildOpaqueVarRefExp (warpSizeMacro, subroutineScope));
+
+  SgExprStatement * assignmentStatement4 = buildAssignStatement (
+      variableDeclarations->getReference (sharedMemoryOffset),
+      multiplyExpression4);
+
+  appendStatement (assignmentStatement4, subroutineScope);
+
+  SgMultiplyOp * multiplyExpression5 = buildMultiplyOp (
+      variableDeclarations->getReference (CUDA::sharedMemorySize),
+      variableDeclarations->getReference (CUDA::threadsPerBlock));
+
+  SgExprStatement * assignmentStatement5 = buildAssignStatement (
+      variableDeclarations->getReference (CUDA::sharedMemorySize),
+      multiplyExpression5);
+
+  appendStatement (assignmentStatement5, subroutineScope);
 }
 
 void
 CPPCUDAHostSubroutineDirectLoop::createStatements ()
 {
+  using namespace SageBuilder;
+  using namespace SageInterface;
+
+  Debug::getInstance ()->debugMessage ("Creating statements",
+      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+
+  if (parallelLoop->isReductionRequired ())
+  {
+    createReductionPrologueStatements ();
+  }
+
+  createCUDAKernelInitialisationStatements ();
+
+  appendStatement (createKernelFunctionCallStatement (), subroutineScope);
+
+  SgFunctionCallExp
+      * threadSynchronisationExpression =
+          CUDA::CPPRuntimeSupport::getCUDASafeHostThreadSynchronisationCallStatement (
+              subroutineScope);
+
+  appendStatement (buildExprStatement (threadSynchronisationExpression),
+      subroutineScope);
+
+  if (parallelLoop->isReductionRequired ())
+  {
+    createReductionEpilogueStatements ();
+  }
 }
 
 void
 CPPCUDAHostSubroutineDirectLoop::createCUDAKernelActualParameterDeclarations ()
 {
   using namespace SageBuilder;
+  using namespace OP2::VariableNames;
 
   Debug::getInstance ()->debugMessage (
       "Creating CUDA configuration parameters", Debug::FUNCTION_LEVEL,
       __FILE__, __LINE__);
 
-  variableDeclarations->add (OP2::VariableNames::sharedMemoryOffset,
+  variableDeclarations->add (sharedMemoryOffset,
       RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
-          OP2::VariableNames::sharedMemoryOffset, buildIntType (),
-          subroutineScope));
-
-  variableDeclarations->add (OP2::VariableNames::warpSize,
-      RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
-          OP2::VariableNames::warpSize, buildIntType (), subroutineScope));
+          sharedMemoryOffset, buildIntType (), subroutineScope));
 }
 
 void
@@ -53,8 +203,9 @@ CPPCUDAHostSubroutineDirectLoop::createLocalVariableDeclarations ()
 
 CPPCUDAHostSubroutineDirectLoop::CPPCUDAHostSubroutineDirectLoop (
     SgScopeStatement * moduleScope, CPPCUDAKernelSubroutine * calleeSubroutine,
-    CPPParallelLoop * parallelLoop) :
-  CPPCUDAHostSubroutine (moduleScope, calleeSubroutine, parallelLoop)
+    CPPParallelLoop * parallelLoop, CPPModuleDeclarations * moduleDeclarations) :
+  CPPCUDAHostSubroutine (moduleScope, calleeSubroutine, parallelLoop,
+      moduleDeclarations)
 {
   Debug::getInstance ()->debugMessage (
       "Creating host subroutine of direct loop", Debug::CONSTRUCTOR_LEVEL,

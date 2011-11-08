@@ -7,6 +7,7 @@
 class CPPProgramDeclarationsAndDefinitions;
 class CPPHostSubroutine;
 class CPPReductionSubroutines;
+class CPPModuleDeclarations;
 
 class CPPSubroutinesGeneration: public SubroutinesGeneration <
     CPPProgramDeclarationsAndDefinitions, CPPHostSubroutine>
@@ -14,6 +15,8 @@ class CPPSubroutinesGeneration: public SubroutinesGeneration <
   protected:
 
     CPPReductionSubroutines * reductionSubroutines;
+
+    CPPModuleDeclarations * moduleDeclarations;
 
   protected:
 

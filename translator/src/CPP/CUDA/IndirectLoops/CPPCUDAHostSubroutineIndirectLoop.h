@@ -34,7 +34,8 @@ class CPPCUDAHostSubroutineIndirectLoop: public CPPCUDAHostSubroutine
 
     CPPCUDAHostSubroutineIndirectLoop (SgScopeStatement * moduleScope,
         CPPCUDAKernelSubroutine * calleeSubroutine,
-        CPPParallelLoop * parallelLoop);
+        CPPParallelLoop * parallelLoop,
+        CPPModuleDeclarations * moduleDeclarations);
 };
 
 #endif
