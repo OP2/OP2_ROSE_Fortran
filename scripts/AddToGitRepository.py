@@ -87,13 +87,13 @@ def add ():
 
 def output ():
 	if inRepo:
-    		debug.verboseMessage("===== These files already exist in the repository =====")
+    		print("===== These files already exist in the repository =====")
     		for f in inRepo:
-        		debug.verboseMessage(f)
+        		print(f)
 	if added:
-    		debug.verboseMessage("===== Added the following files =====")
+    		print("===== Added the following files =====")
     		for f in added:
-        		debug.verboseMessage(f)
+        		print(f)
 
 if opts.dir is None:
 	debug.exitMessage("You must supply a directory on the command line.")
