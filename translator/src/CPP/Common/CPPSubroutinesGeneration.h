@@ -6,11 +6,19 @@
 
 class CPPProgramDeclarationsAndDefinitions;
 class CPPHostSubroutine;
+class CPPReductionSubroutines;
 
 class CPPSubroutinesGeneration: public SubroutinesGeneration <
     CPPProgramDeclarationsAndDefinitions, CPPHostSubroutine>
 {
   protected:
+
+    CPPReductionSubroutines * reductionSubroutines;
+
+  protected:
+
+    virtual void
+    addHeaderIncludes () = 0;
 
     virtual void
     createSubroutines () = 0;

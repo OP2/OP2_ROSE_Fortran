@@ -15,14 +15,8 @@ class CPPOpenCLHostSubroutineIndirectLoop: public CPPOpenCLHostSubroutine
 
   private:
 
-    void
-    createPlanFunctionExecutionStatements ();
-
     virtual SgStatement *
     createKernelFunctionCallStatement ();
-
-    void
-    createExecutionPlanDeclarations ();
 
     virtual void
     createStatements ();

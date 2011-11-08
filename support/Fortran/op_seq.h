@@ -68,22 +68,22 @@ typedef struct {
   int   *accs;
 	
   // execution plan
-  int        *nthrcol;  // number of thread colors for each block
-  int        *thrcol;   // thread colors
-  int        *offset;   // offset for primary set
-  int       **ind_maps; // pointers for indirect datasets
-	int				 * nindirect; // size of each ind_maps position (for Fortran)
-  int        *ind_offs; // offsets for indirect datasets
-  int        *ind_sizes;// sizes for indirect datasets
-  short     **maps;     // regular pointers, renumbered as needed
-  int        *nelems;   // number of elements in each block
-  int         ncolors;  // number of block colors
-  int        *ncolblk;  // number of blocks for each color
-	int					nblocks; // number of blocks (for Fortran)
-  int        *blkmap;   // block mapping
-  int         nshared;  // bytes of shared memory required
-  float       transfer; // bytes of data transfer per kernel call
-  float       transfer2;// bytes of cache line per kernel call
+  int        *nthrcol;   // number of thread colors for each block
+  int        *thrcol;    // thread colors
+  int        *offset;    // offset for primary set
+  int       **ind_maps;  // pointers for indirect datasets
+  int		* nindirect; // size of each ind_maps position (for Fortran)
+  int        *ind_offs;  // offsets for indirect datasets
+  int        *ind_sizes; // sizes for indirect datasets
+  short     **maps;      // regular pointers, renumbered as needed
+  int        *nelems;    // number of elements in each block
+  int         ncolors;   // number of block colors
+  int        *ncolblk;   // number of blocks for each color
+  int		  nblocks;   // number of blocks (for Fortran)
+  int        *blkmap;    // block mapping
+  int         nshared;   // bytes of shared memory required
+  float       transfer;  // bytes of data transfer per kernel call
+  float       transfer2; // bytes of cache line per kernel call
 } op_plan;
 
 typedef struct {

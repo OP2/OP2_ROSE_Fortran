@@ -1116,7 +1116,7 @@ CPPCUDAKernelSubroutineIndirectLoop::createExecutionLocalVariableDeclarations ()
       RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
           getIterationCounterVariableName (1), buildIntType (), subroutineScope));
 
-  variableDeclarations ->add (getUpperBoundVariableName(1),
+  variableDeclarations ->add (getUpperBoundVariableName (1),
       RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
           getUpperBoundVariableName (1), buildIntType (), subroutineScope));
 }
@@ -1402,7 +1402,7 @@ CPPCUDAKernelSubroutineIndirectLoop::createFormalParameterDeclarations ()
 CPPCUDAKernelSubroutineIndirectLoop::CPPCUDAKernelSubroutineIndirectLoop (
     SgScopeStatement * moduleScope, CPPCUDAUserSubroutine * userSubroutine,
     CPPParallelLoop * parallelLoop,
-    CPPCUDAReductionSubroutines * reductionSubroutines) :
+    CPPReductionSubroutines * reductionSubroutines) :
   CPPCUDAKernelSubroutine (moduleScope, userSubroutine, parallelLoop,
       reductionSubroutines)
 {

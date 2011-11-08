@@ -12,26 +12,14 @@ CPPOpenCLHostSubroutineIndirectLoop::createKernelFunctionCallStatement ()
 }
 
 void
-CPPOpenCLHostSubroutineIndirectLoop::createPlanFunctionExecutionStatements ()
-{
-}
-
-void
-CPPOpenCLHostSubroutineIndirectLoop::createExecutionPlanDeclarations ()
-{
-}
-
-void
 CPPOpenCLHostSubroutineIndirectLoop::createStatements ()
 {
-  if (parallelLoop->isReductionRequired () == true)
+  if (parallelLoop->isReductionRequired ())
   {
     createReductionPrologueStatements ();
   }
 
-  createPlanFunctionExecutionStatements ();
-
-  if (parallelLoop->isReductionRequired () == true)
+  if (parallelLoop->isReductionRequired ())
   {
     createReductionEpilogueStatements ();
   }
@@ -40,9 +28,7 @@ CPPOpenCLHostSubroutineIndirectLoop::createStatements ()
 void
 CPPOpenCLHostSubroutineIndirectLoop::createLocalVariableDeclarations ()
 {
-  createExecutionPlanDeclarations ();
-
-  if (parallelLoop->isReductionRequired () == true)
+  if (parallelLoop->isReductionRequired ())
   {
     createReductionDeclarations ();
   }

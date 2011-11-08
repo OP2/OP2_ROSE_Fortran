@@ -7,8 +7,8 @@
 #include <CPPCUDAKernelSubroutineIndirectLoop.h>
 #include <CPPCUDAHostSubroutineIndirectLoop.h>
 #include <CPPCUDAUserSubroutine.h>
-#include <CPPCUDAReductionSubroutines.h>
 #include <CPPCUDAReductionSubroutine.h>
+#include <CPPReductionSubroutines.h>
 
 void
 CPPCUDASubroutinesGeneration::createReductionSubroutines ()
@@ -43,6 +43,11 @@ CPPCUDASubroutinesGeneration::createReductionSubroutines ()
     reductionSubroutines->addSubroutine (*it,
         subroutine->getSubroutineHeaderStatement ());
   }
+}
+
+void
+CPPCUDASubroutinesGeneration::addHeaderIncludes ()
+{
 }
 
 void
@@ -95,7 +100,5 @@ CPPCUDASubroutinesGeneration::CPPCUDASubroutinesGeneration (
     SgProject * project, CPPProgramDeclarationsAndDefinitions * declarations) :
   CPPSubroutinesGeneration (project, declarations, "rose_cuda_code.cpp")
 {
-  reductionSubroutines = new CPPCUDAReductionSubroutines ();
-
   generate ();
 }

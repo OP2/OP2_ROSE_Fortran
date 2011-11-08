@@ -5,7 +5,7 @@
 #include <CPPKernelSubroutine.h>
 
 class CPPCUDAUserSubroutine;
-class CPPCUDAReductionSubroutines;
+class CPPReductionSubroutines;
 
 class CPPCUDAKernelSubroutine: public CPPKernelSubroutine
 {
@@ -59,7 +59,7 @@ class CPPCUDAKernelSubroutine: public CPPKernelSubroutine
 
     CPPCUDAKernelSubroutine (SgScopeStatement * moduleScope,
         CPPCUDAUserSubroutine * userSubroutine, CPPParallelLoop * parallelLoop,
-        CPPCUDAReductionSubroutines * reductionSubroutines);
+        CPPReductionSubroutines * reductionSubroutines);
 
 };
 

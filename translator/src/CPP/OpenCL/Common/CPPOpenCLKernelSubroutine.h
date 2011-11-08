@@ -1,32 +1,66 @@
+#pragma once
 #ifndef CPP_OPENCL_KERNEL_SUBROUTINE_H
 #define CPP_OPENCL_KERNEL_SUBROUTINE_H
 
 #include <CPPKernelSubroutine.h>
-#include <CPPOpDatDimensionsDeclaration.h>
+
+class CPPOpenCLUserSubroutine;
+class CPPReductionSubroutines;
 
 class CPPOpenCLKernelSubroutine: public CPPKernelSubroutine
 {
   protected:
 
-    CPPOpDatDimensionsDeclaration * opDatDimensionsDeclaration; //FIXME
-
-  protected:
+    /*
+     * ======================================================
+     * Creates the statements which initialises the variables
+     * used to stage in data from device->shared->stack memory
+     * ======================================================
+     */
     void
-    createReductionLoopStatements ();
+    createInitialiseCUDAStageInVariablesStatements ();
 
+    /*
+     * ======================================================
+     * Creates the statements executed before the call to the
+     * user subroutine to initialise the local thread variables
+     * to zero
+     * ======================================================
+     */
     void
-    createLocalThreadDeclarations ();
+    createReductionPrologueStatements ();
 
+    /*
+     * ======================================================
+     * Creates the statements executed after the call to the
+     * user subroutine to perform the thread-block reduction
+     * ======================================================
+     */
     void
-    createAutoSharedDeclaration ();
+    createReductionEpilogueStatements ();
 
-    CPPOpenCLKernelSubroutine (
-            std::string const & subroutineName,
-            std::string const & userSubroutineName, 
-            CPPParallelLoop * parallelLoop,
-            SgScopeStatement * moduleScope,
-            CPPReductionSubroutines * reductionSubroutines,
-            CPPOpDatDimensionsDeclaration * opDatDimensionsDeclaration);
+    /*
+     * ======================================================
+     * Creates the variable declarations needed to stage in
+     * data from device->shared->stack memory
+     * ======================================================
+     */
+    void
+    createCUDAStageInVariablesVariableDeclarations ();
+
+    /*
+     * ======================================================
+     * Creates the variable declarations needed in CUDA
+     * shared memory
+     * ======================================================
+     */
+    void
+    createCUDASharedVariableDeclarations ();
+
+    CPPOpenCLKernelSubroutine (SgScopeStatement * moduleScope,
+        CPPOpenCLUserSubroutine * userSubroutine,
+        CPPParallelLoop * parallelLoop,
+        CPPReductionSubroutines * reductionSubroutines);
 };
 
 #endif

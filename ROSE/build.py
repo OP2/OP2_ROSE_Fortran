@@ -29,6 +29,13 @@ parser.add_option("-b",
                  help="Build ROSE from scratch (i.e. the tarball).",
                  default=False)
 
+parser.add_option("-c",
+                 "--check",
+                 action="store_true",
+                 dest="check",
+                 help="Check environment is suitable for ROSE build and installation.",
+                 default=False)
+
 parser.add_option("-h",
                   "--help",
                   action="help",
@@ -93,14 +100,32 @@ def getBoostPath ():
 
 	LD_LIBRARY_PATH = string.split(os.environ.get(osLibraryPathString), os.pathsep)
 	boostDirectory  = None
-	boostPattern    = re.compile("boost")
+	boostPattern    = re.compile("libboost")
 	
-	for path in LD_LIBRARY_PATH:
-		if boostPattern.search(path):
-			boostDirectory = path
+	try:
+		for path in LD_LIBRARY_PATH:
+			for file in os.listdir(path):
+				if boostPattern.match(file):
+					boostDirectory = path
+					raise StopIteration ()
+	except StopIteration:
+		pass
+
+	translatorRequiredLibraries = ['libboost_filesystem.so', 'libboost_system.so']
+	for libraryName in translatorRequiredLibraries:
+		match  = False
+		for file in os.listdir(boostDirectory):
+			if libraryName == file:
+				match = True
+		if match:
+			debug.verboseMessage("Found Boost library '%s' needed to compile source-to-source translator" % libraryName)
+		else:
+			debug.exitMessage("Unable to find Boost library '%s' in your Boost libraries. This is needed to compile source-to-source translator" % libraryName)
 
 	if boostDirectory is None:
 		debug.exitMessage("Unable to find BOOST in your Library Path '%s'" % osLibraryPathString)
+	else:
+		debug.verboseMessage("Boost libraries found in '%s'" % boostDirectory)
 	
 	return boostDirectory
 
@@ -346,7 +371,7 @@ def rebuildTranslator ():
 		debug.exitMessage("Command '%s' failed" % sconsString)
 
 def buildAction ():
-	checkEnvironment()
+	checkEnvironment ()
 	boostDirectory = getBoostPath ()
 	tarball        = selectROSETarball ()
 	roseDirectory  = extractTarball (tarball)
@@ -369,13 +394,18 @@ def updateAction ():
 	else:
 		debug.verboseMessage("None of the files in the ROSE distribution have changed. Therefore, nothing to do.")
 
+if opts.check:
+	checkEnvironment ()
+	boostDirectory = getBoostPath ()
+	debug.verboseMessage("Your environment is sane.")
+
 if opts.build:
 	buildAction ()
+	debug.verboseMessage("ROSE build completed.")
 
 if opts.update:
 	updateAction ()
+	debug.verboseMessage("Updating completed.")
 
-if not opts.build and not opts.update:
+if not opts.build and not opts.update and not opts.check:
 	debug.exitMessage("No actions selected. Use -h for options")
-else:	
-	debug.verboseMessage("My work is done here.")

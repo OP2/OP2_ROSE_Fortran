@@ -80,8 +80,8 @@ namespace OP2
     std::string const blockID = "blockID";
     std::string const colour1 = "colour";
     std::string const colour2 = "colour2";
-    std::string const dataOnHost = "dat";
-    std::string const dataOnDevice = "dat_d";
+    std::string const dataOnHost = "data";
+    std::string const dataOnDevice = "data_d";
     std::string const dimension = "dim";
     std::string const index = "index";
     std::string const localOffset = "localOffset";

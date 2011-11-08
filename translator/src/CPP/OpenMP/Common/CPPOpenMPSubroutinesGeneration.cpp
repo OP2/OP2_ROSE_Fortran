@@ -7,6 +7,11 @@
 #include <RoseStatementsAndExpressionsBuilder.h>
 
 void
+CPPOpenMPSubroutinesGeneration::addHeaderIncludes ()
+{
+}
+
+void
 CPPOpenMPSubroutinesGeneration::createSubroutines ()
 {
   using namespace SageInterface;

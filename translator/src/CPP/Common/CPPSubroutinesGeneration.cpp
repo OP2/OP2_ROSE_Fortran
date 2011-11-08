@@ -2,6 +2,7 @@
 #include <CPPParallelLoop.h>
 #include <CPPHostSubroutine.h>
 #include <CPPProgramDeclarationsAndDefinitions.h>
+#include <CPPReductionSubroutines.h>
 #include <Exceptions.h>
 
 void
@@ -49,7 +50,6 @@ CPPSubroutinesGeneration::patchCallsToParallelLoops ()
         functionCallExpression->get_args ()->get_expressions ();
 
     arguments.erase (arguments.begin ());
-
   }
 }
 
@@ -57,6 +57,8 @@ void
 CPPSubroutinesGeneration::generate ()
 {
   moduleScope = sourceFile->get_globalScope ();
+
+  addHeaderIncludes ();
 
   createSubroutines ();
 }
@@ -67,5 +69,6 @@ CPPSubroutinesGeneration::CPPSubroutinesGeneration (SgProject * project,
   SubroutinesGeneration <CPPProgramDeclarationsAndDefinitions,
       CPPHostSubroutine> (project, declarations, newFileName)
 {
+  reductionSubroutines = new CPPReductionSubroutines ();
 }
 

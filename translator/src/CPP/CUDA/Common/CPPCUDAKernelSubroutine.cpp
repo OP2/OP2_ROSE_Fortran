@@ -1,6 +1,6 @@
 #include <CPPCUDAKernelSubroutine.h>
 #include <CPPCUDAUserSubroutine.h>
-#include <CPPCUDAReductionSubroutines.h>
+#include <CPPReductionSubroutines.h>
 #include <RoseStatementsAndExpressionsBuilder.h>
 #include <CUDA.h>
 #include <CommonNamespaces.h>
@@ -404,7 +404,7 @@ CPPCUDAKernelSubroutine::createCUDASharedVariableDeclarations ()
 CPPCUDAKernelSubroutine::CPPCUDAKernelSubroutine (
     SgScopeStatement * moduleScope, CPPCUDAUserSubroutine * userSubroutine,
     CPPParallelLoop * parallelLoop,
-    CPPCUDAReductionSubroutines * reductionSubroutines) :
+    CPPReductionSubroutines * reductionSubroutines) :
   CPPKernelSubroutine (moduleScope, userSubroutine, parallelLoop)
 {
   this->reductionSubroutines = reductionSubroutines;

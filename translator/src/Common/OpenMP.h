@@ -2,7 +2,7 @@
 #ifndef OPEN_MP_H
 #define OPEN_MP_H
 
-#include <rose.h>
+#include <string>
 
 class SgFunctionCallExp;
 class SgScopeStatement;

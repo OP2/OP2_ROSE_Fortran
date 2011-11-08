@@ -9,6 +9,9 @@ class CPPOpenMPSubroutinesGeneration: public CPPSubroutinesGeneration
   private:
 
     virtual void
+    addHeaderIncludes ();
+
+    virtual void
     createSubroutines ();
 
   public:

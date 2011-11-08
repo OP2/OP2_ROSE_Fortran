@@ -1,17 +1,17 @@
 #pragma once
-#ifndef CPP_CUDA_REDUCTION_SUBROUTINES_H
-#define CPP_CUDA_REDUCTION_SUBROUTINES_H
+#ifndef CPP_REDUCTION_SUBROUTINES_H
+#define CPP_REDUCTION_SUBROUTINES_H
 
 #include <ReductionSubroutines.h>
 
 class SgFunctionDeclaration;
 
-class CPPCUDAReductionSubroutines: public ReductionSubroutines <
+class CPPReductionSubroutines: public ReductionSubroutines <
     SgFunctionDeclaration>
 {
   public:
 
-    CPPCUDAReductionSubroutines () :
+    CPPReductionSubroutines () :
       ReductionSubroutines <SgFunctionDeclaration> ()
     {
     }

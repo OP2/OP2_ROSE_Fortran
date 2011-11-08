@@ -629,7 +629,7 @@ CPPCUDAKernelSubroutineDirectLoop::createFormalParameterDeclarations ()
 CPPCUDAKernelSubroutineDirectLoop::CPPCUDAKernelSubroutineDirectLoop (
     SgScopeStatement * moduleScope, CPPCUDAUserSubroutine * userSubroutine,
     CPPParallelLoop * parallelLoop,
-    CPPCUDAReductionSubroutines * reductionSubroutines) :
+    CPPReductionSubroutines * reductionSubroutines) :
   CPPCUDAKernelSubroutine (moduleScope, userSubroutine, parallelLoop,
       reductionSubroutines)
 {

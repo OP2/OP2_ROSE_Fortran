@@ -1,10 +1,3 @@
-/*
- * Written by Adam Betts and Carlo Bertolli
- *
- * Helper class to get (opaque) variable references to variables
- * defined in the CUDA run-time library
- */
-
 #pragma once
 #ifndef CUDA_H
 #define CUDA_H
@@ -28,9 +21,9 @@ enum THREAD_BLOCK_DIMENSION
 
 namespace CUDA
 {
-  std::string const blocksPerGrid = "nblocks";
-  std::string const threadsPerBlock = "nthreads";
-  std::string const sharedMemorySize = "nshared";
+  std::string const blocksPerGrid = "blocksPerGrid";
+  std::string const threadsPerBlock = "threadsPerBlock";
+  std::string const sharedMemorySize = "dynamicSharedMemorySize";
   std::string const threadSynchRet = "threadSynchRet";
 
   /*
