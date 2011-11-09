@@ -348,6 +348,8 @@ FortranProgramDeclarationsAndDefinitions::visit (SgNode * node)
 
         subroutinesInSourceCode[subroutineName] = procedureHeaderStatement;
 
+        subroutineToFileName[subroutineName] = currentSourceFile;
+
         Debug::getInstance ()->debugMessage (
             "Found procedure header statement '"
                 + procedureHeaderStatement->get_name ().getString ()

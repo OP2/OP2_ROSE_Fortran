@@ -14,12 +14,15 @@ FortranSubroutinesGeneration::fixUseStatement (SgUseStatement * useStatement,
   using namespace SageInterface;
   using boost::iequals;
 
+  std::string const & fileName = declarations->getFileNameForSubroutine (
+      userSubroutineName);
+
   std::string const & moduleNameToRemove = declarations->getModuleNameForFile (
-      declarations->getFileNameForSubroutine (userSubroutineName));
+      fileName);
 
   Debug::getInstance ()->debugMessage ("'" + userSubroutineName
-      + "' is in Fortran module '" + moduleNameToRemove + "'",
-      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+      + "' is in Fortran module '" + moduleNameToRemove + "' (file '"
+      + fileName + "')", Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
   SgUseStatement * lastUseStatement = useStatement;
 
