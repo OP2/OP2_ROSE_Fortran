@@ -7,8 +7,9 @@
 #include <FortranTypesBuilder.h>
 #include <FortranStatementsAndExpressionsBuilder.h>
 #include <RoseStatementsAndExpressionsBuilder.h>
-#include <CommonNamespaces.h>
 #include <RoseHelper.h>
+#include <CommonNamespaces.h>
+#include <PlanFunction.h>
 #include <CUDA.h>
 #include <Debug.h>
 
@@ -16,6 +17,7 @@ SgStatement *
 FortranCUDAHostSubroutineIndirectLoop::createKernelFunctionCallStatement ()
 {
   using namespace SageBuilder;
+  using namespace OP2::VariableNames;
 
   Debug::getInstance ()->debugMessage (
       "Creating CUDA kernel function call statement", Debug::FUNCTION_LEVEL,
@@ -24,10 +26,10 @@ FortranCUDAHostSubroutineIndirectLoop::createKernelFunctionCallStatement ()
   SgExprListExp * actualParameters = buildExprListExp ();
 
   actualParameters->append_expression (variableDeclarations->getReference (
-      OP2::VariableNames::opDatDimensions));
+      opDatDimensions));
 
   actualParameters->append_expression (variableDeclarations->getReference (
-      OP2::VariableNames::opDatCardinalities));
+      opDatCardinalities));
 
   Debug::getInstance ()->debugMessage ("Adding OP_DAT parameters",
       Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
@@ -39,28 +41,24 @@ FortranCUDAHostSubroutineIndirectLoop::createKernelFunctionCallStatement ()
       if (parallelLoop->isReductionRequired (i))
       {
         actualParameters->append_expression (
-            variableDeclarations->getReference (
-                OP2::VariableNames::getReductionArrayDeviceName (i)));
+            variableDeclarations->getReference (getReductionArrayDeviceName (i)));
       }
       else if (parallelLoop->isIndirect (i) || parallelLoop->isDirect (i))
       {
         actualParameters->append_expression (
-            variableDeclarations->getReference (
-                OP2::VariableNames::getOpDatDeviceName (i)));
+            variableDeclarations->getReference (getOpDatDeviceName (i)));
       }
       else if (parallelLoop->isRead (i))
       {
         if (parallelLoop->isArray (i))
         {
           actualParameters->append_expression (
-              variableDeclarations->getReference (
-                  OP2::VariableNames::getOpDatDeviceName (i)));
+              variableDeclarations->getReference (getOpDatDeviceName (i)));
         }
         else
         {
           actualParameters->append_expression (
-              variableDeclarations->getReference (
-                  OP2::VariableNames::getOpDatHostName (i)));
+              variableDeclarations->getReference (getOpDatHostName (i)));
         }
       }
     }
@@ -77,8 +75,7 @@ FortranCUDAHostSubroutineIndirectLoop::createKernelFunctionCallStatement ()
       if (parallelLoop->isIndirect (i))
       {
         actualParameters->append_expression (
-            variableDeclarations->getReference (
-                OP2::VariableNames::getLocalToGlobalMappingName (i)));
+            variableDeclarations->getReference (getLocalToGlobalMappingName (i)));
       }
     }
   }
@@ -92,7 +89,7 @@ FortranCUDAHostSubroutineIndirectLoop::createKernelFunctionCallStatement ()
     if (parallelLoop->isIndirect (i))
     {
       actualParameters->append_expression (variableDeclarations->getReference (
-          OP2::VariableNames::getGlobalToLocalMappingName (i)));
+          getGlobalToLocalMappingName (i)));
     }
   }
 
@@ -100,28 +97,28 @@ FortranCUDAHostSubroutineIndirectLoop::createKernelFunctionCallStatement ()
       Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
   actualParameters->append_expression (variableDeclarations->getReference (
-      OP2::VariableNames::PlanFunction::pindSizes));
+      PlanFunction::pindSizes));
 
   actualParameters->append_expression (variableDeclarations->getReference (
-      OP2::VariableNames::PlanFunction::pindOffs));
+      PlanFunction::pindOffs));
 
   actualParameters->append_expression (variableDeclarations->getReference (
-      OP2::VariableNames::PlanFunction::pblkMap));
+      PlanFunction::pblkMap));
 
   actualParameters->append_expression (variableDeclarations->getReference (
-      OP2::VariableNames::PlanFunction::poffset));
+      PlanFunction::poffset));
 
   actualParameters->append_expression (variableDeclarations->getReference (
-      OP2::VariableNames::PlanFunction::pnelems));
+      PlanFunction::pnelems));
 
   actualParameters->append_expression (variableDeclarations->getReference (
-      OP2::VariableNames::PlanFunction::pnthrcol));
+      PlanFunction::pnthrcol));
 
   actualParameters->append_expression (variableDeclarations->getReference (
-      OP2::VariableNames::PlanFunction::pthrcol));
+      PlanFunction::pthrcol));
 
   actualParameters->append_expression (variableDeclarations->getReference (
-      OP2::VariableNames::PlanFunction::blockOffset));
+      PlanFunction::blockOffset));
 
   SgCudaKernelExecConfig * kernelConfiguration = new SgCudaKernelExecConfig (
       RoseHelper::getFileInfo (), variableDeclarations->getReference (
@@ -146,6 +143,7 @@ FortranCUDAHostSubroutineIndirectLoop::createPlanFunctionExecutionStatements ()
 {
   using namespace SageBuilder;
   using namespace SageInterface;
+  using namespace OP2::VariableNames;
   using std::string;
 
   Debug::getInstance ()->debugMessage (
@@ -161,8 +159,8 @@ FortranCUDAHostSubroutineIndirectLoop::createPlanFunctionExecutionStatements ()
    */
 
   SgExprStatement * assignmentStatement1 = buildAssignStatement (
-      variableDeclarations->getReference (
-          OP2::VariableNames::PlanFunction::blockOffset), buildIntVal (0));
+      variableDeclarations->getReference (PlanFunction::blockOffset),
+      buildIntVal (0));
 
   appendStatement (assignmentStatement1, subroutineScope);
 
@@ -174,12 +172,11 @@ FortranCUDAHostSubroutineIndirectLoop::createPlanFunctionExecutionStatements ()
    */
 
   SgExpression * arrayIndexExpression1 = buildAddOp (
-      variableDeclarations->getReference (OP2::VariableNames::colour1),
-      buildIntVal (1));
+      variableDeclarations->getReference (colour1), buildIntVal (1));
 
   SgPntrArrRefExp * arrayExpression1 = buildPntrArrRefExp (
-      variableDeclarations->getReference (
-          OP2::VariableNames::PlanFunction::ncolblk), arrayIndexExpression1);
+      variableDeclarations->getReference (PlanFunction::ncolblk),
+      arrayIndexExpression1);
 
   SgExprStatement * statement1 = buildAssignStatement (
       variableDeclarations->getReference (CUDA::blocksPerGrid),
@@ -196,8 +193,7 @@ FortranCUDAHostSubroutineIndirectLoop::createPlanFunctionExecutionStatements ()
 
   SgExprStatement * statement2 = buildAssignStatement (
       variableDeclarations->getReference (CUDA::threadsPerBlock),
-      buildOpaqueVarRefExp (OP2::VariableNames::threadBlockSizeMacro,
-          subroutineScope));
+      buildOpaqueVarRefExp (threadBlockSizeMacro, subroutineScope));
 
   appendStatement (statement2, loopBody);
 
@@ -209,8 +205,8 @@ FortranCUDAHostSubroutineIndirectLoop::createPlanFunctionExecutionStatements ()
    */
 
   SgDotExp * dotExpression3 = buildDotExp (variableDeclarations->getReference (
-      OP2::VariableNames::PlanFunction::actualPlan), buildOpaqueVarRefExp (
-      OP2::VariableNames::PlanFunction::nshared, subroutineScope));
+      PlanFunction::actualPlan), buildOpaqueVarRefExp (PlanFunction::nshared,
+      subroutineScope));
 
   SgExprStatement * statement3 = buildAssignStatement (
       variableDeclarations->getReference (CUDA::sharedMemorySize),
@@ -239,12 +235,12 @@ FortranCUDAHostSubroutineIndirectLoop::createPlanFunctionExecutionStatements ()
    */
 
   SgAddOp * addExpression4 = buildAddOp (variableDeclarations->getReference (
-      OP2::VariableNames::PlanFunction::blockOffset),
-      variableDeclarations->getReference (CUDA::blocksPerGrid));
+      PlanFunction::blockOffset), variableDeclarations->getReference (
+      CUDA::blocksPerGrid));
 
   SgStatement * statement4 = buildAssignStatement (
-      variableDeclarations->getReference (
-          OP2::VariableNames::PlanFunction::blockOffset), addExpression4);
+      variableDeclarations->getReference (PlanFunction::blockOffset),
+      addExpression4);
 
   appendStatement (statement4, loopBody);
 
@@ -255,8 +251,7 @@ FortranCUDAHostSubroutineIndirectLoop::createPlanFunctionExecutionStatements ()
    */
 
   SgAssignOp * initializationExpression = buildAssignOp (
-      variableDeclarations->getReference (OP2::VariableNames::colour1),
-      buildIntVal (0));
+      variableDeclarations->getReference (colour1), buildIntVal (0));
 
   /*
    * ======================================================
@@ -266,8 +261,8 @@ FortranCUDAHostSubroutineIndirectLoop::createPlanFunctionExecutionStatements ()
    */
 
   SgDotExp * dotExpression = buildDotExp (variableDeclarations->getReference (
-      OP2::VariableNames::PlanFunction::actualPlan), buildOpaqueVarRefExp (
-      OP2::VariableNames::PlanFunction::ncolors, subroutineScope));
+      PlanFunction::actualPlan), buildOpaqueVarRefExp (PlanFunction::ncolors,
+      subroutineScope));
 
   SgExpression * upperBoundExpression = buildSubtractOp (dotExpression,
       buildIntVal (1));
@@ -285,6 +280,7 @@ FortranCUDAHostSubroutineIndirectLoop::createCardinalitiesInitialisationStatemen
 {
   using namespace SageBuilder;
   using namespace SageInterface;
+  using namespace OP2::VariableNames;
   using std::string;
   using std::vector;
 
@@ -301,15 +297,13 @@ FortranCUDAHostSubroutineIndirectLoop::createCardinalitiesInitialisationStatemen
       if (parallelLoop->isIndirect (i))
       {
         SgDotExp * dotExpression = buildDotExp (
-            variableDeclarations->getReference (
-                OP2::VariableNames::opDatCardinalities),
+            variableDeclarations->getReference (opDatCardinalities),
             cardinalitiesDeclaration->getFieldDeclarations ()->getReference (
-                OP2::VariableNames::getLocalToGlobalMappingSizeName (i)));
+                getLocalToGlobalMappingSizeName (i)));
 
         SgPntrArrRefExp * arrayIndexExpression = buildPntrArrRefExp (
-            variableDeclarations->getReference (
-                OP2::VariableNames::PlanFunction::pnindirect), buildIntVal (
-                countIndirectArgs));
+            variableDeclarations->getReference (PlanFunction::pnindirect),
+            buildIntVal (countIndirectArgs));
 
         SgExprStatement * assignmentStatement = buildAssignStatement (
             dotExpression, arrayIndexExpression);
@@ -326,14 +320,13 @@ FortranCUDAHostSubroutineIndirectLoop::createCardinalitiesInitialisationStatemen
     if (parallelLoop->isIndirect (i))
     {
       SgDotExp * fieldSelectionExpression = buildDotExp (
-          variableDeclarations->getReference (
-              OP2::VariableNames::opDatCardinalities),
+          variableDeclarations->getReference (opDatCardinalities),
           cardinalitiesDeclaration->getFieldDeclarations ()->getReference (
-              OP2::VariableNames::getGlobalToLocalMappingSizeName (i)));
+              getGlobalToLocalMappingSizeName (i)));
 
       SgExprStatement * assignmentStatement = buildAssignStatement (
           fieldSelectionExpression, variableDeclarations->getReference (
-              OP2::VariableNames::getGlobalToLocalMappingSizeName (i)));
+              getGlobalToLocalMappingSizeName (i)));
 
       appendStatement (assignmentStatement, subroutineScope);
     }
@@ -341,33 +334,19 @@ FortranCUDAHostSubroutineIndirectLoop::createCardinalitiesInitialisationStatemen
 
   vector <string> planFunctionSizeVariables;
 
-  planFunctionSizeVariables.push_back (
-      OP2::VariableNames::PlanFunction::pblkMapSize);
-
-  planFunctionSizeVariables.push_back (
-      OP2::VariableNames::PlanFunction::pindOffsSize);
-
-  planFunctionSizeVariables.push_back (
-      OP2::VariableNames::PlanFunction::pindSizesSize);
-
-  planFunctionSizeVariables.push_back (
-      OP2::VariableNames::PlanFunction::pnelemsSize);
-
-  planFunctionSizeVariables.push_back (
-      OP2::VariableNames::PlanFunction::pnthrcolSize);
-
-  planFunctionSizeVariables.push_back (
-      OP2::VariableNames::PlanFunction::poffsetSize);
-
-  planFunctionSizeVariables.push_back (
-      OP2::VariableNames::PlanFunction::pthrcolSize);
+  planFunctionSizeVariables.push_back (PlanFunction::pblkMapSize);
+  planFunctionSizeVariables.push_back (PlanFunction::pindOffsSize);
+  planFunctionSizeVariables.push_back (PlanFunction::pindSizesSize);
+  planFunctionSizeVariables.push_back (PlanFunction::pnelemsSize);
+  planFunctionSizeVariables.push_back (PlanFunction::pnthrcolSize);
+  planFunctionSizeVariables.push_back (PlanFunction::poffsetSize);
+  planFunctionSizeVariables.push_back (PlanFunction::pthrcolSize);
 
   for (vector <string>::iterator it = planFunctionSizeVariables.begin (); it
       != planFunctionSizeVariables.end (); ++it)
   {
     SgDotExp * fieldSelectionExpression = buildDotExp (
-        variableDeclarations->getReference (
-            OP2::VariableNames::opDatCardinalities),
+        variableDeclarations->getReference (opDatCardinalities),
         cardinalitiesDeclaration->getFieldDeclarations ()->getReference (*it));
 
     SgExprStatement * assignmentStatement = buildAssignStatement (
@@ -382,6 +361,7 @@ FortranCUDAHostSubroutineIndirectLoop::createExecutionPlanDeclarations ()
 {
   using namespace SageBuilder;
   using namespace SageInterface;
+  using namespace OP2::VariableNames;
   using std::map;
   using std::string;
   using std::vector;
@@ -398,10 +378,10 @@ FortranCUDAHostSubroutineIndirectLoop::createExecutionPlanDeclarations ()
   SgType * op_planType = FortranTypesBuilder::buildClassDeclaration ("op_plan",
       subroutineScope)->get_type ();
 
-  variableDeclarations->add (OP2::VariableNames::PlanFunction::actualPlan,
+  variableDeclarations->add (PlanFunction::actualPlan,
       FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
-          OP2::VariableNames::PlanFunction::actualPlan, buildPointerType (
-              op_planType), subroutineScope));
+          PlanFunction::actualPlan, buildPointerType (op_planType),
+          subroutineScope));
 
   /*
    * ======================================================
@@ -412,21 +392,21 @@ FortranCUDAHostSubroutineIndirectLoop::createExecutionPlanDeclarations ()
   SgType * c_devptrType = FortranTypesBuilder::buildClassDeclaration (
       "c_devptr", subroutineScope)->get_type ();
 
-  variableDeclarations->add (OP2::VariableNames::PlanFunction::pindMaps,
+  variableDeclarations->add (PlanFunction::pindMaps,
       FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
-          OP2::VariableNames::PlanFunction::pindMaps, buildPointerType (
+          PlanFunction::pindMaps, buildPointerType (
               FortranTypesBuilder::getArray_RankOne (c_devptrType)),
           subroutineScope));
 
-  variableDeclarations->add (OP2::VariableNames::PlanFunction::pmaps,
+  variableDeclarations->add (PlanFunction::pmaps,
       FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
-          OP2::VariableNames::PlanFunction::pmaps, buildPointerType (
+          PlanFunction::pmaps, buildPointerType (
               FortranTypesBuilder::getArray_RankOne (c_devptrType)),
           subroutineScope));
 
-  variableDeclarations->add (OP2::VariableNames::PlanFunction::pindMapsSize,
+  variableDeclarations->add (PlanFunction::pindMapsSize,
       FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
-          OP2::VariableNames::PlanFunction::pindMapsSize,
+          PlanFunction::pindMapsSize,
           FortranTypesBuilder::getFourByteInteger (), subroutineScope));
 
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
@@ -435,8 +415,7 @@ FortranCUDAHostSubroutineIndirectLoop::createExecutionPlanDeclarations ()
     {
       if (parallelLoop->isIndirect (i))
       {
-        string const variableName =
-            OP2::VariableNames::getLocalToGlobalMappingName (i);
+        string const variableName = getLocalToGlobalMappingName (i);
 
         variableDeclarations->add (variableName,
             FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
@@ -463,15 +442,11 @@ FortranCUDAHostSubroutineIndirectLoop::createExecutionPlanDeclarations ()
 
   vector <string> fourByteIntegerArrays;
 
-  fourByteIntegerArrays.push_back (OP2::VariableNames::PlanFunction::args);
-
-  fourByteIntegerArrays.push_back (OP2::VariableNames::PlanFunction::idxs);
-
-  fourByteIntegerArrays.push_back (OP2::VariableNames::PlanFunction::maps);
-
-  fourByteIntegerArrays.push_back (OP2::VariableNames::PlanFunction::accesses);
-
-  fourByteIntegerArrays.push_back (OP2::VariableNames::PlanFunction::inds);
+  fourByteIntegerArrays.push_back (PlanFunction::args);
+  fourByteIntegerArrays.push_back (PlanFunction::idxs);
+  fourByteIntegerArrays.push_back (PlanFunction::maps);
+  fourByteIntegerArrays.push_back (PlanFunction::accesses);
+  fourByteIntegerArrays.push_back (PlanFunction::inds);
 
   for (vector <string>::iterator it = fourByteIntegerArrays.begin (); it
       != fourByteIntegerArrays.end (); ++it)
@@ -495,8 +470,7 @@ FortranCUDAHostSubroutineIndirectLoop::createExecutionPlanDeclarations ()
   {
     if (parallelLoop->isIndirect (i))
     {
-      string const variableName =
-          OP2::VariableNames::getGlobalToLocalMappingName (i);
+      string const variableName = getGlobalToLocalMappingName (i);
 
       variableDeclarations->add (variableName,
           FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
@@ -516,8 +490,7 @@ FortranCUDAHostSubroutineIndirectLoop::createExecutionPlanDeclarations ()
   {
     if (parallelLoop->isIndirect (i))
     {
-      string const variableName =
-          OP2::VariableNames::getGlobalToLocalMappingSizeName (i);
+      string const variableName = getGlobalToLocalMappingSizeName (i);
 
       variableDeclarations->add (variableName,
           FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
@@ -537,40 +510,21 @@ FortranCUDAHostSubroutineIndirectLoop::createExecutionPlanDeclarations ()
 
   vector <string> fourByteIntegerVariables;
 
-  fourByteIntegerVariables.push_back (OP2::VariableNames::colour1);
+  fourByteIntegerVariables.push_back (colour1);
 
   fourByteIntegerVariables.push_back (
       CommonVariableNames::getIterationCounterVariableName (1));
 
-  fourByteIntegerVariables.push_back (
-      OP2::VariableNames::PlanFunction::argsNumber);
-
-  fourByteIntegerVariables.push_back (
-      OP2::VariableNames::PlanFunction::indsNumber);
-
-  fourByteIntegerVariables.push_back (
-      OP2::VariableNames::PlanFunction::blockOffset);
-
-  fourByteIntegerVariables.push_back (
-      OP2::VariableNames::PlanFunction::pindSizesSize);
-
-  fourByteIntegerVariables.push_back (
-      OP2::VariableNames::PlanFunction::pindOffsSize);
-
-  fourByteIntegerVariables.push_back (
-      OP2::VariableNames::PlanFunction::pblkMapSize);
-
-  fourByteIntegerVariables.push_back (
-      OP2::VariableNames::PlanFunction::poffsetSize);
-
-  fourByteIntegerVariables.push_back (
-      OP2::VariableNames::PlanFunction::pnelemsSize);
-
-  fourByteIntegerVariables.push_back (
-      OP2::VariableNames::PlanFunction::pnthrcolSize);
-
-  fourByteIntegerVariables.push_back (
-      OP2::VariableNames::PlanFunction::pthrcolSize);
+  fourByteIntegerVariables.push_back (PlanFunction::argsNumber);
+  fourByteIntegerVariables.push_back (PlanFunction::indsNumber);
+  fourByteIntegerVariables.push_back (PlanFunction::blockOffset);
+  fourByteIntegerVariables.push_back (PlanFunction::pindSizesSize);
+  fourByteIntegerVariables.push_back (PlanFunction::pindOffsSize);
+  fourByteIntegerVariables.push_back (PlanFunction::pblkMapSize);
+  fourByteIntegerVariables.push_back (PlanFunction::poffsetSize);
+  fourByteIntegerVariables.push_back (PlanFunction::pnelemsSize);
+  fourByteIntegerVariables.push_back (PlanFunction::pnthrcolSize);
+  fourByteIntegerVariables.push_back (PlanFunction::pthrcolSize);
 
   for (vector <string>::iterator it = fourByteIntegerVariables.begin (); it
       != fourByteIntegerVariables.end (); ++it)
@@ -591,10 +545,8 @@ FortranCUDAHostSubroutineIndirectLoop::createExecutionPlanDeclarations ()
 
   vector <string> integerPointerVariables;
 
-  integerPointerVariables.push_back (OP2::VariableNames::PlanFunction::ncolblk);
-
-  integerPointerVariables.push_back (
-      OP2::VariableNames::PlanFunction::pnindirect);
+  integerPointerVariables.push_back (PlanFunction::ncolblk);
+  integerPointerVariables.push_back (PlanFunction::pnindirect);
 
   for (vector <string>::iterator it = integerPointerVariables.begin (); it
       != integerPointerVariables.end (); ++it)
@@ -616,26 +568,13 @@ FortranCUDAHostSubroutineIndirectLoop::createExecutionPlanDeclarations ()
 
   vector <string> deviceIntegerArrayVariables;
 
-  deviceIntegerArrayVariables.push_back (
-      OP2::VariableNames::PlanFunction::pindSizes);
-
-  deviceIntegerArrayVariables.push_back (
-      OP2::VariableNames::PlanFunction::pindOffs);
-
-  deviceIntegerArrayVariables.push_back (
-      OP2::VariableNames::PlanFunction::pblkMap);
-
-  deviceIntegerArrayVariables.push_back (
-      OP2::VariableNames::PlanFunction::poffset);
-
-  deviceIntegerArrayVariables.push_back (
-      OP2::VariableNames::PlanFunction::pnelems);
-
-  deviceIntegerArrayVariables.push_back (
-      OP2::VariableNames::PlanFunction::pnthrcol);
-
-  deviceIntegerArrayVariables.push_back (
-      OP2::VariableNames::PlanFunction::pthrcol);
+  deviceIntegerArrayVariables.push_back (PlanFunction::pindSizes);
+  deviceIntegerArrayVariables.push_back (PlanFunction::pindOffs);
+  deviceIntegerArrayVariables.push_back (PlanFunction::pblkMap);
+  deviceIntegerArrayVariables.push_back (PlanFunction::poffset);
+  deviceIntegerArrayVariables.push_back (PlanFunction::pnelems);
+  deviceIntegerArrayVariables.push_back (PlanFunction::pnthrcol);
+  deviceIntegerArrayVariables.push_back (PlanFunction::pthrcol);
 
   for (vector <string>::iterator it = deviceIntegerArrayVariables.begin (); it
       != deviceIntegerArrayVariables.end (); ++it)
@@ -679,8 +618,7 @@ FortranCUDAHostSubroutineIndirectLoop::createStatements ()
           FortranStatementsAndExpressionsBuilder::createCToFortranPointerCallStatement (
               subroutineScope,
               moduleDeclarations->getCPlanReturnDeclaration (),
-              variableDeclarations->getReference (
-                  OP2::VariableNames::PlanFunction::actualPlan));
+              variableDeclarations->getReference (PlanFunction::actualPlan));
 
   appendStatement (callStatement1, subroutineScope);
 

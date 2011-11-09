@@ -6,8 +6,9 @@
 #include <FortranTypesBuilder.h>
 #include <RoseStatementsAndExpressionsBuilder.h>
 #include <CommonNamespaces.h>
-#include <Debug.h>
+#include <PlanFunction.h>
 #include <OpenMP.h>
+#include <Debug.h>
 
 SgStatement *
 FortranOpenMPHostSubroutineIndirectLoop::createKernelFunctionCallStatement ()

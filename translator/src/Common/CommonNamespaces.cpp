@@ -42,6 +42,22 @@ OP2::CPPMacroSupport::createMaxCallStatement (SgScopeStatement * scope,
       actualParameters, scope);
 }
 
+SgFunctionCallExp *
+OP2::CPPMacroSupport::createMinCallStatement (SgScopeStatement * scope,
+    SgExpression * parameterExpression1, SgExpression * parameterExpression2)
+{
+  using namespace SageBuilder;
+  using std::string;
+
+  SgExprListExp * actualParameters = buildExprListExp (parameterExpression1,
+      parameterExpression2);
+
+  string const functionName = "MIN";
+
+  return buildFunctionCallExp (functionName, buildVoidType (),
+      actualParameters, scope);
+}
+
 std::string const
 OP2::VariableNames::getUserSubroutineName ()
 {

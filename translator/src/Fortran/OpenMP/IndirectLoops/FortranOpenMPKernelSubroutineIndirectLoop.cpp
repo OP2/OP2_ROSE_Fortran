@@ -7,6 +7,7 @@
 #include <Debug.h>
 #include <Plan.h>
 #include <OpenMP.h>
+#include <PlanFunction.h>
 
 SgStatement *
 FortranOpenMPKernelSubroutineIndirectLoop::createUserSubroutineCallStatement ()
@@ -31,17 +32,11 @@ FortranOpenMPKernelSubroutineIndirectLoop::createPlanFormalParameterDeclarations
   vector <string> fourByteIntegerArrayVariables;
 
   fourByteIntegerArrayVariables.push_back (PlanFunction::pindSizes);
-
   fourByteIntegerArrayVariables.push_back (PlanFunction::pindOffs);
-
   fourByteIntegerArrayVariables.push_back (PlanFunction::pblkMap);
-
   fourByteIntegerArrayVariables.push_back (PlanFunction::poffset);
-
   fourByteIntegerArrayVariables.push_back (PlanFunction::pnelems);
-
   fourByteIntegerArrayVariables.push_back (PlanFunction::pnthrcol);
-
   fourByteIntegerArrayVariables.push_back (PlanFunction::pthrcol);
 
   for (vector <string>::const_iterator it =

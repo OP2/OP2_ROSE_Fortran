@@ -4,12 +4,14 @@
 #include <FortranTypesBuilder.h>
 #include <ScopedVariableDeclarations.h>
 #include <CommonNamespaces.h>
+#include <PlanFunction.h>
 #include <rose.h>
 
 void
 FortranCUDAOpDatCardinalitiesDeclarationIndirectLoop::addIndirectLoopFields ()
 {
   using namespace SageBuilder;
+  using namespace OP2::VariableNames;
   using std::string;
   using std::vector;
 
@@ -20,8 +22,7 @@ FortranCUDAOpDatCardinalitiesDeclarationIndirectLoop::addIndirectLoopFields ()
       if (parallelLoop->isDuplicateOpDat (i) == false)
       {
 
-        string const variableName1 =
-            OP2::VariableNames::getLocalToGlobalMappingSizeName (i);
+        string const variableName1 = getLocalToGlobalMappingSizeName (i);
 
         SgVariableDeclaration * fieldDeclaration1 = buildVariableDeclaration (
             variableName1, FortranTypesBuilder::getFourByteInteger (), NULL,
@@ -35,8 +36,7 @@ FortranCUDAOpDatCardinalitiesDeclarationIndirectLoop::addIndirectLoopFields ()
         fieldDeclarations->add (variableName1, fieldDeclaration1);
       }
 
-      string const variableName2 =
-          OP2::VariableNames::getGlobalToLocalMappingSizeName (i);
+      string const variableName2 = getGlobalToLocalMappingSizeName (i);
 
       SgVariableDeclaration * fieldDeclaration2 = buildVariableDeclaration (
           variableName2, FortranTypesBuilder::getFourByteInteger (), NULL,
@@ -48,32 +48,18 @@ FortranCUDAOpDatCardinalitiesDeclarationIndirectLoop::addIndirectLoopFields ()
           fieldDeclaration2);
 
       fieldDeclarations->add (variableName2, fieldDeclaration2);
-
     }
   }
 
   vector <string> planFunctionSizeVariables;
 
-  planFunctionSizeVariables.push_back (
-      OP2::VariableNames::PlanFunction::pblkMapSize);
-
-  planFunctionSizeVariables.push_back (
-      OP2::VariableNames::PlanFunction::pindOffsSize);
-
-  planFunctionSizeVariables.push_back (
-      OP2::VariableNames::PlanFunction::pindSizesSize);
-
-  planFunctionSizeVariables.push_back (
-      OP2::VariableNames::PlanFunction::pnelemsSize);
-
-  planFunctionSizeVariables.push_back (
-      OP2::VariableNames::PlanFunction::pnthrcolSize);
-
-  planFunctionSizeVariables.push_back (
-      OP2::VariableNames::PlanFunction::poffsetSize);
-
-  planFunctionSizeVariables.push_back (
-      OP2::VariableNames::PlanFunction::pthrcolSize);
+  planFunctionSizeVariables.push_back (PlanFunction::pblkMapSize);
+  planFunctionSizeVariables.push_back (PlanFunction::pindOffsSize);
+  planFunctionSizeVariables.push_back (PlanFunction::pindSizesSize);
+  planFunctionSizeVariables.push_back (PlanFunction::pnelemsSize);
+  planFunctionSizeVariables.push_back (PlanFunction::pnthrcolSize);
+  planFunctionSizeVariables.push_back (PlanFunction::poffsetSize);
+  planFunctionSizeVariables.push_back (PlanFunction::pthrcolSize);
 
   for (vector <string>::iterator it = planFunctionSizeVariables.begin (); it
       != planFunctionSizeVariables.end (); ++it)

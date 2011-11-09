@@ -3,11 +3,85 @@
 #include <RoseStatementsAndExpressionsBuilder.h>
 #include <FortranTypesBuilder.h>
 #include <CommonNamespaces.h>
+#include <PlanFunction.h>
+
+SgBasicBlock *
+CPPHostSubroutine::createInitialisePlanFunctionArrayStatements ()
+{
+  using namespace SageBuilder;
+  using namespace SageInterface;
+  using namespace OP2::VariableNames;
+  using namespace CommonVariableNames;
+  using std::map;
+  using std::string;
+
+  Debug::getInstance ()->debugMessage (
+      "Creating statements to initialise plan function variables",
+      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+
+  SgBasicBlock * block = buildBasicBlock ();
+
+  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
+  {
+    SgPntrArrRefExp * arrayIndexExpression = buildPntrArrRefExp (
+        variableDeclarations->getReference (PlanFunction::args), buildIntVal (i
+            - 1));
+
+    SgExprStatement * assignmentStatement = buildAssignStatement (
+        arrayIndexExpression, variableDeclarations->getReference (getOpDatName (
+            i)));
+
+    appendStatement (assignmentStatement, block);
+  }
+
+  map <string, unsigned int> indirectOpDatsToIndirection;
+  unsigned int indirection = 0;
+
+  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
+  {
+    SgPntrArrRefExp * arrayIndexExpression = buildPntrArrRefExp (
+        variableDeclarations->getReference (PlanFunction::inds), buildIntVal (i
+            - 1));
+
+    SgExprStatement * assignmentStatement;
+
+    if (parallelLoop->isDirect (i))
+    {
+      assignmentStatement = buildAssignStatement (arrayIndexExpression,
+          buildIntVal (-1));
+    }
+    else if (parallelLoop->isIndirect (i))
+    {
+      if (parallelLoop->isDuplicateOpDat (i) == false)
+      {
+        assignmentStatement = buildAssignStatement (arrayIndexExpression,
+            buildIntVal (indirection));
+
+        indirectOpDatsToIndirection[parallelLoop->getOpDatVariableName (i)]
+            = indirection;
+
+        indirection++;
+      }
+      else
+      {
+        assignmentStatement = buildAssignStatement (arrayIndexExpression,
+            buildIntVal (
+                indirectOpDatsToIndirection[parallelLoop->getOpDatVariableName (
+                    i)]));
+      }
+    }
+
+    appendStatement (assignmentStatement, block);
+  }
+
+  return block;
+}
 
 void
 CPPHostSubroutine::createFormalParameterDeclarations ()
 {
   using namespace SageBuilder;
+  using namespace OP2::VariableNames;
   using std::string;
 
   Debug::getInstance ()->debugMessage (
@@ -20,8 +94,7 @@ CPPHostSubroutine::createFormalParameterDeclarations ()
    * ======================================================
    */
 
-  string const & kernelVariableName =
-      OP2::VariableNames::getUserSubroutineName ();
+  string const & kernelVariableName = getUserSubroutineName ();
 
   SgVariableDeclaration
       * kernelVariableNameDeclaration =
@@ -37,7 +110,7 @@ CPPHostSubroutine::createFormalParameterDeclarations ()
    * ======================================================
    */
 
-  string const & opSetVariableName = OP2::VariableNames::getOpSetName ();
+  string const & opSetVariableName = getOpSetName ();
 
   variableDeclarations->add (
       opSetVariableName,
@@ -54,7 +127,7 @@ CPPHostSubroutine::createFormalParameterDeclarations ()
 
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
-    string const & opDatvariableName = OP2::VariableNames::getOpDatName (i);
+    string const & opDatvariableName = getOpDatName (i);
 
     variableDeclarations->add (
         opDatvariableName,

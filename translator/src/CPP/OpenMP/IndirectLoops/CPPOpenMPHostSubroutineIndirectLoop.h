@@ -19,9 +19,6 @@ class CPPOpenMPHostSubroutineIndirectLoop: public CPPOpenMPHostSubroutine
     SgOmpParallelStatement *
     createOpenMPLoopStatements ();
 
-    SgBasicBlock *
-    createInitialisePlanFunctionVariablesStatements ();
-
     virtual void
     createStatements ();
 

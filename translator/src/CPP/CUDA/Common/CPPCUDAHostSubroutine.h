@@ -15,8 +15,14 @@ class CPPCUDAHostSubroutine: public CPPHostSubroutine
 
   protected:
 
+    SgForStatement *
+    createReductionUpdateStatements (unsigned int OP_DAT_ArgumentGroup);
+
     virtual void
     createReductionEpilogueStatements ();
+
+    SgForStatement *
+    createReductionInitialisationStatements (unsigned int OP_DAT_ArgumentGroup);
 
     virtual void
     createReductionPrologueStatements ();

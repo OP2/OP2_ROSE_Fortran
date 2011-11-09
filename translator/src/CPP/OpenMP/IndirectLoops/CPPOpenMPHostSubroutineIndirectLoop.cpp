@@ -20,78 +20,6 @@ CPPOpenMPHostSubroutineIndirectLoop::createOpenMPLoopStatements ()
 {
 }
 
-SgBasicBlock *
-CPPOpenMPHostSubroutineIndirectLoop::createInitialisePlanFunctionVariablesStatements ()
-{
-  using namespace SageBuilder;
-  using namespace SageInterface;
-  using namespace OP2::VariableNames;
-  using namespace CommonVariableNames;
-  using std::map;
-  using std::string;
-
-  Debug::getInstance ()->debugMessage (
-      "Creating statements to initialise plan function variables",
-      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
-
-  SgBasicBlock * block = buildBasicBlock ();
-
-  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
-  {
-    SgPntrArrRefExp * arrayIndexExpression = buildPntrArrRefExp (
-        variableDeclarations->getReference (
-            OP2::VariableNames::PlanFunction::args), buildIntVal (i - 1));
-
-    SgExprStatement * assignmentStatement = buildAssignStatement (
-        arrayIndexExpression, variableDeclarations->getReference (getOpDatName (
-            i)));
-
-    appendStatement (assignmentStatement, block);
-  }
-
-  map <string, unsigned int> indirectOpDatsToIndirection;
-  unsigned int indirection = 0;
-
-  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
-  {
-    SgPntrArrRefExp * arrayIndexExpression = buildPntrArrRefExp (
-        variableDeclarations->getReference (
-            OP2::VariableNames::PlanFunction::inds), buildIntVal (i - 1));
-
-    SgExprStatement * assignmentStatement;
-
-    if (parallelLoop->isDirect (i))
-    {
-      assignmentStatement = buildAssignStatement (arrayIndexExpression,
-          buildIntVal (-1));
-    }
-    else if (parallelLoop->isIndirect (i))
-    {
-      if (parallelLoop->isDuplicateOpDat (i))
-      {
-        assignmentStatement = buildAssignStatement (arrayIndexExpression,
-            buildIntVal (indirection));
-
-        indirectOpDatsToIndirection[parallelLoop->getOpDatVariableName (i)]
-            = indirection;
-
-        indirection++;
-      }
-      else
-      {
-        assignmentStatement = buildAssignStatement (arrayIndexExpression,
-            buildIntVal (
-                indirectOpDatsToIndirection[parallelLoop->getOpDatVariableName (
-                    i)]));
-      }
-    }
-
-    appendStatement (assignmentStatement, block);
-  }
-
-  return block;
-}
-
 void
 CPPOpenMPHostSubroutineIndirectLoop::createStatements ()
 {
@@ -101,7 +29,7 @@ CPPOpenMPHostSubroutineIndirectLoop::createStatements ()
       Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
   appendStatementList (
-      createInitialisePlanFunctionVariablesStatements ()->getStatementList (),
+      createInitialisePlanFunctionArrayStatements ()->getStatementList (),
       subroutineScope);
 
   appendStatementList (

@@ -6,6 +6,7 @@
 #include <CommonNamespaces.h>
 #include <Debug.h>
 #include <Subroutine.h>
+#include <PlanFunction.h>
 
 SgBasicBlock *
 FortranPlan::createConvertPlanFunctionParametersStatements ()

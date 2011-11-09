@@ -10,6 +10,9 @@ class CPPHostSubroutine: public HostSubroutine <SgFunctionDeclaration>
 {
   protected:
 
+    SgBasicBlock *
+    createInitialisePlanFunctionArrayStatements ();
+
     virtual void
     createFormalParameterDeclarations ();
 

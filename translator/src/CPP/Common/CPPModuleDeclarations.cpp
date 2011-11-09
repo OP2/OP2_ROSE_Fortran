@@ -59,7 +59,7 @@ CPPModuleDeclarations::addParallelLoopSettingsVariables (
           userSubroutineName);
 
       SgVariableDeclaration * variableDeclaration2 = buildVariableDeclaration (
-          variableName1, buildIntType (), buildAssignInitializer (buildIntVal (
+          variableName2, buildIntType (), buildAssignInitializer (buildIntVal (
               0), buildIntType ()), moduleScope);
 
       variableDeclarations ->add (variableName2, variableDeclaration2);

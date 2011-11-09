@@ -18,14 +18,17 @@ class CPPCUDAHostSubroutineIndirectLoop: public CPPCUDAHostSubroutine
     virtual SgStatement *
     createKernelFunctionCallStatement ();
 
-    void
+    SgBasicBlock *
     createPlanFunctionExecutionStatements ();
 
-    void
-    createExecutionPlanDeclarations ();
+    SgStatement *
+    createPlanFunctionCallStatement ();
 
     virtual void
     createStatements ();
+
+    void
+    createPlanFunctionDeclarations ();
 
     virtual void
     createLocalVariableDeclarations ();
