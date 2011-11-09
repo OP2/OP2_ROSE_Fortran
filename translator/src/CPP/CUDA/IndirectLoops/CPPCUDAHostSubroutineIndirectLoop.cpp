@@ -42,7 +42,7 @@ CPPCUDAHostSubroutineIndirectLoop::createKernelFunctionCallStatement ()
       if (parallelLoop->isIndirect (i))
       {
         SgPntrArrRefExp * arrayExpression = buildPntrArrRefExp (
-            buildOpaqueVarRefExp (PlanFunction::ind_maps), buildIntVal (
+            buildOpaqueVarRefExp (PlanFunction::ind_maps, subroutineScope), buildIntVal (
                 arrayIndex));
 
         SgArrowExp * arrowExpression = buildArrowExp (
@@ -61,7 +61,7 @@ CPPCUDAHostSubroutineIndirectLoop::createKernelFunctionCallStatement ()
     if (parallelLoop->isIndirect (i))
     {
       SgPntrArrRefExp * arrayExpression = buildPntrArrRefExp (
-          buildOpaqueVarRefExp (PlanFunction::loc_maps), buildIntVal (i - 1));
+          buildOpaqueVarRefExp (PlanFunction::loc_maps, subroutineScope), buildIntVal (i - 1));
 
       SgArrowExp * arrowExpression = buildArrowExp (
           variableDeclarations->getReference (PlanFunction::planRet),

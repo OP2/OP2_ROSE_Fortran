@@ -1,6 +1,7 @@
 #include <CPPCUDAKernelSubroutineIndirectLoop.h>
 #include <RoseStatementsAndExpressionsBuilder.h>
 #include <CommonNamespaces.h>
+#include <PlanFunction.h>
 #include <CUDA.h>
 
 SgStatement *

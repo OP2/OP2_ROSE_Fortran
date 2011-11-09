@@ -4,6 +4,7 @@
 #include <RoseHelper.h>
 #include <CommonNamespaces.h>
 #include <OpenMP.h>
+#include <PlanFunction.h>
 
 SgStatement *
 CPPOpenMPHostSubroutineIndirectLoop::createKernelFunctionCallStatement ()
