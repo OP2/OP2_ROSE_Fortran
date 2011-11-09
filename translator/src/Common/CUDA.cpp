@@ -193,8 +193,26 @@ CUDA::createHostThreadSynchronisationCallStatement (SgScopeStatement * scope)
 {
   using namespace SageBuilder;
 
-  return buildFunctionCallExp ("cudaThreadSynchronize", buildVoidType (),
-      buildExprListExp (), scope);
+  switch (Globals::getInstance ()->getHostLanguage ())
+  {
+    case TargetLanguage::FORTRAN:
+    {
+      SgFunctionSymbol * functionSymbol =
+          FortranTypesBuilder::buildNewFortranSubroutine (
+              "cudaThreadSynchronize", scope);
+
+      return buildFunctionCallExp (functionSymbol, buildExprListExp ());
+    }
+    case TargetLanguage::CPP:
+    {
+      return buildFunctionCallExp ("cudaThreadSynchronize", buildVoidType (),
+          buildExprListExp (), scope);
+    }
+    default:
+    {
+      throw Exceptions::CommandLine::LanguageException ("Unknown host language");
+    }
+  }
 }
 
 SgFunctionCallExp *
