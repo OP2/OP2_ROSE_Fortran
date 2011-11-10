@@ -1,7 +1,7 @@
 #include <CommandLine.h>
 #include <CommandLineOption.h>
 #include <CommandLineOptionWithParameters.h>
-#include <TargetBackend.h>
+#include <TargetLanguage.h>
 #include <Debug.h>
 #include <Globals.h>
 #include <Exceptions.h>

@@ -1,16 +1,8 @@
-/*
- * Written by Adam Betts and Carlo Bertolli
- *
- * Class storing global variables set by the user on the command line.
- * Implemented by singleton pattern as we should only ever
- * create a single instance
- */
-
 #pragma once
 #ifndef GLOBALS_H
 #define GLOBALS_H
 
-#include <TargetBackend.h>
+#include <TargetLanguage.h>
 
 class Globals
 {

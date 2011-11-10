@@ -1,10 +1,3 @@
-/*
- * Written by Adam Betts and Carlo Bertolli
- *
- * Helper functions to build particular kinds of ROSE statements
- * and expressions
- */
-
 #pragma once
 #ifndef ROSE_STATEMENTS_AND_EXPRESSIONS_BUILDER_H
 #define ROSE_STATEMENTS_AND_EXPRESSIONS_BUILDER_H
