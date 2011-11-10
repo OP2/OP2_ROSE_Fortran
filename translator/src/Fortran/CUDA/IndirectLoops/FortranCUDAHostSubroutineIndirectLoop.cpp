@@ -10,7 +10,6 @@
 #include <RoseHelper.h>
 #include <CompilerGeneratedNames.h>
 #include <OP2Definitions.h>
-#include <PlanFunction.h>
 #include <CUDA.h>
 #include <Debug.h>
 

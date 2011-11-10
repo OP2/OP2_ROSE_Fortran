@@ -5,7 +5,6 @@
 #include <RoseStatementsAndExpressionsBuilder.h>
 #include <Debug.h>
 #include <Subroutine.h>
-#include <PlanFunction.h>
 #include <CompilerGeneratedNames.h>
 #include <OP2Definitions.h>
 

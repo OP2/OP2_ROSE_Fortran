@@ -5,7 +5,6 @@
 #include <ScopedVariableDeclarations.h>
 #include <Debug.h>
 #include <CompilerGeneratedNames.h>
-#include <PlanFunction.h>
 #include <rose.h>
 
 void
