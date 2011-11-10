@@ -8,8 +8,8 @@
 #include <boost/algorithm/string/predicate.hpp>
 
 void
-FortranSubroutinesGeneration::fixUseStatement (SgUseStatement * useStatement,
-    std::string const & userSubroutineName)
+FortranSubroutinesGeneration::removeUseStatement (
+    SgUseStatement * useStatement, std::string const & userSubroutineName)
 {
   using namespace SageInterface;
   using boost::iequals;
@@ -42,6 +42,102 @@ FortranSubroutinesGeneration::fixUseStatement (SgUseStatement * useStatement,
   while (lastUseStatement != NULL);
 }
 
+SgVariableDeclaration *
+FortranSubroutinesGeneration::addUserSubroutineNameDeclaration (
+    SgScopeStatement * scope, std::string const & userSubroutineName)
+{
+  using namespace SageBuilder;
+  using namespace SageInterface;
+
+  Debug::getInstance ()->debugMessage (
+      "Adding character array declaration with name '" + userSubroutineName
+          + "'", Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+
+  SgTypeString * characterArray = FortranTypesBuilder::getString (
+      userSubroutineName.size ());
+
+  SgAssignInitializer * initializer = buildAssignInitializer (buildStringVal (
+      userSubroutineName), characterArray);
+
+  SgVariableDeclaration * variableDeclaration = buildVariableDeclaration (
+      userSubroutineName + "_user", characterArray, initializer, scope);
+
+  insertStatementAfterLastDeclaration (variableDeclaration, scope);
+
+  return variableDeclaration;
+}
+
+SgScopeStatement *
+FortranSubroutinesGeneration::addModuleUseStatement (SgNode * parent,
+    std::string const & moduleName)
+{
+  using namespace SageBuilder;
+  using namespace SageInterface;
+
+  Debug::getInstance ()->debugMessage ("Adding module use statement",
+      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+
+  if (isSgProgramHeaderStatement (parent))
+  {
+    Debug::getInstance ()->debugMessage ("Program header statement",
+        Debug::INNER_LOOP_LEVEL, __FILE__, __LINE__);
+
+    SgProgramHeaderStatement * parentStatement = isSgProgramHeaderStatement (
+        parent);
+
+    SgScopeStatement * scope = parentStatement->get_definition ()->get_body ();
+
+    if (find (headersWithAddedUseStatements.begin (),
+        headersWithAddedUseStatements.end (),
+        parentStatement->get_name ().getString ())
+        == headersWithAddedUseStatements.end ())
+    {
+      SgUseStatement * newUseStatement = new SgUseStatement (
+          getEnclosingFileNode (parentStatement)->get_file_info (), moduleName,
+          false);
+
+      prependStatement (newUseStatement, scope);
+
+      headersWithAddedUseStatements.push_back (
+          parentStatement->get_name ().getString ());
+    }
+
+    return scope;
+  }
+  else if (isSgProcedureHeaderStatement (parent))
+  {
+    Debug::getInstance ()->debugMessage ("Procedure header statement",
+        Debug::INNER_LOOP_LEVEL, __FILE__, __LINE__);
+
+    SgProcedureHeaderStatement * parentStatement =
+        isSgProcedureHeaderStatement (parent);
+
+    SgScopeStatement * scope = parentStatement->get_definition ()->get_body ();
+
+    if (find (headersWithAddedUseStatements.begin (),
+        headersWithAddedUseStatements.end (),
+        parentStatement->get_name ().getString ())
+        == headersWithAddedUseStatements.end ())
+    {
+      SgUseStatement * newUseStatement = new SgUseStatement (
+          getEnclosingFileNode (parentStatement)->get_file_info (), moduleName,
+          false);
+
+      prependStatement (newUseStatement, scope);
+
+      headersWithAddedUseStatements.push_back (
+          parentStatement->get_name ().getString ());
+    }
+
+    return scope;
+  }
+  else
+  {
+    throw Exceptions::CodeGeneration::UnfoundStatementException (
+        "Could not find enclosing scope of OP_PAR_LOOP call");
+  }
+}
+
 void
 FortranSubroutinesGeneration::patchCallsToParallelLoops (
     std::string const & moduleName)
@@ -70,107 +166,45 @@ FortranSubroutinesGeneration::patchCallsToParallelLoops (
     FortranHostSubroutine * hostSubroutine =
         hostSubroutines[userSubroutineName];
 
+    /*
+     * ======================================================
+     * Recursively go back in the scopes until we can find the
+     * program header or subroutine header
+     * ======================================================
+     */
+
     SgFunctionCallExp * functionCallExpression =
         parallelLoop->getFunctionCall ();
+
+    ROSE_ASSERT (isSgExprStatement(functionCallExpression->get_parent()));
 
     SgScopeStatement * scope = isSgExprStatement (
         functionCallExpression->get_parent ())->get_scope ();
 
-    /*
-     * ======================================================
-     * We first need to add a 'use <NEWLY_CREATED_MODULE>'
-     * statement to the Fortran module where the OP_PAR_LOOP
-     * call takes place
-     * ======================================================
-     */
+    SgNode * parent = functionCallExpression->get_parent ();
+
+    while (!isSgProcedureHeaderStatement (parent)
+        && !isSgProgramHeaderStatement (parent))
+    {
+      parent = parent->get_parent ();
+    }
 
     /*
      * ======================================================
-     * Recursively go back in the scopes until we can find a
-     * declaration statement
+     * Add module use statement
      * ======================================================
      */
+
+    SgScopeStatement * parentScope = addModuleUseStatement (parent, moduleName);
+
     SgStatement * lastDeclarationStatement = findLastDeclarationStatement (
-        scope);
-
-    SgScopeStatement * parent = scope;
-
-    while (lastDeclarationStatement == NULL)
-    {
-      parent = (SgScopeStatement *) parent->get_parent ();
-      lastDeclarationStatement = findLastDeclarationStatement (parent);
-    }
-
-    if (lastDeclarationStatement == NULL)
-    {
-      throw Exceptions::CodeGeneration::UnfoundStatementException (
-          "Could not find declaration statements");
-    }
-
-    /*
-     * ======================================================
-     * Now find the last 'use' statement
-     * ======================================================
-     */
-
-    SgStatement * previousStatement = lastDeclarationStatement;
-    SgUseStatement * lastUseStatement;
-    do
-    {
-      previousStatement = getPreviousStatement (previousStatement);
-      lastUseStatement = isSgUseStatement (previousStatement);
-    }
-    while (lastUseStatement == NULL);
-
-    if (lastUseStatement == NULL)
-    {
-      throw Exceptions::CodeGeneration::UnfoundStatementException (
-          "Could not find last 'use' statement");
-    }
+        parentScope);
 
     if (find (dirtyFiles.begin (), dirtyFiles.end (),
         parallelLoop->getFileName ()) == dirtyFiles.end ())
     {
-      Debug::getInstance ()->debugMessage ("Adding new use statement for '"
-          + moduleName + "'", Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
-
       dirtyFiles.push_back (parallelLoop->getFileName ());
-
-      /*
-       * ======================================================
-       * Add a new 'use' statement for the newly created module
-       * only if we have not previously added it to this file
-       * ======================================================
-       */
-
-      SgUseStatement * newUseStatement = new SgUseStatement (
-          getEnclosingFileNode (lastUseStatement)->get_file_info (),
-          moduleName, false);
-
-      insertStatementAfter (lastUseStatement, newUseStatement);
     }
-
-    fixUseStatement (lastUseStatement, userSubroutineName);
-
-    /*
-     * ======================================================
-     * The character array contains exactly the number of
-     * characters as the user subroutine name
-     * ======================================================
-     */
-
-    SgTypeString * characterArray = FortranTypesBuilder::getString (
-        userSubroutineName.size ());
-
-    SgAssignInitializer * initializer = buildAssignInitializer (buildStringVal (
-        userSubroutineName), characterArray);
-
-    SgVariableDeclaration * userSubroutineNameStringVariable =
-        buildVariableDeclaration (userSubroutineName + "_user", characterArray,
-            initializer, getScope (lastDeclarationStatement));
-
-    insertStatementAfter (lastDeclarationStatement,
-        userSubroutineNameStringVariable);
 
     /*
      * ======================================================
@@ -191,13 +225,15 @@ FortranSubroutinesGeneration::patchCallsToParallelLoops (
      * ======================================================
      */
 
+    SgVariableDeclaration * variableDeclaration =
+        addUserSubroutineNameDeclaration (parentScope, userSubroutineName);
+
     SgExpressionPtrList & arguments =
         functionCallExpression->get_args ()->get_expressions ();
 
     arguments.erase (arguments.begin ());
 
-    arguments.insert (arguments.begin (), buildVarRefExp (
-        userSubroutineNameStringVariable));
+    arguments.insert (arguments.begin (), buildVarRefExp (variableDeclaration));
 
     /*
      * ======================================================

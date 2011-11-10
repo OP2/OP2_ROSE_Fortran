@@ -26,11 +26,20 @@ class FortranSubroutinesGeneration: public SubroutinesGeneration <
 
     std::map <std::string, FortranModuleDeclarations *> moduleDeclarations;
 
+    std::vector <std::string> headersWithAddedUseStatements;
+
   private:
 
     void
-    fixUseStatement (SgUseStatement * lastUseStatement,
+    removeUseStatement (SgUseStatement * lastUseStatement,
         std::string const & userSubroutineName);
+
+    SgVariableDeclaration *
+    addUserSubroutineNameDeclaration (SgScopeStatement * scope,
+        std::string const & userSubroutineName);
+
+    SgScopeStatement *
+    addModuleUseStatement (SgNode * parent, std::string const & moduleName);
 
     void
     patchCallsToParallelLoops (std::string const & moduleName);

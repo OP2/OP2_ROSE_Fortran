@@ -3,7 +3,6 @@ program airfoil
 use OP2_C
 use constantVars
 use airfoil_seq
-
 use, intrinsic :: ISO_C_BINDING
 
   implicit none
