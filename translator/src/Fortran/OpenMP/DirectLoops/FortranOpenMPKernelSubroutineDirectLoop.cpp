@@ -4,13 +4,14 @@
 #include <FortranTypesBuilder.h>
 #include <RoseHelper.h>
 #include <Debug.h>
-#include <CommonNamespaces.h>
+#include <CompilerGeneratedNames.h>
 #include <OpenMP.h>
 
 SgStatement *
 FortranOpenMPKernelSubroutineDirectLoop::createUserSubroutineCallStatement ()
 {
   using namespace SageBuilder;
+  using namespace OP2VariableNames;
 
   SgExprListExp * actualParameters = buildExprListExp ();
 
@@ -42,17 +43,15 @@ FortranOpenMPKernelSubroutineDirectLoop::createUserSubroutineCallStatement ()
             RoseHelper::getFileInfo ());
 
         SgPntrArrRefExp * parameterExpression = buildPntrArrRefExp (
-            variableDeclarations->getReference (
-                OP2::VariableNames::getOpDatName (i)), buildExprListExp (
-                arraySubscriptExpression));
+            variableDeclarations->getReference (getOpDatName (i)),
+            buildExprListExp (arraySubscriptExpression));
 
         actualParameters->append_expression (parameterExpression);
       }
       else
       {
         actualParameters->append_expression (
-            variableDeclarations->getReference (
-                OP2::VariableNames::getOpDatName (i)));
+            variableDeclarations->getReference (getOpDatName (i)));
       }
     }
   }
@@ -96,6 +95,7 @@ void
 FortranOpenMPKernelSubroutineDirectLoop::createOpDatFormalParameterDeclarations ()
 {
   using namespace SageBuilder;
+  using namespace OP2VariableNames;
 
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
@@ -109,10 +109,9 @@ FortranOpenMPKernelSubroutineDirectLoop::createOpDatFormalParameterDeclarations 
               new SgAsteriskShapeExp (RoseHelper::getFileInfo ()));
 
       variableDeclarations->add (
-          OP2::VariableNames::getOpDatName (i),
+          getOpDatName (i),
           FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
-              OP2::VariableNames::getOpDatName (i), newArrayType,
-              subroutineScope, formalParameters));
+              getOpDatName (i), newArrayType, subroutineScope, formalParameters));
     }
   }
 }

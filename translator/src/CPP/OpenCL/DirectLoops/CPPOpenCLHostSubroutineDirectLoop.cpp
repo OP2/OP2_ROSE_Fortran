@@ -2,7 +2,7 @@
 #include <RoseStatementsAndExpressionsBuilder.h>
 #include <RoseHelper.h>
 #include <Debug.h>
-#include <CommonNamespaces.h>
+#include <CompilerGeneratedNames.h>
 #include <OpenCL.h>
 
 SgStatement *

@@ -8,6 +8,4 @@ CPPOpenCLUserSubroutine::CPPOpenCLUserSubroutine (
   CPPUserSubroutine (moduleScope, parallelLoop, declarations)
 {
   subroutineHeaderStatement->get_functionModifier ().setInline ();
-
-  subroutineHeaderStatement->get_functionModifier ().setOpenclKernel ();
 }

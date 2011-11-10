@@ -4,7 +4,8 @@
 #include <FortranStatementsAndExpressionsBuilder.h>
 #include <FortranTypesBuilder.h>
 #include <RoseStatementsAndExpressionsBuilder.h>
-#include <CommonNamespaces.h>
+#include <CompilerGeneratedNames.h>
+#include <OP2Definitions.h>
 #include <RoseHelper.h>
 #include <Debug.h>
 #include <OpenMP.h>
@@ -13,6 +14,7 @@ SgStatement *
 FortranOpenMPHostSubroutineDirectLoop::createKernelFunctionCallStatement ()
 {
   using namespace SageBuilder;
+  using namespace OP2VariableNames;
 
   SgExprListExp * actualParameters = buildExprListExp ();
 
@@ -39,9 +41,8 @@ FortranOpenMPHostSubroutineDirectLoop::createKernelFunctionCallStatement ()
             RoseHelper::getFileInfo ());
 
         SgPntrArrRefExp * parameterExpression = buildPntrArrRefExp (
-            variableDeclarations->getReference (
-                OP2::VariableNames::getOpDatLocalName (i)), buildExprListExp (
-                arraySubscriptExpression));
+            variableDeclarations->getReference (getOpDatLocalName (i)),
+            buildExprListExp (arraySubscriptExpression));
 
         actualParameters->append_expression (parameterExpression);
       }
@@ -69,6 +70,8 @@ FortranOpenMPHostSubroutineDirectLoop::createKernelDoLoop ()
 {
   using namespace SageBuilder;
   using namespace SageInterface;
+  using namespace OP2VariableNames;
+  using namespace OP2::RunTimeVariableNames;
 
   Debug::getInstance ()->debugMessage ("Creating kernel do loop",
       Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
@@ -84,8 +87,7 @@ FortranOpenMPHostSubroutineDirectLoop::createKernelDoLoop ()
   SgBasicBlock * loopBody = buildBasicBlock ();
 
   SgDotExp * dotExpression1 = buildDotExp (variableDeclarations->getReference (
-      OP2::VariableNames::getOpSetName ()), buildOpaqueVarRefExp (
-      OP2::VariableNames::size, subroutineScope));
+      getOpSetName ()), buildOpaqueVarRefExp (size, subroutineScope));
 
   SgMultiplyOp * multiplyExpression1 = buildMultiplyOp (dotExpression1,
       variableDeclarations->getReference (OpenMP::threadIndex));
@@ -98,8 +100,7 @@ FortranOpenMPHostSubroutineDirectLoop::createKernelDoLoop ()
       divideExpression1);
 
   SgDotExp * dotExpression2 = buildDotExp (variableDeclarations->getReference (
-      OP2::VariableNames::getOpSetName ()), buildOpaqueVarRefExp (
-      OP2::VariableNames::size, subroutineScope));
+      getOpSetName ()), buildOpaqueVarRefExp (size, subroutineScope));
 
   SgAddOp * addExpression2 = buildAddOp (variableDeclarations->getReference (
       OpenMP::threadIndex), buildIntVal (1));
@@ -139,6 +140,8 @@ FortranOpenMPHostSubroutineDirectLoop::createTransferOpDatStatements ()
 {
   using namespace SageBuilder;
   using namespace SageInterface;
+  using namespace OP2VariableNames;
+  using namespace OP2::RunTimeVariableNames;
 
   Debug::getInstance ()->debugMessage (
       "Creating statements to transfer OP_DAT", Debug::FUNCTION_LEVEL,
@@ -150,10 +153,9 @@ FortranOpenMPHostSubroutineDirectLoop::createTransferOpDatStatements ()
   {
     if (parallelLoop->isDuplicateOpDat (i) == false)
     {
-      SgDotExp * parameterExpression1 =
-          buildDotExp (variableDeclarations->getReference (
-              OP2::VariableNames::getOpDatName (i)), buildOpaqueVarRefExp (
-              OP2::VariableNames::dataOnHost, block));
+      SgDotExp * parameterExpression1 = buildDotExp (
+          variableDeclarations->getReference (getOpDatName (i)),
+          buildOpaqueVarRefExp (dataOnHost, block));
 
       SgVarRefExp * parameterExpression2 =
           moduleDeclarations->getGlobalOpDatDeclaration (i);

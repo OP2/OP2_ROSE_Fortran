@@ -8,7 +8,8 @@
 #include <FortranTypesBuilder.h>
 #include <RoseStatementsAndExpressionsBuilder.h>
 #include <Debug.h>
-#include <CommonNamespaces.h>
+#include <CompilerGeneratedNames.h>
+#include <OP2Definitions.h>
 #include <CUDA.h>
 
 void
@@ -16,8 +17,9 @@ FortranCUDAHostSubroutine::createReductionPrologueStatements ()
 {
   using namespace SageBuilder;
   using namespace SageInterface;
-  using namespace OP2::VariableNames;
-  using namespace CommonVariableNames;
+  using namespace OP2VariableNames;
+  using namespace ReductionVariableNames;
+  using namespace LoopVariableNames;
 
   Debug::getInstance ()->debugMessage (
       "Creating reduction prologue statements", Debug::FUNCTION_LEVEL,
@@ -98,8 +100,9 @@ FortranCUDAHostSubroutine::createReductionEpilogueStatements ()
 {
   using namespace SageBuilder;
   using namespace SageInterface;
-  using namespace OP2::VariableNames;
-  using namespace CommonVariableNames;
+  using namespace OP2VariableNames;
+  using namespace ReductionVariableNames;
+  using namespace LoopVariableNames;
   using boost::lexical_cast;
   using std::string;
 
@@ -218,8 +221,9 @@ FortranCUDAHostSubroutine::createReductionEpilogueStatements ()
 void
 FortranCUDAHostSubroutine::createReductionDeclarations ()
 {
-  using namespace OP2::VariableNames;
-  using namespace CommonVariableNames;
+  using namespace OP2VariableNames;
+  using namespace ReductionVariableNames;
+  using namespace LoopVariableNames;
   using boost::lexical_cast;
   using std::string;
 
@@ -284,7 +288,8 @@ FortranCUDAHostSubroutine::createRHSOfInitialiseOpDatCardinalityStatement (
     SgScopeStatement * scope, unsigned int OP_DAT_ArgumentGroup)
 {
   using namespace SageBuilder;
-  using namespace OP2::VariableNames;
+  using namespace OP2::RunTimeVariableNames;
+  using namespace OP2VariableNames;
 
   if (parallelLoop->isDirect (OP_DAT_ArgumentGroup)
       || parallelLoop->isIndirect (OP_DAT_ArgumentGroup))
@@ -347,7 +352,7 @@ FortranCUDAHostSubroutine::createDeallocateStatements ()
 {
   using namespace SageBuilder;
   using namespace SageInterface;
-  using namespace OP2::VariableNames;
+  using namespace OP2VariableNames;
 
   Debug::getInstance ()->debugMessage (
       "Creating statements to deallocate global arrays which are read",
@@ -376,7 +381,8 @@ FortranCUDAHostSubroutine::createTransferOpDatStatements ()
 {
   using namespace SageBuilder;
   using namespace SageInterface;
-  using namespace OP2::VariableNames;
+  using namespace OP2VariableNames;
+  using namespace OP2::RunTimeVariableNames;
 
   Debug::getInstance ()->debugMessage (
       "Creating statements to transfer OP_DATs onto device",
@@ -569,8 +575,7 @@ FortranCUDAHostSubroutine::createTransferOpDatStatements ()
                 getOpDatCardinalityName (i));
 
             FortranStatementsAndExpressionsBuilder::appendAllocateStatement (
-                arrayExpression, SageBuilder::buildIntVal (1), upperBound,
-                block);
+                arrayExpression, buildIntVal (1), upperBound, block);
 
             SgExprStatement * assignmentStatement1 = buildAssignStatement (
                 variableDeclarations->getReference (getOpDatDeviceName (i)),
@@ -611,7 +616,7 @@ FortranCUDAHostSubroutine::createDataMarshallingDeclarations ()
 {
   using namespace SageBuilder;
   using namespace SageInterface;
-  using namespace OP2::VariableNames;
+  using namespace OP2VariableNames;
   using boost::lexical_cast;
   using std::string;
 
@@ -780,7 +785,7 @@ FortranCUDAHostSubroutine::createCUDAConfigurationLaunchDeclarations ()
 void
 FortranCUDAHostSubroutine::createOpDatCardinalitiesDeclaration ()
 {
-  using namespace OP2::VariableNames;
+  using namespace OP2VariableNames;
 
   Debug::getInstance ()->debugMessage (
       "Generating OP_DAT cardinalities declaration ", Debug::FUNCTION_LEVEL,
@@ -795,7 +800,7 @@ FortranCUDAHostSubroutine::createOpDatCardinalitiesDeclaration ()
 void
 FortranCUDAHostSubroutine::createOpDatDimensionsDeclaration ()
 {
-  using namespace OP2::VariableNames;
+  using namespace OP2VariableNames;
 
   Debug::getInstance ()->debugMessage (
       "Generating OP_DAT dimensions declaration", Debug::FUNCTION_LEVEL,

@@ -3,7 +3,7 @@
 #include <CPPOP2Definitions.h>
 #include <Debug.h>
 #include <Exceptions.h>
-#include <CommonNamespaces.h>
+#include <OP2Definitions.h>
 
 void
 CPPModifyOP2CallsToComplyWithOxfordAPI::patchOpArgGblCall (

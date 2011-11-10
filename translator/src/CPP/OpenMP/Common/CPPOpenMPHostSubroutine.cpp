@@ -2,7 +2,8 @@
 #include <CPPParallelLoop.h>
 #include <CPPUserSubroutine.h>
 #include <RoseStatementsAndExpressionsBuilder.h>
-#include <CommonNamespaces.h>
+#include <CompilerGeneratedNames.h>
+#include <OP2Definitions.h>
 #include <OpenMP.h>
 #include <Exceptions.h>
 
@@ -48,7 +49,8 @@ CPPOpenMPHostSubroutine::createOpDatTypeCastStatements ()
 {
   using namespace SageBuilder;
   using namespace SageInterface;
-  using namespace OP2::VariableNames;
+  using namespace OP2VariableNames;
+  using namespace OP2::RunTimeVariableNames;
   using std::string;
 
   Debug::getInstance ()->debugMessage (
@@ -79,7 +81,7 @@ void
 CPPOpenMPHostSubroutine::createOpDatTypeCastVariableDeclarations ()
 {
   using namespace SageBuilder;
-  using namespace OP2::VariableNames;
+  using namespace OP2VariableNames;
   using std::string;
 
   Debug::getInstance ()->debugMessage (
@@ -103,8 +105,9 @@ CPPOpenMPHostSubroutine::createReductionEpilogueStatements ()
 {
   using namespace SageBuilder;
   using namespace SageInterface;
-  using namespace OP2::VariableNames;
-  using namespace CommonVariableNames;
+  using namespace OP2VariableNames;
+  using namespace LoopVariableNames;
+  using namespace ReductionVariableNames;
   using namespace OpenMP;
 
   Debug::getInstance ()->debugMessage (
@@ -124,8 +127,8 @@ CPPOpenMPHostSubroutine::createReductionEpilogueStatements ()
        */
 
       SgMultiplyOp * arrayIndexExpression = buildMultiplyOp (
-          variableDeclarations->getReference (getIterationCounterVariableName(1)), buildIntVal (
-              64));
+          variableDeclarations->getReference (getIterationCounterVariableName (
+              1)), buildIntVal (64));
 
       SgPntrArrRefExp * arrayExpression = buildPntrArrRefExp (
           variableDeclarations->getReference (getReductionArrayHostName (i)),
@@ -144,15 +147,16 @@ CPPOpenMPHostSubroutine::createReductionEpilogueStatements ()
        */
 
       SgExprStatement * initialisationExpression = buildAssignStatement (
-          variableDeclarations->getReference (getIterationCounterVariableName(1)), buildIntVal (
-              0));
+          variableDeclarations->getReference (getIterationCounterVariableName (
+              1)), buildIntVal (0));
 
       SgLessThanOp * upperBoundExpression = buildLessThanOp (
-          variableDeclarations->getReference (getIterationCounterVariableName(1)),
-          variableDeclarations->getReference (numberOfThreads));
+          variableDeclarations->getReference (getIterationCounterVariableName (
+              1)), variableDeclarations->getReference (numberOfThreads));
 
       SgPlusPlusOp * strideExpression = buildPlusPlusOp (
-          variableDeclarations->getReference (getIterationCounterVariableName(1)));
+          variableDeclarations->getReference (getIterationCounterVariableName (
+              1)));
 
       SgForStatement * forLoopStatement = buildForStatement (
           initialisationExpression, buildExprStatement (upperBoundExpression),
@@ -168,8 +172,9 @@ CPPOpenMPHostSubroutine::createReductionPrologueStatements ()
 {
   using namespace SageBuilder;
   using namespace SageInterface;
-  using namespace OP2::VariableNames;
-  using namespace CommonVariableNames;
+  using namespace OP2VariableNames;
+  using namespace LoopVariableNames;
+  using namespace ReductionVariableNames;
   using namespace OpenMP;
 
   Debug::getInstance ()->debugMessage (
@@ -189,8 +194,8 @@ CPPOpenMPHostSubroutine::createReductionPrologueStatements ()
        */
 
       SgMultiplyOp * arrayIndexExpression = buildMultiplyOp (
-          variableDeclarations->getReference (getIterationCounterVariableName(1)), buildIntVal (
-              64));
+          variableDeclarations->getReference (getIterationCounterVariableName (
+              1)), buildIntVal (64));
 
       SgPntrArrRefExp * arrayExpression = buildPntrArrRefExp (
           variableDeclarations->getReference (getReductionArrayHostName (i)),
@@ -228,15 +233,16 @@ CPPOpenMPHostSubroutine::createReductionPrologueStatements ()
        */
 
       SgExprStatement * initialisationExpression = buildAssignStatement (
-          variableDeclarations->getReference (getIterationCounterVariableName(1)), buildIntVal (
-              0));
+          variableDeclarations->getReference (getIterationCounterVariableName (
+              1)), buildIntVal (0));
 
       SgLessThanOp * upperBoundExpression = buildLessThanOp (
-          variableDeclarations->getReference (getIterationCounterVariableName(1)),
-          variableDeclarations->getReference (numberOfThreads));
+          variableDeclarations->getReference (getIterationCounterVariableName (
+              1)), variableDeclarations->getReference (numberOfThreads));
 
       SgPlusPlusOp * strideExpression = buildPlusPlusOp (
-          variableDeclarations->getReference (getIterationCounterVariableName(1)));
+          variableDeclarations->getReference (getIterationCounterVariableName (
+              1)));
 
       SgForStatement * forLoopStatement = buildForStatement (
           initialisationExpression, buildExprStatement (upperBoundExpression),
@@ -251,7 +257,8 @@ void
 CPPOpenMPHostSubroutine::createReductionDeclarations ()
 {
   using namespace SageBuilder;
-  using namespace OP2::VariableNames;
+  using namespace OP2VariableNames;
+  using namespace ReductionVariableNames;
   using std::string;
 
   Debug::getInstance ()->debugMessage (
@@ -279,8 +286,8 @@ void
 CPPOpenMPHostSubroutine::createOpenMPLocalVariableDeclarations ()
 {
   using namespace SageBuilder;
-  using namespace OP2::VariableNames;
-  using namespace CommonVariableNames;
+  using namespace OP2VariableNames;
+  using namespace LoopVariableNames;
   using namespace OpenMP;
 
   Debug::getInstance ()->debugMessage (
@@ -291,11 +298,13 @@ CPPOpenMPHostSubroutine::createOpenMPLocalVariableDeclarations ()
       RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
           numberOfThreads, buildIntType (), subroutineScope));
 
-  variableDeclarations->add (getIterationCounterVariableName(1),
+  variableDeclarations->add (
+      getIterationCounterVariableName (1),
       RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
-          getIterationCounterVariableName(1), buildIntType (), subroutineScope));
+          getIterationCounterVariableName (1), buildIntType (), subroutineScope));
 
-  variableDeclarations->add (getIterationCounterVariableName(2),
+  variableDeclarations->add (
+      getIterationCounterVariableName (2),
       RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
           getIterationCounterVariableName (2), buildIntType (), subroutineScope));
 

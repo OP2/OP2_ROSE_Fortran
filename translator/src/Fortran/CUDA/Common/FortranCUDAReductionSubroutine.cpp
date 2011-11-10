@@ -3,7 +3,7 @@
 #include <FortranStatementsAndExpressionsBuilder.h>
 #include <FortranTypesBuilder.h>
 #include <RoseStatementsAndExpressionsBuilder.h>
-#include <CommonNamespaces.h>
+#include <CompilerGeneratedNames.h>
 #include <RoseHelper.h>
 #include <Debug.h>
 #include <CUDA.h>
@@ -14,8 +14,9 @@ FortranCUDAReductionSubroutine::createThreadZeroReductionStatements ()
 {
   using namespace SageBuilder;
   using namespace SageInterface;
-  using namespace CommonVariableNames;
-  using namespace OP2::VariableNames;
+  using namespace LoopVariableNames;
+  using namespace OP2VariableNames;
+  using namespace ReductionVariableNames;
 
   /*
    * ======================================================
@@ -154,8 +155,9 @@ FortranCUDAReductionSubroutine::createReductionStatements ()
 {
   using namespace SageBuilder;
   using namespace SageInterface;
-  using namespace CommonVariableNames;
-  using namespace OP2::VariableNames;
+  using namespace LoopVariableNames;
+  using namespace OP2VariableNames;
+  using namespace ReductionVariableNames;
 
   /*
    * ======================================================
@@ -335,7 +337,8 @@ FortranCUDAReductionSubroutine::createSharedVariableInitialisationStatements ()
 {
   using namespace SageBuilder;
   using namespace SageInterface;
-  using namespace OP2::VariableNames;
+  using namespace OP2VariableNames;
+  using namespace ReductionVariableNames;
 
   Debug::getInstance ()->debugMessage (
       "Creating shared variable initialisation statements",
@@ -357,8 +360,8 @@ FortranCUDAReductionSubroutine::createInitialisationStatements ()
 {
   using namespace SageBuilder;
   using namespace SageInterface;
-  using namespace CommonVariableNames;
-  using namespace OP2::VariableNames;
+  using namespace LoopVariableNames;
+  using namespace OP2VariableNames;
 
   Debug::getInstance ()->debugMessage ("Creating initialisation statements",
       Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
@@ -427,8 +430,8 @@ FortranCUDAReductionSubroutine::createStatements ()
 void
 FortranCUDAReductionSubroutine::createLocalVariableDeclarations ()
 {
-  using namespace CommonVariableNames;
-  using namespace OP2::VariableNames;
+  using namespace LoopVariableNames;
+  using namespace OP2VariableNames;
   using std::string;
 
   Debug::getInstance ()->debugMessage ("Creating local variable declarations",
@@ -472,8 +475,9 @@ FortranCUDAReductionSubroutine::createLocalVariableDeclarations ()
 void
 FortranCUDAReductionSubroutine::createFormalParameterDeclarations ()
 {
-  using namespace CommonVariableNames;
-  using namespace OP2::VariableNames;
+  using namespace LoopVariableNames;
+  using namespace OP2VariableNames;
+  using namespace ReductionVariableNames;
 
   Debug::getInstance ()->debugMessage (
       "Creating reduction procedure formal parameter", Debug::FUNCTION_LEVEL,

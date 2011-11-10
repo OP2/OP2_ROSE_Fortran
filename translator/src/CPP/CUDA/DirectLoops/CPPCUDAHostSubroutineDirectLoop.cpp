@@ -4,14 +4,16 @@
 #include <CPPModuleDeclarations.h>
 #include <RoseStatementsAndExpressionsBuilder.h>
 #include <RoseHelper.h>
-#include <CommonNamespaces.h>
+#include <CompilerGeneratedNames.h>
+#include <OP2Definitions.h>
 #include <CUDA.h>
 
 SgStatement *
 CPPCUDAHostSubroutineDirectLoop::createKernelFunctionCallStatement ()
 {
   using namespace SageBuilder;
-  using namespace OP2::VariableNames;
+  using namespace OP2VariableNames;
+  using namespace OP2::RunTimeVariableNames;
 
   Debug::getInstance ()->debugMessage (
       "Creating statement to call CUDA kernel", Debug::FUNCTION_LEVEL,
@@ -69,8 +71,8 @@ CPPCUDAHostSubroutineDirectLoop::createCUDAKernelInitialisationStatements ()
 {
   using namespace SageBuilder;
   using namespace SageInterface;
-  using namespace OP2::VariableNames;
-  using namespace OP2::CPPMacroSupport;
+  using namespace OP2VariableNames;
+  using namespace OP2::Macros;
 
   Debug::getInstance ()->debugMessage (
       "Creating CUDA kernel initialisation statements", Debug::FUNCTION_LEVEL,
@@ -107,9 +109,10 @@ CPPCUDAHostSubroutineDirectLoop::createCUDAKernelInitialisationStatements ()
         SgMultiplyOp * multiplyExpression = buildMultiplyOp (sizeOfExpression,
             buildIntVal (parallelLoop->getSizeOfOpDat (i)));
 
-        SgFunctionCallExp * maxCallExpression = createMaxCallStatement (
-            subroutineScope, variableDeclarations->getReference (
-                CUDA::sharedMemorySize), multiplyExpression);
+        SgFunctionCallExp * maxCallExpression =
+            OP2::Macros::createMaxCallStatement (subroutineScope,
+                variableDeclarations->getReference (CUDA::sharedMemorySize),
+                multiplyExpression);
 
         SgExprStatement * assignmentStatement = buildAssignStatement (
             variableDeclarations->getReference (CUDA::sharedMemorySize),
@@ -177,7 +180,7 @@ void
 CPPCUDAHostSubroutineDirectLoop::createCUDAKernelActualParameterDeclarations ()
 {
   using namespace SageBuilder;
-  using namespace OP2::VariableNames;
+  using namespace OP2VariableNames;
 
   Debug::getInstance ()->debugMessage (
       "Creating CUDA configuration parameters", Debug::FUNCTION_LEVEL,

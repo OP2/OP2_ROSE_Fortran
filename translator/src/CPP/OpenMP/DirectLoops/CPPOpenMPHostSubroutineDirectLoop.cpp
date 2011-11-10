@@ -2,15 +2,16 @@
 #include <CPPUserSubroutine.h>
 #include <RoseStatementsAndExpressionsBuilder.h>
 #include <RoseHelper.h>
-#include <CommonNamespaces.h>
+#include <CompilerGeneratedNames.h>
+#include <OP2Definitions.h>
 #include <OpenMP.h>
 
 SgStatement *
 CPPOpenMPHostSubroutineDirectLoop::createKernelFunctionCallStatement ()
 {
   using namespace SageBuilder;
-  using namespace OP2::VariableNames;
-  using namespace CommonVariableNames;
+  using namespace OP2VariableNames;
+  using namespace LoopVariableNames;
 
   Debug::getInstance ()->debugMessage ("Creating call to user kernel",
       Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
@@ -49,8 +50,8 @@ CPPOpenMPHostSubroutineDirectLoop::createThreadLoopStatements ()
 {
   using namespace SageBuilder;
   using namespace SageInterface;
-  using namespace OP2::VariableNames;
-  using namespace CommonVariableNames;
+  using namespace OP2VariableNames;
+  using namespace LoopVariableNames;
   using namespace OpenMP;
 
   Debug::getInstance ()->debugMessage (
@@ -96,8 +97,9 @@ CPPOpenMPHostSubroutineDirectLoop::createOpenMPLoopStatements ()
 {
   using namespace SageBuilder;
   using namespace SageInterface;
-  using namespace OP2::VariableNames;
-  using namespace CommonVariableNames;
+  using namespace OP2VariableNames;
+  using namespace LoopVariableNames;
+  using namespace OP2::RunTimeVariableNames;
   using namespace OpenMP;
 
   Debug::getInstance ()->debugMessage ("Creating OpenMP for loop statements",

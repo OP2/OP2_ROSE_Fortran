@@ -4,20 +4,20 @@
 #include <FortranParallelLoop.h>
 #include <ScopedVariableDeclarations.h>
 #include <Debug.h>
-#include <CommonNamespaces.h>
+#include <CompilerGeneratedNames.h>
 #include <rose.h>
 
 void
 FortranModuleDeclarations::createCPlanReturnDeclaration ()
 {
+  using namespace OP2VariableNames;
   using std::string;
 
   SgType * c_ptrType = FortranTypesBuilder::buildClassDeclaration ("c_ptr",
       moduleScope)->get_type ();
 
-  std::string const & variableName =
-      OP2::VariableNames::getPlanReturnVariableDeclarationName (
-          parallelLoop->getUserSubroutineName ());
+  std::string const & variableName = getPlanReturnVariableDeclarationName (
+      parallelLoop->getUserSubroutineName ());
 
   variableDeclarations->add (variableName,
       FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
@@ -39,8 +39,10 @@ FortranModuleDeclarations::FortranModuleDeclarations (
 SgVarRefExp *
 FortranModuleDeclarations::getCPlanReturnDeclaration ()
 {
+  using namespace OP2VariableNames;
+
   return variableDeclarations->getReference (
-      OP2::VariableNames::getPlanReturnVariableDeclarationName (
+      getPlanReturnVariableDeclarationName (
           parallelLoop->getUserSubroutineName ()));
 }
 
@@ -48,6 +50,8 @@ SgVarRefExp *
 FortranModuleDeclarations::getGlobalOpDatDeclaration (
     unsigned int OP_DAT_ArgumentGroup)
 {
-  return variableDeclarations->getReference (
-      OP2::VariableNames::getOpDatGlobalName (OP_DAT_ArgumentGroup));
+  using namespace OP2VariableNames;
+
+  return variableDeclarations->getReference (getOpDatGlobalName (
+      OP_DAT_ArgumentGroup));
 }

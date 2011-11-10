@@ -3,14 +3,15 @@
 #include <RoseStatementsAndExpressionsBuilder.h>
 #include <RoseHelper.h>
 #include <CUDA.h>
-#include <CommonNamespaces.h>
+#include <CompilerGeneratedNames.h>
+#include <OP2Definitions.h>
 
 SgStatement *
 CPPCUDAKernelSubroutineDirectLoop::createUserSubroutineCallStatement ()
 {
   using namespace SageBuilder;
-  using namespace CommonVariableNames;
-  using namespace OP2::VariableNames;
+  using namespace LoopVariableNames;
+  using namespace OP2VariableNames;
   using std::string;
   using std::vector;
 
@@ -81,8 +82,8 @@ CPPCUDAKernelSubroutineDirectLoop::createStageInFromDeviceMemoryToSharedMemorySt
 {
   using namespace SageBuilder;
   using namespace SageInterface;
-  using namespace CommonVariableNames;
-  using namespace OP2::VariableNames;
+  using namespace LoopVariableNames;
+  using namespace OP2VariableNames;
   using std::string;
 
   string const autosharedVariableName = getCUDASharedMemoryDeclarationName (
@@ -137,8 +138,8 @@ CPPCUDAKernelSubroutineDirectLoop::createStageInFromSharedMemoryToLocalMemorySta
 {
   using namespace SageBuilder;
   using namespace SageInterface;
-  using namespace CommonVariableNames;
-  using namespace OP2::VariableNames;
+  using namespace LoopVariableNames;
+  using namespace OP2VariableNames;
   using std::string;
 
   string const autosharedVariableName = getCUDASharedMemoryDeclarationName (
@@ -188,8 +189,8 @@ CPPCUDAKernelSubroutineDirectLoop::createStageOutFromSharedMemoryToDeviceMemoryS
 {
   using namespace SageBuilder;
   using namespace SageInterface;
-  using namespace CommonVariableNames;
-  using namespace OP2::VariableNames;
+  using namespace LoopVariableNames;
+  using namespace OP2VariableNames;
   using std::string;
 
   string const autosharedVariableName = getCUDASharedMemoryDeclarationName (
@@ -244,8 +245,8 @@ CPPCUDAKernelSubroutineDirectLoop::createStageOutFromLocalMemoryToSharedMemorySt
 {
   using namespace SageBuilder;
   using namespace SageInterface;
-  using namespace CommonVariableNames;
-  using namespace OP2::VariableNames;
+  using namespace LoopVariableNames;
+  using namespace OP2VariableNames;
   using std::string;
 
   string const autosharedVariableName = getCUDASharedMemoryDeclarationName (
@@ -294,8 +295,8 @@ CPPCUDAKernelSubroutineDirectLoop::createExecutionLoopStatements ()
 {
   using namespace SageBuilder;
   using namespace SageInterface;
-  using namespace CommonVariableNames;
-  using namespace OP2::VariableNames;
+  using namespace LoopVariableNames;
+  using namespace OP2VariableNames;
   using boost::lexical_cast;
   using std::string;
 
@@ -317,14 +318,11 @@ CPPCUDAKernelSubroutineDirectLoop::createExecutionLoopStatements ()
       variableDeclarations->getReference (setSize),
       variableDeclarations->getReference (localOffset));
 
-  SgExprListExp * actualParameters = buildExprListExp (buildOpaqueVarRefExp (
-      warpSizeMacro, subroutineScope), subtractExpression2);
-
-  SgFunctionCallExp * functionCall = buildFunctionCallExp ("MIN",
-      buildIntType (), actualParameters, subroutineScope);
-
   SgExprStatement * assignmentStatement2 = buildAssignStatement (
-      variableDeclarations->getReference (nelems), functionCall);
+      variableDeclarations->getReference (nelems),
+      OP2::Macros::createMinCallStatement (subroutineScope,
+          buildOpaqueVarRefExp (OP2::Macros::warpSizeMacro, subroutineScope),
+          subtractExpression2));
 
   appendStatement (assignmentStatement2, loopBody);
 
@@ -411,8 +409,8 @@ CPPCUDAKernelSubroutineDirectLoop::createInitialiseOffsetIntoCUDASharedVariableS
 {
   using namespace SageBuilder;
   using namespace SageInterface;
-  using namespace CommonVariableNames;
-  using namespace OP2::VariableNames;
+  using namespace LoopVariableNames;
+  using namespace OP2VariableNames;
   using std::find;
   using std::vector;
   using std::string;
@@ -467,7 +465,8 @@ CPPCUDAKernelSubroutineDirectLoop::createThreadIDInitialisationStatement ()
 {
   using namespace SageBuilder;
   using namespace SageInterface;
-  using namespace OP2::VariableNames;
+  using namespace OP2VariableNames;
+  using namespace OP2::Macros;
 
   Debug::getInstance ()->debugMessage (
       "Creating thread ID initialisation statement", Debug::FUNCTION_LEVEL,
@@ -503,8 +502,8 @@ void
 CPPCUDAKernelSubroutineDirectLoop::createLocalVariableDeclarations ()
 {
   using namespace SageBuilder;
-  using namespace CommonVariableNames;
-  using namespace OP2::VariableNames;
+  using namespace LoopVariableNames;
+  using namespace OP2VariableNames;
   using std::vector;
   using std::string;
 
@@ -541,8 +540,9 @@ CPPCUDAKernelSubroutineDirectLoop::createLocalVariableDeclarations ()
 void
 CPPCUDAKernelSubroutineDirectLoop::createOpDatFormalParameterDeclarations ()
 {
-  using namespace CommonVariableNames;
-  using namespace OP2::VariableNames;
+  using namespace LoopVariableNames;
+  using namespace OP2VariableNames;
+  using namespace ReductionVariableNames;
   using namespace SageBuilder;
   using boost::lexical_cast;
   using std::string;
@@ -597,8 +597,8 @@ void
 CPPCUDAKernelSubroutineDirectLoop::createFormalParameterDeclarations ()
 {
   using namespace SageBuilder;
-  using namespace CommonVariableNames;
-  using namespace OP2::VariableNames;
+  using namespace LoopVariableNames;
+  using namespace OP2VariableNames;
 
   createOpDatFormalParameterDeclarations ();
 

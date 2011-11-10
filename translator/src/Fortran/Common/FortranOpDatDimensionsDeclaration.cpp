@@ -4,7 +4,7 @@
 #include <FortranParallelLoop.h>
 #include <ScopedVariableDeclarations.h>
 #include <RoseStatementsAndExpressionsBuilder.h>
-#include <CommonNamespaces.h>
+#include <CompilerGeneratedNames.h>
 #include <Debug.h>
 #include <boost/lexical_cast.hpp>
 #include <rose.h>
@@ -14,6 +14,7 @@ FortranOpDatDimensionsDeclaration::addFields ()
 {
   using namespace SageBuilder;
   using namespace SageInterface;
+  using namespace OP2VariableNames;
   using boost::lexical_cast;
   using std::string;
 
@@ -27,8 +28,7 @@ FortranOpDatDimensionsDeclaration::addFields ()
           "Adding dimensions field for OP_DAT " + lexical_cast <string> (i),
           Debug::INNER_LOOP_LEVEL, __FILE__, __LINE__);
 
-      string const & variableName = OP2::VariableNames::getOpDatDimensionName (
-          i);
+      string const & variableName = getOpDatDimensionName (i);
 
       SgVariableDeclaration * fieldDeclaration = buildVariableDeclaration (
           variableName, FortranTypesBuilder::getFourByteInteger (), NULL,
@@ -66,8 +66,10 @@ SgVarRefExp *
 FortranOpDatDimensionsDeclaration::getOpDatDimensionField (
     unsigned int OP_DAT_ArgumentGroup)
 {
-  return fieldDeclarations->getReference (
-      OP2::VariableNames::getOpDatDimensionName (OP_DAT_ArgumentGroup));
+  using namespace OP2VariableNames;
+
+  return fieldDeclarations->getReference (getOpDatDimensionName (
+      OP_DAT_ArgumentGroup));
 }
 
 FortranOpDatDimensionsDeclaration::FortranOpDatDimensionsDeclaration (

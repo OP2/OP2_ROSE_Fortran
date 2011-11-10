@@ -2,14 +2,15 @@
 #include <CUDA.h>
 #include <Reduction.h>
 #include <RoseStatementsAndExpressionsBuilder.h>
-#include <CommonNamespaces.h>
+#include <CompilerGeneratedNames.h>
 
 void
 CPPCUDAReductionSubroutine::createThreadZeroReductionStatements ()
 {
   using namespace SageBuilder;
   using namespace SageInterface;
-  using namespace OP2::VariableNames;
+  using namespace OP2VariableNames;
+  using namespace ReductionVariableNames;
 
   /*
    * ======================================================
@@ -159,8 +160,9 @@ CPPCUDAReductionSubroutine::createSecondRoundOfReduceStatements ()
 {
   using namespace SageBuilder;
   using namespace SageInterface;
-  using namespace CommonVariableNames;
-  using namespace OP2::VariableNames;
+  using namespace LoopVariableNames;
+  using namespace OP2VariableNames;
+  using namespace ReductionVariableNames;
 
   Debug::getInstance ()->debugMessage (
       "Creating second round of statements to perform reduction",
@@ -361,8 +363,9 @@ CPPCUDAReductionSubroutine::createFirstRoundOfReduceStatements ()
 {
   using namespace SageBuilder;
   using namespace SageInterface;
-  using namespace CommonVariableNames;
-  using namespace OP2::VariableNames;
+  using namespace LoopVariableNames;
+  using namespace OP2VariableNames;
+  using namespace ReductionVariableNames;
 
   Debug::getInstance ()->debugMessage (
       "Creating first round of statements to perform reduction",
@@ -546,7 +549,8 @@ CPPCUDAReductionSubroutine::createSharedVariableInitialisationStatements ()
 {
   using namespace SageBuilder;
   using namespace SageInterface;
-  using namespace OP2::VariableNames;
+  using namespace OP2VariableNames;
+  using namespace ReductionVariableNames;
 
   Debug::getInstance ()->debugMessage (
       "Creating shared variable initialisation statements",
@@ -567,8 +571,8 @@ CPPCUDAReductionSubroutine::createInitialisationStatements ()
 {
   using namespace SageBuilder;
   using namespace SageInterface;
-  using namespace CommonVariableNames;
-  using namespace OP2::VariableNames;
+  using namespace LoopVariableNames;
+  using namespace OP2VariableNames;
 
   SgExprStatement * assignmentStatement1 = buildAssignStatement (
       variableDeclarations->getReference (threadID), CUDA::getThreadId (
@@ -624,8 +628,8 @@ void
 CPPCUDAReductionSubroutine::createLocalVariableDeclarations ()
 {
   using namespace SageBuilder;
-  using namespace CommonVariableNames;
-  using namespace OP2::VariableNames;
+  using namespace LoopVariableNames;
+  using namespace OP2VariableNames;
   using std::string;
 
   Debug::getInstance ()->debugMessage ("Creating local variable declarations",
@@ -685,7 +689,8 @@ void
 CPPCUDAReductionSubroutine::createFormalParameterDeclarations ()
 {
   using namespace SageBuilder;
-  using namespace OP2::VariableNames;
+  using namespace OP2VariableNames;
+  using namespace ReductionVariableNames;
 
   variableDeclarations->add (
       reductionResult,

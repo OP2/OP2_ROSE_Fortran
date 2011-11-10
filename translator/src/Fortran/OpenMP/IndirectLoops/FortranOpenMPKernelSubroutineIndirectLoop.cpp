@@ -2,12 +2,11 @@
 #include <FortranParallelLoop.h>
 #include <FortranStatementsAndExpressionsBuilder.h>
 #include <FortranTypesBuilder.h>
-#include <CommonNamespaces.h>
+#include <CompilerGeneratedNames.h>
 #include <RoseHelper.h>
 #include <Debug.h>
 #include <Plan.h>
 #include <OpenMP.h>
-#include <PlanFunction.h>
 
 SgStatement *
 FortranOpenMPKernelSubroutineIndirectLoop::createUserSubroutineCallStatement ()
@@ -25,19 +24,20 @@ void
 FortranOpenMPKernelSubroutineIndirectLoop::createPlanFormalParameterDeclarations ()
 {
   using namespace SageBuilder;
-  using namespace OP2::VariableNames;
+  using namespace OP2VariableNames;
+  using namespace PlanFunctionVariableNames;
   using std::string;
   using std::vector;
 
   vector <string> fourByteIntegerArrayVariables;
 
-  fourByteIntegerArrayVariables.push_back (PlanFunction::pindSizes);
-  fourByteIntegerArrayVariables.push_back (PlanFunction::pindOffs);
-  fourByteIntegerArrayVariables.push_back (PlanFunction::pblkMap);
-  fourByteIntegerArrayVariables.push_back (PlanFunction::poffset);
-  fourByteIntegerArrayVariables.push_back (PlanFunction::pnelems);
-  fourByteIntegerArrayVariables.push_back (PlanFunction::pnthrcol);
-  fourByteIntegerArrayVariables.push_back (PlanFunction::pthrcol);
+  fourByteIntegerArrayVariables.push_back (pindSizes);
+  fourByteIntegerArrayVariables.push_back (pindOffs);
+  fourByteIntegerArrayVariables.push_back (pblkMap);
+  fourByteIntegerArrayVariables.push_back (poffset);
+  fourByteIntegerArrayVariables.push_back (pnelems);
+  fourByteIntegerArrayVariables.push_back (pnthrcol);
+  fourByteIntegerArrayVariables.push_back (pthrcol);
 
   for (vector <string>::const_iterator it =
       fourByteIntegerArrayVariables.begin (); it
@@ -55,18 +55,17 @@ FortranOpenMPKernelSubroutineIndirectLoop::createPlanFormalParameterDeclarations
   }
 
   variableDeclarations->add (
-      PlanFunction::blockOffset,
+      blockOffset,
       FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
-          PlanFunction::blockOffset,
-          FortranTypesBuilder::getFourByteInteger (), subroutineScope,
-          formalParameters));
+          blockOffset, FortranTypesBuilder::getFourByteInteger (),
+          subroutineScope, formalParameters));
 }
 
 void
 FortranOpenMPKernelSubroutineIndirectLoop::createOpDatFormalParameterDeclarations ()
 {
   using namespace SageBuilder;
-  using namespace OP2::VariableNames;
+  using namespace OP2VariableNames;
   using std::string;
 
   Debug::getInstance ()->debugMessage ("Creating OP_DAT formal parameters",
@@ -158,7 +157,7 @@ FortranOpenMPKernelSubroutineIndirectLoop::createLocalVariableDeclarations ()
 void
 FortranOpenMPKernelSubroutineIndirectLoop::createFormalParameterDeclarations ()
 {
-  using namespace OP2::VariableNames;
+  using namespace OP2VariableNames;
 
   variableDeclarations->add (
       blockID,

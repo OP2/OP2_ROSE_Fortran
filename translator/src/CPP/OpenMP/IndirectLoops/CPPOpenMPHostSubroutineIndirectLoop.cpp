@@ -2,9 +2,9 @@
 #include <CPPUserSubroutine.h>
 #include <RoseStatementsAndExpressionsBuilder.h>
 #include <RoseHelper.h>
-#include <CommonNamespaces.h>
+#include <CompilerGeneratedNames.h>
+#include <OP2Definitions.h>
 #include <OpenMP.h>
-#include <PlanFunction.h>
 
 SgStatement *
 CPPOpenMPHostSubroutineIndirectLoop::createKernelFunctionCallStatement ()
@@ -49,8 +49,8 @@ void
 CPPOpenMPHostSubroutineIndirectLoop::createIncrementAccessLocalVariableDeclarations ()
 {
   using namespace SageBuilder;
-  using namespace CommonVariableNames;
-  using namespace OP2::VariableNames;
+  using namespace LoopVariableNames;
+  using namespace OP2VariableNames;
   using boost::lexical_cast;
   using std::string;
 
@@ -79,8 +79,9 @@ void
 CPPOpenMPHostSubroutineIndirectLoop::createPlanFunctionDeclarations ()
 {
   using namespace SageBuilder;
-  using namespace OP2::VariableNames;
-  using namespace CommonVariableNames;
+  using namespace OP2VariableNames;
+  using namespace LoopVariableNames;
+  using namespace PlanFunctionVariableNames;
 
   Debug::getInstance ()->debugMessage (
       "Creating local variable declarations for plan function",
@@ -95,17 +96,17 @@ CPPOpenMPHostSubroutineIndirectLoop::createPlanFunctionDeclarations ()
       RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (blockID,
           buildIntType (), subroutineScope));
 
-  variableDeclarations->add (PlanFunction::blockOffset,
+  variableDeclarations->add (blockOffset,
       RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
-          PlanFunction::blockOffset, buildIntType (), subroutineScope));
+          blockOffset, buildIntType (), subroutineScope));
 
-  variableDeclarations->add (PlanFunction::nblocks,
-      RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
-          PlanFunction::nblocks, buildIntType (), subroutineScope));
+  variableDeclarations->add (nblocks,
+      RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (nblocks,
+          buildIntType (), subroutineScope));
 
-  variableDeclarations->add (PlanFunction::nelems,
-      RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
-          PlanFunction::nelems, buildIntType (), subroutineScope));
+  variableDeclarations->add (nelems,
+      RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (nelems,
+          buildIntType (), subroutineScope));
 
   variableDeclarations->add (nbytes,
       RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (nbytes,
@@ -115,23 +116,25 @@ CPPOpenMPHostSubroutineIndirectLoop::createPlanFunctionDeclarations ()
       RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
           partitionSize, buildIntType (), subroutineScope));
 
-  variableDeclarations->add (PlanFunction::args,
+  variableDeclarations->add (
+      args,
       RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
-          PlanFunction::args, buildArrayType (buildClassDeclaration (
-              OP2::OP_ARG, subroutineScope)->get_type (), buildIntVal (
+          args,
+          buildArrayType (
+              buildClassDeclaration (OP2::OP_ARG, subroutineScope)->get_type (),
+              buildIntVal (parallelLoop->getNumberOfOpDatArgumentGroups ())),
+          subroutineScope));
+
+  variableDeclarations->add (inds,
+      RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (inds,
+          buildArrayType (buildIntType (), buildIntVal (
               parallelLoop->getNumberOfOpDatArgumentGroups ())),
           subroutineScope));
 
-  variableDeclarations->add (PlanFunction::inds,
-      RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
-          PlanFunction::inds, buildArrayType (buildIntType (), buildIntVal (
-              parallelLoop->getNumberOfOpDatArgumentGroups ())),
-          subroutineScope));
-
-  variableDeclarations->add (PlanFunction::planRet,
-      RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
-          PlanFunction::planRet, buildPointerType (buildClassDeclaration (
-              OP2::OP_PLAN, subroutineScope)->get_type ()), subroutineScope));
+  variableDeclarations->add (planRet,
+      RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (planRet,
+          buildPointerType (buildClassDeclaration (OP2::OP_PLAN,
+              subroutineScope)->get_type ()), subroutineScope));
 }
 
 void

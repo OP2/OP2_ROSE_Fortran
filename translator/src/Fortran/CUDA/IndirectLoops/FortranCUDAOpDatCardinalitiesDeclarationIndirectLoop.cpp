@@ -3,15 +3,15 @@
 #include <FortranStatementsAndExpressionsBuilder.h>
 #include <FortranTypesBuilder.h>
 #include <ScopedVariableDeclarations.h>
-#include <CommonNamespaces.h>
-#include <PlanFunction.h>
+#include <CompilerGeneratedNames.h>
 #include <rose.h>
 
 void
 FortranCUDAOpDatCardinalitiesDeclarationIndirectLoop::addIndirectLoopFields ()
 {
   using namespace SageBuilder;
-  using namespace OP2::VariableNames;
+  using namespace OP2VariableNames;
+  using namespace PlanFunctionVariableNames;
   using std::string;
   using std::vector;
 
@@ -53,13 +53,13 @@ FortranCUDAOpDatCardinalitiesDeclarationIndirectLoop::addIndirectLoopFields ()
 
   vector <string> planFunctionSizeVariables;
 
-  planFunctionSizeVariables.push_back (PlanFunction::pblkMapSize);
-  planFunctionSizeVariables.push_back (PlanFunction::pindOffsSize);
-  planFunctionSizeVariables.push_back (PlanFunction::pindSizesSize);
-  planFunctionSizeVariables.push_back (PlanFunction::pnelemsSize);
-  planFunctionSizeVariables.push_back (PlanFunction::pnthrcolSize);
-  planFunctionSizeVariables.push_back (PlanFunction::poffsetSize);
-  planFunctionSizeVariables.push_back (PlanFunction::pthrcolSize);
+  planFunctionSizeVariables.push_back (pblkMapSize);
+  planFunctionSizeVariables.push_back (pindOffsSize);
+  planFunctionSizeVariables.push_back (pindSizesSize);
+  planFunctionSizeVariables.push_back (pnelemsSize);
+  planFunctionSizeVariables.push_back (pnthrcolSize);
+  planFunctionSizeVariables.push_back (poffsetSize);
+  planFunctionSizeVariables.push_back (pthrcolSize);
 
   for (vector <string>::iterator it = planFunctionSizeVariables.begin (); it
       != planFunctionSizeVariables.end (); ++it)

@@ -6,7 +6,7 @@
 #include <FortranTypesBuilder.h>
 #include <RoseStatementsAndExpressionsBuilder.h>
 #include <FortranStatementsAndExpressionsBuilder.h>
-#include <CommonNamespaces.h>
+#include <CompilerGeneratedNames.h>
 #include <RoseHelper.h>
 #include <Plan.h>
 #include <PlanFunction.h>
@@ -18,8 +18,8 @@ SgStatement *
 FortranCUDAKernelSubroutineIndirectLoop::createUserSubroutineCallStatement ()
 {
   using namespace SageBuilder;
-  using namespace CommonVariableNames;
-  using namespace OP2::VariableNames;
+  using namespace LoopVariableNames;
+  using namespace OP2VariableNames;
   using std::string;
   using std::vector;
 
@@ -232,8 +232,9 @@ FortranCUDAKernelSubroutineIndirectLoop::createIncrementAndWriteAccessEpilogueSt
 {
   using namespace SageBuilder;
   using namespace SageInterface;
-  using namespace CommonVariableNames;
-  using namespace OP2::VariableNames;
+  using namespace OP2VariableNames;
+  using namespace PlanFunctionVariableNames;
+  using namespace LoopVariableNames;
   using std::string;
 
   Debug::getInstance ()->debugMessage (
@@ -318,8 +319,7 @@ FortranCUDAKernelSubroutineIndirectLoop::createIncrementAndWriteAccessEpilogueSt
               multiplyExpression2a);
 
           SgPntrArrRefExp * arrayIndexExpression2a = buildPntrArrRefExp (
-              variableDeclarations->getReference (PlanFunction::pindOffs),
-              addExpression2a);
+              variableDeclarations->getReference (pindOffs), addExpression2a);
 
           SgDivideOp * divideExpression2 = buildDivideOp (
               variableDeclarations->getReference (
@@ -417,8 +417,9 @@ FortranCUDAKernelSubroutineIndirectLoop::createStageOutFromLocalMemoryToSharedMe
 {
   using namespace SageBuilder;
   using namespace SageInterface;
-  using namespace CommonVariableNames;
-  using namespace OP2::VariableNames;
+  using namespace LoopVariableNames;
+  using namespace OP2VariableNames;
+  using namespace OP2VariableNames;
   using std::string;
 
   Debug::getInstance ()->debugMessage (
@@ -529,8 +530,8 @@ FortranCUDAKernelSubroutineIndirectLoop::createIncrementAdjustmentStatements ()
 {
   using namespace SageBuilder;
   using namespace SageInterface;
-  using namespace CommonVariableNames;
-  using namespace OP2::VariableNames;
+  using namespace LoopVariableNames;
+  using namespace OP2VariableNames;
   using boost::lexical_cast;
   using std::string;
 
@@ -572,8 +573,8 @@ FortranCUDAKernelSubroutineIndirectLoop::createInitialiseIncrementAccessStatemen
 {
   using namespace SageBuilder;
   using namespace SageInterface;
-  using namespace CommonVariableNames;
-  using namespace OP2::VariableNames;
+  using namespace LoopVariableNames;
+  using namespace OP2VariableNames;
   using boost::lexical_cast;
   using std::string;
 
@@ -631,8 +632,9 @@ FortranCUDAKernelSubroutineIndirectLoop::createExecutionLoopStatements ()
 {
   using namespace SageBuilder;
   using namespace SageInterface;
-  using namespace CommonVariableNames;
-  using namespace OP2::VariableNames;
+  using namespace LoopVariableNames;
+  using namespace OP2VariableNames;
+  using namespace PlanFunctionVariableNames;
 
   Debug::getInstance ()->debugMessage (
       "Creating main execution loop statements", Debug::FUNCTION_LEVEL,
@@ -658,8 +660,7 @@ FortranCUDAKernelSubroutineIndirectLoop::createExecutionLoopStatements ()
         variableDeclarations->getReference (sharedMemoryOffset));
 
     SgPntrArrRefExp * arrayExpression1 = buildPntrArrRefExp (
-        variableDeclarations->getReference (PlanFunction::pthrcol),
-        addExpression1);
+        variableDeclarations->getReference (pthrcol), addExpression1);
 
     SgExprStatement * assignmentStatement2 = buildAssignStatement (
         variableDeclarations->getReference (colour2), arrayExpression1);
@@ -732,8 +733,9 @@ FortranCUDAKernelSubroutineIndirectLoop::createInitialiseCUDASharedVariablesStat
 {
   using namespace SageBuilder;
   using namespace SageInterface;
-  using namespace CommonVariableNames;
-  using namespace OP2::VariableNames;
+  using namespace LoopVariableNames;
+  using namespace OP2VariableNames;
+  using namespace PlanFunctionVariableNames;
   using std::string;
 
   Debug::getInstance ()->debugMessage (
@@ -857,8 +859,7 @@ FortranCUDAKernelSubroutineIndirectLoop::createInitialiseCUDASharedVariablesStat
               multiplyExpression4a);
 
           SgPntrArrRefExp * arrayIndexExpression4b = buildPntrArrRefExp (
-              variableDeclarations->getReference (PlanFunction::pindOffs),
-              addExpression4b);
+              variableDeclarations->getReference (pindOffs), addExpression4b);
 
           SgDotExp * dotExpression4 = buildDotExp (
               variableDeclarations->getReference (opDatDimensions),
@@ -961,8 +962,9 @@ FortranCUDAKernelSubroutineIndirectLoop::createIncrementAccessThreadZeroStatemen
 {
   using namespace SageBuilder;
   using namespace SageInterface;
-  using namespace CommonVariableNames;
-  using namespace OP2::VariableNames;
+  using namespace LoopVariableNames;
+  using namespace OP2VariableNames;
+  using namespace PlanFunctionVariableNames;
 
   Debug::getInstance ()->debugMessage (
       "Creating thread zero statements for incremented OP_DATs",
@@ -1002,7 +1004,7 @@ FortranCUDAKernelSubroutineIndirectLoop::createIncrementAccessThreadZeroStatemen
    */
 
   SgPntrArrRefExp * arrayExpression2 = buildPntrArrRefExp (
-      buildOpaqueVarRefExp (PlanFunction::pnthrcol, subroutineScope),
+      buildOpaqueVarRefExp (pnthrcol, subroutineScope),
       variableDeclarations->getReference (blockID));
 
   SgStatement * statement2 = buildAssignStatement (buildOpaqueVarRefExp (
@@ -1018,8 +1020,8 @@ FortranCUDAKernelSubroutineIndirectLoop::createInitialiseBytesPerOpDatStatements
 {
   using namespace SageBuilder;
   using namespace SageInterface;
-  using namespace CommonVariableNames;
-  using namespace OP2::VariableNames;
+  using namespace LoopVariableNames;
+  using namespace OP2VariableNames;
 
   Debug::getInstance ()->debugMessage (
       "Creating statements to initialise bytes per OP_DAT",
@@ -1131,8 +1133,9 @@ FortranCUDAKernelSubroutineIndirectLoop::createThreadZeroStatements ()
 {
   using namespace SageBuilder;
   using namespace SageInterface;
-  using namespace CommonVariableNames;
-  using namespace OP2::VariableNames;
+  using namespace LoopVariableNames;
+  using namespace OP2VariableNames;
+  using namespace PlanFunctionVariableNames;
 
   Debug::getInstance ()->debugMessage ("Creating thread zero statements",
       Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
@@ -1149,11 +1152,10 @@ FortranCUDAKernelSubroutineIndirectLoop::createThreadZeroStatements ()
       BLOCK_X, subroutineScope), buildIntVal (1));
 
   SgAddOp * arrayIndexExpression1 = buildAddOp (subtractExpression1,
-      variableDeclarations->getReference (PlanFunction::blockOffset));
+      variableDeclarations->getReference (blockOffset));
 
   SgPntrArrRefExp * arrayExpression1 = buildPntrArrRefExp (
-      variableDeclarations->getReference (PlanFunction::pblkMap),
-      arrayIndexExpression1);
+      variableDeclarations->getReference (pblkMap), arrayIndexExpression1);
 
   SgStatement * statement1 = buildAssignStatement (
       variableDeclarations->getReference (blockID), arrayExpression1);
@@ -1167,7 +1169,7 @@ FortranCUDAKernelSubroutineIndirectLoop::createThreadZeroStatements ()
    */
 
   SgPntrArrRefExp * arrayExpression2 = buildPntrArrRefExp (
-      buildOpaqueVarRefExp (PlanFunction::pnelems, subroutineScope),
+      buildOpaqueVarRefExp (pnelems, subroutineScope),
       variableDeclarations->getReference (blockID));
 
   SgStatement * statement2 = buildAssignStatement (buildOpaqueVarRefExp (
@@ -1193,7 +1195,7 @@ FortranCUDAKernelSubroutineIndirectLoop::createThreadZeroStatements ()
    */
 
   SgPntrArrRefExp * arrayExpression3 = buildPntrArrRefExp (
-      buildOpaqueVarRefExp (PlanFunction::poffset, subroutineScope),
+      buildOpaqueVarRefExp (poffset, subroutineScope),
       variableDeclarations->getReference (blockID));
 
   SgStatement * statement3 = buildAssignStatement (buildOpaqueVarRefExp (
@@ -1223,8 +1225,7 @@ FortranCUDAKernelSubroutineIndirectLoop::createThreadZeroStatements ()
             multiplyExpression);
 
         SgPntrArrRefExp * arrayExpression = buildPntrArrRefExp (
-            variableDeclarations->getReference (PlanFunction::pindSizes),
-            addExpression);
+            variableDeclarations->getReference (pindSizes), addExpression);
 
         SgStatement * statement = buildAssignStatement (
             variableDeclarations->getReference (getIndirectionArgumentSizeName (
@@ -1259,7 +1260,7 @@ FortranCUDAKernelSubroutineIndirectLoop::createStatements ()
 {
   using namespace SageBuilder;
   using namespace SageInterface;
-  using namespace CommonVariableNames;
+  using namespace LoopVariableNames;
 
   appendStatement (createThreadZeroStatements (), subroutineScope);
 
@@ -1294,8 +1295,8 @@ FortranCUDAKernelSubroutineIndirectLoop::createStatements ()
 void
 FortranCUDAKernelSubroutineIndirectLoop::createIncrementAccessLocalVariableDeclarations ()
 {
-  using namespace CommonVariableNames;
-  using namespace OP2::VariableNames;
+  using namespace LoopVariableNames;
+  using namespace OP2VariableNames;
   using boost::lexical_cast;
   using std::string;
 
@@ -1347,8 +1348,8 @@ FortranCUDAKernelSubroutineIndirectLoop::createIncrementAccessLocalVariableDecla
 void
 FortranCUDAKernelSubroutineIndirectLoop::createExecutionLocalVariableDeclarations ()
 {
-  using namespace CommonVariableNames;
-  using namespace OP2::VariableNames;
+  using namespace LoopVariableNames;
+  using namespace OP2VariableNames;
 
   Debug::getInstance ()->debugMessage (
       "Creating local variable declarations needed to execute kernel",
@@ -1392,7 +1393,7 @@ FortranCUDAKernelSubroutineIndirectLoop::createExecutionLocalVariableDeclaration
 void
 FortranCUDAKernelSubroutineIndirectLoop::createLocalVariableDeclarations ()
 {
-  using namespace OP2::VariableNames;
+  using namespace OP2VariableNames;
   using boost::lexical_cast;
   using std::string;
 
@@ -1483,8 +1484,9 @@ void
 FortranCUDAKernelSubroutineIndirectLoop::createPlanFormalParameterDeclarations ()
 {
   using namespace SageBuilder;
-  using namespace CommonVariableNames;
-  using namespace OP2::VariableNames;
+  using namespace LoopVariableNames;
+  using namespace OP2VariableNames;
+  using namespace PlanFunctionVariableNames;
   using std::string;
   using std::map;
 
@@ -1494,19 +1496,13 @@ FortranCUDAKernelSubroutineIndirectLoop::createPlanFormalParameterDeclarations (
 
   map <string, string> variableToSizeMap;
 
-  variableToSizeMap[PlanFunction::pindSizes] = PlanFunction::pindSizesSize;
-
-  variableToSizeMap[PlanFunction::pindOffs] = PlanFunction::pindOffsSize;
-
-  variableToSizeMap[PlanFunction::pblkMap] = PlanFunction::pblkMapSize;
-
-  variableToSizeMap[PlanFunction::poffset] = PlanFunction::poffsetSize;
-
-  variableToSizeMap[PlanFunction::pnelems] = PlanFunction::pnelemsSize;
-
-  variableToSizeMap[PlanFunction::pnthrcol] = PlanFunction::pnthrcolSize;
-
-  variableToSizeMap[PlanFunction::pthrcol] = PlanFunction::pthrcolSize;
+  variableToSizeMap[pindSizes] = pindSizesSize;
+  variableToSizeMap[pindOffs] = pindOffsSize;
+  variableToSizeMap[pblkMap] = pblkMapSize;
+  variableToSizeMap[poffset] = poffsetSize;
+  variableToSizeMap[pnelems] = pnelemsSize;
+  variableToSizeMap[pnthrcol] = pnthrcolSize;
+  variableToSizeMap[pthrcol] = pthrcolSize;
 
   for (map <string, string>::const_iterator it = variableToSizeMap.begin (); it
       != variableToSizeMap.end (); ++it)
@@ -1530,18 +1526,18 @@ FortranCUDAKernelSubroutineIndirectLoop::createPlanFormalParameterDeclarations (
   }
 
   variableDeclarations->add (
-      PlanFunction::blockOffset,
+      blockOffset,
       FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
-          PlanFunction::blockOffset,
-          FortranTypesBuilder::getFourByteInteger (), subroutineScope,
-          formalParameters, 1, VALUE));
+          blockOffset, FortranTypesBuilder::getFourByteInteger (),
+          subroutineScope, formalParameters, 1, VALUE));
 }
 
 void
 FortranCUDAKernelSubroutineIndirectLoop::createOpDatFormalParameterDeclarations ()
 {
-  using namespace CommonVariableNames;
-  using namespace OP2::VariableNames;
+  using namespace LoopVariableNames;
+  using namespace OP2VariableNames;
+  using namespace ReductionVariableNames;
   using namespace SageBuilder;
   using std::string;
 
@@ -1671,7 +1667,7 @@ FortranCUDAKernelSubroutineIndirectLoop::createOpDatFormalParameterDeclarations 
 void
 FortranCUDAKernelSubroutineIndirectLoop::createFormalParameterDeclarations ()
 {
-  using namespace OP2::VariableNames;
+  using namespace OP2VariableNames;
 
   Debug::getInstance ()->debugMessage (
       "Creating formal parameter declarations", Debug::FUNCTION_LEVEL,

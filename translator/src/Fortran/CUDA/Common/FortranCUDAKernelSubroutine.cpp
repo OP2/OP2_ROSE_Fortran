@@ -9,7 +9,7 @@
 #include <RoseHelper.h>
 #include <Reduction.h>
 #include <Debug.h>
-#include <CommonNamespaces.h>
+#include <CompilerGeneratedNames.h>
 #include <CUDA.h>
 
 void
@@ -17,7 +17,8 @@ FortranCUDAKernelSubroutine::createReductionEpilogueStatements ()
 {
   using namespace SageBuilder;
   using namespace SageInterface;
-  using namespace OP2::VariableNames;
+  using namespace OP2VariableNames;
+  using namespace ReductionVariableNames;
   using std::string;
 
   Debug::getInstance ()->debugMessage ("Adding reduction subroutine call",
@@ -109,7 +110,7 @@ FortranCUDAKernelSubroutine::createReductionEpilogueStatements ()
 void
 FortranCUDAKernelSubroutine::createCUDAStageInVariablesVariableDeclarations ()
 {
-  using namespace OP2::VariableNames;
+  using namespace OP2VariableNames;
   using std::string;
 
   Debug::getInstance ()->debugMessage ("Creating local thread variables",
@@ -143,7 +144,7 @@ FortranCUDAKernelSubroutine::createCUDAStageInVariablesVariableDeclarations ()
 void
 FortranCUDAKernelSubroutine::createCUDASharedVariableDeclarations ()
 {
-  using namespace OP2::VariableNames;
+  using namespace OP2VariableNames;
   using std::find;
   using std::vector;
   using std::string;

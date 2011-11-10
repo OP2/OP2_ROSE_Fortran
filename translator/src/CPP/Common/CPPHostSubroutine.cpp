@@ -2,16 +2,17 @@
 #include <CPPParallelLoop.h>
 #include <RoseStatementsAndExpressionsBuilder.h>
 #include <FortranTypesBuilder.h>
-#include <CommonNamespaces.h>
-#include <PlanFunction.h>
+#include <CompilerGeneratedNames.h>
+#include <OP2Definitions.h>
 
 SgBasicBlock *
 CPPHostSubroutine::createInitialisePlanFunctionArrayStatements ()
 {
   using namespace SageBuilder;
   using namespace SageInterface;
-  using namespace OP2::VariableNames;
-  using namespace CommonVariableNames;
+  using namespace OP2VariableNames;
+  using namespace LoopVariableNames;
+  using namespace PlanFunctionVariableNames;
   using std::map;
   using std::string;
 
@@ -24,8 +25,7 @@ CPPHostSubroutine::createInitialisePlanFunctionArrayStatements ()
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
     SgPntrArrRefExp * arrayIndexExpression = buildPntrArrRefExp (
-        variableDeclarations->getReference (PlanFunction::args), buildIntVal (i
-            - 1));
+        variableDeclarations->getReference (args), buildIntVal (i - 1));
 
     SgExprStatement * assignmentStatement = buildAssignStatement (
         arrayIndexExpression, variableDeclarations->getReference (getOpDatName (
@@ -40,8 +40,7 @@ CPPHostSubroutine::createInitialisePlanFunctionArrayStatements ()
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
     SgPntrArrRefExp * arrayIndexExpression = buildPntrArrRefExp (
-        variableDeclarations->getReference (PlanFunction::inds), buildIntVal (i
-            - 1));
+        variableDeclarations->getReference (inds), buildIntVal (i - 1));
 
     SgExprStatement * assignmentStatement;
 
@@ -81,7 +80,7 @@ void
 CPPHostSubroutine::createFormalParameterDeclarations ()
 {
   using namespace SageBuilder;
-  using namespace OP2::VariableNames;
+  using namespace OP2VariableNames;
   using std::string;
 
   Debug::getInstance ()->debugMessage (

@@ -4,7 +4,7 @@
 #include <RoseStatementsAndExpressionsBuilder.h>
 #include <ScopedVariableDeclarations.h>
 #include <Debug.h>
-#include <CommonNamespaces.h>
+#include <CompilerGeneratedNames.h>
 #include <boost/lexical_cast.hpp>
 #include <rose.h>
 
@@ -12,6 +12,7 @@ void
 FortranCUDAOpDatCardinalitiesDeclaration::addFields ()
 {
   using namespace SageBuilder;
+  using namespace OP2VariableNames;
   using boost::lexical_cast;
   using std::string;
 
@@ -26,8 +27,7 @@ FortranCUDAOpDatCardinalitiesDeclaration::addFields ()
                 + lexical_cast <string> (i), Debug::HIGHEST_DEBUG_LEVEL,
             __FILE__, __LINE__);
 
-        string const & variableName =
-            OP2::VariableNames::getOpDatCardinalityName (i);
+        string const & variableName = getOpDatCardinalityName (i);
 
         SgVariableDeclaration * fieldDeclaration = buildVariableDeclaration (
             variableName, FortranTypesBuilder::getFourByteInteger (), NULL,

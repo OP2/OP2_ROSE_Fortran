@@ -3,7 +3,7 @@
 #include <CPPReductionSubroutines.h>
 #include <RoseStatementsAndExpressionsBuilder.h>
 #include <CUDA.h>
-#include <CommonNamespaces.h>
+#include <CompilerGeneratedNames.h>
 
 void
 CPPCUDAKernelSubroutine::createInitialiseCUDAStageInVariablesStatements ()
@@ -15,8 +15,8 @@ CPPCUDAKernelSubroutine::createReductionPrologueStatements ()
 {
   using namespace SageBuilder;
   using namespace SageInterface;
-  using namespace CommonVariableNames;
-  using namespace OP2::VariableNames;
+  using namespace LoopVariableNames;
+  using namespace OP2VariableNames;
   using std::string;
 
   Debug::getInstance ()->debugMessage (
@@ -118,8 +118,9 @@ CPPCUDAKernelSubroutine::createReductionEpilogueStatements ()
 {
   using namespace SageBuilder;
   using namespace SageInterface;
-  using namespace CommonVariableNames;
-  using namespace OP2::VariableNames;
+  using namespace LoopVariableNames;
+  using namespace OP2VariableNames;
+  using namespace ReductionVariableNames;
   using std::string;
 
   Debug::getInstance ()->debugMessage (
@@ -289,7 +290,7 @@ void
 CPPCUDAKernelSubroutine::createCUDAStageInVariablesVariableDeclarations ()
 {
   using namespace SageBuilder;
-  using namespace OP2::VariableNames;
+  using namespace OP2VariableNames;
   using std::string;
 
   Debug::getInstance ()->debugMessage ("Creating local thread variables",
@@ -335,7 +336,7 @@ void
 CPPCUDAKernelSubroutine::createCUDASharedVariableDeclarations ()
 {
   using namespace SageBuilder;
-  using namespace OP2::VariableNames;
+  using namespace OP2VariableNames;
   using std::find;
   using std::vector;
   using std::string;

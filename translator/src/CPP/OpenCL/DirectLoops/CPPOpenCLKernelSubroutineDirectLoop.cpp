@@ -2,7 +2,7 @@
 #include <RoseStatementsAndExpressionsBuilder.h>
 #include <Debug.h>
 #include <OpenCL.h>
-#include <CommonNamespaces.h>
+#include <CompilerGeneratedNames.h>
 
 SgStatement *
 CPPOpenCLKernelSubroutineDirectLoop::createUserSubroutineCallStatement ()
@@ -29,8 +29,9 @@ CPPOpenCLKernelSubroutineDirectLoop::createLocalVariableDeclarations ()
 void
 CPPOpenCLKernelSubroutineDirectLoop::createOpDatFormalParameterDeclarations ()
 {
-  using namespace CommonVariableNames;
-  using namespace OP2::VariableNames;
+  using namespace LoopVariableNames;
+  using namespace OP2VariableNames;
+  using namespace ReductionVariableNames;
   using namespace SageBuilder;
   using boost::lexical_cast;
   using std::string;
@@ -85,8 +86,8 @@ void
 CPPOpenCLKernelSubroutineDirectLoop::createFormalParameterDeclarations ()
 {
   using namespace SageBuilder;
-  using namespace CommonVariableNames;
-  using namespace OP2::VariableNames;
+  using namespace LoopVariableNames;
+  using namespace OP2VariableNames;
 
   createOpDatFormalParameterDeclarations ();
 

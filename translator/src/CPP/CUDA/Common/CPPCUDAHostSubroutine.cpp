@@ -3,7 +3,8 @@
 #include <CPPModuleDeclarations.h>
 #include <RoseStatementsAndExpressionsBuilder.h>
 #include <CUDA.h>
-#include <CommonNamespaces.h>
+#include <CompilerGeneratedNames.h>
+#include <OP2Definitions.h>
 #include <Exceptions.h>
 
 SgForStatement *
@@ -12,8 +13,9 @@ CPPCUDAHostSubroutine::createReductionUpdateStatements (
 {
   using namespace SageBuilder;
   using namespace SageInterface;
-  using namespace OP2::VariableNames;
-  using namespace CommonVariableNames;
+  using namespace OP2VariableNames;
+  using namespace LoopVariableNames;
+  using namespace ReductionVariableNames;
 
   Debug::getInstance ()->debugMessage (
       "Creating statements to update reduction variable",
@@ -57,7 +59,7 @@ CPPCUDAHostSubroutine::createReductionUpdateStatements (
               OP_DAT_ArgumentGroup)));
 
       SgFunctionCallExp * maxCallExpression =
-          OP2::CPPMacroSupport::createMaxCallStatement (subroutineScope,
+          OP2::Macros::createMaxCallStatement (subroutineScope,
               arrayExpression1, arrayExpression2);
 
       SgExprStatement * assignmentStatement = buildAssignStatement (
@@ -72,7 +74,7 @@ CPPCUDAHostSubroutine::createReductionUpdateStatements (
               OP_DAT_ArgumentGroup)));
 
       SgFunctionCallExp * minCallExpression =
-          OP2::CPPMacroSupport::createMinCallStatement (subroutineScope,
+          OP2::Macros::createMinCallStatement (subroutineScope,
               arrayExpression1, arrayExpression2);
 
       SgExprStatement * assignmentStatement = buildAssignStatement (
@@ -125,7 +127,7 @@ CPPCUDAHostSubroutine::createReductionUpdateStatements (
               OP_DAT_ArgumentGroup)));
 
       SgFunctionCallExp * maxCallExpression =
-          OP2::CPPMacroSupport::createMaxCallStatement (subroutineScope,
+          OP2::Macros::createMaxCallStatement (subroutineScope,
               pointerDerefenceExpression2, arrayExpression);
 
       SgExprStatement * assignmentStatement = buildAssignStatement (
@@ -140,7 +142,7 @@ CPPCUDAHostSubroutine::createReductionUpdateStatements (
               OP_DAT_ArgumentGroup)));
 
       SgFunctionCallExp * minCallExpression =
-          OP2::CPPMacroSupport::createMinCallStatement (subroutineScope,
+          OP2::Macros::createMinCallStatement (subroutineScope,
               pointerDerefenceExpression2, arrayExpression);
 
       SgExprStatement * assignmentStatement = buildAssignStatement (
@@ -173,7 +175,8 @@ CPPCUDAHostSubroutine::createReductionEpilogueStatements ()
 {
   using namespace SageBuilder;
   using namespace SageInterface;
-  using namespace OP2::VariableNames;
+  using namespace OP2VariableNames;
+  using namespace ReductionVariableNames;
 
   Debug::getInstance ()->debugMessage (
       "Creating reduction prologue statements", Debug::FUNCTION_LEVEL,
@@ -203,8 +206,9 @@ CPPCUDAHostSubroutine::createReductionInitialisationStatements (
 {
   using namespace SageBuilder;
   using namespace SageInterface;
-  using namespace OP2::VariableNames;
-  using namespace CommonVariableNames;
+  using namespace OP2VariableNames;
+  using namespace LoopVariableNames;
+  using namespace OP2::RunTimeVariableNames;
 
   Debug::getInstance ()->debugMessage (
       "Creating statements to initialise reduction variable",
@@ -337,8 +341,10 @@ CPPCUDAHostSubroutine::createReductionPrologueStatements ()
 {
   using namespace SageBuilder;
   using namespace SageInterface;
-  using namespace OP2::VariableNames;
-  using namespace CommonVariableNames;
+  using namespace OP2VariableNames;
+  using namespace LoopVariableNames;
+  using namespace ReductionVariableNames;
+  using namespace OP2::RunTimeVariableNames;
 
   Debug::getInstance ()->debugMessage (
       "Creating reduction epilogue statements", Debug::FUNCTION_LEVEL,
@@ -392,15 +398,13 @@ CPPCUDAHostSubroutine::createReductionPrologueStatements ()
             multiplyExpression1, buildIntVal (parallelLoop->getOpDatDimension (
                 i)));
 
-        roundUpCallExpression
-            = OP2::CPPMacroSupport::createRoundUpCallStatement (
-                subroutineScope, multiplyExpression2);
+        roundUpCallExpression = OP2::Macros::createRoundUpCallStatement (
+            subroutineScope, multiplyExpression2);
       }
       else
       {
-        roundUpCallExpression
-            = OP2::CPPMacroSupport::createRoundUpCallStatement (
-                subroutineScope, multiplyExpression1);
+        roundUpCallExpression = OP2::Macros::createRoundUpCallStatement (
+            subroutineScope, multiplyExpression1);
       }
 
       SgPlusAssignOp * assignmentStatement3 = buildPlusAssignOp (
@@ -411,7 +415,7 @@ CPPCUDAHostSubroutine::createReductionPrologueStatements ()
           subroutineScope);
 
       SgFunctionCallExp * maxCallExpression =
-          OP2::CPPMacroSupport::createMaxCallStatement (subroutineScope,
+          OP2::Macros::createMaxCallStatement (subroutineScope,
               variableDeclarations->getReference (reductionSharedMemorySize),
               sizeOfExpression);
 
@@ -513,15 +517,13 @@ CPPCUDAHostSubroutine::createReductionPrologueStatements ()
             multiplyExpression1, buildIntVal (parallelLoop->getOpDatDimension (
                 i)));
 
-        roundUpCallExpression
-            = OP2::CPPMacroSupport::createRoundUpCallStatement (
-                subroutineScope, multiplyExpression2);
+        roundUpCallExpression = OP2::Macros::createRoundUpCallStatement (
+            subroutineScope, multiplyExpression2);
       }
       else
       {
-        roundUpCallExpression
-            = OP2::CPPMacroSupport::createRoundUpCallStatement (
-                subroutineScope, multiplyExpression1);
+        roundUpCallExpression = OP2::Macros::createRoundUpCallStatement (
+            subroutineScope, multiplyExpression1);
       }
 
       SgPlusAssignOp * assignmentStatement6 = buildPlusAssignOp (
@@ -548,8 +550,9 @@ CPPCUDAHostSubroutine::createReductionDeclarations ()
 {
   using namespace SageBuilder;
   using namespace SageInterface;
-  using namespace OP2::VariableNames;
-  using namespace CommonVariableNames;
+  using namespace OP2VariableNames;
+  using namespace LoopVariableNames;
+  using namespace ReductionVariableNames;
   using boost::lexical_cast;
   using std::string;
 

@@ -1,16 +1,16 @@
 #include <FortranOpenMPModuleDeclarations.h>
 #include <FortranParallelLoop.h>
 #include <ScopedVariableDeclarations.h>
-#include <CommonNamespaces.h>
+#include <CompilerGeneratedNames.h>
 #include <Debug.h>
 #include <rose.h>
 
 void
 FortranOpenMPModuleDeclarations::createOpDatDeclarations ()
 {
-  using SageBuilder::buildVariableDeclaration;
-  using SageBuilder::buildPointerType;
-  using SageInterface::appendStatement;
+  using namespace SageBuilder;
+  using namespace SageInterface;
+  using namespace OP2VariableNames;
   using std::string;
 
   Debug::getInstance ()->debugMessage (
@@ -21,7 +21,7 @@ FortranOpenMPModuleDeclarations::createOpDatDeclarations ()
   {
     if (parallelLoop->isDuplicateOpDat (i) == false)
     {
-      string const & variableName = OP2::VariableNames::getOpDatGlobalName (i);
+      string const & variableName = getOpDatGlobalName (i);
 
       SgVariableDeclaration * variableDeclaration = buildVariableDeclaration (
           variableName, buildPointerType (parallelLoop->getOpDatType (i)),

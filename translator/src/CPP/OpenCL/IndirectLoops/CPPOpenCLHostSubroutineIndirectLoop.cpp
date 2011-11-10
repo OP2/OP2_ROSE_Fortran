@@ -2,7 +2,7 @@
 #include <CPPPlan.h>
 #include <CPPParallelLoop.h>
 #include <RoseStatementsAndExpressionsBuilder.h>
-#include <CommonNamespaces.h>
+#include <CompilerGeneratedNames.h>
 #include <RoseHelper.h>
 #include <Debug.h>
 

@@ -1,7 +1,8 @@
 #include <FortranHostSubroutine.h>
 #include <FortranStatementsAndExpressionsBuilder.h>
 #include <FortranTypesBuilder.h>
-#include <CommonNamespaces.h>
+#include <OP2Definitions.h>
+#include <CompilerGeneratedNames.h>
 #include <Debug.h>
 #include <FortranParallelLoop.h>
 #include <boost/algorithm/string/predicate.hpp>
@@ -12,6 +13,8 @@ FortranHostSubroutine::createFormalParameterDeclarations ()
 {
   using namespace SageBuilder;
   using namespace SageInterface;
+  using namespace OP2;
+  using namespace OP2VariableNames;
   using boost::iequals;
   using std::vector;
   using std::string;
@@ -27,8 +30,7 @@ FortranHostSubroutine::createFormalParameterDeclarations ()
    * ======================================================
    */
 
-  string const & kernelVariableName =
-      OP2::VariableNames::getUserSubroutineName ();
+  string const & kernelVariableName = getUserSubroutineName ();
 
   variableDeclarations->add (
       kernelVariableName,
@@ -43,13 +45,13 @@ FortranHostSubroutine::createFormalParameterDeclarations ()
    * ======================================================
    */
 
-  string const & opSetVariableName = OP2::VariableNames::getOpSetName ();
+  string const & opSetVariableName = getOpSetName ();
 
   variableDeclarations->add (
       opSetVariableName,
       FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
           opSetVariableName, FortranTypesBuilder::buildClassDeclaration (
-              OP2::OP_SET, subroutineScope)->get_type (), subroutineScope,
+              OP_SET, subroutineScope)->get_type (), subroutineScope,
           formalParameters, 1, INTENT_IN));
 
   /*
@@ -61,7 +63,7 @@ FortranHostSubroutine::createFormalParameterDeclarations ()
 
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
-    string const & opDatvariableName = OP2::VariableNames::getOpDatName (i);
+    string const & opDatvariableName = getOpDatName (i);
 
     variableDeclarations->add (
         opDatvariableName,
@@ -70,8 +72,7 @@ FortranHostSubroutine::createFormalParameterDeclarations ()
                 OP2::OP_DAT, subroutineScope)->get_type (), subroutineScope,
             formalParameters, 1, INTENT_IN));
 
-    string const & indirectionVariableName =
-        OP2::VariableNames::getOpIndirectionName (i);
+    string const & indirectionVariableName = getOpIndirectionName (i);
 
     variableDeclarations->add (
         indirectionVariableName,
@@ -80,7 +81,7 @@ FortranHostSubroutine::createFormalParameterDeclarations ()
             FortranTypesBuilder::getFourByteInteger (), subroutineScope,
             formalParameters, 1, INTENT_IN));
 
-    string const & opMapVariableName = OP2::VariableNames::getOpMapName (i);
+    string const & opMapVariableName = getOpMapName (i);
 
     variableDeclarations->add (
         opMapVariableName,
@@ -89,7 +90,7 @@ FortranHostSubroutine::createFormalParameterDeclarations ()
                 OP2::OP_MAP, subroutineScope)->get_type (), subroutineScope,
             formalParameters, 1, INTENT_IN));
 
-    string const & accessVariableName = OP2::VariableNames::getOpAccessName (i);
+    string const & accessVariableName = getOpAccessName (i);
 
     variableDeclarations->add (
         accessVariableName,

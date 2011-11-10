@@ -1,6 +1,5 @@
 #include <FortranStatementsAndExpressionsBuilder.h>
 #include <FortranTypesBuilder.h>
-#include <CommonNamespaces.h>
 #include <RoseHelper.h>
 #include <Exceptions.h>
 

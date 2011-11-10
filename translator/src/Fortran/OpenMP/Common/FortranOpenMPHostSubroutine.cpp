@@ -4,7 +4,7 @@
 #include <FortranOpenMPModuleDeclarations.h>
 #include <FortranStatementsAndExpressionsBuilder.h>
 #include <FortranTypesBuilder.h>
-#include <CommonNamespaces.h>
+#include <CompilerGeneratedNames.h>
 #include <OpenMP.h>
 
 void
@@ -12,6 +12,9 @@ FortranOpenMPHostSubroutine::createReductionEpilogueStatements ()
 {
   using namespace SageBuilder;
   using namespace SageInterface;
+  using namespace OP2VariableNames;
+  using namespace ReductionVariableNames;
+  using namespace LoopVariableNames;
 
   Debug::getInstance ()->debugMessage (
       "Creating reduction epilogue statements", Debug::FUNCTION_LEVEL,
@@ -31,8 +34,8 @@ FortranOpenMPHostSubroutine::createReductionEpilogueStatements ()
         && parallelLoop->isReductionRequired (i))
     {
       SgAssignOp * innerLoopInitializationExpression = buildAssignOp (
-          variableDeclarations->getReference (
-              CommonVariableNames::getIterationCounterVariableName(2)), buildIntVal (0));
+          variableDeclarations->getReference (getIterationCounterVariableName (
+              2)), buildIntVal (0));
 
       SgSubtractOp * innerLoopUpperBoundExpression = buildSubtractOp (
           buildIntVal (parallelLoop->getOpDatDimension (i)), buildIntVal (1));
@@ -40,29 +43,29 @@ FortranOpenMPHostSubroutine::createReductionEpilogueStatements ()
       SgBasicBlock * innerLoopBody = buildBasicBlock ();
 
       SgMultiplyOp * multiplyExpression1 = buildMultiplyOp (
-          variableDeclarations->getReference (
-              CommonVariableNames::getIterationCounterVariableName(1)), buildIntVal (64));
+          variableDeclarations->getReference (getIterationCounterVariableName (
+              1)), buildIntVal (64));
 
       SgAddOp * addExpression1 = buildAddOp (
-          variableDeclarations->getReference (
-              CommonVariableNames::getIterationCounterVariableName(2)), multiplyExpression1);
+          variableDeclarations->getReference (getIterationCounterVariableName (
+              2)), multiplyExpression1);
 
       SgPntrArrRefExp * arrayIndexExpression1 = buildPntrArrRefExp (
-          variableDeclarations->getReference (
-              OP2::VariableNames::getOpDatLocalName (i)), addExpression1);
+          variableDeclarations->getReference (getOpDatLocalName (i)),
+          addExpression1);
 
       SgAddOp * addExpression2 = buildAddOp (buildIntVal (
           parallelLoop->getOpDatDimension (i)),
-          variableDeclarations->getReference (
-              CommonVariableNames::getIterationCounterVariableName(2)));
+          variableDeclarations->getReference (getIterationCounterVariableName (
+              2)));
 
       SgPntrArrRefExp * arrayIndexExpression2 = buildPntrArrRefExp (
           moduleDeclarations->getGlobalOpDatDeclaration (i), addExpression2);
 
       SgAddOp * addExpression3 = buildAddOp (buildIntVal (
           parallelLoop->getOpDatDimension (i)),
-          variableDeclarations->getReference (
-              CommonVariableNames::getIterationCounterVariableName(2)));
+          variableDeclarations->getReference (getIterationCounterVariableName (
+              2)));
 
       SgPntrArrRefExp * arrayIndexExpression3 = buildPntrArrRefExp (
           moduleDeclarations->getGlobalOpDatDeclaration (i), addExpression3);
@@ -89,8 +92,8 @@ FortranOpenMPHostSubroutine::createReductionEpilogueStatements ()
    */
 
   SgAssignOp * outerLoopInitializationExpression = buildAssignOp (
-      variableDeclarations->getReference (
-          CommonVariableNames::getIterationCounterVariableName(1)), buildIntVal (0));
+      variableDeclarations->getReference (getIterationCounterVariableName (1)),
+      buildIntVal (0));
 
   SgSubtractOp * outerLoopUpperBoundExpression = buildSubtractOp (
       variableDeclarations->getReference (OpenMP::numberOfThreads),
@@ -109,6 +112,9 @@ FortranOpenMPHostSubroutine::createReductionPrologueStatements ()
 {
   using namespace SageBuilder;
   using namespace SageInterface;
+  using namespace OP2VariableNames;
+  using namespace ReductionVariableNames;
+  using namespace LoopVariableNames;
 
   Debug::getInstance ()->debugMessage (
       "Creating reduction prologue statements", Debug::FUNCTION_LEVEL,
@@ -128,8 +134,8 @@ FortranOpenMPHostSubroutine::createReductionPrologueStatements ()
         && parallelLoop->isReductionRequired (i))
     {
       SgAssignOp * innerLoopInitializationExpression = buildAssignOp (
-          variableDeclarations->getReference (
-              CommonVariableNames::getIterationCounterVariableName(2)), buildIntVal (0));
+          variableDeclarations->getReference (getIterationCounterVariableName (
+              2)), buildIntVal (0));
 
       SgSubtractOp * innerLoopUpperBoundExpression = buildSubtractOp (
           buildIntVal (parallelLoop->getOpDatDimension (i)), buildIntVal (1));
@@ -137,15 +143,15 @@ FortranOpenMPHostSubroutine::createReductionPrologueStatements ()
       SgBasicBlock * innerLoopBody = buildBasicBlock ();
 
       SgMultiplyOp * multiplyExpression = buildMultiplyOp (
-          variableDeclarations->getReference (
-              CommonVariableNames::getIterationCounterVariableName(1)), buildIntVal (64));
+          variableDeclarations->getReference (getIterationCounterVariableName (
+              1)), buildIntVal (64));
 
       SgAddOp * addExpression = buildAddOp (variableDeclarations->getReference (
-          CommonVariableNames::getIterationCounterVariableName(2)), multiplyExpression);
+          getIterationCounterVariableName (2)), multiplyExpression);
 
       SgPntrArrRefExp * arrayIndexExpression = buildPntrArrRefExp (
-          variableDeclarations->getReference (
-              OP2::VariableNames::getOpDatLocalName (i)), addExpression);
+          variableDeclarations->getReference (getOpDatLocalName (i)),
+          addExpression);
 
       SgExprStatement * assignmentStatement = buildAssignStatement (
           arrayIndexExpression, buildIntVal (0));
@@ -168,8 +174,8 @@ FortranOpenMPHostSubroutine::createReductionPrologueStatements ()
    */
 
   SgAssignOp * outerLoopInitializationExpression = buildAssignOp (
-      variableDeclarations->getReference (
-          CommonVariableNames::getIterationCounterVariableName(1)), buildIntVal (0));
+      variableDeclarations->getReference (getIterationCounterVariableName (1)),
+      buildIntVal (0));
 
   SgSubtractOp * outerLoopUpperBoundExpression = buildSubtractOp (
       variableDeclarations->getReference (OpenMP::numberOfThreads),
@@ -187,20 +193,22 @@ void
 FortranOpenMPHostSubroutine::createReductionDeclarations ()
 {
   using namespace SageBuilder;
+  using namespace OP2VariableNames;
+  using namespace LoopVariableNames;
   using std::string;
 
   Debug::getInstance ()->debugMessage (
       "Creating reduction local variable declarations", Debug::FUNCTION_LEVEL,
       __FILE__, __LINE__);
 
-  variableDeclarations->add (CommonVariableNames::getIterationCounterVariableName(1),
+  variableDeclarations->add (getIterationCounterVariableName (1),
       FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
-          CommonVariableNames::getIterationCounterVariableName (1),
+          getIterationCounterVariableName (1),
           FortranTypesBuilder::getFourByteInteger (), subroutineScope));
 
-  variableDeclarations->add (CommonVariableNames::getIterationCounterVariableName(2),
+  variableDeclarations->add (getIterationCounterVariableName (2),
       FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
-          CommonVariableNames::getIterationCounterVariableName(2),
+          getIterationCounterVariableName (2),
           FortranTypesBuilder::getFourByteInteger (), subroutineScope));
 
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
@@ -208,7 +216,7 @@ FortranOpenMPHostSubroutine::createReductionDeclarations ()
     if (parallelLoop->isDuplicateOpDat (i) == false
         && parallelLoop->isReductionRequired (i))
     {
-      string const & variableName = OP2::VariableNames::getOpDatLocalName (i);
+      string const & variableName = getOpDatLocalName (i);
 
       SgMultiplyOp * multiplyExpression = buildMultiplyOp (buildIntVal (64),
           buildIntVal (64));

@@ -5,7 +5,8 @@
 #include <FortranStatementsAndExpressionsBuilder.h>
 #include <RoseStatementsAndExpressionsBuilder.h>
 #include <RoseHelper.h>
-#include <CommonNamespaces.h>
+#include <CompilerGeneratedNames.h>
+#include <OP2Definitions.h>
 #include <Debug.h>
 #include <Exceptions.h>
 #include <CUDA.h>
@@ -14,6 +15,9 @@ SgStatement *
 FortranCUDAHostSubroutineDirectLoop::createKernelFunctionCallStatement ()
 {
   using namespace SageBuilder;
+  using namespace OP2VariableNames;
+  using namespace ReductionVariableNames;
+  using namespace OP2::RunTimeVariableNames;
 
   Debug::getInstance ()->debugMessage (
       "Creating statement to call CUDA kernel", Debug::FUNCTION_LEVEL,
@@ -22,10 +26,10 @@ FortranCUDAHostSubroutineDirectLoop::createKernelFunctionCallStatement ()
   SgExprListExp * actualParameters = buildExprListExp ();
 
   actualParameters->append_expression (variableDeclarations->getReference (
-      OP2::VariableNames::opDatDimensions));
+      opDatDimensions));
 
   actualParameters->append_expression (variableDeclarations->getReference (
-      OP2::VariableNames::opDatCardinalities));
+      opDatCardinalities));
 
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
@@ -34,44 +38,40 @@ FortranCUDAHostSubroutineDirectLoop::createKernelFunctionCallStatement ()
       if (parallelLoop->isReductionRequired (i))
       {
         actualParameters->append_expression (
-            variableDeclarations->getReference (
-                OP2::VariableNames::getReductionArrayDeviceName (i)));
+            variableDeclarations->getReference (getReductionArrayDeviceName (i)));
       }
       else if (parallelLoop->isDirect (i))
       {
         actualParameters->append_expression (
-            variableDeclarations->getReference (
-                OP2::VariableNames::getOpDatDeviceName (i)));
+            variableDeclarations->getReference (getOpDatDeviceName (i)));
       }
       else if (parallelLoop->isRead (i))
       {
         if (parallelLoop->isArray (i))
         {
           actualParameters->append_expression (
-              variableDeclarations->getReference (
-                  OP2::VariableNames::getOpDatDeviceName (i)));
+              variableDeclarations->getReference (getOpDatDeviceName (i)));
         }
         else
         {
           actualParameters->append_expression (
-              variableDeclarations->getReference (
-                  OP2::VariableNames::getOpDatHostName (i)));
+              variableDeclarations->getReference (getOpDatHostName (i)));
         }
       }
     }
   }
 
   SgExpression * dotExpression = buildDotExp (
-      variableDeclarations->getReference (OP2::VariableNames::getOpSetName ()),
-      buildOpaqueVarRefExp (OP2::VariableNames::size, subroutineScope));
+      variableDeclarations->getReference (getOpSetName ()),
+      buildOpaqueVarRefExp (size, subroutineScope));
 
   actualParameters->append_expression (dotExpression);
 
   actualParameters->append_expression (variableDeclarations->getReference (
-      OP2::VariableNames::warpSize));
+      warpSize));
 
   actualParameters->append_expression (variableDeclarations->getReference (
-      OP2::VariableNames::sharedMemoryOffset));
+      sharedMemoryOffset));
 
   SgCudaKernelExecConfig * kernelConfiguration = new SgCudaKernelExecConfig (
       RoseHelper::getFileInfo (), variableDeclarations->getReference (
@@ -96,6 +96,8 @@ FortranCUDAHostSubroutineDirectLoop::createCUDAKernelInitialisationStatements ()
 {
   using namespace SageBuilder;
   using namespace SageInterface;
+  using namespace OP2VariableNames;
+  using namespace OP2::Macros;
   using boost::lexical_cast;
   using std::string;
   using std::max;
@@ -125,10 +127,9 @@ FortranCUDAHostSubroutineDirectLoop::createCUDAKernelInitialisationStatements ()
 
   appendStatement (assignmentStatement2, subroutineScope);
 
-  SgExprStatement * assignmentStatement3 =
-      buildAssignStatement (variableDeclarations->getReference (
-          OP2::VariableNames::warpSize), buildOpaqueVarRefExp (
-          OP2::VariableNames::warpSizeMacro, subroutineScope));
+  SgExprStatement * assignmentStatement3 = buildAssignStatement (
+      variableDeclarations->getReference (warpSize), buildOpaqueVarRefExp (
+          warpSizeMacro, subroutineScope));
 
   appendStatement (assignmentStatement3, subroutineScope);
 
@@ -203,14 +204,13 @@ FortranCUDAHostSubroutineDirectLoop::createCUDAKernelInitialisationStatements ()
    * ======================================================
    */
 
-  SgMultiplyOp * multiplyExpression5 =
-      buildMultiplyOp (variableDeclarations->getReference (
-          CUDA::sharedMemorySize), buildOpaqueVarRefExp (
-          OP2::VariableNames::warpSizeMacro, subroutineScope));
+  SgMultiplyOp * multiplyExpression5 = buildMultiplyOp (
+      variableDeclarations->getReference (CUDA::sharedMemorySize),
+      buildOpaqueVarRefExp (warpSizeMacro, subroutineScope));
 
   SgExprStatement * assignmentStatement5 = buildAssignStatement (
-      variableDeclarations->getReference (
-          OP2::VariableNames::sharedMemoryOffset), multiplyExpression5);
+      variableDeclarations->getReference (sharedMemoryOffset),
+      multiplyExpression5);
 
   appendStatement (assignmentStatement5, subroutineScope);
 
@@ -228,19 +228,21 @@ FortranCUDAHostSubroutineDirectLoop::createCUDAKernelInitialisationStatements ()
 void
 FortranCUDAHostSubroutineDirectLoop::createCUDAKernelActualParameterDeclarations ()
 {
+  using namespace OP2VariableNames;
+
   Debug::getInstance ()->debugMessage (
       "Creating CUDA configuration parameters", Debug::FUNCTION_LEVEL,
       __FILE__, __LINE__);
 
-  variableDeclarations->add (OP2::VariableNames::sharedMemoryOffset,
+  variableDeclarations->add (sharedMemoryOffset,
       FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
-          OP2::VariableNames::sharedMemoryOffset,
-          FortranTypesBuilder::getFourByteInteger (), subroutineScope));
+          sharedMemoryOffset, FortranTypesBuilder::getFourByteInteger (),
+          subroutineScope));
 
-  variableDeclarations->add (OP2::VariableNames::warpSize,
+  variableDeclarations->add (
+      warpSize,
       FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
-          OP2::VariableNames::warpSize,
-          FortranTypesBuilder::getFourByteInteger (), subroutineScope));
+          warpSize, FortranTypesBuilder::getFourByteInteger (), subroutineScope));
 }
 
 void

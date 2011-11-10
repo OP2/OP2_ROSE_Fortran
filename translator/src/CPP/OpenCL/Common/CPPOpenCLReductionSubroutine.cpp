@@ -2,7 +2,7 @@
 #include <Reduction.h>
 #include <RoseStatementsAndExpressionsBuilder.h>
 #include <Debug.h>
-#include <CommonNamespaces.h>
+#include <CompilerGeneratedNames.h>
 #include <OpenCL.h>
 
 void
