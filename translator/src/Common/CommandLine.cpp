@@ -7,7 +7,6 @@
 #include <boost/filesystem.hpp>
 #include <Debug.h>
 #include <Globals.h>
-#include <CommonNamespaces.h>
 
 CommandLine * CommandLine::globalsInstance = NULL;
 

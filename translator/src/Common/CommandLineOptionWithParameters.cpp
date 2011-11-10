@@ -1,11 +1,5 @@
 #include <CommandLineOptionWithParameters.h>
 
-/*
- * ======================================================
- * Public functions
- * ======================================================
- */
-
 std::string const &
 CommandLineOptionWithParameters::getParameterName () const
 {

@@ -4,12 +4,6 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
 
-/*
- * ======================================================
- * Public functions
- * ======================================================
- */
-
 std::string const &
 CommandLineOption::getHelpMessage () const
 {
