@@ -1,11 +1,9 @@
 #include <CPPOpenCLKernelSubroutineIndirectLoop.h>
 #include <CPPOpenCLUserSubroutine.h>
 #include <CPPParallelLoop.h>
-#include <CommonNamespaces.h>
 #include <RoseHelper.h>
 #include <RoseStatementsAndExpressionsBuilder.h>
-#include <CommonNamespaces.h>
-#include <Plan.h>
+#include <CompilerGeneratedNames.h>
 #include <Debug.h>
 #include <boost/lexical_cast.hpp>
 
