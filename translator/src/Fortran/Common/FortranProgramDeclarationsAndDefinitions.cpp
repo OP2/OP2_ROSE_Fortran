@@ -1,7 +1,6 @@
 #include <FortranProgramDeclarationsAndDefinitions.h>
 #include <FortranOP2Definitions.h>
 #include <FortranParallelLoop.h>
-#include <CommonNamespaces.h>
 #include <Globals.h>
 #include <Exceptions.h>
 #include <boost/algorithm/string.hpp>

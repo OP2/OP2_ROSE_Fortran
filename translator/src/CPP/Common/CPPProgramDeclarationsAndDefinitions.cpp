@@ -1,7 +1,6 @@
 #include <CPPProgramDeclarationsAndDefinitions.h>
 #include <CPPOP2Definitions.h>
 #include <CPPParallelLoop.h>
-#include <CommonNamespaces.h>
 #include <Exceptions.h>
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
