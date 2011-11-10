@@ -4,14 +4,10 @@
 
 #include <CPPCUDAHostSubroutine.h>
 
-class CPPPlan;
 class CPPCUDAKernelSubroutine;
 
 class CPPCUDAHostSubroutineIndirectLoop: public CPPCUDAHostSubroutine
 {
-  private:
-
-    CPPPlan * cppPlan;
 
   private:
 

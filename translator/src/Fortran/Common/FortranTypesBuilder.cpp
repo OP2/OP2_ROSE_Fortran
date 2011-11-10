@@ -8,10 +8,8 @@
  * ======================================================
  */
 
-SgTypeBool * FortranTypesBuilder::booleanType;
 SgTypeInt * FortranTypesBuilder::twoByteIntegerType;
 SgTypeInt * FortranTypesBuilder::fourByteIntegerType;
-SgTypeInt * FortranTypesBuilder::eightByteIntegerType;
 SgTypeFloat * FortranTypesBuilder::singlePrecisionFloatType;
 SgTypeFloat * FortranTypesBuilder::doublePrecisionFloatType;
 
@@ -60,16 +58,6 @@ FortranTypesBuilder::completeNewDeclaration (
   scope->insert_symbol (classDeclaration->get_name (), classSymbol);
 }
 
-SgTypeBool *
-FortranTypesBuilder::getLogical ()
-{
-  if (booleanType == NULL)
-  {
-    booleanType = new SgTypeBool ();
-  }
-  return booleanType;
-}
-
 SgTypeInt *
 FortranTypesBuilder::getTwoByteInteger ()
 {
@@ -94,19 +82,6 @@ FortranTypesBuilder::getFourByteInteger ()
     fourByteIntegerType->set_type_kind (bytesPerInt);
   }
   return fourByteIntegerType;
-}
-
-SgTypeInt *
-FortranTypesBuilder::getEightByteInteger ()
-{
-  if (eightByteIntegerType == NULL)
-  {
-    eightByteIntegerType = new SgTypeInt ();
-    SgIntVal * bytesPerInt = new SgIntVal (RoseHelper::getFileInfo (), 8);
-    bytesPerInt->set_endOfConstruct (RoseHelper::getFileInfo ());
-    eightByteIntegerType->set_type_kind (bytesPerInt);
-  }
-  return eightByteIntegerType;
 }
 
 SgTypeFloat *

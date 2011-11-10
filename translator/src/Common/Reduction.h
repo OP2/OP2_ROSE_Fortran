@@ -1,9 +1,3 @@
-/*
- * Written by Adam Betts and Carlo Bertolli
- *
- * This class models a reduction
- */
-
 #pragma once
 #ifndef REDUCTION_H
 #define REDUCTION_H

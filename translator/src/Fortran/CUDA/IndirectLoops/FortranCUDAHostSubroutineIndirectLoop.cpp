@@ -3,7 +3,6 @@
 #include <FortranOpDatDimensionsDeclaration.h>
 #include <FortranCUDAModuleDeclarations.h>
 #include <FortranCUDAOpDatCardinalitiesDeclarationIndirectLoop.h>
-#include <FortranPlan.h>
 #include <FortranTypesBuilder.h>
 #include <FortranStatementsAndExpressionsBuilder.h>
 #include <RoseStatementsAndExpressionsBuilder.h>
@@ -591,12 +590,11 @@ FortranCUDAHostSubroutineIndirectLoop::createStatements ()
   using namespace SageInterface;
   using namespace PlanFunctionVariableNames;
 
-  appendStatement (
-      fortranPlan->createPlanFunctionParametersPreparationStatements (),
+  appendStatement (createPlanFunctionParametersPreparationStatements (),
       subroutineScope);
 
   SgFunctionCallExp * planFunctionCallExpression =
-      fortranPlan-> createPlanFunctionCallExpression ();
+      createPlanFunctionCallExpression ();
 
   SgExprStatement * assignmentStatement1 = buildAssignStatement (
       moduleDeclarations->getCPlanReturnDeclaration (),
@@ -606,7 +604,7 @@ FortranCUDAHostSubroutineIndirectLoop::createStatements ()
 
   appendStatement (createTransferOpDatStatements (), subroutineScope);
 
-  if (parallelLoop->isReductionRequired () == true)
+  if (parallelLoop->isReductionRequired ())
   {
     createReductionPrologueStatements ();
   }
@@ -620,11 +618,9 @@ FortranCUDAHostSubroutineIndirectLoop::createStatements ()
 
   appendStatement (callStatement1, subroutineScope);
 
-  appendStatement (fortranPlan->createConvertPositionInPMapsStatements (),
-      subroutineScope);
+  appendStatement (createConvertPositionInPMapsStatements (), subroutineScope);
 
-  appendStatement (
-      fortranPlan->createConvertPlanFunctionParametersStatements (),
+  appendStatement (createConvertPlanFunctionParametersStatements (),
       subroutineScope);
 
   createCardinalitiesInitialisationStatements ();
@@ -671,9 +667,6 @@ FortranCUDAHostSubroutineIndirectLoop::FortranCUDAHostSubroutineIndirectLoop (
   Debug::getInstance ()->debugMessage (
       "CUDA host subroutine creation for indirect loop",
       Debug::CONSTRUCTOR_LEVEL, __FILE__, __LINE__);
-
-  fortranPlan = new FortranPlan (subroutineScope, parallelLoop,
-      variableDeclarations);
 
   createFormalParameterDeclarations ();
 

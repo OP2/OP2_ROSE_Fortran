@@ -1,10 +1,3 @@
-/*
- * Written by Adam Betts and Carlo Bertolli
- *
- * Helper functions to build Fortran types with particular
- * attributes, such as an integer with n bytes
- */
-
 #pragma once
 #ifndef FORTRAN_TYPES_BUILDER_H
 #define FORTRAN_TYPES_BUILDER_H
@@ -41,19 +34,13 @@ class FortranTypesBuilder
 {
   private:
 
-    static SgTypeBool * booleanType;
-
     static SgTypeInt * twoByteIntegerType;
 
     static SgTypeInt * fourByteIntegerType;
 
-    static SgTypeInt * eightByteIntegerType;
-
     static SgTypeFloat * singlePrecisionFloatType;
 
     static SgTypeFloat * doublePrecisionFloatType;
-
-    static std::vector <SgArrayType *> arrays;
 
   private:
 
@@ -83,14 +70,6 @@ class FortranTypesBuilder
 
     /*
      * ======================================================
-     * Returns a Fortran logical.
-     * ======================================================
-     */
-    static SgTypeBool *
-    getLogical ();
-
-    /*
-     * ======================================================
      * Returns a Fortran integer with 2-byte storage.
      * Effectively a 'short'
      * ======================================================
@@ -108,16 +87,6 @@ class FortranTypesBuilder
 
     static SgTypeInt *
     getFourByteInteger ();
-
-    /*
-     * ======================================================
-     * Returns a Fortran integer with 8-byte storage.
-     * Effectively a 'long'
-     * ======================================================
-     */
-
-    static SgTypeInt *
-    getEightByteInteger ();
 
     /*
      * ======================================================

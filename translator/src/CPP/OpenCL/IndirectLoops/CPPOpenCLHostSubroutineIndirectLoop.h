@@ -4,14 +4,10 @@
 
 #include <CPPOpenCLHostSubroutine.h>
 
-class CPPPlan;
 class CPPOpenCLKernelSubroutineIndirectLoop;
 
 class CPPOpenCLHostSubroutineIndirectLoop: public CPPOpenCLHostSubroutine
 {
-  private:
-
-    CPPPlan * plan;
 
   private:
 
