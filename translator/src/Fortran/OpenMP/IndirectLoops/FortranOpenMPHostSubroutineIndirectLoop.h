@@ -3,17 +3,12 @@
 #define FORTRAN_OPENMP_HOST_SUBROUTINE_INDIRECT_LOOP_H
 
 #include <FortranOpenMPHostSubroutine.h>
-#include <FortranPlan.h>
 
-class FortranPlan;
 class FortranOpenMPKernelSubroutine;
 class FortranOpenMPModuleDeclarationsIndirectLoop;
 
 class FortranOpenMPHostSubroutineIndirectLoop: public FortranOpenMPHostSubroutine
 {
-  private:
-
-    FortranPlan * fortranPlan;
 
   private:
 

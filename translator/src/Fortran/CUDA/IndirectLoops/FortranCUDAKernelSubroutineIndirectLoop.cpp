@@ -8,7 +8,6 @@
 #include <FortranStatementsAndExpressionsBuilder.h>
 #include <CompilerGeneratedNames.h>
 #include <RoseHelper.h>
-#include <Plan.h>
 #include <CUDA.h>
 #include <Debug.h>
 #include <boost/lexical_cast.hpp>

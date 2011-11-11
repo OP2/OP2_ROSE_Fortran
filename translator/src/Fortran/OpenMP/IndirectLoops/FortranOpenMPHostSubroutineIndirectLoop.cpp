@@ -349,12 +349,11 @@ FortranOpenMPHostSubroutineIndirectLoop::createStatements ()
 
   initialiseNumberOfThreadsStatements ();
 
-  appendStatement (
-      fortranPlan->createPlanFunctionParametersPreparationStatements (),
+  appendStatement (createPlanFunctionParametersPreparationStatements (),
       subroutineScope);
 
   SgFunctionCallExp * planFunctionCallExpression =
-      fortranPlan->createPlanFunctionCallExpression ();
+      createPlanFunctionCallExpression ();
 
   SgExprStatement * assignmentStatement2 = buildAssignStatement (
       moduleDeclarations->getCPlanReturnDeclaration (),
@@ -364,11 +363,9 @@ FortranOpenMPHostSubroutineIndirectLoop::createStatements ()
 
   appendStatement (createTransferOpDatStatements (), subroutineScope);
 
-  appendStatement (fortranPlan->createConvertPositionInPMapsStatements (),
-      subroutineScope);
+  appendStatement (createConvertPositionInPMapsStatements (), subroutineScope);
 
-  appendStatement (
-      fortranPlan->createConvertPlanFunctionParametersStatements (),
+  appendStatement (createConvertPlanFunctionParametersStatements (),
       subroutineScope);
 
   if (parallelLoop->isReductionRequired ())
@@ -411,9 +408,6 @@ FortranOpenMPHostSubroutineIndirectLoop::FortranOpenMPHostSubroutineIndirectLoop
   Debug::getInstance ()->debugMessage (
       "OpenMP host subroutine creation for indirect loop",
       Debug::CONSTRUCTOR_LEVEL, __FILE__, __LINE__);
-
-  fortranPlan = new FortranPlan (subroutineScope, parallelLoop,
-      variableDeclarations);
 
   createFormalParameterDeclarations ();
 

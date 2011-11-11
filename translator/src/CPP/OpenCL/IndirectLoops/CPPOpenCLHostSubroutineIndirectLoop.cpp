@@ -1,5 +1,4 @@
 #include <CPPOpenCLHostSubroutineIndirectLoop.h>
-#include <CPPPlan.h>
 #include <CPPParallelLoop.h>
 #include <RoseStatementsAndExpressionsBuilder.h>
 #include <CompilerGeneratedNames.h>
@@ -43,8 +42,6 @@ CPPOpenCLHostSubroutineIndirectLoop::CPPOpenCLHostSubroutineIndirectLoop (
   Debug::getInstance ()->debugMessage (
       "Creating OpenCL host subroutine for indirect loop",
       Debug::CONSTRUCTOR_LEVEL, __FILE__, __LINE__);
-
-  plan = new CPPPlan (subroutineScope, parallelLoop, variableDeclarations);
 
   createFormalParameterDeclarations ();
 

@@ -5,7 +5,6 @@
 #include <CompilerGeneratedNames.h>
 #include <RoseHelper.h>
 #include <Debug.h>
-#include <Plan.h>
 #include <OpenMP.h>
 
 SgStatement *
