@@ -52,7 +52,7 @@ CPPOpenMPHostSubroutineDirectLoop::createKernelFunctionCallStatement ()
   return buildExprStatement (functionCallExpression);
 }
 
-SgOmpForStatement *
+void
 CPPOpenMPHostSubroutineDirectLoop::createOpenMPLoopStatements ()
 {
   using namespace SageBuilder;
@@ -64,11 +64,6 @@ CPPOpenMPHostSubroutineDirectLoop::createOpenMPLoopStatements ()
 
   Debug::getInstance ()->debugMessage ("Creating OpenMP for loop statements",
       Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
-
-  SgBasicBlock * block = buildBasicBlock ();
-
-  appendStatementList (
-      createThreadSpecificVariableDeclarations ()->getStatementList (), block);
 
   SgBasicBlock * loopBody = buildBasicBlock ();
 
@@ -146,20 +141,28 @@ CPPOpenMPHostSubroutineDirectLoop::createOpenMPLoopStatements ()
       initialisationExpression, buildExprStatement (upperBoundExpression),
       strideExpression, loopBody);
 
-  appendStatement (forLoopStatement, block);
+  appendStatement (forLoopStatement, subroutineScope);
 
   /*
    * ======================================================
-   * OpenMP for statement
+   * The OpenMP directive
    * ======================================================
    */
 
-  SgOmpForStatement * openmpForStatement = new SgOmpForStatement (
-      RoseHelper::getFileInfo (), block);
+  std::vector <SgVarRefExp *> privateVariableReferences;
 
-  block->set_parent (openmpForStatement);
+  privateVariableReferences.push_back (variableDeclarations->getReference (
+      OpenMP::sliceStart));
 
-  return openmpForStatement;
+  privateVariableReferences.push_back (variableDeclarations->getReference (
+      OpenMP::sliceEnd));
+
+  privateVariableReferences.push_back (variableDeclarations->getReference (
+      getIterationCounterVariableName (1)));
+
+  addTextForUnparser (forLoopStatement,
+      OpenMP::getParallelForDirectiveString () + OpenMP::getPrivateClause (
+          privateVariableReferences), AstUnparseAttribute::e_before);
 }
 
 void
@@ -182,7 +185,7 @@ CPPOpenMPHostSubroutineDirectLoop::createStatements ()
     createReductionPrologueStatements ();
   }
 
-  appendStatement (createOpenMPLoopStatements (), subroutineScope);
+  createOpenMPLoopStatements ();
 
   if (parallelLoop->isReductionRequired ())
   {

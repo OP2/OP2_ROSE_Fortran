@@ -3,9 +3,11 @@
 #define OPEN_MP_H
 
 #include <string>
+#include <vector>
 
 class SgFunctionCallExp;
 class SgScopeStatement;
+class SgVarRefExp;
 
 namespace OpenMP
 {
@@ -24,8 +26,14 @@ namespace OpenMP
   std::string const
   getEndIfDirectiveString ();
 
+  std::string const
+  getParallelForDirectiveString ();
+
   SgFunctionCallExp *
   createGetMaximumNumberOfThreadsCallStatement (SgScopeStatement * scope);
+
+  std::string const
+  getPrivateClause (std::vector <SgVarRefExp *> privateVariableReferences);
 }
 
 #endif

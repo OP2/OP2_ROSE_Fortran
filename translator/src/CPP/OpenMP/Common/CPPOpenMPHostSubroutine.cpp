@@ -8,36 +8,6 @@
 #include <Exceptions.h>
 
 SgBasicBlock *
-CPPOpenMPHostSubroutine::createThreadSpecificVariableDeclarations ()
-{
-  using namespace SageBuilder;
-  using namespace SageInterface;
-  using namespace OpenMP;
-  using namespace LoopVariableNames;
-  using std::string;
-
-  Debug::getInstance ()->debugMessage (
-      "Creating declaration needed per thread", Debug::FUNCTION_LEVEL,
-      __FILE__, __LINE__);
-
-  SgBasicBlock * block = buildBasicBlock ();
-
-  variableDeclarations->add (getIterationCounterVariableName (1),
-      RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
-          getIterationCounterVariableName (1), buildIntType (), block));
-
-  variableDeclarations->add (sliceStart,
-      RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
-          sliceStart, buildIntType (), block));
-
-  variableDeclarations->add (sliceEnd,
-      RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (sliceEnd,
-          buildIntType (), block));
-
-  return block;
-}
-
-SgBasicBlock *
 CPPOpenMPHostSubroutine::createInitialiseNumberOfThreadsStatements ()
 {
   using namespace SageBuilder;
@@ -310,13 +280,16 @@ CPPOpenMPHostSubroutine::createReductionDeclarations ()
     {
       std::string const & variableName = getReductionArrayHostName (i);
 
-      SgMultiplyOp * arrayIndexExpression = buildMultiplyOp (buildIntVal (64),
+      SgMultiplyOp * mulitplyExpression = buildMultiplyOp (buildIntVal (64),
           buildIntVal (64));
+
+      SgAddOp * addExpression =
+          buildAddOp (buildIntVal (1), mulitplyExpression);
 
       variableDeclarations->add (variableName,
           RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
               variableName, buildArrayType (parallelLoop->getOpDatBaseType (i),
-                  arrayIndexExpression), subroutineScope));
+                  addExpression), subroutineScope));
     }
   }
 }
@@ -332,6 +305,19 @@ CPPOpenMPHostSubroutine::createOpenMPLocalVariableDeclarations ()
   Debug::getInstance ()->debugMessage (
       "Creating OpenMP local variable declarations", Debug::FUNCTION_LEVEL,
       __FILE__, __LINE__);
+
+  variableDeclarations->add (
+      getIterationCounterVariableName (1),
+      RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
+          getIterationCounterVariableName (1), buildIntType (), subroutineScope));
+
+  variableDeclarations->add (sliceStart,
+      RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
+          sliceStart, buildIntType (), subroutineScope));
+
+  variableDeclarations->add (sliceEnd,
+      RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (sliceEnd,
+          buildIntType (), subroutineScope));
 
   variableDeclarations->add (numberOfThreads,
       RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
