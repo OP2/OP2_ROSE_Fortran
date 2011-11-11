@@ -52,7 +52,7 @@ CPPOpenMPHostSubroutineDirectLoop::createKernelFunctionCallStatement ()
   return buildExprStatement (functionCallExpression);
 }
 
-SgOmpParallelStatement *
+SgOmpForStatement *
 CPPOpenMPHostSubroutineDirectLoop::createOpenMPLoopStatements ()
 {
   using namespace SageBuilder;
@@ -154,7 +154,7 @@ CPPOpenMPHostSubroutineDirectLoop::createOpenMPLoopStatements ()
    * ======================================================
    */
 
-  SgOmpParallelStatement * openmpForStatement = new SgOmpParallelStatement (
+  SgOmpForStatement * openmpForStatement = new SgOmpForStatement (
       RoseHelper::getFileInfo (), block);
 
   block->set_parent (openmpForStatement);
