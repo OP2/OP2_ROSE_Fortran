@@ -97,8 +97,8 @@ CPPHostSubroutine::createFormalParameterDeclarations ()
   SgVariableDeclaration
       * kernelVariableNameDeclaration =
           RoseStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
-              kernelVariableName, buildPointerType (buildCharType ()),
-              subroutineScope, formalParameters);
+              kernelVariableName, buildPointerType (buildConstType (
+                  buildCharType ())), subroutineScope, formalParameters);
 
   variableDeclarations->add (kernelVariableName, kernelVariableNameDeclaration);
 
