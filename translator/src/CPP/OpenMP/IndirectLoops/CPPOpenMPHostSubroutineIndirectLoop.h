@@ -4,8 +4,6 @@
 
 #include <CPPOpenMPHostSubroutine.h>
 
-class CPPUserSubroutine;
-
 class CPPOpenMPHostSubroutineIndirectLoop: public CPPOpenMPHostSubroutine
 {
   private:
@@ -34,7 +32,8 @@ class CPPOpenMPHostSubroutineIndirectLoop: public CPPOpenMPHostSubroutine
   public:
 
     CPPOpenMPHostSubroutineIndirectLoop (SgScopeStatement * moduleScope,
-        CPPUserSubroutine * calleeSubroutine, CPPParallelLoop * parallelLoop);
+        CPPOpenMPKernelSubroutine * calleeSubroutine,
+        CPPParallelLoop * parallelLoop);
 };
 
 #endif

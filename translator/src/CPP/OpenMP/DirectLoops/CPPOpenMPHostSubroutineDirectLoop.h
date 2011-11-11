@@ -4,17 +4,12 @@
 
 #include <CPPOpenMPHostSubroutine.h>
 
-class CPPUserSubroutine;
-
 class CPPOpenMPHostSubroutineDirectLoop: public CPPOpenMPHostSubroutine
 {
   private:
 
     virtual SgStatement *
     createKernelFunctionCallStatement ();
-
-    SgForStatement *
-    createThreadLoopStatements ();
 
     SgOmpParallelStatement *
     createOpenMPLoopStatements ();
@@ -28,7 +23,8 @@ class CPPOpenMPHostSubroutineDirectLoop: public CPPOpenMPHostSubroutine
   public:
 
     CPPOpenMPHostSubroutineDirectLoop (SgScopeStatement * moduleScope,
-        CPPUserSubroutine * calleeSubroutine, CPPParallelLoop * parallelLoop);
+        CPPOpenMPKernelSubroutine * calleeSubroutine,
+        CPPParallelLoop * parallelLoop);
 };
 
 #endif

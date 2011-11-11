@@ -155,7 +155,8 @@ CPPOpenMPHostSubroutineIndirectLoop::createLocalVariableDeclarations ()
 }
 
 CPPOpenMPHostSubroutineIndirectLoop::CPPOpenMPHostSubroutineIndirectLoop (
-    SgScopeStatement * moduleScope, CPPUserSubroutine * calleeSubroutine,
+    SgScopeStatement * moduleScope,
+    CPPOpenMPKernelSubroutine * calleeSubroutine,
     CPPParallelLoop * parallelLoop) :
   CPPOpenMPHostSubroutine (moduleScope, calleeSubroutine, parallelLoop)
 {

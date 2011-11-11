@@ -3,7 +3,9 @@
 #include <CPPUserSubroutine.h>
 #include <CPPProgramDeclarationsAndDefinitions.h>
 #include <CPPOpenMPHostSubroutineDirectLoop.h>
+#include <CPPOpenMPKernelSubroutineDirectLoop.h>
 #include <CPPOpenMPHostSubroutineIndirectLoop.h>
+#include <CPPOpenMPKernelSubroutineIndirectLoop.h>
 #include <RoseStatementsAndExpressionsBuilder.h>
 
 void
@@ -33,17 +35,25 @@ CPPOpenMPSubroutinesGeneration::createSubroutines ()
     CPPUserSubroutine * userSubroutine = new CPPUserSubroutine (moduleScope,
         parallelLoop, declarations);
 
+    CPPOpenMPKernelSubroutine * kernelSubroutine;
+
     if (parallelLoop->isDirectLoop ())
     {
+      kernelSubroutine = new CPPOpenMPKernelSubroutineDirectLoop (moduleScope,
+          userSubroutine, parallelLoop);
+
       hostSubroutines[userSubroutineName]
-          = new CPPOpenMPHostSubroutineDirectLoop (moduleScope, userSubroutine,
-              parallelLoop);
+          = new CPPOpenMPHostSubroutineDirectLoop (moduleScope,
+              kernelSubroutine, parallelLoop);
     }
     else
     {
+      kernelSubroutine = new CPPOpenMPKernelSubroutineIndirectLoop (
+          moduleScope, userSubroutine, parallelLoop);
+
       hostSubroutines[userSubroutineName]
           = new CPPOpenMPHostSubroutineIndirectLoop (moduleScope,
-              userSubroutine, parallelLoop);
+              kernelSubroutine, parallelLoop);
     }
   }
 }

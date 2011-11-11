@@ -1,5 +1,5 @@
 #include <CPPOpenMPHostSubroutineDirectLoop.h>
-#include <CPPUserSubroutine.h>
+#include <CPPOpenMPKernelSubroutine.h>
 #include <RoseStatementsAndExpressionsBuilder.h>
 #include <RoseHelper.h>
 #include <CompilerGeneratedNames.h>
@@ -11,9 +11,10 @@ CPPOpenMPHostSubroutineDirectLoop::createKernelFunctionCallStatement ()
 {
   using namespace SageBuilder;
   using namespace OP2VariableNames;
+  using namespace ReductionVariableNames;
   using namespace LoopVariableNames;
 
-  Debug::getInstance ()->debugMessage ("Creating call to user kernel",
+  Debug::getInstance ()->debugMessage ("Creating call to OpenMP kernel",
       Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
   SgExprListExp * actualParameters = buildExprListExp ();
@@ -22,19 +23,19 @@ CPPOpenMPHostSubroutineDirectLoop::createKernelFunctionCallStatement ()
   {
     if (parallelLoop->isDirect (i))
     {
-      SgMultiplyOp * multiplyExpression = buildMultiplyOp (
-          variableDeclarations->getReference (getIterationCounterVariableName (
-              2)), buildIntVal (parallelLoop->getOpDatDimension (i)));
-
-      SgAddOp * addExpression = buildAddOp (variableDeclarations->getReference (
-          getOpDatLocalName (i)), multiplyExpression);
-
-      actualParameters->append_expression (addExpression);
+      actualParameters->append_expression (variableDeclarations->getReference (
+          getOpDatLocalName (i)));
     }
     else if (parallelLoop->isReductionRequired (i))
     {
-      actualParameters->append_expression (variableDeclarations->getReference (
-          getOpDatLocalName (i)));
+      SgMultiplyOp * multiplyExpression = buildMultiplyOp (
+          variableDeclarations->getReference (getIterationCounterVariableName (
+              1)), buildIntVal (64));
+
+      SgAddOp * addExpression = buildAddOp (variableDeclarations->getReference (
+          getReductionArrayHostName (i)), multiplyExpression);
+
+      actualParameters->append_expression (addExpression);
     }
   }
 
@@ -43,53 +44,6 @@ CPPOpenMPHostSubroutineDirectLoop::createKernelFunctionCallStatement ()
       actualParameters, subroutineScope);
 
   return buildExprStatement (functionCallExpression);
-}
-
-SgForStatement *
-CPPOpenMPHostSubroutineDirectLoop::createThreadLoopStatements ()
-{
-  using namespace SageBuilder;
-  using namespace SageInterface;
-  using namespace OP2VariableNames;
-  using namespace LoopVariableNames;
-  using namespace OpenMP;
-
-  Debug::getInstance ()->debugMessage (
-      "Creating for loop statements for thread slice", Debug::FUNCTION_LEVEL,
-      __FILE__, __LINE__);
-
-  SgBasicBlock * loopBody = buildBasicBlock ();
-
-  /*
-   * ======================================================
-   * New statement
-   * ======================================================
-   */
-
-  appendStatement (createKernelFunctionCallStatement (), loopBody);
-
-  /*
-   * ======================================================
-   * For loop statement
-   * ======================================================
-   */
-
-  SgExprStatement * initialisationExpression = buildAssignStatement (
-      variableDeclarations->getReference (getIterationCounterVariableName (2)),
-      variableDeclarations->getReference (sliceStart));
-
-  SgLessThanOp * upperBoundExpression = buildLessThanOp (
-      variableDeclarations->getReference (getIterationCounterVariableName (2)),
-      variableDeclarations->getReference (sliceEnd));
-
-  SgPlusPlusOp * strideExpression = buildPlusPlusOp (
-      variableDeclarations->getReference (getIterationCounterVariableName (2)));
-
-  SgForStatement * forLoopStatement = buildForStatement (
-      initialisationExpression, buildExprStatement (upperBoundExpression),
-      strideExpression, loopBody);
-
-  return forLoopStatement;
 }
 
 SgOmpParallelStatement *
@@ -163,7 +117,7 @@ CPPOpenMPHostSubroutineDirectLoop::createOpenMPLoopStatements ()
    * ======================================================
    */
 
-  appendStatement (createThreadLoopStatements (), loopBody);
+  appendStatement (createKernelFunctionCallStatement (), loopBody);
 
   /*
    * ======================================================
@@ -217,11 +171,17 @@ CPPOpenMPHostSubroutineDirectLoop::createStatements ()
   appendStatementList (createOpDatTypeCastStatements ()->getStatementList (),
       subroutineScope);
 
-  createReductionPrologueStatements ();
+  if (parallelLoop->isReductionRequired ())
+  {
+    createReductionPrologueStatements ();
+  }
 
   appendStatement (createOpenMPLoopStatements (), subroutineScope);
 
-  createReductionEpilogueStatements ();
+  if (parallelLoop->isReductionRequired ())
+  {
+    createReductionEpilogueStatements ();
+  }
 }
 
 void
@@ -234,11 +194,15 @@ CPPOpenMPHostSubroutineDirectLoop::createLocalVariableDeclarations ()
 
   createOpDatTypeCastVariableDeclarations ();
 
-  createReductionDeclarations ();
+  if (parallelLoop->isReductionRequired ())
+  {
+    createReductionDeclarations ();
+  }
 }
 
 CPPOpenMPHostSubroutineDirectLoop::CPPOpenMPHostSubroutineDirectLoop (
-    SgScopeStatement * moduleScope, CPPUserSubroutine * calleeSubroutine,
+    SgScopeStatement * moduleScope,
+    CPPOpenMPKernelSubroutine * calleeSubroutine,
     CPPParallelLoop * parallelLoop) :
   CPPOpenMPHostSubroutine (moduleScope, calleeSubroutine, parallelLoop)
 {

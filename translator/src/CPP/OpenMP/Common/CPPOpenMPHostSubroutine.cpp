@@ -1,6 +1,6 @@
 #include <CPPOpenMPHostSubroutine.h>
 #include <CPPParallelLoop.h>
-#include <CPPUserSubroutine.h>
+#include <CPPOpenMPKernelSubroutine.h>
 #include <RoseStatementsAndExpressionsBuilder.h>
 #include <CompilerGeneratedNames.h>
 #include <OP2Definitions.h>
@@ -25,10 +25,6 @@ CPPOpenMPHostSubroutine::createThreadSpecificVariableDeclarations ()
   variableDeclarations->add (getIterationCounterVariableName (1),
       RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
           getIterationCounterVariableName (1), buildIntType (), block));
-
-  variableDeclarations->add (getIterationCounterVariableName (2),
-      RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
-          getIterationCounterVariableName (2), buildIntType (), block));
 
   variableDeclarations->add (sliceStart,
       RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
@@ -162,7 +158,7 @@ CPPOpenMPHostSubroutine::createReductionEpilogueStatements ()
 
       SgMultiplyOp * arrayIndexExpression = buildMultiplyOp (
           variableDeclarations->getReference (getIterationCounterVariableName (
-              3)), buildIntVal (64));
+              2)), buildIntVal (64));
 
       SgPntrArrRefExp * arrayExpression = buildPntrArrRefExp (
           variableDeclarations->getReference (getReductionArrayHostName (i)),
@@ -182,15 +178,15 @@ CPPOpenMPHostSubroutine::createReductionEpilogueStatements ()
 
       SgExprStatement * initialisationExpression = buildAssignStatement (
           variableDeclarations->getReference (getIterationCounterVariableName (
-              3)), buildIntVal (0));
+              2)), buildIntVal (0));
 
       SgLessThanOp * upperBoundExpression = buildLessThanOp (
           variableDeclarations->getReference (getIterationCounterVariableName (
-              3)), variableDeclarations->getReference (numberOfThreads));
+              2)), variableDeclarations->getReference (numberOfThreads));
 
       SgPlusPlusOp * strideExpression = buildPlusPlusOp (
           variableDeclarations->getReference (getIterationCounterVariableName (
-              3)));
+              2)));
 
       SgForStatement * forLoopStatement = buildForStatement (
           initialisationExpression, buildExprStatement (upperBoundExpression),
@@ -229,7 +225,7 @@ CPPOpenMPHostSubroutine::createReductionPrologueStatements ()
 
       SgMultiplyOp * arrayIndexExpression = buildMultiplyOp (
           variableDeclarations->getReference (getIterationCounterVariableName (
-              3)), buildIntVal (64));
+              2)), buildIntVal (64));
 
       SgPntrArrRefExp * arrayExpression = buildPntrArrRefExp (
           variableDeclarations->getReference (getReductionArrayHostName (i)),
@@ -268,15 +264,15 @@ CPPOpenMPHostSubroutine::createReductionPrologueStatements ()
 
       SgExprStatement * initialisationExpression = buildAssignStatement (
           variableDeclarations->getReference (getIterationCounterVariableName (
-              3)), buildIntVal (0));
+              2)), buildIntVal (0));
 
       SgLessThanOp * upperBoundExpression = buildLessThanOp (
           variableDeclarations->getReference (getIterationCounterVariableName (
-              3)), variableDeclarations->getReference (numberOfThreads));
+              2)), variableDeclarations->getReference (numberOfThreads));
 
       SgPlusPlusOp * strideExpression = buildPlusPlusOp (
           variableDeclarations->getReference (getIterationCounterVariableName (
-              3)));
+              2)));
 
       SgForStatement * forLoopStatement = buildForStatement (
           initialisationExpression, buildExprStatement (upperBoundExpression),
@@ -301,9 +297,9 @@ CPPOpenMPHostSubroutine::createReductionDeclarations ()
       Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
   variableDeclarations->add (
-      getIterationCounterVariableName (3),
+      getIterationCounterVariableName (2),
       RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
-          getIterationCounterVariableName (3), buildIntType (), subroutineScope));
+          getIterationCounterVariableName (2), buildIntType (), subroutineScope));
 
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
@@ -340,7 +336,8 @@ CPPOpenMPHostSubroutine::createOpenMPLocalVariableDeclarations ()
 }
 
 CPPOpenMPHostSubroutine::CPPOpenMPHostSubroutine (
-    SgScopeStatement * moduleScope, CPPUserSubroutine * calleeSubroutine,
+    SgScopeStatement * moduleScope,
+    CPPOpenMPKernelSubroutine * calleeSubroutine,
     CPPParallelLoop * parallelLoop) :
   CPPHostSubroutine (moduleScope, calleeSubroutine, parallelLoop)
 {

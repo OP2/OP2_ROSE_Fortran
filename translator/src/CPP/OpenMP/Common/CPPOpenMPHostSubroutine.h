@@ -4,7 +4,7 @@
 
 #include <CPPHostSubroutine.h>
 
-class CPPUserSubroutine;
+class CPPOpenMPKernelSubroutine;
 
 class CPPOpenMPHostSubroutine: public CPPHostSubroutine
 {
@@ -35,7 +35,8 @@ class CPPOpenMPHostSubroutine: public CPPHostSubroutine
     createOpenMPLocalVariableDeclarations ();
 
     CPPOpenMPHostSubroutine (SgScopeStatement * moduleScope,
-        CPPUserSubroutine * calleeSubroutine, CPPParallelLoop * parallelLoop);
+        CPPOpenMPKernelSubroutine * calleeSubroutine,
+        CPPParallelLoop * parallelLoop);
 };
 
 #endif
