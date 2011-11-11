@@ -148,13 +148,15 @@ CPPOpenMPKernelSubroutineDirectLoop::createFormalParameterDeclarations ()
 
   createOpDatFormalParameterDeclarations ();
 
-  variableDeclarations->add (sliceStart,
-      RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
-          sliceStart, buildIntType (), subroutineScope));
+  variableDeclarations->add (
+      sliceStart,
+      RoseStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
+          sliceStart, buildIntType (), subroutineScope, formalParameters));
 
-  variableDeclarations->add (sliceEnd,
-      RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (sliceEnd,
-          buildIntType (), subroutineScope));
+  variableDeclarations->add (
+      sliceEnd,
+      RoseStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
+          sliceEnd, buildIntType (), subroutineScope, formalParameters));
 }
 
 CPPOpenMPKernelSubroutineDirectLoop::CPPOpenMPKernelSubroutineDirectLoop (
