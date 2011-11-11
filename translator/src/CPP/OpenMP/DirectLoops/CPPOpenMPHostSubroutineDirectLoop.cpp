@@ -39,6 +39,12 @@ CPPOpenMPHostSubroutineDirectLoop::createKernelFunctionCallStatement ()
     }
   }
 
+  actualParameters->append_expression (variableDeclarations->getReference (
+      OpenMP::sliceStart));
+
+  actualParameters->append_expression (variableDeclarations->getReference (
+      OpenMP::sliceEnd));
+
   SgFunctionCallExp * functionCallExpression = buildFunctionCallExp (
       calleeSubroutine->getSubroutineName (), buildVoidType (),
       actualParameters, subroutineScope);
