@@ -11,6 +11,9 @@ class CPPOpenMPHostSubroutine: public CPPHostSubroutine
   protected:
 
     SgBasicBlock *
+    createThreadSpecificVariableDeclarations ();
+
+    SgBasicBlock *
     createInitialiseNumberOfThreadsStatements ();
 
     SgBasicBlock *

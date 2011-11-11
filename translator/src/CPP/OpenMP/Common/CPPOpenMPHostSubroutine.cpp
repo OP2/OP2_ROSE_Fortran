@@ -8,6 +8,40 @@
 #include <Exceptions.h>
 
 SgBasicBlock *
+CPPOpenMPHostSubroutine::createThreadSpecificVariableDeclarations ()
+{
+  using namespace SageBuilder;
+  using namespace SageInterface;
+  using namespace OpenMP;
+  using namespace LoopVariableNames;
+  using std::string;
+
+  Debug::getInstance ()->debugMessage (
+      "Creating declaration needed per thread", Debug::FUNCTION_LEVEL,
+      __FILE__, __LINE__);
+
+  SgBasicBlock * block = buildBasicBlock ();
+
+  variableDeclarations->add (getIterationCounterVariableName (1),
+      RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
+          getIterationCounterVariableName (1), buildIntType (), block));
+
+  variableDeclarations->add (getIterationCounterVariableName (2),
+      RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
+          getIterationCounterVariableName (2), buildIntType (), block));
+
+  variableDeclarations->add (sliceStart,
+      RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
+          sliceStart, buildIntType (), block));
+
+  variableDeclarations->add (sliceEnd,
+      RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (sliceEnd,
+          buildIntType (), block));
+
+  return block;
+}
+
+SgBasicBlock *
 CPPOpenMPHostSubroutine::createInitialiseNumberOfThreadsStatements ()
 {
   using namespace SageBuilder;
@@ -128,7 +162,7 @@ CPPOpenMPHostSubroutine::createReductionEpilogueStatements ()
 
       SgMultiplyOp * arrayIndexExpression = buildMultiplyOp (
           variableDeclarations->getReference (getIterationCounterVariableName (
-              1)), buildIntVal (64));
+              3)), buildIntVal (64));
 
       SgPntrArrRefExp * arrayExpression = buildPntrArrRefExp (
           variableDeclarations->getReference (getReductionArrayHostName (i)),
@@ -148,15 +182,15 @@ CPPOpenMPHostSubroutine::createReductionEpilogueStatements ()
 
       SgExprStatement * initialisationExpression = buildAssignStatement (
           variableDeclarations->getReference (getIterationCounterVariableName (
-              1)), buildIntVal (0));
+              3)), buildIntVal (0));
 
       SgLessThanOp * upperBoundExpression = buildLessThanOp (
           variableDeclarations->getReference (getIterationCounterVariableName (
-              1)), variableDeclarations->getReference (numberOfThreads));
+              3)), variableDeclarations->getReference (numberOfThreads));
 
       SgPlusPlusOp * strideExpression = buildPlusPlusOp (
           variableDeclarations->getReference (getIterationCounterVariableName (
-              1)));
+              3)));
 
       SgForStatement * forLoopStatement = buildForStatement (
           initialisationExpression, buildExprStatement (upperBoundExpression),
@@ -195,7 +229,7 @@ CPPOpenMPHostSubroutine::createReductionPrologueStatements ()
 
       SgMultiplyOp * arrayIndexExpression = buildMultiplyOp (
           variableDeclarations->getReference (getIterationCounterVariableName (
-              1)), buildIntVal (64));
+              3)), buildIntVal (64));
 
       SgPntrArrRefExp * arrayExpression = buildPntrArrRefExp (
           variableDeclarations->getReference (getReductionArrayHostName (i)),
@@ -234,15 +268,15 @@ CPPOpenMPHostSubroutine::createReductionPrologueStatements ()
 
       SgExprStatement * initialisationExpression = buildAssignStatement (
           variableDeclarations->getReference (getIterationCounterVariableName (
-              1)), buildIntVal (0));
+              3)), buildIntVal (0));
 
       SgLessThanOp * upperBoundExpression = buildLessThanOp (
           variableDeclarations->getReference (getIterationCounterVariableName (
-              1)), variableDeclarations->getReference (numberOfThreads));
+              3)), variableDeclarations->getReference (numberOfThreads));
 
       SgPlusPlusOp * strideExpression = buildPlusPlusOp (
           variableDeclarations->getReference (getIterationCounterVariableName (
-              1)));
+              3)));
 
       SgForStatement * forLoopStatement = buildForStatement (
           initialisationExpression, buildExprStatement (upperBoundExpression),
@@ -259,11 +293,17 @@ CPPOpenMPHostSubroutine::createReductionDeclarations ()
   using namespace SageBuilder;
   using namespace OP2VariableNames;
   using namespace ReductionVariableNames;
+  using namespace LoopVariableNames;
   using std::string;
 
   Debug::getInstance ()->debugMessage (
-      "Creating local variable declarations to enable OP_DATs to be type cast into their correct types",
+      "Creating local variable declarations needed for reductions",
       Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+
+  variableDeclarations->add (
+      getIterationCounterVariableName (3),
+      RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
+          getIterationCounterVariableName (3), buildIntType (), subroutineScope));
 
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
@@ -297,25 +337,6 @@ CPPOpenMPHostSubroutine::createOpenMPLocalVariableDeclarations ()
   variableDeclarations->add (numberOfThreads,
       RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
           numberOfThreads, buildIntType (), subroutineScope));
-
-  variableDeclarations->add (
-      getIterationCounterVariableName (1),
-      RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
-          getIterationCounterVariableName (1), buildIntType (), subroutineScope));
-
-  variableDeclarations->add (
-      getIterationCounterVariableName (2),
-      RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
-          getIterationCounterVariableName (2), buildIntType (), subroutineScope));
-
-  variableDeclarations->add (sliceStart,
-      RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
-          sliceStart, buildIntType (), subroutineScope));
-
-  variableDeclarations->add (sliceEnd,
-      RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (sliceEnd,
-          buildIntType (), subroutineScope));
-
 }
 
 CPPOpenMPHostSubroutine::CPPOpenMPHostSubroutine (

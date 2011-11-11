@@ -1,7 +1,6 @@
 #include <CPPHostSubroutine.h>
 #include <CPPParallelLoop.h>
 #include <RoseStatementsAndExpressionsBuilder.h>
-#include <FortranTypesBuilder.h>
 #include <CompilerGeneratedNames.h>
 #include <OP2Definitions.h>
 
@@ -114,8 +113,8 @@ CPPHostSubroutine::createFormalParameterDeclarations ()
   variableDeclarations->add (
       opSetVariableName,
       RoseStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
-          opSetVariableName, buildClassDeclaration (OP2::OP_SET,
-              subroutineScope)->get_type (), subroutineScope, formalParameters));
+          opSetVariableName, buildOpaqueType (OP2::OP_SET, subroutineScope),
+          subroutineScope, formalParameters));
 
   /*
    * ======================================================
@@ -131,9 +130,8 @@ CPPHostSubroutine::createFormalParameterDeclarations ()
     variableDeclarations->add (
         opDatvariableName,
         RoseStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
-            opDatvariableName, FortranTypesBuilder::buildClassDeclaration (
-                OP2::OP_ARG, subroutineScope)->get_type (), subroutineScope,
-            formalParameters));
+            opDatvariableName, buildOpaqueType (OP2::OP_ARG, subroutineScope),
+            subroutineScope, formalParameters));
   }
 }
 

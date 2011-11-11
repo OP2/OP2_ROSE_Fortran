@@ -88,9 +88,9 @@ CPPOpenMPHostSubroutineIndirectLoop::createPlanFunctionDeclarations ()
       Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
   variableDeclarations->add (
-      getIterationCounterVariableName (3),
+      getIterationCounterVariableName (4),
       RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
-          getIterationCounterVariableName (3), buildIntType (), subroutineScope));
+          getIterationCounterVariableName (4), buildIntType (), subroutineScope));
 
   variableDeclarations->add (blockID,
       RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (blockID,
@@ -116,12 +116,9 @@ CPPOpenMPHostSubroutineIndirectLoop::createPlanFunctionDeclarations ()
       RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
           partitionSize, buildIntType (), subroutineScope));
 
-  variableDeclarations->add (
-      args,
-      RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
-          args,
-          buildArrayType (
-              buildClassDeclaration (OP2::OP_ARG, subroutineScope)->get_type (),
+  variableDeclarations->add (args,
+      RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (args,
+          buildArrayType (buildOpaqueType (OP2::OP_ARG, subroutineScope),
               buildIntVal (parallelLoop->getNumberOfOpDatArgumentGroups ())),
           subroutineScope));
 
@@ -133,8 +130,8 @@ CPPOpenMPHostSubroutineIndirectLoop::createPlanFunctionDeclarations ()
 
   variableDeclarations->add (planRet,
       RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (planRet,
-          buildPointerType (buildClassDeclaration (OP2::OP_PLAN,
-              subroutineScope)->get_type ()), subroutineScope));
+          buildPointerType (buildOpaqueType (OP2::OP_PLAN, subroutineScope)),
+          subroutineScope));
 }
 
 void

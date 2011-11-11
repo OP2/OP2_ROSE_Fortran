@@ -330,7 +330,7 @@ CPPCUDAReductionSubroutine::createSecondRoundOfReduceStatements ()
       variableDeclarations->getReference (getIterationCounterVariableName (1)),
       buildIntVal (0));
 
-  SgRshiftOp * strideExpression = buildRshiftOp (
+  SgRshiftAssignOp * strideExpression = buildRshiftAssignOp (
       variableDeclarations->getReference (getIterationCounterVariableName (1)),
       buildIntVal (1));
 
@@ -534,7 +534,7 @@ CPPCUDAReductionSubroutine::createFirstRoundOfReduceStatements ()
       variableDeclarations->getReference (getIterationCounterVariableName (1)),
       CUDA::getWarpSizeReference (subroutineScope));
 
-  SgRshiftOp * strideExpression = buildRshiftOp (
+  SgRshiftAssignOp * strideExpression = buildRshiftAssignOp (
       variableDeclarations->getReference (getIterationCounterVariableName (1)),
       buildIntVal (1));
 
@@ -647,7 +647,7 @@ CPPCUDAReductionSubroutine::createLocalVariableDeclarations ()
 
   SgVariableDeclaration * sharedVariableDeclaration =
       RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
-          sharedVariableName, buildPointerType (reduction->getBaseType ()),
+          sharedVariableName, buildArrayType (reduction->getBaseType ()),
           subroutineScope);
 
   sharedVariableDeclaration->get_declarationModifier ().get_storageModifier ().setCudaDynamicShared ();

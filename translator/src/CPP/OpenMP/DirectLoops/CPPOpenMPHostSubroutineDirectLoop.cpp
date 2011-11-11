@@ -105,6 +105,11 @@ CPPOpenMPHostSubroutineDirectLoop::createOpenMPLoopStatements ()
   Debug::getInstance ()->debugMessage ("Creating OpenMP for loop statements",
       Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
+  SgBasicBlock * block = buildBasicBlock ();
+
+  appendStatementList (
+      createThreadSpecificVariableDeclarations ()->getStatementList (), block);
+
   SgBasicBlock * loopBody = buildBasicBlock ();
 
   /*
@@ -181,6 +186,8 @@ CPPOpenMPHostSubroutineDirectLoop::createOpenMPLoopStatements ()
       initialisationExpression, buildExprStatement (upperBoundExpression),
       strideExpression, loopBody);
 
+  appendStatement (forLoopStatement, block);
+
   /*
    * ======================================================
    * OpenMP for statement
@@ -188,9 +195,9 @@ CPPOpenMPHostSubroutineDirectLoop::createOpenMPLoopStatements ()
    */
 
   SgOmpParallelStatement * openmpForStatement = new SgOmpParallelStatement (
-      RoseHelper::getFileInfo (), forLoopStatement);
+      RoseHelper::getFileInfo (), block);
 
-  forLoopStatement->set_parent (openmpForStatement);
+  block->set_parent (openmpForStatement);
 
   return openmpForStatement;
 }
