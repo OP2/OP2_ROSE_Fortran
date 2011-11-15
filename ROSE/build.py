@@ -98,7 +98,10 @@ def getBoostPath ():
         debug.verboseMessage("Linux OS assumed")
         osLibraryPathString = "LD_LIBRARY_PATH"
 
-    LD_LIBRARY_PATH = string.split(os.environ.get(osLibraryPathString), os.pathsep)
+    osLibraryPath = os.environ.get(osLibraryPathString)
+    if not osLibraryPath:
+        debug.exitMessage("%s has not been set in your environment. Set it to contain your Boost libraries." % osLibraryPathString)
+    LD_LIBRARY_PATH = string.split(osLibraryPath, os.pathsep)
     boostDirectory  = None
     boostPattern    = re.compile("libboost")
 
