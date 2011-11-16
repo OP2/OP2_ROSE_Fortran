@@ -13,7 +13,19 @@ However, in general, to install a fresh ROSE revision from a tarball, run
 Note that ROSE requires particular versions of tools and certain environment variables
 to be set. See the ROSE documentataion for more assistance. The 'build.py' does some 
 environment verification. It is imperative that, when building ROSE from scratch, the 
-script can find the Boost libraries in your LD_LIBRARY_PATH (required by ROSE). 
+script can find the Boost libraries and libjvm in your LD_LIBRARY_PATH (required by ROSE). 
+
+================================== Prerequisites ================================
+This is an incomplete list of prerequisites for building ROSE and how to set them
+up on ubuntu:
+* gcc (Note: only gcc 4.1 to 4.4 are currently supported!)
+* SUN javac
+  sudo apt-get install sun-java6-jdk
+  sudo update-alternatives --config javac # select SUN
+* Boost libraries (Note: only Boost 1.40 or 1.42 are currently supported!):
+  sudo apt-get install libboost-system-dev
+  sudo apt-get install libboost-filesystem-dev
+  sudo apt-get install libboost-date-time-dev
 
 ================================== Updating ROSE ================================
 Sometimes it is necessary to modify some of the ROSE source files in order to add

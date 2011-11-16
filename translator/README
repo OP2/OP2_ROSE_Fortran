@@ -2,7 +2,8 @@
 
 This step now depends on the SCons build system.
 
-The following 2 environment variables must be set for compilation to succeed:
+The following 2 environment variables must be set for compilation to
+succeed:
 1) ROSE_HOME: the base directory of your ROSE installation.
 2) BOOST_HOME: the base directory of your Boost libraries.
 
@@ -11,6 +12,14 @@ To compile, run:
 
 To clean, run:
 'scons -c'
+
+========== Running the source-to-source translator  ==========
+
+SCons installs the translator binary 'translator' in the 'bin'
+directory.
+
+The LD_LIBRARY_PATH needs to be set to contain the ROSE (librose.so)
+and JVM libraries (libjvm.so) to be able to run the translator.
 
 ========== Adding to the Git repository ==========
 
