@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import os
 import sys	
 
@@ -223,7 +225,7 @@ def runTests ():
 
 	testReportLines  = []
 	for line in open(testsFile, 'r'):
-		tokens     = line.split(' ')
+		tokens     = line.strip().split(' ')
 		testNum    = tokens[0].strip()
 		testResult = int(tokens[1].strip())	
 		run        = False
