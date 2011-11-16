@@ -228,7 +228,7 @@ def configureROSE (roseDirectory, boostDirectory):
 
     proc.communicate()
     if proc.returncode != 0:
-        debug.exitMessage("The configure command '%s' failed" % (configureString))
+        debug.exitMessage("The configure command '%s' failed\nCheck '%s/config.log' for errors." % (configureString, roseDirectoryBuild))
 
 def makeROSE (roseDirectory):
     roseDirectoryBuild, roseDirectoryInstall = getRoseDirectories(roseDirectory)
