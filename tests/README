@@ -3,8 +3,8 @@ To add a test case, create a C++/Fortran file Test<number>.[cpp|F95]. For exampl
 or Test128.cpp.
 
 Normally you will also need to add a user kernel subroutine declaration and definition
-to the file 'UserKernels.cpp' (for C++) or 'UserKernels.F95' (for Fortran) found in the directory 
-where you are running tests. This depends on the OP_PAR_LOOP (e.g. types of OP_DAT passed), so 
+to the file 'UserKernels.cpp' (for C++) or 'UserKernels.F95' (for Fortran) found in the directory
+where you are running tests. This depends on the OP_PAR_LOOP (e.g. types of OP_DAT passed), so
 check before adding a new one because there might be one already that is sufficient.
 
 ============================== Where to put the new test case ============================
@@ -12,32 +12,32 @@ Several directories are organised below each supported language, intended to gro
 test cases. There are directories for OP_GBLs, directly accessed OP_DATs and indirectly
 accessed OP_DATs.
 
-Therefore, find the appropriate directory then add a line to the file 'testsToRun' with the 
+Therefore, find the appropriate directory then add a line to the file 'testsToRun' with the
 following syntax:
-TestCase ReturnValue (TestFile)+ 
-where TestCase is a positive integer
-      ReturnValue is the expected integer returned by the source-to-source translator
-      TestFile is a C++/Fortran file associated with this test case
+  TestCase ReturnValue (TestFile)+
+  where TestCase is a positive integer
+        ReturnValue is the expected integer returned by the source-to-source translator
+        TestFile is a C++/Fortran file associated with this test case
 
 The return value is needed to guard against false positives; that is, where a test case is
 intended to fail (return a non-zero integer) but in fact fails elsewhere.
 
 For instance:
-12 5 Test12.F95 
+12 5 Test12.F95
 says that test number 12 associated with Fortran file Test12.F95 is expected to fail (since
-the return value is not zero) and, more specifically, the source-to-source translator should 
-return error value 5. 
+the return value is not zero) and, more specifically, the source-to-source translator should
+return error value 5.
 
 10 0 Test1.cpp
-says that test number 10 associated with C++ file Test1.cpp is expected to pass (since the 
+says that test number 10 associated with C++ file Test1.cpp is expected to pass (since the
 return value is zero).
 
 ===================================== Running the tests ===================================
-To run the tests contained in a particular directory, use the 'runTests.py' Python script found 
+To run the tests contained in a particular directory, use the 'runTests.py' Python script found
 in the 'OP2_ROSE_Fortran/scripts' directory. This script expects a file 'testsToRun' describing
 test cases as given above to be present in the current directory. The environment variable
 'IMPERIAL_TRANSLATOR_HOME' needs to be set to point to the root of the OP2 translator repository.
-Use '-h' to display its options. 
+Use '-h' to display its options.
 
 However, in general, to run all tests, use:
 'python runTests.py --run'
@@ -45,7 +45,7 @@ However, in general, to run all tests, use:
 To run specific test cases 12 and 128, for example, use:
 'python runTests.py --run -T 12 -T 128'
 Note that the test case number corresponds to the positive integer supplied in the 'testsToRun'
-file and NOT the suffix of the fileName. 
+file and NOT the suffix of the fileName.
 
 To clean out temporary files, use:
 'python runTests.py --clean'
@@ -54,4 +54,16 @@ When a test case should pass, the translator should generate a bunch of C++/Fort
 are output into a sub-directory 'generatedFiles' such that each generated file has a prefix
 Test<number> and a suffix File<number>.[cpp|F95]. A makefile, intended for the backend compiler, is
 also generated for each test case (provided the test case should pass).
+
+============================ Using Makefile.py =======================
+To run 'Makefile.py' from the 'scripts' directory:
+
+1) Set an environment variable IMPERIAL_TRANSLATOR_HOME to point to
+   the root of the OP2 translator repository.
+
+2) Set up a configuration file called 'config' which lives in the same
+   directory as the source files. This file lists the source file names
+   ordered according to the dependencies. The syntax is:
+     files=FILE+
+     where FILE is the name of a source file.
 
