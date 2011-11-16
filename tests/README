@@ -34,7 +34,9 @@ return value is zero).
 
 ===================================== Running the tests ===================================
 To run the tests contained in a particular directory, use the 'runTests.py' Python script found 
-in the 'OP2_ROSE_Fortran/scripts' directory.
+in the 'OP2_ROSE_Fortran/scripts' directory. This script expects a file 'testsToRun' describing
+test cases as given above to be present in the current directory. The environment variable
+'IMPERIAL_TRANSLATOR_HOME' needs to be set to point to the root of the OP2 translator repository.
 Use '-h' to display its options. 
 
 However, in general, to run all tests, use:
