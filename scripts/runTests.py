@@ -185,9 +185,9 @@ def checkEnvironment ():
 	from string import split
 
 	translatorEnvVariable = 'IMPERIAL_TRANSLATOR_HOME'
-	translatorHome        = split(os.environ.get(translatorEnvVariable), os.pathsep)[0]
+	translatorHome        = split(os.environ.get(translatorEnvVariable) or '', os.pathsep)[0]
 
-	if translatorHome is None:
+	if not translatorHome:
 		debug.exitMessage("Unable to find the root directory of the source-to-source translator. Please set environment variable '%s'" % translatorEnvVariable)
 	elif not os.path.isdir(translatorHome):
 		debug.exitMessage("The source-to-source translator path '%s' is not a directory" % (translatorHome))
