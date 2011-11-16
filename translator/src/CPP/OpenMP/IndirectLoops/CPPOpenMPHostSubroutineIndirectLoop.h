@@ -11,11 +11,11 @@ class CPPOpenMPHostSubroutineIndirectLoop: public CPPOpenMPHostSubroutine
     virtual SgStatement *
     createKernelFunctionCallStatement ();
 
-    SgForStatement *
-    createThreadLoopStatements ();
+    void
+    createOpenMPLoopStatements (SgScopeStatement * scope);
 
-    SgOmpParallelStatement *
-    createOpenMPLoopStatements ();
+    SgBasicBlock *
+    createPlanFunctionExecutionStatements ();
 
     virtual void
     createStatements ();

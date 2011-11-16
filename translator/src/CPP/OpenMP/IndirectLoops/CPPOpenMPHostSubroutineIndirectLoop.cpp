@@ -9,16 +9,284 @@
 SgStatement *
 CPPOpenMPHostSubroutineIndirectLoop::createKernelFunctionCallStatement ()
 {
+  using namespace SageBuilder;
+  using namespace OP2VariableNames;
+  using namespace PlanFunctionVariableNames;
+  using namespace OP2::RunTimeVariableNames;
+  using namespace ReductionVariableNames;
+  using namespace LoopVariableNames;
+
+  Debug::getInstance ()->debugMessage (
+      "Creating statement to call OpenMP kernel", Debug::FUNCTION_LEVEL,
+      __FILE__, __LINE__);
+
+  SgExprListExp * actualParameters = buildExprListExp ();
+
+  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
+  {
+    if (parallelLoop->isDuplicateOpDat (i) == false)
+    {
+      if (parallelLoop->isReductionRequired (i))
+      {
+        SgMultiplyOp * multiplyExpression = buildMultiplyOp (
+            variableDeclarations->getReference (
+                getIterationCounterVariableName (1)), buildIntVal (64));
+
+        SgAddOp * addExpression = buildAddOp (
+            variableDeclarations->getReference (getReductionArrayHostName (i)),
+            multiplyExpression);
+
+        actualParameters->append_expression (addExpression);
+      }
+      else
+      {
+        actualParameters->append_expression (
+            variableDeclarations->getReference (getOpDatLocalName (i)));
+      }
+    }
+  }
+
+  unsigned int arrayIndex = 0;
+
+  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
+  {
+    if (parallelLoop->isDuplicateOpDat (i) == false)
+    {
+      if (parallelLoop->isIndirect (i))
+      {
+        SgVariableDeclaration * variableDeclaration = buildVariableDeclaration (
+            ind_maps, buildArrayType (buildIntType ()), NULL, subroutineScope);
+
+        SgPntrArrRefExp * arrayExpression = buildPntrArrRefExp (buildVarRefExp (
+            variableDeclaration), buildIntVal (arrayIndex));
+
+        SgArrowExp * arrowExpression = buildArrowExp (
+            variableDeclarations->getReference (planRet), arrayExpression);
+
+        actualParameters->append_expression (arrowExpression);
+
+        arrayIndex++;
+      }
+    }
+  }
+
+  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
+  {
+    if (parallelLoop->isIndirect (i))
+    {
+      SgVariableDeclaration * variableDeclaration = buildVariableDeclaration (
+          loc_maps, buildArrayType (buildIntType ()), NULL, subroutineScope);
+
+      SgPntrArrRefExp * arrayExpression = buildPntrArrRefExp (buildVarRefExp (
+          variableDeclaration), buildIntVal (i - 1));
+
+      SgArrowExp * arrowExpression = buildArrowExp (
+          variableDeclarations->getReference (planRet), arrayExpression);
+
+      actualParameters->append_expression (arrowExpression);
+    }
+  }
+
+  actualParameters->append_expression (buildArrowExp (
+      variableDeclarations->getReference (planRet), buildOpaqueVarRefExp (
+          ind_sizes, subroutineScope)));
+
+  actualParameters->append_expression (buildArrowExp (
+      variableDeclarations->getReference (planRet), buildOpaqueVarRefExp (
+          ind_offs, subroutineScope)));
+
+  actualParameters->append_expression (buildArrowExp (
+      variableDeclarations->getReference (planRet), buildOpaqueVarRefExp (
+          blkmap, subroutineScope)));
+
+  actualParameters->append_expression (buildArrowExp (
+      variableDeclarations->getReference (planRet), buildOpaqueVarRefExp (
+          offset, subroutineScope)));
+
+  actualParameters->append_expression (buildArrowExp (
+      variableDeclarations->getReference (planRet), buildOpaqueVarRefExp (
+          nelems, subroutineScope)));
+
+  actualParameters->append_expression (buildArrowExp (
+      variableDeclarations->getReference (planRet), buildOpaqueVarRefExp (
+          thrcol, subroutineScope)));
+
+  actualParameters->append_expression (buildArrowExp (
+      variableDeclarations->getReference (planRet), buildOpaqueVarRefExp (
+          nthrcol, subroutineScope)));
+
+  actualParameters->append_expression (variableDeclarations->getReference (
+      blockOffset));
+
+  actualParameters->append_expression (variableDeclarations->getReference (
+      blockID));
+
+  SgFunctionCallExp * functionCallExpression = buildFunctionCallExp (
+      calleeSubroutine->getSubroutineName (), buildVoidType (),
+      actualParameters, subroutineScope);
+
+  return buildExprStatement (functionCallExpression);
 }
 
-SgForStatement *
-CPPOpenMPHostSubroutineIndirectLoop::createThreadLoopStatements ()
+void
+CPPOpenMPHostSubroutineIndirectLoop::createOpenMPLoopStatements (
+    SgScopeStatement * scope)
 {
+  using namespace SageBuilder;
+  using namespace SageInterface;
+  using namespace OP2VariableNames;
+  using namespace LoopVariableNames;
+  using namespace PlanFunctionVariableNames;
+  using namespace OP2::RunTimeVariableNames;
+  using namespace OpenMP;
+
+  Debug::getInstance ()->debugMessage ("Creating OpenMP for loop statements",
+      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+
+  /*
+   * ======================================================
+   * New statement
+   * ======================================================
+   */
+
+  SgBasicBlock * loopBody = buildBasicBlock ();
+
+  appendStatement (createKernelFunctionCallStatement (), loopBody);
+
+  /*
+   * ======================================================
+   * For loop statement
+   * ======================================================
+   */
+
+  SgExprStatement * initialisationExpression = buildAssignStatement (
+      variableDeclarations->getReference (blockID), buildIntVal (0));
+
+  SgLessThanOp * upperBoundExpression = buildLessThanOp (
+      variableDeclarations->getReference (blockID),
+      variableDeclarations->getReference (nblocks));
+
+  SgPlusPlusOp * strideExpression = buildPlusPlusOp (
+      variableDeclarations->getReference (blockID));
+
+  SgForStatement * forLoopStatement = buildForStatement (
+      initialisationExpression, buildExprStatement (upperBoundExpression),
+      strideExpression, loopBody);
+
+  appendStatement (forLoopStatement, scope);
+
+  /*
+   * ======================================================
+   * The OpenMP directive
+   * ======================================================
+   */
+
+  std::vector <SgVarRefExp *> privateVariableReferences;
+
+  privateVariableReferences.push_back (variableDeclarations->getReference (
+      blockID));
+
+  addTextForUnparser (forLoopStatement,
+      OpenMP::getParallelForDirectiveString () + OpenMP::getPrivateClause (
+          privateVariableReferences), AstUnparseAttribute::e_before);
 }
 
-SgOmpParallelStatement *
-CPPOpenMPHostSubroutineIndirectLoop::createOpenMPLoopStatements ()
+SgBasicBlock *
+CPPOpenMPHostSubroutineIndirectLoop::createPlanFunctionExecutionStatements ()
 {
+  using namespace SageBuilder;
+  using namespace SageInterface;
+  using namespace OP2VariableNames;
+  using namespace LoopVariableNames;
+  using namespace PlanFunctionVariableNames;
+  using namespace OP2::RunTimeVariableNames;
+  using namespace OpenMP;
+
+  Debug::getInstance ()->debugMessage (
+      "Creating plan function execution loop statements",
+      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+
+  SgBasicBlock * block = buildBasicBlock ();
+
+  SgExprStatement * assignmentStatement1 = buildAssignStatement (
+      variableDeclarations->getReference (blockOffset), buildIntVal (0));
+
+  appendStatement (assignmentStatement1, block);
+
+  /*
+   * ======================================================
+   * For loop body
+   * ======================================================
+   */
+
+  SgBasicBlock * loopBody = buildBasicBlock ();
+
+  /*
+   * ======================================================
+   * New statement
+   * ======================================================
+   */
+
+  SgPntrArrRefExp * arrayExpression2 = buildPntrArrRefExp (
+      buildOpaqueVarRefExp (ncolblk, subroutineScope),
+      variableDeclarations->getReference (getIterationCounterVariableName (1)));
+
+  SgArrowExp * arrowExpression2 = buildArrowExp (
+      variableDeclarations->getReference (planRet), arrayExpression2);
+
+  SgExprStatement * assignmentStatement2 = buildAssignStatement (
+      variableDeclarations->getReference (nblocks), arrowExpression2);
+
+  appendStatement (assignmentStatement2, loopBody);
+
+  /*
+   * ======================================================
+   * New statement
+   * ======================================================
+   */
+
+  createOpenMPLoopStatements (loopBody);
+
+  /*
+   * ======================================================
+   * New statement
+   * ======================================================
+   */
+
+  SgExprStatement * assignmentStatement5 = buildExprStatement (
+      buildPlusAssignOp (variableDeclarations->getReference (blockOffset),
+          variableDeclarations->getReference (nblocks)));
+
+  appendStatement (assignmentStatement5, loopBody);
+
+  /*
+   * ======================================================
+   * For loop statement
+   * ======================================================
+   */
+
+  SgExprStatement * initialisationExpression = buildAssignStatement (
+      variableDeclarations->getReference (getIterationCounterVariableName (1)),
+      buildIntVal (0));
+
+  SgArrowExp * arrowExpression = buildArrowExp (
+      variableDeclarations->getReference (planRet), buildOpaqueVarRefExp (
+          ncolors, subroutineScope));
+
+  SgLessThanOp * upperBoundExpression = buildLessThanOp (
+      variableDeclarations->getReference (getIterationCounterVariableName (1)),
+      arrowExpression);
+
+  SgPlusPlusOp * strideExpression = buildPlusPlusOp (
+      variableDeclarations->getReference (getIterationCounterVariableName (1)));
+
+  SgForStatement * forLoopStatement = buildForStatement (
+      initialisationExpression, buildExprStatement (upperBoundExpression),
+      strideExpression, loopBody);
+
+  appendStatement (forLoopStatement, block);
+
+  return block;
 }
 
 void
@@ -40,19 +308,26 @@ CPPOpenMPHostSubroutineIndirectLoop::createStatements ()
   appendStatementList (createOpDatTypeCastStatements ()->getStatementList (),
       subroutineScope);
 
-  createReductionPrologueStatements ();
+  if (parallelLoop->isReductionRequired ())
+  {
+    createReductionPrologueStatements ();
+  }
 
-  createReductionEpilogueStatements ();
+  appendStatementList (
+      createPlanFunctionExecutionStatements ()->getStatementList (),
+      subroutineScope);
+
+  if (parallelLoop->isReductionRequired ())
+  {
+    createReductionEpilogueStatements ();
+  }
 }
 
 void
 CPPOpenMPHostSubroutineIndirectLoop::createIncrementAccessLocalVariableDeclarations ()
 {
   using namespace SageBuilder;
-  using namespace LoopVariableNames;
-  using namespace OP2VariableNames;
-  using boost::lexical_cast;
-  using std::string;
+  using namespace PlanFunctionVariableNames;
 
   Debug::getInstance ()->debugMessage (
       "Creating local variable declarations needed for incremented OP_DATS",
@@ -144,7 +419,10 @@ CPPOpenMPHostSubroutineIndirectLoop::createLocalVariableDeclarations ()
 
   createOpDatTypeCastVariableDeclarations ();
 
-  createReductionDeclarations ();
+  if (parallelLoop->isReductionRequired ())
+  {
+    createReductionDeclarations ();
+  }
 
   createPlanFunctionDeclarations ();
 

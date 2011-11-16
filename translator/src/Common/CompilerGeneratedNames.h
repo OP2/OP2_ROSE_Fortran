@@ -47,7 +47,10 @@ namespace PlanFunctionVariableNames
   std::string const args = "args";
   std::string const argsNumber = "argsNumber";
   std::string const blkmap = "blkmap";
+  std::string const blockID = "blockID";
   std::string const blockOffset = "blockOffset";
+  std::string const colour1 = "colour1";
+  std::string const colour2 = "colour2";
   std::string const cplan = "cplan";
   std::string const idxs = "idxs";
   std::string const inds = "inds";
@@ -60,9 +63,12 @@ namespace PlanFunctionVariableNames
   std::string const nblocks = "nblocks";
   std::string const ncolblk = "ncolblk";
   std::string const ncolors = "ncolors";
+  std::string const nelems = "nelems";
+  std::string const nelems2 = "nelems2";
   std::string const nindirect = "nindirect";
   std::string const nshared = "nshared";
   std::string const nthrcol = "nthrcol";
+  std::string const numberOfColours = "numOfColours";
   std::string const offset = "offset";
   std::string const pblkMap = "pblkMap";
   std::string const pblkMapSize = "pblkMapSize";
@@ -111,15 +117,9 @@ namespace LoopVariableNames
 
 namespace OP2VariableNames
 {
-  std::string const blockID = "blockID";
-  std::string const colour1 = "colour";
-  std::string const colour2 = "colour2";
   std::string const localOffset = "localOffset";
   std::string const moduloResult = "moduloResult";
   std::string const nbytes = "nbytes";
-  std::string const numberOfColours = "numOfColours";
-  std::string const nelems = "nelems";
-  std::string const nelems2 = "nelems2";
   std::string const opDatCardinalities = "opDatCardinalities";
   std::string const opDatDimensions = "opDatDimensions";
   std::string const partitionSize = "partitionSize";

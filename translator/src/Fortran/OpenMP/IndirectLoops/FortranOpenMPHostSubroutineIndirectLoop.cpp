@@ -329,7 +329,7 @@ FortranOpenMPHostSubroutineIndirectLoop::createExecutionPlanDeclarations ()
 void
 FortranOpenMPHostSubroutineIndirectLoop::createOpenMPVariableDeclarations ()
 {
-  using namespace OP2VariableNames;
+  using namespace PlanFunctionVariableNames;
 
   variableDeclarations->add (OpenMP::numberOfThreads,
       FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (

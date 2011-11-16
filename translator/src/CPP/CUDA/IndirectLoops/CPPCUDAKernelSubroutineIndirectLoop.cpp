@@ -228,6 +228,7 @@ CPPCUDAKernelSubroutineIndirectLoop::createStageOutFromLocalMemoryToSharedMemory
   using namespace SageInterface;
   using namespace LoopVariableNames;
   using namespace OP2VariableNames;
+  using namespace PlanFunctionVariableNames;
   using std::string;
 
   Debug::getInstance ()->debugMessage (
@@ -295,8 +296,8 @@ CPPCUDAKernelSubroutineIndirectLoop::createStageOutFromLocalMemoryToSharedMemory
   }
 
   SgEqualityOp * ifGuardExpression = buildEqualityOp (
-      variableDeclarations->getReference (OP2VariableNames::colour2),
-      variableDeclarations->getReference (OP2VariableNames::colour1));
+      variableDeclarations->getReference (colour2),
+      variableDeclarations->getReference (colour1));
 
   SgIfStmt * ifStatement =
       RoseStatementsAndExpressionsBuilder::buildIfStatementWithEmptyElse (
@@ -909,7 +910,6 @@ CPPCUDAKernelSubroutineIndirectLoop::createThreadZeroStatements ()
   using namespace LoopVariableNames;
   using namespace OP2VariableNames;
   using namespace PlanFunctionVariableNames;
-  ;
 
   Debug::getInstance ()->debugMessage ("Creating thread zero statements",
       Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
@@ -1037,6 +1037,7 @@ CPPCUDAKernelSubroutineIndirectLoop::createIncrementAccessLocalVariableDeclarati
   using namespace SageBuilder;
   using namespace LoopVariableNames;
   using namespace OP2VariableNames;
+  using namespace PlanFunctionVariableNames;
   using boost::lexical_cast;
   using std::string;
 
@@ -1080,6 +1081,7 @@ CPPCUDAKernelSubroutineIndirectLoop::createExecutionLocalVariableDeclarations ()
   using namespace SageBuilder;
   using namespace LoopVariableNames;
   using namespace OP2VariableNames;
+  using namespace PlanFunctionVariableNames;
 
   Debug::getInstance ()->debugMessage (
       "Creating local variable declarations needed to execute kernel",
@@ -1129,6 +1131,7 @@ CPPCUDAKernelSubroutineIndirectLoop::createLocalVariableDeclarations ()
   using namespace SageBuilder;
   using namespace LoopVariableNames;
   using namespace OP2VariableNames;
+  using namespace PlanFunctionVariableNames;
   using boost::lexical_cast;
   using std::string;
 

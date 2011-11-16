@@ -156,7 +156,7 @@ FortranOpenMPKernelSubroutineIndirectLoop::createLocalVariableDeclarations ()
 void
 FortranOpenMPKernelSubroutineIndirectLoop::createFormalParameterDeclarations ()
 {
-  using namespace OP2VariableNames;
+  using namespace PlanFunctionVariableNames;
 
   variableDeclarations->add (
       blockID,

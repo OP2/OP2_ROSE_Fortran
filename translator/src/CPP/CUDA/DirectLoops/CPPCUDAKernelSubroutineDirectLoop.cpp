@@ -84,6 +84,7 @@ CPPCUDAKernelSubroutineDirectLoop::createStageInFromDeviceMemoryToSharedMemorySt
   using namespace SageInterface;
   using namespace LoopVariableNames;
   using namespace OP2VariableNames;
+  using namespace PlanFunctionVariableNames;
   using std::string;
 
   string const autosharedVariableName = getCUDASharedMemoryDeclarationName (
@@ -191,6 +192,7 @@ CPPCUDAKernelSubroutineDirectLoop::createStageOutFromSharedMemoryToDeviceMemoryS
   using namespace SageInterface;
   using namespace LoopVariableNames;
   using namespace OP2VariableNames;
+  using namespace PlanFunctionVariableNames;
   using std::string;
 
   string const autosharedVariableName = getCUDASharedMemoryDeclarationName (
@@ -297,6 +299,7 @@ CPPCUDAKernelSubroutineDirectLoop::createExecutionLoopStatements ()
   using namespace SageInterface;
   using namespace LoopVariableNames;
   using namespace OP2VariableNames;
+  using namespace PlanFunctionVariableNames;
   using boost::lexical_cast;
   using std::string;
 
@@ -504,6 +507,7 @@ CPPCUDAKernelSubroutineDirectLoop::createLocalVariableDeclarations ()
   using namespace SageBuilder;
   using namespace LoopVariableNames;
   using namespace OP2VariableNames;
+  using namespace PlanFunctionVariableNames;
   using std::vector;
   using std::string;
 

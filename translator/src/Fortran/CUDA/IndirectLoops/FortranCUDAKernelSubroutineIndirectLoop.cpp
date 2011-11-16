@@ -417,7 +417,7 @@ FortranCUDAKernelSubroutineIndirectLoop::createStageOutFromLocalMemoryToSharedMe
   using namespace SageInterface;
   using namespace LoopVariableNames;
   using namespace OP2VariableNames;
-  using namespace OP2VariableNames;
+  using namespace PlanFunctionVariableNames;
   using std::string;
 
   Debug::getInstance ()->debugMessage (
@@ -1295,6 +1295,7 @@ FortranCUDAKernelSubroutineIndirectLoop::createIncrementAccessLocalVariableDecla
 {
   using namespace LoopVariableNames;
   using namespace OP2VariableNames;
+  using namespace PlanFunctionVariableNames;
   using boost::lexical_cast;
   using std::string;
 
@@ -1348,6 +1349,7 @@ FortranCUDAKernelSubroutineIndirectLoop::createExecutionLocalVariableDeclaration
 {
   using namespace LoopVariableNames;
   using namespace OP2VariableNames;
+  using namespace PlanFunctionVariableNames;
 
   Debug::getInstance ()->debugMessage (
       "Creating local variable declarations needed to execute kernel",

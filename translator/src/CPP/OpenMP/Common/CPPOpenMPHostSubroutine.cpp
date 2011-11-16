@@ -130,16 +130,15 @@ CPPOpenMPHostSubroutine::createReductionEpilogueStatements ()
           variableDeclarations->getReference (getIterationCounterVariableName (
               2)), buildIntVal (64));
 
-      SgPntrArrRefExp * arrayExpression1 = buildPntrArrRefExp (
+      SgPntrArrRefExp * arrayExpression = buildPntrArrRefExp (
           variableDeclarations->getReference (getReductionArrayHostName (i)),
           arrayIndexExpression);
 
-      SgPntrArrRefExp * arrayExpression2 = buildPntrArrRefExp (
-          variableDeclarations->getReference (getOpDatLocalName (i)),
-          buildIntVal (0));
+      SgPointerDerefExp * pointerDerefExpression = buildPointerDerefExp (
+          variableDeclarations->getReference (getOpDatLocalName (i)));
 
       SgPlusAssignOp * assignmentStatement = buildPlusAssignOp (
-          arrayExpression2, arrayExpression1);
+          pointerDerefExpression, arrayExpression);
 
       appendStatement (buildExprStatement (assignmentStatement), loopBody);
 
