@@ -11,6 +11,8 @@ class SgVarRefExp;
 
 namespace OpenMP
 {
+  std::string const FortranLibraryName = "OMP_LIB";
+
   std::string const sliceStart = "sliceStart";
   std::string const sliceEnd = "sliceEnd";
   std::string const numberOfThreads = "numberOfThreads";

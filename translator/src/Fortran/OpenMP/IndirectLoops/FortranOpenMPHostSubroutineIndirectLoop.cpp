@@ -341,5 +341,5 @@ FortranOpenMPHostSubroutineIndirectLoop::FortranOpenMPHostSubroutineIndirectLoop
 
   createLocalVariableDeclarations ();
 
-  createStatements ();
+  //createStatements ();
 }

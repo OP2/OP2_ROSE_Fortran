@@ -5,6 +5,12 @@
 #include <Exceptions.h>
 #include <rose.h>
 
+namespace
+{
+  std::string const OpDatPrefix = "opDat";
+  std::string const Size = "Size";
+}
+
 std::string const
 ReductionVariableNames::getReductionArrayHostName (
     unsigned int OP_DAT_ArgumentGroup)
@@ -36,6 +42,80 @@ ReductionVariableNames::getReductionCardinalityName (
 }
 
 std::string const
+PlanFunctionVariableNames::getActualPlanVariableName (const std::string suffix)
+{
+  return actualPlan + suffix;
+}
+
+std::string const
+PlanFunctionVariableNames::getPlanReturnVariableName (const std::string suffix)
+{
+  return planRet + suffix;
+}
+
+std::string const
+PlanFunctionVariableNames::getLocalToGlobalMappingName (
+    unsigned int OP_DAT_ArgumentGroup)
+{
+  using boost::lexical_cast;
+  using std::string;
+
+  return "pindMaps" + lexical_cast <string> (OP_DAT_ArgumentGroup);
+}
+
+std::string const
+PlanFunctionVariableNames::getLocalToGlobalMappingSizeName (
+    unsigned int OP_DAT_ArgumentGroup)
+{
+  using boost::lexical_cast;
+  using std::string;
+
+  return "pindMaps" + lexical_cast <string> (OP_DAT_ArgumentGroup) + Size;
+}
+
+std::string const
+PlanFunctionVariableNames::getGlobalToLocalMappingName (
+    unsigned int OP_DAT_ArgumentGroup)
+{
+  using boost::lexical_cast;
+  using std::string;
+
+  return "pMaps" + lexical_cast <string> (OP_DAT_ArgumentGroup);
+}
+
+std::string const
+PlanFunctionVariableNames::getGlobalToLocalMappingSizeName (
+    unsigned int OP_DAT_ArgumentGroup)
+{
+  using boost::lexical_cast;
+  using std::string;
+
+  return "pMaps" + lexical_cast <string> (OP_DAT_ArgumentGroup) + Size;
+}
+
+std::string const
+PlanFunctionVariableNames::getIndirectionArgumentSizeName (
+    unsigned int OP_DAT_ArgumentGroup)
+{
+  using boost::lexical_cast;
+  using std::string;
+
+  return OpDatPrefix + lexical_cast <string> (OP_DAT_ArgumentGroup)
+      + "SharedIndirectionSize";
+}
+
+std::string const
+PlanFunctionVariableNames::getIndirectionMapName (
+    unsigned int OP_DAT_ArgumentGroup)
+{
+  using boost::lexical_cast;
+  using std::string;
+
+  return OpDatPrefix + lexical_cast <string> (OP_DAT_ArgumentGroup)
+      + "IndirectionMap";
+}
+
+std::string const
 LoopVariableNames::getIterationCounterVariableName (unsigned int n)
 {
   using boost::lexical_cast;
@@ -51,12 +131,6 @@ LoopVariableNames::getUpperBoundVariableName (unsigned int n)
   using std::string;
 
   return "n" + lexical_cast <string> (n);
-}
-
-namespace
-{
-  std::string const OpDatPrefix = "opDat";
-  std::string const Size = "Size";
 }
 
 std::string const
@@ -191,46 +265,6 @@ OP2VariableNames::getCToFortranVariableName (unsigned int OP_DAT_ArgumentGroup)
 }
 
 std::string const
-OP2VariableNames::getLocalToGlobalMappingName (
-    unsigned int OP_DAT_ArgumentGroup)
-{
-  using boost::lexical_cast;
-  using std::string;
-
-  return "pindMaps" + lexical_cast <string> (OP_DAT_ArgumentGroup);
-}
-
-std::string const
-OP2VariableNames::getLocalToGlobalMappingSizeName (
-    unsigned int OP_DAT_ArgumentGroup)
-{
-  using boost::lexical_cast;
-  using std::string;
-
-  return "pindMaps" + lexical_cast <string> (OP_DAT_ArgumentGroup) + Size;
-}
-
-std::string const
-OP2VariableNames::getGlobalToLocalMappingName (
-    unsigned int OP_DAT_ArgumentGroup)
-{
-  using boost::lexical_cast;
-  using std::string;
-
-  return "pMaps" + lexical_cast <string> (OP_DAT_ArgumentGroup);
-}
-
-std::string const
-OP2VariableNames::getGlobalToLocalMappingSizeName (
-    unsigned int OP_DAT_ArgumentGroup)
-{
-  using boost::lexical_cast;
-  using std::string;
-
-  return "pMaps" + lexical_cast <string> (OP_DAT_ArgumentGroup) + Size;
-}
-
-std::string const
 OP2VariableNames::getNumberOfBytesVariableName (
     unsigned int OP_DAT_ArgumentGroup)
 {
@@ -267,34 +301,6 @@ OP2VariableNames::getIndirectionCUDASharedMemoryName (
 
   return OpDatPrefix + lexical_cast <string> (OP_DAT_ArgumentGroup)
       + "SharedIndirection";
-}
-
-std::string const
-OP2VariableNames::getIndirectionArgumentSizeName (
-    unsigned int OP_DAT_ArgumentGroup)
-{
-  using boost::lexical_cast;
-  using std::string;
-
-  return OpDatPrefix + lexical_cast <string> (OP_DAT_ArgumentGroup)
-      + "SharedIndirectionSize";
-}
-
-std::string const
-OP2VariableNames::getIndirectionMapName (unsigned int OP_DAT_ArgumentGroup)
-{
-  using boost::lexical_cast;
-  using std::string;
-
-  return OpDatPrefix + lexical_cast <string> (OP_DAT_ArgumentGroup)
-      + "IndirectionMap";
-}
-
-std::string const
-OP2VariableNames::getPlanReturnVariableDeclarationName (
-    std::string const & suffix)
-{
-  return "planRet_" + suffix;
 }
 
 std::string const

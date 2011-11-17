@@ -90,6 +90,66 @@ namespace PlanFunctionVariableNames
   std::string const pthrcol = "pthrcol";
   std::string const pthrcolSize = "pthrcolSize";
   std::string const thrcol = "thrcol";
+
+  /*
+   * ======================================================
+   * Get the variable name for an actual plan with this
+   * suffix
+   * ======================================================
+   */
+
+  std::string const
+  getActualPlanVariableName (const std::string suffix = std::string ());
+
+  /*
+   * ======================================================
+   * Get the variable name for the plan return value with this
+   * suffix
+   * ======================================================
+   */
+
+  std::string const
+  getPlanReturnVariableName (const std::string suffix = std::string ());
+
+  /*
+   * ======================================================
+   * Name of the variable which represents the size of a
+   * local to global renumbering (i.e. from local memory
+   * into global device memory in the CUDA architecture)
+   * argument used for an indirect OP_DAT.
+   *
+   * These are the 'ind_maps' variable sizes in the plan
+   * function according to Mike Giles documentation
+   * ======================================================
+   */
+  std::string const
+  getLocalToGlobalMappingName (unsigned int OP_DAT_ArgumentGroup);
+
+  std::string const
+  getLocalToGlobalMappingSizeName (unsigned int OP_DAT_ArgumentGroup);
+
+  /*
+   * ======================================================
+   * Name of the variable which represents the size of a
+   * global to local renumbering (i.e. from global device memory
+   * to local memory in the CUDA architecture)
+   * argument used for an indirect OP_DAT.
+   *
+   * These are the 'maps' variable sizes in the plan function
+   * according to Mike Giles documentation
+   * ======================================================
+   */
+  std::string const
+  getGlobalToLocalMappingName (unsigned int OP_DAT_ArgumentGroup);
+
+  std::string const
+  getGlobalToLocalMappingSizeName (unsigned int OP_DAT_ArgumentGroup);
+
+  std::string const
+  getIndirectionArgumentSizeName (unsigned int OP_DAT_ArgumentGroup);
+
+  std::string const
+  getIndirectionMapName (unsigned int OP_DAT_ArgumentGroup);
 }
 
 namespace LoopVariableNames
@@ -266,40 +326,6 @@ namespace OP2VariableNames
   std::string const
   getCToFortranVariableName (unsigned int OP_DAT_ArgumentGroup);
 
-  /*
-   * ======================================================
-   * Name of the field which represents the size of a
-   * local to global renumbering (i.e. from local memory
-   * into global device memory in the CUDA architecture)
-   * argument used for an indirect OP_DAT.
-   *
-   * These are the 'ind_maps' variable sizes in the plan
-   * function according to Mike Giles documentation
-   * ======================================================
-   */
-  std::string const
-  getLocalToGlobalMappingName (unsigned int OP_DAT_ArgumentGroup);
-
-  std::string const
-  getLocalToGlobalMappingSizeName (unsigned int OP_DAT_ArgumentGroup);
-
-  /*
-   * ======================================================
-   * Name of the field which represents the size of a
-   * global to local renumbering (i.e. from global device memory
-   * to local memory in the CUDA architecture)
-   * argument used for an indirect OP_DAT.
-   *
-   * These are the 'maps' variable sizes in the plan function
-   * according to Mike Giles documentation
-   * ======================================================
-   */
-  std::string const
-  getGlobalToLocalMappingName (unsigned int OP_DAT_ArgumentGroup);
-
-  std::string const
-  getGlobalToLocalMappingSizeName (unsigned int OP_DAT_ArgumentGroup);
-
   std::string const
   getNumberOfBytesVariableName (unsigned int OP_DAT_ArgumentGroup);
 
@@ -311,15 +337,6 @@ namespace OP2VariableNames
 
   std::string const
   getIndirectionCUDASharedMemoryName (unsigned int OP_DAT_ArgumentGroup);
-
-  std::string const
-  getIndirectionArgumentSizeName (unsigned int OP_DAT_ArgumentGroup);
-
-  std::string const
-  getIndirectionMapName (unsigned int OP_DAT_ArgumentGroup);
-
-  std::string const
-  getPlanReturnVariableDeclarationName (std::string const & suffix);
 
   std::string const
   getCUDASharedMemoryDeclarationName (SgType * type, unsigned int size);

@@ -9,6 +9,7 @@
 #include "FortranProgramDeclarationsAndDefinitions.h"
 #include "FortranOpDatDimensionsDeclaration.h"
 #include "RoseHelper.h"
+#include "OpenMP.h"
 #include <boost/algorithm/string.hpp>
 
 void
@@ -68,26 +69,7 @@ FortranOpenMPSubroutinesGeneration::createModuleDeclarations ()
 
   /*
    * ======================================================
-   * First declare the type declarations
-   * ======================================================
-   */
-
-  for (map <string, ParallelLoop *>::const_iterator it =
-      declarations->firstParallelLoop (); it
-      != declarations->lastParallelLoop (); ++it)
-  {
-    string const userSubroutineName = it->first;
-
-    FortranParallelLoop * parallelLoop =
-        static_cast <FortranParallelLoop *> (it->second);
-
-    dimensionsDeclarations[userSubroutineName]
-        = new FortranOpDatDimensionsDeclaration (parallelLoop, moduleScope);
-  }
-
-  /*
-   * ======================================================
-   * Now declare the variables
+   * Declare module-wide variables for indirect loops
    * ======================================================
    */
 
@@ -112,36 +94,29 @@ FortranOpenMPSubroutinesGeneration::createModuleDeclarations ()
 void
 FortranOpenMPSubroutinesGeneration::addLibraries ()
 {
-  using boost::iequals;
-  using SageInterface::appendStatement;
-  using SageInterface::addTextForUnparser;
-  using std::string;
-  using std::vector;
+  using namespace SageInterface;
 
   Debug::getInstance ()->debugMessage (
       "Adding 'use' statements to OpenMP module", Debug::FUNCTION_LEVEL,
       __FILE__, __LINE__);
 
-  vector <string> libs;
-  libs.push_back ("OP2_C");
-  libs.push_back ("OMP_LIB");
+  SgUseStatement* useStatement1 = new SgUseStatement (
+      RoseHelper::getFileInfo (), "OP2_C", false);
 
-  for (vector <string>::const_iterator it = libs.begin (); it != libs.end (); ++it)
-  {
-    SgUseStatement* useStatement = new SgUseStatement (
-        RoseHelper::getFileInfo (), *it, false);
+  useStatement1->set_definingDeclaration (useStatement1);
 
-    useStatement->set_definingDeclaration (useStatement);
+  appendStatement (useStatement1, moduleScope);
 
-    appendStatement (useStatement, moduleScope);
+  SgUseStatement* useStatement2 = new SgUseStatement (
+      RoseHelper::getFileInfo (), OpenMP::FortranLibraryName, false);
 
-    if (iequals (*it, "OMP_LIB"))
-    {
-      addTextForUnparser (useStatement, "#ifdef _OPENMP\n",
-          AstUnparseAttribute::e_before);
+  useStatement2->set_definingDeclaration (useStatement2);
 
-      addTextForUnparser (useStatement, "#endif\n",
-          AstUnparseAttribute::e_after);
-    }
-  }
+  appendStatement (useStatement2, moduleScope);
+
+  addTextForUnparser (useStatement2, OpenMP::getIfDirectiveString (),
+      AstUnparseAttribute::e_before);
+
+  addTextForUnparser (useStatement2, OpenMP::getEndIfDirectiveString (),
+      AstUnparseAttribute::e_after);
 }

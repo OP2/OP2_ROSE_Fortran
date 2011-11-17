@@ -34,11 +34,6 @@ class FortranModuleDeclarations
      */
     SgScopeStatement * moduleScope;
 
-  private:
-
-    void
-    createCPlanReturnDeclaration ();
-
   protected:
 
     FortranModuleDeclarations (FortranParallelLoop * parallelLoop,

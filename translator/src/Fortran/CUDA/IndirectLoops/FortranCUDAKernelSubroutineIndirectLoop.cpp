@@ -18,6 +18,7 @@ FortranCUDAKernelSubroutineIndirectLoop::createUserSubroutineCallStatement ()
   using namespace SageBuilder;
   using namespace LoopVariableNames;
   using namespace OP2VariableNames;
+  using namespace PlanFunctionVariableNames;
   using std::string;
   using std::vector;
 
@@ -530,6 +531,7 @@ FortranCUDAKernelSubroutineIndirectLoop::createIncrementAdjustmentStatements ()
   using namespace SageInterface;
   using namespace LoopVariableNames;
   using namespace OP2VariableNames;
+  using namespace PlanFunctionVariableNames;
   using boost::lexical_cast;
   using std::string;
 
@@ -1020,6 +1022,7 @@ FortranCUDAKernelSubroutineIndirectLoop::createInitialiseBytesPerOpDatStatements
   using namespace SageInterface;
   using namespace LoopVariableNames;
   using namespace OP2VariableNames;
+  using namespace PlanFunctionVariableNames;
 
   Debug::getInstance ()->debugMessage (
       "Creating statements to initialise bytes per OP_DAT",
@@ -1394,6 +1397,7 @@ void
 FortranCUDAKernelSubroutineIndirectLoop::createLocalVariableDeclarations ()
 {
   using namespace OP2VariableNames;
+  using namespace PlanFunctionVariableNames;
   using boost::lexical_cast;
   using std::string;
 
@@ -1538,6 +1542,7 @@ FortranCUDAKernelSubroutineIndirectLoop::createOpDatFormalParameterDeclarations 
   using namespace LoopVariableNames;
   using namespace OP2VariableNames;
   using namespace ReductionVariableNames;
+  using namespace PlanFunctionVariableNames;
   using namespace SageBuilder;
   using std::string;
 
