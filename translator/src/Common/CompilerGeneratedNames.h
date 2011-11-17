@@ -99,7 +99,7 @@ namespace PlanFunctionVariableNames
    */
 
   std::string const
-  getActualPlanVariableName (const std::string suffix = std::string ());
+  getActualPlanVariableName (std::string const & suffix = std::string ());
 
   /*
    * ======================================================
@@ -109,7 +109,7 @@ namespace PlanFunctionVariableNames
    */
 
   std::string const
-  getPlanReturnVariableName (const std::string suffix = std::string ());
+  getPlanReturnVariableName (std::string const & suffix = std::string ());
 
   /*
    * ======================================================
@@ -123,10 +123,12 @@ namespace PlanFunctionVariableNames
    * ======================================================
    */
   std::string const
-  getLocalToGlobalMappingName (unsigned int OP_DAT_ArgumentGroup);
+  getLocalToGlobalMappingName (unsigned int OP_DAT_ArgumentGroup,
+      std::string const & suffix = std::string ());
 
   std::string const
-  getLocalToGlobalMappingSizeName (unsigned int OP_DAT_ArgumentGroup);
+  getLocalToGlobalMappingSizeName (unsigned int OP_DAT_ArgumentGroup,
+      std::string const & suffix = std::string ());
 
   /*
    * ======================================================
@@ -140,16 +142,20 @@ namespace PlanFunctionVariableNames
    * ======================================================
    */
   std::string const
-  getGlobalToLocalMappingName (unsigned int OP_DAT_ArgumentGroup);
+  getGlobalToLocalMappingName (unsigned int OP_DAT_ArgumentGroup,
+      std::string const & suffix = std::string ());
 
   std::string const
-  getGlobalToLocalMappingSizeName (unsigned int OP_DAT_ArgumentGroup);
+  getGlobalToLocalMappingSizeName (unsigned int OP_DAT_ArgumentGroup,
+      std::string const & suffix = std::string ());
 
   std::string const
-  getIndirectionArgumentSizeName (unsigned int OP_DAT_ArgumentGroup);
+  getIndirectionArgumentSizeName (unsigned int OP_DAT_ArgumentGroup,
+      std::string const & suffix = std::string ());
 
   std::string const
-  getIndirectionMapName (unsigned int OP_DAT_ArgumentGroup);
+  getIndirectionMapName (unsigned int OP_DAT_ArgumentGroup,
+      std::string const & suffix = std::string ());
 }
 
 namespace LoopVariableNames

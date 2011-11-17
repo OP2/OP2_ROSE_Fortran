@@ -597,7 +597,8 @@ FortranCUDAHostSubroutineIndirectLoop::createStatements ()
       createPlanFunctionCallExpression ();
 
   SgExprStatement * assignmentStatement1 = buildAssignStatement (
-      variableDeclarations->getReference (planRet), planFunctionCallExpression);
+      variableDeclarations->getReference (getPlanReturnVariableName (
+          parallelLoop->getUserSubroutineName ())), planFunctionCallExpression);
 
   appendStatement (assignmentStatement1, subroutineScope);
 
@@ -611,7 +612,9 @@ FortranCUDAHostSubroutineIndirectLoop::createStatements ()
   SgStatement
       * callStatement1 =
           FortranStatementsAndExpressionsBuilder::createCToFortranPointerCallStatement (
-              subroutineScope, variableDeclarations->getReference (planRet),
+              subroutineScope, variableDeclarations->getReference (
+                  getPlanReturnVariableName (
+                      parallelLoop->getUserSubroutineName ())),
               variableDeclarations->getReference (actualPlan));
 
   appendStatement (callStatement1, subroutineScope);
