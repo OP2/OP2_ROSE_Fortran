@@ -22,25 +22,28 @@ namespace OP2
   std::string const OP_ARG_DAT = "op_arg_dat";
   std::string const OP_ARG_GBL = "op_arg_gbl";
   std::string const OP_DAT = "op_dat";
+  std::string const OP_DAT_CORE = "op_dat_core";
   std::string const OP_DAT_GBL = "op_dat_gbl";
-  std::string const OP_DECL_SET = "op_decl_set";
-  std::string const OP_DECL_MAP = "op_decl_map";
+  std::string const OP_DECL_CONST = "op_decl_const";
   std::string const OP_DECL_DAT = "op_decl_dat";
   std::string const OP_DECL_GBL = "op_decl_gbl";
-  std::string const OP_DECL_CONST = "op_decl_const";
+  std::string const OP_DECL_MAP = "op_decl_map";
+  std::string const OP_DECL_SET = "op_decl_set";
   std::string const OP_GBL = "op_gbl";
-  std::string const OP_SET = "op_set";
-  std::string const OP_MAP = "op_map";
   std::string const OP_ID = "op_id";
-  std::string const OP_READ = "op_read";
-  std::string const OP_WRITE = "op_write";
-  std::string const OP_RW = "op_rw";
   std::string const OP_INC = "op_inc";
+  std::string const OP_MAP = "op_map";
+  std::string const OP_MAP_CORE = "op_map_core";
   std::string const OP_MAX = "op_max";
   std::string const OP_MIN = "op_min";
   std::string const OP_PAR_LOOP = "op_par_loop";
   std::string const OP_PLAN = "op_plan";
   std::string const OP_PLAN_GET = "op_plan_get";
+  std::string const OP_READ = "op_read";
+  std::string const OP_RW = "op_rw";
+  std::string const OP_SET = "op_set";
+  std::string const OP_SET_CORE = "op_set_core";
+  std::string const OP_WRITE = "op_write";
 
   namespace RunTimeVariableNames
   {
@@ -56,6 +59,13 @@ namespace OP2
     std::string const index = "index";
     std::string const set = "set";
     std::string const size = "size";
+
+    namespace Fortran
+    {
+      std::string const dataPtr = "dataPtr";
+      std::string const mapPtr = "mapPtr";
+      std::string const setPtr = "setPtr";
+    }
   }
 
   namespace Macros

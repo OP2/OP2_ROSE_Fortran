@@ -597,8 +597,7 @@ FortranCUDAHostSubroutineIndirectLoop::createStatements ()
       createPlanFunctionCallExpression ();
 
   SgExprStatement * assignmentStatement1 = buildAssignStatement (
-      moduleDeclarations->getCPlanReturnDeclaration (),
-      planFunctionCallExpression);
+      variableDeclarations->getReference (planRet), planFunctionCallExpression);
 
   appendStatement (assignmentStatement1, subroutineScope);
 
@@ -612,8 +611,7 @@ FortranCUDAHostSubroutineIndirectLoop::createStatements ()
   SgStatement
       * callStatement1 =
           FortranStatementsAndExpressionsBuilder::createCToFortranPointerCallStatement (
-              subroutineScope,
-              moduleDeclarations->getCPlanReturnDeclaration (),
+              subroutineScope, variableDeclarations->getReference (planRet),
               variableDeclarations->getReference (actualPlan));
 
   appendStatement (callStatement1, subroutineScope);
@@ -667,6 +665,9 @@ FortranCUDAHostSubroutineIndirectLoop::FortranCUDAHostSubroutineIndirectLoop (
   Debug::getInstance ()->debugMessage (
       "CUDA host subroutine creation for indirect loop",
       Debug::CONSTRUCTOR_LEVEL, __FILE__, __LINE__);
+
+  variableDeclarations->addVisibilityToSymbolsFromOuterScope (
+      moduleDeclarations->getDeclarations ());
 
   createFormalParameterDeclarations ();
 

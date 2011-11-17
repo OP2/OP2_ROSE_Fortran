@@ -151,6 +151,15 @@ namespace OP2VariableNames
 
   /*
    * ======================================================
+   * Returns the name of the variable for the type OP_SET_CORE
+   * in this OP_DAT argument group
+   * ======================================================
+   */
+  std::string const
+  getOpSetCoreName (unsigned int OP_DAT_ArgumentGroup);
+
+  /*
+   * ======================================================
    * Returns the name of an OP_DAT variable in this OP_DAT
    * argument group
    * ======================================================
@@ -202,6 +211,15 @@ namespace OP2VariableNames
    */
   std::string const
   getOpDatDeviceName (unsigned int OP_DAT_ArgumentGroup);
+
+  /*
+   * ======================================================
+   * Returns the name of the OP_DAT core variable
+   * in this OP_DAT argument group
+   * ======================================================
+   */
+  std::string const
+  getOpDatCoreName (unsigned int OP_DAT_ArgumentGroup);
 
   /*
    * ======================================================

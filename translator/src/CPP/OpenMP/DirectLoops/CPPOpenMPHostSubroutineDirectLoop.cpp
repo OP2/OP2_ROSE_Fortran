@@ -161,7 +161,7 @@ CPPOpenMPHostSubroutineDirectLoop::createOpenMPLoopStatements ()
       getIterationCounterVariableName (1)));
 
   addTextForUnparser (forLoopStatement,
-      OpenMP::getParallelForDirectiveString () + OpenMP::getPrivateClause (
+      OpenMP::getParallelLoopDirectiveString () + OpenMP::getPrivateClause (
           privateVariableReferences), AstUnparseAttribute::e_before);
 }
 

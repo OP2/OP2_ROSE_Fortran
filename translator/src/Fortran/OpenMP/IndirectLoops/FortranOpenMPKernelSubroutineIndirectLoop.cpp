@@ -127,16 +127,12 @@ FortranOpenMPKernelSubroutineIndirectLoop::createOpDatFormalParameterDeclaration
       SgAsteriskShapeExp * upperBoundExpression = new SgAsteriskShapeExp (
           RoseHelper::getFileInfo ());
 
-      SgType * opdatType = parallelLoop->getOpDatType (i);
-
-      SgArrayType * baseArrayType = isSgArrayType (opdatType);
-
       variableDeclarations->add (
           getOpDatName (i),
           FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
               getOpDatName (i),
               FortranTypesBuilder::getArray_RankOne_WithLowerAndUpperBounds (
-                  baseArrayType->get_base_type (), buildIntVal (0),
+                  parallelLoop->getOpDatBaseType (i), buildIntVal (0),
                   upperBoundExpression), subroutineScope, formalParameters));
     }
   }
@@ -183,5 +179,5 @@ FortranOpenMPKernelSubroutineIndirectLoop::FortranOpenMPKernelSubroutineIndirect
 
   createLocalVariableDeclarations ();
 
-  createStatements ();
+ // createStatements ();
 }

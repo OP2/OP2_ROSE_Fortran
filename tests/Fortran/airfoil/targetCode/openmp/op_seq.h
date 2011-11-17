@@ -16,14 +16,6 @@
 #define OP_MIN		5
 #define OP_MAX		6
 
-#ifndef MIN
-#define MIN(a,b) ((a<b) ? (a) : (b))
-#endif
-
-#ifndef MAX
-#define MAX(a,b) ((a>b) ? (a) : (b))
-#endif
-
 
 // These are used only by fortran caller, then should be placed somewhere else
 #define FOP_READ 1
@@ -33,14 +25,8 @@
 
 #define ERR -1
 
-
-//
-// alignment macro based on example on page 50 of CUDA Programming Guide version 3.0
-// rounds up to nearest multiple of 16 bytes
-//
-
-#define ROUND_UP(bytes) (((bytes) + 15) & ~15)
-
+#define MAX_TYPE_NAME 10
+// end of fortran wrapper types
 
 typedef int op_access;
 
@@ -82,26 +68,23 @@ typedef struct {
   int   *accs;
 	
   // execution plan
-  int        *nthrcol;  // number of thread colors for each block
-  int        *thrcol;   // thread colors
-  int        *offset;   // offset for primary set
-  int       **ind_maps; // pointers for indirect datasets
-	int				 * nindirect; // size of each ind_maps position (for Fortran)
-  int        *ind_offs; // offsets for indirect datasets
-  int        *ind_sizes;// sizes for indirect datasets
-  short     **maps;     // regular pointers, renumbered as needed
-  int        *nelems;   // number of elements in each block
-  int         ncolors;  // number of block colors
-  int        *ncolblk;  // number of blocks for each color
-	int					nblocks; // number of blocks (for Fortran)
-  int        *blkmap;   // block mapping
-  int         nshared;  // bytes of shared memory required
-  float       transfer; // bytes of data transfer per kernel call
-  float       transfer2;// bytes of cache line per kernel call
+  int        *nthrcol;   // number of thread colors for each block
+  int        *thrcol;    // thread colors
+  int        *offset;    // offset for primary set
+  int       **ind_maps;  // pointers for indirect datasets
+  int		* nindirect; // size of each ind_maps position (for Fortran)
+  int        *ind_offs;  // offsets for indirect datasets
+  int        *ind_sizes; // sizes for indirect datasets
+  short     **maps;      // regular pointers, renumbered as needed
+  int        *nelems;    // number of elements in each block
+  int         ncolors;   // number of block colors
+  int        *ncolblk;   // number of blocks for each color
+  int		  nblocks;   // number of blocks (for Fortran)
+  int        *blkmap;    // block mapping
+  int         nshared;   // bytes of shared memory required
+  float       transfer;  // bytes of data transfer per kernel call
+  float       transfer2; // bytes of cache line per kernel call
 } op_plan;
-
-
-
 
 typedef struct {
   char const *name;     // name of kernel function
@@ -111,6 +94,25 @@ typedef struct {
   float       transfer2;// bytes of data transfer (total)
 } op_kernel;
 
+//
+//  min / max definitions
+//
 
+#ifndef MIN
+#define MIN(a,b) ((a<b) ? (a) : (b))
+#endif
+#ifndef MAX
+#define MAX(a,b) ((a>b) ? (a) : (b))
+#endif
+
+//
+// alignment macro based on example on page 50 of CUDA Programming Guide version 3.0
+// rounds up to nearest multiple of 16 bytes
+//
+
+#define ROUND_UP(bytes) (((bytes) + 15) & ~15)
+
+
+#define OP_WARPSIZE 32
 
 #endif

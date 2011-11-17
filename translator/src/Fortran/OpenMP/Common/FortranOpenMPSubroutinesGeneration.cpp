@@ -1,14 +1,14 @@
-#include <FortranOpenMPSubroutinesGeneration.h>
-#include <FortranParallelLoop.h>
-#include <FortranOpenMPModuleDeclarationsDirectLoop.h>
-#include <FortranOpenMPModuleDeclarationsIndirectLoop.h>
-#include <FortranOpenMPKernelSubroutineDirectLoop.h>
-#include <FortranOpenMPKernelSubroutineIndirectLoop.h>
-#include <FortranOpenMPHostSubroutineDirectLoop.h>
-#include <FortranOpenMPHostSubroutineIndirectLoop.h>
-#include <FortranProgramDeclarationsAndDefinitions.h>
-#include <FortranOpDatDimensionsDeclaration.h>
-#include <RoseHelper.h>
+#include "FortranOpenMPSubroutinesGeneration.h"
+#include "FortranParallelLoop.h"
+#include "FortranUserSubroutine.h"
+#include "FortranOpenMPModuleDeclarationsIndirectLoop.h"
+#include "FortranOpenMPKernelSubroutineDirectLoop.h"
+#include "FortranOpenMPKernelSubroutineIndirectLoop.h"
+#include "FortranOpenMPHostSubroutineDirectLoop.h"
+#include "FortranOpenMPHostSubroutineIndirectLoop.h"
+#include "FortranProgramDeclarationsAndDefinitions.h"
+#include "FortranOpDatDimensionsDeclaration.h"
+#include "RoseHelper.h"
 #include <boost/algorithm/string.hpp>
 
 void
@@ -22,41 +22,17 @@ FortranOpenMPSubroutinesGeneration::createSubroutines ()
   using std::string;
   using std::map;
 
-  class UserSubroutine: public Subroutine <SgProcedureHeaderStatement>
-  {
-    public:
-
-      virtual void
-      createStatements ()
-      {
-      }
-
-      virtual void
-      createLocalVariableDeclarations ()
-      {
-      }
-
-      virtual void
-      createFormalParameterDeclarations ()
-      {
-      }
-
-      UserSubroutine (std::string subroutineName) :
-        Subroutine <SgProcedureHeaderStatement> (subroutineName)
-      {
-      }
-  };
-
   for (map <string, ParallelLoop *>::const_iterator it =
       declarations->firstParallelLoop (); it
       != declarations->lastParallelLoop (); ++it)
   {
     string const userSubroutineName = it->first;
 
-    UserSubroutine * userSubroutine = new UserSubroutine (userSubroutineName);
-
     FortranParallelLoop * parallelLoop =
         static_cast <FortranParallelLoop *> (it->second);
+
+    FortranUserSubroutine * userSubroutine = new FortranUserSubroutine (
+        moduleScope, parallelLoop, declarations);
 
     FortranOpenMPKernelSubroutine * kernelSubroutine;
 
@@ -66,11 +42,8 @@ FortranOpenMPSubroutinesGeneration::createSubroutines ()
           moduleScope, userSubroutine, parallelLoop);
 
       hostSubroutines[userSubroutineName]
-          = new FortranOpenMPHostSubroutineDirectLoop (
-              moduleScope,
-              kernelSubroutine,
-              parallelLoop,
-              static_cast <FortranOpenMPModuleDeclarationsDirectLoop *> (moduleDeclarations[userSubroutineName]));
+          = new FortranOpenMPHostSubroutineDirectLoop (moduleScope,
+              kernelSubroutine, parallelLoop);
     }
     else
     {
@@ -127,13 +100,7 @@ FortranOpenMPSubroutinesGeneration::createModuleDeclarations ()
     FortranParallelLoop * parallelLoop =
         static_cast <FortranParallelLoop *> (it->second);
 
-    if (parallelLoop->isDirectLoop ())
-    {
-      moduleDeclarations[userSubroutineName]
-          = new FortranOpenMPModuleDeclarationsDirectLoop (parallelLoop,
-              moduleScope);
-    }
-    else
+    if (parallelLoop->isDirectLoop () == false)
     {
       moduleDeclarations[userSubroutineName]
           = new FortranOpenMPModuleDeclarationsIndirectLoop (parallelLoop,

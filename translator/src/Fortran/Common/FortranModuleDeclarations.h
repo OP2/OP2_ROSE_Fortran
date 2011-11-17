@@ -46,11 +46,8 @@ class FortranModuleDeclarations
 
   public:
 
-    SgVarRefExp *
-    getCPlanReturnDeclaration ();
-
-    SgVarRefExp *
-    getGlobalOpDatDeclaration (unsigned int OP_DAT_ArgumentGroup);
+    ScopedVariableDeclarations *
+    getDeclarations ();
 };
 
 #endif

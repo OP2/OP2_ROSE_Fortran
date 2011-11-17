@@ -29,6 +29,21 @@ ScopedVariableDeclarations::add (std::string const & variableName,
   theDeclarations[variableName] = declaration;
 }
 
+void
+ScopedVariableDeclarations::addVisibilityToSymbolsFromOuterScope (
+    ScopedVariableDeclarations * outerScopeDeclarations)
+{
+  using std::map;
+  using std::string;
+
+  for (std::map <string, SgVariableDeclaration *>::iterator it =
+      outerScopeDeclarations->theDeclarations.begin (); it
+      != outerScopeDeclarations->theDeclarations.end (); ++it)
+  {
+    add (it->first, it->second);
+  }
+}
+
 ScopedVariableDeclarations::ScopedVariableDeclarations ()
 {
 }

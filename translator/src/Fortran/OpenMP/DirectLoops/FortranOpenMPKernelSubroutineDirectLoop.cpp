@@ -12,6 +12,10 @@ FortranOpenMPKernelSubroutineDirectLoop::createUserSubroutineCallStatement ()
 {
   using namespace SageBuilder;
   using namespace OP2VariableNames;
+  using namespace LoopVariableNames;
+
+  Debug::getInstance ()->debugMessage ("Creating call to user kernel",
+      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
   SgExprListExp * actualParameters = buildExprListExp ();
 
@@ -22,12 +26,14 @@ FortranOpenMPKernelSubroutineDirectLoop::createUserSubroutineCallStatement ()
       if (parallelLoop->isReductionRequired (i) == false)
       {
         SgMultiplyOp * multiplyExpression1 = buildMultiplyOp (
-            variableDeclarations->getReference (OpenMP::sliceIterator),
-            buildIntVal (parallelLoop->getOpDatDimension (i)));
+            variableDeclarations->getReference (
+                getIterationCounterVariableName (1)), buildIntVal (
+                parallelLoop->getOpDatDimension (i)));
 
         SgMultiplyOp * multiplyExpression2 = buildMultiplyOp (
-            variableDeclarations->getReference (OpenMP::sliceIterator),
-            buildIntVal (parallelLoop->getOpDatDimension (i)));
+            variableDeclarations->getReference (
+                getIterationCounterVariableName (1)), buildIntVal (
+                parallelLoop->getOpDatDimension (i)));
 
         SgAddOp * addExpression2 = buildAddOp (multiplyExpression2,
             buildIntVal (parallelLoop->getOpDatDimension (i)));
@@ -71,9 +77,14 @@ FortranOpenMPKernelSubroutineDirectLoop::createExecutionLoopStatements ()
 {
   using namespace SageBuilder;
   using namespace SageInterface;
+  using namespace LoopVariableNames;
+
+  Debug::getInstance ()->debugMessage (
+      "Creating do loop statements for thread slice", Debug::FUNCTION_LEVEL,
+      __FILE__, __LINE__);
 
   SgAssignOp * initializationExpression = buildAssignOp (
-      variableDeclarations->getReference (OpenMP::sliceIterator),
+      variableDeclarations->getReference (getIterationCounterVariableName (1)),
       variableDeclarations->getReference (OpenMP::sliceStart));
 
   SgSubtractOp * upperBoundExpression = buildSubtractOp (
@@ -92,43 +103,50 @@ FortranOpenMPKernelSubroutineDirectLoop::createExecutionLoopStatements ()
 }
 
 void
-FortranOpenMPKernelSubroutineDirectLoop::createOpDatFormalParameterDeclarations ()
-{
-  using namespace SageBuilder;
-  using namespace OP2VariableNames;
-
-  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
-  {
-    if (parallelLoop->isDuplicateOpDat (i) == false)
-    {
-      SgArrayType * arrayType = isSgArrayType (parallelLoop->getOpDatType (i));
-
-      SgArrayType * newArrayType =
-          FortranTypesBuilder::getArray_RankOne_WithLowerAndUpperBounds (
-              arrayType->get_base_type (), buildIntVal (0),
-              new SgAsteriskShapeExp (RoseHelper::getFileInfo ()));
-
-      variableDeclarations->add (
-          getOpDatName (i),
-          FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
-              getOpDatName (i), newArrayType, subroutineScope, formalParameters));
-    }
-  }
-}
-
-void
 FortranOpenMPKernelSubroutineDirectLoop::createStatements ()
 {
+  Debug::getInstance ()->debugMessage ("Creating statements",
+      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+
   createExecutionLoopStatements ();
 }
 
 void
 FortranOpenMPKernelSubroutineDirectLoop::createLocalVariableDeclarations ()
 {
-  variableDeclarations->add (OpenMP::sliceIterator,
+  using namespace LoopVariableNames;
+
+  variableDeclarations->add (getIterationCounterVariableName (1),
       FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
-          OpenMP::sliceIterator, FortranTypesBuilder::getFourByteInteger (),
-          subroutineScope));
+          getIterationCounterVariableName (1),
+          FortranTypesBuilder::getFourByteInteger (), subroutineScope));
+}
+
+void
+FortranOpenMPKernelSubroutineDirectLoop::createOpDatFormalParameterDeclarations ()
+{
+  using namespace SageBuilder;
+  using namespace OP2VariableNames;
+
+  Debug::getInstance ()->debugMessage (
+      "OpenMP kernel subroutine creation for direct loop",
+      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+
+  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
+  {
+    if (parallelLoop->isDuplicateOpDat (i) == false)
+    {
+      SgArrayType * arrayType =
+          FortranTypesBuilder::getArray_RankOne_WithLowerAndUpperBounds (
+              parallelLoop->getOpDatBaseType (i), buildIntVal (0),
+              new SgAsteriskShapeExp (RoseHelper::getFileInfo ()));
+
+      variableDeclarations->add (
+          getOpDatName (i),
+          FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
+              getOpDatName (i), arrayType, subroutineScope, formalParameters));
+    }
+  }
 }
 
 void

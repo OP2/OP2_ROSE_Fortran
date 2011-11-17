@@ -5,26 +5,16 @@
 #include <FortranOpenMPHostSubroutine.h>
 
 class FortranOpenMPKernelSubroutine;
-class FortranOpenMPModuleDeclarationsDirectLoop;
 
 class FortranOpenMPHostSubroutineDirectLoop: public FortranOpenMPHostSubroutine
 {
   private:
 
     void
-    createKernelDoLoop ();
-
-    virtual SgBasicBlock *
-    createTransferOpDatStatements ();
-
-    void
-    initialiseThreadVariablesStatements ();
+    createOpenMPLoopStatements ();
 
     virtual SgStatement *
     createKernelFunctionCallStatement ();
-
-    virtual void
-    createOpenMPVariableDeclarations ();
 
     virtual void
     createStatements ();
@@ -36,8 +26,7 @@ class FortranOpenMPHostSubroutineDirectLoop: public FortranOpenMPHostSubroutine
 
     FortranOpenMPHostSubroutineDirectLoop (SgScopeStatement * moduleScope,
         FortranOpenMPKernelSubroutine * kernelSubroutine,
-        FortranParallelLoop * parallelLoop,
-        FortranOpenMPModuleDeclarationsDirectLoop * moduleDeclarations);
+        FortranParallelLoop * parallelLoop);
 };
 
 #endif

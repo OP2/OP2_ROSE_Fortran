@@ -1,11 +1,10 @@
-#include "CPPUserSubroutine.h"
-#include "CPPParallelLoop.h"
-#include "CPPProgramDeclarationsAndDefinitions.h"
+#include "FortranUserSubroutine.h"
+#include "FortranParallelLoop.h"
+#include "FortranProgramDeclarationsAndDefinitions.h"
 #include "RoseStatementsAndExpressionsBuilder.h"
-#include "RoseHelper.h"
 
 void
-CPPUserSubroutine::createStatements ()
+FortranUserSubroutine::createStatements ()
 {
   using namespace SageInterface;
   using std::vector;
@@ -24,12 +23,13 @@ CPPUserSubroutine::createStatements ()
 }
 
 void
-CPPUserSubroutine::createLocalVariableDeclarations ()
+FortranUserSubroutine::createLocalVariableDeclarations ()
 {
+
 }
 
 void
-CPPUserSubroutine::createFormalParameterDeclarations ()
+FortranUserSubroutine::createFormalParameterDeclarations ()
 {
   using std::string;
   using std::vector;
@@ -55,18 +55,18 @@ CPPUserSubroutine::createFormalParameterDeclarations ()
   }
 }
 
-CPPUserSubroutine::CPPUserSubroutine (SgScopeStatement * moduleScope,
-    CPPParallelLoop * parallelLoop,
-    CPPProgramDeclarationsAndDefinitions * declarations) :
-      UserSubroutine <SgFunctionDeclaration,
-          CPPProgramDeclarationsAndDefinitions> (parallelLoop, declarations)
+FortranUserSubroutine::FortranUserSubroutine (SgScopeStatement * moduleScope,
+    FortranParallelLoop * parallelLoop,
+    FortranProgramDeclarationsAndDefinitions * declarations) :
+  UserSubroutine <SgProcedureHeaderStatement,
+      FortranProgramDeclarationsAndDefinitions> (parallelLoop, declarations)
 {
   using namespace SageBuilder;
   using namespace SageInterface;
 
-  subroutineHeaderStatement = buildDefiningFunctionDeclaration (
+  subroutineHeaderStatement = buildProcedureHeaderStatement (
       this->subroutineName.c_str (), buildVoidType (), formalParameters,
-      moduleScope);
+      SgProcedureHeaderStatement::e_subroutine_subprogram_kind, moduleScope);
 
   appendStatement (subroutineHeaderStatement, moduleScope);
 
@@ -74,12 +74,4 @@ CPPUserSubroutine::CPPUserSubroutine (SgScopeStatement * moduleScope,
 
   originalSubroutine = declarations->getSubroutine (
       parallelLoop->getUserSubroutineName ());
-
-  createFormalParameterDeclarations ();
-
-  createLocalVariableDeclarations ();
-
-  createStatements ();
-
-  RoseHelper::forceOutputOfCodeToFile (subroutineHeaderStatement);
 }

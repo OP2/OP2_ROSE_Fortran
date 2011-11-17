@@ -90,12 +90,6 @@ ParallelLoop::setOpDatType (unsigned int OP_DAT_ArgumentGroup, SgType * type)
   OpDatTypes[OP_DAT_ArgumentGroup] = type;
 }
 
-SgType *
-ParallelLoop::getOpDatType (unsigned int OP_DAT_ArgumentGroup)
-{
-  return OpDatTypes[OP_DAT_ArgumentGroup];
-}
-
 bool
 ParallelLoop::isArray (unsigned int OP_DAT_ArgumentGroup)
 {
@@ -259,7 +253,7 @@ ParallelLoop::hasIncrementedOpDats ()
 {
   for (unsigned int i = 1; i <= getNumberOfOpDatArgumentGroups (); ++i)
   {
-    if (isIncremented(i))
+    if (isIncremented (i))
     {
       return true;
     }

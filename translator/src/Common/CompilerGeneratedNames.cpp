@@ -72,6 +72,15 @@ OP2VariableNames::getOpSetName ()
 }
 
 std::string const
+OP2VariableNames::getOpSetCoreName (unsigned int OP_DAT_ArgumentGroup)
+{
+  using boost::lexical_cast;
+  using std::string;
+
+  return "opSet" + lexical_cast <string> (OP_DAT_ArgumentGroup) + "Core";
+}
+
+std::string const
 OP2VariableNames::getOpDatName (unsigned int OP_DAT_ArgumentGroup)
 {
   using boost::lexical_cast;
@@ -124,6 +133,15 @@ OP2VariableNames::getOpDatDeviceName (unsigned int OP_DAT_ArgumentGroup)
   using std::string;
 
   return OpDatPrefix + lexical_cast <string> (OP_DAT_ArgumentGroup) + "Device";
+}
+
+std::string const
+OP2VariableNames::getOpDatCoreName (unsigned int OP_DAT_ArgumentGroup)
+{
+  using boost::lexical_cast;
+  using std::string;
+
+  return OpDatPrefix + lexical_cast <string> (OP_DAT_ArgumentGroup) + "Core";
 }
 
 std::string const

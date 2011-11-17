@@ -7,6 +7,12 @@
 #include <CompilerGeneratedNames.h>
 #include <rose.h>
 
+ScopedVariableDeclarations *
+FortranModuleDeclarations::getDeclarations ()
+{
+  return variableDeclarations;
+}
+
 void
 FortranModuleDeclarations::createCPlanReturnDeclaration ()
 {
@@ -34,24 +40,4 @@ FortranModuleDeclarations::FortranModuleDeclarations (
   {
     createCPlanReturnDeclaration ();
   }
-}
-
-SgVarRefExp *
-FortranModuleDeclarations::getCPlanReturnDeclaration ()
-{
-  using namespace OP2VariableNames;
-
-  return variableDeclarations->getReference (
-      getPlanReturnVariableDeclarationName (
-          parallelLoop->getUserSubroutineName ()));
-}
-
-SgVarRefExp *
-FortranModuleDeclarations::getGlobalOpDatDeclaration (
-    unsigned int OP_DAT_ArgumentGroup)
-{
-  using namespace OP2VariableNames;
-
-  return variableDeclarations->getReference (getOpDatGlobalName (
-      OP_DAT_ArgumentGroup));
 }

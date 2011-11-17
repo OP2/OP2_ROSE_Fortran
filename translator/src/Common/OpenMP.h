@@ -11,10 +11,8 @@ class SgVarRefExp;
 
 namespace OpenMP
 {
-  std::string const threadIndex = "threadIndex";
   std::string const sliceStart = "sliceStart";
   std::string const sliceEnd = "sliceEnd";
-  std::string const sliceIterator = "sliceIterator";
   std::string const numberOfThreads = "numberOfThreads";
 
   std::string const
@@ -27,7 +25,10 @@ namespace OpenMP
   getEndIfDirectiveString ();
 
   std::string const
-  getParallelForDirectiveString ();
+  getParallelLoopDirectiveString ();
+
+  std::string const
+  getEndParallelLoopDirectiveString ();
 
   SgFunctionCallExp *
   createGetMaximumNumberOfThreadsCallStatement (SgScopeStatement * scope);

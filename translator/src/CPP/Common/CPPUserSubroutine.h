@@ -13,9 +13,6 @@ class CPPUserSubroutine: public UserSubroutine <SgFunctionDeclaration,
 
   protected:
 
-    void
-    forceOutputOfCodeToFile ();
-
     virtual void
     createStatements ();
 

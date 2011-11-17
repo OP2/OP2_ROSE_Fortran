@@ -17,9 +17,6 @@ class FortranOpenMPHostSubroutine: public FortranHostSubroutine
   protected:
 
     virtual void
-    createOpenMPVariableDeclarations () = 0;
-
-    virtual void
     createReductionEpilogueStatements ();
 
     virtual void
@@ -28,13 +25,21 @@ class FortranOpenMPHostSubroutine: public FortranHostSubroutine
     virtual void
     createReductionDeclarations ();
 
+    SgBasicBlock *
+    createInitialiseNumberOfThreadsStatements ();
+
+    virtual SgBasicBlock *
+    createTransferOpDatStatements ();
+
     void
-    initialiseNumberOfThreadsStatements ();
+    createOpDatLocalVariableDeclarations ();
+
+    void
+    createOpenMPLocalVariableDeclarations ();
 
     FortranOpenMPHostSubroutine (SgScopeStatement * moduleScope,
         FortranKernelSubroutine * kernelSubroutine,
-        FortranParallelLoop * parallelLoop,
-        FortranOpenMPModuleDeclarations * moduleDeclarations);
+        FortranParallelLoop * parallelLoop);
 };
 
 #endif

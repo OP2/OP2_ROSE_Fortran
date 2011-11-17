@@ -2,7 +2,7 @@
  * Written by Adam Betts and Carlo Bertolli
  *
  * This class maintains a mapping between a variable name
- * and its declaration in ROSE
+ * and its declaration in the abstract syntax tree
  */
 
 #ifndef SCOPED_VARIABLE_DECLARATIONS_H
@@ -27,6 +27,10 @@ class ScopedVariableDeclarations
 
     void
     add (std::string const & variableName, SgVariableDeclaration * declaration);
+
+    void
+    addVisibilityToSymbolsFromOuterScope (
+        ScopedVariableDeclarations * outerScopeDeclarations);
 
     ScopedVariableDeclarations ();
 };

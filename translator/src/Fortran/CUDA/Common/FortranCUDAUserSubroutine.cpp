@@ -1,51 +1,13 @@
-#include <FortranCUDAUserSubroutine.h>
-#include <FortranParallelLoop.h>
-#include <FortranProgramDeclarationsAndDefinitions.h>
-#include <FortranStatementsAndExpressionsBuilder.h>
-#include <FortranTypesBuilder.h>
-#include <Debug.h>
-#include <Exceptions.h>
+#include "FortranCUDAUserSubroutine.h"
+#include "FortranParallelLoop.h"
+#include "FortranProgramDeclarationsAndDefinitions.h"
+#include "FortranStatementsAndExpressionsBuilder.h"
+#include "FortranTypesBuilder.h"
+#include "Debug.h"
+#include "Exceptions.h"
+#include "RoseHelper.h"
 #include <boost/algorithm/string/predicate.hpp>
 #include <algorithm>
-
-void
-FortranCUDAUserSubroutine::forceOutputOfCodeToFile ()
-{
-  Debug::getInstance ()->debugMessage (
-      "Ensuring user subroutine is generated in output file",
-      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
-
-  /*
-   * ======================================================
-   * We have to set each node in the AST representation of
-   * this subroutine as compiler generated, otherwise chunks
-   * of the user kernel are missing in the output
-   * ======================================================
-   */
-
-  class TreeVisitor: public AstSimpleProcessing
-  {
-    public:
-
-      TreeVisitor ()
-      {
-      }
-
-      virtual void
-      visit (SgNode * node)
-      {
-        SgLocatedNode * locatedNode = isSgLocatedNode (node);
-        if (locatedNode != NULL)
-        {
-          locatedNode->setOutputInCodeGeneration ();
-        }
-      }
-  };
-
-  TreeVisitor * visitor = new TreeVisitor ();
-
-  visitor->traverse (subroutineHeaderStatement, preorder);
-}
 
 void
 FortranCUDAUserSubroutine::createStatements ()
@@ -178,27 +140,11 @@ FortranCUDAUserSubroutine::createFormalParameterDeclarations ()
 FortranCUDAUserSubroutine::FortranCUDAUserSubroutine (
     SgScopeStatement * moduleScope, FortranParallelLoop * parallelLoop,
     FortranProgramDeclarationsAndDefinitions * declarations) :
-  UserSubroutine <SgProcedureHeaderStatement,
-      FortranProgramDeclarationsAndDefinitions> (parallelLoop, declarations)
+  FortranUserSubroutine (moduleScope, parallelLoop, declarations)
 {
-  using SageBuilder::buildProcedureHeaderStatement;
-  using SageBuilder::buildVoidType;
-  using SageInterface::appendStatement;
-
-  subroutineHeaderStatement = buildProcedureHeaderStatement (
-      this->subroutineName.c_str (), buildVoidType (), formalParameters,
-      SgProcedureHeaderStatement::e_subroutine_subprogram_kind, moduleScope);
-
   subroutineHeaderStatement->get_functionModifier ().setCudaDevice ();
-
-  appendStatement (subroutineHeaderStatement, moduleScope);
-
-  subroutineScope = subroutineHeaderStatement->get_definition ()->get_body ();
-
-  originalSubroutine = declarations->getSubroutine (
-      parallelLoop->getUserSubroutineName ());
 
   createStatements ();
 
-  forceOutputOfCodeToFile ();
+  RoseHelper::forceOutputOfCodeToFile (subroutineHeaderStatement);
 }

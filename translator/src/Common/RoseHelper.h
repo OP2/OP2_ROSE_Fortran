@@ -26,6 +26,7 @@ class RoseHelper
      * be used globally
      * ======================================================
      */
+
     static Sg_File_Info *
     getFileInfo ();
 
@@ -36,8 +37,12 @@ class RoseHelper
      * contain multiple variables
      * ======================================================
      */
+
     static std::string const
     getFirstVariableName (SgVariableDeclaration * variableDeclaration);
+
+    static void
+    forceOutputOfCodeToFile (SgNode * root);
 };
 
 #endif

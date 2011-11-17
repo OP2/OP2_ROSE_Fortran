@@ -1,4 +1,7 @@
-#include <OpenMP.h>
+#include "OpenMP.h"
+#include "Globals.h"
+#include "Exceptions.h"
+#include "FortranTypesBuilder.h"
 #include <rose.h>
 
 std::string const
@@ -20,18 +23,69 @@ OpenMP::getEndIfDirectiveString ()
 }
 
 std::string const
-OpenMP::getParallelForDirectiveString ()
+OpenMP::getParallelLoopDirectiveString ()
 {
-  return "\n#pragma omp parallel for ";
+  switch (Globals::getInstance ()->getHostLanguage ())
+  {
+    case TargetLanguage::FORTRAN:
+    {
+      return "\n!$OMP PARALLEL DO ";
+    }
+    case TargetLanguage::CPP:
+    {
+      return "\n#pragma omp parallel for ";
+    }
+    default:
+    {
+      throw Exceptions::CommandLine::LanguageException ("Unknown host language");
+    }
+  }
+}
+
+std::string const
+OpenMP::getEndParallelLoopDirectiveString ()
+{
+  switch (Globals::getInstance ()->getHostLanguage ())
+  {
+    case TargetLanguage::FORTRAN:
+    {
+      return "!$OMP END PARALLEL DO\n";
+    }
+    default:
+    {
+      throw Exceptions::CommandLine::LanguageException (
+          "Unknown/unsupported host language");
+    }
+  }
 }
 
 SgFunctionCallExp *
 OpenMP::createGetMaximumNumberOfThreadsCallStatement (SgScopeStatement * scope)
 {
   using namespace SageBuilder;
+  using std::string;
 
-  return buildFunctionCallExp ("omp_get_max_threads", buildVoidType (),
-      buildExprListExp (), scope);
+  string const functionName = "omp_get_max_threads";
+
+  switch (Globals::getInstance ()->getHostLanguage ())
+  {
+    case TargetLanguage::FORTRAN:
+    {
+      SgFunctionSymbol * functionSymbol =
+          FortranTypesBuilder::buildNewFortranSubroutine (functionName, scope);
+
+      return buildFunctionCallExp (functionSymbol, buildExprListExp ());
+    }
+    case TargetLanguage::CPP:
+    {
+      return buildFunctionCallExp (functionName, buildVoidType (),
+          buildExprListExp (), scope);
+    }
+    default:
+    {
+      throw Exceptions::CommandLine::LanguageException ("Unknown host language");
+    }
+  }
 }
 
 std::string const

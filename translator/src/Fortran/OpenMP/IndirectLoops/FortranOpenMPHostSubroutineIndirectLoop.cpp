@@ -23,70 +23,7 @@ FortranOpenMPHostSubroutineIndirectLoop::createKernelFunctionCallStatement ()
       "Creating kernel function call statement", Debug::FUNCTION_LEVEL,
       __FILE__, __LINE__);
 
-  FortranOpenMPModuleDeclarationsIndirectLoop
-      * moduleDeclarationsIndirectLoop =
-          static_cast <FortranOpenMPModuleDeclarationsIndirectLoop *> (moduleDeclarations);
-
   SgExprListExp * actualParameters = buildExprListExp ();
-
-  actualParameters->append_expression (variableDeclarations->getReference (
-      blockID));
-
-  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
-  {
-    if (parallelLoop->isDuplicateOpDat (i) == false
-        && parallelLoop->isIndirect (i))
-    {
-      actualParameters->append_expression (
-          moduleDeclarationsIndirectLoop->getGlobalOpDatDeclaration (i));
-
-      actualParameters->append_expression (
-          moduleDeclarationsIndirectLoop->getLocalToGlobalMappingDeclaration (i));
-    }
-  }
-
-  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
-  {
-    if (parallelLoop->isIndirect (i))
-    {
-      actualParameters->append_expression (
-          moduleDeclarationsIndirectLoop->getGlobalToLocalMappingDeclaration (i));
-    }
-  }
-
-  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
-  {
-    if (parallelLoop->isDuplicateOpDat (i) == false && parallelLoop->isDirect (
-        i))
-    {
-      actualParameters->append_expression (
-          moduleDeclarationsIndirectLoop->getGlobalOpDatDeclaration (i));
-    }
-  }
-
-  actualParameters->append_expression (
-      moduleDeclarationsIndirectLoop->getPlanFunctionDeclaration (pindSizes));
-
-  actualParameters->append_expression (
-      moduleDeclarationsIndirectLoop->getPlanFunctionDeclaration (pindOffs));
-
-  actualParameters->append_expression (
-      moduleDeclarationsIndirectLoop->getPlanFunctionDeclaration (pblkMap));
-
-  actualParameters->append_expression (
-      moduleDeclarationsIndirectLoop->getPlanFunctionDeclaration (poffset));
-
-  actualParameters->append_expression (
-      moduleDeclarationsIndirectLoop->getPlanFunctionDeclaration (pnelems));
-
-  actualParameters->append_expression (
-      moduleDeclarationsIndirectLoop->getPlanFunctionDeclaration (pnthrcol));
-
-  actualParameters->append_expression (
-      moduleDeclarationsIndirectLoop->getPlanFunctionDeclaration (pthrcol));
-
-  actualParameters->append_expression (variableDeclarations->getReference (
-      blockOffset));
 
   SgExprStatement * callStatement = buildFunctionCallStmt (
       calleeSubroutine->getSubroutineName (), buildVoidType (),
@@ -108,10 +45,6 @@ FortranOpenMPHostSubroutineIndirectLoop::createPlanFunctionExecutionStatements (
   Debug::getInstance ()->debugMessage (
       "Creating plan function execution statements", Debug::FUNCTION_LEVEL,
       __FILE__, __LINE__);
-
-  FortranOpenMPModuleDeclarationsIndirectLoop
-      * moduleDeclarationsIndirectLoop =
-          static_cast <FortranOpenMPModuleDeclarationsIndirectLoop *> (moduleDeclarations);
 
   /*
    * ======================================================
@@ -176,8 +109,7 @@ FortranOpenMPHostSubroutineIndirectLoop::createPlanFunctionExecutionStatements (
       colour1), buildIntVal (1));
 
   SgPntrArrRefExp * arrayIndexExpression2 = buildPntrArrRefExp (
-      moduleDeclarationsIndirectLoop->getPlanFunctionDeclaration (ncolblk),
-      addExpression2);
+      variableDeclarations->getReference (ncolblk), addExpression2);
 
   SgExprStatement * assignmentStatement2 = buildAssignStatement (
       variableDeclarations->getReference (nblocks), arrayIndexExpression2);
@@ -203,9 +135,8 @@ FortranOpenMPHostSubroutineIndirectLoop::createPlanFunctionExecutionStatements (
   SgAssignOp * outerLoopInitializationExpression = buildAssignOp (
       variableDeclarations->getReference (colour1), buildIntVal (0));
 
-  SgDotExp * dotExpression3 = buildDotExp (
-      moduleDeclarationsIndirectLoop->getPlanFunctionDeclaration (actualPlan),
-      buildOpaqueVarRefExp (ncolors, subroutineScope));
+  SgDotExp * dotExpression3 = buildDotExp (variableDeclarations->getReference (
+      actualPlan), buildOpaqueVarRefExp (ncolors, subroutineScope));
 
   SgExpression * outerLoopUpperBoundExpression = buildSubtractOp (
       dotExpression3, buildIntVal (1));
@@ -246,12 +177,8 @@ FortranOpenMPHostSubroutineIndirectLoop::createTransferOpDatStatements ()
       SgExpression * multiplyExpression = buildMultiplyOp (dotExpression1,
           dotExpression3);
 
-      FortranOpenMPModuleDeclarationsIndirectLoop
-          * moduleDeclarationsIndirectLoop =
-              static_cast <FortranOpenMPModuleDeclarationsIndirectLoop *> (moduleDeclarations);
-
       SgExprStatement * assignmentStatement = buildAssignStatement (
-          moduleDeclarationsIndirectLoop->getGlobalOpDatSizeDeclaration (i),
+          variableDeclarations->getReference (getOpDatCardinalityName (i)),
           multiplyExpression);
 
       appendStatement (assignmentStatement, block);
@@ -260,18 +187,16 @@ FortranOpenMPHostSubroutineIndirectLoop::createTransferOpDatStatements ()
           variableDeclarations->getReference (getOpDatName (i)),
           buildOpaqueVarRefExp (dataOnHost, block));
 
-      SgVarRefExp * parameterExpression2 =
-          moduleDeclarations->getGlobalOpDatDeclaration (i);
+      SgVarRefExp * parameterExpression2 = variableDeclarations->getReference (
+          getOpDatCoreName (i));
 
       SgStatement
           * callStatement =
               FortranStatementsAndExpressionsBuilder::createCToFortranPointerCallStatement (
-                  subroutineScope,
-                  parameterExpression1,
-                  parameterExpression2,
+                  subroutineScope, parameterExpression1, parameterExpression2,
                   FortranStatementsAndExpressionsBuilder::buildShapeExpression (
-                      moduleDeclarationsIndirectLoop->getGlobalOpDatSizeDeclaration (
-                          i)));
+                      variableDeclarations->getReference (
+                          getOpDatCardinalityName (i))));
 
       appendStatement (callStatement, block);
     }
@@ -346,8 +271,10 @@ FortranOpenMPHostSubroutineIndirectLoop::createStatements ()
 {
   using namespace SageBuilder;
   using namespace SageInterface;
+  using namespace PlanFunctionVariableNames;
 
-  initialiseNumberOfThreadsStatements ();
+  appendStatement (createInitialiseNumberOfThreadsStatements (),
+      subroutineScope);
 
   appendStatement (createPlanFunctionParametersPreparationStatements (),
       subroutineScope);
@@ -356,8 +283,7 @@ FortranOpenMPHostSubroutineIndirectLoop::createStatements ()
       createPlanFunctionCallExpression ();
 
   SgExprStatement * assignmentStatement2 = buildAssignStatement (
-      moduleDeclarations->getCPlanReturnDeclaration (),
-      planFunctionCallExpression);
+      variableDeclarations->getReference (planRet), planFunctionCallExpression);
 
   appendStatement (assignmentStatement2, subroutineScope);
 
@@ -402,12 +328,14 @@ FortranOpenMPHostSubroutineIndirectLoop::FortranOpenMPHostSubroutineIndirectLoop
     FortranOpenMPKernelSubroutine * kernelSubroutine,
     FortranParallelLoop * parallelLoop,
     FortranOpenMPModuleDeclarationsIndirectLoop * moduleDeclarations) :
-  FortranOpenMPHostSubroutine (moduleScope, kernelSubroutine, parallelLoop,
-      moduleDeclarations)
+  FortranOpenMPHostSubroutine (moduleScope, kernelSubroutine, parallelLoop)
 {
   Debug::getInstance ()->debugMessage (
       "OpenMP host subroutine creation for indirect loop",
       Debug::CONSTRUCTOR_LEVEL, __FILE__, __LINE__);
+
+  variableDeclarations->addVisibilityToSymbolsFromOuterScope (
+      moduleDeclarations->getDeclarations ());
 
   createFormalParameterDeclarations ();
 

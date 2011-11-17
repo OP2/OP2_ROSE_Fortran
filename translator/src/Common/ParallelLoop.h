@@ -173,15 +173,6 @@ class ParallelLoop
     void
     setOpDatType (unsigned int OP_DAT_ArgumentGroup, SgType * type);
 
-    /*
-     * ======================================================
-     * What is the type which is wrapped by the OP_DAT declaration
-     * in the particular OP_DAT argument group?
-     * ======================================================
-     */
-    SgType *
-    getOpDatType (unsigned int OP_DAT_ArgumentGroup);
-
     bool
     isArray (unsigned int OP_DAT_ArgumentGroup);
 

@@ -1,6 +1,5 @@
 #include <FortranOpenMPHostSubroutineDirectLoop.h>
 #include <FortranOpenMPKernelSubroutine.h>
-#include <FortranOpenMPModuleDeclarationsDirectLoop.h>
 #include <FortranStatementsAndExpressionsBuilder.h>
 #include <FortranTypesBuilder.h>
 #include <RoseStatementsAndExpressionsBuilder.h>
@@ -15,6 +14,7 @@ FortranOpenMPHostSubroutineDirectLoop::createKernelFunctionCallStatement ()
 {
   using namespace SageBuilder;
   using namespace OP2VariableNames;
+  using namespace LoopVariableNames;
 
   SgExprListExp * actualParameters = buildExprListExp ();
 
@@ -25,13 +25,13 @@ FortranOpenMPHostSubroutineDirectLoop::createKernelFunctionCallStatement ()
       if (parallelLoop->isReductionRequired (i) == false)
       {
         actualParameters->append_expression (
-            moduleDeclarations->getGlobalOpDatDeclaration (i));
+            variableDeclarations->getReference (getOpDatLocalName (i)));
       }
       else
       {
         SgMultiplyOp * multiplyExpression = buildMultiplyOp (
-            variableDeclarations->getReference (OpenMP::threadIndex),
-            buildIntVal (64));
+            variableDeclarations->getReference (
+                getIterationCounterVariableName (1)), buildIntVal (64));
 
         SgSubscriptExpression * arraySubscriptExpression =
             new SgSubscriptExpression (RoseHelper::getFileInfo (),
@@ -66,19 +66,20 @@ FortranOpenMPHostSubroutineDirectLoop::createKernelFunctionCallStatement ()
 }
 
 void
-FortranOpenMPHostSubroutineDirectLoop::createKernelDoLoop ()
+FortranOpenMPHostSubroutineDirectLoop::createOpenMPLoopStatements ()
 {
   using namespace SageBuilder;
   using namespace SageInterface;
   using namespace OP2VariableNames;
   using namespace OP2::RunTimeVariableNames;
+  using namespace LoopVariableNames;
 
-  Debug::getInstance ()->debugMessage ("Creating kernel do loop",
+  Debug::getInstance ()->debugMessage ("Creating OpenMP for loop statements",
       Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
-  SgAssignOp * initializationExpression =
-      buildAssignOp (variableDeclarations->getReference (OpenMP::threadIndex),
-          buildIntVal (0));
+  SgAssignOp * initializationExpression = buildAssignOp (
+      variableDeclarations->getReference (getIterationCounterVariableName (1)),
+      buildIntVal (0));
 
   SgSubtractOp * upperBoundExpression = buildSubtractOp (
       variableDeclarations->getReference (OpenMP::numberOfThreads),
@@ -90,7 +91,7 @@ FortranOpenMPHostSubroutineDirectLoop::createKernelDoLoop ()
       getOpSetName ()), buildOpaqueVarRefExp (size, subroutineScope));
 
   SgMultiplyOp * multiplyExpression1 = buildMultiplyOp (dotExpression1,
-      variableDeclarations->getReference (OpenMP::threadIndex));
+      variableDeclarations->getReference (getIterationCounterVariableName (1)));
 
   SgDivideOp * divideExpression1 = buildDivideOp (multiplyExpression1,
       variableDeclarations->getReference (OpenMP::numberOfThreads));
@@ -103,7 +104,7 @@ FortranOpenMPHostSubroutineDirectLoop::createKernelDoLoop ()
       getOpSetName ()), buildOpaqueVarRefExp (size, subroutineScope));
 
   SgAddOp * addExpression2 = buildAddOp (variableDeclarations->getReference (
-      OpenMP::threadIndex), buildIntVal (1));
+      getIterationCounterVariableName (1)), buildIntVal (1));
 
   SgMultiplyOp * multiplyExpression2 = buildMultiplyOp (dotExpression2,
       addExpression2);
@@ -114,11 +115,11 @@ FortranOpenMPHostSubroutineDirectLoop::createKernelDoLoop ()
   SgExprStatement * assignmentStatement2 = buildAssignStatement (
       variableDeclarations->getReference (OpenMP::sliceEnd), divideExpression2);
 
-  loopBody->append_statement (assignmentStatement1);
+  appendStatement (assignmentStatement1, loopBody);
 
-  loopBody->append_statement (assignmentStatement2);
+  appendStatement (assignmentStatement2, loopBody);
 
-  loopBody->append_statement (createKernelFunctionCallStatement ());
+  appendStatement (createKernelFunctionCallStatement (), loopBody);
 
   SgFortranDo * doStatement =
       FortranStatementsAndExpressionsBuilder::buildFortranDoStatement (
@@ -127,111 +128,33 @@ FortranOpenMPHostSubroutineDirectLoop::createKernelDoLoop ()
 
   appendStatement (doStatement, subroutineScope);
 
-  addTextForUnparser (doStatement, "!$OMP PARALLEL DO PRIVATE("
-      + OpenMP::sliceStart + ", " + OpenMP::sliceEnd + ")\n",
+  std::vector <SgVarRefExp *> privateVariableReferences;
+
+  privateVariableReferences.push_back (variableDeclarations->getReference (
+      OpenMP::sliceStart));
+
+  privateVariableReferences.push_back (variableDeclarations->getReference (
+      OpenMP::sliceEnd));
+
+  privateVariableReferences.push_back (variableDeclarations->getReference (
+      getIterationCounterVariableName (1)));
+
+  addTextForUnparser (doStatement, OpenMP::getParallelLoopDirectiveString ()
+      + OpenMP::getPrivateClause (privateVariableReferences),
       AstUnparseAttribute::e_before);
 
-  addTextForUnparser (doStatement, "!$OMP END PARALLEL DO\n",
+  addTextForUnparser (doStatement,
+      OpenMP::getEndParallelLoopDirectiveString (),
       AstUnparseAttribute::e_after);
-}
-
-SgBasicBlock *
-FortranOpenMPHostSubroutineDirectLoop::createTransferOpDatStatements ()
-{
-  using namespace SageBuilder;
-  using namespace SageInterface;
-  using namespace OP2VariableNames;
-  using namespace OP2::RunTimeVariableNames;
-
-  Debug::getInstance ()->debugMessage (
-      "Creating statements to transfer OP_DAT", Debug::FUNCTION_LEVEL,
-      __FILE__, __LINE__);
-
-  SgBasicBlock * block = buildBasicBlock ();
-
-  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
-  {
-    if (parallelLoop->isDuplicateOpDat (i) == false)
-    {
-      SgDotExp * parameterExpression1 = buildDotExp (
-          variableDeclarations->getReference (getOpDatName (i)),
-          buildOpaqueVarRefExp (dataOnHost, block));
-
-      SgVarRefExp * parameterExpression2 =
-          moduleDeclarations->getGlobalOpDatDeclaration (i);
-
-      SgStatement
-          * callStatement =
-              FortranStatementsAndExpressionsBuilder::createCToFortranPointerCallStatement (
-                  subroutineScope, parameterExpression1, parameterExpression2);
-
-      appendStatement (callStatement, block);
-    }
-  }
-
-  return block;
-}
-
-void
-FortranOpenMPHostSubroutineDirectLoop::initialiseThreadVariablesStatements ()
-{
-  using namespace SageBuilder;
-  using namespace SageInterface;
-
-  Debug::getInstance ()->debugMessage (
-      "Creating statements to initialise thread variables",
-      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
-
-  SgExprStatement * assignmentStatement1 = buildAssignStatement (
-      variableDeclarations->getReference (OpenMP::threadIndex),
-      buildIntVal (-1));
-
-  appendStatement (assignmentStatement1, subroutineScope);
-
-  SgExprStatement * assignmentStatement2 =
-      buildAssignStatement (variableDeclarations->getReference (
-          OpenMP::sliceStart), buildIntVal (-1));
-
-  appendStatement (assignmentStatement2, subroutineScope);
-
-  SgExprStatement * assignmentStatement3 = buildAssignStatement (
-      variableDeclarations->getReference (OpenMP::sliceEnd), buildIntVal (-1));
-
-  appendStatement (assignmentStatement3, subroutineScope);
-}
-
-void
-FortranOpenMPHostSubroutineDirectLoop::createOpenMPVariableDeclarations ()
-{
-  variableDeclarations->add (OpenMP::numberOfThreads,
-      FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
-          OpenMP::numberOfThreads, FortranTypesBuilder::getFourByteInteger (),
-          subroutineScope));
-
-  variableDeclarations->add (OpenMP::threadIndex,
-      FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
-          OpenMP::threadIndex, FortranTypesBuilder::getFourByteInteger (),
-          subroutineScope));
-
-  variableDeclarations->add (OpenMP::sliceStart,
-      FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
-          OpenMP::sliceStart, FortranTypesBuilder::getFourByteInteger (),
-          subroutineScope));
-
-  variableDeclarations->add (OpenMP::sliceEnd,
-      FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
-          OpenMP::sliceEnd, FortranTypesBuilder::getFourByteInteger (),
-          subroutineScope));
 }
 
 void
 FortranOpenMPHostSubroutineDirectLoop::createStatements ()
 {
-  using SageInterface::appendStatement;
+  using namespace SageInterface;
 
-  initialiseThreadVariablesStatements ();
-
-  initialiseNumberOfThreadsStatements ();
+  appendStatement (createInitialiseNumberOfThreadsStatements (),
+      subroutineScope);
 
   appendStatement (createTransferOpDatStatements (), subroutineScope);
 
@@ -240,7 +163,7 @@ FortranOpenMPHostSubroutineDirectLoop::createStatements ()
     createReductionPrologueStatements ();
   }
 
-  createKernelDoLoop ();
+  createOpenMPLoopStatements ();
 
   if (parallelLoop->isReductionRequired ())
   {
@@ -251,7 +174,9 @@ FortranOpenMPHostSubroutineDirectLoop::createStatements ()
 void
 FortranOpenMPHostSubroutineDirectLoop::createLocalVariableDeclarations ()
 {
-  createOpenMPVariableDeclarations ();
+  createOpDatLocalVariableDeclarations ();
+
+  createOpenMPLocalVariableDeclarations ();
 
   if (parallelLoop->isReductionRequired ())
   {
@@ -262,10 +187,8 @@ FortranOpenMPHostSubroutineDirectLoop::createLocalVariableDeclarations ()
 FortranOpenMPHostSubroutineDirectLoop::FortranOpenMPHostSubroutineDirectLoop (
     SgScopeStatement * moduleScope,
     FortranOpenMPKernelSubroutine * kernelSubroutine,
-    FortranParallelLoop * parallelLoop,
-    FortranOpenMPModuleDeclarationsDirectLoop * moduleDeclarations) :
-  FortranOpenMPHostSubroutine (moduleScope, kernelSubroutine, parallelLoop,
-      moduleDeclarations)
+    FortranParallelLoop * parallelLoop) :
+  FortranOpenMPHostSubroutine (moduleScope, kernelSubroutine, parallelLoop)
 {
   Debug::getInstance ()->debugMessage (
       "OpenMP host subroutine creation for direct loop",
