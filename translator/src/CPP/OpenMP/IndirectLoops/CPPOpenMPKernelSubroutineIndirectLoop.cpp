@@ -276,6 +276,7 @@ CPPOpenMPKernelSubroutineIndirectLoop::createOpDatFormalParameterDeclarations ()
   using namespace LoopVariableNames;
   using namespace OP2VariableNames;
   using namespace ReductionVariableNames;
+  using namespace PlanFunctionVariableNames;
   using std::string;
 
   Debug::getInstance ()->debugMessage ("Creating OP_DAT formal parameters",

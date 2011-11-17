@@ -10,6 +10,7 @@ CPPCUDAKernelSubroutineIndirectLoop::createUserSubroutineCallStatement ()
   using namespace SageBuilder;
   using namespace LoopVariableNames;
   using namespace OP2VariableNames;
+  using namespace PlanFunctionVariableNames;
   using std::string;
   using std::vector;
 
@@ -112,6 +113,7 @@ CPPCUDAKernelSubroutineIndirectLoop::createIncrementAndWriteAccessEpilogueStatem
   using namespace SageInterface;
   using namespace LoopVariableNames;
   using namespace OP2VariableNames;
+  using namespace PlanFunctionVariableNames;
 
   Debug::getInstance ()->debugMessage (
       "Creating increment and write access epilogue statements",
@@ -500,6 +502,7 @@ CPPCUDAKernelSubroutineIndirectLoop::createInitialiseCUDASharedVariablesStatemen
   using namespace SageInterface;
   using namespace LoopVariableNames;
   using namespace OP2VariableNames;
+  using namespace PlanFunctionVariableNames;
   using std::string;
 
   Debug::getInstance ()->debugMessage (
@@ -699,6 +702,7 @@ CPPCUDAKernelSubroutineIndirectLoop::createSetOpDatSharedMemoryPointerStatements
   using namespace SageInterface;
   using namespace LoopVariableNames;
   using namespace OP2VariableNames;
+  using namespace PlanFunctionVariableNames;
   using std::string;
 
   Debug::getInstance ()->debugMessage (
@@ -1304,6 +1308,7 @@ CPPCUDAKernelSubroutineIndirectLoop::createOpDatFormalParameterDeclarations ()
   using namespace LoopVariableNames;
   using namespace OP2VariableNames;
   using namespace ReductionVariableNames;
+  using namespace PlanFunctionVariableNames;
   using std::string;
 
   Debug::getInstance ()->debugMessage ("Creating OP_DAT formal parameters",
