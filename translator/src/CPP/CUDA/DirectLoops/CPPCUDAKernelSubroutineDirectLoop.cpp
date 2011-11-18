@@ -84,7 +84,6 @@ CPPCUDAKernelSubroutineDirectLoop::createStageInFromDeviceMemoryToSharedMemorySt
   using namespace SageInterface;
   using namespace LoopVariableNames;
   using namespace OP2VariableNames;
-  using namespace PlanFunctionVariableNames;
   using std::string;
 
   string const autosharedVariableName = getCUDASharedMemoryDeclarationName (
@@ -93,7 +92,7 @@ CPPCUDAKernelSubroutineDirectLoop::createStageInFromDeviceMemoryToSharedMemorySt
 
   SgMultiplyOp * multiplyExpression1 = buildMultiplyOp (
       variableDeclarations->getReference (getIterationCounterVariableName (2)),
-      variableDeclarations->getReference (nelems));
+      variableDeclarations->getReference (numberOfActiveThreads));
 
   SgMultiplyOp * multiplyExpression2 = buildMultiplyOp (
       variableDeclarations->getReference (localOffset), buildIntVal (
@@ -192,7 +191,6 @@ CPPCUDAKernelSubroutineDirectLoop::createStageOutFromSharedMemoryToDeviceMemoryS
   using namespace SageInterface;
   using namespace LoopVariableNames;
   using namespace OP2VariableNames;
-  using namespace PlanFunctionVariableNames;
   using std::string;
 
   string const autosharedVariableName = getCUDASharedMemoryDeclarationName (
@@ -201,7 +199,7 @@ CPPCUDAKernelSubroutineDirectLoop::createStageOutFromSharedMemoryToDeviceMemoryS
 
   SgMultiplyOp * multiplyExpression1 = buildMultiplyOp (
       variableDeclarations->getReference (getIterationCounterVariableName (2)),
-      variableDeclarations->getReference (nelems));
+      variableDeclarations->getReference (numberOfActiveThreads));
 
   SgMultiplyOp * multiplyExpression2 = buildMultiplyOp (
       variableDeclarations->getReference (localOffset), buildIntVal (
@@ -299,7 +297,6 @@ CPPCUDAKernelSubroutineDirectLoop::createExecutionLoopStatements ()
   using namespace SageInterface;
   using namespace LoopVariableNames;
   using namespace OP2VariableNames;
-  using namespace PlanFunctionVariableNames;
   using boost::lexical_cast;
   using std::string;
 
@@ -322,7 +319,7 @@ CPPCUDAKernelSubroutineDirectLoop::createExecutionLoopStatements ()
       variableDeclarations->getReference (localOffset));
 
   SgExprStatement * assignmentStatement2 = buildAssignStatement (
-      variableDeclarations->getReference (nelems),
+      variableDeclarations->getReference (numberOfActiveThreads),
       OP2::Macros::createMinCallStatement (subroutineScope,
           buildOpaqueVarRefExp (OP2::Macros::warpSizeMacro, subroutineScope),
           subtractExpression2));
@@ -507,7 +504,6 @@ CPPCUDAKernelSubroutineDirectLoop::createLocalVariableDeclarations ()
   using namespace SageBuilder;
   using namespace LoopVariableNames;
   using namespace OP2VariableNames;
-  using namespace PlanFunctionVariableNames;
   using std::vector;
   using std::string;
 
@@ -532,9 +528,9 @@ CPPCUDAKernelSubroutineDirectLoop::createLocalVariableDeclarations ()
       RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
           localOffset, buildIntType (), subroutineScope));
 
-  variableDeclarations->add (nelems,
-      RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (nelems,
-          buildIntType (), subroutineScope));
+  variableDeclarations->add (numberOfActiveThreads,
+      RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
+          numberOfActiveThreads, buildIntType (), subroutineScope));
 
   variableDeclarations->add (threadID,
       RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (threadID,

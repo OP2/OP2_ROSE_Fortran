@@ -1,8 +1,9 @@
-#include <CPPHostSubroutine.h>
-#include <CPPParallelLoop.h>
-#include <RoseStatementsAndExpressionsBuilder.h>
-#include <CompilerGeneratedNames.h>
-#include <OP2Definitions.h>
+#include "CPPHostSubroutine.h"
+#include "CPPParallelLoop.h"
+#include "RoseStatementsAndExpressionsBuilder.h"
+#include "CompilerGeneratedNames.h"
+#include "PlanFunctionNames.h"
+#include "OP2Definitions.h"
 
 SgBasicBlock *
 CPPHostSubroutine::createInitialisePlanFunctionArrayStatements ()

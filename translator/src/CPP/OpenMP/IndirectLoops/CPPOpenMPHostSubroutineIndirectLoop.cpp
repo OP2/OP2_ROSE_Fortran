@@ -1,10 +1,11 @@
-#include <CPPOpenMPHostSubroutineIndirectLoop.h>
-#include <CPPUserSubroutine.h>
-#include <RoseStatementsAndExpressionsBuilder.h>
-#include <RoseHelper.h>
-#include <CompilerGeneratedNames.h>
-#include <OP2Definitions.h>
-#include <OpenMP.h>
+#include "CPPOpenMPHostSubroutineIndirectLoop.h"
+#include "CPPUserSubroutine.h"
+#include "RoseStatementsAndExpressionsBuilder.h"
+#include "RoseHelper.h"
+#include "CompilerGeneratedNames.h"
+#include "PlanFunctionNames.h"
+#include "OP2Definitions.h"
+#include "OpenMP.h"
 
 SgStatement *
 CPPOpenMPHostSubroutineIndirectLoop::createKernelFunctionCallStatement ()
@@ -328,6 +329,7 @@ CPPOpenMPHostSubroutineIndirectLoop::createIncrementAccessLocalVariableDeclarati
 {
   using namespace SageBuilder;
   using namespace PlanFunctionVariableNames;
+  using namespace OP2VariableNames;
 
   Debug::getInstance ()->debugMessage (
       "Creating local variable declarations needed for incremented OP_DATS",
@@ -337,9 +339,9 @@ CPPOpenMPHostSubroutineIndirectLoop::createIncrementAccessLocalVariableDeclarati
       RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
           numberOfColours, buildIntType (), subroutineScope));
 
-  variableDeclarations->add (nelems2,
-      RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (nelems2,
-          buildIntType (), subroutineScope));
+  variableDeclarations->add (numberOfActiveThreadsCeiling,
+      RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
+          numberOfActiveThreadsCeiling, buildIntType (), subroutineScope));
 
   variableDeclarations ->add (colour1,
       RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (colour1,

@@ -1,15 +1,16 @@
-#include <FortranCUDAKernelSubroutineIndirectLoop.h>
-#include <FortranCUDAUserSubroutine.h>
-#include <FortranParallelLoop.h>
-#include <FortranOpDatDimensionsDeclaration.h>
-#include <FortranCUDAOpDatCardinalitiesDeclarationIndirectLoop.h>
-#include <FortranTypesBuilder.h>
-#include <RoseStatementsAndExpressionsBuilder.h>
-#include <FortranStatementsAndExpressionsBuilder.h>
-#include <CompilerGeneratedNames.h>
-#include <RoseHelper.h>
-#include <CUDA.h>
-#include <Debug.h>
+#include "FortranCUDAKernelSubroutineIndirectLoop.h"
+#include "FortranCUDAUserSubroutine.h"
+#include "FortranParallelLoop.h"
+#include "FortranOpDatDimensionsDeclaration.h"
+#include "FortranCUDAOpDatCardinalitiesDeclarationIndirectLoop.h"
+#include "FortranTypesBuilder.h"
+#include "RoseStatementsAndExpressionsBuilder.h"
+#include "FortranStatementsAndExpressionsBuilder.h"
+#include "CompilerGeneratedNames.h"
+#include "PlanFunctionNames.h"
+#include "RoseHelper.h"
+#include "CUDA.h"
+#include "Debug.h"
 #include <boost/lexical_cast.hpp>
 
 SgStatement *
@@ -670,7 +671,7 @@ FortranCUDAKernelSubroutineIndirectLoop::createExecutionLoopStatements ()
     SgExpression * ifGuardExpression =
         buildLessThanOp (variableDeclarations->getReference (
             getIterationCounterVariableName (1)),
-            variableDeclarations->getReference (nelems));
+            variableDeclarations->getReference (numberOfActiveThreads));
 
     SgIfStmt * ifStatement =
         RoseStatementsAndExpressionsBuilder::buildIfStatementWithEmptyElse (
@@ -703,7 +704,7 @@ FortranCUDAKernelSubroutineIndirectLoop::createExecutionLoopStatements ()
     SgLessThanOp * loopGuardExpression =
         buildLessThanOp (variableDeclarations->getReference (
             getIterationCounterVariableName (1)),
-            variableDeclarations->getReference (nelems2));
+            variableDeclarations->getReference (numberOfActiveThreadsCeiling));
 
     SgWhileStmt * loopStatement =
         buildWhileStmt (loopGuardExpression, loopBody);
@@ -717,7 +718,7 @@ FortranCUDAKernelSubroutineIndirectLoop::createExecutionLoopStatements ()
     SgLessThanOp * loopGuardExpression =
         buildLessThanOp (variableDeclarations->getReference (
             getIterationCounterVariableName (1)),
-            variableDeclarations->getReference (nelems));
+            variableDeclarations->getReference (numberOfActiveThreads));
 
     SgWhileStmt * loopStatement =
         buildWhileStmt (loopGuardExpression, loopBody);
@@ -979,7 +980,8 @@ FortranCUDAKernelSubroutineIndirectLoop::createIncrementAccessThreadZeroStatemen
    */
 
   SgSubtractOp * subtractExpression1 = buildSubtractOp (
-      variableDeclarations->getReference (nelems), buildIntVal (1));
+      variableDeclarations->getReference (numberOfActiveThreads), buildIntVal (
+          1));
 
   SgDivideOp * divideExpression1 = buildDivideOp (subtractExpression1,
       CUDA::getThreadBlockDimension (THREAD_X, subroutineScope));
@@ -993,7 +995,7 @@ FortranCUDAKernelSubroutineIndirectLoop::createIncrementAccessThreadZeroStatemen
           addExpression1);
 
   SgStatement * statement1 = buildAssignStatement (buildOpaqueVarRefExp (
-      nelems2, subroutineScope), multiplyExpression1);
+      numberOfActiveThreadsCeiling, subroutineScope), multiplyExpression1);
 
   appendStatement (statement1, block);
 
@@ -1158,10 +1160,10 @@ FortranCUDAKernelSubroutineIndirectLoop::createThreadZeroStatements ()
   SgPntrArrRefExp * arrayExpression1 = buildPntrArrRefExp (
       variableDeclarations->getReference (pblkMap), arrayIndexExpression1);
 
-  SgStatement * statement1 = buildAssignStatement (
+  SgExprStatement * assignmentStatement1 = buildAssignStatement (
       variableDeclarations->getReference (blockID), arrayExpression1);
 
-  appendStatement (statement1, ifBlock);
+  appendStatement (assignmentStatement1, ifBlock);
 
   /*
    * ======================================================
@@ -1173,10 +1175,11 @@ FortranCUDAKernelSubroutineIndirectLoop::createThreadZeroStatements ()
       buildOpaqueVarRefExp (pnelems, subroutineScope),
       variableDeclarations->getReference (blockID));
 
-  SgStatement * statement2 = buildAssignStatement (buildOpaqueVarRefExp (
-      nelems, subroutineScope), arrayExpression2);
+  SgExprStatement * assignmentStatement2 = buildAssignStatement (
+      variableDeclarations->getReference (numberOfActiveThreads),
+      arrayExpression2);
 
-  appendStatement (statement2, ifBlock);
+  appendStatement (assignmentStatement2, ifBlock);
 
   /*
    * ======================================================
@@ -1199,10 +1202,11 @@ FortranCUDAKernelSubroutineIndirectLoop::createThreadZeroStatements ()
       buildOpaqueVarRefExp (poffset, subroutineScope),
       variableDeclarations->getReference (blockID));
 
-  SgStatement * statement3 = buildAssignStatement (buildOpaqueVarRefExp (
-      sharedMemoryOffset, subroutineScope), arrayExpression3);
+  SgExprStatement * assignmentStatement3 = buildAssignStatement (
+      buildOpaqueVarRefExp (sharedMemoryOffset, subroutineScope),
+      arrayExpression3);
 
-  appendStatement (statement3, ifBlock);
+  appendStatement (assignmentStatement3, ifBlock);
 
   /*
    * ======================================================
@@ -1228,11 +1232,11 @@ FortranCUDAKernelSubroutineIndirectLoop::createThreadZeroStatements ()
         SgPntrArrRefExp * arrayExpression = buildPntrArrRefExp (
             variableDeclarations->getReference (pindSizes), addExpression);
 
-        SgStatement * statement = buildAssignStatement (
+        SgExprStatement * assignmentStatement = buildAssignStatement (
             variableDeclarations->getReference (getIndirectionArgumentSizeName (
                 i)), arrayExpression);
 
-        appendStatement (statement, ifBlock);
+        appendStatement (assignmentStatement, ifBlock);
 
         ++offset;
       }
@@ -1328,10 +1332,11 @@ FortranCUDAKernelSubroutineIndirectLoop::createIncrementAccessLocalVariableDecla
           numberOfColours, FortranTypesBuilder::getFourByteInteger (),
           subroutineScope, 1, CUDA_SHARED));
 
-  variableDeclarations->add (nelems2,
+  variableDeclarations->add (numberOfActiveThreadsCeiling,
       FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
-          nelems2, FortranTypesBuilder::getFourByteInteger (), subroutineScope,
-          1, CUDA_SHARED));
+          numberOfActiveThreadsCeiling,
+          FortranTypesBuilder::getFourByteInteger (), subroutineScope, 1,
+          CUDA_SHARED));
 
   variableDeclarations ->add (colour1,
       FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
@@ -1368,10 +1373,10 @@ FortranCUDAKernelSubroutineIndirectLoop::createExecutionLocalVariableDeclaration
           blockID, FortranTypesBuilder::getFourByteInteger (), subroutineScope,
           1, CUDA_SHARED));
 
-  variableDeclarations->add (nelems,
+  variableDeclarations->add (numberOfActiveThreads,
       FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
-          nelems, FortranTypesBuilder::getFourByteInteger (), subroutineScope,
-          1, CUDA_SHARED));
+          numberOfActiveThreads, FortranTypesBuilder::getFourByteInteger (),
+          subroutineScope, 1, CUDA_SHARED));
 
   variableDeclarations ->add (moduloResult,
       FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (

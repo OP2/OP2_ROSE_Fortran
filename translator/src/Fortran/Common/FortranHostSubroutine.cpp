@@ -1,11 +1,12 @@
-#include <FortranHostSubroutine.h>
-#include <FortranStatementsAndExpressionsBuilder.h>
-#include <FortranTypesBuilder.h>
-#include <FortranParallelLoop.h>
-#include <RoseStatementsAndExpressionsBuilder.h>
-#include <OP2Definitions.h>
-#include <CompilerGeneratedNames.h>
-#include <Debug.h>
+#include "FortranHostSubroutine.h"
+#include "FortranStatementsAndExpressionsBuilder.h"
+#include "FortranTypesBuilder.h"
+#include "FortranParallelLoop.h"
+#include "RoseStatementsAndExpressionsBuilder.h"
+#include "OP2Definitions.h"
+#include "PlanFunctionNames.h"
+#include "CompilerGeneratedNames.h"
+#include "Debug.h"
 #include <boost/algorithm/string/predicate.hpp>
 #include <rose.h>
 
@@ -16,7 +17,6 @@ FortranHostSubroutine::createConvertPlanFunctionParametersStatements ()
   using namespace SageInterface;
   using namespace PlanFunctionVariableNames;
   using namespace OP2::RunTimeVariableNames;
-  using namespace OP2VariableNames;
 
   Debug::getInstance ()->debugMessage (
       "Creating statements to convert plan function parameters",

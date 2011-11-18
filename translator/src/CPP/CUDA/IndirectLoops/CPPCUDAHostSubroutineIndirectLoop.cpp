@@ -1,10 +1,11 @@
-#include <CPPCUDAHostSubroutineIndirectLoop.h>
-#include <CPPModuleDeclarations.h>
-#include <RoseHelper.h>
-#include <RoseStatementsAndExpressionsBuilder.h>
-#include <CUDA.h>
-#include <CompilerGeneratedNames.h>
-#include <OP2Definitions.h>
+#include "CPPCUDAHostSubroutineIndirectLoop.h"
+#include "CPPModuleDeclarations.h"
+#include "RoseHelper.h"
+#include "RoseStatementsAndExpressionsBuilder.h"
+#include "CUDA.h"
+#include "CompilerGeneratedNames.h"
+#include "PlanFunctionNames.h"
+#include "OP2Definitions.h"
 
 SgStatement *
 CPPCUDAHostSubroutineIndirectLoop::createKernelFunctionCallStatement ()

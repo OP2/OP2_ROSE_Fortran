@@ -129,7 +129,6 @@ FortranCUDAKernelSubroutineDirectLoop::createStageInFromDeviceMemoryToSharedMemo
   using namespace SageInterface;
   using namespace OP2VariableNames;
   using namespace LoopVariableNames;
-  using namespace PlanFunctionVariableNames;
   using std::string;
 
   string const autosharedVariableName = getCUDASharedMemoryDeclarationName (
@@ -151,7 +150,7 @@ FortranCUDAKernelSubroutineDirectLoop::createStageInFromDeviceMemoryToSharedMemo
 
   SgMultiplyOp * multiplyExpression1 = buildMultiplyOp (
       variableDeclarations->getReference (getIterationCounterVariableName (2)),
-      variableDeclarations->getReference (nelems));
+      variableDeclarations->getReference (numberOfActiveThreads));
 
   SgAddOp * addExpression1 = buildAddOp (variableDeclarations->getReference (
       threadID), multiplyExpression1);
@@ -161,7 +160,7 @@ FortranCUDAKernelSubroutineDirectLoop::createStageInFromDeviceMemoryToSharedMemo
 
   SgMultiplyOp * multiplyExpression2 = buildMultiplyOp (
       variableDeclarations->getReference (getIterationCounterVariableName (2)),
-      variableDeclarations->getReference (nelems));
+      variableDeclarations->getReference (numberOfActiveThreads));
 
   SgMultiplyOp * multiplyExpression3 = buildMultiplyOp (
       variableDeclarations->getReference (localOffset), dotExpression);
@@ -264,7 +263,6 @@ FortranCUDAKernelSubroutineDirectLoop::createStageOutFromSharedMemoryToDeviceMem
   using namespace SageBuilder;
   using namespace SageInterface;
   using namespace OP2VariableNames;
-  using namespace PlanFunctionVariableNames;
   using namespace LoopVariableNames;
   using std::string;
 
@@ -287,7 +285,7 @@ FortranCUDAKernelSubroutineDirectLoop::createStageOutFromSharedMemoryToDeviceMem
 
   SgMultiplyOp * multiplyExpression2 = buildMultiplyOp (
       variableDeclarations->getReference (getIterationCounterVariableName (2)),
-      variableDeclarations->getReference (nelems));
+      variableDeclarations->getReference (numberOfActiveThreads));
 
   SgMultiplyOp * multiplyExpression3 = buildMultiplyOp (
       variableDeclarations->getReference (localOffset), dotExpression);
@@ -300,7 +298,7 @@ FortranCUDAKernelSubroutineDirectLoop::createStageOutFromSharedMemoryToDeviceMem
 
   SgMultiplyOp * multiplyExpression4 = buildMultiplyOp (
       variableDeclarations->getReference (getIterationCounterVariableName (2)),
-      variableDeclarations->getReference (nelems));
+      variableDeclarations->getReference (numberOfActiveThreads));
 
   SgAddOp * addExpression5 = buildAddOp (variableDeclarations->getReference (
       threadID), multiplyExpression4);
@@ -400,7 +398,6 @@ FortranCUDAKernelSubroutineDirectLoop::createExecutionLoopStatements ()
   using namespace SageInterface;
   using namespace OP2VariableNames;
   using namespace LoopVariableNames;
-  using namespace PlanFunctionVariableNames;
   using boost::lexical_cast;
   using std::string;
 
@@ -432,7 +429,7 @@ FortranCUDAKernelSubroutineDirectLoop::createExecutionLoopStatements ()
       actualParameters);
 
   SgExprStatement * assignmentStatement2 = buildAssignStatement (
-      variableDeclarations->getReference (nelems), functionCall);
+      variableDeclarations->getReference (numberOfActiveThreads), functionCall);
 
   appendStatement (assignmentStatement2, loopBody);
 
@@ -620,7 +617,6 @@ FortranCUDAKernelSubroutineDirectLoop::createLocalVariableDeclarations ()
 {
   using namespace LoopVariableNames;
   using namespace OP2VariableNames;
-  using namespace PlanFunctionVariableNames;
   using std::vector;
   using std::string;
 
@@ -635,8 +631,8 @@ FortranCUDAKernelSubroutineDirectLoop::createLocalVariableDeclarations ()
 
   fourByteIntegers.push_back (getIterationCounterVariableName (1));
   fourByteIntegers.push_back (getIterationCounterVariableName (2));
+  fourByteIntegers.push_back (numberOfActiveThreads);
   fourByteIntegers.push_back (localOffset);
-  fourByteIntegers.push_back (nelems);
   fourByteIntegers.push_back (threadID);
 
   for (vector <string>::iterator it = fourByteIntegers.begin (); it

@@ -1,8 +1,9 @@
-#include <CPPCUDAKernelSubroutineIndirectLoop.h>
-#include <RoseStatementsAndExpressionsBuilder.h>
-#include <CompilerGeneratedNames.h>
-#include <OP2Definitions.h>
-#include <CUDA.h>
+#include "CPPCUDAKernelSubroutineIndirectLoop.h"
+#include "RoseStatementsAndExpressionsBuilder.h"
+#include "CompilerGeneratedNames.h"
+#include "PlanFunctionNames.h"
+#include "OP2Definitions.h"
+#include "CUDA.h"
 
 SgStatement *
 CPPCUDAKernelSubroutineIndirectLoop::createUserSubroutineCallStatement ()
@@ -463,7 +464,7 @@ CPPCUDAKernelSubroutineIndirectLoop::createExecutionLoopStatements ()
     SgExpression * ifGuardExpression =
         buildLessThanOp (variableDeclarations->getReference (
             getIterationCounterVariableName (1)),
-            variableDeclarations->getReference (nelems));
+            variableDeclarations->getReference (numberOfActiveThreads));
 
     SgIfStmt * ifStatement =
         RoseStatementsAndExpressionsBuilder::buildIfStatementWithEmptyElse (
@@ -477,7 +478,7 @@ CPPCUDAKernelSubroutineIndirectLoop::createExecutionLoopStatements ()
 
     upperBoundExpression = buildLessThanOp (variableDeclarations->getReference (
         getIterationCounterVariableName (1)),
-        variableDeclarations->getReference (nelems2));
+        variableDeclarations->getReference (numberOfActiveThreadsCeiling));
   }
   else
   {
@@ -485,7 +486,7 @@ CPPCUDAKernelSubroutineIndirectLoop::createExecutionLoopStatements ()
 
     upperBoundExpression = buildLessThanOp (variableDeclarations->getReference (
         getIterationCounterVariableName (1)),
-        variableDeclarations->getReference (nelems));
+        variableDeclarations->getReference (numberOfActiveThreads));
   }
 
   SgForStatement * forLoopStatement = buildForStatement (
@@ -817,7 +818,8 @@ CPPCUDAKernelSubroutineIndirectLoop::createIncrementAccessThreadZeroStatements (
    */
 
   SgSubtractOp * subtractExpression1 = buildSubtractOp (
-      variableDeclarations->getReference (nelems), buildIntVal (1));
+      variableDeclarations->getReference (numberOfActiveThreads), buildIntVal (
+          1));
 
   SgDivideOp * divideExpression1 = buildDivideOp (subtractExpression1,
       CUDA::getThreadBlockDimension (THREAD_X, subroutineScope));
@@ -830,10 +832,11 @@ CPPCUDAKernelSubroutineIndirectLoop::createIncrementAccessThreadZeroStatements (
           CUDA::getThreadBlockDimension (THREAD_X, subroutineScope),
           addExpression1);
 
-  SgStatement * statement1 = buildAssignStatement (buildOpaqueVarRefExp (
-      nelems2, subroutineScope), multiplyExpression1);
+  SgExprStatement * assignmentStatement1 = buildAssignStatement (
+      buildOpaqueVarRefExp (numberOfActiveThreadsCeiling, subroutineScope),
+      multiplyExpression1);
 
-  appendStatement (statement1, block);
+  appendStatement (assignmentStatement1, block);
 
   /*
    * ======================================================
@@ -845,10 +848,11 @@ CPPCUDAKernelSubroutineIndirectLoop::createIncrementAccessThreadZeroStatements (
       buildOpaqueVarRefExp (pnthrcol, subroutineScope),
       variableDeclarations->getReference (blockID));
 
-  SgStatement * statement2 = buildAssignStatement (buildOpaqueVarRefExp (
-      numberOfColours, subroutineScope), arrayExpression2);
+  SgExprStatement * assignmentStatement2 =
+      buildAssignStatement (buildOpaqueVarRefExp (numberOfColours,
+          subroutineScope), arrayExpression2);
 
-  appendStatement (statement2, block);
+  appendStatement (assignmentStatement2, block);
 
   return block;
 }
@@ -947,8 +951,9 @@ CPPCUDAKernelSubroutineIndirectLoop::createThreadZeroStatements ()
       buildOpaqueVarRefExp (pnelems, subroutineScope),
       variableDeclarations->getReference (blockID));
 
-  SgStatement * statement2 = buildAssignStatement (buildOpaqueVarRefExp (
-      nelems, subroutineScope), arrayExpression2);
+  SgStatement * statement2 = buildAssignStatement (
+      variableDeclarations->getReference (numberOfActiveThreads),
+      arrayExpression2);
 
   appendStatement (statement2, ifBlock);
 
@@ -1058,12 +1063,12 @@ CPPCUDAKernelSubroutineIndirectLoop::createIncrementAccessLocalVariableDeclarati
   variableDeclaration1->get_declarationModifier ().get_storageModifier ().setCudaShared ();
 
   SgVariableDeclaration * variableDeclaration2 =
-      RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (nelems2,
-          buildIntType (), subroutineScope);
+      RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
+          numberOfActiveThreadsCeiling, buildIntType (), subroutineScope);
 
   variableDeclaration2->get_declarationModifier ().get_storageModifier ().setCudaShared ();
 
-  variableDeclarations->add (nelems2, variableDeclaration2);
+  variableDeclarations->add (numberOfActiveThreadsCeiling, variableDeclaration2);
 
   variableDeclarations ->add (colour1,
       RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (colour1,
@@ -1100,12 +1105,12 @@ CPPCUDAKernelSubroutineIndirectLoop::createExecutionLocalVariableDeclarations ()
   variableDeclarations->add (sharedMemoryOffset, variableDeclaration1);
 
   SgVariableDeclaration * variableDeclaration2 =
-      RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (nelems,
-          buildIntType (), subroutineScope);
+      RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
+          numberOfActiveThreads, buildIntType (), subroutineScope);
 
   variableDeclaration2->get_declarationModifier ().get_storageModifier ().setCudaShared ();
 
-  variableDeclarations->add (nelems, variableDeclaration2);
+  variableDeclarations->add (numberOfActiveThreads, variableDeclaration2);
 
   SgVariableDeclaration * variableDeclaration3 =
       RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (nbytes,

@@ -1,10 +1,10 @@
-#include <FortranCUDAOpDatCardinalitiesDeclaration.h>
-#include <FortranParallelLoop.h>
-#include <FortranTypesBuilder.h>
-#include <RoseStatementsAndExpressionsBuilder.h>
-#include <ScopedVariableDeclarations.h>
-#include <Debug.h>
-#include <CompilerGeneratedNames.h>
+#include "FortranCUDAOpDatCardinalitiesDeclaration.h"
+#include "FortranParallelLoop.h"
+#include "FortranTypesBuilder.h"
+#include "RoseStatementsAndExpressionsBuilder.h"
+#include "ScopedVariableDeclarations.h"
+#include "Debug.h"
+#include "CompilerGeneratedNames.h"
 #include <boost/lexical_cast.hpp>
 #include <rose.h>
 

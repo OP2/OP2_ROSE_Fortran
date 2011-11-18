@@ -1,6 +1,7 @@
-#include <CPPOpenMPKernelSubroutineIndirectLoop.h>
-#include <RoseStatementsAndExpressionsBuilder.h>
-#include <CompilerGeneratedNames.h>
+#include "CPPOpenMPKernelSubroutineIndirectLoop.h"
+#include "RoseStatementsAndExpressionsBuilder.h"
+#include "CompilerGeneratedNames.h"
+#include "PlanFunctionNames.h"
 
 SgStatement *
 CPPOpenMPKernelSubroutineIndirectLoop::createUserSubroutineCallStatement ()

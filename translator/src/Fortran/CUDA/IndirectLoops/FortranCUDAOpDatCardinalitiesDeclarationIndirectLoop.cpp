@@ -1,16 +1,15 @@
-#include <FortranCUDAOpDatCardinalitiesDeclarationIndirectLoop.h>
-#include <FortranParallelLoop.h>
-#include <FortranStatementsAndExpressionsBuilder.h>
-#include <FortranTypesBuilder.h>
-#include <ScopedVariableDeclarations.h>
-#include <CompilerGeneratedNames.h>
+#include "FortranCUDAOpDatCardinalitiesDeclarationIndirectLoop.h"
+#include "FortranParallelLoop.h"
+#include "FortranStatementsAndExpressionsBuilder.h"
+#include "FortranTypesBuilder.h"
+#include "ScopedVariableDeclarations.h"
+#include "PlanFunctionNames.h"
 #include <rose.h>
 
 void
 FortranCUDAOpDatCardinalitiesDeclarationIndirectLoop::addIndirectLoopFields ()
 {
   using namespace SageBuilder;
-  using namespace OP2VariableNames;
   using namespace PlanFunctionVariableNames;
   using std::string;
   using std::vector;

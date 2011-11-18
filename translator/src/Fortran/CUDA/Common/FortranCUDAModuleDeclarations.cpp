@@ -3,7 +3,7 @@
 #include "FortranTypesBuilder.h"
 #include "FortranParallelLoop.h"
 #include "ScopedVariableDeclarations.h"
-#include "CompilerGeneratedNames.h"
+#include "PlanFunctionNames.h"
 #include <rose.h>
 
 FortranCUDAModuleDeclarations::FortranCUDAModuleDeclarations (
