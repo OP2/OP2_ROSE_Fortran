@@ -9,6 +9,9 @@ class FortranOpenMPModuleDeclarationsIndirectLoop: public FortranOpenMPModuleDec
   private:
 
     void
+    createFirstTimeExecutionDeclaration ();
+
+    void
     createExecutionPlanDeclarations ();
 
   public:

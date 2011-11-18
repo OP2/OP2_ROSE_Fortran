@@ -267,7 +267,8 @@ CPPOpenMPKernelSubroutineIndirectLoop::createPlanFormalParameterDeclarations ()
   variableDeclarations->add (
       blockID,
       RoseStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
-          blockID, buildIntType (), subroutineScope, formalParameters));
+          blockID, buildIntType (), subroutineScope,
+          formalParameters));
 }
 
 void

@@ -161,7 +161,8 @@ CPPOpenMPHostSubroutineIndirectLoop::createOpenMPLoopStatements (
    */
 
   SgExprStatement * initialisationExpression = buildAssignStatement (
-      variableDeclarations->getReference (blockID), buildIntVal (0));
+      variableDeclarations->getReference (blockID),
+      buildIntVal (0));
 
   SgLessThanOp * upperBoundExpression = buildLessThanOp (
       variableDeclarations->getReference (blockID),
@@ -344,12 +345,12 @@ CPPOpenMPHostSubroutineIndirectLoop::createIncrementAccessLocalVariableDeclarati
           numberOfActiveThreadsCeiling, buildIntType (), subroutineScope));
 
   variableDeclarations ->add (colour1,
-      RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (colour1,
-          buildIntType (), subroutineScope));
+      RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
+          colour1, buildIntType (), subroutineScope));
 
   variableDeclarations ->add (colour2,
-      RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (colour2,
-          buildIntType (), subroutineScope));
+      RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
+          colour2, buildIntType (), subroutineScope));
 }
 
 void
@@ -370,8 +371,8 @@ CPPOpenMPHostSubroutineIndirectLoop::createPlanFunctionDeclarations ()
           getIterationCounterVariableName (4), buildIntType (), subroutineScope));
 
   variableDeclarations->add (blockID,
-      RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (blockID,
-          buildIntType (), subroutineScope));
+      RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
+          blockID, buildIntType (), subroutineScope));
 
   variableDeclarations->add (blockOffset,
       RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
@@ -393,14 +394,14 @@ CPPOpenMPHostSubroutineIndirectLoop::createPlanFunctionDeclarations ()
       RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
           partitionSize, buildIntType (), subroutineScope));
 
-  variableDeclarations->add (args,
-      RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (args,
+  variableDeclarations->add (opDatArray,
+      RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (opDatArray,
           buildArrayType (buildOpaqueType (OP2::OP_ARG, subroutineScope),
               buildIntVal (parallelLoop->getNumberOfOpDatArgumentGroups ())),
           subroutineScope));
 
-  variableDeclarations->add (inds,
-      RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (inds,
+  variableDeclarations->add (indirectionDescriptorArray,
+      RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (indirectionDescriptorArray,
           buildArrayType (buildIntType (), buildIntVal (
               parallelLoop->getNumberOfOpDatArgumentGroups ())),
           subroutineScope));

@@ -315,7 +315,8 @@ CPPCUDAKernelSubroutineIndirectLoop::createStageOutFromLocalMemoryToSharedMemory
       loopBody);
 
   SgExprStatement * initialisationExpression = buildAssignStatement (
-      variableDeclarations->getReference (colour1), buildIntVal (0));
+      variableDeclarations->getReference (colour1),
+      buildIntVal (0));
 
   SgLessThanOp * upperBoundExpression = buildLessThanOp (
       variableDeclarations->getReference (colour1),
@@ -437,7 +438,8 @@ CPPCUDAKernelSubroutineIndirectLoop::createExecutionLoopStatements ()
   if (parallelLoop->hasIncrementedOpDats ())
   {
     SgExprStatement * assignmentStatement1 = buildAssignStatement (
-        variableDeclarations->getReference (colour2), buildIntVal (-1));
+        variableDeclarations->getReference (colour2),
+        buildIntVal (-1));
 
     appendStatement (assignmentStatement1, loopBody);
 
@@ -457,7 +459,8 @@ CPPCUDAKernelSubroutineIndirectLoop::createExecutionLoopStatements ()
         variableDeclarations->getReference (pthrcol), addExpression1);
 
     SgExprStatement * assignmentStatement2 = buildAssignStatement (
-        variableDeclarations->getReference (colour2), arrayExpression1);
+        variableDeclarations->getReference (colour2),
+        arrayExpression1);
 
     appendStatement (assignmentStatement2, ifBody);
 
@@ -669,8 +672,8 @@ CPPCUDAKernelSubroutineIndirectLoop::createSetIndirectionMapPointerStatements ()
          */
 
         SgMultiplyOp * multiplyExpression1 = buildMultiplyOp (
-            variableDeclarations->getReference (blockID), buildIntVal (
-                parallelLoop->getOpDatDimension (i)));
+            variableDeclarations->getReference (blockID),
+            buildIntVal (parallelLoop->getOpDatDimension (i)));
 
         SgAddOp * addExpression1a = buildAddOp (buildIntVal (offset),
             multiplyExpression1);
@@ -887,7 +890,8 @@ CPPCUDAKernelSubroutineIndirectLoop::createSetNumberOfIndirectElementsPerBlockSt
       if (parallelLoop->isIndirect (i))
       {
         SgMultiplyOp * multiplyExpression = buildMultiplyOp (
-            variableDeclarations->getReference (blockID), buildIntVal (
+            variableDeclarations->getReference (blockID),
+            buildIntVal (
                 parallelLoop->getNumberOfDistinctIndirectOpDatArguments ()));
 
         SgAddOp * addExpression = buildAddOp (buildIntVal (offset),
@@ -937,7 +941,8 @@ CPPCUDAKernelSubroutineIndirectLoop::createThreadZeroStatements ()
       variableDeclarations->getReference (pblkMap), arrayIndexExpression1);
 
   SgStatement * statement1 = buildAssignStatement (
-      variableDeclarations->getReference (blockID), arrayExpression1);
+      variableDeclarations->getReference (blockID),
+      arrayExpression1);
 
   appendStatement (statement1, ifBlock);
 
@@ -1071,12 +1076,12 @@ CPPCUDAKernelSubroutineIndirectLoop::createIncrementAccessLocalVariableDeclarati
   variableDeclarations->add (numberOfActiveThreadsCeiling, variableDeclaration2);
 
   variableDeclarations ->add (colour1,
-      RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (colour1,
-          buildIntType (), subroutineScope));
+      RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
+          colour1, buildIntType (), subroutineScope));
 
   variableDeclarations ->add (colour2,
-      RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (colour2,
-          buildIntType (), subroutineScope));
+      RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
+          colour2, buildIntType (), subroutineScope));
 
   variableDeclarations ->add (
       getIterationCounterVariableName (2),
@@ -1121,8 +1126,8 @@ CPPCUDAKernelSubroutineIndirectLoop::createExecutionLocalVariableDeclarations ()
   variableDeclarations ->add (nbytes, variableDeclaration3);
 
   variableDeclarations->add (blockID,
-      RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (blockID,
-          buildIntType (), subroutineScope));
+      RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
+          blockID, buildIntType (), subroutineScope));
 
   variableDeclarations ->add (
       getIterationCounterVariableName (1),

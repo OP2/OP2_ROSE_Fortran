@@ -12,24 +12,27 @@ namespace PlanFunctionVariableNames
    * ======================================================
    */
 
-  std::string const accesses = "accesses";
-  std::string const actualPlan = "actualPlan";
-  std::string const args = "args";
-  std::string const argsNumber = "argsNumber";
-  std::string const blkmap = "blkmap";
+  std::string const numberOfIndirectOpDats = "numberOfIndirectOpDats";
+  std::string const numberOfColours = "numOfColours";
+  std::string const numberOfOpDats = "numberOfOpDats";
+  std::string const accessDescriptorArray = "accessDescriptorArray";
+  std::string const opDatArray = "opDatArray";
+  std::string const opDatTypesArray = "opDatTypesArray";
+  std::string const mappingArray = "mappingArray";
+  std::string const mappingIndicesArray = "mappingIndicesArray";
+  std::string const indirectionDescriptorArray = "indirectionDescriptorArray";
   std::string const blockID = "blockID";
   std::string const blockOffset = "blockOffset";
   std::string const colour1 = "colour1";
   std::string const colour2 = "colour2";
+
+  std::string const actualPlan = "actualPlan";
+  std::string const blkmap = "blkmap";
   std::string const cplan = "cplan";
-  std::string const idxs = "idxs";
-  std::string const inds = "inds";
-  std::string const indsNumber = "indsNumber";
   std::string const ind_maps = "ind_maps";
   std::string const ind_offs = "ind_offs";
   std::string const ind_sizes = "ind_sizes";
   std::string const loc_maps = "loc_maps";
-  std::string const maps = "maps";
   std::string const nblocks = "nblocks";
   std::string const ncolblk = "ncolblk";
   std::string const ncolors = "ncolors";
@@ -37,7 +40,6 @@ namespace PlanFunctionVariableNames
   std::string const nindirect = "nindirect";
   std::string const nshared = "nshared";
   std::string const nthrcol = "nthrcol";
-  std::string const numberOfColours = "numOfColours";
   std::string const offset = "offset";
   std::string const pblkMap = "pblkMap";
   std::string const pblkMapSize = "pblkMapSize";

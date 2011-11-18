@@ -292,22 +292,37 @@ FortranOpenMPHostSubroutine::createTransferOpDatStatements ()
 
   SgBasicBlock * block = buildBasicBlock ();
 
-  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
+  if (parallelLoop->isDirectLoop () == false)
   {
-    if (parallelLoop->isDuplicateOpDat (i) == false)
+    for (unsigned int i = 1; i
+        <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
     {
       SgDotExp * dotExpression = buildDotExp (
-          variableDeclarations->getReference (getOpDatName (i)),
-          buildOpaqueVarRefExp (Fortran::dataPtr, block));
+          variableDeclarations->getReference (getOpMapName (i)),
+          buildOpaqueVarRefExp (Fortran::mapPtr, block));
 
       SgPointerAssignOp * assignExpression = new SgPointerAssignOp (
           RoseHelper::getFileInfo (), variableDeclarations->getReference (
-              getOpDatCoreName (i)), dotExpression, buildVoidType ());
+              getOpMapCoreName (i)), dotExpression, buildVoidType ());
 
       assignExpression->set_endOfConstruct (RoseHelper::getFileInfo ());
 
       appendStatement (buildExprStatement (assignExpression), block);
     }
+  }
+
+  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
+  {
+    SgDotExp * dotExpression = buildDotExp (variableDeclarations->getReference (
+        getOpDatName (i)), buildOpaqueVarRefExp (Fortran::dataPtr, block));
+
+    SgPointerAssignOp * assignExpression = new SgPointerAssignOp (
+        RoseHelper::getFileInfo (), variableDeclarations->getReference (
+            getOpDatCoreName (i)), dotExpression, buildVoidType ());
+
+    assignExpression->set_endOfConstruct (RoseHelper::getFileInfo ());
+
+    appendStatement (buildExprStatement (assignExpression), block);
   }
 
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
@@ -405,30 +420,30 @@ FortranOpenMPHostSubroutine::createOpDatLocalVariableDeclarations ()
 
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
+    string const & variableName1 = getOpDatCoreName (i);
+
+    variableDeclarations->add (variableName1,
+        FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
+            variableName1, buildPointerType (
+                FortranTypesBuilder::buildClassDeclaration (OP2::OP_DAT_CORE,
+                    subroutineScope)->get_type ()), subroutineScope));
+
     if (parallelLoop->isDuplicateOpDat (i) == false)
     {
-      string const & variableName1 = getOpDatLocalName (i);
-
-      variableDeclarations->add (variableName1,
-          FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
-              variableName1, buildPointerType (
-                  FortranTypesBuilder::getArray_RankOne (
-                      parallelLoop->getOpDatBaseType (i))), subroutineScope));
-
-      string const & variableName2 = getOpDatCardinalityName (i);
+      string const & variableName2 = getOpDatLocalName (i);
 
       variableDeclarations->add (variableName2,
           FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
-              variableName2, FortranTypesBuilder::getFourByteInteger (),
-              subroutineScope));
+              variableName2, buildPointerType (
+                  FortranTypesBuilder::getArray_RankOne (
+                      parallelLoop->getOpDatBaseType (i))), subroutineScope));
 
-      string const & variableName3 = getOpDatCoreName (i);
+      string const & variableName3 = getOpDatCardinalityName (i);
 
       variableDeclarations->add (variableName3,
           FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
-              variableName3, buildPointerType (
-                  FortranTypesBuilder::buildClassDeclaration (OP2::OP_DAT_CORE,
-                      subroutineScope)->get_type ()), subroutineScope));
+              variableName3, FortranTypesBuilder::getFourByteInteger (),
+              subroutineScope));
 
       if (parallelLoop->isReductionRequired (i) == false)
       {
@@ -441,6 +456,17 @@ FortranOpenMPHostSubroutine::createOpDatLocalVariableDeclarations ()
                         OP2::OP_SET_CORE, subroutineScope)->get_type ()),
                 subroutineScope));
       }
+    }
+
+    if (parallelLoop->isDirectLoop () == false)
+    {
+      string const & variableName5 = getOpMapCoreName (i);
+
+      variableDeclarations->add (variableName5,
+          FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
+              variableName5, buildPointerType (
+                  FortranTypesBuilder::buildClassDeclaration (OP2::OP_MAP_CORE,
+                      subroutineScope)->get_type ()), subroutineScope));
     }
   }
 }

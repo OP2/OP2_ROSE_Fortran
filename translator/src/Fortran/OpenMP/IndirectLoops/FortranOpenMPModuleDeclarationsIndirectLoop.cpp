@@ -9,6 +9,28 @@
 #include <rose.h>
 
 void
+FortranOpenMPModuleDeclarationsIndirectLoop::createFirstTimeExecutionDeclaration ()
+{
+  using namespace SageBuilder;
+  using namespace BooleanVariableNames;
+
+  Debug::getInstance ()->debugMessage (
+      "Creating first time execution boolean at module scope",
+      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+
+  SgVariableDeclaration * variableDeclaration =
+      buildVariableDeclaration (getFirstTimeExecutionVariableName (
+          parallelLoop->getUserSubroutineName ()), buildBoolType (),
+          buildAssignInitializer (buildBoolValExp (true), buildBoolType ()),
+          moduleScope);
+
+  variableDeclaration->get_declarationModifier ().get_accessModifier ().setUndefined ();
+
+  variableDeclarations->add (getFirstTimeExecutionVariableName (
+      parallelLoop->getUserSubroutineName ()), variableDeclaration);
+}
+
+void
 FortranOpenMPModuleDeclarationsIndirectLoop::createExecutionPlanDeclarations ()
 {
   using namespace SageBuilder;
@@ -257,5 +279,7 @@ FortranOpenMPModuleDeclarationsIndirectLoop::FortranOpenMPModuleDeclarationsIndi
     FortranParallelLoop * parallelLoop, SgScopeStatement * moduleScope) :
   FortranOpenMPModuleDeclarations (parallelLoop, moduleScope)
 {
+  createFirstTimeExecutionDeclaration ();
+
   createExecutionPlanDeclarations ();
 }

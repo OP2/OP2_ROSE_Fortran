@@ -288,13 +288,13 @@ CPPCUDAHostSubroutineIndirectLoop::createPlanFunctionCallStatement ()
       parallelLoop->getNumberOfOpDatArgumentGroups ()));
 
   actualParamaters->append_expression (
-      variableDeclarations->getReference (args));
+      variableDeclarations->getReference (opDatArray));
 
   actualParamaters->append_expression (buildIntVal (
       parallelLoop->getNumberOfDistinctIndirectOpDatArguments ()));
 
   actualParamaters->append_expression (
-      variableDeclarations->getReference (inds));
+      variableDeclarations->getReference (indirectionDescriptorArray));
 
   SgFunctionCallExp * functionCallExpression = buildFunctionCallExp (
       OP2::OP_PLAN_GET, buildVoidType (), actualParamaters, subroutineScope);
@@ -353,16 +353,16 @@ CPPCUDAHostSubroutineIndirectLoop::createPlanFunctionDeclarations ()
           getIterationCounterVariableName (3), buildIntType (), subroutineScope));
 
   variableDeclarations->add (
-      args,
+      opDatArray,
       RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
-          args,
+          opDatArray,
           buildArrayType (
               buildClassDeclaration (OP2::OP_ARG, subroutineScope)->get_type (),
               buildIntVal (parallelLoop->getNumberOfOpDatArgumentGroups ())),
           subroutineScope));
 
-  variableDeclarations->add (inds,
-      RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (inds,
+  variableDeclarations->add (indirectionDescriptorArray,
+      RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (indirectionDescriptorArray,
           buildArrayType (buildIntType (), buildIntVal (
               parallelLoop->getNumberOfOpDatArgumentGroups ())),
           subroutineScope));

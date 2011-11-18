@@ -60,6 +60,13 @@ LoopVariableNames::getUpperBoundVariableName (unsigned int n)
 }
 
 std::string const
+BooleanVariableNames::getFirstTimeExecutionVariableName (
+    std::string const & suffix)
+{
+  return "firstTime_" + suffix;
+}
+
+std::string const
 OP2VariableNames::getUserSubroutineName ()
 {
   return "userSubroutine";
@@ -170,6 +177,15 @@ OP2VariableNames::getOpMapName (unsigned int OP_DAT_ArgumentGroup)
   using std::string;
 
   return "opMap" + lexical_cast <string> (OP_DAT_ArgumentGroup);
+}
+
+std::string const
+OP2VariableNames::getOpMapCoreName (unsigned int OP_DAT_ArgumentGroup)
+{
+  using boost::lexical_cast;
+  using std::string;
+
+  return "opMap" + lexical_cast <string> (OP_DAT_ArgumentGroup) + "Core";
 }
 
 std::string const

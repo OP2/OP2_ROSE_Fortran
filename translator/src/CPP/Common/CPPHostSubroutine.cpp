@@ -25,7 +25,7 @@ CPPHostSubroutine::createInitialisePlanFunctionArrayStatements ()
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
     SgPntrArrRefExp * arrayIndexExpression = buildPntrArrRefExp (
-        variableDeclarations->getReference (args), buildIntVal (i - 1));
+        variableDeclarations->getReference (opDatArray), buildIntVal (i - 1));
 
     SgExprStatement * assignmentStatement = buildAssignStatement (
         arrayIndexExpression, variableDeclarations->getReference (getOpDatName (
@@ -40,7 +40,7 @@ CPPHostSubroutine::createInitialisePlanFunctionArrayStatements ()
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
     SgPntrArrRefExp * arrayIndexExpression = buildPntrArrRefExp (
-        variableDeclarations->getReference (inds), buildIntVal (i - 1));
+        variableDeclarations->getReference (indirectionDescriptorArray), buildIntVal (i - 1));
 
     SgExprStatement * assignmentStatement;
 

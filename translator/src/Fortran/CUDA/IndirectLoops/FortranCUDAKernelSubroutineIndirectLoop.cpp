@@ -311,8 +311,9 @@ FortranCUDAKernelSubroutineIndirectLoop::createIncrementAndWriteAccessEpilogueSt
            * ======================================================
            */
 
-          SgMultiplyOp * multiplyExpression2a = buildMultiplyOp (
-              variableDeclarations->getReference (blockID), buildIntVal (
+          SgMultiplyOp * multiplyExpression2a =
+              buildMultiplyOp (variableDeclarations->getReference (
+                  blockID), buildIntVal (
                   parallelLoop->getNumberOfDifferentIndirectOpDats ()));
 
           SgAddOp * addExpression2a = buildAddOp (buildIntVal (pindOffsOffset),
@@ -509,7 +510,8 @@ FortranCUDAKernelSubroutineIndirectLoop::createStageOutFromLocalMemoryToSharedMe
       loopBody);
 
   SgAssignOp * lowerBoundExpression = buildAssignOp (
-      variableDeclarations->getReference (colour1), buildIntVal (0));
+      variableDeclarations->getReference (colour1),
+      buildIntVal (0));
 
   SgSubtractOp * upperBoundExpression = buildSubtractOp (
       variableDeclarations->getReference (numberOfColours), buildIntVal (1));
@@ -646,7 +648,8 @@ FortranCUDAKernelSubroutineIndirectLoop::createExecutionLoopStatements ()
   if (parallelLoop->hasIncrementedOpDats ())
   {
     SgExprStatement * assignmentStatement1 = buildAssignStatement (
-        variableDeclarations->getReference (colour2), buildIntVal (-1));
+        variableDeclarations->getReference (colour2),
+        buildIntVal (-1));
 
     appendStatement (assignmentStatement1, loopBody);
 
@@ -664,7 +667,8 @@ FortranCUDAKernelSubroutineIndirectLoop::createExecutionLoopStatements ()
         variableDeclarations->getReference (pthrcol), addExpression1);
 
     SgExprStatement * assignmentStatement2 = buildAssignStatement (
-        variableDeclarations->getReference (colour2), arrayExpression1);
+        variableDeclarations->getReference (colour2),
+        arrayExpression1);
 
     appendStatement (assignmentStatement2, ifBody);
 
@@ -852,8 +856,9 @@ FortranCUDAKernelSubroutineIndirectLoop::createInitialiseCUDASharedVariablesStat
               variableDeclarations->getReference (autosharedVariableName),
               addExpression4a);
 
-          SgMultiplyOp * multiplyExpression4a = buildMultiplyOp (
-              variableDeclarations->getReference (blockID), buildIntVal (
+          SgMultiplyOp * multiplyExpression4a =
+              buildMultiplyOp (variableDeclarations->getReference (
+                  blockID), buildIntVal (
                   parallelLoop->getNumberOfDifferentIndirectOpDats ()));
 
           SgAddOp * addExpression4b = buildAddOp (buildIntVal (pindOffsOffset),
@@ -1161,7 +1166,8 @@ FortranCUDAKernelSubroutineIndirectLoop::createThreadZeroStatements ()
       variableDeclarations->getReference (pblkMap), arrayIndexExpression1);
 
   SgExprStatement * assignmentStatement1 = buildAssignStatement (
-      variableDeclarations->getReference (blockID), arrayExpression1);
+      variableDeclarations->getReference (blockID),
+      arrayExpression1);
 
   appendStatement (assignmentStatement1, ifBlock);
 
@@ -1223,7 +1229,8 @@ FortranCUDAKernelSubroutineIndirectLoop::createThreadZeroStatements ()
       if (parallelLoop->isIndirect (i))
       {
         SgMultiplyOp * multiplyExpression = buildMultiplyOp (
-            variableDeclarations->getReference (blockID), buildIntVal (
+            variableDeclarations->getReference (blockID),
+            buildIntVal (
                 parallelLoop->getNumberOfDistinctIndirectOpDatArguments ()));
 
         SgAddOp * addExpression = buildAddOp (buildIntVal (offset),
@@ -1340,11 +1347,13 @@ FortranCUDAKernelSubroutineIndirectLoop::createIncrementAccessLocalVariableDecla
 
   variableDeclarations ->add (colour1,
       FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
-          colour1, FortranTypesBuilder::getFourByteInteger (), subroutineScope));
+          colour1,
+          FortranTypesBuilder::getFourByteInteger (), subroutineScope));
 
   variableDeclarations ->add (colour2,
       FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
-          colour2, FortranTypesBuilder::getFourByteInteger (), subroutineScope));
+          colour2,
+          FortranTypesBuilder::getFourByteInteger (), subroutineScope));
 
   variableDeclarations ->add (getIterationCounterVariableName (2),
       FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
@@ -1370,8 +1379,9 @@ FortranCUDAKernelSubroutineIndirectLoop::createExecutionLocalVariableDeclaration
 
   variableDeclarations->add (blockID,
       FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
-          blockID, FortranTypesBuilder::getFourByteInteger (), subroutineScope,
-          1, CUDA_SHARED));
+          blockID,
+          FortranTypesBuilder::getFourByteInteger (), subroutineScope, 1,
+          CUDA_SHARED));
 
   variableDeclarations->add (numberOfActiveThreads,
       FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (

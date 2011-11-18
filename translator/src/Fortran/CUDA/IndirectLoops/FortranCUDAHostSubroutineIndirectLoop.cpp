@@ -147,6 +147,7 @@ FortranCUDAHostSubroutineIndirectLoop::createPlanFunctionExecutionStatements ()
   using namespace SageInterface;
   using namespace OP2VariableNames;
   using namespace PlanFunctionVariableNames;
+  using namespace LoopVariableNames;
   using namespace OP2::Macros;
   using std::string;
 
@@ -175,7 +176,8 @@ FortranCUDAHostSubroutineIndirectLoop::createPlanFunctionExecutionStatements ()
    */
 
   SgExpression * arrayIndexExpression1 = buildAddOp (
-      variableDeclarations->getReference (colour1), buildIntVal (1));
+      variableDeclarations->getReference (getIterationCounterVariableName (2)),
+      buildIntVal (1));
 
   SgPntrArrRefExp * arrayExpression1 = buildPntrArrRefExp (
       variableDeclarations->getReference (ncolblk), arrayIndexExpression1);
@@ -251,7 +253,8 @@ FortranCUDAHostSubroutineIndirectLoop::createPlanFunctionExecutionStatements ()
    */
 
   SgAssignOp * initializationExpression = buildAssignOp (
-      variableDeclarations->getReference (colour1), buildIntVal (0));
+      variableDeclarations->getReference (getIterationCounterVariableName (2)),
+      buildIntVal (0));
 
   /*
    * ======================================================
@@ -446,11 +449,11 @@ FortranCUDAHostSubroutineIndirectLoop::createExecutionPlanDeclarations ()
 
   vector <string> fourByteIntegerArrays;
 
-  fourByteIntegerArrays.push_back (args);
-  fourByteIntegerArrays.push_back (idxs);
-  fourByteIntegerArrays.push_back (maps);
-  fourByteIntegerArrays.push_back (accesses);
-  fourByteIntegerArrays.push_back (inds);
+  fourByteIntegerArrays.push_back (opDatArray);
+  fourByteIntegerArrays.push_back (mappingIndicesArray);
+  fourByteIntegerArrays.push_back (mappingArray);
+  fourByteIntegerArrays.push_back (accessDescriptorArray);
+  fourByteIntegerArrays.push_back (indirectionDescriptorArray);
 
   for (vector <string>::iterator it = fourByteIntegerArrays.begin (); it
       != fourByteIntegerArrays.end (); ++it)
@@ -515,9 +518,9 @@ FortranCUDAHostSubroutineIndirectLoop::createExecutionPlanDeclarations ()
   vector <string> fourByteIntegerVariables;
 
   fourByteIntegerVariables.push_back (getIterationCounterVariableName (1));
-  fourByteIntegerVariables.push_back (colour1);
-  fourByteIntegerVariables.push_back (argsNumber);
-  fourByteIntegerVariables.push_back (indsNumber);
+  fourByteIntegerVariables.push_back (getIterationCounterVariableName (2));
+  fourByteIntegerVariables.push_back (numberOfOpDats);
+  fourByteIntegerVariables.push_back (numberOfIndirectOpDats);
   fourByteIntegerVariables.push_back (blockOffset);
   fourByteIntegerVariables.push_back (pindSizesSize);
   fourByteIntegerVariables.push_back (pindOffsSize);

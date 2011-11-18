@@ -57,6 +57,19 @@ namespace LoopVariableNames
   getUpperBoundVariableName (unsigned int n);
 }
 
+namespace BooleanVariableNames
+{
+  /*
+   * ======================================================
+   * Variable name to determine whether this is the first
+   * time to execute a kernel
+   * ======================================================
+   */
+
+  std::string const
+  getFirstTimeExecutionVariableName (std::string const & suffix);
+}
+
 namespace OP2VariableNames
 {
   std::string const localOffset = "localOffset";
@@ -192,6 +205,15 @@ namespace OP2VariableNames
    */
   std::string const
   getOpMapName (unsigned int OP_DAT_ArgumentGroup);
+
+  /*
+   * ======================================================
+   * Returns the name of the variable for the type OP_MAP_CORE
+   * in this OP_DAT argument group
+   * ======================================================
+   */
+  std::string const
+  getOpMapCoreName (unsigned int OP_DAT_ArgumentGroup);
 
   /*
    * ======================================================

@@ -243,11 +243,11 @@ PlanFunctionVariableNames::getOpDatsGlobalToLocalMappingName (
 {
   if (suffix.length () == 0)
   {
-    return maps;
+    return mappingArray;
   }
   else
   {
-    return maps + "_" + suffix;
+    return mappingArray + "_" + suffix;
   }
 }
 
@@ -260,11 +260,11 @@ PlanFunctionVariableNames::getGlobalToLocalMappingName (
 
   if (suffix.length () == 0)
   {
-    return maps + lexical_cast <string> (OP_DAT_ArgumentGroup);
+    return mappingArray + lexical_cast <string> (OP_DAT_ArgumentGroup);
   }
   else
   {
-    return maps + lexical_cast <string> (OP_DAT_ArgumentGroup) + "_" + suffix;
+    return mappingArray + lexical_cast <string> (OP_DAT_ArgumentGroup) + "_" + suffix;
   }
 }
 
@@ -277,11 +277,11 @@ PlanFunctionVariableNames::getGlobalToLocalMappingSizeName (
 
   if (suffix.length () == 0)
   {
-    return maps + lexical_cast <string> (OP_DAT_ArgumentGroup) + Size;
+    return mappingArray + lexical_cast <string> (OP_DAT_ArgumentGroup) + Size;
   }
   else
   {
-    return maps + lexical_cast <string> (OP_DAT_ArgumentGroup) + Size + "_"
+    return mappingArray + lexical_cast <string> (OP_DAT_ArgumentGroup) + Size + "_"
         + suffix;
   }
 }

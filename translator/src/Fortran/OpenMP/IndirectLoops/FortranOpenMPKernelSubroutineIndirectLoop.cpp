@@ -42,37 +42,69 @@ FortranOpenMPKernelSubroutineIndirectLoop::createPlanFormalParameterDeclarations
   using namespace SageBuilder;
   using namespace OP2VariableNames;
   using namespace PlanFunctionVariableNames;
-  using std::string;
-  using std::vector;
 
   Debug::getInstance ()->debugMessage (
       "Creating plan function formal parameter declarations",
       Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
-  vector <string> fourByteIntegerArrayVariables;
+  SgAsteriskShapeExp * upperBoundExpression = new SgAsteriskShapeExp (
+      RoseHelper::getFileInfo ());
 
-  fourByteIntegerArrayVariables.push_back (pindSizes);
-  fourByteIntegerArrayVariables.push_back (pindOffs);
-  fourByteIntegerArrayVariables.push_back (pblkMap);
-  fourByteIntegerArrayVariables.push_back (poffset);
-  fourByteIntegerArrayVariables.push_back (pnelems);
-  fourByteIntegerArrayVariables.push_back (pnthrcol);
-  fourByteIntegerArrayVariables.push_back (pthrcol);
+  variableDeclarations->add (
+      getIndirectOpDatsNumberOfElementsArrayName (),
+      FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
+          getIndirectOpDatsNumberOfElementsArrayName (),
+          FortranTypesBuilder::getArray_RankOne_WithLowerAndUpperBounds (
+              FortranTypesBuilder::getFourByteInteger (), buildIntVal (0),
+              upperBoundExpression), subroutineScope, formalParameters));
 
-  for (vector <string>::const_iterator it =
-      fourByteIntegerArrayVariables.begin (); it
-      != fourByteIntegerArrayVariables.end (); ++it)
-  {
-    SgAsteriskShapeExp * upperBoundExpression = new SgAsteriskShapeExp (
-        RoseHelper::getFileInfo ());
+  variableDeclarations->add (
+      getIndirectOpDatsOffsetArrayName (),
+      FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
+          getIndirectOpDatsOffsetArrayName (),
+          FortranTypesBuilder::getArray_RankOne_WithLowerAndUpperBounds (
+              FortranTypesBuilder::getFourByteInteger (), buildIntVal (0),
+              upperBoundExpression), subroutineScope, formalParameters));
 
-    variableDeclarations->add (
-        *it,
-        FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
-            *it, FortranTypesBuilder::getArray_RankOne_WithLowerAndUpperBounds (
-                FortranTypesBuilder::getFourByteInteger (), buildIntVal (0),
-                upperBoundExpression), subroutineScope, formalParameters));
-  }
+  variableDeclarations->add (
+      getColourToBlockArrayName (),
+      FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
+          getColourToBlockArrayName (),
+          FortranTypesBuilder::getArray_RankOne_WithLowerAndUpperBounds (
+              FortranTypesBuilder::getFourByteInteger (), buildIntVal (0),
+              upperBoundExpression), subroutineScope, formalParameters));
+
+  variableDeclarations->add (
+      getOffsetIntoBlockSizeName (),
+      FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
+          getOffsetIntoBlockSizeName (),
+          FortranTypesBuilder::getArray_RankOne_WithLowerAndUpperBounds (
+              FortranTypesBuilder::getFourByteInteger (), buildIntVal (0),
+              upperBoundExpression), subroutineScope, formalParameters));
+
+  variableDeclarations->add (
+      getNumberOfSetElementsPerBlockArrayName (),
+      FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
+          getNumberOfSetElementsPerBlockArrayName (),
+          FortranTypesBuilder::getArray_RankOne_WithLowerAndUpperBounds (
+              FortranTypesBuilder::getFourByteInteger (), buildIntVal (0),
+              upperBoundExpression), subroutineScope, formalParameters));
+
+  variableDeclarations->add (
+      getNumberOfThreadColoursPerBlockArrayName (),
+      FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
+          getNumberOfThreadColoursPerBlockArrayName (),
+          FortranTypesBuilder::getArray_RankOne_WithLowerAndUpperBounds (
+              FortranTypesBuilder::getFourByteInteger (), buildIntVal (0),
+              upperBoundExpression), subroutineScope, formalParameters));
+
+  variableDeclarations->add (
+      getThreadColourArrayName (),
+      FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
+          getThreadColourArrayName (),
+          FortranTypesBuilder::getArray_RankOne_WithLowerAndUpperBounds (
+              FortranTypesBuilder::getFourByteInteger (), buildIntVal (0),
+              upperBoundExpression), subroutineScope, formalParameters));
 
   variableDeclarations->add (
       blockOffset,
@@ -102,28 +134,41 @@ FortranOpenMPKernelSubroutineIndirectLoop::createOpDatFormalParameterDeclaration
   {
     if (parallelLoop->isDuplicateOpDat (i) == false)
     {
-      SgAsteriskShapeExp * upperBoundExpression1 = new SgAsteriskShapeExp (
+      string const & variableName = getOpDatName (i);
+
+      SgAsteriskShapeExp * upperBoundExpression = new SgAsteriskShapeExp (
           RoseHelper::getFileInfo ());
 
       variableDeclarations->add (
-          getOpDatName (i),
+          variableName,
           FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
-              getOpDatName (i),
+              variableName,
               FortranTypesBuilder::getArray_RankOne_WithLowerAndUpperBounds (
                   parallelLoop->getOpDatBaseType (i), buildIntVal (0),
-                  upperBoundExpression1), subroutineScope, formalParameters));
+                  upperBoundExpression), subroutineScope, formalParameters));
+    }
+  }
 
-      SgAsteriskShapeExp * upperBoundExpression2 = new SgAsteriskShapeExp (
-          RoseHelper::getFileInfo ());
+  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
+  {
+    if (parallelLoop->isDuplicateOpDat (i) == false)
+    {
+      if (parallelLoop->isIndirect (i))
+      {
+        string const & variableName = getLocalToGlobalMappingName (i);
 
-      variableDeclarations->add (
-          getLocalToGlobalMappingName (i),
-          FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
-              getLocalToGlobalMappingName (i),
-              FortranTypesBuilder::getArray_RankOne_WithLowerAndUpperBounds (
-                  FortranTypesBuilder::getFourByteInteger (), buildIntVal (0),
-                  upperBoundExpression2), subroutineScope, formalParameters));
+        SgAsteriskShapeExp * upperBoundExpression = new SgAsteriskShapeExp (
+            RoseHelper::getFileInfo ());
 
+        variableDeclarations->add (
+            variableName,
+            FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
+                variableName,
+                FortranTypesBuilder::getArray_RankOne_WithLowerAndUpperBounds (
+                    FortranTypesBuilder::getFourByteInteger (),
+                    buildIntVal (0), upperBoundExpression), subroutineScope,
+                formalParameters));
+      }
     }
   }
 
@@ -131,13 +176,15 @@ FortranOpenMPKernelSubroutineIndirectLoop::createOpDatFormalParameterDeclaration
   {
     if (parallelLoop->isIndirect (i))
     {
+      string const & variableName = getGlobalToLocalMappingName (i);
+
       SgAsteriskShapeExp * upperBoundExpression = new SgAsteriskShapeExp (
           RoseHelper::getFileInfo ());
 
       variableDeclarations->add (
-          getGlobalToLocalMappingName (i),
+          variableName,
           FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
-              getGlobalToLocalMappingName (i),
+              variableName,
               FortranTypesBuilder::getArray_RankOne_WithLowerAndUpperBounds (
                   FortranTypesBuilder::getTwoByteInteger (), buildIntVal (0),
                   upperBoundExpression), subroutineScope, formalParameters));

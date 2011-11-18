@@ -37,7 +37,7 @@ FortranHostSubroutine::createConvertPlanFunctionParametersStatements ()
 
   SgAggregateInitializer * parameterExpressionE3 =
       FortranStatementsAndExpressionsBuilder::buildShapeExpression (
-          variableDeclarations->getReference (indsNumber));
+          variableDeclarations->getReference (numberOfIndirectOpDats));
 
   SgStatement
       * callStatementE =
@@ -84,7 +84,7 @@ FortranHostSubroutine::createConvertPlanFunctionParametersStatements ()
           nblocks, block));
 
   SgMultiplyOp * multiplyExpressionG = buildMultiplyOp (dotExpressionG,
-      variableDeclarations->getReference (indsNumber));
+      variableDeclarations->getReference (numberOfIndirectOpDats));
 
   SgExprStatement * assignmentStatementG = buildAssignStatement (
       variableDeclarations->getReference (pindSizesSize), multiplyExpressionG);
@@ -373,7 +373,7 @@ FortranHostSubroutine::createConvertPositionInPMapsStatements ()
 
   SgAggregateInitializer * parameterExpressionB3 =
       FortranStatementsAndExpressionsBuilder::buildShapeExpression (
-          variableDeclarations->getReference (indsNumber));
+          variableDeclarations->getReference (numberOfIndirectOpDats));
 
   SgStatement
       * callStatementB =
@@ -392,12 +392,12 @@ FortranHostSubroutine::createConvertPositionInPMapsStatements ()
 
   SgDotExp * parameterExpressionC1 = buildDotExp (
       variableDeclarations->getReference (getActualPlanVariableName (
-          parallelLoop->getUserSubroutineName ())), buildOpaqueVarRefExp (maps,
+          parallelLoop->getUserSubroutineName ())), buildOpaqueVarRefExp (mappingArray,
           block));
 
   SgAggregateInitializer * parameterExpressionC3 =
       FortranStatementsAndExpressionsBuilder::buildShapeExpression (
-          variableDeclarations->getReference (argsNumber));
+          variableDeclarations->getReference (numberOfOpDats));
 
   SgStatement
       * callStatementC =
@@ -461,7 +461,7 @@ FortranHostSubroutine::createConvertPositionInPMapsStatements ()
        */
 
       SgExpression * arrayIndexExpression = buildPntrArrRefExp (
-          variableDeclarations->getReference (inds), buildIntVal (i));
+          variableDeclarations->getReference (indirectionDescriptorArray), buildIntVal (i));
 
       SgExpression * ifGuardExpression = buildGreaterOrEqualOp (
           arrayIndexExpression, buildIntVal (0));
@@ -500,7 +500,7 @@ FortranHostSubroutine::createPlanFunctionParametersPreparationStatements ()
         OP2::RunTimeVariableNames::index, block));
 
     SgPntrArrRefExp * arrayIndexExpression = buildPntrArrRefExp (
-        variableDeclarations->getReference (args), buildIntVal (i));
+        variableDeclarations->getReference (opDatArray), buildIntVal (i));
 
     SgExprStatement * assignmentStatement = buildAssignStatement (
         arrayIndexExpression, dotExpression);
@@ -511,7 +511,7 @@ FortranHostSubroutine::createPlanFunctionParametersPreparationStatements ()
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
     SgExpression * arrayIndexExpression = buildPntrArrRefExp (
-        variableDeclarations->getReference (idxs), buildIntVal (i));
+        variableDeclarations->getReference (mappingIndicesArray), buildIntVal (i));
 
     SgExprStatement * assignmentStatement = buildAssignStatement (
         arrayIndexExpression, variableDeclarations->getReference (
@@ -520,21 +520,10 @@ FortranHostSubroutine::createPlanFunctionParametersPreparationStatements ()
     appendStatement (assignmentStatement, block);
   }
 
-  /*
-   * ======================================================
-   * The loop starts counting from 1
-   * ======================================================
-   */
   SgExpression * initializationExpression = buildAssignOp (
       variableDeclarations->getReference (getIterationCounterVariableName (1)),
       buildIntVal (1));
 
-  /*
-   * ======================================================
-   * The loop stops counting at the number of OP_DAT argument
-   * groups
-   * ======================================================
-   */
   SgExpression * upperBoundExpression = buildIntVal (
       parallelLoop->getNumberOfOpDatArgumentGroups ());
 
@@ -544,7 +533,7 @@ FortranHostSubroutine::createPlanFunctionParametersPreparationStatements ()
    * ======================================================
    */
   SgPntrArrRefExp * arrayIndexExpression1 = buildPntrArrRefExp (
-      variableDeclarations->getReference (idxs),
+      variableDeclarations->getReference (mappingIndicesArray),
       variableDeclarations->getReference (getIterationCounterVariableName (1)));
 
   SgSubtractOp * subtractExpression1 = buildSubtractOp (arrayIndexExpression1,
@@ -578,7 +567,7 @@ FortranHostSubroutine::createPlanFunctionParametersPreparationStatements ()
         OP2::RunTimeVariableNames::index, block));
 
     SgPntrArrRefExp * arrayIndexExpression = buildPntrArrRefExp (
-        variableDeclarations->getReference (maps), buildIntVal (i));
+        variableDeclarations->getReference (mappingArray), buildIntVal (i));
 
     SgExprStatement * assignmentStatement = buildAssignStatement (
         arrayIndexExpression, dotExpression);
@@ -589,7 +578,7 @@ FortranHostSubroutine::createPlanFunctionParametersPreparationStatements ()
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
     SgPntrArrRefExp * arrayIndexExpression = buildPntrArrRefExp (
-        variableDeclarations->getReference (accesses), buildIntVal (i));
+        variableDeclarations->getReference (accessDescriptorArray), buildIntVal (i));
 
     SgExprStatement * assignmentStatement = buildAssignStatement (
         arrayIndexExpression, variableDeclarations->getReference (
@@ -627,7 +616,7 @@ FortranHostSubroutine::createPlanFunctionParametersPreparationStatements ()
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
     SgPntrArrRefExp * arrayIndexExpression = buildPntrArrRefExp (
-        variableDeclarations->getReference (inds), buildIntVal (i));
+        variableDeclarations->getReference (indirectionDescriptorArray), buildIntVal (i));
 
     SgExprStatement * assignmentStatement;
 
@@ -658,13 +647,13 @@ FortranHostSubroutine::createPlanFunctionParametersPreparationStatements ()
   }
 
   SgExprStatement * assignmentStatement2 = buildAssignStatement (
-      variableDeclarations->getReference (argsNumber), buildIntVal (
+      variableDeclarations->getReference (numberOfOpDats), buildIntVal (
           parallelLoop->getNumberOfOpDatArgumentGroups ()));
 
   appendStatement (assignmentStatement2, block);
 
   SgExprStatement * assignmentStatement3 = buildAssignStatement (
-      variableDeclarations->getReference (indsNumber), buildIntVal (
+      variableDeclarations->getReference (numberOfIndirectOpDats), buildIntVal (
           parallelLoop->getNumberOfDistinctIndirectOpDatArguments ()));
 
   appendStatement (assignmentStatement3, block);
@@ -690,19 +679,19 @@ FortranHostSubroutine::createPlanFunctionCallExpression ()
       getOpSetName ()), buildOpaqueVarRefExp (OP2::RunTimeVariableNames::index,
       subroutineScope));
 
-  SgVarRefExp * parameter3 = variableDeclarations->getReference (argsNumber);
+  SgVarRefExp * parameter3 = variableDeclarations->getReference (numberOfOpDats);
 
-  SgVarRefExp * parameter4 = variableDeclarations->getReference (args);
+  SgVarRefExp * parameter4 = variableDeclarations->getReference (opDatArray);
 
-  SgVarRefExp * parameter5 = variableDeclarations->getReference (idxs);
+  SgVarRefExp * parameter5 = variableDeclarations->getReference (mappingIndicesArray);
 
-  SgVarRefExp * parameter6 = variableDeclarations->getReference (maps);
+  SgVarRefExp * parameter6 = variableDeclarations->getReference (mappingArray);
 
-  SgVarRefExp * parameter7 = variableDeclarations->getReference (accesses);
+  SgVarRefExp * parameter7 = variableDeclarations->getReference (accessDescriptorArray);
 
-  SgVarRefExp * parameter8 = variableDeclarations->getReference (indsNumber);
+  SgVarRefExp * parameter8 = variableDeclarations->getReference (numberOfIndirectOpDats);
 
-  SgVarRefExp * parameter9 = variableDeclarations->getReference (inds);
+  SgVarRefExp * parameter9 = variableDeclarations->getReference (indirectionDescriptorArray);
 
   SgExprListExp * actualParameters = buildExprListExp (parameter1, parameter2,
       parameter3, parameter4, parameter5, parameter6, parameter7, parameter8,

@@ -9,23 +9,31 @@ class FortranOpenMPModuleDeclarationsIndirectLoop;
 
 class FortranOpenMPHostSubroutineIndirectLoop: public FortranOpenMPHostSubroutine
 {
-
   private:
 
-    void
-    createExecutionPlanDeclarations ();
+    SgBasicBlock *
+    createPlanFunctionEpilogueStatements ();
 
-    virtual SgBasicBlock *
-    createTransferOpDatStatements ();
+    SgExprStatement *
+    createPlanFunctionCallStatement ();
+
+    SgBasicBlock *
+    createSetUpOpDatTypeArrayStatements ();
+
+    SgBasicBlock *
+    createSetUpPlanFunctionActualParametersStatements ();
+
+    SgBasicBlock *
+    createPlanFunctionStatements ();
+
+    void
+    createPlanFunctionLocalVariableDeclarations ();
 
     virtual void
     createPlanFunctionExecutionStatements ();
 
     virtual SgStatement *
     createKernelFunctionCallStatement ();
-
-    virtual void
-    createOpenMPVariableDeclarations ();
 
     virtual void
     createStatements ();
