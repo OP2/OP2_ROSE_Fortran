@@ -85,10 +85,23 @@ namespace PlanFunctionVariableNames
       std::string ());
 
   std::string const
+  getNumberOfThreadColoursPerBlockSizeName (std::string const & suffix =
+      std::string ());
+
+  std::string const
   getThreadColourArrayName (std::string const & suffix = std::string ());
 
   std::string const
+  getThreadColourSizeName (std::string const & suffix = std::string ());
+
+  std::string const
   getOffsetIntoBlockArrayName (std::string const & suffix = std::string ());
+
+  std::string const
+  getOffsetIntoBlockSizeName (std::string const & suffix = std::string ());
+
+  std::string const
+  getIndirectOpDatsArrayName (std::string const & suffix = std::string ());
 
   /*
    * ======================================================
@@ -117,7 +130,14 @@ namespace PlanFunctionVariableNames
           std::string ());
 
   std::string const
+  getIndirectOpDatsOffsetSizeName (std::string const & suffix = std::string ());
+
+  std::string const
   getIndirectOpDatsNumberOfElementsArrayName (std::string const & suffix =
+      std::string ());
+
+  std::string const
+  getIndirectOpDatsNumberOfElementsSizeName (std::string const & suffix =
       std::string ());
 
   std::string const
@@ -147,6 +167,10 @@ namespace PlanFunctionVariableNames
       std::string ());
 
   std::string const
+  getNumberOfSetElementsPerBlockSizeName (std::string const & suffix =
+      std::string ());
+
+  std::string const
   getNumberOfBlockColoursName (std::string const & suffix = std::string ());
 
   std::string const
@@ -155,6 +179,9 @@ namespace PlanFunctionVariableNames
 
   std::string const
   getColourToBlockArrayName (std::string const & suffix = std::string ());
+
+  std::string const
+  getColourToBlockSizeName (std::string const & suffix = std::string ());
 
   std::string const
   getIndirectionArgumentSizeName (unsigned int OP_DAT_ArgumentGroup,

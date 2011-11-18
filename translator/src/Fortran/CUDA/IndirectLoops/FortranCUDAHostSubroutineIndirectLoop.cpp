@@ -207,7 +207,8 @@ FortranCUDAHostSubroutineIndirectLoop::createPlanFunctionExecutionStatements ()
    */
 
   SgDotExp * dotExpression3 = buildDotExp (variableDeclarations->getReference (
-      actualPlan), buildOpaqueVarRefExp (nshared, subroutineScope));
+      getActualPlanVariableName (parallelLoop->getUserSubroutineName ())),
+      buildOpaqueVarRefExp (nshared, subroutineScope));
 
   SgExprStatement * statement3 = buildAssignStatement (
       variableDeclarations->getReference (CUDA::sharedMemorySize),
@@ -260,7 +261,8 @@ FortranCUDAHostSubroutineIndirectLoop::createPlanFunctionExecutionStatements ()
    */
 
   SgDotExp * dotExpression = buildDotExp (variableDeclarations->getReference (
-      actualPlan), buildOpaqueVarRefExp (ncolors, subroutineScope));
+      getActualPlanVariableName (parallelLoop->getUserSubroutineName ())),
+      buildOpaqueVarRefExp (ncolors, subroutineScope));
 
   SgExpression * upperBoundExpression = buildSubtractOp (dotExpression,
       buildIntVal (1));
@@ -380,9 +382,11 @@ FortranCUDAHostSubroutineIndirectLoop::createExecutionPlanDeclarations ()
   SgType * op_planType = FortranTypesBuilder::buildClassDeclaration (OP_PLAN,
       subroutineScope)->get_type ();
 
-  variableDeclarations->add (actualPlan,
+  variableDeclarations->add (getActualPlanVariableName (
+      parallelLoop->getUserSubroutineName ()),
       FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
-          actualPlan, buildPointerType (op_planType), subroutineScope));
+          getActualPlanVariableName (parallelLoop->getUserSubroutineName ()),
+          buildPointerType (op_planType), subroutineScope));
 
   /*
    * ======================================================
@@ -616,7 +620,8 @@ FortranCUDAHostSubroutineIndirectLoop::createStatements ()
               subroutineScope, variableDeclarations->getReference (
                   getPlanReturnVariableName (
                       parallelLoop->getUserSubroutineName ())),
-              variableDeclarations->getReference (actualPlan));
+              variableDeclarations->getReference (getActualPlanVariableName (
+                  parallelLoop->getUserSubroutineName ())));
 
   appendStatement (callStatement1, subroutineScope);
 

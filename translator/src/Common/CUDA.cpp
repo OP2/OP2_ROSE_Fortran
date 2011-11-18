@@ -198,7 +198,7 @@ CUDA::createHostThreadSynchronisationCallStatement (SgScopeStatement * scope)
     case TargetLanguage::FORTRAN:
     {
       SgFunctionSymbol * functionSymbol =
-          FortranTypesBuilder::buildNewFortranSubroutine (
+          FortranTypesBuilder::buildNewFortranFunction(
               "cudaThreadSynchronize", scope);
 
       return buildFunctionCallExp (functionSymbol, buildExprListExp ());

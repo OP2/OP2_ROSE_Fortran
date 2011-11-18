@@ -31,7 +31,8 @@ FortranHostSubroutine::createConvertPlanFunctionParametersStatements ()
    */
 
   SgDotExp * parameterExpressionE1 = buildDotExp (
-      variableDeclarations->getReference (actualPlan), buildOpaqueVarRefExp (
+      variableDeclarations->getReference (getActualPlanVariableName (
+          parallelLoop->getUserSubroutineName ())), buildOpaqueVarRefExp (
           ind_maps, block));
 
   SgAggregateInitializer * parameterExpressionE3 =
@@ -54,7 +55,8 @@ FortranHostSubroutine::createConvertPlanFunctionParametersStatements ()
    */
 
   SgDotExp * parameterExpressionF1 = buildDotExp (
-      variableDeclarations->getReference (actualPlan),
+      variableDeclarations->getReference (getActualPlanVariableName (
+          parallelLoop->getUserSubroutineName ())),
       variableDeclarations->getReference (ncolblk));
 
   SgDotExp * parameterExpressionF3 = buildDotExp (
@@ -77,7 +79,8 @@ FortranHostSubroutine::createConvertPlanFunctionParametersStatements ()
    */
 
   SgExpression * dotExpressionG = buildDotExp (
-      variableDeclarations->getReference (actualPlan), buildOpaqueVarRefExp (
+      variableDeclarations->getReference (getActualPlanVariableName (
+          parallelLoop->getUserSubroutineName ())), buildOpaqueVarRefExp (
           nblocks, block));
 
   SgMultiplyOp * multiplyExpressionG = buildMultiplyOp (dotExpressionG,
@@ -89,7 +92,8 @@ FortranHostSubroutine::createConvertPlanFunctionParametersStatements ()
   appendStatement (assignmentStatementG, block);
 
   SgDotExp * parameterExpressionG1 = buildDotExp (
-      variableDeclarations->getReference (actualPlan), buildOpaqueVarRefExp (
+      variableDeclarations->getReference (getActualPlanVariableName (
+          parallelLoop->getUserSubroutineName ())), buildOpaqueVarRefExp (
           ind_sizes, block));
 
   SgAggregateInitializer * parameterExpressionG3 =
@@ -118,7 +122,8 @@ FortranHostSubroutine::createConvertPlanFunctionParametersStatements ()
   appendStatement (assignmentStatementH, block);
 
   SgDotExp * parameterExpressionH1 = buildDotExp (
-      variableDeclarations->getReference (actualPlan), buildOpaqueVarRefExp (
+      variableDeclarations->getReference (getActualPlanVariableName (
+          parallelLoop->getUserSubroutineName ())), buildOpaqueVarRefExp (
           ind_offs, block));
 
   SgAggregateInitializer * parameterExpressionH3 =
@@ -141,7 +146,8 @@ FortranHostSubroutine::createConvertPlanFunctionParametersStatements ()
    */
 
   SgExpression * dotExpressionI = buildDotExp (
-      variableDeclarations->getReference (actualPlan), buildOpaqueVarRefExp (
+      variableDeclarations->getReference (getActualPlanVariableName (
+          parallelLoop->getUserSubroutineName ())), buildOpaqueVarRefExp (
           nblocks, block));
 
   SgExprStatement * assignmentStatementI = buildAssignStatement (
@@ -150,7 +156,8 @@ FortranHostSubroutine::createConvertPlanFunctionParametersStatements ()
   appendStatement (assignmentStatementI, block);
 
   SgDotExp * parameterExpressionI1 = buildDotExp (
-      variableDeclarations->getReference (actualPlan), buildOpaqueVarRefExp (
+      variableDeclarations->getReference (getActualPlanVariableName (
+          parallelLoop->getUserSubroutineName ())), buildOpaqueVarRefExp (
           blkmap, block));
 
   SgAggregateInitializer * parameterExpressionI3 =
@@ -173,7 +180,8 @@ FortranHostSubroutine::createConvertPlanFunctionParametersStatements ()
    */
 
   SgExpression * dotExpressionJ = buildDotExp (
-      variableDeclarations->getReference (actualPlan), buildOpaqueVarRefExp (
+      variableDeclarations->getReference (getActualPlanVariableName (
+          parallelLoop->getUserSubroutineName ())), buildOpaqueVarRefExp (
           nblocks, block));
 
   SgExprStatement * assignmentStatementJ = buildAssignStatement (
@@ -182,7 +190,8 @@ FortranHostSubroutine::createConvertPlanFunctionParametersStatements ()
   appendStatement (assignmentStatementJ, block);
 
   SgDotExp * parameterExpressionJ1 = buildDotExp (
-      variableDeclarations->getReference (actualPlan), buildOpaqueVarRefExp (
+      variableDeclarations->getReference (getActualPlanVariableName (
+          parallelLoop->getUserSubroutineName ())), buildOpaqueVarRefExp (
           offset, block));
 
   SgAggregateInitializer * parameterExpressionJ3 =
@@ -205,7 +214,8 @@ FortranHostSubroutine::createConvertPlanFunctionParametersStatements ()
    */
 
   SgExpression * dotExpressionK = buildDotExp (
-      variableDeclarations->getReference (actualPlan), buildOpaqueVarRefExp (
+      variableDeclarations->getReference (getActualPlanVariableName (
+          parallelLoop->getUserSubroutineName ())), buildOpaqueVarRefExp (
           nblocks, block));
 
   SgExprStatement * assignmentStatementK = buildAssignStatement (
@@ -214,7 +224,8 @@ FortranHostSubroutine::createConvertPlanFunctionParametersStatements ()
   appendStatement (assignmentStatementK, block);
 
   SgDotExp * parameterExpressionK1 = buildDotExp (
-      variableDeclarations->getReference (actualPlan), buildOpaqueVarRefExp (
+      variableDeclarations->getReference (getActualPlanVariableName (
+          parallelLoop->getUserSubroutineName ())), buildOpaqueVarRefExp (
           nelems, block));
 
   SgAggregateInitializer * parameterExpressionK3 =
@@ -237,7 +248,8 @@ FortranHostSubroutine::createConvertPlanFunctionParametersStatements ()
    */
 
   SgExpression * dotExpressionL = buildDotExp (
-      variableDeclarations->getReference (actualPlan), buildOpaqueVarRefExp (
+      variableDeclarations->getReference (getActualPlanVariableName (
+          parallelLoop->getUserSubroutineName ())), buildOpaqueVarRefExp (
           nblocks, block));
 
   SgExprStatement * assignmentStatementL = buildAssignStatement (
@@ -246,7 +258,8 @@ FortranHostSubroutine::createConvertPlanFunctionParametersStatements ()
   appendStatement (assignmentStatementL, block);
 
   SgDotExp * parameterExpressionL1 = buildDotExp (
-      variableDeclarations->getReference (actualPlan), buildOpaqueVarRefExp (
+      variableDeclarations->getReference (getActualPlanVariableName (
+          parallelLoop->getUserSubroutineName ())), buildOpaqueVarRefExp (
           nthrcol, block));
 
   SgAggregateInitializer * parameterExpressionL3 =
@@ -276,7 +289,8 @@ FortranHostSubroutine::createConvertPlanFunctionParametersStatements ()
   appendStatement (assignmentStatementM, block);
 
   SgDotExp * parameterExpressionM1 = buildDotExp (
-      variableDeclarations->getReference (actualPlan), buildOpaqueVarRefExp (
+      variableDeclarations->getReference (getActualPlanVariableName (
+          parallelLoop->getUserSubroutineName ())), buildOpaqueVarRefExp (
           thrcol, block));
 
   SgAggregateInitializer * parameterExpressionM3 =
@@ -353,7 +367,8 @@ FortranHostSubroutine::createConvertPositionInPMapsStatements ()
    */
 
   SgDotExp * parameterExpressionB1 = buildDotExp (
-      variableDeclarations->getReference (actualPlan), buildOpaqueVarRefExp (
+      variableDeclarations->getReference (getActualPlanVariableName (
+          parallelLoop->getUserSubroutineName ())), buildOpaqueVarRefExp (
           nindirect, block));
 
   SgAggregateInitializer * parameterExpressionB3 =
@@ -376,8 +391,9 @@ FortranHostSubroutine::createConvertPositionInPMapsStatements ()
    */
 
   SgDotExp * parameterExpressionC1 = buildDotExp (
-      variableDeclarations->getReference (actualPlan), buildOpaqueVarRefExp (
-          maps, block));
+      variableDeclarations->getReference (getActualPlanVariableName (
+          parallelLoop->getUserSubroutineName ())), buildOpaqueVarRefExp (maps,
+          block));
 
   SgAggregateInitializer * parameterExpressionC3 =
       FortranStatementsAndExpressionsBuilder::buildShapeExpression (

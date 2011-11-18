@@ -137,7 +137,8 @@ FortranOpenMPHostSubroutineIndirectLoop::createPlanFunctionExecutionStatements (
       variableDeclarations->getReference (colour1), buildIntVal (0));
 
   SgDotExp * dotExpression3 = buildDotExp (variableDeclarations->getReference (
-      actualPlan), buildOpaqueVarRefExp (ncolors, subroutineScope));
+      getActualPlanVariableName (parallelLoop->getUserSubroutineName ())),
+      buildOpaqueVarRefExp (ncolors, subroutineScope));
 
   SgExpression * outerLoopUpperBoundExpression = buildSubtractOp (
       dotExpression3, buildIntVal (1));

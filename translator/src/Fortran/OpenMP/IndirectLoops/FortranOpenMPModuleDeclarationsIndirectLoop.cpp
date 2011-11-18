@@ -32,26 +32,34 @@ FortranOpenMPModuleDeclarationsIndirectLoop::createExecutionPlanDeclarations ()
   SgType * c_ptrType = FortranTypesBuilder::buildClassDeclaration ("c_ptr",
       moduleScope)->get_type ();
 
-  variableDeclarations ->add (planRet,
+  variableDeclarations ->add (getPlanReturnVariableName (
+      parallelLoop->getUserSubroutineName ()),
       FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
-          planRet, c_ptrType, moduleScope));
+          getPlanReturnVariableName (parallelLoop->getUserSubroutineName ()),
+          c_ptrType, moduleScope));
 
   SgType * op_planType = FortranTypesBuilder::buildClassDeclaration ("op_plan",
       moduleScope)->get_type ();
 
-  variableDeclarations->add (actualPlan,
+  variableDeclarations->add (getActualPlanVariableName (
+      parallelLoop->getUserSubroutineName ()),
       FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
-          actualPlan, buildPointerType (op_planType), moduleScope));
+          getActualPlanVariableName (parallelLoop->getUserSubroutineName ()),
+          buildPointerType (op_planType), moduleScope));
 
-  variableDeclarations->add (pindMaps,
+  variableDeclarations->add (getIndirectOpDatsLocalToGlobalMappingName (
+      parallelLoop->getUserSubroutineName ()),
       FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
-          pindMaps, buildPointerType (FortranTypesBuilder::getArray_RankOne (
-              c_ptrType)), moduleScope));
+          getIndirectOpDatsLocalToGlobalMappingName (
+              parallelLoop->getUserSubroutineName ()), buildPointerType (
+              FortranTypesBuilder::getArray_RankOne (c_ptrType)), moduleScope));
 
-  variableDeclarations->add (pmaps,
-      FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (pmaps,
-          buildPointerType (FortranTypesBuilder::getArray_RankOne (c_ptrType)),
-          moduleScope));
+  variableDeclarations->add (getOpDatsGlobalToLocalMappingName (
+      parallelLoop->getUserSubroutineName ()),
+      FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
+          getOpDatsGlobalToLocalMappingName (
+              parallelLoop->getUserSubroutineName ()), buildPointerType (
+              FortranTypesBuilder::getArray_RankOne (c_ptrType)), moduleScope));
 
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
@@ -59,7 +67,8 @@ FortranOpenMPModuleDeclarationsIndirectLoop::createExecutionPlanDeclarations ()
     {
       if (parallelLoop->isIndirect (i))
       {
-        string const variableName = getLocalToGlobalMappingName (i);
+        string const variableName = getLocalToGlobalMappingName (i,
+            parallelLoop->getUserSubroutineName ());
 
         variableDeclarations->add (variableName,
             FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
@@ -81,7 +90,8 @@ FortranOpenMPModuleDeclarationsIndirectLoop::createExecutionPlanDeclarations ()
   {
     if (parallelLoop->isIndirect (i))
     {
-      string const variableName = getGlobalToLocalMappingName (i);
+      string const variableName = getGlobalToLocalMappingName (i,
+          parallelLoop->getUserSubroutineName ());
 
       variableDeclarations->add (variableName,
           FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
@@ -103,7 +113,8 @@ FortranOpenMPModuleDeclarationsIndirectLoop::createExecutionPlanDeclarations ()
   {
     if (parallelLoop->isIndirect (i))
     {
-      string const variableName = getGlobalToLocalMappingSizeName (i);
+      string const variableName = getGlobalToLocalMappingSizeName (i,
+          parallelLoop->getUserSubroutineName ());
 
       variableDeclarations->add (variableName,
           FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
@@ -112,44 +123,134 @@ FortranOpenMPModuleDeclarationsIndirectLoop::createExecutionPlanDeclarations ()
     }
   }
 
-  vector <string> planIntegerArrayVariables;
+  map <string, string> planVariablesWithSizes;
 
-  planIntegerArrayVariables.push_back (ncolblk);
-  planIntegerArrayVariables.push_back (pnindirect);
-  planIntegerArrayVariables.push_back (pindSizes);
-  planIntegerArrayVariables.push_back (pindOffs);
-  planIntegerArrayVariables.push_back (pblkMap);
-  planIntegerArrayVariables.push_back (poffset);
-  planIntegerArrayVariables.push_back (pnelems);
-  planIntegerArrayVariables.push_back (pnthrcol);
-  planIntegerArrayVariables.push_back (pthrcol);
+  /*
+   * ======================================================
+   * Colour to block array declarations: 'blkmap'
+   * ======================================================
+   */
 
-  for (vector <string>::iterator it = planIntegerArrayVariables.begin (); it
-      != planIntegerArrayVariables.end (); ++it)
+  planVariablesWithSizes[getColourToBlockArrayName (
+      parallelLoop->getUserSubroutineName ())] = getColourToBlockSizeName (
+      parallelLoop->getUserSubroutineName ());
+
+  /*
+   * ======================================================
+   * Number of thread colours per block declarations: 'nthrcol'
+   * ======================================================
+   */
+
+  planVariablesWithSizes[getNumberOfThreadColoursPerBlockArrayName (
+      parallelLoop->getUserSubroutineName ())]
+      = getNumberOfThreadColoursPerBlockSizeName (
+          parallelLoop->getUserSubroutineName ());
+
+  /*
+   * ======================================================
+   * Thread colour declarations: 'thrcol'
+   * ======================================================
+   */
+
+  planVariablesWithSizes[getThreadColourArrayName (
+      parallelLoop->getUserSubroutineName ())] = getThreadColourSizeName (
+      parallelLoop->getUserSubroutineName ());
+
+  /*
+   * ======================================================
+   * Thread colour declarations: 'ind_sizes'
+   * ======================================================
+   */
+
+  planVariablesWithSizes[getIndirectOpDatsNumberOfElementsArrayName (
+      parallelLoop->getUserSubroutineName ())]
+      = getIndirectOpDatsNumberOfElementsSizeName (
+          parallelLoop->getUserSubroutineName ());
+
+  /*
+   * ======================================================
+   * Indirect OP_DAT offsets declarations: 'ind_offs'
+   * ======================================================
+   */
+
+  planVariablesWithSizes[getIndirectOpDatsOffsetArrayName (
+      parallelLoop->getUserSubroutineName ())]
+      = getIndirectOpDatsOffsetSizeName (parallelLoop->getUserSubroutineName ());
+
+  /*
+   * ======================================================
+   * Offset into block declarations: 'offset'
+   * ======================================================
+   */
+
+  planVariablesWithSizes[getOffsetIntoBlockArrayName (
+      parallelLoop->getUserSubroutineName ())] = getOffsetIntoBlockSizeName (
+      parallelLoop->getUserSubroutineName ());
+
+  /*
+   * ======================================================
+   * Number of OP_SET elements per block declarations: 'nelems'
+   * ======================================================
+   */
+
+  planVariablesWithSizes[getNumberOfSetElementsPerBlockArrayName (
+      parallelLoop->getUserSubroutineName ())]
+      = getNumberOfSetElementsPerBlockSizeName (
+          parallelLoop->getUserSubroutineName ());
+
+  /*
+   * ======================================================
+   * Add the declarations
+   * ======================================================
+   */
+
+  for (map <string, string>::iterator it = planVariablesWithSizes.begin (); it
+      != planVariablesWithSizes.end (); ++it)
   {
-    variableDeclarations->add (*it,
-        FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (*it,
-            buildPointerType (FortranTypesBuilder::getArray_RankOne (
-                FortranTypesBuilder::getFourByteInteger ())), moduleScope));
+    std::string const & variableName1 = it->first;
+    std::string const & variableName2 = it->second;
+
+    variableDeclarations->add (variableName1,
+        FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
+            variableName1, buildPointerType (
+                FortranTypesBuilder::getArray_RankOne (
+                    FortranTypesBuilder::getFourByteInteger ())), moduleScope));
+
+    variableDeclarations->add (variableName2,
+        FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
+            variableName2, FortranTypesBuilder::getFourByteInteger (),
+            moduleScope));
   }
 
-  vector <string> planSizeVariables;
+  /*
+   * ======================================================
+   * Thread colour declarations: 'ncolblk'
+   * ======================================================
+   */
 
-  planSizeVariables.push_back (pindSizesSize);
-  planSizeVariables.push_back (pindOffsSize);
-  planSizeVariables.push_back (pblkMapSize);
-  planSizeVariables.push_back (poffsetSize);
-  planSizeVariables.push_back (pnelemsSize);
-  planSizeVariables.push_back (pnthrcolSize);
-  planSizeVariables.push_back (pthrcolSize);
+  std::string const & variableName1 = getColourToNumberOfBlocksArrayName (
+      parallelLoop->getUserSubroutineName ());
 
-  for (vector <string>::iterator it = planSizeVariables.begin (); it
-      != planSizeVariables.end (); ++it)
-  {
-    variableDeclarations->add (*it,
-        FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (*it,
-            FortranTypesBuilder::getFourByteInteger (), moduleScope));
-  }
+  variableDeclarations->add (variableName1,
+      FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
+          variableName1, buildPointerType (
+              FortranTypesBuilder::getArray_RankOne (
+                  FortranTypesBuilder::getFourByteInteger ())), moduleScope));
+
+  /*
+   * ======================================================
+   * Indirect OP_DAT array declarations: 'nindirect'
+   * ======================================================
+   */
+
+  std::string const & variableName2 = getIndirectOpDatsArrayName (
+      parallelLoop->getUserSubroutineName ());
+
+  variableDeclarations->add (variableName2,
+      FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
+          variableName2, buildPointerType (
+              FortranTypesBuilder::getArray_RankOne (
+                  FortranTypesBuilder::getFourByteInteger ())), moduleScope));
 }
 
 FortranOpenMPModuleDeclarationsIndirectLoop::FortranOpenMPModuleDeclarationsIndirectLoop (

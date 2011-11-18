@@ -41,7 +41,7 @@ class FormatFortranCode():
 		from re import IGNORECASE, compile
 
 		end_regex        = compile("\s*end\s", IGNORECASE)
-		subroutine_regex = compile("\ssubroutine\s", IGNORECASE)	
+		subroutine_regex = compile("\s*\\bsubroutine\\b\s", IGNORECASE)	
 		do_regex         = compile("\s*do\s", IGNORECASE)
 		select_regex     = compile("\s*select\s", IGNORECASE)
 		module_regex     = compile("\s*module\s", IGNORECASE)
