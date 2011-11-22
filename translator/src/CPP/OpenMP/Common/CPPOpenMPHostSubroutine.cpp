@@ -1,11 +1,11 @@
-#include <CPPOpenMPHostSubroutine.h>
-#include <CPPParallelLoop.h>
-#include <CPPOpenMPKernelSubroutine.h>
-#include <RoseStatementsAndExpressionsBuilder.h>
-#include <CompilerGeneratedNames.h>
-#include <OP2Definitions.h>
-#include <OpenMP.h>
-#include <Exceptions.h>
+#include "CPPOpenMPHostSubroutine.h"
+#include "CPPParallelLoop.h"
+#include "CPPOpenMPKernelSubroutine.h"
+#include "RoseStatementsAndExpressionsBuilder.h"
+#include "CompilerGeneratedNames.h"
+#include "OpenMP.h"
+#include "Exceptions.h"
+#include "OP2.h"
 
 SgBasicBlock *
 CPPOpenMPHostSubroutine::createInitialiseNumberOfThreadsStatements ()

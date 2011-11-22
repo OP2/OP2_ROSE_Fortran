@@ -1,11 +1,11 @@
-#include <CPPCUDAHostSubroutine.h>
-#include <CPPCUDAKernelSubroutine.h>
-#include <CPPModuleDeclarations.h>
-#include <RoseStatementsAndExpressionsBuilder.h>
-#include <CUDA.h>
-#include <CompilerGeneratedNames.h>
-#include <OP2Definitions.h>
-#include <Exceptions.h>
+#include "CPPCUDAHostSubroutine.h"
+#include "CPPCUDAKernelSubroutine.h"
+#include "CPPModuleDeclarations.h"
+#include "RoseStatementsAndExpressionsBuilder.h"
+#include "CUDA.h"
+#include "CompilerGeneratedNames.h"
+#include "Exceptions.h"
+#include "OP2.h"
 
 SgForStatement *
 CPPCUDAHostSubroutine::createReductionUpdateStatements (

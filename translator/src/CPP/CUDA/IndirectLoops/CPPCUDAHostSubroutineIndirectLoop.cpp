@@ -5,7 +5,7 @@
 #include "CUDA.h"
 #include "CompilerGeneratedNames.h"
 #include "PlanFunctionNames.h"
-#include "OP2Definitions.h"
+#include "OP2.h"
 
 SgStatement *
 CPPCUDAHostSubroutineIndirectLoop::createKernelFunctionCallStatement ()
@@ -287,14 +287,14 @@ CPPCUDAHostSubroutineIndirectLoop::createPlanFunctionCallStatement ()
   actualParamaters->append_expression (buildIntVal (
       parallelLoop->getNumberOfOpDatArgumentGroups ()));
 
-  actualParamaters->append_expression (
-      variableDeclarations->getReference (opDatArray));
+  actualParamaters->append_expression (variableDeclarations->getReference (
+      opDatArray));
 
   actualParamaters->append_expression (buildIntVal (
       parallelLoop->getNumberOfDistinctIndirectOpDatArguments ()));
 
-  actualParamaters->append_expression (
-      variableDeclarations->getReference (indirectionDescriptorArray));
+  actualParamaters->append_expression (variableDeclarations->getReference (
+      indirectionDescriptorArray));
 
   SgFunctionCallExp * functionCallExpression = buildFunctionCallExp (
       OP2::OP_PLAN_GET, buildVoidType (), actualParamaters, subroutineScope);
@@ -352,19 +352,17 @@ CPPCUDAHostSubroutineIndirectLoop::createPlanFunctionDeclarations ()
       RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
           getIterationCounterVariableName (3), buildIntType (), subroutineScope));
 
-  variableDeclarations->add (
-      opDatArray,
+  variableDeclarations->add (opDatArray,
       RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
-          opDatArray,
-          buildArrayType (
-              buildClassDeclaration (OP2::OP_ARG, subroutineScope)->get_type (),
-              buildIntVal (parallelLoop->getNumberOfOpDatArgumentGroups ())),
+          opDatArray, buildArrayType (buildClassDeclaration (OP2::OP_ARG,
+              subroutineScope)->get_type (), buildIntVal (
+              parallelLoop->getNumberOfOpDatArgumentGroups ())),
           subroutineScope));
 
   variableDeclarations->add (indirectionDescriptorArray,
-      RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (indirectionDescriptorArray,
-          buildArrayType (buildIntType (), buildIntVal (
-              parallelLoop->getNumberOfOpDatArgumentGroups ())),
+      RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
+          indirectionDescriptorArray, buildArrayType (buildIntType (),
+              buildIntVal (parallelLoop->getNumberOfOpDatArgumentGroups ())),
           subroutineScope));
 
   variableDeclarations->add (planRet,

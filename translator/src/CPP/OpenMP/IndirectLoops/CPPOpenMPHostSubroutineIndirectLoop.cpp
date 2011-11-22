@@ -4,7 +4,7 @@
 #include "RoseHelper.h"
 #include "CompilerGeneratedNames.h"
 #include "PlanFunctionNames.h"
-#include "OP2Definitions.h"
+#include "OP2.h"
 #include "OpenMP.h"
 
 SgStatement *
@@ -161,8 +161,7 @@ CPPOpenMPHostSubroutineIndirectLoop::createOpenMPLoopStatements (
    */
 
   SgExprStatement * initialisationExpression = buildAssignStatement (
-      variableDeclarations->getReference (blockID),
-      buildIntVal (0));
+      variableDeclarations->getReference (blockID), buildIntVal (0));
 
   SgLessThanOp * upperBoundExpression = buildLessThanOp (
       variableDeclarations->getReference (blockID),
@@ -345,12 +344,12 @@ CPPOpenMPHostSubroutineIndirectLoop::createIncrementAccessLocalVariableDeclarati
           numberOfActiveThreadsCeiling, buildIntType (), subroutineScope));
 
   variableDeclarations ->add (colour1,
-      RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
-          colour1, buildIntType (), subroutineScope));
+      RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (colour1,
+          buildIntType (), subroutineScope));
 
   variableDeclarations ->add (colour2,
-      RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
-          colour2, buildIntType (), subroutineScope));
+      RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (colour2,
+          buildIntType (), subroutineScope));
 }
 
 void
@@ -371,8 +370,8 @@ CPPOpenMPHostSubroutineIndirectLoop::createPlanFunctionDeclarations ()
           getIterationCounterVariableName (4), buildIntType (), subroutineScope));
 
   variableDeclarations->add (blockID,
-      RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
-          blockID, buildIntType (), subroutineScope));
+      RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (blockID,
+          buildIntType (), subroutineScope));
 
   variableDeclarations->add (blockOffset,
       RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
@@ -395,15 +394,16 @@ CPPOpenMPHostSubroutineIndirectLoop::createPlanFunctionDeclarations ()
           partitionSize, buildIntType (), subroutineScope));
 
   variableDeclarations->add (opDatArray,
-      RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (opDatArray,
-          buildArrayType (buildOpaqueType (OP2::OP_ARG, subroutineScope),
-              buildIntVal (parallelLoop->getNumberOfOpDatArgumentGroups ())),
+      RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
+          opDatArray, buildArrayType (buildOpaqueType (OP2::OP_ARG,
+              subroutineScope), buildIntVal (
+              parallelLoop->getNumberOfOpDatArgumentGroups ())),
           subroutineScope));
 
   variableDeclarations->add (indirectionDescriptorArray,
-      RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (indirectionDescriptorArray,
-          buildArrayType (buildIntType (), buildIntVal (
-              parallelLoop->getNumberOfOpDatArgumentGroups ())),
+      RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
+          indirectionDescriptorArray, buildArrayType (buildIntType (),
+              buildIntVal (parallelLoop->getNumberOfOpDatArgumentGroups ())),
           subroutineScope));
 
   variableDeclarations->add (planRet,

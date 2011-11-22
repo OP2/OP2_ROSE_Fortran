@@ -1,10 +1,10 @@
-#include <CPPOpenMPHostSubroutineDirectLoop.h>
-#include <CPPOpenMPKernelSubroutine.h>
-#include <RoseStatementsAndExpressionsBuilder.h>
-#include <RoseHelper.h>
-#include <CompilerGeneratedNames.h>
-#include <OP2Definitions.h>
-#include <OpenMP.h>
+#include "CPPOpenMPHostSubroutineDirectLoop.h"
+#include "CPPOpenMPKernelSubroutine.h"
+#include "RoseStatementsAndExpressionsBuilder.h"
+#include "RoseHelper.h"
+#include "CompilerGeneratedNames.h"
+#include "OpenMP.h"
+#include "OP2.h"
 
 SgStatement *
 CPPOpenMPHostSubroutineDirectLoop::createKernelFunctionCallStatement ()
