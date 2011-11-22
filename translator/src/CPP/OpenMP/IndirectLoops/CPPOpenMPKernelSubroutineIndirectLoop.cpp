@@ -132,7 +132,7 @@ CPPOpenMPKernelSubroutineIndirectLoop::createLocalVariableDeclarations ()
             "Creating shared indirection mapping for OP_DAT " + lexical_cast <
                 string> (i), Debug::INNER_LOOP_LEVEL, __FILE__, __LINE__);
 
-        string const variableName = getIndirectionMapName (i);
+        string const variableName = getIndirectOpDatMapName (i);
 
         variableDeclarations->add (variableName,
             RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
@@ -152,7 +152,7 @@ CPPOpenMPKernelSubroutineIndirectLoop::createLocalVariableDeclarations ()
             "Creating indirection size argument for OP_DAT " + lexical_cast <
                 string> (i), Debug::INNER_LOOP_LEVEL, __FILE__, __LINE__);
 
-        string const variableName = getIndirectionArgumentSizeName (i);
+        string const variableName = getIndirectOpDatCardinalityName (i);
 
         variableDeclarations->add (variableName,
             RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
@@ -172,7 +172,7 @@ CPPOpenMPKernelSubroutineIndirectLoop::createLocalVariableDeclarations ()
                 + lexical_cast <string> (i), Debug::INNER_LOOP_LEVEL, __FILE__,
             __LINE__);
 
-        string const variableName = getIndirectionCUDASharedMemoryName (i);
+        string const variableName = getIndirectOpDatSharedMemoryName (i);
 
         SgVariableDeclaration * variableDeclaration =
             RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
@@ -192,7 +192,7 @@ CPPOpenMPKernelSubroutineIndirectLoop::createLocalVariableDeclarations ()
               + lexical_cast <string> (i), Debug::INNER_LOOP_LEVEL, __FILE__,
           __LINE__);
 
-      string const variableName = getIndirectionCUDASharedMemoryName (i);
+      string const variableName = getIndirectOpDatSharedMemoryName (i);
 
       variableDeclarations ->add (
           variableName,

@@ -35,6 +35,12 @@ FortranOpenMPSubroutinesGeneration::createSubroutines ()
     FortranUserSubroutine * userSubroutine = new FortranUserSubroutine (
         moduleScope, parallelLoop, declarations);
 
+    userSubroutine->createFormalParameterDeclarations ();
+    userSubroutine->createLocalVariableDeclarations ();
+    userSubroutine->createStatements ();
+    RoseHelper::forceOutputOfCodeToFile (
+        userSubroutine->getSubroutineHeaderStatement ());
+
     FortranOpenMPKernelSubroutine * kernelSubroutine;
 
     if (parallelLoop->isDirectLoop ())

@@ -241,7 +241,7 @@ OP2VariableNames::getIncrementAccessMapName (unsigned int OP_DAT_ArgumentGroup)
 }
 
 std::string const
-OP2VariableNames::getIndirectionCUDASharedMemoryName (
+OP2VariableNames::getIndirectOpDatSharedMemoryName (
     unsigned int OP_DAT_ArgumentGroup)
 {
   using boost::lexical_cast;

@@ -253,7 +253,7 @@ namespace OP2VariableNames
   getIncrementAccessMapName (unsigned int OP_DAT_ArgumentGroup);
 
   std::string const
-  getIndirectionCUDASharedMemoryName (unsigned int OP_DAT_ArgumentGroup);
+  getIndirectOpDatSharedMemoryName (unsigned int OP_DAT_ArgumentGroup);
 
   std::string const
   getSharedMemoryDeclarationName (SgType * type, unsigned int size);

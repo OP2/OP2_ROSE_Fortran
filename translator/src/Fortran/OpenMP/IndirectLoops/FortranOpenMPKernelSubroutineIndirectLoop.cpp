@@ -181,6 +181,7 @@ FortranOpenMPKernelSubroutineIndirectLoop::createStatements ()
 void
 FortranOpenMPKernelSubroutineIndirectLoop::createIncrementAccessLocalVariableDeclarations ()
 {
+  using namespace SageBuilder;
   using namespace LoopVariableNames;
   using namespace OP2VariableNames;
   using namespace PlanFunctionVariableNames;
@@ -190,6 +191,33 @@ FortranOpenMPKernelSubroutineIndirectLoop::createIncrementAccessLocalVariableDec
   Debug::getInstance ()->debugMessage (
       "Creating local variable declarations needed for incremented OP_DATS",
       Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+
+  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
+  {
+    if (parallelLoop->isIncremented (i))
+    {
+      Debug::getInstance ()->debugMessage (
+          "Creating local variables for incremented OP_DAT " + lexical_cast <
+              string> (i), Debug::INNER_LOOP_LEVEL, __FILE__, __LINE__);
+
+      string const variableName1 = getOpDatLocalName (i);
+
+      variableDeclarations->add (variableName1,
+          FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
+              variableName1,
+              FortranTypesBuilder::getArray_RankOne_WithLowerAndUpperBounds (
+                  parallelLoop->getOpDatBaseType (i), buildIntVal (0),
+                  buildIntVal (parallelLoop->getOpDatDimension (i) - 1)),
+              subroutineScope));
+
+      string const variableName2 = getIncrementAccessMapName (i);
+
+      variableDeclarations->add (variableName2,
+          FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
+              variableName2, FortranTypesBuilder::getFourByteInteger (),
+              subroutineScope));
+    }
+  }
 
   variableDeclarations->add (numberOfColours,
       FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
@@ -230,15 +258,23 @@ FortranOpenMPKernelSubroutineIndirectLoop::createSharedVariableDeclarations ()
     {
       if (parallelLoop->isIndirect (i))
       {
-        string const autosharedVariableName = getSharedMemoryDeclarationName (
+        string const & variableName = getIndirectOpDatSharedMemoryName (i);
+
+        variableDeclarations->add (variableName,
+            FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
+                variableName, buildPointerType (
+                    FortranTypesBuilder::getArray_RankOne (
+                        parallelLoop->getOpDatBaseType (i))), subroutineScope));
+
+        string const & sharedVariableName = getSharedMemoryDeclarationName (
             parallelLoop->getOpDatBaseType (i),
             parallelLoop->getSizeOfOpDat (i));
 
         if (find (autosharedNames.begin (), autosharedNames.end (),
-            autosharedVariableName) == autosharedNames.end ())
+            sharedVariableName) == autosharedNames.end ())
         {
           Debug::getInstance ()->debugMessage (
-              "Creating declaration with name '" + autosharedVariableName
+              "Creating declaration with name '" + sharedVariableName
                   + "' for OP_DAT '" + parallelLoop->getOpDatVariableName (i)
                   + "'", Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
@@ -246,14 +282,13 @@ FortranOpenMPKernelSubroutineIndirectLoop::createSharedVariableDeclarations ()
               buildIntVal (1));
 
           variableDeclarations->add (
-              autosharedVariableName,
+              sharedVariableName,
               FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
-                  autosharedVariableName,
-                  FortranTypesBuilder::getArray_RankOne (
+                  sharedVariableName, FortranTypesBuilder::getArray_RankOne (
                       parallelLoop->getOpDatBaseType (i), 0, upperBound),
                   subroutineScope, 1, TARGET));
 
-          autosharedNames.push_back (autosharedVariableName);
+          autosharedNames.push_back (sharedVariableName);
         }
       }
     }
@@ -298,13 +333,108 @@ FortranOpenMPKernelSubroutineIndirectLoop::createExecutionLocalVariableDeclarati
 }
 
 void
-FortranOpenMPKernelSubroutineIndirectLoop::createLocalVariableDeclarations ()
+FortranOpenMPKernelSubroutineIndirectLoop::createIndirectOpDatCardinalityLocalVariableDeclarations ()
 {
-  using namespace OP2VariableNames;
   using namespace PlanFunctionVariableNames;
   using boost::lexical_cast;
   using std::string;
 
+  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
+  {
+    if (parallelLoop->isDuplicateOpDat (i) == false)
+    {
+      if (parallelLoop->isIndirect (i))
+      {
+        Debug::getInstance ()->debugMessage (
+            "Creating cardinality argument for indirect OP_DAT "
+                + lexical_cast <string> (i), Debug::INNER_LOOP_LEVEL, __FILE__,
+            __LINE__);
+
+        string const variableName = getIndirectOpDatCardinalityName (i);
+
+        variableDeclarations->add (variableName,
+            FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
+                variableName, FortranTypesBuilder::getFourByteInteger (),
+                subroutineScope));
+      }
+    }
+  }
+}
+
+void
+FortranOpenMPKernelSubroutineIndirectLoop::createRoundUpLocalVariableDeclarations ()
+{
+  using namespace OP2VariableNames;
+  using boost::lexical_cast;
+  using std::string;
+
+  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
+  {
+    if (parallelLoop->isDuplicateOpDat (i) == false)
+    {
+      if (parallelLoop->isIndirect (i))
+      {
+        Debug::getInstance ()->debugMessage ("Creating round up declaration "
+            + lexical_cast <string> (i), Debug::INNER_LOOP_LEVEL, __FILE__,
+            __LINE__);
+
+        string const & variableName = getRoundUpVariableName (i);
+
+        variableDeclarations->add (variableName,
+            FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
+                variableName, FortranTypesBuilder::getFourByteInteger (),
+                subroutineScope));
+      }
+    }
+  }
+}
+
+void
+FortranOpenMPKernelSubroutineIndirectLoop::createNumberOfBytesPerOpDatLocalVariableDeclarations ()
+{
+  using namespace OP2VariableNames;
+  using boost::lexical_cast;
+  using std::string;
+
+  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
+  {
+    string const & variableName = getNumberOfBytesVariableName (i);
+
+    if (parallelLoop->isIndirect (i))
+    {
+      if (parallelLoop->isDuplicateOpDat (i) == false)
+      {
+        Debug::getInstance ()->debugMessage (
+            "Creating number of bytes declaration for OP_DAT " + lexical_cast <
+                string> (i), Debug::INNER_LOOP_LEVEL, __FILE__, __LINE__);
+
+        SgVariableDeclaration * variableDeclaration =
+            FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
+                variableName, FortranTypesBuilder::getFourByteInteger (),
+                subroutineScope);
+
+        variableDeclarations->add (variableName, variableDeclaration);
+
+        numberOfBytesDeclarations[parallelLoop->getOpDatVariableName (i)]
+            = variableDeclaration;
+      }
+      else
+      {
+        Debug::getInstance ()->debugMessage (
+            "Number of bytes declaration NOT needed for OP_DAT "
+                + lexical_cast <string> (i), Debug::INNER_LOOP_LEVEL, __FILE__,
+            __LINE__);
+
+        variableDeclarations ->add (variableName,
+            numberOfBytesDeclarations[parallelLoop->getOpDatVariableName (i)]);
+      }
+    }
+  }
+}
+
+void
+FortranOpenMPKernelSubroutineIndirectLoop::createLocalVariableDeclarations ()
+{
   Debug::getInstance ()->debugMessage ("Creating local variable declarations",
       Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
@@ -312,36 +442,11 @@ FortranOpenMPKernelSubroutineIndirectLoop::createLocalVariableDeclarations ()
 
   createSharedVariableDeclarations ();
 
-  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
-  {
-    string const & variableName = getNumberOfBytesVariableName (i);
+  createNumberOfBytesPerOpDatLocalVariableDeclarations ();
 
-    if (parallelLoop->isDuplicateOpDat (i) == false)
-    {
-      Debug::getInstance ()->debugMessage (
-          "Creating number of bytes declaration for OP_DAT " + lexical_cast <
-              string> (i), Debug::INNER_LOOP_LEVEL, __FILE__, __LINE__);
+  createRoundUpLocalVariableDeclarations ();
 
-      SgVariableDeclaration * variableDeclaration =
-          FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
-              variableName, FortranTypesBuilder::getFourByteInteger (),
-              subroutineScope);
-
-      variableDeclarations->add (variableName, variableDeclaration);
-
-      numberOfBytesDeclarations[parallelLoop->getOpDatVariableName (i)]
-          = variableDeclaration;
-    }
-    else
-    {
-      Debug::getInstance ()->debugMessage (
-          "Number of bytes declaration NOT needed for OP_DAT " + lexical_cast <
-              string> (i), Debug::INNER_LOOP_LEVEL, __FILE__, __LINE__);
-
-      variableDeclarations ->add (variableName,
-          numberOfBytesDeclarations[parallelLoop->getOpDatVariableName (i)]);
-    }
-  }
+  createIndirectOpDatCardinalityLocalVariableDeclarations ();
 
   if (parallelLoop->hasIncrementedOpDats ())
   {

@@ -264,7 +264,8 @@ PlanFunctionVariableNames::getGlobalToLocalMappingName (
   }
   else
   {
-    return mappingArray + lexical_cast <string> (OP_DAT_ArgumentGroup) + "_" + suffix;
+    return mappingArray + lexical_cast <string> (OP_DAT_ArgumentGroup) + "_"
+        + suffix;
   }
 }
 
@@ -281,8 +282,8 @@ PlanFunctionVariableNames::getGlobalToLocalMappingSizeName (
   }
   else
   {
-    return mappingArray + lexical_cast <string> (OP_DAT_ArgumentGroup) + Size + "_"
-        + suffix;
+    return mappingArray + lexical_cast <string> (OP_DAT_ArgumentGroup) + Size
+        + "_" + suffix;
   }
 }
 
@@ -370,7 +371,7 @@ PlanFunctionVariableNames::getColourToBlockSizeName (std::string const & suffix)
 }
 
 std::string const
-PlanFunctionVariableNames::getIndirectionArgumentSizeName (
+PlanFunctionVariableNames::getIndirectOpDatCardinalityName (
     unsigned int OP_DAT_ArgumentGroup, std::string const & suffix)
 {
   using boost::lexical_cast;
@@ -389,7 +390,7 @@ PlanFunctionVariableNames::getIndirectionArgumentSizeName (
 }
 
 std::string const
-PlanFunctionVariableNames::getIndirectionMapName (
+PlanFunctionVariableNames::getIndirectOpDatMapName (
     unsigned int OP_DAT_ArgumentGroup, std::string const & suffix)
 {
   using boost::lexical_cast;

@@ -9,7 +9,7 @@ class FortranProgramDeclarationsAndDefinitions;
 class FortranUserSubroutine: public UserSubroutine <SgProcedureHeaderStatement,
     FortranProgramDeclarationsAndDefinitions>
 {
-  protected:
+  public:
 
     virtual void
     createStatements ();
@@ -19,8 +19,6 @@ class FortranUserSubroutine: public UserSubroutine <SgProcedureHeaderStatement,
 
     virtual void
     createFormalParameterDeclarations ();
-
-  public:
 
     FortranUserSubroutine (SgScopeStatement * moduleScope,
         FortranParallelLoop * parallelLoop,

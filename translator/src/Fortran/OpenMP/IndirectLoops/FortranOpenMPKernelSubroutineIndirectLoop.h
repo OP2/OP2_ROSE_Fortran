@@ -25,6 +25,15 @@ class FortranOpenMPKernelSubroutineIndirectLoop: public FortranOpenMPKernelSubro
     createSharedVariableDeclarations ();
 
     void
+    createIndirectOpDatCardinalityLocalVariableDeclarations ();
+
+    void
+    createRoundUpLocalVariableDeclarations ();
+
+    void
+    createNumberOfBytesPerOpDatLocalVariableDeclarations ();
+
+    void
     createExecutionLocalVariableDeclarations ();
 
     virtual SgStatement *

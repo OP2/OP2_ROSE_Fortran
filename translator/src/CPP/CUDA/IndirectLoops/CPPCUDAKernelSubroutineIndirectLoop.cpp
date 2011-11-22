@@ -55,7 +55,7 @@ CPPCUDAKernelSubroutineIndirectLoop::createUserSubroutineCallStatement ()
             buildIntVal (parallelLoop->getOpDatDimension (i)));
 
         parameterExpression = buildAddOp (variableDeclarations->getReference (
-            getIndirectionCUDASharedMemoryName (i)), multiplyExpression1);
+            getIndirectOpDatSharedMemoryName (i)), multiplyExpression1);
       }
     }
     else if (parallelLoop->isDirect (i))
@@ -145,7 +145,7 @@ CPPCUDAKernelSubroutineIndirectLoop::createIncrementAndWriteAccessEpilogueStatem
                   parallelLoop->getOpDatDimension (i)));
 
           SgPntrArrRefExp * arrayExpression1a = buildPntrArrRefExp (
-              variableDeclarations->getReference (getIndirectionMapName (i)),
+              variableDeclarations->getReference (getIndirectOpDatMapName (i)),
               divideExpression1);
 
           SgMultiplyOp * multiplyExpression1 = buildMultiplyOp (
@@ -166,7 +166,7 @@ CPPCUDAKernelSubroutineIndirectLoop::createIncrementAndWriteAccessEpilogueStatem
 
           SgPntrArrRefExp * arrayExpression1c = buildPntrArrRefExp (
               variableDeclarations->getReference (
-                  getIndirectionCUDASharedMemoryName (i)),
+                  getIndirectOpDatSharedMemoryName (i)),
               variableDeclarations->getReference (
                   getIterationCounterVariableName (1)));
 
@@ -199,7 +199,7 @@ CPPCUDAKernelSubroutineIndirectLoop::createIncrementAndWriteAccessEpilogueStatem
 
           SgMultiplyOp * multiplyExpression = buildMultiplyOp (
               variableDeclarations->getReference (
-                  getIndirectionArgumentSizeName (i)), buildIntVal (
+                  getIndirectOpDatCardinalityName (i)), buildIntVal (
                   parallelLoop->getOpDatDimension (i)));
 
           SgLessThanOp * upperBoundExpression = buildLessThanOp (
@@ -265,7 +265,7 @@ CPPCUDAKernelSubroutineIndirectLoop::createStageOutFromLocalMemoryToSharedMemory
 
       SgPntrArrRefExp * arrayExpression2 = buildPntrArrRefExp (
           variableDeclarations->getReference (
-              getIndirectionCUDASharedMemoryName (i)), addExpression2);
+              getIndirectOpDatSharedMemoryName (i)), addExpression2);
 
       SgPntrArrRefExp * arrayExpression3 = buildPntrArrRefExp (
           variableDeclarations->getReference (getOpDatLocalName (i)),
@@ -533,7 +533,7 @@ CPPCUDAKernelSubroutineIndirectLoop::createInitialiseCUDASharedVariablesStatemen
         {
           SgPntrArrRefExp * arrayExpression = buildPntrArrRefExp (
               variableDeclarations->getReference (
-                  getIndirectionCUDASharedMemoryName (i)),
+                  getIndirectOpDatSharedMemoryName (i)),
               variableDeclarations->getReference (
                   getIterationCounterVariableName (1)));
 
@@ -567,7 +567,7 @@ CPPCUDAKernelSubroutineIndirectLoop::createInitialiseCUDASharedVariablesStatemen
                   parallelLoop->getOpDatDimension (i)));
 
           SgPntrArrRefExp * arrayExpression1 = buildPntrArrRefExp (
-              variableDeclarations->getReference (getIndirectionMapName (i)),
+              variableDeclarations->getReference (getIndirectOpDatMapName (i)),
               divideExpression);
 
           SgMultiplyOp * multiplyExpression = buildMultiplyOp (
@@ -588,7 +588,7 @@ CPPCUDAKernelSubroutineIndirectLoop::createInitialiseCUDASharedVariablesStatemen
 
           SgPntrArrRefExp * arrayExpression3 = buildPntrArrRefExp (
               variableDeclarations->getReference (
-                  getIndirectionCUDASharedMemoryName (i)),
+                  getIndirectOpDatSharedMemoryName (i)),
               variableDeclarations->getReference (
                   getIterationCounterVariableName (1)));
 
@@ -610,7 +610,7 @@ CPPCUDAKernelSubroutineIndirectLoop::createInitialiseCUDASharedVariablesStatemen
                 THREAD_X, subroutineScope));
 
         SgMultiplyOp * multiplyExpression = buildMultiplyOp (
-            variableDeclarations->getReference (getIndirectionArgumentSizeName (
+            variableDeclarations->getReference (getIndirectOpDatCardinalityName (
                 i)), buildIntVal (parallelLoop->getOpDatDimension (i)));
 
         SgLessThanOp * upperBoundExpression = buildLessThanOp (
@@ -686,7 +686,7 @@ CPPCUDAKernelSubroutineIndirectLoop::createSetIndirectionMapPointerStatements ()
                 getLocalToGlobalMappingName (i)), arrayExpression1);
 
         SgExprStatement * assignmentStatement1 = buildAssignStatement (
-            variableDeclarations->getReference (getIndirectionMapName (i)),
+            variableDeclarations->getReference (getIndirectOpDatMapName (i)),
             addExpression1b);
 
         appendStatement (assignmentStatement1, block);
@@ -759,7 +759,7 @@ CPPCUDAKernelSubroutineIndirectLoop::createSetOpDatSharedMemoryPointerStatements
 
         SgExprStatement * assignmentStatement2 = buildAssignStatement (
             variableDeclarations->getReference (
-                getIndirectionCUDASharedMemoryName (i)), addressOfExpression2);
+                getIndirectOpDatSharedMemoryName (i)), addressOfExpression2);
 
         appendStatement (assignmentStatement2, block);
 
@@ -780,7 +780,7 @@ CPPCUDAKernelSubroutineIndirectLoop::createSetOpDatSharedMemoryPointerStatements
 
           SgMultiplyOp * multiplyExpression3b = buildMultiplyOp (
               variableDeclarations->getReference (
-                  getIndirectionArgumentSizeName (i)), multiplyExpression3a);
+                  getIndirectOpDatCardinalityName (i)), multiplyExpression3a);
 
           SgFunctionCallExp * functionCallExpression3 =
               OP2::Macros::createRoundUpCallStatement (subroutineScope,
@@ -901,7 +901,7 @@ CPPCUDAKernelSubroutineIndirectLoop::createSetNumberOfIndirectElementsPerBlockSt
             variableDeclarations->getReference (pindSizes), addExpression);
 
         SgStatement * statement = buildAssignStatement (
-            variableDeclarations->getReference (getIndirectionArgumentSizeName (
+            variableDeclarations->getReference (getIndirectOpDatCardinalityName (
                 i)), arrayExpression);
 
         appendStatement (statement, block);
@@ -1168,7 +1168,7 @@ CPPCUDAKernelSubroutineIndirectLoop::createLocalVariableDeclarations ()
             "Creating shared indirection mapping for OP_DAT " + lexical_cast <
                 string> (i), Debug::INNER_LOOP_LEVEL, __FILE__, __LINE__);
 
-        string const variableName = getIndirectionMapName (i);
+        string const variableName = getIndirectOpDatMapName (i);
 
         SgVariableDeclaration * variableDeclaration =
             RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
@@ -1192,7 +1192,7 @@ CPPCUDAKernelSubroutineIndirectLoop::createLocalVariableDeclarations ()
             "Creating indirection size argument for OP_DAT " + lexical_cast <
                 string> (i), Debug::INNER_LOOP_LEVEL, __FILE__, __LINE__);
 
-        string const variableName = getIndirectionArgumentSizeName (i);
+        string const variableName = getIndirectOpDatCardinalityName (i);
 
         SgVariableDeclaration * variableDeclaration =
             RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
@@ -1216,7 +1216,7 @@ CPPCUDAKernelSubroutineIndirectLoop::createLocalVariableDeclarations ()
                 + lexical_cast <string> (i), Debug::INNER_LOOP_LEVEL, __FILE__,
             __LINE__);
 
-        string const variableName = getIndirectionCUDASharedMemoryName (i);
+        string const variableName = getIndirectOpDatSharedMemoryName (i);
 
         SgVariableDeclaration * variableDeclaration =
             RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
@@ -1238,7 +1238,7 @@ CPPCUDAKernelSubroutineIndirectLoop::createLocalVariableDeclarations ()
               + lexical_cast <string> (i), Debug::INNER_LOOP_LEVEL, __FILE__,
           __LINE__);
 
-      string const variableName = getIndirectionCUDASharedMemoryName (i);
+      string const variableName = getIndirectOpDatSharedMemoryName (i);
 
       variableDeclarations ->add (
           variableName,

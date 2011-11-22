@@ -186,11 +186,11 @@ namespace PlanFunctionVariableNames
   getColourToBlockSizeName (std::string const & suffix = std::string ());
 
   std::string const
-  getIndirectionArgumentSizeName (unsigned int OP_DAT_ArgumentGroup,
+  getIndirectOpDatCardinalityName (unsigned int OP_DAT_ArgumentGroup,
       std::string const & suffix = std::string ());
 
   std::string const
-  getIndirectionMapName (unsigned int OP_DAT_ArgumentGroup,
+  getIndirectOpDatMapName (unsigned int OP_DAT_ArgumentGroup,
       std::string const & suffix = std::string ());
 }
 
