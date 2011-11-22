@@ -1,10 +1,10 @@
-#include <CPPCUDAKernelSubroutineDirectLoop.h>
-#include <CPPParallelLoop.h>
-#include <RoseStatementsAndExpressionsBuilder.h>
-#include <RoseHelper.h>
-#include <CUDA.h>
-#include <CompilerGeneratedNames.h>
-#include <OP2Definitions.h>
+#include "CPPCUDAKernelSubroutineDirectLoop.h"
+#include "CPPParallelLoop.h"
+#include "RoseStatementsAndExpressionsBuilder.h"
+#include "RoseHelper.h"
+#include "CUDA.h"
+#include "CompilerGeneratedNames.h"
+#include "OP2.h"
 
 SgStatement *
 CPPCUDAKernelSubroutineDirectLoop::createUserSubroutineCallStatement ()
@@ -427,9 +427,9 @@ CPPCUDAKernelSubroutineDirectLoop::createInitialiseOffsetIntoCUDASharedVariableS
     {
       if (parallelLoop->isDirect (i) && parallelLoop->getOpDatDimension (i) > 1)
       {
-        string const autosharedVariableName =
-            getSharedMemoryDeclarationName (parallelLoop->getOpDatBaseType (
-                i), parallelLoop->getSizeOfOpDat (i));
+        string const autosharedVariableName = getSharedMemoryDeclarationName (
+            parallelLoop->getOpDatBaseType (i),
+            parallelLoop->getSizeOfOpDat (i));
 
         string const autosharedOffsetVariableName =
             getSharedMemoryOffsetDeclarationName (
