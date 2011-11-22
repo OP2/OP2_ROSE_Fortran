@@ -8,7 +8,7 @@
 #include "RoseHelper.h"
 #include "CompilerGeneratedNames.h"
 #include "PlanFunctionNames.h"
-#include "OP2Definitions.h"
+#include "OP2.h"
 #include "OpenMP.h"
 #include "Debug.h"
 

@@ -1,15 +1,15 @@
-#include <FortranCUDAHostSubroutineDirectLoop.h>
-#include <FortranParallelLoop.h>
-#include <FortranCUDAModuleDeclarations.h>
-#include <FortranTypesBuilder.h>
-#include <FortranStatementsAndExpressionsBuilder.h>
-#include <RoseStatementsAndExpressionsBuilder.h>
-#include <RoseHelper.h>
-#include <CompilerGeneratedNames.h>
-#include <OP2Definitions.h>
-#include <Debug.h>
-#include <Exceptions.h>
-#include <CUDA.h>
+#include "FortranCUDAHostSubroutineDirectLoop.h"
+#include "FortranParallelLoop.h"
+#include "FortranCUDAModuleDeclarations.h"
+#include "FortranTypesBuilder.h"
+#include "FortranStatementsAndExpressionsBuilder.h"
+#include "RoseStatementsAndExpressionsBuilder.h"
+#include "RoseHelper.h"
+#include "CompilerGeneratedNames.h"
+#include "OP2.h"
+#include "Debug.h"
+#include "Exceptions.h"
+#include "CUDA.h"
 
 SgStatement *
 FortranCUDAHostSubroutineDirectLoop::createKernelFunctionCallStatement ()

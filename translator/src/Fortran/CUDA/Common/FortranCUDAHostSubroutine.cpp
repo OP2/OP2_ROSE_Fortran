@@ -1,16 +1,16 @@
-#include <FortranCUDAHostSubroutine.h>
-#include <FortranKernelSubroutine.h>
-#include <FortranParallelLoop.h>
-#include <FortranCUDAOpDatCardinalitiesDeclaration.h>
-#include <FortranCUDAModuleDeclarations.h>
-#include <FortranOpDatDimensionsDeclaration.h>
-#include <FortranStatementsAndExpressionsBuilder.h>
-#include <FortranTypesBuilder.h>
-#include <RoseStatementsAndExpressionsBuilder.h>
-#include <Debug.h>
-#include <CompilerGeneratedNames.h>
-#include <OP2Definitions.h>
-#include <CUDA.h>
+#include "FortranCUDAHostSubroutine.h"
+#include "FortranKernelSubroutine.h"
+#include "FortranParallelLoop.h"
+#include "FortranCUDAOpDatCardinalitiesDeclaration.h"
+#include "FortranCUDAModuleDeclarations.h"
+#include "FortranOpDatDimensionsDeclaration.h"
+#include "FortranStatementsAndExpressionsBuilder.h"
+#include "FortranTypesBuilder.h"
+#include "RoseStatementsAndExpressionsBuilder.h"
+#include "Debug.h"
+#include "CompilerGeneratedNames.h"
+#include "OP2.h"
+#include "CUDA.h"
 
 void
 FortranCUDAHostSubroutine::createReductionPrologueStatements ()

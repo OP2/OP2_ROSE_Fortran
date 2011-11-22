@@ -2,7 +2,7 @@
 #include "FortranStatementsAndExpressionsBuilder.h"
 #include "FortranTypesBuilder.h"
 #include "FortranParallelLoop.h"
-#include "OP2Definitions.h"
+#include "OP2.h"
 #include "CompilerGeneratedNames.h"
 #include "Debug.h"
 #include <boost/algorithm/string/predicate.hpp>
