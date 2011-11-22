@@ -164,7 +164,7 @@ CPPCUDAHostSubroutineDirectLoop::createStatements ()
 
   SgFunctionCallExp
       * threadSynchronisationExpression =
-          CUDA::CPPRuntimeSupport::getCUDASafeHostThreadSynchronisationCallStatement (
+          CUDA::OP2RuntimeSupport::getCUDASafeHostThreadSynchronisationCallStatement (
               subroutineScope);
 
   appendStatement (buildExprStatement (threadSynchronisationExpression),

@@ -8,6 +8,9 @@ class FortranOpenMPKernelSubroutineIndirectLoop: public FortranOpenMPKernelSubro
 {
   private:
 
+    void
+    createExecutionLocalVariableDeclarations ();
+
     virtual SgStatement *
     createUserSubroutineCallStatement ();
 

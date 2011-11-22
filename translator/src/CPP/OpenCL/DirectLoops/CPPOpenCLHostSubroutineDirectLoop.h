@@ -21,7 +21,8 @@ class CPPOpenCLHostSubroutineDirectLoop: public CPPOpenCLHostSubroutine
 
     CPPOpenCLHostSubroutineDirectLoop (SgScopeStatement * moduleScope,
         CPPOpenCLKernelSubroutine * calleeSubroutine,
-        CPPParallelLoop * parallelLoop);
+        CPPParallelLoop * parallelLoop,
+        CPPModuleDeclarations * moduleDeclarations);
 };
 
 #endif

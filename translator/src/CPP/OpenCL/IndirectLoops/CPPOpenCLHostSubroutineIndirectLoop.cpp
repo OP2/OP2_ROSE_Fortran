@@ -36,8 +36,9 @@ CPPOpenCLHostSubroutineIndirectLoop::createLocalVariableDeclarations ()
 CPPOpenCLHostSubroutineIndirectLoop::CPPOpenCLHostSubroutineIndirectLoop (
     SgScopeStatement * moduleScope,
     CPPOpenCLKernelSubroutine * kernelSubroutine,
-    CPPParallelLoop * parallelLoop) :
-  CPPOpenCLHostSubroutine (moduleScope, kernelSubroutine, parallelLoop)
+    CPPParallelLoop * parallelLoop, CPPModuleDeclarations * moduleDeclarations) :
+  CPPOpenCLHostSubroutine (moduleScope, kernelSubroutine, parallelLoop,
+      moduleDeclarations)
 {
   Debug::getInstance ()->debugMessage (
       "Creating OpenCL host subroutine for indirect loop",

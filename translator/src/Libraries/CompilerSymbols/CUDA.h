@@ -91,7 +91,7 @@ namespace CUDA
   SgFunctionCallExp *
   createHostThreadSynchronisationCallStatement (SgScopeStatement * scope);
 
-  namespace CPPRuntimeSupport
+  namespace OP2RuntimeSupport
   {
     /*
      * ======================================================

@@ -30,10 +30,53 @@ FortranOpenMPKernelSubroutineIndirectLoop::createStatements ()
 }
 
 void
+FortranOpenMPKernelSubroutineIndirectLoop::createExecutionLocalVariableDeclarations ()
+{
+  using namespace LoopVariableNames;
+  using namespace OP2VariableNames;
+  using namespace PlanFunctionVariableNames;
+
+  Debug::getInstance ()->debugMessage (
+      "Creating local variable declarations needed to execute kernel",
+      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+
+  variableDeclarations->add (sharedMemoryOffset,
+      FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
+          sharedMemoryOffset, FortranTypesBuilder::getFourByteInteger (),
+          subroutineScope));
+
+  variableDeclarations->add (blockID,
+      FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
+          blockID, FortranTypesBuilder::getFourByteInteger (), subroutineScope));
+
+  variableDeclarations->add (numberOfActiveThreads,
+      FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
+          numberOfActiveThreads, FortranTypesBuilder::getFourByteInteger (),
+          subroutineScope));
+
+  variableDeclarations ->add (nbytes,
+      FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
+          nbytes, FortranTypesBuilder::getFourByteInteger (), subroutineScope));
+
+  variableDeclarations ->add (getIterationCounterVariableName (1),
+      FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
+          getIterationCounterVariableName (1),
+          FortranTypesBuilder::getFourByteInteger (), subroutineScope));
+
+  variableDeclarations ->add (getIterationCounterVariableName (2),
+      FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
+          getIterationCounterVariableName (2),
+          FortranTypesBuilder::getFourByteInteger (), subroutineScope));
+}
+
+void
 FortranOpenMPKernelSubroutineIndirectLoop::createLocalVariableDeclarations ()
 {
+
   Debug::getInstance ()->debugMessage ("Creating local variable declarations",
       Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+
+  createExecutionLocalVariableDeclarations ();
 }
 
 void

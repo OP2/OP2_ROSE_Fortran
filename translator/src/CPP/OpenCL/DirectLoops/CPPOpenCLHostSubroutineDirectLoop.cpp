@@ -32,13 +32,15 @@ CPPOpenCLHostSubroutineDirectLoop::createStatements ()
 void
 CPPOpenCLHostSubroutineDirectLoop::createLocalVariableDeclarations ()
 {
+
 }
 
 CPPOpenCLHostSubroutineDirectLoop::CPPOpenCLHostSubroutineDirectLoop (
     SgScopeStatement * moduleScope,
     CPPOpenCLKernelSubroutine * calleeSubroutine,
-    CPPParallelLoop * parallelLoop) :
-  CPPOpenCLHostSubroutine (moduleScope, calleeSubroutine, parallelLoop)
+    CPPParallelLoop * parallelLoop, CPPModuleDeclarations * moduleDeclarations) :
+  CPPOpenCLHostSubroutine (moduleScope, calleeSubroutine, parallelLoop,
+      moduleDeclarations)
 {
   Debug::getInstance ()->debugMessage (
       "Creating host subroutine of direct loop", Debug::CONSTRUCTOR_LEVEL,

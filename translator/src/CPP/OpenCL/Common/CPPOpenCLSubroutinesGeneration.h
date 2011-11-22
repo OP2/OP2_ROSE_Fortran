@@ -9,6 +9,9 @@ class CPPOpenCLSubroutinesGeneration: public CPPSubroutinesGeneration
   private:
 
     void
+    createReductionSubroutines ();
+
+    void
     addHeaderIncludes ();
 
     virtual void

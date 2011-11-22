@@ -28,7 +28,6 @@ namespace PlanFunctionVariableNames
 
   std::string const actualPlan = "actualPlan";
   std::string const blkmap = "blkmap";
-  std::string const cplan = "cplan";
   std::string const ind_maps = "ind_maps";
   std::string const ind_offs = "ind_offs";
   std::string const ind_sizes = "ind_sizes";

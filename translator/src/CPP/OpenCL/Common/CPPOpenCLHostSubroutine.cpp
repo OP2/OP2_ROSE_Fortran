@@ -19,7 +19,8 @@ CPPOpenCLHostSubroutine::createReductionDeclarations ()
 CPPOpenCLHostSubroutine::CPPOpenCLHostSubroutine (
     SgScopeStatement * moduleScope,
     CPPOpenCLKernelSubroutine * calleeSubroutine,
-    CPPParallelLoop * parallelLoop) :
-  CPPHostSubroutine (moduleScope, calleeSubroutine, parallelLoop)
+    CPPParallelLoop * parallelLoop, CPPModuleDeclarations * moduleDeclarations) :
+  CPPHostSubroutine (moduleScope, calleeSubroutine, parallelLoop),
+      moduleDeclarations (moduleDeclarations)
 {
 }

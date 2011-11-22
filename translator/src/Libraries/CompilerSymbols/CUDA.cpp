@@ -216,7 +216,7 @@ CUDA::createHostThreadSynchronisationCallStatement (SgScopeStatement * scope)
 }
 
 SgFunctionCallExp *
-CUDA::CPPRuntimeSupport::getReallocateReductionArraysCallStatement (
+CUDA::OP2RuntimeSupport::getReallocateReductionArraysCallStatement (
     SgScopeStatement * scope, SgVarRefExp * reductionBytesReference)
 {
   using namespace SageBuilder;
@@ -228,7 +228,7 @@ CUDA::CPPRuntimeSupport::getReallocateReductionArraysCallStatement (
 }
 
 SgFunctionCallExp *
-CUDA::CPPRuntimeSupport::getMoveReductionArraysFromHostToDeviceCallStatement (
+CUDA::OP2RuntimeSupport::getMoveReductionArraysFromHostToDeviceCallStatement (
     SgScopeStatement * scope, SgVarRefExp * reductionBytesReference)
 {
   using namespace SageBuilder;
@@ -240,7 +240,7 @@ CUDA::CPPRuntimeSupport::getMoveReductionArraysFromHostToDeviceCallStatement (
 }
 
 SgFunctionCallExp *
-CUDA::CPPRuntimeSupport::getMoveReductionArraysFromDeviceToHostCallStatement (
+CUDA::OP2RuntimeSupport::getMoveReductionArraysFromDeviceToHostCallStatement (
     SgScopeStatement * scope, SgVarRefExp * reductionBytesReference)
 {
   using namespace SageBuilder;
@@ -252,7 +252,7 @@ CUDA::CPPRuntimeSupport::getMoveReductionArraysFromDeviceToHostCallStatement (
 }
 
 SgFunctionCallExp *
-CUDA::CPPRuntimeSupport::getCUDASafeHostThreadSynchronisationCallStatement (
+CUDA::OP2RuntimeSupport::getCUDASafeHostThreadSynchronisationCallStatement (
     SgScopeStatement * scope)
 {
   using namespace SageBuilder;
@@ -267,7 +267,7 @@ CUDA::CPPRuntimeSupport::getCUDASafeHostThreadSynchronisationCallStatement (
 }
 
 SgVarRefExp *
-CUDA::CPPRuntimeSupport::getPointerToMemoryAllocatedForHostReductionArray (
+CUDA::OP2RuntimeSupport::getPointerToMemoryAllocatedForHostReductionArray (
     SgScopeStatement * scope)
 {
   using namespace SageBuilder;
@@ -276,7 +276,7 @@ CUDA::CPPRuntimeSupport::getPointerToMemoryAllocatedForHostReductionArray (
 }
 
 SgVarRefExp *
-CUDA::CPPRuntimeSupport::getPointerToMemoryAllocatedForDeviceReductionArray (
+CUDA::OP2RuntimeSupport::getPointerToMemoryAllocatedForDeviceReductionArray (
     SgScopeStatement * scope)
 {
   using namespace SageBuilder;

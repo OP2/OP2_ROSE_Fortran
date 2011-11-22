@@ -5,9 +5,14 @@
 #include <CPPHostSubroutine.h>
 
 class CPPOpenCLKernelSubroutine;
+class CPPModuleDeclarations;
 
 class CPPOpenCLHostSubroutine: public CPPHostSubroutine
 {
+  protected:
+
+    CPPModuleDeclarations * moduleDeclarations;
+
   protected:
 
     virtual void
@@ -21,7 +26,8 @@ class CPPOpenCLHostSubroutine: public CPPHostSubroutine
 
     CPPOpenCLHostSubroutine (SgScopeStatement * moduleScope,
         CPPOpenCLKernelSubroutine * calleeSubroutine,
-        CPPParallelLoop * parallelLoop);
+        CPPParallelLoop * parallelLoop,
+        CPPModuleDeclarations * moduleDeclarations);
 };
 
 #endif

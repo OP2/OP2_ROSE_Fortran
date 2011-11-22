@@ -10,6 +10,31 @@
 #include <CPPReductionSubroutines.h>
 
 void
+CPPOpenCLSubroutinesGeneration::createReductionSubroutines ()
+{
+  using boost::lexical_cast;
+  using std::string;
+  using std::map;
+  using std::vector;
+
+  Debug::getInstance ()->debugMessage ("Creating reduction subroutines",
+      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+
+  vector <Reduction *> reductionsNeeded;
+
+  for (map <string, ParallelLoop *>::const_iterator it =
+      declarations->firstParallelLoop (); it
+      != declarations->lastParallelLoop (); ++it)
+  {
+    string const userSubroutineName = it->first;
+
+    ParallelLoop * parallelLoop = it->second;
+
+    parallelLoop->getReductionsNeeded (reductionsNeeded);
+  }
+}
+
+void
 CPPOpenCLSubroutinesGeneration::createSubroutines ()
 {
   using std::string;
@@ -36,12 +61,20 @@ CPPOpenCLSubroutinesGeneration::createSubroutines ()
     {
       kernelSubroutine = new CPPOpenCLKernelSubroutineDirectLoop (moduleScope,
           userDeviceSubroutine, parallelLoop, reductionSubroutines);
+
+      hostSubroutines[userSubroutineName]
+          = new CPPOpenCLHostSubroutineDirectLoop (moduleScope,
+              kernelSubroutine, parallelLoop, moduleDeclarations);
     }
     else
     {
       kernelSubroutine
           = new CPPOpenCLKernelSubroutineIndirectLoop (moduleScope,
               userDeviceSubroutine, parallelLoop, reductionSubroutines);
+
+      hostSubroutines[userSubroutineName]
+          = new CPPOpenCLHostSubroutineIndirectLoop (moduleScope,
+              kernelSubroutine, parallelLoop, moduleDeclarations);
     }
   }
 }

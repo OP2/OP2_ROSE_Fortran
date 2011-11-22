@@ -11,12 +11,13 @@ class SgVarRefExp;
 
 namespace OpenMP
 {
-  std::string const FortranLibraryName = "OMP_LIB";
+  std::string const fortranLibraryName = "OMP_LIB";
   std::string const fortranCplanFunction = "cplan_OpenMP";
 
   std::string const sliceStart = "sliceStart";
   std::string const sliceEnd = "sliceEnd";
   std::string const numberOfThreads = "numberOfThreads";
+  std::string const threadBlockID = "threadBlockID";
 
   std::string const
   getIfDirectiveString ();

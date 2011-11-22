@@ -184,7 +184,7 @@ CPPCUDAHostSubroutine::createReductionEpilogueStatements ()
 
   SgFunctionCallExp
       * moveReductionArraysToHostCall =
-          CUDA::CPPRuntimeSupport::getMoveReductionArraysFromDeviceToHostCallStatement (
+          CUDA::OP2RuntimeSupport::getMoveReductionArraysFromDeviceToHostCallStatement (
               subroutineScope, variableDeclarations->getReference (
                   reductionBytes));
 
@@ -434,7 +434,7 @@ CPPCUDAHostSubroutine::createReductionPrologueStatements ()
    */
 
   SgFunctionCallExp * reallocateReductionArraysExpression =
-      CUDA::CPPRuntimeSupport::getReallocateReductionArraysCallStatement (
+      CUDA::OP2RuntimeSupport::getReallocateReductionArraysCallStatement (
           subroutineScope, variableDeclarations->getReference (reductionBytes));
 
   appendStatement (buildExprStatement (reallocateReductionArraysExpression),
@@ -464,7 +464,7 @@ CPPCUDAHostSubroutine::createReductionPrologueStatements ()
       SgAddOp
           * addExpression1 =
               buildAddOp (
-                  CUDA::CPPRuntimeSupport::getPointerToMemoryAllocatedForHostReductionArray (
+                  CUDA::OP2RuntimeSupport::getPointerToMemoryAllocatedForHostReductionArray (
                       subroutineScope), variableDeclarations->getReference (
                       reductionBytes));
 
@@ -480,7 +480,7 @@ CPPCUDAHostSubroutine::createReductionPrologueStatements ()
       SgAddOp
           * addExpression2 =
               buildAddOp (
-                  CUDA::CPPRuntimeSupport::getPointerToMemoryAllocatedForDeviceReductionArray (
+                  CUDA::OP2RuntimeSupport::getPointerToMemoryAllocatedForDeviceReductionArray (
                       subroutineScope), variableDeclarations->getReference (
                       reductionBytes));
 
@@ -537,7 +537,7 @@ CPPCUDAHostSubroutine::createReductionPrologueStatements ()
 
   SgFunctionCallExp
       * moveReductionArraysToDeviceCall =
-          CUDA::CPPRuntimeSupport::getMoveReductionArraysFromHostToDeviceCallStatement (
+          CUDA::OP2RuntimeSupport::getMoveReductionArraysFromHostToDeviceCallStatement (
               subroutineScope, variableDeclarations->getReference (
                   reductionBytes));
 

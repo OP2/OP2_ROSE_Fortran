@@ -17,18 +17,6 @@ class FortranHostSubroutine: public HostSubroutine <SgProcedureHeaderStatement>
     virtual SgBasicBlock *
     createTransferOpDatStatements () = 0;
 
-    SgBasicBlock *
-    createConvertPositionInPMapsStatements ();
-
-    SgBasicBlock *
-    createConvertPlanFunctionParametersStatements ();
-
-    SgBasicBlock *
-    createPlanFunctionParametersPreparationStatements ();
-
-    SgFunctionCallExp *
-    createPlanFunctionCallExpression ();
-
     virtual void
     createFormalParameterDeclarations ();
 
