@@ -1,9 +1,9 @@
-#include <CPPModifyOP2CallsToComplyWithOxfordAPI.h>
-#include <CPPProgramDeclarationsAndDefinitions.h>
-#include <CPPOP2Definitions.h>
-#include <Debug.h>
-#include <Exceptions.h>
-#include <OP2Definitions.h>
+#include "CPPModifyOP2CallsToComplyWithOxfordAPI.h"
+#include "CPPProgramDeclarationsAndDefinitions.h"
+#include "CPPOP2Definitions.h"
+#include "Debug.h"
+#include "Exceptions.h"
+#include "OP2.h"
 
 void
 CPPModifyOP2CallsToComplyWithOxfordAPI::patchOpArgGblCall (

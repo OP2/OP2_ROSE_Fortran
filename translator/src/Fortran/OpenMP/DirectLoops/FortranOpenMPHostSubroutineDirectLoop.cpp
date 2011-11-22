@@ -1,13 +1,13 @@
-#include <FortranOpenMPHostSubroutineDirectLoop.h>
-#include <FortranOpenMPKernelSubroutine.h>
-#include <FortranStatementsAndExpressionsBuilder.h>
-#include <FortranTypesBuilder.h>
-#include <RoseStatementsAndExpressionsBuilder.h>
-#include <CompilerGeneratedNames.h>
-#include <OP2Definitions.h>
-#include <RoseHelper.h>
-#include <Debug.h>
-#include <OpenMP.h>
+#include "FortranOpenMPHostSubroutineDirectLoop.h"
+#include "FortranOpenMPKernelSubroutine.h"
+#include "FortranStatementsAndExpressionsBuilder.h"
+#include "FortranTypesBuilder.h"
+#include "RoseStatementsAndExpressionsBuilder.h"
+#include "CompilerGeneratedNames.h"
+#include "OP2.h"
+#include "RoseHelper.h"
+#include "Debug.h"
+#include "OpenMP.h"
 
 SgStatement *
 FortranOpenMPHostSubroutineDirectLoop::createKernelFunctionCallStatement ()

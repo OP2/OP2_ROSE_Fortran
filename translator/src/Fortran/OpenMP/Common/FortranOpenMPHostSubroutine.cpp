@@ -6,7 +6,7 @@
 #include "FortranTypesBuilder.h"
 #include "RoseHelper.h"
 #include "CompilerGeneratedNames.h"
-#include "OP2Definitions.h"
+#include "OP2.h"
 #include "OpenMP.h"
 
 void
