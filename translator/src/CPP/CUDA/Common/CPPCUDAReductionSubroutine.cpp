@@ -642,7 +642,7 @@ CPPCUDAReductionSubroutine::createLocalVariableDeclarations ()
    * ======================================================
    */
 
-  sharedVariableName = getCUDASharedMemoryDeclarationName (
+  sharedVariableName = getSharedMemoryDeclarationName (
       reduction->getBaseType (), reduction->getVariableSize ());
 
   SgVariableDeclaration * sharedVariableDeclaration =

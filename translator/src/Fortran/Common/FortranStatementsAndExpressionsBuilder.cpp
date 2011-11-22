@@ -1,7 +1,7 @@
-#include <FortranStatementsAndExpressionsBuilder.h>
-#include <FortranTypesBuilder.h>
-#include <RoseHelper.h>
-#include <Exceptions.h>
+#include "FortranStatementsAndExpressionsBuilder.h"
+#include "FortranTypesBuilder.h"
+#include "RoseHelper.h"
+#include "Exceptions.h"
 
 void
 FortranStatementsAndExpressionsBuilder::setFortranAttributes (
@@ -26,6 +26,12 @@ FortranStatementsAndExpressionsBuilder::setFortranAttributes (
       case ALLOCATABLE:
       {
         variableDeclaration->get_declarationModifier ().get_typeModifier ().setAllocatable ();
+        break;
+      }
+
+      case TARGET:
+      {
+        variableDeclaration->get_declarationModifier ().get_typeModifier ().setTarget ();
         break;
       }
 

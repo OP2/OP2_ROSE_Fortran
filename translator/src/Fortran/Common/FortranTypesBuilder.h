@@ -18,18 +18,6 @@ class SgFunctionSymbol;
 class SgModuleStatement;
 class SgTypeString;
 
-enum FORTRAN_VARIABLE_ATTRIBUTES
-{
-  ALLOCATABLE,
-  CUDA_CONSTANT,
-  CUDA_DEVICE,
-  CUDA_SHARED,
-  VALUE,
-  INTENT_IN,
-  INTENT_OUT,
-  INTENT_INOUT
-};
-
 class FortranTypesBuilder
 {
   private:

@@ -86,7 +86,7 @@ CPPCUDAKernelSubroutineDirectLoop::createStageInFromDeviceMemoryToSharedMemorySt
   using namespace OP2VariableNames;
   using std::string;
 
-  string const autosharedVariableName = getCUDASharedMemoryDeclarationName (
+  string const autosharedVariableName = getSharedMemoryDeclarationName (
       parallelLoop->getOpDatBaseType (OP_DAT_ArgumentGroup),
       parallelLoop->getSizeOfOpDat (OP_DAT_ArgumentGroup));
 
@@ -142,7 +142,7 @@ CPPCUDAKernelSubroutineDirectLoop::createStageInFromSharedMemoryToLocalMemorySta
   using namespace OP2VariableNames;
   using std::string;
 
-  string const autosharedVariableName = getCUDASharedMemoryDeclarationName (
+  string const autosharedVariableName = getSharedMemoryDeclarationName (
       parallelLoop->getOpDatBaseType (OP_DAT_ArgumentGroup),
       parallelLoop->getSizeOfOpDat (OP_DAT_ArgumentGroup));
 
@@ -193,7 +193,7 @@ CPPCUDAKernelSubroutineDirectLoop::createStageOutFromSharedMemoryToDeviceMemoryS
   using namespace OP2VariableNames;
   using std::string;
 
-  string const autosharedVariableName = getCUDASharedMemoryDeclarationName (
+  string const autosharedVariableName = getSharedMemoryDeclarationName (
       parallelLoop->getOpDatBaseType (OP_DAT_ArgumentGroup),
       parallelLoop->getSizeOfOpDat (OP_DAT_ArgumentGroup));
 
@@ -249,7 +249,7 @@ CPPCUDAKernelSubroutineDirectLoop::createStageOutFromLocalMemoryToSharedMemorySt
   using namespace OP2VariableNames;
   using std::string;
 
-  string const autosharedVariableName = getCUDASharedMemoryDeclarationName (
+  string const autosharedVariableName = getSharedMemoryDeclarationName (
       parallelLoop->getOpDatBaseType (OP_DAT_ArgumentGroup),
       parallelLoop->getSizeOfOpDat (OP_DAT_ArgumentGroup));
 
@@ -428,11 +428,11 @@ CPPCUDAKernelSubroutineDirectLoop::createInitialiseOffsetIntoCUDASharedVariableS
       if (parallelLoop->isDirect (i) && parallelLoop->getOpDatDimension (i) > 1)
       {
         string const autosharedVariableName =
-            getCUDASharedMemoryDeclarationName (parallelLoop->getOpDatBaseType (
+            getSharedMemoryDeclarationName (parallelLoop->getOpDatBaseType (
                 i), parallelLoop->getSizeOfOpDat (i));
 
         string const autosharedOffsetVariableName =
-            getCUDASharedMemoryOffsetDeclarationName (
+            getSharedMemoryOffsetDeclarationName (
                 parallelLoop->getOpDatBaseType (i),
                 parallelLoop->getSizeOfOpDat (i));
 

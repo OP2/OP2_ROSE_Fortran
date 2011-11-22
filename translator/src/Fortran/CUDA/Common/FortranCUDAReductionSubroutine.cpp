@@ -444,7 +444,7 @@ FortranCUDAReductionSubroutine::createLocalVariableDeclarations ()
    * ======================================================
    */
 
-  sharedVariableName = getCUDASharedMemoryDeclarationName (
+  sharedVariableName = getSharedMemoryDeclarationName (
       reduction->getBaseType (), reduction->getVariableSize ());
 
   SgArrayType * arrayType = FortranTypesBuilder::getArray_RankOne (

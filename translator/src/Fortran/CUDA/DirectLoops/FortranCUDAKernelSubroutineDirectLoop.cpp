@@ -131,12 +131,12 @@ FortranCUDAKernelSubroutineDirectLoop::createStageInFromDeviceMemoryToSharedMemo
   using namespace LoopVariableNames;
   using std::string;
 
-  string const autosharedVariableName = getCUDASharedMemoryDeclarationName (
+  string const autosharedVariableName = getSharedMemoryDeclarationName (
       parallelLoop->getOpDatBaseType (OP_DAT_ArgumentGroup),
       parallelLoop->getSizeOfOpDat (OP_DAT_ArgumentGroup));
 
   string const autosharedOffsetVariableName =
-      getCUDASharedMemoryOffsetDeclarationName (parallelLoop->getOpDatBaseType (
+      getSharedMemoryOffsetDeclarationName (parallelLoop->getOpDatBaseType (
           OP_DAT_ArgumentGroup), parallelLoop->getSizeOfOpDat (
           OP_DAT_ArgumentGroup));
 
@@ -205,12 +205,12 @@ FortranCUDAKernelSubroutineDirectLoop::createStageInFromSharedMemoryToLocalMemor
   using namespace LoopVariableNames;
   using std::string;
 
-  string const autosharedVariableName = getCUDASharedMemoryDeclarationName (
+  string const autosharedVariableName = getSharedMemoryDeclarationName (
       parallelLoop->getOpDatBaseType (OP_DAT_ArgumentGroup),
       parallelLoop->getSizeOfOpDat (OP_DAT_ArgumentGroup));
 
   string const autosharedOffsetVariableName =
-      getCUDASharedMemoryOffsetDeclarationName (parallelLoop->getOpDatBaseType (
+      getSharedMemoryOffsetDeclarationName (parallelLoop->getOpDatBaseType (
           OP_DAT_ArgumentGroup), parallelLoop->getSizeOfOpDat (
           OP_DAT_ArgumentGroup));
 
@@ -266,12 +266,12 @@ FortranCUDAKernelSubroutineDirectLoop::createStageOutFromSharedMemoryToDeviceMem
   using namespace LoopVariableNames;
   using std::string;
 
-  string const autosharedVariableName = getCUDASharedMemoryDeclarationName (
+  string const autosharedVariableName = getSharedMemoryDeclarationName (
       parallelLoop->getOpDatBaseType (OP_DAT_ArgumentGroup),
       parallelLoop->getSizeOfOpDat (OP_DAT_ArgumentGroup));
 
   string const autosharedOffsetVariableName =
-      getCUDASharedMemoryOffsetDeclarationName (parallelLoop->getOpDatBaseType (
+      getSharedMemoryOffsetDeclarationName (parallelLoop->getOpDatBaseType (
           OP_DAT_ArgumentGroup), parallelLoop->getSizeOfOpDat (
           OP_DAT_ArgumentGroup));
 
@@ -340,12 +340,12 @@ FortranCUDAKernelSubroutineDirectLoop::createStageOutFromLocalMemoryToSharedMemo
   using namespace LoopVariableNames;
   using std::string;
 
-  string const autosharedVariableName = getCUDASharedMemoryDeclarationName (
+  string const autosharedVariableName = getSharedMemoryDeclarationName (
       parallelLoop->getOpDatBaseType (OP_DAT_ArgumentGroup),
       parallelLoop->getSizeOfOpDat (OP_DAT_ArgumentGroup));
 
   string const autosharedOffsetVariableName =
-      getCUDASharedMemoryOffsetDeclarationName (parallelLoop->getOpDatBaseType (
+      getSharedMemoryOffsetDeclarationName (parallelLoop->getOpDatBaseType (
           OP_DAT_ArgumentGroup), parallelLoop->getSizeOfOpDat (
           OP_DAT_ArgumentGroup));
 
@@ -535,7 +535,7 @@ FortranCUDAKernelSubroutineDirectLoop::createInitialiseOffsetIntoCUDASharedVaria
       if (parallelLoop->isGlobal (i) == false)
       {
         string const autosharedOffsetVariableName =
-            getCUDASharedMemoryOffsetDeclarationName (
+            getSharedMemoryOffsetDeclarationName (
                 parallelLoop->getOpDatBaseType (i),
                 parallelLoop->getSizeOfOpDat (i));
 

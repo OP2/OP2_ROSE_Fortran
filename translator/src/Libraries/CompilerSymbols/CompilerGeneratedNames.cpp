@@ -246,7 +246,7 @@ OP2VariableNames::getIndirectionCUDASharedMemoryName (
 }
 
 std::string const
-OP2VariableNames::getCUDASharedMemoryDeclarationName (SgType * type,
+OP2VariableNames::getSharedMemoryDeclarationName (SgType * type,
     unsigned int size)
 {
   using boost::lexical_cast;
@@ -310,7 +310,7 @@ OP2VariableNames::getCUDAVolatileSharedMemoryDeclarationName (SgType * type,
 }
 
 std::string const
-OP2VariableNames::getCUDASharedMemoryOffsetDeclarationName (SgType * type,
+OP2VariableNames::getSharedMemoryOffsetDeclarationName (SgType * type,
     unsigned int size)
 {
   using boost::lexical_cast;

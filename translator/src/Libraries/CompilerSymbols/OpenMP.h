@@ -18,6 +18,7 @@ namespace OpenMP
   std::string const sliceEnd = "sliceEnd";
   std::string const numberOfThreads = "numberOfThreads";
   std::string const threadBlockID = "threadBlockID";
+  std::string const threadBlockOffset = "threadBlockOffset";
 
   std::string const
   getIfDirectiveString ();

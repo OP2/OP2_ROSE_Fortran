@@ -20,13 +20,132 @@ FortranOpenMPKernelSubroutineIndirectLoop::createExecutionLoopStatements ()
 
 }
 
+SgBasicBlock *
+FortranOpenMPKernelSubroutineIndirectLoop::createInitialiseThreadVariablesStatements ()
+{
+  using namespace SageBuilder;
+  using namespace SageInterface;
+  using namespace PlanFunctionVariableNames;
+  using namespace OP2VariableNames;
+
+  Debug::getInstance ()->debugMessage (
+      "Creating statements to initialse thread-specific variables",
+      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+
+  SgBasicBlock * block = buildBasicBlock ();
+
+  /*
+   * ======================================================
+   * Statement to initialise thread-block ID
+   * ======================================================
+   */
+
+  SgAddOp * addExpression1 = buildAddOp (variableDeclarations->getReference (
+      blockID), variableDeclarations->getReference (blockOffset));
+
+  SgExprStatement * assignmentStatement1 = buildAssignStatement (
+      variableDeclarations->getReference (OpenMP::threadBlockID),
+      addExpression1);
+
+  appendStatement (assignmentStatement1, block);
+
+  /*
+   * ======================================================
+   * Statement to initialise number of active threads
+   * ======================================================
+   */
+
+  SgPntrArrRefExp * arrayExpression2 = buildPntrArrRefExp (
+      variableDeclarations->getReference (
+          getNumberOfSetElementsPerBlockArrayName ()),
+      variableDeclarations->getReference (blockID));
+
+  SgExprStatement * assignmentStatement2 = buildAssignStatement (
+      variableDeclarations->getReference (numberOfActiveThreads),
+      arrayExpression2);
+
+  appendStatement (assignmentStatement2, block);
+
+  /*
+   * ======================================================
+   * Statement to initialise offset into shared memory
+   * ======================================================
+   */
+
+  SgPntrArrRefExp * arrayExpression3 = buildPntrArrRefExp (
+      variableDeclarations->getReference (getOffsetIntoBlockSizeName ()),
+      variableDeclarations->getReference (blockID));
+
+  SgExprStatement * assignmentStatement3 = buildAssignStatement (
+      variableDeclarations->getReference (OpenMP::threadBlockOffset),
+      arrayExpression3);
+
+  appendStatement (assignmentStatement3, block);
+
+  return block;
+}
+
 void
 FortranOpenMPKernelSubroutineIndirectLoop::createStatements ()
 {
+  using namespace SageInterface;
+
   Debug::getInstance ()->debugMessage ("Creating statements",
       Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
+  appendStatement (createInitialiseThreadVariablesStatements (),
+      subroutineScope);
+
   createExecutionLoopStatements ();
+}
+
+void
+FortranOpenMPKernelSubroutineIndirectLoop::createSharedVariableDeclarations ()
+{
+  using namespace SageBuilder;
+  using namespace OP2VariableNames;
+  using std::find;
+  using std::vector;
+  using std::string;
+
+  Debug::getInstance ()->debugMessage ("Creating shared variable declarations",
+      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+
+  vector <string> autosharedNames;
+
+  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
+  {
+    if (parallelLoop->isDuplicateOpDat (i) == false)
+    {
+      if (parallelLoop->isIndirect (i))
+      {
+        string const autosharedVariableName = getSharedMemoryDeclarationName (
+            parallelLoop->getOpDatBaseType (i),
+            parallelLoop->getSizeOfOpDat (i));
+
+        if (find (autosharedNames.begin (), autosharedNames.end (),
+            autosharedVariableName) == autosharedNames.end ())
+        {
+          Debug::getInstance ()->debugMessage (
+              "Creating declaration with name '" + autosharedVariableName
+                  + "' for OP_DAT '" + parallelLoop->getOpDatVariableName (i)
+                  + "'", Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+
+          SgSubtractOp * upperBound = buildSubtractOp (buildIntVal (8000) - 1);
+
+          variableDeclarations->add (
+              autosharedVariableName,
+              FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
+                  autosharedVariableName,
+                  FortranTypesBuilder::getArray_RankOne (
+                      parallelLoop->getOpDatBaseType (i), 0, upperBound),
+                  subroutineScope, 1, TARGET));
+
+          autosharedNames.push_back (autosharedVariableName);
+        }
+      }
+    }
+  }
 }
 
 void
@@ -40,23 +159,20 @@ FortranOpenMPKernelSubroutineIndirectLoop::createExecutionLocalVariableDeclarati
       "Creating local variable declarations needed to execute kernel",
       Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
-  variableDeclarations->add (sharedMemoryOffset,
+  variableDeclarations->add (OpenMP::threadBlockOffset,
       FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
-          sharedMemoryOffset, FortranTypesBuilder::getFourByteInteger (),
-          subroutineScope));
+          OpenMP::threadBlockOffset,
+          FortranTypesBuilder::getFourByteInteger (), subroutineScope));
 
-  variableDeclarations->add (blockID,
+  variableDeclarations->add (OpenMP::threadBlockID,
       FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
-          blockID, FortranTypesBuilder::getFourByteInteger (), subroutineScope));
+          OpenMP::threadBlockID, FortranTypesBuilder::getFourByteInteger (),
+          subroutineScope));
 
   variableDeclarations->add (numberOfActiveThreads,
       FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
           numberOfActiveThreads, FortranTypesBuilder::getFourByteInteger (),
           subroutineScope));
-
-  variableDeclarations ->add (nbytes,
-      FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
-          nbytes, FortranTypesBuilder::getFourByteInteger (), subroutineScope));
 
   variableDeclarations ->add (getIterationCounterVariableName (1),
       FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
@@ -72,11 +188,48 @@ FortranOpenMPKernelSubroutineIndirectLoop::createExecutionLocalVariableDeclarati
 void
 FortranOpenMPKernelSubroutineIndirectLoop::createLocalVariableDeclarations ()
 {
+  using namespace OP2VariableNames;
+  using namespace PlanFunctionVariableNames;
+  using boost::lexical_cast;
+  using std::string;
 
   Debug::getInstance ()->debugMessage ("Creating local variable declarations",
       Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
   createExecutionLocalVariableDeclarations ();
+
+  createSharedVariableDeclarations ();
+
+  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
+  {
+    string const & variableName = getNumberOfBytesVariableName (i);
+
+    if (parallelLoop->isDuplicateOpDat (i) == false)
+    {
+      Debug::getInstance ()->debugMessage (
+          "Creating number of bytes declaration for OP_DAT " + lexical_cast <
+              string> (i), Debug::INNER_LOOP_LEVEL, __FILE__, __LINE__);
+
+      SgVariableDeclaration * variableDeclaration =
+          FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
+              variableName, FortranTypesBuilder::getFourByteInteger (),
+              subroutineScope);
+
+      variableDeclarations->add (variableName, variableDeclaration);
+
+      numberOfBytesDeclarations[parallelLoop->getOpDatVariableName (i)]
+          = variableDeclaration;
+    }
+    else
+    {
+      Debug::getInstance ()->debugMessage (
+          "Number of bytes declaration NOT needed for OP_DAT " + lexical_cast <
+              string> (i), Debug::INNER_LOOP_LEVEL, __FILE__, __LINE__);
+
+      variableDeclarations ->add (variableName,
+          numberOfBytesDeclarations[parallelLoop->getOpDatVariableName (i)]);
+    }
+  }
 }
 
 void

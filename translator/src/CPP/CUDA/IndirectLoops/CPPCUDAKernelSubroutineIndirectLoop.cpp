@@ -741,7 +741,7 @@ CPPCUDAKernelSubroutineIndirectLoop::createSetOpDatSharedMemoryPointerStatements
       if (parallelLoop->isIndirect (i))
       {
         string const autosharedVariableName =
-            getCUDASharedMemoryDeclarationName (parallelLoop->getOpDatBaseType (
+            getSharedMemoryDeclarationName (parallelLoop->getOpDatBaseType (
                 i), parallelLoop->getSizeOfOpDat (i));
 
         /*

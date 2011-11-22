@@ -246,13 +246,13 @@ namespace OP2VariableNames
   getIndirectionCUDASharedMemoryName (unsigned int OP_DAT_ArgumentGroup);
 
   std::string const
-  getCUDASharedMemoryDeclarationName (SgType * type, unsigned int size);
+  getSharedMemoryDeclarationName (SgType * type, unsigned int size);
 
   std::string const
   getCUDAVolatileSharedMemoryDeclarationName (SgType * type, unsigned int size);
 
   std::string const
-  getCUDASharedMemoryOffsetDeclarationName (SgType * type, unsigned int size);
+  getSharedMemoryOffsetDeclarationName (SgType * type, unsigned int size);
 }
 
 #endif

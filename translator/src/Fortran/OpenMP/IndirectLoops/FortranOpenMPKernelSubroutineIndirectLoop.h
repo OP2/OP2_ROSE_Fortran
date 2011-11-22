@@ -8,6 +8,16 @@ class FortranOpenMPKernelSubroutineIndirectLoop: public FortranOpenMPKernelSubro
 {
   private:
 
+    std::map <std::string, SgVariableDeclaration *> numberOfBytesDeclarations;
+
+  private:
+
+    SgBasicBlock *
+    createInitialiseThreadVariablesStatements ();
+
+    void
+    createSharedVariableDeclarations ();
+
     void
     createExecutionLocalVariableDeclarations ();
 

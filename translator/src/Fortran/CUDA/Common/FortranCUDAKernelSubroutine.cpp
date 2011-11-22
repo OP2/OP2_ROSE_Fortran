@@ -163,7 +163,7 @@ FortranCUDAKernelSubroutine::createCUDASharedVariableDeclarations ()
           && parallelLoop->getOpDatDimension (i) > 1))
       {
         string const autosharedVariableName =
-            getCUDASharedMemoryDeclarationName (parallelLoop->getOpDatBaseType (
+            getSharedMemoryDeclarationName (parallelLoop->getOpDatBaseType (
                 i), parallelLoop->getSizeOfOpDat (i));
 
         if (find (autosharedNames.begin (), autosharedNames.end (),
@@ -188,7 +188,7 @@ FortranCUDAKernelSubroutine::createCUDASharedVariableDeclarations ()
           autosharedNames.push_back (autosharedVariableName);
 
           string const autosharedOffsetVariableName =
-              getCUDASharedMemoryOffsetDeclarationName (
+              getSharedMemoryOffsetDeclarationName (
                   parallelLoop->getOpDatBaseType (i),
                   parallelLoop->getSizeOfOpDat (i));
 

@@ -17,6 +17,19 @@ class SgFunctionParameterList;
 class SgType;
 class SgExprStatement;
 
+enum FORTRAN_VARIABLE_ATTRIBUTES
+{
+  ALLOCATABLE,
+  TARGET,
+  CUDA_CONSTANT,
+  CUDA_DEVICE,
+  CUDA_SHARED,
+  VALUE,
+  INTENT_IN,
+  INTENT_OUT,
+  INTENT_INOUT
+};
+
 class FortranStatementsAndExpressionsBuilder
 {
   private:
