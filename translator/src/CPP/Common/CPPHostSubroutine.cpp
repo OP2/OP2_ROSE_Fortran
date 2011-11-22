@@ -3,7 +3,7 @@
 #include "RoseStatementsAndExpressionsBuilder.h"
 #include "CompilerGeneratedNames.h"
 #include "PlanFunctionNames.h"
-#include "OP2Definitions.h"
+#include "OP2.h"
 
 SgBasicBlock *
 CPPHostSubroutine::createInitialisePlanFunctionArrayStatements ()
@@ -40,7 +40,8 @@ CPPHostSubroutine::createInitialisePlanFunctionArrayStatements ()
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
     SgPntrArrRefExp * arrayIndexExpression = buildPntrArrRefExp (
-        variableDeclarations->getReference (indirectionDescriptorArray), buildIntVal (i - 1));
+        variableDeclarations->getReference (indirectionDescriptorArray),
+        buildIntVal (i - 1));
 
     SgExprStatement * assignmentStatement;
 
