@@ -32,6 +32,7 @@ namespace PlanFunctionVariableNames
   std::string const ind_offs = "ind_offs";
   std::string const ind_sizes = "ind_sizes";
   std::string const loc_maps = "loc_maps";
+  std::string const maps = "maps";
   std::string const nblocks = "nblocks";
   std::string const ncolblk = "ncolblk";
   std::string const ncolors = "ncolors";

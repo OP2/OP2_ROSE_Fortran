@@ -91,8 +91,9 @@ namespace OP2VariableNames
 
   /*
    * ======================================================
-   * Returns the name of the formal parameter which models the
-   * name of the user subroutine
+   * Returns the name of the formal parameter with type
+   * character array which models the name of the user
+   * subroutine
    * ======================================================
    */
   std::string const
@@ -100,12 +101,21 @@ namespace OP2VariableNames
 
   /*
    * ======================================================
-   * Returns the name of the formal parameter which models the
+   * Returns the name of the formal parameter with type
    * OP_SET
    * ======================================================
    */
   std::string const
   getOpSetName ();
+
+  /*
+   * ======================================================
+   * Returns the name of the variable for the type OP_SET_CORE
+   * in this OP_DAT argument group
+   * ======================================================
+   */
+  std::string const
+  getOpSetCoreName ();
 
   /*
    * ======================================================

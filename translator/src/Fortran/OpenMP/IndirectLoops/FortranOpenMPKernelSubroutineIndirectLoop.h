@@ -12,8 +12,14 @@ class FortranOpenMPKernelSubroutineIndirectLoop: public FortranOpenMPKernelSubro
 
   private:
 
-    SgBasicBlock *
+    void
+    createInitialiseIncrementAccessVariablesStatements ();
+
+    void
     createInitialiseThreadVariablesStatements ();
+
+    void
+    createIncrementAccessLocalVariableDeclarations ();
 
     void
     createSharedVariableDeclarations ();

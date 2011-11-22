@@ -11,7 +11,46 @@
 SgStatement *
 FortranOpenMPKernelSubroutineIndirectLoop::createUserSubroutineCallStatement ()
 {
+  using namespace SageBuilder;
+  using namespace OP2VariableNames;
+  using namespace LoopVariableNames;
 
+  Debug::getInstance ()->debugMessage ("Creating call to user kernel",
+      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+
+  SgExprListExp * actualParameters = buildExprListExp ();
+
+  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
+  {
+    if (parallelLoop->isDuplicateOpDat (i) == false)
+    {
+      if (parallelLoop->isReductionRequired (i) == false)
+      {
+        if (parallelLoop->isIncremented (i))
+        {
+          actualParameters->append_expression (
+              variableDeclarations->getReference (getOpDatLocalName (i)));
+        }
+        else
+        {
+        }
+      }
+      else
+      {
+        actualParameters->append_expression (
+            variableDeclarations->getReference (getOpDatName (i)));
+      }
+    }
+  }
+
+  SgFunctionSymbol * userSubroutineSymbol =
+      FortranTypesBuilder::buildNewFortranSubroutine (
+          userSubroutine->getSubroutineName (), subroutineScope);
+
+  SgFunctionCallExp * userSubroutineCall = buildFunctionCallExp (
+      userSubroutineSymbol, actualParameters);
+
+  return buildExprStatement (userSubroutineCall);
 }
 
 void
@@ -20,7 +59,49 @@ FortranOpenMPKernelSubroutineIndirectLoop::createExecutionLoopStatements ()
 
 }
 
-SgBasicBlock *
+void
+FortranOpenMPKernelSubroutineIndirectLoop::createInitialiseIncrementAccessVariablesStatements ()
+{
+  using namespace SageBuilder;
+  using namespace SageInterface;
+  using namespace PlanFunctionVariableNames;
+  using namespace OP2VariableNames;
+
+  Debug::getInstance ()->debugMessage (
+      "Creating statements to initialse thread-specific variables needed for incremented OP_DATs",
+      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+
+  /*
+   * ======================================================
+   * Statement to initialise ceiling of number of active
+   * threads
+   * ======================================================
+   */
+
+  SgExprStatement * assignmentStatement1 = buildAssignStatement (
+      variableDeclarations->getReference (numberOfActiveThreadsCeiling),
+      variableDeclarations->getReference (numberOfActiveThreads));
+
+  appendStatement (assignmentStatement1, subroutineScope);
+
+  /*
+   * ======================================================
+   * Statement to initialise number of colours
+   * ======================================================
+   */
+
+  SgPntrArrRefExp * arrayExpression2 = buildPntrArrRefExp (
+      variableDeclarations->getReference (
+          getNumberOfThreadColoursPerBlockArrayName ()),
+      variableDeclarations->getReference (OpenMP::threadBlockID));
+
+  SgExprStatement * assignmentStatement2 = buildAssignStatement (
+      variableDeclarations->getReference (numberOfColours), arrayExpression2);
+
+  appendStatement (assignmentStatement2, subroutineScope);
+}
+
+void
 FortranOpenMPKernelSubroutineIndirectLoop::createInitialiseThreadVariablesStatements ()
 {
   using namespace SageBuilder;
@@ -31,8 +112,6 @@ FortranOpenMPKernelSubroutineIndirectLoop::createInitialiseThreadVariablesStatem
   Debug::getInstance ()->debugMessage (
       "Creating statements to initialse thread-specific variables",
       Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
-
-  SgBasicBlock * block = buildBasicBlock ();
 
   /*
    * ======================================================
@@ -47,7 +126,7 @@ FortranOpenMPKernelSubroutineIndirectLoop::createInitialiseThreadVariablesStatem
       variableDeclarations->getReference (OpenMP::threadBlockID),
       addExpression1);
 
-  appendStatement (assignmentStatement1, block);
+  appendStatement (assignmentStatement1, subroutineScope);
 
   /*
    * ======================================================
@@ -58,13 +137,13 @@ FortranOpenMPKernelSubroutineIndirectLoop::createInitialiseThreadVariablesStatem
   SgPntrArrRefExp * arrayExpression2 = buildPntrArrRefExp (
       variableDeclarations->getReference (
           getNumberOfSetElementsPerBlockArrayName ()),
-      variableDeclarations->getReference (blockID));
+      variableDeclarations->getReference (OpenMP::threadBlockID));
 
   SgExprStatement * assignmentStatement2 = buildAssignStatement (
       variableDeclarations->getReference (numberOfActiveThreads),
       arrayExpression2);
 
-  appendStatement (assignmentStatement2, block);
+  appendStatement (assignmentStatement2, subroutineScope);
 
   /*
    * ======================================================
@@ -74,15 +153,13 @@ FortranOpenMPKernelSubroutineIndirectLoop::createInitialiseThreadVariablesStatem
 
   SgPntrArrRefExp * arrayExpression3 = buildPntrArrRefExp (
       variableDeclarations->getReference (getOffsetIntoBlockSizeName ()),
-      variableDeclarations->getReference (blockID));
+      variableDeclarations->getReference (OpenMP::threadBlockID));
 
   SgExprStatement * assignmentStatement3 = buildAssignStatement (
       variableDeclarations->getReference (OpenMP::threadBlockOffset),
       arrayExpression3);
 
-  appendStatement (assignmentStatement3, block);
-
-  return block;
+  appendStatement (assignmentStatement3, subroutineScope);
 }
 
 void
@@ -93,10 +170,44 @@ FortranOpenMPKernelSubroutineIndirectLoop::createStatements ()
   Debug::getInstance ()->debugMessage ("Creating statements",
       Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
-  appendStatement (createInitialiseThreadVariablesStatements (),
-      subroutineScope);
+  createInitialiseThreadVariablesStatements ();
 
-  createExecutionLoopStatements ();
+  if (parallelLoop->hasIncrementedOpDats ())
+  {
+    createInitialiseIncrementAccessVariablesStatements ();
+  }
+}
+
+void
+FortranOpenMPKernelSubroutineIndirectLoop::createIncrementAccessLocalVariableDeclarations ()
+{
+  using namespace LoopVariableNames;
+  using namespace OP2VariableNames;
+  using namespace PlanFunctionVariableNames;
+  using boost::lexical_cast;
+  using std::string;
+
+  Debug::getInstance ()->debugMessage (
+      "Creating local variable declarations needed for incremented OP_DATS",
+      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+
+  variableDeclarations->add (numberOfColours,
+      FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
+          numberOfColours, FortranTypesBuilder::getFourByteInteger (),
+          subroutineScope));
+
+  variableDeclarations->add (numberOfActiveThreadsCeiling,
+      FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
+          numberOfActiveThreadsCeiling,
+          FortranTypesBuilder::getFourByteInteger (), subroutineScope));
+
+  variableDeclarations ->add (colour1,
+      FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
+          colour1, FortranTypesBuilder::getFourByteInteger (), subroutineScope));
+
+  variableDeclarations ->add (colour2,
+      FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
+          colour2, FortranTypesBuilder::getFourByteInteger (), subroutineScope));
 }
 
 void
@@ -131,7 +242,8 @@ FortranOpenMPKernelSubroutineIndirectLoop::createSharedVariableDeclarations ()
                   + "' for OP_DAT '" + parallelLoop->getOpDatVariableName (i)
                   + "'", Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
-          SgSubtractOp * upperBound = buildSubtractOp (buildIntVal (8000) - 1);
+          SgSubtractOp * upperBound = buildSubtractOp (buildIntVal (8000),
+              buildIntVal (1));
 
           variableDeclarations->add (
               autosharedVariableName,
@@ -229,6 +341,11 @@ FortranOpenMPKernelSubroutineIndirectLoop::createLocalVariableDeclarations ()
       variableDeclarations ->add (variableName,
           numberOfBytesDeclarations[parallelLoop->getOpDatVariableName (i)]);
     }
+  }
+
+  if (parallelLoop->hasIncrementedOpDats ())
+  {
+    createIncrementAccessLocalVariableDeclarations ();
   }
 }
 

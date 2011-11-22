@@ -12,6 +12,12 @@ class FortranOpenMPHostSubroutineIndirectLoop: public FortranOpenMPHostSubroutin
   private:
 
     SgBasicBlock *
+    createConvertGlobalToLocalMappingStatements ();
+
+    SgBasicBlock *
+    createConvertLocalToGlobalMappingStatements ();
+
+    SgBasicBlock *
     createPlanFunctionEpilogueStatements ();
 
     SgExprStatement *

@@ -294,6 +294,18 @@ FortranOpenMPHostSubroutine::createTransferOpDatStatements ()
 
   if (parallelLoop->isDirectLoop () == false)
   {
+    SgDotExp * dotExpression1 = buildDotExp (
+        variableDeclarations->getReference (getOpSetName ()),
+        buildOpaqueVarRefExp (Fortran::setPtr, block));
+
+    SgPointerAssignOp * assignExpression1 = new SgPointerAssignOp (
+        RoseHelper::getFileInfo (), variableDeclarations->getReference (
+            getOpSetCoreName ()), dotExpression1, buildVoidType ());
+
+    assignExpression1->set_endOfConstruct (RoseHelper::getFileInfo ());
+
+    appendStatement (buildExprStatement (assignExpression1), block);
+
     for (unsigned int i = 1; i
         <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
     {
@@ -417,6 +429,15 @@ FortranOpenMPHostSubroutine::createOpDatLocalVariableDeclarations ()
   Debug::getInstance ()->debugMessage (
       "Creating variables needed to initialise OP_DAT data",
       Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+
+  if (parallelLoop->isDirectLoop () == false)
+  {
+    variableDeclarations->add (getOpSetCoreName (),
+        FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
+            getOpSetCoreName (), buildPointerType (
+                FortranTypesBuilder::buildClassDeclaration (OP2::OP_SET_CORE,
+                    subroutineScope)->get_type ()), subroutineScope));
+  }
 
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {

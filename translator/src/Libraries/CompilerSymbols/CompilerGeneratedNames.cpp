@@ -79,6 +79,12 @@ OP2VariableNames::getOpSetName ()
 }
 
 std::string const
+OP2VariableNames::getOpSetCoreName ()
+{
+  return "opSetCore";
+}
+
+std::string const
 OP2VariableNames::getOpSetCoreName (unsigned int OP_DAT_ArgumentGroup)
 {
   using boost::lexical_cast;

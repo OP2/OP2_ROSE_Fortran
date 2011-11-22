@@ -97,6 +97,130 @@ FortranOpenMPHostSubroutineIndirectLoop::createKernelFunctionCallStatement ()
 }
 
 SgBasicBlock *
+FortranOpenMPHostSubroutineIndirectLoop::createConvertGlobalToLocalMappingStatements ()
+{
+  using namespace SageBuilder;
+  using namespace SageInterface;
+  using namespace PlanFunctionVariableNames;
+  using namespace OP2VariableNames;
+
+  Debug::getInstance ()->debugMessage (
+      "Creating statements to convert global-to-local mapping arrays",
+      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+
+  SgBasicBlock * block = buildBasicBlock ();
+
+  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
+  {
+    if (parallelLoop->isIndirect (i))
+    {
+      SgBasicBlock * ifBody = buildBasicBlock ();
+
+      SgPntrArrRefExp * parameterExpression1 = buildPntrArrRefExp (
+          variableDeclarations->getReference (
+              getOpDatsGlobalToLocalMappingName (
+                  parallelLoop->getUserSubroutineName ())), buildIntVal (i));
+
+      SgVarRefExp * parameterExpression2 = variableDeclarations->getReference (
+          getGlobalToLocalMappingName (i,
+              parallelLoop->getUserSubroutineName ()));
+
+      SgDotExp * dotExpression = buildDotExp (
+          variableDeclarations->getReference (getOpSetCoreName ()),
+          buildOpaqueVarRefExp (OP2::RunTimeVariableNames::size,
+              subroutineScope));
+
+      SgAggregateInitializer * parameterExpression3 =
+          FortranStatementsAndExpressionsBuilder::buildShapeExpression (
+              dotExpression);
+
+      SgStatement
+          * callStatement =
+              FortranStatementsAndExpressionsBuilder::createCToFortranPointerCallStatement (
+                  subroutineScope, parameterExpression1, parameterExpression2,
+                  parameterExpression3);
+
+      appendStatement (callStatement, ifBody);
+
+      /*
+       * ======================================================
+       * If statement
+       * ======================================================
+       */
+
+      SgPntrArrRefExp * arrayExpression = buildPntrArrRefExp (
+          variableDeclarations->getReference (indirectionDescriptorArray),
+          buildIntVal (i));
+
+      SgGreaterThanOp * ifGuardExpression = buildGreaterThanOp (
+          arrayExpression, buildIntVal (0));
+
+      SgIfStmt * ifStatement =
+          RoseStatementsAndExpressionsBuilder::buildIfStatementWithEmptyElse (
+              ifGuardExpression, ifBody);
+
+      appendStatement (ifStatement, block);
+    }
+  }
+
+  return block;
+}
+
+SgBasicBlock *
+FortranOpenMPHostSubroutineIndirectLoop::createConvertLocalToGlobalMappingStatements ()
+{
+  using namespace SageBuilder;
+  using namespace SageInterface;
+  using namespace PlanFunctionVariableNames;
+  using namespace OP2VariableNames;
+
+  Debug::getInstance ()->debugMessage (
+      "Creating statements to convert local-to-global mapping arrays",
+      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+
+  SgBasicBlock * block = buildBasicBlock ();
+
+  unsigned int index = 1;
+
+  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
+  {
+    if (parallelLoop->isDuplicateOpDat (i) == false)
+    {
+      if (parallelLoop->isIndirect (i))
+      {
+        SgPntrArrRefExp * parameterExpression1 = buildPntrArrRefExp (
+            variableDeclarations->getReference (
+                getIndirectOpDatsLocalToGlobalMappingName (
+                    parallelLoop->getUserSubroutineName ())), buildIntVal (
+                index));
+
+        SgVarRefExp * parameterExpression2 =
+            variableDeclarations->getReference (getLocalToGlobalMappingName (i,
+                parallelLoop->getUserSubroutineName ()));
+
+        SgPntrArrRefExp * dotExpression = buildPntrArrRefExp (
+            variableDeclarations->getReference (getIndirectOpDatsArrayName (
+                parallelLoop->getUserSubroutineName ())), buildIntVal (index));
+
+        SgAggregateInitializer * parameterExpression3 =
+            FortranStatementsAndExpressionsBuilder::buildShapeExpression (
+                dotExpression);
+
+        SgStatement
+            * callStatement =
+                FortranStatementsAndExpressionsBuilder::createCToFortranPointerCallStatement (
+                    subroutineScope, parameterExpression1,
+                    parameterExpression2, parameterExpression3);
+
+        appendStatement (callStatement, block);
+      }
+    }
+  }
+
+  return block;
+}
+
+SgBasicBlock *
 FortranOpenMPHostSubroutineIndirectLoop::createPlanFunctionEpilogueStatements ()
 {
   using namespace SageBuilder;
@@ -190,8 +314,8 @@ FortranOpenMPHostSubroutineIndirectLoop::createPlanFunctionEpilogueStatements ()
 
   SgDotExp * parameterExpressionD1 = buildDotExp (
       variableDeclarations->getReference (getActualPlanVariableName (
-          parallelLoop->getUserSubroutineName ())), buildOpaqueVarRefExp (
-          mappingArray, block));
+          parallelLoop->getUserSubroutineName ())), buildOpaqueVarRefExp (maps,
+          block));
 
   SgVarRefExp * parameterExpressionD2 =
       variableDeclarations->getReference (getOpDatsGlobalToLocalMappingName (
@@ -215,17 +339,263 @@ FortranOpenMPHostSubroutineIndirectLoop::createPlanFunctionEpilogueStatements ()
    * ======================================================
    */
 
-  /*
-   * ======================================================
-   * New C-To-Fortran pointer conversion call
-   * ======================================================
-   */
+  SgDotExp * parameterExpressionE1 = buildDotExp (
+      variableDeclarations->getReference (getActualPlanVariableName (
+          parallelLoop->getUserSubroutineName ())), buildOpaqueVarRefExp (
+          ncolblk, block));
+
+  SgVarRefExp * parameterExpressionE2 = variableDeclarations->getReference (
+      getColourToNumberOfBlocksArrayName (
+          parallelLoop->getUserSubroutineName ()));
+
+  SgDotExp * dotExpressionE3 = buildDotExp (variableDeclarations->getReference (
+      getOpSetCoreName ()), buildOpaqueVarRefExp (
+      OP2::RunTimeVariableNames::size, subroutineScope));
+
+  SgAggregateInitializer * parameterExpressionE3 =
+      FortranStatementsAndExpressionsBuilder::buildShapeExpression (
+          dotExpressionE3);
+
+  SgStatement
+      * callStatementE =
+          FortranStatementsAndExpressionsBuilder::createCToFortranPointerCallStatement (
+              subroutineScope, parameterExpressionE1, parameterExpressionE2,
+              parameterExpressionE3);
+
+  appendStatement (callStatementE, block);
 
   /*
    * ======================================================
    * New C-To-Fortran pointer conversion call
    * ======================================================
    */
+
+  SgDotExp * parameterExpressionF1 = buildDotExp (
+      variableDeclarations->getReference (getActualPlanVariableName (
+          parallelLoop->getUserSubroutineName ())), buildOpaqueVarRefExp (
+          ind_sizes, block));
+
+  SgVarRefExp * parameterExpressionF2 = variableDeclarations->getReference (
+      getIndirectOpDatsNumberOfElementsArrayName (
+          parallelLoop->getUserSubroutineName ()));
+
+  SgDotExp * dotExpressionF3 = buildDotExp (variableDeclarations->getReference (
+      getActualPlanVariableName (parallelLoop->getUserSubroutineName ())),
+      buildOpaqueVarRefExp (nblocks, subroutineScope));
+
+  SgMultiplyOp * multiplyExpressionF3 = buildMultiplyOp (dotExpressionF3,
+      variableDeclarations->getReference (numberOfIndirectOpDats));
+
+  SgAggregateInitializer * parameterExpressionF3 =
+      FortranStatementsAndExpressionsBuilder::buildShapeExpression (
+          multiplyExpressionF3);
+
+  SgStatement
+      * callStatementF =
+          FortranStatementsAndExpressionsBuilder::createCToFortranPointerCallStatement (
+              subroutineScope, parameterExpressionF1, parameterExpressionF2,
+              parameterExpressionF3);
+
+  appendStatement (callStatementF, block);
+
+  /*
+   * ======================================================
+   * New C-To-Fortran pointer conversion call
+   * ======================================================
+   */
+
+  SgDotExp * parameterExpressionG1 = buildDotExp (
+      variableDeclarations->getReference (getActualPlanVariableName (
+          parallelLoop->getUserSubroutineName ())), buildOpaqueVarRefExp (
+          ind_offs, block));
+
+  SgVarRefExp * parameterExpressionG2 =
+      variableDeclarations->getReference (getIndirectOpDatsOffsetArrayName (
+          parallelLoop->getUserSubroutineName ()));
+
+  SgDotExp * dotExpressionG3 = buildDotExp (variableDeclarations->getReference (
+      getActualPlanVariableName (parallelLoop->getUserSubroutineName ())),
+      buildOpaqueVarRefExp (nblocks, subroutineScope));
+
+  SgAggregateInitializer * parameterExpressionG3 =
+      FortranStatementsAndExpressionsBuilder::buildShapeExpression (
+          dotExpressionG3);
+
+  SgStatement
+      * callStatementG =
+          FortranStatementsAndExpressionsBuilder::createCToFortranPointerCallStatement (
+              subroutineScope, parameterExpressionG1, parameterExpressionG2,
+              parameterExpressionG3);
+
+  appendStatement (callStatementG, block);
+
+  /*
+   * ======================================================
+   * New C-To-Fortran pointer conversion call
+   * ======================================================
+   */
+
+  SgDotExp * parameterExpressionH1 = buildDotExp (
+      variableDeclarations->getReference (getActualPlanVariableName (
+          parallelLoop->getUserSubroutineName ())), buildOpaqueVarRefExp (
+          blkmap, block));
+
+  SgVarRefExp * parameterExpressionH2 = variableDeclarations->getReference (
+      getColourToBlockArrayName (parallelLoop->getUserSubroutineName ()));
+
+  SgDotExp * dotExpressionH3 = buildDotExp (variableDeclarations->getReference (
+      getActualPlanVariableName (parallelLoop->getUserSubroutineName ())),
+      buildOpaqueVarRefExp (nblocks, subroutineScope));
+
+  SgAggregateInitializer * parameterExpressionH3 =
+      FortranStatementsAndExpressionsBuilder::buildShapeExpression (
+          dotExpressionH3);
+
+  SgStatement
+      * callStatementH =
+          FortranStatementsAndExpressionsBuilder::createCToFortranPointerCallStatement (
+              subroutineScope, parameterExpressionH1, parameterExpressionH2,
+              parameterExpressionH3);
+
+  appendStatement (callStatementH, block);
+
+  /*
+   * ======================================================
+   * New C-To-Fortran pointer conversion call
+   * ======================================================
+   */
+
+  SgDotExp * parameterExpressionI1 = buildDotExp (
+      variableDeclarations->getReference (getActualPlanVariableName (
+          parallelLoop->getUserSubroutineName ())), buildOpaqueVarRefExp (
+          offset, block));
+
+  SgVarRefExp * parameterExpressionI2 = variableDeclarations->getReference (
+      getOffsetIntoBlockArrayName (parallelLoop->getUserSubroutineName ()));
+
+  SgDotExp * dotExpressionI3 = buildDotExp (variableDeclarations->getReference (
+      getActualPlanVariableName (parallelLoop->getUserSubroutineName ())),
+      buildOpaqueVarRefExp (nblocks, subroutineScope));
+
+  SgAggregateInitializer * parameterExpressionI3 =
+      FortranStatementsAndExpressionsBuilder::buildShapeExpression (
+          dotExpressionI3);
+
+  SgStatement
+      * callStatementI =
+          FortranStatementsAndExpressionsBuilder::createCToFortranPointerCallStatement (
+              subroutineScope, parameterExpressionI1, parameterExpressionI2,
+              parameterExpressionI3);
+
+  appendStatement (callStatementI, block);
+
+  /*
+   * ======================================================
+   * New C-To-Fortran pointer conversion call
+   * ======================================================
+   */
+
+  SgDotExp * parameterExpressionJ1 = buildDotExp (
+      variableDeclarations->getReference (getActualPlanVariableName (
+          parallelLoop->getUserSubroutineName ())), buildOpaqueVarRefExp (
+          nelems, block));
+
+  SgVarRefExp * parameterExpressionJ2 = variableDeclarations->getReference (
+      getNumberOfSetElementsPerBlockArrayName (
+          parallelLoop->getUserSubroutineName ()));
+
+  SgDotExp * dotExpressionJ3 = buildDotExp (variableDeclarations->getReference (
+      getActualPlanVariableName (parallelLoop->getUserSubroutineName ())),
+      buildOpaqueVarRefExp (nblocks, subroutineScope));
+
+  SgAggregateInitializer * parameterExpressionJ3 =
+      FortranStatementsAndExpressionsBuilder::buildShapeExpression (
+          dotExpressionJ3);
+
+  SgStatement
+      * callStatementJ =
+          FortranStatementsAndExpressionsBuilder::createCToFortranPointerCallStatement (
+              subroutineScope, parameterExpressionJ1, parameterExpressionJ2,
+              parameterExpressionJ3);
+
+  appendStatement (callStatementJ, block);
+
+  /*
+   * ======================================================
+   * New C-To-Fortran pointer conversion call
+   * ======================================================
+   */
+
+  SgDotExp * parameterExpressionK1 = buildDotExp (
+      variableDeclarations->getReference (getActualPlanVariableName (
+          parallelLoop->getUserSubroutineName ())), buildOpaqueVarRefExp (
+          nthrcol, block));
+
+  SgVarRefExp * parameterExpressionK2 = variableDeclarations->getReference (
+      getNumberOfThreadColoursPerBlockArrayName (
+          parallelLoop->getUserSubroutineName ()));
+
+  SgDotExp * dotExpressionK3 = buildDotExp (variableDeclarations->getReference (
+      getActualPlanVariableName (parallelLoop->getUserSubroutineName ())),
+      buildOpaqueVarRefExp (nblocks, subroutineScope));
+
+  SgAggregateInitializer * parameterExpressionK3 =
+      FortranStatementsAndExpressionsBuilder::buildShapeExpression (
+          dotExpressionK3);
+
+  SgStatement
+      * callStatementK =
+          FortranStatementsAndExpressionsBuilder::createCToFortranPointerCallStatement (
+              subroutineScope, parameterExpressionK1, parameterExpressionK2,
+              parameterExpressionK3);
+
+  appendStatement (callStatementK, block);
+
+  /*
+   * ======================================================
+   * New C-To-Fortran pointer conversion call
+   * ======================================================
+   */
+
+  SgDotExp * parameterExpressionL1 = buildDotExp (
+      variableDeclarations->getReference (getActualPlanVariableName (
+          parallelLoop->getUserSubroutineName ())), buildOpaqueVarRefExp (
+          thrcol, block));
+
+  SgVarRefExp * parameterExpressionL2 = variableDeclarations->getReference (
+      getThreadColourArrayName (parallelLoop->getUserSubroutineName ()));
+
+  SgDotExp * dotExpressionL3 = buildDotExp (variableDeclarations->getReference (
+      getOpSetCoreName ()), buildOpaqueVarRefExp (
+      OP2::RunTimeVariableNames::size, subroutineScope));
+
+  SgAggregateInitializer * parameterExpressionL3 =
+      FortranStatementsAndExpressionsBuilder::buildShapeExpression (
+          dotExpressionL3);
+
+  SgStatement
+      * callStatementL =
+          FortranStatementsAndExpressionsBuilder::createCToFortranPointerCallStatement (
+              subroutineScope, parameterExpressionL1, parameterExpressionL2,
+              parameterExpressionL3);
+
+  appendStatement (callStatementL, block);
+
+  /*
+   * ======================================================
+   * New C-To-Fortran pointer conversion calls
+   * ======================================================
+   */
+
+  appendStatement (createConvertLocalToGlobalMappingStatements (), block);
+
+  /*
+   * ======================================================
+   * New C-To-Fortran pointer conversion calls
+   * ======================================================
+   */
+
+  appendStatement (createConvertGlobalToLocalMappingStatements (), block);
 
   return block;
 }
@@ -245,8 +615,8 @@ FortranOpenMPHostSubroutineIndirectLoop::createPlanFunctionCallStatement ()
       getUserSubroutineName ());
 
   SgDotExp * parameter2 = buildDotExp (variableDeclarations->getReference (
-      getOpSetName ()), buildOpaqueVarRefExp (OP2::RunTimeVariableNames::index,
-      subroutineScope));
+      getOpSetCoreName ()), buildOpaqueVarRefExp (
+      OP2::RunTimeVariableNames::index, subroutineScope));
 
   SgVarRefExp * parameter3 =
       variableDeclarations->getReference (numberOfOpDats);

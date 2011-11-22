@@ -110,11 +110,11 @@ FortranStatementsAndExpressionsBuilder::buildFortranDoStatement (
 
 SgAggregateInitializer *
 FortranStatementsAndExpressionsBuilder::buildShapeExpression (
-    SgVarRefExp * variableReference)
+    SgExpression * expression)
 {
   using namespace SageBuilder;
 
-  SgExprListExp * parameters = buildExprListExp (variableReference);
+  SgExprListExp * parameters = buildExprListExp (expression);
 
   SgAggregateInitializer * shapeExpression = buildAggregateInitializer (
       parameters, buildIntType ());
