@@ -60,6 +60,250 @@ FortranOpenMPKernelSubroutineIndirectLoop::createExecutionLoopStatements ()
 }
 
 void
+FortranOpenMPKernelSubroutineIndirectLoop::createInitialiseBytesPerOpDatStatements ()
+{
+  using namespace SageBuilder;
+  using namespace SageInterface;
+  using namespace LoopVariableNames;
+  using namespace OP2VariableNames;
+  using namespace PlanFunctionVariableNames;
+
+  Debug::getInstance ()->debugMessage (
+      "Creating statements to initialise bytes per OP_DAT",
+      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+
+  /*
+   * ======================================================
+   * Initialise round-up variables
+   * ======================================================
+   */
+
+  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
+  {
+    if (parallelLoop->isDuplicateOpDat (i) == false)
+    {
+      if (parallelLoop->isIndirect (i))
+      {
+        Debug::getInstance ()->debugMessage (
+            "Initialising round-up variable for '"
+                + parallelLoop->getOpDatVariableName (i) + "'",
+            Debug::HIGHEST_DEBUG_LEVEL, __FILE__, __LINE__);
+
+        SgMultiplyOp * multiplyExpression = buildMultiplyOp (
+            variableDeclarations->getReference (
+                getIndirectOpDatCardinalityName (i)), buildIntVal (
+                parallelLoop->getOpDatDimension (i)));
+
+        SgExprStatement * assignmentStatement = buildAssignStatement (
+            variableDeclarations->getReference (getRoundUpVariableName (i)),
+            multiplyExpression);
+
+        appendStatement (assignmentStatement, subroutineScope);
+      }
+    }
+  }
+
+  /*
+   * ======================================================
+   * Initialise number of bytes variables
+   * ======================================================
+   */
+
+  bool firstInitialization = true;
+
+  for (unsigned int i = 1, lasti = 1; i
+      <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
+  {
+    if (parallelLoop->isDuplicateOpDat (i) == false)
+    {
+      Debug::getInstance ()->debugMessage (
+          "Initialising number of bytes variable for '"
+              + parallelLoop->getOpDatVariableName (i) + "'",
+          Debug::HIGHEST_DEBUG_LEVEL, __FILE__, __LINE__);
+
+      if (parallelLoop->isIndirect (i))
+      {
+        if (firstInitialization)
+        {
+          firstInitialization = false;
+
+          SgExprStatement * assignmentStatement = buildAssignStatement (
+              variableDeclarations->getReference (getNumberOfBytesVariableName (
+                  i)), buildIntVal (0));
+
+          appendStatement (assignmentStatement, subroutineScope);
+        }
+        else
+        {
+          SgAddOp * addExpression = buildAddOp (
+              variableDeclarations->getReference (getNumberOfBytesVariableName (
+                  lasti)), variableDeclarations->getReference (
+                  getRoundUpVariableName (i)));
+
+          SgExprStatement * assignmentStatement = buildAssignStatement (
+              variableDeclarations->getReference (getNumberOfBytesVariableName (
+                  i)), addExpression);
+
+          appendStatement (assignmentStatement, subroutineScope);
+        }
+
+        lasti = i;
+      }
+    }
+  }
+}
+
+void
+FortranOpenMPKernelSubroutineIndirectLoop::createInitialiseSharedVariableStatements ()
+{
+  using namespace SageBuilder;
+  using namespace SageInterface;
+  using namespace PlanFunctionVariableNames;
+  using namespace OP2VariableNames;
+  using std::string;
+
+  Debug::getInstance ()->debugMessage (
+      "Creating statements to initialise shared variables of indirect OP_DATs",
+      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+
+  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
+  {
+    if (parallelLoop->isDuplicateOpDat (i) == false)
+    {
+      if (parallelLoop->isIndirect (i))
+      {
+        string const & sharedVariableName = getSharedMemoryDeclarationName (
+            parallelLoop->getOpDatBaseType (i),
+            parallelLoop->getSizeOfOpDat (i));
+
+        SgSubscriptExpression * subsricptExpression =
+            new SgSubscriptExpression (RoseHelper::getFileInfo (),
+                variableDeclarations->getReference (
+                    getNumberOfBytesVariableName (i)), buildNullExpression (),
+                buildIntVal (1));
+
+        subsricptExpression->set_endOfConstruct (RoseHelper::getFileInfo ());
+
+        SgPntrArrRefExp * arrayExpression = buildPntrArrRefExp (
+            variableDeclarations->getReference (sharedVariableName),
+            subsricptExpression);
+
+        SgPointerAssignOp * assignExpression = new SgPointerAssignOp (
+            RoseHelper::getFileInfo (), variableDeclarations->getReference (
+                getIndirectOpDatSharedMemoryName (i)), arrayExpression,
+            buildVoidType ());
+
+        assignExpression->set_endOfConstruct (RoseHelper::getFileInfo ());
+
+        appendStatement (buildExprStatement (assignExpression), subroutineScope);
+      }
+    }
+  }
+}
+
+void
+FortranOpenMPKernelSubroutineIndirectLoop::createInitialiseIndirectOpDatSizesStatements ()
+{
+  using namespace SageBuilder;
+  using namespace SageInterface;
+  using namespace PlanFunctionVariableNames;
+  using namespace OP2VariableNames;
+
+  Debug::getInstance ()->debugMessage (
+      "Creating statements to initialise sizes of indirect OP_DATs",
+      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+
+  unsigned int offset = 0;
+
+  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
+  {
+    if (parallelLoop->isDuplicateOpDat (i) == false)
+    {
+      if (parallelLoop->isIndirect (i))
+      {
+        SgMultiplyOp * multiplyExpression = buildMultiplyOp (
+            variableDeclarations->getReference (OpenMP::threadBlockID),
+            buildIntVal (parallelLoop->getOpDatDimension (i)));
+
+        SgAddOp * addExpression = buildAddOp (buildIntVal (offset),
+            multiplyExpression);
+
+        SgPntrArrRefExp * arrayExpression = buildPntrArrRefExp (
+            variableDeclarations->getReference (
+                getIndirectOpDatsNumberOfElementsArrayName ()), addExpression);
+
+        SgPointerAssignOp * assignExpression = new SgPointerAssignOp (
+            RoseHelper::getFileInfo (), variableDeclarations->getReference (
+                getIndirectOpDatCardinalityName (i)), arrayExpression,
+            buildVoidType ());
+
+        assignExpression->set_endOfConstruct (RoseHelper::getFileInfo ());
+
+        appendStatement (buildExprStatement (assignExpression), subroutineScope);
+
+        offset++;
+      }
+    }
+  }
+}
+
+void
+FortranOpenMPKernelSubroutineIndirectLoop::createInitialiseIndirectOpDatMapsStatements ()
+{
+  using namespace SageBuilder;
+  using namespace SageInterface;
+  using namespace PlanFunctionVariableNames;
+  using namespace OP2VariableNames;
+
+  Debug::getInstance ()->debugMessage (
+      "Creating statements to initialise indirect OP_DAT maps",
+      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+
+  unsigned int offset = 0;
+
+  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
+  {
+    if (parallelLoop->isDuplicateOpDat (i) == false)
+    {
+      if (parallelLoop->isIndirect (i))
+      {
+        SgMultiplyOp * multiplyExpression = buildMultiplyOp (
+            variableDeclarations->getReference (OpenMP::threadBlockID),
+            buildIntVal (parallelLoop->getOpDatDimension (i)));
+
+        SgAddOp * addExpression = buildAddOp (buildIntVal (offset),
+            multiplyExpression);
+
+        SgPntrArrRefExp * arrayExpression1 = buildPntrArrRefExp (
+            variableDeclarations->getReference (
+                getIndirectOpDatsOffsetArrayName ()), addExpression);
+
+        SgSubscriptExpression * subsricptExpression =
+            new SgSubscriptExpression (RoseHelper::getFileInfo (),
+                arrayExpression1, buildNullExpression (), buildIntVal (1));
+
+        subsricptExpression->set_endOfConstruct (RoseHelper::getFileInfo ());
+
+        SgPntrArrRefExp * arrayExpression2 =
+            buildPntrArrRefExp (variableDeclarations->getReference (
+                getLocalToGlobalMappingName (i)), subsricptExpression);
+
+        SgPointerAssignOp * assignExpression = new SgPointerAssignOp (
+            RoseHelper::getFileInfo (), variableDeclarations->getReference (
+                getIndirectOpDatMapName (i)), arrayExpression2,
+            buildVoidType ());
+
+        assignExpression->set_endOfConstruct (RoseHelper::getFileInfo ());
+
+        appendStatement (buildExprStatement (assignExpression), subroutineScope);
+
+        offset++;
+      }
+    }
+  }
+}
+
+void
 FortranOpenMPKernelSubroutineIndirectLoop::createInitialiseIncrementAccessVariablesStatements ()
 {
   using namespace SageBuilder;
@@ -68,7 +312,7 @@ FortranOpenMPKernelSubroutineIndirectLoop::createInitialiseIncrementAccessVariab
   using namespace OP2VariableNames;
 
   Debug::getInstance ()->debugMessage (
-      "Creating statements to initialse thread-specific variables needed for incremented OP_DATs",
+      "Creating statements to initialise thread-specific variables needed for incremented OP_DATs",
       Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
   /*
@@ -176,6 +420,14 @@ FortranOpenMPKernelSubroutineIndirectLoop::createStatements ()
   {
     createInitialiseIncrementAccessVariablesStatements ();
   }
+
+  createInitialiseIndirectOpDatSizesStatements ();
+
+  createInitialiseIndirectOpDatMapsStatements ();
+
+  createInitialiseBytesPerOpDatStatements ();
+
+  createInitialiseSharedVariableStatements ();
 }
 
 void
@@ -243,6 +495,7 @@ FortranOpenMPKernelSubroutineIndirectLoop::createSharedVariableDeclarations ()
 {
   using namespace SageBuilder;
   using namespace OP2VariableNames;
+  using namespace PlanFunctionVariableNames;
   using std::find;
   using std::vector;
   using std::string;
@@ -258,11 +511,20 @@ FortranOpenMPKernelSubroutineIndirectLoop::createSharedVariableDeclarations ()
     {
       if (parallelLoop->isIndirect (i))
       {
-        string const & variableName = getIndirectOpDatSharedMemoryName (i);
+        string const & variableName1 = getIndirectOpDatMapName (i);
 
-        variableDeclarations->add (variableName,
+        variableDeclarations->add (variableName1,
             FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
-                variableName, buildPointerType (
+                variableName1, buildPointerType (
+                    FortranTypesBuilder::getArray_RankOne (
+                        FortranTypesBuilder::getFourByteInteger ())),
+                subroutineScope));
+
+        string const & variableName2 = getIndirectOpDatSharedMemoryName (i);
+
+        variableDeclarations->add (variableName2,
+            FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
+                variableName2, buildPointerType (
                     FortranTypesBuilder::getArray_RankOne (
                         parallelLoop->getOpDatBaseType (i))), subroutineScope));
 

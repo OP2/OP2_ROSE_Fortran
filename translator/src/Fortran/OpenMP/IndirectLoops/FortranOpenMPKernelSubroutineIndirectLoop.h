@@ -13,7 +13,19 @@ class FortranOpenMPKernelSubroutineIndirectLoop: public FortranOpenMPKernelSubro
   private:
 
     void
+    createInitialiseBytesPerOpDatStatements ();
+
+    void
+    createInitialiseSharedVariableStatements ();
+
+    void
     createInitialiseIncrementAccessVariablesStatements ();
+
+    void
+    createInitialiseIndirectOpDatSizesStatements ();
+
+    void
+    createInitialiseIndirectOpDatMapsStatements ();
 
     void
     createInitialiseThreadVariablesStatements ();
