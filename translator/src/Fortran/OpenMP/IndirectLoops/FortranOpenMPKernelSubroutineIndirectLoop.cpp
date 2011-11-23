@@ -775,7 +775,7 @@ FortranOpenMPKernelSubroutineIndirectLoop::createInitialiseIndirectOpDatSizesSta
       {
         SgMultiplyOp * multiplyExpression = buildMultiplyOp (
             variableDeclarations->getReference (OpenMP::threadBlockID),
-            buildIntVal (parallelLoop->getOpDatDimension (i)));
+            buildIntVal (parallelLoop->getNumberOfDifferentIndirectOpDats ()));
 
         SgAddOp * addExpression = buildAddOp (buildIntVal (offset),
             multiplyExpression);
@@ -818,7 +818,7 @@ FortranOpenMPKernelSubroutineIndirectLoop::createInitialiseIndirectOpDatMapsStat
       {
         SgMultiplyOp * multiplyExpression = buildMultiplyOp (
             variableDeclarations->getReference (OpenMP::threadBlockID),
-            buildIntVal (parallelLoop->getOpDatDimension (i)));
+            buildIntVal (parallelLoop->getNumberOfDifferentIndirectOpDats ()));
 
         SgAddOp * addExpression = buildAddOp (buildIntVal (offset),
             multiplyExpression);
@@ -915,9 +915,13 @@ FortranOpenMPKernelSubroutineIndirectLoop::createInitialiseThreadVariablesStatem
   SgAddOp * addExpression1 = buildAddOp (variableDeclarations->getReference (
       blockID), variableDeclarations->getReference (blockOffset));
 
+  SgPntrArrRefExp * arrayExpression1 = buildPntrArrRefExp (
+      variableDeclarations->getReference (getColourToBlockArrayName ()),
+      addExpression1);
+
   SgExprStatement * assignmentStatement1 = buildAssignStatement (
       variableDeclarations->getReference (OpenMP::threadBlockID),
-      addExpression1);
+      arrayExpression1);
 
   appendStatement (assignmentStatement1, subroutineScope);
 
@@ -1318,9 +1322,9 @@ FortranOpenMPKernelSubroutineIndirectLoop::createPlanFormalParameterDeclarations
               upperBoundExpression), subroutineScope, formalParameters));
 
   variableDeclarations->add (
-      getOffsetIntoBlockSizeName (),
+      getOffsetIntoBlockArrayName (),
       FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
-          getOffsetIntoBlockSizeName (),
+          getOffsetIntoBlockArrayName (),
           FortranTypesBuilder::getArray_RankOne_WithLowerAndUpperBounds (
               FortranTypesBuilder::getFourByteInteger (), buildIntVal (0),
               upperBoundExpression), subroutineScope, formalParameters));

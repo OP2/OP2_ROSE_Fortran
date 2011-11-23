@@ -20,6 +20,7 @@ FortranOpenMPHostSubroutineIndirectLoop::createKernelFunctionCallStatement ()
   using namespace OP2VariableNames;
   using namespace LoopVariableNames;
   using namespace PlanFunctionVariableNames;
+  using namespace ReductionVariableNames;
 
   Debug::getInstance ()->debugMessage (
       "Creating kernel function call statement", Debug::FUNCTION_LEVEL,
@@ -50,7 +51,7 @@ FortranOpenMPHostSubroutineIndirectLoop::createKernelFunctionCallStatement ()
             RoseHelper::getFileInfo ());
 
         SgPntrArrRefExp * parameterExpression = buildPntrArrRefExp (
-            variableDeclarations->getReference (getOpDatLocalName (i)),
+            variableDeclarations->getReference (getReductionArrayHostName (i)),
             buildExprListExp (arraySubscriptExpression));
 
         actualParameters->append_expression (parameterExpression);
