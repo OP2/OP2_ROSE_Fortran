@@ -88,7 +88,7 @@ FortranOpenMPHostSubroutineDirectLoop::createOpenMPLoopStatements ()
   SgBasicBlock * loopBody = buildBasicBlock ();
 
   SgDotExp * dotExpression1 = buildDotExp (variableDeclarations->getReference (
-      getOpSetName ()), buildOpaqueVarRefExp (size, subroutineScope));
+      getOpSetCoreName ()), buildOpaqueVarRefExp (size, subroutineScope));
 
   SgMultiplyOp * multiplyExpression1 = buildMultiplyOp (dotExpression1,
       variableDeclarations->getReference (getIterationCounterVariableName (1)));
@@ -101,7 +101,7 @@ FortranOpenMPHostSubroutineDirectLoop::createOpenMPLoopStatements ()
       divideExpression1);
 
   SgDotExp * dotExpression2 = buildDotExp (variableDeclarations->getReference (
-      getOpSetName ()), buildOpaqueVarRefExp (size, subroutineScope));
+      getOpSetCoreName ()), buildOpaqueVarRefExp (size, subroutineScope));
 
   SgAddOp * addExpression2 = buildAddOp (variableDeclarations->getReference (
       getIterationCounterVariableName (1)), buildIntVal (1));

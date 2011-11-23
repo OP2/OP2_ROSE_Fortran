@@ -52,9 +52,11 @@ namespace OP2
      * ======================================================
      */
 
-    std::string const dataOnHost = "data";
-    std::string const dataOnDevice = "data_d";
-    std::string const dimension = "dim";
+    std::string const dat = "dat";
+    std::string const dat_d = "dat_d";
+    std::string const data = "data";
+    std::string const data_d = "data_d";
+    std::string const dim = "dim";
     std::string const index = "index";
     std::string const set = "set";
     std::string const size = "size";
@@ -116,6 +118,16 @@ namespace OP2
         SgExpression * parameterExpression1,
         SgExpression * parameterExpression2);
   }
+
+  namespace Libraries
+  {
+    namespace Fortran
+    {
+      std::string const declarations = "OP2_FORTRAN_DECLARATIONS";
+      std::string const runtimeSupport = "OP2_FORTRAN_RT_SUPPORT";
+    }
+  }
+
 }
 
 #endif

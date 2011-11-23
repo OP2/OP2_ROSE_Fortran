@@ -795,7 +795,7 @@ FortranOpenMPHostSubroutineIndirectLoop::createSetUpOpDatTypeArrayStatements ()
   {
     SgDotExp * dotExpression = buildDotExp (variableDeclarations->getReference (
         getOpMapCoreName (i)), buildOpaqueVarRefExp (
-        OP2::RunTimeVariableNames::dimension, subroutineScope));
+        OP2::RunTimeVariableNames::dim, subroutineScope));
 
     SgEqualityOp * ifGuardExpression = buildEqualityOp (dotExpression,
         buildIntVal (-1));

@@ -10,6 +10,7 @@
 #include "FortranOpDatDimensionsDeclaration.h"
 #include "RoseHelper.h"
 #include "OpenMP.h"
+#include "OP2.h"
 #include <boost/algorithm/string.hpp>
 
 void
@@ -106,23 +107,49 @@ FortranOpenMPSubroutinesGeneration::addLibraries ()
       "Adding 'use' statements to OpenMP module", Debug::FUNCTION_LEVEL,
       __FILE__, __LINE__);
 
+  /*
+   * ======================================================
+   * Module including OP2 declarations
+   * ======================================================
+   */
+
   SgUseStatement* useStatement1 = new SgUseStatement (
-      RoseHelper::getFileInfo (), "OP2_C", false);
+      RoseHelper::getFileInfo (), OP2::Libraries::Fortran::declarations, false);
 
   useStatement1->set_definingDeclaration (useStatement1);
 
   appendStatement (useStatement1, moduleScope);
 
+  /*
+   * ======================================================
+   * Module including OP2 run-time support
+   * ======================================================
+   */
+
   SgUseStatement* useStatement2 = new SgUseStatement (
-      RoseHelper::getFileInfo (), OpenMP::fortranLibraryName, false);
+      RoseHelper::getFileInfo (), OP2::Libraries::Fortran::runtimeSupport,
+      false);
 
   useStatement2->set_definingDeclaration (useStatement2);
 
   appendStatement (useStatement2, moduleScope);
 
-  addTextForUnparser (useStatement2, OpenMP::getIfDirectiveString (),
+  /*
+   * ======================================================
+   * Module including OpenMP run-time support
+   * ======================================================
+   */
+
+  SgUseStatement* useStatement3 = new SgUseStatement (
+      RoseHelper::getFileInfo (), OpenMP::fortranLibraryName, false);
+
+  useStatement3->set_definingDeclaration (useStatement3);
+
+  appendStatement (useStatement3, moduleScope);
+
+  addTextForUnparser (useStatement3, OpenMP::getIfDirectiveString (),
       AstUnparseAttribute::e_before);
 
-  addTextForUnparser (useStatement2, OpenMP::getEndIfDirectiveString (),
+  addTextForUnparser (useStatement3, OpenMP::getEndIfDirectiveString (),
       AstUnparseAttribute::e_after);
 }

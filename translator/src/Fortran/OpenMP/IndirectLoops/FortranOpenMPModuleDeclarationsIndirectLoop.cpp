@@ -12,6 +12,7 @@ void
 FortranOpenMPModuleDeclarationsIndirectLoop::createFirstTimeExecutionDeclaration ()
 {
   using namespace SageBuilder;
+  using namespace SageInterface;
   using namespace BooleanVariableNames;
 
   Debug::getInstance ()->debugMessage (
@@ -28,6 +29,8 @@ FortranOpenMPModuleDeclarationsIndirectLoop::createFirstTimeExecutionDeclaration
 
   variableDeclarations->add (getFirstTimeExecutionVariableName (
       parallelLoop->getUserSubroutineName ()), variableDeclaration);
+
+  appendStatement (variableDeclaration, moduleScope);
 }
 
 void
@@ -94,9 +97,10 @@ FortranOpenMPModuleDeclarationsIndirectLoop::createExecutionPlanDeclarations ()
 
         variableDeclarations->add (variableName,
             FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
-                variableName, FortranTypesBuilder::getArray_RankOne (
-                    FortranTypesBuilder::getFourByteInteger ()), moduleScope,
-                1, ALLOCATABLE));
+                variableName, buildPointerType (
+                    FortranTypesBuilder::getArray_RankOne (
+                        FortranTypesBuilder::getFourByteInteger ())),
+                moduleScope));
       }
     }
   }
@@ -119,8 +123,7 @@ FortranOpenMPModuleDeclarationsIndirectLoop::createExecutionPlanDeclarations ()
           FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
               variableName, buildPointerType (
                   FortranTypesBuilder::getArray_RankOne (
-                      FortranTypesBuilder::getTwoByteInteger ())), moduleScope,
-              1, ALLOCATABLE));
+                      FortranTypesBuilder::getTwoByteInteger ())), moduleScope));
     }
   }
 

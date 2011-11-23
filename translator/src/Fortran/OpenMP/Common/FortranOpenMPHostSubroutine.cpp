@@ -292,20 +292,19 @@ FortranOpenMPHostSubroutine::createTransferOpDatStatements ()
 
   SgBasicBlock * block = buildBasicBlock ();
 
+  SgDotExp * dotExpression1 = buildDotExp (variableDeclarations->getReference (
+      getOpSetName ()), buildOpaqueVarRefExp (Fortran::setPtr, block));
+
+  SgPointerAssignOp * assignExpression1 = new SgPointerAssignOp (
+      RoseHelper::getFileInfo (), variableDeclarations->getReference (
+          getOpSetCoreName ()), dotExpression1, buildVoidType ());
+
+  assignExpression1->set_endOfConstruct (RoseHelper::getFileInfo ());
+
+  appendStatement (buildExprStatement (assignExpression1), block);
+
   if (parallelLoop->isDirectLoop () == false)
   {
-    SgDotExp * dotExpression1 = buildDotExp (
-        variableDeclarations->getReference (getOpSetName ()),
-        buildOpaqueVarRefExp (Fortran::setPtr, block));
-
-    SgPointerAssignOp * assignExpression1 = new SgPointerAssignOp (
-        RoseHelper::getFileInfo (), variableDeclarations->getReference (
-            getOpSetCoreName ()), dotExpression1, buildVoidType ());
-
-    assignExpression1->set_endOfConstruct (RoseHelper::getFileInfo ());
-
-    appendStatement (buildExprStatement (assignExpression1), block);
-
     for (unsigned int i = 1; i
         <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
     {
@@ -364,7 +363,7 @@ FortranOpenMPHostSubroutine::createTransferOpDatStatements ()
     {
       SgDotExp * dotExpression1 = buildDotExp (
           variableDeclarations->getReference (getOpDatCoreName (i)),
-          buildOpaqueVarRefExp (dimension, block));
+          buildOpaqueVarRefExp (dim, block));
 
       if (parallelLoop->isReductionRequired (i))
       {
@@ -398,7 +397,7 @@ FortranOpenMPHostSubroutine::createTransferOpDatStatements ()
     {
       SgDotExp * dotExpression = buildDotExp (
           variableDeclarations->getReference (getOpDatCoreName (i)),
-          buildOpaqueVarRefExp (dataOnHost, block));
+          buildOpaqueVarRefExp (dat, block));
 
       SgAggregateInitializer * shapeExpression =
           FortranStatementsAndExpressionsBuilder::buildShapeExpression (
@@ -430,14 +429,11 @@ FortranOpenMPHostSubroutine::createOpDatLocalVariableDeclarations ()
       "Creating variables needed to initialise OP_DAT data",
       Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
-  if (parallelLoop->isDirectLoop () == false)
-  {
-    variableDeclarations->add (getOpSetCoreName (),
-        FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
-            getOpSetCoreName (), buildPointerType (
-                FortranTypesBuilder::buildClassDeclaration (OP2::OP_SET_CORE,
-                    subroutineScope)->get_type ()), subroutineScope));
-  }
+  variableDeclarations->add (getOpSetCoreName (),
+      FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
+          getOpSetCoreName (), buildPointerType (
+              FortranTypesBuilder::buildClassDeclaration (OP2::OP_SET_CORE,
+                  subroutineScope)->get_type ()), subroutineScope));
 
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {

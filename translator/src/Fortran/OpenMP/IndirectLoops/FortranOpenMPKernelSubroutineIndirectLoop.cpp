@@ -327,8 +327,8 @@ FortranOpenMPKernelSubroutineIndirectLoop::createExecutionLoopStatements ()
         variableDeclarations->getReference (OpenMP::threadBlockOffset));
 
     SgPntrArrRefExp * arrayExpression1 = buildPntrArrRefExp (
-        variableDeclarations->getReference (
-            getThreadColourArrayName ()), addExpression1);
+        variableDeclarations->getReference (getThreadColourArrayName ()),
+        addExpression1);
 
     SgExprStatement * assignmentStatement2 = buildAssignStatement (
         variableDeclarations->getReference (colour2), arrayExpression1);
@@ -784,14 +784,11 @@ FortranOpenMPKernelSubroutineIndirectLoop::createInitialiseIndirectOpDatSizesSta
             variableDeclarations->getReference (
                 getIndirectOpDatsNumberOfElementsArrayName ()), addExpression);
 
-        SgPointerAssignOp * assignExpression = new SgPointerAssignOp (
-            RoseHelper::getFileInfo (), variableDeclarations->getReference (
-                getIndirectOpDatSizeName (i)), arrayExpression,
-            buildVoidType ());
+        SgExprStatement * assignStatement = buildAssignStatement (
+            variableDeclarations->getReference (getIndirectOpDatSizeName (i)),
+            arrayExpression);
 
-        assignExpression->set_endOfConstruct (RoseHelper::getFileInfo ());
-
-        appendStatement (buildExprStatement (assignExpression), subroutineScope);
+        appendStatement (assignStatement, subroutineScope);
 
         offset++;
       }
@@ -1403,17 +1400,14 @@ FortranOpenMPKernelSubroutineIndirectLoop::createOpDatFormalParameterDeclaration
       {
         string const & variableName = getLocalToGlobalMappingName (i);
 
-        SgAsteriskShapeExp * upperBoundExpression = new SgAsteriskShapeExp (
-            RoseHelper::getFileInfo ());
-
         variableDeclarations->add (
             variableName,
             FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
                 variableName,
                 FortranTypesBuilder::getArray_RankOne_WithLowerAndUpperBounds (
                     FortranTypesBuilder::getFourByteInteger (),
-                    buildIntVal (0), upperBoundExpression), subroutineScope,
-                formalParameters));
+                    buildIntVal (0), buildNullExpression ()), subroutineScope,
+                formalParameters, 1, TARGET));
       }
     }
   }

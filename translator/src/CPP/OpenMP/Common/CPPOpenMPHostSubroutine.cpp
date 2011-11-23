@@ -62,7 +62,7 @@ CPPOpenMPHostSubroutine::createOpDatTypeCastStatements ()
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
     SgDotExp * dotExpression = buildDotExp (variableDeclarations->getReference (
-        getOpDatName (i)), buildOpaqueVarRefExp (dataOnHost, subroutineScope));
+        getOpDatName (i)), buildOpaqueVarRefExp (data, subroutineScope));
 
     SgCastExp * castExpression = buildCastExp (dotExpression, buildPointerType (
         parallelLoop->getOpDatBaseType (i)));

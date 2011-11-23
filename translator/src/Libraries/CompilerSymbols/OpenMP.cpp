@@ -72,7 +72,7 @@ OpenMP::createGetMaximumNumberOfThreadsCallStatement (SgScopeStatement * scope)
     case TargetLanguage::FORTRAN:
     {
       SgFunctionSymbol * functionSymbol =
-          FortranTypesBuilder::buildNewFortranSubroutine (functionName, scope);
+          FortranTypesBuilder::buildNewFortranFunction (functionName, scope);
 
       return buildFunctionCallExp (functionSymbol, buildExprListExp ());
     }

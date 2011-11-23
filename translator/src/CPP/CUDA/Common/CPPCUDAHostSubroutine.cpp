@@ -258,7 +258,7 @@ CPPCUDAHostSubroutine::createReductionInitialisationStatements (
     SgBasicBlock * loopBody2 = buildBasicBlock ();
 
     SgDotExp * dotExpression = buildDotExp (variableDeclarations->getReference (
-        getOpDatName (OP_DAT_ArgumentGroup)), buildOpaqueVarRefExp (dataOnHost,
+        getOpDatName (OP_DAT_ArgumentGroup)), buildOpaqueVarRefExp (data,
         subroutineScope));
 
     SgCastExp * castExpression = buildCastExp (dotExpression, buildPointerType (
@@ -302,7 +302,7 @@ CPPCUDAHostSubroutine::createReductionInitialisationStatements (
   else
   {
     SgDotExp * dotExpression = buildDotExp (variableDeclarations->getReference (
-        getOpDatName (OP_DAT_ArgumentGroup)), buildOpaqueVarRefExp (dataOnHost,
+        getOpDatName (OP_DAT_ArgumentGroup)), buildOpaqueVarRefExp (data,
         subroutineScope));
 
     SgCastExp * castExpression = buildCastExp (dotExpression, buildPointerType (
@@ -470,7 +470,7 @@ CPPCUDAHostSubroutine::createReductionPrologueStatements ()
 
       SgDotExp * dotExpression1 = buildDotExp (
           variableDeclarations->getReference (getOpDatName (i)),
-          buildOpaqueVarRefExp (dataOnHost, subroutineScope));
+          buildOpaqueVarRefExp (data, subroutineScope));
 
       SgExprStatement * assignmentStatement4 = buildAssignStatement (
           dotExpression1, addExpression1);
@@ -486,7 +486,7 @@ CPPCUDAHostSubroutine::createReductionPrologueStatements ()
 
       SgDotExp * dotExpression2 = buildDotExp (
           variableDeclarations->getReference (getOpDatName (i)),
-          buildOpaqueVarRefExp (dataOnDevice, subroutineScope));
+          buildOpaqueVarRefExp (data_d, subroutineScope));
 
       SgExprStatement * assignmentStatement5 = buildAssignStatement (
           dotExpression2, addExpression2);

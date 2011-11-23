@@ -27,7 +27,7 @@ CPPCUDAHostSubroutineIndirectLoop::createKernelFunctionCallStatement ()
     {
       SgDotExp * dotExpression = buildDotExp (
           variableDeclarations->getReference (getOpDatName (i)),
-          buildOpaqueVarRefExp (dataOnDevice, subroutineScope));
+          buildOpaqueVarRefExp (data_d, subroutineScope));
 
       SgCastExp * castExpression = buildCastExp (dotExpression,
           buildPointerType (parallelLoop->getOpDatBaseType (i)));

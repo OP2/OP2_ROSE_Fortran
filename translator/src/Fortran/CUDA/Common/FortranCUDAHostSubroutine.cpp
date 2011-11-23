@@ -296,7 +296,7 @@ FortranCUDAHostSubroutine::createRHSOfInitialiseOpDatCardinalityStatement (
   {
     SgDotExp * dotExpression1 =
         buildDotExp (variableDeclarations->getReference (getOpDatName (
-            OP_DAT_ArgumentGroup)), buildOpaqueVarRefExp (dimension, scope));
+            OP_DAT_ArgumentGroup)), buildOpaqueVarRefExp (dim, scope));
 
     SgDotExp * dotExpression2 =
         buildDotExp (variableDeclarations->getReference (getOpDatName (
@@ -316,7 +316,7 @@ FortranCUDAHostSubroutine::createRHSOfInitialiseOpDatCardinalityStatement (
     {
       SgDotExp * dotExpression1 = buildDotExp (
           variableDeclarations->getReference (getOpDatName (
-              OP_DAT_ArgumentGroup)), buildOpaqueVarRefExp (dimension, scope));
+              OP_DAT_ArgumentGroup)), buildOpaqueVarRefExp (dim, scope));
 
       SgDotExp * dotExpression2 = buildDotExp (
           variableDeclarations->getReference (getOpSetName ()),
@@ -340,7 +340,7 @@ FortranCUDAHostSubroutine::createRHSOfInitialiseOpDatCardinalityStatement (
       && parallelLoop->isRead (OP_DAT_ArgumentGroup))
   {
     SgDotExp * dotExpression = buildDotExp (variableDeclarations->getReference (
-        getOpDatName (OP_DAT_ArgumentGroup)), buildOpaqueVarRefExp (dimension,
+        getOpDatName (OP_DAT_ArgumentGroup)), buildOpaqueVarRefExp (dim,
         scope));
 
     return dotExpression;
@@ -404,7 +404,7 @@ FortranCUDAHostSubroutine::createTransferOpDatStatements ()
 
       SgDotExp * dotExpression2 = buildDotExp (
           variableDeclarations->getReference (getOpDatName (i)),
-          buildOpaqueVarRefExp (dimension, block));
+          buildOpaqueVarRefExp (dim, block));
 
       SgExprStatement * assignmentStatement = buildAssignStatement (
           dotExpression1, dotExpression2);
@@ -490,7 +490,7 @@ FortranCUDAHostSubroutine::createTransferOpDatStatements ()
 
         SgDotExp * parameterExpression1A = buildDotExp (
             variableDeclarations->getReference (getOpDatName (i)),
-            buildOpaqueVarRefExp (dataOnDevice, block));
+            buildOpaqueVarRefExp (data_d, block));
 
         SgVarRefExp * parameterExpression2A =
             variableDeclarations->getReference (getOpDatDeviceName (i));
@@ -523,7 +523,7 @@ FortranCUDAHostSubroutine::createTransferOpDatStatements ()
 
           SgDotExp * parameterExpression1A = buildDotExp (
               variableDeclarations->getReference (getOpDatName (i)),
-              buildOpaqueVarRefExp (dataOnHost, block));
+              buildOpaqueVarRefExp (data, block));
 
           SgVarRefExp * parameterExpression1B =
               variableDeclarations->getReference (getOpDatHostName (i));
@@ -548,7 +548,7 @@ FortranCUDAHostSubroutine::createTransferOpDatStatements ()
 
             SgDotExp * parameterExpression1A = buildDotExp (
                 variableDeclarations->getReference (getOpDatName (i)),
-                buildOpaqueVarRefExp (dataOnHost, block));
+                buildOpaqueVarRefExp (data, block));
 
             SgVarRefExp * parameterExpression1B =
                 variableDeclarations->getReference (getOpDatHostName (i));
@@ -590,7 +590,7 @@ FortranCUDAHostSubroutine::createTransferOpDatStatements ()
 
             SgDotExp * parameterExpression1A = buildDotExp (
                 variableDeclarations->getReference (getOpDatName (i)),
-                buildOpaqueVarRefExp (dataOnHost, block));
+                buildOpaqueVarRefExp (data, block));
 
             SgVarRefExp * parameterExpression1B =
                 variableDeclarations->getReference (getOpDatHostName (i));
