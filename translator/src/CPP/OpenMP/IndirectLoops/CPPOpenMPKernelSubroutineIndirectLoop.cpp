@@ -152,7 +152,7 @@ CPPOpenMPKernelSubroutineIndirectLoop::createLocalVariableDeclarations ()
             "Creating indirection size argument for OP_DAT " + lexical_cast <
                 string> (i), Debug::INNER_LOOP_LEVEL, __FILE__, __LINE__);
 
-        string const variableName = getIndirectOpDatCardinalityName (i);
+        string const variableName = getIndirectOpDatSizeName (i);
 
         variableDeclarations->add (variableName,
             RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (

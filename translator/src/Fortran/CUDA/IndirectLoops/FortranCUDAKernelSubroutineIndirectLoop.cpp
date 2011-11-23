@@ -269,7 +269,7 @@ FortranCUDAKernelSubroutineIndirectLoop::createIncrementAndWriteAccessEpilogueSt
 
           SgMultiplyOp * multiplyExpression1 = buildMultiplyOp (
               variableDeclarations->getReference (
-                  getIndirectOpDatCardinalityName (i)), dotExpression2);
+                  getIndirectOpDatSizeName (i)), dotExpression2);
 
           SgLessThanOp * lessThanExpression1 = buildLessThanOp (
               variableDeclarations->getReference (
@@ -790,7 +790,7 @@ FortranCUDAKernelSubroutineIndirectLoop::createInitialiseCUDASharedVariablesStat
             dimensionsDeclaration->getOpDatDimensionField (i));
 
         SgMultiplyOp * multiplyExpression2 = buildMultiplyOp (
-            variableDeclarations->getReference (getIndirectOpDatCardinalityName (
+            variableDeclarations->getReference (getIndirectOpDatSizeName (
                 i)), dotExpression2);
 
         SgExprStatement * assignmentStatement2 = buildAssignStatement (
@@ -1053,7 +1053,7 @@ FortranCUDAKernelSubroutineIndirectLoop::createInitialiseBytesPerOpDatStatements
             dimensionsDeclaration->getOpDatDimensionField (i));
 
         SgMultiplyOp * multiplyExpression = buildMultiplyOp (
-            variableDeclarations->getReference (getIndirectOpDatCardinalityName (
+            variableDeclarations->getReference (getIndirectOpDatSizeName (
                 i)), dotExpression);
 
         SgExprStatement * assignmentStatement = buildAssignStatement (
@@ -1232,7 +1232,7 @@ FortranCUDAKernelSubroutineIndirectLoop::createThreadZeroStatements ()
             variableDeclarations->getReference (pindSizes), addExpression);
 
         SgExprStatement * assignmentStatement = buildAssignStatement (
-            variableDeclarations->getReference (getIndirectOpDatCardinalityName (
+            variableDeclarations->getReference (getIndirectOpDatSizeName (
                 i)), arrayExpression);
 
         appendStatement (assignmentStatement, ifBlock);
@@ -1472,7 +1472,7 @@ FortranCUDAKernelSubroutineIndirectLoop::createLocalVariableDeclarations ()
             "Creating size argument for OP_DAT " + lexical_cast <string> (i),
             Debug::INNER_LOOP_LEVEL, __FILE__, __LINE__);
 
-        string const variableName = getIndirectOpDatCardinalityName (i);
+        string const variableName = getIndirectOpDatSizeName (i);
 
         variableDeclarations->add (variableName,
             FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (

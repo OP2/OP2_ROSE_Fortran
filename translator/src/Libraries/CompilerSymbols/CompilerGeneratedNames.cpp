@@ -241,6 +241,26 @@ OP2VariableNames::getIncrementAccessMapName (unsigned int OP_DAT_ArgumentGroup)
 }
 
 std::string const
+OP2VariableNames::getIndirectOpDatSizeName (unsigned int OP_DAT_ArgumentGroup)
+{
+  using boost::lexical_cast;
+  using std::string;
+
+  return OpDatPrefix + lexical_cast <string> (OP_DAT_ArgumentGroup)
+      + "SharedIndirectionSize";
+}
+
+std::string const
+OP2VariableNames::getIndirectOpDatMapName (unsigned int OP_DAT_ArgumentGroup)
+{
+  using boost::lexical_cast;
+  using std::string;
+
+  return OpDatPrefix + lexical_cast <string> (OP_DAT_ArgumentGroup)
+      + "IndirectionMap";
+}
+
+std::string const
 OP2VariableNames::getIndirectOpDatSharedMemoryName (
     unsigned int OP_DAT_ArgumentGroup)
 {

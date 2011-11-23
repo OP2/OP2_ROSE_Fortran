@@ -253,6 +253,12 @@ namespace OP2VariableNames
   getIncrementAccessMapName (unsigned int OP_DAT_ArgumentGroup);
 
   std::string const
+  getIndirectOpDatSizeName (unsigned int OP_DAT_ArgumentGroup);
+
+  std::string const
+  getIndirectOpDatMapName (unsigned int OP_DAT_ArgumentGroup);
+
+  std::string const
   getIndirectOpDatSharedMemoryName (unsigned int OP_DAT_ArgumentGroup);
 
   std::string const

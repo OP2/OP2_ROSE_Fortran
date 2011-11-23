@@ -199,7 +199,7 @@ CPPCUDAKernelSubroutineIndirectLoop::createIncrementAndWriteAccessEpilogueStatem
 
           SgMultiplyOp * multiplyExpression = buildMultiplyOp (
               variableDeclarations->getReference (
-                  getIndirectOpDatCardinalityName (i)), buildIntVal (
+                  getIndirectOpDatSizeName (i)), buildIntVal (
                   parallelLoop->getOpDatDimension (i)));
 
           SgLessThanOp * upperBoundExpression = buildLessThanOp (
@@ -610,7 +610,7 @@ CPPCUDAKernelSubroutineIndirectLoop::createInitialiseCUDASharedVariablesStatemen
                 THREAD_X, subroutineScope));
 
         SgMultiplyOp * multiplyExpression = buildMultiplyOp (
-            variableDeclarations->getReference (getIndirectOpDatCardinalityName (
+            variableDeclarations->getReference (getIndirectOpDatSizeName (
                 i)), buildIntVal (parallelLoop->getOpDatDimension (i)));
 
         SgLessThanOp * upperBoundExpression = buildLessThanOp (
@@ -780,7 +780,7 @@ CPPCUDAKernelSubroutineIndirectLoop::createSetOpDatSharedMemoryPointerStatements
 
           SgMultiplyOp * multiplyExpression3b = buildMultiplyOp (
               variableDeclarations->getReference (
-                  getIndirectOpDatCardinalityName (i)), multiplyExpression3a);
+                  getIndirectOpDatSizeName (i)), multiplyExpression3a);
 
           SgFunctionCallExp * functionCallExpression3 =
               OP2::Macros::createRoundUpCallStatement (subroutineScope,
@@ -901,7 +901,7 @@ CPPCUDAKernelSubroutineIndirectLoop::createSetNumberOfIndirectElementsPerBlockSt
             variableDeclarations->getReference (pindSizes), addExpression);
 
         SgStatement * statement = buildAssignStatement (
-            variableDeclarations->getReference (getIndirectOpDatCardinalityName (
+            variableDeclarations->getReference (getIndirectOpDatSizeName (
                 i)), arrayExpression);
 
         appendStatement (statement, block);
@@ -1192,7 +1192,7 @@ CPPCUDAKernelSubroutineIndirectLoop::createLocalVariableDeclarations ()
             "Creating indirection size argument for OP_DAT " + lexical_cast <
                 string> (i), Debug::INNER_LOOP_LEVEL, __FILE__, __LINE__);
 
-        string const variableName = getIndirectOpDatCardinalityName (i);
+        string const variableName = getIndirectOpDatSizeName (i);
 
         SgVariableDeclaration * variableDeclaration =
             RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
