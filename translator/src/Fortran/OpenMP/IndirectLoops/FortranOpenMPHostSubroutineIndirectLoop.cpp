@@ -58,6 +58,29 @@ FortranOpenMPHostSubroutineIndirectLoop::createKernelFunctionCallStatement ()
     }
   }
 
+  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
+  {
+    if (parallelLoop->isDuplicateOpDat (i) == false)
+    {
+      if (parallelLoop->isIndirect (i))
+      {
+        actualParameters->append_expression (
+            variableDeclarations->getReference (getLocalToGlobalMappingName (i,
+                parallelLoop->getUserSubroutineName ())));
+      }
+    }
+  }
+
+  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
+  {
+    if (parallelLoop->isIndirect (i))
+    {
+      actualParameters->append_expression (variableDeclarations->getReference (
+          getGlobalToLocalMappingName (i,
+              parallelLoop->getUserSubroutineName ())));
+    }
+  }
+
   actualParameters->append_expression (variableDeclarations->getReference (
       getIndirectOpDatsNumberOfElementsArrayName (
           parallelLoop->getUserSubroutineName ())));
@@ -70,7 +93,7 @@ FortranOpenMPHostSubroutineIndirectLoop::createKernelFunctionCallStatement ()
       getColourToBlockArrayName (parallelLoop->getUserSubroutineName ())));
 
   actualParameters->append_expression (variableDeclarations->getReference (
-      getOffsetIntoBlockSizeName (parallelLoop->getUserSubroutineName ())));
+      getOffsetIntoBlockArrayName (parallelLoop->getUserSubroutineName ())));
 
   actualParameters->append_expression (variableDeclarations->getReference (
       getNumberOfSetElementsPerBlockArrayName (

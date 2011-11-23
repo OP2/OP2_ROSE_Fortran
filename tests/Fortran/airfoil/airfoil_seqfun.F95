@@ -80,7 +80,7 @@ subroutine adt_calc ( x1, x2, x3, x4, q, adt ) BIND(C)
   real(8), dimension(*) :: x3
   real(8), dimension(*) :: x4
   real(8), dimension(*) :: q
-  real(8) :: adt
+  real(8), dimension(1) :: adt
 
   ! local variables
   real(8) :: dx, dy, ri, u, v, c
@@ -170,7 +170,7 @@ subroutine bres_calc ( x1, x2, q1, adt1, res1, bound ) BIND(C)
   real(8), dimension(*)  :: q1
   real(8), dimension(*) :: adt1
   real(8), dimension(*) :: res1
-  integer(4) :: bound
+  integer(4), dimension(*) :: bound
 
   ! local variables
   real(8) :: dx, dy, mu, ri, p1, vol1, p2, vol2, f
@@ -182,7 +182,7 @@ subroutine bres_calc ( x1, x2, q1, adt1, res1, bound ) BIND(C)
   p1 = gm1*(q1(4)-0.5 * ri * (q1(2) * q1(2) + q1(3) * q1(3)));
 
 
-  if ( bound == 1 ) then
+  if ( bound(1) == 1 ) then
     res1(2) = res1(2) + (+ p1*dy)
     res1(3) = res1(3) + (- p1*dx)
 
@@ -220,7 +220,7 @@ subroutine update ( qold, q, res, adt, rms ) BIND(C)
   real(8), dimension(*) :: q
   real(8), dimension(*) :: res
   real(8), dimension(*) :: adt
-  real(8)  :: rms
+  real(8), dimension(1)  :: rms
   real(8) :: del, adti
 
   integer(4) :: i
