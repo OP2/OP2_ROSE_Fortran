@@ -290,6 +290,33 @@ CPPOpenMPHostSubroutineIndirectLoop::createPlanFunctionExecutionStatements ()
   return block;
 }
 
+SgExprStatement *
+CPPOpenMPHostSubroutineIndirectLoop::createPlanFunctionCallStatement ()
+{
+  using namespace SageBuilder;
+  using namespace PlanFunctionVariableNames;
+  using namespace OP2VariableNames;
+
+  Debug::getInstance ()->debugMessage ("Creating plan function call statement",
+      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+
+  SgExprListExp * actualParameters = buildExprListExp ();
+
+  actualParameters->append_expression (variableDeclarations->getReference (
+      getUserSubroutineName ()));
+
+  actualParameters->append_expression (variableDeclarations->getReference (
+      getOpSetName ()));
+
+  SgFunctionCallExp * functionCall = buildFunctionCallExp (OP2::OP_PLAN_GET,
+      buildVoidType (), actualParameters, subroutineScope);
+
+  SgExprStatement * assignmentStatement = buildAssignStatement (
+      variableDeclarations->getReference (planRet), functionCall);
+
+  return assignmentStatement;
+}
+
 void
 CPPOpenMPHostSubroutineIndirectLoop::createStatements ()
 {
@@ -314,6 +341,8 @@ CPPOpenMPHostSubroutineIndirectLoop::createStatements ()
     createReductionPrologueStatements ();
   }
 
+  appendStatement (createPlanFunctionCallStatement (), subroutineScope);
+
   appendStatementList (
       createPlanFunctionExecutionStatements ()->getStatementList (),
       subroutineScope);
@@ -325,31 +354,19 @@ CPPOpenMPHostSubroutineIndirectLoop::createStatements ()
 }
 
 void
-CPPOpenMPHostSubroutineIndirectLoop::createIncrementAccessLocalVariableDeclarations ()
+CPPOpenMPHostSubroutineIndirectLoop::createOpenMPLocalVariableDeclarations ()
 {
   using namespace SageBuilder;
-  using namespace PlanFunctionVariableNames;
-  using namespace OP2VariableNames;
+  using namespace LoopVariableNames;
 
   Debug::getInstance ()->debugMessage (
-      "Creating local variable declarations needed for incremented OP_DATS",
-      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+      "Creating OpenMP local variable declarations", Debug::FUNCTION_LEVEL,
+      __FILE__, __LINE__);
 
-  variableDeclarations->add (numberOfColours,
+  variableDeclarations->add (
+      getIterationCounterVariableName (1),
       RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
-          numberOfColours, buildIntType (), subroutineScope));
-
-  variableDeclarations->add (numberOfActiveThreadsCeiling,
-      RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
-          numberOfActiveThreadsCeiling, buildIntType (), subroutineScope));
-
-  variableDeclarations ->add (colour1,
-      RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (colour1,
-          buildIntType (), subroutineScope));
-
-  variableDeclarations ->add (colour2,
-      RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (colour2,
-          buildIntType (), subroutineScope));
+          getIterationCounterVariableName (1), buildIntType (), subroutineScope));
 }
 
 void
@@ -363,11 +380,6 @@ CPPOpenMPHostSubroutineIndirectLoop::createPlanFunctionDeclarations ()
   Debug::getInstance ()->debugMessage (
       "Creating local variable declarations for plan function",
       Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
-
-  variableDeclarations->add (
-      getIterationCounterVariableName (4),
-      RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
-          getIterationCounterVariableName (4), buildIntType (), subroutineScope));
 
   variableDeclarations->add (blockID,
       RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (blockID,
@@ -428,18 +440,14 @@ CPPOpenMPHostSubroutineIndirectLoop::createLocalVariableDeclarations ()
   }
 
   createPlanFunctionDeclarations ();
-
-  if (parallelLoop->hasIncrementedOpDats ())
-  {
-    createIncrementAccessLocalVariableDeclarations ();
-  }
 }
 
 CPPOpenMPHostSubroutineIndirectLoop::CPPOpenMPHostSubroutineIndirectLoop (
     SgScopeStatement * moduleScope,
     CPPOpenMPKernelSubroutine * calleeSubroutine,
-    CPPParallelLoop * parallelLoop) :
-  CPPOpenMPHostSubroutine (moduleScope, calleeSubroutine, parallelLoop)
+    CPPParallelLoop * parallelLoop, CPPModuleDeclarations * moduleDeclarations) :
+  CPPOpenMPHostSubroutine (moduleScope, calleeSubroutine, parallelLoop,
+      moduleDeclarations)
 {
   Debug::getInstance ()->debugMessage (
       "Creating host subroutine of indirect loop", Debug::CONSTRUCTOR_LEVEL,

@@ -89,6 +89,12 @@ namespace OP2VariableNames
   std::string const warpSize = "warpSize";
   std::string const warpMemorySize = "warpMemorySize";
 
+  std::string const
+  getBlockSizeVariableName (std::string const & suffix);
+
+  std::string const
+  getPartitionSizeVariableName (std::string const & suffix);
+
   /*
    * ======================================================
    * Returns the name of the formal parameter with type

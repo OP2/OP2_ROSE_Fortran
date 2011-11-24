@@ -67,6 +67,18 @@ BooleanVariableNames::getFirstTimeExecutionVariableName (
 }
 
 std::string const
+OP2VariableNames::getBlockSizeVariableName (std::string const & suffix)
+{
+  return "threadsPerBlockSize_" + suffix;
+}
+
+std::string const
+OP2VariableNames::getPartitionSizeVariableName (std::string const & suffix)
+{
+  return "setPartitionSize_" + suffix;
+}
+
+std::string const
 OP2VariableNames::getUserSubroutineName ()
 {
   return "userSubroutine";

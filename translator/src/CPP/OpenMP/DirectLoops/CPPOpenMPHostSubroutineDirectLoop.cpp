@@ -194,6 +194,36 @@ CPPOpenMPHostSubroutineDirectLoop::createStatements ()
 }
 
 void
+CPPOpenMPHostSubroutineDirectLoop::createOpenMPLocalVariableDeclarations ()
+{
+  using namespace SageBuilder;
+  using namespace OP2VariableNames;
+  using namespace LoopVariableNames;
+  using namespace OpenMP;
+
+  Debug::getInstance ()->debugMessage (
+      "Creating OpenMP local variable declarations", Debug::FUNCTION_LEVEL,
+      __FILE__, __LINE__);
+
+  variableDeclarations->add (
+      getIterationCounterVariableName (1),
+      RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
+          getIterationCounterVariableName (1), buildIntType (), subroutineScope));
+
+  variableDeclarations->add (sliceStart,
+      RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
+          sliceStart, buildIntType (), subroutineScope));
+
+  variableDeclarations->add (sliceEnd,
+      RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (sliceEnd,
+          buildIntType (), subroutineScope));
+
+  variableDeclarations->add (numberOfThreads,
+      RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
+          numberOfThreads, buildIntType (), subroutineScope));
+}
+
+void
 CPPOpenMPHostSubroutineDirectLoop::createLocalVariableDeclarations ()
 {
   Debug::getInstance ()->debugMessage ("Creating local variable declarations",
@@ -212,8 +242,9 @@ CPPOpenMPHostSubroutineDirectLoop::createLocalVariableDeclarations ()
 CPPOpenMPHostSubroutineDirectLoop::CPPOpenMPHostSubroutineDirectLoop (
     SgScopeStatement * moduleScope,
     CPPOpenMPKernelSubroutine * calleeSubroutine,
-    CPPParallelLoop * parallelLoop) :
-  CPPOpenMPHostSubroutine (moduleScope, calleeSubroutine, parallelLoop)
+    CPPParallelLoop * parallelLoop, CPPModuleDeclarations * moduleDeclarations) :
+  CPPOpenMPHostSubroutine (moduleScope, calleeSubroutine, parallelLoop,
+      moduleDeclarations)
 {
   Debug::getInstance ()->debugMessage (
       "Creating host subroutine of direct loop", Debug::CONSTRUCTOR_LEVEL,

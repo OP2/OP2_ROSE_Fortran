@@ -193,8 +193,8 @@ CPPCUDAHostSubroutineIndirectLoop::createPlanFunctionExecutionStatements ()
 
   SgExprStatement * assignmentStatement4 = buildAssignStatement (
       variableDeclarations->getReference (CUDA::threadsPerBlock),
-      moduleDeclarations->getBlockSizeReference (
-          parallelLoop->getUserSubroutineName ()));
+      variableDeclarations->getReference (getBlockSizeVariableName (
+          parallelLoop->getUserSubroutineName ())));
 
   appendStatement (assignmentStatement4, loopBody);
 
@@ -280,9 +280,8 @@ CPPCUDAHostSubroutineIndirectLoop::createPlanFunctionCallStatement ()
   actualParamaters->append_expression (variableDeclarations->getReference (
       getOpSetName ()));
 
-  actualParamaters->append_expression (
-      moduleDeclarations->getPartitionSizeReference (
-          parallelLoop->getUserSubroutineName ()));
+  actualParamaters->append_expression (variableDeclarations->getReference (
+      getPartitionSizeVariableName (parallelLoop->getUserSubroutineName ())));
 
   actualParamaters->append_expression (buildIntVal (
       parallelLoop->getNumberOfOpDatArgumentGroups ()));

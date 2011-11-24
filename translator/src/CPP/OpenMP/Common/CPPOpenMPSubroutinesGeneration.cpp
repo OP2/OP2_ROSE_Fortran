@@ -44,7 +44,7 @@ CPPOpenMPSubroutinesGeneration::createSubroutines ()
 
       hostSubroutines[userSubroutineName]
           = new CPPOpenMPHostSubroutineDirectLoop (moduleScope,
-              kernelSubroutine, parallelLoop);
+              kernelSubroutine, parallelLoop, moduleDeclarations);
     }
     else
     {
@@ -53,7 +53,7 @@ CPPOpenMPSubroutinesGeneration::createSubroutines ()
 
       hostSubroutines[userSubroutineName]
           = new CPPOpenMPHostSubroutineIndirectLoop (moduleScope,
-              kernelSubroutine, parallelLoop);
+              kernelSubroutine, parallelLoop, moduleDeclarations);
     }
   }
 }

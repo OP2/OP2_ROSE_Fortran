@@ -1,23 +1,10 @@
-#include <CPPModuleDeclarations.h>
-#include <CPPProgramDeclarationsAndDefinitions.h>
-#include <CPPParallelLoop.h>
-#include <ScopedVariableDeclarations.h>
-#include <Debug.h>
+#include "CPPModuleDeclarations.h"
+#include "CPPProgramDeclarationsAndDefinitions.h"
+#include "CPPParallelLoop.h"
+#include "ScopedVariableDeclarations.h"
+#include "Debug.h"
+#include "CompilerGeneratedNames.h"
 #include <rose.h>
-
-std::string const
-CPPModuleDeclarations::getBlockSizeVariableName (
-    std::string const & userSubroutineName)
-{
-  return "threadsPerBlockSize_" + userSubroutineName;
-}
-
-std::string const
-CPPModuleDeclarations::getPartitionSizeVariableName (
-    std::string const & userSubroutineName)
-{
-  return "setPartitionSize_" + userSubroutineName;
-}
 
 void
 CPPModuleDeclarations::addParallelLoopSettingsVariables (
@@ -26,6 +13,7 @@ CPPModuleDeclarations::addParallelLoopSettingsVariables (
 {
   using namespace SageBuilder;
   using namespace SageInterface;
+  using namespace OP2VariableNames;
   using std::map;
   using std::string;
 
@@ -69,20 +57,10 @@ CPPModuleDeclarations::addParallelLoopSettingsVariables (
   }
 }
 
-SgVarRefExp *
-CPPModuleDeclarations::getBlockSizeReference (
-    std::string const & userSubroutineName)
+ScopedVariableDeclarations *
+CPPModuleDeclarations::getDeclarations ()
 {
-  return variableDeclarations->getReference (getBlockSizeVariableName (
-      userSubroutineName));
-}
-
-SgVarRefExp *
-CPPModuleDeclarations::getPartitionSizeReference (
-    std::string const & userSubroutineName)
-{
-  return variableDeclarations->getReference (getPartitionSizeVariableName (
-      userSubroutineName));
+  return variableDeclarations;
 }
 
 CPPModuleDeclarations::CPPModuleDeclarations (SgScopeStatement * moduleScope,
