@@ -141,7 +141,7 @@ FortranOpenMPSubroutinesGeneration::addLibraries ()
    */
 
   SgUseStatement* useStatement3 = new SgUseStatement (
-      RoseHelper::getFileInfo (), OpenMP::fortranLibraryName, false);
+      RoseHelper::getFileInfo (), OpenMP::Fortran::libraryName, false);
 
   useStatement3->set_definingDeclaration (useStatement3);
 

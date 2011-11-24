@@ -1033,7 +1033,8 @@ CPPOpenMPKernelSubroutineIndirectLoop::createSharedVariableDeclarations ()
 
           variableDeclarations->add (sharedVariableName,
               RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
-                  sharedVariableName, parallelLoop->getOpDatBaseType (i),
+                  sharedVariableName, buildArrayType (
+                      parallelLoop->getOpDatBaseType (i), buildIntVal (64000)),
                   subroutineScope));
 
           autosharedNames.push_back (sharedVariableName);

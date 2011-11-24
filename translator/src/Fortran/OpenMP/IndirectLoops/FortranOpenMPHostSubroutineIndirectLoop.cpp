@@ -672,7 +672,7 @@ FortranOpenMPHostSubroutineIndirectLoop::createPlanFunctionCallStatement ()
 
   SgFunctionSymbol * functionSymbol =
       FortranTypesBuilder::buildNewFortranFunction (
-          OpenMP::fortranCplanFunction, subroutineScope);
+          OpenMP::Fortran::cPlanFunction, subroutineScope);
 
   SgFunctionCallExp * functionCall = buildFunctionCallExp (functionSymbol,
       actualParameters);

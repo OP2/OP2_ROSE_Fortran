@@ -11,8 +11,17 @@ class SgVarRefExp;
 
 namespace OpenMP
 {
-  std::string const fortranLibraryName = "OMP_LIB";
-  std::string const fortranCplanFunction = "cplan_OpenMP";
+  namespace CPP
+  {
+    std::string const libraryName = "omp.h";
+    std::string const OP2RuntimeSupport = "op_openmp_rt_support.h";
+  }
+
+  namespace Fortran
+  {
+    std::string const libraryName = "OMP_LIB";
+    std::string const cPlanFunction = "cplan_OpenMP";
+  }
 
   std::string const sliceStart = "sliceStart";
   std::string const sliceEnd = "sliceEnd";

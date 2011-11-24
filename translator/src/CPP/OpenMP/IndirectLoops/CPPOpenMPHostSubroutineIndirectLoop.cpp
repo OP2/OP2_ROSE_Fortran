@@ -308,6 +308,21 @@ CPPOpenMPHostSubroutineIndirectLoop::createPlanFunctionCallStatement ()
   actualParameters->append_expression (variableDeclarations->getReference (
       getOpSetName ()));
 
+  actualParameters->append_expression (variableDeclarations->getReference (
+      getPartitionSizeVariableName (parallelLoop->getUserSubroutineName ())));
+
+  actualParameters->append_expression (buildIntVal (
+      parallelLoop->getNumberOfOpDatArgumentGroups ()));
+
+  actualParameters->append_expression (variableDeclarations->getReference (
+      opDatArray));
+
+  actualParameters->append_expression (buildIntVal (
+      parallelLoop->getNumberOfDifferentIndirectOpDats ()));
+
+  actualParameters->append_expression (variableDeclarations->getReference (
+      indirectionDescriptorArray));
+
   SgFunctionCallExp * functionCall = buildFunctionCallExp (OP2::OP_PLAN_GET,
       buildVoidType (), actualParameters, subroutineScope);
 
@@ -367,6 +382,10 @@ CPPOpenMPHostSubroutineIndirectLoop::createOpenMPLocalVariableDeclarations ()
       getIterationCounterVariableName (1),
       RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
           getIterationCounterVariableName (1), buildIntType (), subroutineScope));
+
+  variableDeclarations->add (OpenMP::numberOfThreads,
+      RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
+          OpenMP::numberOfThreads, buildIntType (), subroutineScope));
 }
 
 void
