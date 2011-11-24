@@ -5,6 +5,7 @@
 #include <CPPReductionSubroutines.h>
 #include <CPPModuleDeclarations.h>
 #include <Exceptions.h>
+#include "CPPUserSubroutine.h"
 
 void
 CPPSubroutinesGeneration::patchCallsToParallelLoops ()
@@ -28,6 +29,11 @@ CPPSubroutinesGeneration::patchCallsToParallelLoops ()
     CPPParallelLoop * parallelLoop =
         static_cast <CPPParallelLoop *> (it->second);
 
+    Debug::getInstance ()->debugMessage (
+        "Analysing OP_PAR_LOOP for user subroutine '" + userSubroutineName
+            + "'. Call is in file '" + parallelLoop->getFileName () + "'",
+        Debug::INNER_LOOP_LEVEL, __FILE__, __LINE__);
+
     CPPHostSubroutine * hostSubroutine = hostSubroutines[userSubroutineName];
 
     SgFunctionCallExp * functionCallExpression =
@@ -41,6 +47,12 @@ CPPSubroutinesGeneration::patchCallsToParallelLoops ()
 
     functionCallExpression->set_function (hostSubroutineReference);
 
+    if (find (dirtyFiles.begin (), dirtyFiles.end (),
+        parallelLoop->getFileName ()) == dirtyFiles.end ())
+    {
+      dirtyFiles.push_back (parallelLoop->getFileName ());
+    }
+
     /*
      * ==================================================
      * Remove the first parameter (kernel reference)
@@ -51,6 +63,14 @@ CPPSubroutinesGeneration::patchCallsToParallelLoops ()
         functionCallExpression->get_args ()->get_expressions ();
 
     arguments.erase (arguments.begin ());
+
+    arguments.erase (arguments.begin ());
+
+    arguments.insert (arguments.begin (), buildFunctionRefExp (
+        userSubroutines[userSubroutineName]->getSubroutineHeaderStatement ()));
+
+    arguments.insert (arguments.begin () + 1, buildStringVal (
+        userSubroutines[userSubroutineName]->getSubroutineName ()));
   }
 }
 
@@ -64,6 +84,8 @@ CPPSubroutinesGeneration::generate ()
   moduleDeclarations = new CPPModuleDeclarations (moduleScope, declarations);
 
   createSubroutines ();
+
+  patchCallsToParallelLoops ();
 }
 
 CPPSubroutinesGeneration::CPPSubroutinesGeneration (SgProject * project,

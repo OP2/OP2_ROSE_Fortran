@@ -235,7 +235,7 @@ ParallelLoop::getNumberOfIndirectOpDats ()
 }
 
 unsigned int
-ParallelLoop::getNumberOfDifferentIndirectOpDats ()
+ParallelLoop::getNumberOfDistinctIndirectOpDats ()
 {
   int count = 0;
   for (unsigned int i = 1; i <= getNumberOfOpDatArgumentGroups (); ++i)

@@ -15,10 +15,10 @@ CPPOpenMPSubroutinesGeneration::addHeaderIncludes ()
   using namespace SageInterface;
 
   addTextForUnparser (moduleScope, "#include \"" + OpenMP::CPP::libraryName
-      + "\"", AstUnparseAttribute::e_before);
+      + "\"\n", AstUnparseAttribute::e_before);
 
   addTextForUnparser (moduleScope, "#include \""
-      + OpenMP::CPP::OP2RuntimeSupport + "\"", AstUnparseAttribute::e_before);
+      + OpenMP::CPP::OP2RuntimeSupport + "\"\n", AstUnparseAttribute::e_before);
 }
 
 void
@@ -42,6 +42,8 @@ CPPOpenMPSubroutinesGeneration::createSubroutines ()
 
     CPPUserSubroutine * userSubroutine = new CPPUserSubroutine (moduleScope,
         parallelLoop, declarations);
+
+    userSubroutines[userSubroutineName] = userSubroutine;
 
     CPPOpenMPKernelSubroutine * kernelSubroutine;
 

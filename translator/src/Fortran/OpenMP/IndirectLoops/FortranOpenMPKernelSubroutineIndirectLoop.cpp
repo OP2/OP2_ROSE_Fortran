@@ -775,7 +775,7 @@ FortranOpenMPKernelSubroutineIndirectLoop::createInitialiseIndirectOpDatSizesSta
       {
         SgMultiplyOp * multiplyExpression = buildMultiplyOp (
             variableDeclarations->getReference (OpenMP::threadBlockID),
-            buildIntVal (parallelLoop->getNumberOfDifferentIndirectOpDats ()));
+            buildIntVal (parallelLoop->getNumberOfDistinctIndirectOpDats ()));
 
         SgAddOp * addExpression = buildAddOp (buildIntVal (offset),
             multiplyExpression);
@@ -818,7 +818,7 @@ FortranOpenMPKernelSubroutineIndirectLoop::createInitialiseIndirectOpDatMapsStat
       {
         SgMultiplyOp * multiplyExpression = buildMultiplyOp (
             variableDeclarations->getReference (OpenMP::threadBlockID),
-            buildIntVal (parallelLoop->getNumberOfDifferentIndirectOpDats ()));
+            buildIntVal (parallelLoop->getNumberOfDistinctIndirectOpDats ()));
 
         SgAddOp * addExpression = buildAddOp (buildIntVal (offset),
             multiplyExpression);

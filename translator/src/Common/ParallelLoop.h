@@ -264,7 +264,7 @@ class ParallelLoop
      * ======================================================
      */
     unsigned int
-    getNumberOfDifferentIndirectOpDats ();
+    getNumberOfDistinctIndirectOpDats ();
 
     /*
      * ======================================================

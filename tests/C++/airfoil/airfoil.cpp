@@ -46,7 +46,6 @@
 // global constants
 
 float gam, gm1, cfl, eps, mach, alpha, qinf[4];
-
 //
 // OP header file
 //
@@ -188,7 +187,7 @@ int main(int argc, char **argv){
   op_decl_const(1,"float",&alpha);
   op_decl_const(4,"float",qinf  );
 
-  op_diagnostic_output();
+    op_diagnostic_output();
 
 // main time-marching loop
 

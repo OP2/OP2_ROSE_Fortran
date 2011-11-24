@@ -691,7 +691,7 @@ CPPOpenMPKernelSubroutineIndirectLoop::createInitialiseIndirectOpDatMapsStatemen
       {
         SgMultiplyOp * multiplyExpression = buildMultiplyOp (
             variableDeclarations->getReference (OpenMP::threadBlockID),
-            buildIntVal (parallelLoop->getNumberOfDifferentIndirectOpDats ()));
+            buildIntVal (parallelLoop->getNumberOfDistinctIndirectOpDats ()));
 
         SgAddOp * addExpression1 = buildAddOp (buildIntVal (offset),
             multiplyExpression);
@@ -738,7 +738,7 @@ CPPOpenMPKernelSubroutineIndirectLoop::createInitialiseIndirectOpDatSizesStateme
       {
         SgMultiplyOp * multiplyExpression = buildMultiplyOp (
             variableDeclarations->getReference (OpenMP::threadBlockID),
-            buildIntVal (parallelLoop->getNumberOfDifferentIndirectOpDats ()));
+            buildIntVal (parallelLoop->getNumberOfDistinctIndirectOpDats ()));
 
         SgAddOp * addExpression = buildAddOp (buildIntVal (offset),
             multiplyExpression);

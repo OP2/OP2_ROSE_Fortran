@@ -772,7 +772,7 @@ CPPCUDAKernelSubroutineIndirectLoop::createSetOpDatSharedMemoryPointerStatements
         indirectOpDatCounter++;
 
         if (indirectOpDatCounter
-            < parallelLoop->getNumberOfDifferentIndirectOpDats ())
+            < parallelLoop->getNumberOfDistinctIndirectOpDats ())
         {
           SgMultiplyOp * multiplyExpression3a = buildMultiplyOp (buildSizeOfOp (
               buildFloatType ()), buildIntVal (parallelLoop->getOpDatDimension (

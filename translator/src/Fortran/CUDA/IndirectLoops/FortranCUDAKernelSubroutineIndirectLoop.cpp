@@ -312,7 +312,7 @@ FortranCUDAKernelSubroutineIndirectLoop::createIncrementAndWriteAccessEpilogueSt
 
           SgMultiplyOp * multiplyExpression2a = buildMultiplyOp (
               variableDeclarations->getReference (blockID), buildIntVal (
-                  parallelLoop->getNumberOfDifferentIndirectOpDats ()));
+                  parallelLoop->getNumberOfDistinctIndirectOpDats ()));
 
           SgAddOp * addExpression2a = buildAddOp (buildIntVal (pindOffsOffset),
               multiplyExpression2a);
@@ -853,7 +853,7 @@ FortranCUDAKernelSubroutineIndirectLoop::createInitialiseCUDASharedVariablesStat
 
           SgMultiplyOp * multiplyExpression4a = buildMultiplyOp (
               variableDeclarations->getReference (blockID), buildIntVal (
-                  parallelLoop->getNumberOfDifferentIndirectOpDats ()));
+                  parallelLoop->getNumberOfDistinctIndirectOpDats ()));
 
           SgAddOp * addExpression4b = buildAddOp (buildIntVal (pindOffsOffset),
               multiplyExpression4a);

@@ -8,6 +8,7 @@ class CPPProgramDeclarationsAndDefinitions;
 class CPPHostSubroutine;
 class CPPReductionSubroutines;
 class CPPModuleDeclarations;
+class CPPUserSubroutine;
 
 class CPPSubroutinesGeneration: public SubroutinesGeneration <
     CPPProgramDeclarationsAndDefinitions, CPPHostSubroutine>
@@ -17,6 +18,8 @@ class CPPSubroutinesGeneration: public SubroutinesGeneration <
     CPPReductionSubroutines * reductionSubroutines;
 
     CPPModuleDeclarations * moduleDeclarations;
+
+    std::map <std::string, CPPUserSubroutine *> userSubroutines;
 
   protected:
 

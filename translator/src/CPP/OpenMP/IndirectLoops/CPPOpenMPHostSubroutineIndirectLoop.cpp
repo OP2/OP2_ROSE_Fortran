@@ -318,7 +318,7 @@ CPPOpenMPHostSubroutineIndirectLoop::createPlanFunctionCallStatement ()
       opDatArray));
 
   actualParameters->append_expression (buildIntVal (
-      parallelLoop->getNumberOfDifferentIndirectOpDats ()));
+      parallelLoop->getNumberOfDistinctIndirectOpDats ()));
 
   actualParameters->append_expression (variableDeclarations->getReference (
       indirectionDescriptorArray));
