@@ -9,24 +9,54 @@ class CPPOpenMPKernelSubroutineIndirectLoop: public CPPOpenMPKernelSubroutine
   private:
 
     std::map <std::string, SgVariableDeclaration *>
-        indirectOpDatSharedMemoryDeclarations;
+        sharedIndirectionDeclarations;
 
   private:
+
+    SgBasicBlock *
+    createStageOutIncrementedOpDatStatements ();
+
+    SgBasicBlock *
+    createIncrementedOpDatPrologueStatements ();
+
+    void
+    createIncrementedOpDatEpilogueStatements ();
+
+    void
+    createStageInStatements ();
+
+    void
+    createInitialiseSharedVariableStatements ();
+
+    void
+    createInitialiseThreadVariablesStatements ();
+
+    void
+    createInitialiseIncrementAccessVariablesStatements ();
+
+    void
+    createInitialiseIndirectOpDatSizesStatements ();
+
+    void
+    createInitialiseIndirectOpDatMapsStatements ();
+
+    void
+    createIncrementAccessLocalVariableDeclarations ();
+
+    void
+    createIndirectOpDatSizeLocalVariableDeclarations ();
+
+    void
+    createSharedVariableDeclarations ();
+
+    void
+    createExecutionLocalVariableDeclarations ();
 
     virtual SgStatement *
     createUserSubroutineCallStatement ();
 
     virtual void
     createExecutionLoopStatements ();
-
-    void
-    createIncrementAccessLocalVariableDeclarations ();
-
-    void
-    createExecutionLocalVariableDeclarations ();
-
-    void
-    createCUDAStageInVariablesVariableDeclarations ();
 
     void
     createPlanFormalParameterDeclarations ();

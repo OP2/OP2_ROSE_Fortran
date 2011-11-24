@@ -949,7 +949,7 @@ FortranOpenMPKernelSubroutineIndirectLoop::createInitialiseThreadVariablesStatem
    */
 
   SgPntrArrRefExp * arrayExpression3 = buildPntrArrRefExp (
-      variableDeclarations->getReference (getOffsetIntoBlockSizeName ()),
+      variableDeclarations->getReference (getOffsetIntoBlockArrayName ()),
       variableDeclarations->getReference (OpenMP::threadBlockID));
 
   SgExprStatement * assignmentStatement3 = buildAssignStatement (
@@ -962,8 +962,6 @@ FortranOpenMPKernelSubroutineIndirectLoop::createInitialiseThreadVariablesStatem
 void
 FortranOpenMPKernelSubroutineIndirectLoop::createStatements ()
 {
-  using namespace SageInterface;
-
   Debug::getInstance ()->debugMessage ("Creating statements",
       Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
@@ -1162,7 +1160,7 @@ FortranOpenMPKernelSubroutineIndirectLoop::createExecutionLocalVariableDeclarati
 }
 
 void
-FortranOpenMPKernelSubroutineIndirectLoop::createIndirectOpDatCardinalityLocalVariableDeclarations ()
+FortranOpenMPKernelSubroutineIndirectLoop::createIndirectOpDatSizeLocalVariableDeclarations ()
 {
   using namespace OP2VariableNames;
   using boost::lexical_cast;
@@ -1275,7 +1273,7 @@ FortranOpenMPKernelSubroutineIndirectLoop::createLocalVariableDeclarations ()
 
   createRoundUpLocalVariableDeclarations ();
 
-  createIndirectOpDatCardinalityLocalVariableDeclarations ();
+  createIndirectOpDatSizeLocalVariableDeclarations ();
 
   if (parallelLoop->hasIncrementedOpDats ())
   {

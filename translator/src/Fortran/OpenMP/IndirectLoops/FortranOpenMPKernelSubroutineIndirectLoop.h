@@ -52,7 +52,7 @@ class FortranOpenMPKernelSubroutineIndirectLoop: public FortranOpenMPKernelSubro
     createSharedVariableDeclarations ();
 
     void
-    createIndirectOpDatCardinalityLocalVariableDeclarations ();
+    createIndirectOpDatSizeLocalVariableDeclarations ();
 
     void
     createRoundUpLocalVariableDeclarations ();

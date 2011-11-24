@@ -371,108 +371,111 @@ CPPProgramDeclarationsAndDefinitions::detectAndHandleOP2Definition (
 
   string const typeName = typeDefinition->get_name ().getString ();
 
-  if (iequals (typeName, OP2::OP_SET))
+  SgAssignInitializer * assignmentInitializer = isSgAssignInitializer (
+      variableDeclaration->get_decl_item (variableName)->get_initializer ());
+
+  if (assignmentInitializer != NULL)
   {
-    Debug::getInstance ()->debugMessage ("OP_SET declaration call found",
-        Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
-
-    SgAssignInitializer * assignmentInitializer = isSgAssignInitializer (
-        variableDeclaration->get_decl_item (variableName)->get_initializer ());
-
-    ROSE_ASSERT (assignmentInitializer != NULL);
-
-    SgFunctionCallExp * functionCallExpression = isSgFunctionCallExp (
-        assignmentInitializer->get_operand ());
-
-    ROSE_ASSERT (functionCallExpression != NULL);
-
-    OpSetDefinition * opSetDeclaration;
-
-    if (functionCallExpression->get_args ()->get_expressions ().size ()
-        == CPPImperialOpSetDefinition::getNumberOfExpectedArguments ())
+    if (iequals (typeName, OP2::OP_SET))
     {
-      opSetDeclaration = new CPPImperialOpSetDefinition (
-          functionCallExpression->get_args (), variableName);
+      Debug::getInstance ()->debugMessage ("OP_SET declaration call found",
+          Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+
+      SgFunctionCallExp * functionCallExpression = isSgFunctionCallExp (
+          assignmentInitializer->get_operand ());
+
+      ROSE_ASSERT (functionCallExpression != NULL);
+
+      OpSetDefinition * opSetDeclaration;
+
+      if (functionCallExpression->get_args ()->get_expressions ().size ()
+          == CPPImperialOpSetDefinition::getNumberOfExpectedArguments ())
+      {
+        opSetDeclaration = new CPPImperialOpSetDefinition (
+            functionCallExpression->get_args (), variableName);
+      }
+      else
+      {
+        ROSE_ASSERT (functionCallExpression->get_args ()->get_expressions ().size ()
+            == CPPOxfordOpSetDefinition::getNumberOfExpectedArguments ());
+
+        opSetDeclaration = new CPPOxfordOpSetDefinition (
+            functionCallExpression->get_args (), variableName);
+      }
+
+      OpSetDefinitions[opSetDeclaration->getVariableName ()] = opSetDeclaration;
     }
-    else
+    else if (iequals (typeName, OP2::OP_MAP))
     {
-      ROSE_ASSERT (functionCallExpression->get_args ()->get_expressions ().size ()
-          == CPPOxfordOpSetDefinition::getNumberOfExpectedArguments ());
 
-      opSetDeclaration = new CPPOxfordOpSetDefinition (
-          functionCallExpression->get_args (), variableName);
+      Debug::getInstance ()->debugMessage ("OP_MAP declaration call found",
+          Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+
+      SgAssignInitializer * assignmentInitializer =
+          isSgAssignInitializer (variableDeclaration->get_decl_item (
+              variableName)->get_initializer ());
+
+      ROSE_ASSERT (assignmentInitializer != NULL);
+
+      SgFunctionCallExp * functionCallExpression = isSgFunctionCallExp (
+          assignmentInitializer->get_operand ());
+
+      ROSE_ASSERT (functionCallExpression != NULL);
+
+      OpMapDefinition * opMapDeclaration;
+
+      if (functionCallExpression->get_args ()->get_expressions ().size ()
+          == CPPImperialOpSetDefinition::getNumberOfExpectedArguments ())
+      {
+        opMapDeclaration = new CPPImperialOpMapDefinition (
+            functionCallExpression->get_args (), variableName);
+      }
+      else
+      {
+        ROSE_ASSERT (functionCallExpression->get_args ()->get_expressions ().size ()
+            == CPPOxfordOpMapDefinition::getNumberOfExpectedArguments ());
+
+        opMapDeclaration = new CPPOxfordOpMapDefinition (
+            functionCallExpression->get_args (), variableName);
+      }
+
+      OpMapDefinitions[opMapDeclaration->getVariableName ()] = opMapDeclaration;
     }
-
-    OpSetDefinitions[opSetDeclaration->getVariableName ()] = opSetDeclaration;
-  }
-  else if (iequals (typeName, OP2::OP_MAP))
-  {
-
-    Debug::getInstance ()->debugMessage ("OP_MAP declaration call found",
-        Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
-
-    SgAssignInitializer * assignmentInitializer = isSgAssignInitializer (
-        variableDeclaration->get_decl_item (variableName)->get_initializer ());
-
-    ROSE_ASSERT (assignmentInitializer != NULL);
-
-    SgFunctionCallExp * functionCallExpression = isSgFunctionCallExp (
-        assignmentInitializer->get_operand ());
-
-    ROSE_ASSERT (functionCallExpression != NULL);
-
-    OpMapDefinition * opMapDeclaration;
-
-    if (functionCallExpression->get_args ()->get_expressions ().size ()
-        == CPPImperialOpSetDefinition::getNumberOfExpectedArguments ())
+    else if (iequals (typeName, OP2::OP_DAT))
     {
-      opMapDeclaration = new CPPImperialOpMapDefinition (
-          functionCallExpression->get_args (), variableName);
+      Debug::getInstance ()->debugMessage ("OP_DAT declaration call found",
+          Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+
+      SgAssignInitializer * assignmentInitializer =
+          isSgAssignInitializer (variableDeclaration->get_decl_item (
+              variableName)->get_initializer ());
+
+      ROSE_ASSERT (assignmentInitializer != NULL);
+
+      SgFunctionCallExp * functionCallExpression = isSgFunctionCallExp (
+          assignmentInitializer->get_operand ());
+
+      ROSE_ASSERT (functionCallExpression != NULL);
+
+      OpDatDefinition * opDatDeclaration;
+
+      if (functionCallExpression->get_args ()->get_expressions ().size ()
+          == CPPImperialOpDatDefinition::getNumberOfExpectedArguments ())
+      {
+        opDatDeclaration = new CPPImperialOpDatDefinition (
+            functionCallExpression->get_args (), variableName);
+      }
+      else
+      {
+        ROSE_ASSERT (functionCallExpression->get_args ()->get_expressions ().size ()
+            == CPPOxfordOpDatDefinition::getNumberOfExpectedArguments ());
+
+        opDatDeclaration = new CPPOxfordOpDatDefinition (
+            functionCallExpression->get_args (), variableName);
+      }
+
+      OpDatDefinitions[opDatDeclaration->getVariableName ()] = opDatDeclaration;
     }
-    else
-    {
-      ROSE_ASSERT (functionCallExpression->get_args ()->get_expressions ().size ()
-          == CPPOxfordOpMapDefinition::getNumberOfExpectedArguments ());
-
-      opMapDeclaration = new CPPOxfordOpMapDefinition (
-          functionCallExpression->get_args (), variableName);
-    }
-
-    OpMapDefinitions[opMapDeclaration->getVariableName ()] = opMapDeclaration;
-  }
-  else if (iequals (typeName, OP2::OP_DAT))
-  {
-    Debug::getInstance ()->debugMessage ("OP_DAT declaration call found",
-        Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
-
-    SgAssignInitializer * assignmentInitializer = isSgAssignInitializer (
-        variableDeclaration->get_decl_item (variableName)->get_initializer ());
-
-    ROSE_ASSERT (assignmentInitializer != NULL);
-
-    SgFunctionCallExp * functionCallExpression = isSgFunctionCallExp (
-        assignmentInitializer->get_operand ());
-
-    ROSE_ASSERT (functionCallExpression != NULL);
-
-    OpDatDefinition * opDatDeclaration;
-
-    if (functionCallExpression->get_args ()->get_expressions ().size ()
-        == CPPImperialOpDatDefinition::getNumberOfExpectedArguments ())
-    {
-      opDatDeclaration = new CPPImperialOpDatDefinition (
-          functionCallExpression->get_args (), variableName);
-    }
-    else
-    {
-      ROSE_ASSERT (functionCallExpression->get_args ()->get_expressions ().size ()
-          == CPPOxfordOpDatDefinition::getNumberOfExpectedArguments ());
-
-      opDatDeclaration = new CPPOxfordOpDatDefinition (
-          functionCallExpression->get_args (), variableName);
-    }
-
-    OpDatDefinitions[opDatDeclaration->getVariableName ()] = opDatDeclaration;
   }
 }
 
