@@ -1,24 +1,24 @@
-#include <CPPOpenMPSubroutinesGeneration.h>
-#include <CPPParallelLoop.h>
-#include <CPPUserSubroutine.h>
-#include <CPPProgramDeclarationsAndDefinitions.h>
-#include <CPPOpenMPHostSubroutineDirectLoop.h>
-#include <CPPOpenMPKernelSubroutineDirectLoop.h>
-#include <CPPOpenMPHostSubroutineIndirectLoop.h>
-#include <CPPOpenMPKernelSubroutineIndirectLoop.h>
-#include <RoseStatementsAndExpressionsBuilder.h>
+#include "CPPOpenMPSubroutinesGeneration.h"
+#include "CPPParallelLoop.h"
+#include "CPPUserSubroutine.h"
+#include "CPPProgramDeclarationsAndDefinitions.h"
+#include "CPPOpenMPHostSubroutineDirectLoop.h"
+#include "CPPOpenMPKernelSubroutineDirectLoop.h"
+#include "CPPOpenMPHostSubroutineIndirectLoop.h"
+#include "CPPOpenMPKernelSubroutineIndirectLoop.h"
+#include "RoseStatementsAndExpressionsBuilder.h"
+#include "OpenMP.h"
 
 void
 CPPOpenMPSubroutinesGeneration::addHeaderIncludes ()
 {
   using namespace SageInterface;
 
-  addTextForUnparser (moduleScope, "#include " + OpenMP::CPP::libraryName,
-      AstUnparseAttribute::e_before);
+  addTextForUnparser (moduleScope, "#include \"" + OpenMP::CPP::libraryName
+      + "\"", AstUnparseAttribute::e_before);
 
-  addTextForUnparser (moduleScope,
-      "#include " + OpenMP::CPP::OP2RuntimeSupport,
-      AstUnparseAttribute::e_before);
+  addTextForUnparser (moduleScope, "#include \""
+      + OpenMP::CPP::OP2RuntimeSupport + "\"", AstUnparseAttribute::e_before);
 }
 
 void
