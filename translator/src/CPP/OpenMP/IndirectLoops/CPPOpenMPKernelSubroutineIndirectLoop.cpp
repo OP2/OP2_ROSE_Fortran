@@ -71,14 +71,11 @@ CPPOpenMPKernelSubroutineIndirectLoop::createUserSubroutineCallStatement ()
       SgMultiplyOp * multiplyExpression = buildMultiplyOp (addExpression1,
           buildIntVal (parallelLoop->getOpDatDimension (i)));
 
-      SgAddOp * addExpression2 = buildAddOp (multiplyExpression, buildIntVal (
-          parallelLoop->getOpDatDimension (i)));
+      SgAddOp * addExpression2 = buildAddOp (
+          variableDeclarations->getReference (getOpDatName (i)),
+          multiplyExpression);
 
-      SgAddOp * addExpression3 =
-          buildAddOp (variableDeclarations->getReference (getOpDatName (i)),
-              addExpression2);
-
-      actualParameters->append_expression (addExpression3);
+      actualParameters->append_expression (addExpression2);
     }
   }
 
@@ -608,6 +605,7 @@ CPPOpenMPKernelSubroutineIndirectLoop::createInitialiseSharedVariableStatements 
       Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
   bool firstIndirectOp = true;
+  unsigned int previousOpDat;
 
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
@@ -615,6 +613,8 @@ CPPOpenMPKernelSubroutineIndirectLoop::createInitialiseSharedVariableStatements 
     {
       if (parallelLoop->isIndirect (i))
       {
+        previousOpDat = i;
+
         if (firstIndirectOp)
         {
           firstIndirectOp = false;
@@ -627,15 +627,15 @@ CPPOpenMPKernelSubroutineIndirectLoop::createInitialiseSharedVariableStatements 
         else
         {
           SgSizeOfOp * sizeOfExpression = buildSizeOfOp (
-              parallelLoop->getOpDatBaseType (i));
+              parallelLoop->getOpDatBaseType (previousOpDat));
 
           SgMultiplyOp * multiplyExpression1 = buildMultiplyOp (
-              sizeOfExpression, buildIntVal (
-                  parallelLoop->getOpDatDimension (i)));
+              sizeOfExpression, buildIntVal (parallelLoop->getOpDatDimension (
+                  previousOpDat)));
 
-          SgMultiplyOp * multiplyExpression2 =
-              buildMultiplyOp (variableDeclarations->getReference (
-                  getIndirectOpDatSizeName (i)), multiplyExpression1);
+          SgMultiplyOp * multiplyExpression2 = buildMultiplyOp (
+              variableDeclarations->getReference (getIndirectOpDatSizeName (
+                  previousOpDat)), multiplyExpression1);
 
           SgFunctionCallExp * functionCallExpression =
               OP2::Macros::createRoundUpCallStatement (subroutineScope,
@@ -923,8 +923,7 @@ CPPOpenMPKernelSubroutineIndirectLoop::createIncrementAccessLocalVariableDeclara
           RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
               variableName1, buildArrayType (
                   parallelLoop->getOpDatBaseType (i), buildIntVal (
-                      parallelLoop->getOpDatDimension (i) - 1)),
-              subroutineScope));
+                      parallelLoop->getOpDatDimension (i))), subroutineScope));
 
       string const variableName2 = getIncrementAccessMapName (i);
 
@@ -1142,16 +1141,16 @@ CPPOpenMPKernelSubroutineIndirectLoop::createPlanFormalParameterDeclarations ()
               buildIntType ()), subroutineScope, formalParameters));
 
   variableDeclarations->add (
-      getNumberOfThreadColoursPerBlockArrayName (),
-      RoseStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
-          getNumberOfThreadColoursPerBlockArrayName (), buildPointerType (
-              buildIntType ()), subroutineScope, formalParameters));
-
-  variableDeclarations->add (
       getThreadColourArrayName (),
       RoseStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
           getThreadColourArrayName (), buildPointerType (buildIntType ()),
           subroutineScope, formalParameters));
+
+  variableDeclarations->add (
+      getNumberOfThreadColoursPerBlockArrayName (),
+      RoseStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
+          getNumberOfThreadColoursPerBlockArrayName (), buildPointerType (
+              buildIntType ()), subroutineScope, formalParameters));
 
   variableDeclarations->add (
       blockOffset,

@@ -66,10 +66,7 @@ CPPSubroutinesGeneration::patchCallsToParallelLoops ()
 
     arguments.erase (arguments.begin ());
 
-    arguments.insert (arguments.begin (), buildFunctionRefExp (
-        userSubroutines[userSubroutineName]->getSubroutineHeaderStatement ()));
-
-    arguments.insert (arguments.begin () + 1, buildStringVal (
+    arguments.insert (arguments.begin (), buildStringVal (
         userSubroutines[userSubroutineName]->getSubroutineName ()));
   }
 }

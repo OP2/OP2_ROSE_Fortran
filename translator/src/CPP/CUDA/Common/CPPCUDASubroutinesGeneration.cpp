@@ -73,6 +73,8 @@ CPPCUDASubroutinesGeneration::createSubroutines ()
     CPPCUDAUserSubroutine * userDeviceSubroutine = new CPPCUDAUserSubroutine (
         moduleScope, parallelLoop, declarations);
 
+    userSubroutines[userSubroutineName] = userDeviceSubroutine;
+
     CPPCUDAKernelSubroutine * kernelSubroutine;
 
     if (parallelLoop->isDirectLoop ())

@@ -50,6 +50,9 @@ float gam, gm1, cfl, eps, mach, alpha, qinf[4];
 // OP header file
 //
 
+//#include "op_lib_cpp.h"
+//#include "rose_openmp_code.cpp"
+
 #include "OP2_OXFORD.h"
 
 //
@@ -244,15 +247,14 @@ int main(int argc, char **argv){
                   op_arg_dat(p_q,   -1,OP_ID, 4,"float",OP_WRITE),
                   op_arg_dat(p_res, -1,OP_ID, 4,"float",OP_RW   ),
                   op_arg_dat(p_adt, -1,OP_ID, 1,"float",OP_READ ),
-                  op_arg_gbl(rms,1,"float",OP_INC));
+                  op_arg_gbl(&rms,1,"float",OP_INC));
     }
 
 //  print iteration history
 
     rms = sqrt(rms/(float) ncell);
 
-    if (iter%100 == 0)
-      printf(" %d  %10.5e \n",iter,rms);
+    printf(" %d  %10.5e \n",iter,rms);
   }
 
   op_timing_output();
