@@ -29,7 +29,8 @@ CPPSubroutinesGeneration::addOP2IncludeDirective ()
         sourceFile->get_globalScope ());
 
     addTextForUnparser (lastDeclarationStatement, "#include \""
-        + OP2::Libraries::CPP::mainLibrary + "\"\n", AstUnparseAttribute::e_before);
+        + OP2::Libraries::CPP::mainLibrary + "\"\n",
+        AstUnparseAttribute::e_before);
 
     addTextForUnparser (lastDeclarationStatement, "#include \"" + newFileName
         + "\"\n", AstUnparseAttribute::e_before);
