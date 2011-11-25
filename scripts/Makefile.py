@@ -108,13 +108,10 @@ def outputStdout (stdoutLines):
 		print(line)
 	print('================================================================================================')
 
-# Runs the compiler
-def compile ():
-	from subprocess import Popen, PIPE
-	from string import split
-
-	allBackends       = (opts.cuda, opts.openmp, opts.opencl)
-	backendsSelected  = [] 
+# Check that the backend selected is sane before returning which was chosen
+def getBackendTarget ():
+	allBackends      = (opts.cuda, opts.openmp, opts.opencl)
+	backendsSelected = [] 
 
 	for backend in allBackends:
 		if backend:
@@ -124,10 +121,17 @@ def compile ():
 		debug.exitMessage("You must specify one of %s on the command line." % allBackendOptions)
 	elif len(backendsSelected) > 1:
 		debug.exitMessage("You specified multiple backends on the command line. Please only specify one of these." % backendsSelected)
+	
+	if opts.cuda:
+		return cudaFlag + ' '
+	elif opts.openmp:
+		return openmpFlag + ' '
+	elif opts.opencl:
+		return openclFlag + ' '
 
-	configFile = 'config'
-	if not os.path.isfile(configFile):
-		debug.exitMessage("Unable to find configuration file '%s' with the path to source-to-source translator and files to translate." % (configFile))
+# Check that the path to the translator can be found before returning its absolute path
+def getTranslatorHome ():
+	from string import split
 
 	translatorEnvVariable = 'IMPERIAL_TRANSLATOR_HOME'
 	translatorHome        = split(os.environ.get(translatorEnvVariable), os.pathsep)[0]
@@ -137,8 +141,15 @@ def compile ():
 	elif not os.path.isdir(translatorHome):
 		debug.exitMessage("The source-to-source translator path '%s' is not a directory" % (translatorHome))
 
-	translatorPath = translatorHome + os.sep + 'translator' + os.sep + 'bin' + os.sep + 'translator'
-	op2Path        = translatorHome + os.sep + 'support' + os.sep + 'Fortran'
+	return translatorHome
+
+# Get the files to translate from the mandatory 'config' file
+def getCompilationFiles ():
+	from string import split
+	
+	configFile = 'config'
+	if not os.path.isfile(configFile):
+		debug.exitMessage("Unable to find configuration file '%s' with the files to translate." % (configFile))
 
 	filesToCompile = []
 
@@ -156,24 +167,43 @@ def compile ():
 	if not filesToCompile:
 		debug.exitMessage("You did not specify which files need to compiled. Use files=<list/of/files> in the configuration file.")
 
-	cmd = translatorPath + ' -d ' + str(opts.debug) + ' '
+	return filesToCompile
 
-	if opts.cuda:
-		cmd += cudaFlag + ' '
-	elif opts.openmp:
-		cmd += openmpFlag + ' '
-	elif opts.opencl:
-		cmd += openclFlag + ' '
+# Get the command to source-to-source translate the Fortran code
+def getFortranCompilationCommand (filesToCompile):
+	translatorHome = getTranslatorHome ()
+	translatorPath = translatorHome + os.sep + 'translator' + os.sep + 'bin' + os.sep + 'translator'
+	op2Path        = translatorHome + os.sep + 'support' + os.sep + 'Fortran'
+
+	cmd = translatorPath + ' -d ' + str(opts.debug) + ' ' + getBackendTarget ()
 
 	auxiliaryFiles = ['ISO_C_BINDING.F95', 'OP2.F95']
+
 	for f in auxiliaryFiles:
 		cmd += op2Path + os.sep + f + ' '
 
 	for f in filesToCompile:
 		cmd += f + ' '
+	
+	return cmd	
+
+# Get the command to source-to-source translate the Fortran code
+def getCPPCompilationCommand (filesToCompile):
+	translatorHome = getTranslatorHome ()
+	translatorPath = translatorHome + os.sep + 'translator' + os.sep + 'bin' + os.sep + 'translator'
+	includePath    = translatorHome + os.sep + 'support' + os.sep + 'C++'
+
+	cmd = translatorPath + ' -d ' + str(opts.debug) + ' ' + getBackendTarget () + ' -I' + includePath + ' '
+	for f in filesToCompile:
+		cmd += f + ' '
+	
+	return cmd	
+
+def runCompiler (cmd):
+	from subprocess import Popen, PIPE
 
 	debug.verboseMessage("Running: '" + cmd + "'")
-
+	
 	# Run the compiler in a bash shell as it needs the environment variables such as
 	# LD_LIBRARY_PATH
 	proc = Popen(cmd,
@@ -193,12 +223,72 @@ def compile ():
 		
 		print('==================================== STANDARD ERROR ============================================')
 		lines = stderrLines.splitlines()
-		print(lines[len(lines)-1])
+		for line in lines:
+			print (line)		
 		print('================================================================================================') 
         	exit(1)
 
 	if opts.debug > 0:
 		outputStdout (stdoutLines)
+
+def renameFortranCUDAfile (generatedFiles):
+	from shutil import move
+
+	cudaCodeName = "rose_cuda_code.F95"
+	debug.verboseMessage("Looking for the ROSE generated file '%s'" % cudaCodeName)
+
+	for f in generatedFiles:
+		if os.path.basename(f) == cudaCodeName:
+			destinationName = os.path.dirname(f) + os.sep + cudaCodeName[:-4] + ".CUF" 
+			debug.verboseMessage("Moving '%s' into '%s'" % (f, destinationName))
+			move(f, destinationName)
+
+def patchOpParLoops (generatedFiles):
+	from tempfile import mkstemp
+	from shutil import move
+	from os import remove, close
+
+	for file in generatedFiles:
+		#Create temp file
+		debug.verboseMessage("Analysing file '%s'" % file)
+		fh, abs_path = mkstemp()
+		new_file = open(abs_path,'w')
+		old_file = open(file)
+		for line in old_file:
+			new_file.write(line.replace("*(&OP_ID)", "OP_ID"))
+
+		new_file.close()
+		close(fh)
+		old_file.close()
+		remove(file)
+		move(abs_path, file)
+
+def handleFortranProject (filesToCompile):
+	from FormatFortranCode import FormatFortranCode	
+	from glob import glob
+
+	cmd = getFortranCompilationCommand (filesToCompile)
+	runCompiler (cmd)
+
+	# The files generated by our compiler
+	generatedFiles = glob(os.getcwd() + os.sep + "rose_*")
+	
+	if opts.format > 0:
+		f = FormatFortranCode (generatedFiles, opts.format)
+
+	if opts.cuda:
+		renameFortranCUDAfile (generatedFiles)
+
+def handleCPPProject (filesToCompile):
+	from glob import glob
+
+	cmd = getCPPCompilationCommand (filesToCompile)
+	runCompiler (cmd)
+
+	# The files generated by our compiler
+	generatedFiles = glob(os.getcwd() + os.sep + "rose_*")
+
+	patchOpParLoops (generatedFiles)
 
 if opts.clean:
 	clean()
@@ -208,24 +298,21 @@ if opts.format:
 		debug.exitMessage("Formatting length must be positive number greater than or equal to 40. Currently set to " + str(opts.format))
 
 if opts.compile:
-	from FormatFortranCode import FormatFortranCode
-	from glob import glob
-	from shutil import move
+	import re
 
-	compile()
+	filesToCompile = getCompilationFiles ()
 
-	# The files generated by our compiler
-	files = glob(os.getcwd() + os.sep + "rose_*")
-	
-	if opts.format > 0:
-		f = FormatFortranCode (files, opts.format)
+	fortranGeneration = False
+	char_regex        = re.compile("[f|F][0-9][0-9]")
 
-	generatedCodeName = "rose_cuda_code.F95"
-	for f in files:
-		if os.path.basename(f) == generatedCodeName:
-			destinationName = os.path.dirname(f) + os.sep + generatedCodeName[:-4] + ".CUF" 
-			debug.verboseMessage("Moving '%s' into '%s'" % (f, destinationName))
-			move(f, destinationName)
+	for f in filesToCompile:
+		if char_regex.match(f[-3:]):
+			fortranGeneration = True
+
+	if fortranGeneration:
+		handleFortranProject (filesToCompile)
+	else:
+		handleCPPProject (filesToCompile)
 
 if not opts.clean and not opts.compile:
 	debug.exitMessage("No actions selected. Use %s for options." % helpShortFlag)

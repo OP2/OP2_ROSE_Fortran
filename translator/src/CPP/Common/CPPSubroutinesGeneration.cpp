@@ -1,11 +1,40 @@
-#include <CPPSubroutinesGeneration.h>
-#include <CPPParallelLoop.h>
-#include <CPPHostSubroutine.h>
-#include <CPPProgramDeclarationsAndDefinitions.h>
-#include <CPPReductionSubroutines.h>
-#include <CPPModuleDeclarations.h>
-#include <Exceptions.h>
+#include "CPPSubroutinesGeneration.h"
+#include "CPPParallelLoop.h"
+#include "CPPHostSubroutine.h"
+#include "CPPProgramDeclarationsAndDefinitions.h"
+#include "CPPReductionSubroutines.h"
+#include "CPPModuleDeclarations.h"
+#include "Exceptions.h"
 #include "CPPUserSubroutine.h"
+#include "OP2.h"
+
+void
+CPPSubroutinesGeneration::addOP2IncludeDirective ()
+{
+  using namespace SageInterface;
+  using std::vector;
+  using std::string;
+
+  Debug::getInstance ()->debugMessage ("Adding OP2 include directive",
+      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+
+  for (vector <string>::iterator it = dirtyFiles.begin (); it
+      != dirtyFiles.end (); ++it)
+  {
+    std::string const & fileName = *it;
+
+    SgSourceFile * sourceFile = declarations->getSourceFile (fileName);
+
+    SgStatement * lastDeclarationStatement = findLastDeclarationStatement (
+        sourceFile->get_globalScope ());
+
+    addTextForUnparser (lastDeclarationStatement, "#include \""
+        + OP2::Libraries::CPP::mainLibrary + "\"\n", AstUnparseAttribute::e_before);
+
+    addTextForUnparser (lastDeclarationStatement, "#include \"" + newFileName
+        + "\"\n", AstUnparseAttribute::e_before);
+  }
+}
 
 void
 CPPSubroutinesGeneration::patchCallsToParallelLoops ()
@@ -83,6 +112,8 @@ CPPSubroutinesGeneration::generate ()
   createSubroutines ();
 
   patchCallsToParallelLoops ();
+
+  addOP2IncludeDirective ();
 }
 
 CPPSubroutinesGeneration::CPPSubroutinesGeneration (SgProject * project,

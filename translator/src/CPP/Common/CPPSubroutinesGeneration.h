@@ -23,17 +23,20 @@ class CPPSubroutinesGeneration: public SubroutinesGeneration <
 
   protected:
 
-    virtual void
-    addHeaderIncludes () = 0;
-
-    virtual void
-    createSubroutines () = 0;
+    void
+    addOP2IncludeDirective ();
 
     void
     patchCallsToParallelLoops ();
 
     void
     generate ();
+
+    virtual void
+    addHeaderIncludes () = 0;
+
+    virtual void
+    createSubroutines () = 0;
 
   public:
 

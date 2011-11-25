@@ -626,5 +626,8 @@ CPPCUDAHostSubroutine::CPPCUDAHostSubroutine (SgScopeStatement * moduleScope,
   CPPHostSubroutine (moduleScope, calleeSubroutine, parallelLoop),
       moduleDeclarations (moduleDeclarations)
 {
+  variableDeclarations->addVisibilityToSymbolsFromOuterScope (
+      moduleDeclarations->getDeclarations ());
+
   subroutineHeaderStatement->get_functionModifier ().setCudaHost ();
 }

@@ -121,6 +121,11 @@ namespace OP2
 
   namespace Libraries
   {
+    namespace CPP
+    {
+      std::string const mainLibrary = "op_lib_cpp.h";
+    }
+
     namespace Fortran
     {
       std::string const declarations = "OP2_FORTRAN_DECLARATIONS";

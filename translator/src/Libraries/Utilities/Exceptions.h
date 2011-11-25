@@ -242,6 +242,23 @@ namespace Exceptions
         }
     };
   }
+
+  namespace ASTParsing
+  {
+    class NoSourceFileException: public std::runtime_error
+    {
+      public:
+
+        static unsigned int const returnValue = 18;
+
+      public:
+
+        NoSourceFileException (const std::string& msg) :
+          std::runtime_error (msg)
+        {
+        }
+    };
+  }
 }
 
 #endif

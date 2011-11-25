@@ -500,8 +500,11 @@ CPPProgramDeclarationsAndDefinitions::visit (SgNode * node)
       Debug::getInstance ()->debugMessage ("Source file '" + currentSourceFile
           + "' detected", Debug::OUTER_LOOP_LEVEL, __FILE__, __LINE__ );
 
+      givenSourceFiles[currentSourceFile] = sourceFile;
+
       break;
     }
+
     case V_SgVariableDeclaration:
     {
       SgVariableDeclaration * variableDeclaration = isSgVariableDeclaration (

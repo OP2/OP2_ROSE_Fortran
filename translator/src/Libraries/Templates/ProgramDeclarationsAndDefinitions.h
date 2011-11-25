@@ -105,7 +105,16 @@ template <typename TSubroutineHeader>
        * The source file AST currently being scanned
        * ======================================================
        */
+
       std::string currentSourceFile;
+
+      /*
+       * ======================================================
+       * Source files encountered during AST scan
+       * ======================================================
+       */
+
+      std::map <std::string, SgSourceFile *> givenSourceFiles;
 
     protected:
 
@@ -400,6 +409,18 @@ template <typename TSubroutineHeader>
       lastParallelLoop ()
       {
         return parallelLoops.end ();
+      }
+
+      SgSourceFile *
+      getSourceFile (std::string const & fileName)
+      {
+        if (givenSourceFiles.find (fileName) == givenSourceFiles.end ())
+        {
+          throw Exceptions::ASTParsing::NoSourceFileException ("Cannot find '"
+              + fileName + "'");
+        }
+
+        return givenSourceFiles[fileName];
       }
   };
 
