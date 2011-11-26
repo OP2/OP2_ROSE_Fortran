@@ -1,86 +1,80 @@
-#include <CommandLine.h>
-#include <CommandLineOption.h>
-#include <CommandLineOptionWithParameters.h>
-#include <TargetLanguage.h>
-#include <Debug.h>
-#include <Globals.h>
-#include <Exceptions.h>
-#include <UDrawGraph.h>
-#include <FortranProgramDeclarationsAndDefinitions.h>
-#include <FortranCUDASubroutinesGeneration.h>
-#include <FortranOpenMPSubroutinesGeneration.h>
-#include <CPPModifyOP2CallsToComplyWithOxfordAPI.h>
-#include <CPPProgramDeclarationsAndDefinitions.h>
-#include <CPPCUDASubroutinesGeneration.h>
-#include <CPPOpenMPSubroutinesGeneration.h>
-#include <CPPOpenCLSubroutinesGeneration.h>
+#include "CommandLine.h"
+#include "TranslatorCommandLineOptions.h"
+#include "Debug.h"
+#include "Globals.h"
+#include "Exceptions.h"
+#include "FortranProgramDeclarationsAndDefinitions.h"
+#include "FortranCUDASubroutinesGeneration.h"
+#include "FortranOpenMPSubroutinesGeneration.h"
+#include "CPPModifyOP2CallsToComplyWithOxfordAPI.h"
+#include "CPPProgramDeclarationsAndDefinitions.h"
+#include "CPPCUDASubroutinesGeneration.h"
+#include "CPPOpenMPSubroutinesGeneration.h"
+#include "CPPOpenCLSubroutinesGeneration.h"
 #include <boost/algorithm/string.hpp>
 #include <boost/filesystem.hpp>
 #include <rose.h>
 
-class OxfordOption: public CommandLineOption
-{
-  public:
-
-    virtual void
-    run ()
+template <class TGenerator>
+  void
+  unparseSourceFiles (SgProject * project, TGenerator * generator)
+  {
+    class TreeVisitor: public AstSimpleProcessing
     {
-      Globals::getInstance ()->setRenderOxfordAPICalls ();
-    }
+      private:
 
-    OxfordOption (std::string helpMessage, std::string longOption) :
-      CommandLineOption (helpMessage, "", longOption)
-    {
-    }
-};
+        TGenerator * generator;
 
-class CUDAOption: public CommandLineOption
-{
-  public:
+      public:
 
-    virtual void
-    run ()
-    {
-      Globals::getInstance ()->setTargetBackend (TargetLanguage::CUDA);
-    }
+        TreeVisitor (TGenerator * generator) :
+          generator (generator)
+        {
+        }
 
-    CUDAOption (std::string helpMessage, std::string longOption) :
-      CommandLineOption (helpMessage, "", longOption)
-    {
-    }
-};
+        virtual void
+        visit (SgNode * node)
+        {
+          using boost::iequals;
+          using boost::filesystem::path;
+          using boost::filesystem::system_complete;
 
-class OpenMPOption: public CommandLineOption
-{
-  public:
+          SgSourceFile * file = isSgSourceFile (node);
+          if (file != NULL)
+          {
+            path p = system_complete (path (
+                isSgSourceFile (node)->getFileName ()));
 
-    virtual void
-    run ()
-    {
-      Globals::getInstance ()->setTargetBackend (TargetLanguage::OPENMP);
-    }
+            if (generator->isDirty (p.filename ()))
+            {
+              Debug::getInstance ()->debugMessage ("Unparsing '"
+                  + p.filename () + "'", Debug::FUNCTION_LEVEL, __FILE__,
+                  __LINE__);
 
-    OpenMPOption (std::string helpMessage, std::string longOption) :
-      CommandLineOption (helpMessage, "", longOption)
-    {
-    }
-};
+              file->unparse ();
+            }
+            else if (iequals (p.filename (), generator->getFileName ()))
+            {
+              Debug::getInstance ()->debugMessage ("Unparsing generated file '"
+                  + p.filename () + "'", Debug::FUNCTION_LEVEL, __FILE__,
+                  __LINE__);
 
-class OpenCLOption: public CommandLineOption
-{
-  public:
+              file->unparse ();
+            }
+            else
+            {
+              Debug::getInstance ()->debugMessage ("File '" + p.filename ()
+                  + "' remains unchanged", Debug::FUNCTION_LEVEL, __FILE__,
+                  __LINE__);
+            }
+          }
+        }
+    };
 
-    virtual void
-    run ()
-    {
-      Globals::getInstance ()->setTargetBackend (TargetLanguage::OPENCL);
-    }
+    TreeVisitor * visitor = new TreeVisitor (generator);
 
-    OpenCLOption (std::string helpMessage, std::string longOption) :
-      CommandLineOption (helpMessage, "", longOption)
-    {
-    }
-};
+    visitor->traverse (project, preorder);
+  }
 
 CPPSubroutinesGeneration *
 handleCPPProject (SgProject * project)
@@ -180,125 +174,6 @@ handleFortranProject (SgProject * project)
   }
 
   return generator;
-}
-
-void
-unparseSourceFiles (SgProject * project, CPPSubroutinesGeneration * generator)
-{
-  class TreeVisitor: public AstSimpleProcessing
-  {
-    private:
-
-      CPPSubroutinesGeneration * generator;
-
-    public:
-
-      TreeVisitor (CPPSubroutinesGeneration * generator) :
-        generator (generator)
-      {
-      }
-
-      virtual void
-      visit (SgNode * node)
-      {
-        using boost::iequals;
-        using boost::filesystem::path;
-        using boost::filesystem::system_complete;
-
-        SgSourceFile * file = isSgSourceFile (node);
-        if (file != NULL)
-        {
-          path p = system_complete (
-              path (isSgSourceFile (node)->getFileName ()));
-
-          if (generator->isDirty (p.filename ()))
-          {
-            Debug::getInstance ()->debugMessage ("Unparsing '" + p.filename ()
-                + "'", Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
-
-            file->unparse ();
-          }
-          else if (iequals (p.filename (), generator->getFileName ()))
-          {
-            Debug::getInstance ()->debugMessage ("Unparsing generated file '"
-                + p.filename () + "'", Debug::FUNCTION_LEVEL, __FILE__,
-                __LINE__);
-
-            file->unparse ();
-          }
-          else
-          {
-            Debug::getInstance ()->debugMessage ("File '" + p.filename ()
-                + "' remains unchanged", Debug::FUNCTION_LEVEL, __FILE__,
-                __LINE__);
-          }
-        }
-      }
-  };
-
-  TreeVisitor * visitor = new TreeVisitor (generator);
-
-  visitor->traverse (project, preorder);
-}
-
-void
-unparseSourceFiles (SgProject * project,
-    FortranSubroutinesGeneration * generator)
-{
-  class TreeVisitor: public AstSimpleProcessing
-  {
-    private:
-
-      FortranSubroutinesGeneration * generator;
-
-    public:
-
-      TreeVisitor (FortranSubroutinesGeneration * generator) :
-        generator (generator)
-      {
-      }
-
-      virtual void
-      visit (SgNode * node)
-      {
-        using boost::iequals;
-        using boost::filesystem::path;
-        using boost::filesystem::system_complete;
-
-        SgSourceFile * file = isSgSourceFile (node);
-        if (file != NULL)
-        {
-          path p = system_complete (
-              path (isSgSourceFile (node)->getFileName ()));
-
-          if (generator->isDirty (p.filename ()))
-          {
-            Debug::getInstance ()->debugMessage ("Unparsing '" + p.filename ()
-                + "'", Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
-
-            file->unparse ();
-          }
-          else if (iequals (p.filename (), generator->getFileName ()))
-          {
-            Debug::getInstance ()->debugMessage ("Unparsing generated file '"
-                + p.filename () + "'", Debug::FUNCTION_LEVEL, __FILE__,
-                __LINE__);
-
-            file->unparse ();
-          }
-          else
-          {
-            Debug::getInstance ()->debugMessage ("File '" + p.filename ()
-                + "' remains unchanged", Debug::FUNCTION_LEVEL, __FILE__,
-                __LINE__);
-          }
-        }
-      }
-  };
-
-  TreeVisitor * visitor = new TreeVisitor (generator);
-
-  visitor->traverse (project, preorder);
 }
 
 void
@@ -547,4 +422,3 @@ main (int argc, char ** argv)
 
   return 0;
 }
-
