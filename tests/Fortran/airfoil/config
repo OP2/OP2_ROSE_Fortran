@@ -1,1 +1,2 @@
 files=output.F95 input.F95 constvars.F95 airfoil_seqfun.F95 airfoil.F95
+freeVariables=constvars.F95

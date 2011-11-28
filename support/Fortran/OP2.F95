@@ -1,4 +1,4 @@
-module OP2_C
+module OP2_FORTRAN_DECLARATIONS
 
 use, intrinsic :: ISO_C_BINDING
 
@@ -49,7 +49,8 @@ use, intrinsic :: ISO_C_BINDING
 
 contains
 
-  subroutine op_init ()
+  subroutine op_init (diags)
+    integer :: diags
   end subroutine op_init
 
   ! OP_SET declaration
@@ -90,16 +91,16 @@ contains
 
   ! OP_GBL declarations
  
-  subroutine op_decl_gbl_real_8 ( dat, dim, data)
+  subroutine op_decl_gbl_real_8 ( dat, data, dim)
     real(8), dimension(:) :: dat
-    integer :: dim
     type(op_dat) :: data    
+    integer :: dim
   end subroutine op_decl_gbl_real_8
 
-  subroutine op_decl_gbl_integer_4 ( dat, dim, data)
+  subroutine op_decl_gbl_integer_4 ( dat, data, dim)
     integer(4), dimension(:) :: dat
-    integer :: dim
     type(op_dat) :: data    
+    integer :: dim
   end subroutine op_decl_gbl_integer_4
 
   subroutine op_decl_gbl_scalar_integer_4 ( dat, data)
@@ -251,4 +252,4 @@ contains
     type(op_map) :: map0, map1, map2, map3, map4, map5, map6, map7            
   end subroutine op_par_loop_8
 
-end module OP2_C
+end module OP2_FORTRAN_DECLARATIONS

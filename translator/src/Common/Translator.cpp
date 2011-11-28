@@ -250,6 +250,18 @@ handleFortranProject (SgProject * project)
 }
 
 void
+checkFreeVariablesFileOption ()
+{
+  using std::string;
+
+  if (Globals::getInstance ()->getFreeVariablesFilename ().empty ())
+  {
+    throw Exceptions::ASTParsing::NoSourceFileException (
+        "You have not supplied a file containing the declarations of free variables referenced within the user kernel functions");
+  }
+}
+
+void
 checkBackendOption ()
 {
   using std::vector;
@@ -296,6 +308,9 @@ addCommandLineOptions ()
   CommandLine::getInstance ()->addOption (
       new OpenCLOption ("Generate OpenCL code", TargetLanguage::toString (
           TargetLanguage::OPENCL)));
+
+  CommandLine::getInstance ()->addOption (new FreeVariablesFileOption (
+      "The file containing free variables referenced in user kernels"));
 
   CommandLine::getInstance ()->addOption (new OxfordOption (
       "Refactor OP2 calls to comply with Oxford API", "oxford"));
@@ -351,6 +366,8 @@ processUserSelections (SgProject * project)
     Globals::getInstance ()->setHostLanguage (TargetLanguage::FORTRAN);
 
     checkBackendOption ();
+
+    checkFreeVariablesFileOption ();
 
     FortranSubroutinesGeneration * generator = handleFortranProject (project);
 

@@ -1,66 +1,15 @@
+module AIRFOIL_SEQ
 
+use CONSTANTVARS
 
-module airfoil_seq
+contains
 
-use constantVars
-
- contains
-
-subroutine initialise_flow_field ( ncell, q, res )
-
-	implicit none
-	
-	! formal parameters
-	integer(4) :: ncell
-	
-	real(8), dimension(:) :: q
-	real(8), dimension(:) :: res
-				
-	! local variables
-	real(8) :: p, r, u, e
-
-	integer(4) :: n, m
-
-
-	gam = 1.4
-  gm1 = gam - 1.0
-  cfl = 0.9
-  eps = 0.05
-
-
-  mach  = 0.4
-  alpha = 3.0 * atan(1.0) / 45.0
-  p     = 1.0
-  r     = 1.0
-	u     = sqrt ( gam * p / r ) * mach
-  e     = p / ( r * gm1 ) + 0.5 * u * u
-
-  qinf(1) = r
-  qinf(2) = r * u
-  qinf(3) = 0.0
-  qinf(4) = r * e
-
-	! -4 in the subscript is done to adapt C++ code to fortran one
-	do n = 1, ncell
-		do m = 1, 4
-			q( (4 * n + m) - 4) = qinf(m)
-			res( (4 * n + m) - 4) = 0.0
-		end do
-	end do
-
-end subroutine initialise_flow_field
-
-
-! save old solution
 subroutine save_soln ( q, qold ) BIND(C)
-
   implicit none
 
-  ! declaration of formal parameters
   real(8), dimension(*) :: q
   real(8), dimension(*) :: qold
 
-  ! iteration variable
   integer(4) :: i
 
   do i = 1, 4
@@ -69,12 +18,9 @@ subroutine save_soln ( q, qold ) BIND(C)
 
 end subroutine save_soln
 
-
 subroutine adt_calc ( x1, x2, x3, x4, q, adt ) BIND(C)
-
   implicit none
 
-  ! formal parameters
   real(8), dimension(*) :: x1
   real(8), dimension(*) :: x2
   real(8), dimension(*) :: x3
@@ -82,10 +28,8 @@ subroutine adt_calc ( x1, x2, x3, x4, q, adt ) BIND(C)
   real(8), dimension(*) :: q
   real(8), dimension(1) :: adt
 
-  ! local variables
   real(8) :: dx, dy, ri, u, v, c
 
-  ! computation
   ri = 1.0 / q(1)
   u = ri * q(2)
   v = ri * q(3)
@@ -112,10 +56,8 @@ subroutine adt_calc ( x1, x2, x3, x4, q, adt ) BIND(C)
 end subroutine adt_calc
 
 subroutine res_calc ( x1, x2, q1, q2, adt1, adt2, res1, res2 ) BIND(C)
-
   implicit none
 
-  ! formal parameters
   real(8), dimension(*) :: x1
   real(8), dimension(*) :: x2
   real(8), dimension(*) :: q1
@@ -125,7 +67,6 @@ subroutine res_calc ( x1, x2, q1, q2, adt1, adt2, res1, res2 ) BIND(C)
   real(8), dimension(*) :: res1
   real(8), dimension(*) :: res2
 
-  ! local variables
   real(8) :: dx, dy, mu, ri, p1, vol1, p2, vol2, f
 
   dx = x1(1) - x2(1)
@@ -159,12 +100,9 @@ subroutine res_calc ( x1, x2, q1, q2, adt1, adt2, res1, res2 ) BIND(C)
 
 end subroutine res_calc
 
-
 subroutine bres_calc ( x1, x2, q1, adt1, res1, bound ) BIND(C)
-
   implicit none
 
-  ! formal parameters
   real(8), dimension(*) :: x1
   real(8), dimension(*) :: x2
   real(8), dimension(*)  :: q1
@@ -172,7 +110,6 @@ subroutine bres_calc ( x1, x2, q1, adt1, res1, bound ) BIND(C)
   real(8), dimension(*) :: res1
   integer(4), dimension(*) :: bound
 
-  ! local variables
   real(8) :: dx, dy, mu, ri, p1, vol1, p2, vol2, f
 
   dx = x1(1) - x2(1)
@@ -181,10 +118,9 @@ subroutine bres_calc ( x1, x2, q1, adt1, res1, bound ) BIND(C)
   ri = 1.0 / q1(1)
   p1 = gm1*(q1(4)-0.5 * ri * (q1(2) * q1(2) + q1(3) * q1(3)));
 
-
   if ( bound(1) == 1 ) then
-    res1(2) = res1(2) + (+ p1*dy)
-    res1(3) = res1(3) + (- p1*dx)
+    res1(2) = res1(2) + (p1*dy)
+    res1(3) = res1(3) + (-(p1*dx))
 
   else
     vol1 =  ri*(q1(2)*dy - q1(3)*dx)
@@ -210,12 +146,9 @@ subroutine bres_calc ( x1, x2, q1, adt1, res1, bound ) BIND(C)
 
 end subroutine bres_calc
 
-
 subroutine update ( qold, q, res, adt, rms ) BIND(C)
-
   implicit none
 
-  ! formal parameters
   real(8), dimension(*) :: qold
   real(8), dimension(*) :: q
   real(8), dimension(*) :: res
@@ -236,4 +169,4 @@ subroutine update ( qold, q, res, adt, rms ) BIND(C)
 
 end subroutine update
 
-end module airfoil_seq
+end module AIRFOIL_SEQ

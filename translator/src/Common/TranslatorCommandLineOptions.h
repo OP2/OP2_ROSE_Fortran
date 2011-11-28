@@ -4,6 +4,24 @@
 #include "Globals.h"
 #include "TargetLanguage.h"
 #include "CommandLineOption.h"
+#include "CommandLineOptionWithParameters.h"
+
+class FreeVariablesFileOption: public CommandLineOptionWithParameters
+{
+  public:
+
+    virtual void
+    run ()
+    {
+      Globals::getInstance ()->setFreeVariablesFilename (getParameter ());
+    }
+
+    FreeVariablesFileOption (std::string helpMessage) :
+      CommandLineOptionWithParameters (helpMessage, "file", "f",
+          "free-variables")
+    {
+    }
+};
 
 class OxfordOption: public CommandLineOption
 {

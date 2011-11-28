@@ -1,4 +1,3 @@
-
 #pragma once
 #ifndef FORTRAN_OP2_DEFINITIONS_H
 #define FORTRAN_OP2_DEFINITIONS_H
@@ -120,7 +119,7 @@ class FortranOpGblDefinition: public OpGblDefinition
      * Models an OP_GBL definition in Fortran.
      *
      * The following style is assumed:
-     * OP_DECL_GBL (data, dimension, OpDatName)
+     * OP_DECL_GBL (data, OpDatName, dimension)
      * ======================================================
      */
 
@@ -128,9 +127,9 @@ class FortranOpGblDefinition: public OpGblDefinition
 
     static int const index_data = 0;
 
-    static int const index_dimension = 1;
+    static int const index_OpDatName = 1;
 
-    static int const index_OpDatName = 2;
+    static int const index_dimension = 2;
 
   public:
 

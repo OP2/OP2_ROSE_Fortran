@@ -288,11 +288,11 @@ FortranOpGblDefinition::FortranOpGblDefinition (SgExprListExp * parameters)
   primitiveType
       = isSgVarRefExp (parameters->get_expressions ()[index_data])->get_type ();
 
-  dimension
-      = isSgIntVal (parameters->get_expressions ()[index_dimension])->get_value ();
-
   variableName
       = isSgVarRefExp (parameters->get_expressions ()[index_OpDatName])->get_symbol ()->get_name ().getString ();
+
+  dimension
+      = isSgIntVal (parameters->get_expressions ()[index_dimension])->get_value ();
 
   ROSE_ASSERT (dimension > 0);
   ROSE_ASSERT (primitiveType != NULL);

@@ -9,6 +9,7 @@
 #include "FortranProgramDeclarationsAndDefinitions.h"
 #include "FortranOpDatDimensionsDeclaration.h"
 #include "RoseHelper.h"
+#include "Globals.h"
 #include "OpenMP.h"
 #include "OP2.h"
 #include <boost/algorithm/string.hpp>
@@ -136,20 +137,35 @@ FortranOpenMPSubroutinesGeneration::addLibraries ()
 
   /*
    * ======================================================
-   * Module including OpenMP run-time support
+   * Module including free variables referenced in
+   * user kernels
    * ======================================================
    */
 
   SgUseStatement* useStatement3 = new SgUseStatement (
-      RoseHelper::getFileInfo (), OpenMP::Fortran::libraryName, false);
+      RoseHelper::getFileInfo (), declarations->getModuleNameForFile (
+          Globals::getInstance ()->getFreeVariablesFilename ()), false);
 
   useStatement3->set_definingDeclaration (useStatement3);
 
   appendStatement (useStatement3, moduleScope);
 
-  addTextForUnparser (useStatement3, OpenMP::getIfDirectiveString (),
+  /*
+   * ======================================================
+   * Module including OpenMP run-time support
+   * ======================================================
+   */
+
+  SgUseStatement* useStatement4 = new SgUseStatement (
+      RoseHelper::getFileInfo (), OpenMP::Fortran::libraryName, false);
+
+  useStatement4->set_definingDeclaration (useStatement4);
+
+  appendStatement (useStatement4, moduleScope);
+
+  addTextForUnparser (useStatement4, OpenMP::getIfDirectiveString (),
       AstUnparseAttribute::e_before);
 
-  addTextForUnparser (useStatement3, OpenMP::getEndIfDirectiveString (),
+  addTextForUnparser (useStatement4, OpenMP::getEndIfDirectiveString (),
       AstUnparseAttribute::e_after);
 }
