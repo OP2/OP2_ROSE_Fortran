@@ -13,24 +13,30 @@
 #include "CPPOpenCLSubroutinesGeneration.h"
 #include <boost/algorithm/string.hpp>
 #include <boost/filesystem.hpp>
+#include <iostream>
+#include <fstream>
 #include <rose.h>
 
 template <class TGenerator>
   void
   unparseSourceFiles (SgProject * project, TGenerator * generator)
   {
+    using std::vector;
+    using std::string;
+
     class TreeVisitor: public AstSimpleProcessing
     {
       private:
 
         TGenerator * generator;
 
-      public:
+        SgProject * project;
 
-        TreeVisitor (TGenerator * generator) :
-          generator (generator)
-        {
-        }
+        vector <string> outputFiles;
+
+        string mainFile;
+
+      public:
 
         virtual void
         visit (SgNode * node)
@@ -40,16 +46,20 @@ template <class TGenerator>
           using boost::filesystem::system_complete;
 
           SgSourceFile * file = isSgSourceFile (node);
+
           if (file != NULL)
           {
-            path p = system_complete (path (
-                isSgSourceFile (node)->getFileName ()));
+            path p = system_complete (path (file->getFileName ()));
 
             if (generator->isDirty (p.filename ()))
             {
               Debug::getInstance ()->debugMessage ("Unparsing '"
                   + p.filename () + "'", Debug::FUNCTION_LEVEL, __FILE__,
                   __LINE__);
+
+              mainFile = "rose_" + p.filename ();
+
+              outputFiles.push_back (mainFile);
 
               file->unparse ();
             }
@@ -59,6 +69,8 @@ template <class TGenerator>
                   + p.filename () + "'", Debug::FUNCTION_LEVEL, __FILE__,
                   __LINE__);
 
+              outputFiles.push_back (p.filename ());
+
               file->unparse ();
             }
             else
@@ -66,14 +78,75 @@ template <class TGenerator>
               Debug::getInstance ()->debugMessage ("File '" + p.filename ()
                   + "' remains unchanged", Debug::FUNCTION_LEVEL, __FILE__,
                   __LINE__);
+
+              outputFiles.push_back (p.filename ());
             }
           }
         }
+
+        TreeVisitor (TGenerator * generator, SgProject * project) :
+          generator (generator), project (project)
+        {
+          using std::string;
+          using std::ofstream;
+
+          traverse (this->project, preorder);
+
+          string fileName;
+
+          switch (Globals::getInstance ()->getTargetBackend ())
+          {
+            case TargetLanguage::CUDA:
+            {
+              fileName = ".translator.cuda";
+
+              break;
+            }
+
+            case TargetLanguage::OPENMP:
+            {
+              fileName = ".translator.openmp";
+
+              break;
+            }
+
+            case TargetLanguage::OPENCL:
+            {
+              fileName = ".translator.opencl";
+
+              break;
+            }
+
+            default:
+            {
+              throw Exceptions::CommandLine::LanguageException (
+                  "Unknown/unsupported backend selected");
+            }
+          }
+
+          ofstream outputFile;
+
+          outputFile.open (fileName.c_str ());
+
+          outputFile << "files=";
+
+          for (vector <string>::iterator it = outputFiles.begin (); it
+              != outputFiles.end (); ++it)
+          {
+            outputFile << *it << " ";
+          }
+
+          outputFile << std::endl;
+
+          outputFile << "main=" + mainFile;
+
+          outputFile << std::endl;
+
+          outputFile.close ();
+        }
     };
 
-    TreeVisitor * visitor = new TreeVisitor (generator);
-
-    visitor->traverse (project, preorder);
+    new TreeVisitor (generator, project);
   }
 
 CPPSubroutinesGeneration *
@@ -415,6 +488,12 @@ main (int argc, char ** argv)
     std::cout << e.what () << std::endl;
 
     return Exceptions::CodeGeneration::FileCreationException::returnValue;
+  }
+  catch (Exceptions::ASTParsing::NoSourceFileException const & e)
+  {
+    std::cout << e.what () << std::endl;
+
+    return Exceptions::ASTParsing::NoSourceFileException::returnValue;
   }
 
   Debug::getInstance ()->debugMessage ("Translation completed",

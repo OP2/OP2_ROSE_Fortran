@@ -93,9 +93,31 @@ def clean ():
 	filesToRemove.extend(glob('*.mod'))
 	filesToRemove.extend(glob('hs_err_pid*.log'))
 	filesToRemove.extend(glob('~*'))
+	
+	# The translator generates a file specific to each backend
+	translatorCUDAFileName = ".translator.cuda"
+	translatorOpenCLFileName = ".translator.opencl"	
+	translatorOpenMPFileName = ".translator.openmp"
 
-	if opts.cuda or opts.openmp:
-		filesToRemove.extend(glob('rose*.[fF?]*')) 
+	generatedFile = None
+	if os.path.exists(translatorCUDAFileName) and opts.cuda:
+		generatedFile = open(translatorCUDAFileName, 'r')	
+	if os.path.exists(translatorOpenCLFileName) and opts.opencl:
+		generatedFile = open(translatorOpenCLFileName, 'r')
+	if  os.path.exists(translatorOpenMPFileName) and opts.openmp:
+		generatedFile = open(translatorOpenMPFileName, 'r')
+
+	if generatedFile is not None:
+		for line in generatedFile:
+			line  = line.strip()
+			if line.startswith("files="):
+				words = line.split('=')
+				files = words[1].strip().split(' ')
+				for compilationUnitFileName in files:
+					compilationUnitFileName = compilationUnitFileName.strip()
+					if compilationUnitFileName.startswith("rose_"):
+						filesToRemove.append(compilationUnitFileName)
+		generatedFile.close()
 
 	for file in filesToRemove:
 		if os.path.exists(file):
@@ -243,13 +265,30 @@ def renameFortranCUDAfile (generatedFiles):
 			debug.verboseMessage("Moving '%s' into '%s'" % (f, destinationName))
 			move(f, destinationName)
 
-def fixOP2Declarations (generatedFiles):
+def preprocessOP2HeaderFiles (filesToCompile, oxfordOP2HeaderInclude):
 	from tempfile import mkstemp
 	from shutil import move
 	from os import remove, close
 
-	oxfordOP2Header = '#include "OP2_OXFORD.h"'
-	imperialOP2Header = '#include "OP2_IMPERIAL.h"'
+	for file in filesToCompile:
+		#Create temp file
+		debug.verboseMessage("Analysing file '%s'" % file)
+		fh, abs_path = mkstemp()
+		new_file = open(abs_path,'w')
+		old_file = open(file)
+		for line in old_file:
+			new_file.write(line.replace('#include "op_lib_cpp.h"', oxfordOP2HeaderInclude))
+
+		new_file.close()
+		close(fh)
+		old_file.close()
+		remove(file)
+		move(abs_path, file)
+
+def postprocessOP2Declarations (generatedFiles, oxfordOP2HeaderInclude):
+	from tempfile import mkstemp
+	from shutil import move
+	from os import remove, close
 
 	for file in generatedFiles:
 		#Create temp file
@@ -258,8 +297,8 @@ def fixOP2Declarations (generatedFiles):
 		new_file = open(abs_path,'w')
 		old_file = open(file)
 		for line in old_file:
-			if oxfordOP2Header in line or imperialOP2Header in line:
-				new_file.write("//" + line)
+			if oxfordOP2HeaderInclude in line:
+				new_file.write("\n")
 			else:
 				new_file.write(line.replace("*(&OP_ID)", "OP_ID"))
 
@@ -268,6 +307,63 @@ def fixOP2Declarations (generatedFiles):
 		old_file.close()
 		remove(file)
 		move(abs_path, file)
+
+def createMakefile ():
+	# The translator generates a file specific to each backend
+	translatorCUDAFileName = ".translator.cuda"
+	translatorOpenCLFileName = ".translator.opencl"	
+	translatorOpenMPFileName = ".translator.openmp"
+
+	generatedFile = None
+	if os.path.exists(translatorCUDAFileName) and opts.cuda:
+		generatedFile = open(translatorCUDAFileName, 'r')	
+	if os.path.exists(translatorOpenCLFileName) and opts.opencl:
+		generatedFile = open(translatorOpenCLFileName, 'r')
+	if  os.path.exists(translatorOpenMPFileName) and opts.openmp:
+		generatedFile = open(translatorOpenMPFileName, 'r')
+
+	mainCompilationUnit = None
+	compilationUnits    = []
+	if generatedFile is not None:
+		for line in generatedFile:
+			line  = line.strip()
+			if line.startswith("main="):
+				words               = line.split('=')
+				mainCompilationUnit = words[1].strip().split(' ')[0]
+			elif line.startswith("files="):
+				words = line.split('=')
+				files = words[1].strip().split(' ')
+				for compilationUnitFileName in files:
+					compilationUnitFileName = compilationUnitFileName.strip()
+					compilationUnits.append(compilationUnitFileName)
+	generatedFile.close()
+	
+	makefile = None
+
+	if opts.cuda:
+		makefile = open('Makefile.cuda', 'w')	
+		makefile.write("OUT = binary_cuda\n")
+
+	elif opts.opencl:
+		makefile = open('Makefile.opencl', 'w')
+		makefile.write("OUT = binary_opencl\n")
+
+	elif opts.openmp:
+		makefile = open('Makefile.openmp', 'w')
+		makefile.write("OUT      = binary_openmp\n")
+		makefile.write("CPP      = g++\n")
+		makefile.write("CPPFLAGS = -g -fPIC -Wall -DUNIX -fopenmp\n")
+		makefile.write("\n")
+		
+		makefile.write("$(OUT): ")
+		for file in compilationUnits:
+			makefile.write("%s " % file)
+		
+		makefile.write("\n")
+		makefile.write("\t")
+		makefile.write("$(CPP) %s $(CPPFLAGS) -I$(OP2_INSTALL_PATH)/c/include -L$(OP2_INSTALL_PATH)/c/lib -lm -lop2_openmp -o $(OUT)\n" % mainCompilationUnit)
+
+	makefile.close()
 
 def handleFortranProject (filesToCompile):
 	from FormatFortranCode import FormatFortranCode	
@@ -288,13 +384,18 @@ def handleFortranProject (filesToCompile):
 def handleCPPProject (filesToCompile):
 	from glob import glob
 
+	oxfordOP2HeaderInclude = '#include "OP2_OXFORD.h"'
+	preprocessOP2HeaderFiles (filesToCompile, oxfordOP2HeaderInclude)
+
 	cmd = getCPPCompilationCommand (filesToCompile)
 	runCompiler (cmd)
 
 	# The files generated by our compiler
 	generatedFiles = glob(os.getcwd() + os.sep + "rose_*")
 
-	fixOP2Declarations (generatedFiles)
+	postprocessOP2Declarations (generatedFiles, oxfordOP2HeaderInclude)
+
+	createMakefile ()
 
 if opts.clean:
 	clean()
