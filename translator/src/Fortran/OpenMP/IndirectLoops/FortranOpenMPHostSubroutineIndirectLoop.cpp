@@ -237,6 +237,8 @@ FortranOpenMPHostSubroutineIndirectLoop::createConvertLocalToGlobalMappingStatem
                     parameterExpression2, parameterExpression3);
 
         appendStatement (callStatement, block);
+
+        index++;
       }
     }
   }

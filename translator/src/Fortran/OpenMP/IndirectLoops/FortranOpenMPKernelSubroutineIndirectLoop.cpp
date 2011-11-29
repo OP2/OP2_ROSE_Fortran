@@ -67,7 +67,7 @@ FortranOpenMPKernelSubroutineIndirectLoop::createUserSubroutineCallStatement ()
 
         SgSubscriptExpression * subsricptExpression =
             new SgSubscriptExpression (RoseHelper::getFileInfo (),
-                multiplyExpression, subtractExpression, buildIntVal (1));
+                addExpression2, subtractExpression, buildIntVal (1));
 
         subsricptExpression->set_endOfConstruct (RoseHelper::getFileInfo ());
 
@@ -631,6 +631,9 @@ FortranOpenMPKernelSubroutineIndirectLoop::createInitialiseBytesPerOpDatStatemen
    * ======================================================
    */
 
+  bool firstIndirectOpDat = true;
+  unsigned int lastIndirectOpDat;
+
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
     if (parallelLoop->isDuplicateOpDat (i) == false)
@@ -642,15 +645,26 @@ FortranOpenMPKernelSubroutineIndirectLoop::createInitialiseBytesPerOpDatStatemen
                 + parallelLoop->getOpDatVariableName (i) + "'",
             Debug::HIGHEST_DEBUG_LEVEL, __FILE__, __LINE__);
 
-        SgMultiplyOp * multiplyExpression = buildMultiplyOp (
-            variableDeclarations->getReference (getIndirectOpDatSizeName (i)),
-            buildIntVal (parallelLoop->getOpDatDimension (i)));
+        if (firstIndirectOpDat)
+        {
+          firstIndirectOpDat = false;
+          lastIndirectOpDat = i;
+        }
+        else
+        {
+          SgMultiplyOp * multiplyExpression = buildMultiplyOp (
+              variableDeclarations->getReference (getIndirectOpDatSizeName (
+                  lastIndirectOpDat)), buildIntVal (
+                  parallelLoop->getOpDatDimension (lastIndirectOpDat)));
 
-        SgExprStatement * assignmentStatement = buildAssignStatement (
-            variableDeclarations->getReference (getRoundUpVariableName (i)),
-            multiplyExpression);
+          SgExprStatement * assignmentStatement = buildAssignStatement (
+              variableDeclarations->getReference (getRoundUpVariableName (i)),
+              multiplyExpression);
 
-        appendStatement (assignmentStatement, subroutineScope);
+          appendStatement (assignmentStatement, subroutineScope);
+
+          lastIndirectOpDat = i;
+        }
       }
     }
   }
@@ -661,7 +675,7 @@ FortranOpenMPKernelSubroutineIndirectLoop::createInitialiseBytesPerOpDatStatemen
    * ======================================================
    */
 
-  bool firstInitialization = true;
+  firstIndirectOpDat = true;
 
   for (unsigned int i = 1, lasti = 1; i
       <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
@@ -675,9 +689,9 @@ FortranOpenMPKernelSubroutineIndirectLoop::createInitialiseBytesPerOpDatStatemen
 
       if (parallelLoop->isIndirect (i))
       {
-        if (firstInitialization)
+        if (firstIndirectOpDat)
         {
-          firstInitialization = false;
+          firstIndirectOpDat = false;
 
           SgExprStatement * assignmentStatement = buildAssignStatement (
               variableDeclarations->getReference (getNumberOfBytesVariableName (
