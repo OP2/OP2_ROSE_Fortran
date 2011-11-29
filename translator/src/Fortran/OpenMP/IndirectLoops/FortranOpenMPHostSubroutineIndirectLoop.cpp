@@ -176,7 +176,7 @@ FortranOpenMPHostSubroutineIndirectLoop::createConvertGlobalToLocalMappingStatem
           variableDeclarations->getReference (indirectionDescriptorArray),
           buildIntVal (i));
 
-      SgGreaterThanOp * ifGuardExpression = buildGreaterThanOp (
+      SgGreaterOrEqualOp * ifGuardExpression = buildGreaterOrEqualOp (
           arrayExpression, buildIntVal (0));
 
       SgIfStmt * ifStatement =
@@ -441,9 +441,12 @@ FortranOpenMPHostSubroutineIndirectLoop::createPlanFunctionEpilogueStatements ()
       getActualPlanVariableName (parallelLoop->getUserSubroutineName ())),
       buildOpaqueVarRefExp (nblocks, subroutineScope));
 
+  SgMultiplyOp * multiplyExpressionG3 = buildMultiplyOp (dotExpressionG3,
+      variableDeclarations->getReference (numberOfIndirectOpDats));
+
   SgAggregateInitializer * parameterExpressionG3 =
       FortranStatementsAndExpressionsBuilder::buildShapeExpression (
-          dotExpressionG3);
+          multiplyExpressionG3);
 
   SgStatement
       * callStatementG =

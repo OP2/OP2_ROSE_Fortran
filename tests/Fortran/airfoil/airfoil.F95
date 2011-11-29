@@ -194,6 +194,8 @@ program AIRFOIL
     ncellr = real ( ncell )
     rms = sqrt ( rms / ncellr )
 
+    print *, "=====> Iteration result ", rms
+
   end do ! external loop
 
 end program AIRFOIL
