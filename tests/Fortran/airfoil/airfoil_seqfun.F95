@@ -4,6 +4,54 @@ use CONSTANTVARS
 
 contains
 
+   subroutine fused ( x1, x2, x3, x4, q, qold, adt ) BIND(C)
+
+     implicit none
+
+     ! formal parameters
+     real(8), dimension(*) :: x1
+     real(8), dimension(*) :: x2
+     real(8), dimension(*) :: x3
+     real(8), dimension(*) :: x4
+     real(8), dimension(4) :: q
+     real(8), dimension(4) :: qold
+     real(8), dimension(1) :: adt
+
+     ! iteration variable
+     integer(4) :: i
+
+   real(8) :: dx, dy, ri, u, v, c
+
+     do i = 1, 4
+       qold(i) = q(i)
+     end do
+
+     ! computation
+     ri = 1.0 / q(1)
+     u = ri * q(2)
+     v = ri * q(3)
+     c = sqrt ( gam * gm1 * ( ri * q(4) - 0.5 * ( u*u + v*v ) ) )
+
+     dx = x2(1) - x1(1)
+     dy = x2(2) - x1(2)
+     adt = abs ( u * dy - v * dx ) + c * sqrt ( dx*dx + dy*dy )
+
+     dx = x3(1) - x2(1)
+     dy = x3(2) - x2(2)
+     adt = adt + abs ( u * dy - v * dx ) + c * sqrt ( dx*dx + dy*dy )
+
+     dx = x4(1) - x3(1)
+     dy = x4(2) - x3(2)
+     adt = adt + abs ( u * dy - v * dx ) + c * sqrt ( dx*dx + dy*dy )
+
+     dx = x1(1) - x4(1)
+     dy = x1(2) - x4(2)
+     adt = adt + abs ( u * dy - v * dx ) + c * sqrt ( dx*dx + dy*dy )
+
+     adt = adt / cfl
+
+   end subroutine
+
 subroutine save_soln ( q, qold ) BIND(C)
   implicit none
 

@@ -112,7 +112,7 @@ FortranCUDAHostSubroutine::createReductionEpilogueStatements ()
 
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
-    if (parallelLoop->isReductionRequired (i) == true)
+    if (parallelLoop->isReductionRequired (i))
     {
       if (parallelLoop->getOpDatDimension (i) == 1)
       {
@@ -284,7 +284,7 @@ FortranCUDAHostSubroutine::createReductionDeclarations ()
 }
 
 SgExpression *
-FortranCUDAHostSubroutine::createRHSOfInitialiseOpDatCardinalityStatement (
+FortranCUDAHostSubroutine::getOpDatCardinalityInitialisationExpression (
     SgScopeStatement * scope, unsigned int OP_DAT_ArgumentGroup)
 {
   using namespace SageBuilder;
@@ -339,9 +339,9 @@ FortranCUDAHostSubroutine::createRHSOfInitialiseOpDatCardinalityStatement (
   else if (parallelLoop->isArray (OP_DAT_ArgumentGroup)
       && parallelLoop->isRead (OP_DAT_ArgumentGroup))
   {
-    SgDotExp * dotExpression = buildDotExp (variableDeclarations->getReference (
-        getOpDatName (OP_DAT_ArgumentGroup)), buildOpaqueVarRefExp (dim,
-        scope));
+    SgDotExp * dotExpression =
+        buildDotExp (variableDeclarations->getReference (getOpDatName (
+            OP_DAT_ArgumentGroup)), buildOpaqueVarRefExp (dim, scope));
 
     return dotExpression;
   }
@@ -432,7 +432,7 @@ FortranCUDAHostSubroutine::createTransferOpDatStatements ()
                 getOpDatCardinalityName (i)));
 
         SgExpression * rhsOfAssigment =
-            createRHSOfInitialiseOpDatCardinalityStatement (block, i);
+            getOpDatCardinalityInitialisationExpression (block, i);
 
         SgExprStatement * assignmentStatement = buildAssignStatement (
             dotExpression, rhsOfAssigment);
@@ -456,7 +456,7 @@ FortranCUDAHostSubroutine::createTransferOpDatStatements ()
       if (fortranParallelLoop->isCardinalityDeclarationNeeded (i))
       {
         SgExpression * rhsOfAssigment =
-            createRHSOfInitialiseOpDatCardinalityStatement (block, i);
+            getOpDatCardinalityInitialisationExpression (block, i);
 
         SgExprStatement * assignmentStatement = buildAssignStatement (
             variableDeclarations->getReference (getOpDatCardinalityName (i)),
@@ -682,6 +682,14 @@ FortranCUDAHostSubroutine::createDataMarshallingDeclarations ()
                   variableName, FortranTypesBuilder::getArray_RankOne (
                       parallelLoop->getOpDatBaseType (i)), subroutineScope, 2,
                   CUDA_DEVICE, ALLOCATABLE));
+
+          string const & variableName2 = getOpDatHostName (i);
+
+          variableDeclarations->add (
+              variableName2,
+              FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
+                  variableName2, buildPointerType (
+                      parallelLoop->getOpDatBaseType (i)), subroutineScope));
         }
         else
         {

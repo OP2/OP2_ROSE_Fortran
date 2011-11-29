@@ -1,16 +1,16 @@
-#include <FortranCUDAKernelSubroutine.h>
-#include <FortranCUDAUserSubroutine.h>
-#include <FortranParallelLoop.h>
-#include <FortranCUDAModuleDeclarations.h>
-#include <FortranReductionSubroutines.h>
-#include <FortranCUDAReductionSubroutine.h>
-#include <FortranTypesBuilder.h>
-#include <FortranStatementsAndExpressionsBuilder.h>
-#include <RoseHelper.h>
-#include <Reduction.h>
-#include <Debug.h>
-#include <CompilerGeneratedNames.h>
-#include <CUDA.h>
+#include "FortranCUDAKernelSubroutine.h"
+#include "FortranCUDAUserSubroutine.h"
+#include "FortranParallelLoop.h"
+#include "FortranCUDAModuleDeclarations.h"
+#include "FortranReductionSubroutines.h"
+#include "FortranCUDAReductionSubroutine.h"
+#include "FortranTypesBuilder.h"
+#include "FortranStatementsAndExpressionsBuilder.h"
+#include "RoseHelper.h"
+#include "Reduction.h"
+#include "Debug.h"
+#include "CompilerGeneratedNames.h"
+#include "CUDA.h"
 
 void
 FortranCUDAKernelSubroutine::createReductionEpilogueStatements ()
@@ -120,7 +120,7 @@ FortranCUDAKernelSubroutine::createCUDAStageInVariablesVariableDeclarations ()
   {
     string const & variableName = getOpDatLocalName (i);
 
-    if (parallelLoop->isCUDAStageInVariableDeclarationNeeded (i))
+    if (parallelLoop->isStageInNeeded (i))
     {
       if (parallelLoop->isGlobal (i) && parallelLoop->isArray (i) == false)
       {
@@ -162,9 +162,9 @@ FortranCUDAKernelSubroutine::createCUDASharedVariableDeclarations ()
       if (parallelLoop->isIndirect (i) || (parallelLoop->isDirect (i)
           && parallelLoop->getOpDatDimension (i) > 1))
       {
-        string const autosharedVariableName =
-            getSharedMemoryDeclarationName (parallelLoop->getOpDatBaseType (
-                i), parallelLoop->getSizeOfOpDat (i));
+        string const autosharedVariableName = getSharedMemoryDeclarationName (
+            parallelLoop->getOpDatBaseType (i),
+            parallelLoop->getSizeOfOpDat (i));
 
         if (find (autosharedNames.begin (), autosharedNames.end (),
             autosharedVariableName) == autosharedNames.end ())

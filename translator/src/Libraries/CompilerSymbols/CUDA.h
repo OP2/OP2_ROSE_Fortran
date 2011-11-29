@@ -21,6 +21,11 @@ enum THREAD_BLOCK_DIMENSION
 
 namespace CUDA
 {
+  namespace CPP
+  {
+    std::string const OP2RuntimeSupport = "op_cuda_rt_support.h";
+  }
+
   std::string const blocksPerGrid = "blocksPerGrid";
   std::string const threadsPerBlock = "threadsPerBlock";
   std::string const sharedMemorySize = "dynamicSharedMemorySize";

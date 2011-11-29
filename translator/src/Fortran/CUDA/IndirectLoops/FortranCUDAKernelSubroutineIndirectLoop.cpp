@@ -267,8 +267,8 @@ FortranCUDAKernelSubroutineIndirectLoop::createIncrementAndWriteAccessEpilogueSt
               variableDeclarations->getReference (opDatDimensions),
               dimensionsDeclaration->getOpDatDimensionField (i));
 
-          SgMultiplyOp * multiplyExpression1 = buildMultiplyOp (
-              variableDeclarations->getReference (
+          SgMultiplyOp * multiplyExpression1 =
+              buildMultiplyOp (variableDeclarations->getReference (
                   getIndirectOpDatSizeName (i)), dotExpression2);
 
           SgLessThanOp * lessThanExpression1 = buildLessThanOp (
@@ -790,8 +790,8 @@ FortranCUDAKernelSubroutineIndirectLoop::createInitialiseCUDASharedVariablesStat
             dimensionsDeclaration->getOpDatDimensionField (i));
 
         SgMultiplyOp * multiplyExpression2 = buildMultiplyOp (
-            variableDeclarations->getReference (getIndirectOpDatSizeName (
-                i)), dotExpression2);
+            variableDeclarations->getReference (getIndirectOpDatSizeName (i)),
+            dotExpression2);
 
         SgExprStatement * assignmentStatement2 = buildAssignStatement (
             variableDeclarations->getReference (getUpperBoundVariableName (1)),
@@ -1053,8 +1053,8 @@ FortranCUDAKernelSubroutineIndirectLoop::createInitialiseBytesPerOpDatStatements
             dimensionsDeclaration->getOpDatDimensionField (i));
 
         SgMultiplyOp * multiplyExpression = buildMultiplyOp (
-            variableDeclarations->getReference (getIndirectOpDatSizeName (
-                i)), dotExpression);
+            variableDeclarations->getReference (getIndirectOpDatSizeName (i)),
+            dotExpression);
 
         SgExprStatement * assignmentStatement = buildAssignStatement (
             variableDeclarations->getReference (getRoundUpVariableName (i)),
@@ -1223,7 +1223,7 @@ FortranCUDAKernelSubroutineIndirectLoop::createThreadZeroStatements ()
       {
         SgMultiplyOp * multiplyExpression = buildMultiplyOp (
             variableDeclarations->getReference (blockID), buildIntVal (
-                parallelLoop->getNumberOfDistinctIndirectOpDatArguments ()));
+                parallelLoop->getNumberOfDistinctIndirectOpDats ()));
 
         SgAddOp * addExpression = buildAddOp (buildIntVal (offset),
             multiplyExpression);
@@ -1232,8 +1232,8 @@ FortranCUDAKernelSubroutineIndirectLoop::createThreadZeroStatements ()
             variableDeclarations->getReference (pindSizes), addExpression);
 
         SgExprStatement * assignmentStatement = buildAssignStatement (
-            variableDeclarations->getReference (getIndirectOpDatSizeName (
-                i)), arrayExpression);
+            variableDeclarations->getReference (getIndirectOpDatSizeName (i)),
+            arrayExpression);
 
         appendStatement (assignmentStatement, ifBlock);
 

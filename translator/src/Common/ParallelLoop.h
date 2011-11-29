@@ -161,15 +161,6 @@ class ParallelLoop
     bool
     isDirectLoop ();
 
-    /*
-     * ======================================================
-     * How many OP_DAT arguments have indirect access
-     * descriptors?
-     * ======================================================
-     */
-    unsigned int
-    getNumberOfDistinctIndirectOpDatArguments ();
-
     void
     setOpDatType (unsigned int OP_DAT_ArgumentGroup, SgType * type);
 
@@ -324,13 +315,13 @@ class ParallelLoop
 
     /*
      * ======================================================
-     * Does this OP_DAT argument group need a variable
-     * declaration in CUDA in order to stage in data from device
-     * memory?
+     * Does this OP_DAT argument group need its data to be
+     * staged in from upper levels of the memory hierarchy
+     * into lower levels?
      * ======================================================
      */
     bool
-    isCUDAStageInVariableDeclarationNeeded (unsigned int OP_DAT_ArgumentGroup);
+    isStageInNeeded (unsigned int OP_DAT_ArgumentGroup);
 
     /*
      * ======================================================

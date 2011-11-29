@@ -67,23 +67,6 @@ ParallelLoop::isDirectLoop ()
   return true;
 }
 
-unsigned int
-ParallelLoop::getNumberOfDistinctIndirectOpDatArguments ()
-{
-  unsigned int count = 0;
-  for (unsigned int i = 1; i <= getNumberOfOpDatArgumentGroups (); ++i)
-  {
-    if (OpDatDuplicates[i] == false)
-    {
-      if (OpDatMappingDescriptors[i] == INDIRECT)
-      {
-        count++;
-      }
-    }
-  }
-  return count;
-}
-
 void
 ParallelLoop::setOpDatType (unsigned int OP_DAT_ArgumentGroup, SgType * type)
 {
@@ -364,7 +347,7 @@ ParallelLoop::setUniqueOpDat (std::string const & variableName)
 }
 
 bool
-ParallelLoop::isCUDAStageInVariableDeclarationNeeded (
+ParallelLoop::isStageInNeeded (
     unsigned int OP_DAT_ArgumentGroup)
 {
   /*

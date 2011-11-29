@@ -1,14 +1,16 @@
-#include <CPPCUDASubroutinesGeneration.h>
-#include <CPPParallelLoop.h>
-#include <CPPProgramDeclarationsAndDefinitions.h>
-#include <CPPCUDAKernelSubroutine.h>
-#include <CPPCUDAKernelSubroutineDirectLoop.h>
-#include <CPPCUDAHostSubroutineDirectLoop.h>
-#include <CPPCUDAKernelSubroutineIndirectLoop.h>
-#include <CPPCUDAHostSubroutineIndirectLoop.h>
-#include <CPPCUDAUserSubroutine.h>
-#include <CPPCUDAReductionSubroutine.h>
-#include <CPPReductionSubroutines.h>
+#include "CPPCUDASubroutinesGeneration.h"
+#include "CPPParallelLoop.h"
+#include "CPPProgramDeclarationsAndDefinitions.h"
+#include "CPPCUDAKernelSubroutine.h"
+#include "CPPCUDAKernelSubroutineDirectLoop.h"
+#include "CPPCUDAHostSubroutineDirectLoop.h"
+#include "CPPCUDAKernelSubroutineIndirectLoop.h"
+#include "CPPCUDAHostSubroutineIndirectLoop.h"
+#include "CPPCUDAUserSubroutine.h"
+#include "CPPCUDAReductionSubroutine.h"
+#include "CPPReductionSubroutines.h"
+#include "CUDA.h"
+#include "OP2.h"
 
 void
 CPPCUDASubroutinesGeneration::createReductionSubroutines ()
@@ -48,6 +50,14 @@ CPPCUDASubroutinesGeneration::createReductionSubroutines ()
 void
 CPPCUDASubroutinesGeneration::addHeaderIncludes ()
 {
+  using namespace SageInterface;
+
+  addTextForUnparser (moduleScope, "#include \""
+      + OP2::Libraries::CPP::mainLibrary + "\"\n",
+      AstUnparseAttribute::e_before);
+
+  addTextForUnparser (moduleScope, "#include \"" + CUDA::CPP::OP2RuntimeSupport
+      + "\"\n", AstUnparseAttribute::e_before);
 }
 
 void

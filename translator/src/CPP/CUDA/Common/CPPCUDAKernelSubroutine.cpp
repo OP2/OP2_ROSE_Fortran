@@ -300,7 +300,7 @@ CPPCUDAKernelSubroutine::createCUDAStageInVariablesVariableDeclarations ()
   {
     string const & variableName = getOpDatLocalName (i);
 
-    if (parallelLoop->isCUDAStageInVariableDeclarationNeeded (i))
+    if (parallelLoop->isStageInNeeded (i))
     {
       if (parallelLoop->isReductionRequired (i))
       {

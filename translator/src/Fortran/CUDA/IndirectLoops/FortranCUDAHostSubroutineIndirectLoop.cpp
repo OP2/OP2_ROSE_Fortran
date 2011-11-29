@@ -952,7 +952,7 @@ FortranCUDAHostSubroutineIndirectLoop::createPlanFunctionParametersPreparationSt
 
   SgExprStatement * assignmentStatement3 = buildAssignStatement (
       variableDeclarations->getReference (numberOfIndirectOpDats), buildIntVal (
-          parallelLoop->getNumberOfDistinctIndirectOpDatArguments ()));
+          parallelLoop->getNumberOfDistinctIndirectOpDats ()));
 
   appendStatement (assignmentStatement3, block);
 
@@ -1168,7 +1168,8 @@ FortranCUDAHostSubroutineIndirectLoop::createExecutionPlanDeclarations ()
 
   /*
    * ======================================================
-   * Create pointer to the
+   * Create pointer to the array containing arrays of
+   * local to global mappings
    * ======================================================
    */
 

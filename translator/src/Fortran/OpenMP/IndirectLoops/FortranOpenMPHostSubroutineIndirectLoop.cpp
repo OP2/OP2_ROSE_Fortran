@@ -1042,7 +1042,7 @@ FortranOpenMPHostSubroutineIndirectLoop::createSetUpPlanFunctionActualParameters
 
   SgExprStatement * assignmentStatement3 = buildAssignStatement (
       variableDeclarations->getReference (numberOfIndirectOpDats), buildIntVal (
-          parallelLoop->getNumberOfDistinctIndirectOpDatArguments ()));
+          parallelLoop->getNumberOfDistinctIndirectOpDats ()));
 
   appendStatement (assignmentStatement3, block);
 

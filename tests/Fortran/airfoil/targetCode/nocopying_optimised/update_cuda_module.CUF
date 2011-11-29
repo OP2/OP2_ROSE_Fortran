@@ -516,8 +516,6 @@ contains
 			! arguments *plus* the size of the needed memory for the reduction variable (see below)
 			nshared = nshared * nthreads
 
-	!		nshared = max ( nshared * nthreads, reductSize * nthreads )
-			
 			! copy arguments from host to device
 
 			! 1. transfer C pointers to Fortran pointers
@@ -537,125 +535,33 @@ contains
 			arg4Size = arg4%dim
 			call c_f_pointer ( arg4%dat, c2fPtrArg4, (/arg4Size/) )
 
-
-
-
-
-			! in Fortran CUDA we have to allocate enough automatic shared memory
-			! directly from here, and to fit all information in the "same space:
-			! (see the difference between Fortran CUDA automatic shared variables
-			! and C CUDA ones)
-
-			! the start offset of dynamically allocated shared memory is the end of the previously
-			! allocated shared space used for some of the parallel loop variables
 			redStartOffset = nshared
 
-			! Adding up memory space for shared variable in reduction routine
-			! (this is actually the max addressable position in the reduction variable)
 			maxReductionSize = nthreads * 8 !( nthreads - 1 ) +  ishft ( nblocks, -1 ) * reductSize 
 			nshared = nshared + maxReductionSize
-
-!		end if
-
-!		print *, arg4Size
-
-
 
 		! 2. allocate space on device for reduction variable (old value, the new value is computed in redArrayDev)
 		allocate ( argument4 ( arg4Size ) )
 
-
-		
-
-
-
-	
-
-		! initialise redArrayHost to 0
-!		do i = 1, reductItems !reductionItems = maxblocks
-!		
-!			redArrayDev(i) = 0.0 ! real(8) variable
-!		
-!		end do
-!
-!
-
 		! this to guarantee that the actual reduct value respects user modifications in the main program
 		argument4 = c2fPtrArg4
-
-
-		istat = cudaEventRecord ( stopHostTime, 0 )
-		istat = cudaEventSynchronize ( stopHostTime )
-		istat = cudaEventElapsedTime ( tmpHostTime, startHostTime, stopHostTime )
-
-		op_par_loop_update%hostTime = 0
-		op_par_loop_update%hostTime = op_par_loop_update%hostTime + tmpHostTime
-		tmpHostTime = 0
-
-		istat = cudaEventRecord ( startKernelTime, 0 )
 		
+		call  op_cuda_update <<< nblocks, nthreads, nshared >>> ( argSizes, argument0, argument1, argument2, argument3, redArrayDev, offsetS, 
+set%size, warpSizeOP2,redStartOffset)
 
-		call  op_cuda_update <<< nblocks, nthreads, nshared >>> ( argSizes, &
-																														&	argument0, &
-																														& argument1, &
-																														& argument2, &
-																														& argument3, &
-																														& redArrayDev, &
-																														& offsetS, &
-																														& set%size, &
-																														& warpSizeOP2, &
-																														& redStartOffset &
-																													& )
-
-		! synchronise threads after kernel call
 		threadSynchRet = cudaThreadSynchronize()
 
-		istat = cudaEventRecord ( stopKernelTime, 0 )
-		istat = cudaEventSynchronize ( stopKernelTime )
-		istat = cudaEventElapsedTime ( op_par_loop_update%kernelTime, startKernelTime, stopKernelTime )
-
-		
-		istat = cudaEventRecord ( startHostTime, 0 )
-
-		
-
-		! 2. reduct the host array to the single user variable
-		! implements:
-		! for (int b=0; b<maxblocks; b++)
-    !		for (int d=0; d<1; d++)
-		!			arg4h[d] = arg4h[d] + ((double *)arg4.dat)[d+b*1];
 		do b = 1, reductItems
-		
 			do d = 0, 0
-
-				! 1 for argument4 is needed because we map scalar variables to array of 1 position
-				! possibly this works always because global data are always scalar values?
-				
-				! +1 is needed because in this case we are using the Fortran indexing notation (1:N)
-				partialArg4Sum = argument4(d+1)
-				partialRedArrayDev4Sum = redArrayDev ( d + b * 1 )
-				argument4(d+1) = partialArg4Sum + partialRedArrayDev4Sum
-				!c2fPtrArg4(d+1) = c2fPtrArg4(d+1) + redArrayHost ( d + b * 1 )
-			
+				argument4(d+1) = argument4(d+1) + redArrayDev ( d + b * 1 )
 			end do
-		
 		end do
 
-		
-		! copy back device to host of global variable
 		c2fPtrArg4 = argument4
-
-		istat = cudaEventRecord ( stopHostTime, 0 )
-		istat = cudaEventSynchronize ( stopHostTime )
-		istat = cudaEventElapsedTime ( tmpHostTime, startHostTime, stopHostTime )
-
-		op_par_loop_update%hostTime = op_par_loop_update%hostTime + tmpHostTime	
 
 		deallocate ( redArrayDev )
 		deallocate ( argument4 )
 		
 	end function op_par_loop_update
-
-	
 
 end module update_cuda_module
