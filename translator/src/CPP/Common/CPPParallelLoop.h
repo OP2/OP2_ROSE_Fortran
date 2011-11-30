@@ -24,8 +24,7 @@ class CPPParallelLoop: public ParallelLoop
 
   public:
 
-    CPPParallelLoop (SgFunctionCallExp * functionCallExpression,
-        std::string fileName);
+    CPPParallelLoop (SgFunctionCallExp * functionCallExpression);
 };
 
 #endif

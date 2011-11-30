@@ -435,8 +435,8 @@ FortranCUDAKernelSubroutineDirectLoop::createExecutionLoopStatements ()
 
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
-    if (parallelLoop->isGlobal (i) == false && parallelLoop->isWritten (i)
-        == false && parallelLoop->getOpDatDimension (i) != 1)
+    if (parallelLoop->isDirect (i) && parallelLoop->isWritten (i) == false
+        && parallelLoop->getOpDatDimension (i) > 1)
     {
       Debug::getInstance ()->debugMessage (
           "Creating statements to stage in from device memory to shared memory for OP_DAT "
@@ -460,8 +460,8 @@ FortranCUDAKernelSubroutineDirectLoop::createExecutionLoopStatements ()
 
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
-    if (parallelLoop->isGlobal (i) == false && parallelLoop->isRead (i)
-        == false && parallelLoop->getOpDatDimension (i) != 1)
+    if (parallelLoop->isDirect (i) && parallelLoop->isRead (i) == false
+        && parallelLoop->getOpDatDimension (i) > 1)
     {
       Debug::getInstance ()->debugMessage (
           "Creating statements to stage out from local memory to shared memory for OP_DAT "
@@ -532,7 +532,7 @@ FortranCUDAKernelSubroutineDirectLoop::createInitialiseOffsetIntoCUDASharedVaria
   {
     if (parallelLoop->isDuplicateOpDat (i) == false)
     {
-      if (parallelLoop->isGlobal (i) == false)
+      if (parallelLoop->isDirect (i) && parallelLoop->getOpDatDimension (i) > 1)
       {
         string const autosharedOffsetVariableName =
             getSharedMemoryOffsetDeclarationName (
@@ -606,7 +606,7 @@ FortranCUDAKernelSubroutineDirectLoop::createStatements ()
 
   createExecutionLoopStatements ();
 
-  if (parallelLoop->isReductionRequired () == true)
+  if (parallelLoop->isReductionRequired ())
   {
     createReductionEpilogueStatements ();
   }

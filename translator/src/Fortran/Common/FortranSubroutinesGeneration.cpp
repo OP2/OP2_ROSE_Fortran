@@ -67,7 +67,7 @@ FortranSubroutinesGeneration::addUserSubroutineNameDeclaration (
   return variableDeclaration;
 }
 
-SgScopeStatement *
+void
 FortranSubroutinesGeneration::addModuleUseStatement (SgNode * parent,
     std::string const & moduleName)
 {
@@ -101,8 +101,6 @@ FortranSubroutinesGeneration::addModuleUseStatement (SgNode * parent,
       headersWithAddedUseStatements.push_back (
           parentStatement->get_name ().getString ());
     }
-
-    return scope;
   }
   else if (isSgProcedureHeaderStatement (parent))
   {
@@ -128,8 +126,6 @@ FortranSubroutinesGeneration::addModuleUseStatement (SgNode * parent,
       headersWithAddedUseStatements.push_back (
           parentStatement->get_name ().getString ());
     }
-
-    return scope;
   }
   else
   {
@@ -167,13 +163,6 @@ FortranSubroutinesGeneration::patchCallsToParallelLoops (
     FortranHostSubroutine * hostSubroutine =
         hostSubroutines[userSubroutineName];
 
-    /*
-     * ======================================================
-     * Recursively go back in the scopes until we can find the
-     * program header or subroutine header
-     * ======================================================
-     */
-
     for (vector <SgFunctionCallExp *>::const_iterator it =
         parallelLoop->getFirstFunctionCall (); it
         != parallelLoop->getLastFunctionCall (); ++it)
@@ -181,6 +170,14 @@ FortranSubroutinesGeneration::patchCallsToParallelLoops (
       SgFunctionCallExp * functionCallExpression = *it;
 
       ROSE_ASSERT (isSgExprStatement(functionCallExpression->get_parent()));
+
+      /*
+       * ======================================================
+       * Recursively go back in the scopes until we can find the
+       * program header or subroutine header in which the
+       * OP_PAR_LOOP call is contained
+       * ======================================================
+       */
 
       SgNode * parent = functionCallExpression->get_parent ();
 
@@ -192,12 +189,11 @@ FortranSubroutinesGeneration::patchCallsToParallelLoops (
 
       /*
        * ======================================================
-       * Add module use statement
+       * Add module use statement to the scope just obtained
        * ======================================================
        */
 
-      SgScopeStatement * parentScope = addModuleUseStatement (parent,
-          moduleName);
+      addModuleUseStatement (parent, moduleName);
 
       /*
        * ======================================================
@@ -205,12 +201,6 @@ FortranSubroutinesGeneration::patchCallsToParallelLoops (
        * built host subroutine
        * ======================================================
        */
-
-      if (find (dirtyFiles.begin (), dirtyFiles.end (),
-          parallelLoop->getFileName ()) == dirtyFiles.end ())
-      {
-        dirtyFiles.push_back (parallelLoop->getFileName ());
-      }
 
       SgFunctionRefExp * hostSubroutineReference = buildFunctionRefExp (
           hostSubroutine->getSubroutineHeaderStatement ());
@@ -308,6 +298,8 @@ FortranSubroutinesGeneration::generate ()
   createSubroutines ();
 
   patchCallsToParallelLoops (moduleName);
+
+  determineWhichInputFilesToBeUnparsed ();
 }
 
 FortranSubroutinesGeneration::FortranSubroutinesGeneration (

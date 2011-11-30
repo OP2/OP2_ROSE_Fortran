@@ -495,7 +495,9 @@ FortranProgramDeclarationsAndDefinitions::visit (SgNode * node)
              */
 
             FortranParallelLoop * parallelLoop = new FortranParallelLoop (
-                functionCallExp, currentSourceFile);
+                functionCallExp);
+
+            parallelLoop->addFileName (currentSourceFile);
 
             parallelLoops[userSubroutineName] = parallelLoop;
 
@@ -512,6 +514,8 @@ FortranProgramDeclarationsAndDefinitions::visit (SgNode * node)
             ParallelLoop * parallelLoop = parallelLoops[userSubroutineName];
 
             parallelLoop->addFunctionCallExpression (functionCallExp);
+
+            parallelLoop->addFileName (currentSourceFile);
           }
         }
 

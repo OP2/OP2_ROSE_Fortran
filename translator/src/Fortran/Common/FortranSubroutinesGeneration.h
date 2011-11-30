@@ -38,7 +38,7 @@ class FortranSubroutinesGeneration: public SubroutinesGeneration <
     addUserSubroutineNameDeclaration (SgScopeStatement * scope,
         std::string const & userSubroutineName);
 
-    SgScopeStatement *
+    void
     addModuleUseStatement (SgNode * parent, std::string const & moduleName);
 
     void

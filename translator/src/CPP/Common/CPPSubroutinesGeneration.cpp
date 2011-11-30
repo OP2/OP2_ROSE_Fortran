@@ -80,12 +80,6 @@ CPPSubroutinesGeneration::patchCallsToParallelLoops ()
 
       functionCallExpression->set_function (hostSubroutineReference);
 
-      if (find (dirtyFiles.begin (), dirtyFiles.end (),
-          parallelLoop->getFileName ()) == dirtyFiles.end ())
-      {
-        dirtyFiles.push_back (parallelLoop->getFileName ());
-      }
-
       /*
        * ==================================================
        * Remove the first parameter (kernel reference)
@@ -119,6 +113,8 @@ CPPSubroutinesGeneration::generate ()
   patchCallsToParallelLoops ();
 
   addOP2IncludeDirective ();
+
+  determineWhichInputFilesToBeUnparsed ();
 }
 
 CPPSubroutinesGeneration::CPPSubroutinesGeneration (SgProject * project,

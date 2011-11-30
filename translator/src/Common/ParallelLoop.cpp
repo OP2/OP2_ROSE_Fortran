@@ -6,12 +6,10 @@
 #include <rose.h>
 #include <boost/lexical_cast.hpp>
 
-ParallelLoop::ParallelLoop (SgFunctionCallExp * functionCallExpression,
-    std::string fileName) :
-  fileName (fileName)
+ParallelLoop::ParallelLoop (SgFunctionCallExp * functionCallExpression)
 {
-  Debug::getInstance ()->debugMessage ("Parallel loop created in file '"
-      + fileName + "'", Debug::CONSTRUCTOR_LEVEL, __FILE__, __LINE__);
+  Debug::getInstance ()->debugMessage ("Parallel loop created",
+      Debug::CONSTRUCTOR_LEVEL, __FILE__, __LINE__);
 
   functionCallExpressions.push_back (functionCallExpression);
 
@@ -394,10 +392,27 @@ ParallelLoop::getLastFunctionCall ()
   return functionCallExpressions.end ();
 }
 
-std::string const &
-ParallelLoop::getFileName () const
+void
+ParallelLoop::addFileName (std::string fileName)
 {
-  return fileName;
+  using std::find;
+
+  if (find (fileNames.begin (), fileNames.end (), fileName) == fileNames.end ())
+  {
+    fileNames.push_back (fileName);
+  }
+}
+
+std::vector <std::string>::const_iterator
+ParallelLoop::getFirstFileName ()
+{
+  return fileNames.begin ();
+}
+
+std::vector <std::string>::const_iterator
+ParallelLoop::getLastFileName ()
+{
+  return fileNames.end ();
 }
 
 Reduction *

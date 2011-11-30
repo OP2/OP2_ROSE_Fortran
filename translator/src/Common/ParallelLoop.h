@@ -43,10 +43,10 @@ class ParallelLoop
 
     /*
      * ======================================================
-     * The file name where the call was detected
+     * The file names where the calls were detected
      * ======================================================
      */
-    std::string fileName;
+    std::vector <std::string> fileNames;
 
     /*
      * ======================================================
@@ -124,8 +124,7 @@ class ParallelLoop
 
   protected:
 
-    ParallelLoop (SgFunctionCallExp * functionCallExpression,
-        std::string fileName);
+    ParallelLoop (SgFunctionCallExp * functionCallExpression);
 
   public:
 
@@ -334,8 +333,8 @@ class ParallelLoop
 
     /*
      * ======================================================
-     * Returns an iterator pointing to the nodes in the
-     * AST modelling the calls to to this OP_PAR_LOOP
+     * Returns an iterator pointing to the first node in the
+     * AST which models a call to this OP_PAR_LOOP
      * ======================================================
      */
     std::vector <SgFunctionCallExp *>::const_iterator
@@ -343,8 +342,8 @@ class ParallelLoop
 
     /*
      * ======================================================
-     * Returns an iterator pointing to the nodes in the
-     * AST modelling the calls to to this OP_PAR_LOOP
+     * Returns an iterator pointing to the last node in the
+     * AST which models a call to this OP_PAR_LOOP
      * ======================================================
      */
     std::vector <SgFunctionCallExp *>::const_iterator
@@ -352,12 +351,30 @@ class ParallelLoop
 
     /*
      * ======================================================
-     * Returns the name of the file in which the OP_PAR_LOOP
-     * call is contained
+     * Adds an additional file name in which a call to this
+     * OP_PAR_LOOP occurs
      * ======================================================
      */
-    std::string const &
-    getFileName () const;
+    void
+    addFileName (std::string fileName);
+
+    /*
+     * ======================================================
+     * Returns an iterator pointing to the first file name
+     * in which a call to this OP_PAR_LOOP is contained
+     * ======================================================
+     */
+    std::vector <std::string>::const_iterator
+    getFirstFileName ();
+
+    /*
+     * ======================================================
+     * Returns an iterator pointing to the last file name
+     * in which a call to this OP_PAR_LOOP is contained
+     * ======================================================
+     */
+    std::vector <std::string>::const_iterator
+    getLastFileName ();
 
     Reduction *
     getReductionTuple (unsigned int OP_DAT_ArgumentGroup);
