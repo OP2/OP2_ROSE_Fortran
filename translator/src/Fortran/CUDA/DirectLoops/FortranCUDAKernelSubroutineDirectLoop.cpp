@@ -38,24 +38,10 @@ FortranCUDAKernelSubroutineDirectLoop::createUserSubroutineCallStatement ()
 
       if (parallelLoop->getOpDatDimension (i) == 1)
       {
-        SgAddOp * addExpression = buildAddOp (
-            variableDeclarations->getReference (
-                getIterationCounterVariableName (1)), buildIntVal (
-                parallelLoop->getOpDatDimension (i) - 1));
-
-        SgSubscriptExpression * arraySubscriptExpression =
-            new SgSubscriptExpression (RoseHelper::getFileInfo (),
-                variableDeclarations->getReference (
-                    getIterationCounterVariableName (1)), addExpression,
-                buildIntVal (1));
-
-        arraySubscriptExpression->set_endOfConstruct (
-            RoseHelper::getFileInfo ());
-
         parameterExpression = buildPntrArrRefExp (
             variableDeclarations->getReference (getOpDatName (i)),
-            arraySubscriptExpression);
-
+            variableDeclarations->getReference (
+                getIterationCounterVariableName (1)));
       }
       else
       {

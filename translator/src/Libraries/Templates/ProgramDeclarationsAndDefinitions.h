@@ -98,6 +98,10 @@ template <typename TSubroutineHeader>
 
       std::vector <std::string> doubleDeclarations;
 
+      std::vector <std::string> arrayDeclarations;
+
+      std::vector <std::string> pointerDeclarations;
+
       std::map <std::string, SgVariableDeclaration *> declarations;
 
       /*
@@ -163,6 +167,20 @@ template <typename TSubroutineHeader>
               + "' is a double", Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
           doubleDeclarations.push_back (variableName);
+        }
+        else if (isSgArrayType (type) != NULL)
+        {
+          Debug::getInstance ()->debugMessage ("'" + variableName
+              + "' is an array", Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+
+          arrayDeclarations.push_back (variableName);
+        }
+        else if (isSgPointerType (type) != NULL)
+        {
+          Debug::getInstance ()->debugMessage ("'" + variableName
+              + "' is a pointer", Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+
+          pointerDeclarations.push_back (variableName);
         }
       }
 
@@ -363,6 +381,59 @@ template <typename TSubroutineHeader>
 
         return find (doubleDeclarations.begin (), doubleDeclarations.end (),
             variableName) != doubleDeclarations.end ();
+      }
+
+      bool
+      isArrayType (std::string const & variableName) const
+      {
+        using std::find;
+
+        return find (arrayDeclarations.begin (), arrayDeclarations.end (),
+            variableName) != arrayDeclarations.end ();
+      }
+
+      bool
+      isPointerType (std::string const & variableName) const
+      {
+        using std::find;
+
+        return find (pointerDeclarations.begin (), pointerDeclarations.end (),
+            variableName) != pointerDeclarations.end ();
+      }
+
+      SgType *
+      getType (std::string const & variableName)
+      {
+        using namespace SageBuilder;
+
+        if (isTypeShort (variableName))
+        {
+          return buildShortType ();
+        }
+        else if (isTypeInteger (variableName))
+        {
+          return buildIntType ();
+        }
+        else if (isTypeLong (variableName))
+        {
+          return buildLongType ();
+        }
+        else if (isTypeFloat (variableName))
+        {
+          return buildFloatType ();
+        }
+        else if (isTypeDouble (variableName))
+        {
+          return buildDoubleType ();
+        }
+        else if (isArrayType (variableName))
+        {
+          return buildIntType ();
+        }
+        else if (isPointerType (variableName))
+        {
+          return buildIntType ();
+        }
       }
 
       SgVariableDeclaration *

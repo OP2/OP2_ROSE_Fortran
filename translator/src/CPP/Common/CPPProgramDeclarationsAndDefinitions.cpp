@@ -8,11 +8,33 @@
 #include <boost/filesystem.hpp>
 
 void
+CPPProgramDeclarationsAndDefinitions::extractTypesFromVariableDeclaration (
+    SgVariableDeclaration * variableDeclaration)
+{
+  using std::vector;
+  using std::string;
+
+  Debug::getInstance ()->debugMessage (
+      "Extracting types for variable declaration", Debug::FUNCTION_LEVEL,
+      __FILE__, __LINE__);
+
+  for (SgInitializedNamePtrList::iterator it =
+      variableDeclaration->get_variables ().begin (); it
+      != variableDeclaration->get_variables ().end (); ++it)
+  {
+    string const variableName = (*it)->get_name ().getString ();
+
+    SgType * type = (*it)->get_typeptr ();
+
+    handleBaseTypeDeclaration (type, variableName);
+  }
+}
+
+void
 CPPProgramDeclarationsAndDefinitions::setOpGblProperties (
     CPPParallelLoop * parallelLoop, std::string const & variableName,
     int OP_DAT_ArgumentGroup)
 {
-
 }
 
 void
@@ -528,10 +550,12 @@ CPPProgramDeclarationsAndDefinitions::visit (SgNode * node)
         }
         else
         {
+          extractTypesFromVariableDeclaration (variableDeclaration);
         }
       }
       else
       {
+        extractTypesFromVariableDeclaration (variableDeclaration);
       }
 
       break;
@@ -645,6 +669,8 @@ CPPProgramDeclarationsAndDefinitions::visit (SgNode * node)
         }
 
         string const & variableName = opConstDeclaration->getVariableName ();
+
+        opConstDeclaration->setType (getType (variableName));
 
         OpConstDefinitions[variableName] = opConstDeclaration;
       }

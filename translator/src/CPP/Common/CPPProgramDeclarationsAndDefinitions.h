@@ -17,6 +17,10 @@ class CPPProgramDeclarationsAndDefinitions: public ProgramDeclarationsAndDefinit
   private:
 
     void
+    extractTypesFromVariableDeclaration (
+        SgVariableDeclaration * variableDeclaration);
+
+    void
     setOpGblProperties (CPPParallelLoop * parallelLoop,
         std::string const & variableName, int OP_DAT_ArgumentGroup);
 
