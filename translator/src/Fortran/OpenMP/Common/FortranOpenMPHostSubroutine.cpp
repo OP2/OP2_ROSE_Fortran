@@ -37,7 +37,7 @@ FortranOpenMPHostSubroutine::createReductionEpilogueStatements ()
     {
       SgAssignOp * innerLoopInitializationExpression = buildAssignOp (
           variableDeclarations->getReference (getIterationCounterVariableName (
-              2)), buildIntVal (0));
+              11)), buildIntVal (0));
 
       SgSubtractOp * innerLoopUpperBoundExpression = buildSubtractOp (
           buildIntVal (parallelLoop->getOpDatDimension (i)), buildIntVal (1));
@@ -46,11 +46,11 @@ FortranOpenMPHostSubroutine::createReductionEpilogueStatements ()
 
       SgMultiplyOp * multiplyExpression1 = buildMultiplyOp (
           variableDeclarations->getReference (getIterationCounterVariableName (
-              1)), buildIntVal (64));
+              10)), buildIntVal (64));
 
       SgAddOp * addExpression1 = buildAddOp (
           variableDeclarations->getReference (getIterationCounterVariableName (
-              2)), multiplyExpression1);
+              11)), multiplyExpression1);
 
       SgPntrArrRefExp * arrayIndexExpression1 = buildPntrArrRefExp (
           variableDeclarations->getReference (getReductionArrayHostName (i)),
@@ -59,7 +59,7 @@ FortranOpenMPHostSubroutine::createReductionEpilogueStatements ()
       SgAddOp * addExpression2 = buildAddOp (buildIntVal (
           parallelLoop->getOpDatDimension (i)),
           variableDeclarations->getReference (getIterationCounterVariableName (
-              2)));
+              11)));
 
       SgPntrArrRefExp * arrayIndexExpression2 = buildPntrArrRefExp (
           variableDeclarations->getReference (getOpDatLocalName (i)),
@@ -68,7 +68,7 @@ FortranOpenMPHostSubroutine::createReductionEpilogueStatements ()
       SgAddOp * addExpression3 = buildAddOp (buildIntVal (
           parallelLoop->getOpDatDimension (i)),
           variableDeclarations->getReference (getIterationCounterVariableName (
-              2)));
+              11)));
 
       SgPntrArrRefExp * arrayIndexExpression3 = buildPntrArrRefExp (
           variableDeclarations->getReference (getOpDatLocalName (i)),
@@ -95,9 +95,9 @@ FortranOpenMPHostSubroutine::createReductionEpilogueStatements ()
    * ======================================================
    */
 
-  SgAssignOp * outerLoopInitializationExpression = buildAssignOp (
-      variableDeclarations->getReference (getIterationCounterVariableName (1)),
-      buildIntVal (0));
+  SgAssignOp * outerLoopInitializationExpression =
+      buildAssignOp (variableDeclarations->getReference (
+          getIterationCounterVariableName (10)), buildIntVal (0));
 
   SgSubtractOp * outerLoopUpperBoundExpression = buildSubtractOp (
       variableDeclarations->getReference (OpenMP::numberOfThreads),
@@ -138,7 +138,7 @@ FortranOpenMPHostSubroutine::createReductionPrologueStatements ()
     {
       SgAssignOp * innerLoopInitializationExpression = buildAssignOp (
           variableDeclarations->getReference (getIterationCounterVariableName (
-              2)), buildIntVal (0));
+              11)), buildIntVal (0));
 
       SgSubtractOp * innerLoopUpperBoundExpression = buildSubtractOp (
           buildIntVal (parallelLoop->getOpDatDimension (i)), buildIntVal (1));
@@ -147,10 +147,10 @@ FortranOpenMPHostSubroutine::createReductionPrologueStatements ()
 
       SgMultiplyOp * multiplyExpression = buildMultiplyOp (
           variableDeclarations->getReference (getIterationCounterVariableName (
-              1)), buildIntVal (64));
+              10)), buildIntVal (64));
 
       SgAddOp * addExpression = buildAddOp (variableDeclarations->getReference (
-          getIterationCounterVariableName (2)), multiplyExpression);
+          getIterationCounterVariableName (11)), multiplyExpression);
 
       SgPntrArrRefExp * arrayIndexExpression = buildPntrArrRefExp (
           variableDeclarations->getReference (getReductionArrayHostName (i)),
@@ -176,9 +176,9 @@ FortranOpenMPHostSubroutine::createReductionPrologueStatements ()
    * ======================================================
    */
 
-  SgAssignOp * outerLoopInitializationExpression = buildAssignOp (
-      variableDeclarations->getReference (getIterationCounterVariableName (1)),
-      buildIntVal (0));
+  SgAssignOp * outerLoopInitializationExpression =
+      buildAssignOp (variableDeclarations->getReference (
+          getIterationCounterVariableName (10)), buildIntVal (0));
 
   SgSubtractOp * outerLoopUpperBoundExpression = buildSubtractOp (
       variableDeclarations->getReference (OpenMP::numberOfThreads),
@@ -204,14 +204,14 @@ FortranOpenMPHostSubroutine::createReductionDeclarations ()
       "Creating reduction local variable declarations", Debug::FUNCTION_LEVEL,
       __FILE__, __LINE__);
 
-  variableDeclarations->add (getIterationCounterVariableName (2),
+  variableDeclarations->add (getIterationCounterVariableName (10),
       FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
-          getIterationCounterVariableName (2),
+          getIterationCounterVariableName (10),
           FortranTypesBuilder::getFourByteInteger (), subroutineScope));
 
-  variableDeclarations->add (getIterationCounterVariableName (3),
+  variableDeclarations->add (getIterationCounterVariableName (11),
       FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
-          getIterationCounterVariableName (3),
+          getIterationCounterVariableName (11),
           FortranTypesBuilder::getFourByteInteger (), subroutineScope));
 
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
@@ -503,15 +503,18 @@ FortranOpenMPHostSubroutine::createOpenMPLocalVariableDeclarations ()
           OpenMP::numberOfThreads, FortranTypesBuilder::getFourByteInteger (),
           subroutineScope));
 
-  variableDeclarations->add (OpenMP::sliceStart,
-      FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
-          OpenMP::sliceStart, FortranTypesBuilder::getFourByteInteger (),
-          subroutineScope));
+  if (parallelLoop->isDirectLoop ())
+  {
+    variableDeclarations->add (OpenMP::sliceStart,
+        FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
+            OpenMP::sliceStart, FortranTypesBuilder::getFourByteInteger (),
+            subroutineScope));
 
-  variableDeclarations->add (OpenMP::sliceEnd,
-      FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
-          OpenMP::sliceEnd, FortranTypesBuilder::getFourByteInteger (),
-          subroutineScope));
+    variableDeclarations->add (OpenMP::sliceEnd,
+        FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
+            OpenMP::sliceEnd, FortranTypesBuilder::getFourByteInteger (),
+            subroutineScope));
+  }
 }
 
 FortranOpenMPHostSubroutine::FortranOpenMPHostSubroutine (
