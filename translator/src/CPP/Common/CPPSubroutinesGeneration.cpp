@@ -61,8 +61,7 @@ CPPSubroutinesGeneration::patchCallsToParallelLoops ()
 
     Debug::getInstance ()->debugMessage (
         "Analysing OP_PAR_LOOP for user subroutine '" + userSubroutineName
-            + "'. Call is in file '" + parallelLoop->getFileName () + "'",
-        Debug::INNER_LOOP_LEVEL, __FILE__, __LINE__);
+            + "'", Debug::INNER_LOOP_LEVEL, __FILE__, __LINE__);
 
     CPPHostSubroutine * hostSubroutine = hostSubroutines[userSubroutineName];
 
