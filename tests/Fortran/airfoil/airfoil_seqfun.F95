@@ -4,7 +4,7 @@ use CONSTANTVARS
 
 contains
 
-   subroutine fused ( x1, x2, x3, x4, q, qold, adt ) BIND(C)
+   subroutine fused ( x1, x2, x3, x4, q, qold, adt ) 
 
      implicit none
 
@@ -52,7 +52,7 @@ contains
 
    end subroutine
 
-subroutine save_soln ( q, qold ) BIND(C)
+subroutine save_soln ( q, qold ) 
   implicit none
 
   real(8), dimension(*) :: q
@@ -66,7 +66,7 @@ subroutine save_soln ( q, qold ) BIND(C)
 
 end subroutine save_soln
 
-subroutine adt_calc ( x1, x2, x3, x4, q, adt ) BIND(C)
+subroutine adt_calc ( x1, x2, x3, x4, q, adt ) 
   implicit none
 
   real(8), dimension(*) :: x1
@@ -103,7 +103,7 @@ subroutine adt_calc ( x1, x2, x3, x4, q, adt ) BIND(C)
 
 end subroutine adt_calc
 
-subroutine res_calc ( x1, x2, q1, q2, adt1, adt2, res1, res2 ) BIND(C)
+subroutine res_calc ( x1, x2, q1, q2, adt1, adt2, res1, res2 ) 
   implicit none
 
   real(8), dimension(*) :: x1
@@ -148,7 +148,7 @@ subroutine res_calc ( x1, x2, q1, q2, adt1, adt2, res1, res2 ) BIND(C)
 
 end subroutine res_calc
 
-subroutine bres_calc ( x1, x2, q1, adt1, res1, bound ) BIND(C)
+subroutine bres_calc ( x1, x2, q1, adt1, res1, bound ) 
   implicit none
 
   real(8), dimension(*) :: x1
@@ -194,7 +194,7 @@ subroutine bres_calc ( x1, x2, q1, adt1, res1, bound ) BIND(C)
 
 end subroutine bres_calc
 
-subroutine update ( qold, q, res, adt, rms ) BIND(C)
+subroutine update ( qold, q, res, adt, rms ) 
   implicit none
 
   real(8), dimension(*) :: qold
@@ -216,5 +216,62 @@ subroutine update ( qold, q, res, adt, rms ) BIND(C)
   end do
 
 end subroutine update
+
+subroutine fused_2 ( qold, q, res, adt, rms, x1, x2, x3, x4 ) 
+  implicit none
+
+  real(8), dimension(*) :: qold
+  real(8), dimension(*) :: q
+  real(8), dimension(*) :: res
+  real(8), dimension(1) :: adt
+  real(8), dimension(1)  :: rms
+  real(8), dimension(*) :: x1
+  real(8), dimension(*) :: x2
+  real(8), dimension(*) :: x3
+  real(8), dimension(*) :: x4
+
+  real(8) :: del, adti
+
+  integer(4) :: i
+
+  real(8) :: dx, dy, ri, u, v, c
+
+
+  adti = 1.0 / adt(1);
+
+  do i = 1, 4
+    del = adti * res(i)
+    q(i) = qold(i) - del
+    res(i) = 0.0
+    rms = rms + del * del
+  end do
+
+  ri = 1.0 / q(1)
+  u = ri * q(2)
+  v = ri * q(3)
+  c = sqrt ( gam * gm1 * ( ri * q(4) - 0.5 * ( u*u + v*v ) ) )
+
+  dx = x2(1) - x1(1)
+  dy = x2(2) - x1(2)
+  adt = abs ( u * dy - v * dx ) + c * sqrt ( dx*dx + dy*dy )
+
+  dx = x3(1) - x2(1)
+  dy = x3(2) - x2(2)
+  adt = adt + abs ( u * dy - v * dx ) + c * sqrt ( dx*dx + dy*dy )
+
+  dx = x4(1) - x3(1)
+  dy = x4(2) - x3(2)
+  adt = adt + abs ( u * dy - v * dx ) + c * sqrt ( dx*dx + dy*dy )
+
+  dx = x1(1) - x4(1)
+  dy = x1(2) - x4(2)
+  adt = adt + abs ( u * dy - v * dx ) + c * sqrt ( dx*dx + dy*dy )
+
+  adt = adt / cfl
+
+
+end subroutine fused_2
+
+
 
 end module AIRFOIL_SEQ
