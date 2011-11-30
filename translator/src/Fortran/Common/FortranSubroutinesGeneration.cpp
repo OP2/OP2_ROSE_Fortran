@@ -42,31 +42,6 @@ FortranSubroutinesGeneration::removeUseStatement (
   while (lastUseStatement != NULL);
 }
 
-SgVariableDeclaration *
-FortranSubroutinesGeneration::addUserSubroutineNameDeclaration (
-    SgScopeStatement * scope, std::string const & userSubroutineName)
-{
-  using namespace SageBuilder;
-  using namespace SageInterface;
-
-  Debug::getInstance ()->debugMessage (
-      "Adding character array declaration with name '" + userSubroutineName
-          + "'", Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
-
-  SgTypeString * characterArray = FortranTypesBuilder::getString (
-      userSubroutineName.size ());
-
-  SgAssignInitializer * initializer = buildAssignInitializer (buildStringVal (
-      userSubroutineName), characterArray);
-
-  SgVariableDeclaration * variableDeclaration = buildVariableDeclaration (
-      userSubroutineName + "_user", characterArray, initializer, scope);
-
-  insertStatementAfterLastDeclaration (variableDeclaration, scope);
-
-  return variableDeclaration;
-}
-
 void
 FortranSubroutinesGeneration::addModuleUseStatement (SgNode * parent,
     std::string const & moduleName)
