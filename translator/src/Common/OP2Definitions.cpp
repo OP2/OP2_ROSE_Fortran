@@ -75,6 +75,18 @@ OpGblDefinition::getPrimitiveType ()
   return primitiveType;
 }
 
+void
+OpConstDefinition::setType (SgType * baseType)
+{
+  this->baseType = baseType;
+}
+
+SgType *
+OpConstDefinition::getType ()
+{
+  return baseType;
+}
+
 unsigned int
 OpConstDefinition::getDimension () const
 {

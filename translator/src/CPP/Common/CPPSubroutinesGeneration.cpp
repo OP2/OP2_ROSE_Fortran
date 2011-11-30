@@ -7,6 +7,12 @@
 #include "Exceptions.h"
 #include "CPPUserSubroutine.h"
 #include "OP2.h"
+#include "Globals.h"
+
+void
+CPPSubroutinesGeneration::addFreeVariableDeclarations ()
+{
+}
 
 void
 CPPSubroutinesGeneration::addOP2IncludeDirective ()
@@ -112,6 +118,11 @@ CPPSubroutinesGeneration::generate ()
   patchCallsToParallelLoops ();
 
   addOP2IncludeDirective ();
+
+  if (Globals::getInstance ()->getTargetBackend () == TargetLanguage::CUDA)
+  {
+    addFreeVariableDeclarations ();
+  }
 
   determineWhichInputFilesToBeUnparsed ();
 }

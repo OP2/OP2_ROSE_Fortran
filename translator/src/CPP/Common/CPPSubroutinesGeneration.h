@@ -23,6 +23,9 @@ class CPPSubroutinesGeneration: public SubroutinesGeneration <
 
   protected:
 
+    virtual void
+    addFreeVariableDeclarations ();
+
     void
     addOP2IncludeDirective ();
 

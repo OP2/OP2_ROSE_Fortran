@@ -143,7 +143,15 @@ class OpConstDefinition: public OP2Definition
 
     unsigned int dimension;
 
+    SgType * baseType;
+
   public:
+
+    void
+    setType (SgType * baseType);
+
+    SgType *
+    getType ();
 
     unsigned int
     getDimension () const;

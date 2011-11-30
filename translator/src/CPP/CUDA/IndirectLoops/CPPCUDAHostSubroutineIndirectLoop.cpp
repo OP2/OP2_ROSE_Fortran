@@ -247,7 +247,7 @@ CPPCUDAHostSubroutineIndirectLoop::createPlanFunctionExecutionStatements ()
 
   SgLessThanOp * upperBoundExpression = buildLessThanOp (
       variableDeclarations->getReference (getIterationCounterVariableName (3)),
-      buildOpaqueVarRefExp (numberOfColours, subroutineScope));
+      arrowExpression);
 
   SgPlusPlusOp * strideExpression = buildPlusPlusOp (
       variableDeclarations->getReference (getIterationCounterVariableName (3)));

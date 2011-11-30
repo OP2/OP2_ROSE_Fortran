@@ -34,6 +34,8 @@ template <class TGenerator>
 
         vector <string> outputFiles;
 
+        string generatedFile;
+
         string mainFile;
 
       public:
@@ -71,6 +73,8 @@ template <class TGenerator>
 
               outputFiles.push_back (p.filename ());
 
+              generatedFile = p.filename ();
+
               file->unparse ();
             }
             else
@@ -90,7 +94,7 @@ template <class TGenerator>
           using std::string;
           using std::ofstream;
 
-          traverse (this->project, preorder);
+          traverseInputFiles (this->project, preorder);
 
           string fileName;
 
@@ -135,6 +139,10 @@ template <class TGenerator>
           {
             outputFile << *it << " ";
           }
+
+          outputFile << std::endl;
+
+          outputFile << "generated=" + generatedFile;
 
           outputFile << std::endl;
 

@@ -8,6 +8,9 @@ class CPPCUDASubroutinesGeneration: public CPPSubroutinesGeneration
 {
   private:
 
+    virtual void
+    addFreeVariableDeclarations ();
+
     void
     createReductionSubroutines ();
 

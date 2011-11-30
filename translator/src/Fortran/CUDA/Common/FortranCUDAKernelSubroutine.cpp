@@ -133,12 +133,8 @@ FortranCUDAKernelSubroutine::createCUDAStageInVariablesVariableDeclarations ()
       }
       else
       {
-        SgDotExp * dotExpression = buildDotExp (
-            variableDeclarations->getReference (opDatDimensions),
-            dimensionsDeclaration->getOpDatDimensionField (i));
-
-        SgSubtractOp * subtractExpression = buildSubtractOp (dotExpression,
-            buildIntVal (1));
+        SgSubtractOp * subtractExpression = buildSubtractOp (buildIntVal (
+            parallelLoop->getOpDatDimension (i)), buildIntVal (1));
 
         variableDeclarations->add (variableName,
             FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
