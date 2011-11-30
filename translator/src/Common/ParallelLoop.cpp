@@ -446,12 +446,6 @@ ParallelLoop::getReductionsNeeded (std::vector <Reduction *> & reductions)
 std::string
 ParallelLoop::getUserSubroutineName ()
 {
-  SgExpressionPtrList & actualArguments =
-      functionCallExpression->get_args ()->get_expressions ();
-
-  SgFunctionRefExp * functionRefExpression = isSgFunctionRefExp (
-      actualArguments.front ());
-
   return userSubroutineName;
 }
 
