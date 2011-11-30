@@ -508,6 +508,10 @@ FortranProgramDeclarationsAndDefinitions::visit (SgNode * node)
             Debug::getInstance ()->debugMessage ("Parallel loop for '"
                 + userSubroutineName + "' already created",
                 Debug::OUTER_LOOP_LEVEL, __FILE__, __LINE__);
+
+            ParallelLoop * parallelLoop = parallelLoops[userSubroutineName];
+
+            parallelLoop->addFunctionCallExpression (functionCallExp);
           }
         }
 

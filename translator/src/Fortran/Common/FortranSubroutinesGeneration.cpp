@@ -182,9 +182,6 @@ FortranSubroutinesGeneration::patchCallsToParallelLoops (
 
       ROSE_ASSERT (isSgExprStatement(functionCallExpression->get_parent()));
 
-      SgScopeStatement * scope = isSgExprStatement (
-          functionCallExpression->get_parent ())->get_scope ();
-
       SgNode * parent = functionCallExpression->get_parent ();
 
       while (!isSgProcedureHeaderStatement (parent)
@@ -202,21 +199,18 @@ FortranSubroutinesGeneration::patchCallsToParallelLoops (
       SgScopeStatement * parentScope = addModuleUseStatement (parent,
           moduleName);
 
-      SgStatement * lastDeclarationStatement = findLastDeclarationStatement (
-          parentScope);
-
-      if (find (dirtyFiles.begin (), dirtyFiles.end (),
-          parallelLoop->getFileName ()) == dirtyFiles.end ())
-      {
-        dirtyFiles.push_back (parallelLoop->getFileName ());
-      }
-
       /*
        * ======================================================
        * Modify the call to OP_PAR_LOOP with a call to the newly
        * built host subroutine
        * ======================================================
        */
+
+      if (find (dirtyFiles.begin (), dirtyFiles.end (),
+          parallelLoop->getFileName ()) == dirtyFiles.end ())
+      {
+        dirtyFiles.push_back (parallelLoop->getFileName ());
+      }
 
       SgFunctionRefExp * hostSubroutineReference = buildFunctionRefExp (
           hostSubroutine->getSubroutineHeaderStatement ());
@@ -230,16 +224,12 @@ FortranSubroutinesGeneration::patchCallsToParallelLoops (
        * ======================================================
        */
 
-      SgVariableDeclaration * variableDeclaration =
-          addUserSubroutineNameDeclaration (parentScope, userSubroutineName);
-
       SgExpressionPtrList & arguments =
           functionCallExpression->get_args ()->get_expressions ();
 
       arguments.erase (arguments.begin ());
 
-      arguments.insert (arguments.begin (),
-          buildVarRefExp (variableDeclaration));
+      arguments.insert (arguments.begin (), buildStringVal (userSubroutineName));
 
       /*
        * ======================================================
