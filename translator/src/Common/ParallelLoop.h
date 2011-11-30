@@ -117,14 +117,6 @@ class ParallelLoop
 
     /*
      * ======================================================
-     * The name of the user kernel associated with this
-     * parallel loop
-     * ======================================================
-     */
-    std::string userSubroutineName;
-
-    /*
-     * ======================================================
      * The number of OP_DAT argument groups
      * ======================================================
      */
