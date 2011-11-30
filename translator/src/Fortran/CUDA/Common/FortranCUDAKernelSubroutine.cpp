@@ -2,6 +2,7 @@
 #include "FortranCUDAUserSubroutine.h"
 #include "FortranParallelLoop.h"
 #include "FortranCUDAModuleDeclarations.h"
+#include "FortranOpDatDimensionsDeclaration.h"
 #include "FortranReductionSubroutines.h"
 #include "FortranCUDAReductionSubroutine.h"
 #include "FortranTypesBuilder.h"
@@ -110,6 +111,7 @@ FortranCUDAKernelSubroutine::createReductionEpilogueStatements ()
 void
 FortranCUDAKernelSubroutine::createCUDAStageInVariablesVariableDeclarations ()
 {
+  using namespace SageBuilder;
   using namespace OP2VariableNames;
   using std::string;
 
@@ -131,11 +133,18 @@ FortranCUDAKernelSubroutine::createCUDAStageInVariablesVariableDeclarations ()
       }
       else
       {
+        SgDotExp * dotExpression = buildDotExp (
+            variableDeclarations->getReference (opDatDimensions),
+            dimensionsDeclaration->getOpDatDimensionField (i));
+
+        SgSubtractOp * subtractExpression = buildSubtractOp (dotExpression,
+            buildIntVal (1));
+
         variableDeclarations->add (variableName,
             FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
                 variableName, FortranTypesBuilder::getArray_RankOne (
-                    parallelLoop->getOpDatBaseType (i), 0,
-                    parallelLoop->getOpDatDimension (i) - 1), subroutineScope));
+                    parallelLoop->getOpDatBaseType (i), 0, subtractExpression),
+                subroutineScope));
       }
     }
   }

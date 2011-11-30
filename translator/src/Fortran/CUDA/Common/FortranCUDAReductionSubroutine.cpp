@@ -344,13 +344,15 @@ FortranCUDAReductionSubroutine::createSharedVariableInitialisationStatements ()
       "Creating shared variable initialisation statements",
       Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
-  SgPntrArrRefExp * subscriptExpression1 = buildPntrArrRefExp (
+  SgPntrArrRefExp * arrayExpression1 = buildPntrArrRefExp (
       variableDeclarations->getReference (sharedVariableName),
       variableDeclarations->getReference (threadID));
 
-  SgExprStatement * assignStatement1 =
-      buildAssignStatement (subscriptExpression1,
-          variableDeclarations->getReference (reductionInput));
+  SgPntrArrRefExp * arrayExpression2 = buildPntrArrRefExp (
+      variableDeclarations->getReference (reductionInput), buildIntVal (1));
+
+  SgExprStatement * assignStatement1 = buildAssignStatement (arrayExpression1,
+      arrayExpression2);
 
   appendStatement (assignStatement1, subroutineScope);
 }
@@ -475,6 +477,7 @@ FortranCUDAReductionSubroutine::createLocalVariableDeclarations ()
 void
 FortranCUDAReductionSubroutine::createFormalParameterDeclarations ()
 {
+  using namespace SageBuilder;
   using namespace LoopVariableNames;
   using namespace OP2VariableNames;
   using namespace ReductionVariableNames;
@@ -499,15 +502,18 @@ FortranCUDAReductionSubroutine::createFormalParameterDeclarations ()
   /*
    * ======================================================
    * Declare the value of the reduction variable produced by
-   * each thread which is passed by value
+   * each thread which is a single value. It is declared
+   * as a rank-one array with one element to interoperate
+   * between scalars and arrays
    * ======================================================
    */
 
   variableDeclarations->add (
       reductionInput,
       FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
-          reductionInput, reduction->getBaseType (), subroutineScope,
-          formalParameters, 1, VALUE));
+          reductionInput, FortranTypesBuilder::getArray_RankOne (
+              reduction->getBaseType (), 1, 1), subroutineScope,
+          formalParameters));
 
   /*
    * ======================================================

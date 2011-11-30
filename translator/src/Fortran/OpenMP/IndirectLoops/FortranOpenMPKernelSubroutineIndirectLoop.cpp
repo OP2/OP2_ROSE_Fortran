@@ -398,7 +398,7 @@ FortranOpenMPKernelSubroutineIndirectLoop::createIncrementedOpDatEpilogueStateme
   {
     if (parallelLoop->isDuplicateOpDat (i) == false)
     {
-      if (parallelLoop->isIncremented (i))
+      if (parallelLoop->isIndirect (i) && parallelLoop->isIncremented (i))
       {
         /*
          * ======================================================
@@ -1020,7 +1020,7 @@ FortranOpenMPKernelSubroutineIndirectLoop::createIncrementAccessLocalVariableDec
 
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
-    if (parallelLoop->isIncremented (i))
+    if (parallelLoop->isIndirect (i) && parallelLoop->isIncremented (i))
     {
       Debug::getInstance ()->debugMessage (
           "Creating local variables for incremented OP_DAT " + lexical_cast <
