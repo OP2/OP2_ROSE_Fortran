@@ -26,11 +26,20 @@ class ParallelLoop
 
     /*
      * ======================================================
-     * The function call expression where the call to the
-     * OP_PAR_LOOP occurs
+     * The function call expressions where calls to the
+     * OP_PAR_LOOP occur. Note that there can be several
+     * calls to the same kernel in different parts of the
+     * code
      * ======================================================
      */
-    SgFunctionCallExp * functionCallExpression;
+    std::vector <SgFunctionCallExp *> functionCallExpressions;
+
+    /*
+     * ======================================================
+     * The name of the user subroutine kernel
+     * ======================================================
+     */
+    std::string userSubroutineName;
 
     /*
      * ======================================================
@@ -325,12 +334,29 @@ class ParallelLoop
 
     /*
      * ======================================================
-     * Returns the node in the AST modelling the call to
-     * to this OP_PAR_LOOP
+     * Adds an additional function call expression
      * ======================================================
      */
-    SgFunctionCallExp *
-    getFunctionCall ();
+    void
+    addFunctionCallExpression (SgFunctionCallExp * functionCallExpression);
+
+    /*
+     * ======================================================
+     * Returns an iterator pointing to the nodes in the
+     * AST modelling the calls to to this OP_PAR_LOOP
+     * ======================================================
+     */
+    std::vector <SgFunctionCallExp *>::const_iterator
+    getFirstFunctionCall ();
+
+    /*
+     * ======================================================
+     * Returns an iterator pointing to the nodes in the
+     * AST modelling the calls to to this OP_PAR_LOOP
+     * ======================================================
+     */
+    std::vector <SgFunctionCallExp *>::const_iterator
+    getLastFunctionCall ();
 
     /*
      * ======================================================

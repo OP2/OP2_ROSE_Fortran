@@ -8,10 +8,21 @@
 
 ParallelLoop::ParallelLoop (SgFunctionCallExp * functionCallExpression,
     std::string fileName) :
-  functionCallExpression (functionCallExpression), fileName (fileName)
+  fileName (fileName)
 {
   Debug::getInstance ()->debugMessage ("Parallel loop created in file '"
       + fileName + "'", Debug::CONSTRUCTOR_LEVEL, __FILE__, __LINE__);
+
+  functionCallExpressions.push_back (functionCallExpression);
+
+  SgExpressionPtrList & actualArguments =
+      functionCallExpression->get_args ()->get_expressions ();
+
+  SgFunctionRefExp * functionRefExpression = isSgFunctionRefExp (
+      actualArguments.front ());
+
+  userSubroutineName
+      = functionRefExpression->getAssociatedFunctionDeclaration ()->get_name ().getString ();
 }
 
 void
@@ -236,7 +247,7 @@ ParallelLoop::hasIncrementedOpDats ()
 {
   for (unsigned int i = 1; i <= getNumberOfOpDatArgumentGroups (); ++i)
   {
-    if (isIncremented (i))
+    if (isReductionRequired (i) == false && isIncremented (i))
     {
       return true;
     }
@@ -347,8 +358,7 @@ ParallelLoop::setUniqueOpDat (std::string const & variableName)
 }
 
 bool
-ParallelLoop::isStageInNeeded (
-    unsigned int OP_DAT_ArgumentGroup)
+ParallelLoop::isStageInNeeded (unsigned int OP_DAT_ArgumentGroup)
 {
   /*
    * ======================================================
@@ -365,10 +375,23 @@ ParallelLoop::isStageInNeeded (
           OP_DAT_ArgumentGroup) > 1);
 }
 
-SgFunctionCallExp *
-ParallelLoop::getFunctionCall ()
+void
+ParallelLoop::addFunctionCallExpression (
+    SgFunctionCallExp * functionCallExpression)
 {
-  return functionCallExpression;
+  functionCallExpressions.push_back (functionCallExpression);
+}
+
+std::vector <SgFunctionCallExp *>::const_iterator
+ParallelLoop::getFirstFunctionCall ()
+{
+  return functionCallExpressions.begin ();
+}
+
+std::vector <SgFunctionCallExp *>::const_iterator
+ParallelLoop::getLastFunctionCall ()
+{
+  return functionCallExpressions.end ();
 }
 
 std::string const &
@@ -429,7 +452,7 @@ ParallelLoop::getUserSubroutineName ()
   SgFunctionRefExp * functionRefExpression = isSgFunctionRefExp (
       actualArguments.front ());
 
-  return functionRefExpression->getAssociatedFunctionDeclaration ()->get_name ().getString ();
+  return userSubroutineName;
 }
 
 std::string const

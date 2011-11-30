@@ -19,6 +19,15 @@ allBackendOptions = [openclFlag, cudaFlag, openmpFlag]
 
 helpShortFlag = "-h"
 
+parser.add_option("-c",
+                  "--config",
+                  action="store",
+                  dest="config",
+		  type="string",
+                  help="Use this configuration file.",
+                  default=0,
+		  metavar="<STRING>")
+
 parser.add_option("--clean",
                   action="store_true",
                   dest="clean",
@@ -169,7 +178,12 @@ def getTranslatorHome ():
 def getCompilationFiles ():
 	from string import split
 	
-	configFile = 'config'
+	configFile = None
+	if opts.config:
+		configFile = opts.config
+	else:
+		configFile = 'config'
+
 	if not os.path.isfile(configFile):
 		debug.exitMessage("Unable to find configuration file '%s' with the files to translate." % (configFile))
 

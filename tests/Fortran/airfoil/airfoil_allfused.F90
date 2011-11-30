@@ -199,7 +199,6 @@ program airfoil
                          & p_rms,  -1, OP_GBL, OP_INC   &
                        & )
 
-
 !      call op_par_loop_5 ( update, cells, &
 !                         & p_qold, -1, OP_ID,  OP_READ,  &
 !                         & p_q,    -1, OP_ID,  OP_WRITE, &
@@ -252,9 +251,10 @@ program airfoil
                          & p_rms,  -1, OP_GBL, OP_INC    &
                        & )
 
-
     ncellr = real ( ncell )
     rms = sqrt ( rms / ncellr )
+    
+    print *, "=====> Iteration result ", rms
 
   end do ! external loop
 
