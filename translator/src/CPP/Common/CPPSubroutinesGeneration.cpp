@@ -66,38 +66,42 @@ CPPSubroutinesGeneration::patchCallsToParallelLoops ()
 
     CPPHostSubroutine * hostSubroutine = hostSubroutines[userSubroutineName];
 
-    SgFunctionCallExp * functionCallExpression =
-        parallelLoop->getFunctionCall ();
-
-    SgScopeStatement * scope = isSgExprStatement (
-        functionCallExpression->get_parent ())->get_scope ();
-
-    SgFunctionRefExp * hostSubroutineReference = buildFunctionRefExp (
-        hostSubroutine->getSubroutineHeaderStatement ());
-
-    functionCallExpression->set_function (hostSubroutineReference);
-
-    if (find (dirtyFiles.begin (), dirtyFiles.end (),
-        parallelLoop->getFileName ()) == dirtyFiles.end ())
+    for (vector <SgFunctionCallExp *>::const_iterator it =
+        parallelLoop->getFirstFunctionCall (); it
+        != parallelLoop->getLastFunctionCall (); ++it)
     {
-      dirtyFiles.push_back (parallelLoop->getFileName ());
+      SgFunctionCallExp * functionCallExpression = *it;
+
+      SgScopeStatement * scope = isSgExprStatement (
+          functionCallExpression->get_parent ())->get_scope ();
+
+      SgFunctionRefExp * hostSubroutineReference = buildFunctionRefExp (
+          hostSubroutine->getSubroutineHeaderStatement ());
+
+      functionCallExpression->set_function (hostSubroutineReference);
+
+      if (find (dirtyFiles.begin (), dirtyFiles.end (),
+          parallelLoop->getFileName ()) == dirtyFiles.end ())
+      {
+        dirtyFiles.push_back (parallelLoop->getFileName ());
+      }
+
+      /*
+       * ==================================================
+       * Remove the first parameter (kernel reference)
+       * ==================================================
+       */
+
+      SgExpressionPtrList & arguments =
+          functionCallExpression->get_args ()->get_expressions ();
+
+      arguments.erase (arguments.begin ());
+
+      arguments.erase (arguments.begin ());
+
+      arguments.insert (arguments.begin (), buildStringVal (
+          userSubroutines[userSubroutineName]->getSubroutineName ()));
     }
-
-    /*
-     * ==================================================
-     * Remove the first parameter (kernel reference)
-     * ==================================================
-     */
-
-    SgExpressionPtrList & arguments =
-        functionCallExpression->get_args ()->get_expressions ();
-
-    arguments.erase (arguments.begin ());
-
-    arguments.erase (arguments.begin ());
-
-    arguments.insert (arguments.begin (), buildStringVal (
-        userSubroutines[userSubroutineName]->getSubroutineName ()));
   }
 }
 

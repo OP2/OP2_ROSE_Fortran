@@ -175,7 +175,8 @@ FortranSubroutinesGeneration::patchCallsToParallelLoops (
      */
 
     for (vector <SgFunctionCallExp *>::const_iterator it =
-        parallelLoop->getFirstFunctionCall (); parallelLoop->getLastFunctionCall (); ++it)
+        parallelLoop->getFirstFunctionCall (); it
+        != parallelLoop->getLastFunctionCall (); ++it)
     {
       SgFunctionCallExp * functionCallExpression = *it;
 
