@@ -1128,10 +1128,81 @@ CPPCUDAKernelSubroutineIndirectLoop::createExecutionLocalVariableDeclarations ()
       getIterationCounterVariableName (1),
       RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
           getIterationCounterVariableName (1), buildIntType (), subroutineScope));
+}
 
-  variableDeclarations ->add (getUpperBoundVariableName (1),
-      RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
-          getUpperBoundVariableName (1), buildIntType (), subroutineScope));
+void
+CPPCUDAKernelSubroutineIndirectLoop::createStageInVariableDeclarations ()
+{
+  using namespace SageBuilder;
+  using namespace OP2VariableNames;
+  using std::string;
+
+  Debug::getInstance ()->debugMessage ("Creating local thread variables",
+      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+
+  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
+  {
+    if (parallelLoop->isIndirect (i) && parallelLoop->isIncremented (i))
+    {
+      string const & variableName = getOpDatLocalName (i);
+
+      variableDeclarations ->add (variableName,
+          RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
+              variableName, buildArrayType (parallelLoop->getOpDatBaseType (i),
+                  buildIntVal (parallelLoop->getOpDatDimension (i))),
+              subroutineScope));
+    }
+  }
+}
+
+void
+CPPCUDAKernelSubroutineIndirectLoop::createCUDASharedVariableDeclarations ()
+{
+  using namespace SageBuilder;
+  using namespace OP2VariableNames;
+  using std::find;
+  using std::vector;
+  using std::string;
+
+  Debug::getInstance ()->debugMessage (
+      "Creating CUDA shared variable declarations", Debug::FUNCTION_LEVEL,
+      __FILE__, __LINE__);
+
+  vector <string> autosharedNames;
+
+  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
+  {
+    if (parallelLoop->isDuplicateOpDat (i) == false)
+    {
+      if (parallelLoop->isIndirect (i))
+      {
+        string const autosharedVariableName = getSharedMemoryDeclarationName (
+            parallelLoop->getOpDatBaseType (i),
+            parallelLoop->getSizeOfOpDat (i));
+
+        if (find (autosharedNames.begin (), autosharedNames.end (),
+            autosharedVariableName) == autosharedNames.end ())
+        {
+          Debug::getInstance ()->debugMessage (
+              "Creating declaration with name '" + autosharedVariableName
+                  + "' for OP_DAT '" + parallelLoop->getOpDatVariableName (i)
+                  + "'", Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+
+          SgVariableDeclaration * autosharedVariableDeclaration =
+              RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
+                  autosharedVariableName, buildArrayType (
+                      parallelLoop->getOpDatBaseType (i)), subroutineScope);
+
+          autosharedVariableDeclaration->get_declarationModifier ().get_storageModifier ().setCudaDynamicShared ();
+
+          variableDeclarations->add (autosharedVariableName,
+              autosharedVariableDeclaration);
+
+          autosharedNames.push_back (autosharedVariableName);
+        }
+      }
+    }
+  }
 }
 
 void
@@ -1147,11 +1218,16 @@ CPPCUDAKernelSubroutineIndirectLoop::createLocalVariableDeclarations ()
   Debug::getInstance ()->debugMessage ("Creating local variable declarations",
       Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
-  createCUDAStageInVariablesVariableDeclarations ();
+  createStageInVariableDeclarations ();
 
   createCUDASharedVariableDeclarations ();
 
   createExecutionLocalVariableDeclarations ();
+
+  if (parallelLoop->isReductionRequired ())
+  {
+    createReductionVariableDeclarations ();
+  }
 
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {

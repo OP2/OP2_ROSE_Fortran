@@ -98,9 +98,9 @@ template <typename TSubroutineHeader>
 
       std::vector <std::string> doubleDeclarations;
 
-      std::vector <std::string> arrayDeclarations;
+      std::map <std::string, SgArrayType *> arrayDeclarations;
 
-      std::vector <std::string> pointerDeclarations;
+      std::map <std::string, SgPointerType *> pointerDeclarations;
 
       std::map <std::string, SgVariableDeclaration *> declarations;
 
@@ -173,14 +173,14 @@ template <typename TSubroutineHeader>
           Debug::getInstance ()->debugMessage ("'" + variableName
               + "' is an array", Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
-          arrayDeclarations.push_back (variableName);
+          arrayDeclarations[variableName] = isSgArrayType (type);
         }
         else if (isSgPointerType (type) != NULL)
         {
           Debug::getInstance ()->debugMessage ("'" + variableName
               + "' is a pointer", Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
-          pointerDeclarations.push_back (variableName);
+          pointerDeclarations[variableName] = isSgPointerType (type);
         }
       }
 
@@ -426,13 +426,15 @@ template <typename TSubroutineHeader>
         {
           return buildDoubleType ();
         }
-        else if (isArrayType (variableName))
+        else if (arrayDeclarations.find (variableName)
+            != arrayDeclarations.end ())
         {
-          return buildIntType ();
+          return arrayDeclarations[variableName];
         }
-        else if (isPointerType (variableName))
+        else if (pointerDeclarations.find (variableName)
+            != pointerDeclarations.end ())
         {
-          return buildIntType ();
+          return pointerDeclarations[variableName];
         }
       }
 

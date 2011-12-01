@@ -379,3 +379,34 @@ OP2VariableNames::getSharedMemoryOffsetDeclarationName (SgType * type,
   }
 }
 
+std::string const
+OP2VariableNames::getSharedMemoryPointerDeclarationName (SgType * type,
+    unsigned int size)
+{
+  using boost::lexical_cast;
+  using std::string;
+
+  std::string const prefix = "sharedPointer";
+
+  switch (type->variantT ())
+  {
+    case V_SgTypeInt:
+    {
+      return prefix + "Integer" + lexical_cast <string> (size);
+    }
+    case V_SgTypeFloat:
+    {
+      return prefix + "Float" + lexical_cast <string> (size);
+    }
+    case V_SgTypeDouble:
+    {
+      return prefix + "Double" + lexical_cast <string> (size);
+    }
+    default:
+    {
+      throw Exceptions::CUDA::SharedVariableTypeException (
+          "Unsupported type for shared memory variable: '"
+              + type->class_name ());
+    }
+  }
+}

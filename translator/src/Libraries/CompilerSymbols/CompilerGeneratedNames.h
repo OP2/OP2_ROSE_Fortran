@@ -275,6 +275,9 @@ namespace OP2VariableNames
 
   std::string const
   getSharedMemoryOffsetDeclarationName (SgType * type, unsigned int size);
+
+  std::string const
+  getSharedMemoryPointerDeclarationName (SgType * type, unsigned int size);
 }
 
 #endif

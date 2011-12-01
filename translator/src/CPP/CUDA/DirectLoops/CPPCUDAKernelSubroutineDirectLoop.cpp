@@ -86,9 +86,10 @@ CPPCUDAKernelSubroutineDirectLoop::createStageInFromDeviceMemoryToSharedMemorySt
   using namespace OP2VariableNames;
   using std::string;
 
-  string const autosharedVariableName = getSharedMemoryDeclarationName (
-      parallelLoop->getOpDatBaseType (OP_DAT_ArgumentGroup),
-      parallelLoop->getSizeOfOpDat (OP_DAT_ArgumentGroup));
+  string const sharedPointerVariableName =
+      getSharedMemoryPointerDeclarationName (parallelLoop->getOpDatBaseType (
+          OP_DAT_ArgumentGroup), parallelLoop->getSizeOfOpDat (
+          OP_DAT_ArgumentGroup));
 
   SgMultiplyOp * multiplyExpression1 = buildMultiplyOp (
       variableDeclarations->getReference (getIterationCounterVariableName (2)),
@@ -108,7 +109,7 @@ CPPCUDAKernelSubroutineDirectLoop::createStageInFromDeviceMemoryToSharedMemorySt
       addExpression2);
 
   SgPntrArrRefExp * arrayExpression2 = buildPntrArrRefExp (
-      variableDeclarations->getReference (autosharedVariableName),
+      variableDeclarations->getReference (sharedPointerVariableName),
       addExpression1);
 
   SgExprStatement * assignmentStatement1 = buildAssignStatement (
@@ -142,9 +143,10 @@ CPPCUDAKernelSubroutineDirectLoop::createStageInFromSharedMemoryToLocalMemorySta
   using namespace OP2VariableNames;
   using std::string;
 
-  string const autosharedVariableName = getSharedMemoryDeclarationName (
-      parallelLoop->getOpDatBaseType (OP_DAT_ArgumentGroup),
-      parallelLoop->getSizeOfOpDat (OP_DAT_ArgumentGroup));
+  string const sharedPointerVariableName =
+      getSharedMemoryPointerDeclarationName (parallelLoop->getOpDatBaseType (
+          OP_DAT_ArgumentGroup), parallelLoop->getSizeOfOpDat (
+          OP_DAT_ArgumentGroup));
 
   SgMultiplyOp * multiplyExpression1 = buildMultiplyOp (
       variableDeclarations->getReference (threadID), buildIntVal (
@@ -154,7 +156,7 @@ CPPCUDAKernelSubroutineDirectLoop::createStageInFromSharedMemoryToLocalMemorySta
       getIterationCounterVariableName (2)), multiplyExpression1);
 
   SgPntrArrRefExp * arrayExpression1 = buildPntrArrRefExp (
-      variableDeclarations->getReference (autosharedVariableName),
+      variableDeclarations->getReference (sharedPointerVariableName),
       addExpression1);
 
   SgPntrArrRefExp * arrayExpression2 = buildPntrArrRefExp (
@@ -193,9 +195,10 @@ CPPCUDAKernelSubroutineDirectLoop::createStageOutFromSharedMemoryToDeviceMemoryS
   using namespace OP2VariableNames;
   using std::string;
 
-  string const autosharedVariableName = getSharedMemoryDeclarationName (
-      parallelLoop->getOpDatBaseType (OP_DAT_ArgumentGroup),
-      parallelLoop->getSizeOfOpDat (OP_DAT_ArgumentGroup));
+  string const sharedPointerVariableName =
+      getSharedMemoryPointerDeclarationName (parallelLoop->getOpDatBaseType (
+          OP_DAT_ArgumentGroup), parallelLoop->getSizeOfOpDat (
+          OP_DAT_ArgumentGroup));
 
   SgMultiplyOp * multiplyExpression1 = buildMultiplyOp (
       variableDeclarations->getReference (getIterationCounterVariableName (2)),
@@ -215,7 +218,7 @@ CPPCUDAKernelSubroutineDirectLoop::createStageOutFromSharedMemoryToDeviceMemoryS
       addExpression2);
 
   SgPntrArrRefExp * arrayExpression2 = buildPntrArrRefExp (
-      variableDeclarations->getReference (autosharedVariableName),
+      variableDeclarations->getReference (sharedPointerVariableName),
       addExpression1);
 
   SgExprStatement * assignmentStatement1 = buildAssignStatement (
@@ -249,9 +252,10 @@ CPPCUDAKernelSubroutineDirectLoop::createStageOutFromLocalMemoryToSharedMemorySt
   using namespace OP2VariableNames;
   using std::string;
 
-  string const autosharedVariableName = getSharedMemoryDeclarationName (
-      parallelLoop->getOpDatBaseType (OP_DAT_ArgumentGroup),
-      parallelLoop->getSizeOfOpDat (OP_DAT_ArgumentGroup));
+  string const sharedPointerVariableName =
+      getSharedMemoryPointerDeclarationName (parallelLoop->getOpDatBaseType (
+          OP_DAT_ArgumentGroup), parallelLoop->getSizeOfOpDat (
+          OP_DAT_ArgumentGroup));
 
   SgMultiplyOp * multiplyExpression1 = buildMultiplyOp (
       variableDeclarations->getReference (threadID), buildIntVal (
@@ -261,7 +265,7 @@ CPPCUDAKernelSubroutineDirectLoop::createStageOutFromLocalMemoryToSharedMemorySt
       getIterationCounterVariableName (2)), multiplyExpression1);
 
   SgPntrArrRefExp * arrayExpression1 = buildPntrArrRefExp (
-      variableDeclarations->getReference (autosharedVariableName),
+      variableDeclarations->getReference (sharedPointerVariableName),
       addExpression1);
 
   SgPntrArrRefExp * arrayExpression2 = buildPntrArrRefExp (
@@ -411,6 +415,7 @@ CPPCUDAKernelSubroutineDirectLoop::createInitialiseOffsetIntoCUDASharedVariableS
   using namespace SageInterface;
   using namespace LoopVariableNames;
   using namespace OP2VariableNames;
+  using namespace OP2::Macros;
   using std::find;
   using std::vector;
   using std::string;
@@ -419,7 +424,7 @@ CPPCUDAKernelSubroutineDirectLoop::createInitialiseOffsetIntoCUDASharedVariableS
       "Creating initialisation statements for offset in CUDA shared variables",
       Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
-  vector <string> autosharedOffsetNames;
+  vector <string> sharedMemoryNames;
 
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
@@ -427,31 +432,35 @@ CPPCUDAKernelSubroutineDirectLoop::createInitialiseOffsetIntoCUDASharedVariableS
     {
       if (parallelLoop->isDirect (i) && parallelLoop->getOpDatDimension (i) > 1)
       {
-        string const autosharedVariableName = getSharedMemoryDeclarationName (
+        string const sharedVariableName = getSharedMemoryDeclarationName (
             parallelLoop->getOpDatBaseType (i),
             parallelLoop->getSizeOfOpDat (i));
 
-        string const autosharedOffsetVariableName =
-            getSharedMemoryOffsetDeclarationName (
+        string const sharedPointerVariableName =
+            getSharedMemoryPointerDeclarationName (
                 parallelLoop->getOpDatBaseType (i),
                 parallelLoop->getSizeOfOpDat (i));
 
-        if (find (autosharedOffsetNames.begin (), autosharedOffsetNames.end (),
-            autosharedOffsetVariableName) == autosharedOffsetNames.end ())
+        if (find (sharedMemoryNames.begin (), sharedMemoryNames.end (),
+            sharedVariableName) == sharedMemoryNames.end ())
         {
-          autosharedOffsetNames.push_back (autosharedOffsetVariableName);
+          sharedMemoryNames.push_back (sharedVariableName);
 
-          SgMultiplyOp * multiplyExpression1 = buildMultiplyOp (
+          SgDivideOp * divideExpression = buildDivideOp (CUDA::getThreadId (
+              THREAD_X, subroutineScope), buildOpaqueVarRefExp (warpSizeMacro,
+              subroutineScope));
+
+          SgMultiplyOp * multiplyExpression = buildMultiplyOp (
               variableDeclarations->getReference (sharedMemoryOffset),
-              variableDeclarations->getReference (threadID));
+              divideExpression);
 
-          SgAddOp * addExpression1 =
-              buildAddOp (variableDeclarations->getReference (
-                  autosharedOffsetVariableName), multiplyExpression1);
+          SgAddOp * addExpression = buildAddOp (
+              variableDeclarations->getReference (sharedVariableName),
+              multiplyExpression);
 
           SgExprStatement * assignmentStatement = buildAssignStatement (
-              variableDeclarations->getReference (autosharedVariableName),
-              addExpression1);
+              variableDeclarations->getReference (sharedPointerVariableName),
+              addExpression);
 
           appendStatement (assignmentStatement, subroutineScope);
         }
@@ -492,9 +501,103 @@ CPPCUDAKernelSubroutineDirectLoop::createStatements ()
 
   createExecutionLoopStatements ();
 
-  if (parallelLoop->isReductionRequired () == true)
+  if (parallelLoop->isReductionRequired ())
   {
     createReductionEpilogueStatements ();
+  }
+}
+
+void
+CPPCUDAKernelSubroutineDirectLoop::createStageInVariableDeclarations ()
+{
+  using namespace SageBuilder;
+  using namespace OP2VariableNames;
+  using std::string;
+
+  Debug::getInstance ()->debugMessage ("Creating local thread variables",
+      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+
+  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
+  {
+    if (parallelLoop->isDuplicateOpDat (i) == false)
+    {
+      if (parallelLoop->isDirect (i) && parallelLoop->getOpDatDimension (i) > 1)
+      {
+        string const & variableName = getOpDatLocalName (i);
+
+        variableDeclarations ->add (variableName,
+            RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
+                variableName, buildArrayType (
+                    parallelLoop->getOpDatBaseType (i), buildIntVal (
+                        parallelLoop->getOpDatDimension (i))), subroutineScope));
+      }
+    }
+  }
+}
+
+void
+CPPCUDAKernelSubroutineDirectLoop::createCUDASharedVariableDeclarations ()
+{
+  using namespace SageBuilder;
+  using namespace OP2VariableNames;
+  using std::find;
+  using std::vector;
+  using std::string;
+
+  Debug::getInstance ()->debugMessage (
+      "Creating CUDA shared variable declarations", Debug::FUNCTION_LEVEL,
+      __FILE__, __LINE__);
+
+  vector <string> autosharedNames;
+
+  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
+  {
+    if (parallelLoop->isDuplicateOpDat (i) == false)
+    {
+      if (parallelLoop->isDirect (i) && parallelLoop->getOpDatDimension (i) > 1)
+      {
+        string const autosharedVariableName = getSharedMemoryDeclarationName (
+            parallelLoop->getOpDatBaseType (i),
+            parallelLoop->getSizeOfOpDat (i));
+
+        if (find (autosharedNames.begin (), autosharedNames.end (),
+            autosharedVariableName) == autosharedNames.end ())
+        {
+          Debug::getInstance ()->debugMessage (
+              "Creating declaration with name '" + autosharedVariableName
+                  + "' for OP_DAT '" + parallelLoop->getOpDatVariableName (i)
+                  + "'", Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+
+          SgVariableDeclaration * autosharedVariableDeclaration =
+              RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
+                  autosharedVariableName, buildArrayType (
+                      parallelLoop->getOpDatBaseType (i)), subroutineScope);
+
+          autosharedVariableDeclaration->get_declarationModifier ().get_storageModifier ().setCudaDynamicShared ();
+
+          variableDeclarations->add (autosharedVariableName,
+              autosharedVariableDeclaration);
+
+          autosharedNames.push_back (autosharedVariableName);
+
+          string const autosharedPointerVariableName =
+              getSharedMemoryPointerDeclarationName (
+                  parallelLoop->getOpDatBaseType (i),
+                  parallelLoop->getSizeOfOpDat (i));
+
+          Debug::getInstance ()->debugMessage (
+              "Creating pointer into shared memory with name '"
+                  + autosharedPointerVariableName + "' for OP_DAT '"
+                  + parallelLoop->getOpDatVariableName (i) + "'",
+              Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+
+          variableDeclarations->add (autosharedPointerVariableName,
+              RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
+                  autosharedPointerVariableName, buildPointerType (
+                      parallelLoop->getOpDatBaseType (i)), subroutineScope));
+        }
+      }
+    }
   }
 }
 
@@ -510,9 +613,14 @@ CPPCUDAKernelSubroutineDirectLoop::createLocalVariableDeclarations ()
   Debug::getInstance ()->debugMessage ("Creating local variable declarations",
       Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
-  createCUDAStageInVariablesVariableDeclarations ();
+  createStageInVariableDeclarations ();
 
   createCUDASharedVariableDeclarations ();
+
+  if (parallelLoop->isReductionRequired ())
+  {
+    createReductionVariableDeclarations ();
+  }
 
   variableDeclarations->add (
       getIterationCounterVariableName (1),

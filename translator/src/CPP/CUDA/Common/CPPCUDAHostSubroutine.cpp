@@ -54,10 +54,6 @@ CPPCUDAHostSubroutine::createReductionUpdateStatements (
     }
     else if (parallelLoop->isMaximised (OP_DAT_ArgumentGroup))
     {
-      SgPointerDerefExp * pointerDerefenceExpression2 = buildPointerDerefExp (
-          variableDeclarations->getReference (getReductionArrayHostName (
-              OP_DAT_ArgumentGroup)));
-
       SgFunctionCallExp * maxCallExpression =
           OP2::Macros::createMaxCallStatement (subroutineScope,
               arrayExpression1, arrayExpression2);
@@ -69,10 +65,6 @@ CPPCUDAHostSubroutine::createReductionUpdateStatements (
     }
     else if (parallelLoop->isMinimised (OP_DAT_ArgumentGroup))
     {
-      SgPointerDerefExp * pointerDerefenceExpression2 = buildPointerDerefExp (
-          variableDeclarations->getReference (getReductionArrayHostName (
-              OP_DAT_ArgumentGroup)));
-
       SgFunctionCallExp * minCallExpression =
           OP2::Macros::createMinCallStatement (subroutineScope,
               arrayExpression1, arrayExpression2);

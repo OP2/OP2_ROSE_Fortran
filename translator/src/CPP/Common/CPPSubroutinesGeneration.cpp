@@ -111,6 +111,8 @@ CPPSubroutinesGeneration::generate ()
 
   addHeaderIncludes ();
 
+  addFreeVariableDeclarations ();
+
   moduleDeclarations = new CPPModuleDeclarations (moduleScope, declarations);
 
   createSubroutines ();
@@ -118,11 +120,6 @@ CPPSubroutinesGeneration::generate ()
   patchCallsToParallelLoops ();
 
   addOP2IncludeDirective ();
-
-  if (Globals::getInstance ()->getTargetBackend () == TargetLanguage::CUDA)
-  {
-    addFreeVariableDeclarations ();
-  }
 
   determineWhichInputFilesToBeUnparsed ();
 }

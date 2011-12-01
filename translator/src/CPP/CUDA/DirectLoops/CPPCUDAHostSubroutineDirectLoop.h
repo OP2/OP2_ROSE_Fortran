@@ -13,6 +13,9 @@ class CPPCUDAHostSubroutineDirectLoop: public CPPCUDAHostSubroutine
     void
     createCUDAKernelInitialisationStatements ();
 
+    void
+    createCUDASharedVariableDeclarations ();
+
     virtual SgStatement *
     createKernelFunctionCallStatement ();
 

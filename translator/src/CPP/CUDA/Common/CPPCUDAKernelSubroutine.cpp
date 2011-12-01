@@ -6,11 +6,6 @@
 #include <CompilerGeneratedNames.h>
 
 void
-CPPCUDAKernelSubroutine::createInitialiseCUDAStageInVariablesStatements ()
-{
-}
-
-void
 CPPCUDAKernelSubroutine::createReductionPrologueStatements ()
 {
   using namespace SageBuilder;
@@ -125,10 +120,6 @@ CPPCUDAKernelSubroutine::createReductionEpilogueStatements ()
 
   Debug::getInstance ()->debugMessage (
       "Creating reduction epilogue statements", Debug::FUNCTION_LEVEL,
-      __FILE__, __LINE__);
-
-  Debug::getInstance ()->debugMessage (
-      "Creating reduction prologue statements", Debug::FUNCTION_LEVEL,
       __FILE__, __LINE__);
 
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
@@ -287,21 +278,22 @@ CPPCUDAKernelSubroutine::createReductionEpilogueStatements ()
 }
 
 void
-CPPCUDAKernelSubroutine::createCUDAStageInVariablesVariableDeclarations ()
+CPPCUDAKernelSubroutine::createReductionVariableDeclarations ()
 {
   using namespace SageBuilder;
   using namespace OP2VariableNames;
   using std::string;
 
-  Debug::getInstance ()->debugMessage ("Creating local thread variables",
-      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+  Debug::getInstance ()->debugMessage (
+      "Creating declarations needed for reduction", Debug::FUNCTION_LEVEL,
+      __FILE__, __LINE__);
 
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
-    string const & variableName = getOpDatLocalName (i);
-
-    if (parallelLoop->isStageInNeeded (i))
+    if (parallelLoop->isDuplicateOpDat (i) == false)
     {
+      string const & variableName = getOpDatLocalName (i);
+
       if (parallelLoop->isReductionRequired (i))
       {
         if (parallelLoop->isArray (i) || parallelLoop->isPointer (i))
@@ -318,84 +310,6 @@ CPPCUDAKernelSubroutine::createCUDAStageInVariablesVariableDeclarations ()
               RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
                   variableName, parallelLoop->getOpDatBaseType (i),
                   subroutineScope));
-        }
-      }
-      else
-      {
-        variableDeclarations ->add (variableName,
-            RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
-                variableName, buildArrayType (
-                    parallelLoop->getOpDatBaseType (i), buildIntVal (
-                        parallelLoop->getOpDatDimension (i))), subroutineScope));
-      }
-    }
-  }
-}
-
-void
-CPPCUDAKernelSubroutine::createCUDASharedVariableDeclarations ()
-{
-  using namespace SageBuilder;
-  using namespace OP2VariableNames;
-  using std::find;
-  using std::vector;
-  using std::string;
-
-  Debug::getInstance ()->debugMessage (
-      "Creating CUDA shared variable declarations", Debug::FUNCTION_LEVEL,
-      __FILE__, __LINE__);
-
-  vector <string> autosharedNames;
-
-  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
-  {
-    if (parallelLoop->isDuplicateOpDat (i) == false)
-    {
-      if (parallelLoop->isIndirect (i) || (parallelLoop->isDirect (i)
-          && parallelLoop->getOpDatDimension (i) > 1))
-      {
-        string const autosharedVariableName =
-            getSharedMemoryDeclarationName (parallelLoop->getOpDatBaseType (
-                i), parallelLoop->getSizeOfOpDat (i));
-
-        if (find (autosharedNames.begin (), autosharedNames.end (),
-            autosharedVariableName) == autosharedNames.end ())
-        {
-          Debug::getInstance ()->debugMessage (
-              "Creating declaration with name '" + autosharedVariableName
-                  + "' for OP_DAT '" + parallelLoop->getOpDatVariableName (i)
-                  + "'", Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
-
-          SgVariableDeclaration * autosharedVariableDeclaration =
-              RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
-                  autosharedVariableName, buildArrayType (
-                      parallelLoop->getOpDatBaseType (i)), subroutineScope);
-
-          autosharedVariableDeclaration->get_declarationModifier ().get_storageModifier ().setCudaDynamicShared ();
-
-          variableDeclarations->add (autosharedVariableName,
-              autosharedVariableDeclaration);
-
-          autosharedNames.push_back (autosharedVariableName);
-
-          if (parallelLoop->isDirectLoop ())
-          {
-            string const autosharedOffsetVariableName =
-                getSharedMemoryOffsetDeclarationName (
-                    parallelLoop->getOpDatBaseType (i),
-                    parallelLoop->getSizeOfOpDat (i));
-
-            Debug::getInstance ()->debugMessage (
-                "Creating offset declaration with name '"
-                    + autosharedOffsetVariableName + "' for OP_DAT '"
-                    + parallelLoop->getOpDatVariableName (i) + "'",
-                Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
-
-            variableDeclarations->add (autosharedOffsetVariableName,
-                RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
-                    autosharedOffsetVariableName, buildIntType (),
-                    subroutineScope));
-          }
         }
       }
     }
