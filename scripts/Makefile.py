@@ -510,8 +510,9 @@ def createMakefile (generatedFiles):
 
 	op2InstallPath = "OP2_INSTALL_PATH"
 	message = """\n**************************************************************** WARNING ****************************************************************
-* Good news: I am generating a Makefile for you called '%s'!
+* Good news: I am generating a Makefile for you called '%s' to compile the code I just generated on your behalf!
 * Bad news: in order to succesfully compile the generated code via this Makefile, you must set an environment variable '%s'.
+* This environment variable should point to the directory '<prefix>/OP2-Common/op2'.
 * Otherwise, the OP2 include and library directories will not be found and the make process is doomed to fail.
 *****************************************************************************************************************************************
 """ % (makefileName, op2InstallPath)
