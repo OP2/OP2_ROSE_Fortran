@@ -58,7 +58,7 @@ FortranOpDatDefinition::FortranOpDatDefinition (SgExprListExp * parameters)
         parameters->get_expressions ()[index_data]);
   }
 
-  primitiveType = actualDataVariableReference->get_type ();
+  baseType = actualDataVariableReference->get_type ();
 
   /*
    * ======================================================
@@ -84,12 +84,12 @@ FortranOpDatDefinition::FortranOpDatDefinition (SgExprListExp * parameters)
 
   ROSE_ASSERT (opSetName.empty () == false);
   ROSE_ASSERT (dimension > 0);
-  ROSE_ASSERT (primitiveType != NULL);
+  ROSE_ASSERT (baseType != NULL);
   ROSE_ASSERT (variableName.empty () == false);
 
   Debug::getInstance ()->debugMessage ("Found an OP_DAT definition: '"
       + variableName + "'. The data pertains to the set '" + opSetName
-      + "'. Its actual type is " + primitiveType->class_name ()
+      + "'. Its actual type is " + baseType->class_name ()
       + " and its dimension is " + lexical_cast <string> (dimension),
       Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 }
@@ -285,7 +285,7 @@ FortranOpGblDefinition::FortranOpGblDefinition (SgExprListExp * parameters)
   using boost::lexical_cast;
   using std::string;
 
-  primitiveType
+  baseType
       = isSgVarRefExp (parameters->get_expressions ()[index_data])->get_type ();
 
   variableName
@@ -295,11 +295,11 @@ FortranOpGblDefinition::FortranOpGblDefinition (SgExprListExp * parameters)
       = isSgIntVal (parameters->get_expressions ()[index_dimension])->get_value ();
 
   ROSE_ASSERT (dimension > 0);
-  ROSE_ASSERT (primitiveType != NULL);
+  ROSE_ASSERT (baseType != NULL);
   ROSE_ASSERT (variableName.empty () == false);
 
   Debug::getInstance ()->debugMessage ("Found an OP_GBL definition: '"
-      + variableName + "'. Its actual type is " + primitiveType->class_name ()
+      + variableName + "'. Its actual type is " + baseType->class_name ()
       + " and its dimension is " + lexical_cast <string> (dimension),
       Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 }
@@ -310,17 +310,17 @@ FortranOpGblScalarDefinition::FortranOpGblScalarDefinition (
   using boost::lexical_cast;
   using std::string;
 
-  primitiveType
+  baseType
       = isSgVarRefExp (parameters->get_expressions ()[index_data])->get_type ();
 
   variableName
       = isSgVarRefExp (parameters->get_expressions ()[index_OpDatName])->get_symbol ()->get_name ().getString ();
 
-  ROSE_ASSERT (primitiveType != NULL);
+  ROSE_ASSERT (baseType != NULL);
   ROSE_ASSERT (variableName.empty () == false);
 
   Debug::getInstance ()->debugMessage ("Found an OP_GBL scalar definition: '"
-      + variableName + "'. Its actual type is " + primitiveType->class_name (),
+      + variableName + "'. Its actual type is " + baseType->class_name (),
       Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 }
 

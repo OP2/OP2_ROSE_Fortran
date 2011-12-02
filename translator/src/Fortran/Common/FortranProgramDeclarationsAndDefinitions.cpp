@@ -45,7 +45,7 @@ FortranProgramDeclarationsAndDefinitions::setOpGblProperties (
   parallelLoop->setUniqueOpDat (variableName);
 
   parallelLoop->setOpDatType (OP_DAT_ArgumentGroup,
-      opGblDeclaration->getPrimitiveType ());
+      opGblDeclaration->getBaseType ());
 
   parallelLoop->setOpDatVariableName (OP_DAT_ArgumentGroup, variableName);
 
@@ -67,7 +67,7 @@ FortranProgramDeclarationsAndDefinitions::setOpDatProperties (
       __FILE__, __LINE__);
 
   parallelLoop->setOpDatType (OP_DAT_ArgumentGroup,
-      opDatDeclaration->getPrimitiveType ());
+      opDatDeclaration->getBaseType ());
 
   parallelLoop->setOpDatDimension (OP_DAT_ArgumentGroup,
       opDatDeclaration->getDimension ());
@@ -80,7 +80,7 @@ FortranProgramDeclarationsAndDefinitions::setOpDatProperties (
 
     parallelLoop->setDuplicateOpDat (OP_DAT_ArgumentGroup, false);
 
-    if (isSgArrayType (opDatDeclaration->getPrimitiveType ()) == NULL)
+    if (isSgArrayType (opDatDeclaration->getBaseType ()) == NULL)
     {
       throw Exceptions::ParallelLoop::UnsupportedBaseTypeException ("OP_DAT '"
           + variableName + "' is not an array");

@@ -18,17 +18,17 @@ CPPImperialOpDatDefinition::CPPImperialOpDatDefinition (
   dimension
       = isSgIntVal (parameters->get_expressions ()[indexDimension])->get_value ();
 
-  primitiveType
+  baseType
       = isSgVarRefExp (parameters->get_expressions ()[indexDataArray])->get_type ();
 
   ROSE_ASSERT (opSetName.empty () == false);
   ROSE_ASSERT (dimension > 0);
-  ROSE_ASSERT (primitiveType != NULL);
+  ROSE_ASSERT (baseType != NULL);
   ROSE_ASSERT (variableName.empty () == false);
 
   Debug::getInstance ()->debugMessage ("Found an OP_DAT declaration: '"
       + variableName + "'. The data pertains to the set '" + opSetName
-      + "'. Its actual type is " + primitiveType->class_name ()
+      + "'. Its actual type is " + baseType->class_name ()
       + " and its dimension is " + lexical_cast <string> (dimension),
       Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 }
@@ -132,17 +132,17 @@ CPPOxfordOpDatDefinition::CPPOxfordOpDatDefinition (SgExprListExp * parameters,
   dimension
       = isSgIntVal (parameters->get_expressions ()[indexDimension])->get_value ();
 
-  primitiveType
+  baseType
       = isSgVarRefExp (parameters->get_expressions ()[indexDataArray])->get_type ();
 
   ROSE_ASSERT (opSetName.empty () == false);
   ROSE_ASSERT (dimension > 0);
-  ROSE_ASSERT (primitiveType != NULL);
+  ROSE_ASSERT (baseType != NULL);
   ROSE_ASSERT (variableName.empty () == false);
 
   Debug::getInstance ()->debugMessage ("Found an OP_DAT declaration: '"
       + variableName + "'. The data pertains to the set '" + opSetName
-      + "'. Its actual type is " + primitiveType->class_name ()
+      + "'. Its actual type is " + baseType->class_name ()
       + " and its dimension is " + lexical_cast <string> (dimension),
       Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 }

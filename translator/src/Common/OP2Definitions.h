@@ -43,7 +43,7 @@ class OpDatDefinition: public OP2Definition
 
     unsigned int dimension;
 
-    SgType * primitiveType;
+    SgType * baseType;
 
   public:
 
@@ -54,7 +54,7 @@ class OpDatDefinition: public OP2Definition
     getDimension () const;
 
     SgType *
-    getPrimitiveType ();
+    getBaseType ();
 };
 
 class OpSetDefinition: public OP2Definition
@@ -120,7 +120,7 @@ class OpGblDefinition: public OP2Definition
 
     unsigned int dimension;
 
-    SgType * primitiveType;
+    SgType * baseType;
 
   public:
 
@@ -128,7 +128,7 @@ class OpGblDefinition: public OP2Definition
     getDimension () const;
 
     SgType *
-    getPrimitiveType ();
+    getBaseType ();
 };
 
 class OpConstDefinition: public OP2Definition
@@ -146,9 +146,6 @@ class OpConstDefinition: public OP2Definition
     SgType * baseType;
 
   public:
-
-    void
-    setType (SgType * baseType);
 
     SgType *
     getType ();

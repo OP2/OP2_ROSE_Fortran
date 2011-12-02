@@ -225,7 +225,7 @@ CPPModifyOP2CallsToComplyWithOxfordAPI::patchOpArgDatCall (
       actualArguments.begin () + 4;
 
   SgPointerType * pointerType = isSgPointerType (
-      opDatDefinition->getPrimitiveType ());
+      opDatDefinition->getBaseType ());
 
   ROSE_ASSERT (pointerType != NULL);
 

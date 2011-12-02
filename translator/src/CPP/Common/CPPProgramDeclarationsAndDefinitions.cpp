@@ -29,7 +29,7 @@ CPPProgramDeclarationsAndDefinitions::setOpDatProperties (
       __FILE__, __LINE__);
 
   parallelLoop->setOpDatType (OP_DAT_ArgumentGroup,
-      opDatDeclaration->getPrimitiveType ());
+      opDatDeclaration->getBaseType ());
 
   parallelLoop->setOpDatDimension (OP_DAT_ArgumentGroup,
       opDatDeclaration->getDimension ());
@@ -42,7 +42,7 @@ CPPProgramDeclarationsAndDefinitions::setOpDatProperties (
 
     parallelLoop->setDuplicateOpDat (OP_DAT_ArgumentGroup, false);
 
-    if (isSgPointerType (opDatDeclaration->getPrimitiveType ()) == NULL)
+    if (isSgPointerType (opDatDeclaration->getBaseType ()) == NULL)
     {
       throw new Exceptions::ParallelLoop::UnsupportedBaseTypeException (
           "OP_DAT '" + variableName + "' is not a pointer");

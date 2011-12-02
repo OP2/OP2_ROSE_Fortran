@@ -412,18 +412,6 @@ CPPOpenMPHostSubroutineIndirectLoop::createPlanFunctionDeclarations ()
       RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (nblocks,
           buildIntType (), subroutineScope));
 
-  variableDeclarations->add (nelems,
-      RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (nelems,
-          buildIntType (), subroutineScope));
-
-  variableDeclarations->add (nbytes,
-      RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (nbytes,
-          buildIntType (), subroutineScope));
-
-  variableDeclarations->add (partitionSize,
-      RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
-          partitionSize, buildIntType (), subroutineScope));
-
   variableDeclarations->add (opDatArray,
       RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
           opDatArray, buildArrayType (buildOpaqueType (OP2::OP_ARG,

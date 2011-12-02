@@ -93,7 +93,7 @@ parser.add_option("-f",
 debug = Debug(opts.verbose)
 
 # The translator generates a file specific to each backend
-translatorCUDAFileName = ".translator.cuda"
+translatorCUDAFileName   = ".translator.cuda"
 translatorOpenCLFileName = ".translator.opencl"	
 translatorOpenMPFileName = ".translator.openmp"
 
@@ -113,16 +113,16 @@ def clean ():
 	translatorOpenCLFileName = ".translator.opencl"	
 	translatorOpenMPFileName = ".translator.openmp"
 
-	generatedFile = None
+	hiddenFile = None
 	if os.path.exists(translatorCUDAFileName) and opts.cuda:
-		generatedFile = open(translatorCUDAFileName, 'r')	
+		hiddenFile = open(translatorCUDAFileName, 'r')	
 	if os.path.exists(translatorOpenCLFileName) and opts.opencl:
-		generatedFile = open(translatorOpenCLFileName, 'r')
+		hiddenFile = open(translatorOpenCLFileName, 'r')
 	if  os.path.exists(translatorOpenMPFileName) and opts.openmp:
-		generatedFile = open(translatorOpenMPFileName, 'r')
+		hiddenFile = open(translatorOpenMPFileName, 'r')
 
-	if generatedFile is not None:
-		for line in generatedFile:
+	if hiddenFile is not None:
+		for line in hiddenFile:
 			line  = line.strip()
 			if line.startswith("files="):
 				words = line.split('=')
@@ -131,7 +131,7 @@ def clean ():
 					compilationUnitFileName = compilationUnitFileName.strip()
 					if compilationUnitFileName.startswith("rose_"):
 						filesToRemove.append(compilationUnitFileName)
-		generatedFile.close()
+	hiddenFile.close()
 
 	for file in filesToRemove:
 		if os.path.exists(file):
@@ -346,9 +346,11 @@ def postprocessGeneratedFiles (generatedFiles, completeOP2Header, reducedOP2Head
 	from shutil import move
 	from os import remove, close
 
-	for file in generatedFiles:
+	mainCompilationUnits = generatedFiles[0]
+
+	for file in mainCompilationUnits:
 		#Create temp file
-		debug.verboseMessage("Analysing file '%s'" % file)
+		debug.verboseMessage("Postprocessing generated file '%s'" % file)
 		fh, abs_path = mkstemp()
 		new_file = open(abs_path,'w')
 		old_file = open(file)
@@ -365,40 +367,88 @@ def postprocessGeneratedFiles (generatedFiles, completeOP2Header, reducedOP2Head
 		move(abs_path, file)
 
 def getGeneratedFiles ():
-	outputFiles         = []
-	generatedFiles      = []
-	mainCompilationUnit = None
+	hiddenFile = None
+	if opts.cuda:
+		hiddenFile = open(translatorCUDAFileName, 'r')	
+	elif opts.openmp:
+		hiddenFile = open(translatorOpenMPFileName, 'r')
+	elif opts.opencl:
+		hiddenFile = open(translatorOpenCLFileName, 'r')
 
-def createMakefile ():
-	generatedFile = None
-	if os.path.exists(translatorCUDAFileName) and opts.cuda:
-		generatedFile = open(translatorCUDAFileName, 'r')	
-	if os.path.exists(translatorOpenCLFileName) and opts.opencl:
-		generatedFile = open(translatorOpenCLFileName, 'r')
-	if  os.path.exists(translatorOpenMPFileName) and opts.openmp:
-		generatedFile = open(translatorOpenMPFileName, 'r')
+	compilationUnits         = []
+	generatedCompilationUnit = None
 
-	mainCompilationUnit = None
-	compilationUnits    = []
-	if generatedFile is not None:
-		for line in generatedFile:
-			line  = line.strip()
-			if line.startswith("main="):
-				words               = line.split('=')
-				mainCompilationUnit = words[1].strip().split(' ')[0]
-			elif line.startswith("files="):
-				words = line.split('=')
-				files = words[1].strip().split(' ')
-				for compilationUnitFileName in files:
-					compilationUnitFileName = compilationUnitFileName.strip()
-					compilationUnits.append(compilationUnitFileName)
-	generatedFile.close()
-	
+	for line in hiddenFile:
+		line  = line.strip()
+		if line.startswith("generated="):
+			words                    = line.split('=')
+			generatedCompilationUnit = words[1].strip().split(' ')[0]
+		elif line.startswith("files="):
+			words = line.split('=')
+			files = words[1].strip().split(' ')
+			for compilationUnitFileName in files:
+				compilationUnitFileName = compilationUnitFileName.strip()
+				compilationUnits.append(compilationUnitFileName)
+
+	hiddenFile.close()
+
+	return (compilationUnits, generatedCompilationUnit)
+
+def createMakefile (generatedFiles):
+	from shutil import move
+
+	compilationUnits        = generatedFiles[0]
+	generatedCompilatonUnit = generatedFiles[1]
+
 	makefile = None
 
 	if opts.cuda:
+		cudaCompilationUnit = generatedCompilatonUnit[:-4] + ".cu"
+		cudaObjectFile      = generatedCompilatonUnit[:-4] + ".o"
+		move(generatedCompilatonUnit, cudaCompilationUnit)
+		
 		makefile = open('Makefile.cuda', 'w')	
-		makefile.write("OUT = binary_cuda\n")
+		makefile.write("OUT       = binary_cuda\n")
+		makefile.write("CPP       = g++\n")
+		makefile.write("CPPFLAGS  = -O3 -Wall\n")
+		makefile.write("NVCC      = nvcc\n")
+		makefile.write("NVCCFLAGS = -O3 -arch=sm_20 -Xptxas=-v -use_fast_math\n")	
+		makefile.write("\n")
+
+		makefile.write("$(OUT): ")
+		for file in compilationUnits:
+			if file == generatedCompilatonUnit:
+				makefile.write(cudaObjectFile + " ")
+			else:
+				objectFile = file[:-4] + ".o"
+				makefile.write(objectFile + " ")
+
+		makefile.write("\n")
+		makefile.write("\t")
+		makefile.write("$(CPP) ")		
+		for file in compilationUnits:
+			if file == generatedCompilatonUnit:
+				makefile.write(cudaObjectFile + " ")
+			else:
+				objectFile = file[:-4] + ".o"
+				makefile.write(objectFile + " ")
+		makefile.write(" -L$(OP2_INSTALL_PATH)/c/lib -lcudart -lop2_cuda -o $(OUT)\n")
+
+		makefile.write("\n")
+		makefile.write(cudaObjectFile + ": " + cudaCompilationUnit)
+		makefile.write("\n")
+		makefile.write("\t")
+		makefile.write("$(NVCC) $(NVCCFLAGS) -I$(OP2_INSTALL_PATH)/c/include -c %s -o %s" % (cudaCompilationUnit, cudaObjectFile))
+		makefile.write("\n")
+
+		for file in compilationUnits:
+			if file != generatedCompilatonUnit:
+				objectFile = file[:-4] + ".o"
+				makefile.write("\n")
+				makefile.write(objectFile + ": " + file)
+				makefile.write("\n")
+				makefile.write("\t")
+				makefile.write("$(CPP) $(CPPFLAGS) -I$(OP2_INSTALL_PATH)/c/include -c %s -o %s\n" % (file, objectFile))
 
 	elif opts.opencl:
 		makefile = open('Makefile.opencl', 'w')
@@ -408,16 +458,26 @@ def createMakefile ():
 		makefile = open('Makefile.openmp', 'w')
 		makefile.write("OUT      = binary_openmp\n")
 		makefile.write("CPP      = g++\n")
-		makefile.write("CPPFLAGS = -g -fPIC -Wall -DUNIX -fopenmp\n")
+		makefile.write("CPPFLAGS = -O3 -Wall -fopenmp\n")
 		makefile.write("\n")
 		
 		makefile.write("$(OUT): ")
 		for file in compilationUnits:
-			makefile.write("%s " % file)
+			makefile.write(file + " ")
 		
 		makefile.write("\n")
 		makefile.write("\t")
-		makefile.write("$(CPP) %s $(CPPFLAGS) -I$(OP2_INSTALL_PATH)/c/include -L$(OP2_INSTALL_PATH)/c/lib -lm -lop2_openmp -o $(OUT)\n" % mainCompilationUnit)
+		makefile.write("$(CPP) ")
+		for file in compilationUnits:
+			makefile.write(file + " ")
+		makefile.write("$(CPPFLAGS) -I$(OP2_INSTALL_PATH)/c/include -L$(OP2_INSTALL_PATH)/c/lib -lm -lop2_openmp -o $(OUT)\n")
+
+	# Every Makefile has a clean target
+	makefile.write("\n")
+	makefile.write("clean:")
+	makefile.write("\n")
+	makefile.write("\t")
+	makefile.write("rm -f $(OUT) *.o")
 
 	makefile.close()
 
@@ -454,11 +514,12 @@ def handleCPPProject (filesToCompile):
 	switchHeadersInGivenFiles (filesToCompile, completeOP2Header, reducedOP2Header, False)
 
 	# The files generated by our compiler
-	generatedFiles = glob(os.getcwd() + os.sep + "rose_*")
+	generatedFiles = getGeneratedFiles ()
 
 	postprocessGeneratedFiles (generatedFiles, completeOP2Header, reducedOP2Header)
 
-	createMakefile ()
+	# Create a backend-specific Makefile
+	createMakefile (generatedFiles)
 
 if opts.clean:
 	clean()
