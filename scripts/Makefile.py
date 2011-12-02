@@ -548,9 +548,9 @@ def makeArchive (makefile, generatedFiles, headerFiles):
 		z.write(file)
 	
 	message = """\n********************************************************************************
-Created archive '%s' containing the following files: '%s'"
+Created archive '%s' containing the following files:\n%s
 *******************************************************************************
-"""  % (fileName, z.namelist())
+"""  % (fileName, '\n'.join('{}: {}'.format(*k) for k in enumerate(z.namelist())))
 
 	stdout.write(message)
 
