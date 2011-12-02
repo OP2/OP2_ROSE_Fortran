@@ -1,5 +1,11 @@
 #include <math.h>
-#include "globalVariables.h"
+
+extern float eps;
+extern float alpha;
+extern float cfl;
+extern float gam;
+extern float gm1;
+extern float qinf[4];
 
 inline void 
 save_soln(float *q, float *qold){

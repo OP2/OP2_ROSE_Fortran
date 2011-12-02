@@ -521,8 +521,9 @@ def createMakefile (generatedFiles):
 
 	return makefile.name
 
-def makeArchive (makefile, generatedFiles):
-	import zipfile
+def makeArchive (makefile, generatedFiles, headerFiles):
+	from zipfile import ZipFile
+	from sys import stdout
 
 	compilationUnits        = generatedFiles[0]
 	generatedCompilatonUnit = generatedFiles[1]
@@ -535,14 +536,25 @@ def makeArchive (makefile, generatedFiles):
 	elif opts.openmp:
 		fileName = "files_openmp.zip"
 
-	z = zipfile.ZipFile(fileName, "w")
+	z = ZipFile(fileName, "w")
 
 	z.write(makefile)
 	z.write(generatedCompilatonUnit)
+	
 	for file in compilationUnits:
 		z.write(file)
+	
+	for file in headerFiles:
+		z.write(file)
+	
+	message = """\n********************************************************************************
+Created archive '%s' containing the following files: '%s'"
+*******************************************************************************
+"""  % (fileName, z.namelist())
 
-	z.close()
+	stdout.write(message)
+
+	z.close()	
 
 def handleFortranProject (filesToCompile):
 	from FormatFortranCode import FormatFortranCode	
@@ -584,8 +596,10 @@ def handleCPPProject (filesToCompile):
 
 	# Create a backend-specific Makefile
 	makefile = createMakefile (generatedFiles)
+	
+	headerFiles = glob('*.h')
 
-	makeArchive (makefile, generatedFiles)
+	makeArchive (makefile, generatedFiles, headerFiles)
 
 def main ():
 	if opts.clean:
