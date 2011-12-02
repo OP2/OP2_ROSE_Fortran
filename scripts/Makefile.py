@@ -401,16 +401,23 @@ def getGeneratedFiles ():
 			oldFileName              = words[1].strip().split(' ')[0]
 			newFileName              = getBackendSpecificFileName (oldFileName)
 			generatedCompilationUnit = newFileName
+			move(oldFileName, newFileName)
 		elif line.startswith("files="):
 			words = line.split('=')
 			files = words[1].strip().split(' ')
 			for compilationUnitFileName in files:
 				compilationUnitFileName = compilationUnitFileName.strip()
 				newFileName             = getBackendSpecificFileName (compilationUnitFileName)
-				move (compilationUnitFileName, newFileName)
-				compilationUnits.append(newFileName)
-
+				if newFileName != generatedCompilationUnit:
+					move (compilationUnitFileName, newFileName)
+					compilationUnits.append(newFileName)
 	hiddenFile.close()
+
+	if opts.cuda:
+		# Move the generated file so that it has the correct suffix as required by CUDA compilers
+		cudaCompilationUnit = generatedCompilationUnit[:-4] + ".cu"
+		move(generatedCompilationUnit, cudaCompilationUnit)
+		generatedCompilationUnit = cudaCompilationUnit
 
 	return (compilationUnits, generatedCompilationUnit)
 
@@ -425,12 +432,8 @@ def createMakefile (generatedFiles):
 	makefile = None
 
 	if opts.cuda:
-		cudaCompilationUnit = generatedCompilatonUnit[:-4] + ".cu"
-		cudaObjectFile      = generatedCompilatonUnit[:-4] + ".o"
+		cudaObjectFile  = generatedCompilatonUnit[:-3] + ".o"
 
-		# Move the generated file so that it has the correct suffix as required by CUDA compilers
-		move(generatedCompilatonUnit, cudaCompilationUnit)
-		
 		makefileName = 'Makefile.cuda'
 		makefile = open(makefileName, 'w')	
 		makefile.write("OUT       = binary_cuda\n")
@@ -441,29 +444,25 @@ def createMakefile (generatedFiles):
 		makefile.write("\n")
 
 		makefile.write("$(OUT): ")
-		for file in compilationUnits:
-			if file == generatedCompilatonUnit:
-				makefile.write(cudaObjectFile + " ")
-			else:
-				objectFile = file[:-4] + ".o"
-				makefile.write(objectFile + " ")
+		makefile.write(cudaObjectFile + " ")
+		for file in compilationUnits:		
+			objectFile = file[:-4] + ".o"
+			makefile.write(objectFile + " ")
 
 		makefile.write("\n")
 		makefile.write("\t")
-		makefile.write("$(CPP) ")		
+		makefile.write("$(CPP) ")	
+		makefile.write(cudaObjectFile + " ")	
 		for file in compilationUnits:
-			if file == generatedCompilatonUnit:
-				makefile.write(cudaObjectFile + " ")
-			else:
-				objectFile = file[:-4] + ".o"
-				makefile.write(objectFile + " ")
-		makefile.write(" -L$(OP2_INSTALL_PATH)/c/lib -lcudart -lop2_cuda -o $(OUT)\n")
+			objectFile = file[:-4] + ".o"
+			makefile.write(objectFile + " ")
+		makefile.write("-L$(OP2_INSTALL_PATH)/c/lib -lcudart -lop2_cuda -o $(OUT)\n")
 
 		makefile.write("\n")
-		makefile.write(cudaObjectFile + ": " + cudaCompilationUnit)
+		makefile.write(cudaObjectFile + ": " + generatedCompilatonUnit)
 		makefile.write("\n")
 		makefile.write("\t")
-		makefile.write("$(NVCC) $(NVCCFLAGS) -I$(OP2_INSTALL_PATH)/c/include -c %s -o %s" % (cudaCompilationUnit, cudaObjectFile))
+		makefile.write("$(NVCC) $(NVCCFLAGS) -I$(OP2_INSTALL_PATH)/c/include -c %s -o %s" % (generatedCompilatonUnit, cudaObjectFile))
 		makefile.write("\n")
 
 		for file in compilationUnits:
@@ -488,13 +487,15 @@ def createMakefile (generatedFiles):
 		makefile.write("CPPFLAGS = -O3 -Wall -fopenmp\n")
 		makefile.write("\n")
 		
-		makefile.write("$(OUT): ")
+		makefile.write("$(OUT): ")		
+		makefile.write(generatedCompilatonUnit + " ")
 		for file in compilationUnits:
 			makefile.write(file + " ")
 		
 		makefile.write("\n")
 		makefile.write("\t")
-		makefile.write("$(CPP) ")
+		makefile.write("$(CPP) ")		
+		makefile.write(generatedCompilatonUnit + " ")
 		for file in compilationUnits:
 			makefile.write(file + " ")
 		makefile.write("$(CPPFLAGS) -I$(OP2_INSTALL_PATH)/c/include -L$(OP2_INSTALL_PATH)/c/lib -lm -lop2_openmp -o $(OUT)\n")
@@ -517,6 +518,31 @@ def createMakefile (generatedFiles):
 *****************************************************************************************************************************************
 """ % (makefileName, op2InstallPath)
 	stdout.write(message)
+
+	return makefile.name
+
+def makeArchive (makefile, generatedFiles):
+	import zipfile
+
+	compilationUnits        = generatedFiles[0]
+	generatedCompilatonUnit = generatedFiles[1]
+
+	fileName = None
+	if opts.cuda:
+		fileName = "files_cuda.zip"
+	elif opts.opencl:
+		fileName = "files_opencl.zip"	
+	elif opts.openmp:
+		fileName = "files_openmp.zip"
+
+	z = zipfile.ZipFile(fileName, "w")
+
+	z.write(makefile)
+	z.write(generatedCompilatonUnit)
+	for file in compilationUnits:
+		z.write(file)
+
+	z.close()
 
 def handleFortranProject (filesToCompile):
 	from FormatFortranCode import FormatFortranCode	
@@ -557,7 +583,9 @@ def handleCPPProject (filesToCompile):
 	postprocessGeneratedFiles (generatedFiles, completeOP2Header, reducedOP2Header)
 
 	# Create a backend-specific Makefile
-	createMakefile (generatedFiles)
+	makefile = createMakefile (generatedFiles)
+
+	makeArchive (makefile, generatedFiles)
 
 def main ():
 	if opts.clean:

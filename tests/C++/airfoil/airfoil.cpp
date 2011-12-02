@@ -43,27 +43,20 @@
 #include <string.h>
 #include <math.h>
 
-// global constants
-
-float gam, gm1, cfl, eps, mach, alpha, qinf[4];
-
 //
 // OP header file
 //
-
-#include "op_lib_cpp.h"
+#include "OP2_OXFORD.h"
 
 //
-// kernel routines for parallel loops
+// Variables referenced in kernels with global scope
 //
+#include "globalVariables.h"
 
-#include "save_soln.h"
-#include "adt_calc.h"
-#include "res_calc.h"
-#include "bres_calc.h"
-#include "update.h"
-
-// main program
+//
+// The user-supplied kernels
+//
+#include "kernels.h"
 
 int main(int argc, char **argv){
 

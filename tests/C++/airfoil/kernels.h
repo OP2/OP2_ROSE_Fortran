@@ -1,8 +1,18 @@
-#ifndef OP_KERNELS
-#define OP_KERNELS
-#include "op_datatypes.h"
-float op_par_loop_adt_calc(const char *name,op_set set,struct op_dat<void> *arg0,int idx0,op_ptr *ptr0,enum op_access acc0,struct op_dat<void> *arg1,int idx1,op_ptr *ptr1,enum op_access acc1,struct op_dat<void> *arg2,int idx2,op_ptr *ptr2,enum op_access acc2,struct op_dat<void> *arg3,int idx3,op_ptr *ptr3,enum op_access acc3,struct op_dat<void> *arg4,int idx4,op_ptr *ptr4,enum op_access acc4,struct op_dat<void> *arg5,int idx5,op_ptr *ptr5,enum op_access acc5);
-float op_par_loop_res_calc(const char *name,op_set set,struct op_dat<void> *arg0,int idx0,op_ptr *ptr0,enum op_access acc0,struct op_dat<void> *arg1,int idx1,op_ptr *ptr1,enum op_access acc1,struct op_dat<void> *arg2,int idx2,op_ptr *ptr2,enum op_access acc2,struct op_dat<void> *arg3,int idx3,op_ptr *ptr3,enum op_access acc3,struct op_dat<void> *arg4,int idx4,op_ptr *ptr4,enum op_access acc4,struct op_dat<void> *arg5,int idx5,op_ptr *ptr5,enum op_access acc5,struct op_dat<void> *arg6,int idx6,op_ptr *ptr6,enum op_access acc6,struct op_dat<void> *arg7,int idx7,op_ptr *ptr7,enum op_access acc7,struct op_dat<void> *arg8,int idx8,op_ptr *ptr8,enum op_access acc8);
-float op_par_loop_save_soln(const char *name,op_set set,struct op_dat<void> *arg0,int idx0,op_ptr *ptr0,enum op_access acc0,struct op_dat<void> *arg1,int idx1,op_ptr *ptr1,enum op_access acc1);
-float op_par_loop_update(const char *name,op_set set,struct op_dat<void> *arg0,int idx0,op_ptr *ptr0,enum op_access acc0,struct op_dat<void> *arg1,int idx1,op_ptr *ptr1,enum op_access acc1,struct op_dat<void> *arg2,int idx2,op_ptr *ptr2,enum op_access acc2,struct op_dat<void> *arg3,int idx3,op_ptr *ptr3,enum op_access acc3,struct op_dat<void> *arg4,int idx4,op_ptr *ptr4,enum op_access acc4);
-#endif
+
+void
+save_soln(float *q, float *qold);
+
+void 
+res_calc(float *x1,  float *x2,  float *q1,  float *q2,
+                     float *adt1,float *adt2,float *res1,float *res2);
+
+void 
+bres_calc(float *x1,  float *x2,  float *q1,
+                      float *adt1,float *res1,int *bound);
+
+void
+adt_calc(float *x1,float *x2,float *x3,float *x4,float *q,float *adt);
+
+void
+update(float *qold, float *q, float *res, float *adt, float *rms);
+

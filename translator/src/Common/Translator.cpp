@@ -35,8 +35,6 @@ template <class TGenerator>
 
         string generatedFile;
 
-        string mainFile;
-
       public:
 
         virtual void
@@ -58,9 +56,7 @@ template <class TGenerator>
                   + p.filename () + "'", Debug::FUNCTION_LEVEL, __FILE__,
                   __LINE__);
 
-              mainFile = "rose_" + p.filename ();
-
-              outputFiles.push_back (mainFile);
+              outputFiles.push_back ("rose_" + p.filename ());
 
               file->unparse ();
             }
@@ -131,6 +127,10 @@ template <class TGenerator>
 
           outputFile.open (fileName.c_str ());
 
+          outputFile << "generated=" + generatedFile;
+
+          outputFile << std::endl;
+
           outputFile << "files=";
 
           for (vector <string>::iterator it = outputFiles.begin (); it
@@ -138,14 +138,6 @@ template <class TGenerator>
           {
             outputFile << *it << " ";
           }
-
-          outputFile << std::endl;
-
-          outputFile << "generated=" + generatedFile;
-
-          outputFile << std::endl;
-
-          outputFile << "main=" + mainFile;
 
           outputFile << std::endl;
 
@@ -352,7 +344,7 @@ processUserSelections (SgProject * project)
       CPPProgramDeclarationsAndDefinitions * declarations =
           new CPPProgramDeclarationsAndDefinitions (project);
 
-     // new CPPModifyOP2CallsToComplyWithOxfordAPI (project, declarations);
+      // new CPPModifyOP2CallsToComplyWithOxfordAPI (project, declarations);
 
       project->unparse ();
     }
