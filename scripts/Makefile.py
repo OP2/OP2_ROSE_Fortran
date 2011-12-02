@@ -1,10 +1,10 @@
 #!/usr/bin/env python
 
-import os
-import sys
+from os import sep
+from sys import path, argv
 
 # Add the 'src' directory to the module search and PYTHONPATH
-sys.path.append(sys.path[0] + os.sep + "src")
+path.append(path[0] + sep + "src")
 	
 from optparse import OptionParser
 from Debug import Debug
@@ -88,7 +88,7 @@ parser.add_option("-f",
 		 metavar="<INT>",
                  help="Format the generated code.")
 
-(opts, args) = parser.parse_args(sys.argv[1:])
+(opts, args) = parser.parse_args(argv[1:])
 
 debug = Debug(opts.verbose)
 
@@ -97,9 +97,18 @@ translatorCUDAFileName   = ".translator.cuda"
 translatorOpenCLFileName = ".translator.opencl"	
 translatorOpenMPFileName = ".translator.openmp"
 
+def getBackendSpecificFileName (fileName):
+	if opts.cuda:
+		return fileName[:-4] + "_cuda.cpp"
+	elif opts.openmp:
+		return fileName[:-4] + "_openmp.cpp"
+	elif opts.opencl:
+		return fileName[:-4] + "_opencl.cpp"
+
 # Cleans out files generated during the compilation process
 def clean ():
 	from glob import glob
+	from os import path, remove 
 
 	filesToRemove = []
 	filesToRemove.extend(glob('*_postprocessed.[fF?]*'))
@@ -107,20 +116,16 @@ def clean ():
 	filesToRemove.extend(glob('*.mod'))
 	filesToRemove.extend(glob('hs_err_pid*.log'))
 	filesToRemove.extend(glob('~*'))
-	
-	# The translator generates a file specific to each backend
-	translatorCUDAFileName = ".translator.cuda"
-	translatorOpenCLFileName = ".translator.opencl"	
-	translatorOpenMPFileName = ".translator.openmp"
 
 	hiddenFile = None
-	if os.path.exists(translatorCUDAFileName) and opts.cuda:
+	if path.exists(translatorCUDAFileName) and opts.cuda:
 		hiddenFile = open(translatorCUDAFileName, 'r')	
-	if os.path.exists(translatorOpenCLFileName) and opts.opencl:
+	if path.exists(translatorOpenCLFileName) and opts.opencl:
 		hiddenFile = open(translatorOpenCLFileName, 'r')
-	if  os.path.exists(translatorOpenMPFileName) and opts.openmp:
+	if path.exists(translatorOpenMPFileName) and opts.openmp:
 		hiddenFile = open(translatorOpenMPFileName, 'r')
 
+	compilerGeneratedFiles = []
 	if hiddenFile is not None:
 		for line in hiddenFile:
 			line  = line.strip()
@@ -129,14 +134,15 @@ def clean ():
 				files = words[1].strip().split(' ')
 				for compilationUnitFileName in files:
 					compilationUnitFileName = compilationUnitFileName.strip()
-					if compilationUnitFileName.startswith("rose_"):
-						filesToRemove.append(compilationUnitFileName)
+					newFileName = getBackendSpecificFileName(compilationUnitFileName)
+					compilerGeneratedFiles.append(newFileName)
 	hiddenFile.close()
 
+	filesToRemove.extend(compilerGeneratedFiles)
 	for file in filesToRemove:
-		if os.path.exists(file):
+		if path.exists(file):
 			debug.verboseMessage("Removing file: '" + file + "'") 
-			os.remove(file)
+			remove(file)
 
 def outputStdout (stdoutLines):
 	print('==================================== STANDARD OUTPUT ===========================================')
@@ -144,8 +150,8 @@ def outputStdout (stdoutLines):
 		print(line)
 	print('================================================================================================')
 
-# Check that the backend selected is sane before returning which was chosen
 def getBackendTarget ():
+	# Check that the backend selected is sane before returning which was chosen
 	allBackends      = (opts.cuda, opts.openmp, opts.opencl)
 	backendsSelected = [] 
 
@@ -165,27 +171,29 @@ def getBackendTarget ():
 	elif opts.opencl:
 		return openclFlag + ' '
 
-# Check that the path to the translator can be found before returning its absolute path
 def getTranslatorHome ():
+	# Check that the path to the translator can be found before returning its absolute path
 	from string import split
+	from os import environ, path, pathsep
 
 	translatorEnvVariable = 'IMPERIAL_TRANSLATOR_HOME'
 
-	if not os.environ.has_key(translatorEnvVariable):
+	if not environ.has_key(translatorEnvVariable):
 		errorMessage = "=" * 80 + \
 "\nYou need to set the environment variable '" + translatorEnvVariable + "' to point to the base directory of the translator infrastructure." + \
 "\nThis is the path ending with the directory 'OP2_ROSE_Fortran'." + \
 "\nFor example, 'export IMPERIAL_TRANSLATOR_HOME=/usr/joe/bloggs/subdir/OP_ROSE_FORTRAN'\n" + "=" * 80 
 		debug.exitMessage(errorMessage)
 	
-	translatorHome = split(os.environ.get(translatorEnvVariable), os.pathsep)[0]
-	if not os.path.isdir(translatorHome):
+	translatorHome = split(environ.get(translatorEnvVariable), pathsep)[0]
+	if not path.isdir(translatorHome):
 		debug.exitMessage("The source-to-source translator path '%s' is not a directory" % (translatorHome))
 
 	return translatorHome
 
-# Get the files to translate from the mandatory 'config' file
-def getCompilationFiles ():
+def getCompilationFiles ():		
+	# Get the files to translate from the mandatory 'config' file
+	from os import path
 	from string import split
 	
 	configFile = None
@@ -194,7 +202,7 @@ def getCompilationFiles ():
 	else:
 		configFile = 'config'
 
-	if not os.path.isfile(configFile):
+	if not path.isfile(configFile):
 		debug.exitMessage("Unable to find configuration file '%s' with the files to translate." % (configFile))
 
 	filesToCompile = []
@@ -207,7 +215,7 @@ def getCompilationFiles ():
 			for f in files:
 				f = f.strip()
 				filesToCompile.append(f)
-				if not os.path.isfile(f):
+				if not path.isfile(f):
 					debug.exitMessage("File '" + f + "' does not exist.")
 
 	if not filesToCompile:
@@ -215,12 +223,13 @@ def getCompilationFiles ():
 
 	return filesToCompile
 
-# Get the name of the file containing free variables referenced in the kernel functions
 def getFreeVariablesFilename ():
+	# Get the name of the file containing free variables referenced in the kernel functions
 	from string import split
+	from os import path
 	
 	configFile = 'config'
-	if not os.path.isfile(configFile):
+	if not path.isfile(configFile):
 		debug.exitMessage("Unable to find configuration file '%s' with the files to translate." % (configFile))
 
 	filename = None
@@ -231,7 +240,7 @@ def getFreeVariablesFilename ():
 		words = line.split('=')
 		if line.startswith('freeVariables'):
 			filename = words[1].strip().split(' ')[0]
-			if not os.path.isfile(filename):
+			if not path.isfile(filename):
 				debug.exitMessage("File '" + filename + "' does not exist.")
 	f.close ()
 
@@ -240,18 +249,18 @@ def getFreeVariablesFilename ():
 
 	return filename	
 
-# Get the command to source-to-source translate the Fortran code
 def getFortranCompilationCommand (filesToCompile, freeVariablesFilename):
+	# Get the command to source-to-source translate the Fortran code
 	translatorHome = getTranslatorHome ()
-	translatorPath = translatorHome + os.sep + 'translator' + os.sep + 'bin' + os.sep + 'translator'
-	op2Path        = translatorHome + os.sep + 'support' + os.sep + 'Fortran'
+	translatorPath = translatorHome + sep + 'translator' + sep + 'bin' + sep + 'translator'
+	op2Path        = translatorHome + sep + 'support' + sep + 'Fortran'
 
 	cmd = translatorPath + ' -d ' + str(opts.debug) + ' ' + getBackendTarget ()
 
 	auxiliaryFiles = ['ISO_C_BINDING.F95', 'OP2.F95']
 
 	for f in auxiliaryFiles:
-		cmd += op2Path + os.sep + f + ' '
+		cmd += op2Path + sep + f + ' '
 
 	for f in filesToCompile:
 		cmd += f + ' '
@@ -260,11 +269,11 @@ def getFortranCompilationCommand (filesToCompile, freeVariablesFilename):
 	
 	return cmd	
 
-# Get the command to source-to-source translate the Fortran code
 def getCPPCompilationCommand (filesToCompile):
+	# Get the command to source-to-source translate the Fortran code
 	translatorHome = getTranslatorHome ()
-	translatorPath = translatorHome + os.sep + 'translator' + os.sep + 'bin' + os.sep + 'translator'
-	includePath    = translatorHome + os.sep + 'support' + os.sep + 'C++'
+	translatorPath = translatorHome + sep + 'translator' + sep + 'bin' + sep + 'translator'
+	includePath    = translatorHome + sep + 'support' + sep + 'C++'
 
 	cmd = translatorPath + ' -d ' + str(opts.debug) + ' ' + getBackendTarget () + ' -I' + includePath + ' '
 	for f in filesToCompile:
@@ -306,13 +315,14 @@ def runCompiler (cmd):
 
 def renameFortranCUDAfile (generatedFiles):
 	from shutil import move
+	from os import path
 
 	cudaCodeName = "rose_cuda_code.F95"
 	debug.verboseMessage("Looking for the ROSE generated file '%s'" % cudaCodeName)
 
 	for f in generatedFiles:
-		if os.path.basename(f) == cudaCodeName:
-			destinationName = os.path.dirname(f) + os.sep + cudaCodeName[:-4] + ".CUF" 
+		if path.basename(f) == cudaCodeName:
+			destinationName = path.dirname(f) + sep + cudaCodeName[:-4] + ".CUF" 
 			debug.verboseMessage("Moving '%s' into '%s'" % (f, destinationName))
 			move(f, destinationName)
 
@@ -323,7 +333,11 @@ def switchHeadersInGivenFiles (filesToCompile, completeOP2Header, reducedOP2Head
 
 	for file in filesToCompile:
 		#Create temp file
-		debug.verboseMessage("Analysing file '%s'" % file)
+		if preprocess:
+			debug.verboseMessage("Pre-processing OP2 header includes in file '%s'" % file)
+		else:
+			debug.verboseMessage("Post-processing OP2 header includes in file '%s'" % file)
+
 		fh, abs_path = mkstemp()
 		new_file = open(abs_path,'w')
 		old_file = open(file)
@@ -367,6 +381,8 @@ def postprocessGeneratedFiles (generatedFiles, completeOP2Header, reducedOP2Head
 		move(abs_path, file)
 
 def getGeneratedFiles ():
+	from shutil import move
+	
 	hiddenFile = None
 	if opts.cuda:
 		hiddenFile = open(translatorCUDAFileName, 'r')	
@@ -382,13 +398,17 @@ def getGeneratedFiles ():
 		line  = line.strip()
 		if line.startswith("generated="):
 			words                    = line.split('=')
-			generatedCompilationUnit = words[1].strip().split(' ')[0]
+			oldFileName              = words[1].strip().split(' ')[0]
+			newFileName              = getBackendSpecificFileName (oldFileName)
+			generatedCompilationUnit = newFileName
 		elif line.startswith("files="):
 			words = line.split('=')
 			files = words[1].strip().split(' ')
 			for compilationUnitFileName in files:
 				compilationUnitFileName = compilationUnitFileName.strip()
-				compilationUnits.append(compilationUnitFileName)
+				newFileName             = getBackendSpecificFileName (compilationUnitFileName)
+				move (compilationUnitFileName, newFileName)
+				compilationUnits.append(newFileName)
 
 	hiddenFile.close()
 
@@ -396,6 +416,8 @@ def getGeneratedFiles ():
 
 def createMakefile (generatedFiles):
 	from shutil import move
+	from os import environ
+	from sys import stdout
 
 	compilationUnits        = generatedFiles[0]
 	generatedCompilatonUnit = generatedFiles[1]
@@ -405,9 +427,12 @@ def createMakefile (generatedFiles):
 	if opts.cuda:
 		cudaCompilationUnit = generatedCompilatonUnit[:-4] + ".cu"
 		cudaObjectFile      = generatedCompilatonUnit[:-4] + ".o"
+
+		# Move the generated file so that it has the correct suffix as required by CUDA compilers
 		move(generatedCompilatonUnit, cudaCompilationUnit)
 		
-		makefile = open('Makefile.cuda', 'w')	
+		makefileName = 'Makefile.cuda'
+		makefile = open(makefileName, 'w')	
 		makefile.write("OUT       = binary_cuda\n")
 		makefile.write("CPP       = g++\n")
 		makefile.write("CPPFLAGS  = -O3 -Wall\n")
@@ -451,11 +476,13 @@ def createMakefile (generatedFiles):
 				makefile.write("$(CPP) $(CPPFLAGS) -I$(OP2_INSTALL_PATH)/c/include -c %s -o %s\n" % (file, objectFile))
 
 	elif opts.opencl:
-		makefile = open('Makefile.opencl', 'w')
+		makefileName = 'Makefile.opencl'
+		makefile = open(makefileName, 'w')
 		makefile.write("OUT = binary_opencl\n")
 
 	elif opts.openmp:
-		makefile = open('Makefile.openmp', 'w')
+		makefileName = 'Makefile.openmp'
+		makefile = open(makefileName, 'w')
 		makefile.write("OUT      = binary_openmp\n")
 		makefile.write("CPP      = g++\n")
 		makefile.write("CPPFLAGS = -O3 -Wall -fopenmp\n")
@@ -481,16 +508,26 @@ def createMakefile (generatedFiles):
 
 	makefile.close()
 
+	op2InstallPath = "OP2_INSTALL_PATH"
+	message = """\n**************************************************************** WARNING ****************************************************************
+* Good news: I am generating a Makefile for you called '%s'!
+* Bad news: in order to succesfully compile the generated code via this Makefile, you must set an environment variable '%s'.
+* Otherwise, the OP2 include and library directories will not be found and the make process is doomed to fail.
+*****************************************************************************************************************************************
+""" % (makefileName, op2InstallPath)
+	stdout.write(message)
+
 def handleFortranProject (filesToCompile):
 	from FormatFortranCode import FormatFortranCode	
 	from glob import glob
+	from os import getcwd
 
 	freeVariablesFilename = getFreeVariablesFilename ()
 	cmd = getFortranCompilationCommand (filesToCompile, freeVariablesFilename)
 	runCompiler (cmd)
 
 	# The files generated by our compiler
-	generatedFiles = glob(os.getcwd() + os.sep + "rose_*")
+	generatedFiles = glob(getcwd() + sep + "rose_*")
 	
 	if opts.format > 0:
 		f = FormatFortranCode (generatedFiles, opts.format)
@@ -521,28 +558,33 @@ def handleCPPProject (filesToCompile):
 	# Create a backend-specific Makefile
 	createMakefile (generatedFiles)
 
-if opts.clean:
-	clean()
+def main ():
+	if opts.clean:
+		clean()
 
-if opts.format:
-	if opts.format < 40:
-		debug.exitMessage("Formatting length must be positive number greater than or equal to 40. Currently set to " + str(opts.format))
+	if opts.format:
+		if opts.format < 40:
+			debug.exitMessage("Formatting length must be positive number greater than or equal to 40. Currently set to " + str(opts.format))
 
-if opts.compile:
-	from re import compile
+	if opts.compile:
+		from re import compile
 
-	filesToCompile    = getCompilationFiles ()
-	fortranGeneration = False
-	char_regex        = compile("[f|F][0-9][0-9]")
+		filesToCompile    = getCompilationFiles ()
+		fortranGeneration = False
+		char_regex        = compile("[f|F][0-9][0-9]")
 
-	for f in filesToCompile:
-		if char_regex.match(f[-3:]):
-			fortranGeneration = True
+		for f in filesToCompile:
+			if char_regex.match(f[-3:]):
+				fortranGeneration = True
 
-	if fortranGeneration:
-		handleFortranProject (filesToCompile)
-	else:
-		handleCPPProject (filesToCompile)
+		if fortranGeneration:
+			handleFortranProject (filesToCompile)
+		else:
+			handleCPPProject (filesToCompile)
 
-if not opts.clean and not opts.compile:
-	debug.exitMessage("No actions selected. Use %s for options." % helpShortFlag)
+	if not opts.clean and not opts.compile:
+		debug.exitMessage("No actions selected. Use %s for options." % helpShortFlag)
+
+if __name__ == "__main__":
+	main ()
+
