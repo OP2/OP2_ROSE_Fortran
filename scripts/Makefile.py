@@ -105,17 +105,33 @@ def getBackendSpecificFileName (fileName):
 	elif opts.opencl:
 		return fileName[:-4] + "_opencl.cpp"
 
-# Cleans out files generated during the compilation process
-def clean ():
-	from glob import glob
-	from os import path, remove 
+
+def getMakefileName ():
+	if opts.cuda:
+		return "Makefile.cuda"
+	elif opts.opencl:
+		return "Makefile.opencl"	
+	elif opts.openmp:
+		return "Makefile.openmp"
+
+def getArchiveFileName ():
+	if opts.cuda:
+		return "files_cuda.zip"
+	elif opts.opencl:
+		return "files_opencl.zip"	
+	elif opts.openmp:
+		return "files_openmp.zip"
+
+def getCUDACompilationUnitName (generatedCompilationUnit):
+	return generatedCompilationUnit[:-4] + ".cu"
+
+def getBackendCreatedFiles ():
+	from os import path
 
 	filesToRemove = []
-	filesToRemove.extend(glob('*_postprocessed.[fF?]*'))
-	filesToRemove.extend(glob('*.rmod'))
-	filesToRemove.extend(glob('*.mod'))
-	filesToRemove.extend(glob('hs_err_pid*.log'))
-	filesToRemove.extend(glob('~*'))
+	
+	filesToRemove.append(getMakefileName())
+	filesToRemove.append(getArchiveFileName())
 
 	hiddenFile = None
 	if path.exists(translatorCUDAFileName) and opts.cuda:
@@ -125,20 +141,42 @@ def clean ():
 	if path.exists(translatorOpenMPFileName) and opts.openmp:
 		hiddenFile = open(translatorOpenMPFileName, 'r')
 
-	compilerGeneratedFiles = []
+	generatedCompilationUnit = None
+
 	if hiddenFile is not None:
 		for line in hiddenFile:
 			line  = line.strip()
+			if line.startswith("generated="):
+				words                    = line.split('=')
+				oldFileName              = words[1].strip().split(' ')[0]
+				newFileName              = getBackendSpecificFileName (oldFileName)
+				generatedCompilationUnit = newFileName
 			if line.startswith("files="):
 				words = line.split('=')
 				files = words[1].strip().split(' ')
 				for compilationUnitFileName in files:
 					compilationUnitFileName = compilationUnitFileName.strip()
 					newFileName = getBackendSpecificFileName(compilationUnitFileName)
-					compilerGeneratedFiles.append(newFileName)
+					if generatedCompilationUnit == newFileName and opts.cuda:
+						newFileName = getCUDACompilationUnitName(newFileName)
+					filesToRemove.append(newFileName)
 	hiddenFile.close()
 
-	filesToRemove.extend(compilerGeneratedFiles)
+	return filesToRemove
+
+def clean ():
+	# Cleans out files generated during the compilation process
+	from glob import glob
+	from os import path, remove 
+
+	filesToRemove = []
+	filesToRemove.extend(glob('*_postprocessed.[fF?]*'))
+	filesToRemove.extend(glob('*.rmod'))
+	filesToRemove.extend(glob('*.mod'))
+	filesToRemove.extend(glob('hs_err_pid*.log'))
+	filesToRemove.extend(glob('~*'))
+	filesToRemove.extend(getBackendCreatedFiles())
+
 	for file in filesToRemove:
 		if path.exists(file):
 			debug.verboseMessage("Removing file: '" + file + "'") 
@@ -415,7 +453,7 @@ def getGeneratedFiles ():
 
 	if opts.cuda:
 		# Move the generated file so that it has the correct suffix as required by CUDA compilers
-		cudaCompilationUnit = generatedCompilationUnit[:-4] + ".cu"
+		cudaCompilationUnit = getCUDACompilationUnitName(generatedCompilationUnit)
 		move(generatedCompilationUnit, cudaCompilationUnit)
 		generatedCompilationUnit = cudaCompilationUnit
 
@@ -429,13 +467,11 @@ def createMakefile (generatedFiles):
 	compilationUnits        = generatedFiles[0]
 	generatedCompilatonUnit = generatedFiles[1]
 
-	makefile = None
+	makefile = open(getMakefileName(), 'w')	
 
 	if opts.cuda:
 		cudaObjectFile  = generatedCompilatonUnit[:-3] + ".o"
 
-		makefileName = 'Makefile.cuda'
-		makefile = open(makefileName, 'w')	
 		makefile.write("OUT       = binary_cuda\n")
 		makefile.write("CPP       = g++\n")
 		makefile.write("CPPFLAGS  = -O3 -Wall\n")
@@ -475,13 +511,9 @@ def createMakefile (generatedFiles):
 				makefile.write("$(CPP) $(CPPFLAGS) -I$(OP2_INSTALL_PATH)/c/include -c %s -o %s\n" % (file, objectFile))
 
 	elif opts.opencl:
-		makefileName = 'Makefile.opencl'
-		makefile = open(makefileName, 'w')
 		makefile.write("OUT = binary_opencl\n")
 
 	elif opts.openmp:
-		makefileName = 'Makefile.openmp'
-		makefile = open(makefileName, 'w')
 		makefile.write("OUT      = binary_openmp\n")
 		makefile.write("CPP      = g++\n")
 		makefile.write("CPPFLAGS = -O3 -Wall -fopenmp\n")
@@ -516,7 +548,7 @@ def createMakefile (generatedFiles):
 * This environment variable should point to the directory '<prefix>/OP2-Common/op2'.
 * Otherwise, the OP2 include and library directories will not be found and the make process is doomed to fail.
 *****************************************************************************************************************************************
-""" % (makefileName, op2InstallPath)
+""" % (makefile.name, op2InstallPath)
 	stdout.write(message)
 
 	return makefile.name
@@ -528,15 +560,7 @@ def makeArchive (makefile, generatedFiles, headerFiles):
 	compilationUnits        = generatedFiles[0]
 	generatedCompilatonUnit = generatedFiles[1]
 
-	fileName = None
-	if opts.cuda:
-		fileName = "files_cuda.zip"
-	elif opts.opencl:
-		fileName = "files_opencl.zip"	
-	elif opts.openmp:
-		fileName = "files_openmp.zip"
-
-	z = ZipFile(fileName, "w")
+	z = ZipFile(getArchiveFileName(), "w")
 
 	z.write(makefile)
 	z.write(generatedCompilatonUnit)
@@ -550,7 +574,7 @@ def makeArchive (makefile, generatedFiles, headerFiles):
 	message = """\n********************************************************************************
 Created archive '%s' containing the following files:\n%s
 *******************************************************************************
-"""  % (fileName, '\n'.join('{}: {}'.format(*k) for k in enumerate(z.namelist())))
+"""  % (getArchiveFileName(), '\n'.join('{}: {}'.format(*k) for k in enumerate(z.namelist())))
 
 	stdout.write(message)
 
