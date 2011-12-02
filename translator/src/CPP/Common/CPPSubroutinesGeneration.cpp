@@ -47,6 +47,7 @@ void
 CPPSubroutinesGeneration::patchCallsToParallelLoops ()
 {
   using namespace SageBuilder;
+  using namespace SageInterface;
   using std::map;
   using std::string;
   using std::vector;
@@ -100,6 +101,27 @@ CPPSubroutinesGeneration::patchCallsToParallelLoops ()
 
       arguments.insert (arguments.begin (), buildStringVal (
           userSubroutines[userSubroutineName]->getSubroutineName ()));
+
+      for (vector <string>::const_iterator it =
+          parallelLoop->getFirstFileName (); it
+          != parallelLoop->getLastFileName (); ++it)
+      {
+        string fileName = *it;
+
+        SgSourceFile * sourceFile = declarations->getSourceFile (fileName);
+
+        SgScopeStatement * fileScope = sourceFile->get_globalScope ();
+
+        SgFunctionDeclaration * nonDefininingDeclaration =
+            buildNondefiningFunctionDeclaration (
+                hostSubroutine->getSubroutineName (), buildVoidType (),
+                hostSubroutine->getCopyOfFormalParameters (), fileScope);
+
+        SgStatement * declarationStatement = findLastDeclarationStatement (
+            fileScope);
+
+        insertStatementBefore (declarationStatement, nonDefininingDeclaration);
+      }
     }
   }
 }

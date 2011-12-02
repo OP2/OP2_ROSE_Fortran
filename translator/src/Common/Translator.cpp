@@ -6,7 +6,6 @@
 #include "FortranProgramDeclarationsAndDefinitions.h"
 #include "FortranCUDASubroutinesGeneration.h"
 #include "FortranOpenMPSubroutinesGeneration.h"
-#include "CPPModifyOP2CallsToComplyWithOxfordAPI.h"
 #include "CPPProgramDeclarationsAndDefinitions.h"
 #include "CPPCUDASubroutinesGeneration.h"
 #include "CPPOpenMPSubroutinesGeneration.h"
@@ -353,7 +352,7 @@ processUserSelections (SgProject * project)
       CPPProgramDeclarationsAndDefinitions * declarations =
           new CPPProgramDeclarationsAndDefinitions (project);
 
-      new CPPModifyOP2CallsToComplyWithOxfordAPI (project, declarations);
+     // new CPPModifyOP2CallsToComplyWithOxfordAPI (project, declarations);
 
       project->unparse ();
     }

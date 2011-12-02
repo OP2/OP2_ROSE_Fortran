@@ -522,23 +522,6 @@ FortranProgramDeclarationsAndDefinitions::visit (SgNode * node)
         break;
       }
 
-      case V_SgVariableDeclaration:
-      {
-        SgVariableDeclaration * variableDeclaration = isSgVariableDeclaration (
-            node);
-
-        for (SgInitializedNamePtrList::iterator it =
-            variableDeclaration->get_variables ().begin (); it
-            != variableDeclaration->get_variables ().end (); it++)
-        {
-          string const variableName = (*it)->get_name ().getString ();
-
-          declarations[variableName] = variableDeclaration;
-        }
-
-        break;
-      }
-
       default:
       {
         break;

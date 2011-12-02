@@ -8,6 +8,10 @@ class CPPParallelLoop;
 
 class CPPHostSubroutine: public HostSubroutine <SgFunctionDeclaration>
 {
+  private:
+
+    SgFunctionDeclaration * nonDefininingDeclaration;
+
   protected:
 
     SgBasicBlock *
@@ -19,6 +23,11 @@ class CPPHostSubroutine: public HostSubroutine <SgFunctionDeclaration>
     CPPHostSubroutine (SgScopeStatement * moduleScope, Subroutine <
         SgFunctionDeclaration> * calleeSubroutine,
         CPPParallelLoop * parallelLoop);
+
+  public:
+
+    SgFunctionParameterList *
+    getCopyOfFormalParameters ();
 };
 
 #endif

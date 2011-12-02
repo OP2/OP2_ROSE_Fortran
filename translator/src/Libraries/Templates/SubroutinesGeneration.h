@@ -96,7 +96,7 @@ template <typename TDeclarations, typename THostSubroutine>
       void
       createSourceFile ()
       {
-        using SageBuilder::buildFile;
+        using namespace SageBuilder;
         using std::string;
 
         Debug::getInstance ()->debugMessage ("Generating file '" + newFileName

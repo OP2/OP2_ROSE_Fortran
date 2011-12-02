@@ -33,6 +33,9 @@ class CPPSubroutinesGeneration: public SubroutinesGeneration <
     patchCallsToParallelLoops ();
 
     void
+    createHeaderFile ();
+
+    void
     generate ();
 
     virtual void

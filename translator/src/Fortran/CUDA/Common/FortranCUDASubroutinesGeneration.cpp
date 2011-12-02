@@ -20,51 +20,6 @@
 #include <boost/algorithm/string.hpp>
 
 void
-FortranCUDASubroutinesGeneration::createConstantDeclarations ()
-{
-  using namespace SageInterface;
-  using boost::lexical_cast;
-  using boost::iequals;
-  using std::map;
-  using std::string;
-  using std::vector;
-
-  Debug::getInstance ()->debugMessage ("Creating constant declarations",
-      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
-
-  for (map <string, OpConstDefinition *>::const_iterator it =
-      declarations->firstOpConstDefinition (); it
-      != declarations->lastOpConstDefinition (); ++it)
-  {
-    string const constantName = it->first;
-
-    Debug::getInstance ()->debugMessage ("Creating declaration for variable '"
-        + constantName + "'", Debug::HIGHEST_DEBUG_LEVEL, __FILE__, __LINE__);
-
-    SgVariableDeclaration * originalDeclaration =
-        declarations->getOriginalDeclaration (constantName);
-
-    SgVariableDeclaration * newDeclaration =
-        FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
-            constantName,
-            originalDeclaration ->get_decl_item (constantName)->get_type (),
-            moduleScope, 1, CUDA_CONSTANT);
-
-    SgInitializedNamePtrList & variables =
-        originalDeclaration->get_variables ();
-
-    if (variables.size () == 1)
-    {
-      Debug::getInstance ()->debugMessage (
-          "Single variable in declaration. Removing entire statement",
-          Debug::HIGHEST_DEBUG_LEVEL, __FILE__, __LINE__);
-
-      removeStatement (originalDeclaration);
-    }
-  }
-}
-
-void
 FortranCUDASubroutinesGeneration::createReductionSubroutines ()
 {
   using boost::lexical_cast;
@@ -231,13 +186,6 @@ FortranCUDASubroutinesGeneration::createModuleDeclarations ()
         cardinalitiesDeclarations[userSubroutineName],
         dimensionsDeclarations[userSubroutineName]);
   }
-
-  /*
-   * ======================================================
-   * Now declare constants
-   * ======================================================
-   */
-  createConstantDeclarations ();
 }
 
 void

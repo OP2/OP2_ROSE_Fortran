@@ -137,6 +137,14 @@ CPPHostSubroutine::createFormalParameterDeclarations ()
   }
 }
 
+SgFunctionParameterList *
+CPPHostSubroutine::getCopyOfFormalParameters ()
+{
+  using namespace SageInterface;
+
+  return deepCopy (formalParameters);
+}
+
 CPPHostSubroutine::CPPHostSubroutine (SgScopeStatement * moduleScope,
     Subroutine <SgFunctionDeclaration> * calleeSubroutine,
     CPPParallelLoop * parallelLoop) :
