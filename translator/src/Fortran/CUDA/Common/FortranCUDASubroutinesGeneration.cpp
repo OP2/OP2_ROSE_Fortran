@@ -1,22 +1,24 @@
-#include <FortranCUDASubroutinesGeneration.h>
-#include <FortranCUDAKernelSubroutineDirectLoop.h>
-#include <FortranCUDAKernelSubroutineIndirectLoop.h>
-#include <FortranCUDAHostSubroutineDirectLoop.h>
-#include <FortranCUDAHostSubroutineIndirectLoop.h>
-#include <FortranCUDAUserSubroutine.h>
-#include <FortranCUDAReductionSubroutine.h>
-#include <FortranReductionSubroutines.h>
-#include <FortranCUDAModuleDeclarations.h>
-#include <FortranCUDAOpDatCardinalitiesDeclarationIndirectLoop.h>
-#include <FortranOpDatDimensionsDeclaration.h>
-#include <FortranParallelLoop.h>
-#include <FortranProgramDeclarationsAndDefinitions.h>
-#include <FortranTypesBuilder.h>
-#include <FortranStatementsAndExpressionsBuilder.h>
-#include <OP2Definitions.h>
-#include <RoseHelper.h>
-#include <Reduction.h>
-#include <Exceptions.h>
+#include "FortranCUDASubroutinesGeneration.h"
+#include "FortranCUDAKernelSubroutineDirectLoop.h"
+#include "FortranCUDAKernelSubroutineIndirectLoop.h"
+#include "FortranCUDAHostSubroutineDirectLoop.h"
+#include "FortranCUDAHostSubroutineIndirectLoop.h"
+#include "FortranCUDAUserSubroutine.h"
+#include "FortranCUDAReductionSubroutine.h"
+#include "FortranReductionSubroutines.h"
+#include "FortranCUDAModuleDeclarations.h"
+#include "FortranCUDAOpDatCardinalitiesDeclarationIndirectLoop.h"
+#include "FortranOpDatDimensionsDeclaration.h"
+#include "FortranParallelLoop.h"
+#include "FortranProgramDeclarationsAndDefinitions.h"
+#include "FortranTypesBuilder.h"
+#include "FortranStatementsAndExpressionsBuilder.h"
+#include "OP2Definitions.h"
+#include "RoseHelper.h"
+#include "Reduction.h"
+#include "Exceptions.h"
+#include "OP2.h"
+#include "CUDA.h"
 #include <boost/algorithm/string.hpp>
 
 void
@@ -201,10 +203,10 @@ FortranCUDASubroutinesGeneration::addLibraries ()
 
   vector <string> libs;
 
-  libs.push_back ("ISO_C_BINDING");
-  libs.push_back ("OP2_C");
-  libs.push_back ("CUDAFOR");
-  libs.push_back ("CUDACONFIGURATIONPARAMS");
+  libs.push_back (OP2::Libraries::Fortran::declarations);
+  libs.push_back (OP2::Libraries::Fortran::CBindings);
+  libs.push_back (CUDA::Libraries::Fortran::CUDARuntimeSupport);
+  libs.push_back (CUDA::Libraries::Fortran::CUDALaunchParameters);
 
   for (vector <string>::const_iterator it = libs.begin (); it != libs.end (); ++it)
   {

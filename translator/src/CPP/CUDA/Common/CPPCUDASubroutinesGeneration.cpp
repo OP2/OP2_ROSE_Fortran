@@ -89,8 +89,9 @@ CPPCUDASubroutinesGeneration::addHeaderIncludes ()
       + OP2::Libraries::CPP::mainLibrary + "\"\n",
       AstUnparseAttribute::e_before);
 
-  addTextForUnparser (moduleScope, "#include \"" + CUDA::CPP::OP2RuntimeSupport
-      + "\"\n", AstUnparseAttribute::e_before);
+  addTextForUnparser (moduleScope, "#include \""
+      + CUDA::Libraries::CPP::OP2RuntimeSupport + "\"\n",
+      AstUnparseAttribute::e_before);
 }
 
 void

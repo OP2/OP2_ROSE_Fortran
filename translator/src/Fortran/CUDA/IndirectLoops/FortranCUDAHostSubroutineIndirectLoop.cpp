@@ -346,9 +346,12 @@ FortranCUDAHostSubroutineIndirectLoop::createConvertPlanFunctionParametersStatem
           parallelLoop->getUserSubroutineName ())),
       variableDeclarations->getReference (ncolblk));
 
-  SgDotExp * parameterExpressionF3 = buildDotExp (
-      variableDeclarations->getReference (set), buildOpaqueVarRefExp (size,
-          block));
+  SgDotExp * dotExpressionF3 = buildDotExp (variableDeclarations->getReference (
+      set), buildOpaqueVarRefExp (size, block));
+
+  SgAggregateInitializer * parameterExpressionF3 =
+      FortranStatementsAndExpressionsBuilder::buildShapeExpression (
+          dotExpressionF3);
 
   SgStatement
       * callStatementF =

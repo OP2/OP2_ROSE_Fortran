@@ -130,6 +130,7 @@ namespace OP2
     {
       std::string const declarations = "OP2_FORTRAN_DECLARATIONS";
       std::string const runtimeSupport = "OP2_FORTRAN_RT_SUPPORT";
+      std::string const CBindings = "ISO_C_BINDING";
     }
   }
 

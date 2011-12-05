@@ -21,9 +21,18 @@ enum THREAD_BLOCK_DIMENSION
 
 namespace CUDA
 {
-  namespace CPP
+  namespace Libraries
   {
-    std::string const OP2RuntimeSupport = "op_cuda_rt_support.h";
+    namespace CPP
+    {
+      std::string const OP2RuntimeSupport = "op_cuda_rt_support.h";
+    }
+
+    namespace Fortran
+    {
+      std::string const CUDARuntimeSupport = "CUDAFOR";
+      std::string const CUDALaunchParameters = "CUDACONFIGURATIONPARAMS";
+    }
   }
 
   std::string const blocksPerGrid = "blocksPerGrid";

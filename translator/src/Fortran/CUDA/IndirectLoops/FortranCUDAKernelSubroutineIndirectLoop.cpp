@@ -1495,43 +1495,177 @@ FortranCUDAKernelSubroutineIndirectLoop::createPlanFormalParameterDeclarations (
   using namespace LoopVariableNames;
   using namespace OP2VariableNames;
   using namespace PlanFunctionVariableNames;
-  using std::string;
-  using std::map;
 
   Debug::getInstance ()->debugMessage (
       "Creating plan formal parameter declarations", Debug::FUNCTION_LEVEL,
       __FILE__, __LINE__);
 
-  map <string, string> variableToSizeMap;
+  /*
+   * ======================================================
+   * Another plan function formal parameter
+   * ======================================================
+   */
 
-  variableToSizeMap[pindSizes] = pindSizesSize;
-  variableToSizeMap[pindOffs] = pindOffsSize;
-  variableToSizeMap[pblkMap] = pblkMapSize;
-  variableToSizeMap[poffset] = poffsetSize;
-  variableToSizeMap[pnelems] = pnelemsSize;
-  variableToSizeMap[pnthrcol] = pnthrcolSize;
-  variableToSizeMap[pthrcol] = pthrcolSize;
+  SgDotExp * dotExpression1 = buildDotExp (variableDeclarations->getReference (
+      opDatCardinalities),
+      cardinalitiesDeclaration->getFieldDeclarations ()->getReference (
+          pindSizesSize));
 
-  for (map <string, string>::const_iterator it = variableToSizeMap.begin (); it
-      != variableToSizeMap.end (); ++it)
-  {
-    SgDotExp * dotExpression = buildDotExp (variableDeclarations->getReference (
-        opDatCardinalities),
-        cardinalitiesDeclaration->getFieldDeclarations ()->getReference (
-            it->second));
+  SgSubtractOp * upperBoundExpression1 = buildSubtractOp (dotExpression1,
+      buildIntVal (1));
 
-    SgSubtractOp * upperBoundExpression = buildSubtractOp (dotExpression,
-        buildIntVal (1));
+  variableDeclarations->add (
+      pindSizes,
+      FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
+          pindSizes,
+          FortranTypesBuilder::getArray_RankOne_WithLowerAndUpperBounds (
+              FortranTypesBuilder::getFourByteInteger (), buildIntVal (0),
+              upperBoundExpression1), subroutineScope, formalParameters, 1,
+          CUDA_DEVICE));
 
-    variableDeclarations->add (
-        it->first,
-        FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
-            it->first,
-            FortranTypesBuilder::getArray_RankOne_WithLowerAndUpperBounds (
-                FortranTypesBuilder::getFourByteInteger (), buildIntVal (0),
-                upperBoundExpression), subroutineScope, formalParameters, 1,
-            CUDA_DEVICE));
-  }
+  /*
+   * ======================================================
+   * Another plan function formal parameter
+   * ======================================================
+   */
+
+  SgDotExp * dotExpression2 = buildDotExp (variableDeclarations->getReference (
+      opDatCardinalities),
+      cardinalitiesDeclaration->getFieldDeclarations ()->getReference (
+          pindOffsSize));
+
+  SgSubtractOp * upperBoundExpression2 = buildSubtractOp (dotExpression2,
+      buildIntVal (1));
+
+  variableDeclarations->add (
+      pindOffs,
+      FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
+          pindOffs,
+          FortranTypesBuilder::getArray_RankOne_WithLowerAndUpperBounds (
+              FortranTypesBuilder::getFourByteInteger (), buildIntVal (0),
+              upperBoundExpression2), subroutineScope, formalParameters, 1,
+          CUDA_DEVICE));
+
+  /*
+   * ======================================================
+   * Another plan function formal parameter
+   * ======================================================
+   */
+
+  SgDotExp * dotExpression3 = buildDotExp (variableDeclarations->getReference (
+      opDatCardinalities),
+      cardinalitiesDeclaration->getFieldDeclarations ()->getReference (
+          pblkMapSize));
+
+  SgSubtractOp * upperBoundExpression3 = buildSubtractOp (dotExpression3,
+      buildIntVal (1));
+
+  variableDeclarations->add (
+      pblkMap,
+      FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
+          pblkMap,
+          FortranTypesBuilder::getArray_RankOne_WithLowerAndUpperBounds (
+              FortranTypesBuilder::getFourByteInteger (), buildIntVal (0),
+              upperBoundExpression3), subroutineScope, formalParameters, 1,
+          CUDA_DEVICE));
+
+  /*
+   * ======================================================
+   * Another plan function formal parameter
+   * ======================================================
+   */
+
+  SgDotExp * dotExpression4 = buildDotExp (variableDeclarations->getReference (
+      opDatCardinalities),
+      cardinalitiesDeclaration->getFieldDeclarations ()->getReference (
+          poffsetSize));
+
+  SgSubtractOp * upperBoundExpression4 = buildSubtractOp (dotExpression4,
+      buildIntVal (1));
+
+  variableDeclarations->add (
+      poffset,
+      FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
+          poffset,
+          FortranTypesBuilder::getArray_RankOne_WithLowerAndUpperBounds (
+              FortranTypesBuilder::getFourByteInteger (), buildIntVal (0),
+              upperBoundExpression4), subroutineScope, formalParameters, 1,
+          CUDA_DEVICE));
+
+  /*
+   * ======================================================
+   * Another plan function formal parameter
+   * ======================================================
+   */
+
+  SgDotExp * dotExpression5 = buildDotExp (variableDeclarations->getReference (
+      opDatCardinalities),
+      cardinalitiesDeclaration->getFieldDeclarations ()->getReference (
+          pnelemsSize));
+
+  SgSubtractOp * upperBoundExpression5 = buildSubtractOp (dotExpression1,
+      buildIntVal (1));
+
+  variableDeclarations->add (
+      pnelems,
+      FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
+          pnelems,
+          FortranTypesBuilder::getArray_RankOne_WithLowerAndUpperBounds (
+              FortranTypesBuilder::getFourByteInteger (), buildIntVal (0),
+              upperBoundExpression5), subroutineScope, formalParameters, 1,
+          CUDA_DEVICE));
+
+  /*
+   * ======================================================
+   * Another plan function formal parameter
+   * ======================================================
+   */
+
+  SgDotExp * dotExpression6 = buildDotExp (variableDeclarations->getReference (
+      opDatCardinalities),
+      cardinalitiesDeclaration->getFieldDeclarations ()->getReference (
+          pnthrcolSize));
+
+  SgSubtractOp * upperBoundExpression6 = buildSubtractOp (dotExpression6,
+      buildIntVal (1));
+
+  variableDeclarations->add (
+      pnthrcol,
+      FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
+          pnthrcol,
+          FortranTypesBuilder::getArray_RankOne_WithLowerAndUpperBounds (
+              FortranTypesBuilder::getFourByteInteger (), buildIntVal (0),
+              upperBoundExpression6), subroutineScope, formalParameters, 1,
+          CUDA_DEVICE));
+
+  /*
+   * ======================================================
+   * Another plan function formal parameter
+   * ======================================================
+   */
+
+  SgDotExp * dotExpression7 = buildDotExp (variableDeclarations->getReference (
+      opDatCardinalities),
+      cardinalitiesDeclaration->getFieldDeclarations ()->getReference (
+          pthrcolSize));
+
+  SgSubtractOp * upperBoundExpression7 = buildSubtractOp (dotExpression7,
+      buildIntVal (1));
+
+  variableDeclarations->add (
+      pthrcol,
+      FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
+          pthrcol,
+          FortranTypesBuilder::getArray_RankOne_WithLowerAndUpperBounds (
+              FortranTypesBuilder::getFourByteInteger (), buildIntVal (0),
+              upperBoundExpression7), subroutineScope, formalParameters, 1,
+          CUDA_DEVICE));
+
+  /*
+   * ======================================================
+   * Another plan function formal parameter
+   * ======================================================
+   */
 
   variableDeclarations->add (
       blockOffset,

@@ -133,13 +133,11 @@ FortranCUDAKernelSubroutine::createCUDAStageInVariablesVariableDeclarations ()
       }
       else
       {
-        SgSubtractOp * subtractExpression = buildSubtractOp (buildIntVal (
-            parallelLoop->getOpDatDimension (i)), buildIntVal (1));
-
         variableDeclarations->add (variableName,
             FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
                 variableName, FortranTypesBuilder::getArray_RankOne (
-                    parallelLoop->getOpDatBaseType (i), 0, subtractExpression),
+                    parallelLoop->getOpDatBaseType (i), 0, buildIntVal (
+                        parallelLoop->getOpDatDimension (i) - 1)),
                 subroutineScope));
       }
     }
