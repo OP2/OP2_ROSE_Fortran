@@ -24,6 +24,9 @@ class CPPOpenCLHostSubroutine: public CPPHostSubroutine
     virtual void
     createReductionDeclarations ();
 
+    void
+    createOpenCLConfigurationLaunchDeclarations ();
+
     CPPOpenCLHostSubroutine (SgScopeStatement * moduleScope,
         CPPOpenCLKernelSubroutine * calleeSubroutine,
         CPPParallelLoop * parallelLoop,

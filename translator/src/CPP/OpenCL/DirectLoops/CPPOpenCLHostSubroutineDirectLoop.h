@@ -8,6 +8,12 @@ class CPPOpenCLHostSubroutineDirectLoop: public CPPOpenCLHostSubroutine
 {
   private:
 
+    void
+    createOpenCLKernelInitialisationStatements ();
+
+    void
+    createOpenCLKernelActualParameterDeclarations ();
+
     virtual SgStatement *
     createKernelFunctionCallStatement ();
 

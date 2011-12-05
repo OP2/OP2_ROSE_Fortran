@@ -19,6 +19,9 @@ namespace OpenCL
   std::string const totalThreadNumber = "totalThreadNumber";
   std::string const sharedMemorySize = "dynamicSharedMemorySize";
   std::string const CL_SUCCESS = "CL_SUCCESS";
+  std::string const errorCode = "errorCode";
+  std::string const event = "event";
+  std::string const kernelPointer = "kernelPointer";
 
   /*
    * ======================================================
@@ -38,11 +41,11 @@ namespace OpenCL
 
   /*
    * ======================================================
-   * The OpenCL type 'cl_kernel'
+   * The OpenCL type 'cl_mem'
    * ======================================================
    */
   SgType *
-  getKernelType (SgScopeStatement * scope);
+  getMemoryType (SgScopeStatement * scope);
 
   /*
    * ======================================================
@@ -50,7 +53,7 @@ namespace OpenCL
    * ======================================================
    */
   SgType *
-  getSizeOfType (SgScopeStatement * scope);
+  getSizeType (SgScopeStatement * scope);
 
   /*
    * ======================================================
@@ -123,8 +126,8 @@ namespace OpenCL
    */
   SgFunctionCallExp *
   getSetKernelArgumentCallExpression (SgScopeStatement * scope,
-      SgVarRefExp * openCLKernel, SgIntVal * argumentIndex,
-      SgType * sizeOfArgument, SgExpression * argument = NULL);
+      SgVarRefExp * openCLKernel, int argumentIndex, SgType * sizeOfArgument,
+      SgExpression * argument = NULL);
 
   SgFunctionCallExp *
   getWorkGroupDimensionsCallStatement (SgScopeStatement * scope);
@@ -146,6 +149,9 @@ namespace OpenCL
 
   namespace OP2RuntimeSupport
   {
+    SgFunctionCallExp *
+    getKernel (SgScopeStatement * scope, std::string const & kernelName);
+
     SgFunctionCallExp *
     getAssertMessage (SgScopeStatement * scope, SgVarRefExp * successReference,
         SgStringVal * message);
