@@ -1,5 +1,6 @@
-#include <CPPOpenCLHostSubroutine.h>
-#include <CPPOpenCLKernelSubroutine.h>
+#include "CPPOpenCLHostSubroutine.h"
+#include "CPPOpenCLKernelSubroutine.h"
+#include "CPPModuleDeclarations.h"
 
 void
 CPPOpenCLHostSubroutine::createReductionEpilogueStatements ()
@@ -23,4 +24,6 @@ CPPOpenCLHostSubroutine::CPPOpenCLHostSubroutine (
   CPPHostSubroutine (moduleScope, calleeSubroutine, parallelLoop),
       moduleDeclarations (moduleDeclarations)
 {
+  variableDeclarations->addVisibilityToSymbolsFromOuterScope (
+      moduleDeclarations->getDeclarations ());
 }

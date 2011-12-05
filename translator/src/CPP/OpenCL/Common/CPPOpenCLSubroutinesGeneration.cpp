@@ -55,6 +55,8 @@ CPPOpenCLSubroutinesGeneration::createSubroutines ()
     CPPOpenCLUserSubroutine * userDeviceSubroutine =
         new CPPOpenCLUserSubroutine (moduleScope, parallelLoop, declarations);
 
+    userSubroutines[userSubroutineName] = userDeviceSubroutine;
+
     CPPOpenCLKernelSubroutine * kernelSubroutine;
 
     if (parallelLoop->isDirectLoop ())

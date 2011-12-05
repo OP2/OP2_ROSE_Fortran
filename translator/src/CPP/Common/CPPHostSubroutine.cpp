@@ -45,12 +45,7 @@ CPPHostSubroutine::createInitialisePlanFunctionArrayStatements ()
 
     SgExprStatement * assignmentStatement;
 
-    if (parallelLoop->isDirect (i))
-    {
-      assignmentStatement = buildAssignStatement (arrayIndexExpression,
-          buildIntVal (-1));
-    }
-    else if (parallelLoop->isIndirect (i))
+    if (parallelLoop->isIndirect (i))
     {
       if (parallelLoop->isDuplicateOpDat (i) == false)
       {
@@ -69,6 +64,11 @@ CPPHostSubroutine::createInitialisePlanFunctionArrayStatements ()
                 indirectOpDatsToIndirection[parallelLoop->getOpDatVariableName (
                     i)]));
       }
+    }
+    else
+    {
+      assignmentStatement = buildAssignStatement (arrayIndexExpression,
+          buildIntVal (-1));
     }
 
     appendStatement (assignmentStatement, block);

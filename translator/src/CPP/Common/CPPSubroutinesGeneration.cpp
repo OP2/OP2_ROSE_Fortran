@@ -68,7 +68,7 @@ CPPSubroutinesGeneration::patchCallsToParallelLoops ()
 
     Debug::getInstance ()->debugMessage (
         "Analysing OP_PAR_LOOP for user subroutine '" + userSubroutineName
-            + "'", Debug::INNER_LOOP_LEVEL, __FILE__, __LINE__);
+            + "'", Debug::OUTER_LOOP_LEVEL, __FILE__, __LINE__);
 
     CPPHostSubroutine * hostSubroutine = hostSubroutines[userSubroutineName];
 
@@ -107,6 +107,9 @@ CPPSubroutinesGeneration::patchCallsToParallelLoops ()
           != parallelLoop->getLastFileName (); ++it)
       {
         string fileName = *it;
+
+        Debug::getInstance ()->debugMessage ("Analysing file '" + fileName
+            + "'", Debug::INNER_LOOP_LEVEL, __FILE__, __LINE__);
 
         SgSourceFile * sourceFile = declarations->getSourceFile (fileName);
 

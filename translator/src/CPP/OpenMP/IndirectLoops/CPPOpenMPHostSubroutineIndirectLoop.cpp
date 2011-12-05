@@ -341,11 +341,11 @@ CPPOpenMPHostSubroutineIndirectLoop::createStatements ()
       Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
   appendStatementList (
-      createInitialisePlanFunctionArrayStatements ()->getStatementList (),
+      createInitialiseNumberOfThreadsStatements ()->getStatementList (),
       subroutineScope);
 
   appendStatementList (
-      createInitialiseNumberOfThreadsStatements ()->getStatementList (),
+      createInitialisePlanFunctionArrayStatements ()->getStatementList (),
       subroutineScope);
 
   appendStatementList (createOpDatTypeCastStatements ()->getStatementList (),
