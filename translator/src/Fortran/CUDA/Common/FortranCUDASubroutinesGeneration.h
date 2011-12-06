@@ -5,6 +5,7 @@
 #include <FortranSubroutinesGeneration.h>
 
 class FortranCUDAOpDatCardinalitiesDeclaration;
+class FortranCUDAConstantDeclarations;
 
 class FortranCUDASubroutinesGeneration: public FortranSubroutinesGeneration
 {
@@ -13,6 +14,8 @@ class FortranCUDASubroutinesGeneration: public FortranSubroutinesGeneration
 
     std::map <std::string, FortranCUDAOpDatCardinalitiesDeclaration *>
         cardinalitiesDeclarations;
+
+    FortranCUDAConstantDeclarations * CUDAconstants;
 
   private:
 

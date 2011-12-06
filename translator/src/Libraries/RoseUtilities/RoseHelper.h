@@ -8,7 +8,8 @@
 #ifndef ROSE_HELPER_H
 #define ROSE_HELPER_H
 
-#include <rose.h>
+class Sg_File_Info;
+class SgNode;
 
 class RoseHelper
 {
@@ -29,17 +30,6 @@ class RoseHelper
 
     static Sg_File_Info *
     getFileInfo ();
-
-    /*
-     * ======================================================
-     * Returns the name of the first variable in this
-     * variable declaration. Assumes the declaration does NOT
-     * contain multiple variables
-     * ======================================================
-     */
-
-    static std::string const
-    getFirstVariableName (SgVariableDeclaration * variableDeclaration);
 
     static void
     forceOutputOfCodeToFile (SgNode * root);

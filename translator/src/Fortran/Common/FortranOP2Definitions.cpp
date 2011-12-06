@@ -335,10 +335,14 @@ FortranOpConstDefinition::FortranOpConstDefinition (SgExprListExp * parameters)
   variableName
       = isSgVarRefExp (parameters->get_expressions ()[index_OpConstName])->get_symbol ()->get_name ().getString ();
 
+  baseType
+      = isSgVarRefExp (parameters->get_expressions ()[index_OpConstName])->get_type ();
+
   ROSE_ASSERT (dimension > 0);
   ROSE_ASSERT (variableName.empty () == false);
 
   Debug::getInstance ()->debugMessage ("Found an OP_CONST definition: '"
       + variableName + "'. Its dimension is " + lexical_cast <string> (
-      dimension), Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+      dimension) + " and its type is " + baseType->class_name (),
+      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 }

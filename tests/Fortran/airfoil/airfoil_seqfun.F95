@@ -4,7 +4,7 @@ use CONSTANTVARS
 
 contains
 
-   subroutine fused ( x1, x2, x3, x4, q, qold, adt ) 
+subroutine fused ( x1, x2, x3, x4, q, qold, adt ) 
 
      implicit none
 
@@ -50,7 +50,7 @@ contains
 
      adt = adt / cfl
 
-   end subroutine
+end subroutine fused
 
 subroutine save_soln ( q, qold ) 
   implicit none
@@ -212,7 +212,7 @@ subroutine update ( qold, q, res, adt, rms )
     del = adti * res(i)
     q(i) = qold(i) - del
     res(i) = 0.0
-    rms = rms + del * del
+    rms(1) = rms(1) + del * del
   end do
 
 end subroutine update
@@ -224,7 +224,7 @@ subroutine fused_2 ( qold, q, res, adt, rms, x1, x2, x3, x4 )
   real(8), dimension(*) :: q
   real(8), dimension(*) :: res
   real(8), dimension(1) :: adt
-  real(8), dimension(1)  :: rms
+  real(8), dimension(1) :: rms
   real(8), dimension(*) :: x1
   real(8), dimension(*) :: x2
   real(8), dimension(*) :: x3
@@ -243,7 +243,7 @@ subroutine fused_2 ( qold, q, res, adt, rms, x1, x2, x3, x4 )
     del = adti * res(i)
     q(i) = qold(i) - del
     res(i) = 0.0
-    rms = rms + del * del
+    rms(1) = rms(1) + del * del
   end do
 
   ri = 1.0 / q(1)
@@ -269,9 +269,6 @@ subroutine fused_2 ( qold, q, res, adt, rms, x1, x2, x3, x4 )
 
   adt = adt / cfl
 
-
 end subroutine fused_2
-
-
 
 end module AIRFOIL_SEQ
