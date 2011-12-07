@@ -82,6 +82,7 @@ namespace OP2VariableNames
   std::string const opDatDimensions = "opDatDimensions";
   std::string const partitionSize = "partitionSize";
   std::string const setSize = "setSize";
+  std::string const sharedMemory = "sharedMemory";
   std::string const sharedMemoryOffset = "sharedMemoryOffset";
   std::string const sharedMemoryBytes = "sharedMemoryBytes";
   std::string const threadID = "threadID";
