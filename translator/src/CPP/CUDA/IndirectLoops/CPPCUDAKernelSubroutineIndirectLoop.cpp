@@ -772,8 +772,8 @@ CPPCUDAKernelSubroutineIndirectLoop::createSetOpDatSharedMemoryPointerStatements
             < parallelLoop->getNumberOfDistinctIndirectOpDats ())
         {
           SgMultiplyOp * multiplyExpression3a = buildMultiplyOp (buildSizeOfOp (
-              buildFloatType ()), buildIntVal (parallelLoop->getOpDatDimension (
-              i)));
+              parallelLoop->getOpDatBaseType (i)), buildIntVal (
+              parallelLoop->getOpDatDimension (i)));
 
           SgMultiplyOp * multiplyExpression3b =
               buildMultiplyOp (variableDeclarations->getReference (

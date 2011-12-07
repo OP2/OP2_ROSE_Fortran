@@ -23,6 +23,9 @@ class FortranCUDASubroutinesGeneration: public FortranSubroutinesGeneration
     processOP2ConstantDeclarations ();
 
     void
+    createSubroutinesInConstantsModule ();
+
+    void
     createReductionSubroutines ();
 
     virtual void

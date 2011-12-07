@@ -77,6 +77,10 @@ template <class TGenerator>
               Debug::getInstance ()->debugMessage ("File '" + p.filename ()
                   + "' remains unchanged", Debug::FUNCTION_LEVEL, __FILE__,
                   __LINE__);
+
+              outputFiles.push_back ("rose_" + p.filename ());
+
+              file->unparse ();
             }
           }
         }

@@ -72,8 +72,34 @@ FortranCUDASubroutinesGeneration::processOP2ConstantDeclarations ()
     arguments.insert (arguments.begin (), buildOpaqueVarRefExp (variableName,
         moduleScope));
 
-  //  arguments.insert (arguments.begin () + 1,
-  //      CUDAconstants->getReferenceToNewVariable (variableName));
+    //  arguments.insert (arguments.begin () + 1,
+    //      CUDAconstants->getReferenceToNewVariable (variableName));
+  }
+}
+
+void
+FortranCUDASubroutinesGeneration::createSubroutinesInConstantsModule ()
+{
+  using namespace SageInterface;
+  using std::string;
+  using std::vector;
+
+  Debug::getInstance ()->debugMessage (
+      "Outputting subroutines referring to CUDA constants into generated module",
+      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+
+  std::string const & moduleName =
+      Globals::getInstance ()->getFreeVariablesModuleName ();
+
+  for (vector <string>::const_iterator it = declarations->getFirstSubroutine (
+      moduleName); it != declarations->getLastSubroutine (moduleName); ++it)
+  {
+    string const & subroutineName = *it;
+
+    SgProcedureHeaderStatement * procedureHeader = deepCopy (
+        declarations->getSubroutine (subroutineName));
+
+    //CUDAconstants->patchReferencesToCUDAConstants (procedureHeader);
   }
 }
 
@@ -117,6 +143,8 @@ FortranCUDASubroutinesGeneration::createSubroutines ()
 {
   using std::string;
   using std::map;
+
+  createSubroutinesInConstantsModule ();
 
   for (map <string, ParallelLoop *>::const_iterator it =
       declarations->firstParallelLoop (); it

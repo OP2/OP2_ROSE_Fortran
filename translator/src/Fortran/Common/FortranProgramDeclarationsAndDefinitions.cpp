@@ -568,6 +568,20 @@ FortranProgramDeclarationsAndDefinitions::checkModuleExists (
   return found;
 }
 
+std::vector <std::string>::const_iterator
+FortranProgramDeclarationsAndDefinitions::getFirstSubroutine (
+    std::string const & moduleName)
+{
+  return moduleNameToSubroutines[moduleName].begin ();
+}
+
+std::vector <std::string>::const_iterator
+FortranProgramDeclarationsAndDefinitions::getLastSubroutine (
+    std::string const & moduleName)
+{
+  return moduleNameToSubroutines[moduleName].end ();
+}
+
 std::string const &
 FortranProgramDeclarationsAndDefinitions::getFileNameForModule (
     std::string const & moduleName)

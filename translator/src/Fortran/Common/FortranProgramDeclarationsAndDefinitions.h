@@ -49,6 +49,12 @@ class FortranProgramDeclarationsAndDefinitions: public ProgramDeclarationsAndDef
 
   public:
 
+    std::vector <std::string>::const_iterator
+    getFirstSubroutine (std::string const & moduleName);
+
+    std::vector <std::string>::const_iterator
+    getLastSubroutine (std::string const & moduleName);
+
     std::string const &
     getFileNameForModule (std::string const & moduleName);
 
