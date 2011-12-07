@@ -465,6 +465,9 @@ def createMakefile (generatedFiles):
 	compilationUnits        = generatedFiles[0]
 	generatedCompilatonUnit = generatedFiles[1]
 
+	op2InstallPath  = "OP2_INSTALL_PATH"
+	cudaInstallPath = "CUDA_INSTALL_PATH"
+
 	makefile = open(getMakefileName(), 'w')	
 
 	if opts.cuda:
@@ -485,12 +488,12 @@ def createMakefile (generatedFiles):
 
 		makefile.write("\n")
 		makefile.write("\t")
-		makefile.write("$(CPP) ")	
+		makefile.write("$(NVCC) ")	
 		makefile.write(cudaObjectFile + " ")	
 		for file in compilationUnits:
 			objectFile = file[:-4] + ".o"
 			makefile.write(objectFile + " ")
-		makefile.write("-L$(OP2_INSTALL_PATH)/c/lib -L$(CUDA_INSTALL_PATH)/lib -lcudart -lop2_cuda -o $(OUT)\n")
+		makefile.write("-L$(%s)/c/lib -lcudart -lop2_cuda -o $(OUT)\n" % (op2InstallPath))
 
 		makefile.write("\n")
 		makefile.write(cudaObjectFile + ": " + generatedCompilatonUnit)
@@ -538,6 +541,15 @@ def createMakefile (generatedFiles):
 	makefile.write("rm -f $(OUT) *.o")
 
 	makefile.close()
+
+	message = """\n**************************************************************** WARNING ****************************************************************
+* Good news: I am generating a Makefile for you called '%s' to compile the code I just generated on your behalf!
+* Bad news: in order to succesfully compile the generated code via this Makefile, you must set an environment variable '%s'.
+* This environment variable should point to the directory '<prefix>/OP2-Common/op2'.
+* Otherwise, the OP2 include and library directories will not be found and the make process is doomed to fail. "*****************************************************************************************************************************************
+""" % (makefile.name, op2InstallPath)
+
+	stdout.write(message)
 
 	return makefile.name
 

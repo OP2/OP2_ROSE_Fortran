@@ -1018,8 +1018,7 @@ CPPCUDAKernelSubroutineIndirectLoop::createStatements ()
   using namespace SageBuilder;
   using namespace SageInterface;
 
-  appendStatementList (createThreadZeroStatements ()->generateStatementList (),
-      subroutineScope);
+  appendStatement (createThreadZeroStatements (), subroutineScope);
 
   appendStatement (buildExprStatement (
       CUDA::createDeviceThreadSynchronisationCallStatement (subroutineScope)),
