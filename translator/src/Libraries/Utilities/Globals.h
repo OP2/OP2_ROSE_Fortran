@@ -20,7 +20,7 @@ class Globals
 
     std::vector <std::string> inputFilenames;
 
-    std::string freeVariabesFilename;
+    std::string freeVariablesModuleName;
 
   private:
 
@@ -94,10 +94,10 @@ class Globals
     isInputFile (std::string const & fileName) const;
 
     void
-    setFreeVariablesFilename (std::string const & fileName);
+    setFreeVariablesModuleName (std::string const & fileName);
 
     std::string const
-    getFreeVariablesFilename () const;
+    getFreeVariablesModuleName () const;
 };
 
 #endif

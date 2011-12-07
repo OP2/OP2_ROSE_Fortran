@@ -30,9 +30,8 @@ class FortranSubroutinesGeneration: public SubroutinesGeneration <
 
   private:
 
-    void
-    removeUseStatement (SgUseStatement * lastUseStatement,
-        std::string const & userSubroutineName);
+    virtual void
+    processOP2ConstantDeclarations ();
 
     void
     addModuleUseStatement (SgNode * parent, std::string const & moduleName);

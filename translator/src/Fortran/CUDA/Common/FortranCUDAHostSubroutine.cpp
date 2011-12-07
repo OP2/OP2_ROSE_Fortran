@@ -545,7 +545,31 @@ FortranCUDAHostSubroutine::createTransferOpDatStatements ()
       {
         if (parallelLoop->isArray (i))
         {
+          Debug::getInstance ()->debugMessage ("Global array conversion",
+              Debug::HIGHEST_DEBUG_LEVEL, __FILE__, __LINE__);
 
+          SgDotExp * parameterExpression1A = buildDotExp (
+              variableDeclarations->getReference (getOpDatName (i)),
+              buildOpaqueVarRefExp (data, block));
+
+          SgVarRefExp * parameterExpression1B =
+              variableDeclarations->getReference (getOpDatHostName (i));
+
+          SgDotExp * dotExpression = buildDotExp (
+              variableDeclarations->getReference (getOpDatName (i)),
+              buildOpaqueVarRefExp (dim, block));
+
+          SgAggregateInitializer * parameterExpression1C =
+              FortranStatementsAndExpressionsBuilder::buildShapeExpression (
+                  dotExpression);
+
+          SgStatement
+              * callStatementA =
+                  FortranStatementsAndExpressionsBuilder::createCToFortranPointerCallStatement (
+                      subroutineScope, parameterExpression1A,
+                      parameterExpression1B, parameterExpression1C);
+
+          appendStatement (callStatementA, block);
         }
         else
         {

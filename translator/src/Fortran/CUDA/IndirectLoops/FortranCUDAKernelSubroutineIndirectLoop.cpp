@@ -1603,7 +1603,7 @@ FortranCUDAKernelSubroutineIndirectLoop::createPlanFormalParameterDeclarations (
       cardinalitiesDeclaration->getFieldDeclarations ()->getReference (
           pnelemsSize));
 
-  SgSubtractOp * upperBoundExpression5 = buildSubtractOp (dotExpression1,
+  SgSubtractOp * upperBoundExpression5 = buildSubtractOp (dotExpression5,
       buildIntVal (1));
 
   variableDeclarations->add (

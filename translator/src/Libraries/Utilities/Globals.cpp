@@ -108,13 +108,13 @@ Globals::isInputFile (std::string const & fileName) const
 }
 
 void
-Globals::setFreeVariablesFilename (std::string const & fileName)
+Globals::setFreeVariablesModuleName (std::string const & moduleName)
 {
-  freeVariabesFilename = fileName;
+  freeVariablesModuleName = moduleName;
 }
 
 std::string const
-Globals::getFreeVariablesFilename () const
+Globals::getFreeVariablesModuleName () const
 {
-  return freeVariabesFilename;
+  return freeVariablesModuleName;
 }

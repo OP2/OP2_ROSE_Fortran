@@ -1,45 +1,17 @@
-#include <FortranSubroutinesGeneration.h>
-#include <FortranParallelLoop.h>
-#include <FortranHostSubroutine.h>
-#include <FortranTypesBuilder.h>
-#include <FortranProgramDeclarationsAndDefinitions.h>
-#include <FortranReductionSubroutines.h>
-#include <RoseHelper.h>
+#include "FortranSubroutinesGeneration.h"
+#include "FortranParallelLoop.h"
+#include "FortranHostSubroutine.h"
+#include "FortranTypesBuilder.h"
+#include "FortranProgramDeclarationsAndDefinitions.h"
+#include "FortranReductionSubroutines.h"
+#include "RoseHelper.h"
 #include <boost/algorithm/string/predicate.hpp>
 
 void
-FortranSubroutinesGeneration::removeUseStatement (
-    SgUseStatement * useStatement, std::string const & userSubroutineName)
+FortranSubroutinesGeneration::processOP2ConstantDeclarations ()
 {
-  using namespace SageInterface;
-  using boost::iequals;
-
-  std::string const & fileName = declarations->getFileNameForSubroutine (
-      userSubroutineName);
-
-  std::string const & moduleNameToRemove = declarations->getModuleNameForFile (
-      fileName);
-
-  Debug::getInstance ()->debugMessage ("'" + userSubroutineName
-      + "' is in Fortran module '" + moduleNameToRemove + "' (file '"
-      + fileName + "')", Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
-
-  SgUseStatement * lastUseStatement = useStatement;
-
-  ROSE_ASSERT (lastUseStatement != NULL);
-
-  do
-  {
-    if (iequals (lastUseStatement->get_name ().getString (), moduleNameToRemove))
-    {
-      removeStatement (lastUseStatement);
-      break;
-    }
-
-    lastUseStatement = isSgUseStatement (
-        getPreviousStatement (lastUseStatement));
-  }
-  while (lastUseStatement != NULL);
+  Debug::getInstance ()->debugMessage ("Processing OP_DECL_CONST calls",
+      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 }
 
 void
@@ -194,7 +166,22 @@ FortranSubroutinesGeneration::patchCallsToParallelLoops (
 
       arguments.erase (arguments.begin ());
 
-      arguments.insert (arguments.begin (), buildStringVal (userSubroutineName));
+      SgStringVal * stringExpression = buildStringVal (userSubroutineName);
+
+      SgFunctionSymbol * functionSymbol =
+          FortranTypesBuilder::buildNewFortranFunction ("CHAR", moduleScope);
+
+      SgExprListExp * actualParameters = buildExprListExp ();
+
+      actualParameters->append_expression (buildIntVal (0));
+
+      SgFunctionCallExp * functionCallExp = buildFunctionCallExp (
+          functionSymbol, actualParameters);
+
+      SgConcatenationOp * conctenationExpression = buildConcatenationOp (
+          stringExpression, functionCallExp);
+
+      arguments.insert (arguments.begin (), conctenationExpression);
 
       /*
        * ======================================================
@@ -275,6 +262,8 @@ FortranSubroutinesGeneration::generate ()
   patchCallsToParallelLoops (moduleName);
 
   determineWhichInputFilesToBeUnparsed ();
+
+  processOP2ConstantDeclarations ();
 }
 
 FortranSubroutinesGeneration::FortranSubroutinesGeneration (

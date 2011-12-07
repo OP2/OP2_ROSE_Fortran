@@ -6,19 +6,19 @@
 #include "CommandLineOption.h"
 #include "CommandLineOptionWithParameters.h"
 
-class FreeVariablesFileOption: public CommandLineOptionWithParameters
+class FreeVariablesModuleOption: public CommandLineOptionWithParameters
 {
   public:
 
     virtual void
     run ()
     {
-      Globals::getInstance ()->setFreeVariablesFilename (getParameter ());
+      Globals::getInstance ()->setFreeVariablesModuleName (getParameter ());
     }
 
-    FreeVariablesFileOption (std::string helpMessage) :
-      CommandLineOptionWithParameters (helpMessage, "file", "f",
-          "free-variables")
+    FreeVariablesModuleOption (std::string helpMessage) :
+      CommandLineOptionWithParameters (helpMessage, "string", "m",
+          "constants-module")
     {
     }
 };

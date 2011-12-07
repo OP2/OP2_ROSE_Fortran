@@ -1,6 +1,6 @@
 program AIRFOIL
   use OP2_FORTRAN_DECLARATIONS
-  use CONSTANTVARS
+  use OP2_CONSTANTS
   use AIRFOIL_SEQ
   use, intrinsic :: ISO_C_BINDING
 
@@ -81,7 +81,7 @@ program AIRFOIL
   call getSetInfo ( nnode, ncell, nedge, nbedge, cell, edge, ecell, bedge, becell, bound, x, q, qold, res, adt )
 
   print *, "Initialising constants"
-  call initialise_flow_field ( ncell, q, res )
+  call initialise_flow_field ( )
 
   do iter = 1, 4*ncell
     res(iter) = 0.0
@@ -116,16 +116,7 @@ program AIRFOIL
   print *, "Declaring OP2 globals"
   call op_decl_gbl ( rms, p_rms, 1 )
 
-  print *, "Declaraing OP2 constants"
-  call op_decl_const (1, gam)
-  call op_decl_const (1, gm1)
-  call op_decl_const (1, cfl)
-  call op_decl_const (1, eps)
-  call op_decl_const (1, mach)
-  call op_decl_const (1, alpha)
-  call op_decl_const (4, qinf)
-
-  ! main time-marching loop
+    ! main time-marching loop
 
   do niter = 1, iterationNumber
 
