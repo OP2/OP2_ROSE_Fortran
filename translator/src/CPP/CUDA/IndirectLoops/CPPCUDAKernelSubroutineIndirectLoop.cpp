@@ -750,9 +750,12 @@ CPPCUDAKernelSubroutineIndirectLoop::createSetOpDatSharedMemoryPointerStatements
         SgAddressOfOp * addressOfExpression2 = buildAddressOfOp (
             arrayExpression2);
 
+        SgCastExp * castExpression2 = buildCastExp (addressOfExpression2,
+            buildPointerType (parallelLoop->getOpDatBaseType (i)));
+
         SgExprStatement * assignmentStatement2 = buildAssignStatement (
             variableDeclarations->getReference (
-                getIndirectOpDatSharedMemoryName (i)), addressOfExpression2);
+                getIndirectOpDatSharedMemoryName (i)), castExpression2);
 
         appendStatement (assignmentStatement2, block);
 
