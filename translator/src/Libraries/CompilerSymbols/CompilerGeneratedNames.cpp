@@ -316,7 +316,17 @@ OP2VariableNames::getSharedMemoryDeclarationName (SgType * type,
 }
 
 std::string const
-OP2VariableNames::getCUDAVolatileSharedMemoryDeclarationName (SgType * type,
+OP2VariableNames::getSharedMemoryDeclarationName (std::string suffix)
+{
+  using std::string;
+
+  std::string const prefix = "shared";
+
+  return prefix + "_" + suffix;
+}
+
+std::string const
+OP2VariableNames::getVolatileSharedMemoryDeclarationName (SgType * type,
     unsigned int size)
 {
   using boost::lexical_cast;
@@ -354,7 +364,7 @@ OP2VariableNames::getSharedMemoryOffsetDeclarationName (SgType * type,
   using boost::lexical_cast;
   using std::string;
 
-  std::string const prefix = "sharedOffset";
+  string const prefix = "sharedOffset";
 
   switch (type->variantT ())
   {
@@ -380,13 +390,23 @@ OP2VariableNames::getSharedMemoryOffsetDeclarationName (SgType * type,
 }
 
 std::string const
+OP2VariableNames::getSharedMemoryOffsetDeclarationName (std::string suffix)
+{
+  using std::string;
+
+  string const prefix = "sharedOffset";
+
+  return prefix + "_" + suffix;
+}
+
+std::string const
 OP2VariableNames::getSharedMemoryPointerDeclarationName (SgType * type,
     unsigned int size)
 {
   using boost::lexical_cast;
   using std::string;
 
-  std::string const prefix = "sharedPointer";
+  string const prefix = "sharedPointer";
 
   switch (type->variantT ())
   {
@@ -409,4 +429,14 @@ OP2VariableNames::getSharedMemoryPointerDeclarationName (SgType * type,
               + type->class_name ());
     }
   }
+}
+
+std::string const
+OP2VariableNames::getSharedMemoryPointerDeclarationName (std::string suffix)
+{
+  using std::string;
+
+  string const prefix = "sharedPointer";
+
+  return prefix + "_" + suffix;
 }

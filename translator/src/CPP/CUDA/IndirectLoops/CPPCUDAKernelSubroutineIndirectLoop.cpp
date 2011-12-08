@@ -744,7 +744,8 @@ CPPCUDAKernelSubroutineIndirectLoop::createSetOpDatSharedMemoryPointerStatements
          */
 
         SgPntrArrRefExp * arrayExpression2 = buildPntrArrRefExp (
-            variableDeclarations->getReference (sharedMemory),
+            variableDeclarations->getReference (getSharedMemoryDeclarationName (
+                parallelLoop->getUserSubroutineName ())),
             variableDeclarations->getReference (nbytes));
 
         SgAddressOfOp * addressOfExpression2 = buildAddressOfOp (
@@ -1164,13 +1165,16 @@ CPPCUDAKernelSubroutineIndirectLoop::createCUDASharedVariableDeclarations ()
       "Creating CUDA shared variable declarations", Debug::FUNCTION_LEVEL,
       __FILE__, __LINE__);
 
+  string const & variableName = getSharedMemoryDeclarationName (
+      parallelLoop->getUserSubroutineName ());
+
   SgVariableDeclaration * autosharedVariableDeclaration =
       RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
-          sharedMemory, buildArrayType (buildCharType ()), subroutineScope);
+          variableName, buildArrayType (buildCharType ()), subroutineScope);
 
   autosharedVariableDeclaration->get_declarationModifier ().get_storageModifier ().setCudaDynamicShared ();
 
-  variableDeclarations->add (sharedMemory, autosharedVariableDeclaration);
+  variableDeclarations->add (variableName, autosharedVariableDeclaration);
 }
 
 void

@@ -82,7 +82,6 @@ namespace OP2VariableNames
   std::string const opDatDimensions = "opDatDimensions";
   std::string const partitionSize = "partitionSize";
   std::string const setSize = "setSize";
-  std::string const sharedMemory = "sharedMemory";
   std::string const sharedMemoryOffset = "sharedMemoryOffset";
   std::string const sharedMemoryBytes = "sharedMemoryBytes";
   std::string const threadID = "threadID";
@@ -272,13 +271,22 @@ namespace OP2VariableNames
   getSharedMemoryDeclarationName (SgType * type, unsigned int size);
 
   std::string const
-  getCUDAVolatileSharedMemoryDeclarationName (SgType * type, unsigned int size);
+  getSharedMemoryDeclarationName (std::string suffix);
+
+  std::string const
+  getVolatileSharedMemoryDeclarationName (SgType * type, unsigned int size);
 
   std::string const
   getSharedMemoryOffsetDeclarationName (SgType * type, unsigned int size);
 
   std::string const
+  getSharedMemoryOffsetDeclarationName (std::string suffix);
+
+  std::string const
   getSharedMemoryPointerDeclarationName (SgType * type, unsigned int size);
+
+  std::string const
+  getSharedMemoryPointerDeclarationName (std::string suffix);
 }
 
 #endif
