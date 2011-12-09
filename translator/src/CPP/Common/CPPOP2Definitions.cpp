@@ -48,6 +48,27 @@ CPPImperialOpSetDefinition::CPPImperialOpSetDefinition (
       + "'", Debug::FUNCTION_LEVEL, __FILE__, __LINE__ );
 }
 
+SgNode*
+CPPImperialOpSubSetDefinition::getOpArgDat(int i) {
+    return this->parameters->get_expressions ()[2 + i];
+}
+
+CPPImperialOpSubSetDefinition::CPPImperialOpSubSetDefinition (
+                                                        SgExprListExp * parameters, std::string const & variableName)
+{
+    this->variableName = variableName;
+    
+    this->originSetName = isSgVarRefExp (parameters->get_expressions ()[indexOriginSet])->get_symbol ()->get_name ().getString ();
+    
+    this->filterKernelName = isSgFunctionRefExp (parameters->get_expressions ()[indexFilterKernel])->get_symbol ()->get_name ().getString ();
+    
+    this->nbFilterArg = parameters->get_expressions ().size () - 2;
+    this->parameters = parameters;
+    
+    Debug::getInstance ()->debugMessage ("Found an OP_SUBSET declaration: '"
+                                         + variableName + "', from '" + originSetName + "', filtered with '" + filterKernelName + "'", Debug::FUNCTION_LEVEL, __FILE__, __LINE__ );
+}
+
 CPPImperialOpMapDefinition::CPPImperialOpMapDefinition (
     SgExprListExp * parameters, std::string const & variableName)
 {

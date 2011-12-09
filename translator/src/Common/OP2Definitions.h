@@ -73,6 +73,37 @@ class OpSetDefinition: public OP2Definition
 
     std::string const &
     getDimensionName () const;
+    
+    bool
+    isOpSubSet () { return false; }
+};
+
+class OpSubSetDefinition: public OpSetDefinition
+{
+    /*
+     * ======================================================
+     * Models an OP_SUBSET variable definition
+     * ======================================================
+     */
+
+  protected:
+    std::string originSetName;
+    std::string filterKernelName;
+    int nbFilterArg;
+    
+  public:
+
+    bool
+    isOpSubSet () { return true; }
+    
+    std::string const &
+    getOriginSetName () const;
+    
+    std::string const &
+    getFilterKernelName () const;
+    
+    int
+    getNbFilterArg ();
 };
 
 class OpMapDefinition: public OP2Definition

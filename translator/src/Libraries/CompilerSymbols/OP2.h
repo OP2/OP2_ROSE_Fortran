@@ -27,7 +27,8 @@ namespace OP2
   std::string const OP_DECL_DAT = "op_decl_dat";
   std::string const OP_DECL_GBL = "op_decl_gbl";
   std::string const OP_DECL_MAP = "op_decl_map";
-  std::string const OP_DECL_SET = "op_decl_set";
+  std::string const OP_DECL_SET = "op_decl_set";\
+  std::string const OP_DECL_SUBSET = "op_decl_subset";
   std::string const OP_GBL = "op_gbl";
   std::string const OP_ID = "op_id";
   std::string const OP_INC = "op_inc";

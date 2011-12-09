@@ -15,6 +15,8 @@ class Globals
     TargetLanguage::BACKEND backend;
 
     bool oxfordOption;
+    
+    bool preprocessOption;
 
     bool uDrawOption;
 
@@ -78,6 +80,12 @@ class Globals
 
     bool
     renderOxfordAPICalls () const;
+    
+    void
+    setPreprocess ();
+    
+    bool
+    preprocess () const;
 
     void
     setOutputUDrawGraphs ();

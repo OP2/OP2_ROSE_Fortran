@@ -10,6 +10,7 @@
 #include <FortranCUDASubroutinesGeneration.h>
 #include <FortranOpenMPSubroutinesGeneration.h>
 #include <CPPModifyOP2CallsToComplyWithOxfordAPI.h>
+#include <CPPPreProcess.h>
 #include <CPPProgramDeclarationsAndDefinitions.h>
 #include <CPPCUDASubroutinesGeneration.h>
 #include <CPPOpenMPSubroutinesGeneration.h>
@@ -30,6 +31,21 @@ class OxfordOption: public CommandLineOption
 
     OxfordOption (std::string helpMessage, std::string longOption) :
       CommandLineOption (helpMessage, "", longOption)
+    {
+    }
+};
+
+class PreprocessOption: public CommandLineOption
+{
+public:
+    virtual void
+    run ()
+    {
+        Globals::getInstance ()->setPreprocess ();
+    }
+    
+    PreprocessOption (std::string helpMessage, std::string longOption) :
+    CommandLineOption (helpMessage, "", longOption)
     {
     }
 };
@@ -351,6 +367,9 @@ addCommandLineOptions ()
 
   CommandLine::getInstance ()->addOption (new OxfordOption (
       "Refactor OP2 calls to comply with Oxford API", "oxford"));
+    
+  CommandLine::getInstance ()->addOption (new PreprocessOption (
+      "Preprocess OP2 declarations", "pre"));                                                                
 
   CommandLine::getInstance ()->addUDrawGraphOption ();
 }
@@ -368,6 +387,16 @@ processUserSelections (SgProject * project)
 
     Globals::getInstance ()->setHostLanguage (TargetLanguage::CPP);
 
+    if (Globals::getInstance ()->preprocess ())
+    {
+      CPPProgramDeclarationsAndDefinitions * declarations =
+        new CPPProgramDeclarationsAndDefinitions (project);
+        
+      new CPPPreProcess (project, declarations);
+          
+      project->unparse ();
+    }
+    else 
     if (Globals::getInstance ()->renderOxfordAPICalls ())
     {
       if (Globals::getInstance ()->getTargetBackend ()

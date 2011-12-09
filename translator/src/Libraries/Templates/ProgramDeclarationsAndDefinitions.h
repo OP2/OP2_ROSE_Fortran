@@ -19,6 +19,7 @@
 
 class ParallelLoop;
 class OpSetDefinition;
+class OpSubSetDefinition;
 class OpMapDefinition;
 class OpDatDefinition;
 class OpGblDefinition;
@@ -44,6 +45,14 @@ template <typename TSubroutineHeader>
        */
       std::map <std::string, OpSetDefinition *> OpSetDefinitions;
 
+      /*
+       * ======================================================
+       * OP_DECL_SUBSET declarations
+       * ======================================================
+       */
+      std::map <std::string, OpSubSetDefinition *> OpSubSetDefinitions;
+
+      
       /*
        * ======================================================
        * OP_DECL_MAP declarations
@@ -162,6 +171,12 @@ template <typename TSubroutineHeader>
       {
         return OpSetDefinitions.find (variableName) != OpSetDefinitions.end ();
       }
+      
+      bool
+      isOpSubSet (std::string const & variableName) const
+      {
+        return OpSubSetDefinitions.find (variableName) != OpSubSetDefinitions.end ();
+      }
 
       bool
       isOpMap (std::string const & variableName) const
@@ -210,6 +225,26 @@ template <typename TSubroutineHeader>
         }
       }
 
+      OpSubSetDefinition *
+      getOpSubSetDefinition (std::string const & opSubSetName)
+      throw (std::string const &)
+      {
+          using std::map;
+          using std::string;
+          
+          map <string, OpSubSetDefinition *>::const_iterator it =
+          OpSubSetDefinitions.find (opSubSetName);
+          
+          if (it == OpSubSetDefinitions.end ())
+          {
+              throw opSubSetName;
+          }
+          else
+          {
+              return it->second;
+          }
+      }
+      
       OpMapDefinition *
       getOpMapDefinition (std::string const & opMapName)
           throw (std::string const &)

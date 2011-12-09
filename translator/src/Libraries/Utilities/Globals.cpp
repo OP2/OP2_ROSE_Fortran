@@ -24,6 +24,8 @@ Globals::Globals ()
    */
   oxfordOption = false;
 
+  preprocessOption = false;
+
   uDrawOption = false;
 }
 
@@ -77,6 +79,18 @@ bool
 Globals::renderOxfordAPICalls () const
 {
   return oxfordOption;
+}
+
+void
+Globals::setPreprocess ()
+{
+    preprocessOption = true;
+}
+
+bool
+Globals::preprocess () const
+{
+    return preprocessOption;
 }
 
 void

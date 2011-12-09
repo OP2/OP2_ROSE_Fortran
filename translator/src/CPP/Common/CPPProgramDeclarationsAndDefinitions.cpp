@@ -388,21 +388,29 @@ CPPProgramDeclarationsAndDefinitions::detectAndHandleOP2Definition (
 
     OpSetDefinition * opSetDeclaration;
 
-    if (functionCallExpression->get_args ()->get_expressions ().size ()
-        == CPPImperialOpSetDefinition::getNumberOfExpectedArguments ())
+    if (iequals (functionCallExpression->getAssociatedFunctionSymbol ()->get_name ().getString (), OP2::OP_DECL_SUBSET))
     {
-      opSetDeclaration = new CPPImperialOpSetDefinition (
-          functionCallExpression->get_args (), variableName);
+        OpSubSetDefinition* opSubSetDeclaration = new CPPImperialOpSubSetDefinition (functionCallExpression->get_args (), variableName);
+        OpSubSetDefinitions[opSubSetDeclaration->getVariableName ()] = opSubSetDeclaration;
+        opSetDeclaration = opSubSetDeclaration;
     }
     else
     {
-      ROSE_ASSERT (functionCallExpression->get_args ()->get_expressions ().size ()
-          == CPPOxfordOpSetDefinition::getNumberOfExpectedArguments ());
+      if (functionCallExpression->get_args ()->get_expressions ().size ()
+          == CPPImperialOpSetDefinition::getNumberOfExpectedArguments ())
+      {
+        opSetDeclaration = new CPPImperialOpSetDefinition (
+            functionCallExpression->get_args (), variableName);
+      }
+      else
+      {
+        ROSE_ASSERT (functionCallExpression->get_args ()->get_expressions ().size ()
+            == CPPOxfordOpSetDefinition::getNumberOfExpectedArguments ());
 
-      opSetDeclaration = new CPPOxfordOpSetDefinition (
-          functionCallExpression->get_args (), variableName);
+        opSetDeclaration = new CPPOxfordOpSetDefinition (
+            functionCallExpression->get_args (), variableName);
+      }
     }
-
     OpSetDefinitions[opSetDeclaration->getVariableName ()] = opSetDeclaration;
   }
   else if (iequals (typeName, OP2::OP_MAP))
@@ -547,6 +555,8 @@ CPPProgramDeclarationsAndDefinitions::visit (SgNode * node)
       if (iequals (OP2::OP_ACCESS, enumDeclaration->get_name ().getString ()))
       {
         unsigned int index = 0;
+          
+          opAccessEnumDeclaration = enumDeclaration;
 
         for (std::vector <SgInitializedName *>::const_iterator it =
             enumDeclaration->get_enumerators ().begin (); it
@@ -676,7 +686,43 @@ CPPProgramDeclarationsAndDefinitions::visit (SgNode * node)
 
       break;
     }
-
+    case V_SgTypedefDeclaration:
+    {
+        SgTypedefDeclaration* typedefType = isSgTypedefDeclaration (node);
+        if ( iequals (typedefType->get_name ().getString (), OP2::OP_DAT) )
+        {
+            Debug::getInstance ()->debugMessage ("Registering type reference for '"
+                                                 + OP2::OP_DAT + "'",
+                                                 Debug::OUTER_LOOP_LEVEL, __FILE__, __LINE__);
+            
+            op_dat_type = typedefType->get_type ();
+        }
+        if ( iequals (typedefType->get_name ().getString (), OP2::OP_MAP) )
+        {
+            Debug::getInstance ()->debugMessage ("Registering type reference for '"
+                                                 + OP2::OP_MAP + "'",
+                                                 Debug::OUTER_LOOP_LEVEL, __FILE__, __LINE__);
+            
+            op_map_type = typedefType->get_type ();
+        }
+        if ( iequals (typedefType->get_name ().getString (), OP2::OP_SET) )
+        {
+            Debug::getInstance ()->debugMessage ("Registering type reference for '"
+                                                 + OP2::OP_SET + "'",
+                                                 Debug::OUTER_LOOP_LEVEL, __FILE__, __LINE__);
+            
+            op_set_type = typedefType->get_type ();
+        }
+        if ( iequals (typedefType->get_name ().getString (), OP2::OP_ACCESS) )
+        {
+            Debug::getInstance ()->debugMessage ("Registering type reference for '"
+                                                 + OP2::OP_ACCESS + "'",
+                                                 Debug::OUTER_LOOP_LEVEL, __FILE__, __LINE__);
+            
+            op_access_type = typedefType->get_type ();
+        }
+        break;
+    }
     default:
     {
       break;
@@ -689,3 +735,34 @@ CPPProgramDeclarationsAndDefinitions::CPPProgramDeclarationsAndDefinitions (
 {
   traverse (project, preorder);
 }
+
+SgType *
+CPPProgramDeclarationsAndDefinitions::getOpDatType ()
+{
+    return op_dat_type;
+}
+
+SgType *
+CPPProgramDeclarationsAndDefinitions::getOpSetType ()
+{
+    return op_set_type;
+}
+
+SgType *
+CPPProgramDeclarationsAndDefinitions::getOpMapType ()
+{
+    return op_map_type;
+}
+
+SgType *
+CPPProgramDeclarationsAndDefinitions::getOpAccessType ()
+{
+    return op_access_type;
+}
+
+SgEnumDeclaration *
+CPPProgramDeclarationsAndDefinitions::getOpAccessEnumDeclaration ()
+{
+    return opAccessEnumDeclaration;
+}
+

@@ -3,6 +3,7 @@
 #define CPP_OP2_DEFINITIONS_H
 
 #include <OP2Definitions.h>
+#include <rose.h>
 
 class SgExprListExp;
 
@@ -62,6 +63,30 @@ class CPPImperialOpSetDefinition: public OpSetDefinition
 
     CPPImperialOpSetDefinition (SgExprListExp * parameters,
         std::string const & variableName);
+};
+
+class CPPImperialOpSubSetDefinition: public OpSubSetDefinition
+{
+    /*
+     * ======================================================
+     * Models an OP_SUBSET definition in C++ (Imperial API).
+     *
+     * The following function prototype is assumed:
+     * OP_DECL_SUBSET (op_set, kernel, op_arg...)
+     * ======================================================
+     */
+    
+private:
+    SgExprListExp* parameters;
+    
+public:
+    static int const indexOriginSet = 0;
+    static int const indexFilterKernel = 1;
+    
+    SgNode* getOpArgDat(int i);
+    
+    CPPImperialOpSubSetDefinition (SgExprListExp * parameters,
+                                std::string const & variableName);
 };
 
 class CPPImperialOpMapDefinition: public OpMapDefinition

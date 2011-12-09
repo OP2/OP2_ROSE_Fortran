@@ -40,6 +40,24 @@ OpSetDefinition::getDimensionName () const
 }
 
 std::string const &
+OpSubSetDefinition::getOriginSetName () const
+{
+  return originSetName;
+}
+
+std::string const &
+OpSubSetDefinition::getFilterKernelName () const
+{
+  return filterKernelName;
+}
+
+int
+OpSubSetDefinition::getNbFilterArg ()
+{
+    return nbFilterArg;
+}
+
+std::string const &
 OpMapDefinition::getSourceOpSetName () const
 {
   return sourceOpSetName;
