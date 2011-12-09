@@ -67,7 +67,7 @@ FortranOpenMPKernelSubroutineIndirectLoop::createUserSubroutineCallStatement ()
 
         SgSubscriptExpression * subsricptExpression =
             new SgSubscriptExpression (RoseHelper::getFileInfo (),
-                multiplyExpression, subtractExpression, buildIntVal (1));
+                addExpression2, subtractExpression, buildIntVal (1));
 
         subsricptExpression->set_endOfConstruct (RoseHelper::getFileInfo ());
 
@@ -398,7 +398,7 @@ FortranOpenMPKernelSubroutineIndirectLoop::createIncrementedOpDatEpilogueStateme
   {
     if (parallelLoop->isDuplicateOpDat (i) == false)
     {
-      if (parallelLoop->isIncremented (i))
+      if (parallelLoop->isIndirect (i) && parallelLoop->isIncremented (i))
       {
         /*
          * ======================================================
@@ -631,6 +631,9 @@ FortranOpenMPKernelSubroutineIndirectLoop::createInitialiseBytesPerOpDatStatemen
    * ======================================================
    */
 
+  bool firstIndirectOpDat = true;
+  unsigned int lastIndirectOpDat;
+
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
     if (parallelLoop->isDuplicateOpDat (i) == false)
@@ -642,15 +645,26 @@ FortranOpenMPKernelSubroutineIndirectLoop::createInitialiseBytesPerOpDatStatemen
                 + parallelLoop->getOpDatVariableName (i) + "'",
             Debug::HIGHEST_DEBUG_LEVEL, __FILE__, __LINE__);
 
-        SgMultiplyOp * multiplyExpression = buildMultiplyOp (
-            variableDeclarations->getReference (getIndirectOpDatSizeName (i)),
-            buildIntVal (parallelLoop->getOpDatDimension (i)));
+        if (firstIndirectOpDat)
+        {
+          firstIndirectOpDat = false;
+          lastIndirectOpDat = i;
+        }
+        else
+        {
+          SgMultiplyOp * multiplyExpression = buildMultiplyOp (
+              variableDeclarations->getReference (getIndirectOpDatSizeName (
+                  lastIndirectOpDat)), buildIntVal (
+                  parallelLoop->getOpDatDimension (lastIndirectOpDat)));
 
-        SgExprStatement * assignmentStatement = buildAssignStatement (
-            variableDeclarations->getReference (getRoundUpVariableName (i)),
-            multiplyExpression);
+          SgExprStatement * assignmentStatement = buildAssignStatement (
+              variableDeclarations->getReference (getRoundUpVariableName (i)),
+              multiplyExpression);
 
-        appendStatement (assignmentStatement, subroutineScope);
+          appendStatement (assignmentStatement, subroutineScope);
+
+          lastIndirectOpDat = i;
+        }
       }
     }
   }
@@ -661,7 +675,7 @@ FortranOpenMPKernelSubroutineIndirectLoop::createInitialiseBytesPerOpDatStatemen
    * ======================================================
    */
 
-  bool firstInitialization = true;
+  firstIndirectOpDat = true;
 
   for (unsigned int i = 1, lasti = 1; i
       <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
@@ -675,9 +689,9 @@ FortranOpenMPKernelSubroutineIndirectLoop::createInitialiseBytesPerOpDatStatemen
 
       if (parallelLoop->isIndirect (i))
       {
-        if (firstInitialization)
+        if (firstIndirectOpDat)
         {
-          firstInitialization = false;
+          firstIndirectOpDat = false;
 
           SgExprStatement * assignmentStatement = buildAssignStatement (
               variableDeclarations->getReference (getNumberOfBytesVariableName (
@@ -775,7 +789,7 @@ FortranOpenMPKernelSubroutineIndirectLoop::createInitialiseIndirectOpDatSizesSta
       {
         SgMultiplyOp * multiplyExpression = buildMultiplyOp (
             variableDeclarations->getReference (OpenMP::threadBlockID),
-            buildIntVal (parallelLoop->getNumberOfDifferentIndirectOpDats ()));
+            buildIntVal (parallelLoop->getNumberOfDistinctIndirectOpDats ()));
 
         SgAddOp * addExpression = buildAddOp (buildIntVal (offset),
             multiplyExpression);
@@ -818,7 +832,7 @@ FortranOpenMPKernelSubroutineIndirectLoop::createInitialiseIndirectOpDatMapsStat
       {
         SgMultiplyOp * multiplyExpression = buildMultiplyOp (
             variableDeclarations->getReference (OpenMP::threadBlockID),
-            buildIntVal (parallelLoop->getNumberOfDifferentIndirectOpDats ()));
+            buildIntVal (parallelLoop->getNumberOfDistinctIndirectOpDats ()));
 
         SgAddOp * addExpression = buildAddOp (buildIntVal (offset),
             multiplyExpression);
@@ -949,7 +963,7 @@ FortranOpenMPKernelSubroutineIndirectLoop::createInitialiseThreadVariablesStatem
    */
 
   SgPntrArrRefExp * arrayExpression3 = buildPntrArrRefExp (
-      variableDeclarations->getReference (getOffsetIntoBlockSizeName ()),
+      variableDeclarations->getReference (getOffsetIntoBlockArrayName ()),
       variableDeclarations->getReference (OpenMP::threadBlockID));
 
   SgExprStatement * assignmentStatement3 = buildAssignStatement (
@@ -962,8 +976,6 @@ FortranOpenMPKernelSubroutineIndirectLoop::createInitialiseThreadVariablesStatem
 void
 FortranOpenMPKernelSubroutineIndirectLoop::createStatements ()
 {
-  using namespace SageInterface;
-
   Debug::getInstance ()->debugMessage ("Creating statements",
       Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
@@ -1008,7 +1020,7 @@ FortranOpenMPKernelSubroutineIndirectLoop::createIncrementAccessLocalVariableDec
 
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
-    if (parallelLoop->isIncremented (i))
+    if (parallelLoop->isIndirect (i) && parallelLoop->isIncremented (i))
     {
       Debug::getInstance ()->debugMessage (
           "Creating local variables for incremented OP_DAT " + lexical_cast <
@@ -1162,7 +1174,7 @@ FortranOpenMPKernelSubroutineIndirectLoop::createExecutionLocalVariableDeclarati
 }
 
 void
-FortranOpenMPKernelSubroutineIndirectLoop::createIndirectOpDatCardinalityLocalVariableDeclarations ()
+FortranOpenMPKernelSubroutineIndirectLoop::createIndirectOpDatSizeLocalVariableDeclarations ()
 {
   using namespace OP2VariableNames;
   using boost::lexical_cast;
@@ -1275,7 +1287,7 @@ FortranOpenMPKernelSubroutineIndirectLoop::createLocalVariableDeclarations ()
 
   createRoundUpLocalVariableDeclarations ();
 
-  createIndirectOpDatCardinalityLocalVariableDeclarations ();
+  createIndirectOpDatSizeLocalVariableDeclarations ();
 
   if (parallelLoop->hasIncrementedOpDats ())
   {

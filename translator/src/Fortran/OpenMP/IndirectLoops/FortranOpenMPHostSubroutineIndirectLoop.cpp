@@ -176,7 +176,7 @@ FortranOpenMPHostSubroutineIndirectLoop::createConvertGlobalToLocalMappingStatem
           variableDeclarations->getReference (indirectionDescriptorArray),
           buildIntVal (i));
 
-      SgGreaterThanOp * ifGuardExpression = buildGreaterThanOp (
+      SgGreaterOrEqualOp * ifGuardExpression = buildGreaterOrEqualOp (
           arrayExpression, buildIntVal (0));
 
       SgIfStmt * ifStatement =
@@ -237,6 +237,8 @@ FortranOpenMPHostSubroutineIndirectLoop::createConvertLocalToGlobalMappingStatem
                     parameterExpression2, parameterExpression3);
 
         appendStatement (callStatement, block);
+
+        index++;
       }
     }
   }
@@ -441,9 +443,12 @@ FortranOpenMPHostSubroutineIndirectLoop::createPlanFunctionEpilogueStatements ()
       getActualPlanVariableName (parallelLoop->getUserSubroutineName ())),
       buildOpaqueVarRefExp (nblocks, subroutineScope));
 
+  SgMultiplyOp * multiplyExpressionG3 = buildMultiplyOp (dotExpressionG3,
+      variableDeclarations->getReference (numberOfIndirectOpDats));
+
   SgAggregateInitializer * parameterExpressionG3 =
       FortranStatementsAndExpressionsBuilder::buildShapeExpression (
-          dotExpressionG3);
+          multiplyExpressionG3);
 
   SgStatement
       * callStatementG =
@@ -672,7 +677,7 @@ FortranOpenMPHostSubroutineIndirectLoop::createPlanFunctionCallStatement ()
 
   SgFunctionSymbol * functionSymbol =
       FortranTypesBuilder::buildNewFortranFunction (
-          OpenMP::fortranCplanFunction, subroutineScope);
+          OpenMP::Fortran::cPlanFunction, subroutineScope);
 
   SgFunctionCallExp * functionCall = buildFunctionCallExp (functionSymbol,
       actualParameters);
@@ -1037,7 +1042,7 @@ FortranOpenMPHostSubroutineIndirectLoop::createSetUpPlanFunctionActualParameters
 
   SgExprStatement * assignmentStatement3 = buildAssignStatement (
       variableDeclarations->getReference (numberOfIndirectOpDats), buildIntVal (
-          parallelLoop->getNumberOfDistinctIndirectOpDatArguments ()));
+          parallelLoop->getNumberOfDistinctIndirectOpDats ()));
 
   appendStatement (assignmentStatement3, block);
 

@@ -112,7 +112,7 @@ FortranCUDAHostSubroutine::createReductionEpilogueStatements ()
 
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
-    if (parallelLoop->isReductionRequired (i) == true)
+    if (parallelLoop->isReductionRequired (i))
     {
       if (parallelLoop->getOpDatDimension (i) == 1)
       {
@@ -221,6 +221,7 @@ FortranCUDAHostSubroutine::createReductionEpilogueStatements ()
 void
 FortranCUDAHostSubroutine::createReductionDeclarations ()
 {
+  using namespace SageBuilder;
   using namespace OP2VariableNames;
   using namespace ReductionVariableNames;
   using namespace LoopVariableNames;
@@ -273,6 +274,36 @@ FortranCUDAHostSubroutine::createReductionDeclarations ()
 
       variableDeclarations->add (reductionArrayDeviceName, reductionArrayDevice);
 
+      if (parallelLoop->isArray (i))
+      {
+        Debug::getInstance ()->debugMessage (
+            "Creating device array for array REDUCTION "
+                + lexical_cast <string> (i), Debug::FUNCTION_LEVEL, __FILE__,
+            __LINE__);
+
+        string const & variableName = getOpDatHostName (i);
+
+        variableDeclarations->add (variableName,
+            FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
+                variableName, buildPointerType (
+                    FortranTypesBuilder::getArray_RankOne (
+                        parallelLoop->getOpDatBaseType (i))), subroutineScope));
+      }
+      else
+      {
+        Debug::getInstance ()->debugMessage (
+            "Creating host scalar pointer for scalar REDUCTION "
+                + lexical_cast <string> (i), Debug::FUNCTION_LEVEL, __FILE__,
+            __LINE__);
+
+        string const & variableName = getOpDatHostName (i);
+
+        variableDeclarations->add (variableName,
+            FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
+                variableName, buildPointerType (parallelLoop->getOpDatBaseType (
+                    i)), subroutineScope));
+      }
+
       string const & reductionCardinalityName = getReductionCardinalityName (i);
 
       variableDeclarations->add (reductionCardinalityName,
@@ -284,7 +315,7 @@ FortranCUDAHostSubroutine::createReductionDeclarations ()
 }
 
 SgExpression *
-FortranCUDAHostSubroutine::createRHSOfInitialiseOpDatCardinalityStatement (
+FortranCUDAHostSubroutine::getOpDatCardinalityInitialisationExpression (
     SgScopeStatement * scope, unsigned int OP_DAT_ArgumentGroup)
 {
   using namespace SageBuilder;
@@ -339,9 +370,9 @@ FortranCUDAHostSubroutine::createRHSOfInitialiseOpDatCardinalityStatement (
   else if (parallelLoop->isArray (OP_DAT_ArgumentGroup)
       && parallelLoop->isRead (OP_DAT_ArgumentGroup))
   {
-    SgDotExp * dotExpression = buildDotExp (variableDeclarations->getReference (
-        getOpDatName (OP_DAT_ArgumentGroup)), buildOpaqueVarRefExp (dim,
-        scope));
+    SgDotExp * dotExpression =
+        buildDotExp (variableDeclarations->getReference (getOpDatName (
+            OP_DAT_ArgumentGroup)), buildOpaqueVarRefExp (dim, scope));
 
     return dotExpression;
   }
@@ -432,7 +463,7 @@ FortranCUDAHostSubroutine::createTransferOpDatStatements ()
                 getOpDatCardinalityName (i)));
 
         SgExpression * rhsOfAssigment =
-            createRHSOfInitialiseOpDatCardinalityStatement (block, i);
+            getOpDatCardinalityInitialisationExpression (block, i);
 
         SgExprStatement * assignmentStatement = buildAssignStatement (
             dotExpression, rhsOfAssigment);
@@ -456,7 +487,7 @@ FortranCUDAHostSubroutine::createTransferOpDatStatements ()
       if (fortranParallelLoop->isCardinalityDeclarationNeeded (i))
       {
         SgExpression * rhsOfAssigment =
-            createRHSOfInitialiseOpDatCardinalityStatement (block, i);
+            getOpDatCardinalityInitialisationExpression (block, i);
 
         SgExprStatement * assignmentStatement = buildAssignStatement (
             variableDeclarations->getReference (getOpDatCardinalityName (i)),
@@ -514,7 +545,31 @@ FortranCUDAHostSubroutine::createTransferOpDatStatements ()
       {
         if (parallelLoop->isArray (i))
         {
+          Debug::getInstance ()->debugMessage ("Global array conversion",
+              Debug::HIGHEST_DEBUG_LEVEL, __FILE__, __LINE__);
 
+          SgDotExp * parameterExpression1A = buildDotExp (
+              variableDeclarations->getReference (getOpDatName (i)),
+              buildOpaqueVarRefExp (data, block));
+
+          SgVarRefExp * parameterExpression1B =
+              variableDeclarations->getReference (getOpDatHostName (i));
+
+          SgDotExp * dotExpression = buildDotExp (
+              variableDeclarations->getReference (getOpDatName (i)),
+              buildOpaqueVarRefExp (dim, block));
+
+          SgAggregateInitializer * parameterExpression1C =
+              FortranStatementsAndExpressionsBuilder::buildShapeExpression (
+                  dotExpression);
+
+          SgStatement
+              * callStatementA =
+                  FortranStatementsAndExpressionsBuilder::createCToFortranPointerCallStatement (
+                      subroutineScope, parameterExpression1A,
+                      parameterExpression1B, parameterExpression1C);
+
+          appendStatement (callStatementA, block);
         }
         else
         {
@@ -665,39 +720,6 @@ FortranCUDAHostSubroutine::createDataMarshallingDeclarations ()
                 variableName, FortranTypesBuilder::getArray_RankOne (
                     parallelLoop->getOpDatBaseType (i)), subroutineScope, 2,
                 CUDA_DEVICE, ALLOCATABLE));
-      }
-      else if (parallelLoop->isReductionRequired (i))
-      {
-        if (parallelLoop->isArray (i))
-        {
-          Debug::getInstance ()->debugMessage (
-              "Creating device array for array REDUCTION " + lexical_cast <
-                  string> (i), Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
-
-          string const & variableName = getOpDatDeviceName (i);
-
-          variableDeclarations->add (
-              variableName,
-              FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
-                  variableName, FortranTypesBuilder::getArray_RankOne (
-                      parallelLoop->getOpDatBaseType (i)), subroutineScope, 2,
-                  CUDA_DEVICE, ALLOCATABLE));
-        }
-        else
-        {
-          Debug::getInstance ()->debugMessage (
-              "Creating host scalar pointer for scalar REDUCTION "
-                  + lexical_cast <string> (i), Debug::FUNCTION_LEVEL, __FILE__,
-              __LINE__);
-
-          string const & variableName = getOpDatHostName (i);
-
-          variableDeclarations->add (
-              variableName,
-              FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
-                  variableName, buildPointerType (
-                      parallelLoop->getOpDatBaseType (i)), subroutineScope));
-        }
       }
       else
       {

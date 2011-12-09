@@ -14,6 +14,7 @@ class CPPModifyOP2CallsToComplyWithOxfordAPI: public AstSimpleProcessing
 
   private:
 
+#ifdef INCLUDE
     void
     patchOpArgGblCall (SgExpressionPtrList & actualArguments);
 
@@ -40,6 +41,7 @@ class CPPModifyOP2CallsToComplyWithOxfordAPI: public AstSimpleProcessing
 
     virtual void
     visit (SgNode * node);
+#endif
 
   public:
 

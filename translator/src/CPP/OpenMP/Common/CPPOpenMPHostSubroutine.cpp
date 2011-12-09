@@ -1,6 +1,7 @@
 #include "CPPOpenMPHostSubroutine.h"
 #include "CPPParallelLoop.h"
 #include "CPPOpenMPKernelSubroutine.h"
+#include "CPPModuleDeclarations.h"
 #include "RoseStatementsAndExpressionsBuilder.h"
 #include "CompilerGeneratedNames.h"
 #include "OpenMP.h"
@@ -293,40 +294,13 @@ CPPOpenMPHostSubroutine::createReductionDeclarations ()
   }
 }
 
-void
-CPPOpenMPHostSubroutine::createOpenMPLocalVariableDeclarations ()
-{
-  using namespace SageBuilder;
-  using namespace OP2VariableNames;
-  using namespace LoopVariableNames;
-  using namespace OpenMP;
-
-  Debug::getInstance ()->debugMessage (
-      "Creating OpenMP local variable declarations", Debug::FUNCTION_LEVEL,
-      __FILE__, __LINE__);
-
-  variableDeclarations->add (
-      getIterationCounterVariableName (1),
-      RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
-          getIterationCounterVariableName (1), buildIntType (), subroutineScope));
-
-  variableDeclarations->add (sliceStart,
-      RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
-          sliceStart, buildIntType (), subroutineScope));
-
-  variableDeclarations->add (sliceEnd,
-      RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (sliceEnd,
-          buildIntType (), subroutineScope));
-
-  variableDeclarations->add (numberOfThreads,
-      RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
-          numberOfThreads, buildIntType (), subroutineScope));
-}
-
 CPPOpenMPHostSubroutine::CPPOpenMPHostSubroutine (
     SgScopeStatement * moduleScope,
     CPPOpenMPKernelSubroutine * calleeSubroutine,
-    CPPParallelLoop * parallelLoop) :
-  CPPHostSubroutine (moduleScope, calleeSubroutine, parallelLoop)
+    CPPParallelLoop * parallelLoop, CPPModuleDeclarations * moduleDeclarations) :
+  CPPHostSubroutine (moduleScope, calleeSubroutine, parallelLoop),
+      moduleDeclarations (moduleDeclarations)
 {
+  variableDeclarations->addVisibilityToSymbolsFromOuterScope (
+      moduleDeclarations->getDeclarations ());
 }

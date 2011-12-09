@@ -661,7 +661,7 @@ CPPCUDAReductionSubroutine::createLocalVariableDeclarations ()
    * ======================================================
    */
 
-  volatileSharedVariableName = getCUDAVolatileSharedMemoryDeclarationName (
+  volatileSharedVariableName = getVolatileSharedMemoryDeclarationName (
       reduction->getBaseType (), reduction->getVariableSize ());
 
   variableDeclarations->add (volatileSharedVariableName,

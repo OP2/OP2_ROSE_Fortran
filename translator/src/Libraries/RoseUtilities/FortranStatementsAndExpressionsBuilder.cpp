@@ -2,6 +2,7 @@
 #include "FortranTypesBuilder.h"
 #include "RoseHelper.h"
 #include "Exceptions.h"
+#include <rose.h>
 
 void
 FortranStatementsAndExpressionsBuilder::setFortranAttributes (

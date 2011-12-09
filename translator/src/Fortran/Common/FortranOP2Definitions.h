@@ -1,4 +1,3 @@
-
 #pragma once
 #ifndef FORTRAN_OP2_DEFINITIONS_H
 #define FORTRAN_OP2_DEFINITIONS_H
@@ -6,6 +5,7 @@
 #include <OP2Definitions.h>
 
 class SgExprListExp;
+class SgFunctionCallExp;
 
 class FortranOpDatDefinition: public OpDatDefinition
 {
@@ -120,7 +120,7 @@ class FortranOpGblDefinition: public OpGblDefinition
      * Models an OP_GBL definition in Fortran.
      *
      * The following style is assumed:
-     * OP_DECL_GBL (data, dimension, OpDatName)
+     * OP_DECL_GBL (data, OpDatName, dimension)
      * ======================================================
      */
 
@@ -128,9 +128,9 @@ class FortranOpGblDefinition: public OpGblDefinition
 
     static int const index_data = 0;
 
-    static int const index_dimension = 1;
+    static int const index_OpDatName = 1;
 
-    static int const index_OpDatName = 2;
+    static int const index_dimension = 2;
 
   public:
 
@@ -188,6 +188,8 @@ class FortranOpConstDefinition: public OpConstDefinition
 
     static int const index_OpConstName = 1;
 
+    SgFunctionCallExp * callExpression;
+
   public:
 
     static unsigned int
@@ -196,7 +198,11 @@ class FortranOpConstDefinition: public OpConstDefinition
       return 2;
     }
 
-    FortranOpConstDefinition (SgExprListExp * parameters);
+    SgFunctionCallExp *
+    getCallSite ();
+
+    FortranOpConstDefinition (SgExprListExp * parameters,
+        SgFunctionCallExp * callExpression);
 };
 
 #endif

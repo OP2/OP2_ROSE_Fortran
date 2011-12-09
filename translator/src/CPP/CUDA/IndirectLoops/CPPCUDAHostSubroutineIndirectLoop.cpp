@@ -95,11 +95,11 @@ CPPCUDAHostSubroutineIndirectLoop::createKernelFunctionCallStatement ()
 
   actualParameters->append_expression (buildArrowExp (
       variableDeclarations->getReference (planRet), buildOpaqueVarRefExp (
-          thrcol, subroutineScope)));
+          nthrcol, subroutineScope)));
 
   actualParameters->append_expression (buildArrowExp (
       variableDeclarations->getReference (planRet), buildOpaqueVarRefExp (
-          nthrcol, subroutineScope)));
+          thrcol, subroutineScope)));
 
   actualParameters->append_expression (variableDeclarations->getReference (
       blockOffset));
@@ -193,8 +193,8 @@ CPPCUDAHostSubroutineIndirectLoop::createPlanFunctionExecutionStatements ()
 
   SgExprStatement * assignmentStatement4 = buildAssignStatement (
       variableDeclarations->getReference (CUDA::threadsPerBlock),
-      moduleDeclarations->getBlockSizeReference (
-          parallelLoop->getUserSubroutineName ()));
+      variableDeclarations->getReference (getBlockSizeVariableName (
+          parallelLoop->getUserSubroutineName ())));
 
   appendStatement (assignmentStatement4, loopBody);
 
@@ -247,7 +247,7 @@ CPPCUDAHostSubroutineIndirectLoop::createPlanFunctionExecutionStatements ()
 
   SgLessThanOp * upperBoundExpression = buildLessThanOp (
       variableDeclarations->getReference (getIterationCounterVariableName (3)),
-      buildOpaqueVarRefExp (numberOfColours, subroutineScope));
+      arrowExpression);
 
   SgPlusPlusOp * strideExpression = buildPlusPlusOp (
       variableDeclarations->getReference (getIterationCounterVariableName (3)));
@@ -280,9 +280,8 @@ CPPCUDAHostSubroutineIndirectLoop::createPlanFunctionCallStatement ()
   actualParamaters->append_expression (variableDeclarations->getReference (
       getOpSetName ()));
 
-  actualParamaters->append_expression (
-      moduleDeclarations->getPartitionSizeReference (
-          parallelLoop->getUserSubroutineName ()));
+  actualParamaters->append_expression (variableDeclarations->getReference (
+      getPartitionSizeVariableName (parallelLoop->getUserSubroutineName ())));
 
   actualParamaters->append_expression (buildIntVal (
       parallelLoop->getNumberOfOpDatArgumentGroups ()));
@@ -291,7 +290,7 @@ CPPCUDAHostSubroutineIndirectLoop::createPlanFunctionCallStatement ()
       opDatArray));
 
   actualParamaters->append_expression (buildIntVal (
-      parallelLoop->getNumberOfDistinctIndirectOpDatArguments ()));
+      parallelLoop->getNumberOfDistinctIndirectOpDats ()));
 
   actualParamaters->append_expression (variableDeclarations->getReference (
       indirectionDescriptorArray));
@@ -354,8 +353,8 @@ CPPCUDAHostSubroutineIndirectLoop::createPlanFunctionDeclarations ()
 
   variableDeclarations->add (opDatArray,
       RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
-          opDatArray, buildArrayType (buildClassDeclaration (OP2::OP_ARG,
-              subroutineScope)->get_type (), buildIntVal (
+          opDatArray, buildArrayType (buildOpaqueType (OP2::OP_ARG,
+              subroutineScope), buildIntVal (
               parallelLoop->getNumberOfOpDatArgumentGroups ())),
           subroutineScope));
 
@@ -367,8 +366,8 @@ CPPCUDAHostSubroutineIndirectLoop::createPlanFunctionDeclarations ()
 
   variableDeclarations->add (planRet,
       RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (planRet,
-          buildPointerType (buildClassDeclaration (OP2::OP_PLAN,
-              subroutineScope)->get_type ()), subroutineScope));
+          buildPointerType (buildOpaqueType (OP2::OP_PLAN, subroutineScope)),
+          subroutineScope));
 
   variableDeclarations->add (blockOffset,
       RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (

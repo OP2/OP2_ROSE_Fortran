@@ -1,4 +1,5 @@
 #include <CPPOP2Definitions.h>
+#include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
 #include <Debug.h>
 #include <rose.h>
@@ -17,17 +18,17 @@ CPPImperialOpDatDefinition::CPPImperialOpDatDefinition (
   dimension
       = isSgIntVal (parameters->get_expressions ()[indexDimension])->get_value ();
 
-  primitiveType
+  baseType
       = isSgVarRefExp (parameters->get_expressions ()[indexDataArray])->get_type ();
 
   ROSE_ASSERT (opSetName.empty () == false);
   ROSE_ASSERT (dimension > 0);
-  ROSE_ASSERT (primitiveType != NULL);
+  ROSE_ASSERT (baseType != NULL);
   ROSE_ASSERT (variableName.empty () == false);
 
   Debug::getInstance ()->debugMessage ("Found an OP_DAT declaration: '"
       + variableName + "'. The data pertains to the set '" + opSetName
-      + "'. Its actual type is " + primitiveType->class_name ()
+      + "'. Its actual type is " + baseType->class_name ()
       + " and its dimension is " + lexical_cast <string> (dimension),
       Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 }
@@ -152,17 +153,17 @@ CPPOxfordOpDatDefinition::CPPOxfordOpDatDefinition (SgExprListExp * parameters,
   dimension
       = isSgIntVal (parameters->get_expressions ()[indexDimension])->get_value ();
 
-  primitiveType
+  baseType
       = isSgVarRefExp (parameters->get_expressions ()[indexDataArray])->get_type ();
 
   ROSE_ASSERT (opSetName.empty () == false);
   ROSE_ASSERT (dimension > 0);
-  ROSE_ASSERT (primitiveType != NULL);
+  ROSE_ASSERT (baseType != NULL);
   ROSE_ASSERT (variableName.empty () == false);
 
   Debug::getInstance ()->debugMessage ("Found an OP_DAT declaration: '"
       + variableName + "'. The data pertains to the set '" + opSetName
-      + "'. Its actual type is " + primitiveType->class_name ()
+      + "'. Its actual type is " + baseType->class_name ()
       + " and its dimension is " + lexical_cast <string> (dimension),
       Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 }
@@ -189,19 +190,20 @@ CPPOxfordOpMapDefinition::CPPOxfordOpMapDefinition (SgExprListExp * parameters,
   using boost::lexical_cast;
   using std::string;
 
+  SgExpressionPtrList & parameterExpressions = parameters->get_expressions ();
+
   this->variableName = variableName;
 
   sourceOpSetName
-      = isSgVarRefExp (parameters->get_expressions ()[indexOpSetSource])->get_symbol ()->get_name ().getString ();
+      = isSgVarRefExp (parameterExpressions[indexOpSetSource])->get_symbol ()->get_name ().getString ();
 
   destinationOpSetName
-      = isSgVarRefExp (parameters->get_expressions ()[indexOpSetDestination])->get_symbol ()->get_name ().getString ();
+      = isSgVarRefExp (parameterExpressions[indexOpSetDestination])->get_symbol ()->get_name ().getString ();
 
-  dimension
-      = isSgIntVal (parameters->get_expressions ()[indexDimension])->get_value ();
+  dimension = isSgIntVal (parameterExpressions[indexDimension])->get_value ();
 
   mappingName
-      = isSgVarRefExp (parameters->get_expressions ()[indexMappingArray])->get_symbol ()->get_name ().getString ();
+      = isSgVarRefExp (parameterExpressions[indexMappingArray])->get_symbol ()->get_name ().getString ();
 
   ROSE_ASSERT (sourceOpSetName.empty () == false);
   ROSE_ASSERT (destinationOpSetName.empty () == false);
@@ -219,14 +221,17 @@ CPPOxfordOpMapDefinition::CPPOxfordOpMapDefinition (SgExprListExp * parameters,
 CPPOxfordOpConstDefinition::CPPOxfordOpConstDefinition (
     SgExprListExp * parameters)
 {
+  using namespace SageBuilder;
+  using boost::iequals;
   using boost::lexical_cast;
   using std::string;
 
-  dimension
-      = isSgIntVal (parameters->get_expressions ()[indexDimension])->get_value ();
+  SgExpressionPtrList & parameterExpressions = parameters->get_expressions ();
+
+  dimension = isSgIntVal (parameterExpressions[indexDimension])->get_value ();
 
   SgAddressOfOp * addressOfOperator = isSgAddressOfOp (
-      parameters->get_expressions ()[indexData]);
+      parameterExpressions[indexData]);
 
   if (addressOfOperator != NULL)
   {
@@ -236,13 +241,22 @@ CPPOxfordOpConstDefinition::CPPOxfordOpConstDefinition (
     ROSE_ASSERT (operandExpression != NULL);
 
     variableName = operandExpression->get_symbol ()->get_name ().getString ();
+
+    baseType = operandExpression->get_type ();
   }
   else
   {
-    variableName
-        = isSgVarRefExp (parameters->get_expressions ()[indexData])->get_symbol ()->get_name ().getString ();
+    SgVarRefExp * varRefExpression = isSgVarRefExp (
+        parameters->get_expressions ()[indexData]);
+
+    ROSE_ASSERT (varRefExpression != NULL);
+
+    variableName = varRefExpression->get_symbol ()->get_name ().getString ();
+
+    baseType = varRefExpression->get_type ();
   }
 
+  ROSE_ASSERT (baseType != NULL);
   ROSE_ASSERT (dimension > 0);
   ROSE_ASSERT (variableName.empty () == false);
 

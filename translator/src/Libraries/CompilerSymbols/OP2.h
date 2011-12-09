@@ -80,7 +80,7 @@ namespace OP2
 
     std::string const partitionSizeMacro = "OP_PARTITION_SIZE";
     std::string const threadBlockSizeMacro = "OP_BLOCK_SIZE";
-    std::string const warpSizeMacro = "OP_WARP_SIZE";
+    std::string const warpSizeMacro = "OP_WARPSIZE";
     std::string const fortranTypeOpGblMacro = "F_OP_ARG_GBL";
     std::string const fortranTypeOpDatMacro = "F_OP_ARG_DAT";
 
@@ -122,10 +122,16 @@ namespace OP2
 
   namespace Libraries
   {
+    namespace CPP
+    {
+      std::string const mainLibrary = "op_lib_cpp.h";
+    }
+
     namespace Fortran
     {
       std::string const declarations = "OP2_FORTRAN_DECLARATIONS";
       std::string const runtimeSupport = "OP2_FORTRAN_RT_SUPPORT";
+      std::string const CBindings = "ISO_C_BINDING";
     }
   }
 

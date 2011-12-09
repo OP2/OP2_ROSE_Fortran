@@ -1,102 +1,156 @@
-#include <CommandLine.h>
-#include <CommandLineOption.h>
-#include <CommandLineOptionWithParameters.h>
-#include <TargetLanguage.h>
-#include <Debug.h>
-#include <Globals.h>
-#include <Exceptions.h>
-#include <UDrawGraph.h>
-#include <FortranProgramDeclarationsAndDefinitions.h>
-#include <FortranCUDASubroutinesGeneration.h>
-#include <FortranOpenMPSubroutinesGeneration.h>
-#include <CPPModifyOP2CallsToComplyWithOxfordAPI.h>
-#include <CPPPreProcess.h>
-#include <CPPProgramDeclarationsAndDefinitions.h>
-#include <CPPCUDASubroutinesGeneration.h>
-#include <CPPOpenMPSubroutinesGeneration.h>
-#include <CPPOpenCLSubroutinesGeneration.h>
+#include "CommandLine.h"
+#include "TranslatorCommandLineOptions.h"
+#include "Debug.h"
+#include "Globals.h"
+#include "Exceptions.h"
+#include "FortranProgramDeclarationsAndDefinitions.h"
+#include "FortranCUDASubroutinesGeneration.h"
+#include "FortranOpenMPSubroutinesGeneration.h"
+#include "CPPProgramDeclarationsAndDefinitions.h"
+#include "CPPCUDASubroutinesGeneration.h"
+#include "CPPOpenMPSubroutinesGeneration.h"
+#include "CPPOpenCLSubroutinesGeneration.h"
 #include <boost/algorithm/string.hpp>
 #include <boost/filesystem.hpp>
+#include <iostream>
+#include <fstream>
 #include <rose.h>
 
-class OxfordOption: public CommandLineOption
-{
-  public:
+#include "CPPPreProcess.h"
 
-    virtual void
-    run ()
+template <class TGenerator>
+  void
+  unparseSourceFiles (SgProject * project, TGenerator * generator)
+  {
+    using std::vector;
+    using std::string;
+
+    class TreeVisitor: public AstSimpleProcessing
     {
-      Globals::getInstance ()->setRenderOxfordAPICalls ();
-    }
+      private:
 
-    OxfordOption (std::string helpMessage, std::string longOption) :
-      CommandLineOption (helpMessage, "", longOption)
-    {
-    }
-};
+        TGenerator * generator;
 
-class PreprocessOption: public CommandLineOption
-{
-public:
-    virtual void
-    run ()
-    {
-        Globals::getInstance ()->setPreprocess ();
-    }
-    
-    PreprocessOption (std::string helpMessage, std::string longOption) :
-    CommandLineOption (helpMessage, "", longOption)
-    {
-    }
-};
+        SgProject * project;
 
-class CUDAOption: public CommandLineOption
-{
-  public:
+        vector <string> outputFiles;
 
-    virtual void
-    run ()
-    {
-      Globals::getInstance ()->setTargetBackend (TargetLanguage::CUDA);
-    }
+        string generatedFile;
 
-    CUDAOption (std::string helpMessage, std::string longOption) :
-      CommandLineOption (helpMessage, "", longOption)
-    {
-    }
-};
+      public:
 
-class OpenMPOption: public CommandLineOption
-{
-  public:
+        virtual void
+        visit (SgNode * node)
+        {
+          using boost::iequals;
+          using boost::filesystem::path;
+          using boost::filesystem::system_complete;
 
-    virtual void
-    run ()
-    {
-      Globals::getInstance ()->setTargetBackend (TargetLanguage::OPENMP);
-    }
+          SgSourceFile * file = isSgSourceFile (node);
 
-    OpenMPOption (std::string helpMessage, std::string longOption) :
-      CommandLineOption (helpMessage, "", longOption)
-    {
-    }
-};
+          if (file != NULL)
+          {
+            path p = system_complete (path (file->getFileName ()));
 
-class OpenCLOption: public CommandLineOption
-{
-  public:
+            if (generator->isDirty (p.filename ()))
+            {
+              Debug::getInstance ()->debugMessage ("Unparsing '"
+                  + p.filename () + "'", Debug::FUNCTION_LEVEL, __FILE__,
+                  __LINE__);
 
-    virtual void
-    run ()
-    {
-      Globals::getInstance ()->setTargetBackend (TargetLanguage::OPENCL);
-    }
+              outputFiles.push_back ("rose_" + p.filename ());
 
-    OpenCLOption (std::string helpMessage, std::string longOption) :
-      CommandLineOption (helpMessage, "", longOption)
-    {
-    }
-};
+              file->unparse ();
+            }
+            else if (iequals (p.filename (), generator->getFileName ()))
+            {
+              Debug::getInstance ()->debugMessage ("Unparsing generated file '"
+                  + p.filename () + "'", Debug::FUNCTION_LEVEL, __FILE__,
+                  __LINE__);
+
+              outputFiles.push_back (p.filename ());
+
+              generatedFile = p.filename ();
+
+              file->unparse ();
+            }
+            else
+            {
+              Debug::getInstance ()->debugMessage ("File '" + p.filename ()
+                  + "' remains unchanged", Debug::FUNCTION_LEVEL, __FILE__,
+                  __LINE__);
+
+              outputFiles.push_back ("rose_" + p.filename ());
+
+              file->unparse ();
+            }
+          }
+        }
+
+        TreeVisitor (TGenerator * generator, SgProject * project) :
+          generator (generator), project (project)
+        {
+          using std::string;
+          using std::ofstream;
+
+          traverseInputFiles (this->project, preorder);
+
+          string fileName;
+
+          switch (Globals::getInstance ()->getTargetBackend ())
+          {
+            case TargetLanguage::CUDA:
+            {
+              fileName = ".translator.cuda";
+
+              break;
+            }
+
+            case TargetLanguage::OPENMP:
+            {
+              fileName = ".translator.openmp";
+
+              break;
+            }
+
+            case TargetLanguage::OPENCL:
+            {
+              fileName = ".translator.opencl";
+
+              break;
+            }
+
+            default:
+            {
+              throw Exceptions::CommandLine::LanguageException (
+                  "Unknown/unsupported backend selected");
+            }
+          }
+
+          ofstream outputFile;
+
+          outputFile.open (fileName.c_str ());
+
+          outputFile << "generated=" + generatedFile;
+
+          outputFile << std::endl;
+
+          outputFile << "files=";
+
+          for (vector <string>::iterator it = outputFiles.begin (); it
+              != outputFiles.end (); ++it)
+          {
+            outputFile << *it << " ";
+          }
+
+          outputFile << std::endl;
+
+          outputFile.close ();
+        }
+    };
+
+    new TreeVisitor (generator, project);
+  }
 
 CPPSubroutinesGeneration *
 handleCPPProject (SgProject * project)
@@ -199,122 +253,15 @@ handleFortranProject (SgProject * project)
 }
 
 void
-unparseSourceFiles (SgProject * project, CPPSubroutinesGeneration * generator)
+checkFreeVariablesFileOption ()
 {
-  class TreeVisitor: public AstSimpleProcessing
+  using std::string;
+
+  if (Globals::getInstance ()->getFreeVariablesModuleName ().empty ())
   {
-    private:
-
-      CPPSubroutinesGeneration * generator;
-
-    public:
-
-      TreeVisitor (CPPSubroutinesGeneration * generator) :
-        generator (generator)
-      {
-      }
-
-      virtual void
-      visit (SgNode * node)
-      {
-        using boost::iequals;
-        using boost::filesystem::path;
-        using boost::filesystem::system_complete;
-
-        SgSourceFile * file = isSgSourceFile (node);
-        if (file != NULL)
-        {
-          path p = system_complete (
-              path (isSgSourceFile (node)->getFileName ()));
-
-          if (generator->isDirty (p.filename ()))
-          {
-            Debug::getInstance ()->debugMessage ("Unparsing '" + p.filename ()
-                + "'", Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
-
-            file->unparse ();
-          }
-          else if (iequals (p.filename (), generator->getFileName ()))
-          {
-            Debug::getInstance ()->debugMessage ("Unparsing generated file '"
-                + p.filename () + "'", Debug::FUNCTION_LEVEL, __FILE__,
-                __LINE__);
-
-            file->unparse ();
-          }
-          else
-          {
-            Debug::getInstance ()->debugMessage ("File '" + p.filename ()
-                + "' remains unchanged", Debug::FUNCTION_LEVEL, __FILE__,
-                __LINE__);
-          }
-        }
-      }
-  };
-
-  TreeVisitor * visitor = new TreeVisitor (generator);
-
-  visitor->traverse (project, preorder);
-}
-
-void
-unparseSourceFiles (SgProject * project,
-    FortranSubroutinesGeneration * generator)
-{
-  class TreeVisitor: public AstSimpleProcessing
-  {
-    private:
-
-      FortranSubroutinesGeneration * generator;
-
-    public:
-
-      TreeVisitor (FortranSubroutinesGeneration * generator) :
-        generator (generator)
-      {
-      }
-
-      virtual void
-      visit (SgNode * node)
-      {
-        using boost::iequals;
-        using boost::filesystem::path;
-        using boost::filesystem::system_complete;
-
-        SgSourceFile * file = isSgSourceFile (node);
-        if (file != NULL)
-        {
-          path p = system_complete (
-              path (isSgSourceFile (node)->getFileName ()));
-
-          if (generator->isDirty (p.filename ()))
-          {
-            Debug::getInstance ()->debugMessage ("Unparsing '" + p.filename ()
-                + "'", Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
-
-            file->unparse ();
-          }
-          else if (iequals (p.filename (), generator->getFileName ()))
-          {
-            Debug::getInstance ()->debugMessage ("Unparsing generated file '"
-                + p.filename () + "'", Debug::FUNCTION_LEVEL, __FILE__,
-                __LINE__);
-
-            file->unparse ();
-          }
-          else
-          {
-            Debug::getInstance ()->debugMessage ("File '" + p.filename ()
-                + "' remains unchanged", Debug::FUNCTION_LEVEL, __FILE__,
-                __LINE__);
-          }
-        }
-      }
-  };
-
-  TreeVisitor * visitor = new TreeVisitor (generator);
-
-  visitor->traverse (project, preorder);
+    throw Exceptions::ASTParsing::NoSourceFileException (
+        "You have not supplied a file containing the declarations of free variables referenced within the user kernel functions");
+  }
 }
 
 void
@@ -365,6 +312,9 @@ addCommandLineOptions ()
       new OpenCLOption ("Generate OpenCL code", TargetLanguage::toString (
           TargetLanguage::OPENCL)));
 
+  CommandLine::getInstance ()->addOption (new FreeVariablesModuleOption (
+      "The module containing free variables referenced in user kernels"));
+
   CommandLine::getInstance ()->addOption (new OxfordOption (
       "Refactor OP2 calls to comply with Oxford API", "oxford"));
     
@@ -396,33 +346,33 @@ processUserSelections (SgProject * project)
           
       project->unparse ();
     }
-    else 
-    if (Globals::getInstance ()->renderOxfordAPICalls ())
-    {
-      if (Globals::getInstance ()->getTargetBackend ()
-          != TargetLanguage::UNKNOWN_BACKEND)
-      {
-        throw Exceptions::CommandLine::MutuallyExclusiveException (
-            "You have selected to generate code for " + toString (
-                Globals::getInstance ()->getTargetBackend ())
-                + " and replace all OP2 calls with calls complying with the Oxford API. These options are mutually exclusive");
-      }
-
-      CPPProgramDeclarationsAndDefinitions * declarations =
-          new CPPProgramDeclarationsAndDefinitions (project);
-
-      new CPPModifyOP2CallsToComplyWithOxfordAPI (project, declarations);
-
-      project->unparse ();
-    }
     else
-    {
-      checkBackendOption ();
+		if (Globals::getInstance ()->renderOxfordAPICalls ())
+		{
+			if (Globals::getInstance ()->getTargetBackend ()
+				!= TargetLanguage::UNKNOWN_BACKEND)
+			{
+				throw Exceptions::CommandLine::MutuallyExclusiveException (
+				  "You have selected to generate code for " + toString (
+				  Globals::getInstance ()->getTargetBackend ())
+                  + " and replace all OP2 calls with calls complying with the Oxford API. These options are mutually exclusive");
+			}
 
-      CPPSubroutinesGeneration * generator = handleCPPProject (project);
+			CPPProgramDeclarationsAndDefinitions * declarations =
+			new CPPProgramDeclarationsAndDefinitions (project);
 
-      unparseSourceFiles (project, generator);
-    }
+			// new CPPModifyOP2CallsToComplyWithOxfordAPI (project, declarations);
+
+			project->unparse ();
+		}
+		else
+		{
+			checkBackendOption ();
+
+			CPPSubroutinesGeneration * generator = handleCPPProject (project);
+
+			unparseSourceFiles (project, generator);
+		}
   }
   else if (project->get_Fortran_only ())
   {
@@ -432,6 +382,8 @@ processUserSelections (SgProject * project)
     Globals::getInstance ()->setHostLanguage (TargetLanguage::FORTRAN);
 
     checkBackendOption ();
+
+    checkFreeVariablesFileOption ();
 
     FortranSubroutinesGeneration * generator = handleFortranProject (project);
 
@@ -570,10 +522,15 @@ main (int argc, char ** argv)
 
     return Exceptions::CodeGeneration::FileCreationException::returnValue;
   }
+  catch (Exceptions::ASTParsing::NoSourceFileException const & e)
+  {
+    std::cout << e.what () << std::endl;
+
+    return Exceptions::ASTParsing::NoSourceFileException::returnValue;
+  }
 
   Debug::getInstance ()->debugMessage ("Translation completed",
       Debug::VERBOSE_LEVEL, __FILE__, __LINE__);
 
   return 0;
 }
-

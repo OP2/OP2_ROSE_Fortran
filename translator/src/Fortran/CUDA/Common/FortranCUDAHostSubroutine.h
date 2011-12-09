@@ -30,15 +30,8 @@ class FortranCUDAHostSubroutine: public FortranHostSubroutine
     virtual void
     createReductionDeclarations ();
 
-    /*
-     * ======================================================
-     * Creates the expression on the right-hand side of the
-     * statement which initialises the cardinality of the OP_DAT
-     * in this argument group
-     * ======================================================
-     */
     SgExpression *
-    createRHSOfInitialiseOpDatCardinalityStatement (SgScopeStatement * scope,
+    getOpDatCardinalityInitialisationExpression (SgScopeStatement * scope,
         unsigned int OP_DAT_ArgumentGroup);
 
     virtual SgBasicBlock *

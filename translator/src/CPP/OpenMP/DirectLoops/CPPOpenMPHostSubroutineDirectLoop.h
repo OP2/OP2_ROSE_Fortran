@@ -8,6 +8,9 @@ class CPPOpenMPHostSubroutineDirectLoop: public CPPOpenMPHostSubroutine
 {
   private:
 
+    void
+    createOpenMPLocalVariableDeclarations ();
+
     virtual SgStatement *
     createKernelFunctionCallStatement ();
 
@@ -24,7 +27,8 @@ class CPPOpenMPHostSubroutineDirectLoop: public CPPOpenMPHostSubroutine
 
     CPPOpenMPHostSubroutineDirectLoop (SgScopeStatement * moduleScope,
         CPPOpenMPKernelSubroutine * calleeSubroutine,
-        CPPParallelLoop * parallelLoop);
+        CPPParallelLoop * parallelLoop,
+        CPPModuleDeclarations * moduleDeclarations);
 };
 
 #endif

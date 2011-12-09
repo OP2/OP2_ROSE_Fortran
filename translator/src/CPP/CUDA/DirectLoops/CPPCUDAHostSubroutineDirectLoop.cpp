@@ -86,8 +86,8 @@ CPPCUDAHostSubroutineDirectLoop::createCUDAKernelInitialisationStatements ()
 
   SgExprStatement * assignmentStatement2 = buildAssignStatement (
       variableDeclarations->getReference (CUDA::threadsPerBlock),
-      moduleDeclarations->getBlockSizeReference (
-          parallelLoop->getUserSubroutineName ()));
+      variableDeclarations->getReference (getBlockSizeVariableName (
+          parallelLoop->getUserSubroutineName ())));
 
   appendStatement (assignmentStatement2, subroutineScope);
 
@@ -153,12 +153,12 @@ CPPCUDAHostSubroutineDirectLoop::createStatements ()
   Debug::getInstance ()->debugMessage ("Creating statements",
       Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
+  createCUDAKernelInitialisationStatements ();
+
   if (parallelLoop->isReductionRequired ())
   {
     createReductionPrologueStatements ();
   }
-
-  createCUDAKernelInitialisationStatements ();
 
   appendStatement (createKernelFunctionCallStatement (), subroutineScope);
 

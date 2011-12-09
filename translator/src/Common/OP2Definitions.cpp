@@ -28,9 +28,9 @@ OpDatDefinition::getDimension () const
 }
 
 SgType *
-OpDatDefinition::getPrimitiveType ()
+OpDatDefinition::getBaseType ()
 {
-  return primitiveType;
+  return baseType;
 }
 
 std::string const &
@@ -88,9 +88,15 @@ OpGblDefinition::getDimension () const
 }
 
 SgType *
-OpGblDefinition::getPrimitiveType ()
+OpGblDefinition::getBaseType ()
 {
-  return primitiveType;
+  return baseType;
+}
+
+SgType *
+OpConstDefinition::getType ()
+{
+  return baseType;
 }
 
 unsigned int

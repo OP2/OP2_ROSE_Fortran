@@ -8,6 +8,7 @@ class CPPProgramDeclarationsAndDefinitions;
 class CPPHostSubroutine;
 class CPPReductionSubroutines;
 class CPPModuleDeclarations;
+class CPPUserSubroutine;
 
 class CPPSubroutinesGeneration: public SubroutinesGeneration <
     CPPProgramDeclarationsAndDefinitions, CPPHostSubroutine>
@@ -18,19 +19,30 @@ class CPPSubroutinesGeneration: public SubroutinesGeneration <
 
     CPPModuleDeclarations * moduleDeclarations;
 
+    std::map <std::string, CPPUserSubroutine *> userSubroutines;
+
   protected:
+
+    virtual void
+    addFreeVariableDeclarations ();
+
+    void
+    addOP2IncludeDirective ();
+
+    void
+    patchCallsToParallelLoops ();
+
+    void
+    createHeaderFile ();
+
+    void
+    generate ();
 
     virtual void
     addHeaderIncludes () = 0;
 
     virtual void
     createSubroutines () = 0;
-
-    void
-    patchCallsToParallelLoops ();
-
-    void
-    generate ();
 
   public:
 

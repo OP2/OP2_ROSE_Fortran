@@ -17,7 +17,10 @@ class FortranCUDAHostSubroutineIndirectLoop: public FortranCUDAHostSubroutine
     createPlanFunctionExecutionStatements ();
 
     SgBasicBlock *
-    createConvertPositionInPMapsStatements ();
+    createConvertLocalToGlobalMappingStatements ();
+
+    SgBasicBlock *
+    createConvertGlobalToLocalMappingStatements ();
 
     SgBasicBlock *
     createConvertPlanFunctionParametersStatements ();

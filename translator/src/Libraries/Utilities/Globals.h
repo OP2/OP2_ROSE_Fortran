@@ -20,7 +20,9 @@ class Globals
 
     bool uDrawOption;
 
-    std::vector <std::string> inputFiles;
+    std::vector <std::string> inputFilenames;
+
+    std::string freeVariablesModuleName;
 
   private:
 
@@ -98,6 +100,12 @@ class Globals
 
     bool
     isInputFile (std::string const & fileName) const;
+
+    void
+    setFreeVariablesModuleName (std::string const & fileName);
+
+    std::string const
+    getFreeVariablesModuleName () const;
 };
 
 #endif

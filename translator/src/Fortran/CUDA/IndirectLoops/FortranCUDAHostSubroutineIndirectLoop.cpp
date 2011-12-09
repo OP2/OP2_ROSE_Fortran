@@ -346,9 +346,12 @@ FortranCUDAHostSubroutineIndirectLoop::createConvertPlanFunctionParametersStatem
           parallelLoop->getUserSubroutineName ())),
       variableDeclarations->getReference (ncolblk));
 
-  SgDotExp * parameterExpressionF3 = buildDotExp (
-      variableDeclarations->getReference (set), buildOpaqueVarRefExp (size,
-          block));
+  SgDotExp * dotExpressionF3 = buildDotExp (variableDeclarations->getReference (
+      set), buildOpaqueVarRefExp (size, block));
+
+  SgAggregateInitializer * parameterExpressionF3 =
+      FortranStatementsAndExpressionsBuilder::buildShapeExpression (
+          dotExpressionF3);
 
   SgStatement
       * callStatementF =
@@ -599,6 +602,48 @@ FortranCUDAHostSubroutineIndirectLoop::createConvertPlanFunctionParametersStatem
 
   appendStatement (callStatementM, block);
 
+  return block;
+}
+
+SgBasicBlock *
+FortranCUDAHostSubroutineIndirectLoop::createConvertLocalToGlobalMappingStatements ()
+{
+  using namespace SageBuilder;
+  using namespace SageInterface;
+  using namespace PlanFunctionVariableNames;
+  using namespace OP2::RunTimeVariableNames;
+  using namespace OP2VariableNames;
+
+  Debug::getInstance ()->debugMessage (
+      "Creating statements to convert local-to-global mapping arrays",
+      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+
+  SgBasicBlock * block = buildBasicBlock ();
+
+  /*
+   * ======================================================
+   * New C-To-Fortran pointer conversion call
+   * ======================================================
+   */
+
+  SgDotExp * parameterExpressionA1 = buildDotExp (
+      variableDeclarations->getReference (getActualPlanVariableName (
+          parallelLoop->getUserSubroutineName ())), buildOpaqueVarRefExp (
+          nindirect, block));
+
+  SgAggregateInitializer * parameterExpressionA3 =
+      FortranStatementsAndExpressionsBuilder::buildShapeExpression (
+          variableDeclarations->getReference (numberOfIndirectOpDats));
+
+  SgStatement
+      * callStatementA =
+          FortranStatementsAndExpressionsBuilder::createCToFortranPointerCallStatement (
+              subroutineScope, parameterExpressionA1,
+              variableDeclarations->getReference (pnindirect),
+              parameterExpressionA3);
+
+  appendStatement (callStatementA, block);
+
   /*
    * ======================================================
    * New C-To-Fortran pointer conversion calls
@@ -639,7 +684,7 @@ FortranCUDAHostSubroutineIndirectLoop::createConvertPlanFunctionParametersStatem
 }
 
 SgBasicBlock *
-FortranCUDAHostSubroutineIndirectLoop::createConvertPositionInPMapsStatements ()
+FortranCUDAHostSubroutineIndirectLoop::createConvertGlobalToLocalMappingStatements ()
 {
   using namespace SageBuilder;
   using namespace SageInterface;
@@ -648,7 +693,7 @@ FortranCUDAHostSubroutineIndirectLoop::createConvertPositionInPMapsStatements ()
   using namespace OP2VariableNames;
 
   Debug::getInstance ()->debugMessage (
-      "Creating statements in Fortran plan to convert positions in PMaps",
+      "Creating statements to convert global-to-local mapping arrays",
       Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
   SgBasicBlock * block = buildBasicBlock ();
@@ -659,46 +704,22 @@ FortranCUDAHostSubroutineIndirectLoop::createConvertPositionInPMapsStatements ()
    * ======================================================
    */
 
-  SgDotExp * parameterExpressionB1 = buildDotExp (
+  SgDotExp * parameterExpressionA1 = buildDotExp (
       variableDeclarations->getReference (getActualPlanVariableName (
-          parallelLoop->getUserSubroutineName ())), buildOpaqueVarRefExp (
-          nindirect, block));
+          parallelLoop->getUserSubroutineName ())), buildOpaqueVarRefExp (maps,
+          block));
 
-  SgAggregateInitializer * parameterExpressionB3 =
-      FortranStatementsAndExpressionsBuilder::buildShapeExpression (
-          variableDeclarations->getReference (numberOfIndirectOpDats));
-
-  SgStatement
-      * callStatementB =
-          FortranStatementsAndExpressionsBuilder::createCToFortranPointerCallStatement (
-              subroutineScope, parameterExpressionB1,
-              variableDeclarations->getReference (pnindirect),
-              parameterExpressionB3);
-
-  appendStatement (callStatementB, block);
-
-  /*
-   * ======================================================
-   * New C-To-Fortran pointer conversion call
-   * ======================================================
-   */
-
-  SgDotExp * parameterExpressionC1 = buildDotExp (
-      variableDeclarations->getReference (getActualPlanVariableName (
-          parallelLoop->getUserSubroutineName ())), buildOpaqueVarRefExp (
-          mappingArray, block));
-
-  SgAggregateInitializer * parameterExpressionC3 =
+  SgAggregateInitializer * parameterExpressionA3 =
       FortranStatementsAndExpressionsBuilder::buildShapeExpression (
           variableDeclarations->getReference (numberOfOpDats));
 
   SgStatement
-      * callStatementC =
+      * callStatementA =
           FortranStatementsAndExpressionsBuilder::createCToFortranPointerCallStatement (
-              subroutineScope, parameterExpressionC1,
-              variableDeclarations->getReference (pmaps), parameterExpressionC3);
+              subroutineScope, parameterExpressionA1,
+              variableDeclarations->getReference (pmaps), parameterExpressionA3);
 
-  appendStatement (callStatementC, block);
+  appendStatement (callStatementA, block);
 
   /*
    * ======================================================
@@ -890,7 +911,6 @@ FortranCUDAHostSubroutineIndirectLoop::createPlanFunctionParametersPreparationSt
    * values. At the beginning everything is set to undefined
    * ======================================================
    */
-  int const undefinedIndex = -2;
 
   std::map <std::string, int> indexValues;
 
@@ -898,7 +918,7 @@ FortranCUDAHostSubroutineIndirectLoop::createPlanFunctionParametersPreparationSt
   {
     if (parallelLoop->isIndirect (i))
     {
-      indexValues[parallelLoop->getOpDatVariableName (i)] = undefinedIndex;
+      indexValues[parallelLoop->getOpDatVariableName (i)] = -1;
     }
   }
 
@@ -920,7 +940,7 @@ FortranCUDAHostSubroutineIndirectLoop::createPlanFunctionParametersPreparationSt
 
     if (parallelLoop->isIndirect (i))
     {
-      if (indexValues[parallelLoop->getOpDatVariableName (i)] == undefinedIndex)
+      if (indexValues[parallelLoop->getOpDatVariableName (i)] == -1)
       {
         assignmentStatement = buildAssignStatement (arrayIndexExpression,
             buildIntVal (nextIndex));
@@ -952,7 +972,7 @@ FortranCUDAHostSubroutineIndirectLoop::createPlanFunctionParametersPreparationSt
 
   SgExprStatement * assignmentStatement3 = buildAssignStatement (
       variableDeclarations->getReference (numberOfIndirectOpDats), buildIntVal (
-          parallelLoop->getNumberOfDistinctIndirectOpDatArguments ()));
+          parallelLoop->getNumberOfDistinctIndirectOpDats ()));
 
   appendStatement (assignmentStatement3, block);
 
@@ -1121,7 +1141,11 @@ FortranCUDAHostSubroutineIndirectLoop::createStatements ()
   appendStatement (createConvertPlanFunctionParametersStatements (),
       subroutineScope);
 
-  appendStatement (createConvertPositionInPMapsStatements (), subroutineScope);
+  appendStatement (createConvertLocalToGlobalMappingStatements (),
+      subroutineScope);
+
+  appendStatement (createConvertGlobalToLocalMappingStatements (),
+      subroutineScope);
 
   createCardinalitiesInitialisationStatements ();
 
@@ -1168,7 +1192,8 @@ FortranCUDAHostSubroutineIndirectLoop::createExecutionPlanDeclarations ()
 
   /*
    * ======================================================
-   * Create pointer to the
+   * Create pointer to the array containing arrays of
+   * local to global mappings
    * ======================================================
    */
 

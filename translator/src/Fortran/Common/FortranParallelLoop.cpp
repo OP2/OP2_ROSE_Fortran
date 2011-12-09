@@ -24,7 +24,7 @@ FortranParallelLoop::isCardinalityDeclarationNeeded (
 }
 
 FortranParallelLoop::FortranParallelLoop (
-    SgFunctionCallExp * functionCallExpression, std::string fileName) :
-  ParallelLoop (functionCallExpression, fileName)
+    SgFunctionCallExp * functionCallExpression) :
+  ParallelLoop (functionCallExpression)
 {
 }

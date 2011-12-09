@@ -1,4 +1,4 @@
-#include <OpenCL.h>
+#include "OpenCL.h"
 #include <rose.h>
 
 SgType *
@@ -10,7 +10,23 @@ OpenCL::getKernelType (SgScopeStatement * scope)
 }
 
 SgType *
-OpenCL::getSizeOfType (SgScopeStatement * scope)
+OpenCL::getEventType (SgScopeStatement * scope)
+{
+  using namespace SageBuilder;
+
+  return buildOpaqueType ("cl_event", scope);
+}
+
+SgType *
+OpenCL::getMemoryType (SgScopeStatement * scope)
+{
+  using namespace SageBuilder;
+
+  return buildOpaqueType ("cl_mem", scope);
+}
+
+SgType *
+OpenCL::getSizeType (SgScopeStatement * scope)
 {
   using namespace SageBuilder;
 
@@ -83,8 +99,8 @@ OpenCL::getDoublePrecisionFloatType (SgScopeStatement * scope)
 
 SgFunctionCallExp *
 OpenCL::getSetKernelArgumentCallExpression (SgScopeStatement * scope,
-    SgVarRefExp * openCLKernel, SgIntVal * argumentIndex,
-    SgType * sizeOfArgument, SgExpression * argument)
+    SgVarRefExp * openCLKernel, int argumentIndex, SgType * sizeOfArgument,
+    SgExpression * argument)
 {
   using namespace SageBuilder;
 
@@ -92,7 +108,7 @@ OpenCL::getSetKernelArgumentCallExpression (SgScopeStatement * scope,
 
   actualParameters->append_expression (openCLKernel);
 
-  actualParameters->append_expression (argumentIndex);
+  actualParameters->append_expression (buildIntVal (argumentIndex));
 
   actualParameters->append_expression (buildSizeOfOp (sizeOfArgument));
 
@@ -137,6 +153,20 @@ OpenCL::getWorkGroupIDCallStatement (SgScopeStatement * scope)
 SgFunctionCallExp *
 OpenCL::getNumberOfWorkGroupsCallStatement (SgScopeStatement * scope)
 {
+}
+
+SgFunctionCallExp *
+OpenCL::OP2RuntimeSupport::getKernel (SgScopeStatement * scope,
+    std::string const & kernelName)
+{
+  using namespace SageBuilder;
+
+  SgExprListExp * actualParameters = buildExprListExp ();
+
+  actualParameters->append_expression (buildStringVal (kernelName));
+
+  return buildFunctionCallExp ("getKernel", buildVoidType (), actualParameters,
+      scope);
 }
 
 SgFunctionCallExp *

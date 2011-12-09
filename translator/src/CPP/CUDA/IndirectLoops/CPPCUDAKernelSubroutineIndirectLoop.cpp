@@ -197,8 +197,8 @@ CPPCUDAKernelSubroutineIndirectLoop::createIncrementAndWriteAccessEpilogueStatem
                   getIterationCounterVariableName (1)), CUDA::getThreadId (
                   THREAD_X, subroutineScope));
 
-          SgMultiplyOp * multiplyExpression = buildMultiplyOp (
-              variableDeclarations->getReference (
+          SgMultiplyOp * multiplyExpression =
+              buildMultiplyOp (variableDeclarations->getReference (
                   getIndirectOpDatSizeName (i)), buildIntVal (
                   parallelLoop->getOpDatDimension (i)));
 
@@ -264,8 +264,8 @@ CPPCUDAKernelSubroutineIndirectLoop::createStageOutFromLocalMemoryToSharedMemory
               2)), multiplyExpression1);
 
       SgPntrArrRefExp * arrayExpression2 = buildPntrArrRefExp (
-          variableDeclarations->getReference (
-              getIndirectOpDatSharedMemoryName (i)), addExpression2);
+          variableDeclarations->getReference (getIndirectOpDatSharedMemoryName (
+              i)), addExpression2);
 
       SgPntrArrRefExp * arrayExpression3 = buildPntrArrRefExp (
           variableDeclarations->getReference (getOpDatLocalName (i)),
@@ -315,8 +315,7 @@ CPPCUDAKernelSubroutineIndirectLoop::createStageOutFromLocalMemoryToSharedMemory
       loopBody);
 
   SgExprStatement * initialisationExpression = buildAssignStatement (
-      variableDeclarations->getReference (colour1),
-      buildIntVal (0));
+      variableDeclarations->getReference (colour1), buildIntVal (0));
 
   SgLessThanOp * upperBoundExpression = buildLessThanOp (
       variableDeclarations->getReference (colour1),
@@ -438,8 +437,7 @@ CPPCUDAKernelSubroutineIndirectLoop::createExecutionLoopStatements ()
   if (parallelLoop->hasIncrementedOpDats ())
   {
     SgExprStatement * assignmentStatement1 = buildAssignStatement (
-        variableDeclarations->getReference (colour2),
-        buildIntVal (-1));
+        variableDeclarations->getReference (colour2), buildIntVal (-1));
 
     appendStatement (assignmentStatement1, loopBody);
 
@@ -459,8 +457,7 @@ CPPCUDAKernelSubroutineIndirectLoop::createExecutionLoopStatements ()
         variableDeclarations->getReference (pthrcol), addExpression1);
 
     SgExprStatement * assignmentStatement2 = buildAssignStatement (
-        variableDeclarations->getReference (colour2),
-        arrayExpression1);
+        variableDeclarations->getReference (colour2), arrayExpression1);
 
     appendStatement (assignmentStatement2, ifBody);
 
@@ -610,8 +607,8 @@ CPPCUDAKernelSubroutineIndirectLoop::createInitialiseCUDASharedVariablesStatemen
                 THREAD_X, subroutineScope));
 
         SgMultiplyOp * multiplyExpression = buildMultiplyOp (
-            variableDeclarations->getReference (getIndirectOpDatSizeName (
-                i)), buildIntVal (parallelLoop->getOpDatDimension (i)));
+            variableDeclarations->getReference (getIndirectOpDatSizeName (i)),
+            buildIntVal (parallelLoop->getOpDatDimension (i)));
 
         SgLessThanOp * upperBoundExpression = buildLessThanOp (
             variableDeclarations->getReference (
@@ -672,8 +669,8 @@ CPPCUDAKernelSubroutineIndirectLoop::createSetIndirectionMapPointerStatements ()
          */
 
         SgMultiplyOp * multiplyExpression1 = buildMultiplyOp (
-            variableDeclarations->getReference (blockID),
-            buildIntVal (parallelLoop->getOpDatDimension (i)));
+            variableDeclarations->getReference (blockID), buildIntVal (
+                parallelLoop->getOpDatDimension (i)));
 
         SgAddOp * addExpression1a = buildAddOp (buildIntVal (offset),
             multiplyExpression1);
@@ -740,10 +737,6 @@ CPPCUDAKernelSubroutineIndirectLoop::createSetOpDatSharedMemoryPointerStatements
     {
       if (parallelLoop->isIndirect (i))
       {
-        string const autosharedVariableName =
-            getSharedMemoryDeclarationName (parallelLoop->getOpDatBaseType (
-                i), parallelLoop->getSizeOfOpDat (i));
-
         /*
          * ======================================================
          * New statement
@@ -751,15 +744,19 @@ CPPCUDAKernelSubroutineIndirectLoop::createSetOpDatSharedMemoryPointerStatements
          */
 
         SgPntrArrRefExp * arrayExpression2 = buildPntrArrRefExp (
-            variableDeclarations->getReference (autosharedVariableName),
+            variableDeclarations->getReference (getSharedMemoryDeclarationName (
+                parallelLoop->getUserSubroutineName ())),
             variableDeclarations->getReference (nbytes));
 
         SgAddressOfOp * addressOfExpression2 = buildAddressOfOp (
             arrayExpression2);
 
+        SgCastExp * castExpression2 = buildCastExp (addressOfExpression2,
+            buildPointerType (parallelLoop->getOpDatBaseType (i)));
+
         SgExprStatement * assignmentStatement2 = buildAssignStatement (
             variableDeclarations->getReference (
-                getIndirectOpDatSharedMemoryName (i)), addressOfExpression2);
+                getIndirectOpDatSharedMemoryName (i)), castExpression2);
 
         appendStatement (assignmentStatement2, block);
 
@@ -772,14 +769,14 @@ CPPCUDAKernelSubroutineIndirectLoop::createSetOpDatSharedMemoryPointerStatements
         indirectOpDatCounter++;
 
         if (indirectOpDatCounter
-            < parallelLoop->getNumberOfDifferentIndirectOpDats ())
+            < parallelLoop->getNumberOfDistinctIndirectOpDats ())
         {
           SgMultiplyOp * multiplyExpression3a = buildMultiplyOp (buildSizeOfOp (
-              buildFloatType ()), buildIntVal (parallelLoop->getOpDatDimension (
-              i)));
+              parallelLoop->getOpDatBaseType (i)), buildIntVal (
+              parallelLoop->getOpDatDimension (i)));
 
-          SgMultiplyOp * multiplyExpression3b = buildMultiplyOp (
-              variableDeclarations->getReference (
+          SgMultiplyOp * multiplyExpression3b =
+              buildMultiplyOp (variableDeclarations->getReference (
                   getIndirectOpDatSizeName (i)), multiplyExpression3a);
 
           SgFunctionCallExp * functionCallExpression3 =
@@ -890,9 +887,8 @@ CPPCUDAKernelSubroutineIndirectLoop::createSetNumberOfIndirectElementsPerBlockSt
       if (parallelLoop->isIndirect (i))
       {
         SgMultiplyOp * multiplyExpression = buildMultiplyOp (
-            variableDeclarations->getReference (blockID),
-            buildIntVal (
-                parallelLoop->getNumberOfDistinctIndirectOpDatArguments ()));
+            variableDeclarations->getReference (blockID), buildIntVal (
+                parallelLoop->getNumberOfDistinctIndirectOpDats ()));
 
         SgAddOp * addExpression = buildAddOp (buildIntVal (offset),
             multiplyExpression);
@@ -901,8 +897,8 @@ CPPCUDAKernelSubroutineIndirectLoop::createSetNumberOfIndirectElementsPerBlockSt
             variableDeclarations->getReference (pindSizes), addExpression);
 
         SgStatement * statement = buildAssignStatement (
-            variableDeclarations->getReference (getIndirectOpDatSizeName (
-                i)), arrayExpression);
+            variableDeclarations->getReference (getIndirectOpDatSizeName (i)),
+            arrayExpression);
 
         appendStatement (statement, block);
 
@@ -941,8 +937,7 @@ CPPCUDAKernelSubroutineIndirectLoop::createThreadZeroStatements ()
       variableDeclarations->getReference (pblkMap), arrayIndexExpression1);
 
   SgStatement * statement1 = buildAssignStatement (
-      variableDeclarations->getReference (blockID),
-      arrayExpression1);
+      variableDeclarations->getReference (blockID), arrayExpression1);
 
   appendStatement (statement1, ifBlock);
 
@@ -1023,8 +1018,7 @@ CPPCUDAKernelSubroutineIndirectLoop::createStatements ()
   using namespace SageBuilder;
   using namespace SageInterface;
 
-  appendStatementList (createThreadZeroStatements ()->generateStatementList (),
-      subroutineScope);
+  appendStatement (createThreadZeroStatements (), subroutineScope);
 
   appendStatement (buildExprStatement (
       CUDA::createDeviceThreadSynchronisationCallStatement (subroutineScope)),
@@ -1076,12 +1070,12 @@ CPPCUDAKernelSubroutineIndirectLoop::createIncrementAccessLocalVariableDeclarati
   variableDeclarations->add (numberOfActiveThreadsCeiling, variableDeclaration2);
 
   variableDeclarations ->add (colour1,
-      RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
-          colour1, buildIntType (), subroutineScope));
+      RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (colour1,
+          buildIntType (), subroutineScope));
 
   variableDeclarations ->add (colour2,
-      RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
-          colour2, buildIntType (), subroutineScope));
+      RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (colour2,
+          buildIntType (), subroutineScope));
 
   variableDeclarations ->add (
       getIterationCounterVariableName (2),
@@ -1126,17 +1120,61 @@ CPPCUDAKernelSubroutineIndirectLoop::createExecutionLocalVariableDeclarations ()
   variableDeclarations ->add (nbytes, variableDeclaration3);
 
   variableDeclarations->add (blockID,
-      RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
-          blockID, buildIntType (), subroutineScope));
+      RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (blockID,
+          buildIntType (), subroutineScope));
 
   variableDeclarations ->add (
       getIterationCounterVariableName (1),
       RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
           getIterationCounterVariableName (1), buildIntType (), subroutineScope));
+}
 
-  variableDeclarations ->add (getUpperBoundVariableName (1),
+void
+CPPCUDAKernelSubroutineIndirectLoop::createStageInVariableDeclarations ()
+{
+  using namespace SageBuilder;
+  using namespace OP2VariableNames;
+  using std::string;
+
+  Debug::getInstance ()->debugMessage ("Creating local thread variables",
+      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+
+  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
+  {
+    if (parallelLoop->isIndirect (i) && parallelLoop->isIncremented (i))
+    {
+      string const & variableName = getOpDatLocalName (i);
+
+      variableDeclarations ->add (variableName,
+          RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
+              variableName, buildArrayType (parallelLoop->getOpDatBaseType (i),
+                  buildIntVal (parallelLoop->getOpDatDimension (i))),
+              subroutineScope));
+    }
+  }
+}
+
+void
+CPPCUDAKernelSubroutineIndirectLoop::createCUDASharedVariableDeclarations ()
+{
+  using namespace SageBuilder;
+  using namespace OP2VariableNames;
+  using std::string;
+
+  Debug::getInstance ()->debugMessage (
+      "Creating CUDA shared variable declarations", Debug::FUNCTION_LEVEL,
+      __FILE__, __LINE__);
+
+  string const & variableName = getSharedMemoryDeclarationName (
+      parallelLoop->getUserSubroutineName ());
+
+  SgVariableDeclaration * autosharedVariableDeclaration =
       RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
-          getUpperBoundVariableName (1), buildIntType (), subroutineScope));
+          variableName, buildArrayType (buildCharType ()), subroutineScope);
+
+  autosharedVariableDeclaration->get_declarationModifier ().get_storageModifier ().setCudaDynamicShared ();
+
+  variableDeclarations->add (variableName, autosharedVariableDeclaration);
 }
 
 void
@@ -1152,11 +1190,16 @@ CPPCUDAKernelSubroutineIndirectLoop::createLocalVariableDeclarations ()
   Debug::getInstance ()->debugMessage ("Creating local variable declarations",
       Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
-  createCUDAStageInVariablesVariableDeclarations ();
+  createStageInVariableDeclarations ();
 
   createCUDASharedVariableDeclarations ();
 
   createExecutionLocalVariableDeclarations ();
+
+  if (parallelLoop->isReductionRequired ())
+  {
+    createReductionVariableDeclarations ();
+  }
 
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {

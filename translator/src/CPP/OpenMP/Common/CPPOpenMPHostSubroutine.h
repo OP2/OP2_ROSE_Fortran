@@ -5,9 +5,14 @@
 #include <CPPHostSubroutine.h>
 
 class CPPOpenMPKernelSubroutine;
+class CPPModuleDeclarations;
 
 class CPPOpenMPHostSubroutine: public CPPHostSubroutine
 {
+  protected:
+
+    CPPModuleDeclarations * moduleDeclarations;
+
   protected:
 
     SgBasicBlock *
@@ -28,12 +33,10 @@ class CPPOpenMPHostSubroutine: public CPPHostSubroutine
     virtual void
     createReductionDeclarations ();
 
-    void
-    createOpenMPLocalVariableDeclarations ();
-
     CPPOpenMPHostSubroutine (SgScopeStatement * moduleScope,
         CPPOpenMPKernelSubroutine * calleeSubroutine,
-        CPPParallelLoop * parallelLoop);
+        CPPParallelLoop * parallelLoop,
+        CPPModuleDeclarations * moduleDeclarations);
 };
 
 #endif

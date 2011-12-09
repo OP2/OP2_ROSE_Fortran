@@ -63,6 +63,12 @@ class CPPCUDAKernelSubroutineDirectLoop: public CPPCUDAKernelSubroutine
         unsigned int OP_DAT_ArgumentGroup);
 
     void
+    createStageInVariableDeclarations ();
+
+    void
+    createCUDASharedVariableDeclarations ();
+
+    void
     createInitialiseOffsetIntoCUDASharedVariableStatements ();
 
     void

@@ -16,11 +16,14 @@ FortranCUDAModuleDeclarations::FortranCUDAModuleDeclarations (
   using namespace PlanFunctionVariableNames;
   using std::string;
 
-  string const & variableName = getPlanReturnVariableName (
-      parallelLoop->getUserSubroutineName ());
+  if (parallelLoop->isDirectLoop () == false)
+  {
+    string const & variableName = getPlanReturnVariableName (
+        parallelLoop->getUserSubroutineName ());
 
-  variableDeclarations->add (variableName,
-      FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
-          variableName, FortranTypesBuilder::buildClassDeclaration ("c_ptr",
-              moduleScope)->get_type (), moduleScope));
+    variableDeclarations->add (variableName,
+        FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
+            variableName, FortranTypesBuilder::buildClassDeclaration ("c_ptr",
+                moduleScope)->get_type (), moduleScope));
+  }
 }

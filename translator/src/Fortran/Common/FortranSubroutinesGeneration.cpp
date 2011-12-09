@@ -1,73 +1,20 @@
-#include <FortranSubroutinesGeneration.h>
-#include <FortranParallelLoop.h>
-#include <FortranHostSubroutine.h>
-#include <FortranTypesBuilder.h>
-#include <FortranProgramDeclarationsAndDefinitions.h>
-#include <FortranReductionSubroutines.h>
-#include <RoseHelper.h>
+#include "FortranSubroutinesGeneration.h"
+#include "FortranParallelLoop.h"
+#include "FortranHostSubroutine.h"
+#include "FortranTypesBuilder.h"
+#include "FortranProgramDeclarationsAndDefinitions.h"
+#include "FortranReductionSubroutines.h"
+#include "RoseHelper.h"
 #include <boost/algorithm/string/predicate.hpp>
 
 void
-FortranSubroutinesGeneration::removeUseStatement (
-    SgUseStatement * useStatement, std::string const & userSubroutineName)
+FortranSubroutinesGeneration::processOP2ConstantDeclarations ()
 {
-  using namespace SageInterface;
-  using boost::iequals;
-
-  std::string const & fileName = declarations->getFileNameForSubroutine (
-      userSubroutineName);
-
-  std::string const & moduleNameToRemove = declarations->getModuleNameForFile (
-      fileName);
-
-  Debug::getInstance ()->debugMessage ("'" + userSubroutineName
-      + "' is in Fortran module '" + moduleNameToRemove + "' (file '"
-      + fileName + "')", Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
-
-  SgUseStatement * lastUseStatement = useStatement;
-
-  ROSE_ASSERT (lastUseStatement != NULL);
-
-  do
-  {
-    if (iequals (lastUseStatement->get_name ().getString (), moduleNameToRemove))
-    {
-      removeStatement (lastUseStatement);
-      break;
-    }
-
-    lastUseStatement = isSgUseStatement (
-        getPreviousStatement (lastUseStatement));
-  }
-  while (lastUseStatement != NULL);
+  Debug::getInstance ()->debugMessage ("Processing OP_DECL_CONST calls",
+      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 }
 
-SgVariableDeclaration *
-FortranSubroutinesGeneration::addUserSubroutineNameDeclaration (
-    SgScopeStatement * scope, std::string const & userSubroutineName)
-{
-  using namespace SageBuilder;
-  using namespace SageInterface;
-
-  Debug::getInstance ()->debugMessage (
-      "Adding character array declaration with name '" + userSubroutineName
-          + "'", Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
-
-  SgTypeString * characterArray = FortranTypesBuilder::getString (
-      userSubroutineName.size ());
-
-  SgAssignInitializer * initializer = buildAssignInitializer (buildStringVal (
-      userSubroutineName), characterArray);
-
-  SgVariableDeclaration * variableDeclaration = buildVariableDeclaration (
-      userSubroutineName + "_user", characterArray, initializer, scope);
-
-  insertStatementAfterLastDeclaration (variableDeclaration, scope);
-
-  return variableDeclaration;
-}
-
-SgScopeStatement *
+void
 FortranSubroutinesGeneration::addModuleUseStatement (SgNode * parent,
     std::string const & moduleName)
 {
@@ -101,8 +48,6 @@ FortranSubroutinesGeneration::addModuleUseStatement (SgNode * parent,
       headersWithAddedUseStatements.push_back (
           parentStatement->get_name ().getString ());
     }
-
-    return scope;
   }
   else if (isSgProcedureHeaderStatement (parent))
   {
@@ -128,8 +73,6 @@ FortranSubroutinesGeneration::addModuleUseStatement (SgNode * parent,
       headersWithAddedUseStatements.push_back (
           parentStatement->get_name ().getString ());
     }
-
-    return scope;
   }
   else
   {
@@ -145,6 +88,7 @@ FortranSubroutinesGeneration::patchCallsToParallelLoops (
   using namespace SageBuilder;
   using namespace SageInterface;
   using std::map;
+  using std::vector;
   using std::string;
   using std::find;
 
@@ -166,88 +110,93 @@ FortranSubroutinesGeneration::patchCallsToParallelLoops (
     FortranHostSubroutine * hostSubroutine =
         hostSubroutines[userSubroutineName];
 
-    /*
-     * ======================================================
-     * Recursively go back in the scopes until we can find the
-     * program header or subroutine header
-     * ======================================================
-     */
-
-    SgFunctionCallExp * functionCallExpression =
-        parallelLoop->getFunctionCall ();
-
-    ROSE_ASSERT (isSgExprStatement(functionCallExpression->get_parent()));
-
-    SgScopeStatement * scope = isSgExprStatement (
-        functionCallExpression->get_parent ())->get_scope ();
-
-    SgNode * parent = functionCallExpression->get_parent ();
-
-    while (!isSgProcedureHeaderStatement (parent)
-        && !isSgProgramHeaderStatement (parent))
+    for (vector <SgFunctionCallExp *>::const_iterator it =
+        parallelLoop->getFirstFunctionCall (); it
+        != parallelLoop->getLastFunctionCall (); ++it)
     {
-      parent = parent->get_parent ();
+      SgFunctionCallExp * functionCallExpression = *it;
+
+      ROSE_ASSERT (isSgExprStatement(functionCallExpression->get_parent()));
+
+      /*
+       * ======================================================
+       * Recursively go back in the scopes until we can find the
+       * program header or subroutine header in which the
+       * OP_PAR_LOOP call is contained
+       * ======================================================
+       */
+
+      SgNode * parent = functionCallExpression->get_parent ();
+
+      while (!isSgProcedureHeaderStatement (parent)
+          && !isSgProgramHeaderStatement (parent))
+      {
+        parent = parent->get_parent ();
+      }
+
+      /*
+       * ======================================================
+       * Add module use statement to the scope just obtained
+       * ======================================================
+       */
+
+      addModuleUseStatement (parent, moduleName);
+
+      /*
+       * ======================================================
+       * Modify the call to OP_PAR_LOOP with a call to the newly
+       * built host subroutine
+       * ======================================================
+       */
+
+      SgFunctionRefExp * hostSubroutineReference = buildFunctionRefExp (
+          hostSubroutine->getSubroutineHeaderStatement ());
+
+      functionCallExpression->set_function (hostSubroutineReference);
+
+      /*
+       * ======================================================
+       * Modify the first parameter from a kernel reference to
+       * a kernel name
+       * ======================================================
+       */
+
+      SgExpressionPtrList & arguments =
+          functionCallExpression->get_args ()->get_expressions ();
+
+      arguments.erase (arguments.begin ());
+
+      SgStringVal * stringExpression = buildStringVal (userSubroutineName);
+
+      SgFunctionSymbol * functionSymbol =
+          FortranTypesBuilder::buildNewFortranFunction ("CHAR", moduleScope);
+
+      SgExprListExp * actualParameters = buildExprListExp ();
+
+      actualParameters->append_expression (buildIntVal (0));
+
+      SgFunctionCallExp * functionCallExp = buildFunctionCallExp (
+          functionSymbol, actualParameters);
+
+      SgConcatenationOp * conctenationExpression = buildConcatenationOp (
+          stringExpression, functionCallExp);
+
+      arguments.insert (arguments.begin (), conctenationExpression);
+
+      /*
+       * ======================================================
+       * Set where the function call is invoked as a transformation
+       * in the unparser
+       * ======================================================
+       */
+
+      SgLocatedNode * functionCallLocation = isSgLocatedNode (
+          functionCallExpression);
+
+      ROSE_ASSERT (functionCallLocation != NULL);
+
+      functionCallLocation->get_file_info ()->setTransformation ();
     }
-
-    /*
-     * ======================================================
-     * Add module use statement
-     * ======================================================
-     */
-
-    SgScopeStatement * parentScope = addModuleUseStatement (parent, moduleName);
-
-    SgStatement * lastDeclarationStatement = findLastDeclarationStatement (
-        parentScope);
-
-    if (find (dirtyFiles.begin (), dirtyFiles.end (),
-        parallelLoop->getFileName ()) == dirtyFiles.end ())
-    {
-      dirtyFiles.push_back (parallelLoop->getFileName ());
-    }
-
-    /*
-     * ======================================================
-     * Modify the call to OP_PAR_LOOP with a call to the newly
-     * built host subroutine
-     * ======================================================
-     */
-
-    SgFunctionRefExp * hostSubroutineReference = buildFunctionRefExp (
-        hostSubroutine->getSubroutineHeaderStatement ());
-
-    functionCallExpression->set_function (hostSubroutineReference);
-
-    /*
-     * ======================================================
-     * Modify the first parameter from a kernel reference to
-     * a kernel name
-     * ======================================================
-     */
-
-    SgVariableDeclaration * variableDeclaration =
-        addUserSubroutineNameDeclaration (parentScope, userSubroutineName);
-
-    SgExpressionPtrList & arguments =
-        functionCallExpression->get_args ()->get_expressions ();
-
-    arguments.erase (arguments.begin ());
-
-    arguments.insert (arguments.begin (), buildVarRefExp (variableDeclaration));
-
-    /*
-     * ======================================================
-     * Set where the function call is invoked as a transformation
-     * in the unparser
-     * ======================================================
-     */
-
-    SgLocatedNode * functionCallLocation = isSgLocatedNode (
-        functionCallExpression);
-
-    ROSE_ASSERT (functionCallLocation != NULL);
-
-    functionCallLocation->get_file_info ()->setTransformation ();
   }
 }
 
@@ -311,6 +260,10 @@ FortranSubroutinesGeneration::generate ()
   createSubroutines ();
 
   patchCallsToParallelLoops (moduleName);
+
+  determineWhichInputFilesToBeUnparsed ();
+
+  processOP2ConstantDeclarations ();
 }
 
 FortranSubroutinesGeneration::FortranSubroutinesGeneration (

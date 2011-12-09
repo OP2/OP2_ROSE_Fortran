@@ -67,8 +67,7 @@ class FortranParallelLoop: public ParallelLoop
     bool
     isCardinalityDeclarationNeeded (unsigned int OP_DAT_ArgumentGroup);
 
-    FortranParallelLoop (SgFunctionCallExp * functionCallExpression,
-        std::string fileName);
+    FortranParallelLoop (SgFunctionCallExp * functionCallExpression);
 };
 
 #endif

@@ -6,12 +6,21 @@
 #include <rose.h>
 #include <boost/lexical_cast.hpp>
 
-ParallelLoop::ParallelLoop (SgFunctionCallExp * functionCallExpression,
-    std::string fileName) :
-  functionCallExpression (functionCallExpression), fileName (fileName)
+ParallelLoop::ParallelLoop (SgFunctionCallExp * functionCallExpression)
 {
-  Debug::getInstance ()->debugMessage ("Parallel loop created in file '"
-      + fileName + "'", Debug::CONSTRUCTOR_LEVEL, __FILE__, __LINE__);
+  Debug::getInstance ()->debugMessage ("Parallel loop created",
+      Debug::CONSTRUCTOR_LEVEL, __FILE__, __LINE__);
+
+  functionCallExpressions.push_back (functionCallExpression);
+
+  SgExpressionPtrList & actualArguments =
+      functionCallExpression->get_args ()->get_expressions ();
+
+  SgFunctionRefExp * functionRefExpression = isSgFunctionRefExp (
+      actualArguments.front ());
+
+  userSubroutineName
+      = functionRefExpression->getAssociatedFunctionDeclaration ()->get_name ().getString ();
 }
 
 void
@@ -65,23 +74,6 @@ ParallelLoop::isDirectLoop ()
     }
   }
   return true;
-}
-
-unsigned int
-ParallelLoop::getNumberOfDistinctIndirectOpDatArguments ()
-{
-  unsigned int count = 0;
-  for (unsigned int i = 1; i <= getNumberOfOpDatArgumentGroups (); ++i)
-  {
-    if (OpDatDuplicates[i] == false)
-    {
-      if (OpDatMappingDescriptors[i] == INDIRECT)
-      {
-        count++;
-      }
-    }
-  }
-  return count;
 }
 
 void
@@ -235,7 +227,7 @@ ParallelLoop::getNumberOfIndirectOpDats ()
 }
 
 unsigned int
-ParallelLoop::getNumberOfDifferentIndirectOpDats ()
+ParallelLoop::getNumberOfDistinctIndirectOpDats ()
 {
   int count = 0;
   for (unsigned int i = 1; i <= getNumberOfOpDatArgumentGroups (); ++i)
@@ -253,7 +245,7 @@ ParallelLoop::hasIncrementedOpDats ()
 {
   for (unsigned int i = 1; i <= getNumberOfOpDatArgumentGroups (); ++i)
   {
-    if (isIncremented (i))
+    if (isReductionRequired (i) == false && isIncremented (i))
     {
       return true;
     }
@@ -364,8 +356,7 @@ ParallelLoop::setUniqueOpDat (std::string const & variableName)
 }
 
 bool
-ParallelLoop::isCUDAStageInVariableDeclarationNeeded (
-    unsigned int OP_DAT_ArgumentGroup)
+ParallelLoop::isStageInNeeded (unsigned int OP_DAT_ArgumentGroup)
 {
   /*
    * ======================================================
@@ -382,16 +373,46 @@ ParallelLoop::isCUDAStageInVariableDeclarationNeeded (
           OP_DAT_ArgumentGroup) > 1);
 }
 
-SgFunctionCallExp *
-ParallelLoop::getFunctionCall ()
+void
+ParallelLoop::addFunctionCallExpression (
+    SgFunctionCallExp * functionCallExpression)
 {
-  return functionCallExpression;
+  functionCallExpressions.push_back (functionCallExpression);
 }
 
-std::string const &
-ParallelLoop::getFileName () const
+std::vector <SgFunctionCallExp *>::const_iterator
+ParallelLoop::getFirstFunctionCall ()
 {
-  return fileName;
+  return functionCallExpressions.begin ();
+}
+
+std::vector <SgFunctionCallExp *>::const_iterator
+ParallelLoop::getLastFunctionCall ()
+{
+  return functionCallExpressions.end ();
+}
+
+void
+ParallelLoop::addFileName (std::string fileName)
+{
+  using std::find;
+
+  if (find (fileNames.begin (), fileNames.end (), fileName) == fileNames.end ())
+  {
+    fileNames.push_back (fileName);
+  }
+}
+
+std::vector <std::string>::const_iterator
+ParallelLoop::getFirstFileName ()
+{
+  return fileNames.begin ();
+}
+
+std::vector <std::string>::const_iterator
+ParallelLoop::getLastFileName ()
+{
+  return fileNames.end ();
 }
 
 Reduction *
@@ -440,13 +461,7 @@ ParallelLoop::getReductionsNeeded (std::vector <Reduction *> & reductions)
 std::string
 ParallelLoop::getUserSubroutineName ()
 {
-  SgExpressionPtrList & actualArguments =
-      functionCallExpression->get_args ()->get_expressions ();
-
-  SgFunctionRefExp * functionRefExpression = isSgFunctionRefExp (
-      actualArguments.front ());
-
-  return functionRefExpression->getAssociatedFunctionDeclaration ()->get_name ().getString ();
+  return userSubroutineName;
 }
 
 std::string const

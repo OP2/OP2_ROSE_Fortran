@@ -5,6 +5,7 @@
 #include "Exceptions.h"
 #include "OP2.h"
 
+#ifdef INCLUDE
 void
 CPPModifyOP2CallsToComplyWithOxfordAPI::patchOpArgGblCall (
     SgExpressionPtrList & actualArguments)
@@ -224,7 +225,7 @@ CPPModifyOP2CallsToComplyWithOxfordAPI::patchOpArgDatCall (
       actualArguments.begin () + 4;
 
   SgPointerType * pointerType = isSgPointerType (
-      opDatDefinition->getPrimitiveType ());
+      opDatDefinition->getBaseType ());
 
   ROSE_ASSERT (pointerType != NULL);
 
@@ -619,10 +620,11 @@ CPPModifyOP2CallsToComplyWithOxfordAPI::visit (SgNode * node)
     }
   }
 }
+#endif
 
 CPPModifyOP2CallsToComplyWithOxfordAPI::CPPModifyOP2CallsToComplyWithOxfordAPI (
     SgProject * project, CPPProgramDeclarationsAndDefinitions * declarations) :
   declarations (declarations)
 {
-  traverseInputFiles (project, preorder);
+ // traverseInputFiles (project, preorder);
 }

@@ -111,12 +111,24 @@ Globals::addInputFile (std::string const & fileName)
   Debug::getInstance ()->debugMessage ("Adding file '" + fileName + "'",
       Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
-  inputFiles.push_back (fileName);
+  inputFilenames.push_back (fileName);
 }
 
 bool
 Globals::isInputFile (std::string const & fileName) const
 {
-  return std::find (inputFiles.begin (), inputFiles.end (), fileName)
-      != inputFiles.end ();
+  return std::find (inputFilenames.begin (), inputFilenames.end (), fileName)
+      != inputFilenames.end ();
+}
+
+void
+Globals::setFreeVariablesModuleName (std::string const & moduleName)
+{
+  freeVariablesModuleName = moduleName;
+}
+
+std::string const
+Globals::getFreeVariablesModuleName () const
+{
+  return freeVariablesModuleName;
 }

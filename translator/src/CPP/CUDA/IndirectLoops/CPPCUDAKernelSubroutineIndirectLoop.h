@@ -47,6 +47,12 @@ class CPPCUDAKernelSubroutineIndirectLoop: public CPPCUDAKernelSubroutine
     createThreadZeroStatements ();
 
     void
+    createStageInVariableDeclarations ();
+
+    void
+    createCUDASharedVariableDeclarations ();
+
+    void
     createIncrementAccessLocalVariableDeclarations ();
 
     void

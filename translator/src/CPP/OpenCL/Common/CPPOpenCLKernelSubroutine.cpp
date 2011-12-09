@@ -1,5 +1,6 @@
-#include <CPPOpenCLKernelSubroutine.h>
-#include <CPPOpenCLUserSubroutine.h>
+#include "CPPOpenCLKernelSubroutine.h"
+#include "CPPOpenCLUserSubroutine.h"
+#include "CPPReductionSubroutines.h"
 
 CPPOpenCLKernelSubroutine::CPPOpenCLKernelSubroutine (
     SgScopeStatement * moduleScope, CPPOpenCLUserSubroutine * userSubroutine,
@@ -7,4 +8,7 @@ CPPOpenCLKernelSubroutine::CPPOpenCLKernelSubroutine (
     CPPReductionSubroutines * reductionSubroutines) :
   CPPKernelSubroutine (moduleScope, userSubroutine, parallelLoop)
 {
+  this->reductionSubroutines = reductionSubroutines;
+
+  subroutineHeaderStatement->get_functionModifier ().setOpenclKernel ();
 }

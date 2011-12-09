@@ -13,15 +13,6 @@ class CPPCUDAKernelSubroutine: public CPPKernelSubroutine
 
     /*
      * ======================================================
-     * Creates the statements which initialises the variables
-     * used to stage in data from device->shared->stack memory
-     * ======================================================
-     */
-    void
-    createInitialiseCUDAStageInVariablesStatements ();
-
-    /*
-     * ======================================================
      * Creates the statements executed before the call to the
      * user subroutine to initialise the local thread variables
      * to zero
@@ -41,21 +32,12 @@ class CPPCUDAKernelSubroutine: public CPPKernelSubroutine
 
     /*
      * ======================================================
-     * Creates the variable declarations needed to stage in
-     * data from device->shared->stack memory
+     * Creates the variable declarations needed to perform
+     * reductions
      * ======================================================
      */
     void
-    createCUDAStageInVariablesVariableDeclarations ();
-
-    /*
-     * ======================================================
-     * Creates the variable declarations needed in CUDA
-     * shared memory
-     * ======================================================
-     */
-    void
-    createCUDASharedVariableDeclarations ();
+    createReductionVariableDeclarations ();
 
     CPPCUDAKernelSubroutine (SgScopeStatement * moduleScope,
         CPPCUDAUserSubroutine * userSubroutine, CPPParallelLoop * parallelLoop,

@@ -26,18 +26,27 @@ class ParallelLoop
 
     /*
      * ======================================================
-     * The function call expression where the call to the
-     * OP_PAR_LOOP occurs
+     * The function call expressions where calls to the
+     * OP_PAR_LOOP occur. Note that there can be several
+     * calls to the same kernel in different parts of the
+     * code
      * ======================================================
      */
-    SgFunctionCallExp * functionCallExpression;
+    std::vector <SgFunctionCallExp *> functionCallExpressions;
 
     /*
      * ======================================================
-     * The file name where the call was detected
+     * The name of the user subroutine kernel
      * ======================================================
      */
-    std::string fileName;
+    std::string userSubroutineName;
+
+    /*
+     * ======================================================
+     * The file names where the calls were detected
+     * ======================================================
+     */
+    std::vector <std::string> fileNames;
 
     /*
      * ======================================================
@@ -108,14 +117,6 @@ class ParallelLoop
 
     /*
      * ======================================================
-     * The name of the user kernel associated with this
-     * parallel loop
-     * ======================================================
-     */
-    std::string userSubroutineName;
-
-    /*
-     * ======================================================
      * The number of OP_DAT argument groups
      * ======================================================
      */
@@ -123,8 +124,7 @@ class ParallelLoop
 
   protected:
 
-    ParallelLoop (SgFunctionCallExp * functionCallExpression,
-        std::string fileName);
+    ParallelLoop (SgFunctionCallExp * functionCallExpression);
 
   public:
 
@@ -160,15 +160,6 @@ class ParallelLoop
      */
     bool
     isDirectLoop ();
-
-    /*
-     * ======================================================
-     * How many OP_DAT arguments have indirect access
-     * descriptors?
-     * ======================================================
-     */
-    unsigned int
-    getNumberOfDistinctIndirectOpDatArguments ();
 
     void
     setOpDatType (unsigned int OP_DAT_ArgumentGroup, SgType * type);
@@ -264,7 +255,7 @@ class ParallelLoop
      * ======================================================
      */
     unsigned int
-    getNumberOfDifferentIndirectOpDats ();
+    getNumberOfDistinctIndirectOpDats ();
 
     /*
      * ======================================================
@@ -324,31 +315,66 @@ class ParallelLoop
 
     /*
      * ======================================================
-     * Does this OP_DAT argument group need a variable
-     * declaration in CUDA in order to stage in data from device
-     * memory?
+     * Does this OP_DAT argument group need its data to be
+     * staged in from upper levels of the memory hierarchy
+     * into lower levels?
      * ======================================================
      */
     bool
-    isCUDAStageInVariableDeclarationNeeded (unsigned int OP_DAT_ArgumentGroup);
+    isStageInNeeded (unsigned int OP_DAT_ArgumentGroup);
 
     /*
      * ======================================================
-     * Returns the node in the AST modelling the call to
-     * to this OP_PAR_LOOP
+     * Adds an additional function call expression
      * ======================================================
      */
-    SgFunctionCallExp *
-    getFunctionCall ();
+    void
+    addFunctionCallExpression (SgFunctionCallExp * functionCallExpression);
 
     /*
      * ======================================================
-     * Returns the name of the file in which the OP_PAR_LOOP
-     * call is contained
+     * Returns an iterator pointing to the first node in the
+     * AST which models a call to this OP_PAR_LOOP
      * ======================================================
      */
-    std::string const &
-    getFileName () const;
+    std::vector <SgFunctionCallExp *>::const_iterator
+    getFirstFunctionCall ();
+
+    /*
+     * ======================================================
+     * Returns an iterator pointing to the last node in the
+     * AST which models a call to this OP_PAR_LOOP
+     * ======================================================
+     */
+    std::vector <SgFunctionCallExp *>::const_iterator
+    getLastFunctionCall ();
+
+    /*
+     * ======================================================
+     * Adds an additional file name in which a call to this
+     * OP_PAR_LOOP occurs
+     * ======================================================
+     */
+    void
+    addFileName (std::string fileName);
+
+    /*
+     * ======================================================
+     * Returns an iterator pointing to the first file name
+     * in which a call to this OP_PAR_LOOP is contained
+     * ======================================================
+     */
+    std::vector <std::string>::const_iterator
+    getFirstFileName ();
+
+    /*
+     * ======================================================
+     * Returns an iterator pointing to the last file name
+     * in which a call to this OP_PAR_LOOP is contained
+     * ======================================================
+     */
+    std::vector <std::string>::const_iterator
+    getLastFileName ();
 
     Reduction *
     getReductionTuple (unsigned int OP_DAT_ArgumentGroup);

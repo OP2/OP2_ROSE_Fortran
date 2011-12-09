@@ -59,6 +59,27 @@ parser.add_option("-v",
 
 debug = Debug(opts.verbose)
 
+def queryYesNo(question, default="yes"):
+    valid = {"yes":"yes", "y":"yes", "ye":"yes", "no":"no","n":"no"}
+    if default == None:
+        prompt = " [y/n] "
+    elif default == "yes":
+        prompt = " [Y/n] "
+    elif default == "no":
+        prompt = " [y/N] "
+    else:
+        raise ValueError("Invalid default answer: '%s'" % default)
+
+    while True:
+        sys.stdout.write("=== %s ===" % question + prompt)
+        choice = raw_input().lower()
+        if default is not None and choice == '':
+            return default
+        elif choice in valid.keys():
+            return valid[choice]
+        else:
+            sys.stdout.write("Please respond with 'yes/y' or 'no/n'.\n")
+
 def checkEnvironment ():
     debug.verboseMessage("Checking G++ version")
 
@@ -215,7 +236,10 @@ def configureROSE (roseDirectory, boostDirectory):
     debug.verboseMessage("Build ROSE in '%s'" % roseDirectoryBuild)
     debug.verboseMessage("Installing ROSE in '%s'" % roseDirectoryInstall)
 
-    configureString = "%s/configure --prefix=%s --with-boost=%s --enable-static --enable-cuda --enable-edg-cuda --enable-opencl --enable-edg-opencl --with-java --without-haskell" % (os.getcwd() + os.sep + roseDirectory, os.getcwd() + os.sep + roseDirectoryInstall, boostDirectory)
+    configureString = "%s/configure --prefix=%s --with-boost=%s --enable-cuda --enable-edg-cuda --enable-opencl --enable-edg-opencl --with-java --without-haskell" % (os.getcwd() + os.sep + roseDirectory, os.getcwd() + os.sep + roseDirectoryInstall, boostDirectory)
+
+    if queryYesNo("Shall I build a STATIC library for ROSE? (This is not strictly needed and will consume A LOT of extra space.)", "no") == "yes":
+	configureString = " --enable-static" 
 
     debug.verboseMessage("Configuring ROSE with command '%s'" % (configureString))
 
@@ -336,27 +360,6 @@ def copyFilesIfNeeded (roseDirectory):
     fileListFile.close()
     return makeNeeded
 
-def queryYesNo(question, default="yes"):
-    valid = {"yes":"yes", "y":"yes", "ye":"yes", "no":"no","n":"no"}
-    if default == None:
-        prompt = " [y/n] "
-    elif default == "yes":
-        prompt = " [Y/n] "
-    elif default == "no":
-        prompt = " [y/N] "
-    else:
-        raise ValueError("Invalid default answer: '%s'" % default)
-
-    while True:
-        sys.stdout.write("=== %s ===" % question + prompt)
-        choice = raw_input().lower()
-        if default is not None and choice == '':
-            return default
-        elif choice in valid.keys():
-            return valid[choice]
-        else:
-            sys.stdout.write("Please respond with 'yes/y' or 'no/n'.\n")
-
 def rebuildTranslator ():
     # Run the 'scons' command in the 'translator' directory
     sconsString = "scons -j 6"
@@ -413,4 +416,3 @@ if opts.update:
 if not opts.build and not opts.update and not opts.check:
     debug.exitMessage("No actions selected. Use -h for options")
 
-# vim:sw=4:ts=4:sts=4:et

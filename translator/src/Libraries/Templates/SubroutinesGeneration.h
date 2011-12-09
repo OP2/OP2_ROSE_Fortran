@@ -13,11 +13,12 @@
 #ifndef SUBROUTINES_GENERATION_H
 #define SUBROUTINES_GENERATION_H
 
+#include "ParallelLoop.h"
+#include "Debug.h"
+#include "Exceptions.h"
 #include <vector>
 #include <map>
 #include <string>
-#include <Debug.h>
-#include <Exceptions.h>
 #include <rose.h>
 
 template <typename TDeclarations, typename THostSubroutine>
@@ -95,7 +96,7 @@ template <typename TDeclarations, typename THostSubroutine>
       void
       createSourceFile ()
       {
-        using SageBuilder::buildFile;
+        using namespace SageBuilder;
         using std::string;
 
         Debug::getInstance ()->debugMessage ("Generating file '" + newFileName
@@ -120,6 +121,35 @@ template <typename TDeclarations, typename THostSubroutine>
       }
 
     protected:
+
+      void
+      determineWhichInputFilesToBeUnparsed ()
+      {
+        using std::map;
+        using std::string;
+        using std::vector;
+
+        for (map <string, ParallelLoop *>::const_iterator it =
+            declarations->firstParallelLoop (); it
+            != declarations->lastParallelLoop (); ++it)
+        {
+          ParallelLoop * parallelLoop = it->second;
+
+          /*
+           * ======================================================
+           * All the files in which this parallel loop has been
+           * found should be output in the code generation
+           * ======================================================
+           */
+
+          for (vector <string>::const_iterator it =
+              parallelLoop->getFirstFileName (); it
+              != parallelLoop->getLastFileName (); ++it)
+          {
+            dirtyFiles.push_back (*it);
+          }
+        }
+      }
 
       SubroutinesGeneration (SgProject * project, TDeclarations * declarations,
           std::string const & newFileName) :

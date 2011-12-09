@@ -5,7 +5,6 @@
 #include "FortranTypesBuilder.h"
 #include "Debug.h"
 #include "Exceptions.h"
-#include "RoseHelper.h"
 #include <boost/algorithm/string/predicate.hpp>
 #include <algorithm>
 
@@ -145,6 +144,4 @@ FortranCUDAUserSubroutine::FortranCUDAUserSubroutine (
   subroutineHeaderStatement->get_functionModifier ().setCudaDevice ();
 
   createStatements ();
-
-  RoseHelper::forceOutputOfCodeToFile (subroutineHeaderStatement);
 }

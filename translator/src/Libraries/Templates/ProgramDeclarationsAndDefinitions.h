@@ -91,80 +91,21 @@ template <typename TSubroutineHeader>
 
       /*
        * ======================================================
-       * Other declarations
-       * ======================================================
-       */
-
-      std::vector <std::string> booleanDeclarations;
-
-      std::vector <std::string> shortDeclarations;
-
-      std::vector <std::string> integerDeclarations;
-
-      std::vector <std::string> longDeclarations;
-
-      std::vector <std::string> floatDeclarations;
-
-      std::vector <std::string> doubleDeclarations;
-
-      std::map <std::string, SgVariableDeclaration *> declarations;
-
-      /*
-       * ======================================================
        * The source file AST currently being scanned
        * ======================================================
        */
+
       std::string currentSourceFile;
 
+      /*
+       * ======================================================
+       * Source files encountered during AST scan
+       * ======================================================
+       */
+
+      std::map <std::string, SgSourceFile *> givenSourceFiles;
+
     protected:
-
-      void
-      handleBaseTypeDeclaration (SgType * type,
-          std::string const & variableName)
-      {
-        if (isSgTypeBool (type) != NULL)
-        {
-          Debug::getInstance ()->debugMessage ("'" + variableName
-              + "' is a boolean", Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
-
-          booleanDeclarations.push_back (variableName);
-        }
-        else if (isSgTypeShort (type) != NULL)
-        {
-          Debug::getInstance ()->debugMessage ("'" + variableName
-              + "' is a short", Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
-
-          shortDeclarations.push_back (variableName);
-        }
-        else if (isSgTypeInt (type) != NULL)
-        {
-          Debug::getInstance ()->debugMessage ("'" + variableName
-              + "' is an integer", Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
-
-          integerDeclarations.push_back (variableName);
-        }
-        else if (isSgTypeLong (type) != NULL)
-        {
-          Debug::getInstance ()->debugMessage ("'" + variableName
-              + "' is a long", Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
-
-          longDeclarations.push_back (variableName);
-        }
-        else if (isSgTypeFloat (type) != NULL)
-        {
-          Debug::getInstance ()->debugMessage ("'" + variableName
-              + "' is a float", Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
-
-          floatDeclarations.push_back (variableName);
-        }
-        else if (isSgTypeDouble (type) != NULL)
-        {
-          Debug::getInstance ()->debugMessage ("'" + variableName
-              + "' is a double", Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
-
-          doubleDeclarations.push_back (variableName);
-        }
-      }
 
       bool
       isOpSet (std::string const & variableName) const
@@ -337,66 +278,6 @@ template <typename TSubroutineHeader>
         return OpConstDefinitions.end ();
       }
 
-      bool
-      isTypeBoolean (std::string const & variableName) const
-      {
-        using std::find;
-
-        return find (booleanDeclarations.begin (), booleanDeclarations.end (),
-            variableName) != booleanDeclarations.end ();
-      }
-
-      bool
-      isTypeShort (std::string const & variableName) const
-      {
-        using std::find;
-
-        return find (shortDeclarations.begin (), shortDeclarations.end (),
-            variableName) != shortDeclarations.end ();
-      }
-
-      bool
-      isTypeInteger (std::string const & variableName) const
-      {
-        using std::find;
-
-        return find (integerDeclarations.begin (), integerDeclarations.end (),
-            variableName) != integerDeclarations.end ();
-      }
-
-      bool
-      isTypeLong (std::string const & variableName) const
-      {
-        using std::find;
-
-        return find (longDeclarations.begin (), longDeclarations.end (),
-            variableName) != longDeclarations.end ();
-      }
-
-      bool
-      isTypeFloat (std::string const & variableName) const
-      {
-        using std::find;
-
-        return find (floatDeclarations.begin (), floatDeclarations.end (),
-            variableName) != floatDeclarations.end ();
-      }
-
-      bool
-      isTypeDouble (std::string const & variableName) const
-      {
-        using std::find;
-
-        return find (doubleDeclarations.begin (), doubleDeclarations.end (),
-            variableName) != doubleDeclarations.end ();
-      }
-
-      SgVariableDeclaration *
-      getOriginalDeclaration (std::string const & variableName)
-      {
-        return declarations[variableName];
-      }
-
       TSubroutineHeader *
       getSubroutine (std::string subroutineName)
       {
@@ -435,6 +316,18 @@ template <typename TSubroutineHeader>
       lastParallelLoop ()
       {
         return parallelLoops.end ();
+      }
+
+      SgSourceFile *
+      getSourceFile (std::string const & fileName)
+      {
+        if (givenSourceFiles.find (fileName) == givenSourceFiles.end ())
+        {
+          throw Exceptions::ASTParsing::NoSourceFileException ("Cannot find '"
+              + fileName + "'");
+        }
+
+        return givenSourceFiles[fileName];
       }
   };
 

@@ -1,66 +1,105 @@
-#include <FortranCUDASubroutinesGeneration.h>
-#include <FortranCUDAKernelSubroutineDirectLoop.h>
-#include <FortranCUDAKernelSubroutineIndirectLoop.h>
-#include <FortranCUDAHostSubroutineDirectLoop.h>
-#include <FortranCUDAHostSubroutineIndirectLoop.h>
-#include <FortranCUDAUserSubroutine.h>
-#include <FortranCUDAReductionSubroutine.h>
-#include <FortranReductionSubroutines.h>
-#include <FortranCUDAModuleDeclarations.h>
-#include <FortranCUDAOpDatCardinalitiesDeclarationIndirectLoop.h>
-#include <FortranOpDatDimensionsDeclaration.h>
-#include <FortranParallelLoop.h>
-#include <FortranProgramDeclarationsAndDefinitions.h>
-#include <FortranTypesBuilder.h>
-#include <FortranStatementsAndExpressionsBuilder.h>
-#include <OP2Definitions.h>
-#include <RoseHelper.h>
-#include <Reduction.h>
-#include <Exceptions.h>
+#include "FortranCUDASubroutinesGeneration.h"
+#include "FortranCUDAKernelSubroutineDirectLoop.h"
+#include "FortranCUDAKernelSubroutineIndirectLoop.h"
+#include "FortranCUDAHostSubroutineDirectLoop.h"
+#include "FortranCUDAHostSubroutineIndirectLoop.h"
+#include "FortranCUDAUserSubroutine.h"
+#include "FortranCUDAReductionSubroutine.h"
+#include "FortranReductionSubroutines.h"
+#include "FortranCUDAModuleDeclarations.h"
+#include "FortranCUDAOpDatCardinalitiesDeclarationIndirectLoop.h"
+#include "FortranOpDatDimensionsDeclaration.h"
+#include "FortranParallelLoop.h"
+#include "FortranProgramDeclarationsAndDefinitions.h"
+#include "FortranTypesBuilder.h"
+#include "FortranStatementsAndExpressionsBuilder.h"
+#include "FortranCUDAConstantDeclarations.h"
+#include "FortranOP2Definitions.h"
+#include "OP2Definitions.h"
+#include "RoseHelper.h"
+#include "Reduction.h"
+#include "Exceptions.h"
+#include "OP2.h"
+#include "Globals.h"
+#include "CUDA.h"
 #include <boost/algorithm/string.hpp>
 
 void
-FortranCUDASubroutinesGeneration::createConstantDeclarations ()
+FortranCUDASubroutinesGeneration::processOP2ConstantDeclarations ()
 {
-  using namespace SageInterface;
-  using boost::lexical_cast;
-  using boost::iequals;
+  using namespace SageBuilder;
   using std::map;
   using std::string;
-  using std::vector;
 
-  Debug::getInstance ()->debugMessage ("Creating constant declarations",
-      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+  Debug::getInstance ()->debugMessage (
+      "Processing OP_DECL_CONST calls for CUDA", Debug::FUNCTION_LEVEL,
+      __FILE__, __LINE__);
+
+  string const & fileName = declarations->getFileNameForModule (
+      Globals::getInstance ()->getFreeVariablesModuleName ());
+
+  dirtyFiles.push_back (fileName);
 
   for (map <string, OpConstDefinition *>::const_iterator it =
       declarations->firstOpConstDefinition (); it
       != declarations->lastOpConstDefinition (); ++it)
   {
-    string const constantName = it->first;
+    string const & variableName = it->first;
 
-    Debug::getInstance ()->debugMessage ("Creating declaration for variable '"
-        + constantName + "'", Debug::HIGHEST_DEBUG_LEVEL, __FILE__, __LINE__);
+    Debug::getInstance ()->debugMessage ("Analysing OP_DECL_CONST with name '"
+        + variableName + "'", Debug::OUTER_LOOP_LEVEL, __FILE__, __LINE__);
 
-    SgVariableDeclaration * originalDeclaration =
-        declarations->getOriginalDeclaration (constantName);
+    FortranOpConstDefinition * constDefinition =
+        static_cast <FortranOpConstDefinition *> (it->second);
 
-    SgVariableDeclaration * newDeclaration =
-        FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
-            constantName,
-            originalDeclaration ->get_decl_item (constantName)->get_type (),
-            moduleScope, 1, CUDA_CONSTANT);
+    SgFunctionCallExp * callExpression = constDefinition->getCallSite ();
 
-    SgInitializedNamePtrList & variables =
-        originalDeclaration->get_variables ();
+    SgFunctionSymbol * cudaFunctionCall =
+        FortranTypesBuilder::buildNewFortranFunction ("cudaMemcpyToSymbol",
+            moduleScope);
 
-    if (variables.size () == 1)
-    {
-      Debug::getInstance ()->debugMessage (
-          "Single variable in declaration. Removing entire statement",
-          Debug::HIGHEST_DEBUG_LEVEL, __FILE__, __LINE__);
+    callExpression->set_function (buildFunctionRefExp (cudaFunctionCall));
 
-      removeStatement (originalDeclaration);
-    }
+    SgExpressionPtrList & arguments =
+        callExpression->get_args ()->get_expressions ();
+
+    ROSE_ASSERT (arguments.size() == constDefinition->getNumberOfExpectedArguments());
+
+    arguments.erase (arguments.begin ());
+
+    arguments.erase (arguments.begin ());
+
+    arguments.insert (arguments.begin (), buildOpaqueVarRefExp (variableName,
+        moduleScope));
+
+    //  arguments.insert (arguments.begin () + 1,
+    //      CUDAconstants->getReferenceToNewVariable (variableName));
+  }
+}
+
+void
+FortranCUDASubroutinesGeneration::createSubroutinesInConstantsModule ()
+{
+  using namespace SageInterface;
+  using std::string;
+  using std::vector;
+
+  Debug::getInstance ()->debugMessage (
+      "Outputting subroutines referring to CUDA constants into generated module",
+      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+
+  std::string const & moduleName =
+      Globals::getInstance ()->getFreeVariablesModuleName ();
+
+  for (vector <string>::const_iterator it = declarations->getFirstSubroutine (
+      moduleName); it != declarations->getLastSubroutine (moduleName); ++it)
+  {
+    string const & subroutineName = *it;
+
+    SgProcedureHeaderStatement * procedureHeader = deepCopy (
+        declarations->getSubroutine (subroutineName));
+
+    //CUDAconstants->patchReferencesToCUDAConstants (procedureHeader);
   }
 }
 
@@ -105,6 +144,8 @@ FortranCUDASubroutinesGeneration::createSubroutines ()
   using std::string;
   using std::map;
 
+  createSubroutinesInConstantsModule ();
+
   for (map <string, ParallelLoop *>::const_iterator it =
       declarations->firstParallelLoop (); it
       != declarations->lastParallelLoop (); ++it)
@@ -119,6 +160,20 @@ FortranCUDASubroutinesGeneration::createSubroutines ()
 
     FortranCUDAUserSubroutine * userDeviceSubroutine =
         new FortranCUDAUserSubroutine (moduleScope, parallelLoop, declarations);
+
+    CUDAconstants->patchReferencesToCUDAConstants (
+        userDeviceSubroutine->getSubroutineHeaderStatement ());
+
+    /*
+     * ======================================================
+     * We have to set each node in the AST representation of
+     * this subroutine as compiler generated, otherwise chunks
+     * of the user kernel are missing in the output
+     * ======================================================
+     */
+
+    RoseHelper::forceOutputOfCodeToFile (
+        userDeviceSubroutine->getSubroutineHeaderStatement ());
 
     FortranCUDAKernelSubroutine * kernelSubroutine;
 
@@ -172,6 +227,9 @@ FortranCUDASubroutinesGeneration::createModuleDeclarations ()
 {
   using std::map;
   using std::string;
+
+  CUDAconstants = new FortranCUDAConstantDeclarations (declarations,
+      moduleScope);
 
   /*
    * ======================================================
@@ -231,13 +289,6 @@ FortranCUDASubroutinesGeneration::createModuleDeclarations ()
         cardinalitiesDeclarations[userSubroutineName],
         dimensionsDeclarations[userSubroutineName]);
   }
-
-  /*
-   * ======================================================
-   * Now declare constants
-   * ======================================================
-   */
-  createConstantDeclarations ();
 }
 
 void
@@ -253,10 +304,10 @@ FortranCUDASubroutinesGeneration::addLibraries ()
 
   vector <string> libs;
 
-  libs.push_back ("ISO_C_BINDING");
-  libs.push_back ("OP2_C");
-  libs.push_back ("CUDAFOR");
-  libs.push_back ("CUDACONFIGURATIONPARAMS");
+  libs.push_back (OP2::Libraries::Fortran::declarations);
+  libs.push_back (OP2::Libraries::Fortran::CBindings);
+  libs.push_back (CUDA::Libraries::Fortran::CUDARuntimeSupport);
+  libs.push_back (CUDA::Libraries::Fortran::CUDALaunchParameters);
 
   for (vector <string>::const_iterator it = libs.begin (); it != libs.end (); ++it)
   {

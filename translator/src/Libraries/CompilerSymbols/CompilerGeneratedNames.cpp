@@ -67,6 +67,18 @@ BooleanVariableNames::getFirstTimeExecutionVariableName (
 }
 
 std::string const
+OP2VariableNames::getBlockSizeVariableName (std::string const & suffix)
+{
+  return "threadsPerBlockSize_" + suffix;
+}
+
+std::string const
+OP2VariableNames::getPartitionSizeVariableName (std::string const & suffix)
+{
+  return "setPartitionSize_" + suffix;
+}
+
+std::string const
 OP2VariableNames::getUserSubroutineName ()
 {
   return "userSubroutine";
@@ -304,7 +316,17 @@ OP2VariableNames::getSharedMemoryDeclarationName (SgType * type,
 }
 
 std::string const
-OP2VariableNames::getCUDAVolatileSharedMemoryDeclarationName (SgType * type,
+OP2VariableNames::getSharedMemoryDeclarationName (std::string suffix)
+{
+  using std::string;
+
+  std::string const prefix = "shared";
+
+  return prefix + "_" + suffix;
+}
+
+std::string const
+OP2VariableNames::getVolatileSharedMemoryDeclarationName (SgType * type,
     unsigned int size)
 {
   using boost::lexical_cast;
@@ -342,7 +364,7 @@ OP2VariableNames::getSharedMemoryOffsetDeclarationName (SgType * type,
   using boost::lexical_cast;
   using std::string;
 
-  std::string const prefix = "sharedOffset";
+  string const prefix = "sharedOffset";
 
   switch (type->variantT ())
   {
@@ -367,3 +389,54 @@ OP2VariableNames::getSharedMemoryOffsetDeclarationName (SgType * type,
   }
 }
 
+std::string const
+OP2VariableNames::getSharedMemoryOffsetDeclarationName (std::string suffix)
+{
+  using std::string;
+
+  string const prefix = "sharedOffset";
+
+  return prefix + "_" + suffix;
+}
+
+std::string const
+OP2VariableNames::getSharedMemoryPointerDeclarationName (SgType * type,
+    unsigned int size)
+{
+  using boost::lexical_cast;
+  using std::string;
+
+  string const prefix = "sharedPointer";
+
+  switch (type->variantT ())
+  {
+    case V_SgTypeInt:
+    {
+      return prefix + "Integer" + lexical_cast <string> (size);
+    }
+    case V_SgTypeFloat:
+    {
+      return prefix + "Float" + lexical_cast <string> (size);
+    }
+    case V_SgTypeDouble:
+    {
+      return prefix + "Double" + lexical_cast <string> (size);
+    }
+    default:
+    {
+      throw Exceptions::CUDA::SharedVariableTypeException (
+          "Unsupported type for shared memory variable: '"
+              + type->class_name ());
+    }
+  }
+}
+
+std::string const
+OP2VariableNames::getSharedMemoryPointerDeclarationName (std::string suffix)
+{
+  using std::string;
+
+  string const prefix = "sharedPointer";
+
+  return prefix + "_" + suffix;
+}

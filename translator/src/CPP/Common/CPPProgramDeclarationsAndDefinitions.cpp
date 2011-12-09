@@ -12,7 +12,6 @@ CPPProgramDeclarationsAndDefinitions::setOpGblProperties (
     CPPParallelLoop * parallelLoop, std::string const & variableName,
     int OP_DAT_ArgumentGroup)
 {
-
 }
 
 void
@@ -30,7 +29,7 @@ CPPProgramDeclarationsAndDefinitions::setOpDatProperties (
       __FILE__, __LINE__);
 
   parallelLoop->setOpDatType (OP_DAT_ArgumentGroup,
-      opDatDeclaration->getPrimitiveType ());
+      opDatDeclaration->getBaseType ());
 
   parallelLoop->setOpDatDimension (OP_DAT_ArgumentGroup,
       opDatDeclaration->getDimension ());
@@ -43,7 +42,7 @@ CPPProgramDeclarationsAndDefinitions::setOpDatProperties (
 
     parallelLoop->setDuplicateOpDat (OP_DAT_ArgumentGroup, false);
 
-    if (isSgPointerType (opDatDeclaration->getPrimitiveType ()) == NULL)
+    if (isSgPointerType (opDatDeclaration->getBaseType ()) == NULL)
     {
       throw new Exceptions::ParallelLoop::UnsupportedBaseTypeException (
           "OP_DAT '" + variableName + "' is not a pointer");
@@ -369,17 +368,18 @@ CPPProgramDeclarationsAndDefinitions::detectAndHandleOP2Definition (
   using boost::iequals;
   using std::string;
 
+  Debug::getInstance ()->debugMessage ("Handling OP2 definition",
+      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+
   string const typeName = typeDefinition->get_name ().getString ();
+
+  SgAssignInitializer * assignmentInitializer = isSgAssignInitializer (
+      variableDeclaration->get_decl_item (variableName)->get_initializer ());
 
   if (iequals (typeName, OP2::OP_SET))
   {
     Debug::getInstance ()->debugMessage ("OP_SET declaration call found",
         Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
-
-    SgAssignInitializer * assignmentInitializer = isSgAssignInitializer (
-        variableDeclaration->get_decl_item (variableName)->get_initializer ());
-
-    ROSE_ASSERT (assignmentInitializer != NULL);
 
     SgFunctionCallExp * functionCallExpression = isSgFunctionCallExp (
         assignmentInitializer->get_operand ());
@@ -505,24 +505,34 @@ CPPProgramDeclarationsAndDefinitions::visit (SgNode * node)
       Debug::getInstance ()->debugMessage ("Source file '" + currentSourceFile
           + "' detected", Debug::OUTER_LOOP_LEVEL, __FILE__, __LINE__ );
 
+      givenSourceFiles[currentSourceFile] = sourceFile;
+
       break;
     }
+
     case V_SgVariableDeclaration:
     {
       SgVariableDeclaration * variableDeclaration = isSgVariableDeclaration (
           node);
 
-      string const
-          variableName =
-              variableDeclaration->get_variables ().front ()->get_name ().getString ();
-
-      SgType * type =
-          variableDeclaration->get_decl_item (variableName)->get_type ();
-
-      if (isSgTypedefType (type) != NULL)
+      if (variableDeclaration->get_variables ().size () == 1)
       {
-        detectAndHandleOP2Definition (variableDeclaration, variableName,
-            isSgTypedefType (type));
+        string const
+            variableName =
+                variableDeclaration->get_variables ().front ()->get_name ().getString ();
+
+        SgType * type =
+            variableDeclaration->get_decl_item (variableName)->get_type ();
+
+        SgAssignInitializer * assignInitializer =
+            isSgAssignInitializer (variableDeclaration->get_decl_item (
+                variableName)->get_initializer ());
+
+        if (assignInitializer != NULL && isSgTypedefType (type) != NULL)
+        {
+          detectAndHandleOP2Definition (variableDeclaration, variableName,
+              isSgTypedefType (type));
+        }
       }
 
       break;
@@ -635,10 +645,13 @@ CPPProgramDeclarationsAndDefinitions::visit (SgNode * node)
 
           opConstDeclaration = new CPPOxfordOpConstDefinition (
               functionCallExp->get_args ());
-        }
 
-        OpConstDefinitions[opConstDeclaration->getVariableName ()]
-            = opConstDeclaration;
+          string const & variableName = opConstDeclaration->getVariableName ();
+
+          //opConstDeclaration->setType (getType (variableName));
+
+          OpConstDefinitions[variableName] = opConstDeclaration;
+        }
       }
       else if (iequals (calleeName, OP2::OP_PAR_LOOP))
       {
@@ -666,8 +679,10 @@ CPPProgramDeclarationsAndDefinitions::visit (SgNode * node)
            * ======================================================
            */
 
-          CPPParallelLoop * parallelLoop = new CPPParallelLoop (
-              functionCallExp, functionCallExp->getFilenameString ());
+          CPPParallelLoop * parallelLoop =
+              new CPPParallelLoop (functionCallExp);
+
+          parallelLoop->addFileName (currentSourceFile);
 
           parallelLoops[userSubroutineName] = parallelLoop;
 
@@ -680,6 +695,12 @@ CPPProgramDeclarationsAndDefinitions::visit (SgNode * node)
           Debug::getInstance ()->debugMessage ("Parallel loop for '"
               + userSubroutineName + "' already created",
               Debug::OUTER_LOOP_LEVEL, __FILE__, __LINE__);
+
+          ParallelLoop * parallelLoop = parallelLoops[userSubroutineName];
+
+          parallelLoop->addFunctionCallExpression (functionCallExp);
+
+          parallelLoop->addFileName (currentSourceFile);
         }
 
       }
