@@ -243,6 +243,27 @@ FortranCUDAKernelSubroutineIndirectLoop::createIncrementAndWriteAccessEpilogueSt
 
   SgBasicBlock * block = buildBasicBlock ();
 
+  /*
+   * ======================================================
+   * Append a syncthreads call if OP_RW or OP_WRITE is
+   * present, but no OP_INC is
+   * ======================================================
+   */
+
+  
+  bool hasIncrementedArg = false;
+  bool hasWriteOrReadWrite = false;
+  
+  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
+  {
+    if (parallelLoop->isWritten (i) || parallelLoop->isReadAndWritten (i) ) hasWriteOrReadWrite = true;
+    if (parallelLoop->isIncremented (i)) hasIncrementedArg = true;
+  }
+
+  if (hasWriteOrReadWrite && !hasIncrementedArg)
+    appendStatement (buildExprStatement (CUDA::createDeviceThreadSynchronisationCallStatement (subroutineScope)),
+      block);
+  
   unsigned int pindOffsOffset = 0;
 
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
