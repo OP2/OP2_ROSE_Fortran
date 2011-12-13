@@ -670,7 +670,7 @@ CPPCUDAKernelSubroutineIndirectLoop::createSetIndirectionMapPointerStatements ()
 
         SgMultiplyOp * multiplyExpression1 = buildMultiplyOp (
             variableDeclarations->getReference (blockID), buildIntVal (
-                parallelLoop->getOpDatDimension (i)));
+                parallelLoop->getNumberOfDistinctIndirectOpDats ()));
 
         SgAddOp * addExpression1a = buildAddOp (buildIntVal (offset),
             multiplyExpression1);
