@@ -4,15 +4,9 @@
 
 #include <FortranUserSubroutine.h>
 
-class FortranCUDAConstantDeclarations;
-
 class FortranCUDAUserSubroutine: public FortranUserSubroutine
 {
   private:
-
-    void
-    patchReferencesToCUDAConstants (
-        FortranCUDAConstantDeclarations * CUDAConstants);
 
     virtual void
     createStatements ();
@@ -27,8 +21,7 @@ class FortranCUDAUserSubroutine: public FortranUserSubroutine
 
     FortranCUDAUserSubroutine (SgScopeStatement * moduleScope,
         FortranParallelLoop * parallelLoop,
-        FortranProgramDeclarationsAndDefinitions * declarations,
-        FortranCUDAConstantDeclarations * CUDAConstants);
+        FortranProgramDeclarationsAndDefinitions * declarations);
 };
 
 #endif

@@ -271,13 +271,22 @@ namespace OP2VariableNames
   getSharedMemoryDeclarationName (SgType * type, unsigned int size);
 
   std::string const
-  getCUDAVolatileSharedMemoryDeclarationName (SgType * type, unsigned int size);
+  getSharedMemoryDeclarationName (std::string suffix);
+
+  std::string const
+  getVolatileSharedMemoryDeclarationName (SgType * type, unsigned int size);
 
   std::string const
   getSharedMemoryOffsetDeclarationName (SgType * type, unsigned int size);
 
   std::string const
+  getSharedMemoryOffsetDeclarationName (std::string suffix);
+
+  std::string const
   getSharedMemoryPointerDeclarationName (SgType * type, unsigned int size);
+
+  std::string const
+  getSharedMemoryPointerDeclarationName (std::string suffix);
 }
 
 #endif

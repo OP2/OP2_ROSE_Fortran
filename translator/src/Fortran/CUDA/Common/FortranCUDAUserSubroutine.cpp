@@ -1,60 +1,12 @@
 #include "FortranCUDAUserSubroutine.h"
-#include "FortranCUDAConstantDeclarations.h"
 #include "FortranParallelLoop.h"
 #include "FortranProgramDeclarationsAndDefinitions.h"
 #include "FortranStatementsAndExpressionsBuilder.h"
 #include "FortranTypesBuilder.h"
 #include "Debug.h"
 #include "Exceptions.h"
-#include "RoseHelper.h"
 #include <boost/algorithm/string/predicate.hpp>
 #include <algorithm>
-
-void
-FortranCUDAUserSubroutine::patchReferencesToCUDAConstants (
-    FortranCUDAConstantDeclarations * CUDAConstants)
-{
-  Debug::getInstance ()->debugMessage ("Patching references to CUDA constants",
-      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
-
-  class TreeVisitor: public AstSimpleProcessing
-  {
-    private:
-
-      FortranCUDAConstantDeclarations * CUDAConstants;
-
-    public:
-
-      TreeVisitor (FortranCUDAConstantDeclarations * CUDAConstants) :
-        CUDAConstants (CUDAConstants)
-      {
-      }
-
-      virtual void
-      visit (SgNode * node)
-      {
-        using std::string;
-
-        SgVarRefExp * variableReference = isSgVarRefExp (node);
-
-        if (variableReference != NULL)
-        {
-          string const variableName =
-              variableReference->get_symbol ()->get_name ();
-
-          if (CUDAConstants->isCUDAConstant (variableName))
-          {
-            variableReference->set_symbol (
-                CUDAConstants->getReferenceToNewVariable (variableName)->get_symbol ());
-          }
-        }
-      }
-  };
-
-  TreeVisitor * visitor = new TreeVisitor (CUDAConstants);
-
-  visitor->traverse (subroutineHeaderStatement, preorder);
-}
 
 void
 FortranCUDAUserSubroutine::createStatements ()
@@ -186,23 +138,10 @@ FortranCUDAUserSubroutine::createFormalParameterDeclarations ()
 
 FortranCUDAUserSubroutine::FortranCUDAUserSubroutine (
     SgScopeStatement * moduleScope, FortranParallelLoop * parallelLoop,
-    FortranProgramDeclarationsAndDefinitions * declarations,
-    FortranCUDAConstantDeclarations * CUDAConstants) :
+    FortranProgramDeclarationsAndDefinitions * declarations) :
   FortranUserSubroutine (moduleScope, parallelLoop, declarations)
 {
   subroutineHeaderStatement->get_functionModifier ().setCudaDevice ();
 
   createStatements ();
-
-  patchReferencesToCUDAConstants (CUDAConstants);
-
-  /*
-   * ======================================================
-   * We have to set each node in the AST representation of
-   * this subroutine as compiler generated, otherwise chunks
-   * of the user kernel are missing in the output
-   * ======================================================
-   */
-
-  RoseHelper::forceOutputOfCodeToFile (subroutineHeaderStatement);
 }

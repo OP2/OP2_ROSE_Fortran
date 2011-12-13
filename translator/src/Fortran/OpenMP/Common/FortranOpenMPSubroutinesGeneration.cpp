@@ -143,8 +143,8 @@ FortranOpenMPSubroutinesGeneration::addLibraries ()
    */
 
   SgUseStatement* useStatement3 = new SgUseStatement (
-      RoseHelper::getFileInfo (), declarations->getModuleNameForFile (
-          Globals::getInstance ()->getFreeVariablesFilename ()), false);
+      RoseHelper::getFileInfo (),
+      Globals::getInstance ()->getFreeVariablesModuleName (), false);
 
   useStatement3->set_definingDeclaration (useStatement3);
 

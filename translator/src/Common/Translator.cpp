@@ -77,6 +77,10 @@ template <class TGenerator>
               Debug::getInstance ()->debugMessage ("File '" + p.filename ()
                   + "' remains unchanged", Debug::FUNCTION_LEVEL, __FILE__,
                   __LINE__);
+
+              outputFiles.push_back ("rose_" + p.filename ());
+
+              file->unparse ();
             }
           }
         }
@@ -251,7 +255,7 @@ checkFreeVariablesFileOption ()
 {
   using std::string;
 
-  if (Globals::getInstance ()->getFreeVariablesFilename ().empty ())
+  if (Globals::getInstance ()->getFreeVariablesModuleName ().empty ())
   {
     throw Exceptions::ASTParsing::NoSourceFileException (
         "You have not supplied a file containing the declarations of free variables referenced within the user kernel functions");
@@ -306,8 +310,8 @@ addCommandLineOptions ()
       new OpenCLOption ("Generate OpenCL code", TargetLanguage::toString (
           TargetLanguage::OPENCL)));
 
-  CommandLine::getInstance ()->addOption (new FreeVariablesFileOption (
-      "The file containing free variables referenced in user kernels"));
+  CommandLine::getInstance ()->addOption (new FreeVariablesModuleOption (
+      "The module containing free variables referenced in user kernels"));
 
   CommandLine::getInstance ()->addOption (new OxfordOption (
       "Refactor OP2 calls to comply with Oxford API", "oxford"));

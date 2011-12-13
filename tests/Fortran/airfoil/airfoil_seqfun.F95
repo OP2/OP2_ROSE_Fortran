@@ -1,11 +1,10 @@
-module AIRFOIL_SEQ
+MODULE AIRFOIL_SEQ
 
-use CONSTANTVARS
+  USE OP2_CONSTANTS
 
-contains
+  CONTAINS
 
-subroutine fused ( x1, x2, x3, x4, q, qold, adt ) 
-
+  subroutine fused ( x1, x2, x3, x4, q, qold, adt ) 
      implicit none
 
      ! formal parameters
@@ -20,7 +19,7 @@ subroutine fused ( x1, x2, x3, x4, q, qold, adt )
      ! iteration variable
      integer(4) :: i
 
-   real(8) :: dx, dy, ri, u, v, c
+     real(8) :: dx, dy, ri, u, v, c
 
      do i = 1, 4
        qold(i) = q(i)

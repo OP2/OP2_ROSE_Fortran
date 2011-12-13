@@ -911,7 +911,6 @@ FortranCUDAHostSubroutineIndirectLoop::createPlanFunctionParametersPreparationSt
    * values. At the beginning everything is set to undefined
    * ======================================================
    */
-  int const undefinedIndex = -2;
 
   std::map <std::string, int> indexValues;
 
@@ -919,7 +918,7 @@ FortranCUDAHostSubroutineIndirectLoop::createPlanFunctionParametersPreparationSt
   {
     if (parallelLoop->isIndirect (i))
     {
-      indexValues[parallelLoop->getOpDatVariableName (i)] = undefinedIndex;
+      indexValues[parallelLoop->getOpDatVariableName (i)] = -1;
     }
   }
 
@@ -941,7 +940,7 @@ FortranCUDAHostSubroutineIndirectLoop::createPlanFunctionParametersPreparationSt
 
     if (parallelLoop->isIndirect (i))
     {
-      if (indexValues[parallelLoop->getOpDatVariableName (i)] == undefinedIndex)
+      if (indexValues[parallelLoop->getOpDatVariableName (i)] == -1)
       {
         assignmentStatement = buildAssignStatement (arrayIndexExpression,
             buildIntVal (nextIndex));

@@ -95,11 +95,11 @@ CPPCUDAHostSubroutineIndirectLoop::createKernelFunctionCallStatement ()
 
   actualParameters->append_expression (buildArrowExp (
       variableDeclarations->getReference (planRet), buildOpaqueVarRefExp (
-          thrcol, subroutineScope)));
+          nthrcol, subroutineScope)));
 
   actualParameters->append_expression (buildArrowExp (
       variableDeclarations->getReference (planRet), buildOpaqueVarRefExp (
-          nthrcol, subroutineScope)));
+          thrcol, subroutineScope)));
 
   actualParameters->append_expression (variableDeclarations->getReference (
       blockOffset));

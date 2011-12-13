@@ -36,7 +36,7 @@ FortranHostSubroutine::createFormalParameterDeclarations ()
       kernelVariableName,
       FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
           kernelVariableName, FortranTypesBuilder::getString (
-              parallelLoop->getUserSubroutineName ().length ()),
+              parallelLoop->getUserSubroutineName ().length () + 1),
           subroutineScope, formalParameters, 1, INTENT_IN));
 
   /*

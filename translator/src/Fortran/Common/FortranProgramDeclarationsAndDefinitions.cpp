@@ -321,13 +321,15 @@ FortranProgramDeclarationsAndDefinitions::visit (SgNode * node)
       {
         SgModuleStatement * moduleStatement = isSgModuleStatement (node);
 
-        fileNameToModuleName[currentSourceFile]
-            = moduleStatement->get_name ().getString ();
+        currentModuleName = moduleStatement->get_name ().getString ();
 
-        Debug::getInstance ()->debugMessage ("Module '"
-            + moduleStatement->get_name ().getString () + "' in file '"
-            + currentSourceFile + "'", Debug::OUTER_LOOP_LEVEL, __FILE__,
-            __LINE__ );
+        fileNameToModuleNames[currentSourceFile].push_back (currentModuleName);
+
+        moduleNameToFileName[currentModuleName] = currentSourceFile;
+
+        Debug::getInstance ()->debugMessage ("Module '" + currentModuleName
+            + "' in file '" + currentSourceFile + "'", Debug::OUTER_LOOP_LEVEL,
+            __FILE__, __LINE__ );
 
         break;
       }
@@ -348,13 +350,18 @@ FortranProgramDeclarationsAndDefinitions::visit (SgNode * node)
 
         subroutinesInSourceCode[subroutineName] = procedureHeaderStatement;
 
+        ROSE_ASSERT (currentModuleName.size() > 0);
+
+        moduleNameToSubroutines[currentModuleName].push_back (subroutineName);
+
         subroutineToFileName[subroutineName] = currentSourceFile;
 
         Debug::getInstance ()->debugMessage (
             "Found procedure header statement '"
                 + procedureHeaderStatement->get_name ().getString ()
-                + "' in file '" + currentSourceFile + "'",
-            Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+                + "' in file '" + currentSourceFile + "', and module '"
+                + currentModuleName + "'", Debug::FUNCTION_LEVEL, __FILE__,
+            __LINE__);
 
         break;
       }
@@ -455,7 +462,7 @@ FortranProgramDeclarationsAndDefinitions::visit (SgNode * node)
            */
 
           FortranOpConstDefinition * opConstDeclaration =
-              new FortranOpConstDefinition (actualArguments);
+              new FortranOpConstDefinition (actualArguments, functionCallExp);
 
           OpConstDefinitions[opConstDeclaration->getVariableName ()]
               = opConstDeclaration;
@@ -530,6 +537,65 @@ FortranProgramDeclarationsAndDefinitions::visit (SgNode * node)
   }
 }
 
+bool
+FortranProgramDeclarationsAndDefinitions::checkModuleExists (
+    std::string const & moduleName)
+{
+  using boost::iequals;
+  using std::string;
+  using std::map;
+  using std::vector;
+
+  bool found = false;
+
+  for (map <string, vector <string> >::const_iterator it =
+      fileNameToModuleNames.begin (); it != fileNameToModuleNames.end (); ++it)
+  {
+    string fileName = it->first;
+
+    vector <string> moduleNames = it->second;
+
+    for (vector <string>::const_iterator vectorIt = moduleNames.begin (); vectorIt
+        != moduleNames.end (); ++vectorIt)
+    {
+      if (iequals (*vectorIt, moduleName))
+      {
+        found = true;
+      }
+    }
+  }
+
+  return found;
+}
+
+std::vector <std::string>::const_iterator
+FortranProgramDeclarationsAndDefinitions::getFirstSubroutine (
+    std::string const & moduleName)
+{
+  return moduleNameToSubroutines[moduleName].begin ();
+}
+
+std::vector <std::string>::const_iterator
+FortranProgramDeclarationsAndDefinitions::getLastSubroutine (
+    std::string const & moduleName)
+{
+  return moduleNameToSubroutines[moduleName].end ();
+}
+
+std::string const &
+FortranProgramDeclarationsAndDefinitions::getFileNameForModule (
+    std::string const & moduleName)
+{
+  return moduleNameToFileName[moduleName];
+}
+
+std::string const &
+FortranProgramDeclarationsAndDefinitions::getFileNameForSubroutine (
+    std::string const & subroutineName)
+{
+  return subroutineToFileName[subroutineName];
+}
+
 FortranProgramDeclarationsAndDefinitions::FortranProgramDeclarationsAndDefinitions (
     SgProject * project)
 {
@@ -538,4 +604,13 @@ FortranProgramDeclarationsAndDefinitions::FortranProgramDeclarationsAndDefinitio
       __FILE__, __LINE__ );
 
   traverseInputFiles (project, preorder);
+
+  if (checkModuleExists (Globals::getInstance ()->getFreeVariablesModuleName ())
+      == false)
+  {
+    throw Exceptions::ASTParsing::NoSourceFileException (
+        "Unable to find the module '"
+            + Globals::getInstance ()->getFreeVariablesModuleName ()
+            + "' containing OP2 constant information");
+  }
 }

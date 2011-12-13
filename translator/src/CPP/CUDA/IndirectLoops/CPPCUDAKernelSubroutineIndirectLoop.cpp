@@ -737,10 +737,6 @@ CPPCUDAKernelSubroutineIndirectLoop::createSetOpDatSharedMemoryPointerStatements
     {
       if (parallelLoop->isIndirect (i))
       {
-        string const autosharedVariableName = getSharedMemoryDeclarationName (
-            parallelLoop->getOpDatBaseType (i),
-            parallelLoop->getSizeOfOpDat (i));
-
         /*
          * ======================================================
          * New statement
@@ -748,15 +744,19 @@ CPPCUDAKernelSubroutineIndirectLoop::createSetOpDatSharedMemoryPointerStatements
          */
 
         SgPntrArrRefExp * arrayExpression2 = buildPntrArrRefExp (
-            variableDeclarations->getReference (autosharedVariableName),
+            variableDeclarations->getReference (getSharedMemoryDeclarationName (
+                parallelLoop->getUserSubroutineName ())),
             variableDeclarations->getReference (nbytes));
 
         SgAddressOfOp * addressOfExpression2 = buildAddressOfOp (
             arrayExpression2);
 
+        SgCastExp * castExpression2 = buildCastExp (addressOfExpression2,
+            buildPointerType (parallelLoop->getOpDatBaseType (i)));
+
         SgExprStatement * assignmentStatement2 = buildAssignStatement (
             variableDeclarations->getReference (
-                getIndirectOpDatSharedMemoryName (i)), addressOfExpression2);
+                getIndirectOpDatSharedMemoryName (i)), castExpression2);
 
         appendStatement (assignmentStatement2, block);
 
@@ -772,8 +772,8 @@ CPPCUDAKernelSubroutineIndirectLoop::createSetOpDatSharedMemoryPointerStatements
             < parallelLoop->getNumberOfDistinctIndirectOpDats ())
         {
           SgMultiplyOp * multiplyExpression3a = buildMultiplyOp (buildSizeOfOp (
-              buildFloatType ()), buildIntVal (parallelLoop->getOpDatDimension (
-              i)));
+              parallelLoop->getOpDatBaseType (i)), buildIntVal (
+              parallelLoop->getOpDatDimension (i)));
 
           SgMultiplyOp * multiplyExpression3b =
               buildMultiplyOp (variableDeclarations->getReference (
@@ -1018,8 +1018,7 @@ CPPCUDAKernelSubroutineIndirectLoop::createStatements ()
   using namespace SageBuilder;
   using namespace SageInterface;
 
-  appendStatementList (createThreadZeroStatements ()->generateStatementList (),
-      subroutineScope);
+  appendStatement (createThreadZeroStatements (), subroutineScope);
 
   appendStatement (buildExprStatement (
       CUDA::createDeviceThreadSynchronisationCallStatement (subroutineScope)),
@@ -1160,49 +1159,22 @@ CPPCUDAKernelSubroutineIndirectLoop::createCUDASharedVariableDeclarations ()
 {
   using namespace SageBuilder;
   using namespace OP2VariableNames;
-  using std::find;
-  using std::vector;
   using std::string;
 
   Debug::getInstance ()->debugMessage (
       "Creating CUDA shared variable declarations", Debug::FUNCTION_LEVEL,
       __FILE__, __LINE__);
 
-  vector <string> autosharedNames;
+  string const & variableName = getSharedMemoryDeclarationName (
+      parallelLoop->getUserSubroutineName ());
 
-  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
-  {
-    if (parallelLoop->isDuplicateOpDat (i) == false)
-    {
-      if (parallelLoop->isIndirect (i))
-      {
-        string const autosharedVariableName = getSharedMemoryDeclarationName (
-            parallelLoop->getOpDatBaseType (i),
-            parallelLoop->getSizeOfOpDat (i));
+  SgVariableDeclaration * autosharedVariableDeclaration =
+      RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
+          variableName, buildArrayType (buildCharType ()), subroutineScope);
 
-        if (find (autosharedNames.begin (), autosharedNames.end (),
-            autosharedVariableName) == autosharedNames.end ())
-        {
-          Debug::getInstance ()->debugMessage (
-              "Creating declaration with name '" + autosharedVariableName
-                  + "' for OP_DAT '" + parallelLoop->getOpDatVariableName (i)
-                  + "'", Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+  autosharedVariableDeclaration->get_declarationModifier ().get_storageModifier ().setCudaDynamicShared ();
 
-          SgVariableDeclaration * autosharedVariableDeclaration =
-              RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
-                  autosharedVariableName, buildArrayType (
-                      parallelLoop->getOpDatBaseType (i)), subroutineScope);
-
-          autosharedVariableDeclaration->get_declarationModifier ().get_storageModifier ().setCudaDynamicShared ();
-
-          variableDeclarations->add (autosharedVariableName,
-              autosharedVariableDeclaration);
-
-          autosharedNames.push_back (autosharedVariableName);
-        }
-      }
-    }
-  }
+  variableDeclarations->add (variableName, autosharedVariableDeclaration);
 }
 
 void

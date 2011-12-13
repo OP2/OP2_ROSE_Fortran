@@ -6,6 +6,21 @@
 #include "Debug.h"
 #include <rose.h>
 
+SgVarRefExp *
+FortranCUDAConstantDeclarations::getReferenceToNewVariable (
+    std::string const & originalName)
+{
+  return variableDeclarations->getReference (getNewConstantVariableName (
+      originalName));
+}
+
+bool
+FortranCUDAConstantDeclarations::isCUDAConstant (
+    std::string const & originalName)
+{
+  return oldNamesToNewNames.count (originalName) != 0;
+}
+
 std::string
 FortranCUDAConstantDeclarations::getNewConstantVariableName (
     std::string const & originalName)
@@ -48,19 +63,52 @@ FortranCUDAConstantDeclarations::addDeclarations (
   }
 }
 
-SgVarRefExp *
-FortranCUDAConstantDeclarations::getReferenceToNewVariable (
-    std::string const & originalName)
+void
+FortranCUDAConstantDeclarations::patchReferencesToCUDAConstants (
+    SgProcedureHeaderStatement * procedureHeader)
 {
-  return variableDeclarations->getReference (getNewConstantVariableName (
-      originalName));
-}
+  Debug::getInstance ()->debugMessage ("Patching references to CUDA constants",
+      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
-bool
-FortranCUDAConstantDeclarations::isCUDAConstant (
-    std::string const & originalName)
-{
-  return oldNamesToNewNames.count (originalName) != 0;
+  class TreeVisitor: public AstSimpleProcessing
+  {
+    private:
+
+      FortranCUDAConstantDeclarations * CUDAConstants;
+
+    public:
+
+      TreeVisitor (FortranCUDAConstantDeclarations * CUDAConstants) :
+        CUDAConstants (CUDAConstants)
+      {
+      }
+
+      virtual void
+      visit (SgNode * node)
+      {
+        using std::string;
+
+        SgVarRefExp * variableReference = isSgVarRefExp (node);
+
+        if (variableReference != NULL)
+        {
+          string const variableName =
+              variableReference->get_symbol ()->get_name ();
+
+          if (CUDAConstants->isCUDAConstant (variableName))
+          {
+            SgVarRefExp * newReference =
+                CUDAConstants->getReferenceToNewVariable (variableName);
+
+            variableReference->set_symbol (newReference->get_symbol ());
+          }
+        }
+      }
+  };
+
+  TreeVisitor * visitor = new TreeVisitor (this);
+
+  visitor->traverse (procedureHeader, preorder);
 }
 
 FortranCUDAConstantDeclarations::FortranCUDAConstantDeclarations (

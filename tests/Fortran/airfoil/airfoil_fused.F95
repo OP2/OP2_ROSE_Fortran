@@ -1,22 +1,13 @@
 program airfoil
 
-use OP2_C
-use constantVars
-use airfoil_seq
-use, intrinsic :: ISO_C_BINDING
+  use OP2_C
+  use OP2_CONSTANTS
+  use AIRFOIL_SEQ
+  use, intrinsic :: ISO_C_BINDING
 
   implicit none
 
   intrinsic :: sqrt, real
-
-  !external save_soln, adt_calc, res_calc, bres_calc, update
-
-	! debug variables
-!	integer(c_int) :: retDebug, dataSize
-!!	character(kind=c_char) :: debfilename(20)
-!	real(c_double) :: datad
-!	integer(4) :: debugiter
-
 
   integer(4) :: iter, k, i
 

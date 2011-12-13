@@ -9,6 +9,7 @@ class FortranProgramDeclarationsAndDefinitions;
 class ScopedVariableDeclarations;
 class SgScopeStatement;
 class SgVarRefExp;
+class SgProcedureHeaderStatement;
 
 class FortranCUDAConstantDeclarations
 {
@@ -34,6 +35,10 @@ class FortranCUDAConstantDeclarations
 
     bool
     isCUDAConstant (std::string const & originalName);
+
+    void
+    patchReferencesToCUDAConstants (
+        SgProcedureHeaderStatement * procedureHeader);
 
     FortranCUDAConstantDeclarations (
         FortranProgramDeclarationsAndDefinitions * declarations,

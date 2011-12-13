@@ -324,7 +324,9 @@ FortranOpGblScalarDefinition::FortranOpGblScalarDefinition (
       Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 }
 
-FortranOpConstDefinition::FortranOpConstDefinition (SgExprListExp * parameters)
+FortranOpConstDefinition::FortranOpConstDefinition (SgExprListExp * parameters,
+    SgFunctionCallExp * callExpression) :
+  callExpression (callExpression)
 {
   using boost::lexical_cast;
   using std::string;
@@ -345,4 +347,10 @@ FortranOpConstDefinition::FortranOpConstDefinition (SgExprListExp * parameters)
       + variableName + "'. Its dimension is " + lexical_cast <string> (
       dimension) + " and its type is " + baseType->class_name (),
       Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+}
+
+SgFunctionCallExp *
+FortranOpConstDefinition::getCallSite ()
+{
+  return callExpression;
 }

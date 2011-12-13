@@ -5,6 +5,7 @@
 #include <OP2Definitions.h>
 
 class SgExprListExp;
+class SgFunctionCallExp;
 
 class FortranOpDatDefinition: public OpDatDefinition
 {
@@ -187,6 +188,8 @@ class FortranOpConstDefinition: public OpConstDefinition
 
     static int const index_OpConstName = 1;
 
+    SgFunctionCallExp * callExpression;
+
   public:
 
     static unsigned int
@@ -195,7 +198,11 @@ class FortranOpConstDefinition: public OpConstDefinition
       return 2;
     }
 
-    FortranOpConstDefinition (SgExprListExp * parameters);
+    SgFunctionCallExp *
+    getCallSite ();
+
+    FortranOpConstDefinition (SgExprListExp * parameters,
+        SgFunctionCallExp * callExpression);
 };
 
 #endif

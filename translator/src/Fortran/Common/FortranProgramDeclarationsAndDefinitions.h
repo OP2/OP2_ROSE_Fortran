@@ -1,7 +1,4 @@
-/*
- * Written by Adam Betts and Carlo Bertolli
- */
-
+#pragma once
 #ifndef FORTRAN_PROGRAM_DECLARATIONS_AND_DEFINITIONS_H
 #define FORTRAN_PROGRAM_DECLARATIONS_AND_DEFINITIONS_H
 
@@ -17,7 +14,13 @@ class FortranProgramDeclarationsAndDefinitions: public ProgramDeclarationsAndDef
 
     std::map <std::string, std::string> subroutineToFileName;
 
-    std::map <std::string, std::string> fileNameToModuleName;
+    std::map <std::string, std::vector <std::string> > moduleNameToSubroutines;
+
+    std::map <std::string, std::vector <std::string> > fileNameToModuleNames;
+
+    std::map <std::string, std::string> moduleNameToFileName;
+
+    std::string currentModuleName;
 
   private:
 
@@ -41,19 +44,22 @@ class FortranProgramDeclarationsAndDefinitions: public ProgramDeclarationsAndDef
     virtual void
     visit (SgNode * node);
 
+    bool
+    checkModuleExists (std::string const & moduleName);
+
   public:
 
-    std::string const &
-    getModuleNameForFile (std::string fileName)
-    {
-      return fileNameToModuleName[fileName];
-    }
+    std::vector <std::string>::const_iterator
+    getFirstSubroutine (std::string const & moduleName);
+
+    std::vector <std::string>::const_iterator
+    getLastSubroutine (std::string const & moduleName);
 
     std::string const &
-    getFileNameForSubroutine (std::string subroutineName)
-    {
-      return subroutineToFileName[subroutineName];
-    }
+    getFileNameForModule (std::string const & moduleName);
+
+    std::string const &
+    getFileNameForSubroutine (std::string const & subroutineName);
 
     FortranProgramDeclarationsAndDefinitions (SgProject * project);
 };

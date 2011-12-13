@@ -19,6 +19,12 @@ class FortranCUDASubroutinesGeneration: public FortranSubroutinesGeneration
 
   private:
 
+    virtual void
+    processOP2ConstantDeclarations ();
+
+    void
+    createSubroutinesInConstantsModule ();
+
     void
     createReductionSubroutines ();
 

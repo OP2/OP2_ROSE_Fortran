@@ -14,13 +14,94 @@
 #include "FortranTypesBuilder.h"
 #include "FortranStatementsAndExpressionsBuilder.h"
 #include "FortranCUDAConstantDeclarations.h"
+#include "FortranOP2Definitions.h"
 #include "OP2Definitions.h"
 #include "RoseHelper.h"
 #include "Reduction.h"
 #include "Exceptions.h"
 #include "OP2.h"
+#include "Globals.h"
 #include "CUDA.h"
 #include <boost/algorithm/string.hpp>
+
+void
+FortranCUDASubroutinesGeneration::processOP2ConstantDeclarations ()
+{
+  using namespace SageBuilder;
+  using std::map;
+  using std::string;
+
+  Debug::getInstance ()->debugMessage (
+      "Processing OP_DECL_CONST calls for CUDA", Debug::FUNCTION_LEVEL,
+      __FILE__, __LINE__);
+
+  string const & fileName = declarations->getFileNameForModule (
+      Globals::getInstance ()->getFreeVariablesModuleName ());
+
+  dirtyFiles.push_back (fileName);
+
+  for (map <string, OpConstDefinition *>::const_iterator it =
+      declarations->firstOpConstDefinition (); it
+      != declarations->lastOpConstDefinition (); ++it)
+  {
+    string const & variableName = it->first;
+
+    Debug::getInstance ()->debugMessage ("Analysing OP_DECL_CONST with name '"
+        + variableName + "'", Debug::OUTER_LOOP_LEVEL, __FILE__, __LINE__);
+
+    FortranOpConstDefinition * constDefinition =
+        static_cast <FortranOpConstDefinition *> (it->second);
+
+    SgFunctionCallExp * callExpression = constDefinition->getCallSite ();
+
+    SgFunctionSymbol * cudaFunctionCall =
+        FortranTypesBuilder::buildNewFortranFunction ("cudaMemcpyToSymbol",
+            moduleScope);
+
+    callExpression->set_function (buildFunctionRefExp (cudaFunctionCall));
+
+    SgExpressionPtrList & arguments =
+        callExpression->get_args ()->get_expressions ();
+
+    ROSE_ASSERT (arguments.size() == constDefinition->getNumberOfExpectedArguments());
+
+    arguments.erase (arguments.begin ());
+
+    arguments.erase (arguments.begin ());
+
+    arguments.insert (arguments.begin (), buildOpaqueVarRefExp (variableName,
+        moduleScope));
+
+    //  arguments.insert (arguments.begin () + 1,
+    //      CUDAconstants->getReferenceToNewVariable (variableName));
+  }
+}
+
+void
+FortranCUDASubroutinesGeneration::createSubroutinesInConstantsModule ()
+{
+  using namespace SageInterface;
+  using std::string;
+  using std::vector;
+
+  Debug::getInstance ()->debugMessage (
+      "Outputting subroutines referring to CUDA constants into generated module",
+      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+
+  std::string const & moduleName =
+      Globals::getInstance ()->getFreeVariablesModuleName ();
+
+  for (vector <string>::const_iterator it = declarations->getFirstSubroutine (
+      moduleName); it != declarations->getLastSubroutine (moduleName); ++it)
+  {
+    string const & subroutineName = *it;
+
+    SgProcedureHeaderStatement * procedureHeader = deepCopy (
+        declarations->getSubroutine (subroutineName));
+
+    //CUDAconstants->patchReferencesToCUDAConstants (procedureHeader);
+  }
+}
 
 void
 FortranCUDASubroutinesGeneration::createReductionSubroutines ()
@@ -63,6 +144,8 @@ FortranCUDASubroutinesGeneration::createSubroutines ()
   using std::string;
   using std::map;
 
+  createSubroutinesInConstantsModule ();
+
   for (map <string, ParallelLoop *>::const_iterator it =
       declarations->firstParallelLoop (); it
       != declarations->lastParallelLoop (); ++it)
@@ -76,8 +159,21 @@ FortranCUDASubroutinesGeneration::createSubroutines ()
         static_cast <FortranParallelLoop *> (it->second);
 
     FortranCUDAUserSubroutine * userDeviceSubroutine =
-        new FortranCUDAUserSubroutine (moduleScope, parallelLoop, declarations,
-            CUDAconstants);
+        new FortranCUDAUserSubroutine (moduleScope, parallelLoop, declarations);
+
+    CUDAconstants->patchReferencesToCUDAConstants (
+        userDeviceSubroutine->getSubroutineHeaderStatement ());
+
+    /*
+     * ======================================================
+     * We have to set each node in the AST representation of
+     * this subroutine as compiler generated, otherwise chunks
+     * of the user kernel are missing in the output
+     * ======================================================
+     */
+
+    RoseHelper::forceOutputOfCodeToFile (
+        userDeviceSubroutine->getSubroutineHeaderStatement ());
 
     FortranCUDAKernelSubroutine * kernelSubroutine;
 
