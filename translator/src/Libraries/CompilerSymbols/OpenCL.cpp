@@ -114,7 +114,7 @@ OpenCL::getSetKernelArgumentCallExpression (SgScopeStatement * scope,
 
   if (argument == NULL)
   {
-    actualParameters->append_expression (buildNullExpression ());
+    actualParameters->append_expression (buildIntVal (0));
   }
   else
   {
@@ -123,6 +123,52 @@ OpenCL::getSetKernelArgumentCallExpression (SgScopeStatement * scope,
 
   return buildFunctionCallExp ("clSetKernelArg", buildIntType (),
       actualParameters, scope);
+}
+
+SgFunctionCallExp *
+OpenCL::getEnqueueKernelCallExpression (SgScopeStatement * scope,
+    SgVarRefExp * commandQueue, SgVarRefExp * openCLKernel,
+    SgVarRefExp * globalWorkSize, SgVarRefExp * localWorkSize,
+    SgVarRefExp * event)
+{
+  using namespace SageBuilder;
+
+  SgExprListExp * actualParameters = buildExprListExp ();
+
+  actualParameters->append_expression (commandQueue);
+
+  actualParameters->append_expression (openCLKernel);
+
+  actualParameters->append_expression (buildIntVal (1));
+
+  actualParameters->append_expression (buildIntVal (0));
+
+  actualParameters->append_expression (buildAddressOfOp (globalWorkSize));
+
+  actualParameters->append_expression (buildAddressOfOp (localWorkSize));
+
+  actualParameters->append_expression (buildIntVal (0));
+
+  actualParameters->append_expression (buildIntVal (0));
+
+  actualParameters->append_expression (buildAddressOfOp (event));
+
+  return buildFunctionCallExp ("clEnqueueNDRangeKernel", buildIntType (),
+      actualParameters, scope);
+}
+
+SgFunctionCallExp *
+OpenCL::getFinishCommandQueueCallExpression (SgScopeStatement * scope,
+    SgVarRefExp * commandQueue)
+{
+  using namespace SageBuilder;
+
+  SgExprListExp * actualParameters = buildExprListExp ();
+
+  actualParameters->append_expression (commandQueue);
+
+  return buildFunctionCallExp ("clFinish", buildIntType (), actualParameters,
+      scope);
 }
 
 SgFunctionCallExp *
@@ -171,13 +217,13 @@ OpenCL::OP2RuntimeSupport::getKernel (SgScopeStatement * scope,
 
 SgFunctionCallExp *
 OpenCL::OP2RuntimeSupport::getAssertMessage (SgScopeStatement * scope,
-    SgVarRefExp * successReference, SgStringVal * message)
+    SgExpression * assertExpression, SgStringVal * message)
 {
   using namespace SageBuilder;
 
   SgExprListExp * actualParameters = buildExprListExp ();
 
-  actualParameters->append_expression (successReference);
+  actualParameters->append_expression (assertExpression);
 
   actualParameters->append_expression (message);
 

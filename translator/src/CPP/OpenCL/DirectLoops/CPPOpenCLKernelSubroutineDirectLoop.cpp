@@ -51,11 +51,17 @@ CPPOpenCLKernelSubroutineDirectLoop::createOpDatFormalParameterDeclarations ()
         Debug::getInstance ()->debugMessage ("Reduction type",
             Debug::HIGHEST_DEBUG_LEVEL, __FILE__, __LINE__);
 
-        variableDeclarations->add (
-            variableName,
-            RoseStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
-                variableName, buildPointerType (parallelLoop->getOpDatBaseType (
-                    i)), subroutineScope, formalParameters));
+        SgVariableDeclaration
+            * variableDeclaration =
+
+                RoseStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
+                    variableName, buildPointerType (
+                        parallelLoop->getOpDatBaseType (i)), subroutineScope,
+                    formalParameters);
+
+        variableDeclaration->get_declarationModifier ().get_storageModifier ().setOpenclGlobal ();
+
+        variableDeclarations->add (variableName, variableDeclaration);
 
       }
       else if (parallelLoop->isDirect (i))
@@ -65,11 +71,18 @@ CPPOpenCLKernelSubroutineDirectLoop::createOpDatFormalParameterDeclarations ()
 
         string const & variableName = getOpDatName (i);
 
-        variableDeclarations->add (
-            variableName,
-            RoseStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
-                variableName, buildPointerType (parallelLoop->getOpDatBaseType (
-                    i)), subroutineScope, formalParameters));
+        SgVariableDeclaration
+            * variableDeclaration =
+                RoseStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
+                    variableName, buildPointerType (
+                        parallelLoop->getOpDatBaseType (i)), subroutineScope,
+                    formalParameters);
+
+        variableDeclaration->get_declarationModifier ().get_storageModifier ().setOpenclGlobal ();
+
+        variableDeclaration->get_declarationModifier ().get_storageModifier ().setExtern();
+
+        variableDeclarations->add (variableName, variableDeclaration);
       }
       else if (parallelLoop->isRead (i))
       {

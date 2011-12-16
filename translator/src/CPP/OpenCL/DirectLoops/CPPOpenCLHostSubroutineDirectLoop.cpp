@@ -18,6 +18,8 @@ CPPOpenCLHostSubroutineDirectLoop::createKernelFunctionCallStatement ()
       "Creating statements to call OpenCL kernel", Debug::FUNCTION_LEVEL,
       __FILE__, __LINE__);
 
+  SgBasicBlock * block = buildBasicBlock ();
+
   /*
    * ======================================================
    * Assign the kernel pointer using the run-time support
@@ -30,7 +32,7 @@ CPPOpenCLHostSubroutineDirectLoop::createKernelFunctionCallStatement ()
       OpenCL::OP2RuntimeSupport::getKernel (subroutineScope,
           calleeSubroutine->getSubroutineName ()));
 
-  appendStatement (assignmentStatement1, subroutineScope);
+  appendStatement (assignmentStatement1, block);
 
   /*
    * ======================================================
@@ -66,7 +68,7 @@ CPPOpenCLHostSubroutineDirectLoop::createKernelFunctionCallStatement ()
               variableDeclarations->getReference (OpenCL::errorCode),
               kernelArgumentExpression);
 
-          appendStatement (assignmentStatement, subroutineScope);
+          appendStatement (assignmentStatement, block);
         }
         else
         {
@@ -78,7 +80,7 @@ CPPOpenCLHostSubroutineDirectLoop::createKernelFunctionCallStatement ()
               variableDeclarations->getReference (OpenCL::errorCode),
               orExpression);
 
-          appendStatement (assignmentStatement, subroutineScope);
+          appendStatement (assignmentStatement, block);
 
         }
 
@@ -104,7 +106,7 @@ CPPOpenCLHostSubroutineDirectLoop::createKernelFunctionCallStatement ()
   SgExprStatement * assignmentStatement2 = buildAssignStatement (
       variableDeclarations->getReference (OpenCL::errorCode), orExpression2);
 
-  appendStatement (assignmentStatement2, subroutineScope);
+  appendStatement (assignmentStatement2, block);
 
   argumentCounter++;
 
@@ -129,7 +131,7 @@ CPPOpenCLHostSubroutineDirectLoop::createKernelFunctionCallStatement ()
   SgExprStatement * assignmentStatement3 = buildAssignStatement (
       variableDeclarations->getReference (OpenCL::errorCode), orExpression3);
 
-  appendStatement (assignmentStatement3, subroutineScope);
+  appendStatement (assignmentStatement3, block);
 
   argumentCounter++;
 
@@ -151,7 +153,84 @@ CPPOpenCLHostSubroutineDirectLoop::createKernelFunctionCallStatement ()
   SgExprStatement * assignmentStatement4 = buildAssignStatement (
       variableDeclarations->getReference (OpenCL::errorCode), orExpression4);
 
-  appendStatement (assignmentStatement4, subroutineScope);
+  appendStatement (assignmentStatement4, block);
+
+  /*
+   * ======================================================
+   * Assert statement
+   * ======================================================
+   */
+
+  SgEqualityOp * equalityExpression1 = buildEqualityOp (
+      variableDeclarations->getReference (OpenCL::errorCode),
+      buildOpaqueVarRefExp (OpenCL::CL_SUCCESS, subroutineScope));
+
+  appendStatement (buildExprStatement (
+      OpenCL::OP2RuntimeSupport::getAssertMessage (subroutineScope,
+          equalityExpression1, buildStringVal (
+              "Error setting OpenCL kernel arguments"))), block);
+
+  /*
+   * ======================================================
+   * Execute kernel statement
+   * ======================================================
+   */
+
+  SgExprStatement * assignmentStatement5 = buildAssignStatement (
+      variableDeclarations->getReference (OpenCL::errorCode),
+      OpenCL::getEnqueueKernelCallExpression (subroutineScope,
+          buildOpaqueVarRefExp (OpenCL::commandQueue, subroutineScope),
+          variableDeclarations->getReference (OpenCL::kernelPointer),
+          variableDeclarations->getReference (OpenCL::totalThreadNumber),
+          variableDeclarations->getReference (OpenCL::threadsPerBlock),
+          variableDeclarations->getReference (OpenCL::event)));
+
+  appendStatement (assignmentStatement5, block);
+
+  /*
+   * ======================================================
+   * Assert statement
+   * ======================================================
+   */
+
+  SgEqualityOp * equalityExpression2 = buildEqualityOp (
+      variableDeclarations->getReference (OpenCL::errorCode),
+      buildOpaqueVarRefExp (OpenCL::CL_SUCCESS, subroutineScope));
+
+  appendStatement (buildExprStatement (
+      OpenCL::OP2RuntimeSupport::getAssertMessage (subroutineScope,
+          equalityExpression2, buildStringVal (
+              "Error setting OpenCL kernel arguments"))), block);
+
+  /*
+   * ======================================================
+   * Complete device commands statement
+   * ======================================================
+   */
+
+  SgExprStatement * assignmentStatement6 = buildAssignStatement (
+      variableDeclarations->getReference (OpenCL::errorCode),
+      OpenCL::getFinishCommandQueueCallExpression (subroutineScope,
+          buildOpaqueVarRefExp (OpenCL::commandQueue, subroutineScope)));
+
+  appendStatement (assignmentStatement6, block);
+
+  /*
+   * ======================================================
+   * Assert statement
+   * ======================================================
+   */
+
+  SgEqualityOp * equalityExpression3 = buildEqualityOp (
+      variableDeclarations->getReference (OpenCL::errorCode),
+      buildOpaqueVarRefExp (OpenCL::CL_SUCCESS, subroutineScope));
+
+  appendStatement (buildExprStatement (
+      OpenCL::OP2RuntimeSupport::getAssertMessage (subroutineScope,
+          equalityExpression3, buildStringVal (
+              "Error setting OpenCL kernel arguments"))), block);
+
+  return block;
 }
 
 void
@@ -166,11 +245,23 @@ CPPOpenCLHostSubroutineDirectLoop::createOpenCLKernelInitialisationStatements ()
       "Creating OpenCL kernel initialisation statements",
       Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
+  /*
+   * ======================================================
+   * Setting blocks per grid
+   * ======================================================
+   */
+
   SgExprStatement * assignmentStatement1 = buildAssignStatement (
       variableDeclarations->getReference (OpenCL::blocksPerGrid), buildIntVal (
           200));
 
   appendStatement (assignmentStatement1, subroutineScope);
+
+  /*
+   * ======================================================
+   * Setting threads per block
+   * ======================================================
+   */
 
   SgExprStatement * assignmentStatement2 = buildAssignStatement (
       variableDeclarations->getReference (OpenCL::threadsPerBlock),
@@ -179,11 +270,33 @@ CPPOpenCLHostSubroutineDirectLoop::createOpenCLKernelInitialisationStatements ()
 
   appendStatement (assignmentStatement2, subroutineScope);
 
+  /*
+   * ======================================================
+   * Setting total number of threads
+   * ======================================================
+   */
+
+  SgMultiplyOp * multiplyExpression3 = buildMultiplyOp (
+      variableDeclarations->getReference (OpenCL::threadsPerBlock),
+      variableDeclarations->getReference (OpenCL::blocksPerGrid));
+
   SgExprStatement * assignmentStatement3 = buildAssignStatement (
+      variableDeclarations->getReference (OpenCL::totalThreadNumber),
+      multiplyExpression3);
+
+  appendStatement (assignmentStatement3, subroutineScope);
+
+  /*
+   * ======================================================
+   * Setting shared memory size
+   * ======================================================
+   */
+
+  SgExprStatement * assignmentStatement4 = buildAssignStatement (
       variableDeclarations->getReference (OpenCL::sharedMemorySize),
       buildIntVal (0));
 
-  appendStatement (assignmentStatement3, subroutineScope);
+  appendStatement (assignmentStatement4, subroutineScope);
 
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
@@ -211,25 +324,25 @@ CPPOpenCLHostSubroutineDirectLoop::createOpenCLKernelInitialisationStatements ()
     }
   }
 
-  SgMultiplyOp * multiplyExpression4 = buildMultiplyOp (
+  SgMultiplyOp * multiplyExpression5 = buildMultiplyOp (
       variableDeclarations->getReference (OpenCL::sharedMemorySize),
       buildOpaqueVarRefExp (warpSizeMacro, subroutineScope));
 
-  SgExprStatement * assignmentStatement4 = buildAssignStatement (
-      variableDeclarations->getReference (sharedMemoryOffset),
-      multiplyExpression4);
-
-  appendStatement (assignmentStatement4, subroutineScope);
-
-  SgMultiplyOp * multiplyExpression5 = buildMultiplyOp (
-      variableDeclarations->getReference (OpenCL::sharedMemorySize),
-      variableDeclarations->getReference (OpenCL::threadsPerBlock));
-
   SgExprStatement * assignmentStatement5 = buildAssignStatement (
-      variableDeclarations->getReference (OpenCL::sharedMemorySize),
+      variableDeclarations->getReference (sharedMemoryOffset),
       multiplyExpression5);
 
   appendStatement (assignmentStatement5, subroutineScope);
+
+  SgMultiplyOp * multiplyExpression6 = buildMultiplyOp (
+      variableDeclarations->getReference (OpenCL::sharedMemorySize),
+      variableDeclarations->getReference (OpenCL::threadsPerBlock));
+
+  SgExprStatement * assignmentStatement6 = buildAssignStatement (
+      variableDeclarations->getReference (OpenCL::sharedMemorySize),
+      multiplyExpression6);
+
+  appendStatement (assignmentStatement6, subroutineScope);
 }
 
 void
@@ -248,7 +361,7 @@ CPPOpenCLHostSubroutineDirectLoop::createStatements ()
     createReductionPrologueStatements ();
   }
 
-  createKernelFunctionCallStatement ();
+  appendStatement (createKernelFunctionCallStatement (), subroutineScope);
 
   if (parallelLoop->isReductionRequired ())
   {

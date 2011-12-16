@@ -38,6 +38,11 @@ CPPOpenCLHostSubroutine::createOpenCLConfigurationLaunchDeclarations ()
           OpenCL::threadsPerBlock, OpenCL::getSizeType (subroutineScope),
           subroutineScope));
 
+  variableDeclarations->add (OpenCL::totalThreadNumber,
+      RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
+          OpenCL::totalThreadNumber, OpenCL::getSizeType (subroutineScope),
+          subroutineScope));
+
   variableDeclarations->add (OpenCL::sharedMemorySize,
       RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
           OpenCL::sharedMemorySize, OpenCL::getSizeType (subroutineScope),

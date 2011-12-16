@@ -21,6 +21,7 @@ namespace OpenCL
   std::string const CL_SUCCESS = "CL_SUCCESS";
   std::string const errorCode = "errorCode";
   std::string const event = "event";
+  std::string const commandQueue = "commandQueue";
   std::string const kernelPointer = "kernelPointer";
 
   /*
@@ -121,13 +122,34 @@ namespace OpenCL
 
   /*
    * ======================================================
-   * The OpenCL type 'cl_double'
+   * Function call to set an OpenCL kernel actual
+   * argument
    * ======================================================
    */
   SgFunctionCallExp *
   getSetKernelArgumentCallExpression (SgScopeStatement * scope,
       SgVarRefExp * openCLKernel, int argumentIndex, SgType * sizeOfArgument,
       SgExpression * argument = NULL);
+
+  /*
+   * ======================================================
+   * Function call to enqueue an OpenCL kernel
+   * ======================================================
+   */
+  SgFunctionCallExp *
+  getEnqueueKernelCallExpression (SgScopeStatement * scope,
+      SgVarRefExp * commandQueue, SgVarRefExp * openCLKernel,
+      SgVarRefExp * globalWorkSize, SgVarRefExp * localWorkSize,
+      SgVarRefExp * event);
+
+  /*
+   * ======================================================
+   * Function call to finish OpenCL command queue
+   * ======================================================
+   */
+  SgFunctionCallExp *
+  getFinishCommandQueueCallExpression (SgScopeStatement * scope,
+      SgVarRefExp * commandQueue);
 
   SgFunctionCallExp *
   getWorkGroupDimensionsCallStatement (SgScopeStatement * scope);
@@ -153,8 +175,8 @@ namespace OpenCL
     getKernel (SgScopeStatement * scope, std::string const & kernelName);
 
     SgFunctionCallExp *
-    getAssertMessage (SgScopeStatement * scope, SgVarRefExp * successReference,
-        SgStringVal * message);
+    getAssertMessage (SgScopeStatement * scope,
+        SgExpression * assertExpression, SgStringVal * message);
   }
 }
 

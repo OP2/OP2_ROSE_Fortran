@@ -80,35 +80,54 @@ def queryYesNo(question, default="yes"):
         else:
             sys.stdout.write("Please respond with 'yes/y' or 'no/n'.\n")
 
-def checkEnvironment ():
-    debug.verboseMessage("Checking G++ version")
+class RequiredTool:
+	def __init__(self, name, minorVersions, majorVersion):
+		self.name          = name
+		self.minorVersions = minorVersions
+		self.majorVersion  = majorVersion
 
-    proc = Popen("g++ --version",
-                 shell=True,
+	def getName (self):
+		return self.name
+
+	def getMinorVersions (self):
+		return self.minorVersions
+
+	def getMajorVersion (self):
+		return self.majorVersion
+
+def checkEnvironment ():
+    gPlusPlus = RequiredTool ("g++", [0, 1, 2, 3, 4], 4)
+    gFortran  = RequiredTool ("gfortran", [2, 3, 4], 4)
+
+    for tool in [gPlusPlus, gFortran]:
+	debug.verboseMessage("Checking %s version" % tool.getName())
+
+    	proc = Popen("%s --version" % tool.getName(),
+         	     shell=True,
                      executable='/bin/bash',
                      stderr=PIPE,
                      stdout=PIPE)
 
-    stdoutLines, stderrLines = proc.communicate()
+    	stdoutLines, stderrLines = proc.communicate()
 
-    versionNumberPattern = re.compile("[0-9]\.[0-9]\.[0-9]$")
+    	versionNumberPattern = re.compile("[0-9]\.[0-9]\.[0-9]$")
 
-    for line in stdoutLines.splitlines():
-        tokens = line.split()
-        for token in tokens:
-            if versionNumberPattern.match(token):
-                numbers = token.split('.')
-                majorVersion = int(numbers[0])
-                minorVersion = int(numbers[1])
+    	for line in stdoutLines.splitlines():
+        	tokens = line.split()
+       		for token in tokens:
+            		if versionNumberPattern.match(token):
+                		numbers = token.split('.')
+                		majorVersion = int(numbers[0])
+               			minorVersion = int(numbers[1])
 
-                if majorVersion != 4:
-                    debug.exitMessage("Major version of g++ has to be 4 to successfully compile ROSE. Yours is currently '%s'" % numbers[0])
+                		if majorVersion != tool.getMajorVersion():
+                    			debug.exitMessage("Major version of %s has to be %s to successfully compile ROSE. Yours is currently '%s'" % (tool.getName(), tool.getMajorVersion(), numbers[0]))
 
-                if minorVersion > 4:
-                    debug.exitMessage("Minor version of g++ has to be between 0 and 4 to successfully compile ROSE. Yours is currently '%s'" % numbers[1])
+               			if minorVersion not in tool.getMinorVersions():
+					debug.exitMessage("Minor version of %s has to be in range %s to successfully compile ROSE. Yours is currently '%s'" % (tool.getName(), tool.getMinorVersions(), numbers[1]))
 
-                debug.verboseMessage("g++ version %s passes" % token)
-                break
+                		debug.verboseMessage("%s version %s passes" % (tool.getName(), token))
+                		break
 
 def getBoostPath ():
     osLibraryPathString = None
