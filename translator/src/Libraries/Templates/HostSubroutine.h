@@ -23,8 +23,8 @@ template <typename TSubroutineHeader>
        * Create the statement which calls the kernel function
        * ======================================================
        */
-      virtual SgStatement *
-      createKernelFunctionCallStatement () = 0;
+      virtual void
+      createKernelFunctionCallStatement (SgScopeStatement * scope) = 0;
 
       /*
        * ======================================================

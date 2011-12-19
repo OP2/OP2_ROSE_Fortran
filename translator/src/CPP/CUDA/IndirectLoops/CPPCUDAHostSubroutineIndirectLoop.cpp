@@ -7,9 +7,11 @@
 #include "PlanFunctionNames.h"
 #include "OP2.h"
 
-SgStatement *
-CPPCUDAHostSubroutineIndirectLoop::createKernelFunctionCallStatement ()
+void
+CPPCUDAHostSubroutineIndirectLoop::createKernelFunctionCallStatement (
+    SgScopeStatement * scope)
 {
+  using namespace SageInterface;
   using namespace SageBuilder;
   using namespace OP2VariableNames;
   using namespace PlanFunctionVariableNames;
@@ -119,7 +121,7 @@ CPPCUDAHostSubroutineIndirectLoop::createKernelFunctionCallStatement ()
 
   kernelCallExpression->set_endOfConstruct (RoseHelper::getFileInfo ());
 
-  return buildExprStatement (kernelCallExpression);
+  appendStatement (buildExprStatement (kernelCallExpression), scope);
 }
 
 SgBasicBlock *
@@ -204,7 +206,7 @@ CPPCUDAHostSubroutineIndirectLoop::createPlanFunctionExecutionStatements ()
    * ======================================================
    */
 
-  appendStatement (createKernelFunctionCallStatement (), loopBody);
+  createKernelFunctionCallStatement (loopBody);
 
   /*
    * ======================================================

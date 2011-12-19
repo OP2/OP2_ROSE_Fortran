@@ -15,6 +15,9 @@ class CPPOpenCLHostSubroutine: public CPPHostSubroutine
 
   protected:
 
+    void
+    createKernelCallEpilogueStatements (SgScopeStatement * scope);
+
     virtual void
     createReductionEpilogueStatements ();
 

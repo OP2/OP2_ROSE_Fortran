@@ -11,11 +11,20 @@ class CPPOpenCLHostSubroutineIndirectLoop: public CPPOpenCLHostSubroutine
 
   private:
 
-    virtual SgStatement *
-    createKernelFunctionCallStatement ();
+    virtual void
+    createKernelFunctionCallStatement (SgScopeStatement * scope);
+
+    SgBasicBlock *
+    createPlanFunctionExecutionStatements ();
+
+    SgStatement *
+    createPlanFunctionCallStatement ();
 
     virtual void
     createStatements ();
+
+    void
+    createPlanFunctionDeclarations ();
 
     virtual void
     createLocalVariableDeclarations ();

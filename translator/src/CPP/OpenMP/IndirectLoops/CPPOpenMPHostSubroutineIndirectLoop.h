@@ -23,8 +23,8 @@ class CPPOpenMPHostSubroutineIndirectLoop: public CPPOpenMPHostSubroutine
     void
     createOpenMPLocalVariableDeclarations ();
 
-    virtual SgStatement *
-    createKernelFunctionCallStatement ();
+    virtual void
+    createKernelFunctionCallStatement (SgScopeStatement * scope);
 
     virtual void
     createStatements ();

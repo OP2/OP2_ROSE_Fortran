@@ -10,8 +10,8 @@ class FortranCUDAHostSubroutineIndirectLoop: public FortranCUDAHostSubroutine
 {
   private:
 
-    virtual SgStatement *
-    createKernelFunctionCallStatement ();
+    virtual void
+    createKernelFunctionCallStatement (SgScopeStatement * scope);
 
     void
     createPlanFunctionExecutionStatements ();
