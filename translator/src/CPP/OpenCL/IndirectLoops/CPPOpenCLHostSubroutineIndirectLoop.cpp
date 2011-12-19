@@ -20,8 +20,8 @@ CPPOpenCLHostSubroutineIndirectLoop::createKernelFunctionCallStatement (
   using namespace PlanFunctionVariableNames;
 
   Debug::getInstance ()->debugMessage (
-      "Creating statements to call OpenCL kernel", Debug::FUNCTION_LEVEL,
-      __FILE__, __LINE__);
+      "Creating statements to set up OpenCL kernel arguments",
+      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
   /*
    * ======================================================
@@ -32,7 +32,7 @@ CPPOpenCLHostSubroutineIndirectLoop::createKernelFunctionCallStatement (
 
   SgExprStatement * assignmentStatement1 = buildAssignStatement (
       variableDeclarations->getReference (OpenCL::kernelPointer),
-      OpenCL::OP2RuntimeSupport::getKernel (scope,
+      OpenCL::OP2RuntimeSupport::getKernel (subroutineScope,
           calleeSubroutine->getSubroutineName ()));
 
   appendStatement (assignmentStatement1, scope);
@@ -55,7 +55,7 @@ CPPOpenCLHostSubroutineIndirectLoop::createKernelFunctionCallStatement (
           buildOpaqueVarRefExp (data_d, scope));
 
       SgFunctionCallExp * kernelArgumentExpression =
-          OpenCL::getSetKernelArgumentCallExpression (scope,
+          OpenCL::getSetKernelArgumentCallExpression (subroutineScope,
               variableDeclarations->getReference (OpenCL::kernelPointer),
               argumentCounter, OpenCL::getMemoryType (scope), dotExpression);
 
@@ -99,16 +99,18 @@ CPPOpenCLHostSubroutineIndirectLoop::createKernelFunctionCallStatement (
     {
       if (parallelLoop->isIndirect (i))
       {
-        SgPntrArrRefExp * arrayExpression = buildPntrArrRefExp (
-            buildOpaqueVarRefExp (ind_maps, scope), buildIntVal (
-                arrayIndex));
+        SgVariableDeclaration * variableDeclaration = buildVariableDeclaration (
+            ind_maps, buildArrayType (buildIntType ()), NULL, subroutineScope);
+
+        SgPntrArrRefExp * arrayExpression = buildPntrArrRefExp (buildVarRefExp (
+            variableDeclaration), buildIntVal (arrayIndex));
 
         SgArrowExp * arrowExpression = buildArrowExp (
             variableDeclarations->getReference (planRet), arrayExpression);
 
         SgFunctionCallExp
             * kernelArgumentExpression =
-                OpenCL::getSetKernelArgumentCallExpression (scope,
+                OpenCL::getSetKernelArgumentCallExpression (subroutineScope,
                     variableDeclarations->getReference (OpenCL::kernelPointer),
                     argumentCounter, OpenCL::getMemoryType (scope),
                     arrowExpression);
@@ -139,15 +141,17 @@ CPPOpenCLHostSubroutineIndirectLoop::createKernelFunctionCallStatement (
   {
     if (parallelLoop->isIndirect (i))
     {
-      SgPntrArrRefExp * arrayExpression =
-          buildPntrArrRefExp (buildOpaqueVarRefExp (loc_maps, scope),
-              buildIntVal (i - 1));
+      SgVariableDeclaration * variableDeclaration = buildVariableDeclaration (
+          loc_maps, buildArrayType (buildIntType ()), NULL, subroutineScope);
+
+      SgPntrArrRefExp * arrayExpression = buildPntrArrRefExp (buildVarRefExp (
+          variableDeclaration), buildIntVal (i - 1));
 
       SgArrowExp * arrowExpression = buildArrowExp (
           variableDeclarations->getReference (planRet), arrayExpression);
 
       SgFunctionCallExp * kernelArgumentExpression =
-          OpenCL::getSetKernelArgumentCallExpression (scope,
+          OpenCL::getSetKernelArgumentCallExpression (subroutineScope,
               variableDeclarations->getReference (OpenCL::kernelPointer),
               argumentCounter, OpenCL::getMemoryType (scope), arrowExpression);
 
@@ -162,6 +166,207 @@ CPPOpenCLHostSubroutineIndirectLoop::createKernelFunctionCallStatement (
     }
   }
 
+  /*
+   * ======================================================
+   * OpenCL kernel arguments for plan function variable
+   * ======================================================
+   */
+
+  SgArrowExp * arrowExpression2 = buildArrowExp (
+      variableDeclarations->getReference (planRet), buildOpaqueVarRefExp (
+          ind_sizes, scope));
+
+  SgFunctionCallExp * kernelArgumentExpression2 =
+      OpenCL::getSetKernelArgumentCallExpression (subroutineScope,
+          variableDeclarations->getReference (OpenCL::kernelPointer),
+          argumentCounter, OpenCL::getMemoryType (scope), arrowExpression2);
+
+  SgBitOrOp * orExpression2 = buildBitOrOp (variableDeclarations->getReference (
+      OpenCL::errorCode), kernelArgumentExpression2);
+
+  SgExprStatement * assignmentStatement2 = buildAssignStatement (
+      variableDeclarations->getReference (OpenCL::errorCode), orExpression2);
+
+  appendStatement (assignmentStatement2, scope);
+
+  /*
+   * ======================================================
+   * OpenCL kernel arguments for plan function variable
+   * ======================================================
+   */
+
+  SgArrowExp * arrowExpression3 = buildArrowExp (
+      variableDeclarations->getReference (planRet), buildOpaqueVarRefExp (
+          ind_offs, scope));
+
+  SgFunctionCallExp * kernelArgumentExpression3 =
+      OpenCL::getSetKernelArgumentCallExpression (subroutineScope,
+          variableDeclarations->getReference (OpenCL::kernelPointer),
+          argumentCounter, OpenCL::getMemoryType (scope), arrowExpression3);
+
+  SgBitOrOp * orExpression3 = buildBitOrOp (variableDeclarations->getReference (
+      OpenCL::errorCode), kernelArgumentExpression3);
+
+  SgExprStatement * assignmentStatement3 = buildAssignStatement (
+      variableDeclarations->getReference (OpenCL::errorCode), orExpression3);
+
+  appendStatement (assignmentStatement3, scope);
+
+  /*
+   * ======================================================
+   * OpenCL kernel arguments for plan function variable
+   * ======================================================
+   */
+
+  SgArrowExp * arrowExpression4 = buildArrowExp (
+      variableDeclarations->getReference (planRet), buildOpaqueVarRefExp (
+          blkmap, scope));
+
+  SgFunctionCallExp * kernelArgumentExpression4 =
+      OpenCL::getSetKernelArgumentCallExpression (subroutineScope,
+          variableDeclarations->getReference (OpenCL::kernelPointer),
+          argumentCounter, OpenCL::getMemoryType (scope), arrowExpression4);
+
+  SgBitOrOp * orExpression4 = buildBitOrOp (variableDeclarations->getReference (
+      OpenCL::errorCode), kernelArgumentExpression4);
+
+  SgExprStatement * assignmentStatement4 = buildAssignStatement (
+      variableDeclarations->getReference (OpenCL::errorCode), orExpression4);
+
+  appendStatement (assignmentStatement4, scope);
+
+  /*
+   * ======================================================
+   * OpenCL kernel arguments for plan function variable
+   * ======================================================
+   */
+
+  SgArrowExp * arrowExpression5 = buildArrowExp (
+      variableDeclarations->getReference (planRet), buildOpaqueVarRefExp (
+          offset, scope));
+
+  SgFunctionCallExp * kernelArgumentExpression5 =
+      OpenCL::getSetKernelArgumentCallExpression (subroutineScope,
+          variableDeclarations->getReference (OpenCL::kernelPointer),
+          argumentCounter, OpenCL::getMemoryType (scope), arrowExpression5);
+
+  SgBitOrOp * orExpression5 = buildBitOrOp (variableDeclarations->getReference (
+      OpenCL::errorCode), kernelArgumentExpression5);
+
+  SgExprStatement * assignmentStatement5 = buildAssignStatement (
+      variableDeclarations->getReference (OpenCL::errorCode), orExpression5);
+
+  appendStatement (assignmentStatement5, scope);
+
+  /*
+   * ======================================================
+   * OpenCL kernel arguments for plan function variable
+   * ======================================================
+   */
+
+  SgArrowExp * arrowExpression6 = buildArrowExp (
+      variableDeclarations->getReference (planRet), buildOpaqueVarRefExp (
+          nelems, scope));
+
+  SgFunctionCallExp * kernelArgumentExpression6 =
+      OpenCL::getSetKernelArgumentCallExpression (subroutineScope,
+          variableDeclarations->getReference (OpenCL::kernelPointer),
+          argumentCounter, OpenCL::getMemoryType (scope), arrowExpression6);
+
+  SgBitOrOp * orExpression6 = buildBitOrOp (variableDeclarations->getReference (
+      OpenCL::errorCode), kernelArgumentExpression6);
+
+  SgExprStatement * assignmentStatement6 = buildAssignStatement (
+      variableDeclarations->getReference (OpenCL::errorCode), orExpression6);
+
+  appendStatement (assignmentStatement6, scope);
+
+  /*
+   * ======================================================
+   * OpenCL kernel arguments for plan function variable
+   * ======================================================
+   */
+
+  SgArrowExp * arrowExpression7 = buildArrowExp (
+      variableDeclarations->getReference (planRet), buildOpaqueVarRefExp (
+          nthrcol, scope));
+
+  SgFunctionCallExp * kernelArgumentExpression7 =
+      OpenCL::getSetKernelArgumentCallExpression (subroutineScope,
+          variableDeclarations->getReference (OpenCL::kernelPointer),
+          argumentCounter, OpenCL::getMemoryType (scope), arrowExpression7);
+
+  SgBitOrOp * orExpression7 = buildBitOrOp (variableDeclarations->getReference (
+      OpenCL::errorCode), kernelArgumentExpression7);
+
+  SgExprStatement * assignmentStatement7 = buildAssignStatement (
+      variableDeclarations->getReference (OpenCL::errorCode), orExpression7);
+
+  appendStatement (assignmentStatement7, scope);
+
+  /*
+   * ======================================================
+   * OpenCL kernel arguments for plan function variable
+   * ======================================================
+   */
+
+  SgArrowExp * arrowExpression8 = buildArrowExp (
+      variableDeclarations->getReference (planRet), buildOpaqueVarRefExp (
+          thrcol, scope));
+
+  SgFunctionCallExp * kernelArgumentExpression8 =
+      OpenCL::getSetKernelArgumentCallExpression (subroutineScope,
+          variableDeclarations->getReference (OpenCL::kernelPointer),
+          argumentCounter, OpenCL::getMemoryType (scope), arrowExpression8);
+
+  SgBitOrOp * orExpression8 = buildBitOrOp (variableDeclarations->getReference (
+      OpenCL::errorCode), kernelArgumentExpression8);
+
+  SgExprStatement * assignmentStatement8 = buildAssignStatement (
+      variableDeclarations->getReference (OpenCL::errorCode), orExpression8);
+
+  appendStatement (assignmentStatement8, scope);
+
+  /*
+   * ======================================================
+   * OpenCL kernel arguments for plan function variable
+   * ======================================================
+   */
+
+  SgFunctionCallExp * kernelArgumentExpression9 =
+      OpenCL::getSetKernelArgumentCallExpression (subroutineScope,
+          variableDeclarations->getReference (OpenCL::kernelPointer),
+          argumentCounter, OpenCL::getMemoryType (scope),
+          variableDeclarations->getReference (blockOffset));
+
+  SgBitOrOp * orExpression9 = buildBitOrOp (variableDeclarations->getReference (
+      OpenCL::errorCode), kernelArgumentExpression9);
+
+  SgExprStatement * assignmentStatement9 = buildAssignStatement (
+      variableDeclarations->getReference (OpenCL::errorCode), orExpression9);
+
+  appendStatement (assignmentStatement9, scope);
+
+  /*
+   * ======================================================
+   * OpenCL kernel arguments for dynamic shared memory size
+   * ======================================================
+   */
+
+  SgFunctionCallExp * kernelArgumentExpression10 =
+      OpenCL::getSetKernelArgumentCallExpression (subroutineScope,
+          variableDeclarations->getReference (OpenCL::kernelPointer),
+          argumentCounter, OpenCL::getMemoryType (scope),
+          variableDeclarations->getReference (OpenCL::sharedMemorySize));
+
+  SgBitOrOp * orExpression10 = buildBitOrOp (
+      variableDeclarations->getReference (OpenCL::errorCode),
+      kernelArgumentExpression10);
+
+  SgExprStatement * assignmentStatement10 = buildAssignStatement (
+      variableDeclarations->getReference (OpenCL::errorCode), orExpression10);
+
+  appendStatement (assignmentStatement10, scope);
 }
 
 SgBasicBlock *

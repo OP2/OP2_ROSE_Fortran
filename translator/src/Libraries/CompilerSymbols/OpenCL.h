@@ -151,23 +151,49 @@ namespace OpenCL
   getFinishCommandQueueCallExpression (SgScopeStatement * scope,
       SgVarRefExp * commandQueue);
 
+  /*
+   * ======================================================
+   * Function call to OpenCL get_local_size.
+   * When the given expression is NULL, this returns
+   * get_loval_size(0) by default
+   * ======================================================
+   */
   SgFunctionCallExp *
-  getWorkGroupDimensionsCallStatement (SgScopeStatement * scope);
+  getLocalWorkGroupSizeCallStatement (SgScopeStatement * scope,
+      SgExpression * expression = NULL);
 
+  /*
+   * ======================================================
+   * Function call to OpenCL get_global_size.
+   * When the given expression is NULL, this returns
+   * get_global_size(0) by default
+   * ======================================================
+   */
   SgFunctionCallExp *
-  getLocalWorkGroupSizeCallStatement (SgScopeStatement * scope);
+  getGlobalWorkGroupSizeCallStatement (SgScopeStatement * scope,
+      SgExpression * expression = NULL);
 
+  /*
+   * ======================================================
+   * Function call to OpenCL get_local_id.
+   * When the given expression is NULL, this returns
+   * get_local_id(0) by default
+   * ======================================================
+   */
   SgFunctionCallExp *
-  getGlobalWorkGroupSizeCallStatement (SgScopeStatement * scope);
+  getLocalWorkItemIDCallStatement (SgScopeStatement * scope,
+      SgExpression * expression = NULL);
 
+  /*
+   * ======================================================
+   * Function call to OpenCL get_global_id.
+   * When the given expression is NULL, this returns
+   * get_global_id(0) by default
+   * ======================================================
+   */
   SgFunctionCallExp *
-  getLocalWorkItemIDCallStatement (SgScopeStatement * scope);
-
-  SgFunctionCallExp *
-  getWorkGroupIDCallStatement (SgScopeStatement * scope);
-
-  SgFunctionCallExp *
-  getNumberOfWorkGroupsCallStatement (SgScopeStatement * scope);
+  getWorkGroupIDCallStatement (SgScopeStatement * scope,
+      SgExpression * expression = NULL);
 
   namespace OP2RuntimeSupport
   {

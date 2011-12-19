@@ -3,6 +3,8 @@
 #include "CPPModuleDeclarations.h"
 #include "RoseStatementsAndExpressionsBuilder.h"
 #include "OpenCL.h"
+#include "CompilerGeneratedNames.h"
+#include "OP2.h"
 
 void
 CPPOpenCLHostSubroutine::createReductionEpilogueStatements ()
@@ -17,6 +19,54 @@ CPPOpenCLHostSubroutine::createReductionPrologueStatements ()
 void
 CPPOpenCLHostSubroutine::createReductionDeclarations ()
 {
+  using namespace SageBuilder;
+  using namespace SageInterface;
+  using namespace OP2VariableNames;
+  using namespace LoopVariableNames;
+  using namespace ReductionVariableNames;
+  using boost::lexical_cast;
+  using std::string;
+
+  Debug::getInstance ()->debugMessage (
+      "Creating local variable declarations needed for reduction",
+      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+
+  variableDeclarations->add (
+      getIterationCounterVariableName (1),
+      RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
+          getIterationCounterVariableName (1), buildIntType (), subroutineScope));
+
+  variableDeclarations->add (
+      getIterationCounterVariableName (2),
+      RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
+          getIterationCounterVariableName (2), buildIntType (), subroutineScope));
+
+  variableDeclarations->add (reductionBytes,
+      RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
+          reductionBytes, buildIntType (), subroutineScope));
+
+  variableDeclarations->add (reductionSharedMemorySize,
+      RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
+          reductionSharedMemorySize, buildIntType (), subroutineScope));
+
+  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
+  {
+    if (parallelLoop->isReductionRequired (i))
+    {
+      string const reductionArrayHostName = getReductionArrayHostName (i);
+
+      Debug::getInstance ()->debugMessage ("Creating host reduction pointer '"
+          + reductionArrayHostName + "'", Debug::HIGHEST_DEBUG_LEVEL, __FILE__,
+          __LINE__);
+
+      SgVariableDeclaration * reductionArrayHost =
+          RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
+              reductionArrayHostName, buildPointerType (
+                  parallelLoop->getOpDatBaseType (i)), subroutineScope);
+
+      variableDeclarations->add (reductionArrayHostName, reductionArrayHost);
+    }
+  }
 }
 
 void
@@ -41,8 +91,9 @@ CPPOpenCLHostSubroutine::createKernelCallEpilogueStatements (
       buildOpaqueVarRefExp (OpenCL::CL_SUCCESS, scope));
 
   appendStatement (buildExprStatement (
-      OpenCL::OP2RuntimeSupport::getAssertMessage (scope, equalityExpression1,
-          buildStringVal ("Error setting OpenCL kernel arguments"))), scope);
+      OpenCL::OP2RuntimeSupport::getAssertMessage (subroutineScope,
+          equalityExpression1, buildStringVal (
+              "Error setting OpenCL kernel arguments"))), scope);
 
   /*
    * ======================================================
@@ -52,12 +103,12 @@ CPPOpenCLHostSubroutine::createKernelCallEpilogueStatements (
 
   SgExprStatement * assignmentStatement1 = buildAssignStatement (
       variableDeclarations->getReference (OpenCL::errorCode),
-      OpenCL::getEnqueueKernelCallExpression (scope, buildOpaqueVarRefExp (
-          OpenCL::commandQueue, scope), variableDeclarations->getReference (
-          OpenCL::kernelPointer), variableDeclarations->getReference (
-          OpenCL::totalThreadNumber), variableDeclarations->getReference (
-          OpenCL::threadsPerBlock), variableDeclarations->getReference (
-          OpenCL::event)));
+      OpenCL::getEnqueueKernelCallExpression (subroutineScope,
+          buildOpaqueVarRefExp (OpenCL::commandQueue, scope),
+          variableDeclarations->getReference (OpenCL::kernelPointer),
+          variableDeclarations->getReference (OpenCL::totalThreadNumber),
+          variableDeclarations->getReference (OpenCL::threadsPerBlock),
+          variableDeclarations->getReference (OpenCL::event)));
 
   appendStatement (assignmentStatement1, scope);
 
@@ -71,9 +122,10 @@ CPPOpenCLHostSubroutine::createKernelCallEpilogueStatements (
       variableDeclarations->getReference (OpenCL::errorCode),
       buildOpaqueVarRefExp (OpenCL::CL_SUCCESS, scope));
 
-  appendStatement (buildExprStatement (
-      OpenCL::OP2RuntimeSupport::getAssertMessage (scope, equalityExpression2,
-          buildStringVal ("Error setting OpenCL kernel arguments"))), scope);
+  appendStatement (
+      buildExprStatement (OpenCL::OP2RuntimeSupport::getAssertMessage (
+          subroutineScope, equalityExpression2, buildStringVal (
+              "Error executing OpenCL kernel"))), scope);
 
   /*
    * ======================================================
@@ -83,8 +135,8 @@ CPPOpenCLHostSubroutine::createKernelCallEpilogueStatements (
 
   SgExprStatement * assignmentStatement2 = buildAssignStatement (
       variableDeclarations->getReference (OpenCL::errorCode),
-      OpenCL::getFinishCommandQueueCallExpression (scope, buildOpaqueVarRefExp (
-          OpenCL::commandQueue, scope)));
+      OpenCL::getFinishCommandQueueCallExpression (subroutineScope,
+          buildOpaqueVarRefExp (OpenCL::commandQueue, scope)));
 
   appendStatement (assignmentStatement2, scope);
 
@@ -99,8 +151,9 @@ CPPOpenCLHostSubroutine::createKernelCallEpilogueStatements (
       buildOpaqueVarRefExp (OpenCL::CL_SUCCESS, scope));
 
   appendStatement (buildExprStatement (
-      OpenCL::OP2RuntimeSupport::getAssertMessage (scope, equalityExpression3,
-          buildStringVal ("Error setting OpenCL kernel arguments"))), scope);
+      OpenCL::OP2RuntimeSupport::getAssertMessage (subroutineScope,
+          equalityExpression3, buildStringVal (
+              "Error completing device command queue"))), scope);
 }
 
 void

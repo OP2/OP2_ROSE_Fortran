@@ -172,33 +172,87 @@ OpenCL::getFinishCommandQueueCallExpression (SgScopeStatement * scope,
 }
 
 SgFunctionCallExp *
-OpenCL::getWorkGroupDimensionsCallStatement (SgScopeStatement * scope)
+OpenCL::getLocalWorkGroupSizeCallStatement (SgScopeStatement * scope,
+    SgExpression * expression)
 {
+  using namespace SageBuilder;
+
+  SgExprListExp * actualParameters = buildExprListExp ();
+
+  if (expression == NULL)
+  {
+    actualParameters->append_expression (buildIntVal (0));
+  }
+  else
+  {
+    actualParameters->append_expression (expression);
+  }
+
+  return buildFunctionCallExp ("get_local_size", buildIntType (),
+      actualParameters, scope);
 }
 
 SgFunctionCallExp *
-OpenCL::getLocalWorkGroupSizeCallStatement (SgScopeStatement * scope)
+OpenCL::getGlobalWorkGroupSizeCallStatement (SgScopeStatement * scope,
+    SgExpression * expression)
 {
+  using namespace SageBuilder;
+
+  SgExprListExp * actualParameters = buildExprListExp ();
+
+  if (expression == NULL)
+  {
+    actualParameters->append_expression (buildIntVal (0));
+  }
+  else
+  {
+    actualParameters->append_expression (expression);
+  }
+
+  return buildFunctionCallExp ("get_global_size", buildIntType (),
+      actualParameters, scope);
 }
 
 SgFunctionCallExp *
-OpenCL::getGlobalWorkGroupSizeCallStatement (SgScopeStatement * scope)
+OpenCL::getLocalWorkItemIDCallStatement (SgScopeStatement * scope,
+    SgExpression * expression)
 {
+  using namespace SageBuilder;
+
+  SgExprListExp * actualParameters = buildExprListExp ();
+
+  if (expression == NULL)
+  {
+    actualParameters->append_expression (buildIntVal (0));
+  }
+  else
+  {
+    actualParameters->append_expression (expression);
+  }
+
+  return buildFunctionCallExp ("get_local_id", buildIntType (),
+      actualParameters, scope);
 }
 
 SgFunctionCallExp *
-OpenCL::getLocalWorkItemIDCallStatement (SgScopeStatement * scope)
+OpenCL::getWorkGroupIDCallStatement (SgScopeStatement * scope,
+    SgExpression * expression)
 {
-}
+  using namespace SageBuilder;
 
-SgFunctionCallExp *
-OpenCL::getWorkGroupIDCallStatement (SgScopeStatement * scope)
-{
-}
+  SgExprListExp * actualParameters = buildExprListExp ();
 
-SgFunctionCallExp *
-OpenCL::getNumberOfWorkGroupsCallStatement (SgScopeStatement * scope)
-{
+  if (expression == NULL)
+  {
+    actualParameters->append_expression (buildIntVal (0));
+  }
+  else
+  {
+    actualParameters->append_expression (expression);
+  }
+
+  return buildFunctionCallExp ("get_global_id", buildIntType (),
+      actualParameters, scope);
 }
 
 SgFunctionCallExp *
