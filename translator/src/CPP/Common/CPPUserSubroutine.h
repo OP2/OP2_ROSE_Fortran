@@ -8,13 +8,16 @@ class CPPParallelLoop;
 class CPPProgramDeclarationsAndDefinitions;
 
 class CPPUserSubroutine: public UserSubroutine <SgFunctionDeclaration,
-    CPPProgramDeclarationsAndDefinitions>
+    CPPProgramDeclarationsAndDefinitions> , public AstSimpleProcessing
 {
+  private:
+
+    std::vector <std::string> referencedOpDeclConsts;
 
   protected:
 
-    void
-    analyseOpDeclConstReferences ();
+    virtual void
+    visit (SgNode * node);
 
     virtual void
     createStatements ();
@@ -26,6 +29,18 @@ class CPPUserSubroutine: public UserSubroutine <SgFunctionDeclaration,
     createFormalParameterDeclarations ();
 
   public:
+
+    std::vector <std::string>::const_iterator
+    firstOpConstReference ()
+    {
+      return referencedOpDeclConsts.begin ();
+    }
+
+    std::vector <std::string>::const_iterator
+    lastOpConstReference ()
+    {
+      return referencedOpDeclConsts.end ();
+    }
 
     CPPUserSubroutine (SgScopeStatement * moduleScope,
         CPPParallelLoop * parallelLoop,

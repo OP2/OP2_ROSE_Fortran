@@ -108,6 +108,20 @@ CPPOpenCLKernelSubroutineIndirectLoop::createUserSubroutineCallStatement ()
     actualParameters->append_expression (parameterExpression);
   }
 
+  /*
+   * ======================================================
+   * OP_DECL_CONST parameters
+   * ======================================================
+   */
+
+  for (vector <string>::const_iterator it =
+      ((CPPUserSubroutine *) userSubroutine)->firstOpConstReference (); it
+      != ((CPPUserSubroutine *) userSubroutine)->lastOpConstReference (); ++it)
+  {
+    actualParameters->append_expression (variableDeclarations->getReference (
+        *it));
+  }
+
   return buildFunctionCallStmt (userSubroutine->getSubroutineName (),
       buildVoidType (), actualParameters, subroutineScope);
 }
@@ -1567,14 +1581,17 @@ CPPOpenCLKernelSubroutineIndirectLoop::createFormalParameterDeclarations ()
   createOpDatFormalParameterDeclarations ();
 
   createPlanFormalParameterDeclarations ();
+
+  createOpDeclConstFormalParameterDeclarations ();
 }
 
 CPPOpenCLKernelSubroutineIndirectLoop::CPPOpenCLKernelSubroutineIndirectLoop (
     SgScopeStatement * moduleScope, CPPOpenCLUserSubroutine * userSubroutine,
     CPPParallelLoop * parallelLoop,
-    CPPReductionSubroutines * reductionSubroutines) :
+    CPPReductionSubroutines * reductionSubroutines,
+    CPPProgramDeclarationsAndDefinitions * declarations) :
   CPPOpenCLKernelSubroutine (moduleScope, userSubroutine, parallelLoop,
-      reductionSubroutines)
+      reductionSubroutines, declarations)
 {
   Debug::getInstance ()->debugMessage ("<Kernel, Indirect, OpenCL>",
       Debug::CONSTRUCTOR_LEVEL, __FILE__, __LINE__);

@@ -57,7 +57,7 @@ CPPOpenCLHostSubroutineIndirectLoop::createKernelFunctionCallStatement (
       SgFunctionCallExp * kernelArgumentExpression =
           OpenCL::getSetKernelArgumentCallExpression (subroutineScope,
               variableDeclarations->getReference (OpenCL::kernelPointer),
-              argumentCounter, OpenCL::getMemoryType (scope), dotExpression);
+              argumentCounter++, OpenCL::getMemoryType (scope), dotExpression);
 
       if (firstAssignment)
       {
@@ -108,12 +108,11 @@ CPPOpenCLHostSubroutineIndirectLoop::createKernelFunctionCallStatement (
         SgArrowExp * arrowExpression = buildArrowExp (
             variableDeclarations->getReference (planRet), arrayExpression);
 
-        SgFunctionCallExp
-            * kernelArgumentExpression =
-                OpenCL::getSetKernelArgumentCallExpression (subroutineScope,
-                    variableDeclarations->getReference (OpenCL::kernelPointer),
-                    argumentCounter, OpenCL::getMemoryType (scope),
-                    arrowExpression);
+        SgFunctionCallExp * kernelArgumentExpression =
+            OpenCL::getSetKernelArgumentCallExpression (subroutineScope,
+                variableDeclarations->getReference (OpenCL::kernelPointer),
+                argumentCounter++, OpenCL::getMemoryType (scope),
+                arrowExpression);
 
         SgBitOrOp * orExpression = buildBitOrOp (
             variableDeclarations->getReference (OpenCL::errorCode),
@@ -150,10 +149,12 @@ CPPOpenCLHostSubroutineIndirectLoop::createKernelFunctionCallStatement (
       SgArrowExp * arrowExpression = buildArrowExp (
           variableDeclarations->getReference (planRet), arrayExpression);
 
-      SgFunctionCallExp * kernelArgumentExpression =
-          OpenCL::getSetKernelArgumentCallExpression (subroutineScope,
-              variableDeclarations->getReference (OpenCL::kernelPointer),
-              argumentCounter, OpenCL::getMemoryType (scope), arrowExpression);
+      SgFunctionCallExp
+          * kernelArgumentExpression =
+              OpenCL::getSetKernelArgumentCallExpression (subroutineScope,
+                  variableDeclarations->getReference (OpenCL::kernelPointer),
+                  argumentCounter++, OpenCL::getMemoryType (scope),
+                  arrowExpression);
 
       SgBitOrOp * orExpression = buildBitOrOp (
           variableDeclarations->getReference (OpenCL::errorCode),
@@ -179,7 +180,7 @@ CPPOpenCLHostSubroutineIndirectLoop::createKernelFunctionCallStatement (
   SgFunctionCallExp * kernelArgumentExpression2 =
       OpenCL::getSetKernelArgumentCallExpression (subroutineScope,
           variableDeclarations->getReference (OpenCL::kernelPointer),
-          argumentCounter, OpenCL::getMemoryType (scope), arrowExpression2);
+          argumentCounter++, OpenCL::getMemoryType (scope), arrowExpression2);
 
   SgBitOrOp * orExpression2 = buildBitOrOp (variableDeclarations->getReference (
       OpenCL::errorCode), kernelArgumentExpression2);
@@ -202,7 +203,7 @@ CPPOpenCLHostSubroutineIndirectLoop::createKernelFunctionCallStatement (
   SgFunctionCallExp * kernelArgumentExpression3 =
       OpenCL::getSetKernelArgumentCallExpression (subroutineScope,
           variableDeclarations->getReference (OpenCL::kernelPointer),
-          argumentCounter, OpenCL::getMemoryType (scope), arrowExpression3);
+          argumentCounter++, OpenCL::getMemoryType (scope), arrowExpression3);
 
   SgBitOrOp * orExpression3 = buildBitOrOp (variableDeclarations->getReference (
       OpenCL::errorCode), kernelArgumentExpression3);
@@ -225,7 +226,7 @@ CPPOpenCLHostSubroutineIndirectLoop::createKernelFunctionCallStatement (
   SgFunctionCallExp * kernelArgumentExpression4 =
       OpenCL::getSetKernelArgumentCallExpression (subroutineScope,
           variableDeclarations->getReference (OpenCL::kernelPointer),
-          argumentCounter, OpenCL::getMemoryType (scope), arrowExpression4);
+          argumentCounter++, OpenCL::getMemoryType (scope), arrowExpression4);
 
   SgBitOrOp * orExpression4 = buildBitOrOp (variableDeclarations->getReference (
       OpenCL::errorCode), kernelArgumentExpression4);
@@ -248,7 +249,7 @@ CPPOpenCLHostSubroutineIndirectLoop::createKernelFunctionCallStatement (
   SgFunctionCallExp * kernelArgumentExpression5 =
       OpenCL::getSetKernelArgumentCallExpression (subroutineScope,
           variableDeclarations->getReference (OpenCL::kernelPointer),
-          argumentCounter, OpenCL::getMemoryType (scope), arrowExpression5);
+          argumentCounter++, OpenCL::getMemoryType (scope), arrowExpression5);
 
   SgBitOrOp * orExpression5 = buildBitOrOp (variableDeclarations->getReference (
       OpenCL::errorCode), kernelArgumentExpression5);
@@ -271,7 +272,7 @@ CPPOpenCLHostSubroutineIndirectLoop::createKernelFunctionCallStatement (
   SgFunctionCallExp * kernelArgumentExpression6 =
       OpenCL::getSetKernelArgumentCallExpression (subroutineScope,
           variableDeclarations->getReference (OpenCL::kernelPointer),
-          argumentCounter, OpenCL::getMemoryType (scope), arrowExpression6);
+          argumentCounter++, OpenCL::getMemoryType (scope), arrowExpression6);
 
   SgBitOrOp * orExpression6 = buildBitOrOp (variableDeclarations->getReference (
       OpenCL::errorCode), kernelArgumentExpression6);
@@ -294,7 +295,7 @@ CPPOpenCLHostSubroutineIndirectLoop::createKernelFunctionCallStatement (
   SgFunctionCallExp * kernelArgumentExpression7 =
       OpenCL::getSetKernelArgumentCallExpression (subroutineScope,
           variableDeclarations->getReference (OpenCL::kernelPointer),
-          argumentCounter, OpenCL::getMemoryType (scope), arrowExpression7);
+          argumentCounter++, OpenCL::getMemoryType (scope), arrowExpression7);
 
   SgBitOrOp * orExpression7 = buildBitOrOp (variableDeclarations->getReference (
       OpenCL::errorCode), kernelArgumentExpression7);
@@ -317,7 +318,7 @@ CPPOpenCLHostSubroutineIndirectLoop::createKernelFunctionCallStatement (
   SgFunctionCallExp * kernelArgumentExpression8 =
       OpenCL::getSetKernelArgumentCallExpression (subroutineScope,
           variableDeclarations->getReference (OpenCL::kernelPointer),
-          argumentCounter, OpenCL::getMemoryType (scope), arrowExpression8);
+          argumentCounter++, OpenCL::getMemoryType (scope), arrowExpression8);
 
   SgBitOrOp * orExpression8 = buildBitOrOp (variableDeclarations->getReference (
       OpenCL::errorCode), kernelArgumentExpression8);
@@ -336,7 +337,7 @@ CPPOpenCLHostSubroutineIndirectLoop::createKernelFunctionCallStatement (
   SgFunctionCallExp * kernelArgumentExpression9 =
       OpenCL::getSetKernelArgumentCallExpression (subroutineScope,
           variableDeclarations->getReference (OpenCL::kernelPointer),
-          argumentCounter, OpenCL::getMemoryType (scope),
+          argumentCounter++, OpenCL::getMemoryType (scope),
           variableDeclarations->getReference (blockOffset));
 
   SgBitOrOp * orExpression9 = buildBitOrOp (variableDeclarations->getReference (
@@ -356,7 +357,7 @@ CPPOpenCLHostSubroutineIndirectLoop::createKernelFunctionCallStatement (
   SgFunctionCallExp * kernelArgumentExpression10 =
       OpenCL::getSetKernelArgumentCallExpression (subroutineScope,
           variableDeclarations->getReference (OpenCL::kernelPointer),
-          argumentCounter, OpenCL::getMemoryType (scope),
+          argumentCounter++, OpenCL::getMemoryType (scope),
           variableDeclarations->getReference (OpenCL::sharedMemorySize));
 
   SgBitOrOp * orExpression10 = buildBitOrOp (
@@ -367,6 +368,14 @@ CPPOpenCLHostSubroutineIndirectLoop::createKernelFunctionCallStatement (
       variableDeclarations->getReference (OpenCL::errorCode), orExpression10);
 
   appendStatement (assignmentStatement10, scope);
+
+  /*
+   * ======================================================
+   * OP_DECL_CONST actual parameters
+   * ======================================================
+   */
+
+  addOpDeclConstActualParameters (scope, argumentCounter);
 }
 
 SgBasicBlock *
@@ -642,9 +651,11 @@ CPPOpenCLHostSubroutineIndirectLoop::createLocalVariableDeclarations ()
 CPPOpenCLHostSubroutineIndirectLoop::CPPOpenCLHostSubroutineIndirectLoop (
     SgScopeStatement * moduleScope,
     CPPOpenCLKernelSubroutine * kernelSubroutine,
-    CPPParallelLoop * parallelLoop, CPPModuleDeclarations * moduleDeclarations) :
+    CPPParallelLoop * parallelLoop, CPPModuleDeclarations * moduleDeclarations,
+    CPPUserSubroutine * userSubroutine,
+    CPPOpenCLConstantDeclarations * constantDeclarations) :
   CPPOpenCLHostSubroutine (moduleScope, kernelSubroutine, parallelLoop,
-      moduleDeclarations)
+      moduleDeclarations, userSubroutine, constantDeclarations)
 {
   Debug::getInstance ()->debugMessage (
       "Creating OpenCL host subroutine for indirect loop",

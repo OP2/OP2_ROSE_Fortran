@@ -2,52 +2,33 @@
 #include "CPPParallelLoop.h"
 #include "CPPProgramDeclarationsAndDefinitions.h"
 #include "RoseStatementsAndExpressionsBuilder.h"
+#include "OP2Definitions.h"
 #include "RoseHelper.h"
 
 void
-CPPUserSubroutine::analyseOpDeclConstReferences ()
+CPPUserSubroutine::visit (SgNode * node)
 {
-  Debug::getInstance ()->debugMessage (
-      "Analysing user subroutine for references to OP_DECL_CONSTs",
-      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+  using std::string;
+  using std::find;
 
-  class TreeVisitor: public AstSimpleProcessing
+  SgVarRefExp * variableReference = isSgVarRefExp (node);
+
+  if (variableReference != NULL)
   {
-    private:
+    string const variableName = variableReference->get_symbol ()->get_name ();
 
-      CPPProgramDeclarationsAndDefinitions * declarations;
+    if (declarations->isOpConstDefinition (variableName))
+    {
+      Debug::getInstance ()->debugMessage ("Found reference to OP_DECL_CONST '"
+          + variableName + "'", Debug::OUTER_LOOP_LEVEL, __FILE__, __LINE__);
 
-    public:
-
-      TreeVisitor (CPPProgramDeclarationsAndDefinitions * declarations) :
-        declarations (declarations)
+      if (find (referencedOpDeclConsts.begin (), referencedOpDeclConsts.end (),
+          variableName) == referencedOpDeclConsts.end ())
       {
+        referencedOpDeclConsts.push_back (variableName);
       }
-
-      virtual void
-      visit (SgNode * node)
-      {
-        using std::string;
-
-        SgVarRefExp * variableReference = isSgVarRefExp (node);
-        if (variableReference != NULL)
-        {
-          string const variableName =
-              variableReference->get_symbol ()->get_name ();
-
-          if (declarations->isOpConstDefinition (variableName))
-          {
-            Debug::getInstance ()->debugMessage (
-                "Found reference to OP_DECL_CONST '" + variableName + "'",
-                Debug::OUTER_LOOP_LEVEL, __FILE__, __LINE__);
-          }
-        }
-      }
-  };
-
-  TreeVisitor * visitor = new TreeVisitor (declarations);
-
-  visitor->traverse (subroutineHeaderStatement, preorder);
+    }
+  }
 }
 
 void
@@ -99,6 +80,19 @@ CPPUserSubroutine::createFormalParameterDeclarations ()
             RoseStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
                 variableName, type, subroutineScope, formalParameters);
   }
+
+  for (vector <string>::const_iterator it = referencedOpDeclConsts.begin (); it
+      != referencedOpDeclConsts.end (); ++it)
+  {
+    OpConstDefinition * opConst = declarations->getOpConstDefinition (*it);
+
+    SgType * type = opConst->getType ();
+
+    SgVariableDeclaration
+        * variableDeclaration =
+            RoseStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
+                *it, type, subroutineScope, formalParameters);
+  }
 }
 
 CPPUserSubroutine::CPPUserSubroutine (SgScopeStatement * moduleScope,
@@ -121,13 +115,13 @@ CPPUserSubroutine::CPPUserSubroutine (SgScopeStatement * moduleScope,
   originalSubroutine = declarations->getSubroutine (
       parallelLoop->getUserSubroutineName ());
 
+  traverse (originalSubroutine, preorder);
+
   createFormalParameterDeclarations ();
 
   createLocalVariableDeclarations ();
 
   createStatements ();
-
-  analyseOpDeclConstReferences ();
 
   RoseHelper::forceOutputOfCodeToFile (subroutineHeaderStatement);
 }

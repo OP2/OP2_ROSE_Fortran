@@ -6,9 +6,14 @@
 
 class CPPOpenCLUserSubroutine;
 class CPPReductionSubroutines;
+class CPPProgramDeclarationsAndDefinitions;
 
 class CPPOpenCLKernelSubroutine: public CPPKernelSubroutine
 {
+  protected:
+
+    CPPProgramDeclarationsAndDefinitions * declarations;
+
   protected:
 
     /*
@@ -39,10 +44,14 @@ class CPPOpenCLKernelSubroutine: public CPPKernelSubroutine
     void
     createReductionVariableDeclarations ();
 
+    void
+    createOpDeclConstFormalParameterDeclarations ();
+
     CPPOpenCLKernelSubroutine (SgScopeStatement * moduleScope,
         CPPOpenCLUserSubroutine * userSubroutine,
         CPPParallelLoop * parallelLoop,
-        CPPReductionSubroutines * reductionSubroutines);
+        CPPReductionSubroutines * reductionSubroutines,
+        CPPProgramDeclarationsAndDefinitions * declarations);
 };
 
 #endif

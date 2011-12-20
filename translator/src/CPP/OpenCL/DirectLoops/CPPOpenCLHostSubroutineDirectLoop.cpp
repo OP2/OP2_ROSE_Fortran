@@ -150,6 +150,14 @@ CPPOpenCLHostSubroutineDirectLoop::createKernelFunctionCallStatement (
       variableDeclarations->getReference (OpenCL::errorCode), orExpression4);
 
   appendStatement (assignmentStatement4, scope);
+
+  /*
+   * ======================================================
+   * OP_DECL_CONST actual parameters
+   * ======================================================
+   */
+
+  addOpDeclConstActualParameters (scope, argumentCounter);
 }
 
 void
@@ -321,9 +329,11 @@ CPPOpenCLHostSubroutineDirectLoop::createLocalVariableDeclarations ()
 CPPOpenCLHostSubroutineDirectLoop::CPPOpenCLHostSubroutineDirectLoop (
     SgScopeStatement * moduleScope,
     CPPOpenCLKernelSubroutine * calleeSubroutine,
-    CPPParallelLoop * parallelLoop, CPPModuleDeclarations * moduleDeclarations) :
+    CPPParallelLoop * parallelLoop, CPPModuleDeclarations * moduleDeclarations,
+    CPPUserSubroutine * userSubroutine,
+    CPPOpenCLConstantDeclarations * constantDeclarations) :
   CPPOpenCLHostSubroutine (moduleScope, calleeSubroutine, parallelLoop,
-      moduleDeclarations)
+      moduleDeclarations, userSubroutine, constantDeclarations)
 {
   Debug::getInstance ()->debugMessage (
       "Creating host subroutine of direct loop", Debug::CONSTRUCTOR_LEVEL,

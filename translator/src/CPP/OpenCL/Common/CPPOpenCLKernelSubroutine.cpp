@@ -1,6 +1,8 @@
 #include "CPPOpenCLKernelSubroutine.h"
 #include "CPPOpenCLUserSubroutine.h"
 #include "CPPReductionSubroutines.h"
+#include "CPPProgramDeclarationsAndDefinitions.h"
+#include "OP2Definitions.h"
 #include "RoseStatementsAndExpressionsBuilder.h"
 #include "CompilerGeneratedNames.h"
 #include "OpenCL.h"
@@ -321,11 +323,42 @@ CPPOpenCLKernelSubroutine::createReductionVariableDeclarations ()
   }
 }
 
+void
+CPPOpenCLKernelSubroutine::createOpDeclConstFormalParameterDeclarations ()
+{
+  using std::string;
+  using std::vector;
+
+  Debug::getInstance ()->debugMessage (
+      "Creating OP_DECL_CONST formal parameter declarations",
+      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+
+  for (vector <string>::const_iterator it =
+      ((CPPUserSubroutine *) userSubroutine)->firstOpConstReference (); it
+      != ((CPPUserSubroutine *) userSubroutine)->lastOpConstReference (); ++it)
+  {
+    string const & variableName = *it;
+
+    SgVariableDeclaration
+        * variableDeclaration =
+            RoseStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
+                variableName,
+                declarations->getOpConstDefinition (variableName)->getType (),
+                subroutineScope, formalParameters);
+
+    (*variableDeclaration->get_variables ().begin ())->get_storageModifier ().setOpenclConstant ();
+
+    variableDeclarations->add (variableName, variableDeclaration);
+  }
+}
+
 CPPOpenCLKernelSubroutine::CPPOpenCLKernelSubroutine (
     SgScopeStatement * moduleScope, CPPOpenCLUserSubroutine * userSubroutine,
     CPPParallelLoop * parallelLoop,
-    CPPReductionSubroutines * reductionSubroutines) :
-  CPPKernelSubroutine (moduleScope, userSubroutine, parallelLoop)
+    CPPReductionSubroutines * reductionSubroutines,
+    CPPProgramDeclarationsAndDefinitions * declarations) :
+  CPPKernelSubroutine (moduleScope, userSubroutine, parallelLoop),
+      declarations (declarations)
 {
   this->reductionSubroutines = reductionSubroutines;
 

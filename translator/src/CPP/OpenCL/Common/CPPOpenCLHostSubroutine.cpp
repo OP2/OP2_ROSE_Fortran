@@ -1,11 +1,47 @@
 #include "CPPOpenCLHostSubroutine.h"
 #include "CPPOpenCLKernelSubroutine.h"
 #include "CPPModuleDeclarations.h"
+#include "CPPUserSubroutine.h"
+#include "CPPOpenCLConstantDeclarations.h"
 #include "RoseStatementsAndExpressionsBuilder.h"
 #include "OpenCL.h"
 #include "CompilerGeneratedNames.h"
 #include "OP2.h"
 #include "Exceptions.h"
+
+void
+CPPOpenCLHostSubroutine::addOpDeclConstActualParameters (
+    SgScopeStatement * scope, unsigned int argumentCounter)
+{
+  using namespace SageBuilder;
+  using namespace SageInterface;
+  using std::string;
+  using std::vector;
+
+  Debug::getInstance ()->debugMessage (
+      "Adding actual parameters for OP_DECL_CONSTs", Debug::FUNCTION_LEVEL,
+      __FILE__, __LINE__);
+
+  for (vector <string>::const_iterator it =
+      ((CPPUserSubroutine *) userSubroutine)->firstOpConstReference (); it
+      != ((CPPUserSubroutine *) userSubroutine)->lastOpConstReference (); ++it)
+  {
+    SgFunctionCallExp * kernelArgumentExpression =
+        OpenCL::getSetKernelArgumentCallExpression (subroutineScope,
+            variableDeclarations->getReference (OpenCL::kernelPointer),
+            argumentCounter++, OpenCL::getMemoryType (scope),
+            variableDeclarations->getReference (*it));
+
+    SgBitOrOp * orExpression = buildBitOrOp (
+        variableDeclarations->getReference (OpenCL::errorCode),
+        kernelArgumentExpression);
+
+    SgExprStatement * assignmentStatement = buildAssignStatement (
+        variableDeclarations->getReference (OpenCL::errorCode), orExpression);
+
+    appendStatement (assignmentStatement, scope);
+  }
+}
 
 SgForStatement *
 CPPOpenCLHostSubroutine::createReductionUpdateStatements (
@@ -760,10 +796,16 @@ CPPOpenCLHostSubroutine::createOpenCLConfigurationLaunchDeclarations ()
 CPPOpenCLHostSubroutine::CPPOpenCLHostSubroutine (
     SgScopeStatement * moduleScope,
     CPPOpenCLKernelSubroutine * calleeSubroutine,
-    CPPParallelLoop * parallelLoop, CPPModuleDeclarations * moduleDeclarations) :
+    CPPParallelLoop * parallelLoop, CPPModuleDeclarations * moduleDeclarations,
+    CPPUserSubroutine * userSubroutine,
+    CPPOpenCLConstantDeclarations * constantDeclarations) :
   CPPHostSubroutine (moduleScope, calleeSubroutine, parallelLoop),
-      moduleDeclarations (moduleDeclarations)
+      moduleDeclarations (moduleDeclarations), userSubroutine (userSubroutine),
+      constantDeclarations (constantDeclarations)
 {
   variableDeclarations->addVisibilityToSymbolsFromOuterScope (
       moduleDeclarations->getDeclarations ());
+
+  variableDeclarations->addVisibilityToSymbolsFromOuterScope (
+      constantDeclarations->getDeclarations ());
 }

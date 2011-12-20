@@ -1,9 +1,9 @@
-#include <CPPKernelSubroutine.h>
-#include <CPPParallelLoop.h>
+#include "CPPKernelSubroutine.h"
+#include "CPPParallelLoop.h"
+#include "CPPUserSubroutine.h"
 
 CPPKernelSubroutine::CPPKernelSubroutine (SgScopeStatement * moduleScope,
-    Subroutine <SgFunctionDeclaration> * calleeSubroutine,
-    CPPParallelLoop * parallelLoop) :
+    CPPUserSubroutine * calleeSubroutine, CPPParallelLoop * parallelLoop) :
   KernelSubroutine <SgFunctionDeclaration> (calleeSubroutine, parallelLoop)
 {
   using namespace SageBuilder;

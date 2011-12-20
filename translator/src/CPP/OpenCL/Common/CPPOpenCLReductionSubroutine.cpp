@@ -693,7 +693,7 @@ CPPOpenCLReductionSubroutine::createFormalParameterDeclarations ()
                   reduction->getBaseType ())), subroutineScope,
               formalParameters);
 
-  variableDeclaration1->get_declarationModifier ().get_storageModifier ().setOpenclGlobal ();
+  (*variableDeclaration1->get_variables ().begin ())->get_storageModifier ().setOpenclGlobal ();
 
   variableDeclarations->add (reductionResult, variableDeclaration1);
 
@@ -709,7 +709,7 @@ CPPOpenCLReductionSubroutine::createFormalParameterDeclarations ()
               reductionInput, reduction->getBaseType (), subroutineScope,
               formalParameters);
 
-  variableDeclaration2->get_declarationModifier ().get_storageModifier ().setOpenclPrivate ();
+  (*variableDeclaration2->get_variables ().begin ())->get_storageModifier ().setOpenclPrivate ();
 
   variableDeclarations->add (reductionInput, variableDeclaration2);
 
@@ -725,7 +725,7 @@ CPPOpenCLReductionSubroutine::createFormalParameterDeclarations ()
               reductionOperation, buildIntType (), subroutineScope,
               formalParameters);
 
-  variableDeclaration3->get_declarationModifier ().get_storageModifier ().setOpenclPrivate ();
+  (*variableDeclaration3->get_variables ().begin ())->get_storageModifier ().setOpenclPrivate ();
 
   variableDeclarations->add (reductionOperation, variableDeclaration3);
 
@@ -744,7 +744,7 @@ CPPOpenCLReductionSubroutine::createFormalParameterDeclarations ()
               sharedVariableName, buildPointerType (reduction->getBaseType ()),
               subroutineScope, formalParameters);
 
-  variableDeclaration4->get_declarationModifier ().get_storageModifier ().setOpenclLocal ();
+  (*variableDeclaration4->get_variables ().begin ())->get_storageModifier ().setOpenclLocal ();
 
   variableDeclarations->add (sharedVariableName, variableDeclaration4);
 }

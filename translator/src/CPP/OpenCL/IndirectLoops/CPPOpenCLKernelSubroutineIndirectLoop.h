@@ -77,8 +77,8 @@ class CPPOpenCLKernelSubroutineIndirectLoop: public CPPOpenCLKernelSubroutine
     CPPOpenCLKernelSubroutineIndirectLoop (SgScopeStatement * moduleScope,
         CPPOpenCLUserSubroutine * userSubroutine,
         CPPParallelLoop * parallelLoop,
-        CPPReductionSubroutines * reductionSubroutines);
-
+        CPPReductionSubroutines * reductionSubroutines,
+        CPPProgramDeclarationsAndDefinitions * declarations);
 };
 
 #endif

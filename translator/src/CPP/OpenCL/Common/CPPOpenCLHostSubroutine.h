@@ -6,6 +6,9 @@
 
 class CPPOpenCLKernelSubroutine;
 class CPPModuleDeclarations;
+class CPPUserSubroutine;
+class CPPOpenCLConstantDeclarations;
+class SgScopeStatement;
 
 class CPPOpenCLHostSubroutine: public CPPHostSubroutine
 {
@@ -13,7 +16,15 @@ class CPPOpenCLHostSubroutine: public CPPHostSubroutine
 
     CPPModuleDeclarations * moduleDeclarations;
 
+    CPPUserSubroutine * userSubroutine;
+
+    CPPOpenCLConstantDeclarations * constantDeclarations;
+
   protected:
+
+    void
+    addOpDeclConstActualParameters (SgScopeStatement * scope,
+        unsigned int argumentCounter);
 
     void
     createKernelCallEpilogueStatements (SgScopeStatement * scope);
@@ -39,7 +50,9 @@ class CPPOpenCLHostSubroutine: public CPPHostSubroutine
     CPPOpenCLHostSubroutine (SgScopeStatement * moduleScope,
         CPPOpenCLKernelSubroutine * calleeSubroutine,
         CPPParallelLoop * parallelLoop,
-        CPPModuleDeclarations * moduleDeclarations);
+        CPPModuleDeclarations * moduleDeclarations,
+        CPPUserSubroutine * userSubroutine,
+        CPPOpenCLConstantDeclarations * constantDeclarations);
 };
 
 #endif

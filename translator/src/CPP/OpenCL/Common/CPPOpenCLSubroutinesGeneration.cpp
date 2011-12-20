@@ -8,38 +8,16 @@
 #include "CPPOpenCLUserSubroutine.h"
 #include "CPPOpenCLReductionSubroutine.h"
 #include "CPPReductionSubroutines.h"
+#include "CPPOpenCLConstantDeclarations.h"
 #include "RoseStatementsAndExpressionsBuilder.h"
 #include "OP2Definitions.h"
+#include "OP2.h"
 
 void
 CPPOpenCLSubroutinesGeneration::addFreeVariableDeclarations ()
 {
-  using std::map;
-  using std::string;
-
-  Debug::getInstance ()->debugMessage (
-      "Adding variables with constant access specifiers to module",
-      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
-
-  for (map <string, OpConstDefinition *>::const_iterator it =
-      declarations->firstOpConstDefinition (); it
-      != declarations->lastOpConstDefinition (); ++it)
-  {
-    std::string const & variableName = it->first;
-
-    OpConstDefinition * constDefinition = it->second;
-
-    SgType * type = constDefinition->getType ();
-
-    Debug::getInstance ()->debugMessage ("Analysing OP_DECL_CONST with name '"
-        + variableName + "'", Debug::OUTER_LOOP_LEVEL, __FILE__, __LINE__);
-
-    SgVariableDeclaration * variableDeclaration =
-        RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
-            variableName, type, moduleScope);
-
-    variableDeclaration->get_declarationModifier ().get_storageModifier ().setExtern ();
-  }
+  constantDeclarations = new CPPOpenCLConstantDeclarations (declarations,
+      moduleScope);
 }
 
 void
@@ -107,21 +85,24 @@ CPPOpenCLSubroutinesGeneration::createSubroutines ()
     if (parallelLoop->isDirectLoop ())
     {
       kernelSubroutine = new CPPOpenCLKernelSubroutineDirectLoop (moduleScope,
-          userDeviceSubroutine, parallelLoop, reductionSubroutines);
+          userDeviceSubroutine, parallelLoop, reductionSubroutines,
+          declarations);
 
       hostSubroutines[userSubroutineName]
           = new CPPOpenCLHostSubroutineDirectLoop (moduleScope,
-              kernelSubroutine, parallelLoop, moduleDeclarations);
+              kernelSubroutine, parallelLoop, moduleDeclarations,
+              userDeviceSubroutine, constantDeclarations);
     }
     else
     {
-      kernelSubroutine
-          = new CPPOpenCLKernelSubroutineIndirectLoop (moduleScope,
-              userDeviceSubroutine, parallelLoop, reductionSubroutines);
+      kernelSubroutine = new CPPOpenCLKernelSubroutineIndirectLoop (
+          moduleScope, userDeviceSubroutine, parallelLoop,
+          reductionSubroutines, declarations);
 
       hostSubroutines[userSubroutineName]
           = new CPPOpenCLHostSubroutineIndirectLoop (moduleScope,
-              kernelSubroutine, parallelLoop, moduleDeclarations);
+              kernelSubroutine, parallelLoop, moduleDeclarations,
+              userDeviceSubroutine, constantDeclarations);
     }
   }
 }
@@ -137,6 +118,10 @@ CPPOpenCLSubroutinesGeneration::addHeaderIncludes ()
 
   addTextForUnparser (moduleScope, "\n#include <CL/cl.h>\n",
       AstUnparseAttribute::e_after);
+
+  addTextForUnparser (moduleScope, "#include \""
+      + OP2::Libraries::CPP::mainLibrary + "\"\n",
+      AstUnparseAttribute::e_before);
 }
 
 CPPOpenCLSubroutinesGeneration::CPPOpenCLSubroutinesGeneration (

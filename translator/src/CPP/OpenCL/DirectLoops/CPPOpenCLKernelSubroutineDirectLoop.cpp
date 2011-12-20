@@ -1,4 +1,5 @@
 #include "CPPOpenCLKernelSubroutineDirectLoop.h"
+#include "CPPUserSubroutine.h"
 #include "RoseStatementsAndExpressionsBuilder.h"
 #include "Debug.h"
 #include "OpenCL.h"
@@ -69,6 +70,20 @@ CPPOpenCLKernelSubroutineDirectLoop::createUserSubroutineCallStatement ()
     ROSE_ASSERT (parameterExpression != NULL);
 
     actualParameters->append_expression (parameterExpression);
+  }
+
+  /*
+   * ======================================================
+   * OP_DECL_CONST parameters
+   * ======================================================
+   */
+
+  for (vector <string>::const_iterator it =
+      ((CPPUserSubroutine *) userSubroutine)->firstOpConstReference (); it
+      != ((CPPUserSubroutine *) userSubroutine)->lastOpConstReference (); ++it)
+  {
+    actualParameters->append_expression (variableDeclarations->getReference (
+        *it));
   }
 
   return buildFunctionCallStmt (userSubroutine->getSubroutineName (),
@@ -612,13 +627,12 @@ CPPOpenCLKernelSubroutineDirectLoop::createOpDatFormalParameterDeclarations ()
 
         SgVariableDeclaration
             * variableDeclaration =
-
                 RoseStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
                     variableName, buildPointerType (
                         parallelLoop->getOpDatBaseType (i)), subroutineScope,
                     formalParameters);
 
-        variableDeclaration->get_declarationModifier ().get_storageModifier ().setOpenclGlobal ();
+        (*variableDeclaration->get_variables ().begin ())->get_storageModifier ().setOpenclGlobal ();
 
         variableDeclarations->add (variableName, variableDeclaration);
 
@@ -637,7 +651,7 @@ CPPOpenCLKernelSubroutineDirectLoop::createOpDatFormalParameterDeclarations ()
                         parallelLoop->getOpDatBaseType (i)), subroutineScope,
                     formalParameters);
 
-        variableDeclaration->get_declarationModifier ().get_storageModifier ().setOpenclGlobal ();
+        (*variableDeclaration->get_variables ().begin ())->get_storageModifier ().setOpenclGlobal ();
 
         variableDeclarations->add (variableName, variableDeclaration);
       }
@@ -703,15 +717,18 @@ CPPOpenCLKernelSubroutineDirectLoop::createFormalParameterDeclarations ()
   variableDeclarations->add (sharedMemoryVariableName,
       sharedMemoryVariableDeclaration);
 
-  sharedMemoryVariableDeclaration->get_declarationModifier ().get_storageModifier ().setOpenclLocal ();
+  (*sharedMemoryVariableDeclaration->get_variables ().begin ())->get_storageModifier ().setOpenclLocal ();
+
+  createOpDeclConstFormalParameterDeclarations ();
 }
 
 CPPOpenCLKernelSubroutineDirectLoop::CPPOpenCLKernelSubroutineDirectLoop (
     SgScopeStatement * moduleScope, CPPOpenCLUserSubroutine * calleeSubroutine,
     CPPParallelLoop * parallelLoop,
-    CPPReductionSubroutines * reductionSubroutines) :
+    CPPReductionSubroutines * reductionSubroutines,
+    CPPProgramDeclarationsAndDefinitions * declarations) :
   CPPOpenCLKernelSubroutine (moduleScope, calleeSubroutine, parallelLoop,
-      reductionSubroutines)
+      reductionSubroutines, declarations)
 {
   Debug::getInstance ()->debugMessage (
       "Creating OpenCL kernel for direct loop", Debug::CONSTRUCTOR_LEVEL,
