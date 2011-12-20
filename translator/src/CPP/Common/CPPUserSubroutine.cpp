@@ -5,6 +5,52 @@
 #include "RoseHelper.h"
 
 void
+CPPUserSubroutine::analyseOpDeclConstReferences ()
+{
+  Debug::getInstance ()->debugMessage (
+      "Analysing user subroutine for references to OP_DECL_CONSTs",
+      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+
+  class TreeVisitor: public AstSimpleProcessing
+  {
+    private:
+
+      CPPProgramDeclarationsAndDefinitions * declarations;
+
+    public:
+
+      TreeVisitor (CPPProgramDeclarationsAndDefinitions * declarations) :
+        declarations (declarations)
+      {
+      }
+
+      virtual void
+      visit (SgNode * node)
+      {
+        using std::string;
+
+        SgVarRefExp * variableReference = isSgVarRefExp (node);
+        if (variableReference != NULL)
+        {
+          string const variableName =
+              variableReference->get_symbol ()->get_name ();
+
+          if (declarations->isOpConstDefinition (variableName))
+          {
+            Debug::getInstance ()->debugMessage (
+                "Found reference to OP_DECL_CONST '" + variableName + "'",
+                Debug::OUTER_LOOP_LEVEL, __FILE__, __LINE__);
+          }
+        }
+      }
+  };
+
+  TreeVisitor * visitor = new TreeVisitor (declarations);
+
+  visitor->traverse (subroutineHeaderStatement, preorder);
+}
+
+void
 CPPUserSubroutine::createStatements ()
 {
   using namespace SageInterface;
@@ -80,6 +126,8 @@ CPPUserSubroutine::CPPUserSubroutine (SgScopeStatement * moduleScope,
   createLocalVariableDeclarations ();
 
   createStatements ();
+
+  analyseOpDeclConstReferences ();
 
   RoseHelper::forceOutputOfCodeToFile (subroutineHeaderStatement);
 }

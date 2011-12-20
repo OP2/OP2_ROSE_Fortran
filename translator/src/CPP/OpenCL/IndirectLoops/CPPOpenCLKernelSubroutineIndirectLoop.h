@@ -10,48 +10,64 @@ class CPPOpenCLKernelSubroutineIndirectLoop: public CPPOpenCLKernelSubroutine
 {
   private:
 
-    std::map <std::string, unsigned int> positionOfNbytes;
+    std::map <std::string, SgVariableDeclaration *>
+        indirectOpDatSharedMemoryDeclarations;
 
   private:
 
     virtual SgStatement *
     createUserSubroutineCallStatement ();
 
+    SgBasicBlock *
+    createIncrementAndWriteAccessEpilogueStatements ();
+
+    SgBasicBlock *
+    createStageOutFromLocalMemoryToSharedMemoryStatements ();
+
+    SgBasicBlock *
+    createInitialiseIncrementAccessStatements ();
+
     virtual void
     createExecutionLoopStatements ();
 
-    void
-    createInnerExecutionLoopStatements (SgScopeStatement * scope);
+    SgBasicBlock *
+    createInitialiseOpenCLSharedVariablesStatements ();
 
-    void
-    createIncrementAdjustmentStatements (SgScopeStatement * scope);
+    SgBasicBlock *
+    createSetIndirectionMapPointerStatements ();
 
-    void
-    createInitialiseLocalOpDatStatements (SgScopeStatement * scope);
+    SgBasicBlock *
+    createSetOpDatSharedMemoryPointerStatements ();
 
-    void
-    createPointeredIncrementsOrWritesStatements ();
+    SgBasicBlock *
+    createSetNumberOfIndirectElementsPerBlockStatements ();
 
-    void
-    createAutoSharedWhileLoopStatements ();
+    SgBasicBlock *
+    createIncrementAccessThreadZeroStatements ();
 
-    void
-    createInitialiseLocalVariablesStatements ();
-
-    void
+    SgIfStmt *
     createThreadZeroStatements ();
+
+    virtual void
+    createStatements ();
+
+    void
+    createIncrementAccessLocalVariableDeclarations ();
+
+    void
+    createStageInVariableDeclarations ();
+
+    void
+    createExecutionLocalVariableDeclarations ();
+
+    virtual void
+    createLocalVariableDeclarations ();
 
     void
     createPlanFormalParameterDeclarations ();
 
     virtual void
     createOpDatFormalParameterDeclarations ();
-
-    virtual void
-    createStatements ();
-
-    virtual void
-    createLocalVariableDeclarations ();
 
     virtual void
     createFormalParameterDeclarations ();

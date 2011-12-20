@@ -256,6 +256,20 @@ OpenCL::getWorkGroupIDCallStatement (SgScopeStatement * scope,
 }
 
 SgFunctionCallExp *
+OpenCL::createWorkItemsSynchronisationCallStatement (SgScopeStatement * scope)
+{
+  using namespace SageBuilder;
+
+  SgExprListExp * actualParameters = buildExprListExp ();
+
+  actualParameters->append_expression (buildOpaqueVarRefExp (
+      CLK_LOCAL_MEM_FENCE, scope));
+
+  return buildFunctionCallExp ("barrier", buildVoidType (), actualParameters,
+      scope);
+}
+
+SgFunctionCallExp *
 OpenCL::OP2RuntimeSupport::getKernel (SgScopeStatement * scope,
     std::string const & kernelName)
 {
@@ -283,4 +297,58 @@ OpenCL::OP2RuntimeSupport::getAssertMessage (SgScopeStatement * scope,
 
   return buildFunctionCallExp ("assert_m", buildVoidType (), actualParameters,
       scope);
+}
+
+SgFunctionCallExp *
+OpenCL::OP2RuntimeSupport::getReallocateReductionArraysCallStatement (
+    SgScopeStatement * scope, SgVarRefExp * reductionBytesReference)
+{
+  using namespace SageBuilder;
+
+  SgExprListExp * actualParameters = buildExprListExp (reductionBytesReference);
+
+  return buildFunctionCallExp ("reallocReductArrays", buildVoidType (),
+      actualParameters, scope);
+}
+
+SgFunctionCallExp *
+OpenCL::OP2RuntimeSupport::getMoveReductionArraysFromHostToDeviceCallStatement (
+    SgScopeStatement * scope, SgVarRefExp * reductionBytesReference)
+{
+  using namespace SageBuilder;
+
+  SgExprListExp * actualParameters = buildExprListExp (reductionBytesReference);
+
+  return buildFunctionCallExp ("mvReductArraysToDevice", buildVoidType (),
+      actualParameters, scope);
+}
+
+SgFunctionCallExp *
+OpenCL::OP2RuntimeSupport::getMoveReductionArraysFromDeviceToHostCallStatement (
+    SgScopeStatement * scope, SgVarRefExp * reductionBytesReference)
+{
+  using namespace SageBuilder;
+
+  SgExprListExp * actualParameters = buildExprListExp (reductionBytesReference);
+
+  return buildFunctionCallExp ("mvReductArraysToHost", buildVoidType (),
+      actualParameters, scope);
+}
+
+SgVarRefExp *
+OpenCL::OP2RuntimeSupport::getPointerToMemoryAllocatedForHostReductionArray (
+    SgScopeStatement * scope)
+{
+  using namespace SageBuilder;
+
+  return buildOpaqueVarRefExp ("OP_reduct_h", scope);
+}
+
+SgVarRefExp *
+OpenCL::OP2RuntimeSupport::getPointerToMemoryAllocatedForDeviceReductionArray (
+    SgScopeStatement * scope)
+{
+  using namespace SageBuilder;
+
+  return buildOpaqueVarRefExp ("OP_reduct_d", scope);
 }

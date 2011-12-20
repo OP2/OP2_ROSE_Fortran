@@ -8,6 +8,9 @@ class CPPOpenCLSubroutinesGeneration: public CPPSubroutinesGeneration
 {
   private:
 
+    virtual void
+    addFreeVariableDeclarations ();
+
     void
     createReductionSubroutines ();
 

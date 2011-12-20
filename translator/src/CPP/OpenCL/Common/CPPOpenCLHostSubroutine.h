@@ -18,8 +18,14 @@ class CPPOpenCLHostSubroutine: public CPPHostSubroutine
     void
     createKernelCallEpilogueStatements (SgScopeStatement * scope);
 
+    SgForStatement *
+    createReductionUpdateStatements (unsigned int OP_DAT_ArgumentGroup);
+
     virtual void
     createReductionEpilogueStatements ();
+
+    SgForStatement *
+    createReductionInitialisationStatements (unsigned int OP_DAT_ArgumentGroup);
 
     virtual void
     createReductionPrologueStatements ();

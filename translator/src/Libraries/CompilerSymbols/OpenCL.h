@@ -19,6 +19,7 @@ namespace OpenCL
   std::string const totalThreadNumber = "totalThreadNumber";
   std::string const sharedMemorySize = "dynamicSharedMemorySize";
   std::string const CL_SUCCESS = "CL_SUCCESS";
+  std::string const CLK_LOCAL_MEM_FENCE = "CLK_LOCAL_MEM_FENCE";
   std::string const errorCode = "errorCode";
   std::string const event = "event";
   std::string const commandQueue = "commandQueue";
@@ -195,6 +196,14 @@ namespace OpenCL
   getWorkGroupIDCallStatement (SgScopeStatement * scope,
       SgExpression * expression = NULL);
 
+  /*
+   * ======================================================
+   * Creates a barrier statement for all local work items
+   * ======================================================
+   */
+  SgFunctionCallExp *
+  createWorkItemsSynchronisationCallStatement (SgScopeStatement * scope);
+
   namespace OP2RuntimeSupport
   {
     SgFunctionCallExp *
@@ -203,6 +212,61 @@ namespace OpenCL
     SgFunctionCallExp *
     getAssertMessage (SgScopeStatement * scope,
         SgExpression * assertExpression, SgStringVal * message);
+
+    /*
+     * ======================================================
+     * Returns a function call expression to the run-time
+     * support function which allocates reduction arrays
+     * ======================================================
+     */
+    SgFunctionCallExp *
+    getReallocateReductionArraysCallStatement (SgScopeStatement * scope,
+        SgVarRefExp * reductionBytesReference);
+
+    /*
+     * ======================================================
+     * Returns a function call expression to the run-time
+     * support function which moves reduction arrays from host
+     * to device
+     * ======================================================
+     */
+    SgFunctionCallExp *
+    getMoveReductionArraysFromHostToDeviceCallStatement (
+        SgScopeStatement * scope, SgVarRefExp * reductionBytesReference);
+
+    /*
+     * ======================================================
+     * Returns a function call expression to the run-time
+     * support function which moves reduction arrays from host
+     * to device
+     * ======================================================
+     */
+    SgFunctionCallExp *
+    getMoveReductionArraysFromDeviceToHostCallStatement (
+        SgScopeStatement * scope, SgVarRefExp * reductionBytesReference);
+
+    /*
+     * ======================================================
+     * Returns a reference to the pointer which is returned
+     * after allocating a reduction array on the host through
+     * malloc (these are macros provided in the OP2 run-time
+     * support)
+     * ======================================================
+     */
+    SgVarRefExp *
+    getPointerToMemoryAllocatedForHostReductionArray (SgScopeStatement * scope);
+
+    /*
+     * ======================================================
+     * Returns a reference to the pointer which is returned
+     * after allocating a reduction array on the device through
+     * malloc (these are macros provided in the OP2 run-time
+     * support)
+     * ======================================================
+     */
+    SgVarRefExp *
+    getPointerToMemoryAllocatedForDeviceReductionArray (
+        SgScopeStatement * scope);
   }
 }
 

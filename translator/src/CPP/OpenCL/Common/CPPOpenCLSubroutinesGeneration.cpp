@@ -1,13 +1,46 @@
-#include <CPPOpenCLSubroutinesGeneration.h>
-#include <CPPParallelLoop.h>
-#include <CPPProgramDeclarationsAndDefinitions.h>
-#include <CPPOpenCLKernelSubroutineDirectLoop.h>
-#include <CPPOpenCLKernelSubroutineIndirectLoop.h>
-#include <CPPOpenCLHostSubroutineDirectLoop.h>
-#include <CPPOpenCLHostSubroutineIndirectLoop.h>
-#include <CPPOpenCLUserSubroutine.h>
-#include <CPPOpenCLReductionSubroutine.h>
-#include <CPPReductionSubroutines.h>
+#include "CPPOpenCLSubroutinesGeneration.h"
+#include "CPPParallelLoop.h"
+#include "CPPProgramDeclarationsAndDefinitions.h"
+#include "CPPOpenCLKernelSubroutineDirectLoop.h"
+#include "CPPOpenCLKernelSubroutineIndirectLoop.h"
+#include "CPPOpenCLHostSubroutineDirectLoop.h"
+#include "CPPOpenCLHostSubroutineIndirectLoop.h"
+#include "CPPOpenCLUserSubroutine.h"
+#include "CPPOpenCLReductionSubroutine.h"
+#include "CPPReductionSubroutines.h"
+#include "RoseStatementsAndExpressionsBuilder.h"
+#include "OP2Definitions.h"
+
+void
+CPPOpenCLSubroutinesGeneration::addFreeVariableDeclarations ()
+{
+  using std::map;
+  using std::string;
+
+  Debug::getInstance ()->debugMessage (
+      "Adding variables with constant access specifiers to module",
+      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+
+  for (map <string, OpConstDefinition *>::const_iterator it =
+      declarations->firstOpConstDefinition (); it
+      != declarations->lastOpConstDefinition (); ++it)
+  {
+    std::string const & variableName = it->first;
+
+    OpConstDefinition * constDefinition = it->second;
+
+    SgType * type = constDefinition->getType ();
+
+    Debug::getInstance ()->debugMessage ("Analysing OP_DECL_CONST with name '"
+        + variableName + "'", Debug::OUTER_LOOP_LEVEL, __FILE__, __LINE__);
+
+    SgVariableDeclaration * variableDeclaration =
+        RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
+            variableName, type, moduleScope);
+
+    variableDeclaration->get_declarationModifier ().get_storageModifier ().setExtern ();
+  }
+}
 
 void
 CPPOpenCLSubroutinesGeneration::createReductionSubroutines ()
@@ -32,6 +65,16 @@ CPPOpenCLSubroutinesGeneration::createReductionSubroutines ()
 
     parallelLoop->getReductionsNeeded (reductionsNeeded);
   }
+
+  for (vector <Reduction *>::const_iterator it = reductionsNeeded.begin (); it
+      != reductionsNeeded.end (); ++it)
+  {
+    CPPOpenCLReductionSubroutine * subroutine =
+        new CPPOpenCLReductionSubroutine (moduleScope, *it);
+
+    reductionSubroutines->addSubroutine (*it,
+        subroutine->getSubroutineHeaderStatement ());
+  }
 }
 
 void
@@ -39,6 +82,8 @@ CPPOpenCLSubroutinesGeneration::createSubroutines ()
 {
   using std::string;
   using std::map;
+
+  createReductionSubroutines ();
 
   for (map <string, ParallelLoop *>::const_iterator it =
       declarations->firstParallelLoop (); it

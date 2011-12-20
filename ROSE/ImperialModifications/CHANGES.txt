@@ -32,6 +32,7 @@ else if (procedureHeader->get_functionModifier ().isCudaHost () == true)
 {
   curprint("attributes (host) ");
 }
+// END Imperial College changes
 
 ---------
 Rationale
@@ -63,6 +64,7 @@ if (variableDeclaration->get_declarationModifier ().get_storageModifier ().isCud
 {
   curprint (", CONSTANT");
 }
+// END Imperial College changes
 
 ---------
 Rationale
@@ -111,6 +113,7 @@ else if (decl_stmt->get_declarationModifier ().get_accessModifier ().isPublic ()
     // printf ("Output PUBLIC keyword! \n");
   }
 }
+// END Imperial College changes
 
 ---------
 Rationale
@@ -132,6 +135,7 @@ Change 1
 
 // Imperial College changes 
 e_cuda_device	     = 19,
+// END Imperial College changes
 
 // TV (05/06/2010): Support for OpenCL storage modifiers
 e_opencl_global   = 20, /*!< OpenCL, accessible from all the device */
@@ -146,6 +150,7 @@ Change 2
 // Imperial College changes 
 bool isCudaDevice() const;
 void setCudaDevice();
+// END Imperial College changes
 
 --------
 Change 3
@@ -154,6 +159,7 @@ Change 3
 // Imperial College changes 
 bool SgStorageModifier::isCudaDevice() const { return p_modifier == e_cuda_device; }
 void SgStorageModifier::setCudaDevice()      { p_modifier = e_cuda_device; }
+// END Imperial College changes
 
 ---------
 Rationale
@@ -161,3 +167,44 @@ Rationale
 
 Need an additional attribute to support CUDA Fortran DEVICE attribute of variable 
 declarations
+
+===== File backend/unparser/CxxCodeGeneration/unparseCxx_statements.C =====
+
+--------
+Function
+--------
+
+void
+Unparse_ExprStmt::
+unparseFunctionParameterDeclaration (SgFunctionDeclaration* funcdecl_stmt, SgInitializedName* initializedName, 
+                                     bool outputParameterDeclaration, SgUnparse_Info& info)
+
+-------
+Changes
+-------
+
+// Imperial College changes 
+if (initializedName->get_storageModifier ().isOpenclLocal ())
+{
+  curprint ("__local ");
+}
+else if (initializedName->get_storageModifier ().isOpenclGlobal ())
+{
+  curprint ("__global ");
+}
+else if (initializedName->get_storageModifier ().isOpenclPrivate ())
+{
+  curprint ("__private ");
+}
+else if (initializedName->get_storageModifier ().isOpenclConstant ())
+{
+  curprint ("__constant ");
+}
+// END Imperial College changes
+
+---------
+Rationale
+---------
+
+C++ formal parameters need OpenCL storage access modifiers 
+

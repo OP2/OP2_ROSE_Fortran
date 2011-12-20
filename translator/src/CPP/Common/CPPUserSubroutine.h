@@ -13,6 +13,9 @@ class CPPUserSubroutine: public UserSubroutine <SgFunctionDeclaration,
 
   protected:
 
+    void
+    analyseOpDeclConstReferences ();
+
     virtual void
     createStatements ();
 

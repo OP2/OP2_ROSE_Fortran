@@ -52,7 +52,6 @@ template <typename TSubroutineHeader>
        */
       std::map <std::string, OpSubSetDefinition *> OpSubSetDefinitions;
 
-      
       /*
        * ======================================================
        * OP_DECL_MAP declarations
@@ -112,11 +111,12 @@ template <typename TSubroutineHeader>
       {
         return OpSetDefinitions.find (variableName) != OpSetDefinitions.end ();
       }
-      
+
       bool
       isOpSubSet (std::string const & variableName) const
       {
-        return OpSubSetDefinitions.find (variableName) != OpSubSetDefinitions.end ();
+        return OpSubSetDefinitions.find (variableName)
+            != OpSubSetDefinitions.end ();
       }
 
       bool
@@ -168,24 +168,24 @@ template <typename TSubroutineHeader>
 
       OpSubSetDefinition *
       getOpSubSetDefinition (std::string const & opSubSetName)
-      throw (std::string const &)
+          throw (std::string const &)
       {
-          using std::map;
-          using std::string;
-          
-          map <string, OpSubSetDefinition *>::const_iterator it =
-          OpSubSetDefinitions.find (opSubSetName);
-          
-          if (it == OpSubSetDefinitions.end ())
-          {
-              throw opSubSetName;
-          }
-          else
-          {
-              return it->second;
-          }
+        using std::map;
+        using std::string;
+
+        map <string, OpSubSetDefinition *>::const_iterator it =
+            OpSubSetDefinitions.find (opSubSetName);
+
+        if (it == OpSubSetDefinitions.end ())
+        {
+          throw opSubSetName;
+        }
+        else
+        {
+          return it->second;
+        }
       }
-      
+
       OpMapDefinition *
       getOpMapDefinition (std::string const & opMapName)
           throw (std::string const &)
@@ -276,6 +276,12 @@ template <typename TSubroutineHeader>
       lastOpConstDefinition ()
       {
         return OpConstDefinitions.end ();
+      }
+
+      bool
+      isOpConstDefinition (std::string const & variableName)
+      {
+        return OpConstDefinitions.count (variableName) > 0;
       }
 
       TSubroutineHeader *
