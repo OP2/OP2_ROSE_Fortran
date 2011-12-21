@@ -11,17 +11,45 @@ class CPPOpenCLKernelSubroutineDirectLoop: public CPPOpenCLKernelSubroutine
     virtual SgStatement *
     createUserSubroutineCallStatement ();
 
+    SgForStatement *
+    createStageInFromDeviceMemoryToSharedMemoryStatements (
+        unsigned int OP_DAT_ArgumentGroup);
+
+    SgForStatement *
+    createStageInFromSharedMemoryToLocalMemoryStatements (
+        unsigned int OP_DAT_ArgumentGroup);
+
+    SgForStatement *
+    createStageOutFromSharedMemoryToDeviceMemoryStatements (
+        unsigned int OP_DAT_ArgumentGroup);
+
+    SgForStatement *
+    createStageOutFromLocalMemoryToSharedMemoryStatements (
+        unsigned int OP_DAT_ArgumentGroup);
+
     virtual void
     createExecutionLoopStatements ();
 
-    virtual void
-    createOpDatFormalParameterDeclarations ();
+    void
+    createInitialiseOffsetIntoOpenCLSharedVariableStatements ();
+
+    void
+    createThreadIDInitialisationStatement ();
 
     virtual void
     createStatements ();
 
+    void
+    createOpenCLSharedVariableDeclarations ();
+
+    void
+    createStageInVariableDeclarations ();
+
     virtual void
     createLocalVariableDeclarations ();
+
+    virtual void
+    createOpDatFormalParameterDeclarations ();
 
     virtual void
     createFormalParameterDeclarations ();
@@ -31,7 +59,8 @@ class CPPOpenCLKernelSubroutineDirectLoop: public CPPOpenCLKernelSubroutine
     CPPOpenCLKernelSubroutineDirectLoop (SgScopeStatement * moduleScope,
         CPPOpenCLUserSubroutine * calleeSubroutine,
         CPPParallelLoop * parallelLoop,
-        CPPReductionSubroutines * reductionSubroutines);
+        CPPReductionSubroutines * reductionSubroutines,
+        CPPProgramDeclarationsAndDefinitions * declarations);
 };
 
 #endif

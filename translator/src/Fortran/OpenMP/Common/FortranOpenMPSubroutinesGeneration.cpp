@@ -43,6 +43,25 @@ FortranOpenMPSubroutinesGeneration::createSubroutines ()
     RoseHelper::forceOutputOfCodeToFile (
         userSubroutine->getSubroutineHeaderStatement ());
 
+    /*
+     * ======================================================
+     * When the user subroutine has calls to other user
+     * subroutines we need to add them to the generated file
+     * ======================================================
+     */
+        
+    userSubroutine->appendAdditionalSubroutines (moduleScope, parallelLoop, declarations);
+    
+    vector < FortranUserSubroutine * > additionalSubroutines = userSubroutine->getAdditionalSubroutines ();
+    
+    vector < FortranUserSubroutine * > :: iterator it;
+    for ( it = additionalSubroutines.begin(); it != additionalSubroutines.end(); it++ )
+    {          
+      RoseHelper::forceOutputOfCodeToFile (
+        (*it)->getSubroutineHeaderStatement ());
+    }        
+        
+        
     FortranOpenMPKernelSubroutine * kernelSubroutine;
 
     if (parallelLoop->isDirectLoop ())

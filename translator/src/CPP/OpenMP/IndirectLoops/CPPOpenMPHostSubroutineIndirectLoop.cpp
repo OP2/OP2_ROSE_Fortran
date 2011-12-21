@@ -7,9 +7,11 @@
 #include "OP2.h"
 #include "OpenMP.h"
 
-SgStatement *
-CPPOpenMPHostSubroutineIndirectLoop::createKernelFunctionCallStatement ()
+void
+CPPOpenMPHostSubroutineIndirectLoop::createKernelFunctionCallStatement (
+    SgScopeStatement * scope)
 {
+  using namespace SageInterface;
   using namespace SageBuilder;
   using namespace OP2VariableNames;
   using namespace PlanFunctionVariableNames;
@@ -126,7 +128,7 @@ CPPOpenMPHostSubroutineIndirectLoop::createKernelFunctionCallStatement ()
       calleeSubroutine->getSubroutineName (), buildVoidType (),
       actualParameters, subroutineScope);
 
-  return buildExprStatement (functionCallExpression);
+  appendStatement (buildExprStatement (functionCallExpression), scope);
 }
 
 void
@@ -152,7 +154,7 @@ CPPOpenMPHostSubroutineIndirectLoop::createOpenMPLoopStatements (
 
   SgBasicBlock * loopBody = buildBasicBlock ();
 
-  appendStatement (createKernelFunctionCallStatement (), loopBody);
+  createKernelFunctionCallStatement (loopBody);
 
   /*
    * ======================================================

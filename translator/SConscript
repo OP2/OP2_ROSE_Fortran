@@ -48,9 +48,10 @@ for path, dirs, files in os.walk(os.path.abspath(os.curdir + os.sep + 'src')):
 		elif fileExtension == '.h' and dirBasename not in includeDirectories:
 			includeDirectories.append(dirBasename)
 
-# Include directories and flags for g++
+# Include directories and flags for g++ ('-O2')
 env = Environment (CPPPATH=includeDirectories,
-		   CPPFLAGS=[ '-Wall', '-O2', '-g'],
+		   CPPFLAGS=[ '-Wall', '-g'],
+
 		   CXXCOMSTR="=========================== Compiling $SOURCE ===========================")
 
 # The target binary directory and name

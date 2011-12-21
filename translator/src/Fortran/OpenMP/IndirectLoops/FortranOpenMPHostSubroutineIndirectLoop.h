@@ -38,8 +38,8 @@ class FortranOpenMPHostSubroutineIndirectLoop: public FortranOpenMPHostSubroutin
     virtual void
     createPlanFunctionExecutionStatements ();
 
-    virtual SgStatement *
-    createKernelFunctionCallStatement ();
+    virtual void
+    createKernelFunctionCallStatement (SgScopeStatement * scope);
 
     virtual void
     createStatements ();

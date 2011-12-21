@@ -13,10 +13,12 @@
 #include "CUDA.h"
 #include "Debug.h"
 
-SgStatement *
-FortranCUDAHostSubroutineIndirectLoop::createKernelFunctionCallStatement ()
+void
+FortranCUDAHostSubroutineIndirectLoop::createKernelFunctionCallStatement (
+    SgScopeStatement * scope)
 {
   using namespace SageBuilder;
+  using namespace SageInterface;
   using namespace OP2VariableNames;
   using namespace ReductionVariableNames;
   using namespace PlanFunctionVariableNames;
@@ -137,7 +139,7 @@ FortranCUDAHostSubroutineIndirectLoop::createKernelFunctionCallStatement ()
 
   kernelCallExpression->set_endOfConstruct (RoseHelper::getFileInfo ());
 
-  return buildExprStatement (kernelCallExpression);
+  appendStatement (buildExprStatement (kernelCallExpression), scope);
 }
 
 void
@@ -218,7 +220,7 @@ FortranCUDAHostSubroutineIndirectLoop::createPlanFunctionExecutionStatements ()
 
   appendStatement (statement3, loopBody);
 
-  appendStatement (createKernelFunctionCallStatement (), loopBody);
+  createKernelFunctionCallStatement (loopBody);
 
   /*
    * ======================================================

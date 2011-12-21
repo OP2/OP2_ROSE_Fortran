@@ -6,8 +6,9 @@
 #include "OpenCL.h"
 #include "OP2.h"
 
-SgStatement *
-CPPOpenCLHostSubroutineDirectLoop::createKernelFunctionCallStatement ()
+void
+CPPOpenCLHostSubroutineDirectLoop::createKernelFunctionCallStatement (
+    SgScopeStatement * scope)
 {
   using namespace SageBuilder;
   using namespace SageInterface;
@@ -27,10 +28,10 @@ CPPOpenCLHostSubroutineDirectLoop::createKernelFunctionCallStatement ()
 
   SgExprStatement * assignmentStatement1 = buildAssignStatement (
       variableDeclarations->getReference (OpenCL::kernelPointer),
-      OpenCL::OP2RuntimeSupport::getKernel (subroutineScope,
+      OpenCL::OP2RuntimeSupport::getKernel (scope,
           calleeSubroutine->getSubroutineName ()));
 
-  appendStatement (assignmentStatement1, subroutineScope);
+  appendStatement (assignmentStatement1, scope);
 
   /*
    * ======================================================
@@ -49,14 +50,12 @@ CPPOpenCLHostSubroutineDirectLoop::createKernelFunctionCallStatement ()
       {
         SgDotExp * dotExpression = buildDotExp (
             variableDeclarations->getReference (getOpDatName (i)),
-            buildOpaqueVarRefExp (OP2::RunTimeVariableNames::data_d,
-                subroutineScope));
+            buildOpaqueVarRefExp (OP2::RunTimeVariableNames::data_d, scope));
 
         SgFunctionCallExp * kernelArgumentExpression =
-            OpenCL::getSetKernelArgumentCallExpression (subroutineScope,
+            OpenCL::getSetKernelArgumentCallExpression (scope,
                 variableDeclarations->getReference (OpenCL::kernelPointer),
-                argumentCounter, OpenCL::getMemoryType (subroutineScope),
-                dotExpression);
+                argumentCounter, OpenCL::getMemoryType (scope), dotExpression);
 
         if (firstAssignment)
         {
@@ -66,7 +65,7 @@ CPPOpenCLHostSubroutineDirectLoop::createKernelFunctionCallStatement ()
               variableDeclarations->getReference (OpenCL::errorCode),
               kernelArgumentExpression);
 
-          appendStatement (assignmentStatement, subroutineScope);
+          appendStatement (assignmentStatement, scope);
         }
         else
         {
@@ -78,8 +77,7 @@ CPPOpenCLHostSubroutineDirectLoop::createKernelFunctionCallStatement ()
               variableDeclarations->getReference (OpenCL::errorCode),
               orExpression);
 
-          appendStatement (assignmentStatement, subroutineScope);
-
+          appendStatement (assignmentStatement, scope);
         }
 
         argumentCounter++;
@@ -93,7 +91,7 @@ CPPOpenCLHostSubroutineDirectLoop::createKernelFunctionCallStatement ()
    * ======================================================
    */
   SgFunctionCallExp * kernelArgumentExpression2 =
-      OpenCL::getSetKernelArgumentCallExpression (subroutineScope,
+      OpenCL::getSetKernelArgumentCallExpression (scope,
           variableDeclarations->getReference (OpenCL::kernelPointer),
           argumentCounter, buildIntType (), variableDeclarations->getReference (
               sharedMemoryOffset));
@@ -104,7 +102,7 @@ CPPOpenCLHostSubroutineDirectLoop::createKernelFunctionCallStatement ()
   SgExprStatement * assignmentStatement2 = buildAssignStatement (
       variableDeclarations->getReference (OpenCL::errorCode), orExpression2);
 
-  appendStatement (assignmentStatement2, subroutineScope);
+  appendStatement (assignmentStatement2, scope);
 
   argumentCounter++;
 
@@ -116,10 +114,10 @@ CPPOpenCLHostSubroutineDirectLoop::createKernelFunctionCallStatement ()
 
   SgArrowExp * arrowExpression3 = buildArrowExp (
       variableDeclarations->getReference (getOpSetName ()),
-      buildOpaqueVarRefExp (OP2::RunTimeVariableNames::size, subroutineScope));
+      buildOpaqueVarRefExp (OP2::RunTimeVariableNames::size, scope));
 
   SgFunctionCallExp * kernelArgumentExpression3 =
-      OpenCL::getSetKernelArgumentCallExpression (subroutineScope,
+      OpenCL::getSetKernelArgumentCallExpression (scope,
           variableDeclarations->getReference (OpenCL::kernelPointer),
           argumentCounter, buildIntType (), arrowExpression3);
 
@@ -129,7 +127,7 @@ CPPOpenCLHostSubroutineDirectLoop::createKernelFunctionCallStatement ()
   SgExprStatement * assignmentStatement3 = buildAssignStatement (
       variableDeclarations->getReference (OpenCL::errorCode), orExpression3);
 
-  appendStatement (assignmentStatement3, subroutineScope);
+  appendStatement (assignmentStatement3, scope);
 
   argumentCounter++;
 
@@ -140,9 +138,9 @@ CPPOpenCLHostSubroutineDirectLoop::createKernelFunctionCallStatement ()
    */
 
   SgFunctionCallExp * kernelArgumentExpression4 =
-      OpenCL::getSetKernelArgumentCallExpression (subroutineScope,
+      OpenCL::getSetKernelArgumentCallExpression (scope,
           variableDeclarations->getReference (OpenCL::kernelPointer),
-          argumentCounter, OpenCL::getSizeType (subroutineScope),
+          argumentCounter, OpenCL::getSizeType (scope),
           variableDeclarations->getReference (OpenCL::sharedMemorySize));
 
   SgBitOrOp * orExpression4 = buildBitOrOp (variableDeclarations->getReference (
@@ -151,7 +149,15 @@ CPPOpenCLHostSubroutineDirectLoop::createKernelFunctionCallStatement ()
   SgExprStatement * assignmentStatement4 = buildAssignStatement (
       variableDeclarations->getReference (OpenCL::errorCode), orExpression4);
 
-  appendStatement (assignmentStatement4, subroutineScope);
+  appendStatement (assignmentStatement4, scope);
+
+  /*
+   * ======================================================
+   * OP_DECL_CONST actual parameters
+   * ======================================================
+   */
+
+  addOpDeclConstActualParameters (scope, argumentCounter);
 }
 
 void
@@ -166,11 +172,23 @@ CPPOpenCLHostSubroutineDirectLoop::createOpenCLKernelInitialisationStatements ()
       "Creating OpenCL kernel initialisation statements",
       Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
+  /*
+   * ======================================================
+   * Setting blocks per grid
+   * ======================================================
+   */
+
   SgExprStatement * assignmentStatement1 = buildAssignStatement (
       variableDeclarations->getReference (OpenCL::blocksPerGrid), buildIntVal (
           200));
 
   appendStatement (assignmentStatement1, subroutineScope);
+
+  /*
+   * ======================================================
+   * Setting threads per block
+   * ======================================================
+   */
 
   SgExprStatement * assignmentStatement2 = buildAssignStatement (
       variableDeclarations->getReference (OpenCL::threadsPerBlock),
@@ -179,11 +197,33 @@ CPPOpenCLHostSubroutineDirectLoop::createOpenCLKernelInitialisationStatements ()
 
   appendStatement (assignmentStatement2, subroutineScope);
 
+  /*
+   * ======================================================
+   * Setting total number of threads
+   * ======================================================
+   */
+
+  SgMultiplyOp * multiplyExpression3 = buildMultiplyOp (
+      variableDeclarations->getReference (OpenCL::threadsPerBlock),
+      variableDeclarations->getReference (OpenCL::blocksPerGrid));
+
   SgExprStatement * assignmentStatement3 = buildAssignStatement (
+      variableDeclarations->getReference (OpenCL::totalThreadNumber),
+      multiplyExpression3);
+
+  appendStatement (assignmentStatement3, subroutineScope);
+
+  /*
+   * ======================================================
+   * Setting shared memory size
+   * ======================================================
+   */
+
+  SgExprStatement * assignmentStatement4 = buildAssignStatement (
       variableDeclarations->getReference (OpenCL::sharedMemorySize),
       buildIntVal (0));
 
-  appendStatement (assignmentStatement3, subroutineScope);
+  appendStatement (assignmentStatement4, subroutineScope);
 
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
@@ -211,25 +251,25 @@ CPPOpenCLHostSubroutineDirectLoop::createOpenCLKernelInitialisationStatements ()
     }
   }
 
-  SgMultiplyOp * multiplyExpression4 = buildMultiplyOp (
+  SgMultiplyOp * multiplyExpression5 = buildMultiplyOp (
       variableDeclarations->getReference (OpenCL::sharedMemorySize),
       buildOpaqueVarRefExp (warpSizeMacro, subroutineScope));
 
-  SgExprStatement * assignmentStatement4 = buildAssignStatement (
-      variableDeclarations->getReference (sharedMemoryOffset),
-      multiplyExpression4);
-
-  appendStatement (assignmentStatement4, subroutineScope);
-
-  SgMultiplyOp * multiplyExpression5 = buildMultiplyOp (
-      variableDeclarations->getReference (OpenCL::sharedMemorySize),
-      variableDeclarations->getReference (OpenCL::threadsPerBlock));
-
   SgExprStatement * assignmentStatement5 = buildAssignStatement (
-      variableDeclarations->getReference (OpenCL::sharedMemorySize),
+      variableDeclarations->getReference (sharedMemoryOffset),
       multiplyExpression5);
 
   appendStatement (assignmentStatement5, subroutineScope);
+
+  SgMultiplyOp * multiplyExpression6 = buildMultiplyOp (
+      variableDeclarations->getReference (OpenCL::sharedMemorySize),
+      variableDeclarations->getReference (OpenCL::threadsPerBlock));
+
+  SgExprStatement * assignmentStatement6 = buildAssignStatement (
+      variableDeclarations->getReference (OpenCL::sharedMemorySize),
+      multiplyExpression6);
+
+  appendStatement (assignmentStatement6, subroutineScope);
 }
 
 void
@@ -248,7 +288,9 @@ CPPOpenCLHostSubroutineDirectLoop::createStatements ()
     createReductionPrologueStatements ();
   }
 
-  createKernelFunctionCallStatement ();
+  createKernelFunctionCallStatement (subroutineScope);
+
+  createKernelCallEpilogueStatements (subroutineScope);
 
   if (parallelLoop->isReductionRequired ())
   {
@@ -287,9 +329,11 @@ CPPOpenCLHostSubroutineDirectLoop::createLocalVariableDeclarations ()
 CPPOpenCLHostSubroutineDirectLoop::CPPOpenCLHostSubroutineDirectLoop (
     SgScopeStatement * moduleScope,
     CPPOpenCLKernelSubroutine * calleeSubroutine,
-    CPPParallelLoop * parallelLoop, CPPModuleDeclarations * moduleDeclarations) :
+    CPPParallelLoop * parallelLoop, CPPModuleDeclarations * moduleDeclarations,
+    CPPUserSubroutine * userSubroutine,
+    CPPOpenCLConstantDeclarations * constantDeclarations) :
   CPPOpenCLHostSubroutine (moduleScope, calleeSubroutine, parallelLoop,
-      moduleDeclarations)
+      moduleDeclarations, userSubroutine, constantDeclarations)
 {
   Debug::getInstance ()->debugMessage (
       "Creating host subroutine of direct loop", Debug::CONSTRUCTOR_LEVEL,

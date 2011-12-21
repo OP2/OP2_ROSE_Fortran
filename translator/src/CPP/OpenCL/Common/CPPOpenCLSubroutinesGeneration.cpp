@@ -1,13 +1,24 @@
-#include <CPPOpenCLSubroutinesGeneration.h>
-#include <CPPParallelLoop.h>
-#include <CPPProgramDeclarationsAndDefinitions.h>
-#include <CPPOpenCLKernelSubroutineDirectLoop.h>
-#include <CPPOpenCLKernelSubroutineIndirectLoop.h>
-#include <CPPOpenCLHostSubroutineDirectLoop.h>
-#include <CPPOpenCLHostSubroutineIndirectLoop.h>
-#include <CPPOpenCLUserSubroutine.h>
-#include <CPPOpenCLReductionSubroutine.h>
-#include <CPPReductionSubroutines.h>
+#include "CPPOpenCLSubroutinesGeneration.h"
+#include "CPPParallelLoop.h"
+#include "CPPProgramDeclarationsAndDefinitions.h"
+#include "CPPOpenCLKernelSubroutineDirectLoop.h"
+#include "CPPOpenCLKernelSubroutineIndirectLoop.h"
+#include "CPPOpenCLHostSubroutineDirectLoop.h"
+#include "CPPOpenCLHostSubroutineIndirectLoop.h"
+#include "CPPOpenCLUserSubroutine.h"
+#include "CPPOpenCLReductionSubroutine.h"
+#include "CPPReductionSubroutines.h"
+#include "CPPOpenCLConstantDeclarations.h"
+#include "RoseStatementsAndExpressionsBuilder.h"
+#include "OP2Definitions.h"
+#include "OP2.h"
+
+void
+CPPOpenCLSubroutinesGeneration::addFreeVariableDeclarations ()
+{
+  constantDeclarations = new CPPOpenCLConstantDeclarations (declarations,
+      moduleScope);
+}
 
 void
 CPPOpenCLSubroutinesGeneration::createReductionSubroutines ()
@@ -32,6 +43,16 @@ CPPOpenCLSubroutinesGeneration::createReductionSubroutines ()
 
     parallelLoop->getReductionsNeeded (reductionsNeeded);
   }
+
+  for (vector <Reduction *>::const_iterator it = reductionsNeeded.begin (); it
+      != reductionsNeeded.end (); ++it)
+  {
+    CPPOpenCLReductionSubroutine * subroutine =
+        new CPPOpenCLReductionSubroutine (moduleScope, *it);
+
+    reductionSubroutines->addSubroutine (*it,
+        subroutine->getSubroutineHeaderStatement ());
+  }
 }
 
 void
@@ -39,6 +60,8 @@ CPPOpenCLSubroutinesGeneration::createSubroutines ()
 {
   using std::string;
   using std::map;
+
+  createReductionSubroutines ();
 
   for (map <string, ParallelLoop *>::const_iterator it =
       declarations->firstParallelLoop (); it
@@ -62,21 +85,24 @@ CPPOpenCLSubroutinesGeneration::createSubroutines ()
     if (parallelLoop->isDirectLoop ())
     {
       kernelSubroutine = new CPPOpenCLKernelSubroutineDirectLoop (moduleScope,
-          userDeviceSubroutine, parallelLoop, reductionSubroutines);
+          userDeviceSubroutine, parallelLoop, reductionSubroutines,
+          declarations);
 
       hostSubroutines[userSubroutineName]
           = new CPPOpenCLHostSubroutineDirectLoop (moduleScope,
-              kernelSubroutine, parallelLoop, moduleDeclarations);
+              kernelSubroutine, parallelLoop, moduleDeclarations,
+              userDeviceSubroutine, constantDeclarations);
     }
     else
     {
-      kernelSubroutine
-          = new CPPOpenCLKernelSubroutineIndirectLoop (moduleScope,
-              userDeviceSubroutine, parallelLoop, reductionSubroutines);
+      kernelSubroutine = new CPPOpenCLKernelSubroutineIndirectLoop (
+          moduleScope, userDeviceSubroutine, parallelLoop,
+          reductionSubroutines, declarations);
 
       hostSubroutines[userSubroutineName]
           = new CPPOpenCLHostSubroutineIndirectLoop (moduleScope,
-              kernelSubroutine, parallelLoop, moduleDeclarations);
+              kernelSubroutine, parallelLoop, moduleDeclarations,
+              userDeviceSubroutine, constantDeclarations);
     }
   }
 }
@@ -92,6 +118,10 @@ CPPOpenCLSubroutinesGeneration::addHeaderIncludes ()
 
   addTextForUnparser (moduleScope, "\n#include <CL/cl.h>\n",
       AstUnparseAttribute::e_after);
+
+  addTextForUnparser (moduleScope, "#include \""
+      + OP2::Libraries::CPP::mainLibrary + "\"\n",
+      AstUnparseAttribute::e_before);
 }
 
 CPPOpenCLSubroutinesGeneration::CPPOpenCLSubroutinesGeneration (

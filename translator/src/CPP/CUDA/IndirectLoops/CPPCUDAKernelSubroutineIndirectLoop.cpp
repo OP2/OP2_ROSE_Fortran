@@ -272,10 +272,10 @@ CPPCUDAKernelSubroutineIndirectLoop::createStageOutFromLocalMemoryToSharedMemory
           variableDeclarations->getReference (getIterationCounterVariableName (
               2)));
 
-      SgExprStatement * assignmentStatement = buildAssignStatement (
+      SgPlusAssignOp * assignmentStatement = buildPlusAssignOp (
           arrayExpression2, arrayExpression3);
 
-      appendStatement (assignmentStatement, innerLoopBody);
+      appendStatement (buildExprStatement (assignmentStatement), innerLoopBody);
 
       SgExprStatement * innerLoopInitialisationExpression =
           buildAssignStatement (variableDeclarations->getReference (
@@ -670,7 +670,7 @@ CPPCUDAKernelSubroutineIndirectLoop::createSetIndirectionMapPointerStatements ()
 
         SgMultiplyOp * multiplyExpression1 = buildMultiplyOp (
             variableDeclarations->getReference (blockID), buildIntVal (
-                parallelLoop->getOpDatDimension (i)));
+                parallelLoop->getNumberOfDistinctIndirectOpDats ()));
 
         SgAddOp * addExpression1a = buildAddOp (buildIntVal (offset),
             multiplyExpression1);

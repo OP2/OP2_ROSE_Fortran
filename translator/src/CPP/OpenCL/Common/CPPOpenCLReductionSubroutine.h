@@ -12,7 +12,26 @@ class CPPOpenCLReductionSubroutine: public Subroutine <SgFunctionDeclaration>
 
     Reduction * reduction;
 
+    std::string sharedVariableName;
+
+    std::string volatileSharedVariableName;
+
   private:
+
+    void
+    createThreadZeroReductionStatements ();
+
+    void
+    createFirstRoundOfReduceStatements ();
+
+    void
+    createSecondRoundOfReduceStatements ();
+
+    void
+    createSharedVariableInitialisationStatements ();
+
+    void
+    createInitialisationStatements ();
 
     virtual void
     createStatements ();

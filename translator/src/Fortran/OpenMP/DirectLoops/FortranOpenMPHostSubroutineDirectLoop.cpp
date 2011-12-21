@@ -9,9 +9,11 @@
 #include "Debug.h"
 #include "OpenMP.h"
 
-SgStatement *
-FortranOpenMPHostSubroutineDirectLoop::createKernelFunctionCallStatement ()
+void
+FortranOpenMPHostSubroutineDirectLoop::createKernelFunctionCallStatement (
+    SgScopeStatement * scope)
 {
+  using namespace SageInterface;
   using namespace SageBuilder;
   using namespace OP2VariableNames;
   using namespace LoopVariableNames;
@@ -63,7 +65,7 @@ FortranOpenMPHostSubroutineDirectLoop::createKernelFunctionCallStatement ()
   SgFunctionCallExp * kernelCall = buildFunctionCallExp (kernelSymbol,
       actualParameters);
 
-  return buildExprStatement (kernelCall);
+  appendStatement (buildExprStatement (kernelCall), scope);
 }
 
 void
@@ -120,7 +122,7 @@ FortranOpenMPHostSubroutineDirectLoop::createOpenMPLoopStatements ()
 
   appendStatement (assignmentStatement2, loopBody);
 
-  appendStatement (createKernelFunctionCallStatement (), loopBody);
+  createKernelFunctionCallStatement (loopBody);
 
   SgFortranDo * doStatement =
       FortranStatementsAndExpressionsBuilder::buildFortranDoStatement (

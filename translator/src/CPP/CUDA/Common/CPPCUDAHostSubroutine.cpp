@@ -41,9 +41,15 @@ CPPCUDAHostSubroutine::createReductionUpdateStatements (
     SgAddOp * addExpression = buildAddOp (variableDeclarations->getReference (
         getIterationCounterVariableName (2)), multiplyExpression);
 
-    SgPntrArrRefExp * arrayExpression2 = buildPntrArrRefExp (
-        variableDeclarations->getReference (getReductionArrayHostName (
-            OP_DAT_ArgumentGroup)), addExpression);
+    SgDotExp * dotExpression = buildDotExp (variableDeclarations->getReference (
+        getOpDatName (OP_DAT_ArgumentGroup)), buildOpaqueVarRefExp (
+        OP2::RunTimeVariableNames::data, subroutineScope));
+
+    SgCastExp * castExpression = buildCastExp (dotExpression, buildPointerType (
+        parallelLoop->getOpDatBaseType (OP_DAT_ArgumentGroup)));
+
+    SgPntrArrRefExp * arrayExpression2 = buildPntrArrRefExp (castExpression,
+        addExpression);
 
     if (parallelLoop->isIncremented (OP_DAT_ArgumentGroup))
     {
@@ -375,6 +381,35 @@ CPPCUDAHostSubroutine::createReductionPrologueStatements ()
   {
     if (parallelLoop->isReductionRequired (i))
     {
+      SgDotExp * dotExpression = buildDotExp (
+          variableDeclarations->getReference (getOpDatName (i)),
+          buildOpaqueVarRefExp (data, subroutineScope));
+
+      if (parallelLoop->isArray (i) || parallelLoop->isPointer (i))
+      {
+        SgCastExp * castExpression = buildCastExp (dotExpression,
+            buildPointerType (parallelLoop->getOpDatBaseType (i)));
+
+        SgExprStatement * assignmentStatement3 = buildAssignStatement (
+            variableDeclarations->getReference (getReductionArrayHostName (i)),
+            castExpression);
+
+        appendStatement (assignmentStatement3, subroutineScope);
+      }
+      else
+      {
+        SgCastExp * castExpression = buildCastExp (dotExpression,
+            buildPointerType (parallelLoop->getOpDatBaseType (i)));
+
+        SgAddressOfOp * addressOfExpression = buildAddressOfOp (castExpression);
+
+        SgExprStatement * assignmentStatement3 = buildAssignStatement (
+            variableDeclarations->getReference (getReductionArrayHostName (i)),
+            addressOfExpression);
+
+        appendStatement (assignmentStatement3, subroutineScope);
+      }
+
       SgSizeOfOp * sizeOfExpression = buildSizeOfOp (
           parallelLoop->getOpDatBaseType (i));
 

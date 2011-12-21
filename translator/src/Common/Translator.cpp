@@ -317,9 +317,9 @@ addCommandLineOptions ()
 
   CommandLine::getInstance ()->addOption (new OxfordOption (
       "Refactor OP2 calls to comply with Oxford API", "oxford"));
-    
+
   CommandLine::getInstance ()->addOption (new PreprocessOption (
-      "Preprocess OP2 declarations", "pre"));                                                                
+      "Preprocess OP2 declarations", "pre"));
 
   CommandLine::getInstance ()->addUDrawGraphOption ();
 }
@@ -340,39 +340,38 @@ processUserSelections (SgProject * project)
     if (Globals::getInstance ()->preprocess ())
     {
       CPPProgramDeclarationsAndDefinitions * declarations =
-        new CPPProgramDeclarationsAndDefinitions (project);
-        
+          new CPPProgramDeclarationsAndDefinitions (project);
+
       new CPPPreProcess (project, declarations);
-          
+
+      project->unparse ();
+    }
+    else if (Globals::getInstance ()->renderOxfordAPICalls ())
+    {
+      if (Globals::getInstance ()->getTargetBackend ()
+          != TargetLanguage::UNKNOWN_BACKEND)
+      {
+        throw Exceptions::CommandLine::MutuallyExclusiveException (
+            "You have selected to generate code for " + toString (
+                Globals::getInstance ()->getTargetBackend ())
+                + " and replace all OP2 calls with calls complying with the Oxford API. These options are mutually exclusive");
+      }
+
+      CPPProgramDeclarationsAndDefinitions * declarations =
+          new CPPProgramDeclarationsAndDefinitions (project);
+
+      // new CPPModifyOP2CallsToComplyWithOxfordAPI (project, declarations);
+
       project->unparse ();
     }
     else
-		if (Globals::getInstance ()->renderOxfordAPICalls ())
-		{
-			if (Globals::getInstance ()->getTargetBackend ()
-				!= TargetLanguage::UNKNOWN_BACKEND)
-			{
-				throw Exceptions::CommandLine::MutuallyExclusiveException (
-				  "You have selected to generate code for " + toString (
-				  Globals::getInstance ()->getTargetBackend ())
-                  + " and replace all OP2 calls with calls complying with the Oxford API. These options are mutually exclusive");
-			}
+    {
+      checkBackendOption ();
 
-			CPPProgramDeclarationsAndDefinitions * declarations =
-			new CPPProgramDeclarationsAndDefinitions (project);
+      CPPSubroutinesGeneration * generator = handleCPPProject (project);
 
-			// new CPPModifyOP2CallsToComplyWithOxfordAPI (project, declarations);
-
-			project->unparse ();
-		}
-		else
-		{
-			checkBackendOption ();
-
-			CPPSubroutinesGeneration * generator = handleCPPProject (project);
-
-			unparseSourceFiles (project, generator);
-		}
+      unparseSourceFiles (project, generator);
+    }
   }
   else if (project->get_Fortran_only ())
   {

@@ -32,6 +32,9 @@ namespace ReductionVariableNames
 
   std::string const
   getReductionCardinalityName (unsigned int OP_DAT_ArgumentGroup);
+
+  std::string const
+  getTemporaryReductionArrayName (unsigned int OP_DAT_ArgumentGroup);
 }
 
 namespace LoopVariableNames

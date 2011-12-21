@@ -480,7 +480,10 @@ CPPCUDAKernelSubroutineDirectLoop::createStatements ()
 {
   createThreadIDInitialisationStatement ();
 
-  createReductionPrologueStatements ();
+  if (parallelLoop->isReductionRequired ())
+  {
+    createReductionPrologueStatements ();
+  }
 
   createInitialiseOffsetIntoCUDASharedVariableStatements ();
 

@@ -1,4 +1,5 @@
 #include "FortranCUDAConstantDeclarations.h"
+#include <FortranCUDAInitialiseConstantsSubroutine.h>
 #include "FortranProgramDeclarationsAndDefinitions.h"
 #include "FortranStatementsAndExpressionsBuilder.h"
 #include "OP2Definitions.h"
@@ -109,6 +110,26 @@ FortranCUDAConstantDeclarations::patchReferencesToCUDAConstants (
   TreeVisitor * visitor = new TreeVisitor (this);
 
   visitor->traverse (procedureHeader, preorder);
+}
+
+void
+FortranCUDAConstantDeclarations::appendCUDAConstantInitialisationToModule ( SgScopeStatement * moduleScope,
+    FortranProgramDeclarationsAndDefinitions * declarations)
+{
+
+  /*
+   * ======================================================
+   * This function appends a new subroutine to the CUDA
+   * module which initialises CUDA constants to their
+   * respective values. Its call is appended just after
+   * the last call to op_decl_const in the user code
+   * ======================================================
+   */
+  
+  std::string subroutineName = "initCUDAConstants";
+  
+  initialisationRoutine = new FortranCUDAInitialiseConstantsSubroutine (subroutineName, moduleScope,
+      declarations, oldNamesToNewNames, variableDeclarations);
 }
 
 FortranCUDAConstantDeclarations::FortranCUDAConstantDeclarations (

@@ -4,9 +4,11 @@
 
 #include <FortranUserSubroutine.h>
 
+class FortranCUDAConstantDeclarations;
+
 class FortranCUDAUserSubroutine: public FortranUserSubroutine
 {
-  private:
+  public:
 
     virtual void
     createStatements ();
@@ -17,11 +19,19 @@ class FortranCUDAUserSubroutine: public FortranUserSubroutine
     virtual void
     createFormalParameterDeclarations ();
 
-  public:
+    virtual void appendAdditionalSubroutines ( SgScopeStatement * moduleScope,
+      FortranParallelLoop * parallelLoop, FortranProgramDeclarationsAndDefinitions * declarations,
+      FortranCUDAConstantDeclarations * CUDAconstants);
 
     FortranCUDAUserSubroutine (SgScopeStatement * moduleScope,
         FortranParallelLoop * parallelLoop,
         FortranProgramDeclarationsAndDefinitions * declarations);
+        
+    FortranCUDAUserSubroutine (SgScopeStatement * moduleScope,
+        FortranParallelLoop * parallelLoop,
+        FortranProgramDeclarationsAndDefinitions * declarations,
+        string subroutineName);
+
 };
 
 #endif
