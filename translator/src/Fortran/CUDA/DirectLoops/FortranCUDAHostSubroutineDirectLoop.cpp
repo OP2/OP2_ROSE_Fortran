@@ -11,9 +11,11 @@
 #include "Exceptions.h"
 #include "CUDA.h"
 
-SgStatement *
-FortranCUDAHostSubroutineDirectLoop::createKernelFunctionCallStatement ()
+void
+FortranCUDAHostSubroutineDirectLoop::createKernelFunctionCallStatement (
+    SgScopeStatement * scope)
 {
+  using namespace SageInterface;
   using namespace SageBuilder;
   using namespace OP2VariableNames;
   using namespace ReductionVariableNames;
@@ -88,7 +90,7 @@ FortranCUDAHostSubroutineDirectLoop::createKernelFunctionCallStatement ()
 
   kernelCallExpression->set_endOfConstruct (RoseHelper::getFileInfo ());
 
-  return buildExprStatement (kernelCallExpression);
+  appendStatement (buildExprStatement (kernelCallExpression), scope);
 }
 
 void
@@ -263,7 +265,7 @@ FortranCUDAHostSubroutineDirectLoop::createStatements ()
     createReductionPrologueStatements ();
   }
 
-  appendStatement (createKernelFunctionCallStatement (), subroutineScope);
+  createKernelFunctionCallStatement (subroutineScope);
 
   SgExprStatement * assignmentStatement2 = buildAssignStatement (
       variableDeclarations->getReference (CUDA::threadSynchRet),

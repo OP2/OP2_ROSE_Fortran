@@ -8,9 +8,11 @@
 #include "CUDA.h"
 #include "OP2.h"
 
-SgStatement *
-CPPCUDAHostSubroutineDirectLoop::createKernelFunctionCallStatement ()
+void
+CPPCUDAHostSubroutineDirectLoop::createKernelFunctionCallStatement (
+    SgScopeStatement * scope)
 {
+  using namespace SageInterface;
   using namespace SageBuilder;
   using namespace OP2VariableNames;
   using namespace OP2::RunTimeVariableNames;
@@ -63,7 +65,7 @@ CPPCUDAHostSubroutineDirectLoop::createKernelFunctionCallStatement ()
 
   kernelCallExpression->set_endOfConstruct (RoseHelper::getFileInfo ());
 
-  return buildExprStatement (kernelCallExpression);
+  appendStatement (buildExprStatement (kernelCallExpression), scope);
 }
 
 void
@@ -160,7 +162,7 @@ CPPCUDAHostSubroutineDirectLoop::createStatements ()
     createReductionPrologueStatements ();
   }
 
-  appendStatement (createKernelFunctionCallStatement (), subroutineScope);
+  createKernelFunctionCallStatement (subroutineScope);
 
   SgFunctionCallExp
       * threadSynchronisationExpression =

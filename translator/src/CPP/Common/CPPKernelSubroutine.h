@@ -5,15 +5,15 @@
 #include <KernelSubroutine.h>
 
 class CPPParallelLoop;
+class CPPUserSubroutine;
 
 class CPPKernelSubroutine: public KernelSubroutine <SgFunctionDeclaration>
 {
 
   protected:
 
-    CPPKernelSubroutine (SgScopeStatement * moduleScope, Subroutine <
-        SgFunctionDeclaration> * calleeSubroutine,
-        CPPParallelLoop * parallelLoop);
+    CPPKernelSubroutine (SgScopeStatement * moduleScope,
+        CPPUserSubroutine * calleeSubroutine, CPPParallelLoop * parallelLoop);
 };
 
 #endif

@@ -12,8 +12,9 @@
 #include "OpenMP.h"
 #include "Debug.h"
 
-SgStatement *
-FortranOpenMPHostSubroutineIndirectLoop::createKernelFunctionCallStatement ()
+void
+FortranOpenMPHostSubroutineIndirectLoop::createKernelFunctionCallStatement (
+    SgScopeStatement * scope)
 {
   using namespace SageBuilder;
   using namespace SageInterface;
@@ -117,7 +118,7 @@ FortranOpenMPHostSubroutineIndirectLoop::createKernelFunctionCallStatement ()
       calleeSubroutine->getSubroutineName (), buildVoidType (),
       actualParameters, subroutineScope);
 
-  return callStatement;
+  appendStatement (callStatement, scope);
 }
 
 SgBasicBlock *
@@ -722,7 +723,7 @@ FortranOpenMPHostSubroutineIndirectLoop::createPlanFunctionExecutionStatements (
 
   SgBasicBlock * innerLoopBody = buildBasicBlock ();
 
-  appendStatement (createKernelFunctionCallStatement (), innerLoopBody);
+  createKernelFunctionCallStatement (innerLoopBody);
 
   /*
    * ======================================================

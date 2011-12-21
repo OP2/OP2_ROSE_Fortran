@@ -6,19 +6,15 @@
 
 class CPPOpenCLUserSubroutine;
 class CPPReductionSubroutines;
+class CPPProgramDeclarationsAndDefinitions;
 
 class CPPOpenCLKernelSubroutine: public CPPKernelSubroutine
 {
   protected:
 
-    /*
-     * ======================================================
-     * Creates the statements which initialises the variables
-     * used to stage in data from device->shared->stack memory
-     * ======================================================
-     */
-    void
-    createInitialiseCUDAStageInVariablesStatements ();
+    CPPProgramDeclarationsAndDefinitions * declarations;
+
+  protected:
 
     /*
      * ======================================================
@@ -41,26 +37,21 @@ class CPPOpenCLKernelSubroutine: public CPPKernelSubroutine
 
     /*
      * ======================================================
-     * Creates the variable declarations needed to stage in
-     * data from device->shared->stack memory
+     * Creates the variable declarations needed to perform
+     * reductions
      * ======================================================
      */
     void
-    createCUDAStageInVariablesVariableDeclarations ();
+    createReductionVariableDeclarations ();
 
-    /*
-     * ======================================================
-     * Creates the variable declarations needed in CUDA
-     * shared memory
-     * ======================================================
-     */
     void
-    createCUDASharedVariableDeclarations ();
+    createOpDeclConstFormalParameterDeclarations ();
 
     CPPOpenCLKernelSubroutine (SgScopeStatement * moduleScope,
         CPPOpenCLUserSubroutine * userSubroutine,
         CPPParallelLoop * parallelLoop,
-        CPPReductionSubroutines * reductionSubroutines);
+        CPPReductionSubroutines * reductionSubroutines,
+        CPPProgramDeclarationsAndDefinitions * declarations);
 };
 
 #endif

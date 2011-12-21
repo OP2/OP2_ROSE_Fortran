@@ -19,6 +19,7 @@ namespace OpenCL
   std::string const totalThreadNumber = "totalThreadNumber";
   std::string const sharedMemorySize = "dynamicSharedMemorySize";
   std::string const CL_SUCCESS = "CL_SUCCESS";
+  std::string const CLK_LOCAL_MEM_FENCE = "CLK_LOCAL_MEM_FENCE";
   std::string const errorCode = "errorCode";
   std::string const event = "event";
   std::string const commandQueue = "commandQueue";
@@ -151,23 +152,57 @@ namespace OpenCL
   getFinishCommandQueueCallExpression (SgScopeStatement * scope,
       SgVarRefExp * commandQueue);
 
+  /*
+   * ======================================================
+   * Function call to OpenCL get_local_size.
+   * When the given expression is NULL, this returns
+   * get_loval_size(0) by default
+   * ======================================================
+   */
   SgFunctionCallExp *
-  getWorkGroupDimensionsCallStatement (SgScopeStatement * scope);
+  getLocalWorkGroupSizeCallStatement (SgScopeStatement * scope,
+      SgExpression * expression = NULL);
 
+  /*
+   * ======================================================
+   * Function call to OpenCL get_global_size.
+   * When the given expression is NULL, this returns
+   * get_global_size(0) by default
+   * ======================================================
+   */
   SgFunctionCallExp *
-  getLocalWorkGroupSizeCallStatement (SgScopeStatement * scope);
+  getGlobalWorkGroupSizeCallStatement (SgScopeStatement * scope,
+      SgExpression * expression = NULL);
 
+  /*
+   * ======================================================
+   * Function call to OpenCL get_local_id.
+   * When the given expression is NULL, this returns
+   * get_local_id(0) by default
+   * ======================================================
+   */
   SgFunctionCallExp *
-  getGlobalWorkGroupSizeCallStatement (SgScopeStatement * scope);
+  getLocalWorkItemIDCallStatement (SgScopeStatement * scope,
+      SgExpression * expression = NULL);
 
+  /*
+   * ======================================================
+   * Function call to OpenCL get_global_id.
+   * When the given expression is NULL, this returns
+   * get_global_id(0) by default
+   * ======================================================
+   */
   SgFunctionCallExp *
-  getLocalWorkItemIDCallStatement (SgScopeStatement * scope);
+  getWorkGroupIDCallStatement (SgScopeStatement * scope,
+      SgExpression * expression = NULL);
 
+  /*
+   * ======================================================
+   * Creates a barrier statement for all local work items
+   * ======================================================
+   */
   SgFunctionCallExp *
-  getWorkGroupIDCallStatement (SgScopeStatement * scope);
-
-  SgFunctionCallExp *
-  getNumberOfWorkGroupsCallStatement (SgScopeStatement * scope);
+  createWorkItemsSynchronisationCallStatement (SgScopeStatement * scope);
 
   namespace OP2RuntimeSupport
   {
@@ -177,6 +212,61 @@ namespace OpenCL
     SgFunctionCallExp *
     getAssertMessage (SgScopeStatement * scope,
         SgExpression * assertExpression, SgStringVal * message);
+
+    /*
+     * ======================================================
+     * Returns a function call expression to the run-time
+     * support function which allocates reduction arrays
+     * ======================================================
+     */
+    SgFunctionCallExp *
+    getReallocateReductionArraysCallStatement (SgScopeStatement * scope,
+        SgVarRefExp * reductionBytesReference);
+
+    /*
+     * ======================================================
+     * Returns a function call expression to the run-time
+     * support function which moves reduction arrays from host
+     * to device
+     * ======================================================
+     */
+    SgFunctionCallExp *
+    getMoveReductionArraysFromHostToDeviceCallStatement (
+        SgScopeStatement * scope, SgVarRefExp * reductionBytesReference);
+
+    /*
+     * ======================================================
+     * Returns a function call expression to the run-time
+     * support function which moves reduction arrays from host
+     * to device
+     * ======================================================
+     */
+    SgFunctionCallExp *
+    getMoveReductionArraysFromDeviceToHostCallStatement (
+        SgScopeStatement * scope, SgVarRefExp * reductionBytesReference);
+
+    /*
+     * ======================================================
+     * Returns a reference to the pointer which is returned
+     * after allocating a reduction array on the host through
+     * malloc (these are macros provided in the OP2 run-time
+     * support)
+     * ======================================================
+     */
+    SgVarRefExp *
+    getPointerToMemoryAllocatedForHostReductionArray (SgScopeStatement * scope);
+
+    /*
+     * ======================================================
+     * Returns a reference to the pointer which is returned
+     * after allocating a reduction array on the device through
+     * malloc (these are macros provided in the OP2 run-time
+     * support)
+     * ======================================================
+     */
+    SgVarRefExp *
+    getPointerToMemoryAllocatedForDeviceReductionArray (
+        SgScopeStatement * scope);
   }
 }
 

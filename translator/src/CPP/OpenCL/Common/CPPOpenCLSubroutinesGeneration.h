@@ -4,9 +4,18 @@
 
 #include <CPPSubroutinesGeneration.h>
 
+class CPPOpenCLConstantDeclarations;
+
 class CPPOpenCLSubroutinesGeneration: public CPPSubroutinesGeneration
 {
   private:
+
+    CPPOpenCLConstantDeclarations * constantDeclarations;
+
+  private:
+
+    virtual void
+    addFreeVariableDeclarations ();
 
     void
     createReductionSubroutines ();

@@ -42,6 +42,17 @@ ReductionVariableNames::getReductionCardinalityName (
 }
 
 std::string const
+ReductionVariableNames::getTemporaryReductionArrayName (
+    unsigned int OP_DAT_ArgumentGroup)
+{
+  using boost::lexical_cast;
+  using std::string;
+
+  return "reductionTemporaryArray" + lexical_cast <string> (
+      OP_DAT_ArgumentGroup);
+}
+
+std::string const
 LoopVariableNames::getIterationCounterVariableName (unsigned int n)
 {
   using boost::lexical_cast;

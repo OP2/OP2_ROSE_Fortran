@@ -1,6 +1,6 @@
-#include <CPPOpenCLUserSubroutine.h>
-#include <CPPParallelLoop.h>
-#include <CPPProgramDeclarationsAndDefinitions.h>
+#include "CPPOpenCLUserSubroutine.h"
+#include "CPPParallelLoop.h"
+#include "CPPProgramDeclarationsAndDefinitions.h"
 
 CPPOpenCLUserSubroutine::CPPOpenCLUserSubroutine (
     SgScopeStatement * moduleScope, CPPParallelLoop * parallelLoop,
