@@ -277,6 +277,19 @@ template <typename TSubroutineHeader>
       {
         return OpConstDefinitions.end ();
       }
+	  
+	  std::map <std::string, OpSubSetDefinition*>::const_iterator
+	  firstOpSubSetDefinition ()
+	  {
+		  return OpSubSetDefinitions.begin ();
+	  }
+	  
+	  std::map <std::string, OpSubSetDefinition*>::const_iterator
+	  lastOpSubSetDefinition ()
+	  {
+		  return OpSubSetDefinitions.end ();
+	  }
+	  
 
       TSubroutineHeader *
       getSubroutine (std::string subroutineName)

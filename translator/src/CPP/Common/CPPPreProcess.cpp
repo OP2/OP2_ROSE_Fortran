@@ -15,9 +15,11 @@ CPPPreProcess::visit (SgNode* node)
     using SageInterface::insertStatementListAfter;
     using SageInterface::insertStatementListBefore;
     using SageInterface::removeStatement;
+	using SageInterface::setOneSourcePositionForTransformation;
     
     using SageInterface::replaceStatement;
     using SageInterface::prependStatement;
+	using SageInterface::appendStatement;
 
     using SageInterface::addTextForUnparser;
     using SageInterface::attachComment;
@@ -74,7 +76,7 @@ CPPPreProcess::visit (SgNode* node)
                             ce,
                             buildPointerType (buildIntType ())),
                           scope);
-                    attachComment (subFlag, "Host data for subset flag");
+                    attachComment (subFlag, "Host data for subset flag.");
                 
                 
                     SgVariableDeclaration* subFlagDat =
@@ -88,24 +90,35 @@ CPPPreProcess::visit (SgNode* node)
                             buildExprListExp (
                               buildVarRefExp (SgName (originSetName), scope),
                               buildIntVal (1),
-                              buildVarRefExp (variableName + "_flag", scope)),
+							  buildStringVal ("int"),
+                              buildVarRefExp (variableName + "_flag", scope),
+							  buildStringVal (variableName + "_flag_op_dat")),
                             scope)),
                         scope);
-                    attachComment (subFlagDat, "op dat for subset flag");    
+                    attachComment (subFlagDat, "op dat for subset flag.");    
                 
                     
                     SgExprListExp* filterLoopCallParams = buildExprListExp ();
                     
-                    filterLoopCallParams->append_expression (buildFunctionRefExp (declarations->getSubroutine (opSubSet->getFilterKernelName ())));
+                    filterLoopCallParams->append_expression (buildFunctionRefExp (static_cast<CPPOxfordOpSubSetDefinition*> (opSubSet)->getFilterWrapperFunction ()->get_declaration ()));
+				
+					filterLoopCallParams->append_expression (buildStringVal (static_cast<CPPOxfordOpSubSetDefinition*> (opSubSet)->getFilterWrapperFunction ()->get_declaration ()->get_name ().getString ()));
                     
                     filterLoopCallParams->append_expression (buildOpaqueVarRefExp (originSetName, scope));
                 
                 for (int i = 0; i < opSubSet->getNbFilterArg (); i++) 
                 {
                     filterLoopCallParams->append_expression (isSgExpression (
-                      static_cast<CPPImperialOpSubSetDefinition*> (opSubSet)->getOpArgDat (i)));
+                      static_cast<CPPOxfordOpSubSetDefinition*> (opSubSet)->getOpArgDat (i)));
                 }
                     
+				
+				SgEnumVal * eval_OP_WRITE = buildEnumVal_nfi (1, declarations->getOpAccessEnumDeclaration (), SgName("OP_WRITE"));
+				setOneSourcePositionForTransformation (eval_OP_WRITE);
+
+				SgEnumVal * eval_OP_INC = buildEnumVal_nfi (3, declarations->getOpAccessEnumDeclaration (), SgName("OP_INC"));
+				setOneSourcePositionForTransformation (eval_OP_INC);				
+				
                 filterLoopCallParams->append_expression (
                   buildFunctionCallExp (
                     SgName ("op_arg_dat"),
@@ -114,7 +127,9 @@ CPPPreProcess::visit (SgNode* node)
                       buildVarRefExp (variableName + "_flag_op_dat", scope),
                       buildIntVal (0),
                       buildOpaqueVarRefExp ("OP_ID", scope),
-                      buildCastExp (buildIntVal (1), declarations->getOpAccessType (), SgCastExp::e_C_style_cast) // OP_WRITE
+					  buildIntVal (1),
+					  buildStringVal ("int"),
+					  eval_OP_WRITE
                     ),
                     scope
                   )
@@ -126,7 +141,9 @@ CPPPreProcess::visit (SgNode* node)
                     buildVoidType (), // Dummy not real type
                     buildExprListExp (
                       buildAddressOfOp(buildVarRefExp (variableName + "_count", scope)),
-                      buildCastExp (buildIntVal (3), declarations->getOpAccessType (), SgCastExp::e_C_style_cast) // OP_INC
+					  buildIntVal (1),
+					  buildStringVal ("int"),
+                      eval_OP_INC
                     ),
                     scope
                   )                                     
@@ -139,6 +156,7 @@ CPPPreProcess::visit (SgNode* node)
                     filterLoopCallParams,
                     scope
                   );
+				attachComment (filterLoopCall, "flagging and counting elements of the subset.");
                 
                 SgVariableDeclaration * nSubSet =
                   buildVariableDeclaration (
@@ -152,7 +170,8 @@ CPPPreProcess::visit (SgNode* node)
                           buildVarRefExp (
                             variableName + "_count",
                             scope
-                          )
+                          ),
+						  buildStringVal (variableName + "_new")
                         ),
                         scope
                       ),
@@ -160,6 +179,19 @@ CPPPreProcess::visit (SgNode* node)
                     ),
                     scope
                   );
+				
+				SgFunctionCallExp * fetchFlag =
+				  buildFunctionCallExp (
+					SgName ("op_fetch_data"),
+					buildVoidType (),
+					buildExprListExp (
+					buildVarRefExp (
+					  variableName + "_flag_op_dat",
+					  scope
+					)
+					),
+					scope
+				  );
                 
                 SgVariableDeclaration* mapArray =
                 buildVariableDeclaration(
@@ -169,7 +201,6 @@ CPPPreProcess::visit (SgNode* node)
                     ce,
                     buildPointerType (buildIntType ())),
                   scope);
-                
 
                 SgVariableDeclaration * ivar =
                   buildVariableDeclaration (
@@ -234,19 +265,22 @@ CPPPreProcess::visit (SgNode* node)
                         buildExprListExp (
                           buildVarRefExp (variableName + "_new", scope),
                           buildVarRefExp (originSetName, scope),
-                          buildIntVal (0),
-                          buildOpaqueVarRefExp ("p_" + variableName, scope)
+                          buildIntVal (1),
+                          buildOpaqueVarRefExp ("p_" + variableName, scope),
+						  buildStringVal ("op_p_" + variableName)
                         ),
                         scope),
                         declarations->getOpMapType ()),
                     scope
                   );
+				attachComment (mapDec, "1to0 mapping from subelements set to original set.");
                 
                 std::vector< SgStatement * > block;
                 block.push_back (subCount);
                 block.push_back (subFlag);
                 block.push_back (subFlagDat);
-                block.push_back (buildExprStatement(filterLoopCall));
+                block.push_back (buildExprStatement (filterLoopCall));
+				block.push_back (buildExprStatement (fetchFlag));
                 block.push_back (nSubSet);
                 block.push_back (mapArray);
                 block.push_back (ivar);
@@ -272,12 +306,10 @@ CPPPreProcess::visit (SgNode* node)
               functionCallExp->getAssociatedFunctionSymbol ()->get_name ().getString ();
             
             if (iequals (functionName, OP2::OP_PAR_LOOP))
-            {
-                Debug::getInstance ()->debugMessage ("Traversing : " + functionCallExp->unparseToString () + "'", Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
-                
+            {   
                 SgVarRefExp * setNameExp = 
                   isSgVarRefExp (
-                    functionCallExp->get_args ()->get_expressions ()[1]);
+                    functionCallExp->get_args ()->get_expressions ()[2]);
                 
                 OpSubSetDefinition* opSubSet;
                 try {
@@ -286,7 +318,7 @@ CPPPreProcess::visit (SgNode* node)
                     
                     Debug::getInstance ()->debugMessage ("Patching op_par_loop, replacing subset: '" + setNameExp->get_symbol ()->get_name ().getString () + "'", Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
                     
-                    functionCallExp->get_args ()->get_expressions ()[1] = 
+                    functionCallExp->get_args ()->get_expressions ()[2] = 
                     buildVarRefExp (setNameExp->get_symbol ()->get_name ().getString () + "_new",
                                     scope);
 
@@ -298,6 +330,107 @@ CPPPreProcess::visit (SgNode* node)
             }
             break;
         }
+			
+		case V_SgFunctionDeclaration:
+		{
+			SgFunctionDeclaration* decl = isSgFunctionDeclaration (node);
+			std::string filterUserFuncName = decl->get_name ().getString ();
+			
+			std::map <std::string, OpSubSetDefinition*>::const_iterator it;
+			
+			OpSubSetDefinition* subSetDefinition = NULL;
+			for (it = declarations->firstOpSubSetDefinition ();
+				 it != declarations->lastOpSubSetDefinition ();
+				 it++)
+			{
+				if (iequals (it->second->getFilterKernelName (), filterUserFuncName))
+				{
+					subSetDefinition = it->second;
+					break;
+				}
+			}
+			
+			if (subSetDefinition)
+			{
+				Debug::getInstance ()->debugMessage ("Patching subset filter function: '" + filterUserFuncName + "'", Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+				
+				SgScopeStatement* scope = getScope (node);
+				
+				SgFunctionParameterList * params = buildFunctionParameterList ();
+				
+				for (SgInitializedNamePtrList::iterator it = decl->get_args ().begin (); it != decl->get_args ().end (); it++)
+				{
+					params->append_arg (buildInitializedName ((*it)->get_name (), (*it)->get_type ()));
+
+				}
+				
+				params->append_arg (buildInitializedName ("is", buildPointerType (buildIntType ())));
+				params->append_arg (buildInitializedName ("isc", buildPointerType (buildIntType ())));
+				
+				SgFunctionDeclaration * filterFunc = 
+				  buildDefiningFunctionDeclaration (
+				    SgName ("_op_subset_filter_" + filterUserFuncName),
+					buildVoidType (),
+				    params,
+					scope
+					);
+				
+				
+				SgBasicBlock * subroutineScope = filterFunc->get_definition ()->get_body ();
+				
+				SgExprListExp * paramsExp = buildExprListExp ();
+
+				for (SgInitializedNamePtrList::iterator it = decl->get_args ().begin (); it != decl->get_args ().end (); it++)
+				{
+					paramsExp->append_expression (buildOpaqueVarRefExp ((*it)->get_name (), subroutineScope));
+				}
+				
+				appendStatement (
+				  buildVariableDeclaration (
+					"_t",
+					buildIntType (),
+					buildAssignInitializer (
+					  buildConditionalExp (
+						buildFunctionCallExp (
+						  SgName (filterUserFuncName),
+						  buildBoolType (),
+						  paramsExp,
+						  subroutineScope
+						),
+						buildIntVal (1),
+						buildIntVal (0)
+					  ),
+					  buildIntType ()),
+					subroutineScope
+				   ),
+				  subroutineScope);
+				
+				appendStatement (
+				  buildExprStatement (
+				    buildAssignOp (
+					  buildPointerDerefExp (buildOpaqueVarRefExp ("is", subroutineScope)),
+					  buildOpaqueVarRefExp ("_t", subroutineScope)
+				    )
+				  ),
+				  subroutineScope);
+
+				appendStatement (
+				  buildExprStatement (
+					buildPlusAssignOp (
+					  buildPointerDerefExp (buildOpaqueVarRefExp ("isc", subroutineScope)),
+					  buildOpaqueVarRefExp ("_t", subroutineScope)
+				    )
+				  ),
+				  subroutineScope);
+
+				attachComment (filterFunc, "Wrapper function for the filter function");
+				appendStatement (filterFunc, scope);
+				
+				static_cast<CPPOxfordOpSubSetDefinition*> (subSetDefinition)->setFilterWrapperFunction (filterFunc->get_definition ());
+			}
+			
+			break;
+		}
         
         default:
         {
@@ -309,9 +442,8 @@ CPPPreProcess::visit (SgNode* node)
 CPPPreProcess::CPPPreProcess (SgProject* project, CPPProgramDeclarationsAndDefinitions * declarations) : declarations (declarations)
 {
     Debug::getInstance ()->debugMessage ("Preprocessing OP2 code'", Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
-//    traverseInputFiles (project, preorder);
         traverse (project, preorder);
 
-    Debug::getInstance ()->debugMessage ("Preprocessing OP2 code -- 2nd pass'", Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
-            traverse (project, preorder);
+//    Debug::getInstance ()->debugMessage ("Preprocessing OP2 code -- 2nd pass'", Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+//            traverse (project, preorder);
 }

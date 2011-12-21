@@ -65,27 +65,32 @@ class CPPImperialOpSetDefinition: public OpSetDefinition
         std::string const & variableName);
 };
 
-class CPPImperialOpSubSetDefinition: public OpSubSetDefinition
+class CPPOxfordOpSubSetDefinition: public OpSubSetDefinition
 {
     /*
      * ======================================================
-     * Models an OP_SUBSET definition in C++ (Imperial API).
+     * Models an OP_SUBSET definition in C++ (Oxford API).
      *
      * The following function prototype is assumed:
-     * OP_DECL_SUBSET (op_set, kernel, op_arg...)
+     * OP_DECL_SUBSET (op_set, givenname, kernel, op_arg...)
      * ======================================================
      */
     
 private:
     SgExprListExp* parameters;
+	SgFunctionDefinition* wrapperFunction;
     
 public:
     static int const indexOriginSet = 0;
-    static int const indexFilterKernel = 1;
+	static int const indexGivenName = 1;
+    static int const indexFilterKernel = 2;
     
     SgNode* getOpArgDat(int i);
+	
+	SgFunctionDefinition* getFilterWrapperFunction ();
+	void setFilterWrapperFunction (SgFunctionDefinition* wrapper);
     
-    CPPImperialOpSubSetDefinition (SgExprListExp * parameters,
+    CPPOxfordOpSubSetDefinition (SgExprListExp * parameters,
                                 std::string const & variableName);
 };
 
