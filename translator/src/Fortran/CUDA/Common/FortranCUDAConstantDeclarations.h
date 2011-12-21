@@ -10,12 +10,17 @@ class ScopedVariableDeclarations;
 class SgScopeStatement;
 class SgVarRefExp;
 class SgProcedureHeaderStatement;
+class FortranCUDAInitialiseConstantsSubroutine;
 
 class FortranCUDAConstantDeclarations
 {
   private:
 
     ScopedVariableDeclarations * variableDeclarations;
+
+    FortranCUDAInitialiseConstantsSubroutine * initialisationRoutine;
+    
+  protected:
 
     std::map <std::string, std::string> oldNamesToNewNames;
 
@@ -40,6 +45,10 @@ class FortranCUDAConstantDeclarations
     patchReferencesToCUDAConstants (
         SgProcedureHeaderStatement * procedureHeader);
 
+    void
+    appendCUDAConstantInitialisationToModule ( SgScopeStatement * moduleScope,
+        FortranProgramDeclarationsAndDefinitions * declarations);
+        
     FortranCUDAConstantDeclarations (
         FortranProgramDeclarationsAndDefinitions * declarations,
         SgScopeStatement * moduleScope);

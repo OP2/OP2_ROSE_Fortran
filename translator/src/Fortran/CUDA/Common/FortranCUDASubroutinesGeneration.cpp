@@ -144,7 +144,7 @@ FortranCUDASubroutinesGeneration::createSubroutines ()
   using std::string;
   using std::map;
 
-  createSubroutinesInConstantsModule ();
+  CUDAconstants->appendCUDAConstantInitialisationToModule ( moduleScope, declarations );
 
   for (map <string, ParallelLoop *>::const_iterator it =
       declarations->firstParallelLoop (); it
@@ -174,7 +174,19 @@ FortranCUDASubroutinesGeneration::createSubroutines ()
 
     RoseHelper::forceOutputOfCodeToFile (
         userDeviceSubroutine->getSubroutineHeaderStatement ());
+        
 
+    /*
+     * ======================================================
+     * When the user subroutine has calls to other user
+     * subroutines we need to add them to the generated file
+     * ======================================================
+     */
+    
+    userDeviceSubroutine->appendAdditionalSubroutines (moduleScope, parallelLoop, declarations, CUDAconstants);
+    
+    vector < FortranUserSubroutine * > additionalSubroutines = userDeviceSubroutine->getAdditionalSubroutines ();
+    
     FortranCUDAKernelSubroutine * kernelSubroutine;
 
     if (parallelLoop->isDirectLoop ())

@@ -3,6 +3,8 @@
 #include "FortranProgramDeclarationsAndDefinitions.h"
 #include "FortranStatementsAndExpressionsBuilder.h"
 #include "FortranTypesBuilder.h"
+#include <FortranCUDAConstantDeclarations.h>
+#include <RoseHelper.h>
 #include "Debug.h"
 #include "Exceptions.h"
 #include <boost/algorithm/string/predicate.hpp>
@@ -27,10 +29,40 @@ FortranCUDAUserSubroutine::createStatements ()
 
   for (vector <SgStatement *>::iterator it = originalStatements.begin (); it
       != originalStatements.end (); ++it)
-  {
+  {    
+            
+    SgExprStatement * isExprStatement = isSgExprStatement ( *it );
+    if ( isExprStatement != NULL )
+    {      
+      SgFunctionCallExp * functionCallExp = isSgFunctionCallExp ( isExprStatement->get_expression() );
+    
+      if ( functionCallExp != NULL )
+      {
+        string const
+            calleeName =
+                functionCallExp->getAssociatedFunctionSymbol ()->get_name ().getString ();
+
+        Debug::getInstance ()->debugMessage ("Found function call in user subroutine "
+            + calleeName + "'", Debug::OUTER_LOOP_LEVEL, __FILE__, __LINE__);
+
+        /*
+         * ======================================================
+         * As we are in fortran, all user subroutines must be
+         * SgProcedureHeaderStatements = subroutines and not
+         * functions. This might be extended to cover also 
+         * functions in the future (?). Probably not in OP2
+         * ======================================================
+         */            
+        SgProcedureHeaderStatement * isProcedureHeaderStatement = isSgProcedureHeaderStatement ( 
+          functionCallExp->getAssociatedFunctionDeclaration() );
+            
+        calledRoutines.push_back ( isProcedureHeaderStatement );
+      }
+    }
+
     SgVariableDeclaration * isVariableDeclaration = isSgVariableDeclaration (
         *it);
-
+        
     if (isVariableDeclaration == NULL)
     {
       Debug::getInstance ()->debugMessage (
@@ -79,6 +111,8 @@ FortranCUDAUserSubroutine::createStatements ()
                       FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
                           variableName, type, subroutineScope,
                           formalParameters, 1, CUDA_SHARED);
+                      
+               ROSE_ASSERT ( variableDeclaration != NULL );
             }
             else if (parallelLoop->isGlobal (OP_DAT_ArgumentGroup)
                 && !parallelLoop->isArray (OP_DAT_ArgumentGroup)
@@ -136,6 +170,63 @@ FortranCUDAUserSubroutine::createFormalParameterDeclarations ()
 {
 }
 
+
+/*
+ * ======================================================
+ * This function appends all additional subroutines
+ * called inside the user subroutine. It is specialised
+ * for CUDA in the related subclass
+ * ======================================================
+ */
+void FortranCUDAUserSubroutine::appendAdditionalSubroutines ( SgScopeStatement * moduleScope,
+  FortranParallelLoop * parallelLoop, FortranProgramDeclarationsAndDefinitions * declarations,
+  FortranCUDAConstantDeclarations * CUDAconstants)
+{
+  /*
+   * ======================================================
+   * First removes duplicates in calledRoutines
+   * ======================================================
+   */
+  sort ( calledRoutines.begin(), calledRoutines.end() );
+  calledRoutines.erase ( unique ( calledRoutines.begin(), calledRoutines.end() ), calledRoutines.end() );
+
+  vector < SgProcedureHeaderStatement * > :: iterator it;
+  for ( it = calledRoutines.begin(); it != calledRoutines.end(); it++ )
+  {
+   /*
+    * ======================================================
+    * Stil does not check if the routine is already present
+    * ======================================================
+    */
+   
+    Debug::getInstance ()->debugMessage ("Appending new subroutine '"
+        + (*it)->get_name ().getString () + "'", Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+   
+    FortranCUDAUserSubroutine * newRoutine = new FortranCUDAUserSubroutine ( moduleScope, 
+        parallelLoop, declarations, (*it)->get_name ().getString () );
+   
+    additionalSubroutines.push_back (newRoutine);
+  }
+  
+  vector < FortranUserSubroutine * > :: iterator itRecursive;
+  for ( itRecursive = additionalSubroutines.begin(); itRecursive != additionalSubroutines.end(); itRecursive++ )
+  {      
+    FortranCUDAUserSubroutine * cudaSubroutineCasting = (FortranCUDAUserSubroutine *) *itRecursive;
+    CUDAconstants->patchReferencesToCUDAConstants (
+      (cudaSubroutineCasting )->getSubroutineHeaderStatement ());
+          
+    RoseHelper::forceOutputOfCodeToFile (
+      (cudaSubroutineCasting )->getSubroutineHeaderStatement ());
+  }
+
+  for ( itRecursive = additionalSubroutines.begin(); itRecursive != additionalSubroutines.end(); itRecursive++ )
+  {    
+    FortranCUDAUserSubroutine * cudaSubroutineCasting = (FortranCUDAUserSubroutine *) *itRecursive;
+    cudaSubroutineCasting->appendAdditionalSubroutines (moduleScope, parallelLoop, declarations, CUDAconstants);
+  }  
+}
+
+
 FortranCUDAUserSubroutine::FortranCUDAUserSubroutine (
     SgScopeStatement * moduleScope, FortranParallelLoop * parallelLoop,
     FortranProgramDeclarationsAndDefinitions * declarations) :
@@ -143,5 +234,17 @@ FortranCUDAUserSubroutine::FortranCUDAUserSubroutine (
 {
   subroutineHeaderStatement->get_functionModifier ().setCudaDevice ();
 
+  createStatements (); 
+}
+
+
+FortranCUDAUserSubroutine::FortranCUDAUserSubroutine (
+    SgScopeStatement * moduleScope, FortranParallelLoop * parallelLoop,
+    FortranProgramDeclarationsAndDefinitions * declarations, string subroutineName) :
+  FortranUserSubroutine (moduleScope, parallelLoop, declarations, subroutineName)
+{
+  subroutineHeaderStatement->get_functionModifier ().setCudaDevice ();
+
   createStatements ();
 }
+

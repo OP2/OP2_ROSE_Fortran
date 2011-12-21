@@ -61,11 +61,13 @@ CommandLine::addDebugOption ()
 
   string const parameterName = "n";
 
+  /* ASK ADAM */
   string const helpMessage = "Set the debug level. Valid values of "
       + parameterName + " are in the range " + lexical_cast <string> (
       Debug::LOWEST_DEBUG_LEVEL) + ".." + lexical_cast <string> (
       Debug::HIGHEST_DEBUG_LEVEL);
-
+      
+      
   DebugOption * debug = new DebugOption (helpMessage, parameterName, "d",
       "debug");
 
