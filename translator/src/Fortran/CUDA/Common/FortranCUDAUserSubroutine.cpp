@@ -17,7 +17,64 @@ FortranCUDAUserSubroutine::createStatements ()
   using boost::iequals;
   using std::string;
   using std::vector;
+  
+  class TreeVisitor: public AstSimpleProcessing
+  {
+    private:
+    /*
+     * ======================================================
+     * The recursive visit of a user subroutine populates
+     * this vector with successive function calls which are
+     * then appended after the visit
+     * ======================================================
+     */            
+    vector < SgProcedureHeaderStatement * > calledRoutines;
 
+    public:
+
+      vector < SgProcedureHeaderStatement * > getCalledRoutinesInStatement()
+      {
+        return calledRoutines;
+      }
+      
+      TreeVisitor ()
+      {
+      }
+
+      virtual void
+      visit (SgNode * node)
+      {
+        SgExprStatement * isExprStatement = isSgExprStatement ( node );
+        if ( isExprStatement != NULL )
+        {      
+          SgFunctionCallExp * functionCallExp = isSgFunctionCallExp ( isExprStatement->get_expression() );
+        
+          if ( functionCallExp != NULL )
+          {
+            string const
+                calleeName =
+                    functionCallExp->getAssociatedFunctionSymbol ()->get_name ().getString ();
+
+            Debug::getInstance ()->debugMessage ("Found function call in user subroutine "
+                + calleeName + "'", Debug::OUTER_LOOP_LEVEL, __FILE__, __LINE__);
+
+            /*
+             * ======================================================
+             * As we are in fortran, all user subroutines must be
+             * SgProcedureHeaderStatements = subroutines and not
+             * functions. This might be extended to cover also 
+             * functions in the future (?). Probably not in OP2
+             * ======================================================
+             */
+            SgProcedureHeaderStatement * isProcedureHeaderStatement = isSgProcedureHeaderStatement ( 
+              functionCallExp->getAssociatedFunctionDeclaration() );
+                
+            calledRoutines.push_back ( isProcedureHeaderStatement );
+          }
+        }
+      }
+  };
+  
   Debug::getInstance ()->debugMessage ("Outputting and modifying statements",
       Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
@@ -29,8 +86,13 @@ FortranCUDAUserSubroutine::createStatements ()
 
   for (vector <SgStatement *>::iterator it = originalStatements.begin (); it
       != originalStatements.end (); ++it)
-  {    
-            
+  { 
+    SgAssignStatement * isAssignStatement = isSgAssignStatement ( *it );
+    
+    if ( isAssignStatement != NULL )
+        Debug::getInstance ()->debugMessage ("Found asssignment statement user subroutine ", Debug::OUTER_LOOP_LEVEL, __FILE__, __LINE__);
+      
+    
     SgExprStatement * isExprStatement = isSgExprStatement ( *it );
     if ( isExprStatement != NULL )
     {      
@@ -62,14 +124,37 @@ FortranCUDAUserSubroutine::createStatements ()
 
     SgVariableDeclaration * isVariableDeclaration = isSgVariableDeclaration (
         *it);
-        
+
     if (isVariableDeclaration == NULL)
-    {
+    { 
       Debug::getInstance ()->debugMessage (
           "Appending (non-variable-declaration) statement",
           Debug::HIGHEST_DEBUG_LEVEL, __FILE__, __LINE__);
 
       appendStatement (*it, subroutineScope);
+
+      /*
+       * ======================================================
+       * Recursively look for subroutine calls inside shallow
+       * nodes in the routines (e.g. when a call is inside an 
+       * if). After the visit get the generated vector of names
+       * and append it to the userSubroutine vector
+       * ======================================================
+       */                  
+      TreeVisitor * visitor = new TreeVisitor ();
+
+      visitor->traverse (*it, preorder);
+
+      Debug::getInstance ()->debugMessage ("Appending deep subroutine calls", Debug::OUTER_LOOP_LEVEL, __FILE__, __LINE__);
+
+      
+      vector < SgProcedureHeaderStatement * > deepStatementCalls = visitor->getCalledRoutinesInStatement ();
+      vector < SgProcedureHeaderStatement * >::iterator itDeepCalls;
+      for (itDeepCalls = deepStatementCalls.begin(); itDeepCalls != deepStatementCalls.end(); ++itDeepCalls)
+        calledRoutines.push_back (*itDeepCalls);
+      
+       Debug::getInstance ()->debugMessage ("Appending deep subroutine calls", Debug::OUTER_LOOP_LEVEL, __FILE__, __LINE__);
+      
     }
     else
     {
@@ -210,8 +295,9 @@ void FortranCUDAUserSubroutine::appendAdditionalSubroutines ( SgScopeStatement *
   
   vector < FortranUserSubroutine * > :: iterator itRecursive;
   for ( itRecursive = additionalSubroutines.begin(); itRecursive != additionalSubroutines.end(); itRecursive++ )
-  {      
+  {
     FortranCUDAUserSubroutine * cudaSubroutineCasting = (FortranCUDAUserSubroutine *) *itRecursive;
+
     CUDAconstants->patchReferencesToCUDAConstants (
       (cudaSubroutineCasting )->getSubroutineHeaderStatement ());
           
@@ -220,12 +306,12 @@ void FortranCUDAUserSubroutine::appendAdditionalSubroutines ( SgScopeStatement *
   }
 
   for ( itRecursive = additionalSubroutines.begin(); itRecursive != additionalSubroutines.end(); itRecursive++ )
-  {    
+  {
     FortranCUDAUserSubroutine * cudaSubroutineCasting = (FortranCUDAUserSubroutine *) *itRecursive;
-    cudaSubroutineCasting->appendAdditionalSubroutines (moduleScope, parallelLoop, declarations, CUDAconstants);
-  }  
-}
 
+    cudaSubroutineCasting->appendAdditionalSubroutines (moduleScope, parallelLoop, declarations, CUDAconstants);
+  }
+}
 
 FortranCUDAUserSubroutine::FortranCUDAUserSubroutine (
     SgScopeStatement * moduleScope, FortranParallelLoop * parallelLoop,
