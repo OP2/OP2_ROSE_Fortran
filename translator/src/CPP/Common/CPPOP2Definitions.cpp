@@ -50,11 +50,22 @@ CPPImperialOpSetDefinition::CPPImperialOpSetDefinition (
 }
 
 SgNode*
-CPPImperialOpSubSetDefinition::getOpArgDat(int i) {
-    return this->parameters->get_expressions ()[2 + i];
+CPPOxfordOpSubSetDefinition::getOpArgDat(int i) {
+    return this->parameters->get_expressions ()[3 + i];
 }
 
-CPPImperialOpSubSetDefinition::CPPImperialOpSubSetDefinition (
+SgFunctionDefinition* 
+CPPOxfordOpSubSetDefinition::getFilterWrapperFunction ()
+{
+	return this->wrapperFunction;
+}
+void
+CPPOxfordOpSubSetDefinition::setFilterWrapperFunction (SgFunctionDefinition* wrapper)
+{
+	this->wrapperFunction = wrapper;
+}
+
+CPPOxfordOpSubSetDefinition::CPPOxfordOpSubSetDefinition (
                                                         SgExprListExp * parameters, std::string const & variableName)
 {
     this->variableName = variableName;
@@ -63,7 +74,7 @@ CPPImperialOpSubSetDefinition::CPPImperialOpSubSetDefinition (
     
     this->filterKernelName = isSgFunctionRefExp (parameters->get_expressions ()[indexFilterKernel])->get_symbol ()->get_name ().getString ();
     
-    this->nbFilterArg = parameters->get_expressions ().size () - 2;
+    this->nbFilterArg = parameters->get_expressions ().size () - 3;
     this->parameters = parameters;
     
     Debug::getInstance ()->debugMessage ("Found an OP_SUBSET declaration: '"
