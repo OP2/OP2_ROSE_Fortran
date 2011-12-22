@@ -196,7 +196,7 @@ FortranCUDAUserSubroutine::createStatements ()
                       FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
                           variableName, type, subroutineScope,
                           formalParameters, 1, CUDA_SHARED);
-                      
+
                ROSE_ASSERT ( variableDeclaration != NULL );
             }
             else if (parallelLoop->isGlobal (OP_DAT_ArgumentGroup)
