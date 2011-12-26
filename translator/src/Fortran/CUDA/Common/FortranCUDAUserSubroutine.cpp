@@ -297,15 +297,20 @@ void FortranCUDAUserSubroutine::appendAdditionalSubroutines ( SgScopeStatement *
   {
    /*
     * ======================================================
-    * Stil does not check if the routine is already present
+    * Each subroutine takes its original name followed by
+    * "_" and the name of the caller, to avoid to manage
+    * consistency between same routine called in different
+    * positions (i.e. for the "value" attribute)
     * ======================================================
     */
    
+    string calledSubroutineName = (*it)->get_name ().getString () + "_" + subroutineName;
+    
     Debug::getInstance ()->debugMessage ("Appending new subroutine '"
-        + (*it)->get_name ().getString () + "'", Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+        + calledSubroutineName + "'", Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
    
     FortranCUDAUserSubroutine * newRoutine = new FortranCUDAUserSubroutine ( moduleScope, 
-        parallelLoop, declarations, (*it)->get_name ().getString () );
+        parallelLoop, declarations, calledSubroutineName );
    
     additionalSubroutines.push_back (newRoutine);
   }
