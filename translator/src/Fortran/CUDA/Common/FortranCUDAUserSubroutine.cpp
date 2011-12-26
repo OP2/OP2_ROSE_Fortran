@@ -10,6 +10,91 @@
 #include <boost/algorithm/string/predicate.hpp>
 #include <algorithm>
 
+void 
+FortranCUDAUserSubroutine::patchCalledSubroutinesNames (string oldSubroutineName,
+  SgProcedureHeaderStatement * calledSubroutineReference)
+{
+  using namespace SageInterface;
+  using boost::iequals;
+  using std::string;
+  using std::vector;
+  
+  class TreeVisitor: public AstSimpleProcessing
+  {
+  private:
+    /*
+     * ======================================================
+     * The recursive visit of a user subroutine changes
+     * the references to the user subroutines to the passed
+     * one as formal parameter to this function
+     * ======================================================
+     */            
+    vector < SgProcedureHeaderStatement * > calledRoutines;
+    
+  public:
+    
+    vector < SgProcedureHeaderStatement * > getCalledRoutinesInStatement()
+    {
+      return calledRoutines;
+    }
+    
+    TreeVisitor ()
+    {
+    }
+    
+    virtual void
+    visit (SgNode * node)
+    {
+      SgExprStatement * isExprStatement = isSgExprStatement ( node );
+      if ( isExprStatement != NULL )
+      {      
+        SgFunctionCallExp * functionCallExp = isSgFunctionCallExp ( isExprStatement->get_expression() );
+        
+        if ( functionCallExp != NULL )
+        {
+          string const
+          calleeName =
+          functionCallExp->getAssociatedFunctionSymbol ()->get_name ().getString ();
+          
+          Debug::getInstance ()->debugMessage ("Found function call in user subroutine "
+                                               + calleeName + "'", Debug::OUTER_LOOP_LEVEL, __FILE__, __LINE__);
+          
+          if ( iequals (calleeName, oldSubroutineName)
+          {
+            /*
+             * ======================================================
+             * Patching the name of the called function
+             * ======================================================
+             */
+            SgFunctionRefExp * referenceToNewName = buildFunctionRefExp (
+              calledSubroutineReference);
+
+            functionCallExp->set_function (referenceToNewName);
+          }
+        }
+      }
+    }
+  };
+  
+  vector <SgStatement *> originalStatements =
+  originalSubroutine->get_definition ()->get_body ()->get_statements ();
+  
+  for (vector <SgStatement *>::iterator it = originalStatements.begin (); it
+       != originalStatements.end (); ++it)
+  {      
+    /*
+     * ======================================================
+     * Recursively look for subroutine calls inside shallow
+     * nodes in the routines to change the name to the 
+     * modified name
+     * ======================================================
+     */                  
+    TreeVisitor * visitor = new TreeVisitor ();
+    
+    visitor->traverse (*it, preorder);
+  }
+}
+
 void
 FortranCUDAUserSubroutine::createStatements ()
 {
@@ -304,7 +389,8 @@ void FortranCUDAUserSubroutine::appendAdditionalSubroutines ( SgScopeStatement *
     * ======================================================
     */
    
-    string calledSubroutineName = (*it)->get_name ().getString () + "_" + subroutineName;
+    string calledSubroutineName = (*it)->get_name ().getString ();
+    // + "_" + subroutineName;
     
     Debug::getInstance ()->debugMessage ("Appending new subroutine '"
         + calledSubroutineName + "'", Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
@@ -313,6 +399,16 @@ void FortranCUDAUserSubroutine::appendAdditionalSubroutines ( SgScopeStatement *
         parallelLoop, declarations, calledSubroutineName );
    
     additionalSubroutines.push_back (newRoutine);
+    
+    /*
+     * ======================================================
+     * As the name of the called routine has changed, I need
+     * to patch all references in the caller
+     * ======================================================
+     */
+//    patchCalledSubroutinesNames ((*it)->get_name ().getString (),
+//      newRoutine->getSubroutineHeaderStatement());
+    
   }
   
   vector < FortranUserSubroutine * > :: iterator itRecursive;
@@ -364,9 +460,9 @@ FortranCUDAUserSubroutine::FortranCUDAUserSubroutine (
 
 FortranCUDAUserSubroutine::FortranCUDAUserSubroutine (
     SgScopeStatement * moduleScope, FortranParallelLoop * parallelLoop,
-    FortranProgramDeclarationsAndDefinitions * declarations, string subroutineName),
-    isUserKernel (false) :
-  FortranUserSubroutine (moduleScope, parallelLoop, declarations, subroutineName)
+    FortranProgramDeclarationsAndDefinitions * declarations, string subroutineName):
+  FortranUserSubroutine (moduleScope, parallelLoop, declarations, subroutineName),
+  isUserKernel (false)
 {
   subroutineHeaderStatement->get_functionModifier ().setCudaDevice ();
 

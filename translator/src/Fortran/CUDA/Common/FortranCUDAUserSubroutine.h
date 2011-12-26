@@ -21,7 +21,7 @@ class FortranCUDAUserSubroutine: public FortranUserSubroutine
      * formal parameters
      * ======================================================
      */
-    isUserKernel;
+    bool isUserKernel;
 
   public:
 
