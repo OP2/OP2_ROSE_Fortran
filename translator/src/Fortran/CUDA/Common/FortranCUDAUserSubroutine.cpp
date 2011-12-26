@@ -10,90 +10,90 @@
 #include <boost/algorithm/string/predicate.hpp>
 #include <algorithm>
 
-void 
-FortranCUDAUserSubroutine::patchCalledSubroutinesNames (string oldSubroutineName,
-  SgProcedureHeaderStatement * calledSubroutineReference)
-{
-  using namespace SageInterface;
-  using boost::iequals;
-  using std::string;
-  using std::vector;
+// void 
+// FortranCUDAUserSubroutine::patchCalledSubroutinesNames (string oldSubroutineName,
+//   SgProcedureHeaderStatement * calledSubroutineReference)
+// {
+//   using namespace SageInterface;
+//   using boost::iequals;
+//   using std::string;
+//   using std::vector;
   
-  class TreeVisitor: public AstSimpleProcessing
-  {
-  private:
-    /*
-     * ======================================================
-     * The recursive visit of a user subroutine changes
-     * the references to the user subroutines to the passed
-     * one as formal parameter to this function
-     * ======================================================
-     */            
-    vector < SgProcedureHeaderStatement * > calledRoutines;
+//   class TreeVisitor: public AstSimpleProcessing
+//   {
+//   private:
+//     /*
+//      * ======================================================
+//      * The recursive visit of a user subroutine changes
+//      * the references to the user subroutines to the passed
+//      * one as formal parameter to this function
+//      * ======================================================
+//      */            
+//     vector < SgProcedureHeaderStatement * > calledRoutines;
     
-  public:
+//   public:
     
-    vector < SgProcedureHeaderStatement * > getCalledRoutinesInStatement()
-    {
-      return calledRoutines;
-    }
+//     vector < SgProcedureHeaderStatement * > getCalledRoutinesInStatement()
+//     {
+//       return calledRoutines;
+//     }
     
-    TreeVisitor ()
-    {
-    }
+//     TreeVisitor ()
+//     {
+//     }
     
-    virtual void
-    visit (SgNode * node)
-    {
-      SgExprStatement * isExprStatement = isSgExprStatement ( node );
-      if ( isExprStatement != NULL )
-      {      
-        SgFunctionCallExp * functionCallExp = isSgFunctionCallExp ( isExprStatement->get_expression() );
+//     virtual void
+//     visit (SgNode * node)
+//     {
+//       SgExprStatement * isExprStatement = isSgExprStatement ( node );
+//       if ( isExprStatement != NULL )
+//       {      
+//         SgFunctionCallExp * functionCallExp = isSgFunctionCallExp ( isExprStatement->get_expression() );
         
-        if ( functionCallExp != NULL )
-        {
-          string const
-          calleeName =
-          functionCallExp->getAssociatedFunctionSymbol ()->get_name ().getString ();
+//         if ( functionCallExp != NULL )
+//         {
+//           string const
+//           calleeName =
+//           functionCallExp->getAssociatedFunctionSymbol ()->get_name ().getString ();
           
-          Debug::getInstance ()->debugMessage ("Found function call in user subroutine "
-                                               + calleeName + "'", Debug::OUTER_LOOP_LEVEL, __FILE__, __LINE__);
+//           Debug::getInstance ()->debugMessage ("Found function call in user subroutine "
+//                                                + calleeName + "'", Debug::OUTER_LOOP_LEVEL, __FILE__, __LINE__);
           
-          if ( iequals (calleeName, oldSubroutineName)
-          {
-            /*
-             * ======================================================
-             * Patching the name of the called function
-             * ======================================================
-             */
-            SgFunctionRefExp * referenceToNewName = buildFunctionRefExp (
-              calledSubroutineReference);
+//           if ( iequals (calleeName, oldSubroutineName)
+//           {
+//             /*
+//              * ======================================================
+//              * Patching the name of the called function
+//              * ======================================================
+//              */
+//             SgFunctionRefExp * referenceToNewName = buildFunctionRefExp (
+//               calledSubroutineReference);
 
-            functionCallExp->set_function (referenceToNewName);
-          }
-        }
-      }
-    }
-  };
+//             functionCallExp->set_function (referenceToNewName);
+//           }
+//         }
+//       }
+//     }
+//   };
   
-  vector <SgStatement *> originalStatements =
-  originalSubroutine->get_definition ()->get_body ()->get_statements ();
+//   vector <SgStatement *> originalStatements =
+//   originalSubroutine->get_definition ()->get_body ()->get_statements ();
   
-  for (vector <SgStatement *>::iterator it = originalStatements.begin (); it
-       != originalStatements.end (); ++it)
-  {      
-    /*
-     * ======================================================
-     * Recursively look for subroutine calls inside shallow
-     * nodes in the routines to change the name to the 
-     * modified name
-     * ======================================================
-     */                  
-    TreeVisitor * visitor = new TreeVisitor ();
+//   for (vector <SgStatement *>::iterator it = originalStatements.begin (); it
+//        != originalStatements.end (); ++it)
+//   {      
+//     /*
+//      * ======================================================
+//      * Recursively look for subroutine calls inside shallow
+//      * nodes in the routines to change the name to the 
+//      * modified name
+//      * ======================================================
+//      */                  
+//     TreeVisitor * visitor = new TreeVisitor ();
     
-    visitor->traverse (*it, preorder);
-  }
-}
+//     visitor->traverse (*it, preorder);
+//   }
+// }
 
 void
 FortranCUDAUserSubroutine::createStatements ()
@@ -260,13 +260,13 @@ FortranCUDAUserSubroutine::createStatements ()
          * ======================================================
          */                  
         
-        if ( isUserKernel == true )
-        {
-          bool isFormalParamater = false;
-
-          for (SgInitializedNamePtrList::iterator paramIt =
-              originalParameters->get_args ().begin (); paramIt
-              != originalParameters->get_args ().end (); ++paramIt, ++OP_DAT_ArgumentGroup)
+	//        if ( isUserKernel == true )
+        //{
+	bool isFormalParamater = false;
+	
+	for (SgInitializedNamePtrList::iterator paramIt =
+	       originalParameters->get_args ().begin (); paramIt
+	       != originalParameters->get_args ().end (); ++paramIt, ++OP_DAT_ArgumentGroup)
           {
             string const formalParamterName =
                 (*paramIt)->get_name ().getString ();
@@ -282,11 +282,17 @@ FortranCUDAUserSubroutine::createStatements ()
                     + "' is an INDIRECT formal parameter which is READ",
                     Debug::HIGHEST_DEBUG_LEVEL, __FILE__, __LINE__);
 
-                SgVariableDeclaration
-                    * variableDeclaration =
+		SgVariableDeclaration * variableDeclaration;
+		if ( isUserKernel == true )
+		  variableDeclaration =
                         FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
                             variableName, type, subroutineScope,
                             formalParameters, 1, CUDA_SHARED);
+		else
+                    variableDeclaration =
+                        FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
+                            variableName, type, subroutineScope,
+                            formalParameters, 0);
 
                  ROSE_ASSERT ( variableDeclaration != NULL );
               }
@@ -298,11 +304,19 @@ FortranCUDAUserSubroutine::createStatements ()
                     + "' is a GLOBAL SCALAR formal parameter which is READ",
                     Debug::HIGHEST_DEBUG_LEVEL, __FILE__, __LINE__);
 
-                SgVariableDeclaration
+		if ( isUserKernel == true )
+		  SgVariableDeclaration
                     * variableDeclaration =
-                        FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
-                            variableName, type, subroutineScope,
-                            formalParameters, 1, VALUE);
+		    FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
+                      variableName, type, subroutineScope,
+                      formalParameters, 1, VALUE);
+		else
+		  SgVariableDeclaration
+                    * variableDeclaration =
+		    FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
+                      variableName, type, subroutineScope,
+                      formalParameters, 0);
+
               }
               else
               {
@@ -311,37 +325,45 @@ FortranCUDAUserSubroutine::createStatements ()
                     + parallelLoop->getOpDatInformation (OP_DAT_ArgumentGroup),
                     Debug::HIGHEST_DEBUG_LEVEL, __FILE__, __LINE__);
 
-                SgVariableDeclaration
+		if ( isUserKernel == true )
+		  SgVariableDeclaration
                     * variableDeclaration =
                         FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
                             variableName, type, subroutineScope,
                             formalParameters, 1, CUDA_DEVICE);
+		else
+		  SgVariableDeclaration
+                    * variableDeclaration =
+                        FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
+                            variableName, type, subroutineScope,
+                            formalParameters, 0);
+
+
               }
             }
           }
-        } else {
-          Debug::getInstance ()->debugMessage ("'" + variableName
-            + "' is a formal parameter", Debug::HIGHEST_DEBUG_LEVEL,
-            _FILE__, __LINE__);
-          
-          SgVariableDeclaration
-            * variableDeclaration =
-              FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
-                variableName, type, subroutineScope);
-          
-        }
-
-        if (isFormalParamater == false)
-        {
-          Debug::getInstance ()->debugMessage ("'" + variableName
+	  if (isFormalParamater == false)
+	    {
+	      Debug::getInstance ()->debugMessage ("'" + variableName
               + "' is NOT a formal parameter", Debug::HIGHEST_DEBUG_LEVEL,
               __FILE__, __LINE__);
 
-          SgVariableDeclaration
-              * variableDeclaration =
+	      SgVariableDeclaration
+		* variableDeclaration =
                   FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
                       variableName, type, subroutineScope);
-        }
+	    }
+	  //        } else {
+	  //          Debug::getInstance ()->debugMessage ("'" + variableName
+	  //            + "' is a formal parameter", Debug::HIGHEST_DEBUG_LEVEL,
+	  //            __FILE__, __LINE__);
+          
+	  //                SgVariableDeclaration
+	  //                    * variableDeclaration =
+	  //                        FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
+	  //                            variableName, type, subroutineScope,
+	  //                            formalParameters, 0);
+	  //}
       }
     }
   }
