@@ -37,7 +37,11 @@ FortranUserSubroutine::createStatements ()
          * As we are in fortran, all user subroutines must be
          * SgProcedureHeaderStatements = subroutines and not
          * functions. This might be extended to cover also 
-         * functions in the future (?). Probably not in OP2
+         * functions in the future (probably not in OP2)
+         * Warning: only shallow calls (and not ones nested 
+         * in some sub-block of the subroutines) are called, for
+         * debugging the CUDA version in which we are forced
+         * to copy-and-paste subroutines in the generated module
          * ======================================================
          */            
         SgProcedureHeaderStatement * isProcedureHeaderStatement = isSgProcedureHeaderStatement ( 
@@ -46,6 +50,10 @@ FortranUserSubroutine::createStatements ()
         calledRoutines.push_back ( isProcedureHeaderStatement );
       }
     }
+
+    SgVariableDeclaration * isVariableDeclaration = isSgVariableDeclaration (
+       *it);
+    
 
     appendStatement (*it, subroutineScope);
   }

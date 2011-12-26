@@ -97,7 +97,7 @@ class RequiredTool:
 
 def checkEnvironment ():
     gPlusPlus = RequiredTool ("g++", [0, 1, 2, 3, 4], 4)
-    gFortran  = RequiredTool ("gfortran", [2, 3, 4], 4)
+    gFortran  = RequiredTool ("gfortran", [2, 3, 4, 5], 4)
 
     for tool in [gPlusPlus, gFortran]:
 	debug.verboseMessage("Checking %s version" % tool.getName())

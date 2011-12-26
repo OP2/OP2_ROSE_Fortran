@@ -86,13 +86,8 @@ FortranCUDAUserSubroutine::createStatements ()
 
   for (vector <SgStatement *>::iterator it = originalStatements.begin (); it
       != originalStatements.end (); ++it)
-  { 
-    SgAssignStatement * isAssignStatement = isSgAssignStatement ( *it );
-    
-    if ( isAssignStatement != NULL )
-        Debug::getInstance ()->debugMessage ("Found asssignment statement user subroutine ", Debug::OUTER_LOOP_LEVEL, __FILE__, __LINE__);
-      
-    
+  {      
+ 
     SgExprStatement * isExprStatement = isSgExprStatement ( *it );
     if ( isExprStatement != NULL )
     {      
@@ -112,7 +107,7 @@ FortranCUDAUserSubroutine::createStatements ()
          * As we are in fortran, all user subroutines must be
          * SgProcedureHeaderStatements = subroutines and not
          * functions. This might be extended to cover also 
-         * functions in the future (?). Probably not in OP2
+         * functions in the future (probably not in OP2)
          * ======================================================
          */            
         SgProcedureHeaderStatement * isProcedureHeaderStatement = isSgProcedureHeaderStatement ( 
@@ -171,62 +166,84 @@ FortranCUDAUserSubroutine::createStatements ()
 
         SgType * type = (*variableIt)->get_typeptr ();
 
-        bool isFormalParamater = false;
-
-        for (SgInitializedNamePtrList::iterator paramIt =
-            originalParameters->get_args ().begin (); paramIt
-            != originalParameters->get_args ().end (); ++paramIt, ++OP_DAT_ArgumentGroup)
+        /*
+         * ======================================================
+         * Specification of "value" attribute is only
+         * for user kernels. Our call convention is that
+         * in all deeper level calls we always pass parameters
+         * by reference (see else branch below)
+         * ======================================================
+         */                  
+        
+        if ( isUserKernel == true )
         {
-          string const formalParamterName =
-              (*paramIt)->get_name ().getString ();
+          bool isFormalParamater = false;
 
-          if (iequals (variableName, formalParamterName))
+          for (SgInitializedNamePtrList::iterator paramIt =
+              originalParameters->get_args ().begin (); paramIt
+              != originalParameters->get_args ().end (); ++paramIt, ++OP_DAT_ArgumentGroup)
           {
-            isFormalParamater = true;
+            string const formalParamterName =
+                (*paramIt)->get_name ().getString ();
 
-            if (parallelLoop->isIndirect (OP_DAT_ArgumentGroup)
-                && parallelLoop->isRead (OP_DAT_ArgumentGroup))
+            if (iequals (variableName, formalParamterName))
             {
-              Debug::getInstance ()->debugMessage ("'" + variableName
-                  + "' is an INDIRECT formal parameter which is READ",
-                  Debug::HIGHEST_DEBUG_LEVEL, __FILE__, __LINE__);
+              isFormalParamater = true;
 
-              SgVariableDeclaration
-                  * variableDeclaration =
-                      FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
-                          variableName, type, subroutineScope,
-                          formalParameters, 1, CUDA_SHARED);
+              if (parallelLoop->isIndirect (OP_DAT_ArgumentGroup)
+                  && parallelLoop->isRead (OP_DAT_ArgumentGroup))
+              {
+                Debug::getInstance ()->debugMessage ("'" + variableName
+                    + "' is an INDIRECT formal parameter which is READ",
+                    Debug::HIGHEST_DEBUG_LEVEL, __FILE__, __LINE__);
 
-               ROSE_ASSERT ( variableDeclaration != NULL );
-            }
-            else if (parallelLoop->isGlobal (OP_DAT_ArgumentGroup)
-                && !parallelLoop->isArray (OP_DAT_ArgumentGroup)
-                && parallelLoop->isRead (OP_DAT_ArgumentGroup))
-            {
-              Debug::getInstance ()->debugMessage ("'" + variableName
-                  + "' is a GLOBAL SCALAR formal parameter which is READ",
-                  Debug::HIGHEST_DEBUG_LEVEL, __FILE__, __LINE__);
+                SgVariableDeclaration
+                    * variableDeclaration =
+                        FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
+                            variableName, type, subroutineScope,
+                            formalParameters, 1, CUDA_SHARED);
 
-              SgVariableDeclaration
-                  * variableDeclaration =
-                      FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
-                          variableName, type, subroutineScope,
-                          formalParameters, 1, VALUE);
-            }
-            else
-            {
-              Debug::getInstance ()->debugMessage ("'" + variableName
-                  + "' is a formal parameter "
-                  + parallelLoop->getOpDatInformation (OP_DAT_ArgumentGroup),
-                  Debug::HIGHEST_DEBUG_LEVEL, __FILE__, __LINE__);
+                 ROSE_ASSERT ( variableDeclaration != NULL );
+              }
+              else if (parallelLoop->isGlobal (OP_DAT_ArgumentGroup)
+                  && !parallelLoop->isArray (OP_DAT_ArgumentGroup)
+                  && parallelLoop->isRead (OP_DAT_ArgumentGroup))
+              {
+                Debug::getInstance ()->debugMessage ("'" + variableName
+                    + "' is a GLOBAL SCALAR formal parameter which is READ",
+                    Debug::HIGHEST_DEBUG_LEVEL, __FILE__, __LINE__);
 
-              SgVariableDeclaration
-                  * variableDeclaration =
-                      FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
-                          variableName, type, subroutineScope,
-                          formalParameters, 1, CUDA_DEVICE);
+                SgVariableDeclaration
+                    * variableDeclaration =
+                        FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
+                            variableName, type, subroutineScope,
+                            formalParameters, 1, VALUE);
+              }
+              else
+              {
+                Debug::getInstance ()->debugMessage ("'" + variableName
+                    + "' is a formal parameter "
+                    + parallelLoop->getOpDatInformation (OP_DAT_ArgumentGroup),
+                    Debug::HIGHEST_DEBUG_LEVEL, __FILE__, __LINE__);
+
+                SgVariableDeclaration
+                    * variableDeclaration =
+                        FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
+                            variableName, type, subroutineScope,
+                            formalParameters, 1, CUDA_DEVICE);
+              }
             }
           }
+        } else {
+          Debug::getInstance ()->debugMessage ("'" + variableName
+            + "' is a formal parameter", Debug::HIGHEST_DEBUG_LEVEL,
+            _FILE__, __LINE__);
+          
+          SgVariableDeclaration
+            * variableDeclaration =
+              FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
+                variableName, type, subroutineScope);
+          
         }
 
         if (isFormalParamater == false)
@@ -313,20 +330,37 @@ void FortranCUDAUserSubroutine::appendAdditionalSubroutines ( SgScopeStatement *
   }
 }
 
+/*
+ * ======================================================
+ * This contructor is for user kernels only. Use the
+ * next one (with the subroutineName specified) to create
+ * a deeper call level user subroutine (i.e. user 
+ * subroutines called inside some level of call graph of
+ * a user kernel)
+ * ======================================================
+ */
+ 
 FortranCUDAUserSubroutine::FortranCUDAUserSubroutine (
     SgScopeStatement * moduleScope, FortranParallelLoop * parallelLoop,
     FortranProgramDeclarationsAndDefinitions * declarations) :
-  FortranUserSubroutine (moduleScope, parallelLoop, declarations)
+  FortranUserSubroutine (moduleScope, parallelLoop, declarations), isUserKernel (true)
 {
   subroutineHeaderStatement->get_functionModifier ().setCudaDevice ();
 
-  createStatements (); 
+  createStatements ();
 }
 
+/*
+ * ======================================================
+ * This contructor is for non user kernels only (see 
+ * above)
+ * ======================================================
+ */
 
 FortranCUDAUserSubroutine::FortranCUDAUserSubroutine (
     SgScopeStatement * moduleScope, FortranParallelLoop * parallelLoop,
-    FortranProgramDeclarationsAndDefinitions * declarations, string subroutineName) :
+    FortranProgramDeclarationsAndDefinitions * declarations, string subroutineName),
+    isUserKernel (false) :
   FortranUserSubroutine (moduleScope, parallelLoop, declarations, subroutineName)
 {
   subroutineHeaderStatement->get_functionModifier ().setCudaDevice ();
