@@ -322,6 +322,30 @@ CPPPreProcess::visit (SgNode* node)
                     buildVarRefExp (setNameExp->get_symbol ()->get_name ().getString () + "_new",
                                     scope);
 
+							  for (int i = 3; i < functionCallExp->get_args ()->get_expressions ().size (); i++)
+							  {
+								  // parsing op_arg_dat || op_arg_gbl calls
+								  SgFunctionCallExp *
+								  opArg = isSgFunctionCallExp (functionCallExp->get_args ()->get_expressions ()[i]);
+								  if (iequals (
+											   opArg->getAssociatedFunctionSymbol ()->get_name ().getString (),
+												"op_arg_dat"))
+								  {
+									  if ( isSgVarRefExp (opArg->get_args ()->get_expressions ()[2]) == NULL )
+									  {
+										  opArg->get_args ()->get_expressions ()[2] =
+										    buildVarRefExp (
+												 "op_p_" + setNameExp->get_symbol ()->get_name ().getString (),
+										      scope  
+										    );
+									  } else
+									  {
+										  Debug::getInstance ()->debugMessage ("Indirect mapping flatening not supported yet: " + opArg->get_args ()->get_expressions ()[2]->unparseToString() + "'.", Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+									  }
+								  } else {
+									  // ignore op_arg_gbl
+								  }
+							  }
                     // TODO: replace ID MAP by the fake map.
                     
                 } catch (string name) {
