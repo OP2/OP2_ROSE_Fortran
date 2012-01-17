@@ -254,7 +254,7 @@ program airfoil
     ncellr = real ( ncell )
     rms = sqrt ( rms / ncellr )
     
-    print *, "=====> Iteration result ", rms
+!    print *, "=====> Iteration result ", rms
 
   end do ! external loop
 

@@ -1,6 +1,6 @@
 program airfoil
 
-  use OP2_C
+  use OP2_FORTRAN_DECLARATIONS
   use OP2_CONSTANTS
   use AIRFOIL_SEQ
   use, intrinsic :: ISO_C_BINDING
@@ -81,14 +81,15 @@ program airfoil
   call getSetInfo ( nnode, ncell, nedge, nbedge, cell, edge, ecell, bedge, becell, bound, x, q, qold, res, adt )
 
   ! set constants and initialise flow field and residual
-  call initialise_flow_field ( ncell, q, res )
+!  call initialise_flow_field ( ncell, q, res )
+  call initialise_flow_field ( )
 
   do iter = 1, 4*ncell
     res(iter) = 0.0
   end do 
 
   ! OP initialisation
-  call op_init()
+  call op_init(7)
 
   ! declare sets, pointers, datasets and global constants (for now, no new partition info)
   call op_decl_set ( nnode, nodes, nodesName )

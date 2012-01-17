@@ -54,7 +54,7 @@ FortranCUDASubroutinesGeneration::processOP2ConstantDeclarations ()
 
     SgFunctionCallExp * callExpression = constDefinition->getCallSite ();
 
-    SgFunctionSymbol * cudaFunctionCall =
+    /*SgFunctionSymbol * cudaFunctionCall =
         FortranTypesBuilder::buildNewFortranFunction ("cudaMemcpyToSymbol",
             moduleScope);
 
@@ -71,7 +71,7 @@ FortranCUDASubroutinesGeneration::processOP2ConstantDeclarations ()
 
     arguments.insert (arguments.begin (), buildOpaqueVarRefExp (variableName,
         moduleScope));
-
+    */
     //  arguments.insert (arguments.begin () + 1,
     //      CUDAconstants->getReferenceToNewVariable (variableName));
   }
@@ -124,12 +124,23 @@ FortranCUDASubroutinesGeneration::createReductionSubroutines ()
 
     ParallelLoop * parallelLoop = it->second;
 
+    Debug::getInstance ()->debugMessage ("Checking parallel loop: " + parallelLoop->getUserSubroutineName (),
+      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+
+    
     parallelLoop->getReductionsNeeded (reductionsNeeded);
   }
+
+    Debug::getInstance ()->debugMessage ("Creating reduction subroutine 2",
+      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+
 
   for (vector <Reduction *>::const_iterator it = reductionsNeeded.begin (); it
       != reductionsNeeded.end (); ++it)
   {
+    Debug::getInstance ()->debugMessage ("Creating a subroutine",
+      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+    
     FortranCUDAReductionSubroutine * subroutine =
         new FortranCUDAReductionSubroutine (moduleScope, *it);
 

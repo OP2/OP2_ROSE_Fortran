@@ -1,0 +1,1 @@
+Running: '/data/carlo/FortranTranslator/OP2_ROSE_Fortran//translator/bin/translator -d 5 --cuda /data/carlo/FortranTranslator/OP2_ROSE_Fortran//support/Fortran/ISO_C_BINDING.F95 /data/carlo/FortranTranslator/OP2_ROSE_Fortran//support/Fortran/OP2.F95 output.F95 input.F95 constvars.F95 airfoil_seqfun.F95 airfoil.F95 -m OP2_CONSTANTS'

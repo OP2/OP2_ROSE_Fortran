@@ -256,6 +256,11 @@ ParallelLoop::hasIncrementedOpDats ()
 bool
 ParallelLoop::isReductionRequired (int OP_DAT_ArgumentGroup)
 {
+  using std::string;
+  using boost::lexical_cast;
+
+  Debug::getInstance ()->debugMessage ("Checking argument " + lexical_cast<string> (OP_DAT_ArgumentGroup), Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+  
   return OpDatMappingDescriptors[OP_DAT_ArgumentGroup] == GLOBAL
       && (isMaximised (OP_DAT_ArgumentGroup) || isMinimised (
           OP_DAT_ArgumentGroup) || isIncremented (OP_DAT_ArgumentGroup));
@@ -263,7 +268,7 @@ ParallelLoop::isReductionRequired (int OP_DAT_ArgumentGroup)
 
 bool
 ParallelLoop::isReductionRequired ()
-{
+{  
   for (unsigned int i = 1; i <= getNumberOfOpDatArgumentGroups (); ++i)
   {
     if (isReductionRequired (i))
