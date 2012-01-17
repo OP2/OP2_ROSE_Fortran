@@ -7,17 +7,11 @@
 Debug * Debug::debugInstance = NULL;
 
 int const Debug::LOWEST_DEBUG_LEVEL;
-
 int const Debug::HIGHEST_DEBUG_LEVEL;
-
 int const Debug::VERBOSE_LEVEL;
-
 int const Debug::CONSTRUCTOR_LEVEL;
-
 int const Debug::FUNCTION_LEVEL;
-
 int const Debug::OUTER_LOOP_LEVEL;
-
 int const Debug::INNER_LOOP_LEVEL;
 
 std::string

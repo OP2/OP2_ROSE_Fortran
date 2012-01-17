@@ -160,7 +160,7 @@ def getBackendCreatedFiles ():
 					if generatedCompilationUnit == newFileName and opts.cuda:
 						newFileName = getCUDACompilationUnitName(newFileName)
 					filesToRemove.append(newFileName)
-	hiddenFile.close()
+		hiddenFile.close()
 
 	return filesToRemove
 

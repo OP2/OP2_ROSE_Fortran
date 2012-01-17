@@ -54,7 +54,7 @@ FortranCUDAHostSubroutine::createReductionPrologueStatements ()
       SgPntrArrRefExp * arrayIndexExpression1 = buildPntrArrRefExp (
           variableDeclarations->getReference (getReductionArrayHostName (i)),
           variableDeclarations->getReference (getIterationCounterVariableName (
-              1)));
+              10)));
 
       SgExprStatement * assignmentStatement2;
 
@@ -73,7 +73,7 @@ FortranCUDAHostSubroutine::createReductionPrologueStatements ()
 
       SgAssignOp * loopInitialiserExpression = buildAssignOp (
           variableDeclarations->getReference (getIterationCounterVariableName (
-              1)), buildIntVal (0));
+              10)), buildIntVal (0));
 
       SgSubtractOp * upperBoundExpression2 = buildSubtractOp (
           variableDeclarations->getReference (getReductionCardinalityName (i)),
@@ -145,7 +145,7 @@ FortranCUDAHostSubroutine::createReductionEpilogueStatements ()
         SgPntrArrRefExp * arrayIndexExpression1 = buildPntrArrRefExp (
             variableDeclarations->getReference (getReductionArrayHostName (i)),
             variableDeclarations->getReference (
-                getIterationCounterVariableName (1)));
+                getIterationCounterVariableName (10)));
 
         SgExpression * reductionComputationExpression;
 
@@ -193,7 +193,7 @@ FortranCUDAHostSubroutine::createReductionEpilogueStatements ()
 
         SgAssignOp * loopInitialiserExpression = buildAssignOp (
             variableDeclarations->getReference (
-                getIterationCounterVariableName (1)), buildIntVal (0));
+                getIterationCounterVariableName (10)), buildIntVal (0));
 
         SgSubtractOp * upperBoundExpression =
             buildSubtractOp (variableDeclarations->getReference (
@@ -232,14 +232,14 @@ FortranCUDAHostSubroutine::createReductionDeclarations ()
       "Creating local variable declarations needed for reduction",
       Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
-  variableDeclarations->add (getIterationCounterVariableName (1),
+  variableDeclarations->add (getIterationCounterVariableName (10),
       FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
-          getIterationCounterVariableName (1),
+          getIterationCounterVariableName (10),
           FortranTypesBuilder::getFourByteInteger (), subroutineScope));
 
-  variableDeclarations->add (getIterationCounterVariableName (2),
+  variableDeclarations->add (getIterationCounterVariableName (20),
       FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
-          getIterationCounterVariableName (2),
+          getIterationCounterVariableName (20),
           FortranTypesBuilder::getFourByteInteger (), subroutineScope));
 
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
