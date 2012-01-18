@@ -4,6 +4,50 @@ MODULE AIRFOIL_SEQ
 
   CONTAINS
 
+subroutine initialise_flow_field ( ncell, q, res )
+
+        implicit none
+
+        ! formal parameters
+        integer(4) :: ncell
+
+        real(8), dimension(:) :: q
+        real(8), dimension(:) :: res
+
+        ! local variables
+        real(8) :: p, r, u, e
+
+        integer(4) :: n, m
+
+
+        gam = 1.4
+	gm1 = gam - 1.0
+        cfl = 0.9
+	eps = 0.05
+
+
+  	mach  = 0.4
+  	alpha = 3.0 * atan(1.0) / 45.0
+  	p     = 1.0
+  	r     = 1.0
+        u     = sqrt ( gam * p / r ) * mach
+  	e     = p / ( r * gm1 ) + 0.5 * u * u
+
+  	qinf(1) = r
+  	qinf(2) = r * u
+  	qinf(3) = 0.0
+  	qinf(4) = r * e
+
+        ! -4 in the subscript is done to adapt C++ code to fortran one
+        do n = 1, ncell
+                do m = 1, 4
+                        q( (4 * n + m) - 4) = qinf(m)
+                        res( (4 * n + m) - 4) = 0.0
+                end do
+        end do
+
+  end subroutine
+
   subroutine fused ( x1, x2, x3, x4, q, qold, adt ) 
      implicit none
 
@@ -33,21 +77,21 @@ MODULE AIRFOIL_SEQ
 
      dx = x2(1) - x1(1)
      dy = x2(2) - x1(2)
-     adt = abs ( u * dy - v * dx ) + c * sqrt ( dx*dx + dy*dy )
+     adt(1) = abs ( u * dy - v * dx ) + c * sqrt ( dx*dx + dy*dy )
 
      dx = x3(1) - x2(1)
      dy = x3(2) - x2(2)
-     adt = adt + abs ( u * dy - v * dx ) + c * sqrt ( dx*dx + dy*dy )
+     adt(1) = adt(1) + abs ( u * dy - v * dx ) + c * sqrt ( dx*dx + dy*dy )
 
      dx = x4(1) - x3(1)
      dy = x4(2) - x3(2)
-     adt = adt + abs ( u * dy - v * dx ) + c * sqrt ( dx*dx + dy*dy )
+     adt(1) = adt(1) + abs ( u * dy - v * dx ) + c * sqrt ( dx*dx + dy*dy )
 
      dx = x1(1) - x4(1)
      dy = x1(2) - x4(2)
-     adt = adt + abs ( u * dy - v * dx ) + c * sqrt ( dx*dx + dy*dy )
+     adt(1) = adt(1) + abs ( u * dy - v * dx ) + c * sqrt ( dx*dx + dy*dy )
 
-     adt = adt / cfl
+     adt(1) = adt(1) / cfl
 
 end subroutine fused
 
@@ -88,10 +132,6 @@ subroutine save_soln ( q, qold )
 
   integer(4) :: i
 
-  call levelTwo ( qold )
-
-  call levelTwo ( qold )
-
   do i = 1, 4
     qold(i) = q(i)
   end do
@@ -117,21 +157,21 @@ subroutine adt_calc ( x1, x2, x3, x4, q, adt )
 
   dx = x2(1) - x1(1)
   dy = x2(2) - x1(2)
-  adt = abs ( u * dy - v * dx ) + c * sqrt ( dx*dx + dy*dy )
+  adt(1) = abs ( u * dy - v * dx ) + c * sqrt ( dx*dx + dy*dy )
 
   dx = x3(1) - x2(1)
   dy = x3(2) - x2(2)
-  adt = adt + abs ( u * dy - v * dx ) + c * sqrt ( dx*dx + dy*dy )
+  adt(1) = adt(1) + abs ( u * dy - v * dx ) + c * sqrt ( dx*dx + dy*dy )
 
   dx = x4(1) - x3(1)
   dy = x4(2) - x3(2)
-  adt = adt + abs ( u * dy - v * dx ) + c * sqrt ( dx*dx + dy*dy )
+  adt(1) = adt(1) + abs ( u * dy - v * dx ) + c * sqrt ( dx*dx + dy*dy )
 
   dx = x1(1) - x4(1)
   dy = x1(2) - x4(2)
-  adt = adt + abs ( u * dy - v * dx ) + c * sqrt ( dx*dx + dy*dy )
+  adt(1) = adt(1) + abs ( u * dy - v * dx ) + c * sqrt ( dx*dx + dy*dy )
 
-  adt = adt / cfl
+  adt(1) = adt(1) / cfl
 
 end subroutine adt_calc
 
@@ -285,21 +325,21 @@ subroutine fused_2 ( qold, q, res, adt, rms, x1, x2, x3, x4 )
 
   dx = x2(1) - x1(1)
   dy = x2(2) - x1(2)
-  adt = abs ( u * dy - v * dx ) + c * sqrt ( dx*dx + dy*dy )
+  adt(1) = abs ( u * dy - v * dx ) + c * sqrt ( dx*dx + dy*dy )
 
   dx = x3(1) - x2(1)
   dy = x3(2) - x2(2)
-  adt = adt + abs ( u * dy - v * dx ) + c * sqrt ( dx*dx + dy*dy )
+  adt(1) = adt(1) + abs ( u * dy - v * dx ) + c * sqrt ( dx*dx + dy*dy )
 
   dx = x4(1) - x3(1)
   dy = x4(2) - x3(2)
-  adt = adt + abs ( u * dy - v * dx ) + c * sqrt ( dx*dx + dy*dy )
+  adt(1) = adt(1) + abs ( u * dy - v * dx ) + c * sqrt ( dx*dx + dy*dy )
 
   dx = x1(1) - x4(1)
   dy = x1(2) - x4(2)
-  adt = adt + abs ( u * dy - v * dx ) + c * sqrt ( dx*dx + dy*dy )
+  adt(1) = adt(1) + abs ( u * dy - v * dx ) + c * sqrt ( dx*dx + dy*dy )
 
-  adt = adt / cfl
+  adt(1) = adt(1) / cfl
 
 end subroutine fused_2
 

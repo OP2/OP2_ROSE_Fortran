@@ -31,8 +31,7 @@ program airfoil
   
   ! arrays used in data
   integer(4), dimension(:), allocatable, target :: ecell, bound, edge, bedge, becell, cell
-  real(8), dimension(:), allocatable, target :: x, q, qold, adt, res
-  real(8) :: rms
+  real(8), dimension(:), allocatable, target :: x, q, qold, adt, res, rms
 
   character(kind=c_char,len=10) :: savesolnName = C_CHAR_'save_soln'//C_NULL_CHAR
   character(kind=c_char,len=10) :: fusedName = C_CHAR_'fused'//C_NULL_CHAR
@@ -59,6 +58,9 @@ program airfoil
   character(kind=c_char,len=4) :: adtName =	C_CHAR_'adt'//C_NULL_CHAR
   character(kind=c_char,len=4) :: resName =	C_CHAR_'res'//C_NULL_CHAR
 
+  integer(4) :: retDebug, debugiter
+  real(8) :: datad
+
   ! read set sizes from input file (input is subdivided in two routines as we cannot allocate arrays in subroutines in
   ! fortran 90)
   call getSetSizes ( nnode, ncell, nedge, nbedge )
@@ -76,13 +78,14 @@ program airfoil
   allocate ( qold ( 4 * ncell ) )
   allocate ( res ( 4 * ncell ) )
   allocate ( adt ( ncell ) )
+  allocate ( rms ( 1 ) )
+
 
   ! fill up arrays from file
   call getSetInfo ( nnode, ncell, nedge, nbedge, cell, edge, ecell, bedge, becell, bound, x, q, qold, res, adt )
 
   ! set constants and initialise flow field and residual
-!  call initialise_flow_field ( ncell, q, res )
-  call initialise_flow_field ( )
+  call initialise_flow_field ( ncell, q, res )
 
   do iter = 1, 4*ncell
     res(iter) = 0.0
@@ -110,7 +113,7 @@ program airfoil
   call op_decl_dat ( cells, 1, adt, p_adt, adtName )
   call op_decl_dat ( cells, 4, res, p_res, resName )
 
-  call op_decl_gbl ( rms, p_rms )
+  call op_decl_gbl ( rms, p_rms, 1 )
 
   call op_decl_const (1, gam)
   call op_decl_const (1, gm1)
@@ -232,20 +235,18 @@ program airfoil
 
 
     ncellr = real ( ncell )
-    rms = sqrt ( rms / ncellr )
+    rms(1) = sqrt ( rms(1) / ncellr )
 
   end do ! external loop
 
 ! uncomment the following statements to get the result of the airfoil written in a file
+!       call op_get_dat ( p_q )
 !	retDebug = openfile ( C_CHAR_"/work/cbertoll/airfoil-generated/q.txt"//C_NULL_CHAR )
 
 !	do debugiter = 1, 4*ncell
-
 !		datad = q(debugiter)
 !		retDebug = writeRealToFile ( datad )
-
-!	retDebug = closefile ()
 !	end do
-
+!	retDebug = closefile ()
 
 end program airfoil
