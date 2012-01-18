@@ -163,7 +163,7 @@ program AIRFOIL
                          & p_adt,  2, pecell, OP_READ, &
                          & p_res,  1, pecell, OP_INC,  &
                          & p_res,  2, pecell, OP_INC,  &
-                         & p_res, -1, OP_GBL, OP_MAX   &
+                         & p_rms, -1, OP_GBL, OP_MAX   &
                          &)
 
 
