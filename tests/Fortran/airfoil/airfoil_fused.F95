@@ -61,6 +61,13 @@ program airfoil
   integer(4) :: retDebug, debugiter
   real(8) :: datad
 
+
+  ! profiling
+  integer :: istat
+  type (cudaEvent) :: startEvent, stopEvent
+  real(4) :: totalExecutiontime
+
+
   ! read set sizes from input file (input is subdivided in two routines as we cannot allocate arrays in subroutines in
   ! fortran 90)
   call getSetSizes ( nnode, ncell, nedge, nbedge )
@@ -123,6 +130,14 @@ program airfoil
   call op_decl_const (1, alpha)
   call op_decl_const (4, qinf)
 
+!call initCUDAConstants(alpha,cfl,eps,gam,gm1,mach,qinf)
+
+!  istat = cudaEventCreate(startEvent)
+!  istat = cudaEventCreate(stopEvent)
+        
+!  istat = cudaEventRecord ( startEvent, 0 )
+
+
   ! main time-marching loop
 
   do niter = 1, iterationNumber
@@ -180,7 +195,7 @@ program airfoil
 
       ! update flow field
       
-      rms = 0.0
+      rms(1) = 0.0
 
       call op_par_loop_5 ( update, cells, &
                          & p_qold, -1, OP_ID,  OP_READ,  &
@@ -223,7 +238,7 @@ program airfoil
 
       ! update flow field
       
-      rms = 0.0
+      rms(1) = 0.0
 
       call op_par_loop_5 ( update, cells, &
                          & p_qold, -1, OP_ID,  OP_READ,  &
@@ -239,9 +254,15 @@ program airfoil
 
   end do ! external loop
 
+!  istat = cudaEventRecord ( stopEvent, 0 )
+!  istat = cudaEventSynchronize ( stopEvent )
+!  istat = cudaEventElapsedTime ( totalExecutiontime, startEvent, stopEvent )
+!  write(*,*) 'Time total execution (ms): ', totalExecutiontime
+
+
 ! uncomment the following statements to get the result of the airfoil written in a file
-!       call op_get_dat ( p_q )
-!	retDebug = openfile ( C_CHAR_"/work/cbertoll/airfoil-generated/q.txt"//C_NULL_CHAR )
+!  call op_get_dat ( p_q )
+!	retDebug = openfile ( C_CHAR_"/work/cbertoll/AirfoilFortran/CUDA/FuseTests/q.txt"//C_NULL_CHAR )
 
 !	do debugiter = 1, 4*ncell
 !		datad = q(debugiter)

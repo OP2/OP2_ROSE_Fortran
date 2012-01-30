@@ -84,7 +84,7 @@ program AIRFOIL
   call getSetInfo ( nnode, ncell, nedge, nbedge, cell, edge, ecell, bedge, becell, bound, x, q, qold, res, adt )
 
   print *, "Initialising constants"
-  call initialise_flow_field ( )
+  call initialise_flow_field ( ncell, q, res )
 
   do iter = 1, 4*ncell
     res(iter) = 0.0
@@ -92,7 +92,7 @@ program AIRFOIL
 
   do iter = 1, 10
 
-    globalArray(iter) = iter
+    globalArray(iter) = -10000.0
 
   end do
 
@@ -125,6 +125,14 @@ program AIRFOIL
   print *, "Declaring OP2 globals"
   call op_decl_gbl ( rms, p_rms, 1 )
   call op_decl_gbl ( globalArray, globalArrayDat, 10 )
+
+  call op_decl_const (1, gam)
+  call op_decl_const (1, gm1)
+  call op_decl_const (1, cfl)
+  call op_decl_const (1, eps)
+  call op_decl_const (1, mach)
+  call op_decl_const (1, alpha)
+  call op_decl_const (4, qinf)
 
     ! main time-marching loop
 
@@ -163,7 +171,7 @@ program AIRFOIL
                          & p_adt,  2, pecell, OP_READ, &
                          & p_res,  1, pecell, OP_INC,  &
                          & p_res,  2, pecell, OP_INC,  &
-                         & p_rms, -1, OP_GBL, OP_MAX   &
+                         & globalArrayDat, -1, OP_GBL, OP_MAX   &
                          &)
 
 
@@ -179,7 +187,7 @@ program AIRFOIL
 
       ! update flow field
       
-      rms = 0.0
+      rms(1) = 0.0
 
       print *, "update"
       call op_par_loop_5 ( update, cells, &
@@ -194,9 +202,9 @@ program AIRFOIL
     end do ! internal loop
 
     ncellr = real ( ncell )
-    rms = sqrt ( rms / ncellr )
+    rms(1) = sqrt ( rms(1) / ncellr )
 
-    print *, "=====> Iteration result ", rms
+    print *, "=====> Iteration result ", rms(1)
 
   end do ! external loop
 

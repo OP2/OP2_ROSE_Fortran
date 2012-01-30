@@ -13,14 +13,17 @@ FortranProgramDeclarationsAndDefinitions::setOpGblProperties (
     FortranParallelLoop * parallelLoop, std::string const & variableName,
     int OP_DAT_ArgumentGroup)
 {
+  using boost::lexical_cast;
+  using std::string;
+
   Debug::getInstance ()->debugMessage ("'" + variableName + "' is an OP_GBL",
       Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
   OpGblDefinition * opGblDeclaration = getOpGblDefinition (variableName);
-
+  
   FortranOpGblDefinition * fortanOpGBL =
       dynamic_cast <FortranOpGblDefinition *> (opGblDeclaration);
-
+      
   if (fortanOpGBL == NULL)
   {
     Debug::getInstance ()->debugMessage ("'" + variableName + "' is a scalar",
@@ -37,7 +40,8 @@ FortranProgramDeclarationsAndDefinitions::setOpGblProperties (
   else
   {
     Debug::getInstance ()->debugMessage ("'" + variableName
-        + "' has is NOT a scalar", Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+        + "' is NOT a scalar, but has dimension " + lexical_cast<string> (opGblDeclaration->getDimension ()),
+        Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
     parallelLoop->setOpDatDimension (OP_DAT_ArgumentGroup,
         opGblDeclaration->getDimension ());

@@ -24,6 +24,16 @@ class FortranCUDAKernelSubroutine: public FortranKernelSubroutine
 
     /*
      * ======================================================
+     * Creates the statements initialising the local thread
+     * variable (0 for OP_INC, actual values for OP_MAX and
+     * OP_MIN)
+     * ======================================================
+     */    
+    void
+    createReductionLocalVariableInitialisation ();
+    
+    /*
+     * ======================================================
      * Creates the statements executed after the call to the
      * user subroutine to perform the thread-block reduction
      * ======================================================

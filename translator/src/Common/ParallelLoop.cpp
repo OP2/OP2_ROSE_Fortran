@@ -260,6 +260,8 @@ ParallelLoop::isReductionRequired (int OP_DAT_ArgumentGroup)
   using boost::lexical_cast;
 
   Debug::getInstance ()->debugMessage ("Checking argument " + lexical_cast<string> (OP_DAT_ArgumentGroup), Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+  if ( isMaximised (OP_DAT_ArgumentGroup) ) 
+    Debug::getInstance ()->debugMessage ("This argument is maximised", Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
   
   return OpDatMappingDescriptors[OP_DAT_ArgumentGroup] == GLOBAL
       && (isMaximised (OP_DAT_ArgumentGroup) || isMinimised (

@@ -98,6 +98,19 @@ class FortranStatementsAndExpressionsBuilder
     /*
      * ======================================================
      * Appends an allocate statement to the given scope
+     * with size
+     * ======================================================
+     */
+
+    static void
+    appendAllocateStatement (SgVarRefExp * arrayReference,
+        SgExpression * size, SgScopeStatement * scope);
+        
+        
+    /*
+     * ======================================================
+     * Appends an allocate statement to the given scope
+     * with lower and upperBounds
      * ======================================================
      */
 

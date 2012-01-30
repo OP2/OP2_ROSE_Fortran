@@ -1,1 +1,1104 @@
 Running: '/data/carlo/FortranTranslator/OP2_ROSE_Fortran//translator/bin/translator -d 5 --cuda /data/carlo/FortranTranslator/OP2_ROSE_Fortran//support/Fortran/ISO_C_BINDING.F95 /data/carlo/FortranTranslator/OP2_ROSE_Fortran//support/Fortran/OP2.F95 output.F95 input.F95 constvars.F95 airfoil_seqfun.F95 airfoil.F95 -m OP2_CONSTANTS'
+Problem running compiler.
+==================================== STANDARD OUTPUT ===========================================
+[CommandLine.cpp:274] /data/carlo/FortranTranslator/OP2_ROSE_Fortran//support/Fortran/ISO_C_BINDING.F95 is a ROSE option.
+[Globals.cpp:112] Adding file 'ISO_C_BINDING.F95'.
+[CommandLine.cpp:274] /data/carlo/FortranTranslator/OP2_ROSE_Fortran//support/Fortran/OP2.F95 is a ROSE option.
+[Globals.cpp:112] Adding file 'OP2.F95'.
+[CommandLine.cpp:274] output.F95 is a ROSE option.
+[Globals.cpp:112] Adding file 'output.F95'.
+[CommandLine.cpp:274] input.F95 is a ROSE option.
+[Globals.cpp:112] Adding file 'input.F95'.
+[CommandLine.cpp:274] constvars.F95 is a ROSE option.
+[Globals.cpp:112] Adding file 'constvars.F95'.
+[CommandLine.cpp:274] airfoil_seqfun.F95 is a ROSE option.
+[Globals.cpp:112] Adding file 'airfoil_seqfun.F95'.
+[CommandLine.cpp:274] airfoil.F95 is a ROSE option.
+[Globals.cpp:112] Adding file 'airfoil.F95'.
+FixupSourcePositionConstructs::visit(): Building a matching endOfConstruct to the available startOfConstruct for locatedNode = 0x7f507c4935c8 = SgIntVal 
+[Translator.cpp:429] Translation starting.
+[Translator.cpp:379] Fortran project detected.
+[Translator.cpp:221] CUDA code generation selected.
+[FortranProgramDeclarationsAndDefinitions.cpp:609] Obtaining declarations and definitions.
+[FortranProgramDeclarationsAndDefinitions.cpp:310] Source file 'ISO_C_BINDING.F95' detected.
+[FortranProgramDeclarationsAndDefinitions.cpp:337] Module 'ISO_C_BINDING' in file 'ISO_C_BINDING.F95'.
+[FortranProgramDeclarationsAndDefinitions.cpp:310] Source file 'iso_c_binding.rmod' detected.
+[FortranProgramDeclarationsAndDefinitions.cpp:310] Source file 'OP2.F95' detected.
+[FortranProgramDeclarationsAndDefinitions.cpp:337] Module 'OP2_FORTRAN_DECLARATIONS' in file 'OP2.F95'.
+[FortranProgramDeclarationsAndDefinitions.cpp:369] Found procedure header statement 'op_init' in file 'OP2.F95', and module 'OP2_FORTRAN_DECLARATIONS'.
+[FortranProgramDeclarationsAndDefinitions.cpp:369] Found procedure header statement 'op_decl_set' in file 'OP2.F95', and module 'OP2_FORTRAN_DECLARATIONS'.
+[FortranProgramDeclarationsAndDefinitions.cpp:369] Found procedure header statement 'op_decl_map' in file 'OP2.F95', and module 'OP2_FORTRAN_DECLARATIONS'.
+[FortranProgramDeclarationsAndDefinitions.cpp:369] Found procedure header statement 'op_decl_dat_real_8' in file 'OP2.F95', and module 'OP2_FORTRAN_DECLARATIONS'.
+[FortranProgramDeclarationsAndDefinitions.cpp:369] Found procedure header statement 'op_decl_dat_integer_4' in file 'OP2.F95', and module 'OP2_FORTRAN_DECLARATIONS'.
+[FortranProgramDeclarationsAndDefinitions.cpp:369] Found procedure header statement 'op_decl_gbl_real_8' in file 'OP2.F95', and module 'OP2_FORTRAN_DECLARATIONS'.
+[FortranProgramDeclarationsAndDefinitions.cpp:369] Found procedure header statement 'op_decl_gbl_integer_4' in file 'OP2.F95', and module 'OP2_FORTRAN_DECLARATIONS'.
+[FortranProgramDeclarationsAndDefinitions.cpp:369] Found procedure header statement 'op_decl_gbl_scalar_integer_4' in file 'OP2.F95', and module 'OP2_FORTRAN_DECLARATIONS'.
+[FortranProgramDeclarationsAndDefinitions.cpp:369] Found procedure header statement 'op_decl_gbl_scalar_real_8' in file 'OP2.F95', and module 'OP2_FORTRAN_DECLARATIONS'.
+[FortranProgramDeclarationsAndDefinitions.cpp:369] Found procedure header statement 'op_decl_const_scalar_logical' in file 'OP2.F95', and module 'OP2_FORTRAN_DECLARATIONS'.
+[FortranProgramDeclarationsAndDefinitions.cpp:369] Found procedure header statement 'op_decl_const_scalar_real_4' in file 'OP2.F95', and module 'OP2_FORTRAN_DECLARATIONS'.
+[FortranProgramDeclarationsAndDefinitions.cpp:369] Found procedure header statement 'op_decl_const_scalar_real_8' in file 'OP2.F95', and module 'OP2_FORTRAN_DECLARATIONS'.
+[FortranProgramDeclarationsAndDefinitions.cpp:369] Found procedure header statement 'op_decl_const_scalar_integer_4' in file 'OP2.F95', and module 'OP2_FORTRAN_DECLARATIONS'.
+[FortranProgramDeclarationsAndDefinitions.cpp:369] Found procedure header statement 'op_decl_const_logical' in file 'OP2.F95', and module 'OP2_FORTRAN_DECLARATIONS'.
+[FortranProgramDeclarationsAndDefinitions.cpp:369] Found procedure header statement 'op_decl_const_real_4' in file 'OP2.F95', and module 'OP2_FORTRAN_DECLARATIONS'.
+[FortranProgramDeclarationsAndDefinitions.cpp:369] Found procedure header statement 'op_decl_const_real_8' in file 'OP2.F95', and module 'OP2_FORTRAN_DECLARATIONS'.
+[FortranProgramDeclarationsAndDefinitions.cpp:369] Found procedure header statement 'op_decl_const_integer_4' in file 'OP2.F95', and module 'OP2_FORTRAN_DECLARATIONS'.
+[FortranProgramDeclarationsAndDefinitions.cpp:369] Found procedure header statement 'op_par_loop_1' in file 'OP2.F95', and module 'OP2_FORTRAN_DECLARATIONS'.
+[FortranProgramDeclarationsAndDefinitions.cpp:369] Found procedure header statement 'op_par_loop_2' in file 'OP2.F95', and module 'OP2_FORTRAN_DECLARATIONS'.
+[FortranProgramDeclarationsAndDefinitions.cpp:369] Found procedure header statement 'op_par_loop_3' in file 'OP2.F95', and module 'OP2_FORTRAN_DECLARATIONS'.
+[FortranProgramDeclarationsAndDefinitions.cpp:369] Found procedure header statement 'op_par_loop_4' in file 'OP2.F95', and module 'OP2_FORTRAN_DECLARATIONS'.
+[FortranProgramDeclarationsAndDefinitions.cpp:369] Found procedure header statement 'op_par_loop_5' in file 'OP2.F95', and module 'OP2_FORTRAN_DECLARATIONS'.
+[FortranProgramDeclarationsAndDefinitions.cpp:369] Found procedure header statement 'op_par_loop_6' in file 'OP2.F95', and module 'OP2_FORTRAN_DECLARATIONS'.
+[FortranProgramDeclarationsAndDefinitions.cpp:369] Found procedure header statement 'op_par_loop_8' in file 'OP2.F95', and module 'OP2_FORTRAN_DECLARATIONS'.
+[FortranProgramDeclarationsAndDefinitions.cpp:310] Source file 'output.F95' detected.
+[FortranProgramDeclarationsAndDefinitions.cpp:369] Found procedure header statement 'writeOutputToFile' in file 'output.F95', and module 'OP2_FORTRAN_DECLARATIONS'.
+[FortranProgramDeclarationsAndDefinitions.cpp:369] Found procedure header statement 'writeRealDataToFile' in file 'output.F95', and module 'OP2_FORTRAN_DECLARATIONS'.
+[FortranProgramDeclarationsAndDefinitions.cpp:369] Found procedure header statement 'writeIntDataToFile' in file 'output.F95', and module 'OP2_FORTRAN_DECLARATIONS'.
+[FortranProgramDeclarationsAndDefinitions.cpp:310] Source file 'input.F95' detected.
+[FortranProgramDeclarationsAndDefinitions.cpp:369] Found procedure header statement 'getSetSizes' in file 'input.F95', and module 'OP2_FORTRAN_DECLARATIONS'.
+[FortranProgramDeclarationsAndDefinitions.cpp:369] Found procedure header statement 'getSetInfo' in file 'input.F95', and module 'OP2_FORTRAN_DECLARATIONS'.
+[FortranProgramDeclarationsAndDefinitions.cpp:310] Source file 'constvars.F95' detected.
+[FortranProgramDeclarationsAndDefinitions.cpp:337] Module 'OP2_CONSTANTS' in file 'constvars.F95'.
+[FortranProgramDeclarationsAndDefinitions.cpp:369] Found procedure header statement 'initialise_flow_field' in file 'constvars.F95', and module 'OP2_CONSTANTS'.
+[FortranProgramDeclarationsAndDefinitions.cpp:391] Found function call 'op_decl_const'.
+[FortranOP2Definitions.cpp:349] Found an OP_CONST definition: 'gam'. Its dimension is 1 and its type is SgTypeFloat.
+[FortranProgramDeclarationsAndDefinitions.cpp:391] Found function call 'op_decl_const'.
+[FortranOP2Definitions.cpp:349] Found an OP_CONST definition: 'gm1'. Its dimension is 1 and its type is SgTypeFloat.
+[FortranProgramDeclarationsAndDefinitions.cpp:391] Found function call 'op_decl_const'.
+[FortranOP2Definitions.cpp:349] Found an OP_CONST definition: 'cfl'. Its dimension is 1 and its type is SgTypeFloat.
+[FortranProgramDeclarationsAndDefinitions.cpp:391] Found function call 'op_decl_const'.
+[FortranOP2Definitions.cpp:349] Found an OP_CONST definition: 'eps'. Its dimension is 1 and its type is SgTypeFloat.
+[FortranProgramDeclarationsAndDefinitions.cpp:391] Found function call 'op_decl_const'.
+[FortranOP2Definitions.cpp:349] Found an OP_CONST definition: 'mach'. Its dimension is 1 and its type is SgTypeFloat.
+[FortranProgramDeclarationsAndDefinitions.cpp:391] Found function call 'op_decl_const'.
+[FortranOP2Definitions.cpp:349] Found an OP_CONST definition: 'alpha'. Its dimension is 1 and its type is SgTypeFloat.
+[FortranProgramDeclarationsAndDefinitions.cpp:391] Found function call 'op_decl_const'.
+[FortranOP2Definitions.cpp:349] Found an OP_CONST definition: 'qinf'. Its dimension is 4 and its type is SgArrayType.
+[FortranProgramDeclarationsAndDefinitions.cpp:391] Found function call 'atan'.
+[FortranProgramDeclarationsAndDefinitions.cpp:391] Found function call 'sqrt'.
+[FortranProgramDeclarationsAndDefinitions.cpp:310] Source file 'op2_constants.rmod' detected.
+[FortranProgramDeclarationsAndDefinitions.cpp:310] Source file 'airfoil_seqfun.F95' detected.
+[FortranProgramDeclarationsAndDefinitions.cpp:337] Module 'AIRFOIL_SEQ' in file 'airfoil_seqfun.F95'.
+[FortranProgramDeclarationsAndDefinitions.cpp:369] Found procedure header statement 'fused' in file 'airfoil_seqfun.F95', and module 'AIRFOIL_SEQ'.
+[FortranProgramDeclarationsAndDefinitions.cpp:391] Found function call 'sqrt'.
+[FortranProgramDeclarationsAndDefinitions.cpp:391] Found function call 'abs'.
+[FortranProgramDeclarationsAndDefinitions.cpp:391] Found function call 'sqrt'.
+[FortranProgramDeclarationsAndDefinitions.cpp:391] Found function call 'abs'.
+[FortranProgramDeclarationsAndDefinitions.cpp:391] Found function call 'sqrt'.
+[FortranProgramDeclarationsAndDefinitions.cpp:391] Found function call 'abs'.
+[FortranProgramDeclarationsAndDefinitions.cpp:391] Found function call 'sqrt'.
+[FortranProgramDeclarationsAndDefinitions.cpp:391] Found function call 'abs'.
+[FortranProgramDeclarationsAndDefinitions.cpp:391] Found function call 'sqrt'.
+[FortranProgramDeclarationsAndDefinitions.cpp:369] Found procedure header statement 'levelThree' in file 'airfoil_seqfun.F95', and module 'AIRFOIL_SEQ'.
+[FortranProgramDeclarationsAndDefinitions.cpp:369] Found procedure header statement 'levelTwo' in file 'airfoil_seqfun.F95', and module 'AIRFOIL_SEQ'.
+[FortranProgramDeclarationsAndDefinitions.cpp:391] Found function call 'levelThree'.
+[FortranProgramDeclarationsAndDefinitions.cpp:369] Found procedure header statement 'save_soln' in file 'airfoil_seqfun.F95', and module 'AIRFOIL_SEQ'.
+[FortranProgramDeclarationsAndDefinitions.cpp:391] Found function call 'levelTwo'.
+[FortranProgramDeclarationsAndDefinitions.cpp:391] Found function call 'levelTwo'.
+[FortranProgramDeclarationsAndDefinitions.cpp:369] Found procedure header statement 'adt_calc' in file 'airfoil_seqfun.F95', and module 'AIRFOIL_SEQ'.
+[FortranProgramDeclarationsAndDefinitions.cpp:391] Found function call 'sqrt'.
+[FortranProgramDeclarationsAndDefinitions.cpp:391] Found function call 'abs'.
+[FortranProgramDeclarationsAndDefinitions.cpp:391] Found function call 'sqrt'.
+[FortranProgramDeclarationsAndDefinitions.cpp:391] Found function call 'abs'.
+[FortranProgramDeclarationsAndDefinitions.cpp:391] Found function call 'sqrt'.
+[FortranProgramDeclarationsAndDefinitions.cpp:391] Found function call 'abs'.
+[FortranProgramDeclarationsAndDefinitions.cpp:391] Found function call 'sqrt'.
+[FortranProgramDeclarationsAndDefinitions.cpp:391] Found function call 'abs'.
+[FortranProgramDeclarationsAndDefinitions.cpp:391] Found function call 'sqrt'.
+[FortranProgramDeclarationsAndDefinitions.cpp:369] Found procedure header statement 'res_calc' in file 'airfoil_seqfun.F95', and module 'AIRFOIL_SEQ'.
+[FortranProgramDeclarationsAndDefinitions.cpp:369] Found procedure header statement 'bres_calc' in file 'airfoil_seqfun.F95', and module 'AIRFOIL_SEQ'.
+[FortranProgramDeclarationsAndDefinitions.cpp:369] Found procedure header statement 'update' in file 'airfoil_seqfun.F95', and module 'AIRFOIL_SEQ'.
+[FortranProgramDeclarationsAndDefinitions.cpp:369] Found procedure header statement 'fused_2' in file 'airfoil_seqfun.F95', and module 'AIRFOIL_SEQ'.
+[FortranProgramDeclarationsAndDefinitions.cpp:391] Found function call 'sqrt'.
+[FortranProgramDeclarationsAndDefinitions.cpp:391] Found function call 'abs'.
+[FortranProgramDeclarationsAndDefinitions.cpp:391] Found function call 'sqrt'.
+[FortranProgramDeclarationsAndDefinitions.cpp:391] Found function call 'abs'.
+[FortranProgramDeclarationsAndDefinitions.cpp:391] Found function call 'sqrt'.
+[FortranProgramDeclarationsAndDefinitions.cpp:391] Found function call 'abs'.
+[FortranProgramDeclarationsAndDefinitions.cpp:391] Found function call 'sqrt'.
+[FortranProgramDeclarationsAndDefinitions.cpp:391] Found function call 'abs'.
+[FortranProgramDeclarationsAndDefinitions.cpp:391] Found function call 'sqrt'.
+[FortranProgramDeclarationsAndDefinitions.cpp:310] Source file 'op2_fortran_declarations.rmod' detected.
+[FortranProgramDeclarationsAndDefinitions.cpp:310] Source file 'airfoil_seq.rmod' detected.
+[FortranProgramDeclarationsAndDefinitions.cpp:310] Source file 'airfoil.F95' detected.
+[FortranProgramDeclarationsAndDefinitions.cpp:391] Found function call 'getSetSizes'.
+[FortranProgramDeclarationsAndDefinitions.cpp:391] Found function call 'getSetInfo'.
+[FortranProgramDeclarationsAndDefinitions.cpp:391] Found function call 'initialise_flow_field'.
+[FortranProgramDeclarationsAndDefinitions.cpp:391] Found function call 'op_init'.
+[FortranProgramDeclarationsAndDefinitions.cpp:391] Found function call 'op_decl_set'.
+[FortranOP2Definitions.cpp:146] Found an OP_SET definition: 'nodes'. Its dimension is contained in 'nnode'.
+[FortranProgramDeclarationsAndDefinitions.cpp:391] Found function call 'op_decl_set'.
+[FortranOP2Definitions.cpp:146] Found an OP_SET definition: 'edges'. Its dimension is contained in 'nedge'.
+[FortranProgramDeclarationsAndDefinitions.cpp:391] Found function call 'op_decl_set'.
+[FortranOP2Definitions.cpp:146] Found an OP_SET definition: 'bedges'. Its dimension is contained in 'nbedge'.
+[FortranProgramDeclarationsAndDefinitions.cpp:391] Found function call 'op_decl_set'.
+[FortranOP2Definitions.cpp:146] Found an OP_SET definition: 'cells'. Its dimension is contained in 'ncell'.
+[FortranProgramDeclarationsAndDefinitions.cpp:391] Found function call 'op_decl_map'.
+[FortranOP2Definitions.cpp:280] Found an OP_MAP definition: 'pedgeName'. Mapping from 'edges' to 'nodes' through 'pedge' (whose cardinality is set in 'edge') with 2 mappings per element.
+[FortranProgramDeclarationsAndDefinitions.cpp:391] Found function call 'op_decl_map'.
+[FortranOP2Definitions.cpp:280] Found an OP_MAP definition: 'pecellName'. Mapping from 'edges' to 'cells' through 'pecell' (whose cardinality is set in 'ecell') with 2 mappings per element.
+[FortranProgramDeclarationsAndDefinitions.cpp:391] Found function call 'op_decl_map'.
+[FortranOP2Definitions.cpp:280] Found an OP_MAP definition: 'pbedgeName'. Mapping from 'bedges' to 'nodes' through 'pbedge' (whose cardinality is set in 'bedge') with 2 mappings per element.
+[FortranProgramDeclarationsAndDefinitions.cpp:391] Found function call 'op_decl_map'.
+[FortranOP2Definitions.cpp:280] Found an OP_MAP definition: 'pecellName'. Mapping from 'bedges' to 'cells' through 'pbecell' (whose cardinality is set in 'becell') with 1 mappings per element.
+[FortranProgramDeclarationsAndDefinitions.cpp:391] Found function call 'op_decl_map'.
+[FortranOP2Definitions.cpp:280] Found an OP_MAP definition: 'pcellName'. Mapping from 'cells' to 'nodes' through 'pcell' (whose cardinality is set in 'cell') with 4 mappings per element.
+[FortranProgramDeclarationsAndDefinitions.cpp:391] Found function call 'op_decl_dat'.
+[FortranOP2Definitions.cpp:94] Found an OP_DAT definition: 'p_bound'. The data pertains to the set 'bedges'. Its actual type is SgArrayType and its dimension is 1.
+[FortranProgramDeclarationsAndDefinitions.cpp:391] Found function call 'op_decl_dat'.
+[FortranOP2Definitions.cpp:94] Found an OP_DAT definition: 'p_x'. The data pertains to the set 'nodes'. Its actual type is SgArrayType and its dimension is 2.
+[FortranProgramDeclarationsAndDefinitions.cpp:391] Found function call 'op_decl_dat'.
+[FortranOP2Definitions.cpp:94] Found an OP_DAT definition: 'p_q'. The data pertains to the set 'cells'. Its actual type is SgArrayType and its dimension is 4.
+[FortranProgramDeclarationsAndDefinitions.cpp:391] Found function call 'op_decl_dat'.
+[FortranOP2Definitions.cpp:94] Found an OP_DAT definition: 'p_qold'. The data pertains to the set 'cells'. Its actual type is SgArrayType and its dimension is 4.
+[FortranProgramDeclarationsAndDefinitions.cpp:391] Found function call 'op_decl_dat'.
+[FortranOP2Definitions.cpp:94] Found an OP_DAT definition: 'p_adt'. The data pertains to the set 'cells'. Its actual type is SgArrayType and its dimension is 1.
+[FortranProgramDeclarationsAndDefinitions.cpp:391] Found function call 'op_decl_dat'.
+[FortranOP2Definitions.cpp:94] Found an OP_DAT definition: 'p_res'. The data pertains to the set 'cells'. Its actual type is SgArrayType and its dimension is 4.
+[FortranProgramDeclarationsAndDefinitions.cpp:391] Found function call 'op_decl_gbl'.
+[FortranOP2Definitions.cpp:304] Found an OP_GBL definition: 'p_rms'. Its actual type is SgArrayType and its dimension is 1.
+[FortranProgramDeclarationsAndDefinitions.cpp:391] Found function call 'op_decl_gbl'.
+[FortranOP2Definitions.cpp:304] Found an OP_GBL definition: 'globalArrayDat'. Its actual type is SgArrayType and its dimension is 10.
+[FortranProgramDeclarationsAndDefinitions.cpp:391] Found function call 'op_par_loop_2'.
+[FortranProgramDeclarationsAndDefinitions.cpp:498] Found 'op_par_loop_2' with (host) user subroutine 'save_soln'.
+[ParallelLoop.cpp:12] Parallel loop created.
+[FortranProgramDeclarationsAndDefinitions.cpp:178] Analysing OP_PAR_LOOP actual arguments.
+[FortranProgramDeclarationsAndDefinitions.cpp:243] OP_DAT 'p_q'.
+[FortranProgramDeclarationsAndDefinitions.cpp:72] 'p_q' has been declared through OP_DECL_DAT.
+[FortranProgramDeclarationsAndDefinitions.cpp:272] ...DIRECT mapping descriptor.
+[FortranProgramDeclarationsAndDefinitions.cpp:118] ...READ access descriptor.
+[FortranProgramDeclarationsAndDefinitions.cpp:243] OP_DAT 'p_qold'.
+[FortranProgramDeclarationsAndDefinitions.cpp:72] 'p_qold' has been declared through OP_DECL_DAT.
+[FortranProgramDeclarationsAndDefinitions.cpp:272] ...DIRECT mapping descriptor.
+[FortranProgramDeclarationsAndDefinitions.cpp:125] ...WRITE access descriptor.
+[FortranProgramDeclarationsAndDefinitions.cpp:391] Found function call 'op_par_loop_6'.
+[FortranProgramDeclarationsAndDefinitions.cpp:498] Found 'op_par_loop_6' with (host) user subroutine 'adt_calc'.
+[ParallelLoop.cpp:12] Parallel loop created.
+[FortranProgramDeclarationsAndDefinitions.cpp:178] Analysing OP_PAR_LOOP actual arguments.
+[FortranProgramDeclarationsAndDefinitions.cpp:243] OP_DAT 'p_x'.
+[FortranProgramDeclarationsAndDefinitions.cpp:72] 'p_x' has been declared through OP_DECL_DAT.
+[FortranProgramDeclarationsAndDefinitions.cpp:279] ...INDIRECT mapping descriptor.
+[FortranProgramDeclarationsAndDefinitions.cpp:118] ...READ access descriptor.
+[FortranProgramDeclarationsAndDefinitions.cpp:243] OP_DAT 'p_x'.
+[FortranProgramDeclarationsAndDefinitions.cpp:72] 'p_x' has been declared through OP_DECL_DAT.
+[FortranProgramDeclarationsAndDefinitions.cpp:279] ...INDIRECT mapping descriptor.
+[FortranProgramDeclarationsAndDefinitions.cpp:118] ...READ access descriptor.
+[FortranProgramDeclarationsAndDefinitions.cpp:243] OP_DAT 'p_x'.
+[FortranProgramDeclarationsAndDefinitions.cpp:72] 'p_x' has been declared through OP_DECL_DAT.
+[FortranProgramDeclarationsAndDefinitions.cpp:279] ...INDIRECT mapping descriptor.
+[FortranProgramDeclarationsAndDefinitions.cpp:118] ...READ access descriptor.
+[FortranProgramDeclarationsAndDefinitions.cpp:243] OP_DAT 'p_x'.
+[FortranProgramDeclarationsAndDefinitions.cpp:72] 'p_x' has been declared through OP_DECL_DAT.
+[FortranProgramDeclarationsAndDefinitions.cpp:279] ...INDIRECT mapping descriptor.
+[FortranProgramDeclarationsAndDefinitions.cpp:118] ...READ access descriptor.
+[FortranProgramDeclarationsAndDefinitions.cpp:243] OP_DAT 'p_q'.
+[FortranProgramDeclarationsAndDefinitions.cpp:72] 'p_q' has been declared through OP_DECL_DAT.
+[FortranProgramDeclarationsAndDefinitions.cpp:272] ...DIRECT mapping descriptor.
+[FortranProgramDeclarationsAndDefinitions.cpp:118] ...READ access descriptor.
+[FortranProgramDeclarationsAndDefinitions.cpp:243] OP_DAT 'p_adt'.
+[FortranProgramDeclarationsAndDefinitions.cpp:72] 'p_adt' has been declared through OP_DECL_DAT.
+[FortranProgramDeclarationsAndDefinitions.cpp:272] ...DIRECT mapping descriptor.
+[FortranProgramDeclarationsAndDefinitions.cpp:125] ...WRITE access descriptor.
+[FortranProgramDeclarationsAndDefinitions.cpp:391] Found function call 'op_par_loop_9'.
+[FortranProgramDeclarationsAndDefinitions.cpp:498] Found 'op_par_loop_9' with (host) user subroutine 'res_calc'.
+[ParallelLoop.cpp:12] Parallel loop created.
+[FortranProgramDeclarationsAndDefinitions.cpp:178] Analysing OP_PAR_LOOP actual arguments.
+[FortranProgramDeclarationsAndDefinitions.cpp:243] OP_DAT 'p_x'.
+[FortranProgramDeclarationsAndDefinitions.cpp:72] 'p_x' has been declared through OP_DECL_DAT.
+[FortranProgramDeclarationsAndDefinitions.cpp:279] ...INDIRECT mapping descriptor.
+[FortranProgramDeclarationsAndDefinitions.cpp:118] ...READ access descriptor.
+[FortranProgramDeclarationsAndDefinitions.cpp:243] OP_DAT 'p_x'.
+[FortranProgramDeclarationsAndDefinitions.cpp:72] 'p_x' has been declared through OP_DECL_DAT.
+[FortranProgramDeclarationsAndDefinitions.cpp:279] ...INDIRECT mapping descriptor.
+[FortranProgramDeclarationsAndDefinitions.cpp:118] ...READ access descriptor.
+[FortranProgramDeclarationsAndDefinitions.cpp:243] OP_DAT 'p_q'.
+[FortranProgramDeclarationsAndDefinitions.cpp:72] 'p_q' has been declared through OP_DECL_DAT.
+[FortranProgramDeclarationsAndDefinitions.cpp:279] ...INDIRECT mapping descriptor.
+[FortranProgramDeclarationsAndDefinitions.cpp:118] ...READ access descriptor.
+[FortranProgramDeclarationsAndDefinitions.cpp:243] OP_DAT 'p_q'.
+[FortranProgramDeclarationsAndDefinitions.cpp:72] 'p_q' has been declared through OP_DECL_DAT.
+[FortranProgramDeclarationsAndDefinitions.cpp:279] ...INDIRECT mapping descriptor.
+[FortranProgramDeclarationsAndDefinitions.cpp:118] ...READ access descriptor.
+[FortranProgramDeclarationsAndDefinitions.cpp:243] OP_DAT 'p_adt'.
+[FortranProgramDeclarationsAndDefinitions.cpp:72] 'p_adt' has been declared through OP_DECL_DAT.
+[FortranProgramDeclarationsAndDefinitions.cpp:279] ...INDIRECT mapping descriptor.
+[FortranProgramDeclarationsAndDefinitions.cpp:118] ...READ access descriptor.
+[FortranProgramDeclarationsAndDefinitions.cpp:243] OP_DAT 'p_adt'.
+[FortranProgramDeclarationsAndDefinitions.cpp:72] 'p_adt' has been declared through OP_DECL_DAT.
+[FortranProgramDeclarationsAndDefinitions.cpp:279] ...INDIRECT mapping descriptor.
+[FortranProgramDeclarationsAndDefinitions.cpp:118] ...READ access descriptor.
+[FortranProgramDeclarationsAndDefinitions.cpp:243] OP_DAT 'p_res'.
+[FortranProgramDeclarationsAndDefinitions.cpp:72] 'p_res' has been declared through OP_DECL_DAT.
+[FortranProgramDeclarationsAndDefinitions.cpp:279] ...INDIRECT mapping descriptor.
+[FortranProgramDeclarationsAndDefinitions.cpp:132] ...INCREMENT access descriptor.
+[FortranProgramDeclarationsAndDefinitions.cpp:243] OP_DAT 'p_res'.
+[FortranProgramDeclarationsAndDefinitions.cpp:72] 'p_res' has been declared through OP_DECL_DAT.
+[FortranProgramDeclarationsAndDefinitions.cpp:279] ...INDIRECT mapping descriptor.
+[FortranProgramDeclarationsAndDefinitions.cpp:132] ...INCREMENT access descriptor.
+[FortranProgramDeclarationsAndDefinitions.cpp:243] OP_DAT 'globalArrayDat'.
+[FortranProgramDeclarationsAndDefinitions.cpp:253] ...GLOBAL mapping descriptor.
+[FortranProgramDeclarationsAndDefinitions.cpp:20] 'globalArrayDat' is an OP_GBL.
+[FortranProgramDeclarationsAndDefinitions.cpp:44] 'globalArrayDat' is NOT a scalar, but has dimension 10.
+[FortranProgramDeclarationsAndDefinitions.cpp:146] ...MAXIMUM access descriptor.
+[FortranProgramDeclarationsAndDefinitions.cpp:391] Found function call 'op_par_loop_6'.
+[FortranProgramDeclarationsAndDefinitions.cpp:498] Found 'op_par_loop_6' with (host) user subroutine 'bres_calc'.
+[ParallelLoop.cpp:12] Parallel loop created.
+[FortranProgramDeclarationsAndDefinitions.cpp:178] Analysing OP_PAR_LOOP actual arguments.
+[FortranProgramDeclarationsAndDefinitions.cpp:243] OP_DAT 'p_x'.
+[FortranProgramDeclarationsAndDefinitions.cpp:72] 'p_x' has been declared through OP_DECL_DAT.
+[FortranProgramDeclarationsAndDefinitions.cpp:279] ...INDIRECT mapping descriptor.
+[FortranProgramDeclarationsAndDefinitions.cpp:118] ...READ access descriptor.
+[FortranProgramDeclarationsAndDefinitions.cpp:243] OP_DAT 'p_x'.
+[FortranProgramDeclarationsAndDefinitions.cpp:72] 'p_x' has been declared through OP_DECL_DAT.
+[FortranProgramDeclarationsAndDefinitions.cpp:279] ...INDIRECT mapping descriptor.
+[FortranProgramDeclarationsAndDefinitions.cpp:118] ...READ access descriptor.
+[FortranProgramDeclarationsAndDefinitions.cpp:243] OP_DAT 'p_q'.
+[FortranProgramDeclarationsAndDefinitions.cpp:72] 'p_q' has been declared through OP_DECL_DAT.
+[FortranProgramDeclarationsAndDefinitions.cpp:279] ...INDIRECT mapping descriptor.
+[FortranProgramDeclarationsAndDefinitions.cpp:118] ...READ access descriptor.
+[FortranProgramDeclarationsAndDefinitions.cpp:243] OP_DAT 'p_adt'.
+[FortranProgramDeclarationsAndDefinitions.cpp:72] 'p_adt' has been declared through OP_DECL_DAT.
+[FortranProgramDeclarationsAndDefinitions.cpp:279] ...INDIRECT mapping descriptor.
+[FortranProgramDeclarationsAndDefinitions.cpp:118] ...READ access descriptor.
+[FortranProgramDeclarationsAndDefinitions.cpp:243] OP_DAT 'p_res'.
+[FortranProgramDeclarationsAndDefinitions.cpp:72] 'p_res' has been declared through OP_DECL_DAT.
+[FortranProgramDeclarationsAndDefinitions.cpp:279] ...INDIRECT mapping descriptor.
+[FortranProgramDeclarationsAndDefinitions.cpp:132] ...INCREMENT access descriptor.
+[FortranProgramDeclarationsAndDefinitions.cpp:243] OP_DAT 'p_bound'.
+[FortranProgramDeclarationsAndDefinitions.cpp:72] 'p_bound' has been declared through OP_DECL_DAT.
+[FortranProgramDeclarationsAndDefinitions.cpp:272] ...DIRECT mapping descriptor.
+[FortranProgramDeclarationsAndDefinitions.cpp:118] ...READ access descriptor.
+[FortranProgramDeclarationsAndDefinitions.cpp:391] Found function call 'op_par_loop_5'.
+[FortranProgramDeclarationsAndDefinitions.cpp:498] Found 'op_par_loop_5' with (host) user subroutine 'update'.
+[ParallelLoop.cpp:12] Parallel loop created.
+[FortranProgramDeclarationsAndDefinitions.cpp:178] Analysing OP_PAR_LOOP actual arguments.
+[FortranProgramDeclarationsAndDefinitions.cpp:243] OP_DAT 'p_qold'.
+[FortranProgramDeclarationsAndDefinitions.cpp:72] 'p_qold' has been declared through OP_DECL_DAT.
+[FortranProgramDeclarationsAndDefinitions.cpp:272] ...DIRECT mapping descriptor.
+[FortranProgramDeclarationsAndDefinitions.cpp:118] ...READ access descriptor.
+[FortranProgramDeclarationsAndDefinitions.cpp:243] OP_DAT 'p_q'.
+[FortranProgramDeclarationsAndDefinitions.cpp:72] 'p_q' has been declared through OP_DECL_DAT.
+[FortranProgramDeclarationsAndDefinitions.cpp:272] ...DIRECT mapping descriptor.
+[FortranProgramDeclarationsAndDefinitions.cpp:125] ...WRITE access descriptor.
+[FortranProgramDeclarationsAndDefinitions.cpp:243] OP_DAT 'p_res'.
+[FortranProgramDeclarationsAndDefinitions.cpp:72] 'p_res' has been declared through OP_DECL_DAT.
+[FortranProgramDeclarationsAndDefinitions.cpp:272] ...DIRECT mapping descriptor.
+[FortranProgramDeclarationsAndDefinitions.cpp:139] ...READ/WRITE access descriptor.
+[FortranProgramDeclarationsAndDefinitions.cpp:243] OP_DAT 'p_adt'.
+[FortranProgramDeclarationsAndDefinitions.cpp:72] 'p_adt' has been declared through OP_DECL_DAT.
+[FortranProgramDeclarationsAndDefinitions.cpp:272] ...DIRECT mapping descriptor.
+[FortranProgramDeclarationsAndDefinitions.cpp:118] ...READ access descriptor.
+[FortranProgramDeclarationsAndDefinitions.cpp:243] OP_DAT 'p_rms'.
+[FortranProgramDeclarationsAndDefinitions.cpp:253] ...GLOBAL mapping descriptor.
+[FortranProgramDeclarationsAndDefinitions.cpp:20] 'p_rms' is an OP_GBL.
+[FortranProgramDeclarationsAndDefinitions.cpp:44] 'p_rms' is NOT a scalar, but has dimension 1.
+[FortranProgramDeclarationsAndDefinitions.cpp:132] ...INCREMENT access descriptor.
+[FortranProgramDeclarationsAndDefinitions.cpp:391] Found function call 'real'.
+[FortranProgramDeclarationsAndDefinitions.cpp:391] Found function call 'sqrt'.
+[SubroutinesGeneration.h:103] Generating file 'rose_cuda_code.F95'.
+[SubroutinesGeneration.h:109] Creating source file 'rose_cuda_code.F95'.
+[FortranSubroutinesGeneration.cpp:225] Creating Fortran module.
+[FortranCUDASubroutinesGeneration.cpp:326] Adding 'use' statements to CUDA module.
+[FortranCUDAConstantDeclarations.cpp:42] Adding variables with constant access specifiers to module.
+[FortranCUDAConstantDeclarations.cpp:55] Analysing OP_DECL_CONST with name 'alpha'.
+[FortranCUDAConstantDeclarations.cpp:55] Analysing OP_DECL_CONST with name 'cfl'.
+[FortranCUDAConstantDeclarations.cpp:55] Analysing OP_DECL_CONST with name 'eps'.
+[FortranCUDAConstantDeclarations.cpp:55] Analysing OP_DECL_CONST with name 'gam'.
+[FortranCUDAConstantDeclarations.cpp:55] Analysing OP_DECL_CONST with name 'gm1'.
+[FortranCUDAConstantDeclarations.cpp:55] Analysing OP_DECL_CONST with name 'mach'.
+[FortranCUDAConstantDeclarations.cpp:55] Analysing OP_DECL_CONST with name 'qinf'.
+[FortranCUDASubroutinesGeneration.cpp:270] Analysing 'adt_calc'.
+[FortranOpDatDimensionsDeclaration.cpp:81] Creating OP_DAT dimensions type declaration.
+[FortranOpDatDimensionsDeclaration.cpp:29] Adding dimensions field for OP_DAT 1.
+[FortranOpDatDimensionsDeclaration.cpp:29] Adding dimensions field for OP_DAT 2.
+[FortranOpDatDimensionsDeclaration.cpp:29] Adding dimensions field for OP_DAT 3.
+[FortranOpDatDimensionsDeclaration.cpp:29] Adding dimensions field for OP_DAT 4.
+[FortranOpDatDimensionsDeclaration.cpp:29] Adding dimensions field for OP_DAT 5.
+[FortranOpDatDimensionsDeclaration.cpp:29] Adding dimensions field for OP_DAT 6.
+[FortranCUDAOpDatCardinalitiesDeclaration.cpp:28] Creating cardinality field for OP_DAT 1.
+[FortranCUDAOpDatCardinalitiesDeclaration.cpp:28] Creating cardinality field for OP_DAT 5.
+[FortranCUDAOpDatCardinalitiesDeclaration.cpp:28] Creating cardinality field for OP_DAT 6.
+[FortranCUDASubroutinesGeneration.cpp:270] Analysing 'bres_calc'.
+[FortranOpDatDimensionsDeclaration.cpp:81] Creating OP_DAT dimensions type declaration.
+[FortranOpDatDimensionsDeclaration.cpp:29] Adding dimensions field for OP_DAT 1.
+[FortranOpDatDimensionsDeclaration.cpp:29] Adding dimensions field for OP_DAT 2.
+[FortranOpDatDimensionsDeclaration.cpp:29] Adding dimensions field for OP_DAT 3.
+[FortranOpDatDimensionsDeclaration.cpp:29] Adding dimensions field for OP_DAT 4.
+[FortranOpDatDimensionsDeclaration.cpp:29] Adding dimensions field for OP_DAT 5.
+[FortranOpDatDimensionsDeclaration.cpp:29] Adding dimensions field for OP_DAT 6.
+[FortranCUDAOpDatCardinalitiesDeclaration.cpp:28] Creating cardinality field for OP_DAT 1.
+[FortranCUDAOpDatCardinalitiesDeclaration.cpp:28] Creating cardinality field for OP_DAT 3.
+[FortranCUDAOpDatCardinalitiesDeclaration.cpp:28] Creating cardinality field for OP_DAT 4.
+[FortranCUDAOpDatCardinalitiesDeclaration.cpp:28] Creating cardinality field for OP_DAT 5.
+[FortranCUDAOpDatCardinalitiesDeclaration.cpp:28] Creating cardinality field for OP_DAT 6.
+[FortranCUDASubroutinesGeneration.cpp:270] Analysing 'res_calc'.
+[FortranOpDatDimensionsDeclaration.cpp:81] Creating OP_DAT dimensions type declaration.
+[FortranOpDatDimensionsDeclaration.cpp:29] Adding dimensions field for OP_DAT 1.
+[FortranOpDatDimensionsDeclaration.cpp:29] Adding dimensions field for OP_DAT 2.
+[FortranOpDatDimensionsDeclaration.cpp:29] Adding dimensions field for OP_DAT 3.
+[FortranOpDatDimensionsDeclaration.cpp:29] Adding dimensions field for OP_DAT 4.
+[FortranOpDatDimensionsDeclaration.cpp:29] Adding dimensions field for OP_DAT 5.
+[FortranOpDatDimensionsDeclaration.cpp:29] Adding dimensions field for OP_DAT 6.
+[FortranOpDatDimensionsDeclaration.cpp:29] Adding dimensions field for OP_DAT 7.
+[FortranOpDatDimensionsDeclaration.cpp:29] Adding dimensions field for OP_DAT 8.
+[FortranCUDAOpDatCardinalitiesDeclaration.cpp:28] Creating cardinality field for OP_DAT 1.
+[FortranCUDAOpDatCardinalitiesDeclaration.cpp:28] Creating cardinality field for OP_DAT 3.
+[FortranCUDAOpDatCardinalitiesDeclaration.cpp:28] Creating cardinality field for OP_DAT 5.
+[FortranCUDAOpDatCardinalitiesDeclaration.cpp:28] Creating cardinality field for OP_DAT 7.
+[ParallelLoop.cpp:262] Checking argument 9.
+[ParallelLoop.cpp:264] This argument is maximised.
+[FortranCUDAOpDatCardinalitiesDeclaration.cpp:28] Creating cardinality field for OP_DAT 9.
+[FortranCUDASubroutinesGeneration.cpp:270] Analysing 'save_soln'.
+[FortranOpDatDimensionsDeclaration.cpp:81] Creating OP_DAT dimensions type declaration.
+[FortranOpDatDimensionsDeclaration.cpp:29] Adding dimensions field for OP_DAT 1.
+[FortranOpDatDimensionsDeclaration.cpp:29] Adding dimensions field for OP_DAT 2.
+[FortranCUDAOpDatCardinalitiesDeclaration.cpp:28] Creating cardinality field for OP_DAT 1.
+[FortranCUDAOpDatCardinalitiesDeclaration.cpp:28] Creating cardinality field for OP_DAT 2.
+[FortranCUDASubroutinesGeneration.cpp:270] Analysing 'update'.
+[FortranOpDatDimensionsDeclaration.cpp:81] Creating OP_DAT dimensions type declaration.
+[FortranOpDatDimensionsDeclaration.cpp:29] Adding dimensions field for OP_DAT 1.
+[FortranOpDatDimensionsDeclaration.cpp:29] Adding dimensions field for OP_DAT 2.
+[FortranOpDatDimensionsDeclaration.cpp:29] Adding dimensions field for OP_DAT 3.
+[FortranOpDatDimensionsDeclaration.cpp:29] Adding dimensions field for OP_DAT 4.
+[FortranCUDAOpDatCardinalitiesDeclaration.cpp:28] Creating cardinality field for OP_DAT 1.
+[FortranCUDAOpDatCardinalitiesDeclaration.cpp:28] Creating cardinality field for OP_DAT 2.
+[FortranCUDAOpDatCardinalitiesDeclaration.cpp:28] Creating cardinality field for OP_DAT 3.
+[FortranCUDAOpDatCardinalitiesDeclaration.cpp:28] Creating cardinality field for OP_DAT 4.
+[ParallelLoop.cpp:262] Checking argument 5.
+[FortranCUDAOpDatCardinalitiesDeclaration.cpp:28] Creating cardinality field for OP_DAT 5.
+[FortranCUDASubroutinesGeneration.cpp:305] Analysing 'adt_calc'.
+[FortranCUDASubroutinesGeneration.cpp:305] Analysing 'bres_calc'.
+[FortranCUDASubroutinesGeneration.cpp:305] Analysing 'res_calc'.
+[FortranCUDASubroutinesGeneration.cpp:305] Analysing 'save_soln'.
+[FortranCUDASubroutinesGeneration.cpp:305] Analysing 'update'.
+[FortranCUDASubroutinesGeneration.cpp:115] Creating reduction subroutines.
+[FortranCUDASubroutinesGeneration.cpp:128] Checking parallel loop: adt_calc.
+[ParallelLoop.cpp:262] Checking argument 1.
+[ParallelLoop.cpp:262] Checking argument 2.
+[ParallelLoop.cpp:262] Checking argument 3.
+[ParallelLoop.cpp:262] Checking argument 4.
+[ParallelLoop.cpp:262] Checking argument 5.
+[ParallelLoop.cpp:262] Checking argument 6.
+[FortranCUDASubroutinesGeneration.cpp:128] Checking parallel loop: bres_calc.
+[ParallelLoop.cpp:262] Checking argument 1.
+[ParallelLoop.cpp:262] Checking argument 2.
+[ParallelLoop.cpp:262] Checking argument 3.
+[ParallelLoop.cpp:262] Checking argument 4.
+[ParallelLoop.cpp:262] Checking argument 5.
+[ParallelLoop.cpp:262] Checking argument 6.
+[FortranCUDASubroutinesGeneration.cpp:128] Checking parallel loop: res_calc.
+[ParallelLoop.cpp:262] Checking argument 1.
+[ParallelLoop.cpp:262] Checking argument 2.
+[ParallelLoop.cpp:262] Checking argument 3.
+[ParallelLoop.cpp:262] Checking argument 4.
+[ParallelLoop.cpp:262] Checking argument 5.
+[ParallelLoop.cpp:262] Checking argument 6.
+[ParallelLoop.cpp:262] Checking argument 7.
+[ParallelLoop.cpp:262] Checking argument 8.
+[ParallelLoop.cpp:262] Checking argument 9.
+[ParallelLoop.cpp:264] This argument is maximised.
+[ParallelLoop.cpp:262] Checking argument 9.
+[ParallelLoop.cpp:264] This argument is maximised.
+[FortranCUDASubroutinesGeneration.cpp:128] Checking parallel loop: save_soln.
+[ParallelLoop.cpp:262] Checking argument 1.
+[ParallelLoop.cpp:262] Checking argument 2.
+[FortranCUDASubroutinesGeneration.cpp:128] Checking parallel loop: update.
+[ParallelLoop.cpp:262] Checking argument 1.
+[ParallelLoop.cpp:262] Checking argument 2.
+[ParallelLoop.cpp:262] Checking argument 3.
+[ParallelLoop.cpp:262] Checking argument 4.
+[ParallelLoop.cpp:262] Checking argument 5.
+[ParallelLoop.cpp:262] Checking argument 5.
+[FortranCUDASubroutinesGeneration.cpp:135] Creating reduction subroutine 2.
+[FortranCUDASubroutinesGeneration.cpp:142] Creating a subroutine.
+[Subroutine.h:121] Subroutine name = ReductionFloat8.
+[FortranCUDAReductionSubroutine.cpp:554] Creating reduction subroutine.
+[FortranCUDAReductionSubroutine.cpp:487] Creating reduction procedure formal parameter.
+[FortranCUDAReductionSubroutine.cpp:440] Creating local variable declarations.
+[FortranCUDAReductionSubroutine.cpp:409] Creating statements.
+[FortranCUDAReductionSubroutine.cpp:369] Creating initialisation statements.
+[FortranCUDAReductionSubroutine.cpp:345] Creating shared variable initialisation statements.
+[Subroutine.h:121] Subroutine name = initCUDAConstants.
+[FortranCUDAInitialiseConstantsSubroutine.cpp:93] Outputting formal parameters for CUDA constant initialisation routine.
+[FortranCUDAInitialiseConstantsSubroutine.cpp:25] Appending assignments for CUDA constants initialisation.
+[FortranCUDASubroutinesGeneration.cpp:167] Analysing user subroutine 'adt_calc'.
+[Subroutine.h:121] Subroutine name = adt_calc_modified.
+[FortranCUDAUserSubroutine.cpp:79] Outputting and modifying statements.
+[FortranCUDAUserSubroutine.cpp:142] Appending (non-variable-declaration) statement.
+[FortranCUDAUserSubroutine.cpp:157] Appending deep subroutine calls.
+[FortranCUDAUserSubroutine.cpp:165] Appending deep subroutine calls.
+[FortranCUDAUserSubroutine.cpp:171] Appending variable declaration.
+[FortranCUDAUserSubroutine.cpp:210] 'x1' is an INDIRECT formal parameter which is READ.
+[FortranCUDAUserSubroutine.cpp:171] Appending variable declaration.
+[FortranCUDAUserSubroutine.cpp:210] 'x2' is an INDIRECT formal parameter which is READ.
+[FortranCUDAUserSubroutine.cpp:171] Appending variable declaration.
+[FortranCUDAUserSubroutine.cpp:210] 'x3' is an INDIRECT formal parameter which is READ.
+[FortranCUDAUserSubroutine.cpp:171] Appending variable declaration.
+[FortranCUDAUserSubroutine.cpp:210] 'x4' is an INDIRECT formal parameter which is READ.
+[FortranCUDAUserSubroutine.cpp:171] Appending variable declaration.
+[FortranCUDAUserSubroutine.cpp:253] 'q' is a formal parameter OP_DAT 5 is read, OP_DAT, ARRAY.
+[FortranCUDAUserSubroutine.cpp:171] Appending variable declaration.
+[FortranCUDAUserSubroutine.cpp:253] 'adt' is a formal parameter OP_DAT 6 is written, OP_DAT, ARRAY.
+[FortranCUDAUserSubroutine.cpp:171] Appending variable declaration.
+[FortranCUDAUserSubroutine.cpp:276] 'dx' is NOT a formal parameter.
+[FortranCUDAUserSubroutine.cpp:276] 'dy' is NOT a formal parameter.
+[FortranCUDAUserSubroutine.cpp:276] 'ri' is NOT a formal parameter.
+[FortranCUDAUserSubroutine.cpp:276] 'u' is NOT a formal parameter.
+[FortranCUDAUserSubroutine.cpp:276] 'v' is NOT a formal parameter.
+[FortranCUDAUserSubroutine.cpp:276] 'c' is NOT a formal parameter.
+[FortranCUDAUserSubroutine.cpp:142] Appending (non-variable-declaration) statement.
+[FortranCUDAUserSubroutine.cpp:157] Appending deep subroutine calls.
+[FortranCUDAUserSubroutine.cpp:165] Appending deep subroutine calls.
+[FortranCUDAUserSubroutine.cpp:142] Appending (non-variable-declaration) statement.
+[FortranCUDAUserSubroutine.cpp:157] Appending deep subroutine calls.
+[FortranCUDAUserSubroutine.cpp:165] Appending deep subroutine calls.
+[FortranCUDAUserSubroutine.cpp:142] Appending (non-variable-declaration) statement.
+[FortranCUDAUserSubroutine.cpp:157] Appending deep subroutine calls.
+[FortranCUDAUserSubroutine.cpp:165] Appending deep subroutine calls.
+[FortranCUDAUserSubroutine.cpp:142] Appending (non-variable-declaration) statement.
+[FortranCUDAUserSubroutine.cpp:157] Appending deep subroutine calls.
+[FortranCUDAUserSubroutine.cpp:165] Appending deep subroutine calls.
+[FortranCUDAUserSubroutine.cpp:142] Appending (non-variable-declaration) statement.
+[FortranCUDAUserSubroutine.cpp:157] Appending deep subroutine calls.
+[FortranCUDAUserSubroutine.cpp:165] Appending deep subroutine calls.
+[FortranCUDAUserSubroutine.cpp:142] Appending (non-variable-declaration) statement.
+[FortranCUDAUserSubroutine.cpp:157] Appending deep subroutine calls.
+[FortranCUDAUserSubroutine.cpp:165] Appending deep subroutine calls.
+[FortranCUDAUserSubroutine.cpp:142] Appending (non-variable-declaration) statement.
+[FortranCUDAUserSubroutine.cpp:157] Appending deep subroutine calls.
+[FortranCUDAUserSubroutine.cpp:165] Appending deep subroutine calls.
+[FortranCUDAUserSubroutine.cpp:142] Appending (non-variable-declaration) statement.
+[FortranCUDAUserSubroutine.cpp:157] Appending deep subroutine calls.
+[FortranCUDAUserSubroutine.cpp:165] Appending deep subroutine calls.
+[FortranCUDAUserSubroutine.cpp:142] Appending (non-variable-declaration) statement.
+[FortranCUDAUserSubroutine.cpp:157] Appending deep subroutine calls.
+[FortranCUDAUserSubroutine.cpp:165] Appending deep subroutine calls.
+[FortranCUDAUserSubroutine.cpp:142] Appending (non-variable-declaration) statement.
+[FortranCUDAUserSubroutine.cpp:157] Appending deep subroutine calls.
+[FortranCUDAUserSubroutine.cpp:165] Appending deep subroutine calls.
+[FortranCUDAUserSubroutine.cpp:142] Appending (non-variable-declaration) statement.
+[FortranCUDAUserSubroutine.cpp:157] Appending deep subroutine calls.
+[FortranCUDAUserSubroutine.cpp:165] Appending deep subroutine calls.
+[FortranCUDAUserSubroutine.cpp:142] Appending (non-variable-declaration) statement.
+[FortranCUDAUserSubroutine.cpp:157] Appending deep subroutine calls.
+[FortranCUDAUserSubroutine.cpp:165] Appending deep subroutine calls.
+[FortranCUDAUserSubroutine.cpp:142] Appending (non-variable-declaration) statement.
+[FortranCUDAUserSubroutine.cpp:157] Appending deep subroutine calls.
+[FortranCUDAUserSubroutine.cpp:165] Appending deep subroutine calls.
+[FortranCUDAUserSubroutine.cpp:142] Appending (non-variable-declaration) statement.
+[FortranCUDAUserSubroutine.cpp:157] Appending deep subroutine calls.
+[FortranCUDAUserSubroutine.cpp:165] Appending deep subroutine calls.
+[FortranCUDAUserSubroutine.cpp:142] Appending (non-variable-declaration) statement.
+[FortranCUDAUserSubroutine.cpp:157] Appending deep subroutine calls.
+[FortranCUDAUserSubroutine.cpp:165] Appending deep subroutine calls.
+[FortranCUDAUserSubroutine.cpp:142] Appending (non-variable-declaration) statement.
+[FortranCUDAUserSubroutine.cpp:157] Appending deep subroutine calls.
+[FortranCUDAUserSubroutine.cpp:165] Appending deep subroutine calls.
+[FortranCUDAUserSubroutine.cpp:142] Appending (non-variable-declaration) statement.
+[FortranCUDAUserSubroutine.cpp:157] Appending deep subroutine calls.
+[FortranCUDAUserSubroutine.cpp:165] Appending deep subroutine calls.
+[FortranCUDAConstantDeclarations.cpp:72] Patching references to CUDA constants.
+[RoseHelper.cpp:23] Forcing output of syntax tree in output file.
+[Subroutine.h:121] Subroutine name = adt_calc_kernel.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:1843] Creating formal parameter declarations.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:1714] Creating OP_DAT formal parameters.
+[ParallelLoop.cpp:262] Checking argument 1.
+[ParallelLoop.cpp:262] Checking argument 5.
+[ParallelLoop.cpp:262] Checking argument 6.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:1527] Creating plan formal parameter declarations.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:1435] Creating local variable declarations.
+[FortranCUDAKernelSubroutine.cpp:119] Creating local thread variables.
+[ParallelLoop.cpp:262] Checking argument 1.
+[ParallelLoop.cpp:262] Checking argument 2.
+[ParallelLoop.cpp:262] Checking argument 3.
+[ParallelLoop.cpp:262] Checking argument 4.
+[ParallelLoop.cpp:262] Checking argument 5.
+[ParallelLoop.cpp:262] Checking argument 6.
+[FortranCUDAKernelSubroutine.cpp:157] Creating CUDA shared variable declarations.
+[FortranCUDAKernelSubroutine.cpp:178] Creating declaration with name 'sharedFloat8' for OP_DAT 'p_x'.
+[FortranCUDAKernelSubroutine.cpp:202] Creating offset declaration with name 'sharedOffsetFloat8' for OP_DAT 'p_x'.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:1389] Creating local variable declarations needed to execute kernel.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:1451] Creating number of bytes declaration for OP_DAT 1.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:1467] Number of bytes declaration NOT needed for OP_DAT 2.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:1467] Number of bytes declaration NOT needed for OP_DAT 3.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:1467] Number of bytes declaration NOT needed for OP_DAT 4.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:1451] Creating number of bytes declaration for OP_DAT 5.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:1451] Creating number of bytes declaration for OP_DAT 6.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:1480] Creating round up declaration 1.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:1480] Creating round up declaration 5.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:1480] Creating round up declaration 6.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:1499] Creating size argument for OP_DAT 1.
+[ParallelLoop.cpp:262] Checking argument 1.
+[ParallelLoop.cpp:262] Checking argument 2.
+[ParallelLoop.cpp:262] Checking argument 3.
+[ParallelLoop.cpp:262] Checking argument 4.
+[ParallelLoop.cpp:262] Checking argument 5.
+[ParallelLoop.cpp:262] Checking argument 6.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:1164] Creating thread zero statements.
+[ParallelLoop.cpp:262] Checking argument 1.
+[ParallelLoop.cpp:262] Checking argument 2.
+[ParallelLoop.cpp:262] Checking argument 3.
+[ParallelLoop.cpp:262] Checking argument 4.
+[ParallelLoop.cpp:262] Checking argument 5.
+[ParallelLoop.cpp:262] Checking argument 6.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:1051] Creating statements to initialise bytes per OP_DAT.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:1070] Initialising round-up variable for 'p_x'.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:1105] Initialising number of bytes variable for 'p_x'.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:1105] Initialising number of bytes variable for 'p_q'.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:1105] Initialising number of bytes variable for 'p_adt'.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:764] Creating statements to initialise shared memory.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:788] Initialise the lower bound of the while loop.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:807] Initialise the upper bound of the while loop.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:830] While loop body.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:864] Statement to index shared memory.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:662] Creating main execution loop statements.
+[ParallelLoop.cpp:262] Checking argument 1.
+[ParallelLoop.cpp:262] Checking argument 2.
+[ParallelLoop.cpp:262] Checking argument 3.
+[ParallelLoop.cpp:262] Checking argument 4.
+[ParallelLoop.cpp:262] Checking argument 5.
+[ParallelLoop.cpp:262] Checking argument 6.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:28] Creating call to user device subroutine.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:51] Indirect OP_DAT with read access.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:51] Indirect OP_DAT with read access.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:51] Indirect OP_DAT with read access.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:51] Indirect OP_DAT with read access.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:143] Direct OP_DAT.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:143] Direct OP_DAT.
+[ParallelLoop.cpp:262] Checking argument 1.
+[ParallelLoop.cpp:262] Checking argument 2.
+[ParallelLoop.cpp:262] Checking argument 3.
+[ParallelLoop.cpp:262] Checking argument 4.
+[ParallelLoop.cpp:262] Checking argument 5.
+[ParallelLoop.cpp:262] Checking argument 6.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:242] Creating increment and write access epilogue statements.
+[ParallelLoop.cpp:262] Checking argument 1.
+[ParallelLoop.cpp:262] Checking argument 2.
+[ParallelLoop.cpp:262] Checking argument 3.
+[ParallelLoop.cpp:262] Checking argument 4.
+[ParallelLoop.cpp:262] Checking argument 5.
+[ParallelLoop.cpp:262] Checking argument 6.
+[Subroutine.h:121] Subroutine name = adt_calc_host.
+[FortranCUDAHostSubroutineIndirectLoop.cpp:1427] CUDA host subroutine creation for indirect loop.
+[FortranHostSubroutine.cpp:25] Creating host subroutine formal parameters.
+[FortranCUDAHostSubroutine.cpp:829] Generating OP_DAT dimensions declaration.
+[FortranCUDAHostSubroutine.cpp:814] Generating OP_DAT cardinalities declaration .
+[FortranCUDAHostSubroutine.cpp:680] Creating local variable declarations for data marshalling.
+[FortranCUDAHostSubroutine.cpp:694] Creating OP_DAT size variable for OP_DAT 1.
+[FortranCUDAHostSubroutine.cpp:694] Creating OP_DAT size variable for OP_DAT 5.
+[FortranCUDAHostSubroutine.cpp:694] Creating OP_DAT size variable for OP_DAT 6.
+[FortranCUDAHostSubroutine.cpp:714] Creating device array for OP_DAT 1.
+[FortranCUDAHostSubroutine.cpp:714] Creating device array for OP_DAT 5.
+[FortranCUDAHostSubroutine.cpp:714] Creating device array for OP_DAT 6.
+[FortranCUDAHostSubroutine.cpp:784] Creating CUDA configuration launch local variable declarations.
+[FortranCUDAHostSubroutineIndirectLoop.cpp:1178] Creating execution plan variables.
+[ParallelLoop.cpp:262] Checking argument 1.
+[ParallelLoop.cpp:262] Checking argument 2.
+[ParallelLoop.cpp:262] Checking argument 3.
+[ParallelLoop.cpp:262] Checking argument 4.
+[ParallelLoop.cpp:262] Checking argument 5.
+[ParallelLoop.cpp:262] Checking argument 6.
+[FortranCUDAHostSubroutineIndirectLoop.cpp:1129] Creating statements.
+[FortranCUDAHostSubroutineIndirectLoop.cpp:809] Creating statements to prepare plan function parameters.
+[FortranCUDAHostSubroutineIndirectLoop.cpp:993] Creating plan function call statement.
+[FortranCUDAHostSubroutine.cpp:420] Creating statements to transfer OP_DATs onto device.
+[FortranCUDAHostSubroutine.cpp:426] Creating statements to initialise OP_DAT dimensions.
+[FortranCUDAHostSubroutine.cpp:449] Creating statements to initialise OP_DAT cardinalities (on device).
+[FortranCUDAHostSubroutine.cpp:478] Creating statements to initialise OP_DAT cardinalities (on host).
+[FortranCUDAHostSubroutine.cpp:503] Creating statements to convert OP_DATs between C and Fortran pointers.
+[FortranCUDAHostSubroutine.cpp:520] Direct/Indirect/Global non-scalar conversion.
+[FortranCUDAHostSubroutine.cpp:520] Direct/Indirect/Global non-scalar conversion.
+[FortranCUDAHostSubroutine.cpp:520] Direct/Indirect/Global non-scalar conversion.
+[ParallelLoop.cpp:262] Checking argument 1.
+[ParallelLoop.cpp:262] Checking argument 2.
+[ParallelLoop.cpp:262] Checking argument 3.
+[ParallelLoop.cpp:262] Checking argument 4.
+[ParallelLoop.cpp:262] Checking argument 5.
+[ParallelLoop.cpp:262] Checking argument 6.
+[FortranCUDAHostSubroutineIndirectLoop.cpp:293] Creating statements to convert plan function parameters.
+[FortranCUDAHostSubroutineIndirectLoop.cpp:621] Creating statements to convert local-to-global mapping arrays.
+[FortranCUDAHostSubroutineIndirectLoop.cpp:699] Creating statements to convert global-to-local mapping arrays.
+[FortranCUDAHostSubroutineIndirectLoop.cpp:1051] Creating statements to initialise OP_DAT cardinalities.
+[FortranCUDAHostSubroutineIndirectLoop.cpp:158] Creating plan function execution statements.
+[FortranCUDAHostSubroutineIndirectLoop.cpp:28] Creating CUDA kernel function call statement.
+[FortranCUDAHostSubroutineIndirectLoop.cpp:39] Adding OP_DAT parameters.
+[ParallelLoop.cpp:262] Checking argument 1.
+[ParallelLoop.cpp:262] Checking argument 5.
+[ParallelLoop.cpp:262] Checking argument 6.
+[FortranCUDAHostSubroutineIndirectLoop.cpp:73] Adding local to global memory remapping parameters.
+[FortranCUDAHostSubroutineIndirectLoop.cpp:89] Adding global to local memory remapping parameters.
+[FortranCUDAHostSubroutineIndirectLoop.cpp:101] Adding plan function parameters.
+[ParallelLoop.cpp:262] Checking argument 1.
+[ParallelLoop.cpp:262] Checking argument 2.
+[ParallelLoop.cpp:262] Checking argument 3.
+[ParallelLoop.cpp:262] Checking argument 4.
+[ParallelLoop.cpp:262] Checking argument 5.
+[ParallelLoop.cpp:262] Checking argument 6.
+[FortranCUDAHostSubroutine.cpp:390] Creating statements to deallocate global arrays which are read.
+[FortranCUDASubroutinesGeneration.cpp:167] Analysing user subroutine 'bres_calc'.
+[Subroutine.h:121] Subroutine name = bres_calc_modified.
+[FortranCUDAUserSubroutine.cpp:79] Outputting and modifying statements.
+[FortranCUDAUserSubroutine.cpp:142] Appending (non-variable-declaration) statement.
+[FortranCUDAUserSubroutine.cpp:157] Appending deep subroutine calls.
+[FortranCUDAUserSubroutine.cpp:165] Appending deep subroutine calls.
+[FortranCUDAUserSubroutine.cpp:171] Appending variable declaration.
+[FortranCUDAUserSubroutine.cpp:210] 'x1' is an INDIRECT formal parameter which is READ.
+[FortranCUDAUserSubroutine.cpp:171] Appending variable declaration.
+[FortranCUDAUserSubroutine.cpp:210] 'x2' is an INDIRECT formal parameter which is READ.
+[FortranCUDAUserSubroutine.cpp:171] Appending variable declaration.
+[FortranCUDAUserSubroutine.cpp:210] 'q1' is an INDIRECT formal parameter which is READ.
+[FortranCUDAUserSubroutine.cpp:171] Appending variable declaration.
+[FortranCUDAUserSubroutine.cpp:210] 'adt1' is an INDIRECT formal parameter which is READ.
+[FortranCUDAUserSubroutine.cpp:171] Appending variable declaration.
+[FortranCUDAUserSubroutine.cpp:253] 'res1' is a formal parameter OP_DAT 5 , OP_DAT, ARRAY.
+[FortranCUDAUserSubroutine.cpp:171] Appending variable declaration.
+[FortranCUDAUserSubroutine.cpp:253] 'bound' is a formal parameter OP_DAT 6 is read, OP_DAT, ARRAY.
+[FortranCUDAUserSubroutine.cpp:171] Appending variable declaration.
+[FortranCUDAUserSubroutine.cpp:276] 'dx' is NOT a formal parameter.
+[FortranCUDAUserSubroutine.cpp:276] 'dy' is NOT a formal parameter.
+[FortranCUDAUserSubroutine.cpp:276] 'mu' is NOT a formal parameter.
+[FortranCUDAUserSubroutine.cpp:276] 'ri' is NOT a formal parameter.
+[FortranCUDAUserSubroutine.cpp:276] 'p1' is NOT a formal parameter.
+[FortranCUDAUserSubroutine.cpp:276] 'vol1' is NOT a formal parameter.
+[FortranCUDAUserSubroutine.cpp:276] 'p2' is NOT a formal parameter.
+[FortranCUDAUserSubroutine.cpp:276] 'vol2' is NOT a formal parameter.
+[FortranCUDAUserSubroutine.cpp:276] 'f' is NOT a formal parameter.
+[FortranCUDAUserSubroutine.cpp:142] Appending (non-variable-declaration) statement.
+[FortranCUDAUserSubroutine.cpp:157] Appending deep subroutine calls.
+[FortranCUDAUserSubroutine.cpp:165] Appending deep subroutine calls.
+[FortranCUDAUserSubroutine.cpp:142] Appending (non-variable-declaration) statement.
+[FortranCUDAUserSubroutine.cpp:157] Appending deep subroutine calls.
+[FortranCUDAUserSubroutine.cpp:165] Appending deep subroutine calls.
+[FortranCUDAUserSubroutine.cpp:142] Appending (non-variable-declaration) statement.
+[FortranCUDAUserSubroutine.cpp:157] Appending deep subroutine calls.
+[FortranCUDAUserSubroutine.cpp:165] Appending deep subroutine calls.
+[FortranCUDAUserSubroutine.cpp:142] Appending (non-variable-declaration) statement.
+[FortranCUDAUserSubroutine.cpp:157] Appending deep subroutine calls.
+[FortranCUDAUserSubroutine.cpp:165] Appending deep subroutine calls.
+[FortranCUDAUserSubroutine.cpp:142] Appending (non-variable-declaration) statement.
+[FortranCUDAUserSubroutine.cpp:157] Appending deep subroutine calls.
+[FortranCUDAUserSubroutine.cpp:165] Appending deep subroutine calls.
+[FortranCUDAConstantDeclarations.cpp:72] Patching references to CUDA constants.
+[RoseHelper.cpp:23] Forcing output of syntax tree in output file.
+[Subroutine.h:121] Subroutine name = bres_calc_kernel.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:1843] Creating formal parameter declarations.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:1714] Creating OP_DAT formal parameters.
+[ParallelLoop.cpp:262] Checking argument 1.
+[ParallelLoop.cpp:262] Checking argument 3.
+[ParallelLoop.cpp:262] Checking argument 4.
+[ParallelLoop.cpp:262] Checking argument 5.
+[ParallelLoop.cpp:262] Checking argument 6.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:1527] Creating plan formal parameter declarations.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:1435] Creating local variable declarations.
+[FortranCUDAKernelSubroutine.cpp:119] Creating local thread variables.
+[ParallelLoop.cpp:262] Checking argument 1.
+[ParallelLoop.cpp:262] Checking argument 2.
+[ParallelLoop.cpp:262] Checking argument 3.
+[ParallelLoop.cpp:262] Checking argument 4.
+[ParallelLoop.cpp:262] Checking argument 5.
+[ParallelLoop.cpp:262] Checking argument 6.
+[FortranCUDAKernelSubroutine.cpp:157] Creating CUDA shared variable declarations.
+[FortranCUDAKernelSubroutine.cpp:178] Creating declaration with name 'sharedFloat8' for OP_DAT 'p_x'.
+[FortranCUDAKernelSubroutine.cpp:202] Creating offset declaration with name 'sharedOffsetFloat8' for OP_DAT 'p_x'.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:1389] Creating local variable declarations needed to execute kernel.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:1451] Creating number of bytes declaration for OP_DAT 1.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:1467] Number of bytes declaration NOT needed for OP_DAT 2.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:1451] Creating number of bytes declaration for OP_DAT 3.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:1451] Creating number of bytes declaration for OP_DAT 4.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:1451] Creating number of bytes declaration for OP_DAT 5.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:1451] Creating number of bytes declaration for OP_DAT 6.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:1480] Creating round up declaration 1.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:1480] Creating round up declaration 3.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:1480] Creating round up declaration 4.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:1480] Creating round up declaration 5.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:1480] Creating round up declaration 6.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:1499] Creating size argument for OP_DAT 1.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:1499] Creating size argument for OP_DAT 3.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:1499] Creating size argument for OP_DAT 4.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:1499] Creating size argument for OP_DAT 5.
+[ParallelLoop.cpp:262] Checking argument 1.
+[ParallelLoop.cpp:262] Checking argument 2.
+[ParallelLoop.cpp:262] Checking argument 3.
+[ParallelLoop.cpp:262] Checking argument 4.
+[ParallelLoop.cpp:262] Checking argument 5.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:1336] Creating local variable declarations needed for incremented OP_DATS.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:1344] Creating increment access mapping for OP_DAT 5.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:1164] Creating thread zero statements.
+[ParallelLoop.cpp:262] Checking argument 1.
+[ParallelLoop.cpp:262] Checking argument 2.
+[ParallelLoop.cpp:262] Checking argument 3.
+[ParallelLoop.cpp:262] Checking argument 4.
+[ParallelLoop.cpp:262] Checking argument 5.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:992] Creating thread zero statements for incremented OP_DATs.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:1051] Creating statements to initialise bytes per OP_DAT.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:1070] Initialising round-up variable for 'p_x'.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:1070] Initialising round-up variable for 'p_q'.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:1070] Initialising round-up variable for 'p_adt'.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:1070] Initialising round-up variable for 'p_res'.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:1105] Initialising number of bytes variable for 'p_x'.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:1105] Initialising number of bytes variable for 'p_q'.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:1105] Initialising number of bytes variable for 'p_adt'.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:1105] Initialising number of bytes variable for 'p_res'.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:1105] Initialising number of bytes variable for 'p_bound'.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:764] Creating statements to initialise shared memory.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:788] Initialise the lower bound of the while loop.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:807] Initialise the upper bound of the while loop.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:830] While loop body.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:864] Statement to index shared memory.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:788] Initialise the lower bound of the while loop.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:807] Initialise the upper bound of the while loop.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:830] While loop body.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:864] Statement to index shared memory.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:788] Initialise the lower bound of the while loop.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:807] Initialise the upper bound of the while loop.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:830] While loop body.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:864] Statement to index shared memory.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:788] Initialise the lower bound of the while loop.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:807] Initialise the upper bound of the while loop.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:830] While loop body.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:662] Creating main execution loop statements.
+[ParallelLoop.cpp:262] Checking argument 1.
+[ParallelLoop.cpp:262] Checking argument 2.
+[ParallelLoop.cpp:262] Checking argument 3.
+[ParallelLoop.cpp:262] Checking argument 4.
+[ParallelLoop.cpp:262] Checking argument 5.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:604] Creating statements to initialise scratchpad memory.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:614] Creating statements for OP_DAT 5.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:28] Creating call to user device subroutine.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:51] Indirect OP_DAT with read access.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:51] Indirect OP_DAT with read access.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:51] Indirect OP_DAT with read access.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:51] Indirect OP_DAT with read access.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:42] Indirect OP_DAT with increment access.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:143] Direct OP_DAT.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:561] Creating statements to adjust incremented OP_DATS.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:571] Creating statements for OP_DAT 5.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:447] Creating stage out from local memory to shared memory statements.
+[ParallelLoop.cpp:262] Checking argument 1.
+[ParallelLoop.cpp:262] Checking argument 2.
+[ParallelLoop.cpp:262] Checking argument 3.
+[ParallelLoop.cpp:262] Checking argument 4.
+[ParallelLoop.cpp:262] Checking argument 5.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:242] Creating increment and write access epilogue statements.
+[ParallelLoop.cpp:262] Checking argument 1.
+[ParallelLoop.cpp:262] Checking argument 2.
+[ParallelLoop.cpp:262] Checking argument 3.
+[ParallelLoop.cpp:262] Checking argument 4.
+[ParallelLoop.cpp:262] Checking argument 5.
+[ParallelLoop.cpp:262] Checking argument 6.
+[Subroutine.h:121] Subroutine name = bres_calc_host.
+[FortranCUDAHostSubroutineIndirectLoop.cpp:1427] CUDA host subroutine creation for indirect loop.
+[FortranHostSubroutine.cpp:25] Creating host subroutine formal parameters.
+[FortranCUDAHostSubroutine.cpp:829] Generating OP_DAT dimensions declaration.
+[FortranCUDAHostSubroutine.cpp:814] Generating OP_DAT cardinalities declaration .
+[FortranCUDAHostSubroutine.cpp:680] Creating local variable declarations for data marshalling.
+[FortranCUDAHostSubroutine.cpp:694] Creating OP_DAT size variable for OP_DAT 1.
+[FortranCUDAHostSubroutine.cpp:694] Creating OP_DAT size variable for OP_DAT 3.
+[FortranCUDAHostSubroutine.cpp:694] Creating OP_DAT size variable for OP_DAT 4.
+[FortranCUDAHostSubroutine.cpp:694] Creating OP_DAT size variable for OP_DAT 5.
+[FortranCUDAHostSubroutine.cpp:694] Creating OP_DAT size variable for OP_DAT 6.
+[FortranCUDAHostSubroutine.cpp:714] Creating device array for OP_DAT 1.
+[FortranCUDAHostSubroutine.cpp:714] Creating device array for OP_DAT 3.
+[FortranCUDAHostSubroutine.cpp:714] Creating device array for OP_DAT 4.
+[FortranCUDAHostSubroutine.cpp:714] Creating device array for OP_DAT 5.
+[FortranCUDAHostSubroutine.cpp:714] Creating device array for OP_DAT 6.
+[FortranCUDAHostSubroutine.cpp:784] Creating CUDA configuration launch local variable declarations.
+[FortranCUDAHostSubroutineIndirectLoop.cpp:1178] Creating execution plan variables.
+[ParallelLoop.cpp:262] Checking argument 1.
+[ParallelLoop.cpp:262] Checking argument 2.
+[ParallelLoop.cpp:262] Checking argument 3.
+[ParallelLoop.cpp:262] Checking argument 4.
+[ParallelLoop.cpp:262] Checking argument 5.
+[ParallelLoop.cpp:262] Checking argument 6.
+[FortranCUDAHostSubroutineIndirectLoop.cpp:1129] Creating statements.
+[FortranCUDAHostSubroutineIndirectLoop.cpp:809] Creating statements to prepare plan function parameters.
+[FortranCUDAHostSubroutineIndirectLoop.cpp:993] Creating plan function call statement.
+[FortranCUDAHostSubroutine.cpp:420] Creating statements to transfer OP_DATs onto device.
+[FortranCUDAHostSubroutine.cpp:426] Creating statements to initialise OP_DAT dimensions.
+[FortranCUDAHostSubroutine.cpp:449] Creating statements to initialise OP_DAT cardinalities (on device).
+[FortranCUDAHostSubroutine.cpp:478] Creating statements to initialise OP_DAT cardinalities (on host).
+[FortranCUDAHostSubroutine.cpp:503] Creating statements to convert OP_DATs between C and Fortran pointers.
+[FortranCUDAHostSubroutine.cpp:520] Direct/Indirect/Global non-scalar conversion.
+[FortranCUDAHostSubroutine.cpp:520] Direct/Indirect/Global non-scalar conversion.
+[FortranCUDAHostSubroutine.cpp:520] Direct/Indirect/Global non-scalar conversion.
+[FortranCUDAHostSubroutine.cpp:520] Direct/Indirect/Global non-scalar conversion.
+[FortranCUDAHostSubroutine.cpp:520] Direct/Indirect/Global non-scalar conversion.
+[ParallelLoop.cpp:262] Checking argument 1.
+[ParallelLoop.cpp:262] Checking argument 2.
+[ParallelLoop.cpp:262] Checking argument 3.
+[ParallelLoop.cpp:262] Checking argument 4.
+[ParallelLoop.cpp:262] Checking argument 5.
+[ParallelLoop.cpp:262] Checking argument 6.
+[FortranCUDAHostSubroutineIndirectLoop.cpp:293] Creating statements to convert plan function parameters.
+[FortranCUDAHostSubroutineIndirectLoop.cpp:621] Creating statements to convert local-to-global mapping arrays.
+[FortranCUDAHostSubroutineIndirectLoop.cpp:699] Creating statements to convert global-to-local mapping arrays.
+[FortranCUDAHostSubroutineIndirectLoop.cpp:1051] Creating statements to initialise OP_DAT cardinalities.
+[FortranCUDAHostSubroutineIndirectLoop.cpp:158] Creating plan function execution statements.
+[FortranCUDAHostSubroutineIndirectLoop.cpp:28] Creating CUDA kernel function call statement.
+[FortranCUDAHostSubroutineIndirectLoop.cpp:39] Adding OP_DAT parameters.
+[ParallelLoop.cpp:262] Checking argument 1.
+[ParallelLoop.cpp:262] Checking argument 3.
+[ParallelLoop.cpp:262] Checking argument 4.
+[ParallelLoop.cpp:262] Checking argument 5.
+[ParallelLoop.cpp:262] Checking argument 6.
+[FortranCUDAHostSubroutineIndirectLoop.cpp:73] Adding local to global memory remapping parameters.
+[FortranCUDAHostSubroutineIndirectLoop.cpp:89] Adding global to local memory remapping parameters.
+[FortranCUDAHostSubroutineIndirectLoop.cpp:101] Adding plan function parameters.
+[ParallelLoop.cpp:262] Checking argument 1.
+[ParallelLoop.cpp:262] Checking argument 2.
+[ParallelLoop.cpp:262] Checking argument 3.
+[ParallelLoop.cpp:262] Checking argument 4.
+[ParallelLoop.cpp:262] Checking argument 5.
+[ParallelLoop.cpp:262] Checking argument 6.
+[FortranCUDAHostSubroutine.cpp:390] Creating statements to deallocate global arrays which are read.
+[FortranCUDASubroutinesGeneration.cpp:167] Analysing user subroutine 'res_calc'.
+[Subroutine.h:121] Subroutine name = res_calc_modified.
+[FortranCUDAUserSubroutine.cpp:79] Outputting and modifying statements.
+[FortranCUDAUserSubroutine.cpp:142] Appending (non-variable-declaration) statement.
+[FortranCUDAUserSubroutine.cpp:157] Appending deep subroutine calls.
+[FortranCUDAUserSubroutine.cpp:165] Appending deep subroutine calls.
+[FortranCUDAUserSubroutine.cpp:171] Appending variable declaration.
+[FortranCUDAUserSubroutine.cpp:210] 'x1' is an INDIRECT formal parameter which is READ.
+[FortranCUDAUserSubroutine.cpp:171] Appending variable declaration.
+[FortranCUDAUserSubroutine.cpp:210] 'x2' is an INDIRECT formal parameter which is READ.
+[FortranCUDAUserSubroutine.cpp:171] Appending variable declaration.
+[FortranCUDAUserSubroutine.cpp:210] 'q1' is an INDIRECT formal parameter which is READ.
+[FortranCUDAUserSubroutine.cpp:171] Appending variable declaration.
+[FortranCUDAUserSubroutine.cpp:210] 'q2' is an INDIRECT formal parameter which is READ.
+[FortranCUDAUserSubroutine.cpp:171] Appending variable declaration.
+[FortranCUDAUserSubroutine.cpp:210] 'adt1' is an INDIRECT formal parameter which is READ.
+[FortranCUDAUserSubroutine.cpp:171] Appending variable declaration.
+[FortranCUDAUserSubroutine.cpp:210] 'adt2' is an INDIRECT formal parameter which is READ.
+[FortranCUDAUserSubroutine.cpp:171] Appending variable declaration.
+[FortranCUDAUserSubroutine.cpp:253] 'res1' is a formal parameter OP_DAT 7 , OP_DAT, ARRAY.
+[FortranCUDAUserSubroutine.cpp:171] Appending variable declaration.
+[FortranCUDAUserSubroutine.cpp:253] 'res2' is a formal parameter OP_DAT 8 , OP_DAT, ARRAY.
+[FortranCUDAUserSubroutine.cpp:171] Appending variable declaration.
+[FortranCUDAUserSubroutine.cpp:253] 'globalarray' is a formal parameter OP_DAT 9 is maximised, OP_GBL , ARRAY.
+[FortranCUDAUserSubroutine.cpp:171] Appending variable declaration.
+[FortranCUDAUserSubroutine.cpp:276] 'dx' is NOT a formal parameter.
+[FortranCUDAUserSubroutine.cpp:276] 'dy' is NOT a formal parameter.
+[FortranCUDAUserSubroutine.cpp:276] 'mu' is NOT a formal parameter.
+[FortranCUDAUserSubroutine.cpp:276] 'ri' is NOT a formal parameter.
+[FortranCUDAUserSubroutine.cpp:276] 'p1' is NOT a formal parameter.
+[FortranCUDAUserSubroutine.cpp:276] 'vol1' is NOT a formal parameter.
+[FortranCUDAUserSubroutine.cpp:276] 'p2' is NOT a formal parameter.
+[FortranCUDAUserSubroutine.cpp:276] 'vol2' is NOT a formal parameter.
+[FortranCUDAUserSubroutine.cpp:276] 'f' is NOT a formal parameter.
+[FortranCUDAUserSubroutine.cpp:171] Appending variable declaration.
+[FortranCUDAUserSubroutine.cpp:276] 'ipde' is NOT a formal parameter.
+[FortranCUDAUserSubroutine.cpp:142] Appending (non-variable-declaration) statement.
+[FortranCUDAUserSubroutine.cpp:157] Appending deep subroutine calls.
+[FortranCUDAUserSubroutine.cpp:165] Appending deep subroutine calls.
+[FortranCUDAUserSubroutine.cpp:142] Appending (non-variable-declaration) statement.
+[FortranCUDAUserSubroutine.cpp:157] Appending deep subroutine calls.
+[FortranCUDAUserSubroutine.cpp:165] Appending deep subroutine calls.
+[FortranCUDAUserSubroutine.cpp:142] Appending (non-variable-declaration) statement.
+[FortranCUDAUserSubroutine.cpp:157] Appending deep subroutine calls.
+[FortranCUDAUserSubroutine.cpp:165] Appending deep subroutine calls.
+[FortranCUDAUserSubroutine.cpp:142] Appending (non-variable-declaration) statement.
+[FortranCUDAUserSubroutine.cpp:157] Appending deep subroutine calls.
+[FortranCUDAUserSubroutine.cpp:165] Appending deep subroutine calls.
+[FortranCUDAUserSubroutine.cpp:142] Appending (non-variable-declaration) statement.
+[FortranCUDAUserSubroutine.cpp:157] Appending deep subroutine calls.
+[FortranCUDAUserSubroutine.cpp:165] Appending deep subroutine calls.
+[FortranCUDAUserSubroutine.cpp:142] Appending (non-variable-declaration) statement.
+[FortranCUDAUserSubroutine.cpp:157] Appending deep subroutine calls.
+[FortranCUDAUserSubroutine.cpp:165] Appending deep subroutine calls.
+[FortranCUDAUserSubroutine.cpp:142] Appending (non-variable-declaration) statement.
+[FortranCUDAUserSubroutine.cpp:157] Appending deep subroutine calls.
+[FortranCUDAUserSubroutine.cpp:165] Appending deep subroutine calls.
+[FortranCUDAUserSubroutine.cpp:142] Appending (non-variable-declaration) statement.
+[FortranCUDAUserSubroutine.cpp:157] Appending deep subroutine calls.
+[FortranCUDAUserSubroutine.cpp:165] Appending deep subroutine calls.
+[FortranCUDAUserSubroutine.cpp:142] Appending (non-variable-declaration) statement.
+[FortranCUDAUserSubroutine.cpp:157] Appending deep subroutine calls.
+[FortranCUDAUserSubroutine.cpp:165] Appending deep subroutine calls.
+[FortranCUDAUserSubroutine.cpp:142] Appending (non-variable-declaration) statement.
+[FortranCUDAUserSubroutine.cpp:157] Appending deep subroutine calls.
+[FortranCUDAUserSubroutine.cpp:165] Appending deep subroutine calls.
+[FortranCUDAUserSubroutine.cpp:142] Appending (non-variable-declaration) statement.
+[FortranCUDAUserSubroutine.cpp:157] Appending deep subroutine calls.
+[FortranCUDAUserSubroutine.cpp:165] Appending deep subroutine calls.
+[FortranCUDAUserSubroutine.cpp:142] Appending (non-variable-declaration) statement.
+[FortranCUDAUserSubroutine.cpp:157] Appending deep subroutine calls.
+[FortranCUDAUserSubroutine.cpp:165] Appending deep subroutine calls.
+[FortranCUDAUserSubroutine.cpp:142] Appending (non-variable-declaration) statement.
+[FortranCUDAUserSubroutine.cpp:157] Appending deep subroutine calls.
+[FortranCUDAUserSubroutine.cpp:165] Appending deep subroutine calls.
+[FortranCUDAUserSubroutine.cpp:142] Appending (non-variable-declaration) statement.
+[FortranCUDAUserSubroutine.cpp:157] Appending deep subroutine calls.
+[FortranCUDAUserSubroutine.cpp:165] Appending deep subroutine calls.
+[FortranCUDAUserSubroutine.cpp:142] Appending (non-variable-declaration) statement.
+[FortranCUDAUserSubroutine.cpp:157] Appending deep subroutine calls.
+[FortranCUDAUserSubroutine.cpp:165] Appending deep subroutine calls.
+[FortranCUDAUserSubroutine.cpp:142] Appending (non-variable-declaration) statement.
+[FortranCUDAUserSubroutine.cpp:157] Appending deep subroutine calls.
+[FortranCUDAUserSubroutine.cpp:165] Appending deep subroutine calls.
+[FortranCUDAUserSubroutine.cpp:142] Appending (non-variable-declaration) statement.
+[FortranCUDAUserSubroutine.cpp:157] Appending deep subroutine calls.
+[FortranCUDAUserSubroutine.cpp:165] Appending deep subroutine calls.
+[FortranCUDAUserSubroutine.cpp:142] Appending (non-variable-declaration) statement.
+[FortranCUDAUserSubroutine.cpp:157] Appending deep subroutine calls.
+[FortranCUDAUserSubroutine.cpp:165] Appending deep subroutine calls.
+[FortranCUDAUserSubroutine.cpp:142] Appending (non-variable-declaration) statement.
+[FortranCUDAUserSubroutine.cpp:157] Appending deep subroutine calls.
+[FortranCUDAUserSubroutine.cpp:165] Appending deep subroutine calls.
+[FortranCUDAUserSubroutine.cpp:142] Appending (non-variable-declaration) statement.
+[FortranCUDAUserSubroutine.cpp:157] Appending deep subroutine calls.
+[FortranCUDAUserSubroutine.cpp:165] Appending deep subroutine calls.
+[FortranCUDAUserSubroutine.cpp:142] Appending (non-variable-declaration) statement.
+[FortranCUDAUserSubroutine.cpp:157] Appending deep subroutine calls.
+[FortranCUDAUserSubroutine.cpp:165] Appending deep subroutine calls.
+[FortranCUDAUserSubroutine.cpp:142] Appending (non-variable-declaration) statement.
+[FortranCUDAUserSubroutine.cpp:157] Appending deep subroutine calls.
+[FortranCUDAUserSubroutine.cpp:165] Appending deep subroutine calls.
+[FortranCUDAConstantDeclarations.cpp:72] Patching references to CUDA constants.
+[RoseHelper.cpp:23] Forcing output of syntax tree in output file.
+[Subroutine.h:121] Subroutine name = res_calc_kernel.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:1843] Creating formal parameter declarations.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:1714] Creating OP_DAT formal parameters.
+[ParallelLoop.cpp:262] Checking argument 1.
+[ParallelLoop.cpp:262] Checking argument 3.
+[ParallelLoop.cpp:262] Checking argument 5.
+[ParallelLoop.cpp:262] Checking argument 7.
+[ParallelLoop.cpp:262] Checking argument 9.
+[ParallelLoop.cpp:264] This argument is maximised.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:1527] Creating plan formal parameter declarations.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:1435] Creating local variable declarations.
+[FortranCUDAKernelSubroutine.cpp:119] Creating local thread variables.
+[ParallelLoop.cpp:262] Checking argument 1.
+[ParallelLoop.cpp:262] Checking argument 2.
+[ParallelLoop.cpp:262] Checking argument 3.
+[ParallelLoop.cpp:262] Checking argument 4.
+[ParallelLoop.cpp:262] Checking argument 5.
+[ParallelLoop.cpp:262] Checking argument 6.
+[ParallelLoop.cpp:262] Checking argument 7.
+[ParallelLoop.cpp:262] Checking argument 8.
+[ParallelLoop.cpp:262] Checking argument 9.
+[ParallelLoop.cpp:264] This argument is maximised.
+[FortranCUDAKernelSubroutine.cpp:157] Creating CUDA shared variable declarations.
+[FortranCUDAKernelSubroutine.cpp:178] Creating declaration with name 'sharedFloat8' for OP_DAT 'p_x'.
+[FortranCUDAKernelSubroutine.cpp:202] Creating offset declaration with name 'sharedOffsetFloat8' for OP_DAT 'p_x'.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:1389] Creating local variable declarations needed to execute kernel.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:1451] Creating number of bytes declaration for OP_DAT 1.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:1467] Number of bytes declaration NOT needed for OP_DAT 2.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:1451] Creating number of bytes declaration for OP_DAT 3.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:1467] Number of bytes declaration NOT needed for OP_DAT 4.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:1451] Creating number of bytes declaration for OP_DAT 5.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:1467] Number of bytes declaration NOT needed for OP_DAT 6.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:1451] Creating number of bytes declaration for OP_DAT 7.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:1467] Number of bytes declaration NOT needed for OP_DAT 8.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:1451] Creating number of bytes declaration for OP_DAT 9.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:1480] Creating round up declaration 1.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:1480] Creating round up declaration 3.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:1480] Creating round up declaration 5.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:1480] Creating round up declaration 7.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:1480] Creating round up declaration 9.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:1499] Creating size argument for OP_DAT 1.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:1499] Creating size argument for OP_DAT 3.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:1499] Creating size argument for OP_DAT 5.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:1499] Creating size argument for OP_DAT 7.
+[ParallelLoop.cpp:262] Checking argument 1.
+[ParallelLoop.cpp:262] Checking argument 2.
+[ParallelLoop.cpp:262] Checking argument 3.
+[ParallelLoop.cpp:262] Checking argument 4.
+[ParallelLoop.cpp:262] Checking argument 5.
+[ParallelLoop.cpp:262] Checking argument 6.
+[ParallelLoop.cpp:262] Checking argument 7.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:1336] Creating local variable declarations needed for incremented OP_DATS.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:1344] Creating increment access mapping for OP_DAT 7.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:1344] Creating increment access mapping for OP_DAT 8.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:1164] Creating thread zero statements.
+[ParallelLoop.cpp:262] Checking argument 1.
+[ParallelLoop.cpp:262] Checking argument 2.
+[ParallelLoop.cpp:262] Checking argument 3.
+[ParallelLoop.cpp:262] Checking argument 4.
+[ParallelLoop.cpp:262] Checking argument 5.
+[ParallelLoop.cpp:262] Checking argument 6.
+[ParallelLoop.cpp:262] Checking argument 7.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:992] Creating thread zero statements for incremented OP_DATs.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:1051] Creating statements to initialise bytes per OP_DAT.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:1070] Initialising round-up variable for 'p_x'.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:1070] Initialising round-up variable for 'p_q'.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:1070] Initialising round-up variable for 'p_adt'.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:1070] Initialising round-up variable for 'p_res'.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:1105] Initialising number of bytes variable for 'p_x'.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:1105] Initialising number of bytes variable for 'p_q'.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:1105] Initialising number of bytes variable for 'p_adt'.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:1105] Initialising number of bytes variable for 'p_res'.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:1105] Initialising number of bytes variable for 'globalArrayDat'.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:764] Creating statements to initialise shared memory.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:788] Initialise the lower bound of the while loop.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:807] Initialise the upper bound of the while loop.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:830] While loop body.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:864] Statement to index shared memory.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:788] Initialise the lower bound of the while loop.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:807] Initialise the upper bound of the while loop.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:830] While loop body.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:864] Statement to index shared memory.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:788] Initialise the lower bound of the while loop.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:807] Initialise the upper bound of the while loop.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:830] While loop body.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:864] Statement to index shared memory.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:788] Initialise the lower bound of the while loop.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:807] Initialise the upper bound of the while loop.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:830] While loop body.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:662] Creating main execution loop statements.
+[ParallelLoop.cpp:262] Checking argument 1.
+[ParallelLoop.cpp:262] Checking argument 2.
+[ParallelLoop.cpp:262] Checking argument 3.
+[ParallelLoop.cpp:262] Checking argument 4.
+[ParallelLoop.cpp:262] Checking argument 5.
+[ParallelLoop.cpp:262] Checking argument 6.
+[ParallelLoop.cpp:262] Checking argument 7.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:604] Creating statements to initialise scratchpad memory.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:614] Creating statements for OP_DAT 7.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:614] Creating statements for OP_DAT 8.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:28] Creating call to user device subroutine.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:51] Indirect OP_DAT with read access.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:51] Indirect OP_DAT with read access.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:51] Indirect OP_DAT with read access.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:51] Indirect OP_DAT with read access.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:51] Indirect OP_DAT with read access.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:51] Indirect OP_DAT with read access.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:42] Indirect OP_DAT with increment access.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:42] Indirect OP_DAT with increment access.
+[ParallelLoop.cpp:262] Checking argument 9.
+[ParallelLoop.cpp:264] This argument is maximised.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:561] Creating statements to adjust incremented OP_DATS.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:571] Creating statements for OP_DAT 7.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:571] Creating statements for OP_DAT 8.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:447] Creating stage out from local memory to shared memory statements.
+[ParallelLoop.cpp:262] Checking argument 1.
+[ParallelLoop.cpp:262] Checking argument 2.
+[ParallelLoop.cpp:262] Checking argument 3.
+[ParallelLoop.cpp:262] Checking argument 4.
+[ParallelLoop.cpp:262] Checking argument 5.
+[ParallelLoop.cpp:262] Checking argument 6.
+[ParallelLoop.cpp:262] Checking argument 7.
+[FortranCUDAKernelSubroutineIndirectLoop.cpp:242] Creating increment and write access epilogue statements.
+[ParallelLoop.cpp:262] Checking argument 1.
+[ParallelLoop.cpp:262] Checking argument 2.
+[ParallelLoop.cpp:262] Checking argument 3.
+[ParallelLoop.cpp:262] Checking argument 4.
+[ParallelLoop.cpp:262] Checking argument 5.
+[ParallelLoop.cpp:262] Checking argument 6.
+[ParallelLoop.cpp:262] Checking argument 7.
+[ParallelLoop.cpp:262] Checking argument 8.
+[ParallelLoop.cpp:262] Checking argument 9.
+[ParallelLoop.cpp:264] This argument is maximised.
+[FortranCUDAKernelSubroutine.cpp:26] Adding reduction subroutine call.
+[ParallelLoop.cpp:262] Checking argument 1.
+[ParallelLoop.cpp:262] Checking argument 2.
+[ParallelLoop.cpp:262] Checking argument 3.
+[ParallelLoop.cpp:262] Checking argument 4.
+[ParallelLoop.cpp:262] Checking argument 5.
+[ParallelLoop.cpp:262] Checking argument 6.
+[ParallelLoop.cpp:262] Checking argument 7.
+[ParallelLoop.cpp:262] Checking argument 8.
+[ParallelLoop.cpp:262] Checking argument 9.
+[ParallelLoop.cpp:264] This argument is maximised.
+Unable to find 'warpSize' in variable declarations
+================================================================================================
+==================================== STANDARD ERROR ============================================
+================================================================================================

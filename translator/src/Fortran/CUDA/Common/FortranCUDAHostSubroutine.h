@@ -52,6 +52,9 @@ class FortranCUDAHostSubroutine: public FortranHostSubroutine
     void
     createOpDatDimensionsDeclaration ();
 
+    void
+    createIterationVariablesDeclarations ();
+    
     FortranCUDAHostSubroutine (SgScopeStatement * moduleScope,
         FortranKernelSubroutine * kernelSubroutine,
         FortranParallelLoop * parallelLoop,

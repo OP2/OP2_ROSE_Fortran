@@ -1298,6 +1298,9 @@ FortranCUDAKernelSubroutineIndirectLoop::createStatements ()
   appendStatement (createInitialiseCUDASharedVariablesStatements (),
       subroutineScope);
 
+  createReductionLocalVariableInitialisation ();
+      
+      
   appendStatement (buildExprStatement (
       CUDA::createDeviceThreadSynchronisationCallStatement (subroutineScope)),
       subroutineScope);
@@ -1315,6 +1318,11 @@ FortranCUDAKernelSubroutineIndirectLoop::createStatements ()
 
   appendStatement (createIncrementAndWriteAccessEpilogueStatements (),
       subroutineScope);
+
+  if (parallelLoop->isReductionRequired ())
+  {
+    createReductionEpilogueStatements ();
+  }
 }
 
 void

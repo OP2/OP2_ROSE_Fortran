@@ -178,6 +178,27 @@ FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParamet
 
 void
 FortranStatementsAndExpressionsBuilder::appendAllocateStatement (
+    SgVarRefExp * arrayReference, SgExpression * size, SgScopeStatement * scope)
+{
+  using namespace SageBuilder;
+  using namespace SageInterface;
+
+  SgPntrArrRefExp * arrayExpression = buildPntrArrRefExp (arrayReference,
+      size );
+
+  SgExprListExp * actualParameters = buildExprListExp (arrayExpression);
+
+  SgAllocateStatement * allocateStatement = new SgAllocateStatement (
+      RoseHelper::getFileInfo ());
+  allocateStatement->set_endOfConstruct (RoseHelper::getFileInfo ());
+  allocateStatement->set_expr_list (actualParameters);
+
+  appendStatement (allocateStatement, scope);
+}
+
+
+void
+FortranStatementsAndExpressionsBuilder::appendAllocateStatement (
     SgVarRefExp * arrayReference, SgExpression * lowerBound,
     SgExpression * upperBound, SgScopeStatement * scope)
 {

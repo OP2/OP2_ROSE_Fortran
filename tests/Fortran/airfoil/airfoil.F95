@@ -56,6 +56,9 @@ program AIRFOIL
   character(kind=c_char,len=4) :: adtName   = C_CHAR_'adt'//C_NULL_CHAR
   character(kind=c_char,len=4) :: resName   = C_CHAR_'res'//C_NULL_CHAR
 
+  integer(4) :: debugiter, retDebug
+  real(8) :: datad
+
   ! read set sizes from input file (input is subdivided in two routines as we cannot allocate arrays in subroutines in
   ! fortran 90)
   print *, "Getting set sizes"
@@ -177,7 +180,7 @@ program AIRFOIL
 
       ! update flow field
       
-      rms = 0.0
+      rms(1) = 0.0
 
       print *, "update"
       call op_par_loop_5 ( update, cells, &
@@ -192,11 +195,22 @@ program AIRFOIL
     end do ! internal loop
 
     ncellr = real ( ncell )
-    rms = sqrt ( rms / ncellr )
+    rms(1) = sqrt ( rms(1) / ncellr )
 
     print *, "=====> Iteration result ", rms
 
   end do ! external loop
+
+ ! uncomment the following statements to get the result of the airfoil written in a file
+!       call op_get_dat ( p_q )
+!        retDebug = openfile ( C_CHAR_"/work/cbertoll/AirfoilFortran/CUDA/FuseTests/q.txt"//C_NULL_CHAR )
+!        do debugiter = 1, 4*ncell
+!                datad = q(debugiter)
+!                retDebug = writeRealToFile ( datad )
+!        end do
+!        retDebug = closefile ()
+
+
 
 end program AIRFOIL
 

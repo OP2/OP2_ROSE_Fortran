@@ -1135,11 +1135,6 @@ FortranCUDAHostSubroutineIndirectLoop::createStatements ()
 
   appendStatement (createTransferOpDatStatements (), subroutineScope);
 
-  if (parallelLoop->isReductionRequired ())
-  {
-    createReductionPrologueStatements ();
-  }
-
   appendStatement (createConvertPlanFunctionParametersStatements (),
       subroutineScope);
 
@@ -1149,6 +1144,20 @@ FortranCUDAHostSubroutineIndirectLoop::createStatements ()
   appendStatement (createConvertGlobalToLocalMappingStatements (),
       subroutineScope);
 
+  /*
+   * ======================================================
+   * Create reduction prologue. This call must stay
+   * after the plan conversion for indirect loops, because
+   * it employs nblocks which is contained in the plan 
+   * function
+   * ======================================================
+   */
+      
+  if (parallelLoop->isReductionRequired ())
+  {
+    createReductionPrologueStatements ();
+  }
+ 
   createCardinalitiesInitialisationStatements ();
 
   createPlanFunctionExecutionStatements ();
@@ -1319,8 +1328,10 @@ FortranCUDAHostSubroutineIndirectLoop::createExecutionPlanDeclarations ()
 
   vector <string> fourByteIntegerVariables;
 
-  fourByteIntegerVariables.push_back (getIterationCounterVariableName (1));
-  fourByteIntegerVariables.push_back (getIterationCounterVariableName (2));
+  // Carlo: already declared in common ancestor of direct and indirect loop
+/*  fourByteIntegerVariables.push_back (getIterationCounterVariableName (1));
+  fourByteIntegerVariables.push_back (getIterationCounterVariableName (2));  */
+
   fourByteIntegerVariables.push_back (numberOfOpDats);
   fourByteIntegerVariables.push_back (numberOfIndirectOpDats);
   fourByteIntegerVariables.push_back (blockOffset);
@@ -1406,6 +1417,8 @@ FortranCUDAHostSubroutineIndirectLoop::createLocalVariableDeclarations ()
 
   createExecutionPlanDeclarations ();
 
+  createIterationVariablesDeclarations ();
+  
   if (parallelLoop->isReductionRequired ())
   {
     createReductionDeclarations ();

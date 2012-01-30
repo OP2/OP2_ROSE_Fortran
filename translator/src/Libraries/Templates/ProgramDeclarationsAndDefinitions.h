@@ -232,7 +232,7 @@ template <typename TSubroutineHeader>
       {
         using std::map;
         using std::string;
-
+              
         map <string, OpGblDefinition *>::const_iterator it =
             OpGblDefinitions.find (opGblName);
 

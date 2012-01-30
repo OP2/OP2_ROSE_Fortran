@@ -523,12 +523,14 @@ FortranCUDAReductionSubroutine::createFormalParameterDeclarations ()
    * ======================================================
    */
 
-  variableDeclarations->add (
+  /* Carlo: modified 18/01/12 we don't use warpsize in the reduction routine*/
+  /*variableDeclarations->add (
       warpSize,
       FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
           warpSize, FortranTypesBuilder::getFourByteInteger (),
           subroutineScope, formalParameters, 1, VALUE));
-
+  */
+  
   /*
    * ======================================================
    * Declare the reduction operation variable

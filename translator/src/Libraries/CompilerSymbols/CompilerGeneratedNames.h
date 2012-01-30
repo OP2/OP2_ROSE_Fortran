@@ -24,6 +24,8 @@ namespace ReductionVariableNames
   std::string const reductionBytes = "reductionBytes";
   std::string const reductionSharedMemorySize = "reductionSharedMemorySize";
 
+  std::string const maxBlocksPerGrid = "maxBlocksPerGrid";
+  
   std::string const
   getReductionArrayHostName (unsigned int OP_DAT_ArgumentGroup);
 

@@ -297,6 +297,8 @@ FortranCUDAHostSubroutineDirectLoop::createLocalVariableDeclarations ()
 
   createCUDAKernelActualParameterDeclarations ();
 
+  createIterationVariablesDeclarations ();
+  
   if (parallelLoop->isReductionRequired ())
   {
     createReductionDeclarations ();

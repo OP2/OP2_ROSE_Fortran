@@ -4,6 +4,50 @@ MODULE AIRFOIL_SEQ
 
   CONTAINS
 
+    subroutine initialise_flow_field ( ncell, q, res )
+
+        implicit none
+
+        ! formal parameters
+        integer(4) :: ncell
+
+        real(8), dimension(:) :: q
+        real(8), dimension(:) :: res
+
+        ! local variables
+        real(8) :: p, r, u, e
+
+        integer(4) :: n, m
+
+
+        gam = 1.4
+        gm1 = gam - 1.0
+        cfl = 0.9
+        eps = 0.05
+
+
+        mach  = 0.4
+        alpha = 3.0 * atan(1.0) / 45.0
+        p     = 1.0
+        r     = 1.0
+            u     = sqrt ( gam * p / r ) * mach
+        e     = p / ( r * gm1 ) + 0.5 * u * u
+
+        qinf(1) = r
+        qinf(2) = r * u
+        qinf(3) = 0.0
+        qinf(4) = r * e
+
+        ! -4 in the subscript is done to adapt C++ code to fortran one
+        do n = 1, ncell
+                do m = 1, 4
+                        q( (4 * n + m) - 4) = qinf(m)
+                        res( (4 * n + m) - 4) = 0.0
+                end do
+        end do
+
+  end subroutine
+
   subroutine fused ( x1, x2, x3, x4, q, qold, adt ) 
      implicit none
 
@@ -181,10 +225,12 @@ subroutine res_calc ( x1, x2, q1, q2, adt1, adt2, res1, res2, globalarray )
   res1(4) = res1(4) + f
   res2(4) = res2(4) - f
 
-  do ipde = 2, 10
+  do ipde = 1, 4
+      if ( globalArray(ipde) < res1(ipde) ) globalArray(ipde) = res1(ipde)
+  end do
 
-    if ( globalArray(1) < globalArray(ipde) ) globalArray(1) = globalArray(ipde)
-
+  do ipde = 5, 10
+      globalArray(ipde) = 0
   end do
 
 end subroutine res_calc
