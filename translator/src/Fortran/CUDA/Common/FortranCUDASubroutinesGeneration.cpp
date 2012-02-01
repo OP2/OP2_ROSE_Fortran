@@ -7,6 +7,8 @@
 #include "FortranCUDAReductionSubroutine.h"
 #include "FortranReductionSubroutines.h"
 #include "FortranCUDAModuleDeclarations.h"
+#include "FortranCUDAModuleDeclarationsDirectLoop.h"
+#include "FortranCUDAModuleDeclarationsIndirectLoop.h"
 #include "FortranCUDAOpDatCardinalitiesDeclarationIndirectLoop.h"
 #include "FortranOpDatDimensionsDeclaration.h"
 #include "FortranParallelLoop.h"
@@ -157,6 +159,15 @@ FortranCUDASubroutinesGeneration::createSubroutines ()
 
   CUDAconstants->appendCUDAConstantInitialisationToModule ( moduleScope, declarations );
 
+  /*
+   * ======================================================
+   * This vector contains all subroutines called by user
+   * kernels, to avoid their duplication in the output
+   * file
+   * ======================================================
+   */
+  vector < SgProcedureHeaderStatement * > allCalledRoutines;
+
   for (map <string, ParallelLoop *>::const_iterator it =
       declarations->firstParallelLoop (); it
       != declarations->lastParallelLoop (); ++it)
@@ -164,8 +175,16 @@ FortranCUDASubroutinesGeneration::createSubroutines ()
     string const userSubroutineName = it->first;
 
     Debug::getInstance ()->debugMessage ("Analysing user subroutine '"
-        + userSubroutineName + "'", Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+        + userSubroutineName + "' with subroutines already defined in previous kernels (number = "
+        + boost::lexical_cast<string> (allCalledRoutines.size()) + ": ", Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
+    vector < SgProcedureHeaderStatement * > :: iterator finder;
+    for ( finder = allCalledRoutines.begin (); finder != allCalledRoutines.end (); finder++ )
+    {
+      Debug::getInstance ()->debugMessage ("Routine: '" + (*finder)->get_name ().getString () + "'", Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+    }
+        
+        
     FortranParallelLoop * parallelLoop =
         static_cast <FortranParallelLoop *> (it->second);
 
@@ -191,12 +210,21 @@ FortranCUDASubroutinesGeneration::createSubroutines ()
      * ======================================================
      * When the user subroutine has calls to other user
      * subroutines we need to add them to the generated file
+     * This call also eliminates automatically the duplicates
+     * of routines already contained in allCalledRoutines
      * ======================================================
      */
+    userDeviceSubroutine->appendAdditionalSubroutines (moduleScope, parallelLoop, declarations, CUDAconstants, &allCalledRoutines);
+        
+//    vector < FortranUserSubroutine * > additionalSubroutines = userDeviceSubroutine->getAdditionalSubroutines ();
     
-    userDeviceSubroutine->appendAdditionalSubroutines (moduleScope, parallelLoop, declarations, CUDAconstants);
-    
-    vector < FortranUserSubroutine * > additionalSubroutines = userDeviceSubroutine->getAdditionalSubroutines ();
+    /*
+     * ======================================================
+     * Appending new routines to the list of all routines
+     * appended
+     * ======================================================
+     */    
+    //allCalledRoutines.insert(allCalledRoutines.end(), additionalSubroutines.begin(), additionalSubroutines.end());
     
     FortranCUDAKernelSubroutine * kernelSubroutine;
 
@@ -307,7 +335,13 @@ FortranCUDASubroutinesGeneration::createModuleDeclarations ()
     FortranParallelLoop * parallelLoop =
         static_cast <FortranParallelLoop *> (it->second);
 
-    moduleDeclarations[userSubroutineName] = new FortranCUDAModuleDeclarations (
+    if ( it->second->isDirectLoop () == true )
+      moduleDeclarations[userSubroutineName] = new FortranCUDAModuleDeclarationsDirectLoop (
+        parallelLoop, moduleScope,
+        cardinalitiesDeclarations[userSubroutineName],
+        dimensionsDeclarations[userSubroutineName]);
+    else
+      moduleDeclarations[userSubroutineName] = new FortranCUDAModuleDeclarationsIndirectLoop (
         parallelLoop, moduleScope,
         cardinalitiesDeclarations[userSubroutineName],
         dimensionsDeclarations[userSubroutineName]);

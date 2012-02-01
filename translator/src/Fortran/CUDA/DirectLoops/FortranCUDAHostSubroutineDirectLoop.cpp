@@ -44,8 +44,11 @@ FortranCUDAHostSubroutineDirectLoop::createKernelFunctionCallStatement (
       }
       else if (parallelLoop->isDirect (i))
       {
-        actualParameters->append_expression (
-            variableDeclarations->getReference (getOpDatDeviceName (i)));
+        
+/* Carlo: no more opDatNDevice as arguments */        
+/*        actualParameters->append_expression (
+            moduleDeclarations->getDeclarations()->getReference (getOpDatDeviceName (i) +
+            parallelLoop->getUserSubroutineName () + postfixName));*/
       }
       else if (parallelLoop->isRead (i))
       {

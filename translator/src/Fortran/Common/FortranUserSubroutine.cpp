@@ -100,11 +100,14 @@ FortranUserSubroutine::createFormalParameterDeclarations ()
  * ======================================================
  */
 void FortranUserSubroutine::appendAdditionalSubroutines ( SgScopeStatement * moduleScope,
-  FortranParallelLoop * parallelLoop, FortranProgramDeclarationsAndDefinitions * declarations)
+  FortranParallelLoop * parallelLoop, FortranProgramDeclarationsAndDefinitions * declarations,
+  std::vector < SgProcedureHeaderStatement * > * allCalledRoutines)
 {
+  using std::vector;
   /*
    * ======================================================
    * First removes duplicates in calledRoutines
+   * Warning: does not avoid duplicates for now!!!!!
    * ======================================================
    */
   sort ( calledRoutines.begin(), calledRoutines.end() );

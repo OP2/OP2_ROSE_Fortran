@@ -36,7 +36,7 @@ class FortranCUDAUserSubroutine: public FortranUserSubroutine
 
     virtual void appendAdditionalSubroutines ( SgScopeStatement * moduleScope,
       FortranParallelLoop * parallelLoop, FortranProgramDeclarationsAndDefinitions * declarations,
-      FortranCUDAConstantDeclarations * CUDAconstants);
+      FortranCUDAConstantDeclarations * CUDAconstants, std::vector < SgProcedureHeaderStatement * > * allCalledRoutines);
 
     FortranCUDAUserSubroutine (SgScopeStatement * moduleScope,
         FortranParallelLoop * parallelLoop,

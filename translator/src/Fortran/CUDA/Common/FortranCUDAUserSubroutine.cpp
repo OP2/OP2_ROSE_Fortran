@@ -68,7 +68,7 @@ FortranCUDAUserSubroutine::createStatements ()
              */
             SgProcedureHeaderStatement * isProcedureHeaderStatement = isSgProcedureHeaderStatement ( 
               functionCallExp->getAssociatedFunctionDeclaration() );
-                
+
             calledRoutines.push_back ( isProcedureHeaderStatement );
           }
         }
@@ -305,16 +305,95 @@ FortranCUDAUserSubroutine::createFormalParameterDeclarations ()
  */
 void FortranCUDAUserSubroutine::appendAdditionalSubroutines ( SgScopeStatement * moduleScope,
   FortranParallelLoop * parallelLoop, FortranProgramDeclarationsAndDefinitions * declarations,
-  FortranCUDAConstantDeclarations * CUDAconstants)
+  FortranCUDAConstantDeclarations * CUDAconstants, std::vector < SgProcedureHeaderStatement * > * allCalledRoutines)
 {
+  using std::vector;
+  using boost::iequals;
   /*
    * ======================================================
-   * First removes duplicates in calledRoutines
+   * First removes duplicates in calledRoutines itself
    * ======================================================
    */
   sort ( calledRoutines.begin(), calledRoutines.end() );
   calledRoutines.erase ( unique ( calledRoutines.begin(), calledRoutines.end() ), calledRoutines.end() );
 
+  Debug::getInstance ()->debugMessage ("Before removing, the list of routine calls found in the user kernels is: ",
+   Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+  vector < SgProcedureHeaderStatement * > :: iterator routinesIt2;
+  for ( routinesIt2 = calledRoutines.begin (); routinesIt2 != calledRoutines.end (); routinesIt2++ )
+  {
+    string appendingSubroutine = (*routinesIt2)->get_name ().getString ();
+    Debug::getInstance ()->debugMessage (appendingSubroutine,
+      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+  }
+  
+  /*
+   * ======================================================
+   * The removes routines already appended by other user
+   * kernels, using the list in allCalledRoutines
+   * ======================================================
+   */
+  Debug::getInstance ()->debugMessage ("Removing global duplicates, the number of routines in the list is: '"
+    + boost::lexical_cast<string> ((int) calledRoutines.size()) + "'", Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+
+  vector < SgProcedureHeaderStatement * > :: iterator routinesIt;
+  for ( routinesIt = calledRoutines.begin (); routinesIt != calledRoutines.end (); ) //routinesIt++ )
+  {
+    string appendingSubroutine = (*routinesIt)->get_name ().getString ();
+
+    Debug::getInstance ()->debugMessage ("Checking routine for deletion: '"
+      + appendingSubroutine + "'", Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+
+    bool foundAndErased = false;
+    vector < SgProcedureHeaderStatement * > :: iterator finder;
+    for ( finder = allCalledRoutines->begin (); finder != allCalledRoutines->end (); finder++ )
+    {
+      Debug::getInstance ()->debugMessage ("Checking against: '"
+        + (*finder)->get_name ().getString () + "'", Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+
+      if ( iequals ((*finder)->get_name ().getString (), appendingSubroutine) )
+      {
+        /*
+         * ======================================================
+         * Routine already appended by another user kernel:
+         * delete it from list of routines to be appended for
+         * this user kernel, and exit this loop
+         * ======================================================
+         */      
+        Debug::getInstance ()->debugMessage ("Deleting: '"
+          + appendingSubroutine + "'", Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+        
+        calledRoutines.erase (routinesIt++);
+
+        if ( calledRoutines.empty () ) return;
+
+        foundAndErased = true;
+
+        routinesIt--;
+        break;
+      }      
+    }
+
+    if ( foundAndErased == false )
+    {
+        /*
+         * ======================================================
+         * New routine: it must be added to the list of 
+         * routines called by all previous user kernels because
+         * recursively called routines need to discard those
+         * already appended by this routine
+         * ======================================================
+         */
+         Debug::getInstance ()->debugMessage ("Not found, appending: '"
+          + appendingSubroutine + "'", Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+        
+        allCalledRoutines->push_back ( *routinesIt );
+        
+        routinesIt++;
+    }
+  }
+  
+  
   vector < SgProcedureHeaderStatement * > :: iterator it;
   for ( it = calledRoutines.begin(); it != calledRoutines.end(); it++ )
   {
@@ -346,7 +425,7 @@ void FortranCUDAUserSubroutine::appendAdditionalSubroutines ( SgScopeStatement *
   {
     FortranCUDAUserSubroutine * cudaSubroutineCasting = (FortranCUDAUserSubroutine *) *itRecursive;
 
-    cudaSubroutineCasting->appendAdditionalSubroutines (moduleScope, parallelLoop, declarations, CUDAconstants);
+    cudaSubroutineCasting->appendAdditionalSubroutines (moduleScope, parallelLoop, declarations, CUDAconstants, allCalledRoutines);
   }
 }
 

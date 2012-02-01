@@ -737,7 +737,8 @@ FortranCUDAHostSubroutine::createTransferOpDatStatements ()
   using namespace SageInterface;
   using namespace OP2VariableNames;
   using namespace OP2::RunTimeVariableNames;
-
+  using std::string;
+  
   Debug::getInstance ()->debugMessage (
       "Creating statements to transfer OP_DATs onto device",
       Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
@@ -825,6 +826,27 @@ FortranCUDAHostSubroutine::createTransferOpDatStatements ()
       "Creating statements to convert OP_DATs between C and Fortran pointers",
       Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
+  /*
+   * ======================================================
+   * First creates the postfix name
+   * ======================================================
+   */   
+//   boost::crc_32_type result;
+//   
+//   string uniqueKernelName = "";
+//   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
+//   {
+//     uniqueKernelName.append ("_");
+//     uniqueKernelName.append (parallelLoop->getOpDatVariableName (i));
+//   }
+//   
+//   result.process_bytes (uniqueKernelName.c_str (), uniqueKernelName.length ());
+//   
+//   string const postfixName = "_" + lexical_cast <string> (result.checksum ());
+
+  string const postfixName = getPostfixNameAsConcatOfOpArgsNames (parallelLoop);
+
+      
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
     if (parallelLoop->isDuplicateOpDat (i) == false)
@@ -846,8 +868,23 @@ FortranCUDAHostSubroutine::createTransferOpDatStatements ()
             variableDeclarations->getReference (getOpDatName (i)),
             buildOpaqueVarRefExp (data_d, block));
 
-        SgVarRefExp * parameterExpression2A =
-            variableDeclarations->getReference (getOpDatDeviceName (i));
+        SgVarRefExp * parameterExpression2A = NULL;
+
+/*        if (parallelLoop->isDirectLoop ())
+          parameterExpression2A =
+              variableDeclarations->getReference (getOpDatDeviceName (i));
+        else */
+
+
+          parameterExpression2A =
+             moduleDeclarations->getDeclarations()->getReference (getOpDatDeviceName (i) + 
+                parallelLoop->getUserSubroutineName () + postfixName);
+
+        Debug::getInstance ()->debugMessage (
+            "Name looked for is: " + getOpDatDeviceName (i) + 
+                parallelLoop->getUserSubroutineName () + postfixName,
+            Debug::HIGHEST_DEBUG_LEVEL, __FILE__, __LINE__);
+
 
         SgAggregateInitializer
             * parameterExpression3A =
@@ -861,6 +898,12 @@ FortranCUDAHostSubroutine::createTransferOpDatStatements ()
                     subroutineScope, parameterExpression1A,
                     parameterExpression2A, parameterExpression3A);
 
+        Debug::getInstance ()->debugMessage (
+            "After appending a c_f pointer to: " + getOpDatDeviceName (i) + 
+                parallelLoop->getUserSubroutineName () + postfixName,
+            Debug::HIGHEST_DEBUG_LEVEL, __FILE__, __LINE__);
+
+                    
         appendStatement (callStatementA, block);
 
       }
@@ -1031,7 +1074,8 @@ FortranCUDAHostSubroutine::createDataMarshallingDeclarations ()
     {
       if (parallelLoop->isDirect (i) || parallelLoop->isIndirect (i))
       {
-        Debug::getInstance ()->debugMessage (
+/* Carlo: removed because we don't need subroutine scope op_dat device variables (they are declared in the module declaration section) */
+/*        Debug::getInstance ()->debugMessage (
             "Creating device array for OP_DAT " + lexical_cast <string> (i),
             Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
@@ -1041,7 +1085,7 @@ FortranCUDAHostSubroutine::createDataMarshallingDeclarations ()
             FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
                 variableName, FortranTypesBuilder::getArray_RankOne (
                     parallelLoop->getOpDatBaseType (i)), subroutineScope, 2,
-                CUDA_DEVICE, ALLOCATABLE));
+                CUDA_DEVICE, ALLOCATABLE));*/
       }
       else
       {

@@ -47,10 +47,12 @@ FortranOpenMPSubroutinesGeneration::createSubroutines ()
      * ======================================================
      * When the user subroutine has calls to other user
      * subroutines we need to add them to the generated file
+     * allCalledRoutines is not used in the openMP case
+     * (need to eliminate it from these calls)
      * ======================================================
      */
-        
-    userSubroutine->appendAdditionalSubroutines (moduleScope, parallelLoop, declarations);
+    vector < SgProcedureHeaderStatement * > allCalledRoutines;
+    userSubroutine->appendAdditionalSubroutines (moduleScope, parallelLoop, declarations, &allCalledRoutines);
     
     vector < FortranUserSubroutine * > additionalSubroutines = userSubroutine->getAdditionalSubroutines ();
     

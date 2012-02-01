@@ -3,6 +3,7 @@
 #include "FortranParallelLoop.h"
 #include "FortranOpDatDimensionsDeclaration.h"
 #include "FortranCUDAOpDatCardinalitiesDeclarationIndirectLoop.h"
+#include <FortranCUDAModuleDeclarations.h>
 #include "FortranTypesBuilder.h"
 #include "RoseStatementsAndExpressionsBuilder.h"
 #include "FortranStatementsAndExpressionsBuilder.h"
@@ -29,6 +30,8 @@ FortranCUDAKernelSubroutineIndirectLoop::createUserSubroutineCallStatement ()
 
   SgExprListExp * actualParameters = buildExprListExp ();
 
+  string const postfixName = getPostfixNameAsConcatOfOpArgsNames (parallelLoop);
+  
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
     SgExpression * parameterExpression;
@@ -58,10 +61,11 @@ FortranCUDAKernelSubroutineIndirectLoop::createUserSubroutineCallStatement ()
             variableDeclarations->getReference (
                 getIterationCounterVariableName (1)),
             variableDeclarations->getReference (sharedMemoryOffset));
-
+            
         SgPntrArrRefExp * arrayExpression1 =
-            buildPntrArrRefExp (variableDeclarations->getReference (
-                getGlobalToLocalMappingName (i)), addExpression1);
+            buildPntrArrRefExp (moduleDeclarations->getDeclarations ()->getReference (
+                getGlobalToLocalMappingName (i) + "_" + parallelLoop->getUserSubroutineName () + postfixName), 
+                buildAddOp (addExpression1, buildIntVal (1)));
 
         SgDotExp * dotExpression1 = buildDotExp (
             variableDeclarations->getReference (opDatDimensions),
@@ -94,8 +98,9 @@ FortranCUDAKernelSubroutineIndirectLoop::createUserSubroutineCallStatement ()
             variableDeclarations->getReference (sharedMemoryOffset));
 
         SgPntrArrRefExp * arrayExpression1 =
-            buildPntrArrRefExp (variableDeclarations->getReference (
-                getGlobalToLocalMappingName (i)), addExpression1);
+            buildPntrArrRefExp (moduleDeclarations->getDeclarations ()->getReference (            
+                getGlobalToLocalMappingName (i) + "_" + parallelLoop->getUserSubroutineName () + postfixName), 
+                buildAddOp (addExpression1, buildIntVal (1)));
 
         SgDotExp * dotExpression1 = buildDotExp (
             variableDeclarations->getReference (opDatDimensions),
@@ -114,8 +119,9 @@ FortranCUDAKernelSubroutineIndirectLoop::createUserSubroutineCallStatement ()
             variableDeclarations->getReference (sharedMemoryOffset));
 
         SgPntrArrRefExp * arrayExpression2 =
-            buildPntrArrRefExp (variableDeclarations->getReference (
-                getGlobalToLocalMappingName (i)), addExpression3);
+            buildPntrArrRefExp (moduleDeclarations->getDeclarations ()->getReference (
+                getGlobalToLocalMappingName (i) + "_" + parallelLoop->getUserSubroutineName () + postfixName), 
+                buildAddOp (addExpression3, buildIntVal (1)));
 
         SgMultiplyOp * multiplyExpression2 = buildMultiplyOp (arrayExpression2,
             dotExpression1);
@@ -161,7 +167,9 @@ FortranCUDAKernelSubroutineIndirectLoop::createUserSubroutineCallStatement ()
             dotExpression);
 
         accessExpression = new SgSubscriptExpression (
-            RoseHelper::getFileInfo (), multiplyExpression, addExpression2,
+            RoseHelper::getFileInfo (),
+            buildAddOp (multiplyExpression, buildIntVal (1)),
+            buildAddOp (addExpression2, buildIntVal (1)),
             buildIntVal (1));
         accessExpression->set_endOfConstruct (RoseHelper::getFileInfo ());
       }
@@ -171,8 +179,9 @@ FortranCUDAKernelSubroutineIndirectLoop::createUserSubroutineCallStatement ()
       }
 
       parameterExpression = buildPntrArrRefExp (
-          variableDeclarations->getReference (getOpDatName (i)),
-          accessExpression);
+          moduleDeclarations->getDeclarations ()->getReference (
+          getOpDatName (i) + deviceString + parallelLoop->getUserSubroutineName () + postfixName),
+          buildAddOp (accessExpression, buildIntVal(1)));
     }
     else if (parallelLoop->isReductionRequired (i))
     {
@@ -266,6 +275,8 @@ FortranCUDAKernelSubroutineIndirectLoop::createIncrementAndWriteAccessEpilogueSt
   
   unsigned int pindOffsOffset = 0;
 
+  string const postfixName = getPostfixNameAsConcatOfOpArgsNames (parallelLoop);  
+  
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
     if (parallelLoop->isDuplicateOpDat (i) == false)
@@ -352,8 +363,9 @@ FortranCUDAKernelSubroutineIndirectLoop::createIncrementAndWriteAccessEpilogueSt
               addExpression2b);
 
           SgPntrArrRefExp * arrayIndexExpression2b = buildPntrArrRefExp (
-              variableDeclarations->getReference (getLocalToGlobalMappingName (
-                  i)), addExpression2c);
+              moduleDeclarations->getDeclarations ()->getReference (
+              getLocalToGlobalMappingName (i) + "_" + parallelLoop->getUserSubroutineName () + postfixName),
+              buildAddOp (addExpression2c, buildIntVal (1)));
 
           SgMultiplyOp * multiplyExpression2b = buildMultiplyOp (
               arrayIndexExpression2b, dotExpression2);
@@ -363,8 +375,9 @@ FortranCUDAKernelSubroutineIndirectLoop::createIncrementAndWriteAccessEpilogueSt
               multiplyExpression2b);
 
           SgPntrArrRefExp * arrayIndexExpression2c = buildPntrArrRefExp (
-              variableDeclarations->getReference (getOpDatName (i)),
-              addExpression2d);
+              moduleDeclarations->getDeclarations ()->getReference (
+              getOpDatName (i) + deviceString + parallelLoop->getUserSubroutineName () + postfixName),
+              buildAddOp (addExpression2d, buildIntVal (1)));
 
           /*
            * ======================================================
@@ -562,6 +575,8 @@ FortranCUDAKernelSubroutineIndirectLoop::createIncrementAdjustmentStatements ()
 
   SgBasicBlock * block = buildBasicBlock ();
 
+  string const postfixName = getPostfixNameAsConcatOfOpArgsNames (parallelLoop);  
+  
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
     if (parallelLoop->isIndirect (i) && parallelLoop->isIncremented (i))
@@ -575,8 +590,9 @@ FortranCUDAKernelSubroutineIndirectLoop::createIncrementAdjustmentStatements ()
           variableDeclarations->getReference (sharedMemoryOffset));
 
       SgPntrArrRefExp * arrayExpression = buildPntrArrRefExp (
-          variableDeclarations->getReference (getGlobalToLocalMappingName (i)),
-          addExpression);
+          moduleDeclarations->getDeclarations ()->getReference (
+          getGlobalToLocalMappingName (i) + "_" + parallelLoop->getUserSubroutineName () + postfixName),
+          buildAddOp (addExpression, buildIntVal (1)));
 
       SgExprStatement * assignmentStatement = buildAssignStatement (
           variableDeclarations->getReference (getIncrementAccessMapName (i)),
@@ -767,6 +783,8 @@ FortranCUDAKernelSubroutineIndirectLoop::createInitialiseCUDASharedVariablesStat
 
   unsigned int pindOffsOffset = 0;
 
+  string const postfixName = getPostfixNameAsConcatOfOpArgsNames (parallelLoop);
+  
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
     if (parallelLoop->isDuplicateOpDat (i) == false)
@@ -897,8 +915,9 @@ FortranCUDAKernelSubroutineIndirectLoop::createInitialiseCUDASharedVariablesStat
               addExpression4c);
 
           SgPntrArrRefExp * arrayIndexExpression4c = buildPntrArrRefExp (
-              variableDeclarations->getReference (getLocalToGlobalMappingName (
-                  i)), addExpression4d);
+              moduleDeclarations->getDeclarations ()->getReference (getLocalToGlobalMappingName (
+                  i) + "_" + parallelLoop->getUserSubroutineName () + postfixName ),
+              buildAddOp (addExpression4d, buildIntVal (1)));
 
           SgMultiplyOp * multiplyExpression4b = buildMultiplyOp (
               arrayIndexExpression4c, dotExpression4);
@@ -908,8 +927,9 @@ FortranCUDAKernelSubroutineIndirectLoop::createInitialiseCUDASharedVariablesStat
               multiplyExpression4b);
 
           SgPntrArrRefExp * arrayIndexExpression4d = buildPntrArrRefExp (
-              variableDeclarations->getReference (getOpDatName (i)),
-              addExpression4e);
+              moduleDeclarations->getDeclarations ()->getReference (
+              getOpDatName (i) + deviceString + parallelLoop->getUserSubroutineName () + postfixName),
+              buildAddOp (addExpression4e, buildIntVal (1)));
 
           SgExprStatement * assignmentStatement4 = buildAssignStatement (
               arrayIndexExpression4a, arrayIndexExpression4d);
@@ -1712,8 +1732,10 @@ FortranCUDAKernelSubroutineIndirectLoop::createOpDatFormalParameterDeclarations 
   using namespace PlanFunctionVariableNames;
   using namespace SageBuilder;
   using std::string;
+  using boost::lexical_cast;
 
-  Debug::getInstance ()->debugMessage ("Creating OP_DAT formal parameters",
+  Debug::getInstance ()->debugMessage ("Creating OP_DAT formal parameters for " + 
+    lexical_cast<string> (parallelLoop->getNumberOfOpDatArgumentGroups ()) + " parameters",
       Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
@@ -1724,6 +1746,9 @@ FortranCUDAKernelSubroutineIndirectLoop::createOpDatFormalParameterDeclarations 
       {
         string const & variableName = getReductionArrayDeviceName (i);
 
+	Debug::getInstance ()->debugMessage ("Reduction for parameter: " + variableName,
+          Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+
         variableDeclarations->add (
             variableName,
             FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
@@ -1733,8 +1758,11 @@ FortranCUDAKernelSubroutineIndirectLoop::createOpDatFormalParameterDeclarations 
       }
       else if (parallelLoop->isIndirect (i) || parallelLoop->isDirect (i))
       {
+/* Carlo: deleted these formal parameters, as they are declared in the module declaration section */
         string const variableName = getOpDatName (i);
-
+	Debug::getInstance ()->debugMessage ("Should add opDat, but it is declared in mod. decl. sect.: " + variableName,
+          Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+	/*
         SgDotExp * dotExpression = buildDotExp (
             variableDeclarations->getReference (opDatCardinalities),
             cardinalitiesDeclaration->getFieldDeclarations ()->getReference (
@@ -1751,10 +1779,14 @@ FortranCUDAKernelSubroutineIndirectLoop::createOpDatFormalParameterDeclarations 
                     parallelLoop->getOpDatBaseType (i), buildIntVal (0),
                     upperBoundExpression), subroutineScope, formalParameters,
                 1, CUDA_DEVICE));
+*/
       }
       else if (parallelLoop->isRead (i))
       {
         string const & variableName = getOpDatName (i);
+
+	Debug::getInstance ()->debugMessage ("Deb formal param: " + variableName,
+	  Debug::FUNCTION_LEVEL, __FILE__, __LINE__);	
 
         if (parallelLoop->isArray (i))
         {
@@ -1780,7 +1812,8 @@ FortranCUDAKernelSubroutineIndirectLoop::createOpDatFormalParameterDeclarations 
     }
   }
 
-  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
+/* Carlo: deleted these formal parameters, as they are declared in the module declaration section */
+/*  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
     if (parallelLoop->isDuplicateOpDat (i) == false)
     {
@@ -1807,8 +1840,9 @@ FortranCUDAKernelSubroutineIndirectLoop::createOpDatFormalParameterDeclarations 
       }
     }
   }
-
-  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
+*/
+/* Carlo: deleted these formal parameters, as they are declared in the module declaration section */
+/*  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
     if (parallelLoop->isIndirect (i))
     {
@@ -1834,6 +1868,7 @@ FortranCUDAKernelSubroutineIndirectLoop::createOpDatFormalParameterDeclarations 
               formalParameters, 1, CUDA_DEVICE));
     }
   }
+*/
 }
 
 void

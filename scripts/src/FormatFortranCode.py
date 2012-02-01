@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 class FormatFortranCode():
 
 	def __init__ (self, files, maxLineLength=120):		
@@ -15,7 +16,7 @@ class FormatFortranCode():
 	
 		# Edit the line so that all extra whitespace is removed and prepend the indent prefix
 		line = line.strip()
-		line = indentPrefix + line
+#		line = indentPrefix + line
 
 		while len(line.rstrip()) > 0:
 			# While the line is not empty, break it up into substrings adhering to line length
@@ -54,28 +55,44 @@ class FormatFortranCode():
 		contains_regex   = compile("\s*contains\s", IGNORECASE)
 
 		for fileName in self.files:
+#			print fileName
 			moduleOrProgramFound = False
 			newLineNeeded        = False
 			callFound            = False
 			indent               = 0
 			f2                   = open("_" + os.path.basename(fileName), "w")
 			f                    = open(fileName, "r")
-
+			counter              = 0
 			for line in f:
+#				if counter >= 2242:
+#					print line
+#				print counter
+
 				if line.strip() and (line.strip()[0] == '#' or line.strip()[0] == '!'):
+#					if counter >= 2242:
+#						print("It is a comment")
+
 					# Only output comments within the module or program scope
 					if moduleOrProgramFound:
 						f2.write(line)
 
+
+
 				elif end_regex.match(line):
+#					if counter >= 2242:
+#						print("Inside first if")
+
 					if not type_regex.search(line):
 						indent = indent - 2
 					self.__writeLine__(f2, line, indent)
 					f2.write("\n")
-					newLineNeeded = False
+					newLineNeeded = False			
 	
 				elif module_regex.match(line) or program_regex.match(line) or subroutine_regex.search(line) or \
 					do_regex.match(line) or if_regex.match(line) or select_regex.match(line):
+
+#					if counter >= 2242:
+#						print("Inside third if")
 				
 					if module_regex.match(line) or program_regex.match(line):
 						moduleOrProgramFound = True
@@ -90,12 +107,20 @@ class FormatFortranCode():
 
 				elif not compile("\n").match(line):
 					if implicit_regex.match(line) or contains_regex.match(line):
+#						if counter >= 2242:
+#							print("Inside fourth if")
+
 						if not newLineNeeded:
 							f2.write("\n")
 						self.__writeLine__(f2, line, indent)
 					else:
 						self.__writeLine__(f2, line, indent)	
 						newLineNeeded = True				
+
+#				if counter >= 2242:
+#					print("At the end of processing this line")
+
+				counter += 1
 
 			f.close()
 			f2.close()

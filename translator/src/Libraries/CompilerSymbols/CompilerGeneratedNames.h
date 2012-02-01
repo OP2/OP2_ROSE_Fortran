@@ -9,6 +9,7 @@ class SgStatement;
 class SgExpression;
 class SgScopeStatement;
 class SgFunctionCallExp;
+class ParallelLoop;
 
 namespace ReductionVariableNames
 {
@@ -94,6 +95,8 @@ namespace OP2VariableNames
   std::string const warpSize = "warpSize";
   std::string const warpMemorySize = "warpMemorySize";
 
+  std::string const deviceString = "Device";
+  
   std::string const
   getBlockSizeVariableName (std::string const & suffix);
 
@@ -292,6 +295,10 @@ namespace OP2VariableNames
 
   std::string const
   getSharedMemoryPointerDeclarationName (std::string suffix);
+  
+  std::string const
+  getPostfixNameAsConcatOfOpArgsNames (ParallelLoop * parallelLoop);
+  
 }
 
 #endif

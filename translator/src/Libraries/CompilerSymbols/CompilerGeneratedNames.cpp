@@ -2,6 +2,8 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/crc.hpp>
 #include <FortranTypesBuilder.h>
+#include "PlanFunctionNames.h"
+#include <ParallelLoop.h>
 #include <Exceptions.h>
 #include <rose.h>
 
@@ -450,4 +452,31 @@ OP2VariableNames::getSharedMemoryPointerDeclarationName (std::string suffix)
   string const prefix = "sharedPointer";
 
   return prefix + "_" + suffix;
+}
+
+std::string const
+OP2VariableNames::getPostfixNameAsConcatOfOpArgsNames (ParallelLoop * parallelLoop)
+{
+  using namespace SageBuilder;
+  using namespace OP2VariableNames;
+  using namespace PlanFunctionVariableNames;
+  using std::map;
+  using std::string;
+  using std::vector;
+  using boost::lexical_cast;
+  
+  boost::crc_32_type result;
+  
+  string uniqueKernelName = "";
+  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
+  {
+    uniqueKernelName.append ("_");
+    uniqueKernelName.append (parallelLoop->getOpDatVariableName (i));
+  }
+  
+  result.process_bytes (uniqueKernelName.c_str (), uniqueKernelName.length ());
+  
+  string const postfixName = "_" + lexical_cast <string> (result.checksum ());
+  
+  return postfixName;
 }

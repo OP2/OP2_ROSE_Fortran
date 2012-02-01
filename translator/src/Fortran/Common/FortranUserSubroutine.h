@@ -35,7 +35,8 @@ class FortranUserSubroutine: public UserSubroutine <SgProcedureHeaderStatement,
     createFormalParameterDeclarations ();
 
     virtual void appendAdditionalSubroutines ( SgScopeStatement * moduleScope,
-      FortranParallelLoop * parallelLoop, FortranProgramDeclarationsAndDefinitions * declarations);
+      FortranParallelLoop * parallelLoop, FortranProgramDeclarationsAndDefinitions * declarations,
+      vector < SgProcedureHeaderStatement * > * allCalledRoutines);
     
     vector < FortranUserSubroutine * > getAdditionalSubroutines()
     {
