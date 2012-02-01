@@ -61,7 +61,7 @@
 //
 #include "kernels.h"
 
-int main(int argc, char **argv){
+int main(int argc, char *argv[]){
 
   int    *becell, *ecell,  *bound, *bedge, *edge, *cell;
   REAL  *x, *q, *qold, *adt, *res;
@@ -69,17 +69,23 @@ int main(int argc, char **argv){
   int    nnode,ncell,nedge,nbedge,niter;
   REAL  rms;
 
+  if (argc != 2) {
+    printf("Usage: airfoil <grid>\n");
+    exit(1);
+  }
+
   // read in grid
 
   printf("reading in grid \n");
+  char* grid = argv[1];
 
   FILE *fp;
-  if ( (fp = fopen("/data/carlo/Airfoil/airfoil-input/new_grid.dat","r")) == NULL) {
-    printf("can't open file new_grid.dat\n"); exit(-1);
+  if ( (fp = fopen(grid,"r")) == NULL) {
+    printf("can't open file %s\n", grid); exit(-1);
   }
 
   if (fscanf(fp,"%d %d %d %d \n",&nnode, &ncell, &nedge, &nbedge) != 4) {
-    printf("error reading from new_grid.dat\n"); exit(-1);
+    printf("error reading from %s\n", grid); exit(-1);
   }
 
   cell   = (int *) malloc(4*ncell*sizeof(int));
