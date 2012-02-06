@@ -32,6 +32,7 @@
 
 #include "FortranHostSubroutine.h"
 #include "FortranStatementsAndExpressionsBuilder.h"
+#include "RoseStatementsAndExpressionsBuilder.h"
 #include "FortranTypesBuilder.h"
 #include "FortranParallelLoop.h"
 #include "OP2.h"
@@ -131,6 +132,37 @@ FortranHostSubroutine::createFormalParameterDeclarations ()
             subroutineScope, formalParameters, 1, INTENT_IN));
   }
 }
+
+void
+FortranHostSubroutine::createEarlyExitStatement (SgScopeStatement * subroutineScope)
+{
+  using namespace SageBuilder;
+  using namespace SageInterface;
+  using namespace OP2VariableNames;
+  using std::string;
+  
+  string const sizeField = "size";
+  
+  SgDotExp * setSizeField = buildDotExp (
+    variableDeclarations->getReference (getOpSetName ()),
+    buildOpaqueVarRefExp (sizeField, subroutineScope));
+
+  SgExpression * conditionSetZero = buildEqualityOp (setSizeField, buildIntVal (0) );
+
+  SgBasicBlock * ifBody = buildBasicBlock ();
+  
+  SgReturnStmt * returnStatement = buildReturnStmt (buildNullExpression ());
+  
+  appendStatement (returnStatement, ifBody);
+  
+  SgIfStmt * ifSetIsZero =
+    RoseStatementsAndExpressionsBuilder::buildIfStatementWithEmptyElse (
+    conditionSetZero , ifBody);
+
+  
+  appendStatement (ifSetIsZero, subroutineScope);
+}
+
 
 FortranHostSubroutine::FortranHostSubroutine (SgScopeStatement * moduleScope,
     Subroutine <SgProcedureHeaderStatement> * calleeSubroutine,

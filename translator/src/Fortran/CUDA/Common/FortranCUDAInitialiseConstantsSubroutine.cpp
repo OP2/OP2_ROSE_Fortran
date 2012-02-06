@@ -66,42 +66,12 @@ FortranCUDAInitialiseConstantsSubroutine::createStatements ()
 
     SgType * type = constDefinition->getType ();
  
-    if ( isSgArrayType (type) != NULL )
-      {
-	SgBasicBlock * initLoopBody = buildBasicBlock ();
+    SgExprStatement * assignmentStatement = buildAssignStatement (
+            constantDeclarations->getReference ( oldNamesToNewNames[it->first] ),
+      variableDeclarations->getReference ( it->first ));
 
-	SgPntrArrRefExp * arrayExpression1 = buildPntrArrRefExp (
-          constantDeclarations->getReference (oldNamesToNewNames[variableName]),
-	  variableDeclarations->getReference (getIterationCounterVariableName (1)));
+    appendStatement (assignmentStatement, subroutineScope);
 
-	SgPntrArrRefExp * arrayExpression2 = buildPntrArrRefExp (
-          variableDeclarations->getReference (variableName),
-	  variableDeclarations->getReference (getIterationCounterVariableName (1)));
-
-	SgExprStatement * assignmentStatement = buildAssignStatement (
-          arrayExpression1, arrayExpression2);
-
-	appendStatement (assignmentStatement, initLoopBody);
-
-	SgAssignOp * initLoopLowerBoundExpression = buildAssignOp (
-          variableDeclarations->getReference (getIterationCounterVariableName (
-              1)), buildIntVal (1));	
-
-	SgFortranDo * initialisationLoop =
-          FortranStatementsAndExpressionsBuilder::buildFortranDoStatement (
-	      initLoopLowerBoundExpression, buildIntVal(constDefinition->getDimension()),
-              buildIntVal (1), initLoopBody);
-
-	appendStatement (initialisationLoop, subroutineScope);
-      } 
-    else
-      {
-	SgExprStatement * assignmentStatement = buildAssignStatement (
-          constantDeclarations->getReference ( oldNamesToNewNames[it->first] ),
-	  variableDeclarations->getReference ( it->first ));
-
-	appendStatement (assignmentStatement, subroutineScope);
-      }
   }
 }
 

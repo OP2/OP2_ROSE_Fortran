@@ -34,6 +34,8 @@ program AIRFOIL
 
   real(8), dimension(10) :: globalArray
   type(op_dat) :: globalArrayDat
+  real(8), dimension(6) :: redArray
+  type(op_dat) :: redArrayDat
 
   character(kind=c_char,len=10) :: savesolnName = C_CHAR_'save_soln'//C_NULL_CHAR
   character(kind=c_char, len=9) :: adtcalcName  = C_CHAR_'adt_calc' // C_NULL_CHAR
@@ -91,10 +93,13 @@ program AIRFOIL
   end do 
 
   do iter = 1, 10
-
     globalArray(iter) = -10000.0
-
   end do
+
+  do iter = 1, 6
+    redArray(iter) = 0.0
+  end do
+
 
   ! OP initialisation
   print *, "Initialising OP2"
@@ -125,23 +130,26 @@ program AIRFOIL
   print *, "Declaring OP2 globals"
   call op_decl_gbl ( rms, p_rms, 1 )
   call op_decl_gbl ( globalArray, globalArrayDat, 10 )
+  call op_decl_gbl ( redArray, redArrayDat, 6 )
 
-  call op_decl_const (1, gam)
-  call op_decl_const (1, gm1)
-  call op_decl_const (1, cfl)
-  call op_decl_const (1, eps)
-  call op_decl_const (1, mach)
-  call op_decl_const (1, alpha)
-  call op_decl_const (4, qinf)
+  call op_decl_const (gam, 1)
+  call op_decl_const (gm1, 1)
+  call op_decl_const (cfl, 1)
+  call op_decl_const (eps, 1)
+  call op_decl_const (mach, 1)
+  call op_decl_const (alpha, 1)
+  call op_decl_const (qinf, 4)
 
     ! main time-marching loop
 
+  call initCUDAConstants(alpha,cfl,eps,gam,gm1,mach,qinf)
+
   do niter = 1, iterationNumber
 
-    print *, "save_soln"
-    call op_par_loop_2 ( save_soln, cells, &
-                       & p_q,    -1, OP_ID, OP_READ, &
-                       & p_qold, -1, OP_ID, OP_WRITE &
+    call op_par_loop_3 ( save_soln, cells, &
+                       & p_q,         -1, OP_ID, OP_READ, &
+                       & p_qold,      -1, OP_ID, OP_WRITE, &
+                       & redArrayDat, -1, OP_GBL,  OP_INC &
                        & )
 
     ! predictor/corrector update loop
@@ -149,7 +157,6 @@ program AIRFOIL
     do k = 1, 2
 
       ! calculate area/timstep
-      print *, "adt_calc"
       call op_par_loop_6 ( adt_calc, cells, &
                          & p_x,   1, pcell, OP_READ, &
                          & p_x,   2, pcell, OP_READ, &
@@ -160,8 +167,6 @@ program AIRFOIL
                          & )
 
       ! calculate flux residual
-
-      print *, "res_calc"
       call op_par_loop_9 ( res_calc, edges, &
                          & p_x,    1, pedge,  OP_READ, &
                          & p_x,    2, pedge,  OP_READ, &
@@ -174,8 +179,6 @@ program AIRFOIL
                          & globalArrayDat, -1, OP_GBL, OP_MAX   &
                          &)
 
-
-      print *, "bres_calc"
       call op_par_loop_6 ( bres_calc, bedges, &
                           & p_x,      1, pbedge,  OP_READ, &
                           & p_x,      2, pbedge,  OP_READ, &
@@ -185,11 +188,9 @@ program AIRFOIL
                           & p_bound,  -1, OP_ID, OP_READ   &
                           & )
 
-      ! update flow field
-      
+      ! update flow field      
       rms(1) = 0.0
 
-      print *, "update"
       call op_par_loop_5 ( update, cells, &
                          & p_qold, -1, OP_ID,  OP_READ,  &
                          & p_q,    -1, OP_ID,  OP_WRITE, &
@@ -204,7 +205,7 @@ program AIRFOIL
     ncellr = real ( ncell )
     rms(1) = sqrt ( rms(1) / ncellr )
 
-    print *, "=====> Iteration result ", rms(1)
+    if ( mod(niter,100) .eq. 0 ) print *, "=====> Iteration result ", rms(1)
 
   end do ! external loop
 

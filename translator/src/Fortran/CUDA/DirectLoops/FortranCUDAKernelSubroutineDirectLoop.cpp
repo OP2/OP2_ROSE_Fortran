@@ -631,6 +631,8 @@ FortranCUDAKernelSubroutineDirectLoop::createStatements ()
 
   createInitialiseOffsetIntoCUDASharedVariableStatements ();
 
+  createReductionLocalVariableInitialisation ();
+  
   createExecutionLoopStatements ();
 
   if (parallelLoop->isReductionRequired ())

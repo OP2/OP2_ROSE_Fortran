@@ -124,20 +124,25 @@ subroutine levelTwo ( qold )
 
 end subroutine
 
-subroutine save_soln ( q, qold ) 
+subroutine save_soln ( q, qold, redarray ) 
   implicit none
 
   real(8), dimension(*) :: q
   real(8), dimension(*) :: qold
+  real(8), dimension(*) :: redarray
 
   integer(4) :: i
 
-  call levelTwo ( qold )
+  !call levelTwo ( qold )
 
-  call levelTwo ( qold )
+  !call levelTwo ( qold )
 
   do i = 1, 4
     qold(i) = q(i)
+  end do
+
+  do i = 1, 6
+    redarray(i) = redarray(i) + 1.0
   end do
 
 end subroutine save_soln

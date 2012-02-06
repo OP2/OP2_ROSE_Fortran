@@ -291,6 +291,8 @@ FortranCUDAHostSubroutineDirectLoop::createStatements ()
   Debug::getInstance ()->debugMessage ("Creating statements",
       Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
+  createEarlyExitStatement (subroutineScope);
+      
   createCUDAKernelInitialisationStatements ();
 
   appendStatement (createTransferOpDatStatements (), subroutineScope);

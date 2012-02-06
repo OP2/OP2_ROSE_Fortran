@@ -188,6 +188,8 @@ FortranOpenMPHostSubroutineDirectLoop::createStatements ()
 {
   using namespace SageInterface;
 
+  createEarlyExitStatement (subroutineScope);
+  
   appendStatement (createInitialiseNumberOfThreadsStatements (),
       subroutineScope);
 

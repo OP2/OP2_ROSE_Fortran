@@ -209,21 +209,28 @@ class FortranOpConstDefinition: public OpConstDefinition
      * ======================================================
      * Models an OP_CONST definition in Fortran.
      *
-     * The following style is assumed:
-     * OP_DECL_CONST (dimension, OpConstName)
+     * The following style is assumed:     
+     * OP_DECL_CONST (OpConstName, dimension)
+     * OP_DECL_CONST (OpConstName, dimension1, dimension2)
      * ======================================================
      */
 
   private:
 
-    static int const index_dimension = 0;
+    static int const index_dimension = 1;
+    static int const index_dimension2 = 3;
 
-    static int const index_OpConstName = 1;
+    static int const index_OpConstName = 0;
 
     SgFunctionCallExp * callExpression;
 
   public:
 
+    /*
+     * ======================================================
+     * The following function is DEPRECATED
+     * ======================================================
+     */
     static unsigned int
     getNumberOfExpectedArguments ()
     {

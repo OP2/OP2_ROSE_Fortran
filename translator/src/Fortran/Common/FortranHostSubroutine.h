@@ -1,6 +1,4 @@
 
-
-
 /*  Open source copyright declaration based on BSD open source template:
  *  http://www.opensource.org/licenses/bsd-license.php
  * 
@@ -52,6 +50,16 @@ class FortranHostSubroutine: public HostSubroutine <SgProcedureHeaderStatement>
     virtual void
     createFormalParameterDeclarations ();
 
+    /*
+     * ======================================================
+     * Generates if (set%size == 0) return statement
+     * Having empty iteration sets is a typical behaviour of 
+     * configurable applications
+     * ======================================================
+     */
+    void
+    createEarlyExitStatement (SgScopeStatement * subroutineScope);
+    
     FortranHostSubroutine (SgScopeStatement * moduleScope, Subroutine <
         SgProcedureHeaderStatement> * calleeSubroutine,
         FortranParallelLoop * parallelLoop);

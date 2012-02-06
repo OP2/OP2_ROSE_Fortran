@@ -289,14 +289,13 @@ FortranCUDAKernelSubroutine::createReductionEpilogueStatements ()
          * ======================================================
          */
 
-        SgSubtractOp * subtractExpression1 = buildSubtractOp (CUDA::getBlockId (
+        SgSubtractOp * subtractExpression = buildSubtractOp (CUDA::getBlockId (
             BLOCK_X, subroutineScope), buildIntVal (1));
 
-        SgSubtractOp * subtractExpression2 = buildSubtractOp (CUDA::getBlockId (
-            BLOCK_X, subroutineScope), buildIntVal (1));
-
+        SgAddOp * sumExpression = buildAddOp (subtractExpression, buildIntVal (1));
+            
         SgSubscriptExpression * subscriptExpression = new SgSubscriptExpression (
-            RoseHelper::getFileInfo (), subtractExpression1, subtractExpression2,
+            RoseHelper::getFileInfo (), sumExpression, buildNullExpression (),
             buildIntVal (1));
         subscriptExpression->set_endOfConstruct (RoseHelper::getFileInfo ());
 

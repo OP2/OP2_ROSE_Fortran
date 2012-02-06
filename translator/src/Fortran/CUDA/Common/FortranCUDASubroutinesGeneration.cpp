@@ -87,27 +87,6 @@ FortranCUDASubroutinesGeneration::processOP2ConstantDeclarations ()
         static_cast <FortranOpConstDefinition *> (it->second);
 
     SgFunctionCallExp * callExpression = constDefinition->getCallSite ();
-
-    /*SgFunctionSymbol * cudaFunctionCall =
-        FortranTypesBuilder::buildNewFortranFunction ("cudaMemcpyToSymbol",
-            moduleScope);
-
-    callExpression->set_function (buildFunctionRefExp (cudaFunctionCall));
-
-    SgExpressionPtrList & arguments =
-        callExpression->get_args ()->get_expressions ();
-
-    ROSE_ASSERT (arguments.size() == constDefinition->getNumberOfExpectedArguments());
-
-    arguments.erase (arguments.begin ());
-
-    arguments.erase (arguments.begin ());
-
-    arguments.insert (arguments.begin (), buildOpaqueVarRefExp (variableName,
-        moduleScope));
-    */
-    //  arguments.insert (arguments.begin () + 1,
-    //      CUDAconstants->getReferenceToNewVariable (variableName));
   }
 }
 

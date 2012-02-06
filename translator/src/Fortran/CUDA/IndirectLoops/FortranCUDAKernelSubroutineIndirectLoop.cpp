@@ -1352,7 +1352,6 @@ FortranCUDAKernelSubroutineIndirectLoop::createStatements ()
 
   createReductionLocalVariableInitialisation ();
       
-      
   appendStatement (buildExprStatement (
       CUDA::createDeviceThreadSynchronisationCallStatement (subroutineScope)),
       subroutineScope);

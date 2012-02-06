@@ -424,30 +424,19 @@ FortranCUDAHostSubroutine::createReductionEpilogueStatements ()
          * and compute either the sum, maximum, or minimum
          * ======================================================
          */
-
-        Debug::getInstance ()->debugMessage (
-            "HERE?'"
-                + lexical_cast <string> (i) + "'", Debug::FUNCTION_LEVEL,
-            __FILE__, __LINE__);
-
         
         SgPntrArrRefExp * arrayIndexExpression1 = buildPntrArrRefExp (
             variableDeclarations->getReference (getOpDatHostName (i)),
             variableDeclarations->getReference (
-                getIterationCounterVariableName (1)));
+                getIterationCounterVariableName (2)));
 
-        Debug::getInstance ()->debugMessage (
-            "HERE?'"
-                + lexical_cast <string> (i) + "'", Debug::FUNCTION_LEVEL,
-            __FILE__, __LINE__);
-                
-                
         SgMultiplyOp * multiplyExpression2 = buildMultiplyOp (
-          buildSubtractOp ( variableDeclarations->getReference (getIterationCounterVariableName (2)), buildIntVal(1)),
-          buildIntVal (10));
+          buildSubtractOp ( variableDeclarations->getReference (getIterationCounterVariableName (1)), buildIntVal(1)),
+          buildIntVal (parallelLoop->getOpDatDimension (i)));
                 
         SgAddOp * indexReductionArrayOnHost = buildAddOp (
-          multiplyExpression2, variableDeclarations->getReference (getIterationCounterVariableName (1)));
+          variableDeclarations->getReference (getIterationCounterVariableName (2)),
+          multiplyExpression2 );
 
         SgPntrArrRefExp * arrayIndexExpression2 = buildPntrArrRefExp (
           variableDeclarations->getReference (getReductionArrayHostName (i)),
@@ -489,16 +478,30 @@ FortranCUDAHostSubroutine::createReductionEpilogueStatements ()
 
         SgExprStatement * assignmentStatement3 = buildAssignStatement (
           buildPntrArrRefExp (variableDeclarations->getReference (getOpDatHostName (i)),
-            variableDeclarations->getReference (getIterationCounterVariableName (1))),
+            variableDeclarations->getReference (getIterationCounterVariableName (2))),
             reductionComputationExpression);
-            
-        SgBasicBlock * loopOverBlocksBody = buildBasicBlock ();
 
-        appendStatement (assignmentStatement3, loopOverBlocksBody);
+        SgBasicBlock * loopOverDimensionBody = buildBasicBlock ();
 
-        SgAssignOp * loopOverBlocksInitialiserExpression = buildAssignOp (
+        appendStatement (assignmentStatement3, loopOverDimensionBody);
+
+        
+        SgAssignOp * loopOverDimensionInitialiserExpression = buildAssignOp (
             variableDeclarations->getReference (
                 getIterationCounterVariableName (2)), buildIntVal (1));
+
+        SgExpression * loopOverDimensionUpperBoundExpression = buildDotExp (
+          variableDeclarations->getReference (getOpDatName (i)),
+          buildOpaqueVarRefExp (dim, subroutineScope));
+        
+        SgFortranDo * loopOverDimensionStatement =
+            FortranStatementsAndExpressionsBuilder::buildFortranDoStatement (
+                loopOverDimensionInitialiserExpression, loopOverDimensionUpperBoundExpression,
+                buildIntVal (1), loopOverDimensionBody);
+        
+        SgAssignOp * loopOverBlocksInitialiserExpression = buildAssignOp (
+            variableDeclarations->getReference (
+                getIterationCounterVariableName (1)), buildIntVal (1));
 
         SgExpression * loopOverBlocksUpperBoundExpression = NULL;
 
@@ -521,29 +524,16 @@ FortranCUDAHostSubroutine::createReductionEpilogueStatements ()
           nblocks, subroutineScope));
         }
         
+        SgBasicBlock * loopOverBlocksBody = buildBasicBlock ();
+                
+        appendStatement (loopOverDimensionStatement, loopOverBlocksBody);
+
         SgFortranDo * loopOverBlocksStatement =
             FortranStatementsAndExpressionsBuilder::buildFortranDoStatement (
                 loopOverBlocksInitialiserExpression, loopOverBlocksUpperBoundExpression,
                 buildIntVal (1), loopOverBlocksBody);
-                
-        SgBasicBlock * loopOverDimensionBody = buildBasicBlock ();
 
-        appendStatement (loopOverBlocksStatement, loopOverDimensionBody);
-
-        SgAssignOp * loopOverDimensionInitialiserExpression = buildAssignOp (
-            variableDeclarations->getReference (
-                getIterationCounterVariableName (1)), buildIntVal (1));
-
-        SgExpression * loopOverDimensionUpperBoundExpression = buildDotExp (
-          variableDeclarations->getReference (getOpDatName (i)),
-          buildOpaqueVarRefExp (dim, subroutineScope));
-        
-        SgFortranDo * loopOverDimensionStatement =
-            FortranStatementsAndExpressionsBuilder::buildFortranDoStatement (
-                loopOverDimensionInitialiserExpression, loopOverDimensionUpperBoundExpression,
-                buildIntVal (1), loopOverDimensionBody);
-                
-        appendStatement (loopOverDimensionStatement, subroutineScope);
+        appendStatement (loopOverBlocksStatement, subroutineScope);
       }
       
       FortranStatementsAndExpressionsBuilder::appendDeallocateStatement (
