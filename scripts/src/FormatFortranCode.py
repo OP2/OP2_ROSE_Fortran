@@ -12,7 +12,7 @@ class FormatFortranCode():
 
 	def __writeLine__ (self, f, line, indent):
 		# Allows pretty-printing indentation
-		indentPrefix = " " * indent
+		indentPrefix = ""#  * indent
 	
 		# Edit the line so that all extra whitespace is removed and prepend the indent prefix
 		line = line.strip()
