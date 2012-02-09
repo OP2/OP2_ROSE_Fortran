@@ -113,13 +113,6 @@ template <typename TSubroutineHeader>
       }
 
       bool
-      isOpSubSet (std::string const & variableName) const
-      {
-        return OpSubSetDefinitions.find (variableName)
-            != OpSubSetDefinitions.end ();
-      }
-
-      bool
       isOpMap (std::string const & variableName) const
       {
         return OpMapDefinitions.find (variableName) != OpMapDefinitions.end ();
@@ -164,6 +157,13 @@ template <typename TSubroutineHeader>
         {
           return it->second;
         }
+      }
+
+      bool
+      isOpSubSet (std::string const & variableName) const
+      {
+		  return OpSubSetDefinitions.find (variableName)
+		  != OpSubSetDefinitions.end ();
       }
 
       OpSubSetDefinition *
@@ -289,7 +289,18 @@ template <typename TSubroutineHeader>
 	  {
 		  return OpSubSetDefinitions.end ();
 	  }
+
+	  std::map <std::string, OpMapDefinition*>::const_iterator
+	  firstOpMapDefinition ()
+	  {
+		  return OpMapDefinitions.begin ();
+	  }
 	  
+	  std::map <std::string, OpMapDefinition*>::const_iterator
+	  lastOpMapDefinition ()
+	  {
+		  return OpMapDefinitions.end ();
+	  }
 
       bool
       isOpConstDefinition (std::string const & variableName)

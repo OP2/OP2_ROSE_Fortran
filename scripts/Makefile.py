@@ -335,7 +335,7 @@ def runCompiler (cmd):
 
 	# If a non-zero return code is detected then the compiler choked
 	if proc.returncode != 0:
-		print('Problem running compiler.')
+		print('Problem running compiler: ' + cmd)
 
 		outputStdout (stdoutLines)
 		
@@ -572,13 +572,6 @@ def makeArchive (makefile, generatedFiles, headerFiles):
 	for file in headerFiles:
 		z.write(file)
 	
-	message = """\n********************************************************************************
-Created archive '%s' containing the following files:\n%s
-*******************************************************************************
-"""  % (getArchiveFileName(), '\n'.join('{}: {}'.format(*k) for k in enumerate(z.namelist())))
-
-	stdout.write(message)
-
 	z.close()	
 
 def handleFortranProject (filesToCompile):
