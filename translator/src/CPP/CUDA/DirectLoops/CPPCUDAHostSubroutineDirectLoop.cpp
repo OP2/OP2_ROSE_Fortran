@@ -141,7 +141,7 @@ CPPCUDAHostSubroutineDirectLoop::createCUDAKernelInitialisationStatements ()
             parallelLoop->getOpDatBaseType (i));
 
         SgMultiplyOp * multiplyExpression = buildMultiplyOp (sizeOfExpression,
-            buildIntVal (parallelLoop->getSizeOfOpDat (i)));
+            buildIntVal (parallelLoop->getOpDatDimension (i)));
 
         SgFunctionCallExp * maxCallExpression =
             OP2::Macros::createMaxCallStatement (subroutineScope,
