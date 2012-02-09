@@ -1,24 +1,25 @@
+#include "real.h"
 
 void
-save_soln(float *q, float *qold);
+save_soln(REAL *q, REAL *qold);
 
 void 
-res_calc(float *x1,  float *x2,  float *q1,  float *q2,
-                     float *adt1,float *adt2,float *res1,float *res2);
+res_calc(REAL *x1,  REAL *x2,  REAL *q1,  REAL *q2,
+                     REAL *adt1,REAL *adt2,REAL *res1,REAL *res2);
 
 void 
-bres_calc(float *x1,  float *x2,  float *q1,
-                      float *adt1,float *res1,int *bound);
+bres_calc(REAL *x1,  REAL *x2,  REAL *q1,
+                      REAL *adt1,REAL *res1,int *bound);
 
 void
-adt_calc(float *x1,float *x2,float *x3,float *x4,float *q,float *adt);
+adt_calc(REAL *x1,REAL *x2,REAL *x3,REAL *x4,REAL *q,REAL *adt);
 
 void
-update(float *qold, float *q, float *res, float *adt, float *rms);
+update(REAL *qold, REAL *q, REAL *res, REAL *adt, REAL *rms);
 
 void 
-fusedOne(float *q, float *qold, float *x1,float *x2,float *x3,float *x4,float *adt);
+fusedOne(REAL *q, REAL *qold, REAL *x1,REAL *x2,REAL *x3,REAL *x4,REAL *adt);
 
 void
-fusedTwo(float *qold, float *q, float *res, float *adt, float *rms, float *x1,float *x2,float *x3,float *x4);
+fusedTwo(REAL *qold, REAL *q, REAL *res, REAL *adt, REAL *rms, REAL *x1,REAL *x2,REAL *x3,REAL *x4);
 

@@ -50,7 +50,7 @@ for path, dirs, files in os.walk(os.path.abspath(os.curdir + os.sep + 'src')):
 
 # Include directories and flags for g++ ('-O2')
 env = Environment (CPPPATH=includeDirectories,
-		   CPPFLAGS=[ '-Wall', '-g'],
+		   CPPFLAGS=[ '-Wall', '-g', '-O0'],
 
 		   CXXCOMSTR="=========================== Compiling $SOURCE ===========================")
 

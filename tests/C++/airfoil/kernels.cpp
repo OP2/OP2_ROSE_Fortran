@@ -1,24 +1,26 @@
 #include <math.h>
 
-extern float eps;
-extern float alpha;
-extern float cfl;
-extern float gam;
-extern float gm1;
-extern float qinf[4];
+#include "real.h"
 
-inline void
-save_soln (float *q, float *qold)
+extern REAL eps;
+extern REAL alpha;
+extern REAL cfl;
+extern REAL gam;
+extern REAL gm1;
+extern REAL qinf[4];
+
+void
+save_soln (REAL *q, REAL *qold)
 {
   for (int n = 0; n < 4; n++)
     qold[n] = q[n];
 }
 
-inline void
-res_calc (float *x1, float *x2, float *q1, float *q2, float *adt1, float *adt2,
-    float *res1, float *res2)
+void
+res_calc (REAL *x1, REAL *x2, REAL *q1, REAL *q2, REAL *adt1, REAL *adt2,
+    REAL *res1, REAL *res2)
 {
-  float dx, dy, mu, ri, p1, vol1, p2, vol2, f;
+  REAL dx, dy, mu, ri, p1, vol1, p2, vol2, f;
 
   dx = x1[0] - x2[0];
   dy = x1[1] - x2[1];
@@ -49,11 +51,11 @@ res_calc (float *x1, float *x2, float *q1, float *q2, float *adt1, float *adt2,
   res2[3] -= f;
 }
 
-inline void
-bres_calc (float *x1, float *x2, float *q1, float *adt1, float *res1,
+void
+bres_calc (REAL *x1, REAL *x2, REAL *q1, REAL *adt1, REAL *res1,
     int *bound)
 {
-  float dx, dy, mu, ri, p1, vol1, p2, vol2, f;
+  REAL dx, dy, mu, ri, p1, vol1, p2, vol2, f;
 
   dx = x1[0] - x2[0];
   dy = x1[1] - x2[1];
@@ -90,10 +92,10 @@ bres_calc (float *x1, float *x2, float *q1, float *adt1, float *res1,
   }
 }
 
-inline void
-adt_calc (float *x1, float *x2, float *x3, float *x4, float *q, float *adt)
+void
+adt_calc (REAL *x1, REAL *x2, REAL *x3, REAL *x4, REAL *q, REAL *adt)
 {
-  float dx, dy, ri, u, v, c;
+  REAL dx, dy, ri, u, v, c;
 
   ri = 1.0f / q[0];
   u = ri * q[1];
@@ -119,10 +121,10 @@ adt_calc (float *x1, float *x2, float *x3, float *x4, float *q, float *adt)
   *adt = (*adt) / cfl;
 }
 
-inline void
-update (float *qold, float *q, float *res, float *adt, float *rms)
+void
+update (REAL *qold, REAL *q, REAL *res, REAL *adt, REAL *rms)
 {
-  float del, adti;
+  REAL del, adti;
 
   adti = 1.0f / (*adt);
 
@@ -135,16 +137,16 @@ update (float *qold, float *q, float *res, float *adt, float *rms)
   }
 }
 
-inline void
-fusedOne (float *q, float *qold, float *x1, float *x2, float *x3, float *x4,
-    float *adt)
+void
+fusedOne (REAL *q, REAL *qold, REAL *x1, REAL *x2, REAL *x3, REAL *x4,
+    REAL *adt)
 {
   for (int n = 0; n < 4; n++)
   {
     qold[n] = q[n];
   }
 
-  float dx, dy, ri, u, v, c;
+  REAL dx, dy, ri, u, v, c;
 
   ri = 1.0f / q[0];
   u = ri * q[1];
@@ -170,12 +172,12 @@ fusedOne (float *q, float *qold, float *x1, float *x2, float *x3, float *x4,
   *adt = (*adt) / cfl;
 }
 
-inline void
-fusedTwo (float *qold, float *q, float *res, float *adt, float *rms, float *x1,
-    float *x2, float *x3, float *x4)
+void
+fusedTwo (REAL *qold, REAL *q, REAL *res, REAL *adt, REAL *rms, REAL *x1,
+    REAL *x2, REAL *x3, REAL *x4)
 {
-  float del, adti;
-  float dx, dy, ri, u, v, c;
+  REAL del, adti;
+  REAL dx, dy, ri, u, v, c;
 
   adti = 1.0f / (*adt);
 

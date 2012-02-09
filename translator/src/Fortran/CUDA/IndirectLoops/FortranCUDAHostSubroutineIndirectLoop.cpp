@@ -1,3 +1,35 @@
+
+
+
+/*  Open source copyright declaration based on BSD open source template:
+ *  http://www.opensource.org/licenses/bsd-license.php
+ * 
+ * Copyright (c) 2011-2012, Adam Betts, Carlo Bertolli
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are
+ * met:
+ *
+ * Redistributions of source code must retain the above copyright notice,
+ * this list of conditions and the following disclaimer.
+ * Redistributions in binary form must reproduce the above copyright
+ * notice, this list of conditions and the following disclaimer in the
+ * documentation and/or other materials provided with the distribution.
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+ * HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+ * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+
 #include "FortranCUDAHostSubroutineIndirectLoop.h"
 #include "FortranParallelLoop.h"
 #include "FortranOpDatDimensionsDeclaration.h"
@@ -22,6 +54,7 @@ FortranCUDAHostSubroutineIndirectLoop::createKernelFunctionCallStatement (
   using namespace OP2VariableNames;
   using namespace ReductionVariableNames;
   using namespace PlanFunctionVariableNames;
+  using std::string;
 
   Debug::getInstance ()->debugMessage (
       "Creating CUDA kernel function call statement", Debug::FUNCTION_LEVEL,
@@ -49,8 +82,13 @@ FortranCUDAHostSubroutineIndirectLoop::createKernelFunctionCallStatement (
       }
       else if (parallelLoop->isIndirect (i) || parallelLoop->isDirect (i))
       {
+/* Carlo: no more opDatNDevice as arguments */
+/*        string const postfixName = getPostfixNameAsConcatOfOpArgsNames (parallelLoop);
+        
         actualParameters->append_expression (
-            variableDeclarations->getReference (getOpDatDeviceName (i)));
+            moduleDeclarations->getDeclarations()->getReference (getOpDatDeviceName (i) + 
+            parallelLoop->getUserSubroutineName () + postfixName));
+*/            
       }
       else if (parallelLoop->isRead (i))
       {
@@ -68,7 +106,8 @@ FortranCUDAHostSubroutineIndirectLoop::createKernelFunctionCallStatement (
     }
   }
 
-  Debug::getInstance ()->debugMessage (
+/* Carlo: these variables are now accessible from the module declaration section and they don't need to be passed as parameters */
+/*  Debug::getInstance ()->debugMessage (
       "Adding local to global memory remapping parameters",
       Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
@@ -88,6 +127,7 @@ FortranCUDAHostSubroutineIndirectLoop::createKernelFunctionCallStatement (
       "Adding global to local memory remapping parameters",
       Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
+
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
     if (parallelLoop->isIndirect (i))
@@ -96,7 +136,7 @@ FortranCUDAHostSubroutineIndirectLoop::createKernelFunctionCallStatement (
           getGlobalToLocalMappingName (i)));
     }
   }
-
+*/
   Debug::getInstance ()->debugMessage ("Adding plan function parameters",
       Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
@@ -615,6 +655,7 @@ FortranCUDAHostSubroutineIndirectLoop::createConvertLocalToGlobalMappingStatemen
   using namespace PlanFunctionVariableNames;
   using namespace OP2::RunTimeVariableNames;
   using namespace OP2VariableNames;
+  using std::string;
 
   Debug::getInstance ()->debugMessage (
       "Creating statements to convert local-to-global mapping arrays",
@@ -654,6 +695,8 @@ FortranCUDAHostSubroutineIndirectLoop::createConvertLocalToGlobalMappingStatemen
 
   unsigned int countIndirectArgs = 1;
 
+  string const postfixName = getPostfixNameAsConcatOfOpArgsNames (parallelLoop);
+  
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
     if (parallelLoop->isDuplicateOpDat (i) == false)
@@ -672,8 +715,8 @@ FortranCUDAHostSubroutineIndirectLoop::createConvertLocalToGlobalMappingStatemen
             * callStatementN =
                 FortranStatementsAndExpressionsBuilder::createCToFortranPointerCallStatement (
                     subroutineScope, parameterExpressionN1,
-                    variableDeclarations->getReference (
-                        getLocalToGlobalMappingName (i)), parameterExpressionN3);
+                    moduleDeclarations->getDeclarations ()->getReference (
+                        getLocalToGlobalMappingName (i) + "_" + parallelLoop->getUserSubroutineName () + postfixName), parameterExpressionN3);
 
         appendStatement (callStatementN, block);
 
@@ -693,7 +736,8 @@ FortranCUDAHostSubroutineIndirectLoop::createConvertGlobalToLocalMappingStatemen
   using namespace PlanFunctionVariableNames;
   using namespace OP2::RunTimeVariableNames;
   using namespace OP2VariableNames;
-
+  using std::string;
+  
   Debug::getInstance ()->debugMessage (
       "Creating statements to convert global-to-local mapping arrays",
       Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
@@ -729,6 +773,8 @@ FortranCUDAHostSubroutineIndirectLoop::createConvertGlobalToLocalMappingStatemen
    * ======================================================
    */
 
+  string const postfixName = getPostfixNameAsConcatOfOpArgsNames (parallelLoop);
+  
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
     if (parallelLoop->isIndirect (i))
@@ -746,16 +792,15 @@ FortranCUDAHostSubroutineIndirectLoop::createConvertGlobalToLocalMappingStatemen
               block));
 
       SgExprStatement * statement1 = buildAssignStatement (
-          variableDeclarations->getReference (getGlobalToLocalMappingSizeName (
-              i)), dotExpression1);
+          variableDeclarations->getReference (getGlobalToLocalMappingSizeName (i)), dotExpression1);
 
       appendStatement (statement1, ifBody);
 
       SgPntrArrRefExp * parameterExpression1 = buildPntrArrRefExp (
           variableDeclarations->getReference (pmaps), buildIntVal (i));
 
-      SgVarRefExp * parameterExpression2 = variableDeclarations->getReference (
-          getGlobalToLocalMappingName (i));
+      SgVarRefExp * parameterExpression2 = moduleDeclarations->getDeclarations ()->getReference (
+          getGlobalToLocalMappingName (i) + "_" + parallelLoop->getUserSubroutineName () + postfixName);
 
       SgAggregateInitializer * parameterExpression3 =
           FortranStatementsAndExpressionsBuilder::buildShapeExpression (
@@ -1128,17 +1173,14 @@ FortranCUDAHostSubroutineIndirectLoop::createStatements ()
   Debug::getInstance ()->debugMessage ("Creating statements",
       Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
+  createEarlyExitStatement (subroutineScope);
+      
   appendStatement (createPlanFunctionParametersPreparationStatements (),
       subroutineScope);
 
   appendStatement (createPlanFunctionCallStatement (), subroutineScope);
 
   appendStatement (createTransferOpDatStatements (), subroutineScope);
-
-  if (parallelLoop->isReductionRequired ())
-  {
-    createReductionPrologueStatements ();
-  }
 
   appendStatement (createConvertPlanFunctionParametersStatements (),
       subroutineScope);
@@ -1149,6 +1191,20 @@ FortranCUDAHostSubroutineIndirectLoop::createStatements ()
   appendStatement (createConvertGlobalToLocalMappingStatements (),
       subroutineScope);
 
+  /*
+   * ======================================================
+   * Create reduction prologue. This call must stay
+   * after the plan conversion for indirect loops, because
+   * it employs nblocks which is contained in the plan 
+   * function
+   * ======================================================
+   */
+      
+  if (parallelLoop->isReductionRequired ())
+  {
+    createReductionPrologueStatements ();
+  }
+ 
   createCardinalitiesInitialisationStatements ();
 
   createPlanFunctionExecutionStatements ();
@@ -1218,22 +1274,23 @@ FortranCUDAHostSubroutineIndirectLoop::createExecutionPlanDeclarations ()
           pindMapsSize, FortranTypesBuilder::getFourByteInteger (),
           subroutineScope));
 
-  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
-  {
-    if (parallelLoop->isDuplicateOpDat (i) == false)
-    {
-      if (parallelLoop->isIndirect (i))
-      {
-        string const variableName = getLocalToGlobalMappingName (i);
-
-        variableDeclarations->add (variableName,
-            FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
-                variableName, FortranTypesBuilder::getArray_RankOne (
-                    FortranTypesBuilder::getFourByteInteger ()),
-                subroutineScope, 2, CUDA_DEVICE, ALLOCATABLE));
-      }
-    }
-  }
+/* Carlo: declarations removed because they are now declared in the module declaration section */          
+//   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
+//   {
+//     if (parallelLoop->isDuplicateOpDat (i) == false)
+//     {
+//       if (parallelLoop->isIndirect (i))
+//       {
+//         string const variableName = getLocalToGlobalMappingName (i);
+// 
+//         variableDeclarations->add (variableName,
+//             FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
+//                 variableName, FortranTypesBuilder::getArray_RankOne (
+//                     FortranTypesBuilder::getFourByteInteger ()),
+//                 subroutineScope, 2, CUDA_DEVICE, ALLOCATABLE));
+//       }
+//     }
+//   }
 
   /*
    * ======================================================
@@ -1274,7 +1331,8 @@ FortranCUDAHostSubroutineIndirectLoop::createExecutionPlanDeclarations ()
    * local indices in shared memory
    * ======================================================
    */
-
+/* Carlo: declarations removed because they are now in the module declaration section */
+/*
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
     if (parallelLoop->isIndirect (i))
@@ -1287,7 +1345,7 @@ FortranCUDAHostSubroutineIndirectLoop::createExecutionPlanDeclarations ()
                   FortranTypesBuilder::getTwoByteInteger ()), subroutineScope,
               2, CUDA_DEVICE, ALLOCATABLE));
     }
-  }
+  }*/
 
   /*
    * ======================================================
@@ -1319,8 +1377,10 @@ FortranCUDAHostSubroutineIndirectLoop::createExecutionPlanDeclarations ()
 
   vector <string> fourByteIntegerVariables;
 
-  fourByteIntegerVariables.push_back (getIterationCounterVariableName (1));
-  fourByteIntegerVariables.push_back (getIterationCounterVariableName (2));
+  // Carlo: already declared in common ancestor of direct and indirect loop
+/*  fourByteIntegerVariables.push_back (getIterationCounterVariableName (1));
+  fourByteIntegerVariables.push_back (getIterationCounterVariableName (2));  */
+
   fourByteIntegerVariables.push_back (numberOfOpDats);
   fourByteIntegerVariables.push_back (numberOfIndirectOpDats);
   fourByteIntegerVariables.push_back (blockOffset);
@@ -1406,6 +1466,8 @@ FortranCUDAHostSubroutineIndirectLoop::createLocalVariableDeclarations ()
 
   createExecutionPlanDeclarations ();
 
+  createIterationVariablesDeclarations ();
+  
   if (parallelLoop->isReductionRequired ())
   {
     createReductionDeclarations ();
