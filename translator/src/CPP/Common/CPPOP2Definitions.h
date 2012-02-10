@@ -110,7 +110,9 @@ class CPPOxfordOpSubSetDefinition: public OpSubSetDefinition
     
 private:
     SgExprListExp* parameters;
+	SgFunctionDefinition* filterFunction;
 	SgFunctionDefinition* wrapperFunction;
+	SgVariableDeclaration * subsetDeclaration;
     
 public:
     static int const indexOriginSet = 0;
@@ -119,11 +121,14 @@ public:
     
     SgNode* getOpArgDat(int i);
 	
+	SgFunctionDefinition* getFilterFunction ();
 	SgFunctionDefinition* getFilterWrapperFunction ();
 	void setFilterWrapperFunction (SgFunctionDefinition* wrapper);
+	SgVariableDeclaration * getSubsetDeclaration ();
     
     CPPOxfordOpSubSetDefinition (SgExprListExp * parameters,
-                                std::string const & variableName);
+                                std::string const & variableName,
+								SgVariableDeclaration * subsetDeclaration);
 };
 
 class CPPImperialOpMapDefinition: public OpMapDefinition

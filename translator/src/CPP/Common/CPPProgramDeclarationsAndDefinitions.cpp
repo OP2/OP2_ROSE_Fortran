@@ -422,7 +422,7 @@ CPPProgramDeclarationsAndDefinitions::detectAndHandleOP2Definition (
 
     if (iequals (functionCallExpression->getAssociatedFunctionSymbol ()->get_name ().getString (), OP2::OP_DECL_SUBSET))
     {
-        OpSubSetDefinition* opSubSetDeclaration = new CPPOxfordOpSubSetDefinition (functionCallExpression->get_args (), variableName);
+        OpSubSetDefinition* opSubSetDeclaration = new CPPOxfordOpSubSetDefinition (functionCallExpression->get_args (), variableName, variableDeclaration);
         OpSubSetDefinitions[opSubSetDeclaration->getVariableName ()] = opSubSetDeclaration;
         opSetDeclaration = opSubSetDeclaration;
     }

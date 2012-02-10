@@ -87,6 +87,12 @@ CPPOxfordOpSubSetDefinition::getOpArgDat(int i) {
 }
 
 SgFunctionDefinition* 
+CPPOxfordOpSubSetDefinition::getFilterFunction ()
+{
+	return this->filterFunction;
+}
+
+SgFunctionDefinition* 
 CPPOxfordOpSubSetDefinition::getFilterWrapperFunction ()
 {
 	return this->wrapperFunction;
@@ -97,14 +103,23 @@ CPPOxfordOpSubSetDefinition::setFilterWrapperFunction (SgFunctionDefinition* wra
 	this->wrapperFunction = wrapper;
 }
 
+SgVariableDeclaration * 
+CPPOxfordOpSubSetDefinition::getSubsetDeclaration () {
+	return this->subsetDeclaration;
+}
+
 CPPOxfordOpSubSetDefinition::CPPOxfordOpSubSetDefinition (
-                                                        SgExprListExp * parameters, std::string const & variableName)
+                                                        SgExprListExp * parameters, std::string const & variableName,
+														  SgVariableDeclaration * subsetDeclaration)
 {
     this->variableName = variableName;
     
     this->originSetName = isSgVarRefExp (parameters->get_expressions ()[indexOriginSet])->get_symbol ()->get_name ().getString ();
+	
+	this->subsetDeclaration = subsetDeclaration;
     
     this->filterKernelName = isSgFunctionRefExp (parameters->get_expressions ()[indexFilterKernel])->get_symbol ()->get_name ().getString ();
+	this->filterFunction = isSgFunctionRefExp (parameters->get_expressions ()[indexFilterKernel])->getAssociatedFunctionDeclaration ()->get_definition ();
     
     this->nbFilterArg = parameters->get_expressions ().size () - 3;
     this->parameters = parameters;
