@@ -215,6 +215,28 @@ FortranSubroutinesGeneration::patchCallsToParallelLoops (
 
       arguments.insert (arguments.begin (), conctenationExpression);
 
+      
+      if ( parallelLoop->isGenericLoop () )
+      {
+        /*
+         * ======================================================
+         * Generic loops have additional dimension and type 
+         * string information as parameters. These must be
+         * removed to make correspond the call signature
+         * to the definition one
+         * parallelLoop->NUMBER_OF_ARGUMENTS_PER_OP_DAT_GENERIC - 1;
+         * is the distance between the type string of an op_arg,
+         * and the dimension of the following one
+         * ======================================================
+         */
+        int offSetBetweenTypeAndDim = parallelLoop->NUMBER_OF_ARGUMENTS_PER_OP_DAT_GENERIC - 1;
+        for (unsigned int offset = parallelLoop->POSITION_OF_FIRST_DAT_DIMENSION_GENERIC; offset
+          < arguments.size (); offset += offSetBetweenTypeAndDim)
+        {
+          arguments.erase (arguments.begin () + offset, arguments.begin () + offset+2);
+        }
+      }
+        
       /*
        * ======================================================
        * Set where the function call is invoked as a transformation

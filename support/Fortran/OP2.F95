@@ -62,6 +62,12 @@ use, intrinsic :: ISO_C_BINDING
                     & op_decl_const_integer_4
   end interface op_decl_const
 
+  interface op_par_loop_2
+      module procedure op_par_loop_2_standard, &
+                     & op_par_loop_2_generic
+  end interface op_par_loop_2
+
+
 contains
 
   subroutine op_init (deb)
@@ -261,24 +267,35 @@ contains
 
 
   
-  subroutine op_par_loop_2 ( subroutineName, set, &
+  subroutine op_par_loop_2_standard ( subroutineName, set, &
                            & data0, itemSel0, map0, access0, &
                            & data1, itemSel1, map1, access1 &
                          & )  
 
   external subroutineName
 
-!  interface
-!    subroutine subroutineName ( d0, d1 )
-!      real(8), dimension(*) :: d0, d1
-!    end subroutine
-!  end interface
   type(op_set) :: set
   type(op_dat) :: data0, data1
   integer:: itemSel0, itemSel1, access0, access1
   type(op_map) :: map0, map1
 
-  end subroutine op_par_loop_2
+  end subroutine op_par_loop_2_standard
+
+  subroutine op_par_loop_2_generic ( subroutineName, set, &
+                                   & data0, itemSel0, map0, datdim0, dattype0,  access0, &
+                                   & data1, itemSel1, map1, datdim1, dattype1, access1 &
+                                 & )  
+
+  external subroutineName
+
+  type(op_set) :: set
+  type(op_dat) :: data0, data1
+  integer:: itemSel0, itemSel1, access0, access1, datdim0, datdim1
+  character(len=*) :: dattype0, dattype1
+  type(op_map) :: map0, map1
+
+  end subroutine op_par_loop_2_generic
+
 
   subroutine op_par_loop_5 ( subroutineName, set, &
                              & data0, itemSel0, map0, access0, &

@@ -229,6 +229,7 @@ class FortranOpConstDefinition: public OpConstDefinition
     /*
      * ======================================================
      * The following function is DEPRECATED
+     * A declaration of constant can have also 3 parameters
      * ======================================================
      */
     static unsigned int

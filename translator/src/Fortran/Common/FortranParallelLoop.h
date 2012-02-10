@@ -60,11 +60,16 @@ class FortranParallelLoop: public ParallelLoop
 
     /*
      * ======================================================
-     * Currently, for every OP_DAT, there is an int, an OP_MAP,
-     * and an OP_ACCESS
+     * In the standard version, for every OP_DAT, there is an
+     * int, an OP_MAP, and an OP_ACCESS
+     * In the generic version, , for every OP_DAT, there is an
+     * int, an OP_MAP, another int (dimension), a string
+     * (type), and an OP_ACCESS
      * ======================================================
      */
     static unsigned int const NUMBER_OF_ARGUMENTS_PER_OP_DAT = 4;
+    
+    static unsigned int const NUMBER_OF_ARGUMENTS_PER_OP_DAT_GENERIC = 6;
 
     /*
      * ======================================================
@@ -76,18 +81,37 @@ class FortranParallelLoop: public ParallelLoop
 
     /*
      * ======================================================
+     * Standard version:
      * In an OP_DAT argument group:
      * 1) The OP_DAT appears in position 0
      * 2) The index into the data appears in position 1
      * 3) The mapping appears in position 2
      * 4) The access descriptor appears in position 3
+     * Generic version:
+     * Standard version:
+     * In an OP_DAT argument group:
+     * 1) The OP_DAT appears in position 0
+     * 2) The index into the data appears in position 1
+     * 3) The mapping appears in position 2
+     * 5) The dimension of the op_dat (literal) appears in position 3
+     * 6) The type of the op_dat (string) appears in position 4
+     * 7) The access descriptor appears in position 5
      * ======================================================
      */
     static unsigned int const POSITION_OF_OP_DAT = 0;
     static unsigned int const POSITION_OF_INDEX = 1;
     static unsigned int const POSITION_OF_MAPPING = 2;
     static unsigned int const POSITION_OF_ACCESS = 3;
+    static unsigned int const POSITION_OF_DIMENSION = 3;
+    static unsigned int const POSITION_OF_TYPE = 4;
+    static unsigned int const POSITION_OF_ACCESS_GENERIC = 5;
 
+    static unsigned int const POSITION_OF_FIRST_DAT_DIMENSION_GENERIC = 5;
+    
+  protected:
+    
+    bool isGenericParallelLoop;
+    
   public:
 
     /*
@@ -100,6 +124,15 @@ class FortranParallelLoop: public ParallelLoop
     isCardinalityDeclarationNeeded (unsigned int OP_DAT_ArgumentGroup);
 
     FortranParallelLoop (SgFunctionCallExp * functionCallExpression);
+    
+    bool
+    isGenericLoop () { return isGenericParallelLoop; }
+    
+    void
+    setStandardLoop () { isGenericParallelLoop = false; }
+
+    void
+    setGenericLoop () { isGenericParallelLoop = true; }
 };
 
 #endif

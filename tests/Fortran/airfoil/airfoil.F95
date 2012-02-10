@@ -119,31 +119,31 @@ program AIRFOIL
   print *, "Declaring OP2 globals"
   call op_decl_gbl ( rms, p_rms, 1 )
 
-  call op_decl_const (1, gam)
-  call op_decl_const (1, gm1)
-  call op_decl_const (1, cfl)
-  call op_decl_const (1, eps)
-  call op_decl_const (1, mach)
-  call op_decl_const (1, alpha)
-  call op_decl_const (4, qinf)
+  call op_decl_const (gam, 1)
+  call op_decl_const (gm1, 1)
+  call op_decl_const (cfl, 1)
+  call op_decl_const (eps, 1)
+  call op_decl_const (mach, 1)
+  call op_decl_const (alpha, 1)
+  call op_decl_const (qinf, 4)
 
 
     ! main time-marching loop
 
   do niter = 1, iterationNumber
 
-    print *, "save_soln"
-    call op_par_loop_2 ( save_soln, cells, &
-                       & p_q,    -1, OP_ID, OP_READ, &
-                       & p_qold, -1, OP_ID, OP_WRITE &
-                       & )
+    call save_soln_subroutine ( cells, p_q, p_qold )
+
+!     call op_par_loop_2 ( save_soln, cells, &
+!                        & p_q,    -1, OP_ID, OP_READ, &
+!                        & p_qold, -1, OP_ID, OP_WRITE &
+!                        & )
 
     ! predictor/corrector update loop
 
     do k = 1, 2
 
       ! calculate area/timstep
-      print *, "adt_calc"
       call op_par_loop_6 ( adt_calc, cells, &
                          & p_x,   1, pcell, OP_READ, &
                          & p_x,   2, pcell, OP_READ, &
@@ -154,8 +154,6 @@ program AIRFOIL
                          & )
 
       ! calculate flux residual
-
-      print *, "res_calc"
       call op_par_loop_8 ( res_calc, edges, &
                          & p_x,    1, pedge,  OP_READ, &
                          & p_x,    2, pedge,  OP_READ, &
@@ -167,8 +165,6 @@ program AIRFOIL
                          & p_res,  2, pecell, OP_INC   &
                          &)
 
-
-      print *, "bres_calc"
       call op_par_loop_6 ( bres_calc, bedges, &
                           & p_x,      1, pbedge,  OP_READ, &
                           & p_x,      2, pbedge,  OP_READ, &
@@ -182,7 +178,6 @@ program AIRFOIL
       
       rms(1) = 0.0
 
-      print *, "update"
       call op_par_loop_5 ( update, cells, &
                          & p_qold, -1, OP_ID,  OP_READ,  &
                          & p_q,    -1, OP_ID,  OP_WRITE, &
@@ -197,11 +192,12 @@ program AIRFOIL
     ncellr = real ( ncell )
     rms(1) = sqrt ( rms(1) / ncellr )
 
-    print *, "=====> Iteration result ", rms
+    if (mod(niter,100) .eq. 0) print *, "=====> Iteration result ", rms(1)
 
   end do ! external loop
 
- ! uncomment the following statements to get the result of the airfoil written in a file
+! uncomment the following statements to get the result of the airfoil written in a file
+! modify the path as convenient
 !       call op_get_dat ( p_q )
 !        retDebug = openfile ( C_CHAR_"/work/cbertoll/AirfoilFortran/CUDA/FuseTests/q.txt"//C_NULL_CHAR )
 !        do debugiter = 1, 4*ncell
@@ -210,7 +206,21 @@ program AIRFOIL
 !        end do
 !        retDebug = closefile ()
 
-
-
 end program AIRFOIL
 
+
+subroutine save_soln_subroutine ( set, src, dest )
+
+  use OP2_FORTRAN_DECLARATIONS
+  use AIRFOIL_SEQ
+
+  implicit none
+  type(op_set) :: set
+  type(op_dat) :: src, dest
+
+  call op_par_loop_2 ( save_soln, set, &
+                     & src,  -1, OP_ID, 4, "real8", OP_READ, &
+                     & dest, -1, OP_ID, 4, "real8", OP_WRITE &
+                     & )
+
+end subroutine

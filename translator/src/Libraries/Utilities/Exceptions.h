@@ -284,8 +284,22 @@ namespace Exceptions
         static unsigned int const returnValue = 18;
 
       public:
-
+        
         NoSourceFileException (const std::string& msg) :
+          std::runtime_error (msg)
+        {
+        }
+    };
+    
+    class WrongOpArgFormatException: public std::runtime_error
+    {
+      public:
+
+        static unsigned int const returnValue = 19;
+
+      public:
+        
+        WrongOpArgFormatException (const std::string& msg) :
           std::runtime_error (msg)
         {
         }

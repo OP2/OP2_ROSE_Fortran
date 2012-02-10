@@ -130,6 +130,39 @@ FortranProgramDeclarationsAndDefinitions::setOpDatProperties (
 }
 
 void
+FortranProgramDeclarationsAndDefinitions::setOpDatPropertiesGeneric (
+    FortranParallelLoop * parallelLoop, std::string const & variableName,
+    int opDatDimension, SgType * opDatBaseType, int OP_DAT_ArgumentGroup)
+{
+  using boost::lexical_cast;
+  using std::string;
+
+  Debug::getInstance ()->debugMessage ("'" + variableName
+      + "' has been declared through OP_DECL_DAT with GENERIC format", Debug::FUNCTION_LEVEL,
+      __FILE__, __LINE__);
+
+  parallelLoop->setOpDatType (OP_DAT_ArgumentGroup,
+      opDatBaseType);
+
+  parallelLoop->setOpDatDimension (OP_DAT_ArgumentGroup,
+      opDatDimension);
+
+  parallelLoop->setOpDatVariableName (OP_DAT_ArgumentGroup, variableName);
+
+  if (parallelLoop->isUniqueOpDat (variableName))
+  {
+    parallelLoop->setUniqueOpDat (variableName);
+
+    parallelLoop->setDuplicateOpDat (OP_DAT_ArgumentGroup, false);
+  }
+  else
+  {
+    parallelLoop->setDuplicateOpDat (OP_DAT_ArgumentGroup, true);
+  }
+}
+
+
+void
 FortranProgramDeclarationsAndDefinitions::setParallelLoopAccessDescriptor (
     FortranParallelLoop * parallelLoop, SgExprListExp * actualArguments,
     unsigned int OP_DAT_ArgumentGroup, unsigned int argumentPosition)
@@ -196,7 +229,8 @@ FortranProgramDeclarationsAndDefinitions::setParallelLoopAccessDescriptor (
 
 void
 FortranProgramDeclarationsAndDefinitions::analyseParallelLoopArguments (
-    FortranParallelLoop * parallelLoop, SgExprListExp * actualArguments)
+    FortranParallelLoop * parallelLoop, SgExprListExp * actualArguments,
+    int numberOfOpArgs)
 {
   using boost::iequals;
   using boost::lexical_cast;
@@ -211,9 +245,43 @@ FortranProgramDeclarationsAndDefinitions::analyseParallelLoopArguments (
 
   unsigned int OP_DAT_ArgumentGroup = 1;
 
+  /*
+   * ======================================================
+   * Analyse argument number and 
+   * of the parallel loop: standard or generic
+   * ======================================================
+   */
+  int offSetBetweenArgs= -1;
+
+  Debug::getInstance ()->debugMessage (
+      "Number of opArgs is " + lexical_cast<string> (numberOfOpArgs) +
+      " and the total number of arguments is " +
+      lexical_cast<string> (actualArguments->get_expressions ().size ()),
+      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+
+  
+  if ( parallelLoop->NUMBER_OF_ARGUMENTS_PER_OP_DAT * numberOfOpArgs == 
+       actualArguments->get_expressions ().size () -
+       parallelLoop->NUMBER_OF_NON_OP_DAT_ARGUMENTS)
+  {
+    offSetBetweenArgs = parallelLoop->NUMBER_OF_ARGUMENTS_PER_OP_DAT;
+    parallelLoop->setStandardLoop ();
+    
+  }
+  else if ( parallelLoop->NUMBER_OF_ARGUMENTS_PER_OP_DAT_GENERIC * numberOfOpArgs ==
+            actualArguments->get_expressions ().size () -
+            parallelLoop->NUMBER_OF_NON_OP_DAT_ARGUMENTS)
+  {
+    offSetBetweenArgs = parallelLoop->NUMBER_OF_ARGUMENTS_PER_OP_DAT_GENERIC;
+    parallelLoop->setGenericLoop ();
+  }
+  else
+    throw Exceptions::ASTParsing::WrongOpArgFormatException (
+        "The op_par_loop argument tag and the number of op_args do not coincide");
+  
   for (unsigned int offset = parallelLoop->NUMBER_OF_NON_OP_DAT_ARGUMENTS; offset
       < actualArguments->get_expressions ().size (); offset
-      += parallelLoop->NUMBER_OF_ARGUMENTS_PER_OP_DAT)
+      += offSetBetweenArgs)
   {
     /*
      * ======================================================
@@ -290,7 +358,14 @@ FortranProgramDeclarationsAndDefinitions::analyseParallelLoopArguments (
     }
     else
     {
-      setOpDatProperties (parallelLoop, opDatName, OP_DAT_ArgumentGroup);
+      /*
+       * ======================================================
+       * In case of standard loop, I can already set this
+       * op_dat info in the parallel loop class
+       * ======================================================
+       */
+      if ( parallelLoop->isGenericLoop () == false )
+        setOpDatProperties (parallelLoop, opDatName, OP_DAT_ArgumentGroup);
 
       if (iequals (mappingValue, OP2::OP_ID))
       {
@@ -313,10 +388,52 @@ FortranProgramDeclarationsAndDefinitions::analyseParallelLoopArguments (
         parallelLoop->setOpMapValue (OP_DAT_ArgumentGroup, INDIRECT);
       }
     }
+    if ( parallelLoop->isGenericLoop () == false )
+    {
+      setParallelLoopAccessDescriptor (parallelLoop, actualArguments,
+          OP_DAT_ArgumentGroup, offset + parallelLoop->POSITION_OF_ACCESS);
+    }
+    else
+    {
+      /*
+       * ======================================================
+       * In case of generic loop, I have to read also the
+       * dimension and type to be able to set the op_dat info
+       * in the parallel loop class
+       * ======================================================
+       */
 
-    setParallelLoopAccessDescriptor (parallelLoop, actualArguments,
-        OP_DAT_ArgumentGroup, offset + parallelLoop->POSITION_OF_ACCESS);
+      unsigned int dimArgumentPosition = offset
+        + parallelLoop->POSITION_OF_DIMENSION;
 
+      Debug::getInstance ()->debugMessage ("...Name is: " + (actualArguments->get_expressions ()[dimArgumentPosition])->class_name (),
+            Debug::OUTER_LOOP_LEVEL, __FILE__, __LINE__);
+              
+      SgIntVal * opDataDimension = isSgIntVal (
+        actualArguments->get_expressions ()[dimArgumentPosition]);
+
+      ROSE_ASSERT (opDataDimension != NULL);
+
+      unsigned int typeArgumentPosition = offset
+        + parallelLoop->POSITION_OF_TYPE;
+      
+      SgStringVal * opDataBaseTypeString = isSgStringVal (
+        actualArguments->get_expressions ()[typeArgumentPosition]);
+
+      ROSE_ASSERT (opDataBaseTypeString != NULL);
+      
+      SgType * opDataBaseType = getTypeFromString (opDataBaseTypeString->get_value (),
+        opDatName);
+        
+      setOpDatPropertiesGeneric (parallelLoop, opDatName, opDataDimension->get_value (),
+        opDataBaseType, OP_DAT_ArgumentGroup);
+        
+      
+        
+      setParallelLoopAccessDescriptor (parallelLoop, actualArguments,
+          OP_DAT_ArgumentGroup, offset + parallelLoop->POSITION_OF_ACCESS_GENERIC);
+    }
+    
     OP_DAT_ArgumentGroup++;
   }
 
@@ -531,6 +648,8 @@ FortranProgramDeclarationsAndDefinitions::visit (SgNode * node)
 
           if (parallelLoops.find (userSubroutineName) == parallelLoops.end ())
           {
+            int numberOfOpArgs = getLoopSuffixNumber ( calleeName );
+
             /*
              * ======================================================
              * If this kernel has not been previously encountered then
@@ -545,7 +664,8 @@ FortranProgramDeclarationsAndDefinitions::visit (SgNode * node)
 
             parallelLoops[userSubroutineName] = parallelLoop;
 
-            analyseParallelLoopArguments (parallelLoop, actualArguments);
+            analyseParallelLoopArguments (parallelLoop, actualArguments,
+              numberOfOpArgs);
 
             parallelLoop->checkArguments ();
           }
@@ -603,6 +723,35 @@ FortranProgramDeclarationsAndDefinitions::checkModuleExists (
   }
 
   return found;
+}
+
+int
+FortranProgramDeclarationsAndDefinitions::getLoopSuffixNumber (std::string const & calleeName)
+{
+  using std::string;
+  using boost::lexical_cast; 
+  
+  string argumentsNumberString = calleeName.substr (OP2::OP_PAR_LOOP.size () + 1, calleeName.size () - 1);
+    
+  return lexical_cast<int> (argumentsNumberString);
+}
+
+SgType *
+FortranProgramDeclarationsAndDefinitions::getTypeFromString (std::string const & opDataBaseTypeString,
+  std::string const & variableName)
+{
+  using namespace SageBuilder;
+  using boost::iequals;
+
+  if ( iequals(opDataBaseTypeString, OP2::FortranSpecific::PrimitiveTypes::real8) )
+    return buildDoubleType ();
+  else if ( iequals(opDataBaseTypeString, OP2::FortranSpecific::PrimitiveTypes::real4) )
+    return buildFloatType ();
+  else if ( iequals(opDataBaseTypeString, OP2::FortranSpecific::PrimitiveTypes::integer4) )
+    return buildIntType ();
+  else
+      throw Exceptions::ParallelLoop::UnsupportedBaseTypeException ("Bad type specified for GENERIC OP_DAT '"
+          + variableName + "' ");    
 }
 
 std::vector <std::string>::const_iterator

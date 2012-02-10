@@ -76,7 +76,7 @@ namespace OP2
   std::string const OP_SET = "op_set";
   std::string const OP_SET_CORE = "op_set_core";
   std::string const OP_WRITE = "op_write";
-
+  
   namespace RunTimeVariableNames
   {
     /*
@@ -98,7 +98,7 @@ namespace OP2
     {
       std::string const dataPtr = "dataPtr";
       std::string const mapPtr = "mapPtr";
-      std::string const setPtr = "setPtr";
+      std::string const setPtr = "setPtr";      
     }
   }
 
@@ -166,7 +166,15 @@ namespace OP2
       std::string const CBindings = "ISO_C_BINDING";
     }
   }
-
+  namespace FortranSpecific
+  {
+      namespace PrimitiveTypes
+      {
+        std::string const real8 = "real8";
+        std::string const real4 = "real4";
+        std::string const integer4 = "integer4";
+      }
+  }
 }
 
 #endif

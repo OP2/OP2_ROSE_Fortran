@@ -46,11 +46,11 @@ class CPPProgramDeclarationsAndDefinitions: public ProgramDeclarationsAndDefinit
 
     std::map <unsigned int, std::string> opAccessDescriptors;
     
-    SgType* op_dat_type;
-    SgType* op_set_type;
-    SgType* op_map_type;
-    SgType* op_access_type;
-    SgEnumDeclaration* opAccessEnumDeclaration;
+    SgType * op_dat_type;
+    SgType * op_set_type;
+    SgType * op_map_type;
+    SgType * op_access_type;
+    SgEnumDeclaration * opAccessEnumDeclaration;
 
   private:
 

@@ -169,7 +169,7 @@ FortranCUDASubroutinesGeneration::createSubroutines ()
   using std::map;
 
   CUDAconstants->appendCUDAConstantInitialisationToModule ( moduleScope, declarations );
-
+  
   /*
    * ======================================================
    * This vector contains all subroutines called by user

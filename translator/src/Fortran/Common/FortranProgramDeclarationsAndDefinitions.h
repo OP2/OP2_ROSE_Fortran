@@ -65,19 +65,31 @@ class FortranProgramDeclarationsAndDefinitions: public ProgramDeclarationsAndDef
         std::string const & variableName, int opDatArgumentGroup);
 
     void
+    setOpDatPropertiesGeneric ( FortranParallelLoop * parallelLoop,
+        std::string const & variableName, int opDatDimension,
+        SgType * opDatBaseType, int OP_DAT_ArgumentGroup);
+        
+    void
     setParallelLoopAccessDescriptor (FortranParallelLoop * parallelLoop,
         SgExprListExp * actualArguments, unsigned int OP_DAT_ArgumentGroup,
         unsigned int argumentPosition);
 
     void
     analyseParallelLoopArguments (FortranParallelLoop * parallelLoop,
-        SgExprListExp * actualArguments);
+        SgExprListExp * actualArguments, int numberOfOpArgs);
 
     virtual void
     visit (SgNode * node);
 
     bool
     checkModuleExists (std::string const & moduleName);
+
+    int
+    getLoopSuffixNumber (std::string const & calleeName);
+    
+    SgType *
+    getTypeFromString (std::string const & opDataBaseTypeString,
+      std::string const & variableName);
 
   public:
 
@@ -92,7 +104,7 @@ class FortranProgramDeclarationsAndDefinitions: public ProgramDeclarationsAndDef
 
     std::string const &
     getFileNameForSubroutine (std::string const & subroutineName);
-
+    
     FortranProgramDeclarationsAndDefinitions (SgProject * project);
 };
 
