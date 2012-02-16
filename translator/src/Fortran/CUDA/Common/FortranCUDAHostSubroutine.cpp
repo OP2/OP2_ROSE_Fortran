@@ -85,8 +85,7 @@ FortranCUDAHostSubroutine::createReductionPrologueStatements ()
           multiplyExpression1);
       }
       else
-      {
-        
+      {        
         SgPntrArrRefExp * ncolBlkFirst= buildPntrArrRefExp (
           variableDeclarations->getReference (ncolblk), buildIntVal (1));
         

@@ -431,6 +431,10 @@ processUserSelections (SgProject * project)
 
     FortranSubroutinesGeneration * generator = handleFortranProject (project);
 
+    Debug::getInstance ()->debugMessage ("Fortran project handled, now unparsing..",
+      Debug::VERBOSE_LEVEL, __FILE__, __LINE__);
+
+    
     unparseSourceFiles (project, generator);
   }
   else
