@@ -1,8 +1,5 @@
 
-
-
 module OP2_FORTRAN_DECLARATIONS
-
 
 use, intrinsic :: ISO_C_BINDING
 
@@ -34,7 +31,12 @@ use, intrinsic :: ISO_C_BINDING
   type(op_map) :: OP_ID, OP_GBL
 
   interface op_decl_dat
-    module procedure op_decl_dat_real_8_1, op_decl_dat_integer_4_1, op_decl_dat_real_8_2, op_decl_dat_integer_4_2, op_decl_dat_real_8_3, op_decl_dat_integer_4_3
+    module procedure op_decl_dat_real_8_1, &
+                   & op_decl_dat_integer_4_1, &
+                   & op_decl_dat_real_8_2, &
+                   & op_decl_dat_integer_4_2, &
+                   & op_decl_dat_real_8_3, &
+                   & op_decl_dat_integer_4_3
   end interface op_decl_dat
  
   interface op_decl_gbl
@@ -61,12 +63,6 @@ use, intrinsic :: ISO_C_BINDING
                     & op_decl_const_real_8_2, &
                     & op_decl_const_integer_4
   end interface op_decl_const
-
-  interface op_par_loop_2
-      module procedure op_par_loop_2_standard, &
-                     & op_par_loop_2_generic
-  end interface op_par_loop_2
-
 
 contains
 
@@ -264,116 +260,5 @@ contains
     real(8), dimension(:,:) :: data
   
   end subroutine op_decl_const_real_8_2
-
-
-  
-  subroutine op_par_loop_2_standard ( subroutineName, set, &
-                           & data0, itemSel0, map0, access0, &
-                           & data1, itemSel1, map1, access1 &
-                         & )  
-
-  external subroutineName
-
-  type(op_set) :: set
-  type(op_dat) :: data0, data1
-  integer:: itemSel0, itemSel1, access0, access1
-  type(op_map) :: map0, map1
-
-  end subroutine op_par_loop_2_standard
-
-  subroutine op_par_loop_2_generic ( subroutineName, set, &
-                                   & data0, itemSel0, map0, datdim0, dattype0,  access0, &
-                                   & data1, itemSel1, map1, datdim1, dattype1, access1 &
-                                 & )  
-
-  external subroutineName
-
-  type(op_set) :: set
-  type(op_dat) :: data0, data1
-  integer:: itemSel0, itemSel1, access0, access1, datdim0, datdim1
-  character(len=*) :: dattype0, dattype1
-  type(op_map) :: map0, map1
-
-  end subroutine op_par_loop_2_generic
-
-
-  subroutine op_par_loop_5 ( subroutineName, set, &
-                             & data0, itemSel0, map0, access0, &
-                             & data1, itemSel1, map1, access1, &
-                             & data2, itemSel2, map2, access2, &
-                             & data3, itemSel3, map3, access3, &
-                             & data4, itemSel4, map4, access4  &
-                           & )
-
-  external subroutineName
-!  interface
-!    subroutine subroutineName ( d0, d1, d2, d3, d4 )
-!    end subroutine
-!  end interface
-                            
-
-  type(op_set) :: set
-  type(op_dat) :: data0, data1, data2, data3, data4
-  integer:: itemSel0, itemSel1, itemSel2, itemSel3, itemSel4
-  integer :: access0, access1, access2, access3, access4
-  type(op_map) :: map0, map1, map2, map3, map4
-
-
-  end subroutine op_par_loop_5
-
-  
-  subroutine op_par_loop_6 ( subroutineName, set, &
-                             & data0, itemSel0, map0, access0, &
-                             & data1, itemSel1, map1, access1, &
-                             & data2, itemSel2, map2, access2, &
-                             & data3, itemSel3, map3, access3, &
-                             & data4, itemSel4, map4, access4, &
-                             & data5, itemSel5, map5, access5  &
-                           & )
-
-  external subroutineName
-!  interface
-!    subroutine subroutineName ( d0, d1, d2, d3, d4, d5 )
-!    end subroutine
-!  end interface
-
-  type(op_set) :: set
-  type(op_dat) :: data0, data1, data2, data3, data4, data5
-  integer :: itemSel0, itemSel1, itemSel2, itemSel3, itemSel4, itemSel5 
-  integer :: access0, access1, access2, access3, access4, access5
-  type(op_map) :: map0, map1, map2, map3, map4, map5
-  
-
-
-          
-    end subroutine op_par_loop_6
-
-  
-  subroutine op_par_loop_8 ( subroutineName, set, &
-                             & data0, itemSel0, map0, access0, &
-                             & data1, itemSel1, map1, access1, &
-                             & data2, itemSel2, map2, access2, &
-                             & data3, itemSel3, map3, access3, &
-                             & data4, itemSel4, map4, access4, &
-                             & data5, itemSel5, map5, access5, &
-                             & data6, itemSel6, map6, access6, &
-                             & data7, itemSel7, map7, access7  &
-                           & )
-
-  external subroutineName
-!  interface
-!    subroutine subroutineName ( d0, d1, d2, d3, d4, d5, d6, d7 )
-!    end subroutine
-!  end interface
-  
-  type(op_set) :: set
-  type(op_dat) :: data0, data1, data2, data3, data4, data5, data6, data7
-  integer :: itemSel0, itemSel1, itemSel2, itemSel3, itemSel4, itemSel5, itemSel6, itemSel7
-  integer :: access0, access1, access2, access3, access4, access5, access6, access7
-  type(op_map) :: map0, map1, map2, map3, map4, map5, map6, map7
-                  
-    end subroutine op_par_loop_8
-
-  
 
 end module OP2_FORTRAN_DECLARATIONS

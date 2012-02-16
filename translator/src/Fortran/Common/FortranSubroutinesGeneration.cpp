@@ -38,6 +38,7 @@
 #include "FortranReductionSubroutines.h"
 #include "RoseHelper.h"
 #include <boost/algorithm/string/predicate.hpp>
+//#include <tr1_impl/complex>
 
 void
 FortranSubroutinesGeneration::processOP2ConstantDeclarations ()
@@ -96,6 +97,9 @@ FortranSubroutinesGeneration::addModuleUseStatement (SgNode * parent,
         parentStatement->get_name ().getString ())
         == headersWithAddedUseStatements.end ())
     {
+      Debug::getInstance ()->debugMessage ("Prepending the statement",
+        Debug::INNER_LOOP_LEVEL, __FILE__, __LINE__);
+
       SgUseStatement * newUseStatement = new SgUseStatement (
           getEnclosingFileNode (parentStatement)->get_file_info (), moduleName,
           false);
@@ -104,6 +108,9 @@ FortranSubroutinesGeneration::addModuleUseStatement (SgNode * parent,
 
       headersWithAddedUseStatements.push_back (
           parentStatement->get_name ().getString ());
+
+      Debug::getInstance ()->debugMessage ("Done prepending",
+        Debug::INNER_LOOP_LEVEL, __FILE__, __LINE__);
     }
   }
   else
@@ -123,6 +130,7 @@ FortranSubroutinesGeneration::patchCallsToParallelLoops (
   using std::vector;
   using std::string;
   using std::find;
+  using boost::lexical_cast;
 
   Debug::getInstance ()->debugMessage ("Patching calls to OP_PAR_LOOPs",
       Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
@@ -215,9 +223,47 @@ FortranSubroutinesGeneration::patchCallsToParallelLoops (
 
       arguments.insert (arguments.begin (), conctenationExpression);
 
-      
-      if ( parallelLoop->isGenericLoop () )
+      /*
+       * ======================================================
+       * Increment of index depends on op_arg type (standard
+       * or generic)
+       * ======================================================
+       */      
+      for (unsigned int offset = parallelLoop->NUMBER_OF_NON_OP_DAT_ARGUMENTS; offset
+          < arguments.size (); )
       {
+        int accessDescriptorPositionStandardLoop = offset
+          + parallelLoop->NUMBER_OF_ARGUMENTS_PER_OP_DAT - 1;
+
+        /*
+         * ======================================================
+         * I am looking for either a string (OP_INC, OP_RW, ..)
+         * or an integer, denoting the dimension
+         * ======================================================
+         */
+          
+        SgIntVal * opDatDimension = isSgIntVal (
+          arguments[accessDescriptorPositionStandardLoop]);
+
+        /*
+         * ======================================================
+         * Found a access string => standard op_args
+         * Not found a dimension => generic op_args
+         * ======================================================
+         */ 
+        if ( opDatDimension == NULL )
+        {
+          Debug::getInstance ()->debugMessage ("Standard op_arg",
+            Debug::OUTER_LOOP_LEVEL, __FILE__, __LINE__);          
+
+          offset += parallelLoop->NUMBER_OF_ARGUMENTS_PER_OP_DAT;
+
+          Debug::getInstance ()->debugMessage ("Standard op_arg, offset = " +
+            lexical_cast<string> ( offset ),
+            Debug::OUTER_LOOP_LEVEL, __FILE__, __LINE__);
+        }
+        else
+        {
         /*
          * ======================================================
          * Generic loops have additional dimension and type 
@@ -228,12 +274,22 @@ FortranSubroutinesGeneration::patchCallsToParallelLoops (
          * is the distance between the type string of an op_arg,
          * and the dimension of the following one
          * ======================================================
-         */
-        int offSetBetweenTypeAndDim = parallelLoop->NUMBER_OF_ARGUMENTS_PER_OP_DAT_GENERIC - 1;
-        for (unsigned int offset = parallelLoop->POSITION_OF_FIRST_DAT_DIMENSION_GENERIC; offset
-          < arguments.size (); offset += offSetBetweenTypeAndDim)
-        {
-          arguments.erase (arguments.begin () + offset, arguments.begin () + offset+2);
+         */   
+          int dimensionPosition = offset + parallelLoop->POSITION_OF_DIMENSION;
+          int typeStringPosition = offset + parallelLoop->POSITION_OF_TYPE;
+          
+          Debug::getInstance ()->debugMessage ("generic op_arg: erasing dimension and type from argument list, offset is " +
+          lexical_cast<string> ( offset ) + " and limit is " + lexical_cast<string> (arguments.size ()),
+            Debug::OUTER_LOOP_LEVEL, __FILE__, __LINE__);
+          
+          arguments.erase (arguments.begin () + dimensionPosition, arguments.begin () + typeStringPosition +1);
+          
+          offset += parallelLoop->NUMBER_OF_ARGUMENTS_PER_OP_DAT;
+          
+          Debug::getInstance ()->debugMessage ("generic op_arg: erasing dimension and type from argument list, offset is " +
+            lexical_cast<string> ( offset ) + " and limit is " + lexical_cast<string> (arguments.size ()),
+            Debug::OUTER_LOOP_LEVEL, __FILE__, __LINE__);
+          
         }
       }
         
@@ -243,13 +299,21 @@ FortranSubroutinesGeneration::patchCallsToParallelLoops (
        * in the unparser
        * ======================================================
        */
+      Debug::getInstance ()->debugMessage ("Done eliminating generic op_arg arguments, set transformation",
+        Debug::OUTER_LOOP_LEVEL, __FILE__, __LINE__);          
 
+      
       SgLocatedNode * functionCallLocation = isSgLocatedNode (
           functionCallExpression);
 
       ROSE_ASSERT (functionCallLocation != NULL);
 
       functionCallLocation->get_file_info ()->setTransformation ();
+      
+      Debug::getInstance ()->debugMessage ("Set transformation done",
+        Debug::OUTER_LOOP_LEVEL, __FILE__, __LINE__);          
+
+      
     }
   }
 }

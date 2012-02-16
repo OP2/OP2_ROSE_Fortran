@@ -244,44 +244,18 @@ FortranProgramDeclarationsAndDefinitions::analyseParallelLoopArguments (
       __FILE__, __LINE__);
 
   unsigned int OP_DAT_ArgumentGroup = 1;
-
+  
   /*
    * ======================================================
-   * Analyse argument number and 
-   * of the parallel loop: standard or generic
+   * The actual offset between args is given by the kind
+   * of op_arg encountered (i.e. standard or generic)
+   * For this reason, the offset index is incremented
+   * according to the kind of argument encountered
    * ======================================================
    */
-  int offSetBetweenArgs= -1;
-
-  Debug::getInstance ()->debugMessage (
-      "Number of opArgs is " + lexical_cast<string> (numberOfOpArgs) +
-      " and the total number of arguments is " +
-      lexical_cast<string> (actualArguments->get_expressions ().size ()),
-      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
-
-  
-  if ( parallelLoop->NUMBER_OF_ARGUMENTS_PER_OP_DAT * numberOfOpArgs == 
-       actualArguments->get_expressions ().size () -
-       parallelLoop->NUMBER_OF_NON_OP_DAT_ARGUMENTS)
-  {
-    offSetBetweenArgs = parallelLoop->NUMBER_OF_ARGUMENTS_PER_OP_DAT;
-    parallelLoop->setStandardLoop ();
-    
-  }
-  else if ( parallelLoop->NUMBER_OF_ARGUMENTS_PER_OP_DAT_GENERIC * numberOfOpArgs ==
-            actualArguments->get_expressions ().size () -
-            parallelLoop->NUMBER_OF_NON_OP_DAT_ARGUMENTS)
-  {
-    offSetBetweenArgs = parallelLoop->NUMBER_OF_ARGUMENTS_PER_OP_DAT_GENERIC;
-    parallelLoop->setGenericLoop ();
-  }
-  else
-    throw Exceptions::ASTParsing::WrongOpArgFormatException (
-        "The op_par_loop argument tag and the number of op_args do not coincide");
-  
+   
   for (unsigned int offset = parallelLoop->NUMBER_OF_NON_OP_DAT_ARGUMENTS; offset
-      < actualArguments->get_expressions ().size (); offset
-      += offSetBetweenArgs)
+      < actualArguments->get_expressions ().size (); )
   {
     /*
      * ======================================================
@@ -346,7 +320,8 @@ FortranProgramDeclarationsAndDefinitions::analyseParallelLoopArguments (
     {
       /*
        * ======================================================
-       * OP_GBL signals that the OP_DAT is a global variable
+       * OP_GBL signals that the op_arg is a global variable
+       * No generic interface is allowed in this case
        * ======================================================
        */
       Debug::getInstance ()->debugMessage ("...GLOBAL mapping descriptor",
@@ -355,17 +330,14 @@ FortranProgramDeclarationsAndDefinitions::analyseParallelLoopArguments (
       setOpGblProperties (parallelLoop, opDatName, OP_DAT_ArgumentGroup);
 
       parallelLoop->setOpMapValue (OP_DAT_ArgumentGroup, GLOBAL);
+
+      setParallelLoopAccessDescriptor (parallelLoop, actualArguments,
+        OP_DAT_ArgumentGroup, offset + parallelLoop->POSITION_OF_ACCESS);
+      
+      offset += parallelLoop->NUMBER_OF_ARGUMENTS_PER_OP_DAT;
     }
     else
     {
-      /*
-       * ======================================================
-       * In case of standard loop, I can already set this
-       * op_dat info in the parallel loop class
-       * ======================================================
-       */
-      if ( parallelLoop->isGenericLoop () == false )
-        setOpDatProperties (parallelLoop, opDatName, OP_DAT_ArgumentGroup);
 
       if (iequals (mappingValue, OP2::OP_ID))
       {
@@ -387,51 +359,77 @@ FortranProgramDeclarationsAndDefinitions::analyseParallelLoopArguments (
 
         parallelLoop->setOpMapValue (OP_DAT_ArgumentGroup, INDIRECT);
       }
-    }
-    if ( parallelLoop->isGenericLoop () == false )
-    {
-      setParallelLoopAccessDescriptor (parallelLoop, actualArguments,
-          OP_DAT_ArgumentGroup, offset + parallelLoop->POSITION_OF_ACCESS);
-    }
-    else
-    {
+           
       /*
        * ======================================================
-       * In case of generic loop, I have to read also the
-       * dimension and type to be able to set the op_dat info
-       * in the parallel loop class
+       * Check if the op_arg is a standard or generic one
+       * and set the op_dat properties consequently
        * ======================================================
        */
+      int accessDescriptorPositionStandardLoop = offset
+        + parallelLoop->NUMBER_OF_ARGUMENTS_PER_OP_DAT - 1;
 
-      unsigned int dimArgumentPosition = offset
-        + parallelLoop->POSITION_OF_DIMENSION;
+      /*
+       * ======================================================
+       * I am looking for either a string (OP_INC, OP_RW, ..)
+       * or an integer, denoting the dimension
+       * ======================================================
+       */
+      SgIntVal * opDatDimension = isSgIntVal (
+        actualArguments->get_expressions ()[accessDescriptorPositionStandardLoop]);
 
-      Debug::getInstance ()->debugMessage ("...Name is: " + (actualArguments->get_expressions ()[dimArgumentPosition])->class_name (),
-            Debug::OUTER_LOOP_LEVEL, __FILE__, __LINE__);
-              
-      SgIntVal * opDataDimension = isSgIntVal (
-        actualArguments->get_expressions ()[dimArgumentPosition]);
+      /*
+       * ======================================================
+       * Found a access string => standard op_args
+       * Not found a dimension => generic op_args
+       * ======================================================
+       */ 
+      if ( opDatDimension == NULL )
+      {
+        setOpDatProperties (parallelLoop, opDatName, OP_DAT_ArgumentGroup);
 
-      ROSE_ASSERT (opDataDimension != NULL);
+        setParallelLoopAccessDescriptor (parallelLoop, actualArguments,
+            OP_DAT_ArgumentGroup, offset + parallelLoop->POSITION_OF_ACCESS);
 
-      unsigned int typeArgumentPosition = offset
-        + parallelLoop->POSITION_OF_TYPE;
-      
-      SgStringVal * opDataBaseTypeString = isSgStringVal (
-        actualArguments->get_expressions ()[typeArgumentPosition]);
+        offset += parallelLoop->NUMBER_OF_ARGUMENTS_PER_OP_DAT;
+      }
+      else
+      {
+       /*
+        * ======================================================
+        * In case of generic loop, I have to read also the
+        * dimension and type to be able to set the op_dat info
+        * in the parallel loop class
+        * ======================================================
+        */
 
-      ROSE_ASSERT (opDataBaseTypeString != NULL);
-      
-      SgType * opDataBaseType = getTypeFromString (opDataBaseTypeString->get_value (),
-        opDatName);
+//        unsigned int dimArgumentPosition = offset
+//          + parallelLoop->POSITION_OF_DIMENSION;
+                
+//        SgIntVal * opDataDimension = isSgIntVal (
+//          actualArguments->get_expressions ()[dimArgumentPosition]);
+
+//        ROSE_ASSERT (opDataDimension != NULL);
+
+        unsigned int typeArgumentPosition = offset
+          + parallelLoop->POSITION_OF_TYPE;
         
-      setOpDatPropertiesGeneric (parallelLoop, opDatName, opDataDimension->get_value (),
-        opDataBaseType, OP_DAT_ArgumentGroup);
+        SgStringVal * opDataBaseTypeString = isSgStringVal (
+          actualArguments->get_expressions ()[typeArgumentPosition]);
+
+        ROSE_ASSERT (opDataBaseTypeString != NULL);
         
-      
-        
-      setParallelLoopAccessDescriptor (parallelLoop, actualArguments,
-          OP_DAT_ArgumentGroup, offset + parallelLoop->POSITION_OF_ACCESS_GENERIC);
+        SgType * opDataBaseType = getTypeFromString (opDataBaseTypeString->get_value (),
+          opDatName);
+          
+        setOpDatPropertiesGeneric (parallelLoop, opDatName, opDatDimension->get_value (),
+          opDataBaseType, OP_DAT_ArgumentGroup);
+          
+        setParallelLoopAccessDescriptor (parallelLoop, actualArguments,
+            OP_DAT_ArgumentGroup, offset + parallelLoop->POSITION_OF_ACCESS_GENERIC);
+
+        offset += parallelLoop->NUMBER_OF_ARGUMENTS_PER_OP_DAT_GENERIC;
+      }
     }
     
     OP_DAT_ArgumentGroup++;

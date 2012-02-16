@@ -38,6 +38,7 @@
 #include "ScopedVariableDeclarations.h"
 #include "Debug.h"
 #include <rose.h>
+#include "../../../../../ROSE/rose-0.9.5a-15165_build/src/frontend/SageIII/Cxx_Grammar.h"
 
 SgVarRefExp *
 FortranCUDAConstantDeclarations::getReferenceToNewVariable (
@@ -89,10 +90,24 @@ FortranCUDAConstantDeclarations::addDeclarations (
     string const & newVariableName = getNewConstantVariableName (variableName);
 
     oldNamesToNewNames[variableName] = newVariableName;
-
-    variableDeclarations->add (newVariableName,
+    
+    if ( constDefinition->getDimension () == 1 )
+      variableDeclarations->add (newVariableName,
         FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
             newVariableName, type, moduleScope, 1, CUDA_CONSTANT));
+    else
+      /*
+       * ======================================================
+       * Constant arrays are mapped to device memory,
+       * currently irregardeless of their size. In the 
+       * future, dimension check might be used to decide
+       * the memory mapping
+       * ======================================================
+       */
+
+       variableDeclarations->add (newVariableName,
+        FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
+            newVariableName, type, moduleScope, 1, CUDA_DEVICE));
   }
 }
 
