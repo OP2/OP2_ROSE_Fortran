@@ -379,6 +379,26 @@ template <typename TSubroutineHeader>
       {
         return parallelLoops.end ();
       }
+	  
+	  ParallelLoop*
+	  getParallelLoop (std::string subroutineName)
+	  {
+		  using std::map;
+		  using std::string;
+		  
+		  typename map <string, ParallelLoop *>::const_iterator it =
+		  parallelLoops.find (subroutineName);
+		  
+		  if (it == parallelLoops.end ())
+		  {
+			  throw Exceptions::CodeGeneration::UnknownSubroutineException (
+																			"Unable to find parallelLoop for subroutine '" + subroutineName + "'");
+		  }
+		  else
+		  {
+			  return it->second;
+		  }
+	  }
 
       SgSourceFile *
       getSourceFile (std::string const & fileName)

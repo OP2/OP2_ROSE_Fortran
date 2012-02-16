@@ -49,6 +49,10 @@ class Globals
     bool oxfordOption;
     
     bool preprocessOption;
+	
+	bool syntacticFusionOption;
+
+	std::string syntacticFusionKernels;
 
     bool uDrawOption;
 
@@ -121,6 +125,18 @@ class Globals
     bool
     preprocess () const;
 
+    void
+    setSyntacticFusion ();
+    
+    bool
+    syntacticFusion () const;
+
+	void
+	setSyntacticFusionKernels (std::string kernels);
+	
+	std::string
+	getSyntacticFusionKernels () const;
+	
     void
     setOutputUDrawGraphs ();
 

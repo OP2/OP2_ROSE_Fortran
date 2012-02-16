@@ -49,6 +49,7 @@
 #include <rose.h>
 
 #include "CPPPreProcess.h"
+#include "CPPSyntacticFusion.h"
 
 template <class TGenerator>
   void
@@ -352,6 +353,9 @@ addCommandLineOptions ()
 
   CommandLine::getInstance ()->addOption (new PreprocessOption (
       "Preprocess OP2 declarations", "pre"));
+	
+  CommandLine::getInstance ()->addOption (new SyntacticFusionOption (
+      "Unsafe OP2 PARLOOP fusion", "sfuse"));
 
   CommandLine::getInstance ()->addUDrawGraphOption ();
 }
@@ -378,6 +382,15 @@ processUserSelections (SgProject * project)
 
       project->unparse ();
     }
+	else if (Globals::getInstance ()->syntacticFusion ())
+	{
+	  CPPProgramDeclarationsAndDefinitions * declarations =
+		new CPPProgramDeclarationsAndDefinitions (project);
+		
+	  new CPPSyntacticFusion (project, declarations);
+		
+	  project->unparse ();
+	}
     else if (Globals::getInstance ()->renderOxfordAPICalls ())
     {
       if (Globals::getInstance ()->getTargetBackend ()
