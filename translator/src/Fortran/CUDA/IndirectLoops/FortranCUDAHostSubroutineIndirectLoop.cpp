@@ -233,13 +233,31 @@ FortranCUDAHostSubroutineIndirectLoop::createPlanFunctionExecutionStatements ()
   /*
    * ======================================================
    * Statement to initialise the number of threads per block
-   * in the CUDA kernel
+   * in the CUDA kernel: calls a proper function
    * ======================================================
    */
+  
+  Debug::getInstance ()->debugMessage ("Creating call to partition size setting function",
+      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+
+  SgVarRefExp * parameter1 = variableDeclarations->getReference (
+      getUserSubroutineName ());
+
+  SgDotExp * parameter2 = buildDotExp (variableDeclarations->getReference (
+      getOpSetName ()), buildOpaqueVarRefExp (OP2::RunTimeVariableNames::size,
+      subroutineScope));
+
+  SgExprListExp * actualParameters = buildExprListExp (parameter1, parameter2);
+
+  SgFunctionSymbol * functionSymbol =
+      FortranTypesBuilder::buildNewFortranFunction (OP2::FortranSpecific::RunTimeFunctions::getBlockSizeFunctionName,
+          subroutineScope);
+
+  SgFunctionCallExp * functionCall = buildFunctionCallExp (functionSymbol,
+      actualParameters);
 
   SgExprStatement * statement2 = buildAssignStatement (
-      variableDeclarations->getReference (CUDA::threadsPerBlock),
-      buildOpaqueVarRefExp (threadBlockSizeMacro, subroutineScope));
+      variableDeclarations->getReference (CUDA::threadsPerBlock), functionCall);
 
   appendStatement (statement2, loopBody);
 
@@ -1063,9 +1081,13 @@ FortranCUDAHostSubroutineIndirectLoop::createPlanFunctionCallStatement ()
   SgVarRefExp * parameter9 = variableDeclarations->getReference (
       indirectionDescriptorArray);
 
+  SgVarRefExp * parameter10 = variableDeclarations->getReference (
+      planPartitionSize);
+      
+      
   SgExprListExp * actualParameters = buildExprListExp (parameter1, parameter2,
       parameter3, parameter4, parameter5, parameter6, parameter7, parameter8,
-      parameter9);
+      parameter9, parameter10);
 
   SgFunctionSymbol * functionSymbol =
       FortranTypesBuilder::buildNewFortranFunction (CUDA::fortranCplanFunction,
@@ -1163,6 +1185,44 @@ FortranCUDAHostSubroutineIndirectLoop::createCardinalitiesInitialisationStatemen
   }
 }
 
+SgExprStatement *
+FortranCUDAHostSubroutineIndirectLoop::createPartitionSizeInitialisationFromEnvironment ()
+{
+  using namespace SageBuilder;
+  using namespace SageInterface;  
+  using namespace OP2VariableNames;
+  using namespace PlanFunctionVariableNames;
+  using namespace LoopVariableNames;
+  using namespace OP2::Macros;
+  using std::string;
+
+  Debug::getInstance ()->debugMessage ("Creating call to partition size setting function",
+      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+
+  SgVarRefExp * parameter1 = variableDeclarations->getReference (
+      getUserSubroutineName ());
+
+  SgDotExp * parameter2 = buildDotExp (variableDeclarations->getReference (
+      getOpSetName ()), buildOpaqueVarRefExp (OP2::RunTimeVariableNames::size,
+      subroutineScope));
+
+
+  SgExprListExp * actualParameters = buildExprListExp (parameter1, parameter2);
+
+  SgFunctionSymbol * functionSymbol =
+      FortranTypesBuilder::buildNewFortranFunction (OP2::FortranSpecific::RunTimeFunctions::getPartitionSizeFunctionName,
+          subroutineScope);
+
+  SgFunctionCallExp * functionCall = buildFunctionCallExp (functionSymbol,
+      actualParameters);
+
+  SgExprStatement * assignmentStatement = buildAssignStatement (
+      variableDeclarations->getReference (planPartitionSize), functionCall);
+
+  return assignmentStatement;
+  
+}
+
 void
 FortranCUDAHostSubroutineIndirectLoop::createStatements ()
 {
@@ -1178,6 +1238,9 @@ FortranCUDAHostSubroutineIndirectLoop::createStatements ()
   appendStatement (createPlanFunctionParametersPreparationStatements (),
       subroutineScope);
 
+  appendStatement (createPartitionSizeInitialisationFromEnvironment (),
+      subroutineScope);
+      
   appendStatement (createPlanFunctionCallStatement (), subroutineScope);
 
   appendStatement (createTransferOpDatStatements (), subroutineScope);
@@ -1450,6 +1513,26 @@ FortranCUDAHostSubroutineIndirectLoop::createExecutionPlanDeclarations ()
             FortranTypesBuilder::getArray_RankOne (
                 FortranTypesBuilder::getFourByteInteger ()), subroutineScope,
             2, CUDA_DEVICE, ALLOCATABLE));
+  }
+  
+  /*
+   * ======================================================
+   * The partition size and block size are part of the
+   * information needed to execute a plan, hence they
+   * are declared here
+   * ======================================================
+   */
+  vector <string> partitionAndBlockSizes;
+
+  partitionAndBlockSizes.push_back (partitionSize);
+  partitionAndBlockSizes.push_back (blockSize);
+
+  for (vector <string>::iterator it = partitionAndBlockSizes.begin (); it
+      != partitionAndBlockSizes.end (); ++it)
+  {
+    variableDeclarations->add (*it,
+        FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (*it,
+            FortranTypesBuilder::getFourByteInteger (), subroutineScope));
   }
 }
 

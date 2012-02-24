@@ -69,6 +69,9 @@ class FortranCUDAHostSubroutineIndirectLoop: public FortranCUDAHostSubroutine
     void
     createExecutionPlanDeclarations ();
 
+    SgExprStatement * 
+    createPartitionSizeInitialisationFromEnvironment ();
+    
     virtual void
     createStatements ();
 

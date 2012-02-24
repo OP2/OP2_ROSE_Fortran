@@ -145,10 +145,10 @@ program AIRFOIL
 
       ! calculate area/timstep
       call op_par_loop_6 ( adt_calc, cells, &
-                         & p_x,   1, pcell, OP_READ, &
-                         & p_x,   2, pcell, OP_READ, &
-                         & p_x,   3, pcell, OP_READ, &
-                         & p_x,   4, pcell, OP_READ, &
+                         & p_x,    1, pcell, OP_READ, &
+                         & p_x,    2, pcell, OP_READ, &
+                         & p_x,    3, pcell, OP_READ, &
+                         & p_x,    4, pcell, OP_READ, &
                          & p_q,   -1, OP_ID, OP_READ, &
                          & p_adt, -1, OP_ID, OP_WRITE &
                          & )
@@ -171,7 +171,7 @@ program AIRFOIL
                           & p_q,      1, pbecell, OP_READ, &
                           & p_adt,    1, pbecell, OP_READ, &
                           & p_res,    1, pbecell, OP_INC,  &
-                          & p_bound,  -1, OP_ID, OP_READ   &
+                          & p_bound, -1, OP_ID, OP_READ   &
                           & )
 
       ! update flow field

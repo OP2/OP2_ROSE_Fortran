@@ -78,7 +78,6 @@ contains
 
   end subroutine op_decl_set
 
-
   subroutine op_decl_map ( from , to, dim, dat, outmap, mapname )
     type(op_set) :: from, to
     integer :: dim
@@ -260,5 +259,6 @@ contains
     real(8), dimension(:,:) :: data
   
   end subroutine op_decl_const_real_8_2
+
 
 end module OP2_FORTRAN_DECLARATIONS

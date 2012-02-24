@@ -40,7 +40,8 @@ namespace PlanFunctionVariableNames
 {
   /*
    * ======================================================
-   * Variable names used in the plan function
+   * Variable names used in the plan function and to 
+   * execute a plan
    * ======================================================
    */
 
@@ -93,6 +94,8 @@ namespace PlanFunctionVariableNames
   std::string const pthrcol = "pthrcol";
   std::string const pthrcolSize = "pthrcolSize";
   std::string const thrcol = "thrcol";
+  std::string const planPartitionSize = "partitionSize";
+  std::string const blockSize = "blockSize";
 
   /*
    * ======================================================
