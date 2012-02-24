@@ -126,6 +126,30 @@ Globals::preprocess () const
 }
 
 void
+Globals::setSyntacticFusion ()
+{
+    syntacticFusionOption = true;
+}
+
+bool
+Globals::syntacticFusion () const
+{
+    return syntacticFusionOption;
+}
+
+void
+Globals::setSyntacticFusionKernels (std::string kernels)
+{
+	syntacticFusionKernels = kernels;
+}
+
+std::string
+Globals::getSyntacticFusionKernels () const
+{
+	return syntacticFusionKernels;
+}
+
+void
 Globals::setOutputUDrawGraphs ()
 {
   uDrawOption = true;

@@ -86,6 +86,22 @@ public:
 	}
 };
 
+class SyntacticFusionOption: public CommandLineOptionWithParameters
+{
+public:
+	virtual void
+	run ()
+	{
+		Globals::getInstance ()->setSyntacticFusion ();
+		Globals::getInstance ()->setSyntacticFusionKernels (getParameter ());
+	}
+	
+	SyntacticFusionOption (std::string helpMessage, std::string longOption) :
+	CommandLineOptionWithParameters (helpMessage, "kernels", "", longOption)
+	{
+	}
+};
+
 class CUDAOption: public CommandLineOption
 {
   public:
