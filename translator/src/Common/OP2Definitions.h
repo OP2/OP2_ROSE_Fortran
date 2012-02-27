@@ -138,6 +138,32 @@ class OpSubSetDefinition: public OpSetDefinition
     getNbFilterArg ();
 };
 
+class OpSparsityDefinition: public OP2Definition
+{
+    /*
+     * ======================================================
+     * Models an OP_SPARSITY variable definition
+     * ======================================================
+     */
+
+  protected:
+
+    std::string map1Name;
+
+    std::string map2Name;
+
+  public:
+
+    std::string const &
+    getSetName () const;
+
+    std::string const &
+    getMap1Name () const;
+
+    std::string const &
+    getMap2Name () const;
+};
+
 class OpMapDefinition: public OP2Definition
 {
     /*
@@ -169,6 +195,24 @@ class OpMapDefinition: public OP2Definition
 
     std::string const &
     getMappingName () const;
+};
+
+class OpMatDefinition: public OP2Definition
+{
+    /*
+     * ======================================================
+     * Models an OP_MAT variable definition
+     * ======================================================
+     */
+
+  protected:
+
+    std::string sparsityName;
+
+  public:
+
+    std::string const &
+    getSparsityName () const;
 };
 
 class OpGblDefinition: public OP2Definition
