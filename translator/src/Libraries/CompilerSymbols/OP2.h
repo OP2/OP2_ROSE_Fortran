@@ -53,6 +53,7 @@ namespace OP2
   std::string const OP_ARG_DAT = "op_arg_dat";
   std::string const OP_ARG_DAT_GENERIC = "op_arg_dat_generic";
   std::string const OP_ARG_GBL = "op_arg_gbl";
+  std::string const OP_ARG_MAT = "op_arg_mat";
   std::string const OP_DAT = "op_dat";
   std::string const OP_DAT_CORE = "op_dat_core";
   std::string const OP_DAT_GBL = "op_dat_gbl";
