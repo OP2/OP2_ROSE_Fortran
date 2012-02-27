@@ -54,6 +54,8 @@ class OpSetDefinition;
 class OpSubSetDefinition;
 class OpMapDefinition;
 class OpDatDefinition;
+class OpMatDefinition;
+class OpSparsityDefinition;
 class OpGblDefinition;
 class OpConstDefinition;
 
@@ -97,6 +99,20 @@ template <typename TSubroutineHeader>
        * ======================================================
        */
       std::map <std::string, OpDatDefinition *> OpDatDefinitions;
+
+      /*
+       * ======================================================
+       * OP_DECL_SPARSITY declarations
+       * ======================================================
+       */
+      std::map <std::string, OpSparsityDefinition *> OpSparsityDefinitions;
+
+      /*
+       * ======================================================
+       * OP_DECL_MAT declarations
+       * ======================================================
+       */
+      std::map <std::string, OpMatDefinition *> OpMatDefinitions;
 
       /*
        * ======================================================

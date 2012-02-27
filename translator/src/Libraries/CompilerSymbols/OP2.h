@@ -60,13 +60,16 @@ namespace OP2
   std::string const OP_DECL_DAT = "op_decl_dat";
   std::string const OP_DECL_GBL = "op_decl_gbl";
   std::string const OP_DECL_MAP = "op_decl_map";
+  std::string const OP_DECL_MAT = "op_decl_mat";
   std::string const OP_DECL_SET = "op_decl_set";\
   std::string const OP_DECL_SUBSET = "op_decl_subset";
+  std::string const OP_DECL_SPARSITY = "op_decl_sparsity";
   std::string const OP_GBL = "op_gbl";
   std::string const OP_ID = "op_id";
   std::string const OP_INC = "op_inc";
   std::string const OP_MAP = "op_map";
   std::string const OP_MAP_CORE = "op_map_core";
+  std::string const OP_MAT = "op_mat";
   std::string const OP_MAX = "op_max";
   std::string const OP_MIN = "op_min";
   std::string const OP_PAR_LOOP = "op_par_loop";
@@ -76,6 +79,7 @@ namespace OP2
   std::string const OP_RW = "op_rw";
   std::string const OP_SET = "op_set";
   std::string const OP_SET_CORE = "op_set_core";
+  std::string const OP_SPARSITY = "op_sparsity";
   std::string const OP_WRITE = "op_write";
   
   namespace RunTimeVariableNames
