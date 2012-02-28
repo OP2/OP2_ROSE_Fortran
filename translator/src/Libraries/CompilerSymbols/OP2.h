@@ -180,7 +180,18 @@ namespace OP2
       {
         std::string const getPartitionSizeFunctionName = "getPartitionSize";
         std::string const getBlockSizeFunctionName = "getBlockSize";
+        std::string const getDumpOpDatFunctionName = "dumpOpDat";
+        std::string const getDumpOpDatFromDeviceFunctionName = "dumpOpDatFromDevice";
       }
+  }
+  
+  namespace PreprocessorDirectives
+  {
+     std::string const
+       getIfPrintOpDatDirectiveString ();
+
+     std::string const
+       getEndIfPrintOpDatDirectiveString (); 
   }
 }
 

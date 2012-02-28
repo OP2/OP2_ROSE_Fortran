@@ -59,7 +59,8 @@ enum FORTRAN_VARIABLE_ATTRIBUTES
   VALUE,
   INTENT_IN,
   INTENT_OUT,
-  INTENT_INOUT
+  INTENT_INOUT,
+  SAVE
 };
 
 class FortranStatementsAndExpressionsBuilder
