@@ -264,13 +264,22 @@ FortranCUDAHostSubroutine::createReductionPrologueStatements ()
                 buildIntVal (1), loopBody);
 
         appendStatement (loopStatement, subroutineScope);
-
-        SgExprStatement * assignmentStatement3 = buildAssignStatement (
-            variableDeclarations->getReference (getReductionArrayDeviceName (i)),
-            variableDeclarations->getReference (getReductionArrayHostName (i)));
-
-        appendStatement (assignmentStatement3, subroutineScope);
       }
+
+       /*
+        * ======================================================
+        * For all cases (OP_INC, OP_MAX, OP_MIN) copy host
+	* array initialised in the above if-then-else to
+	* device array
+        * ======================================================
+        */      
+
+      SgExprStatement * assignmentStatement3 = buildAssignStatement (
+        variableDeclarations->getReference (getReductionArrayDeviceName (i)),
+        variableDeclarations->getReference (getReductionArrayHostName (i)));
+
+      appendStatement (assignmentStatement3, subroutineScope);
+
     }
   }
 }

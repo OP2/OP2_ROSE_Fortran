@@ -316,6 +316,9 @@ FortranCUDAHostSubroutineDirectLoop::createStatements ()
   }
 
   createDeallocateStatements ();
+  
+  createDumpOfOutputStatements (subroutineScope,
+    OP2::FortranSpecific::RunTimeFunctions::getDumpOpDatFromDeviceFunctionName);
 }
 
 void
@@ -334,6 +337,8 @@ FortranCUDAHostSubroutineDirectLoop::createLocalVariableDeclarations ()
 
   createCUDAKernelActualParameterDeclarations ();
 
+  createDumpOfOutputDeclarations (subroutineScope);
+  
   createIterationVariablesDeclarations ();
   
   if (parallelLoop->isReductionRequired ())

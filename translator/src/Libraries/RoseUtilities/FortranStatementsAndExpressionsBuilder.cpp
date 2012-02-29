@@ -92,6 +92,12 @@ FortranStatementsAndExpressionsBuilder::setFortranAttributes (
         break;
       }
 
+      case SAVE:
+      {
+        variableDeclaration->get_declarationModifier ().get_typeModifier ().setSave ();
+        break;
+      }
+
       case INTENT_IN:
       {
         variableDeclaration->get_declarationModifier ().get_typeModifier ().setIntent_in ();

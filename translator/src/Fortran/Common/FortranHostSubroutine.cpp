@@ -41,6 +41,15 @@
 #include <boost/algorithm/string/predicate.hpp>
 #include <rose.h>
 
+/*
+ * ======================================================
+ * Maximum size of variable name for opDats in 
+ * host stub
+ * ======================================================
+ */
+
+int MAX_OPDAT_NAME_LEN = 50;
+
 void
 FortranHostSubroutine::createFormalParameterDeclarations ()
 {
@@ -163,6 +172,111 @@ FortranHostSubroutine::createEarlyExitStatement (SgScopeStatement * subroutineSc
   appendStatement (ifSetIsZero, subroutineScope);
 }
 
+void
+FortranHostSubroutine::createDumpOfOutputDeclarations (SgScopeStatement * subroutineScope)
+{
+  using namespace SageBuilder;
+  using namespace SageInterface;
+  using namespace OP2VariableNames;
+  
+  variableDeclarations->add (OP2VariableNames::calledTimes,
+      FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
+          OP2VariableNames::calledTimes, FortranTypesBuilder::getFourByteInteger (),
+          subroutineScope, 1, SAVE));  
+          
+  variableDeclarations->add (OP2VariableNames::returnDumpOpDat,
+      FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
+          OP2VariableNames::returnDumpOpDat, FortranTypesBuilder::getFourByteInteger (),
+          subroutineScope, 0));  
+          
+}
+
+void
+FortranHostSubroutine::createDumpOfOutputStatements (SgScopeStatement * subroutineScope,
+  std::string const dumpOpDatFunctionName)
+{
+  using namespace SageBuilder;
+  using namespace SageInterface;
+  using namespace OP2VariableNames;
+  
+  SgExpression * incrementCalledTimesExpr = buildAssignOp (
+    variableDeclarations->getReference (OP2VariableNames::calledTimes),
+    buildAddOp (variableDeclarations->getReference (OP2VariableNames::calledTimes),
+      buildIntVal (1)));
+  
+  SgStatement * incrementCalledTimes = buildExprStatement(incrementCalledTimesExpr);
+
+  appendStatement (incrementCalledTimes, subroutineScope);
+  
+  bool firstCall = true;
+  
+  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
+  {
+    if (parallelLoop->isDuplicateOpDat (i) == false)
+    {
+      if ( !parallelLoop->isRead (i) && !parallelLoop->isGlobal (i) )
+      {
+        SgExprListExp * actualParameters = buildExprListExp ();
+        
+        SgStringVal * userSubroutineExpression = buildStringVal (parallelLoop->getUserSubroutineName ());
+
+        SgStringVal * opDatLabel = buildStringVal (getOpDatName (i));
+        
+        SgFunctionSymbol * functionSymbol =
+            FortranTypesBuilder::buildNewFortranFunction ("CHAR", subroutineScope);
+
+        SgExprListExp * actualParametersSlashZero = buildExprListExp ();
+
+        actualParametersSlashZero->append_expression (buildIntVal (0));
+
+        SgFunctionCallExp * functionCallExpSlashZero = buildFunctionCallExp (
+            functionSymbol, actualParametersSlashZero);
+        
+        SgConcatenationOp * concatenationExpression1 = buildConcatenationOp (
+            userSubroutineExpression, opDatLabel);	 
+          
+        SgConcatenationOp * concatenationExpression2 = buildConcatenationOp (
+          concatenationExpression1, functionCallExpSlashZero);
+          
+        SgVarRefExp * opDatReference = variableDeclarations->getReference (
+          getOpDatName (i));
+            
+        actualParameters->append_expression (opDatReference);
+        actualParameters->append_expression (concatenationExpression2);
+        actualParameters->append_expression (
+          variableDeclarations->getReference (OP2VariableNames::calledTimes));
+
+        SgFunctionSymbol * functionSymbolDumpOpDat =
+          FortranTypesBuilder::buildNewFortranFunction (
+            dumpOpDatFunctionName, subroutineScope);
+
+        SgFunctionCallExp * functionCall = buildFunctionCallExp (functionSymbolDumpOpDat,
+          actualParameters);
+       
+        SgExprStatement * assignStmt = buildAssignStatement (
+          variableDeclarations->getReference (OP2VariableNames::returnDumpOpDat),
+          functionCall);
+        
+        appendStatement (assignStmt, subroutineScope);
+        
+        /*
+         * ======================================================
+         * Checks if PRINT_OUTPUT_DAT macro is set using
+         * pre-processor directives (#ifdef)
+         * \warning must be placed here for correct unparsing
+         * by ROSE
+         * ======================================================
+         */
+
+        addTextForUnparser (assignStmt, OP2::PreprocessorDirectives::getIfPrintOpDatDirectiveString(),
+          AstUnparseAttribute::e_before);
+
+        addTextForUnparser (assignStmt, OP2::PreprocessorDirectives::getEndIfPrintOpDatDirectiveString  (),
+          AstUnparseAttribute::e_after);        
+      }
+    }
+  }
+}
 
 FortranHostSubroutine::FortranHostSubroutine (SgScopeStatement * moduleScope,
     Subroutine <SgProcedureHeaderStatement> * calleeSubroutine,

@@ -51,6 +51,7 @@ namespace OP2
   std::string const OP_ACCESS = "op_access";
   std::string const OP_ARG = "op_arg";
   std::string const OP_ARG_DAT = "op_arg_dat";
+  std::string const OP_ARG_DAT_GENERIC = "op_arg_dat_generic";
   std::string const OP_ARG_GBL = "op_arg_gbl";
   std::string const OP_DAT = "op_dat";
   std::string const OP_DAT_CORE = "op_dat_core";
@@ -174,6 +175,23 @@ namespace OP2
         std::string const real4 = "real4";
         std::string const integer4 = "integer4";
       }
+      
+      namespace RunTimeFunctions
+      {
+        std::string const getPartitionSizeFunctionName = "getPartitionSize";
+        std::string const getBlockSizeFunctionName = "getBlockSize";
+        std::string const getDumpOpDatFunctionName = "dumpOpDat";
+        std::string const getDumpOpDatFromDeviceFunctionName = "dumpOpDatFromDevice";
+      }
+  }
+  
+  namespace PreprocessorDirectives
+  {
+     std::string const
+       getIfPrintOpDatDirectiveString ();
+
+     std::string const
+       getEndIfPrintOpDatDirectiveString (); 
   }
 }
 

@@ -129,6 +129,11 @@ namespace OP2VariableNames
 
   std::string const deviceString = "Device";
   
+  std::string const calledTimes = "calledTimes";
+  std::string const calledTimesString = "calledTimesString";
+  std::string const returnDumpOpDat = "returnDumpOpDat";
+  
+  
   std::string const
   getBlockSizeVariableName (std::string const & suffix);
 

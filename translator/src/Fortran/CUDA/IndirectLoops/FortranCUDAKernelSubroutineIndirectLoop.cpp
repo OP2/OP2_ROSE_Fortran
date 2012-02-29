@@ -276,8 +276,8 @@ FortranCUDAKernelSubroutineIndirectLoop::createIncrementAndWriteAccessEpilogueSt
   using namespace OP2VariableNames;
   using namespace PlanFunctionVariableNames;
   using namespace LoopVariableNames;
-  using std::string;
-
+  using std::string;  
+  
   Debug::getInstance ()->debugMessage (
       "Creating increment and write access epilogue statements",
       Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
@@ -1364,9 +1364,20 @@ FortranCUDAKernelSubroutineIndirectLoop::createStatements ()
       subtractExpression1);
 
   appendStatement (assignmentStatement1, subroutineScope);
-
+  
   createExecutionLoopStatements ();
 
+   /*
+   * ======================================================
+   * First, synchronise the threads, to avoid those not
+   * participating into the user kernel call to go on
+   * and increment or write to device before the value
+   * to write has been produced by other threads
+   * ======================================================
+   */  
+//  appendStatement (buildExprStatement (CUDA::createDeviceThreadSynchronisationCallStatement (subroutineScope)),
+ //     );
+  
   appendStatement (createIncrementAndWriteAccessEpilogueStatements (),
       subroutineScope);
 

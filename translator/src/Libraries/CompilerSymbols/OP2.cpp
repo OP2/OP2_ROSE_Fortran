@@ -79,3 +79,18 @@ OP2::Macros::createMinCallStatement (SgScopeStatement * scope,
   return buildFunctionCallExp (functionName, buildVoidType (),
       actualParameters, scope);
 }
+
+
+std::string const
+OP2::PreprocessorDirectives::getIfPrintOpDatDirectiveString ()
+{
+  return "\n#ifdef PRINT_OUTPUT_DAT\n";
+}
+
+std::string const
+OP2::PreprocessorDirectives::getEndIfPrintOpDatDirectiveString ()
+{
+  return "\n#endif \n";
+}
+
+

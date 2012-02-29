@@ -60,6 +60,17 @@ class FortranHostSubroutine: public HostSubroutine <SgProcedureHeaderStatement>
     void
     createEarlyExitStatement (SgScopeStatement * subroutineScope);
     
+    void
+    createDumpOfOutputDeclarations (SgScopeStatement * subroutineScope);
+    
+    /*
+     * ======================================================
+     * Dumps all output op_dats of a parallel loop
+     * ======================================================
+     */
+    void
+      createDumpOfOutputStatements (SgScopeStatement * subroutineScope, std::string const dumpOpDatFunctionName);
+    
     FortranHostSubroutine (SgScopeStatement * moduleScope, Subroutine <
         SgProcedureHeaderStatement> * calleeSubroutine,
         FortranParallelLoop * parallelLoop);
