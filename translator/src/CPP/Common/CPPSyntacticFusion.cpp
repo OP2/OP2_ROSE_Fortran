@@ -144,6 +144,11 @@ CPPSyntacticFusion::fuseOPParLoopCalls (ParallelLoop* parallelLoop1, ParallelLoo
 		SgScopeStatement* scope = getScope ((*it));
 		for (int i = 0; i < parallelLoop2->getNumberOfOpDatArgumentGroups (); i++)
 		{
+			for ( int j = 0; j < parallelLoop1->getNumberOfOpDatArgumentGroups (); i++)
+			{
+				
+			}
+			
 			(*it)->append_arg ((*(parallelLoop2->getFirstFunctionCall ()))->get_args ()->get_expressions ()[i + 3]);
 		}
 		(*it)->get_args ()->get_expressions ()[0] = buildFunctionRefExp (kfname,

@@ -114,7 +114,7 @@ class ParallelLoop
      * ======================================================
      */
     std::map <unsigned int, bool> OpDatDuplicates;
-
+	
     /*
      * ======================================================
      * How is the data for the OP_DAT variables in this position

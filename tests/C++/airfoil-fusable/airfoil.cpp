@@ -34,6 +34,8 @@
 //     by Devendra Ghate and Mike Giles, 2005
 //
 
+#include "real.h"
+
 //
 // standard headers
 //
@@ -48,8 +50,7 @@
 //
 // OP header file
 //
-#include "OP2_OXFORD.h"
-#include "op_seq.h"
+#include "op_lib_cpp.h"
 
 //
 // Variables referenced in kernels with global scope
@@ -208,7 +209,7 @@ int main(int argc, char *argv[]){
 
     // calculate area/timstep
 
-    op_par_loop(adt_calc,"adt_calc",cells,
+    op_par_loop(adt_calc1,"adt_calc1",cells,
                 op_arg_dat(p_x,   0,pcell, 2,REAL_STRING,OP_READ ),
                 op_arg_dat(p_x,   1,pcell, 2,REAL_STRING,OP_READ ),
                 op_arg_dat(p_x,   2,pcell, 2,REAL_STRING,OP_READ ),
@@ -247,7 +248,7 @@ int main(int argc, char *argv[]){
                 op_arg_dat(p_adt, -1,OP_ID, 1,REAL_STRING,OP_READ ),
                 op_arg_gbl(&rms,1,REAL_STRING,OP_INC));
 
-    op_par_loop(adt_calc,"adt_calc",cells,
+    op_par_loop(adt_calc2,"adt_calc2",cells,
                 op_arg_dat(p_x,   0,pcell, 2,REAL_STRING,OP_READ ),
                 op_arg_dat(p_x,   1,pcell, 2,REAL_STRING,OP_READ ),
                 op_arg_dat(p_x,   2,pcell, 2,REAL_STRING,OP_READ ),
@@ -294,8 +295,8 @@ int main(int argc, char *argv[]){
       printf(" %d  %10.5e \n",iter,rms);
   }
 
-  for ( int ll = 0; ll < 4*ncell; ll++ )
-    printf ( "%lf\n", q[ll] );
+//  for ( int ll = 0; ll < 4*ncell; ll++ )
+//    printf ( "%lf\n", q[ll] );
 
   op_timing_output();
 }

@@ -92,8 +92,9 @@ bres_calc (REAL *x1, REAL *x2, REAL *q1, REAL *adt1, REAL *res1,
   }
 }
 
+
 void
-adt_calc (REAL *x1, REAL *x2, REAL *x3, REAL *x4, REAL *q, REAL *adt)
+adt_calc1 (REAL *x1, REAL *x2, REAL *x3, REAL *x4, REAL *q, REAL *adt)
 {
   REAL dx, dy, ri, u, v, c;
 
@@ -121,6 +122,34 @@ adt_calc (REAL *x1, REAL *x2, REAL *x3, REAL *x4, REAL *q, REAL *adt)
   *adt = (*adt) / cfl;
 }
 
+void
+adt_calc2 (REAL *x1, REAL *x2, REAL *x3, REAL *x4, REAL *q, REAL *adt)
+{
+  REAL dx, dy, ri, u, v, c;
+
+  ri = 1.0f / q[0];
+  u = ri * q[1];
+  v = ri * q[2];
+  c = sqrt (gam * gm1 * (ri * q[3] - 0.5f * (u * u + v * v)));
+
+  dx = x2[0] - x1[0];
+  dy = x2[1] - x1[1];
+  *adt = fabs (u * dy - v * dx) + c * sqrt (dx * dx + dy * dy);
+
+  dx = x3[0] - x2[0];
+  dy = x3[1] - x2[1];
+  *adt += fabs (u * dy - v * dx) + c * sqrt (dx * dx + dy * dy);
+
+  dx = x4[0] - x3[0];
+  dy = x4[1] - x3[1];
+  *adt += fabs (u * dy - v * dx) + c * sqrt (dx * dx + dy * dy);
+
+  dx = x1[0] - x4[0];
+  dy = x1[1] - x4[1];
+  *adt += fabs (u * dy - v * dx) + c * sqrt (dx * dx + dy * dy);
+
+  *adt = (*adt) / cfl;
+}
 void
 update (REAL *qold, REAL *q, REAL *res, REAL *adt, REAL *rms)
 {
