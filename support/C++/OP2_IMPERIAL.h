@@ -18,6 +18,14 @@ typedef struct
 {
 } op_arg;
 
+typedef struct
+{
+} op_sparsity;
+
+typedef struct
+{
+} op_mat;
+
 typedef enum {OP_READ, OP_WRITE, OP_INC, OP_RW, OP_MIN, OP_MAX} op_access;
 
 op_map const OP_ID;
