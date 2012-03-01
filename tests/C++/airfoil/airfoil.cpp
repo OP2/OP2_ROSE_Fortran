@@ -49,7 +49,7 @@
 // OP header file
 //
 #include "OP2_OXFORD.h"
-#include "op_seq.h"
+#include "real.h"
 
 //
 // Variables referenced in kernels with global scope

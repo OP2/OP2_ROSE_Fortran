@@ -76,6 +76,10 @@ CPPOpenCLSubroutinesGeneration::createReductionSubroutines ()
     parallelLoop->getReductionsNeeded (reductionsNeeded);
   }
 
+  Debug::getInstance ()->debugMessage ("Creating reduction subroutines 2",
+      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+
+
   for (vector <Reduction *>::const_iterator it = reductionsNeeded.begin (); it
       != reductionsNeeded.end (); ++it)
   {
@@ -85,6 +89,10 @@ CPPOpenCLSubroutinesGeneration::createReductionSubroutines ()
     reductionSubroutines->addSubroutine (*it,
         subroutine->getSubroutineHeaderStatement ());
   }
+  
+  Debug::getInstance ()->debugMessage ("Creating reduction subroutines 3",
+    Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+
 }
 
 void
