@@ -29,7 +29,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-
+#include <boost/algorithm/string.hpp>
 #include "CPPOpenMPKernelSubroutineIndirectLoop.h"
 #include "RoseStatementsAndExpressionsBuilder.h"
 #include "CompilerGeneratedNames.h"
@@ -40,6 +40,7 @@
 SgStatement *
 CPPOpenMPKernelSubroutineIndirectLoop::createUserSubroutineCallStatement ()
 {
+  using boost::iequals;
   using namespace SageBuilder;
   using namespace OP2VariableNames;
   using namespace LoopVariableNames;
@@ -103,9 +104,36 @@ CPPOpenMPKernelSubroutineIndirectLoop::createUserSubroutineCallStatement ()
       SgMultiplyOp * multiplyExpression = buildMultiplyOp (addExpression1,
           buildIntVal (parallelLoop->getOpDatDimension (i)));
 
+/*		
       SgAddOp * addExpression2 = buildAddOp (
           variableDeclarations->getReference (getOpDatName (i)),
           multiplyExpression);
+*/
+		// REPLACED BY
+		
+		SgAddOp * addExpression2 = NULL;
+		
+		if (parallelLoop->isDuplicateOpDat (i))
+		{
+			int oj;
+			for (oj = 1; oj < i; oj++)
+			{
+				if (iequals (parallelLoop->getOpDatVariableName (oj), parallelLoop->getOpDatVariableName (i)) )
+					break;
+			}
+			
+			addExpression2 = buildAddOp (
+										 variableDeclarations->getReference (getOpDatName (oj)),
+										 multiplyExpression);
+		}
+		else
+		{
+			addExpression2 = buildAddOp (
+										 variableDeclarations->getReference (getOpDatName (i)),
+										 multiplyExpression);
+		}
+		
+		// END REPLACE
 
       actualParameters->append_expression (addExpression2);
     }
@@ -1213,7 +1241,7 @@ CPPOpenMPKernelSubroutineIndirectLoop::createOpDatFormalParameterDeclarations ()
     if (parallelLoop->isDuplicateOpDat (i) == false)
     {
       string const variableName = getOpDatName (i);
-
+		
       variableDeclarations->add (
           variableName,
           RoseStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
@@ -1221,6 +1249,30 @@ CPPOpenMPKernelSubroutineIndirectLoop::createOpDatFormalParameterDeclarations ()
                   parallelLoop->getOpDatBaseType (i)), subroutineScope,
               formalParameters));
     }
+	else
+	{
+		
+		/*
+		 * Duplicated direct op_arg_dat
+		 */
+/*
+		if (parallelLoop->isDirect (i))
+		{
+			string const variableName = getOpDatName (i);
+			
+			variableDeclarations->add (
+									   variableName,
+									   RoseStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (variableName,
+																														buildPointerType (
+																																		  parallelLoop->getOpDatBaseType (i)),
+																														subroutineScope,
+																														formalParameters)
+									   );
+																														
+									   
+		}
+*/
+	}
   }
 
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)

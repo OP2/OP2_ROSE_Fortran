@@ -113,6 +113,9 @@ CPPUserSubroutine::createFormalParameterDeclarations ()
                 variableName, type, subroutineScope, formalParameters);
   }
 
+/*
+ * Nicolas: unused by OPEN, CUDA ? is that needed for OpenCL ?
+ 
   for (vector <string>::const_iterator it = referencedOpDeclConsts.begin (); it
       != referencedOpDeclConsts.end (); ++it)
   {
@@ -125,6 +128,7 @@ CPPUserSubroutine::createFormalParameterDeclarations ()
             RoseStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
                 *it, type, subroutineScope, formalParameters);
   }
+*/
 }
 
 CPPUserSubroutine::CPPUserSubroutine (SgScopeStatement * moduleScope,
