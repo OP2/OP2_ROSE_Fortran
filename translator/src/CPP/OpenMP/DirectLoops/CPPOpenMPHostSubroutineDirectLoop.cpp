@@ -53,8 +53,9 @@ CPPOpenMPHostSubroutineDirectLoop::createKernelFunctionCallStatement (
 
   SgExprListExp * actualParameters = buildExprListExp ();
 
-  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
+  for (unsigned int i = 1; i <= parallelLoop->getNumberOfArgumentGroups (); ++i)
   {
+    if (parallelLoop->isOpMatArg (i)) continue;
     if (parallelLoop->isDirect (i))
     {
       actualParameters->append_expression (variableDeclarations->getReference (

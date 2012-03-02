@@ -257,8 +257,9 @@ CPPOpenCLHostSubroutine::createReductionEpilogueStatements ()
   appendStatement (buildExprStatement (moveReductionArraysToHostCall),
       subroutineScope);
 
-  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
+  for (unsigned int i = 1; i <= parallelLoop->getNumberOfArgumentGroups (); ++i)
   {
+    if (parallelLoop->isOpMatArg (i)) continue;
     if (parallelLoop->isReductionRequired (i))
     {
       appendStatement (createReductionUpdateStatements (i), subroutineScope);
@@ -445,8 +446,9 @@ CPPOpenCLHostSubroutine::createReductionPrologueStatements ()
    * ======================================================
    */
 
-  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
+  for (unsigned int i = 1; i <= parallelLoop->getNumberOfArgumentGroups (); ++i)
   {
+    if (parallelLoop->isOpMatArg (i)) continue;
     if (parallelLoop->isReductionRequired (i))
     {
       SgDotExp * dotExpression = buildDotExp (
@@ -552,8 +554,9 @@ CPPOpenCLHostSubroutine::createReductionPrologueStatements ()
    * ======================================================
    */
 
-  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
+  for (unsigned int i = 1; i <= parallelLoop->getNumberOfArgumentGroups (); ++i)
   {
+    if (parallelLoop->isOpMatArg (i)) continue;
     if (parallelLoop->isReductionRequired (i))
     {
       SgAddOp
@@ -673,8 +676,9 @@ CPPOpenCLHostSubroutine::createReductionDeclarations ()
       RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
           reductionSharedMemorySize, buildIntType (), subroutineScope));
 
-  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
+  for (unsigned int i = 1; i <= parallelLoop->getNumberOfArgumentGroups (); ++i)
   {
+    if (parallelLoop->isOpMatArg (i)) continue;
     if (parallelLoop->isReductionRequired (i))
     {
       string const reductionArrayHostName = getReductionArrayHostName (i);

@@ -142,7 +142,7 @@ CPPSyntacticFusion::fuseOPParLoopCalls (ParallelLoop* parallelLoop1, ParallelLoo
 		  it++)
 	{
 		SgScopeStatement* scope = getScope ((*it));
-		for (int i = 0; i < parallelLoop2->getNumberOfOpDatArgumentGroups (); i++)
+		for (int i = 0; i < parallelLoop2->getNumberOfArgumentGroups (); i++)
 		{
 			for ( int j = 0; j < parallelLoop1->getNumberOfOpDatArgumentGroups (); i++)
 			{

@@ -74,8 +74,9 @@ CPPOpenCLHostSubroutineDirectLoop::createKernelFunctionCallStatement (
   unsigned int argumentCounter = 0;
   bool firstAssignment = true;
 
-  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
+  for (unsigned int i = 1; i <= parallelLoop->getNumberOfArgumentGroups (); ++i)
   {
+    if (parallelLoop->isOpMatArg (i)) continue;
     if (parallelLoop->isDuplicateOpDat (i) == false)
     {
       if (parallelLoop->isDirect (i))
@@ -257,8 +258,9 @@ CPPOpenCLHostSubroutineDirectLoop::createOpenCLKernelInitialisationStatements ()
 
   appendStatement (assignmentStatement4, subroutineScope);
 
-  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
+  for (unsigned int i = 1; i <= parallelLoop->getNumberOfArgumentGroups (); ++i)
   {
+    if (parallelLoop->isOpMatArg (i)) continue;
     if (parallelLoop->isDuplicateOpDat (i) == false)
     {
       if (parallelLoop->isDirect (i))

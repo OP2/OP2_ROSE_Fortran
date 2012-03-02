@@ -53,8 +53,9 @@ CPPOpenCLKernelSubroutineDirectLoop::createUserSubroutineCallStatement ()
 
   SgExprListExp * actualParameters = buildExprListExp ();
 
-  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
+  for (unsigned int i = 1; i <= parallelLoop->getNumberOfArgumentGroups (); ++i)
   {
+    if (parallelLoop->isOpMatArg (i)) continue;
     SgExpression * parameterExpression;
 
     if (parallelLoop->isDirect (i))
@@ -384,8 +385,9 @@ CPPOpenCLKernelSubroutineDirectLoop::createExecutionLoopStatements ()
 
   appendStatement (assignmentStatement2, loopBody);
 
-  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
+  for (unsigned int i = 1; i <= parallelLoop->getNumberOfArgumentGroups (); ++i)
   {
+    if (parallelLoop->isOpMatArg (i)) continue;
     if (parallelLoop->isGlobal (i) == false && parallelLoop->isWritten (i)
         == false && parallelLoop->getOpDatDimension (i) > 1)
     {
@@ -409,8 +411,9 @@ CPPOpenCLKernelSubroutineDirectLoop::createExecutionLoopStatements ()
 
   appendStatement (createUserSubroutineCallStatement (), loopBody);
 
-  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
+  for (unsigned int i = 1; i <= parallelLoop->getNumberOfArgumentGroups (); ++i)
   {
+    if (parallelLoop->isOpMatArg (i)) continue;
     if (parallelLoop->isGlobal (i) == false && parallelLoop->isRead (i)
         == false && parallelLoop->getOpDatDimension (i) > 1)
     {
@@ -570,8 +573,9 @@ CPPOpenCLKernelSubroutineDirectLoop::createStageInVariableDeclarations ()
   Debug::getInstance ()->debugMessage ("Creating local thread variables",
       Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
-  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
+  for (unsigned int i = 1; i <= parallelLoop->getNumberOfArgumentGroups (); ++i)
   {
+    if (parallelLoop->isOpMatArg (i)) continue;
     if (parallelLoop->isDuplicateOpDat (i) == false)
     {
       if (parallelLoop->isDirect (i) && parallelLoop->getOpDatDimension (i) > 1)
@@ -646,8 +650,9 @@ CPPOpenCLKernelSubroutineDirectLoop::createOpDatFormalParameterDeclarations ()
       "Creating OP_DAT formal parameter declarations", Debug::FUNCTION_LEVEL,
       __FILE__, __LINE__);
 
-  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
+  for (unsigned int i = 1; i <= parallelLoop->getNumberOfArgumentGroups (); ++i)
   {
+    if (parallelLoop->isOpMatArg (i)) continue;
     if (parallelLoop->isDuplicateOpDat (i) == false)
     {
       if (parallelLoop->isReductionRequired (i))

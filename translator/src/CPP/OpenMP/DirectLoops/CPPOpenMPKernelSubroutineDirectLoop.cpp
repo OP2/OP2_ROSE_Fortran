@@ -48,8 +48,9 @@ CPPOpenMPKernelSubroutineDirectLoop::createUserSubroutineCallStatement ()
 
   SgExprListExp * actualParameters = buildExprListExp ();
 
-  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
+  for (unsigned int i = 1; i <= parallelLoop->getNumberOfArgumentGroups (); ++i)
   {
+    if (parallelLoop->isOpMatArg (i)) continue;
     if (parallelLoop->isDirect (i))
     {
       SgMultiplyOp * multiplyExpression = buildMultiplyOp (
@@ -154,8 +155,9 @@ CPPOpenMPKernelSubroutineDirectLoop::createOpDatFormalParameterDeclarations ()
   using namespace OP2VariableNames;
   using std::string;
 
-  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
+  for (unsigned int i = 1; i <= parallelLoop->getNumberOfArgumentGroups (); ++i)
   {
+    if (parallelLoop->isOpMatArg (i)) continue;
     string const & opDatvariableName = getOpDatName (i);
 
     variableDeclarations->add (

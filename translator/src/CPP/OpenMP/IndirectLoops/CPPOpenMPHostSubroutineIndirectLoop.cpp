@@ -57,8 +57,9 @@ CPPOpenMPHostSubroutineIndirectLoop::createKernelFunctionCallStatement (
 
   SgExprListExp * actualParameters = buildExprListExp ();
 
-  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
+  for (unsigned int i = 1; i <= parallelLoop->getNumberOfArgumentGroups (); ++i)
   {
+    if (parallelLoop->isOpMatArg (i)) continue;
     if (parallelLoop->isDuplicateOpDat (i) == false)
     {
       if (parallelLoop->isReductionRequired (i))
@@ -83,8 +84,9 @@ CPPOpenMPHostSubroutineIndirectLoop::createKernelFunctionCallStatement (
 
   unsigned int arrayIndex = 0;
 
-  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
+  for (unsigned int i = 1; i <= parallelLoop->getNumberOfArgumentGroups (); ++i)
   {
+    if (parallelLoop->isOpMatArg (i)) continue;
     if (parallelLoop->isDuplicateOpDat (i) == false)
     {
       if (parallelLoop->isIndirect (i))
@@ -105,8 +107,9 @@ CPPOpenMPHostSubroutineIndirectLoop::createKernelFunctionCallStatement (
     }
   }
 
-  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
+  for (unsigned int i = 1; i <= parallelLoop->getNumberOfArgumentGroups (); ++i)
   {
+    if (parallelLoop->isOpMatArg (i)) continue;
     if (parallelLoop->isIndirect (i))
     {
       SgVariableDeclaration * variableDeclaration = buildVariableDeclaration (

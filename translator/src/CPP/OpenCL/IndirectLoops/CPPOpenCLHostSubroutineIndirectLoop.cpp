@@ -78,8 +78,9 @@ CPPOpenCLHostSubroutineIndirectLoop::createKernelFunctionCallStatement (
   unsigned int argumentCounter = 0;
   bool firstAssignment = true;
 
-  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
+  for (unsigned int i = 1; i <= parallelLoop->getNumberOfArgumentGroups (); ++i)
   {
+    if (parallelLoop->isOpMatArg (i)) continue;
     if (parallelLoop->isDuplicateOpDat (i) == false)
     {
       SgDotExp * dotExpression = buildDotExp (
@@ -125,8 +126,9 @@ CPPOpenCLHostSubroutineIndirectLoop::createKernelFunctionCallStatement (
 
   unsigned int arrayIndex = 0;
 
-  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
+  for (unsigned int i = 1; i <= parallelLoop->getNumberOfArgumentGroups (); ++i)
   {
+    if (parallelLoop->isOpMatArg (i)) continue;
     if (parallelLoop->isDuplicateOpDat (i) == false)
     {
       if (parallelLoop->isIndirect (i))
@@ -168,8 +170,9 @@ CPPOpenCLHostSubroutineIndirectLoop::createKernelFunctionCallStatement (
    * ======================================================
    */
 
-  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
+  for (unsigned int i = 1; i <= parallelLoop->getNumberOfArgumentGroups (); ++i)
   {
+    if (parallelLoop->isOpMatArg (i)) continue;
     if (parallelLoop->isIndirect (i))
     {
       SgVariableDeclaration * variableDeclaration = buildVariableDeclaration (
