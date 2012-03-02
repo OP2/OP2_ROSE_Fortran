@@ -53,10 +53,12 @@ CPPCUDAKernelSubroutineDirectLoop::createUserSubroutineCallStatement ()
 
   SgExprListExp * actualParameters = buildExprListExp ();
 
-  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
+  for (unsigned int i = 1; i <= parallelLoop->getNumberOfArgumentGroups (); ++i)
   {
+    if (parallelLoop->isOpMatArg (i)) continue;
     SgExpression * parameterExpression;
 
+    unsigned int dat_num = parallelLoop->getOpDatArgNum (i);
     if (parallelLoop->isDirect (i))
     {
       Debug::getInstance ()->debugMessage ("Direct OP_DAT",
@@ -65,13 +67,13 @@ CPPCUDAKernelSubroutineDirectLoop::createUserSubroutineCallStatement ()
       if (parallelLoop->getOpDatDimension (i) == 1)
       {
         parameterExpression = buildAddOp (variableDeclarations->getReference (
-            getOpDatName (i)), variableDeclarations->getReference (
+            getOpDatName (dat_num)), variableDeclarations->getReference (
             getIterationCounterVariableName (1)));
       }
       else
       {
         parameterExpression = variableDeclarations->getReference (
-            getOpDatLocalName (i));
+            getOpDatLocalName (dat_num));
       }
     }
     else if (parallelLoop->isReductionRequired (i))
@@ -80,7 +82,7 @@ CPPCUDAKernelSubroutineDirectLoop::createUserSubroutineCallStatement ()
           Debug::OUTER_LOOP_LEVEL, __FILE__, __LINE__);
 
       parameterExpression = variableDeclarations->getReference (
-          getOpDatLocalName (i));
+          getOpDatLocalName (dat_num));
     }
     else
     {
@@ -90,12 +92,12 @@ CPPCUDAKernelSubroutineDirectLoop::createUserSubroutineCallStatement ()
       if (parallelLoop->isPointer (i) || parallelLoop->isArray (i))
       {
         parameterExpression = variableDeclarations->getReference (
-            getOpDatLocalName (i));
+            getOpDatLocalName (dat_num));
       }
       else
       {
         parameterExpression = variableDeclarations->getReference (getOpDatName (
-            i));
+            dat_num));
       }
     }
 
@@ -136,7 +138,8 @@ CPPCUDAKernelSubroutineDirectLoop::createStageInFromDeviceMemoryToSharedMemorySt
   SgAddOp * addExpression2 = buildAddOp (addExpression1, multiplyExpression2);
 
   SgPntrArrRefExp * arrayExpression1 = buildPntrArrRefExp (
-      variableDeclarations->getReference (getOpDatName (OP_DAT_ArgumentGroup)),
+      variableDeclarations->getReference (getOpDatName (
+      parallelLoop->getOpDatArgNum (OP_DAT_ArgumentGroup))),
       addExpression2);
 
   SgCastExp * castExpression1 = buildCastExp (
@@ -197,7 +200,8 @@ CPPCUDAKernelSubroutineDirectLoop::createStageInFromSharedMemoryToLocalMemorySta
 
   SgPntrArrRefExp * arrayExpression2 = buildPntrArrRefExp (
       variableDeclarations->getReference (getOpDatLocalName (
-          OP_DAT_ArgumentGroup)), variableDeclarations->getReference (
+          parallelLoop->getOpDatArgNum (OP_DAT_ArgumentGroup))),
+          variableDeclarations->getReference (
           getIterationCounterVariableName (2)));
 
   SgExprStatement * assignmentStatement1 = buildAssignStatement (
@@ -249,7 +253,8 @@ CPPCUDAKernelSubroutineDirectLoop::createStageOutFromSharedMemoryToDeviceMemoryS
   SgAddOp * addExpression2 = buildAddOp (addExpression1, multiplyExpression2);
 
   SgPntrArrRefExp * arrayExpression1 = buildPntrArrRefExp (
-      variableDeclarations->getReference (getOpDatName (OP_DAT_ArgumentGroup)),
+      variableDeclarations->getReference (getOpDatName (
+      parallelLoop->getOpDatArgNum (OP_DAT_ArgumentGroup))),
       addExpression2);
 
   SgCastExp * castExpression1 = buildCastExp (
@@ -310,7 +315,7 @@ CPPCUDAKernelSubroutineDirectLoop::createStageOutFromLocalMemoryToSharedMemorySt
 
   SgPntrArrRefExp * arrayExpression2 = buildPntrArrRefExp (
       variableDeclarations->getReference (getOpDatLocalName (
-          OP_DAT_ArgumentGroup)), variableDeclarations->getReference (
+          parallelLoop->getOpDatArgNum (OP_DAT_ArgumentGroup))), variableDeclarations->getReference (
           getIterationCounterVariableName (2)));
 
   SgExprStatement * assignmentStatement1 = buildAssignStatement (
@@ -370,8 +375,9 @@ CPPCUDAKernelSubroutineDirectLoop::createExecutionLoopStatements ()
 
   appendStatement (assignmentStatement2, loopBody);
 
-  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
+  for (unsigned int i = 1; i <= parallelLoop->getNumberOfArgumentGroups (); ++i)
   {
+    if (parallelLoop->isOpMatArg (i)) continue;
     if (parallelLoop->isGlobal (i) == false && parallelLoop->isWritten (i)
         == false && parallelLoop->getOpDatDimension (i) > 1)
     {
@@ -395,8 +401,9 @@ CPPCUDAKernelSubroutineDirectLoop::createExecutionLoopStatements ()
 
   appendStatement (createUserSubroutineCallStatement (), loopBody);
 
-  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
+  for (unsigned int i = 1; i <= parallelLoop->getNumberOfArgumentGroups (); ++i)
   {
+    if (parallelLoop->isOpMatArg (i)) continue;
     if (parallelLoop->isGlobal (i) == false && parallelLoop->isRead (i)
         == false && parallelLoop->getOpDatDimension (i) > 1)
     {
@@ -537,13 +544,15 @@ CPPCUDAKernelSubroutineDirectLoop::createStageInVariableDeclarations ()
   Debug::getInstance ()->debugMessage ("Creating local thread variables",
       Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
-  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
+  for (unsigned int i = 1; i <= parallelLoop->getNumberOfArgumentGroups (); ++i)
   {
+    if (parallelLoop->isOpMatArg (i)) continue;
+    unsigned int dat_num = parallelLoop->getOpDatArgNum (i);
     if (parallelLoop->isDuplicateOpDat (i) == false)
     {
       if (parallelLoop->isDirect (i) && parallelLoop->getOpDatDimension (i) > 1)
       {
-        string const & variableName = getOpDatLocalName (i);
+        string const & variableName = getOpDatLocalName (dat_num);
 
         variableDeclarations ->add (variableName,
             RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
@@ -647,8 +656,9 @@ CPPCUDAKernelSubroutineDirectLoop::createOpDatFormalParameterDeclarations ()
       "Creating OP_DAT formal parameter declarations", Debug::FUNCTION_LEVEL,
       __FILE__, __LINE__);
 
-  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
+  for (unsigned int i = 1; i <= parallelLoop->getNumberOfArgumentGroups (); ++i)
   {
+    if (parallelLoop->isOpMatArg (i)) continue;
     if (parallelLoop->isDuplicateOpDat (i) == false)
     {
       if (parallelLoop->isReductionRequired (i))
@@ -683,7 +693,7 @@ CPPCUDAKernelSubroutineDirectLoop::createOpDatFormalParameterDeclarations ()
         Debug::getInstance ()->debugMessage ("Read",
             Debug::HIGHEST_DEBUG_LEVEL, __FILE__, __LINE__);
 
-        string const & variableName = getOpDatName (i);
+        string const & variableName = getOpDatName (parallelLoop->getOpDatArgNum (i));
       }
     }
   }

@@ -200,6 +200,9 @@ namespace OP2VariableNames
   std::string const
   getOpMatName (unsigned int n);
 
+  std::string const
+  getOpMatEntryName (unsigned int n);
+
   /*
    * ======================================================
    * Returns the name of an OP_DAT variable in this OP_DAT

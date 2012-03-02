@@ -95,6 +95,9 @@ namespace OP2
     std::string const dat_d = "dat_d";
     std::string const data = "data";
     std::string const data_d = "data_d";
+    std::string const colptr_d = "colptr_d";
+    std::string const rowptr_d = "rowptr_d";
+    std::string const nrow = "nrow";
     std::string const dim = "dim";
     std::string const index = "index";
     std::string const set = "set";

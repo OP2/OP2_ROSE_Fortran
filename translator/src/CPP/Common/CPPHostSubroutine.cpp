@@ -54,14 +54,15 @@ CPPHostSubroutine::createInitialisePlanFunctionArrayStatements ()
 
   SgBasicBlock * block = buildBasicBlock ();
 
-  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
+  for (unsigned int i = 1; i <= parallelLoop->getNumberOfArgumentGroups (); ++i)
   {
+    if (parallelLoop->isOpMatArg (i)) continue;
+    unsigned int dat_num = parallelLoop->getOpDatArgNum (i);
     SgPntrArrRefExp * arrayIndexExpression = buildPntrArrRefExp (
-        variableDeclarations->getReference (opDatArray), buildIntVal (i - 1));
+        variableDeclarations->getReference (opDatArray), buildIntVal (dat_num - 1));
 
     SgExprStatement * assignmentStatement = buildAssignStatement (
-        arrayIndexExpression, variableDeclarations->getReference (getOpDatName (
-            i)));
+        arrayIndexExpression, variableDeclarations->getReference (getOpDatName (dat_num)));
 
     appendStatement (assignmentStatement, block);
   }
@@ -69,11 +70,13 @@ CPPHostSubroutine::createInitialisePlanFunctionArrayStatements ()
   map <string, unsigned int> indirectOpDatsToIndirection;
   unsigned int indirection = 0;
 
-  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
+  for (unsigned int i = 1; i <= parallelLoop->getNumberOfArgumentGroups (); ++i)
   {
+    if (parallelLoop->isOpMatArg (i)) continue;
+    unsigned int dat_num = parallelLoop->getOpDatArgNum (i);
     SgPntrArrRefExp * arrayIndexExpression = buildPntrArrRefExp (
         variableDeclarations->getReference (indirectionDescriptorArray),
-        buildIntVal (i - 1));
+        buildIntVal (dat_num - 1));
 
     SgExprStatement * assignmentStatement;
 
@@ -84,7 +87,7 @@ CPPHostSubroutine::createInitialisePlanFunctionArrayStatements ()
         assignmentStatement = buildAssignStatement (arrayIndexExpression,
             buildIntVal (indirection));
 
-        indirectOpDatsToIndirection[parallelLoop->getOpDatVariableName (i)]
+        indirectOpDatsToIndirection[parallelLoop->getOpDatVariableName (dat_num)]
             = indirection;
 
         indirection++;
@@ -93,8 +96,7 @@ CPPHostSubroutine::createInitialisePlanFunctionArrayStatements ()
       {
         assignmentStatement = buildAssignStatement (arrayIndexExpression,
             buildIntVal (
-                indirectOpDatsToIndirection[parallelLoop->getOpDatVariableName (
-                    i)]));
+                indirectOpDatsToIndirection[parallelLoop->getOpDatVariableName (dat_num)]));
       }
     }
     else
@@ -157,14 +159,22 @@ CPPHostSubroutine::createFormalParameterDeclarations ()
    * ======================================================
    */
 
-  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
+  for (unsigned int i = 1; i <= parallelLoop->getNumberOfArgumentGroups (); ++i)
   {
-    string const & opDatvariableName = getOpDatName (i);
+    string variableName;
+    if (parallelLoop->isOpMatArg (i))
+    {
+      variableName = getOpMatName (parallelLoop->getOpMatArgNum (i));
+    }
+    else
+    {
+      variableName = getOpDatName (parallelLoop->getOpDatArgNum (i));
+    }
 
     variableDeclarations->add (
-        opDatvariableName,
+        variableName,
         RoseStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
-            opDatvariableName, buildOpaqueType (OP2::OP_ARG, subroutineScope),
+            variableName, buildOpaqueType (OP2::OP_ARG, subroutineScope),
             subroutineScope, formalParameters));
   }
 }
