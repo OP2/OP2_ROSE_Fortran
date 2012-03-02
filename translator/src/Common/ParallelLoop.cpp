@@ -68,13 +68,32 @@ ParallelLoop::getNumberOfOpDatArgumentGroups ()
 }
 
 void
+ParallelLoop::setNumberOfOpMatArgumentGroups (unsigned int n)
+{
+  this->numberOfOpMats = n;
+}
+
+unsigned int
+ParallelLoop::getNumberOfOpMatArgumentGroups ()
+{
+  return numberOfOpMats;
+}
+
+unsigned int
+ParallelLoop::getNumberOfArgumentGroups ()
+{
+  return numberOfOpDats + numberOfOpMats;
+}
+
+void
 ParallelLoop::checkArguments ()
 {
   using boost::lexical_cast;
   using std::string;
 
-  for (unsigned int i = 1; i <= getNumberOfOpDatArgumentGroups (); ++i)
+  for (unsigned int i = 1; i <= getNumberOfArgumentGroups (); ++i)
   {
+    if (isOpMatArg (i)) continue;
     if (OpDatMappingDescriptors[i] == GLOBAL)
     {
       if (OpDatAccessDescriptors[i] == RW_ACCESS)
@@ -98,9 +117,9 @@ ParallelLoop::checkArguments ()
 bool
 ParallelLoop::isDirectLoop ()
 {
-  for (unsigned int i = 1; i <= getNumberOfOpDatArgumentGroups (); ++i)
+  for (unsigned int i = 1; i <= getNumberOfArgumentGroups (); ++i)
   {
-    if (OpDatMappingDescriptors[i] == INDIRECT)
+    if (isOpMatArg (i) || OpDatMappingDescriptors[i] == INDIRECT)
     {
       return false;
     }
@@ -248,8 +267,9 @@ unsigned int
 ParallelLoop::getNumberOfIndirectOpDats ()
 {
   int count = 0;
-  for (unsigned int i = 1; i <= getNumberOfOpDatArgumentGroups (); ++i)
+  for (unsigned int i = 1; i <= getNumberOfArgumentGroups (); ++i)
   {
+    if (isOpMatArg (i)) continue;
     if (OpDatMappingDescriptors[i] == INDIRECT)
     {
       count++;
@@ -262,8 +282,9 @@ unsigned int
 ParallelLoop::getNumberOfDistinctIndirectOpDats ()
 {
   int count = 0;
-  for (unsigned int i = 1; i <= getNumberOfOpDatArgumentGroups (); ++i)
+  for (unsigned int i = 1; i <= getNumberOfArgumentGroups (); ++i)
   {
+    if (isOpMatArg (i)) continue;
     if (isIndirect (i) && isDuplicateOpDat (i) == false)
     {
       count++;
@@ -275,8 +296,9 @@ ParallelLoop::getNumberOfDistinctIndirectOpDats ()
 bool
 ParallelLoop::hasIncrementedOpDats ()
 {
-  for (unsigned int i = 1; i <= getNumberOfOpDatArgumentGroups (); ++i)
+  for (unsigned int i = 1; i <= getNumberOfArgumentGroups (); ++i)
   {
+    if (isOpMatArg (i)) continue;
     if (isReductionRequired (i) == false && isIncremented (i))
     {
       return true;
@@ -302,8 +324,9 @@ ParallelLoop::isReductionRequired (int OP_DAT_ArgumentGroup)
 bool
 ParallelLoop::isReductionRequired ()
 {  
-  for (unsigned int i = 1; i <= getNumberOfOpDatArgumentGroups (); ++i)
+  for (unsigned int i = 1; i <= getNumberOfArgumentGroups (); ++i)
   {
+    if (isOpMatArg (i)) continue;
     if (isReductionRequired (i))
     {
       return true;
@@ -372,8 +395,9 @@ ParallelLoop::getMaximumSizeOfOpDat ()
 
   unsigned int maximumSize = 0;
 
-  for (unsigned int i = 1; i <= getNumberOfOpDatArgumentGroups (); ++i)
+  for (unsigned int i = 1; i <= getNumberOfArgumentGroups (); ++i)
   {
+    if (isOpMatArg(i)) continue;
     maximumSize = max (maximumSize, getSizeOfOpDat (i));
   }
 
@@ -391,6 +415,54 @@ void
 ParallelLoop::setUniqueOpDat (std::string const & variableName)
 {
   uniqueOpDats.push_back (variableName);
+}
+
+bool
+ParallelLoop::isOpMatArg (unsigned int n)
+{
+  return actuallyOpMat[n];
+}
+
+void
+ParallelLoop::setIsOpMatArg (unsigned int n, bool isOpMat)
+{
+  actuallyOpMat[n] = isOpMat;
+}
+
+void
+ParallelLoop::setOpMatArgNum (unsigned int n, unsigned int m)
+{
+  opMatNumber[n] = m;
+}
+
+unsigned int
+ParallelLoop::getOpMatArgNum (unsigned int n)
+{
+  return opMatNumber[n];
+}
+
+void
+ParallelLoop::setOpDatArgNum (unsigned int n, unsigned int m)
+{
+  opDatNumber[n] = m;
+}
+
+unsigned int
+ParallelLoop::getOpDatArgNum (unsigned int n)
+{
+  return opDatNumber[n];
+}
+
+void
+ParallelLoop::setOpMatArg (unsigned int n, OpArgMatDefinition *arg)
+{
+  opMats[n] = arg;
+}
+
+OpArgMatDefinition *
+ParallelLoop::getOpMatArg (unsigned int n)
+{
+  return opMats[n];
 }
 
 bool
@@ -470,8 +542,9 @@ ParallelLoop::getReductionsNeeded (std::vector <Reduction *> & reductions)
 {
   using std::vector;
 
-  for (unsigned int i = 1; i <= getNumberOfOpDatArgumentGroups (); ++i)
+  for (unsigned int i = 1; i <= getNumberOfArgumentGroups (); ++i)
   {
+    if (isOpMatArg(i)) continue;
     if (isReductionRequired (i))
     {
       Reduction * reduction = getReductionTuple (i);

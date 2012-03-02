@@ -261,4 +261,9 @@ class OpConstDefinition: public OP2Definition
     getDimension () const;
 };
 
+class OpArgMatDefinition: public OP2Definition
+{
+
+};
+
 #endif

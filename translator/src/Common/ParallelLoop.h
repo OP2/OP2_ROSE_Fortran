@@ -41,6 +41,7 @@
 class SgFunctionCallExp;
 class SgType;
 class Reduction;
+class OpArgMatDefinition;
 
 enum MAPPING_VALUE
 {
@@ -154,6 +155,24 @@ class ParallelLoop
      */
     unsigned int numberOfOpDats;
 
+    /*
+     * Does this argument group actually describe an OP_ARG_MAT?
+     */
+    std::map <unsigned int, bool> actuallyOpMat;
+
+    /*
+     * Which op_arg_mat does this argument group correspond to?
+     */
+    std::map <unsigned int, unsigned int> opMatNumber;
+
+    std::map <unsigned int, unsigned int> opDatNumber;
+    /*
+     * The actual op_arg_mat.
+     */
+    std::map <unsigned int, OpArgMatDefinition *> opMats;
+
+    unsigned int numberOfOpMats;
+
   protected:
 
     ParallelLoop (SgFunctionCallExp * functionCallExpression);
@@ -176,6 +195,14 @@ class ParallelLoop
     unsigned int
     getNumberOfOpDatArgumentGroups ();
 
+    void
+    setNumberOfOpMatArgumentGroups (unsigned int n);
+
+    unsigned int
+    getNumberOfOpMatArgumentGroups ();
+
+    unsigned int
+    getNumberOfArgumentGroups ();
     /*
      * ======================================================
      * Checks the consistency of the OP_DAT arguments with
@@ -344,6 +371,30 @@ class ParallelLoop
 
     void
     setUniqueOpDat (std::string const & variableName);
+
+    bool
+    isOpMatArg (unsigned int n);
+
+    void
+    setIsOpMatArg (unsigned int n, bool isOpMat);
+
+    void
+    setOpMatArgNum (unsigned int n, unsigned int m);
+
+    unsigned int
+    getOpMatArgNum (unsigned int n);
+
+    void
+    setOpMatArg (unsigned int n, OpArgMatDefinition *);
+
+    OpArgMatDefinition *
+    getOpMatArg (unsigned int n);
+
+    unsigned int
+    getOpDatArgNum (unsigned int n);
+
+    void
+    setOpDatArgNum (unsigned int n, unsigned int m);
 
     /*
      * ======================================================
