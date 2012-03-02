@@ -92,8 +92,9 @@ CPPOpenMPHostSubroutine::createOpDatTypeCastStatements ()
 
   SgBasicBlock * block = buildBasicBlock ();
 
-  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
+  for (unsigned int i = 1; i <= parallelLoop->getNumberOfArgumentGroups (); ++i)
   {
+    if (parallelLoop->isOpMatArg (i)) continue;
     SgDotExp * dotExpression = buildDotExp (variableDeclarations->getReference (
         getOpDatName (i)), buildOpaqueVarRefExp (data, subroutineScope));
 
@@ -121,8 +122,9 @@ CPPOpenMPHostSubroutine::createOpDatTypeCastVariableDeclarations ()
       "Creating local variable declarations to enable OP_DATs to be type cast into their correct types",
       Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
-  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
+  for (unsigned int i = 1; i <= parallelLoop->getNumberOfArgumentGroups (); ++i)
   {
+    if (parallelLoop->isOpMatArg (i)) continue;
     std::string const & variableName = getOpDatLocalName (i);
 
     variableDeclarations->add (variableName,
@@ -147,8 +149,9 @@ CPPOpenMPHostSubroutine::createReductionEpilogueStatements ()
       "Creating reduction epilogue statements", Debug::FUNCTION_LEVEL,
       __FILE__, __LINE__);
 
-  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
+  for (unsigned int i = 1; i <= parallelLoop->getNumberOfArgumentGroups (); ++i)
   {
+    if (parallelLoop->isOpMatArg (i)) continue;
     if (parallelLoop->isReductionRequired (i))
     {
       SgBasicBlock * loopBody = buildBasicBlock ();
@@ -216,8 +219,9 @@ CPPOpenMPHostSubroutine::createReductionPrologueStatements ()
       "Creating reduction prologue statements", Debug::FUNCTION_LEVEL,
       __FILE__, __LINE__);
 
-  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
+  for (unsigned int i = 1; i <= parallelLoop->getNumberOfArgumentGroups (); ++i)
   {
+    if (parallelLoop->isOpMatArg (i)) continue;
     if (parallelLoop->isReductionRequired (i))
     {
       SgBasicBlock * loopBody = buildBasicBlock ();
@@ -306,8 +310,9 @@ CPPOpenMPHostSubroutine::createReductionDeclarations ()
       RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
           getIterationCounterVariableName (2), buildIntType (), subroutineScope));
 
-  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
+  for (unsigned int i = 1; i <= parallelLoop->getNumberOfArgumentGroups (); ++i)
   {
+    if (parallelLoop->isOpMatArg (i)) continue;
     if (parallelLoop->isReductionRequired (i))
     {
       std::string const & variableName = getReductionArrayHostName (i);

@@ -58,8 +58,9 @@ CPPOpenCLKernelSubroutineIndirectLoop::createUserSubroutineCallStatement ()
 
   SgExprListExp * actualParameters = buildExprListExp ();
 
-  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
+  for (unsigned int i = 1; i <= parallelLoop->getNumberOfArgumentGroups (); ++i)
   {
+    if (parallelLoop->isOpMatArg (i)) continue;
     SgExpression * parameterExpression;
 
     if (parallelLoop->isIndirect (i))
@@ -173,8 +174,9 @@ CPPOpenCLKernelSubroutineIndirectLoop::createIncrementAndWriteAccessEpilogueStat
 
   SgBasicBlock * block = buildBasicBlock ();
 
-  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
+  for (unsigned int i = 1; i <= parallelLoop->getNumberOfArgumentGroups (); ++i)
   {
+    if (parallelLoop->isOpMatArg (i)) continue;
     if (parallelLoop->isDuplicateOpDat (i) == false)
     {
       if (parallelLoop->isIndirect (i))
@@ -293,8 +295,9 @@ CPPOpenCLKernelSubroutineIndirectLoop::createStageOutFromLocalMemoryToSharedMemo
 
   SgBasicBlock * ifBody = buildBasicBlock ();
 
-  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
+  for (unsigned int i = 1; i <= parallelLoop->getNumberOfArgumentGroups (); ++i)
   {
+    if (parallelLoop->isOpMatArg (i)) continue;
     if (parallelLoop->isIndirect (i) && parallelLoop->isIncremented (i))
     {
       SgBasicBlock * innerLoopBody = buildBasicBlock ();
@@ -400,8 +403,9 @@ CPPOpenCLKernelSubroutineIndirectLoop::createInitialiseIncrementAccessStatements
 
   SgBasicBlock * block = buildBasicBlock ();
 
-  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
+  for (unsigned int i = 1; i <= parallelLoop->getNumberOfArgumentGroups (); ++i)
   {
+    if (parallelLoop->isOpMatArg (i)) continue;
     if (parallelLoop->isIndirect (i) && parallelLoop->isIncremented (i))
     {
       Debug::getInstance ()->debugMessage ("Creating statements for OP_DAT "
@@ -563,8 +567,9 @@ CPPOpenCLKernelSubroutineIndirectLoop::createInitialiseOpenCLSharedVariablesStat
 
   SgBasicBlock * block = buildBasicBlock ();
 
-  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
+  for (unsigned int i = 1; i <= parallelLoop->getNumberOfArgumentGroups (); ++i)
   {
+    if (parallelLoop->isOpMatArg (i)) continue;
     if (parallelLoop->isDuplicateOpDat (i) == false)
     {
       if (parallelLoop->isIndirect (i))
@@ -707,8 +712,9 @@ CPPOpenCLKernelSubroutineIndirectLoop::createSetIndirectionMapPointerStatements 
 
   unsigned int offset = 0;
 
-  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
+  for (unsigned int i = 1; i <= parallelLoop->getNumberOfArgumentGroups (); ++i)
   {
+    if (parallelLoop->isOpMatArg (i)) continue;
     if (parallelLoop->isDuplicateOpDat (i) == false)
     {
       if (parallelLoop->isIndirect (i))
@@ -782,8 +788,9 @@ CPPOpenCLKernelSubroutineIndirectLoop::createSetOpDatSharedMemoryPointerStatemen
 
   unsigned int indirectOpDatCounter = 0;
 
-  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
+  for (unsigned int i = 1; i <= parallelLoop->getNumberOfArgumentGroups (); ++i)
   {
+    if (parallelLoop->isOpMatArg (i)) continue;
     if (parallelLoop->isDuplicateOpDat (i) == false)
     {
       if (parallelLoop->isIndirect (i))
@@ -870,8 +877,9 @@ CPPOpenCLKernelSubroutineIndirectLoop::createSetNumberOfIndirectElementsPerBlock
 
   unsigned int offset = 0;
 
-  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
+  for (unsigned int i = 1; i <= parallelLoop->getNumberOfArgumentGroups (); ++i)
   {
+    if (parallelLoop->isOpMatArg (i)) continue;
     if (parallelLoop->isDuplicateOpDat (i) == false)
     {
       if (parallelLoop->isIndirect (i))
@@ -1145,8 +1153,9 @@ CPPOpenCLKernelSubroutineIndirectLoop::createStageInVariableDeclarations ()
   Debug::getInstance ()->debugMessage ("Creating local thread variables",
       Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
-  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
+  for (unsigned int i = 1; i <= parallelLoop->getNumberOfArgumentGroups (); ++i)
   {
+    if (parallelLoop->isOpMatArg (i)) continue;
     if (parallelLoop->isIndirect (i) && parallelLoop->isIncremented (i))
     {
       string const & variableName = getOpDatLocalName (i);
@@ -1230,8 +1239,9 @@ CPPOpenCLKernelSubroutineIndirectLoop::createLocalVariableDeclarations ()
     createReductionVariableDeclarations ();
   }
 
-  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
+  for (unsigned int i = 1; i <= parallelLoop->getNumberOfArgumentGroups (); ++i)
   {
+    if (parallelLoop->isOpMatArg (i)) continue;
     if (parallelLoop->isDuplicateOpDat (i) == false)
     {
       if (parallelLoop->isIndirect (i))
@@ -1254,8 +1264,9 @@ CPPOpenCLKernelSubroutineIndirectLoop::createLocalVariableDeclarations ()
     }
   }
 
-  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
+  for (unsigned int i = 1; i <= parallelLoop->getNumberOfArgumentGroups (); ++i)
   {
+    if (parallelLoop->isOpMatArg (i)) continue;
     if (parallelLoop->isDuplicateOpDat (i) == false)
     {
       if (parallelLoop->isIndirect (i))
@@ -1277,8 +1288,9 @@ CPPOpenCLKernelSubroutineIndirectLoop::createLocalVariableDeclarations ()
     }
   }
 
-  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
+  for (unsigned int i = 1; i <= parallelLoop->getNumberOfArgumentGroups (); ++i)
   {
+    if (parallelLoop->isOpMatArg (i)) continue;
     if (parallelLoop->isDuplicateOpDat (i) == false)
     {
       if (parallelLoop->isIndirect (i))
@@ -1496,8 +1508,9 @@ CPPOpenCLKernelSubroutineIndirectLoop::createOpDatFormalParameterDeclarations ()
   Debug::getInstance ()->debugMessage ("Creating OP_DAT formal parameters",
       Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
-  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
+  for (unsigned int i = 1; i <= parallelLoop->getNumberOfArgumentGroups (); ++i)
   {
+    if (parallelLoop->isOpMatArg (i)) continue;
     if (parallelLoop->isDuplicateOpDat (i) == false)
     {
       if (parallelLoop->isReductionRequired (i))
@@ -1563,8 +1576,9 @@ CPPOpenCLKernelSubroutineIndirectLoop::createOpDatFormalParameterDeclarations ()
     }
   }
 
-  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
+  for (unsigned int i = 1; i <= parallelLoop->getNumberOfArgumentGroups (); ++i)
   {
+    if (parallelLoop->isOpMatArg (i)) continue;
     if (parallelLoop->isDuplicateOpDat (i) == false)
     {
       if (parallelLoop->isIndirect (i))
@@ -1584,8 +1598,9 @@ CPPOpenCLKernelSubroutineIndirectLoop::createOpDatFormalParameterDeclarations ()
     }
   }
 
-  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
+  for (unsigned int i = 1; i <= parallelLoop->getNumberOfArgumentGroups (); ++i)
   {
+    if (parallelLoop->isOpMatArg (i)) continue;
     if (parallelLoop->isIndirect (i))
     {
       string const & variableName = getGlobalToLocalMappingName (i);

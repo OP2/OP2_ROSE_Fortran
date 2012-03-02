@@ -52,8 +52,9 @@ CPPOpenCLKernelSubroutine::createReductionPrologueStatements ()
       "Creating reduction prologue statements", Debug::FUNCTION_LEVEL,
       __FILE__, __LINE__);
 
-  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
+  for (unsigned int i = 1; i <= parallelLoop->getNumberOfArgumentGroups (); ++i)
   {
+    if (parallelLoop->isOpMatArg (i)) continue;
     if (parallelLoop->isReductionRequired (i))
     {
       if (parallelLoop->isArray (i) || parallelLoop->isPointer (i))
@@ -156,8 +157,9 @@ CPPOpenCLKernelSubroutine::createReductionEpilogueStatements ()
       "Creating reduction epilogue statements", Debug::FUNCTION_LEVEL,
       __FILE__, __LINE__);
 
-  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
+  for (unsigned int i = 1; i <= parallelLoop->getNumberOfArgumentGroups (); ++i)
   {
+    if (parallelLoop->isOpMatArg (i)) continue;
     if (parallelLoop->isReductionRequired (i))
     {
       if (parallelLoop->isArray (i) || parallelLoop->isPointer (i))
@@ -325,8 +327,9 @@ CPPOpenCLKernelSubroutine::createReductionVariableDeclarations ()
       "Creating declarations needed for reduction", Debug::FUNCTION_LEVEL,
       __FILE__, __LINE__);
 
-  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
+  for (unsigned int i = 1; i <= parallelLoop->getNumberOfArgumentGroups (); ++i)
   {
+    if (parallelLoop->isOpMatArg (i)) continue;
     if (parallelLoop->isDuplicateOpDat (i) == false)
     {
       if (parallelLoop->isReductionRequired (i))
