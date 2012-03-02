@@ -335,6 +335,9 @@ CPPProgramDeclarationsAndDefinitions::analyseParallelLoopArguments (
 
   unsigned int OP_DAT_ArgumentGroup = 1;
 
+  unsigned int OP_MAT_ArgumentGroup = 1;
+
+  unsigned int ArgumentGroup = 1;
   for (unsigned int argument = 0; argument
       < actualArguments->get_expressions ().size (); ++argument)
   {
@@ -352,43 +355,55 @@ CPPProgramDeclarationsAndDefinitions::analyseParallelLoopArguments (
     {
       SgExprListExp * opDatActualArguments = opDatCall->get_args ();
 
-      if (iequals (
-          opDatCall->getAssociatedFunctionSymbol ()->get_name ().getString (),
-          OP2::OP_ARG_DAT))
+      string name = opDatCall->getAssociatedFunctionSymbol ()->get_name ().getString ();
+      parallelLoop->setIsOpMatArg (ArgumentGroup, false);
+      if (iequals (name, OP2::OP_ARG_DAT))
       {
         if (opDatActualArguments->get_expressions ().size ()
             == CPPImperialOpArgDatCall::getNumberOfExpectedArguments ())
         {
           handleImperialOpDatArgument (parallelLoop, opDatActualArguments,
-              OP_DAT_ArgumentGroup);
+              ArgumentGroup);
         }
         else
         {
           handleOxfordOpDatArgument (parallelLoop, opDatActualArguments,
-              OP_DAT_ArgumentGroup);
+              ArgumentGroup);
         }
+        parallelLoop->setOpDatArgNum (ArgumentGroup, OP_DAT_ArgumentGroup);
+        OP_DAT_ArgumentGroup++;
+      }
+      else if (iequals (name, OP2::OP_ARG_MAT))
+      {
+        parallelLoop->setIsOpMatArg (ArgumentGroup, true);
+        parallelLoop->setOpMatArgNum (ArgumentGroup, OP_MAT_ArgumentGroup);
+        parallelLoop->setOpMatArg (OP_MAT_ArgumentGroup, new OpArgMatDefinition ());
+        OP_MAT_ArgumentGroup++;
       }
       else
       {
-        parallelLoop->setOpMapValue (OP_DAT_ArgumentGroup, GLOBAL);
+        parallelLoop->setOpMapValue (ArgumentGroup, GLOBAL);
+        parallelLoop->setOpDatArgNum (ArgumentGroup, OP_DAT_ArgumentGroup);
 
         if (opDatActualArguments->get_expressions ().size ()
             == CPPImperialOpArgGblCall::getNumberOfExpectedArguments ())
         {
           handleImperialOpGblArgument (parallelLoop, opDatActualArguments,
-              OP_DAT_ArgumentGroup);
+              ArgumentGroup);
         }
         else
         {
           handleOxfordOpGblArgument (parallelLoop, opDatActualArguments,
-              OP_DAT_ArgumentGroup);
+              ArgumentGroup);
         }
+        OP_DAT_ArgumentGroup++;
       }
 
-      OP_DAT_ArgumentGroup++;
+      ArgumentGroup++;
     }
   }
 
+  parallelLoop->setNumberOfOpMatArgumentGroups (OP_MAT_ArgumentGroup - 1);
   parallelLoop->setNumberOfOpDatArgumentGroups (OP_DAT_ArgumentGroup - 1);
 }
 
