@@ -50,8 +50,10 @@ CPPCUDAKernelSubroutine::createReductionPrologueStatements ()
       "Creating reduction prologue statements", Debug::FUNCTION_LEVEL,
       __FILE__, __LINE__);
 
-  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
+  for (unsigned int i = 1; i <= parallelLoop->getNumberOfArgumentGroups (); ++i)
   {
+    if (parallelLoop->isOpMatArg (i)) continue;
+    unsigned int dat_num = parallelLoop->getOpDatArgNum (i);
     if (parallelLoop->isReductionRequired (i))
     {
       if (parallelLoop->isArray (i) || parallelLoop->isPointer (i))
@@ -59,7 +61,7 @@ CPPCUDAKernelSubroutine::createReductionPrologueStatements ()
         SgBasicBlock * loopBody = buildBasicBlock ();
 
         SgPntrArrRefExp * arrayExpression = buildPntrArrRefExp (
-            variableDeclarations->getReference (getOpDatLocalName (i)),
+            variableDeclarations->getReference (getOpDatLocalName (dat_num)),
             variableDeclarations->getReference (
                 getIterationCounterVariableName (1)));
 
@@ -131,7 +133,7 @@ CPPCUDAKernelSubroutine::createReductionPrologueStatements ()
         }
 
         SgExprStatement * assignmentStatement = buildAssignStatement (
-            variableDeclarations->getReference (getOpDatLocalName (i)),
+            variableDeclarations->getReference (getOpDatLocalName (dat_num)),
             rhsExpression);
 
         appendStatement (assignmentStatement, subroutineScope);
@@ -154,8 +156,10 @@ CPPCUDAKernelSubroutine::createReductionEpilogueStatements ()
       "Creating reduction epilogue statements", Debug::FUNCTION_LEVEL,
       __FILE__, __LINE__);
 
-  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
+  for (unsigned int i = 1; i <= parallelLoop->getNumberOfArgumentGroups (); ++i)
   {
+    if (parallelLoop->isOpMatArg (i)) continue;
+    unsigned int dat_num = parallelLoop->getOpDatArgNum (i);
     if (parallelLoop->isReductionRequired (i))
     {
       if (parallelLoop->isArray (i) || parallelLoop->isPointer (i))
@@ -163,7 +167,7 @@ CPPCUDAKernelSubroutine::createReductionEpilogueStatements ()
         SgBasicBlock * loopBody = buildBasicBlock ();
 
         SgPntrArrRefExp * arrayExpression1 = buildPntrArrRefExp (
-            variableDeclarations->getReference (getOpDatLocalName (i)),
+            variableDeclarations->getReference (getOpDatLocalName (dat_num)),
             variableDeclarations->getReference (
                 getIterationCounterVariableName (1)));
 
@@ -177,7 +181,7 @@ CPPCUDAKernelSubroutine::createReductionEpilogueStatements ()
 
         SgPntrArrRefExp * arrayExpression2 =
             buildPntrArrRefExp (variableDeclarations->getReference (
-                getReductionArrayDeviceName (i)), addExpression);
+                getReductionArrayDeviceName (dat_num)), addExpression);
 
         SgAddressOfOp * addressExpression = buildAddressOfOp (arrayExpression2);
 
@@ -254,7 +258,7 @@ CPPCUDAKernelSubroutine::createReductionEpilogueStatements ()
 
         SgPntrArrRefExp * arrayExpression2 =
             buildPntrArrRefExp (variableDeclarations->getReference (
-                getReductionArrayDeviceName (i)), multiplyExpression);
+                getReductionArrayDeviceName (dat_num)), multiplyExpression);
 
         SgAddressOfOp * addressExpression = buildAddressOfOp (arrayExpression2);
 
@@ -288,7 +292,7 @@ CPPCUDAKernelSubroutine::createReductionEpilogueStatements ()
          */
 
         SgExprListExp * actualParameters = buildExprListExp (addressExpression,
-            variableDeclarations->getReference (getOpDatLocalName (i)),
+            variableDeclarations->getReference (getOpDatLocalName (dat_num)),
             reductionType);
 
         SgFunctionSymbol
@@ -320,11 +324,13 @@ CPPCUDAKernelSubroutine::createReductionVariableDeclarations ()
       "Creating declarations needed for reduction", Debug::FUNCTION_LEVEL,
       __FILE__, __LINE__);
 
-  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
+  for (unsigned int i = 1; i <= parallelLoop->getNumberOfArgumentGroups (); ++i)
   {
+    if (parallelLoop->isOpMatArg (i)) continue;
+    unsigned int dat_num = parallelLoop->getOpDatArgNum (i);
     if (parallelLoop->isDuplicateOpDat (i) == false)
     {
-      string const & variableName = getOpDatLocalName (i);
+      string const & variableName = getOpDatLocalName (dat_num);
 
       if (parallelLoop->isReductionRequired (i))
       {

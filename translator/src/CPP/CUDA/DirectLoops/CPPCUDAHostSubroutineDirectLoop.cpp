@@ -55,14 +55,16 @@ CPPCUDAHostSubroutineDirectLoop::createKernelFunctionCallStatement (
 
   SgExprListExp * actualParameters = buildExprListExp ();
 
-  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
+  for (unsigned int i = 1; i <= parallelLoop->getNumberOfArgumentGroups (); ++i)
   {
+    if (parallelLoop->isOpMatArg (i)) continue;
+    unsigned int dat_num = parallelLoop->getOpDatArgNum (i);
     if (parallelLoop->isDuplicateOpDat (i) == false)
     {
       if (parallelLoop->isDirect (i) || parallelLoop->isReductionRequired (i))
       {
         SgDotExp * dotExpression = buildDotExp (
-            variableDeclarations->getReference (getOpDatName (i)),
+            variableDeclarations->getReference (getOpDatName (dat_num)),
             buildOpaqueVarRefExp (data_d, subroutineScope));
 
         SgCastExp * castExpression = buildCastExp (dotExpression,
@@ -131,8 +133,9 @@ CPPCUDAHostSubroutineDirectLoop::createCUDAKernelInitialisationStatements ()
 
   appendStatement (assignmentStatement3, subroutineScope);
 
-  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
+  for (unsigned int i = 1; i <= parallelLoop->getNumberOfArgumentGroups (); ++i)
   {
+    if (parallelLoop->isOpMatArg (i)) continue;
     if (parallelLoop->isDuplicateOpDat (i) == false)
     {
       if (parallelLoop->isDirect (i))

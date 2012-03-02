@@ -55,12 +55,43 @@ CPPCUDAHostSubroutineIndirectLoop::createKernelFunctionCallStatement (
 
   SgExprListExp * actualParameters = buildExprListExp ();
 
-  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
+  for (unsigned int i = 1; i <= parallelLoop->getNumberOfArgumentGroups (); ++i)
   {
+    if (parallelLoop->isOpMatArg (i))
+    {
+      // Pass op_mat data pointer
+      unsigned int mat_num = parallelLoop->getOpMatArgNum (i);
+      SgDotExp * data = buildDotExp (
+        variableDeclarations->getReference (getOpMatName (mat_num)),
+        buildOpaqueVarRefExp (data_d, subroutineScope));
+
+      // TODO Cast to correct type
+      SgCastExp * castExpression = buildCastExp (data,
+         buildPointerType (buildDoubleType ()));
+      actualParameters->append_expression (castExpression);
+
+      // pass row pointer
+      SgDotExp * rowptr = buildDotExp (
+        variableDeclarations->getReference (getOpMatName (mat_num)),
+        buildOpaqueVarRefExp (rowptr_d, subroutineScope));
+      actualParameters->append_expression (rowptr);
+      // pass col pointer
+      SgDotExp * colptr = buildDotExp (
+        variableDeclarations->getReference (getOpMatName (mat_num)),
+        buildOpaqueVarRefExp (colptr_d, subroutineScope));
+      actualParameters->append_expression (colptr);
+      // pass nrow
+      SgDotExp * nrow_d = buildDotExp (
+        variableDeclarations->getReference (getOpMatName (mat_num)),
+        buildOpaqueVarRefExp (nrow, subroutineScope));
+      actualParameters->append_expression (nrow_d);
+      continue;
+    }
+    unsigned int dat_num = parallelLoop->getOpDatArgNum (i);
     if (parallelLoop->isDuplicateOpDat (i) == false)
     {
       SgDotExp * dotExpression = buildDotExp (
-          variableDeclarations->getReference (getOpDatName (i)),
+          variableDeclarations->getReference (getOpDatName (dat_num)),
           buildOpaqueVarRefExp (data_d, subroutineScope));
 
       SgCastExp * castExpression = buildCastExp (dotExpression,
@@ -72,8 +103,9 @@ CPPCUDAHostSubroutineIndirectLoop::createKernelFunctionCallStatement (
 
   unsigned int arrayIndex = 0;
 
-  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
+  for (unsigned int i = 1; i <= parallelLoop->getNumberOfArgumentGroups (); ++i)
   {
+    if (parallelLoop->isOpMatArg (i)) continue;
     if (parallelLoop->isDuplicateOpDat (i) == false)
     {
       if (parallelLoop->isIndirect (i))
@@ -92,8 +124,9 @@ CPPCUDAHostSubroutineIndirectLoop::createKernelFunctionCallStatement (
     }
   }
 
-  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
+  for (unsigned int i = 1; i <= parallelLoop->getNumberOfArgumentGroups (); ++i)
   {
+    if (parallelLoop->isOpMatArg (i)) continue;
     if (parallelLoop->isIndirect (i))
     {
       SgPntrArrRefExp * arrayExpression =

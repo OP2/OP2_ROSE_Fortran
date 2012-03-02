@@ -221,8 +221,9 @@ CPPCUDAHostSubroutine::createReductionEpilogueStatements ()
   appendStatement (buildExprStatement (moveReductionArraysToHostCall),
       subroutineScope);
 
-  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
+  for (unsigned int i = 1; i <= parallelLoop->getNumberOfArgumentGroups (); ++i)
   {
+    if (parallelLoop->isOpMatArg (i)) continue;
     if (parallelLoop->isReductionRequired (i))
     {
       appendStatement (createReductionUpdateStatements (i), subroutineScope);
@@ -254,6 +255,7 @@ CPPCUDAHostSubroutine::createReductionInitialisationStatements (
 
   SgExpression * rhsExpression;
 
+  unsigned int dat_num = parallelLoop->getOpDatArgNum (OP_DAT_ArgumentGroup);
   if (parallelLoop->isIncremented (OP_DAT_ArgumentGroup))
   {
     if (isSgTypeInt (parallelLoop->getOpDatBaseType (OP_DAT_ArgumentGroup)))
@@ -278,8 +280,7 @@ CPPCUDAHostSubroutine::createReductionInitialisationStatements (
   }
   else
   {
-    rhsExpression = variableDeclarations->getReference (getOpDatName (
-        OP_DAT_ArgumentGroup));
+    rhsExpression = variableDeclarations->getReference (getOpDatName (dat_num));
   }
 
   if (parallelLoop->isArray (OP_DAT_ArgumentGroup) || parallelLoop->isPointer (
@@ -288,7 +289,7 @@ CPPCUDAHostSubroutine::createReductionInitialisationStatements (
     SgBasicBlock * loopBody2 = buildBasicBlock ();
 
     SgDotExp * dotExpression = buildDotExp (variableDeclarations->getReference (
-        getOpDatName (OP_DAT_ArgumentGroup)), buildOpaqueVarRefExp (data,
+        getOpDatName (dat_num)), buildOpaqueVarRefExp (data,
         subroutineScope));
 
     SgCastExp * castExpression = buildCastExp (dotExpression, buildPointerType (
@@ -332,7 +333,7 @@ CPPCUDAHostSubroutine::createReductionInitialisationStatements (
   else
   {
     SgDotExp * dotExpression = buildDotExp (variableDeclarations->getReference (
-        getOpDatName (OP_DAT_ArgumentGroup)), buildOpaqueVarRefExp (data,
+        getOpDatName (dat_num)), buildOpaqueVarRefExp (data,
         subroutineScope));
 
     SgCastExp * castExpression = buildCastExp (dotExpression, buildPointerType (
@@ -409,12 +410,14 @@ CPPCUDAHostSubroutine::createReductionPrologueStatements ()
    * ======================================================
    */
 
-  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
+  for (unsigned int i = 1; i <= parallelLoop->getNumberOfArgumentGroups (); ++i)
   {
+    if (parallelLoop->isOpMatArg (i)) continue;
+    unsigned int dat_num = parallelLoop->getOpDatArgNum (i);
     if (parallelLoop->isReductionRequired (i))
     {
       SgDotExp * dotExpression = buildDotExp (
-          variableDeclarations->getReference (getOpDatName (i)),
+          variableDeclarations->getReference (getOpDatName (dat_num)),
           buildOpaqueVarRefExp (data, subroutineScope));
 
       if (parallelLoop->isArray (i) || parallelLoop->isPointer (i))
@@ -423,7 +426,7 @@ CPPCUDAHostSubroutine::createReductionPrologueStatements ()
             buildPointerType (parallelLoop->getOpDatBaseType (i)));
 
         SgExprStatement * assignmentStatement3 = buildAssignStatement (
-            variableDeclarations->getReference (getReductionArrayHostName (i)),
+            variableDeclarations->getReference (getReductionArrayHostName (dat_num)),
             castExpression);
 
         appendStatement (assignmentStatement3, subroutineScope);
@@ -436,7 +439,7 @@ CPPCUDAHostSubroutine::createReductionPrologueStatements ()
         SgAddressOfOp * addressOfExpression = buildAddressOfOp (castExpression);
 
         SgExprStatement * assignmentStatement3 = buildAssignStatement (
-            variableDeclarations->getReference (getReductionArrayHostName (i)),
+            variableDeclarations->getReference (getReductionArrayHostName (dat_num)),
             addressOfExpression);
 
         appendStatement (assignmentStatement3, subroutineScope);
@@ -516,8 +519,10 @@ CPPCUDAHostSubroutine::createReductionPrologueStatements ()
    * ======================================================
    */
 
-  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
+  for (unsigned int i = 1; i <= parallelLoop->getNumberOfArgumentGroups (); ++i)
   {
+    if (parallelLoop->isOpMatArg (i)) continue;
+    unsigned int dat_num = parallelLoop->getOpDatArgNum (i);
     if (parallelLoop->isReductionRequired (i))
     {
       SgAddOp
@@ -528,7 +533,7 @@ CPPCUDAHostSubroutine::createReductionPrologueStatements ()
                       reductionBytes));
 
       SgDotExp * dotExpression1 = buildDotExp (
-          variableDeclarations->getReference (getOpDatName (i)),
+          variableDeclarations->getReference (getOpDatName (dat_num)),
           buildOpaqueVarRefExp (data, subroutineScope));
 
       SgExprStatement * assignmentStatement4 = buildAssignStatement (
@@ -544,7 +549,7 @@ CPPCUDAHostSubroutine::createReductionPrologueStatements ()
                       reductionBytes));
 
       SgDotExp * dotExpression2 = buildDotExp (
-          variableDeclarations->getReference (getOpDatName (i)),
+          variableDeclarations->getReference (getOpDatName (dat_num)),
           buildOpaqueVarRefExp (data_d, subroutineScope));
 
       SgExprStatement * assignmentStatement5 = buildAssignStatement (
@@ -637,11 +642,13 @@ CPPCUDAHostSubroutine::createReductionDeclarations ()
       RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
           reductionSharedMemorySize, buildIntType (), subroutineScope));
 
-  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
+  for (unsigned int i = 1; i <= parallelLoop->getNumberOfArgumentGroups (); ++i)
   {
+    if (parallelLoop->isOpMatArg (i)) continue;
+    unsigned int dat_num = parallelLoop->getOpDatArgNum (i);
     if (parallelLoop->isReductionRequired (i))
     {
-      string const reductionArrayHostName = getReductionArrayHostName (i);
+      string const reductionArrayHostName = getReductionArrayHostName (dat_num);
 
       Debug::getInstance ()->debugMessage ("Creating host reduction pointer '"
           + reductionArrayHostName + "'", Debug::HIGHEST_DEBUG_LEVEL, __FILE__,
