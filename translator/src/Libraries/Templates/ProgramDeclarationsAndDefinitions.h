@@ -173,6 +173,18 @@ template <typename TSubroutineHeader>
       }
 
       bool
+      isOpSparsity (std::string const & variableName) const
+      {
+        return OpSparsityDefinitions.find (variableName) != OpSparsityDefinitions.end ();
+      }
+
+      bool
+      isOpMat (std::string const & variableName) const
+      {
+        return OpMatDefinitions.find (variableName) != OpMatDefinitions.end ();
+      }
+
+      bool
       isOpGbl (std::string const & variableName) const
       {
         return OpGblDefinitions.find (variableName) != OpGblDefinitions.end ();
@@ -267,6 +279,46 @@ template <typename TSubroutineHeader>
         if (it == OpDatDefinitions.end ())
         {
           throw opDatName;
+        }
+        else
+        {
+          return it->second;
+        }
+      }
+
+      OpSparsityDefinition *
+      getOpSparsityDefinition (std::string const & opSparsityName)
+          throw (std::string const &)
+      {
+        using std::map;
+        using std::string;
+
+        map <string, OpSparsityDefinition *>::const_iterator it =
+            OpSparsityDefinitions.find (opSparsityName);
+
+        if (it == OpSparsityDefinitions.end ())
+        {
+          throw opSparsityName;
+        }
+        else
+        {
+          return it->second;
+        }
+      }
+
+      OpMatDefinition *
+      getOpMatDefinition (std::string const & opMatName)
+          throw (std::string const &)
+      {
+        using std::map;
+        using std::string;
+
+        map <string, OpMatDefinition *>::const_iterator it =
+            OpMatDefinitions.find (opMatName);
+
+        if (it == OpMatDefinitions.end ())
+        {
+          throw opMatName;
         }
         else
         {
