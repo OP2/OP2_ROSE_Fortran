@@ -165,11 +165,11 @@ CPPCUDASubroutinesGeneration::createSubroutines ()
     else
     {
       kernelSubroutine = new CPPCUDAKernelSubroutineIndirectLoop (moduleScope,
-          userDeviceSubroutine, parallelLoop, reductionSubroutines);
+          userDeviceSubroutine, parallelLoop, reductionSubroutines, declarations);
 
       hostSubroutines[userSubroutineName]
           = new CPPCUDAHostSubroutineIndirectLoop (moduleScope,
-              kernelSubroutine, parallelLoop, moduleDeclarations);
+              kernelSubroutine, parallelLoop, moduleDeclarations, declarations);
     }
   }
 }

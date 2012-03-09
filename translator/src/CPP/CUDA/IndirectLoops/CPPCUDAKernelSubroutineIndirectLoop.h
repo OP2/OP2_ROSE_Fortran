@@ -36,12 +36,16 @@
 
 #include <CPPCUDAKernelSubroutine.h>
 
+class CPPProgramDeclarationsAndDefinitions;
+
 class CPPCUDAKernelSubroutineIndirectLoop: public CPPCUDAKernelSubroutine
 {
   private:
 
     std::map <std::string, SgVariableDeclaration *>
         indirectOpDatSharedMemoryDeclarations;
+
+    CPPProgramDeclarationsAndDefinitions * declarations;
 
   private:
 
@@ -109,7 +113,8 @@ class CPPCUDAKernelSubroutineIndirectLoop: public CPPCUDAKernelSubroutine
 
     CPPCUDAKernelSubroutineIndirectLoop (SgScopeStatement * moduleScope,
         CPPCUDAUserSubroutine * userSubroutine, CPPParallelLoop * parallelLoop,
-        CPPReductionSubroutines * reductionSubroutines);
+        CPPReductionSubroutines * reductionSubroutines,
+        CPPProgramDeclarationsAndDefinitions * declarations);
 };
 
 #endif
