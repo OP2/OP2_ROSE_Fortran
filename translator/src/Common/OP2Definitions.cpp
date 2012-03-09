@@ -136,3 +136,70 @@ OpConstDefinition::getDimension () const
 {
   return dimension;
 }
+
+std::string const &
+OpArgMatDefinition::getMatName () const
+{
+  return matName;
+}
+
+int
+OpArgMatDefinition::getIdx1 () const
+{
+  return idx1;
+}
+
+std::string const &
+OpArgMatDefinition::getMap1Name () const
+{
+  return map1Name;
+}
+
+int
+OpArgMatDefinition::getIdx2 () const
+{
+  return idx2;
+}
+
+std::string const &
+OpArgMatDefinition::getMap2Name () const
+{
+  return map2Name;
+}
+
+unsigned int
+OpArgMatDefinition::getDimension () const
+{
+  return dimension;
+}
+
+std::string const &
+OpMatDefinition::getSparsityName () const
+{
+  return sparsityName;
+}
+
+unsigned int
+OpMatDefinition::getDimension () const
+{
+  return dimension;
+}
+
+SgType *
+OpMatDefinition::getBaseType ()
+{
+  return baseType;
+}
+
+std::string const &
+OpSparsityDefinition::getMap1Name () const
+{
+  return map1Name;
+}
+
+std::string const &
+OpSparsityDefinition::getMap2Name () const
+{
+  return map2Name;
+}
+

@@ -155,9 +155,6 @@ class OpSparsityDefinition: public OP2Definition
   public:
 
     std::string const &
-    getSetName () const;
-
-    std::string const &
     getMap1Name () const;
 
     std::string const &
@@ -209,10 +206,20 @@ class OpMatDefinition: public OP2Definition
 
     std::string sparsityName;
 
+    unsigned int dimension;
+
+    SgType * baseType;
+
   public:
 
     std::string const &
     getSparsityName () const;
+
+    unsigned int
+    getDimension () const;
+
+    SgType *
+    getBaseType ();
 };
 
 class OpGblDefinition: public OP2Definition
@@ -261,9 +268,41 @@ class OpConstDefinition: public OP2Definition
     getDimension () const;
 };
 
-class OpArgMatDefinition: public OP2Definition
+class OpArgMatDefinition
 {
+  protected:
 
+    std::string matName;
+
+    int idx1;
+
+    std::string map1Name;
+
+    int idx2;
+
+    std::string map2Name;
+
+    unsigned int dimension;
+
+  public:
+
+    std::string const &
+    getMatName () const;
+
+    int
+    getIdx1 () const;
+
+    std::string const &
+    getMap1Name () const;
+
+    int
+    getIdx2 () const;
+
+    std::string const &
+    getMap2Name () const;
+
+    unsigned int
+    getDimension () const;
 };
 
 #endif
