@@ -377,7 +377,17 @@ CPPProgramDeclarationsAndDefinitions::analyseParallelLoopArguments (
       {
         parallelLoop->setIsOpMatArg (ArgumentGroup, true);
         parallelLoop->setOpMatArgNum (ArgumentGroup, OP_MAT_ArgumentGroup);
-        parallelLoop->setOpMatArg (OP_MAT_ArgumentGroup, new OpArgMatDefinition ());
+        if (opDatActualArguments->get_expressions ().size ()
+            == CPPImperialOpArgMatDefinition::getNumberOfExpectedArguments ())
+        {
+          parallelLoop->setOpMatArg (OP_MAT_ArgumentGroup,
+              new CPPImperialOpArgMatDefinition (opDatActualArguments, this));
+        }
+        else
+        {
+          parallelLoop->setOpMatArg (OP_MAT_ArgumentGroup,
+              new CPPOxfordOpArgMatDefinition (opDatActualArguments));
+        }
         OP_MAT_ArgumentGroup++;
       }
       else
@@ -479,7 +489,7 @@ CPPProgramDeclarationsAndDefinitions::detectAndHandleOP2Definition (
     OpMapDefinition * opMapDeclaration;
 
     if (functionCallExpression->get_args ()->get_expressions ().size ()
-        == CPPImperialOpSetDefinition::getNumberOfExpectedArguments ())
+        == CPPImperialOpMapDefinition::getNumberOfExpectedArguments ())
     {
       opMapDeclaration = new CPPImperialOpMapDefinition (
           functionCallExpression->get_args (), variableName);
@@ -528,6 +538,74 @@ CPPProgramDeclarationsAndDefinitions::detectAndHandleOP2Definition (
     }
 
     OpDatDefinitions[opDatDeclaration->getVariableName ()] = opDatDeclaration;
+  }
+  else if (iequals (typeName, OP2::OP_SPARSITY))
+  {
+    Debug::getInstance ()->debugMessage ("OP_SPARSITY declaration call found",
+        Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+
+    SgAssignInitializer * assignmentInitializer = isSgAssignInitializer (
+        variableDeclaration->get_decl_item (variableName)->get_initializer ());
+
+    ROSE_ASSERT (assignmentInitializer != NULL);
+
+    SgFunctionCallExp * functionCallExpression = isSgFunctionCallExp (
+        assignmentInitializer->get_operand ());
+
+    ROSE_ASSERT (functionCallExpression != NULL);
+
+    OpSparsityDefinition * def;
+
+    if (functionCallExpression->get_args ()->get_expressions ().size ()
+        == CPPImperialOpSparsityDefinition::getNumberOfExpectedArguments ())
+    {
+      def = new CPPImperialOpSparsityDefinition (
+          functionCallExpression->get_args (), variableName);
+    }
+    else
+    {
+      ROSE_ASSERT (functionCallExpression->get_args ()->get_expressions ().size ()
+          == CPPOxfordOpSparsityDefinition::getNumberOfExpectedArguments ());
+
+      def = new CPPOxfordOpSparsityDefinition (
+          functionCallExpression->get_args (), variableName);
+    }
+
+    OpSparsityDefinitions[def->getVariableName ()] = def;
+  }
+  else if (iequals (typeName, OP2::OP_MAT))
+  {
+    Debug::getInstance ()->debugMessage ("OP_MAT declaration call found",
+        Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+
+    SgAssignInitializer * assignmentInitializer = isSgAssignInitializer (
+        variableDeclaration->get_decl_item (variableName)->get_initializer ());
+
+    ROSE_ASSERT (assignmentInitializer != NULL);
+
+    SgFunctionCallExp * functionCallExpression = isSgFunctionCallExp (
+        assignmentInitializer->get_operand ());
+
+    ROSE_ASSERT (functionCallExpression != NULL);
+
+    OpMatDefinition * def;
+
+    if (functionCallExpression->get_args ()->get_expressions ().size ()
+        == CPPImperialOpMatDefinition::getNumberOfExpectedArguments ())
+    {
+      def = new CPPImperialOpMatDefinition (
+          functionCallExpression->get_args (), variableName);
+    }
+    else
+    {
+      ROSE_ASSERT (functionCallExpression->get_args ()->get_expressions ().size ()
+          == CPPOxfordOpMatDefinition::getNumberOfExpectedArguments ());
+
+      def = new CPPOxfordOpMatDefinition (
+          functionCallExpression->get_args (), variableName);
+    }
+
+    OpMatDefinitions[def->getVariableName ()] = def;
   }
 }
 
