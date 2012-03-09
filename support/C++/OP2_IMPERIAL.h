@@ -31,8 +31,13 @@ typedef enum {OP_READ, OP_WRITE, OP_INC, OP_RW, OP_MIN, OP_MAX} op_access;
 op_map const OP_ID;
 op_map const OP_GBL;
 
+#define OP_ALL -2
+
 void 
 op_init(int, char **, int);
+
+void
+op_exit ();
 
 op_set 
 op_decl_set (int);
@@ -48,8 +53,17 @@ template <typename T>
 void
 op_decl_const (int, T *);
 
+op_sparsity
+op_decl_sparsity(op_map, op_map);
+
+op_mat
+op_decl_mat(op_sparsity, int, char *);
+
 op_arg
 op_arg_dat(op_dat, int, op_map, op_access);
+
+op_arg
+op_arg_mat(op_mat, int, op_map, int, op_map, op_access);
 
 template <typename T>
 op_arg
