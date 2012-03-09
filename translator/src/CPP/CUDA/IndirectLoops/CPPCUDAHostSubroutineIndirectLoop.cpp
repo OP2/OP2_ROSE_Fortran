@@ -38,6 +38,8 @@
 #include "CompilerGeneratedNames.h"
 #include "PlanFunctionNames.h"
 #include "OP2.h"
+#include "OP2Definitions.h"
+#include "CPPProgramDeclarationsAndDefinitions.h"
 
 void
 CPPCUDAHostSubroutineIndirectLoop::createKernelFunctionCallStatement (
@@ -61,13 +63,15 @@ CPPCUDAHostSubroutineIndirectLoop::createKernelFunctionCallStatement (
     {
       // Pass op_mat data pointer
       unsigned int mat_num = parallelLoop->getOpMatArgNum (i);
+      OpArgMatDefinition * arg_mat = parallelLoop->getOpMatArg (mat_num);
+      OpMatDefinition * mat = declarations->getOpMatDefinition (arg_mat->getMatName ());
+
       SgDotExp * data = buildDotExp (
         variableDeclarations->getReference (getOpMatName (mat_num)),
         buildOpaqueVarRefExp (data_d, subroutineScope));
 
-      // TODO Cast to correct type
       SgCastExp * castExpression = buildCastExp (data,
-         buildPointerType (buildDoubleType ()));
+          buildPointerType (mat->getBaseType ()));
       actualParameters->append_expression (castExpression);
 
       // pass row pointer
@@ -127,11 +131,12 @@ CPPCUDAHostSubroutineIndirectLoop::createKernelFunctionCallStatement (
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfArgumentGroups (); ++i)
   {
     if (parallelLoop->isOpMatArg (i)) continue;
+    unsigned int dat_num = parallelLoop->getOpDatArgNum (i);
     if (parallelLoop->isIndirect (i))
     {
       SgPntrArrRefExp * arrayExpression =
           buildPntrArrRefExp (buildOpaqueVarRefExp (loc_maps, subroutineScope),
-              buildIntVal (i - 1));
+              buildIntVal (dat_num - 1));
 
       SgArrowExp * arrowExpression = buildArrowExp (
           variableDeclarations->getReference (planRet), arrayExpression);
@@ -456,13 +461,16 @@ CPPCUDAHostSubroutineIndirectLoop::createLocalVariableDeclarations ()
 
 CPPCUDAHostSubroutineIndirectLoop::CPPCUDAHostSubroutineIndirectLoop (
     SgScopeStatement * moduleScope, CPPCUDAKernelSubroutine * calleeSubroutine,
-    CPPParallelLoop * parallelLoop, CPPModuleDeclarations * moduleDeclarations) :
+    CPPParallelLoop * parallelLoop, CPPModuleDeclarations * moduleDeclarations,
+    CPPProgramDeclarationsAndDefinitions * declarations) :
   CPPCUDAHostSubroutine (moduleScope, calleeSubroutine, parallelLoop,
       moduleDeclarations)
 {
   Debug::getInstance ()->debugMessage (
       "Creating host subroutine of indirect loop", Debug::CONSTRUCTOR_LEVEL,
       __FILE__, __LINE__);
+
+  this->declarations = declarations;
 
   createFormalParameterDeclarations ();
 

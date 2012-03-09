@@ -37,9 +37,14 @@
 #include <CPPCUDAHostSubroutine.h>
 
 class CPPCUDAKernelSubroutine;
+class CPPProgramDeclarationsAndDefinitions;
 
 class CPPCUDAHostSubroutineIndirectLoop: public CPPCUDAHostSubroutine
 {
+
+  private:
+
+    CPPProgramDeclarationsAndDefinitions * declarations;
 
   private:
 
@@ -66,7 +71,8 @@ class CPPCUDAHostSubroutineIndirectLoop: public CPPCUDAHostSubroutine
     CPPCUDAHostSubroutineIndirectLoop (SgScopeStatement * moduleScope,
         CPPCUDAKernelSubroutine * calleeSubroutine,
         CPPParallelLoop * parallelLoop,
-        CPPModuleDeclarations * moduleDeclarations);
+        CPPModuleDeclarations * moduleDeclarations,
+        CPPProgramDeclarationsAndDefinitions * declarations);
 };
 
 #endif
