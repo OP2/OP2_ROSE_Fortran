@@ -38,6 +38,7 @@
 #include <rose.h>
 
 class SgExprListExp;
+class CPPProgramDeclarationsAndDefinitions;
 
 class CPPImperialOpDatDefinition: public OpDatDefinition
 {
@@ -439,6 +440,179 @@ class CPPOxfordOpArgGblCall
     {
       return 4;
     }
+};
+
+class CPPImperialOpArgMatDefinition: public OpArgMatDefinition
+{
+    /*
+     * op_arg_mat(op_mat, idx1, map1, idx2, map2, access)
+     */
+
+  public:
+
+    static int const indexOpMat = 0;
+
+    static int const indexOpIndex1 = 1;
+
+    static int const indexOpMap1 = 2;
+
+    static int const indexOpIndex2 = 3;
+
+    static int const indexOpMap2 = 4;
+
+    static int const indexAccessDescriptor = 5;
+
+  public:
+
+    static unsigned int
+    getNumberOfExpectedArguments ()
+    {
+      return 6;
+    }
+
+    CPPImperialOpArgMatDefinition (SgExprListExp * parameters,
+        CPPProgramDeclarationsAndDefinitions * declarations);
+};
+
+class CPPOxfordOpArgMatDefinition: public OpArgMatDefinition
+{
+    /*
+     * op_arg_mat(op_mat, idx1, map1, idx2, map2, dim, "datatype", access)
+     */
+
+  public:
+
+    static int const indexOpMat = 0;
+
+    static int const indexOpIndex1 = 1;
+
+    static int const indexOpMap1 = 2;
+
+    static int const indexOpIndex2 = 3;
+
+    static int const indexOpMap2 = 4;
+
+    static int const indexDimension = 5;
+
+    static int const indexTypeName = 6;
+
+    static int const indexAccessDescriptor = 7;
+
+  public:
+
+    static unsigned int
+    getNumberOfExpectedArguments ()
+    {
+      return 8;
+    }
+
+    CPPOxfordOpArgMatDefinition (SgExprListExp * parameters);
+};
+
+class CPPImperialOpSparsityDefinition: public OpSparsityDefinition
+{
+    /*
+     * op_decl_sparsity(op_map, op_map);
+     */
+  public:
+
+    static int const indexOpMap1 = 0;
+
+    static int const indexOpMap2 = 1;
+
+  public:
+
+    static unsigned int
+    getNumberOfExpectedArguments ()
+    {
+      return 2;
+    }
+
+    CPPImperialOpSparsityDefinition (
+        SgExprListExp * parameters, std::string const & variableName);
+};
+
+class CPPImperialOpMatDefinition: public OpMatDefinition
+{
+
+    /*
+     * op_decl_mat(sparsity, dimension, "datatype")
+     */
+  public:
+
+    static int const indexOpSparsity = 0;
+
+    static int const indexDimension = 1;
+
+    static int const indexTypeName = 2;
+
+  public:
+
+    static unsigned int
+    getNumberOfExpectedArguments ()
+    {
+      return 3;
+    }
+
+    CPPImperialOpMatDefinition (
+        SgExprListExp * parameters, std::string const & variableName);
+};
+
+class CPPOxfordOpSparsityDefinition: public OpSparsityDefinition
+{
+
+    /*
+     * op_decl_sparsity(map1, map2, "name")
+     */
+
+  public:
+
+    static int const indexOpMap1 = 0;
+
+    static int const indexOpMap2 = 1;
+
+    static int const indexOpSparsityName = 2;
+
+  public:
+
+    static unsigned int
+    getNumberOfExpectedArguments ()
+    {
+      return 3;
+    }
+
+    CPPOxfordOpSparsityDefinition (
+        SgExprListExp * parameters, std::string const & variableName);
+};
+
+class CPPOxfordOpMatDefinition: public OpMatDefinition
+{
+    /*
+     * op_decl_mat(sparsity, dimension, "typename", sizeof(typename), "name")
+     */
+
+  public:
+
+    static int const indexOpSparsity = 0;
+
+    static int const indexDimension = 1;
+
+    static int const indexTypeName = 2;
+
+    static int const indexTypeSize = 3;
+
+    static int const indexOpMatName = 4;
+
+  public:
+
+    static unsigned int
+    getNumberOfExpectedArguments ()
+    {
+      return 5;
+    }
+
+    CPPOxfordOpMatDefinition (
+        SgExprListExp * parameters, std::string const & variableName);
 };
 
 #endif
