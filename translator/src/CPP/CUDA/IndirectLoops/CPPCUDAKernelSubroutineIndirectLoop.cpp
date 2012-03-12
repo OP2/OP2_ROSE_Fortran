@@ -1556,7 +1556,7 @@ CPPCUDAKernelSubroutineIndirectLoop::createLocalVariableDeclarations ()
         variableDeclarations->add (variableName, variableDeclaration);
 
         indirectOpDatSharedMemoryDeclarations[parallelLoop->getOpDatVariableName (
-            i)] = variableDeclaration;
+            dat_num)] = variableDeclaration;
       }
     }
     else
@@ -1571,7 +1571,7 @@ CPPCUDAKernelSubroutineIndirectLoop::createLocalVariableDeclarations ()
       variableDeclarations ->add (
           variableName,
           indirectOpDatSharedMemoryDeclarations[parallelLoop->getOpDatVariableName (
-              i)]);
+              dat_num)]);
     }
   }
 
