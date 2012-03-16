@@ -1,6 +1,4 @@
 
-
-
 /*  Open source copyright declaration based on BSD open source template:
  *  http://www.opensource.org/licenses/bsd-license.php
  * 
@@ -31,8 +29,8 @@
 
 
 #pragma once
-#ifndef FORTRAN_CUDA_INITIALISE_CONSTANTS_SUBROUTINE_H
-#define FORTRAN_CUDA_INITIALISE_CONSTANTS_SUBROUTINE_H
+#ifndef FORTRAN_INITIALISE_CONSTANTS_SUBROUTINE_H
+#define FORTRAN_INITIALISE_CONSTANTS_SUBROUTINE_H
 
 #include <string>
 #include <map>
@@ -42,7 +40,7 @@
 
 class FortranProgramDeclarationsAndDefinitions;
 
-class FortranCUDAInitialiseConstantsSubroutine: public Subroutine <
+class FortranInitialiseConstantsSubroutine: public Subroutine <
   SgProcedureHeaderStatement>
 {
   private:
@@ -84,7 +82,7 @@ class FortranCUDAInitialiseConstantsSubroutine: public Subroutine <
 
   public:
     
-    FortranCUDAInitialiseConstantsSubroutine (std::string subroutineName, SgScopeStatement * moduleScope,
+    FortranInitialiseConstantsSubroutine (std::string subroutineName, SgScopeStatement * moduleScope,
       FortranProgramDeclarationsAndDefinitions * allDeclarations, std::map <std::string, std::string> oldNamesToNewNames,
       ScopedVariableDeclarations * _constantDeclarations);
 };

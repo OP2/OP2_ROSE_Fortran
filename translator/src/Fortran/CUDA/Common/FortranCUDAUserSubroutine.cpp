@@ -35,7 +35,7 @@
 #include "FortranProgramDeclarationsAndDefinitions.h"
 #include "FortranStatementsAndExpressionsBuilder.h"
 #include "FortranTypesBuilder.h"
-#include <FortranCUDAConstantDeclarations.h>
+#include <FortranConstantDeclarations.h>
 #include <RoseHelper.h>
 #include "Debug.h"
 #include "Exceptions.h"
@@ -337,7 +337,7 @@ FortranCUDAUserSubroutine::createFormalParameterDeclarations ()
  */
 void FortranCUDAUserSubroutine::appendAdditionalSubroutines ( SgScopeStatement * moduleScope,
   FortranParallelLoop * parallelLoop, FortranProgramDeclarationsAndDefinitions * declarations,
-  FortranCUDAConstantDeclarations * CUDAconstants, std::vector < SgProcedureHeaderStatement * > * allCalledRoutines)
+  FortranConstantDeclarations * CUDAconstants, std::vector < SgProcedureHeaderStatement * > * allCalledRoutines)
 {
   using std::vector;
   using boost::iequals;
@@ -446,7 +446,7 @@ void FortranCUDAUserSubroutine::appendAdditionalSubroutines ( SgScopeStatement *
   {
     FortranCUDAUserSubroutine * cudaSubroutineCasting = (FortranCUDAUserSubroutine *) *itRecursive;
 
-    CUDAconstants->patchReferencesToCUDAConstants (
+    CUDAconstants->patchReferencesToConstants (
       (cudaSubroutineCasting )->getSubroutineHeaderStatement ());
           
     RoseHelper::forceOutputOfCodeToFile (

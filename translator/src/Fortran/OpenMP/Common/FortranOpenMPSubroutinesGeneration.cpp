@@ -69,9 +69,15 @@ FortranOpenMPSubroutinesGeneration::createSubroutines ()
     FortranUserSubroutine * userSubroutine = new FortranUserSubroutine (
         moduleScope, parallelLoop, declarations);
 
+    /* This is not done in CUDA (done in the constructor of the user sub.?)*/
     userSubroutine->createFormalParameterDeclarations ();
     userSubroutine->createLocalVariableDeclarations ();
     userSubroutine->createStatements ();
+
+    /* missing patch of names */
+    /* ... */
+
+    /* OK this is done also on the other side */
     RoseHelper::forceOutputOfCodeToFile (
         userSubroutine->getSubroutineHeaderStatement ());
 
@@ -83,19 +89,24 @@ FortranOpenMPSubroutinesGeneration::createSubroutines ()
      * (need to eliminate it from these calls)
      * ======================================================
      */
+
+    /* this must be outside the outer loop over kernels! */
     vector < SgProcedureHeaderStatement * > allCalledRoutines;
+
     userSubroutine->appendAdditionalSubroutines (moduleScope, parallelLoop, declarations, &allCalledRoutines);
-    
+
+    // This is recursively called in the previous routine...erase it
     vector < FortranUserSubroutine * > additionalSubroutines = userSubroutine->getAdditionalSubroutines ();
     
+    // same of above...
     vector < FortranUserSubroutine * > :: iterator it;
     for ( it = additionalSubroutines.begin(); it != additionalSubroutines.end(); it++ )
     {          
       RoseHelper::forceOutputOfCodeToFile (
         (*it)->getSubroutineHeaderStatement ());
     }        
-        
-        
+
+    /* OK from now on */
     FortranOpenMPKernelSubroutine * kernelSubroutine;
 
     if (parallelLoop->isDirectLoop ())

@@ -1,6 +1,4 @@
 
-
-
 /*  Open source copyright declaration based on BSD open source template:
  *  http://www.opensource.org/licenses/bsd-license.php
  * 
@@ -30,8 +28,8 @@
  */
 
 
-#include "FortranCUDAConstantDeclarations.h"
-#include <FortranCUDAInitialiseConstantsSubroutine.h>
+#include "FortranConstantDeclarations.h"
+#include <FortranInitialiseConstantsSubroutine.h>
 #include "FortranProgramDeclarationsAndDefinitions.h"
 #include "FortranStatementsAndExpressionsBuilder.h"
 #include "OP2Definitions.h"
@@ -41,7 +39,7 @@
 #include "../../../../../ROSE/rose-0.9.5a-15165_build/src/frontend/SageIII/Cxx_Grammar.h"
 
 SgVarRefExp *
-FortranCUDAConstantDeclarations::getReferenceToNewVariable (
+FortranConstantDeclarations::getReferenceToNewVariable (
     std::string const & originalName)
 {
   return variableDeclarations->getReference (getNewConstantVariableName (
@@ -49,23 +47,23 @@ FortranCUDAConstantDeclarations::getReferenceToNewVariable (
 }
 
 bool
-FortranCUDAConstantDeclarations::isCUDAConstant (
+FortranConstantDeclarations::isOP2Constant (
     std::string const & originalName)
 {
   return oldNamesToNewNames.count (originalName) != 0;
 }
 
 std::string
-FortranCUDAConstantDeclarations::getNewConstantVariableName (
+FortranConstantDeclarations::getNewConstantVariableName (
     std::string const & originalName)
 {
-  return originalName + "_CUDA";
+  return originalName + "_OP2_CONSTANT";
 }
 
 void
-FortranCUDAConstantDeclarations::addDeclarations (
+FortranConstantDeclarations::addDeclarations (
     FortranProgramDeclarationsAndDefinitions * declarations,
-    SgScopeStatement * moduleScope)
+    SgScopeStatement * moduleScope, bool isCUDA)
 {
   using std::map;
   using std::string;
@@ -92,9 +90,14 @@ FortranCUDAConstantDeclarations::addDeclarations (
     oldNamesToNewNames[variableName] = newVariableName;
     
     if ( constDefinition->getDimension () == 1 )
-      variableDeclarations->add (newVariableName,
-        FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
-            newVariableName, type, moduleScope, 1, CUDA_CONSTANT));
+      if ( isCUDA == true )
+        variableDeclarations->add (newVariableName,
+          FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
+              newVariableName, type, moduleScope, 1, CUDA_CONSTANT));
+      else
+        variableDeclarations->add (newVariableName,
+          FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
+              newVariableName, type, moduleScope, 0));
     else
       /*
        * ======================================================
@@ -104,30 +107,34 @@ FortranCUDAConstantDeclarations::addDeclarations (
        * the memory mapping
        * ======================================================
        */
-
-       variableDeclarations->add (newVariableName,
-        FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
-            newVariableName, type, moduleScope, 1, CUDA_DEVICE));
+       if ( isCUDA == true )
+        variableDeclarations->add (newVariableName,
+          FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
+              newVariableName, type, moduleScope, 1, CUDA_DEVICE));
+       else
+        variableDeclarations->add (newVariableName,
+          FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
+              newVariableName, type, moduleScope, 0));         
   }
 }
 
 void
-FortranCUDAConstantDeclarations::patchReferencesToCUDAConstants (
+FortranConstantDeclarations::patchReferencesToConstants (
     SgProcedureHeaderStatement * procedureHeader)
 {
-  Debug::getInstance ()->debugMessage ("Patching references to CUDA constants",
+  Debug::getInstance ()->debugMessage ("Patching references to constants",
       Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
   class TreeVisitor: public AstSimpleProcessing
   {
     private:
 
-      FortranCUDAConstantDeclarations * CUDAConstants;
+      FortranConstantDeclarations * OP2Constants;
 
     public:
 
-      TreeVisitor (FortranCUDAConstantDeclarations * CUDAConstants) :
-        CUDAConstants (CUDAConstants)
+      TreeVisitor (FortranConstantDeclarations * OP2Constants) :
+        OP2Constants (OP2Constants)
       {
       }
 
@@ -143,10 +150,10 @@ FortranCUDAConstantDeclarations::patchReferencesToCUDAConstants (
           string const variableName =
               variableReference->get_symbol ()->get_name ();
 
-          if (CUDAConstants->isCUDAConstant (variableName))
+          if (OP2Constants->isOP2Constant (variableName))
           {
             SgVarRefExp * newReference =
-                CUDAConstants->getReferenceToNewVariable (variableName);
+                OP2Constants->getReferenceToNewVariable (variableName);
 
             variableReference->set_symbol (newReference->get_symbol ());
           }
@@ -160,30 +167,30 @@ FortranCUDAConstantDeclarations::patchReferencesToCUDAConstants (
 }
 
 void
-FortranCUDAConstantDeclarations::appendCUDAConstantInitialisationToModule ( SgScopeStatement * moduleScope,
+FortranConstantDeclarations::appendConstantInitialisationToModule ( SgScopeStatement * moduleScope,
     FortranProgramDeclarationsAndDefinitions * declarations)
 {
 
   /*
    * ======================================================
    * This function appends a new subroutine to the CUDA
-   * module which initialises CUDA constants to their
+   * module which initialises OP2 constants to their
    * respective values. Its call is appended just after
    * the last call to op_decl_const in the user code
    * ======================================================
    */
   
-  std::string subroutineName = "initCUDAConstants";
+  std::string subroutineName = "initOP2Constants";
   
-  initialisationRoutine = new FortranCUDAInitialiseConstantsSubroutine (subroutineName, moduleScope,
+  initialisationRoutine = new FortranInitialiseConstantsSubroutine (subroutineName, moduleScope,
       declarations, oldNamesToNewNames, variableDeclarations);
 }
 
-FortranCUDAConstantDeclarations::FortranCUDAConstantDeclarations (
+FortranConstantDeclarations::FortranConstantDeclarations (
     FortranProgramDeclarationsAndDefinitions * declarations,
-    SgScopeStatement * moduleScope)
+    SgScopeStatement * moduleScope, bool isCUDA)
 {
   variableDeclarations = new ScopedVariableDeclarations ();
 
-  addDeclarations (declarations, moduleScope);
+  addDeclarations (declarations, moduleScope, isCUDA);
 }

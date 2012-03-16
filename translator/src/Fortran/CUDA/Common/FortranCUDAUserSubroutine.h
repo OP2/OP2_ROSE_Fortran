@@ -36,7 +36,7 @@
 
 #include <FortranUserSubroutine.h>
 
-class FortranCUDAConstantDeclarations;
+class FortranConstantDeclarations;
 
 class FortranCUDAUserSubroutine: public FortranUserSubroutine
 {
@@ -68,7 +68,7 @@ class FortranCUDAUserSubroutine: public FortranUserSubroutine
 
     virtual void appendAdditionalSubroutines ( SgScopeStatement * moduleScope,
       FortranParallelLoop * parallelLoop, FortranProgramDeclarationsAndDefinitions * declarations,
-      FortranCUDAConstantDeclarations * CUDAconstants, std::vector < SgProcedureHeaderStatement * > * allCalledRoutines);
+      FortranConstantDeclarations * CUDAconstants, std::vector < SgProcedureHeaderStatement * > * allCalledRoutines);
 
     FortranCUDAUserSubroutine (SgScopeStatement * moduleScope,
         FortranParallelLoop * parallelLoop,

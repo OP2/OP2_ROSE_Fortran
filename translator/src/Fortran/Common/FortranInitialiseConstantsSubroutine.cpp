@@ -1,6 +1,4 @@
 
-
-
 /*  Open source copyright declaration based on BSD open source template:
  *  http://www.opensource.org/licenses/bsd-license.php
  * 
@@ -31,7 +29,7 @@
 
 
 #include <OP2Definitions.h>
-#include <FortranCUDAInitialiseConstantsSubroutine.h>
+#include <FortranInitialiseConstantsSubroutine.h>
 #include <FortranProgramDeclarationsAndDefinitions.h>
 #include <RoseStatementsAndExpressionsBuilder.h>
 #include <FortranStatementsAndExpressionsBuilder.h>
@@ -39,7 +37,7 @@
 #include <FortranTypesBuilder.h>
 
 void
-FortranCUDAInitialiseConstantsSubroutine::createStatements ()
+FortranInitialiseConstantsSubroutine::createStatements ()
 {
   using namespace SageInterface;
   using namespace SageBuilder;
@@ -53,7 +51,7 @@ FortranCUDAInitialiseConstantsSubroutine::createStatements ()
    * ======================================================
    */
 
-  Debug::getInstance ()->debugMessage ("Appending assignments for CUDA constants initialisation",
+  Debug::getInstance ()->debugMessage ("Appending assignments for OP2 constants initialisation",
       Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
   for (std::map <std::string, OpConstDefinition *>::const_iterator it =
@@ -76,13 +74,13 @@ FortranCUDAInitialiseConstantsSubroutine::createStatements ()
 }
 
 void
-FortranCUDAInitialiseConstantsSubroutine::createLocalVariableDeclarations ()
+FortranInitialiseConstantsSubroutine::createLocalVariableDeclarations ()
 {
   
 }
 
 void
-FortranCUDAInitialiseConstantsSubroutine::createFormalParameterDeclarations ()
+FortranInitialiseConstantsSubroutine::createFormalParameterDeclarations ()
 {
   using std::vector;
   using std::map;
@@ -91,7 +89,7 @@ FortranCUDAInitialiseConstantsSubroutine::createFormalParameterDeclarations ()
   using namespace SageBuilder;
   using namespace LoopVariableNames;
   
-  Debug::getInstance ()->debugMessage ("Outputting formal parameters for CUDA constant initialisation routine",
+  Debug::getInstance ()->debugMessage ("Outputting formal parameters for OP2 constant initialisation routine",
       Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
       
@@ -109,7 +107,6 @@ FortranCUDAInitialiseConstantsSubroutine::createFormalParameterDeclarations ()
       variableName,
       FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
         variableName, type, subroutineScope, formalParameters));
-
   }
 
   /*
@@ -126,7 +123,7 @@ FortranCUDAInitialiseConstantsSubroutine::createFormalParameterDeclarations ()
 
 
 
-FortranCUDAInitialiseConstantsSubroutine::FortranCUDAInitialiseConstantsSubroutine (std::string subroutineName, SgScopeStatement * moduleScope,
+FortranInitialiseConstantsSubroutine::FortranInitialiseConstantsSubroutine (std::string subroutineName, SgScopeStatement * moduleScope,
   FortranProgramDeclarationsAndDefinitions * allDeclarations, std::map <std::string, std::string> _oldNamesToNewNames,
   ScopedVariableDeclarations * _constantDeclarations):
   Subroutine <SgProcedureHeaderStatement> (subroutineName), declarations(allDeclarations), oldNamesToNewNames(_oldNamesToNewNames),

@@ -1,6 +1,4 @@
 
-
-
 /*  Open source copyright declaration based on BSD open source template:
  *  http://www.opensource.org/licenses/bsd-license.php
  * 
@@ -31,8 +29,8 @@
 
 
 #pragma once
-#ifndef FORTRAN_CUDA_CONSTANT_DECLARATIONS_H
-#define FORTRAN_CUDA_CONSTANT_DECLARATIONS_H
+#ifndef FORTRAN_CONSTANT_DECLARATIONS_H
+#define FORTRAN_CONSTANT_DECLARATIONS_H
 
 #include <string>
 #include <map>
@@ -42,15 +40,15 @@ class ScopedVariableDeclarations;
 class SgScopeStatement;
 class SgVarRefExp;
 class SgProcedureHeaderStatement;
-class FortranCUDAInitialiseConstantsSubroutine;
+class FortranInitialiseConstantsSubroutine;
 
-class FortranCUDAConstantDeclarations
+class FortranConstantDeclarations
 {
   private:
 
     ScopedVariableDeclarations * variableDeclarations;
 
-    FortranCUDAInitialiseConstantsSubroutine * initialisationRoutine;
+    FortranInitialiseConstantsSubroutine * initialisationRoutine;
     
   protected:
 
@@ -63,7 +61,7 @@ class FortranCUDAConstantDeclarations
 
     void
     addDeclarations (FortranProgramDeclarationsAndDefinitions * declarations,
-        SgScopeStatement * moduleScope);
+        SgScopeStatement * moduleScope, bool isCUDA);
 
   public:
 
@@ -71,19 +69,19 @@ class FortranCUDAConstantDeclarations
     getReferenceToNewVariable (std::string const & originalName);
 
     bool
-    isCUDAConstant (std::string const & originalName);
+    isOP2Constant (std::string const & originalName);
 
     void
-    patchReferencesToCUDAConstants (
+    patchReferencesToConstants (
         SgProcedureHeaderStatement * procedureHeader);
 
     void
-    appendCUDAConstantInitialisationToModule ( SgScopeStatement * moduleScope,
+    appendConstantInitialisationToModule ( SgScopeStatement * moduleScope,
         FortranProgramDeclarationsAndDefinitions * declarations);
         
-    FortranCUDAConstantDeclarations (
+    FortranConstantDeclarations (
         FortranProgramDeclarationsAndDefinitions * declarations,
-        SgScopeStatement * moduleScope);
+        SgScopeStatement * moduleScope, bool isCUDA);
 };
 
 #endif

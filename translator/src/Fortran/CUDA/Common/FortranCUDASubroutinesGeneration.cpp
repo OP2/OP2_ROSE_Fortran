@@ -47,7 +47,7 @@
 #include "FortranProgramDeclarationsAndDefinitions.h"
 #include "FortranTypesBuilder.h"
 #include "FortranStatementsAndExpressionsBuilder.h"
-#include "FortranCUDAConstantDeclarations.h"
+#include "FortranConstantDeclarations.h"
 #include "FortranOP2Definitions.h"
 #include "OP2Definitions.h"
 #include "RoseHelper.h"
@@ -168,7 +168,7 @@ FortranCUDASubroutinesGeneration::createSubroutines ()
   using std::string;
   using std::map;
 
-  CUDAconstants->appendCUDAConstantInitialisationToModule ( moduleScope, declarations );
+  CUDAconstants->appendConstantInitialisationToModule ( moduleScope, declarations );
   
   /*
    * ======================================================
@@ -202,7 +202,7 @@ FortranCUDASubroutinesGeneration::createSubroutines ()
     FortranCUDAUserSubroutine * userDeviceSubroutine =
         new FortranCUDAUserSubroutine (moduleScope, parallelLoop, declarations);
 
-    CUDAconstants->patchReferencesToCUDAConstants (
+    CUDAconstants->patchReferencesToConstants (
         userDeviceSubroutine->getSubroutineHeaderStatement ());
 
     /*
@@ -290,8 +290,8 @@ FortranCUDASubroutinesGeneration::createModuleDeclarations ()
   using std::map;
   using std::string;
 
-  CUDAconstants = new FortranCUDAConstantDeclarations (declarations,
-      moduleScope);
+  CUDAconstants = new FortranConstantDeclarations (declarations,
+      moduleScope, true);
 
   /*
    * ======================================================

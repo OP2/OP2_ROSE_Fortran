@@ -37,7 +37,7 @@
 #include <FortranSubroutinesGeneration.h>
 
 class FortranCUDAOpDatCardinalitiesDeclaration;
-class FortranCUDAConstantDeclarations;
+class FortranConstantDeclarations;
 
 class FortranCUDASubroutinesGeneration: public FortranSubroutinesGeneration
 {
@@ -47,7 +47,7 @@ class FortranCUDASubroutinesGeneration: public FortranSubroutinesGeneration
     std::map <std::string, FortranCUDAOpDatCardinalitiesDeclaration *>
         cardinalitiesDeclarations;
 
-    FortranCUDAConstantDeclarations * CUDAconstants;
+    FortranConstantDeclarations * CUDAconstants;
 
   private:
 

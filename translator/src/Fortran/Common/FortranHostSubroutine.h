@@ -54,11 +54,15 @@ class FortranHostSubroutine: public HostSubroutine <SgProcedureHeaderStatement>
      * ======================================================
      * Generates if (set%size == 0) return statement
      * Having empty iteration sets is a typical behaviour of 
-     * configurable applications
+     * configurable applications. It also comes as a version 
+     * for the new OP2-Common library
      * ======================================================
      */
     void
     createEarlyExitStatement (SgScopeStatement * subroutineScope);
+
+    void
+    createEarlyExitStatementNewLibrary (SgScopeStatement * subroutineScope);
     
     void
     createDumpOfOutputDeclarations (SgScopeStatement * subroutineScope);

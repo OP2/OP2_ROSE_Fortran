@@ -301,7 +301,7 @@ FortranCUDAKernelSubroutineIndirectLoop::createIncrementAndWriteAccessEpilogueSt
     if (parallelLoop->isIncremented (i)) hasIncrementedArg = true;
   }
 
-  if (hasWriteOrReadWrite && !hasIncrementedArg)
+  if (hasWriteOrReadWrite || hasIncrementedArg)
     appendStatement (buildExprStatement (CUDA::createDeviceThreadSynchronisationCallStatement (subroutineScope)),
       block);
   

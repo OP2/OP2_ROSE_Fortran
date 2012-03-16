@@ -173,6 +173,41 @@ FortranHostSubroutine::createEarlyExitStatement (SgScopeStatement * subroutineSc
 }
 
 void
+FortranHostSubroutine::createEarlyExitStatementNewLibrary (SgScopeStatement * subroutineScope)
+{
+  using namespace SageBuilder;
+  using namespace SageInterface;
+  using namespace OP2VariableNames;
+  using std::string;
+  
+  string const sizeField = OP2::RunTimeVariableNames::size;
+  string const setPtr = OP2::RunTimeVariableNames::Fortran::setPtr;
+  
+  SgDotExp * setPtrField = buildDotExp (
+    variableDeclarations->getReference (getOpSetName ()),
+    buildOpaqueVarRefExp (setPtr, subroutineScope));
+  
+  SgDotExp * setSizeField = buildDotExp (
+    setPtrField,
+    buildOpaqueVarRefExp (sizeField, subroutineScope));
+
+  SgExpression * conditionSetZero = buildEqualityOp (setSizeField, buildIntVal (0) );
+
+  SgBasicBlock * ifBody = buildBasicBlock ();
+  
+  SgReturnStmt * returnStatement = buildReturnStmt (buildNullExpression ());
+  
+  appendStatement (returnStatement, ifBody);
+  
+  SgIfStmt * ifSetIsZero =
+    RoseStatementsAndExpressionsBuilder::buildIfStatementWithEmptyElse (
+    conditionSetZero , ifBody);
+
+  appendStatement (ifSetIsZero, subroutineScope);
+}
+
+
+void
 FortranHostSubroutine::createDumpOfOutputDeclarations (SgScopeStatement * subroutineScope)
 {
   using namespace SageBuilder;
