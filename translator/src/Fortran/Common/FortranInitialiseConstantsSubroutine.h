@@ -84,7 +84,7 @@ class FortranInitialiseConstantsSubroutine: public Subroutine <
     
     FortranInitialiseConstantsSubroutine (std::string subroutineName, SgScopeStatement * moduleScope,
       FortranProgramDeclarationsAndDefinitions * allDeclarations, std::map <std::string, std::string> oldNamesToNewNames,
-      ScopedVariableDeclarations * _constantDeclarations);
+      ScopedVariableDeclarations * _constantDeclarations, bool isCUDA);
 };
   
 #endif

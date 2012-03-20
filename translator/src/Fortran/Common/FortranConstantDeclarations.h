@@ -77,7 +77,7 @@ class FortranConstantDeclarations
 
     void
     appendConstantInitialisationToModule ( SgScopeStatement * moduleScope,
-        FortranProgramDeclarationsAndDefinitions * declarations);
+        FortranProgramDeclarationsAndDefinitions * declarations, bool isCuda);
         
     FortranConstantDeclarations (
         FortranProgramDeclarationsAndDefinitions * declarations,

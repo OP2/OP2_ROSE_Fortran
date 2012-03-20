@@ -40,6 +40,7 @@
 #include "FortranOpenMPHostSubroutineIndirectLoop.h"
 #include "FortranProgramDeclarationsAndDefinitions.h"
 #include "FortranOpDatDimensionsDeclaration.h"
+#include "FortranConstantDeclarations.h"
 #include "RoseHelper.h"
 #include "Globals.h"
 #include "OpenMP.h"
@@ -57,27 +58,71 @@ FortranOpenMPSubroutinesGeneration::createSubroutines ()
   using std::string;
   using std::map;
 
+  Debug::getInstance ()->debugMessage ("Creating subroutines: appending constants initialisation subroutine",
+    Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+  
+  OP2constants->appendConstantInitialisationToModule ( moduleScope, declarations, /* isCuda = */ false );
+
+  Debug::getInstance ()->debugMessage ("Creating subroutines: scanning all parallel loops",
+    Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+
+  
+  /*
+   * ======================================================
+   * This vector contains all subroutines called by user
+   * kernels, to avoid their duplication in the output
+   * file
+   * ======================================================
+   */
+  vector < SgProcedureHeaderStatement * > allCalledRoutines;
+
   for (map <string, ParallelLoop *>::const_iterator it =
       declarations->firstParallelLoop (); it
       != declarations->lastParallelLoop (); ++it)
   {
     string const userSubroutineName = it->first;
 
+    Debug::getInstance ()->debugMessage ("Analysing user subroutine '"
+        + userSubroutineName + "' with subroutines already defined in previous kernels, number = "
+        + boost::lexical_cast<string> (allCalledRoutines.size()), Debug::FUNCTION_LEVEL, __FILE__, __LINE__);    
+    
+    vector < SgProcedureHeaderStatement * > :: iterator finder;
+    for ( finder = allCalledRoutines.begin (); finder != allCalledRoutines.end (); finder++ )
+    {
+      Debug::getInstance ()->debugMessage ("Routine: '" + (*finder)->get_name ().getString () + "'", Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+    }
+
     FortranParallelLoop * parallelLoop =
         static_cast <FortranParallelLoop *> (it->second);
 
+    Debug::getInstance ()->debugMessage ("Creating userSubroutine object",
+      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);            
+        
     FortranUserSubroutine * userSubroutine = new FortranUserSubroutine (
         moduleScope, parallelLoop, declarations);
 
-    /* This is not done in CUDA (done in the constructor of the user sub.?)*/
     userSubroutine->createFormalParameterDeclarations ();
-    userSubroutine->createLocalVariableDeclarations ();
     userSubroutine->createStatements ();
+        
+    Debug::getInstance ()->debugMessage ("Creating OP2Constants",
+      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);                    
+        
+    OP2constants->patchReferencesToConstants (
+       userSubroutine->getSubroutineHeaderStatement ());
 
-    /* missing patch of names */
-    /* ... */
+    /* This is not done in CUDA (done in the constructor of the user sub.?)*/
+    //    userSubroutine->createFormalParameterDeclarations ();
+    //userSubroutine->createLocalVariableDeclarations ();
+    //userSubroutine->createStatements ();
 
-    /* OK this is done also on the other side */
+    /*
+     * ======================================================
+     * We have to set each node in the AST representation of
+     * this subroutine as compiler generated, otherwise chunks
+     * of the user kernel are missing in the output
+     * ======================================================
+     */
+
     RoseHelper::forceOutputOfCodeToFile (
         userSubroutine->getSubroutineHeaderStatement ());
 
@@ -90,23 +135,19 @@ FortranOpenMPSubroutinesGeneration::createSubroutines ()
      * ======================================================
      */
 
-    /* this must be outside the outer loop over kernels! */
-    vector < SgProcedureHeaderStatement * > allCalledRoutines;
-
-    userSubroutine->appendAdditionalSubroutines (moduleScope, parallelLoop, declarations, &allCalledRoutines);
+    userSubroutine->appendAdditionalSubroutines (moduleScope, parallelLoop, declarations, OP2constants, &allCalledRoutines);
 
     // This is recursively called in the previous routine...erase it
-    vector < FortranUserSubroutine * > additionalSubroutines = userSubroutine->getAdditionalSubroutines ();
+    //    vector < FortranUserSubroutine * > additionalSubroutines = userSubroutine->getAdditionalSubroutines ();
     
     // same of above...
-    vector < FortranUserSubroutine * > :: iterator it;
-    for ( it = additionalSubroutines.begin(); it != additionalSubroutines.end(); it++ )
-    {          
-      RoseHelper::forceOutputOfCodeToFile (
-        (*it)->getSubroutineHeaderStatement ());
-    }        
+    //    vector < FortranUserSubroutine * > :: iterator it;
+    //    for ( it = additionalSubroutines.begin(); it != additionalSubroutines.end(); it++ )
+    //    {          
+    //      RoseHelper::forceOutputOfCodeToFile (
+    //        (*it)->getSubroutineHeaderStatement ());
+    //    }        
 
-    /* OK from now on */
     FortranOpenMPKernelSubroutine * kernelSubroutine;
 
     if (parallelLoop->isDirectLoop ())
@@ -139,6 +180,9 @@ FortranOpenMPSubroutinesGeneration::createModuleDeclarations ()
   using std::map;
   using std::string;
 
+  OP2constants = new FortranConstantDeclarations (declarations,
+      moduleScope, false);
+  
   /*
    * ======================================================
    * Declare module-wide variables for indirect loops

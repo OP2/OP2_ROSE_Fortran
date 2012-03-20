@@ -125,7 +125,7 @@ FortranInitialiseConstantsSubroutine::createFormalParameterDeclarations ()
 
 FortranInitialiseConstantsSubroutine::FortranInitialiseConstantsSubroutine (std::string subroutineName, SgScopeStatement * moduleScope,
   FortranProgramDeclarationsAndDefinitions * allDeclarations, std::map <std::string, std::string> _oldNamesToNewNames,
-  ScopedVariableDeclarations * _constantDeclarations):
+  ScopedVariableDeclarations * _constantDeclarations, bool isCUDA):
   Subroutine <SgProcedureHeaderStatement> (subroutineName), declarations(allDeclarations), oldNamesToNewNames(_oldNamesToNewNames),
   constantDeclarations(_constantDeclarations)
 {
@@ -136,7 +136,8 @@ FortranInitialiseConstantsSubroutine::FortranInitialiseConstantsSubroutine (std:
       this->subroutineName.c_str (), buildVoidType (), formalParameters,
       SgProcedureHeaderStatement::e_subroutine_subprogram_kind, moduleScope);
 
-  subroutineHeaderStatement->get_functionModifier ().setCudaHost ();
+  if (isCUDA == true)
+    subroutineHeaderStatement->get_functionModifier ().setCudaHost ();
       
   subroutineScope = subroutineHeaderStatement->get_definition ()->get_body ();
 

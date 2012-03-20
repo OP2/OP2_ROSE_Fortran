@@ -39,13 +39,28 @@
 
 class FortranParallelLoop;
 class FortranProgramDeclarationsAndDefinitions;
+class FortranConstantDeclarations;
 
 using namespace std;
 
 class FortranUserSubroutine: public UserSubroutine <SgProcedureHeaderStatement,
     FortranProgramDeclarationsAndDefinitions>
 {
+
   protected:
+    
+    /*
+     * ======================================================
+     * This boolean indicates if the user subroutine is one
+     * used as an argument to an op_par_loop or if it is 
+     * called inside a user kernel or another user subroutine
+     * It permits handling the "value" attribute in a 
+     * different way w.r.t. the parallelLoop object in which
+     * it is called and the positional identities of its
+     * formal parameters
+     * ======================================================
+     */
+    bool isUserKernel;
     
    /*
     * ======================================================
@@ -66,23 +81,35 @@ class FortranUserSubroutine: public UserSubroutine <SgProcedureHeaderStatement,
     virtual void
     createFormalParameterDeclarations ();
 
-    virtual void appendAdditionalSubroutines ( SgScopeStatement * moduleScope,
+    void appendAdditionalSubroutines ( SgScopeStatement * moduleScope,
       FortranParallelLoop * parallelLoop, FortranProgramDeclarationsAndDefinitions * declarations,
-      vector < SgProcedureHeaderStatement * > * allCalledRoutines);
-    
-    vector < FortranUserSubroutine * > getAdditionalSubroutines()
-    {
-      return additionalSubroutines;
-    }
-    
-    FortranUserSubroutine (SgScopeStatement * moduleScope,
+      FortranConstantDeclarations * OP2constants, std::vector < SgProcedureHeaderStatement * > * allCalledRoutines);
+        
+//    vector < FortranUserSubroutine * > getAdditionalSubroutines()
+//    {
+/*      return additionalSubroutines;
+    }*/
+
+    FortranUserSubroutine (SgScopeStatement * moduleScope, FortranParallelLoop * parallelLoop,
+      FortranProgramDeclarationsAndDefinitions * declarations);
+/*
+ * ======================================================
+ * This contructor is for non user kernels only (see 
+ * above)
+ * ======================================================
+ */
+
+  FortranUserSubroutine (SgScopeStatement * moduleScope, FortranParallelLoop * parallelLoop,
+    FortranProgramDeclarationsAndDefinitions * declarations, string subroutineName);
+
+/*    FortranUserSubroutine (SgScopeStatement * moduleScope,
         FortranParallelLoop * parallelLoop,
         FortranProgramDeclarationsAndDefinitions * declarations);
 
     FortranUserSubroutine (SgScopeStatement * moduleScope,
         FortranParallelLoop * parallelLoop,
         FortranProgramDeclarationsAndDefinitions * declarations,
-        string subroutineName);
+        string subroutineName);*/
 };
 
 #endif

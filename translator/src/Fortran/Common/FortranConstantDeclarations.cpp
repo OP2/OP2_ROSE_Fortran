@@ -168,7 +168,7 @@ FortranConstantDeclarations::patchReferencesToConstants (
 
 void
 FortranConstantDeclarations::appendConstantInitialisationToModule ( SgScopeStatement * moduleScope,
-    FortranProgramDeclarationsAndDefinitions * declarations)
+    FortranProgramDeclarationsAndDefinitions * declarations, bool isCuda)
 {
 
   /*
@@ -183,7 +183,7 @@ FortranConstantDeclarations::appendConstantInitialisationToModule ( SgScopeState
   std::string subroutineName = "initOP2Constants";
   
   initialisationRoutine = new FortranInitialiseConstantsSubroutine (subroutineName, moduleScope,
-      declarations, oldNamesToNewNames, variableDeclarations);
+      declarations, oldNamesToNewNames, variableDeclarations, isCuda);
 }
 
 FortranConstantDeclarations::FortranConstantDeclarations (

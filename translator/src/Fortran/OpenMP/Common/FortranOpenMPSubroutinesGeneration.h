@@ -36,9 +36,13 @@
 
 #include <FortranSubroutinesGeneration.h>
 
+class FortranConstantDeclarations;
+
 class FortranOpenMPSubroutinesGeneration: public FortranSubroutinesGeneration
 {
   private:
+
+    FortranConstantDeclarations * OP2constants;
 
     virtual void
     createReductionSubroutines ();

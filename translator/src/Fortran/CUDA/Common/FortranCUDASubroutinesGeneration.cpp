@@ -168,7 +168,7 @@ FortranCUDASubroutinesGeneration::createSubroutines ()
   using std::string;
   using std::map;
 
-  CUDAconstants->appendConstantInitialisationToModule ( moduleScope, declarations );
+  CUDAconstants->appendConstantInitialisationToModule ( moduleScope, declarations, /* isCuda = */ true );
   
   /*
    * ======================================================
@@ -202,6 +202,8 @@ FortranCUDASubroutinesGeneration::createSubroutines ()
     FortranCUDAUserSubroutine * userDeviceSubroutine =
         new FortranCUDAUserSubroutine (moduleScope, parallelLoop, declarations);
 
+    userDeviceSubroutine->createStatements ();        
+        
     CUDAconstants->patchReferencesToConstants (
         userDeviceSubroutine->getSubroutineHeaderStatement ());
 
