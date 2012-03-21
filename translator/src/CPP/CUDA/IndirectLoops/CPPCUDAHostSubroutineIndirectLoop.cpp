@@ -61,7 +61,13 @@ CPPCUDAHostSubroutineIndirectLoop::createKernelFunctionCallStatement (
   {
     if (parallelLoop->isOpMatArg (i))
     {
-      // Pass op_mat data pointer
+      /*
+       * FIXME, this should be pulled out into a generic routine so
+       * that one can use different matrix storage formats that
+       * require different arguments to the device kernel.
+       */
+
+      /* Pass op_mat data pointer */
       unsigned int mat_num = parallelLoop->getOpMatArgNum (i);
       OpArgMatDefinition * arg_mat = parallelLoop->getOpMatArg (mat_num);
       OpMatDefinition * mat = declarations->getOpMatDefinition (arg_mat->getMatName ());
@@ -74,17 +80,17 @@ CPPCUDAHostSubroutineIndirectLoop::createKernelFunctionCallStatement (
           buildPointerType (mat->getBaseType ()));
       actualParameters->append_expression (castExpression);
 
-      // pass row pointer
+      /* pass row pointer */
       SgDotExp * rowptr = buildDotExp (
         variableDeclarations->getReference (getOpMatName (mat_num)),
         buildOpaqueVarRefExp (rowptr_d, subroutineScope));
       actualParameters->append_expression (rowptr);
-      // pass col pointer
+      /* pass col pointer */
       SgDotExp * colptr = buildDotExp (
         variableDeclarations->getReference (getOpMatName (mat_num)),
         buildOpaqueVarRefExp (colptr_d, subroutineScope));
       actualParameters->append_expression (colptr);
-      // pass nrow
+      /* pass nrow */
       SgDotExp * nrow_d = buildDotExp (
         variableDeclarations->getReference (getOpMatName (mat_num)),
         buildOpaqueVarRefExp (nrow, subroutineScope));
