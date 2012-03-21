@@ -143,10 +143,10 @@ OpArgMatDefinition::getMatName () const
   return matName;
 }
 
-int
-OpArgMatDefinition::getIdx1 () const
+const int *
+OpArgMatDefinition::getMap1Extent () const
 {
-  return idx1;
+  return map1extent;
 }
 
 std::string const &
@@ -155,10 +155,10 @@ OpArgMatDefinition::getMap1Name () const
   return map1Name;
 }
 
-int
-OpArgMatDefinition::getIdx2 () const
+const int *
+OpArgMatDefinition::getMap2Extent () const
 {
-  return idx2;
+  return map2extent;
 }
 
 std::string const &
@@ -203,3 +203,32 @@ OpSparsityDefinition::getMap2Name () const
   return map2Name;
 }
 
+OpIterationSpaceDefinition::OpIterationSpaceDefinition (SgExprListExp * args)
+{
+  SgVarRefExp * set = isSgVarRefExp (args->get_expressions ()[0]);
+
+  ROSE_ASSERT (set != NULL);
+
+  setName = set->get_symbol ()->get_name ().getString ();
+
+  for (unsigned int i = 1; i < args->get_expressions ().size (); i++)
+  {
+    SgIntVal * dim = isSgIntVal (args->get_expressions ()[i]);
+
+    ROSE_ASSERT (dim != NULL);
+
+    iterationDimensions.push_back (dim->get_value ());
+  }
+}
+
+std::vector<int>
+OpIterationSpaceDefinition::getIterationDimensions () const
+{
+  return iterationDimensions;
+}
+
+std::string const &
+OpIterationSpaceDefinition::getSetName () const
+{
+  return setName;
+}

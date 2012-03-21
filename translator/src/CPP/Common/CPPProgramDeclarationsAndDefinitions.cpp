@@ -338,6 +338,7 @@ CPPProgramDeclarationsAndDefinitions::analyseParallelLoopArguments (
   unsigned int OP_MAT_ArgumentGroup = 1;
 
   unsigned int ArgumentGroup = 1;
+  OpIterationSpaceDefinition * itspace = NULL;
   for (unsigned int argument = 0; argument
       < actualArguments->get_expressions ().size (); ++argument)
   {
@@ -356,6 +357,15 @@ CPPProgramDeclarationsAndDefinitions::analyseParallelLoopArguments (
       SgExprListExp * opDatActualArguments = opDatCall->get_args ();
 
       string name = opDatCall->getAssociatedFunctionSymbol ()->get_name ().getString ();
+
+      if (iequals(name, OP2::OP_ITERATION_SPACE))
+      {
+        itspace = new OpIterationSpaceDefinition (opDatActualArguments);
+        /* rewrite set argument, the magic happens in the generated
+         * device code */
+        actualArguments->get_expressions ()[argument] = opDatActualArguments->get_expressions ()[0];
+        continue;
+      }
       parallelLoop->setIsOpMatArg (ArgumentGroup, false);
       if (iequals (name, OP2::OP_ARG_DAT))
       {
@@ -381,12 +391,12 @@ CPPProgramDeclarationsAndDefinitions::analyseParallelLoopArguments (
             == CPPImperialOpArgMatDefinition::getNumberOfExpectedArguments ())
         {
           parallelLoop->setOpMatArg (OP_MAT_ArgumentGroup,
-              new CPPImperialOpArgMatDefinition (opDatActualArguments, this));
+              new CPPImperialOpArgMatDefinition (opDatActualArguments, this, itspace));
         }
         else
         {
           parallelLoop->setOpMatArg (OP_MAT_ArgumentGroup,
-              new CPPOxfordOpArgMatDefinition (opDatActualArguments));
+              new CPPOxfordOpArgMatDefinition (opDatActualArguments, this, itspace));
         }
         OP_MAT_ArgumentGroup++;
       }

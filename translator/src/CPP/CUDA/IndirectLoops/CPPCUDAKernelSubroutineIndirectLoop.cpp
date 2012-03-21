@@ -573,9 +573,13 @@ CPPCUDAKernelSubroutineIndirectLoop::createExecutionLoopStatements ()
     if (parallelLoop->getNumberOfOpMatArgumentGroups () > 0)
     {
       OpArgMatDefinition * arg_mat = parallelLoop->getOpMatArg (1);
+      const int * extent1 = arg_mat->getMap1Extent ();
+      const int * extent2 = arg_mat->getMap2Extent ();
+      int len1 = extent1[1] - extent1[0];
+      int len2 = extent2[1] - extent2[0];
       SgMultiplyOp * m1m2 = buildMultiplyOp (
-          buildIntVal (declarations->getOpMapDefinition (arg_mat->getMap1Name ())->getDimension()),
-          buildIntVal (declarations->getOpMapDefinition (arg_mat->getMap2Name ())->getDimension()));
+          buildIntVal (len1),
+          buildIntVal (len2));
       m1m2->set_need_paren (true);
 
       // i2 = i1 / (map1Dim * map2Dim)
@@ -591,24 +595,42 @@ CPPCUDAKernelSubroutineIndirectLoop::createExecutionLoopStatements ()
               getIterationCounterVariableName (2)));
       i2m1m2->set_need_paren (true);
 
-      appendStatement (buildAssignStatement (variableDeclarations->getReference (
-                  getIterationCounterVariableName (3)),
-              buildIntegerDivideOp (buildSubtractOp (variableDeclarations->getReference(
+      if (len1 == 1)
+      {
+        appendStatement (buildAssignStatement (variableDeclarations->getReference (
+                    getIterationCounterVariableName (3)),
+                buildIntVal (extent1[0])),
+            loopBody);
+      }
+      else {
+        appendStatement (buildAssignStatement (variableDeclarations->getReference (
+                    getIterationCounterVariableName (3)),
+              buildIntegerDivideOp (buildSubtractOp (variableDeclarations->getReference (
                           getIterationCounterVariableName (1)), i2m1m2),
-                  buildIntVal (declarations->getOpMapDefinition (arg_mat->getMap1Name ())->getDimension ()))),
+                                    buildIntVal (len1))),
           loopBody);
+      }
       // i4 = (i1 - (map1Dim * map2Dim) * i2 - map1Dim * i3)
       SgMultiplyOp * i3m1 = buildMultiplyOp (
-          buildIntVal (declarations->getOpMapDefinition (arg_mat->getMap1Name ())->getDimension ()),
+          buildIntVal (len1),
           variableDeclarations->getReference (getIterationCounterVariableName (3)));
 
       i3m1->set_need_paren (true);
-      appendStatement (buildAssignStatement (variableDeclarations->getReference (
-                  getIterationCounterVariableName (4)),
-              buildSubtractOp (variableDeclarations->getReference (
-                      getIterationCounterVariableName (1)),
-                  buildAddOp (i2m1m2, i3m1))),
-          loopBody);
+      if (len2 == 1)
+      {
+        appendStatement (buildAssignStatement (variableDeclarations->getReference (
+                    getIterationCounterVariableName (4)),
+                buildIntVal (extent2[0])),
+            loopBody);
+      }
+      else {
+        appendStatement (buildAssignStatement (variableDeclarations->getReference (
+                    getIterationCounterVariableName (4)),
+                buildSubtractOp (variableDeclarations->getReference (
+                        getIterationCounterVariableName (1)),
+                    buildAddOp (i2m1m2, i3m1))),
+            loopBody);
+      }
     }
 
     appendStatement (createUserSubroutineCallStatement (), loopBody);
@@ -618,11 +640,15 @@ CPPCUDAKernelSubroutineIndirectLoop::createExecutionLoopStatements ()
     if (parallelLoop->getNumberOfOpMatArgumentGroups () > 0)
     {
       OpArgMatDefinition * arg_mat = parallelLoop->getOpMatArg (1);
+      const int * extent1 = arg_mat->getMap1Extent ();
+      const int * extent2 = arg_mat->getMap2Extent ();
+      int len1 = extent1[1] - extent1[0];
+      int len2 = extent2[1] - extent2[0];
       upperBoundExpression = buildLessThanOp (variableDeclarations->getReference (
               getIterationCounterVariableName (1)),
               buildMultiplyOp (nthread, buildMultiplyOp (
-                      buildIntVal (declarations->getOpMapDefinition (arg_mat->getMap1Name ())->getDimension ()),
-                      buildIntVal (declarations->getOpMapDefinition (arg_mat->getMap2Name ())->getDimension ()))));
+                      buildIntVal (len1),
+                      buildIntVal (len2))));
     }
     else
     {
