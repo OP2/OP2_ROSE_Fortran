@@ -582,7 +582,7 @@ CPPCUDAKernelSubroutineIndirectLoop::createExecutionLoopStatements ()
           buildIntVal (len2));
       m1m2->set_need_paren (true);
 
-      // i2 = i1 / (map1Dim * map2Dim)
+      /* i2 = i1 / (map1Dim * map2Dim) */
       appendStatement (buildAssignStatement (variableDeclarations->getReference (
                   getIterationCounterVariableName (2)),
               buildIntegerDivideOp (variableDeclarations->getReference (
@@ -590,7 +590,7 @@ CPPCUDAKernelSubroutineIndirectLoop::createExecutionLoopStatements ()
                   m1m2)),
           loopBody);
 
-      // i3 = (i1 - (map1Dim * map2Dim) * i2) / map1Dim
+      /* i3 = (i1 - (map1Dim * map2Dim) * i2) / map1Dim */
       SgMultiplyOp * i2m1m2 = buildMultiplyOp (m1m2, variableDeclarations->getReference (
               getIterationCounterVariableName (2)));
       i2m1m2->set_need_paren (true);
@@ -610,7 +610,7 @@ CPPCUDAKernelSubroutineIndirectLoop::createExecutionLoopStatements ()
                                     buildIntVal (len1))),
           loopBody);
       }
-      // i4 = (i1 - (map1Dim * map2Dim) * i2 - map1Dim * i3)
+      /* i4 = (i1 - (map1Dim * map2Dim) * i2 - map1Dim * i3) */
       SgMultiplyOp * i3m1 = buildMultiplyOp (
           buildIntVal (len1),
           variableDeclarations->getReference (getIterationCounterVariableName (3)));
@@ -686,13 +686,15 @@ CPPCUDAKernelSubroutineIndirectLoop::createExecutionLoopStatements ()
       parameters->append_expression (
           variableDeclarations->getReference (name));
 
-      // FIXME, we need to correctly stage in mapping variable for
-      // op_mat argument and pull the correct one out here
+      /*
+       * FIXME, we need to correctly stage in mapping variable for
+       * op_mat argument and pull the correct one out here.
+       */
       SgVarRefExp * itvar;
       itvar = variableDeclarations->getReference (
           getIterationCounterVariableName (2));
 
-      // mappingArray1[sharedMemoryOffset + i2 * map1Dim + i3]
+      /* mappingArray1[sharedMemoryOffset + i2 * map1Dim + i3] */
       parameters->append_expression (
           buildPntrArrRefExp (
               variableDeclarations->getReference (
@@ -706,7 +708,7 @@ CPPCUDAKernelSubroutineIndirectLoop::createExecutionLoopStatements ()
                       variableDeclarations->getReference (
                           getIterationCounterVariableName (3))))));
 
-      // mappingArray1[sharedMemoryOffset + i2 * map2Dim + i4]
+      /* mappingArray1[sharedMemoryOffset + i2 * map2Dim + i4] */
       parameters->append_expression (
           buildPntrArrRefExp (
               variableDeclarations->getReference (
@@ -735,7 +737,7 @@ CPPCUDAKernelSubroutineIndirectLoop::createExecutionLoopStatements ()
       parameters2->append_expression (
           variableDeclarations->getReference (getOpMatEntryName (mat_num)));
 
-      // TODO this is wrong if the matrix entry type is not float or int.
+      /* FIXME: this is wrong if the matrix entry type is not float or int. */
       exp = buildFunctionCallStmt ("atomicAdd",
           buildVoidType (), parameters2, subroutineScope);
       appendStatement (exp, loopBody);
