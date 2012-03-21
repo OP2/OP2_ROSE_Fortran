@@ -62,11 +62,12 @@ namespace OP2
   std::string const OP_DECL_GBL = "op_decl_gbl";
   std::string const OP_DECL_MAP = "op_decl_map";
   std::string const OP_DECL_MAT = "op_decl_mat";
-  std::string const OP_DECL_SET = "op_decl_set";\
+  std::string const OP_DECL_SET = "op_decl_set";
   std::string const OP_DECL_SUBSET = "op_decl_subset";
   std::string const OP_DECL_SPARSITY = "op_decl_sparsity";
   std::string const OP_GBL = "op_gbl";
   std::string const OP_ID = "op_id";
+  std::string const OP_ITERATION_SPACE = "op_iteration_space";
   std::string const OP_INC = "op_inc";
   std::string const OP_MAP = "op_map";
   std::string const OP_MAP_CORE = "op_map_core";

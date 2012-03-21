@@ -471,7 +471,8 @@ class CPPImperialOpArgMatDefinition: public OpArgMatDefinition
     }
 
     CPPImperialOpArgMatDefinition (SgExprListExp * parameters,
-        CPPProgramDeclarationsAndDefinitions * declarations);
+        CPPProgramDeclarationsAndDefinitions * declarations,
+        OpIterationSpaceDefinition * itspace);
 };
 
 class CPPOxfordOpArgMatDefinition: public OpArgMatDefinition
@@ -506,7 +507,9 @@ class CPPOxfordOpArgMatDefinition: public OpArgMatDefinition
       return 8;
     }
 
-    CPPOxfordOpArgMatDefinition (SgExprListExp * parameters);
+    CPPOxfordOpArgMatDefinition (SgExprListExp * parameters,
+        CPPProgramDeclarationsAndDefinitions * declarations,
+        OpIterationSpaceDefinition * itspace);
 };
 
 class CPPImperialOpSparsityDefinition: public OpSparsityDefinition

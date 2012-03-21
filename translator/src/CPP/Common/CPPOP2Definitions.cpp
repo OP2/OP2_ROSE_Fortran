@@ -394,8 +394,53 @@ CPPImperialOpMatDefinition::CPPImperialOpMatDefinition (
       Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 }
 
+static void getArgMatExtent (SgExpression * idx,
+    OpIterationSpaceDefinition * itspace,
+    int mapDim,
+    int extent[2])
+{
+  SgFunctionCallExp * f = isSgFunctionCallExp (idx);
+  /* Reference to op_iteration_space argument */
+  if (f != NULL)
+  {
+    int which = isSgIntVal(f->get_args ()->get_expressions ()[0])->
+        get_value ();
+
+    /*
+     * First argument to op_iteration_space is the set, which we don't
+     * want, so shift user values by one.
+     */
+    which--;
+    extent[0] = 0;
+    extent[1] = itspace->getIterationDimensions ()[which];
+  }
+  else if (isSgIntVal (idx))
+  {
+    int val = isSgIntVal (idx)->get_value ();
+    if (val < 0)
+    {
+      /* Negative, OP_ALL */
+      extent[0] = 0;
+      extent[1] = mapDim;
+    }
+    else
+    {
+      extent[0] = val;
+      extent[1] = val + 1;
+    }
+  }
+  else
+  {
+    Debug::getInstance ()->debugMessage (
+        "Unable to parse index in OP_ARG_MAT (not a positive integer, OP_ALL or op_i)",
+        Debug::HIGHEST_DEBUG_LEVEL, __FILE__, __LINE__);
+    ROSE_ASSERT (false);
+  }
+}
+
 CPPImperialOpArgMatDefinition::CPPImperialOpArgMatDefinition (
-  SgExprListExp * parameters, CPPProgramDeclarationsAndDefinitions * declarations)
+    SgExprListExp * parameters, CPPProgramDeclarationsAndDefinitions * declarations,
+    OpIterationSpaceDefinition * itspace)
 {
   using boost::iequals;
   using boost::lexical_cast;
@@ -407,47 +452,25 @@ CPPImperialOpArgMatDefinition::CPPImperialOpArgMatDefinition (
   tmp = exprs[indexOpMat];
   matName = isSgVarRefExp(tmp)->get_symbol ()->get_name ().getString ();
 
-  tmp = exprs[indexOpIndex1];
-
-  if (isSgIntVal (tmp))
-  {
-    idx1 = isSgIntVal (tmp)->get_value ();
-  }
-  else if (isSgUnaryOp (tmp) && isSgMinusOp (tmp))
-  {
-    idx1 = -isSgIntVal (isSgMinusOp (tmp)->get_operand ())->get_value ();
-  }
-  else
-  {
-    Debug::getInstance ()->debugMessage (
-        "Unable to parse index 1 in OP_ARG_MAT (not a positive or negative int)", Debug::HIGHEST_DEBUG_LEVEL, __FILE__, __LINE__);
-    ROSE_ASSERT (false);
-  }
-
   tmp = exprs[indexOpMap1];
 
   map1Name = isSgVarRefExp(tmp)->get_symbol ()->get_name ().getString ();
 
-  tmp = exprs[indexOpIndex2];
+  tmp = exprs[indexOpIndex1];
 
-  if (isSgIntVal (tmp))
-  {
-    idx2 = isSgIntVal (tmp)->get_value ();
-  }
-  else if (isSgUnaryOp (tmp) && isSgMinusOp (tmp))
-  {
-    idx2 = -isSgIntVal (isSgMinusOp (tmp)->get_operand ())->get_value ();
-  }
-  else
-  {
-    Debug::getInstance ()->debugMessage (
-        "Unable to parse index 2 in OP_ARG_MAT (not a positive or negative int)", Debug::HIGHEST_DEBUG_LEVEL, __FILE__, __LINE__);
-    ROSE_ASSERT (false);
-  }
+  getArgMatExtent (tmp, itspace,
+      declarations->getOpMapDefinition (map1Name)->getDimension (),
+      map1extent);
 
   tmp = exprs[indexOpMap2];
 
   map2Name = isSgVarRefExp(tmp)->get_symbol ()->get_name ().getString ();
+
+  tmp = exprs[indexOpIndex2];
+
+  getArgMatExtent (tmp, itspace,
+      declarations->getOpMapDefinition (map2Name)->getDimension (),
+      map2extent);
 
   dimension = declarations->getOpMatDefinition (matName)->getDimension ();
 
@@ -460,8 +483,8 @@ CPPImperialOpArgMatDefinition::CPPImperialOpArgMatDefinition (
   }
 
   Debug::getInstance ()->debugMessage (
-      "Found OP_ARG_MAT: accessing '" + matName + "' through indices ("
-      + lexical_cast <string> (idx1) + ", " + lexical_cast <string> (idx2)
+      "Found OP_ARG_MAT: accessing '" + matName + "' through extents ("
+      + lexical_cast <string> (map1extent) + ", " + lexical_cast <string> (map2extent)
       + ") of maps (" + map1Name + ", " + map2Name + ") with dimension "
       + lexical_cast <string> (dimension),
       Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
@@ -537,7 +560,8 @@ CPPOxfordOpMatDefinition::CPPOxfordOpMatDefinition (
 }
 
 CPPOxfordOpArgMatDefinition::CPPOxfordOpArgMatDefinition (
-    SgExprListExp * parameters)
+    SgExprListExp * parameters, CPPProgramDeclarationsAndDefinitions * declarations,
+    OpIterationSpaceDefinition * itspace)
 {
   using boost::iequals;
   using boost::lexical_cast;
@@ -550,47 +574,25 @@ CPPOxfordOpArgMatDefinition::CPPOxfordOpArgMatDefinition (
   matName = isSgVarRefExp(tmp)->get_symbol ()->get_name ().getString ();
 
 
-  tmp = exprs[indexOpIndex1];
-
-  if (isSgIntVal (tmp))
-  {
-    idx1 = isSgIntVal (tmp)->get_value ();
-  }
-  else if (isSgUnaryOp (tmp) && isSgMinusOp (tmp))
-  {
-    idx1 = -isSgIntVal (isSgMinusOp (tmp)->get_operand ())->get_value ();
-  }
-  else
-  {
-    Debug::getInstance ()->debugMessage (
-        "Unable to parse index 1 in OP_ARG_MAT (not a positive or negative int)", Debug::HIGHEST_DEBUG_LEVEL, __FILE__, __LINE__);
-    ROSE_ASSERT (false);
-  }
-
   tmp = exprs[indexOpMap1];
 
   map1Name = isSgVarRefExp(tmp)->get_symbol ()->get_name ().getString ();
 
-  tmp = exprs[indexOpIndex2];
+  tmp = exprs[indexOpIndex1];
 
-  if (isSgIntVal (tmp))
-  {
-    idx2 = isSgIntVal (tmp)->get_value ();
-  }
-  else if (isSgUnaryOp (tmp) && isSgMinusOp (tmp))
-  {
-    idx2 = -isSgIntVal (isSgMinusOp (tmp)->get_operand ())->get_value ();
-  }
-  else
-  {
-    Debug::getInstance ()->debugMessage (
-        "Unable to parse index 2 in OP_ARG_MAT (not a positive or negative int)", Debug::HIGHEST_DEBUG_LEVEL, __FILE__, __LINE__);
-    ROSE_ASSERT (false);
-  }
+  getArgMatExtent (tmp, itspace,
+      declarations->getOpMapDefinition (map1Name)->getDimension (),
+      map1extent);
 
   tmp = exprs[indexOpMap2];
 
   map2Name = isSgVarRefExp(tmp)->get_symbol ()->get_name ().getString ();
+
+  tmp = exprs[indexOpIndex2];
+
+  getArgMatExtent (tmp, itspace,
+      declarations->getOpMapDefinition (map2Name)->getDimension (),
+      map2extent);
 
   tmp = exprs[indexDimension];
 
@@ -605,8 +607,8 @@ CPPOxfordOpArgMatDefinition::CPPOxfordOpArgMatDefinition (
   }
 
   Debug::getInstance ()->debugMessage (
-      "Found OP_ARG_MAT: accessing '" + matName + "' through indices ("
-      + lexical_cast <string> (idx1) + ", " + lexical_cast <string> (idx2)
+      "Found OP_ARG_MAT: accessing '" + matName + "' through extents ("
+      + lexical_cast <string> (map1extent) + ", " + lexical_cast <string> (map2extent)
       + ") of maps (" + map1Name + ", " + map2Name + ") with dimension "
       + lexical_cast <string> (dimension),
       Debug::FUNCTION_LEVEL, __FILE__, __LINE__);

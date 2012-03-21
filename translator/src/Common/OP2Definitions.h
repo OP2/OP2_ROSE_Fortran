@@ -35,8 +35,10 @@
 #define OP2_DEFINITIONS_H
 
 #include <string>
+#include <vector>
 
 class SgType;
+class SgExprListExp;
 
 class OP2Definition
 {
@@ -268,17 +270,36 @@ class OpConstDefinition: public OP2Definition
     getDimension () const;
 };
 
+class OpIterationSpaceDefinition
+{
+  protected:
+
+    std::string setName;
+
+    std::vector<int> iterationDimensions;
+
+  public:
+
+    std::string const &
+    getSetName () const;
+
+    std::vector<int>
+    getIterationDimensions () const;
+
+    OpIterationSpaceDefinition (SgExprListExp * args);
+};
+
 class OpArgMatDefinition
 {
   protected:
 
     std::string matName;
 
-    int idx1;
+    int map1extent[2];
 
     std::string map1Name;
 
-    int idx2;
+    int map2extent[2];
 
     std::string map2Name;
 
@@ -289,14 +310,14 @@ class OpArgMatDefinition
     std::string const &
     getMatName () const;
 
-    int
-    getIdx1 () const;
+    const int *
+    getMap1Extent () const;
 
     std::string const &
     getMap1Name () const;
 
-    int
-    getIdx2 () const;
+    const int *
+    getMap2Extent () const;
 
     std::string const &
     getMap2Name () const;

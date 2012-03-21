@@ -78,6 +78,18 @@ op_diagnostic_output();
 void
 op_timing_output();
 
+op_set
+op_iteration_space (op_set);
+
+op_set
+op_iteration_space (op_set, int);
+
+op_set
+op_iteration_space (op_set, int, int);
+
+op_set
+op_iteration_space (op_set, int, int, int);
+
 // 1 OP_ARG
 template <typename T1>
 void
