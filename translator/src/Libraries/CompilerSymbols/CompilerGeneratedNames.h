@@ -133,6 +133,7 @@ namespace OP2VariableNames
   std::string const calledTimesString = "calledTimesString";
   std::string const returnDumpOpDat = "returnDumpOpDat";
   
+  std::string const OP_PART_SIZE_1 = "OP_PART_SIZE_1";
   
   std::string const
   getBlockSizeVariableName (std::string const & suffix);

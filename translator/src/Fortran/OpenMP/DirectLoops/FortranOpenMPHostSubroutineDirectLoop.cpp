@@ -65,19 +65,15 @@ FortranOpenMPHostSubroutineDirectLoop::createKernelFunctionCallStatement (
       else
       {
         SgMultiplyOp * multiplyExpression = buildMultiplyOp (
-            variableDeclarations->getReference (
-                getIterationCounterVariableName (1)), buildIntVal (64));
+            variableDeclarations->getReference (OpenMP::threadID),
+            buildIntVal (parallelLoop->getOpDatDimension (i)));
 
-        SgSubscriptExpression * arraySubscriptExpression =
-            new SgSubscriptExpression (RoseHelper::getFileInfo (),
-                multiplyExpression, buildNullExpression (), buildIntVal (1));
-
-        arraySubscriptExpression->set_endOfConstruct (
-            RoseHelper::getFileInfo ());
-
+        SgAddOp * addOpExpression = buildAddOp (
+          multiplyExpression, buildIntVal (1));
+            
         SgPntrArrRefExp * parameterExpression = buildPntrArrRefExp (
             variableDeclarations->getReference (getReductionArrayHostName (i)),
-            buildExprListExp (arraySubscriptExpression));
+            addOpExpression);
 
         actualParameters->append_expression (parameterExpression);
       }
@@ -154,6 +150,12 @@ FortranOpenMPHostSubroutineDirectLoop::createOpenMPLoopStatements ()
 
   appendStatement (assignmentStatement2, loopBody);
 
+  SgExprStatement * initThreadID = buildAssignStatement (
+    variableDeclarations->getReference (OpenMP::threadID),
+    OpenMP::createGetThreadIDCallStatement (subroutineScope));
+  
+  appendStatement ( initThreadID, loopBody);  
+  
   createKernelFunctionCallStatement (loopBody);
 
   SgFortranDo * doStatement =
@@ -174,6 +176,9 @@ FortranOpenMPHostSubroutineDirectLoop::createOpenMPLoopStatements ()
   privateVariableReferences.push_back (variableDeclarations->getReference (
       getIterationCounterVariableName (1)));
 
+  privateVariableReferences.push_back (variableDeclarations->getReference (
+      OpenMP::threadID));
+      
   addTextForUnparser (doStatement, OpenMP::getParallelLoopDirectiveString ()
       + OpenMP::getPrivateClause (privateVariableReferences),
       AstUnparseAttribute::e_before);

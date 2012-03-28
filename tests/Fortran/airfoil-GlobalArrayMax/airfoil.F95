@@ -142,7 +142,7 @@ program AIRFOIL
 
     ! main time-marching loop
 
-  call initCUDAConstants(alpha,cfl,eps,gam,gm1,mach,qinf)
+  call initOP2Constants(alpha,cfl,eps,gam,gm1,mach,qinf)
 
   do niter = 1, iterationNumber
 
@@ -176,8 +176,8 @@ program AIRFOIL
                          & p_adt,  2, pecell, OP_READ, &
                          & p_res,  1, pecell, OP_INC,  &
                          & p_res,  2, pecell, OP_INC,  &
-                         & globalArrayDat, -1, OP_GBL, OP_MAX   &
-                         &)
+                         & globalArrayDat, -1, OP_GBL, OP_MAX &
+                       & )
 
       call op_par_loop_6 ( bres_calc, bedges, &
                           & p_x,      1, pbedge,  OP_READ, &

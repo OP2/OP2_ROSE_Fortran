@@ -60,6 +60,9 @@ class FortranOpenMPKernelSubroutineIndirectLoop: public FortranOpenMPKernelSubro
     createStageInStatements ();
 
     void
+    createStageOutStatements ();
+    
+    void
     createInitialiseBytesPerOpDatStatements ();
 
     void

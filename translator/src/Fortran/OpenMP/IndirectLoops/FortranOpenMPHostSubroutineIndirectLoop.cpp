@@ -73,19 +73,15 @@ FortranOpenMPHostSubroutineIndirectLoop::createKernelFunctionCallStatement (
       else
       {
         SgMultiplyOp * multiplyExpression = buildMultiplyOp (
-            variableDeclarations->getReference (
-                getIterationCounterVariableName (1)), buildIntVal (64));
+            variableDeclarations->getReference (OpenMP::threadID),
+            buildIntVal (parallelLoop->getOpDatDimension (i)));
 
-        SgSubscriptExpression * arraySubscriptExpression =
-            new SgSubscriptExpression (RoseHelper::getFileInfo (),
-                multiplyExpression, buildNullExpression (), buildIntVal (1));
-
-        arraySubscriptExpression->set_endOfConstruct (
-            RoseHelper::getFileInfo ());
-
+        SgAddOp * addOpExpression = buildAddOp (
+          multiplyExpression, buildIntVal (1));
+          
         SgPntrArrRefExp * parameterExpression = buildPntrArrRefExp (
             variableDeclarations->getReference (getReductionArrayHostName (i)),
-            buildExprListExp (arraySubscriptExpression));
+            addOpExpression);
 
         actualParameters->append_expression (parameterExpression);
       }
@@ -701,12 +697,13 @@ FortranOpenMPHostSubroutineIndirectLoop::createPlanFunctionCallStatement ()
 
   SgVarRefExp * parameter10 = variableDeclarations->getReference (
       opDatTypesArray);
-
+      
   SgExprListExp * actualParameters = buildExprListExp (parameter1, parameter2,
       parameter3, parameter4, parameter5, parameter6, parameter7, parameter8,
       parameter9, parameter10);
 
-  actualParameters->append_expression (buildIntVal (0));
+  actualParameters->append_expression (variableDeclarations->getReference (
+      OP2VariableNames::partitionSize));
 
   SgFunctionSymbol * functionSymbol =
       FortranTypesBuilder::buildNewFortranFunction (
@@ -753,8 +750,31 @@ FortranOpenMPHostSubroutineIndirectLoop::createPlanFunctionExecutionStatements (
    * ======================================================
    */
 
+  Debug::getInstance ()->debugMessage (
+      "Creating thread ID initialisation", Debug::FUNCTION_LEVEL,
+      __FILE__, __LINE__);
+  
   SgBasicBlock * innerLoopBody = buildBasicBlock ();
 
+  SgVarRefExp * threadIDRef = variableDeclarations->getReference (OpenMP::threadID);
+
+  Debug::getInstance ()->debugMessage (
+      "Created thread ID reference", Debug::FUNCTION_LEVEL,
+      __FILE__, __LINE__);
+  
+  SgExprStatement * initThreadID = buildAssignStatement (
+    threadIDRef, OpenMP::createGetThreadIDCallStatement (subroutineScope));
+
+  Debug::getInstance ()->debugMessage (
+      "Appending statement", Debug::FUNCTION_LEVEL,
+      __FILE__, __LINE__);    
+    
+  appendStatement ( initThreadID, innerLoopBody);
+
+  Debug::getInstance ()->debugMessage (
+      "Creating kernel call", Debug::FUNCTION_LEVEL,
+      __FILE__, __LINE__);
+    
   createKernelFunctionCallStatement (innerLoopBody);
 
   /*
@@ -775,8 +795,14 @@ FortranOpenMPHostSubroutineIndirectLoop::createPlanFunctionExecutionStatements (
           innerLoopInitializationExpression, innerLoopUpperBoundExpression,
           buildIntVal (1), innerLoopBody);
 
+  std::vector <SgVarRefExp *> privateVariableReferences;
+
+  privateVariableReferences.push_back (variableDeclarations->getReference (
+      OpenMP::threadID));
+
   addTextForUnparser (innerLoopStatement,
-      OpenMP::getParallelLoopDirectiveString () + "\n",
+      OpenMP::getParallelLoopDirectiveString () +
+      OpenMP::getPrivateClause (privateVariableReferences) + "\n",
       AstUnparseAttribute::e_before);
 
   addTextForUnparser (innerLoopStatement,
@@ -1102,24 +1128,22 @@ FortranOpenMPHostSubroutineIndirectLoop::createPlanFunctionStatements ()
    * ======================================================
    */
 
-  SgBasicBlock * ifBody = buildBasicBlock ();
+//   SgBasicBlock * ifBody = buildBasicBlock ();
+// 
+//   SgExprStatement
+//       * assignmentStatement = buildAssignStatement (
+//           variableDeclarations->getReference (
+//               BooleanVariableNames::getFirstTimeExecutionVariableName (
+//                   parallelLoop->getUserSubroutineName ())), buildBoolValExp (
+//               false));
 
-  SgExprStatement
-      * assignmentStatement = buildAssignStatement (
-          variableDeclarations->getReference (
-              BooleanVariableNames::getFirstTimeExecutionVariableName (
-                  parallelLoop->getUserSubroutineName ())), buildBoolValExp (
-              false));
+  appendStatement (createSetUpPlanFunctionActualParametersStatements (), block);
 
-  appendStatement (assignmentStatement, ifBody);
+  appendStatement (createSetUpOpDatTypeArrayStatements (), block);
 
-  appendStatement (createSetUpPlanFunctionActualParametersStatements (), ifBody);
+  appendStatement (createPlanFunctionCallStatement (), block);
 
-  appendStatement (createSetUpOpDatTypeArrayStatements (), ifBody);
-
-  appendStatement (createPlanFunctionCallStatement (), ifBody);
-
-  appendStatement (createPlanFunctionEpilogueStatements (), ifBody);
+  appendStatement (createPlanFunctionEpilogueStatements (), block);
 
   /*
    * ======================================================
@@ -1127,16 +1151,16 @@ FortranOpenMPHostSubroutineIndirectLoop::createPlanFunctionStatements ()
    * ======================================================
    */
 
-  SgEqualityOp * ifGuardExpression = buildEqualityOp (
-      variableDeclarations->getReference (
-          BooleanVariableNames::getFirstTimeExecutionVariableName (
-              parallelLoop->getUserSubroutineName ())), buildBoolValExp (true));
-
-  SgIfStmt * ifStatement =
-      RoseStatementsAndExpressionsBuilder::buildIfStatementWithEmptyElse (
-          ifGuardExpression, ifBody);
-
-  appendStatement (ifStatement, block);
+//   SgEqualityOp * ifGuardExpression = buildEqualityOp (
+//       variableDeclarations->getReference (
+//           BooleanVariableNames::getFirstTimeExecutionVariableName (
+//               parallelLoop->getUserSubroutineName ())), buildBoolValExp (true));
+// 
+//   SgIfStmt * ifStatement =
+//       RoseStatementsAndExpressionsBuilder::buildIfStatementWithEmptyElse (
+//           ifGuardExpression, ifBody);
+// 
+//   appendStatement (ifStatement, block);
 
   return block;
 }
@@ -1149,7 +1173,10 @@ FortranOpenMPHostSubroutineIndirectLoop::createStatements ()
   using namespace PlanFunctionVariableNames;
 
   createEarlyExitStatementNewLibrary (subroutineScope);
-  
+
+  appendStatement (createInitialisePartitionSizeStatements (),
+      subroutineScope);
+
   appendStatement (createInitialiseNumberOfThreadsStatements (),
       subroutineScope);
 

@@ -58,6 +58,9 @@ class FortranOpenMPHostSubroutine: public FortranHostSubroutine
     createReductionDeclarations ();
 
     SgBasicBlock *
+    createInitialisePartitionSizeStatements ();
+    
+    SgBasicBlock *
     createInitialiseNumberOfThreadsStatements ();
 
     virtual SgBasicBlock *

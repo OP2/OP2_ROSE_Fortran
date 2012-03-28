@@ -53,6 +53,7 @@ namespace OpenMP
   {
     std::string const libraryName = "OMP_LIB";
     std::string const cPlanFunction = "cplan_OpenMP";
+    std::string const fileName = "rose_openmp_code.F90";
   }
 
   std::string const sliceStart = "sliceStart";
@@ -60,7 +61,13 @@ namespace OpenMP
   std::string const numberOfThreads = "numberOfThreads";
   std::string const threadBlockID = "threadBlockID";
   std::string const threadBlockOffset = "threadBlockOffset";
-
+  std::string const threadID = "threadID";
+  
+  
+  
+  std::string const
+  getIfPartitionSizeDirectiveString ();  
+  
   std::string const
   getIfDirectiveString ();
 
@@ -76,6 +83,9 @@ namespace OpenMP
   std::string const
   getEndParallelLoopDirectiveString ();
 
+  SgFunctionCallExp *
+  createGetThreadIDCallStatement (SgScopeStatement * scope);
+  
   SgFunctionCallExp *
   createGetMaximumNumberOfThreadsCallStatement (SgScopeStatement * scope);
 

@@ -110,11 +110,6 @@ FortranOpenMPSubroutinesGeneration::createSubroutines ()
     OP2constants->patchReferencesToConstants (
        userSubroutine->getSubroutineHeaderStatement ());
 
-    /* This is not done in CUDA (done in the constructor of the user sub.?)*/
-    //    userSubroutine->createFormalParameterDeclarations ();
-    //userSubroutine->createLocalVariableDeclarations ();
-    //userSubroutine->createStatements ();
-
     /*
      * ======================================================
      * We have to set each node in the AST representation of
@@ -250,13 +245,13 @@ FortranOpenMPSubroutinesGeneration::addLibraries ()
    * ======================================================
    */
 
-  SgUseStatement* useStatement3 = new SgUseStatement (
-      RoseHelper::getFileInfo (),
-      Globals::getInstance ()->getFreeVariablesModuleName (), false);
+//  SgUseStatement* useStatement3 = new SgUseStatement (
+//      RoseHelper::getFileInfo (),
+//      Globals::getInstance ()->getFreeVariablesModuleName (), false);
 
-  useStatement3->set_definingDeclaration (useStatement3);
+//  useStatement3->set_definingDeclaration (useStatement3);
 
-  appendStatement (useStatement3, moduleScope);
+//  appendStatement (useStatement3, moduleScope);
 
   /*
    * ======================================================

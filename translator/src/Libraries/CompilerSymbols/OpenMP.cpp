@@ -36,6 +36,13 @@
 #include "FortranTypesBuilder.h"
 #include <rose.h>
 
+
+std::string const
+OpenMP::getIfPartitionSizeDirectiveString ()
+{
+  return "\n#ifdef OP_PART_SIZE_1 \n";
+}
+
 std::string const
 OpenMP::getIfDirectiveString ()
 {
@@ -90,6 +97,36 @@ OpenMP::getEndParallelLoopDirectiveString ()
     }
   }
 }
+
+SgFunctionCallExp *
+OpenMP::createGetThreadIDCallStatement (SgScopeStatement * scope)
+{
+  using namespace SageBuilder;
+  using std::string;
+
+  string const functionName = "omp_get_thread_num";
+
+  switch (Globals::getInstance ()->getHostLanguage ())
+  {
+    case TargetLanguage::FORTRAN:
+    {
+      SgFunctionSymbol * functionSymbol =
+          FortranTypesBuilder::buildNewFortranFunction (functionName, scope);
+
+      return buildFunctionCallExp (functionSymbol, buildExprListExp ());
+    }
+    case TargetLanguage::CPP:
+    {
+      return buildFunctionCallExp (functionName, buildVoidType (),
+          buildExprListExp (), scope);
+    }
+    default:
+    {
+      throw Exceptions::CommandLine::LanguageException ("Unknown host language");
+    }
+  }
+}
+
 
 SgFunctionCallExp *
 OpenMP::createGetMaximumNumberOfThreadsCallStatement (SgScopeStatement * scope)

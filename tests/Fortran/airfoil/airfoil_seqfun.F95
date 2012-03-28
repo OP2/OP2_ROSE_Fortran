@@ -140,6 +140,21 @@ subroutine save_soln ( q, qold )
 
 end subroutine save_soln
 
+subroutine save_soln_qdim ( qdim, q, qold ) 
+  implicit none
+
+  integer(4) :: qdim
+  real(8), dimension(qdim) :: q
+  real(8), dimension(*) :: qold
+
+  integer(4) :: i
+
+  do i = 1, qdim
+    qold(i) = q(i)
+  end do
+
+end subroutine save_soln_qdim
+
 subroutine adt_calc ( x1, x2, x3, x4, q, adt ) 
   implicit none
 

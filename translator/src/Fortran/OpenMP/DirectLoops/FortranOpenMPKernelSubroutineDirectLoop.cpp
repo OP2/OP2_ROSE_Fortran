@@ -53,10 +53,17 @@ FortranOpenMPKernelSubroutineDirectLoop::createUserSubroutineCallStatement ()
 
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
-    if (parallelLoop->isDuplicateOpDat (i) == false)
+    if (parallelLoop->isGlobal (i) )
+    {
+      actualParameters->append_expression (
+        variableDeclarations->getReference (getOpDatName (i)));
+    }
+    else if (parallelLoop->isDuplicateOpDat (i) == false)
     {
       if (parallelLoop->isReductionRequired (i) == false)
       {
+        SgPntrArrRefExp * parameterExpression;
+        
         SgMultiplyOp * multiplyExpression1 = buildMultiplyOp (
             variableDeclarations->getReference (
                 getIterationCounterVariableName (1)), buildIntVal (
@@ -66,28 +73,39 @@ FortranOpenMPKernelSubroutineDirectLoop::createUserSubroutineCallStatement ()
             variableDeclarations->getReference (
                 getIterationCounterVariableName (1)), buildIntVal (
                 parallelLoop->getOpDatDimension (i)));
-
-        SgAddOp * addExpression2 = buildAddOp (multiplyExpression2,
-            buildIntVal (parallelLoop->getOpDatDimension (i)));
-
-        SgSubtractOp * subtractExpression2 = buildSubtractOp (addExpression2,
-            buildIntVal (1));
-
-        SgSubscriptExpression * arraySubscriptExpression =
-            new SgSubscriptExpression (RoseHelper::getFileInfo (),
-                multiplyExpression1, subtractExpression2, buildIntVal (1));
-
-        arraySubscriptExpression->set_endOfConstruct (
-            RoseHelper::getFileInfo ());
-
-        SgPntrArrRefExp * parameterExpression = buildPntrArrRefExp (
+        
+        if ( parallelLoop->getOpDatDimension (i) == 1 )
+        {
+          parameterExpression = buildPntrArrRefExp (
             variableDeclarations->getReference (getOpDatName (i)),
-            buildExprListExp (arraySubscriptExpression));
+            multiplyExpression2);
 
+        }
+        else
+        {
+          SgAddOp * addExpression2 = buildAddOp (multiplyExpression2,
+              buildIntVal (parallelLoop->getOpDatDimension (i)));
+
+          SgSubtractOp * subtractExpression2 = buildSubtractOp (addExpression2,
+              buildIntVal (1));
+
+          SgSubscriptExpression * arraySubscriptExpression =
+              new SgSubscriptExpression (RoseHelper::getFileInfo (),
+                  multiplyExpression1, subtractExpression2, buildIntVal (1));
+
+          arraySubscriptExpression->set_endOfConstruct (
+              RoseHelper::getFileInfo ());
+
+          parameterExpression = buildPntrArrRefExp (
+              variableDeclarations->getReference (getOpDatName (i)),
+              buildExprListExp (arraySubscriptExpression));
+        }
+        
         actualParameters->append_expression (parameterExpression);
       }
       else
       {
+        /* this seems to be dead code, as the globals are references above (first if) */
         actualParameters->append_expression (
             variableDeclarations->getReference (getOpDatName (i)));
       }
@@ -166,7 +184,41 @@ FortranOpenMPKernelSubroutineDirectLoop::createOpDatFormalParameterDeclarations 
 
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
-    if (parallelLoop->isDuplicateOpDat (i) == false)
+    /*
+     * ======================================================
+     * First treat global variables
+     * ======================================================
+     */
+    
+    if ( parallelLoop->isGlobal (i) )
+    {
+      if ( parallelLoop->isArray (i) )
+      {
+           variableDeclarations->add (
+              getOpDatName (i),
+              FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
+                  getOpDatName (i),
+                  FortranTypesBuilder::getArray_RankOne_WithLowerAndUpperBounds (
+                      parallelLoop->getOpDatBaseType (i), buildIntVal (0),
+                      buildIntVal (parallelLoop->getOpDatDimension (i) - 1)),
+                  subroutineScope, formalParameters, 0));
+      }
+      else
+      {
+      variableDeclarations->add (
+          getOpDatName (i),
+          FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
+              getOpDatName (i), parallelLoop->getOpDatBaseType (i), subroutineScope, formalParameters));
+      }
+    }
+    
+    /*
+     * ======================================================
+     * Then op_dats
+     * ======================================================
+     */
+    
+    else if (parallelLoop->isDuplicateOpDat (i) == false)
     {
       SgArrayType * arrayType =
           FortranTypesBuilder::getArray_RankOne_WithLowerAndUpperBounds (

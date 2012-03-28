@@ -95,34 +95,6 @@ MODULE AIRFOIL_SEQ
 
 end subroutine fused
 
-subroutine levelThree ( qold )
-
-  implicit none
-
-  real(8), dimension(*) :: qold
-
-  integer(4) :: i
-
-  do i = 1, 4
-    qold(i) = -1.0
-  end do
-
-end subroutine
-
-subroutine levelTwo ( qold ) 
-  implicit none
-
-  real(8), dimension(*) :: qold
-
-  integer(4) :: i
-
-  call levelThree ( qold )
-
-  do i = 1, 4
-    qold(i) = 0
-  end do
-
-end subroutine
 
 subroutine save_soln ( q, qold, redarray ) 
   implicit none
@@ -132,10 +104,6 @@ subroutine save_soln ( q, qold, redarray )
   real(8), dimension(*) :: redarray
 
   integer(4) :: i
-
-  !call levelTwo ( qold )
-
-  !call levelTwo ( qold )
 
   do i = 1, 4
     qold(i) = q(i)

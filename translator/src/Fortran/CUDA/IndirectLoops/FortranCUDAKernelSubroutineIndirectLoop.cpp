@@ -1788,7 +1788,7 @@ FortranCUDAKernelSubroutineIndirectLoop::createOpDatFormalParameterDeclarations 
       {
         string const & variableName = getReductionArrayDeviceName (i);
 
-	Debug::getInstance ()->debugMessage ("Reduction for parameter: " + variableName,
+        Debug::getInstance ()->debugMessage ("Reduction for parameter: " + variableName,
           Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
         variableDeclarations->add (
@@ -1800,35 +1800,16 @@ FortranCUDAKernelSubroutineIndirectLoop::createOpDatFormalParameterDeclarations 
       }
       else if (parallelLoop->isIndirect (i) || parallelLoop->isDirect (i))
       {
-/* Carlo: deleted these formal parameters, as they are declared in the module declaration section */
         string const variableName = getOpDatName (i);
-	Debug::getInstance ()->debugMessage ("Should add opDat, but it is declared in mod. decl. sect.: " + variableName,
+        Debug::getInstance ()->debugMessage ("This op_dat is declared in the module declaration section: " + variableName,
           Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
-	/*
-        SgDotExp * dotExpression = buildDotExp (
-            variableDeclarations->getReference (opDatCardinalities),
-            cardinalitiesDeclaration->getFieldDeclarations ()->getReference (
-                getOpDatCardinalityName (i)));
-
-        SgSubtractOp * upperBoundExpression = buildSubtractOp (dotExpression,
-            buildIntVal (1));
-
-        variableDeclarations->add (
-            variableName,
-            FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
-                variableName,
-                FortranTypesBuilder::getArray_RankOne_WithLowerAndUpperBounds (
-                    parallelLoop->getOpDatBaseType (i), buildIntVal (0),
-                    upperBoundExpression), subroutineScope, formalParameters,
-                1, CUDA_DEVICE));
-*/
       }
       else if (parallelLoop->isRead (i))
       {
         string const & variableName = getOpDatName (i);
 
-	Debug::getInstance ()->debugMessage ("Deb formal param: " + variableName,
-	  Debug::FUNCTION_LEVEL, __FILE__, __LINE__);	
+        Debug::getInstance ()->debugMessage ("Appending global read formal parameter " + variableName,
+          Debug::FUNCTION_LEVEL, __FILE__, __LINE__);	
 
         if (parallelLoop->isArray (i))
         {

@@ -16,7 +16,7 @@ program AIRFOIL
 
   integer(4), parameter :: iterationNumber = 1000
 
-  integer(4) :: nnode, ncell, nbedge, nedge, niter
+  integer(4) :: nnode, ncell, nbedge, nedge, niter, qdim
   real(8) :: ncellr
 
   ! integer references (valid inside the OP2 library) for op_set
@@ -26,7 +26,7 @@ program AIRFOIL
   type(op_map) :: pedge, pecell, pcell, pbedge, pbecell
 
   ! integer reference (valid inside the OP2 library) for op_data 
-  type(op_dat) :: p_bound, p_x, p_q, p_qold, p_adt, p_res, p_rms
+  type(op_dat) :: p_bound, p_x, p_q, p_qold, p_adt, p_res, p_rms, p_qdim
   
   ! arrays used in data
   integer(4), dimension(:), allocatable, target :: ecell, bound, edge, bedge, becell, cell
@@ -118,6 +118,8 @@ program AIRFOIL
 
   print *, "Declaring OP2 globals"
   call op_decl_gbl ( rms, p_rms, 1 )
+  qdim = 4
+  call op_decl_gbl ( qdim, p_qdim )
 
   call op_decl_const (gam, 1)
   call op_decl_const (gm1, 1)
@@ -132,7 +134,7 @@ program AIRFOIL
 
   do niter = 1, iterationNumber
 
-    call save_soln_subroutine ( cells, p_q, p_qold )
+    call save_soln_subroutine ( cells, p_qdim, p_q, p_qold )
 
 !     call op_par_loop_2 ( save_soln, cells, &
 !                        & p_q,    -1, OP_ID, OP_READ, &
@@ -209,16 +211,17 @@ program AIRFOIL
 end program AIRFOIL
 
 
-subroutine save_soln_subroutine ( set, src, dest )
+subroutine save_soln_subroutine ( set, p_qdim, src, dest )
 
   use OP2_FORTRAN_DECLARATIONS
   use AIRFOIL_SEQ
 
   implicit none
   type(op_set) :: set
-  type(op_dat) :: src, dest
+  type(op_dat) :: p_qdim, src, dest
 
-  call op_par_loop_2 ( save_soln, set, &
+  call op_par_loop_3 ( save_soln_qdim, set, &
+       		     & p_qdim, -1, OP_GBL, OP_READ, &
                      & src,  -1, OP_ID, 4, "real8", OP_READ, &
                      & dest, -1, OP_ID, 4, "real8", OP_WRITE &
                      & )
