@@ -95,41 +95,63 @@ CPPCUDAHostSubroutineIndirectLoop::createKernelFunctionCallStatement (
         variableDeclarations->getReference (getOpMatName (mat_num)),
         buildOpaqueVarRefExp (nrow, subroutineScope));
       actualParameters->append_expression (nrow_d);
-      continue;
     }
-    unsigned int dat_num = parallelLoop->getOpDatArgNum (i);
-    if (parallelLoop->isDuplicateOpDat (i) == false)
-    {
-      SgDotExp * dotExpression = buildDotExp (
+    else {
+      unsigned int dat_num = parallelLoop->getOpDatArgNum (i);
+      if (parallelLoop->isDuplicateOpDat (i) == false)
+      {
+        SgDotExp * dotExpression = buildDotExp (
           variableDeclarations->getReference (getOpDatName (dat_num)),
           buildOpaqueVarRefExp (data_d, subroutineScope));
 
-      SgCastExp * castExpression = buildCastExp (dotExpression,
+        SgCastExp * castExpression = buildCastExp (
+          dotExpression,
           buildPointerType (parallelLoop->getOpDatBaseType (i)));
 
-      actualParameters->append_expression (castExpression);
+        actualParameters->append_expression (castExpression);
+      }
     }
   }
 
   unsigned int arrayIndex = 0;
+  unsigned int matIndex = 0;
 
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfArgumentGroups (); ++i)
   {
-    if (parallelLoop->isOpMatArg (i)) continue;
-    if (parallelLoop->isDuplicateOpDat (i) == false)
+    if (parallelLoop->isOpMatArg (i))
     {
-      if (parallelLoop->isIndirect (i))
-      {
-        SgPntrArrRefExp * arrayExpression = buildPntrArrRefExp (
-            buildOpaqueVarRefExp (ind_maps, subroutineScope), buildIntVal (
-                arrayIndex));
+      SgPntrArrRefExp * expr = buildPntrArrRefExp (
+        buildOpaqueVarRefExp (mat_maps, subroutineScope), buildIntVal (
+          matIndex));
+      SgArrowExp * arrow = buildArrowExp (
+        variableDeclarations->getReference (planRet), expr);
+      actualParameters->append_expression (arrow);
 
-        SgArrowExp * arrowExpression = buildArrowExp (
+      SgPntrArrRefExp * expr2 = buildPntrArrRefExp (
+        buildOpaqueVarRefExp (mat_maps2, subroutineScope), buildIntVal (
+          matIndex));
+      SgArrowExp * arrow2 = buildArrowExp (
+        variableDeclarations->getReference (planRet), expr2);
+      actualParameters->append_expression (arrow2);
+      matIndex++;
+    }
+    else
+    {
+      if (parallelLoop->isDuplicateOpDat (i) == false)
+      {
+        if (parallelLoop->isIndirect (i))
+        {
+          SgPntrArrRefExp * arrayExpression = buildPntrArrRefExp (
+            buildOpaqueVarRefExp (ind_maps, subroutineScope), buildIntVal (
+              arrayIndex));
+
+          SgArrowExp * arrowExpression = buildArrowExp (
             variableDeclarations->getReference (planRet), arrayExpression);
 
-        actualParameters->append_expression (arrowExpression);
+          actualParameters->append_expression (arrowExpression);
 
-        arrayIndex++;
+          arrayIndex++;
+        }
       }
     }
   }
@@ -362,13 +384,14 @@ CPPCUDAHostSubroutineIndirectLoop::createPlanFunctionCallStatement ()
       getPartitionSizeVariableName (parallelLoop->getUserSubroutineName ())));
 
   actualParamaters->append_expression (buildIntVal (
-      parallelLoop->getNumberOfOpDatArgumentGroups ()));
+      parallelLoop->getNumberOfArgumentGroups ()));
 
   actualParamaters->append_expression (variableDeclarations->getReference (
       opDatArray));
 
   actualParamaters->append_expression (buildIntVal (
-      parallelLoop->getNumberOfDistinctIndirectOpDats ()));
+      parallelLoop->getNumberOfDistinctIndirectOpDats () +
+      parallelLoop->getNumberOfOpMatArgumentGroups ()));
 
   actualParamaters->append_expression (variableDeclarations->getReference (
       indirectionDescriptorArray));
@@ -433,13 +456,13 @@ CPPCUDAHostSubroutineIndirectLoop::createPlanFunctionDeclarations ()
       RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
           opDatArray, buildArrayType (buildOpaqueType (OP2::OP_ARG,
               subroutineScope), buildIntVal (
-              parallelLoop->getNumberOfOpDatArgumentGroups ())),
+              parallelLoop->getNumberOfArgumentGroups ())),
           subroutineScope));
 
   variableDeclarations->add (indirectionDescriptorArray,
       RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
           indirectionDescriptorArray, buildArrayType (buildIntType (),
-              buildIntVal (parallelLoop->getNumberOfOpDatArgumentGroups ())),
+              buildIntVal (parallelLoop->getNumberOfArgumentGroups ())),
           subroutineScope));
 
   variableDeclarations->add (planRet,

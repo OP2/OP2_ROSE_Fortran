@@ -56,13 +56,22 @@ CPPHostSubroutine::createInitialisePlanFunctionArrayStatements ()
 
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfArgumentGroups (); ++i)
   {
-    if (parallelLoop->isOpMatArg (i)) continue;
-    unsigned int dat_num = parallelLoop->getOpDatArgNum (i);
+    SgVarRefExp * var;
+    if (parallelLoop->isOpMatArg (i))
+    {
+      unsigned int mat_num = parallelLoop->getOpMatArgNum (i);
+      var = variableDeclarations->getReference (getOpMatName (mat_num));
+    }
+    else
+    {
+      unsigned int dat_num = parallelLoop->getOpDatArgNum (i);
+      var = variableDeclarations->getReference (getOpDatName (dat_num));
+    }
     SgPntrArrRefExp * arrayIndexExpression = buildPntrArrRefExp (
-        variableDeclarations->getReference (opDatArray), buildIntVal (dat_num - 1));
+        variableDeclarations->getReference (opDatArray), buildIntVal (i - 1));
 
     SgExprStatement * assignmentStatement = buildAssignStatement (
-        arrayIndexExpression, variableDeclarations->getReference (getOpDatName (dat_num)));
+      arrayIndexExpression, var);
 
     appendStatement (assignmentStatement, block);
   }
@@ -72,39 +81,47 @@ CPPHostSubroutine::createInitialisePlanFunctionArrayStatements ()
 
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfArgumentGroups (); ++i)
   {
-    if (parallelLoop->isOpMatArg (i)) continue;
-    unsigned int dat_num = parallelLoop->getOpDatArgNum (i);
     SgPntrArrRefExp * arrayIndexExpression = buildPntrArrRefExp (
-        variableDeclarations->getReference (indirectionDescriptorArray),
-        buildIntVal (dat_num - 1));
+      variableDeclarations->getReference (indirectionDescriptorArray),
+      buildIntVal (i - 1));
 
     SgExprStatement * assignmentStatement;
 
-    if (parallelLoop->isIndirect (i))
+    if (parallelLoop->isOpMatArg (i))
     {
-      if (parallelLoop->isDuplicateOpDat (i) == false)
+      assignmentStatement = buildAssignStatement (arrayIndexExpression,
+                                                  buildIntVal (indirection));
+      indirection++;
+    }
+    else
+    {
+      unsigned int dat_num = parallelLoop->getOpDatArgNum (i);
+      if (parallelLoop->isIndirect (i))
       {
-        assignmentStatement = buildAssignStatement (arrayIndexExpression,
-            buildIntVal (indirection));
+        if (parallelLoop->isDuplicateOpDat (i) == false)
+        {
+          assignmentStatement = buildAssignStatement (arrayIndexExpression,
+                                                      buildIntVal (indirection));
 
-        indirectOpDatsToIndirection[parallelLoop->getOpDatVariableName (dat_num)]
+          indirectOpDatsToIndirection[parallelLoop->getOpDatVariableName (dat_num)]
             = indirection;
 
-        indirection++;
+          indirection++;
+        }
+        else
+        {
+          assignmentStatement = buildAssignStatement (arrayIndexExpression,
+                                                      buildIntVal (
+                                                        indirectOpDatsToIndirection[parallelLoop->getOpDatVariableName (dat_num)]));
+        }
       }
       else
       {
         assignmentStatement = buildAssignStatement (arrayIndexExpression,
-            buildIntVal (
-                indirectOpDatsToIndirection[parallelLoop->getOpDatVariableName (dat_num)]));
+                                                    buildIntVal (-1));
       }
-    }
-    else
-    {
-      assignmentStatement = buildAssignStatement (arrayIndexExpression,
-          buildIntVal (-1));
-    }
 
+    }
     appendStatement (assignmentStatement, block);
   }
 

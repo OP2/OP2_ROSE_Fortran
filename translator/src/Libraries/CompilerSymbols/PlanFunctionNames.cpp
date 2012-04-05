@@ -401,3 +401,35 @@ PlanFunctionVariableNames::getColourToBlockSizeName (std::string const & suffix)
     return blkmap + Size + "_" + suffix;
   }
 }
+
+std::string const
+PlanFunctionVariableNames::getMatMapName (unsigned int n, std::string const & suffix)
+{
+  using std::string;
+  using boost::lexical_cast;
+
+  if (suffix.length () == 0)
+  {
+    return mat_maps + "_" + lexical_cast <string> (n);
+  }
+  else
+  {
+    return mat_maps + "_" + lexical_cast <string> (n) + "_" + suffix;
+  }
+}
+
+std::string const
+PlanFunctionVariableNames::getMatMap2Name (unsigned int n, std::string const & suffix)
+{
+  using std::string;
+  using boost::lexical_cast;
+
+  if (suffix.length () == 0)
+  {
+    return mat_maps2 + "_" + lexical_cast <string> (n);
+  }
+  else
+  {
+    return mat_maps2 + "_" + lexical_cast <string> (n) + "_" + suffix;
+  }
+}
