@@ -66,6 +66,8 @@ namespace PlanFunctionVariableNames
   std::string const ind_sizes = "ind_sizes";
   std::string const loc_maps = "loc_maps";
   std::string const maps = "maps";
+  std::string const mat_maps = "mat_maps";
+  std::string const mat_maps2 = "mat_maps2";
   std::string const nblocks = "nblocks";
   std::string const ncolblk = "ncolblk";
   std::string const ncolors = "ncolors";
@@ -219,6 +221,12 @@ namespace PlanFunctionVariableNames
 
   std::string const
   getColourToBlockSizeName (std::string const & suffix = std::string ());
+
+  std::string const
+  getMatMapName (unsigned int n, std::string const & suffix = std::string ());
+
+  std::string const
+  getMatMap2Name (unsigned int n, std::string const & suffix = std::string ());
 }
 
 #endif

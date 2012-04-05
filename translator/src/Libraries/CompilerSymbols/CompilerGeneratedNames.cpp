@@ -169,6 +169,22 @@ OP2VariableNames::getOpMatEntryName (unsigned int n)
 }
 
 std::string const
+OP2VariableNames::getOpMatMapName (unsigned int n)
+{
+  using std::string;
+
+  return getOpMatName (n) + "Map";
+}
+
+std::string const
+OP2VariableNames::getOpMatMap2Name (unsigned int n)
+{
+  using std::string;
+
+  return getOpMatName (n) + "Map2";
+}
+
+std::string const
 OP2VariableNames::getOpDatName (unsigned int OP_DAT_ArgumentGroup)
 {
   using boost::lexical_cast;
