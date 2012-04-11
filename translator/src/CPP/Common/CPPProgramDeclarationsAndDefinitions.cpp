@@ -423,6 +423,7 @@ CPPProgramDeclarationsAndDefinitions::analyseParallelLoopArguments (
     }
   }
 
+  parallelLoop->setOpIterationSpace (itspace);
   parallelLoop->setNumberOfOpMatArgumentGroups (OP_MAT_ArgumentGroup - 1);
   parallelLoop->setNumberOfOpDatArgumentGroups (OP_DAT_ArgumentGroup - 1);
 }
