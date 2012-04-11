@@ -276,17 +276,25 @@ class OpIterationSpaceDefinition
 
     std::string setName;
 
-    std::vector<int> iterationDimensions;
+    std::vector<int*> iterationDimensions;
 
   public:
 
     std::string const &
     getSetName () const;
 
-    std::vector<int>
+    void
+    setSetName (std::string const & name);
+
+    void
+    addIterationDimension (int dim[2]);
+
+    std::vector<int*>
     getIterationDimensions () const;
 
     OpIterationSpaceDefinition (SgExprListExp * args);
+
+    OpIterationSpaceDefinition ();
 };
 
 class OpArgMatDefinition
