@@ -397,12 +397,18 @@ CPPImperialOpMatDefinition::CPPImperialOpMatDefinition (
 static void getArgMatExtent (SgExpression * idx,
     OpIterationSpaceDefinition * itspace,
     int mapDim,
-    int extent[2])
+    int & mapidx,
+    int idxval,
+    bool createItspace)
 {
+  using boost::iequals;
   SgFunctionCallExp * f = isSgFunctionCallExp (idx);
+  int extent[2];
   /* Reference to op_iteration_space argument */
   if (f != NULL)
   {
+    ROSE_ASSERT (iequals (OP2::OP_I,
+            f->getAssociatedFunctionSymbol ()->get_name ().getString ()));
     int which = isSgIntVal(f->get_args ()->get_expressions ()[0])->
         get_value ();
 
@@ -410,13 +416,12 @@ static void getArgMatExtent (SgExpression * idx,
      * First argument to op_iteration_space is the set, which we don't
      * want, so shift user values by one.
      */
-    which--;
-    extent[0] = 0;
-    extent[1] = itspace->getIterationDimensions ()[which];
+    mapidx = --which;
   }
   else if (isSgIntVal (idx))
   {
     int val = isSgIntVal (idx)->get_value ();
+    mapidx = idxval;
     if (val < 0)
     {
       /* Negative, OP_ALL */
@@ -436,6 +441,15 @@ static void getArgMatExtent (SgExpression * idx,
         Debug::HIGHEST_DEBUG_LEVEL, __FILE__, __LINE__);
     ROSE_ASSERT (false);
   }
+
+  if (createItspace)
+  {
+    if (itspace == NULL)
+    {
+      itspace = new OpIterationSpaceDefinition ();
+    }
+    itspace->addIterationDimension (extent);
+  }
 }
 
 CPPImperialOpArgMatDefinition::CPPImperialOpArgMatDefinition (
@@ -449,6 +463,7 @@ CPPImperialOpArgMatDefinition::CPPImperialOpArgMatDefinition (
   SgExpressionPtrList exprs = parameters->get_expressions ();
   SgExpression * tmp;
 
+  bool createItspace = itspace == NULL;
   tmp = exprs[indexOpMat];
   matName = isSgVarRefExp(tmp)->get_symbol ()->get_name ().getString ();
 
@@ -460,7 +475,7 @@ CPPImperialOpArgMatDefinition::CPPImperialOpArgMatDefinition (
 
   getArgMatExtent (tmp, itspace,
       declarations->getOpMapDefinition (map1Name)->getDimension (),
-      map1extent);
+      map1idx, 0, createItspace);
 
   tmp = exprs[indexOpMap2];
 
@@ -470,7 +485,34 @@ CPPImperialOpArgMatDefinition::CPPImperialOpArgMatDefinition (
 
   getArgMatExtent (tmp, itspace,
       declarations->getOpMapDefinition (map2Name)->getDimension (),
-      map2extent);
+      map2idx, 1, createItspace);
+
+  /* Ensure that the dimensions of the iteration space are not bigger than those of the map */
+  int * extent = itspace->getIterationDimensions ()[map1idx];
+  int mapdim = declarations->getOpMapDefinition (map1Name)->getDimension ();
+  if (extent[1] > mapdim)
+  {
+    Debug::getInstance ()->debugMessage (
+        "OP_ARG_MAT extent of map1 index: " + lexical_cast <string> (extent[0])
+        + "--" + lexical_cast <string> (extent[1])
+        + " does not match dimension of map: "
+        + lexical_cast <string> (mapdim),
+        Debug::LOWEST_DEBUG_LEVEL, __FILE__, __LINE__);
+    ROSE_ASSERT (false);
+  }
+
+  extent = itspace->getIterationDimensions ()[map2idx];
+  mapdim = declarations->getOpMapDefinition (map2Name)->getDimension ();
+  if (extent[1] > mapdim)
+  {
+    Debug::getInstance ()->debugMessage (
+        "OP_ARG_MAT extent of map2 index: " + lexical_cast <string> (extent[0])
+        + "--" + lexical_cast <string> (extent[1])
+        + " does not match dimension of map: "
+        + lexical_cast <string> (mapdim),
+        Debug::LOWEST_DEBUG_LEVEL, __FILE__, __LINE__);
+    ROSE_ASSERT (false);
+  }
 
   dimension = declarations->getOpMatDefinition (matName)->getDimension ();
 
@@ -478,14 +520,28 @@ CPPImperialOpArgMatDefinition::CPPImperialOpArgMatDefinition (
 
   if (isSgEnumVal (tmp))
   {
-    ROSE_ASSERT (iequals (isSgEnumVal (tmp)->get_name ().getString (),
-                          OP2::OP_INC));
+    string access = isSgEnumVal (tmp)->get_name ().getString ();
+
+    if (iequals(access, OP2::OP_INC))
+    {
+      accessType = OP2::OP_INC;
+    }
+    else if (iequals(access, OP2::OP_WRITE))
+    {
+      accessType = OP2::OP_WRITE;
+    }
+    else
+    {
+      Debug::getInstance ()->debugMessage (
+          "Invalid OP_ARG_MAT access descriptor: " + access,
+          Debug::LOWEST_DEBUG_LEVEL, __FILE__, __LINE__);
+      ROSE_ASSERT (false);
+    }
   }
 
   Debug::getInstance ()->debugMessage (
-      "Found OP_ARG_MAT: accessing '" + matName + "' through extents ("
-      + lexical_cast <string> (map1extent) + ", " + lexical_cast <string> (map2extent)
-      + ") of maps (" + map1Name + ", " + map2Name + ") with dimension "
+      "Found OP_ARG_MAT: accessing '" + matName + "' through maps (" + map1Name
+      + ", " + map2Name + ") with dimension "
       + lexical_cast <string> (dimension),
       Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 }
@@ -569,6 +625,7 @@ CPPOxfordOpArgMatDefinition::CPPOxfordOpArgMatDefinition (
 
   SgExpressionPtrList exprs = parameters->get_expressions ();
   SgExpression * tmp;
+  bool createItspace = itspace == NULL;
 
   tmp = exprs[indexOpMat];
   matName = isSgVarRefExp(tmp)->get_symbol ()->get_name ().getString ();
@@ -582,7 +639,7 @@ CPPOxfordOpArgMatDefinition::CPPOxfordOpArgMatDefinition (
 
   getArgMatExtent (tmp, itspace,
       declarations->getOpMapDefinition (map1Name)->getDimension (),
-      map1extent);
+      map1idx, 0, createItspace);
 
   tmp = exprs[indexOpMap2];
 
@@ -592,7 +649,34 @@ CPPOxfordOpArgMatDefinition::CPPOxfordOpArgMatDefinition (
 
   getArgMatExtent (tmp, itspace,
       declarations->getOpMapDefinition (map2Name)->getDimension (),
-      map2extent);
+      map2idx, 1, createItspace);
+
+  /* Ensure that the dimensions of the iteration space are not bigger than those of the map */
+  int * extent = itspace->getIterationDimensions ()[map1idx];
+  int mapdim = declarations->getOpMapDefinition (map1Name)->getDimension ();
+  if (extent[1] > mapdim)
+  {
+    Debug::getInstance ()->debugMessage (
+        "OP_ARG_MAT extent of map1 index: " + lexical_cast <string> (extent[0])
+        + "--" + lexical_cast <string> (extent[1])
+        + " does not match dimension of map: "
+        + lexical_cast <string> (mapdim),
+        Debug::LOWEST_DEBUG_LEVEL, __FILE__, __LINE__);
+    ROSE_ASSERT (false);
+  }
+
+  extent = itspace->getIterationDimensions ()[map2idx];
+  mapdim = declarations->getOpMapDefinition (map2Name)->getDimension ();
+  if (extent[1] > mapdim)
+  {
+    Debug::getInstance ()->debugMessage (
+        "OP_ARG_MAT extent of map2 index: " + lexical_cast <string> (extent[0])
+        + "--" + lexical_cast <string> (extent[1])
+        + " does not match dimension of map: "
+        + lexical_cast <string> (mapdim),
+        Debug::LOWEST_DEBUG_LEVEL, __FILE__, __LINE__);
+    ROSE_ASSERT (false);
+  }
 
   tmp = exprs[indexDimension];
 
@@ -602,14 +686,28 @@ CPPOxfordOpArgMatDefinition::CPPOxfordOpArgMatDefinition (
 
   if (isSgEnumVal (tmp))
   {
-    ROSE_ASSERT (iequals (isSgEnumVal (tmp)->get_name ().getString (),
-                          OP2::OP_INC));
+    string access = isSgEnumVal (tmp)->get_name ().getString ();
+
+    if (iequals(access, OP2::OP_INC))
+    {
+      accessType = OP2::OP_INC;
+    }
+    else if (iequals(access, OP2::OP_WRITE))
+    {
+      accessType = OP2::OP_WRITE;
+    }
+    else
+    {
+      Debug::getInstance ()->debugMessage (
+          "Invalid OP_ARG_MAT access descriptor: " + access,
+          Debug::LOWEST_DEBUG_LEVEL, __FILE__, __LINE__);
+      ROSE_ASSERT (false);
+    }
   }
 
   Debug::getInstance ()->debugMessage (
-      "Found OP_ARG_MAT: accessing '" + matName + "' through extents ("
-      + lexical_cast <string> (map1extent) + ", " + lexical_cast <string> (map2extent)
-      + ") of maps (" + map1Name + ", " + map2Name + ") with dimension "
+      "Found OP_ARG_MAT: accessing '" + matName + "' through maps (" + map1Name
+      + ", " + map2Name + ") with dimension "
       + lexical_cast <string> (dimension),
       Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 }
