@@ -66,6 +66,7 @@ namespace OP2
   std::string const OP_DECL_SUBSET = "op_decl_subset";
   std::string const OP_DECL_SPARSITY = "op_decl_sparsity";
   std::string const OP_GBL = "op_gbl";
+  std::string const OP_I = "op_i";
   std::string const OP_ID = "op_id";
   std::string const OP_ITERATION_SPACE = "op_iteration_space";
   std::string const OP_INC = "op_inc";
