@@ -42,6 +42,7 @@ class SgFunctionCallExp;
 class SgType;
 class Reduction;
 class OpArgMatDefinition;
+class OpIterationSpaceDefinition;
 
 enum MAPPING_VALUE
 {
@@ -172,6 +173,8 @@ class ParallelLoop
     std::map <unsigned int, OpArgMatDefinition *> opMats;
 
     unsigned int numberOfOpMats;
+
+    OpIterationSpaceDefinition * opItSpace;
 
   protected:
 
@@ -476,6 +479,12 @@ class ParallelLoop
      */
     std::string const
     getOpDatInformation (unsigned int OP_DAT_ArgumentGroup);
+
+    OpIterationSpaceDefinition *
+    getOpIterationSpace ();
+
+    void
+    setOpIterationSpace (OpIterationSpaceDefinition * itspace);
 };
 
 #endif

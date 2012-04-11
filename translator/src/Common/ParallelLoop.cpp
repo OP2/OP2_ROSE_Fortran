@@ -628,3 +628,15 @@ ParallelLoop::getOpDatInformation (unsigned int OP_DAT_ArgumentGroup)
 
   return data;
 }
+
+OpIterationSpaceDefinition *
+ParallelLoop::getOpIterationSpace ()
+{
+  return opItSpace;
+}
+
+void
+ParallelLoop::setOpIterationSpace (OpIterationSpaceDefinition * itspace)
+{
+  opItSpace = itspace;
+}
