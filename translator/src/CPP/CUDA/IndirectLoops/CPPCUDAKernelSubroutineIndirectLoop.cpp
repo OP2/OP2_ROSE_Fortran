@@ -3,7 +3,7 @@
 
 /*  Open source copyright declaration based on BSD open source template:
  *  http://www.opensource.org/licenses/bsd-license.php
- * 
+ *
  * Copyright (c) 2011-2012, Adam Betts, Carlo Bertolli
  * All rights reserved.
  *
@@ -28,7 +28,6 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
 
 #include "CPPCUDAKernelSubroutineIndirectLoop.h"
 #include "RoseStatementsAndExpressionsBuilder.h"
@@ -488,6 +487,7 @@ CPPCUDAKernelSubroutineIndirectLoop::createExecutionLoopStatements ()
   using namespace OP2::RunTimeVariableNames;
   using std::string;
   using boost::lexical_cast;
+  using boost::iequals;
 
   Debug::getInstance ()->debugMessage (
       "Creating main execution loop statements", Debug::FUNCTION_LEVEL,
@@ -506,7 +506,7 @@ CPPCUDAKernelSubroutineIndirectLoop::createExecutionLoopStatements ()
   SgLessThanOp * upperBoundExpression;
 
   /*
-   * Need to zero mat entry calls;
+   * Need to zero mat entry calls if accessing via OP_INC
    */
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfArgumentGroups (); ++i)
   {
@@ -518,7 +518,12 @@ CPPCUDAKernelSubroutineIndirectLoop::createExecutionLoopStatements ()
       SgExprStatement * exp = buildAssignStatement (
         variableDeclarations->getReference (getOpMatEntryName (mat_num)),
         buildCastExp(buildIntVal(0), mat->getBaseType ()));
-      appendStatement (exp, loopBody);
+      /* Only need to zero if incrementing (for OP_WRITE we can just
+       * leave it) */
+      if (iequals (arg_mat->getAccessType (), OP2::OP_INC))
+      {
+        appendStatement (exp, loopBody);
+      }
     }
   }
 
@@ -570,65 +575,80 @@ CPPCUDAKernelSubroutineIndirectLoop::createExecutionLoopStatements ()
   }
   else
   {
-    if (parallelLoop->getNumberOfOpMatArgumentGroups () > 0)
+    OpIterationSpaceDefinition * itspace = parallelLoop->getOpIterationSpace ();
+    if (itspace != NULL)
     {
-      OpArgMatDefinition * arg_mat = parallelLoop->getOpMatArg (1);
-      const int * extent1 = arg_mat->getMap1Extent ();
-      const int * extent2 = arg_mat->getMap2Extent ();
-      int len1 = extent1[1] - extent1[0];
-      int len2 = extent2[1] - extent2[0];
-      SgMultiplyOp * m1m2 = buildMultiplyOp (
-          buildIntVal (len1),
-          buildIntVal (len2));
-      m1m2->set_need_paren (true);
-
-      /* i2 = i1 / (map1Dim * map2Dim) */
+      int div = 1;
+      std::vector<int *> itdims = itspace->getIterationDimensions ();
+      for (unsigned int i = 0; i < itdims.size (); i++)
+      {
+        div *= (itdims[i][1] - itdims[i][0]);
+      }
+      /* find set-element from sub-iteration space */
+      /* i2 = i1 / (\prod(iteration_space_extents)) */
       appendStatement (buildAssignStatement (variableDeclarations->getReference (
                   getIterationCounterVariableName (2)),
               buildIntegerDivideOp (variableDeclarations->getReference (
                       getIterationCounterVariableName (1)),
-                  m1m2)),
+                  buildIntVal(div))),
           loopBody);
 
-      /* i3 = (i1 - (map1Dim * map2Dim) * i2) / map1Dim */
-      SgMultiplyOp * i2m1m2 = buildMultiplyOp (m1m2, variableDeclarations->getReference (
-              getIterationCounterVariableName (2)));
-      i2m1m2->set_need_paren (true);
-
-      if (len1 == 1)
+      /* i3 is extent of first entry in iteration space
+       *
+       * i3 = (i1 - i2 * \prod(iteration_space_extents))/(i3_extent)
+       *
+       * except when i3_extent is 1, in which case it's just the lower
+       * limit */
+      int * extent = itspace->getIterationDimensions ()[0];
+      int i3_extent = extent[1] - extent[0];
+      if (i3_extent == 1)
       {
         appendStatement (buildAssignStatement (variableDeclarations->getReference (
                     getIterationCounterVariableName (3)),
-                buildIntVal (extent1[0])),
+                buildIntVal (extent[0])),
             loopBody);
       }
-      else {
+      else
+      {
         appendStatement (buildAssignStatement (variableDeclarations->getReference (
                     getIterationCounterVariableName (3)),
-              buildIntegerDivideOp (buildSubtractOp (variableDeclarations->getReference (
-                          getIterationCounterVariableName (1)), i2m1m2),
-                                    buildIntVal (len1))),
-          loopBody);
+                buildIntegerDivideOp (buildSubtractOp (variableDeclarations->getReference (
+                            getIterationCounterVariableName (1)),
+                        buildMultiplyOp (variableDeclarations->getReference (
+                                getIterationCounterVariableName (2)),
+                            buildIntVal (div))),
+                    buildIntVal (i3_extent))),
+            loopBody);
       }
-      /* i4 = (i1 - (map1Dim * map2Dim) * i2 - map1Dim * i3) */
-      SgMultiplyOp * i3m1 = buildMultiplyOp (
-          buildIntVal (len1),
-          variableDeclarations->getReference (getIterationCounterVariableName (3)));
 
-      i3m1->set_need_paren (true);
-      if (len2 == 1)
+      /* i4 is extent of second entry in iteration space
+       *
+       * i4 = (i1 - i2 * \prod(iteration_space_extents) - i3 * i3_extent)
+       *
+       * except when i4_extent is 1, in which case it's just the lower
+       * limit */
+      extent = itspace->getIterationDimensions ()[1];
+      int i4_extent = extent[1] - extent[0];
+      if (i4_extent == 1)
       {
         appendStatement (buildAssignStatement (variableDeclarations->getReference (
                     getIterationCounterVariableName (4)),
-                buildIntVal (extent2[0])),
+                buildIntVal (extent[0])),
             loopBody);
       }
-      else {
+      else
+      {
         appendStatement (buildAssignStatement (variableDeclarations->getReference (
                     getIterationCounterVariableName (4)),
                 buildSubtractOp (variableDeclarations->getReference (
                         getIterationCounterVariableName (1)),
-                    buildAddOp (i2m1m2, i3m1))),
+                    buildAddOp (
+                        buildMultiplyOp (variableDeclarations->getReference (
+                                getIterationCounterVariableName (2)),
+                            buildIntVal (div)),
+                        buildMultiplyOp (variableDeclarations->getReference (
+                                getIterationCounterVariableName (3)),
+                            buildIntVal (i3_extent))))),
             loopBody);
       }
     }
@@ -637,18 +657,17 @@ CPPCUDAKernelSubroutineIndirectLoop::createExecutionLoopStatements ()
 
     SgVarRefExp * nthread = variableDeclarations->getReference (numberOfActiveThreads);
 
-    if (parallelLoop->getNumberOfOpMatArgumentGroups () > 0)
+    if (itspace != NULL)
     {
-      OpArgMatDefinition * arg_mat = parallelLoop->getOpMatArg (1);
-      const int * extent1 = arg_mat->getMap1Extent ();
-      const int * extent2 = arg_mat->getMap2Extent ();
-      int len1 = extent1[1] - extent1[0];
-      int len2 = extent2[1] - extent2[0];
+      int mult = 1;
+      std::vector<int *> itdims = itspace->getIterationDimensions ();
+      for (unsigned int i = 0; i < itdims.size (); i++)
+      {
+        mult *= (itdims[i][1] - itdims[i][0]);
+      }
       upperBoundExpression = buildLessThanOp (variableDeclarations->getReference (
               getIterationCounterVariableName (1)),
-              buildMultiplyOp (nthread, buildMultiplyOp (
-                      buildIntVal (len1),
-                      buildIntVal (len2))));
+          buildMultiplyOp (nthread, buildIntVal (mult)));
     }
     else
     {
@@ -690,7 +709,19 @@ CPPCUDAKernelSubroutineIndirectLoop::createExecutionLoopStatements ()
       itvar = variableDeclarations->getReference (
           getIterationCounterVariableName (2));
 
-      /* opMatNMap[i2 * map1Dim + i3] */
+      /* When parsing the op_arg_mat calls, we check that the extents
+       * are all fine for all of them, so we can just go ahead
+       * here. */
+      string varname;
+      if (arg->getMap1Idx () == 0)
+      {
+        varname = getIterationCounterVariableName (3);
+      }
+      else
+      {
+        varname = getIterationCounterVariableName (4);
+      }
+      /* opMatNMap[i2 * map1Dim + varname] */
       parameters->append_expression (
           buildPntrArrRefExp (
               variableDeclarations->getReference (
@@ -699,10 +730,17 @@ CPPCUDAKernelSubroutineIndirectLoop::createExecutionLoopStatements ()
                 buildMultiplyOp (itvar, buildIntVal (
                                    declarations->getOpMapDefinition (
                                      arg->getMap1Name ())->getDimension ())),
-                variableDeclarations->getReference (
-                  getIterationCounterVariableName (3)))));
+                variableDeclarations->getReference (varname))));
 
-      /* opMatNMap2[i2 * map2Dim + i4] */
+      if (arg->getMap2Idx () == 0)
+      {
+        varname = getIterationCounterVariableName (3);
+      }
+      else
+      {
+        varname = getIterationCounterVariableName (4);
+      }
+      /* opMatNMap2[i2 * map2Dim + varname] */
       parameters->append_expression (
           buildPntrArrRefExp (
               variableDeclarations->getReference (
@@ -711,8 +749,7 @@ CPPCUDAKernelSubroutineIndirectLoop::createExecutionLoopStatements ()
                 buildMultiplyOp (itvar, buildIntVal (
                                    declarations->getOpMapDefinition (
                                      arg->getMap2Name ())->getDimension ())),
-                variableDeclarations->getReference (
-                  getIterationCounterVariableName (4)))));
+                variableDeclarations->getReference (varname))));
 
       parameters->append_expression (
           buildAddressOfOp (variableDeclarations->getReference ("offset")));

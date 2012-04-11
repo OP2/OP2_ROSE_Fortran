@@ -143,10 +143,10 @@ OpArgMatDefinition::getMatName () const
   return matName;
 }
 
-const int *
-OpArgMatDefinition::getMap1Extent () const
+int
+OpArgMatDefinition::getMap1Idx () const
 {
-  return map1extent;
+  return map1idx;
 }
 
 std::string const &
@@ -155,10 +155,10 @@ OpArgMatDefinition::getMap1Name () const
   return map1Name;
 }
 
-const int *
-OpArgMatDefinition::getMap2Extent () const
+int
+OpArgMatDefinition::getMap2Idx () const
 {
-  return map2extent;
+  return map2idx;
 }
 
 std::string const &
@@ -171,6 +171,12 @@ unsigned int
 OpArgMatDefinition::getDimension () const
 {
   return dimension;
+}
+
+std::string const &
+OpArgMatDefinition::getAccessType () const
+{
+  return accessType;
 }
 
 std::string const &

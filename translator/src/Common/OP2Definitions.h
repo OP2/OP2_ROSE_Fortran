@@ -303,35 +303,40 @@ class OpArgMatDefinition
 
     std::string matName;
 
-    int map1extent[2];
+    int map1idx;
 
     std::string map1Name;
 
-    int map2extent[2];
+    int map2idx;
 
     std::string map2Name;
 
     unsigned int dimension;
+
+    std::string accessType;
 
   public:
 
     std::string const &
     getMatName () const;
 
-    const int *
-    getMap1Extent () const;
+    int
+    getMap1Idx () const;
 
     std::string const &
     getMap1Name () const;
 
-    const int *
-    getMap2Extent () const;
+    int
+    getMap2Idx () const;
 
     std::string const &
     getMap2Name () const;
 
     unsigned int
     getDimension () const;
+
+    std::string const &
+    getAccessType () const;
 };
 
 #endif
