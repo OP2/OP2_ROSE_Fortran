@@ -217,11 +217,28 @@ OpIterationSpaceDefinition::OpIterationSpaceDefinition (SgExprListExp * args)
 
     ROSE_ASSERT (dim != NULL);
 
-    iterationDimensions.push_back (dim->get_value ());
+    int tmp[2];
+    tmp[0] = 0;
+    tmp[1] = dim->get_value ();
+    addIterationDimension (tmp);
   }
 }
 
-std::vector<int>
+OpIterationSpaceDefinition::OpIterationSpaceDefinition ()
+{
+  setName = "";
+}
+
+void
+OpIterationSpaceDefinition::addIterationDimension (int dim[2])
+{
+  int * thing = new int[2];
+  thing[0] = dim[0];
+  thing[1] = dim[1];
+  iterationDimensions.push_back (thing);
+}
+
+std::vector<int*>
 OpIterationSpaceDefinition::getIterationDimensions () const
 {
   return iterationDimensions;
@@ -231,4 +248,10 @@ std::string const &
 OpIterationSpaceDefinition::getSetName () const
 {
   return setName;
+}
+
+void
+OpIterationSpaceDefinition::setSetName (std::string const & name)
+{
+  setName = name;
 }
