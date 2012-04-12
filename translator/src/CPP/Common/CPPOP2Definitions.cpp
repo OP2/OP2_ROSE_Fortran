@@ -418,27 +418,18 @@ static void getArgMatExtent (SgExpression * idx,
      */
     mapidx = --which;
   }
-  else if (isSgIntVal (idx))
+  else if (isSgIntVal (idx) && isSgIntVal (idx)->get_value () < 0)
   {
-    int val = isSgIntVal (idx)->get_value ();
+    /* Negative, OP_ALL */
     mapidx = idxval;
-    if (val < 0)
-    {
-      /* Negative, OP_ALL */
-      extent[0] = 0;
-      extent[1] = mapDim;
-    }
-    else
-    {
-      extent[0] = val;
-      extent[1] = val + 1;
-    }
+    extent[0] = 0;
+    extent[1] = mapDim;
   }
   else
   {
     Debug::getInstance ()->debugMessage (
-        "Unable to parse index in OP_ARG_MAT (not a positive integer, OP_ALL or op_i)",
-        Debug::HIGHEST_DEBUG_LEVEL, __FILE__, __LINE__);
+        "Unable to parse index in OP_ARG_MAT (not OP_ALL or op_i)",
+        Debug::LOWEST_DEBUG_LEVEL, __FILE__, __LINE__);
     ROSE_ASSERT (false);
   }
 
@@ -490,7 +481,7 @@ CPPImperialOpArgMatDefinition::CPPImperialOpArgMatDefinition (
   /* Ensure that the dimensions of the iteration space are not bigger than those of the map */
   int * extent = itspace->getIterationDimensions ()[map1idx];
   int mapdim = declarations->getOpMapDefinition (map1Name)->getDimension ();
-  if (extent[1] > mapdim)
+  if (extent[1] != mapdim)
   {
     Debug::getInstance ()->debugMessage (
         "OP_ARG_MAT extent of map1 index: " + lexical_cast <string> (extent[0])
@@ -503,7 +494,7 @@ CPPImperialOpArgMatDefinition::CPPImperialOpArgMatDefinition (
 
   extent = itspace->getIterationDimensions ()[map2idx];
   mapdim = declarations->getOpMapDefinition (map2Name)->getDimension ();
-  if (extent[1] > mapdim)
+  if (extent[1] != mapdim)
   {
     Debug::getInstance ()->debugMessage (
         "OP_ARG_MAT extent of map2 index: " + lexical_cast <string> (extent[0])
