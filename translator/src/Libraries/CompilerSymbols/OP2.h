@@ -182,6 +182,17 @@ namespace OP2
         std::string const getBlockSizeFunctionName = "getBlockSize";
         std::string const getDumpOpDatFunctionName = "dumpOpDat";
         std::string const getDumpOpDatFromDeviceFunctionName = "dumpOpDatFromDevice";
+        std::string const printStar = "print *, ";
+
+      }
+
+      namespace CUDANames
+      {
+	std::string const cudaEventType = "cudaEvent";
+	std::string const cudaEventCreateFunction = "cudaEventCreate";
+	std::string const cudaEventRecordFunction = "cudaEventRecord";
+	std::string const cudaEventSynchroniseFunction = "cudaEventSynchronize";
+	std::string const cudaEventElapsedTimeFunction = "cudaEventElapsedTime";       
       }
   }
   

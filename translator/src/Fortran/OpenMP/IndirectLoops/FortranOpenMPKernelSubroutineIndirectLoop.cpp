@@ -1330,7 +1330,7 @@ FortranOpenMPKernelSubroutineIndirectLoop::createSharedVariableDeclarations ()
                   + "' for OP_DAT '" + parallelLoop->getOpDatVariableName (i)
                   + "'", Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
-          SgSubtractOp * upperBound = buildSubtractOp (buildIntVal (8000),
+          SgSubtractOp * upperBound = buildSubtractOp (buildIntVal (128000),
               buildIntVal (1));
 
           variableDeclarations->add (

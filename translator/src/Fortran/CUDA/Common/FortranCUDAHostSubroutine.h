@@ -53,6 +53,42 @@ class FortranCUDAHostSubroutine: public FortranHostSubroutine
 
   protected:
 
+    void
+    createProfilingVariablesDeclaration ();
+
+    void
+    initialiseProfilingVariablesDeclaration ();
+
+    void
+    createStartTimerHost ();
+
+    void
+    createEndTimerHost ();
+
+    void
+    createStartTimerKernel ();
+
+    void
+    createEndTimerKernel ();
+
+    void
+    createEndTimerSynchroniseHost ();
+
+    void
+    createEndTimerSynchroniseKernel ();
+
+    void
+    createElapsedTimeHost ();
+
+    void
+    createElapsedTimeKernel ();
+
+    void
+    createAccumulateTimesHost ();
+
+    void
+    createAccumulateTimesKernel ();
+
     virtual void
     createReductionEpilogueStatements ();
 

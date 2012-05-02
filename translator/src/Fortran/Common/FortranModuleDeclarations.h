@@ -75,6 +75,9 @@ class FortranModuleDeclarations
 
     ScopedVariableDeclarations *
     getDeclarations ();
+
+    void
+    createPerformanceProfilingVariables ();
 };
 
 #endif

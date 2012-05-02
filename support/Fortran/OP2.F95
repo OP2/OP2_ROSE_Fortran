@@ -36,7 +36,8 @@ use, intrinsic :: ISO_C_BINDING
                    & op_decl_dat_real_8_2, &
                    & op_decl_dat_integer_4_2, &
                    & op_decl_dat_real_8_3, &
-                   & op_decl_dat_integer_4_3
+                   & op_decl_dat_integer_4_3, &
+                   & op_decl_dat_logical
   end interface op_decl_dat
  
   interface op_decl_gbl
@@ -133,6 +134,14 @@ contains
     type(op_dat) :: data  
 		character(kind=c_char,len=*) :: datname
   end subroutine op_decl_dat_integer_4_3
+
+  subroutine op_decl_dat_logical(set, dim, dat, data, datname)
+    type(op_set) :: set
+    integer :: dim
+    logical, dimension(:) :: dat
+    type(op_dat) :: data  
+    character(kind=c_char,len=*) :: datname
+  end subroutine op_decl_dat_logical
 
   subroutine op_decl_gbl_real_8_0 ( dat, data)
     real(8) :: dat   

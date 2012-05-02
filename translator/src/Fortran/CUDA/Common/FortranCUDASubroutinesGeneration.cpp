@@ -43,6 +43,7 @@
 #include "FortranCUDAModuleDeclarationsIndirectLoop.h"
 #include "FortranCUDAOpDatCardinalitiesDeclarationIndirectLoop.h"
 #include "FortranOpDatDimensionsDeclaration.h"
+#include <FortranPrintProfilingInformationSubroutine.h>
 #include "FortranParallelLoop.h"
 #include "FortranProgramDeclarationsAndDefinitions.h"
 #include "FortranTypesBuilder.h"
@@ -57,6 +58,7 @@
 #include "Globals.h"
 #include "CUDA.h"
 #include <boost/algorithm/string.hpp>
+#include "CompilerGeneratedNames.h"
 
 void
 FortranCUDASubroutinesGeneration::processOP2ConstantDeclarations ()
@@ -165,8 +167,15 @@ FortranCUDASubroutinesGeneration::createReductionSubroutines ()
 void
 FortranCUDASubroutinesGeneration::createSubroutines ()
 {
+  using namespace OP2VariableNames;
   using std::string;
   using std::map;
+
+  string const & printProfilingInformationName = printProfilingInformation;
+
+  FortranPrintProfilingInformationSubroutine * printProfilingInformationSubroutineInstance =
+    new FortranPrintProfilingInformationSubroutine (printProfilingInformationName,
+      moduleScope, moduleDeclarations, declarations);
 
   CUDAconstants->appendConstantInitialisationToModule ( moduleScope, declarations, /* isCuda = */ true );
   

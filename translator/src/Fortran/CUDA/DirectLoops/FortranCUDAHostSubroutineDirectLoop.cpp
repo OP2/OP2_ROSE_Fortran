@@ -158,11 +158,42 @@ FortranCUDAHostSubroutineDirectLoop::createCUDAKernelInitialisationStatements ()
 
   appendStatement (assignmentStatement1, subroutineScope);
 
-  SgExprStatement * assignmentStatement2 = buildAssignStatement (
+  /*
+   * ======================================================
+   * Statement to initialise the number of threads per block
+   * in the CUDA kernel: calls a proper function
+   * ======================================================
+   */
+
+  Debug::getInstance ()->debugMessage ("Creating call to partition size setting function",
+    Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+
+  SgVarRefExp * parameter1 = variableDeclarations->getReference (
+    getUserSubroutineName ());
+
+  SgDotExp * parameter2 = buildDotExp (variableDeclarations->getReference (
+    getOpSetName ()), buildOpaqueVarRefExp (OP2::RunTimeVariableNames::size,
+      subroutineScope));
+
+  SgExprListExp * actualParameters = buildExprListExp (parameter1, parameter2);
+
+  SgFunctionSymbol * functionSymbol =
+    FortranTypesBuilder::buildNewFortranFunction (OP2::FortranSpecific::RunTimeFunctions::getBlockSizeFunctionName,
+      subroutineScope);
+
+  SgFunctionCallExp * functionCall = buildFunctionCallExp (functionSymbol,
+    actualParameters);
+
+  SgExprStatement * statement2 = buildAssignStatement (
+    variableDeclarations->getReference (CUDA::threadsPerBlock), functionCall);
+
+  appendStatement (statement2, subroutineScope);
+
+  /*  SgExprStatement * assignmentStatement2 = buildAssignStatement (
       variableDeclarations->getReference (CUDA::threadsPerBlock), buildIntVal (
           nthreads));
 
-  appendStatement (assignmentStatement2, subroutineScope);
+	  appendStatement (assignmentStatement2, subroutineScope);*/
 
   SgExprStatement * assignmentStatement3 = buildAssignStatement (
       variableDeclarations->getReference (warpSize), buildOpaqueVarRefExp (
@@ -292,6 +323,10 @@ FortranCUDAHostSubroutineDirectLoop::createStatements ()
       Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
   createEarlyExitStatement (subroutineScope);
+
+  initialiseProfilingVariablesDeclaration ();
+
+  createStartTimerHost ();
       
   createCUDAKernelInitialisationStatements ();
 
@@ -302,6 +337,13 @@ FortranCUDAHostSubroutineDirectLoop::createStatements ()
     createReductionPrologueStatements ();
   }
 
+  createEndTimerHost ();
+  createEndTimerSynchroniseHost ();
+  createElapsedTimeHost ();
+  createAccumulateTimesHost ();
+
+  createStartTimerKernel ();
+
   createKernelFunctionCallStatement (subroutineScope);
 
   SgExprStatement * assignmentStatement2 = buildAssignStatement (
@@ -309,6 +351,14 @@ FortranCUDAHostSubroutineDirectLoop::createStatements ()
       CUDA::createHostThreadSynchronisationCallStatement (subroutineScope));
 
   appendStatement (assignmentStatement2, subroutineScope);
+
+  createEndTimerKernel ();
+  createEndTimerSynchroniseKernel ();
+  createElapsedTimeKernel ();
+  createAccumulateTimesKernel ();
+
+  createStartTimerHost ();
+
 
   if (parallelLoop->isReductionRequired ())
   {
@@ -319,6 +369,11 @@ FortranCUDAHostSubroutineDirectLoop::createStatements ()
   
   createDumpOfOutputStatements (subroutineScope,
     OP2::FortranSpecific::RunTimeFunctions::getDumpOpDatFromDeviceFunctionName);
+
+  createEndTimerHost ();
+  createEndTimerSynchroniseHost ();
+  createElapsedTimeHost ();
+  createAccumulateTimesHost ();
 }
 
 void
@@ -345,6 +400,16 @@ FortranCUDAHostSubroutineDirectLoop::createLocalVariableDeclarations ()
   {
     createReductionDeclarations ();
   }
+
+  /*
+   * ======================================================
+   * Profiling declarations. Eventually, this should only
+   * be done if a certain compiler option is turned on
+   * ======================================================
+   */
+
+  createProfilingVariablesDeclaration ();
+
 }
 
 FortranCUDAHostSubroutineDirectLoop::FortranCUDAHostSubroutineDirectLoop (

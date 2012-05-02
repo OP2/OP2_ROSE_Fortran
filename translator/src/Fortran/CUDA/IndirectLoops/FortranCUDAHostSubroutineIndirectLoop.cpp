@@ -1234,7 +1234,15 @@ FortranCUDAHostSubroutineIndirectLoop::createStatements ()
       Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
   createEarlyExitStatement (subroutineScope);
-      
+
+  Debug::getInstance ()->debugMessage (
+       "Host subroutine indirect loop, creating profiling declarations",
+      Debug::CONSTRUCTOR_LEVEL, __FILE__, __LINE__);
+
+  initialiseProfilingVariablesDeclaration ();
+
+  createStartTimerHost ();
+
   appendStatement (createPlanFunctionParametersPreparationStatements (),
       subroutineScope);
 
@@ -1270,7 +1278,29 @@ FortranCUDAHostSubroutineIndirectLoop::createStatements ()
  
   createCardinalitiesInitialisationStatements ();
 
+  Debug::getInstance ()->debugMessage (
+       "Host subroutine indirect loop, creating end timer",
+      Debug::CONSTRUCTOR_LEVEL, __FILE__, __LINE__);
+
+  createEndTimerHost ();
+  createEndTimerSynchroniseHost ();
+  createElapsedTimeHost ();
+  createAccumulateTimesHost ();
+
+  Debug::getInstance ()->debugMessage (
+       "Host subroutine indirect loop, start time for kernel",
+      Debug::CONSTRUCTOR_LEVEL, __FILE__, __LINE__);
+
+  createStartTimerKernel ();
+
   createPlanFunctionExecutionStatements ();
+
+  createEndTimerKernel ();
+  createEndTimerSynchroniseKernel ();
+  createElapsedTimeKernel ();
+  createAccumulateTimesKernel ();
+
+  createStartTimerHost ();
 
   if (parallelLoop->isReductionRequired ())
   {
@@ -1281,6 +1311,11 @@ FortranCUDAHostSubroutineIndirectLoop::createStatements ()
   
   createDumpOfOutputStatements (subroutineScope,
     OP2::FortranSpecific::RunTimeFunctions::getDumpOpDatFromDeviceFunctionName);  
+
+  createEndTimerHost ();
+  createEndTimerSynchroniseHost ();
+  createElapsedTimeHost ();
+  createAccumulateTimesHost ();
 }
 
 void
@@ -1560,6 +1595,15 @@ FortranCUDAHostSubroutineIndirectLoop::createLocalVariableDeclarations ()
   {
     createReductionDeclarations ();
   }
+
+  /*
+   * ======================================================
+   * Profiling declarations. Eventually, this should only
+   * be done if a certain compiler option is turned on
+   * ======================================================
+   */
+
+  createProfilingVariablesDeclaration ();
 }
 
 FortranCUDAHostSubroutineIndirectLoop::FortranCUDAHostSubroutineIndirectLoop (

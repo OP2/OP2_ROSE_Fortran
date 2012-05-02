@@ -29,9 +29,54 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-
+#include <FortranParallelLoop.h>
 #include <FortranModuleDeclarations.h>
+#include <FortranTypesBuilder.h>
 #include <ScopedVariableDeclarations.h>
+#include <FortranStatementsAndExpressionsBuilder.h>
+#include <RoseStatementsAndExpressionsBuilder.h>
+#include "CompilerGeneratedNames.h"
+#include "OP2.h"
+#include "Debug.h"
+#include "Exceptions.h"
+#include "rose.h"
+
+void FortranModuleDeclarations::createPerformanceProfilingVariables ()
+{
+  using namespace SageBuilder;
+  using namespace OP2VariableNames;
+  using std::string;
+
+  string const postfixName = getPostfixNameAsConcatOfOpArgsNames (parallelLoop);
+  
+  string const & variableNameHost = loopTimeHost +
+    parallelLoop->getUserSubroutineName () + postfixName;
+  string const & variableNameKernel = loopTimeKernel +
+    parallelLoop->getUserSubroutineName () + postfixName;
+  string const & numberCalledVariableName = numberCalled +
+    parallelLoop->getUserSubroutineName () + postfixName;
+
+
+  Debug::getInstance ()->debugMessage ("Performance profiling, adding up: " + variableNameHost,
+    Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+  Debug::getInstance ()->debugMessage ("Performance profiling, adding up: " + variableNameKernel,
+    Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+  Debug::getInstance ()->debugMessage ("Performance profiling, adding up: " + numberCalledVariableName,
+    Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+
+  variableDeclarations->add (variableNameHost,
+    FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
+       variableNameHost, FortranTypesBuilder::getSinglePrecisionFloat (), moduleScope, 0));
+
+  variableDeclarations->add (variableNameKernel,
+    FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
+       variableNameKernel, FortranTypesBuilder::getSinglePrecisionFloat (), moduleScope, 0));
+
+  variableDeclarations->add (numberCalledVariableName,
+    FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
+       numberCalledVariableName, FortranTypesBuilder::getFourByteInteger (), moduleScope, 0));
+}
+			     
 
 ScopedVariableDeclarations *
 FortranModuleDeclarations::getDeclarations ()
@@ -44,4 +89,11 @@ FortranModuleDeclarations::FortranModuleDeclarations (
   parallelLoop (parallelLoop), moduleScope (moduleScope)
 {
   variableDeclarations = new ScopedVariableDeclarations ();
+
+  /*
+   * ======================================================
+   * Eventually, put this into a command line option
+   * ======================================================
+   */
+  createPerformanceProfilingVariables ();
 }

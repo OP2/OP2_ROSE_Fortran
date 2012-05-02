@@ -46,6 +46,398 @@
 #include "PlanFunctionNames.h"
 
 void
+FortranCUDAHostSubroutine::createProfilingVariablesDeclaration ()
+{
+  using namespace SageBuilder;
+  using namespace SageInterface;
+  using namespace OP2VariableNames;
+  using std::string;
+
+  Debug::getInstance ()->debugMessage (
+      "Creating local variable declarations for performance profiling",
+      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+
+  SgType * cudaEventType = FortranTypesBuilder::buildClassDeclaration (
+    OP2::FortranSpecific::CUDANames::cudaEventType, subroutineScope)->get_type ();
+
+  variableDeclarations->add (startTimeHost,
+      FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
+          startTimeHost,
+          cudaEventType, subroutineScope));
+
+  variableDeclarations->add (endTimeHost,
+      FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
+          endTimeHost,
+          cudaEventType, subroutineScope));
+
+  variableDeclarations->add (startTimeKernel,
+      FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
+          startTimeKernel,
+          cudaEventType, subroutineScope));
+
+  variableDeclarations->add (endTimeKernel,
+      FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
+          endTimeKernel,
+          cudaEventType, subroutineScope));
+
+  variableDeclarations->add (istat,
+      FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
+          istat,
+          FortranTypesBuilder::getFourByteInteger (), subroutineScope));
+
+  variableDeclarations->add (accumulatorHostTime,
+    FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
+       accumulatorHostTime, FortranTypesBuilder::getSinglePrecisionFloat (), subroutineScope));
+
+  variableDeclarations->add (accumulatorKernelTime,
+    FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
+       accumulatorKernelTime, FortranTypesBuilder::getSinglePrecisionFloat (), subroutineScope));
+}
+
+void
+FortranCUDAHostSubroutine::initialiseProfilingVariablesDeclaration ()
+{
+  using namespace SageBuilder;
+  using namespace SageInterface;
+  using namespace OP2VariableNames;
+  using std::string;
+
+  SgFunctionSymbol * functionSymbol =
+    FortranTypesBuilder::buildNewFortranFunction (OP2::FortranSpecific::CUDANames::cudaEventCreateFunction,
+      subroutineScope);
+
+  SgExprListExp * actualParameters1 = buildExprListExp ();
+  SgExprListExp * actualParameters2 = buildExprListExp ();
+  SgExprListExp * actualParameters3 = buildExprListExp ();
+  SgExprListExp * actualParameters4 = buildExprListExp ();
+
+  actualParameters1->append_expression (
+    variableDeclarations->getReference (startTimeHost));
+
+  actualParameters2->append_expression (
+    variableDeclarations->getReference (endTimeHost));
+  
+  actualParameters3->append_expression (
+    variableDeclarations->getReference (startTimeKernel));
+
+  actualParameters4->append_expression (
+    variableDeclarations->getReference (endTimeKernel));
+
+  SgFunctionCallExp * functionCallExp1 = buildFunctionCallExp (
+    functionSymbol, actualParameters1);
+
+  SgFunctionCallExp * functionCallExp2 = buildFunctionCallExp (
+    functionSymbol, actualParameters2);
+
+  SgFunctionCallExp * functionCallExp3 = buildFunctionCallExp (
+    functionSymbol, actualParameters3);
+
+  SgFunctionCallExp * functionCallExp4 = buildFunctionCallExp (
+    functionSymbol, actualParameters4);
+
+  SgAssignOp * assignFunctionCall1 = buildAssignOp (
+    variableDeclarations->getReference (istat),
+    functionCallExp1);
+
+  SgAssignOp * assignFunctionCall2 = buildAssignOp (
+    variableDeclarations->getReference (istat),
+    functionCallExp2);
+
+  SgAssignOp * assignFunctionCall3 = buildAssignOp (
+    variableDeclarations->getReference (istat),
+    functionCallExp3);
+
+  SgAssignOp * assignFunctionCall4 = buildAssignOp (
+    variableDeclarations->getReference (istat),
+    functionCallExp4);
+
+  appendStatement (buildExprStatement(assignFunctionCall1), subroutineScope);
+  appendStatement (buildExprStatement(assignFunctionCall2), subroutineScope);
+  appendStatement (buildExprStatement(assignFunctionCall3), subroutineScope);
+  appendStatement (buildExprStatement(assignFunctionCall4), subroutineScope);
+
+  string const postfixName = getPostfixNameAsConcatOfOpArgsNames (parallelLoop);
+  string const & numberCalledVariableName = numberCalled +
+    parallelLoop->getUserSubroutineName () + postfixName;
+
+  SgAssignOp * incrementNumberTimesCalled = buildAssignOp (
+   moduleDeclarations->getDeclarations ()->getReference (numberCalledVariableName),
+   buildAddOp (moduleDeclarations->getDeclarations ()->getReference (numberCalledVariableName),
+      buildIntVal (1)));
+
+  appendStatement (buildExprStatement(incrementNumberTimesCalled), subroutineScope);
+}
+
+void
+FortranCUDAHostSubroutine::createStartTimerHost ()
+{
+  using namespace SageBuilder;
+  using namespace SageInterface;
+  using namespace OP2VariableNames;
+  using std::string;
+
+  SgFunctionSymbol * functionSymbol =
+    FortranTypesBuilder::buildNewFortranFunction (OP2::FortranSpecific::CUDANames::cudaEventRecordFunction,
+      subroutineScope);
+
+  SgExprListExp * actualParameters = buildExprListExp ();
+
+  actualParameters->append_expression (
+    variableDeclarations->getReference (startTimeHost));
+
+  actualParameters->append_expression (buildIntVal (0));
+
+  SgFunctionCallExp * functionCallExp = buildFunctionCallExp (
+    functionSymbol, actualParameters);
+
+  SgAssignOp * assignFunctionCall = buildAssignOp (
+   variableDeclarations->getReference (istat), functionCallExp);
+
+  appendStatement (buildExprStatement (assignFunctionCall), subroutineScope);
+}
+
+
+void
+FortranCUDAHostSubroutine::createEndTimerHost ()
+{
+  using namespace SageBuilder;
+  using namespace SageInterface;
+  using namespace OP2VariableNames;
+  using std::string;
+
+  SgFunctionSymbol * functionSymbol =
+    FortranTypesBuilder::buildNewFortranFunction (OP2::FortranSpecific::CUDANames::cudaEventRecordFunction,
+      subroutineScope);
+
+  SgExprListExp * actualParameters = buildExprListExp ();
+
+  actualParameters->append_expression (
+    variableDeclarations->getReference (endTimeHost));
+
+  actualParameters->append_expression (buildIntVal (0));
+
+  SgFunctionCallExp * functionCallExp = buildFunctionCallExp (
+    functionSymbol, actualParameters);
+
+  SgAssignOp * assignFunctionCall = buildAssignOp (
+    variableDeclarations->getReference (istat), functionCallExp);
+
+  appendStatement (buildExprStatement (assignFunctionCall), subroutineScope);
+}
+
+void
+FortranCUDAHostSubroutine::createStartTimerKernel ()
+{
+  using namespace SageBuilder;
+  using namespace SageInterface;
+  using namespace OP2VariableNames;
+  using std::string;
+
+  SgFunctionSymbol * functionSymbol =
+    FortranTypesBuilder::buildNewFortranFunction (OP2::FortranSpecific::CUDANames::cudaEventRecordFunction,
+      subroutineScope);
+
+  SgExprListExp * actualParameters = buildExprListExp ();
+
+  actualParameters->append_expression (
+    variableDeclarations->getReference (startTimeKernel));
+
+  actualParameters->append_expression (buildIntVal (0));
+
+  SgFunctionCallExp * functionCallExp = buildFunctionCallExp (
+    functionSymbol, actualParameters);
+
+  SgAssignOp * assignFunctionCall = buildAssignOp (
+    variableDeclarations->getReference (istat), functionCallExp);
+
+  appendStatement (buildExprStatement (assignFunctionCall), subroutineScope);
+}
+
+void
+FortranCUDAHostSubroutine::createEndTimerKernel ()
+{
+  using namespace SageBuilder;
+  using namespace SageInterface;
+  using namespace OP2VariableNames;
+  using std::string;
+
+  SgFunctionSymbol * functionSymbol =
+    FortranTypesBuilder::buildNewFortranFunction (OP2::FortranSpecific::CUDANames::cudaEventRecordFunction,
+      subroutineScope);
+
+  SgExprListExp * actualParameters = buildExprListExp ();
+
+  actualParameters->append_expression (
+    variableDeclarations->getReference (endTimeKernel));
+
+  actualParameters->append_expression (buildIntVal (0));
+
+  SgFunctionCallExp * functionCallExp = buildFunctionCallExp (
+    functionSymbol, actualParameters);
+
+  SgAssignOp * assignFunctionCall = buildAssignOp (
+    variableDeclarations->getReference (istat), functionCallExp);
+
+  appendStatement (buildExprStatement (assignFunctionCall), subroutineScope);
+}
+
+void
+FortranCUDAHostSubroutine::createEndTimerSynchroniseKernel ()
+{
+  using namespace SageBuilder;
+  using namespace SageInterface;
+  using namespace OP2VariableNames;
+  using std::string;
+
+  SgFunctionSymbol * functionSymbol =
+    FortranTypesBuilder::buildNewFortranFunction (OP2::FortranSpecific::CUDANames::cudaEventSynchroniseFunction,
+      subroutineScope);
+
+  SgExprListExp * actualParameters = buildExprListExp ();
+
+  actualParameters->append_expression (
+    variableDeclarations->getReference (endTimeKernel));
+
+  SgFunctionCallExp * functionCallExp = buildFunctionCallExp (
+    functionSymbol, actualParameters);
+
+  SgAssignOp * assignFunctionCall = buildAssignOp (
+    variableDeclarations->getReference (istat), functionCallExp);
+
+  appendStatement (buildExprStatement (assignFunctionCall), subroutineScope);
+}
+
+void
+FortranCUDAHostSubroutine::createEndTimerSynchroniseHost ()
+{
+  using namespace SageBuilder;
+  using namespace SageInterface;
+  using namespace OP2VariableNames;
+  using std::string;
+
+  SgFunctionSymbol * functionSymbol =
+    FortranTypesBuilder::buildNewFortranFunction (OP2::FortranSpecific::CUDANames::cudaEventSynchroniseFunction,
+      subroutineScope);
+
+  SgExprListExp * actualParameters = buildExprListExp ();
+
+  actualParameters->append_expression (
+    variableDeclarations->getReference (endTimeHost));
+
+  SgFunctionCallExp * functionCallExp = buildFunctionCallExp (
+    functionSymbol, actualParameters);
+
+  SgAssignOp * assignFunctionCall = buildAssignOp (
+    variableDeclarations->getReference (istat), functionCallExp);
+
+  appendStatement (buildExprStatement (assignFunctionCall), subroutineScope);
+}
+
+void
+FortranCUDAHostSubroutine::createElapsedTimeHost ()
+{
+  using namespace SageBuilder;
+  using namespace SageInterface;
+  using namespace OP2VariableNames;
+  using std::string;
+
+  SgFunctionSymbol * functionSymbol =
+    FortranTypesBuilder::buildNewFortranFunction (OP2::FortranSpecific::CUDANames::cudaEventElapsedTimeFunction,
+      subroutineScope);
+
+  SgExprListExp * actualParameters = buildExprListExp ();
+
+  actualParameters->append_expression (
+    variableDeclarations->getReference (accumulatorHostTime));
+
+  actualParameters->append_expression (
+    variableDeclarations->getReference (startTimeHost));
+
+  actualParameters->append_expression (
+    variableDeclarations->getReference (endTimeHost));
+
+  SgFunctionCallExp * functionCallExp = buildFunctionCallExp (
+    functionSymbol, actualParameters);
+
+  SgAssignOp * assignFunctionCall = buildAssignOp (
+    variableDeclarations->getReference (istat), functionCallExp);
+
+  appendStatement (buildExprStatement (assignFunctionCall), subroutineScope);
+}
+
+void
+FortranCUDAHostSubroutine::createElapsedTimeKernel ()
+{
+  using namespace SageBuilder;
+  using namespace SageInterface;
+  using namespace OP2VariableNames;
+  using std::string;
+
+  SgFunctionSymbol * functionSymbol =
+    FortranTypesBuilder::buildNewFortranFunction (OP2::FortranSpecific::CUDANames::cudaEventElapsedTimeFunction,
+      subroutineScope);
+
+  SgExprListExp * actualParameters = buildExprListExp ();
+
+  actualParameters->append_expression (
+    variableDeclarations->getReference (accumulatorKernelTime));
+
+  actualParameters->append_expression (
+    variableDeclarations->getReference (startTimeKernel));
+
+  actualParameters->append_expression (
+    variableDeclarations->getReference (endTimeKernel));
+
+  SgFunctionCallExp * functionCallExp = buildFunctionCallExp (
+    functionSymbol, actualParameters);
+
+  SgAssignOp * assignFunctionCall = buildAssignOp (
+    variableDeclarations->getReference (istat), functionCallExp);
+
+  appendStatement (buildExprStatement (assignFunctionCall), subroutineScope);
+}
+
+void
+FortranCUDAHostSubroutine::createAccumulateTimesHost ()
+{
+  using namespace SageBuilder;
+  using namespace SageInterface;
+  using namespace OP2VariableNames;
+  using std::string;
+
+  string const postfixName = getPostfixNameAsConcatOfOpArgsNames (parallelLoop);
+  string const & variableNameHost = loopTimeHost +
+    parallelLoop->getUserSubroutineName () + postfixName;
+
+  SgAssignOp * accumulateHostTimes = buildAssignOp (
+    moduleDeclarations->getDeclarations ()->getReference (variableNameHost),
+    buildAddOp (moduleDeclarations->getDeclarations ()->getReference (variableNameHost),
+      variableDeclarations->getReference (accumulatorHostTime)));
+
+  appendStatement (buildExprStatement(accumulateHostTimes), subroutineScope);
+}
+
+void
+FortranCUDAHostSubroutine::createAccumulateTimesKernel ()
+{
+  using namespace SageBuilder;
+  using namespace SageInterface;
+  using namespace OP2VariableNames;
+  using std::string;
+
+  string const postfixName = getPostfixNameAsConcatOfOpArgsNames (parallelLoop);
+  string const & variableNameKernel = loopTimeKernel +
+    parallelLoop->getUserSubroutineName () + postfixName;
+
+  SgAssignOp * accumulateKernelTimes = buildAssignOp (
+    moduleDeclarations->getDeclarations ()->getReference (variableNameKernel),
+    buildAddOp (moduleDeclarations->getDeclarations ()->getReference (variableNameKernel),
+      variableDeclarations->getReference (accumulatorKernelTime)));
+
+  appendStatement (buildExprStatement(accumulateKernelTimes), subroutineScope);
+}
+
+void
 FortranCUDAHostSubroutine::createReductionPrologueStatements ()
 {
   using namespace SageBuilder;

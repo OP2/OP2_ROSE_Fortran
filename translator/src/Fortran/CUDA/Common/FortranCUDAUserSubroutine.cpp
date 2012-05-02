@@ -426,6 +426,9 @@ void FortranCUDAUserSubroutine::appendAdditionalSubroutines ( SgScopeStatement *
    
     FortranCUDAUserSubroutine * newRoutine = new FortranCUDAUserSubroutine ( moduleScope, 
         parallelLoop, declarations, calledSubroutineName );
+
+    newRoutine->createFormalParameterDeclarations ();
+    newRoutine->createStatements ();
    
     additionalSubroutines.push_back (newRoutine);        
   }

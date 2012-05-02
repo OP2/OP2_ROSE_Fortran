@@ -134,7 +134,20 @@ namespace OP2VariableNames
   std::string const returnDumpOpDat = "returnDumpOpDat";
   
   std::string const OP_PART_SIZE_1 = "OP_PART_SIZE_1";
-  
+  std::string const startTimeHost = "startTimeHost";
+  std::string const endTimeHost = "endTimeHost";
+  std::string const startTimeKernel = "startTimeKernel";
+  std::string const endTimeKernel = "endTimeKernel";
+  std::string const loopTimeHost = "loopTimeHost";
+  std::string const loopTimeKernel = "loopTimeKernel";
+  std::string const numberCalled = "numberCalled";
+  std::string const istat = "istat";
+  std::string const accumulatorHostTime = "accumulatorHostTime";
+  std::string const accumulatorKernelTime = "accumulatorKernelTime";
+
+  std::string const printProfilingInformation = "printProfInfo";
+
+
   std::string const
   getBlockSizeVariableName (std::string const & suffix);
 
