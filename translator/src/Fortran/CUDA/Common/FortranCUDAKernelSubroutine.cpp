@@ -361,7 +361,7 @@ FortranCUDAKernelSubroutine::createCUDAStageInVariablesVariableDeclarations ()
       }
       else
       {
-        if (parallelLoop->isIncrement (i) == true)
+        if (parallelLoop->isIncremented (i) == true)
         {
           variableDeclarations->add (variableName,
               FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
