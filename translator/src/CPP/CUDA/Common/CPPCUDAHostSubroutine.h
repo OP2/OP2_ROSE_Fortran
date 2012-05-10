@@ -38,6 +38,7 @@
 
 class CPPCUDAKernelSubroutine;
 class CPPModuleDeclarations;
+class CPPProgramDeclarationsAndDefinitions;
 
 class CPPCUDAHostSubroutine: public CPPHostSubroutine
 {
@@ -64,6 +65,12 @@ class CPPCUDAHostSubroutine: public CPPHostSubroutine
 
     void
     createCUDAConfigurationLaunchDeclarations ();
+
+    CPPCUDAHostSubroutine (SgScopeStatement * moduleScope,
+        CPPCUDAKernelSubroutine * calleeSubroutine,
+        CPPParallelLoop * parallelLoop,
+        CPPModuleDeclarations * moduleDeclarations,
+        CPPProgramDeclarationsAndDefinitions * declarations);
 
     CPPCUDAHostSubroutine (SgScopeStatement * moduleScope,
         CPPCUDAKernelSubroutine * calleeSubroutine,

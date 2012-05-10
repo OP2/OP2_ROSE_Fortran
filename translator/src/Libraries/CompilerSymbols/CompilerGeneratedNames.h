@@ -219,6 +219,13 @@ namespace OP2VariableNames
   getOpDatName (unsigned int OP_DAT_ArgumentGroup);
 
   /*
+   * Return the device name of an OP_DAT variable indirection through
+   * an OP_ALL accessor.
+   */
+  std::string const
+  getOpDatVecName (unsigned int OP_DAT_ArgumentGroup);
+
+  /*
    * ======================================================
    * Returns the name of an OP_DAT variable in this OP_DAT
    * argument group on the host

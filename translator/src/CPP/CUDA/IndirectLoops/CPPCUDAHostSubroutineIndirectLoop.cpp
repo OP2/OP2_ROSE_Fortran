@@ -72,29 +72,15 @@ CPPCUDAHostSubroutineIndirectLoop::createKernelFunctionCallStatement (
       OpArgMatDefinition * arg_mat = parallelLoop->getOpMatArg (mat_num);
       OpMatDefinition * mat = declarations->getOpMatDefinition (arg_mat->getMatName ());
 
-      SgDotExp * data = buildDotExp (
-        variableDeclarations->getReference (getOpMatName (mat_num)),
-        buildOpaqueVarRefExp (data_d, subroutineScope));
+      SgArrowExp * data = buildArrowExp(buildDotExp (
+              variableDeclarations->getReference (getOpMatName (mat_num)),
+              buildOpaqueVarRefExp ("mat", subroutineScope)),
+          buildOpaqueVarRefExp ("lma_data", subroutineScope));
 
       SgCastExp * castExpression = buildCastExp (data,
           buildPointerType (mat->getBaseType ()));
       actualParameters->append_expression (castExpression);
 
-      /* pass row pointer */
-      SgDotExp * rowptr = buildDotExp (
-        variableDeclarations->getReference (getOpMatName (mat_num)),
-        buildOpaqueVarRefExp (rowptr_d, subroutineScope));
-      actualParameters->append_expression (rowptr);
-      /* pass col pointer */
-      SgDotExp * colptr = buildDotExp (
-        variableDeclarations->getReference (getOpMatName (mat_num)),
-        buildOpaqueVarRefExp (colptr_d, subroutineScope));
-      actualParameters->append_expression (colptr);
-      /* pass nrow */
-      SgDotExp * nrow_d = buildDotExp (
-        variableDeclarations->getReference (getOpMatName (mat_num)),
-        buildOpaqueVarRefExp (nrow, subroutineScope));
-      actualParameters->append_expression (nrow_d);
     }
     else {
       unsigned int dat_num = parallelLoop->getOpDatArgNum (i);
@@ -114,26 +100,11 @@ CPPCUDAHostSubroutineIndirectLoop::createKernelFunctionCallStatement (
   }
 
   unsigned int arrayIndex = 0;
-  unsigned int matIndex = 0;
-
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfArgumentGroups (); ++i)
   {
     if (parallelLoop->isOpMatArg (i))
     {
-      SgPntrArrRefExp * expr = buildPntrArrRefExp (
-        buildOpaqueVarRefExp (mat_maps, subroutineScope), buildIntVal (
-          matIndex));
-      SgArrowExp * arrow = buildArrowExp (
-        variableDeclarations->getReference (planRet), expr);
-      actualParameters->append_expression (arrow);
-
-      SgPntrArrRefExp * expr2 = buildPntrArrRefExp (
-        buildOpaqueVarRefExp (mat_maps2, subroutineScope), buildIntVal (
-          matIndex));
-      SgArrowExp * arrow2 = buildArrowExp (
-        variableDeclarations->getReference (planRet), expr2);
-      actualParameters->append_expression (arrow2);
-      matIndex++;
+      continue;
     }
     else
     {
@@ -156,20 +127,32 @@ CPPCUDAHostSubroutineIndirectLoop::createKernelFunctionCallStatement (
     }
   }
 
+  int count = 0;
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfArgumentGroups (); ++i)
   {
     if (parallelLoop->isOpMatArg (i)) continue;
-    unsigned int dat_num = parallelLoop->getOpDatArgNum (i);
     if (parallelLoop->isIndirect (i))
     {
-      SgPntrArrRefExp * arrayExpression =
+      int ntimes;
+      if (parallelLoop->getOpIndexValue (i) < 0) // OP_ALL
+      {
+        ntimes = declarations->getOpMapDefinition (parallelLoop->getOpMapName (i))->getDimension ();
+      }
+      else
+      {
+        ntimes = 1;
+      }
+      for ( int j = 0; j < ntimes; j++ )
+      {
+        SgPntrArrRefExp * arrayExpression =
           buildPntrArrRefExp (buildOpaqueVarRefExp (loc_maps, subroutineScope),
-              buildIntVal (dat_num - 1));
+                              buildIntVal (count++));
 
-      SgArrowExp * arrowExpression = buildArrowExp (
+        SgArrowExp * arrowExpression = buildArrowExp (
           variableDeclarations->getReference (planRet), arrayExpression);
 
-      actualParameters->append_expression (arrowExpression);
+        actualParameters->append_expression (arrowExpression);
+      }
     }
   }
 
@@ -383,15 +366,42 @@ CPPCUDAHostSubroutineIndirectLoop::createPlanFunctionCallStatement ()
   actualParamaters->append_expression (variableDeclarations->getReference (
       getPartitionSizeVariableName (parallelLoop->getUserSubroutineName ())));
 
-  actualParamaters->append_expression (buildIntVal (
-      parallelLoop->getNumberOfArgumentGroups ()));
+  int nargs = 0;
+  int ninds = 0;
+  for (unsigned int i = 1; i <= parallelLoop->getNumberOfArgumentGroups (); ++i)
+  {
+    if (parallelLoop->isOpMatArg (i))
+    {
+      continue;
+    }
+    if (parallelLoop->isIndirect (i))
+    {
+      if (!parallelLoop->isDuplicateOpDat (i))
+      {
+        ++ninds;
+        if (parallelLoop->getOpIndexValue (i) < 0) // OP_ALL
+        {
+          int num = declarations->getOpMapDefinition (parallelLoop->getOpMapName (i))->getDimension ();
+          nargs += num;
+        }
+        else
+        {
+          ++nargs;
+        }
+      }
+    }
+    else                        // direct op_dat
+    {
+      ++nargs;
+    }
+  }
+
+  actualParamaters->append_expression (buildIntVal (nargs));
 
   actualParamaters->append_expression (variableDeclarations->getReference (
       opDatArray));
 
-  actualParamaters->append_expression (buildIntVal (
-      parallelLoop->getNumberOfDistinctIndirectOpDats () +
-      parallelLoop->getNumberOfOpMatArgumentGroups ()));
+  actualParamaters->append_expression (buildIntVal (ninds));
 
   actualParamaters->append_expression (variableDeclarations->getReference (
       indirectionDescriptorArray));
@@ -403,6 +413,88 @@ CPPCUDAHostSubroutineIndirectLoop::createPlanFunctionCallStatement ()
       variableDeclarations->getReference (planRet), functionCallExpression);
 
   return assignmentStatement;
+}
+
+void
+CPPCUDAHostSubroutineIndirectLoop::createAllocMatDataStatements ()
+{
+  using namespace SageInterface;
+  using namespace SageBuilder;
+  using namespace OP2VariableNames;
+  for (unsigned int i = 1; i <= parallelLoop->getNumberOfArgumentGroups (); i++)
+  {
+    if (!parallelLoop->isOpMatArg (i)) continue;
+
+    unsigned int mat_num = parallelLoop->getOpMatArgNum (i);
+
+    SgArrowExp * dataref = buildArrowExp (
+        buildDotExp (variableDeclarations->getReference (getOpMatName (mat_num)),
+            buildOpaqueVarRefExp ("mat", subroutineScope)),
+        buildOpaqueVarRefExp ("lma_data", subroutineScope));
+
+    SgEqualityOp * test = buildEqualityOp (dataref,
+        buildOpaqueVarRefExp ("NULL", subroutineScope));
+
+    OpArgMatDefinition * arg = parallelLoop->getOpMatArg (mat_num);
+    OpMatDefinition * mat = declarations->getOpMatDefinition (arg->getMatName ());
+    unsigned int matdim = mat->getDimension ();
+    unsigned int rmapdim = declarations->getOpMapDefinition (arg->getMap1Name ())->getDimension ();
+    unsigned int cmapdim = declarations->getOpMapDefinition (arg->getMap2Name ())->getDimension ();
+
+    unsigned int size = matdim * matdim * rmapdim * cmapdim;
+
+    SgExpression * sizeexp = buildMultiplyOp (buildIntVal (size),
+        buildArrowExp (variableDeclarations->getReference (getOpSetName ()),
+            buildOpaqueVarRefExp (OP2::RunTimeVariableNames::size, subroutineScope)));
+    sizeexp = buildMultiplyOp (sizeexp,
+        buildSizeOfOp (mat->getBaseType ()));
+
+    SgExpression *castdataref = buildCastExp (buildAddressOfOp (dataref),
+        buildPointerType (buildPointerType (buildVoidType ())));
+
+    SgExprListExp * parameters = buildExprListExp ();
+    parameters->append_expression (castdataref);
+    parameters->append_expression (sizeexp);
+    SgFunctionCallExp * fncall = buildFunctionCallExp (
+        "op_callocDevice", buildVoidType (), parameters, subroutineScope);
+
+    SgIfStmt * statement =
+      RoseStatementsAndExpressionsBuilder::buildIfStatementWithEmptyElse (
+          test, buildBasicBlock (buildExprStatement (fncall)));
+    appendStatement (statement, subroutineScope);
+  }
+}
+
+void
+CPPCUDAHostSubroutineIndirectLoop::createConvertMatDataStatements ()
+{
+  using namespace SageInterface;
+  using namespace SageBuilder;
+  using namespace OP2VariableNames;
+  for (unsigned int i = 1; i <= parallelLoop->getNumberOfArgumentGroups (); i++ )
+  {
+    if (!parallelLoop->isOpMatArg (i)) continue;
+    unsigned int mat_num = parallelLoop->getOpMatArgNum (i);
+
+    OpArgMatDefinition * arg = parallelLoop->getOpMatArg (mat_num);
+    OpMatDefinition * mat = declarations->getOpMatDefinition (arg->getMatName ());
+    SgExpression * matref = variableDeclarations->getReference (getOpMatName (mat_num));
+    SgArrowExp * dataref = buildArrowExp (
+        buildDotExp (matref, buildOpaqueVarRefExp ("mat", subroutineScope)),
+        buildOpaqueVarRefExp ("lma_data", subroutineScope));
+
+    SgCastExp * castexp = buildCastExp (dataref,
+        buildPointerType (mat->getBaseType ()));
+
+    SgExprListExp * parameters = buildExprListExp ();
+    parameters->append_expression (castexp);
+    parameters->append_expression (matref);
+    parameters->append_expression (variableDeclarations->getReference (getOpSetName ()));
+    SgFunctionCallExp *fncall = buildFunctionCallExp (
+        "op_mat_lma_to_csr",
+        buildVoidType (), parameters, subroutineScope);
+    appendStatement (buildExprStatement (fncall), subroutineScope);
+  }
 }
 
 void
@@ -425,9 +517,19 @@ CPPCUDAHostSubroutineIndirectLoop::createStatements ()
 
   appendStatement (createPlanFunctionCallStatement (), subroutineScope);
 
+  if (parallelLoop->getNumberOfOpMatArgumentGroups () > 0)
+  {
+    createAllocMatDataStatements ();
+  }
+
   appendStatementList (
       createPlanFunctionExecutionStatements ()->getStatementList (),
       subroutineScope);
+
+  if (parallelLoop->getNumberOfOpMatArgumentGroups () > 0)
+  {
+    createConvertMatDataStatements ();
+  }
 
   if (parallelLoop->isReductionRequired ())
   {
@@ -452,17 +554,36 @@ CPPCUDAHostSubroutineIndirectLoop::createPlanFunctionDeclarations ()
       RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
           getIterationCounterVariableName (3), buildIntType (), subroutineScope));
 
+  int nplanargs = 0;
+  for (unsigned int i = 1; i <= parallelLoop->getNumberOfArgumentGroups (); i++)
+  {
+    if (parallelLoop->isOpMatArg (i)) continue;
+    if (parallelLoop->isIndirect (i))
+    {
+      if (parallelLoop->getOpIndexValue (i) < 0) // OP_ALL
+      {
+        nplanargs += declarations->getOpMapDefinition (parallelLoop->getOpMapName (i))->getDimension ();
+      }
+      else {
+        nplanargs++;
+      }
+    }
+    else
+    {
+      nplanargs++;
+    }
+  }
   variableDeclarations->add (opDatArray,
       RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
           opDatArray, buildArrayType (buildOpaqueType (OP2::OP_ARG,
               subroutineScope), buildIntVal (
-              parallelLoop->getNumberOfArgumentGroups ())),
+              nplanargs)),
           subroutineScope));
 
   variableDeclarations->add (indirectionDescriptorArray,
       RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
           indirectionDescriptorArray, buildArrayType (buildIntType (),
-              buildIntVal (parallelLoop->getNumberOfArgumentGroups ())),
+              buildIntVal (nplanargs)),
           subroutineScope));
 
   variableDeclarations->add (planRet,
@@ -493,13 +614,11 @@ CPPCUDAHostSubroutineIndirectLoop::CPPCUDAHostSubroutineIndirectLoop (
     CPPParallelLoop * parallelLoop, CPPModuleDeclarations * moduleDeclarations,
     CPPProgramDeclarationsAndDefinitions * declarations) :
   CPPCUDAHostSubroutine (moduleScope, calleeSubroutine, parallelLoop,
-      moduleDeclarations)
+      moduleDeclarations, declarations)
 {
   Debug::getInstance ()->debugMessage (
       "Creating host subroutine of indirect loop", Debug::CONSTRUCTOR_LEVEL,
       __FILE__, __LINE__);
-
-  this->declarations = declarations;
 
   createFormalParameterDeclarations ();
 

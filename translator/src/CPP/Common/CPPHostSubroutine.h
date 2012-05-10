@@ -37,6 +37,7 @@
 #include <HostSubroutine.h>
 
 class CPPParallelLoop;
+class CPPProgramDeclarationsAndDefinitions;
 
 class CPPHostSubroutine: public HostSubroutine <SgFunctionDeclaration>
 {
@@ -46,6 +47,8 @@ class CPPHostSubroutine: public HostSubroutine <SgFunctionDeclaration>
 
   protected:
 
+    CPPProgramDeclarationsAndDefinitions * declarations;
+
     SgBasicBlock *
     createInitialisePlanFunctionArrayStatements ();
 
@@ -54,8 +57,12 @@ class CPPHostSubroutine: public HostSubroutine <SgFunctionDeclaration>
 
     CPPHostSubroutine (SgScopeStatement * moduleScope, Subroutine <
         SgFunctionDeclaration> * calleeSubroutine,
-        CPPParallelLoop * parallelLoop);
+        CPPParallelLoop * parallelLoop,
+        CPPProgramDeclarationsAndDefinitions * declarations);
 
+    CPPHostSubroutine (SgScopeStatement * moduleScope, Subroutine <
+        SgFunctionDeclaration> * calleeSubroutine,
+        CPPParallelLoop * parallelLoop);
   public:
 
     SgFunctionParameterList *

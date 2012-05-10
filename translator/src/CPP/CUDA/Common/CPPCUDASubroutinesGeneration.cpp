@@ -116,11 +116,31 @@ void
 CPPCUDASubroutinesGeneration::addHeaderIncludes ()
 {
   using namespace SageInterface;
+  using std::map;
+  using std::string;
 
   addTextForUnparser (moduleScope, "#include \""
       + OP2::Libraries::CPP::mainLibrary + "\"\n",
       AstUnparseAttribute::e_before);
 
+  bool needLibMat = false;
+  for (map<string, ParallelLoop *>::const_iterator it =
+         declarations->firstParallelLoop ();
+       it != declarations->lastParallelLoop (); ++it)
+  {
+    CPPParallelLoop * p =
+        static_cast <CPPParallelLoop *> (it->second);
+    if (p->getNumberOfOpMatArgumentGroups () > 0)
+    {
+      needLibMat = true;
+    }
+  }
+  if (needLibMat)
+  {
+    addTextForUnparser (moduleScope, "#include \""
+        + OP2::Libraries::CPP::matLibrary + "\"\n",
+        AstUnparseAttribute::e_before);
+  }
   addTextForUnparser (moduleScope, "#include \""
       + CUDA::Libraries::CPP::OP2RuntimeSupport + "\"\n",
       AstUnparseAttribute::e_before);

@@ -258,6 +258,11 @@ CPPProgramDeclarationsAndDefinitions::handleImperialOpDatArgument (
   setParallelLoopAccessDescriptor (parallelLoop, actualArguments,
       OP_DAT_ArgumentGroup, CPPImperialOpArgDatCall::indexAccessDescriptor);
 
+  int indexVal = isSgIntVal (
+    actualArguments->get_expressions ()[CPPImperialOpArgDatCall::indexOpIndex])->get_value ();
+
+  parallelLoop->setOpIndexValue (OP_DAT_ArgumentGroup, indexVal);
+
   if (isSgVarRefExp (
       actualArguments->get_expressions ()[CPPImperialOpArgDatCall::indexOpMap])
       == NULL)
@@ -272,6 +277,10 @@ CPPProgramDeclarationsAndDefinitions::handleImperialOpDatArgument (
     Debug::getInstance ()->debugMessage ("...INDIRECT mapping descriptor",
         Debug::OUTER_LOOP_LEVEL, __FILE__, __LINE__);
 
+    string name;
+    name = isSgVarRefExp (
+        actualArguments->get_expressions ()[CPPImperialOpArgDatCall::indexOpMap])->get_symbol ()->get_name ().getString ();
+    parallelLoop->setOpMapName (OP_DAT_ArgumentGroup, name);
     parallelLoop->setOpMapValue (OP_DAT_ArgumentGroup, INDIRECT);
   }
 }
@@ -300,8 +309,13 @@ CPPProgramDeclarationsAndDefinitions::handleOxfordOpDatArgument (
   setParallelLoopAccessDescriptor (parallelLoop, actualArguments,
       OP_DAT_ArgumentGroup, CPPOxfordOpArgDatCall::indexAccessDescriptor);
 
+  int indexVal = isSgIntVal (
+    actualArguments->get_expressions ()[CPPOxfordOpArgDatCall::indexOpIndex])->get_value ();
+
+  parallelLoop->setOpIndexValue (OP_DAT_ArgumentGroup, indexVal);
+
   if (isSgVarRefExp (
-      actualArguments->get_expressions ()[CPPImperialOpArgDatCall::indexOpMap])
+      actualArguments->get_expressions ()[CPPOxfordOpArgDatCall::indexOpMap])
       == NULL)
   {
     Debug::getInstance ()->debugMessage ("...DIRECT mapping descriptor",
@@ -314,6 +328,10 @@ CPPProgramDeclarationsAndDefinitions::handleOxfordOpDatArgument (
     Debug::getInstance ()->debugMessage ("...INDIRECT mapping descriptor",
         Debug::OUTER_LOOP_LEVEL, __FILE__, __LINE__);
 
+    string name;
+    name = isSgVarRefExp (
+        actualArguments->get_expressions ()[CPPOxfordOpArgDatCall::indexOpMap])->get_symbol ()->get_name ().getString ();
+    parallelLoop->setOpMapName (OP_DAT_ArgumentGroup, name);
     parallelLoop->setOpMapValue (OP_DAT_ArgumentGroup, INDIRECT);
   }
 }

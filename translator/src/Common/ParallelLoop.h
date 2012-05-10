@@ -127,6 +127,16 @@ class ParallelLoop
     std::map <unsigned int, MAPPING_VALUE> OpDatMappingDescriptors;
 
     /*
+     * What is the value of the index in the op_arg_dat call?
+     */
+    std::map <unsigned int, int> OpDatIndices;
+
+    /*
+     * What is the name of the map?
+     */
+    std::map <unsigned int, std::string> OpMapNames;
+
+    /*
      * ======================================================
      * How is the data for the OP_DAT variables in this position
      * (in the actual arguments) accessed: read, written, etc.
@@ -270,6 +280,19 @@ class ParallelLoop
 
     void
     setOpMapValue (unsigned int OP_DAT_ArgumentGroup, MAPPING_VALUE value);
+
+    void
+    setOpIndexValue (unsigned int OP_DAT_ArgumentGroup, int value);
+
+    int
+    getOpIndexValue (unsigned int OP_DAT_ArgumentGroup);
+
+    void
+    setOpMapName (unsigned int OP_DAT_ArgumentGroup,
+        std::string const name);
+
+    std::string
+    getOpMapName (unsigned int OP_DAT_ArgumentGroup);
 
     bool
     isIndirect (unsigned int OP_DAT_ArgumentGroup);

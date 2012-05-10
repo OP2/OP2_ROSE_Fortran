@@ -44,10 +44,6 @@ class CPPCUDAHostSubroutineIndirectLoop: public CPPCUDAHostSubroutine
 
   private:
 
-    CPPProgramDeclarationsAndDefinitions * declarations;
-
-  private:
-
     virtual void
     createKernelFunctionCallStatement (SgScopeStatement * scope);
 
@@ -59,6 +55,12 @@ class CPPCUDAHostSubroutineIndirectLoop: public CPPCUDAHostSubroutine
 
     virtual void
     createStatements ();
+
+    void
+    createAllocMatDataStatements ();
+
+    void
+    createConvertMatDataStatements ();
 
     void
     createPlanFunctionDeclarations ();

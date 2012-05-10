@@ -168,6 +168,7 @@ namespace OP2
     namespace CPP
     {
       std::string const mainLibrary = "op_lib_cpp.h";
+      std::string const matLibrary = "op_lib_mat.h";
     }
 
     namespace Fortran

@@ -71,8 +71,15 @@ CPPImperialOpSetDefinition::CPPImperialOpSetDefinition (
 {
   this->variableName = variableName;
 
-  dimensionName
+  if (isSgVarRefExp (parameters->get_expressions ()[indexDimension]))
+  {
+    dimensionName
       = isSgVarRefExp (parameters->get_expressions ()[indexDimension])->get_symbol ()->get_name ().getString ();
+  }
+  else
+  {
+    dimensionName = "__literalSetSize";
+  }
 
   ROSE_ASSERT (dimensionName.empty () == false);
   ROSE_ASSERT (variableName.empty () == false);
@@ -232,9 +239,15 @@ CPPOxfordOpSetDefinition::CPPOxfordOpSetDefinition (SgExprListExp * parameters,
 {
   this->variableName = variableName;
 
-  dimensionName
+  if (isSgVarRefExp (parameters->get_expressions ()[indexDimension]))
+  {
+    dimensionName
       = isSgVarRefExp (parameters->get_expressions ()[indexDimension])->get_symbol ()->get_name ().getString ();
-
+  }
+  else
+  {
+    dimensionName = "__literalSetSize";
+  }
   ROSE_ASSERT (dimensionName.empty () == false);
   ROSE_ASSERT (variableName.empty () == false);
 
@@ -395,7 +408,7 @@ CPPImperialOpMatDefinition::CPPImperialOpMatDefinition (
 }
 
 static void getArgMatExtent (SgExpression * idx,
-    OpIterationSpaceDefinition * itspace,
+    OpIterationSpaceDefinition * &itspace,
     int mapDim,
     int & mapidx,
     int idxval,
