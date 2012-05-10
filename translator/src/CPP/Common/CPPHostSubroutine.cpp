@@ -32,6 +32,8 @@
 
 #include "CPPHostSubroutine.h"
 #include "CPPParallelLoop.h"
+#include "OP2Definitions.h"
+#include "CPPProgramDeclarationsAndDefinitions.h"
 #include "RoseStatementsAndExpressionsBuilder.h"
 #include "CompilerGeneratedNames.h"
 #include "PlanFunctionNames.h"
@@ -47,6 +49,7 @@ CPPHostSubroutine::createInitialisePlanFunctionArrayStatements ()
   using namespace PlanFunctionVariableNames;
   using std::map;
   using std::string;
+  using boost::lexical_cast;
 
   Debug::getInstance ()->debugMessage (
       "Creating statements to initialise plan function variables",
@@ -54,73 +57,147 @@ CPPHostSubroutine::createInitialisePlanFunctionArrayStatements ()
 
   SgBasicBlock * block = buildBasicBlock ();
 
+  unsigned int count = 0;
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfArgumentGroups (); ++i)
   {
     SgVarRefExp * var;
+    unsigned int dat_num;
     if (parallelLoop->isOpMatArg (i))
     {
+      continue;
       unsigned int mat_num = parallelLoop->getOpMatArgNum (i);
       var = variableDeclarations->getReference (getOpMatName (mat_num));
     }
     else
     {
-      unsigned int dat_num = parallelLoop->getOpDatArgNum (i);
+      dat_num = parallelLoop->getOpDatArgNum (i);
       var = variableDeclarations->getReference (getOpDatName (dat_num));
     }
-    SgPntrArrRefExp * arrayIndexExpression = buildPntrArrRefExp (
-        variableDeclarations->getReference (opDatArray), buildIntVal (i - 1));
+    if (!parallelLoop->isOpMatArg (i) && parallelLoop->isIndirect (i)
+        && parallelLoop->getOpIndexValue (i) < 0)
+    {
+      int ntimes = declarations->getOpMapDefinition (parallelLoop->getOpMapName (i))->getDimension ();
+      SgPntrArrRefExp * arrayIndexExpression = buildPntrArrRefExp (
+        variableDeclarations->getReference (opDatArray), buildIntVal (count++));
 
-    SgExprStatement * assignmentStatement = buildAssignStatement (
-      arrayIndexExpression, var);
+      SgExprStatement * mod = buildAssignStatement (buildDotExp (
+              variableDeclarations->getReference (getOpDatName (dat_num)),
+              buildOpaqueVarRefExp ("idx", subroutineScope)),
+          buildIntVal (0));
 
-    appendStatement (assignmentStatement, block);
+      appendStatement (mod, block);
+      SgExprStatement * assignmentStatement = buildAssignStatement (
+        arrayIndexExpression, var);
+
+      appendStatement (assignmentStatement, block);
+      for (int j = 1; j < ntimes; j++)
+      {
+        string tmpname = getOpDatName (dat_num) + "tmp" + lexical_cast <string> (j);
+        variableDeclarations->add (tmpname,
+            RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
+                tmpname, buildOpaqueType (OP2::OP_ARG, subroutineScope),
+                subroutineScope));
+
+        SgExprListExp * parms = buildExprListExp ();
+        parms->append_expression (var);
+        parms->append_expression (buildAddressOfOp (
+                variableDeclarations->getReference (tmpname)));
+        SgStatement * funcall = buildFunctionCallStmt (
+            "op_duplicate_arg", buildVoidType (), parms, subroutineScope);
+
+        appendStatement (funcall, block);
+        mod = buildAssignStatement (buildDotExp (
+                variableDeclarations->getReference (tmpname),
+                buildOpaqueVarRefExp ("idx", subroutineScope)),
+            buildIntVal (j));
+        appendStatement (mod, block);
+        SgPntrArrRefExp * arrayIndexExpression = buildPntrArrRefExp (
+          variableDeclarations->getReference (opDatArray), buildIntVal (count++));
+
+        var = variableDeclarations->getReference (tmpname);
+        SgExprStatement * assignmentStatement = buildAssignStatement (
+          arrayIndexExpression, var);
+
+        appendStatement (assignmentStatement, block);
+      }
+    }
+    else
+    {
+        SgPntrArrRefExp * arrayIndexExpression = buildPntrArrRefExp (
+          variableDeclarations->getReference (opDatArray), buildIntVal (count++));
+
+        SgExprStatement * assignmentStatement = buildAssignStatement (
+          arrayIndexExpression, var);
+
+        appendStatement (assignmentStatement, block);
+    }
   }
 
   map <string, unsigned int> indirectOpDatsToIndirection;
   unsigned int indirection = 0;
 
+  count = 0;
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfArgumentGroups (); ++i)
   {
+    if (parallelLoop->isOpMatArg (i))
+    {
+      continue;
+    }
     SgPntrArrRefExp * arrayIndexExpression = buildPntrArrRefExp (
       variableDeclarations->getReference (indirectionDescriptorArray),
-      buildIntVal (i - 1));
+      buildIntVal (count++));
 
     SgExprStatement * assignmentStatement;
 
-    if (parallelLoop->isOpMatArg (i))
+    if (parallelLoop->isIndirect (i))
     {
-      assignmentStatement = buildAssignStatement (arrayIndexExpression,
-                                                  buildIntVal (indirection));
-      indirection++;
-    }
-    else
-    {
-      unsigned int dat_num = parallelLoop->getOpDatArgNum (i);
-      if (parallelLoop->isIndirect (i))
+      if (parallelLoop->isDuplicateOpDat (i) == false)
       {
-        if (parallelLoop->isDuplicateOpDat (i) == false)
-        {
-          assignmentStatement = buildAssignStatement (arrayIndexExpression,
-                                                      buildIntVal (indirection));
+        assignmentStatement = buildAssignStatement (arrayIndexExpression,
+                                                    buildIntVal (indirection));
 
-          indirectOpDatsToIndirection[parallelLoop->getOpDatVariableName (dat_num)]
-            = indirection;
+        indirectOpDatsToIndirection[parallelLoop->getOpDatVariableName (i)]
+          = indirection;
 
-          indirection++;
-        }
-        else
+        if (parallelLoop->getOpIndexValue (i) < 0)
         {
-          assignmentStatement = buildAssignStatement (arrayIndexExpression,
-                                                      buildIntVal (
-                                                        indirectOpDatsToIndirection[parallelLoop->getOpDatVariableName (dat_num)]));
+          int ntimes = declarations->getOpMapDefinition (parallelLoop->getOpMapName (i))->getDimension ();
+          for ( int j = 1; j < ntimes; j++ )
+          {
+            SgExprStatement * s = buildAssignStatement (
+              buildPntrArrRefExp (
+                variableDeclarations->getReference (indirectionDescriptorArray),
+                buildIntVal(count++)),
+              buildIntVal (indirection));
+            appendStatement (s, block);
+          }
         }
+        indirection++;
       }
       else
       {
         assignmentStatement = buildAssignStatement (arrayIndexExpression,
-                                                    buildIntVal (-1));
+                                                    buildIntVal (
+                                                      indirectOpDatsToIndirection[parallelLoop->getOpDatVariableName (i)]));
+        if (parallelLoop->getOpIndexValue (i) < 0)
+        {
+          int ntimes = declarations->getOpMapDefinition (parallelLoop->getOpMapName (i))->getDimension ();
+          for ( int j = 1; j < ntimes; j++ )
+          {
+            SgExprStatement * s = buildAssignStatement (
+              buildPntrArrRefExp (
+                variableDeclarations->getReference (indirectionDescriptorArray),
+                buildIntVal(count++)),
+              buildIntVal (indirectOpDatsToIndirection[parallelLoop->getOpDatVariableName (i)]));
+            appendStatement (s, block);
+          }
+        }
       }
-
+    }
+    else
+    {
+      assignmentStatement = buildAssignStatement (arrayIndexExpression,
+                                                  buildIntVal (-1));
     }
     appendStatement (assignmentStatement, block);
   }
@@ -219,4 +296,24 @@ CPPHostSubroutine::CPPHostSubroutine (SgScopeStatement * moduleScope,
   subroutineScope = subroutineHeaderStatement->get_definition ()->get_body ();
 
   appendStatement (subroutineHeaderStatement, moduleScope);
+}
+
+CPPHostSubroutine::CPPHostSubroutine (SgScopeStatement * moduleScope,
+    Subroutine <SgFunctionDeclaration> * calleeSubroutine,
+    CPPParallelLoop * parallelLoop,
+    CPPProgramDeclarationsAndDefinitions * declarations) :
+  HostSubroutine <SgFunctionDeclaration> (calleeSubroutine, parallelLoop)
+{
+  using namespace SageBuilder;
+  using namespace SageInterface;
+
+  subroutineHeaderStatement = buildDefiningFunctionDeclaration (
+      this->subroutineName.c_str (), buildVoidType (), formalParameters,
+      moduleScope);
+
+  subroutineScope = subroutineHeaderStatement->get_definition ()->get_body ();
+
+  appendStatement (subroutineHeaderStatement, moduleScope);
+
+  this->declarations = declarations;
 }

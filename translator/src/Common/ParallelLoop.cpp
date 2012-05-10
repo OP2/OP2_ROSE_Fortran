@@ -202,6 +202,32 @@ ParallelLoop::setOpMapValue (unsigned int OP_DAT_ArgumentGroup,
   OpDatMappingDescriptors[OP_DAT_ArgumentGroup] = value;
 }
 
+void
+ParallelLoop::setOpIndexValue (unsigned int OP_DAT_ArgumentGroup,
+    int value)
+{
+  OpDatIndices[OP_DAT_ArgumentGroup] = value;
+}
+
+int
+ParallelLoop::getOpIndexValue (unsigned int OP_DAT_ArgumentGroup)
+{
+  return OpDatIndices[OP_DAT_ArgumentGroup];
+}
+
+void
+ParallelLoop::setOpMapName (unsigned int OP_DAT_ArgumentGroup,
+    std::string const name)
+{
+  OpMapNames[OP_DAT_ArgumentGroup] = name;
+}
+
+std::string
+ParallelLoop::getOpMapName (unsigned int OP_DAT_ArgumentGroup)
+{
+  return OpMapNames[OP_DAT_ArgumentGroup];
+}
+
 bool
 ParallelLoop::isIndirect (unsigned int OP_DAT_ArgumentGroup)
 {

@@ -194,6 +194,15 @@ OP2VariableNames::getOpDatName (unsigned int OP_DAT_ArgumentGroup)
 }
 
 std::string const
+OP2VariableNames::getOpDatVecName (unsigned int OP_DAT_ArgumentGroup)
+{
+  using boost::lexical_cast;
+  using std::string;
+
+  return OpDatPrefix + lexical_cast <string> (OP_DAT_ArgumentGroup) + "vec";
+}
+
+std::string const
 OP2VariableNames::getOpDatHostName (unsigned int OP_DAT_ArgumentGroup)
 {
   using boost::lexical_cast;

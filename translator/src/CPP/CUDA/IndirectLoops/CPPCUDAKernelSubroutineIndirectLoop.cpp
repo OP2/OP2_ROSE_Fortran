@@ -71,10 +71,10 @@ CPPCUDAKernelSubroutineIndirectLoop::createUserSubroutineCallStatement ()
     {
       unsigned int mat_num = parallelLoop->getOpMatArgNum (i);
       SgExpression * exp;
-      exp = variableDeclarations->getReference (getOpMatEntryName (mat_num));
-      exp = buildAddressOfOp (exp);
-      ROSE_ASSERT (exp != NULL);
+      exp = variableDeclarations->getReference (getIterationCounterVariableName (1));
 
+      exp = buildAddOp (variableDeclarations->getReference (getOpMatName (mat_num)),
+                        exp);
       actualParameters->append_expression (exp);
       continue;
     }
@@ -98,18 +98,27 @@ CPPCUDAKernelSubroutineIndirectLoop::createUserSubroutineCallStatement ()
             "Indirect OP_DAT with read/read-write/write access",
             Debug::OUTER_LOOP_LEVEL, __FILE__, __LINE__);
 
-        SgAddOp * addExpression1 = buildAddOp (itvar,
-            variableDeclarations->getReference (sharedMemoryOffset));
+        if (parallelLoop->getOpIndexValue (i) < 0 && !parallelLoop->isDuplicateOpDat (i)) // OP_ALL
+        {
+          parameterExpression = variableDeclarations->getReference (
+              getOpDatVecName (dat_num));
+        }
+        else
+        {
+                               
+          SgAddOp * addExpression1 = buildAddOp (itvar,
+              variableDeclarations->getReference (sharedMemoryOffset));
 
-        SgPntrArrRefExp * arrayExpression1 =
+          SgPntrArrRefExp * arrayExpression1 =
             buildPntrArrRefExp (variableDeclarations->getReference (
-                getGlobalToLocalMappingName (dat_num)), addExpression1);
+                    getGlobalToLocalMappingName (dat_num)), addExpression1);
 
-        SgMultiplyOp * multiplyExpression1 = buildMultiplyOp (arrayExpression1,
-            buildIntVal (parallelLoop->getOpDatDimension (i)));
+          SgMultiplyOp * multiplyExpression1 = buildMultiplyOp (arrayExpression1,
+              buildIntVal (parallelLoop->getOpDatDimension (i)));
 
-        parameterExpression = buildAddOp (variableDeclarations->getReference (
-            getIndirectOpDatSharedMemoryName (dat_num)), multiplyExpression1);
+          parameterExpression = buildAddOp (variableDeclarations->getReference (
+                  getIndirectOpDatSharedMemoryName (dat_num)), multiplyExpression1);
+        }
       }
     }
     else if (parallelLoop->isDirect (i))
@@ -516,7 +525,8 @@ CPPCUDAKernelSubroutineIndirectLoop::createExecutionLoopStatements ()
       OpArgMatDefinition * arg_mat = parallelLoop->getOpMatArg (mat_num);
       OpMatDefinition * mat = declarations->getOpMatDefinition (arg_mat->getMatName ());
       SgExprStatement * exp = buildAssignStatement (
-        variableDeclarations->getReference (getOpMatEntryName (mat_num)),
+        buildPntrArrRefExp (variableDeclarations->getReference (getOpMatName (mat_num)),
+                            variableDeclarations->getReference (getIterationCounterVariableName (1))),
         buildCastExp(buildIntVal(0), mat->getBaseType ()));
       /* Only need to zero if incrementing (for OP_WRITE we can just
        * leave it) */
@@ -653,6 +663,49 @@ CPPCUDAKernelSubroutineIndirectLoop::createExecutionLoopStatements ()
       }
     }
 
+    unsigned int count = 1;
+    for (unsigned int i=1; i <= parallelLoop->getNumberOfArgumentGroups (); i++ ) {
+      if (parallelLoop->isOpMatArg (i)) continue;
+      if (parallelLoop->isIndirect (i) && parallelLoop->getOpIndexValue (i) < 0) // OP_ALL
+      {
+        int ntimes = declarations->getOpMapDefinition (parallelLoop->getOpMapName (i))->getDimension ();
+        unsigned int dat_num = parallelLoop->getOpDatArgNum (i);
+        SgExpression * datvec = variableDeclarations->getReference (getOpDatVecName (dat_num));
+        SgVarRefExp * itvar;
+        if (parallelLoop->getNumberOfOpMatArgumentGroups () > 0)
+        {
+          itvar = variableDeclarations->getReference (
+              getIterationCounterVariableName (2));
+        }
+        else
+        {
+          itvar = variableDeclarations->getReference (
+              getIterationCounterVariableName (1));
+        }
+
+        SgAddOp * addexp = buildAddOp (itvar,
+            variableDeclarations->getReference (sharedMemoryOffset));
+
+        for (int j = 0; j < ntimes; j++)
+        {
+          SgPntrArrRefExp * arrexp =
+            buildPntrArrRefExp (variableDeclarations->getReference (
+                    getGlobalToLocalMappingName (count++)), addexp);
+
+          SgMultiplyOp * multexp = buildMultiplyOp (arrexp,
+              buildIntVal (parallelLoop->getOpDatDimension (i)));
+
+          SgExpression * exp = buildAddOp (
+              variableDeclarations->getReference (
+                  getIndirectOpDatSharedMemoryName (dat_num)),
+              multexp);
+
+          SgStatement * s = buildAssignStatement (buildPntrArrRefExp (datvec,
+                  buildIntVal (j)), exp);
+          appendStatement (s, loopBody);
+        }
+      }
+    }
     appendStatement (createUserSubroutineCallStatement (), loopBody);
 
     SgVarRefExp * nthread = variableDeclarations->getReference (numberOfActiveThreads);
@@ -673,103 +726,6 @@ CPPCUDAKernelSubroutineIndirectLoop::createExecutionLoopStatements ()
     {
       upperBoundExpression = buildLessThanOp (variableDeclarations->getReference (
               getIterationCounterVariableName (1)), nthread);
-    }
-  }
-
-  /*
-   * Need to place matrix entry in global matrix;
-   */
-  if (parallelLoop->getNumberOfOpMatArgumentGroups () > 0)
-  {
-    SgVariableDeclaration * offset =
-      RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
-        "offset", buildIntType (), subroutineScope);
-    variableDeclarations->add ("offset", offset);
-    SgExprStatement * exp = buildAssignStatement (
-        variableDeclarations->getReference ("offset"), buildIntVal (0));
-    appendStatement (exp, loopBody);
-  }
-
-  for (unsigned int i = 1; i <= parallelLoop->getNumberOfArgumentGroups (); ++i)
-  {
-    if (parallelLoop->isOpMatArg (i))
-    {
-      unsigned int mat_num = parallelLoop->getOpMatArgNum (i);
-      SgExprListExp * parameters = buildExprListExp ();
-      OpArgMatDefinition * arg = parallelLoop->getOpMatArg (mat_num);
-      string name = rowptr_d + lexical_cast <string> (mat_num);
-      parameters->append_expression (
-          variableDeclarations->getReference (name));
-
-      name = colptr_d + lexical_cast <string> (mat_num);
-      parameters->append_expression (
-          variableDeclarations->getReference (name));
-
-      SgVarRefExp * itvar;
-      itvar = variableDeclarations->getReference (
-          getIterationCounterVariableName (2));
-
-      /* When parsing the op_arg_mat calls, we check that the extents
-       * are all fine for all of them, so we can just go ahead
-       * here. */
-      string varname;
-      if (arg->getMap1Idx () == 0)
-      {
-        varname = getIterationCounterVariableName (3);
-      }
-      else
-      {
-        varname = getIterationCounterVariableName (4);
-      }
-      /* opMatNMap[i2 * map1Dim + varname] */
-      parameters->append_expression (
-          buildPntrArrRefExp (
-              variableDeclarations->getReference (
-                  getMatMapName (mat_num)),
-              buildAddOp (
-                buildMultiplyOp (itvar, buildIntVal (
-                                   declarations->getOpMapDefinition (
-                                     arg->getMap1Name ())->getDimension ())),
-                variableDeclarations->getReference (varname))));
-
-      if (arg->getMap2Idx () == 0)
-      {
-        varname = getIterationCounterVariableName (3);
-      }
-      else
-      {
-        varname = getIterationCounterVariableName (4);
-      }
-      /* opMatNMap2[i2 * map2Dim + varname] */
-      parameters->append_expression (
-          buildPntrArrRefExp (
-              variableDeclarations->getReference (
-                getMatMap2Name (mat_num)),
-              buildAddOp (
-                buildMultiplyOp (itvar, buildIntVal (
-                                   declarations->getOpMapDefinition (
-                                     arg->getMap2Name ())->getDimension ())),
-                variableDeclarations->getReference (varname))));
-
-      parameters->append_expression (
-          buildAddressOfOp (variableDeclarations->getReference ("offset")));
-
-      SgStatement * exp = buildFunctionCallStmt ("findOffset",
-          buildVoidType (), parameters, subroutineScope);
-      appendStatement (exp, loopBody);
-
-      SgExprListExp * parameters2 = buildExprListExp ();
-      parameters2->append_expression (
-          buildAddOp (
-              variableDeclarations->getReference (getOpMatName (mat_num)),
-              variableDeclarations->getReference ("offset")));
-      parameters2->append_expression (
-          variableDeclarations->getReference (getOpMatEntryName (mat_num)));
-
-      /* FIXME: this is wrong if the matrix entry type is not float or int. */
-      exp = buildFunctionCallStmt ("atomicAdd",
-          buildVoidType (), parameters2, subroutineScope);
-      appendStatement (exp, loopBody);
     }
   }
 
@@ -1524,37 +1480,7 @@ CPPCUDAKernelSubroutineIndirectLoop::createLocalVariableDeclarations ()
   {
     if (parallelLoop->isOpMatArg (i))
     {
-      unsigned int mat_num = parallelLoop->getOpMatArgNum (i);
-
-      string name = getOpMatEntryName (mat_num);
-      OpArgMatDefinition * arg_mat = parallelLoop->getOpMatArg (mat_num);
-      OpMatDefinition * mat = declarations->getOpMatDefinition (arg_mat->getMatName ());
-
-      Debug::getInstance ()->debugMessage (
-        "Creating local matrix entry for OP_MAT " + lexical_cast <string> (mat_num),
-        Debug::INNER_LOOP_LEVEL, __FILE__, __LINE__);
-      SgVariableDeclaration * dec =
-        RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
-          name, mat->getBaseType (), subroutineScope);
-
-      variableDeclarations->add (name, dec);
-      string mapname = getOpMatMapName (mat_num);
-      string mapname2 = getOpMatMap2Name (mat_num);
-
-      SgVariableDeclaration * map =
-        RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
-          mapname, buildPointerType (buildIntType ()),
-          subroutineScope);
-      SgVariableDeclaration * map2 =
-        RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
-          mapname2, buildPointerType (buildIntType ()),
-          subroutineScope);
-
-      map->get_declarationModifier ().get_storageModifier ().setCudaShared ();
-      map2->get_declarationModifier ().get_storageModifier ().setCudaShared ();
-
-      variableDeclarations->add (mapname, map);
-      variableDeclarations->add (mapname2, map2);
+      continue;
     }
     else
     {
@@ -1577,6 +1503,21 @@ CPPCUDAKernelSubroutineIndirectLoop::createLocalVariableDeclarations ()
           variableDeclaration->get_declarationModifier ().get_storageModifier ().setCudaShared ();
 
           variableDeclarations->add (variableName, variableDeclaration);
+
+          if (parallelLoop->getOpIndexValue (i) < 0) // OP_ALL
+          {
+            string varname = getOpDatVecName (dat_num);
+            SgType * datatype = parallelLoop->getOpDatBaseType (i);
+            unsigned int mapdim;
+
+            mapdim = declarations->getOpMapDefinition (parallelLoop->getOpMapName (i))->getDimension ();
+            SgVariableDeclaration * dec =
+              RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
+                  varname, buildArrayType (buildPointerType (datatype),
+                          buildIntVal (mapdim)),
+                  subroutineScope);
+            variableDeclarations->add (varname, dec);
+          }
         }
       }
     }
@@ -1632,7 +1573,7 @@ CPPCUDAKernelSubroutineIndirectLoop::createLocalVariableDeclarations ()
         variableDeclarations->add (variableName, variableDeclaration);
 
         indirectOpDatSharedMemoryDeclarations[parallelLoop->getOpDatVariableName (
-            dat_num)] = variableDeclaration;
+            i)] = variableDeclaration;
       }
     }
     else
@@ -1647,7 +1588,7 @@ CPPCUDAKernelSubroutineIndirectLoop::createLocalVariableDeclarations ()
       variableDeclarations ->add (
           variableName,
           indirectOpDatSharedMemoryDeclarations[parallelLoop->getOpDatVariableName (
-              dat_num)]);
+              i)]);
     }
   }
 
@@ -1744,22 +1685,6 @@ CPPCUDAKernelSubroutineIndirectLoop::createOpDatFormalParameterDeclarations ()
           name, buildPointerType (mat->getBaseType ()), subroutineScope,
           formalParameters));
 
-      name = rowptr_d + lexical_cast <string> (mat_num);
-      variableDeclarations->add (
-        name, RoseStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
-          name, buildPointerType (buildIntType ()), subroutineScope,
-          formalParameters));
-
-      name = colptr_d + lexical_cast <string> (mat_num);
-      variableDeclarations->add (
-        name, RoseStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
-          name, buildPointerType (buildIntType ()), subroutineScope,
-          formalParameters));
-
-      name = nrow + lexical_cast <string> (mat_num);
-      variableDeclarations->add (
-        name, RoseStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
-          name, buildIntType (), subroutineScope, formalParameters));
     }
     else
     {
@@ -1817,20 +1742,7 @@ CPPCUDAKernelSubroutineIndirectLoop::createOpDatFormalParameterDeclarations ()
   {
     if (parallelLoop->isOpMatArg (i))
     {
-      unsigned int mat_num = parallelLoop->getOpMatArgNum (i);
-      string name = getMatMapName (mat_num);
-      string name2 = getMatMap2Name (mat_num);
-
-      variableDeclarations->add (
-        name,
-        RoseStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
-          name, buildPointerType (buildIntType ()),
-          subroutineScope, formalParameters));
-      variableDeclarations->add (
-        name2,
-        RoseStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
-          name2, buildPointerType (buildIntType ()),
-          subroutineScope, formalParameters));
+      continue;
     }
     else
     {
@@ -1851,19 +1763,31 @@ CPPCUDAKernelSubroutineIndirectLoop::createOpDatFormalParameterDeclarations ()
     }
   }
 
+  int count = 1;
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfArgumentGroups (); ++i)
   {
     if (parallelLoop->isOpMatArg (i)) continue;
-    unsigned int dat_num = parallelLoop->getOpDatArgNum (i);
     if (parallelLoop->isIndirect (i))
     {
-      string const & variableName = getGlobalToLocalMappingName (dat_num);
+      int ntimes;
+      if (parallelLoop->getOpIndexValue (i) < 0)
+      {
+        ntimes = declarations->getOpMapDefinition (parallelLoop->getOpMapName (i))->getDimension ();
+      }
+      else
+      {
+        ntimes = 1;
+      }
+      for ( int j = 0; j < ntimes; j++ )
+      {
+        string const & variableName = getGlobalToLocalMappingName (count++);
 
-      variableDeclarations->add (
+        variableDeclarations->add (
           variableName,
           RoseStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
-              variableName, buildPointerType (buildShortType ()),
-              subroutineScope, formalParameters));
+            variableName, buildPointerType (buildShortType ()),
+            subroutineScope, formalParameters));
+      }
     }
   }
 }

@@ -26,6 +26,10 @@ typedef struct
 {
 } op_mat;
 
+typedef struct
+{
+} op_itspace;
+
 typedef enum {OP_READ, OP_WRITE, OP_INC, OP_RW, OP_MIN, OP_MAX} op_access;
 
 op_map const OP_ID;
@@ -78,17 +82,10 @@ op_diagnostic_output();
 void
 op_timing_output();
 
-op_set
-op_iteration_space (op_set);
-
-op_set
-op_iteration_space (op_set, int);
-
-op_set
+op_itspace
 op_iteration_space (op_set, int, int);
 
-op_set
-op_iteration_space (op_set, int, int, int);
+int op_i(int);
 
 // 1 OP_ARG
 template <typename T1>
@@ -231,4 +228,148 @@ op_par_loop (void (*kernel) (T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11),
              op_arg,
              op_arg,
              op_arg,
-			 op_arg);
+             op_arg);
+
+
+// 1 OP_ARG
+template <typename T1>
+void
+op_par_loop (void (*kernel) (T1, int, int), 
+             char *,
+             op_itspace, 
+             op_arg);
+
+// 2 OP_ARG
+template <typename T1, typename T2>
+void
+op_par_loop (void (*kernel) (T1, T2, int, int), 
+             char *,
+             op_itspace, 
+             op_arg, 
+             op_arg);
+
+// 3 OP_ARG
+template <typename T1, typename T2, typename T3>
+void
+op_par_loop (void (*kernel) (T1, T2, T3, int, int), 
+             char *,
+             op_itspace, 
+             op_arg, 
+             op_arg,
+             op_arg);
+
+// 4 OP_ARG
+template <typename T1, typename T2, typename T3, typename T4>
+void
+op_par_loop (void (*kernel) (T1, T2, T3, T4, int, int), 
+             char *,
+             op_itspace, 
+             op_arg, 
+             op_arg,
+             op_arg,
+             op_arg);
+
+// 5 OP_ARG
+template <typename T1, typename T2, typename T3, typename T4, typename T5>
+void
+op_par_loop (void (*kernel) (T1, T2, T3, T4, T5, int, int), 
+             char *,
+             op_itspace, 
+             op_arg, 
+             op_arg, 
+             op_arg, 
+             op_arg, 
+             op_arg);
+
+// 6 OP_ARG
+template <typename T1, typename T2, typename T3, typename T4, typename T5, typename T6>
+void
+op_par_loop (void (*kernel) (T1, T2, T3, T4, T5, T6, int, int), 
+             char *,
+             op_itspace, 
+             op_arg, 
+             op_arg, 
+             op_arg, 
+             op_arg, 
+             op_arg, 
+             op_arg);
+
+// 7 OP_ARG
+template <typename T1, typename T2, typename T3, typename T4, typename T5, typename T6, typename T7>
+void
+op_par_loop (void (*kernel) (T1, T2, T3, T4, T5, T6, T7, int, int), 
+             char *,
+             op_itspace, 
+             op_arg, 
+             op_arg, 
+             op_arg, 
+             op_arg, 
+             op_arg, 
+             op_arg,
+             op_arg);
+
+// 8 OP_ARG
+template <typename T1, typename T2, typename T3, typename T4, typename T5, typename T6, typename T7, typename T8>
+void
+op_par_loop (void (*kernel) (T1, T2, T3, T4, T5, T6, T7, T8, int, int), 
+             char *,
+             op_itspace, 
+             op_arg, 
+             op_arg, 
+             op_arg, 
+             op_arg, 
+             op_arg, 
+             op_arg, 
+             op_arg, 
+             op_arg);
+
+// 9 OP_ARG
+template <typename T1, typename T2, typename T3, typename T4, typename T5, typename T6, typename T7, typename T8, typename T9>
+void
+op_par_loop (void (*kernel) (T1, T2, T3, T4, T5, T6, T7, T8, T9, int, int), 
+             char *,
+             op_itspace, 
+             op_arg, 
+             op_arg, 
+             op_arg, 
+             op_arg, 
+             op_arg, 
+             op_arg, 
+             op_arg, 
+             op_arg, 
+             op_arg);
+
+// 10 OP_ARG
+template <typename T1, typename T2, typename T3, typename T4, typename T5, typename T6, typename T7, typename T8, typename T9, typename T10>
+void
+op_par_loop (void (*kernel) (T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, int, int), 
+             char *,
+             op_itspace, 
+             op_arg, 
+             op_arg, 
+             op_arg, 
+             op_arg, 
+             op_arg, 
+             op_arg, 
+             op_arg, 
+             op_arg, 
+             op_arg,
+             op_arg);
+
+// 11 OP_ARG
+template <typename T1, typename T2, typename T3, typename T4, typename T5, typename T6, typename T7, typename T8, typename T9, typename T10, typename T11>
+void
+op_par_loop (void (*kernel) (T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, int, int),
+             char *,
+             op_itspace,
+             op_arg,
+             op_arg,
+             op_arg,
+             op_arg,
+             op_arg,
+             op_arg,
+             op_arg,
+             op_arg,
+             op_arg,
+             op_arg,
+             op_arg);

@@ -697,3 +697,16 @@ CPPCUDAHostSubroutine::CPPCUDAHostSubroutine (SgScopeStatement * moduleScope,
 
   subroutineHeaderStatement->get_functionModifier ().setCudaHost ();
 }
+
+CPPCUDAHostSubroutine::CPPCUDAHostSubroutine (SgScopeStatement * moduleScope,
+    CPPCUDAKernelSubroutine * calleeSubroutine, CPPParallelLoop * parallelLoop,
+    CPPModuleDeclarations * moduleDeclarations,
+    CPPProgramDeclarationsAndDefinitions * declarations) :
+  CPPHostSubroutine (moduleScope, calleeSubroutine, parallelLoop, declarations),
+      moduleDeclarations (moduleDeclarations)
+{
+  variableDeclarations->addVisibilityToSymbolsFromOuterScope (
+      moduleDeclarations->getDeclarations ());
+
+  subroutineHeaderStatement->get_functionModifier ().setCudaHost ();
+}
