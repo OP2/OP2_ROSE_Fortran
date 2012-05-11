@@ -2,6 +2,8 @@
 // correctly parse C++ programs with OP2 calls. The OP2 syntax is the one
 // suggested by Imperial College to remove some of the superfluous arguments  
 
+#ifndef __OP2_IMPERIAL_H
+#define __OP2_IMPERIAL_H
 typedef struct
 {
 } op_set;
@@ -323,3 +325,5 @@ op_par_loop (void (*kernel) (T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, int, int),
              op_arg, 
              op_arg,
              op_arg);
+
+#endif  /* __OP2_IMPERIAL_H */
