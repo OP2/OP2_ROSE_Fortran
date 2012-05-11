@@ -431,11 +431,13 @@ FortranProgramDeclarationsAndDefinitions::analyseParallelLoopArguments (
         offset += parallelLoop->NUMBER_OF_ARGUMENTS_PER_OP_DAT_GENERIC;
       }
     }
-    
+
+    parallelLoop->setIsOpMatArg (OP_DAT_ArgumentGroup, false);
     OP_DAT_ArgumentGroup++;
   }
 
   parallelLoop->setNumberOfOpDatArgumentGroups (OP_DAT_ArgumentGroup - 1);
+  parallelLoop->setNumberOfOpMatArgumentGroups (0);
 }
 
 void
