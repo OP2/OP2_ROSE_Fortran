@@ -69,6 +69,9 @@ class CPPImperialOpDatDefinition: public OpDatDefinition
 
     CPPImperialOpDatDefinition (SgExprListExp * parameters,
         std::string const & variableName);
+
+    CPPImperialOpDatDefinition (OpDatDefinition * dat,
+        std::string const & variableName);
 };
 
 class CPPImperialOpSetDefinition: public OpSetDefinition

@@ -51,8 +51,21 @@ CPPImperialOpDatDefinition::CPPImperialOpDatDefinition (
   dimension
       = isSgIntVal (parameters->get_expressions ()[indexDimension])->get_value ();
 
-  baseType
-      = isSgVarRefExp (parameters->get_expressions ()[indexDataArray])->get_type ();
+  SgExpression * exp = parameters->get_expressions ()[indexDataArray];
+  if (isSgVarRefExp (exp))
+  {
+    baseType
+      = isSgVarRefExp (exp)->get_type ();
+  }
+  else if (isSgCastExp (exp))
+  {
+    SgType * type = isSgPointerType (isSgCastExp (exp)->get_type ());
+    baseType = type;
+  }
+  else
+  {
+    ROSE_ASSERT (false);
+  }
 
   ROSE_ASSERT (opSetName.empty () == false);
   ROSE_ASSERT (dimension > 0);
@@ -63,6 +76,31 @@ CPPImperialOpDatDefinition::CPPImperialOpDatDefinition (
       + variableName + "'. The data pertains to the set '" + opSetName
       + "'. Its actual type is " + baseType->class_name ()
       + " and its dimension is " + lexical_cast <string> (dimension),
+      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+}
+
+CPPImperialOpDatDefinition::CPPImperialOpDatDefinition (OpDatDefinition * dat,
+    std::string const & variableName)
+{
+  using boost::lexical_cast;
+  using std::string;
+
+  this->variableName = variableName;
+
+  opSetName = dat->getOpSetName ();
+
+  dimension = dat->getDimension ();
+
+  baseType = dat->getBaseType ();
+
+  ROSE_ASSERT (opSetName.empty () == false);
+  ROSE_ASSERT (dimension > 0);
+  ROSE_ASSERT (baseType != NULL);
+  ROSE_ASSERT (variableName.empty () == false);
+
+  Debug::getInstance ()->debugMessage ("Found a temporary OP_DAT declaration: '"
+      + variableName + "'. The data have the same layout as '"
+      + dat->getVariableName () + "'.",
       Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 }
 
@@ -153,8 +191,15 @@ CPPImperialOpMapDefinition::CPPImperialOpMapDefinition (
   dimension
       = isSgIntVal (parameters->get_expressions ()[indexDimension])->get_value ();
 
-  mappingName
+  if (isSgVarRefExp (parameters->get_expressions ()[indexMappingArray]))
+  {
+    mappingName
       = isSgVarRefExp (parameters->get_expressions ()[indexMappingArray])->get_symbol ()->get_name ().getString ();
+  }
+  else
+  {
+    mappingName = "__unknown_map_probably_runtime";
+  }
 
   ROSE_ASSERT (sourceOpSetName.empty () == false);
   ROSE_ASSERT (destinationOpSetName.empty () == false);
@@ -219,8 +264,21 @@ CPPOxfordOpDatDefinition::CPPOxfordOpDatDefinition (SgExprListExp * parameters,
   dimension
       = isSgIntVal (parameters->get_expressions ()[indexDimension])->get_value ();
 
-  baseType
-      = isSgVarRefExp (parameters->get_expressions ()[indexDataArray])->get_type ();
+  SgExpression * exp = parameters->get_expressions ()[indexDataArray];
+  if (isSgVarRefExp (exp))
+  {
+    baseType
+      = isSgVarRefExp (exp)->get_type ();
+  }
+  else if (isSgCastExp (exp))
+  {
+    SgType * type = isSgPointerType (isSgCastExp (exp)->get_type ());
+    baseType = type;
+  }
+  else
+  {
+    ROSE_ASSERT (false);
+  }
 
   ROSE_ASSERT (opSetName.empty () == false);
   ROSE_ASSERT (dimension > 0);
@@ -274,8 +332,15 @@ CPPOxfordOpMapDefinition::CPPOxfordOpMapDefinition (SgExprListExp * parameters,
 
   dimension = isSgIntVal (parameterExpressions[indexDimension])->get_value ();
 
-  mappingName
-      = isSgVarRefExp (parameterExpressions[indexMappingArray])->get_symbol ()->get_name ().getString ();
+  if (isSgVarRefExp (parameters->get_expressions ()[indexMappingArray]))
+  {
+    mappingName
+      = isSgVarRefExp (parameters->get_expressions ()[indexMappingArray])->get_symbol ()->get_name ().getString ();
+  }
+  else
+  {
+    mappingName = "__unknown_map_probably_runtime";
+  }
 
   ROSE_ASSERT (sourceOpSetName.empty () == false);
   ROSE_ASSERT (destinationOpSetName.empty () == false);
