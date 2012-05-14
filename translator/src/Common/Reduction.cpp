@@ -92,6 +92,10 @@ Reduction::hashKey ()
   {
     key += 2;
   }
+  else if (isSgTypeDouble (baseType) != NULL)
+  {
+    key += 4;
+  }
   else
   {
     throw Exceptions::ParallelLoop::UnsupportedBaseTypeException (
