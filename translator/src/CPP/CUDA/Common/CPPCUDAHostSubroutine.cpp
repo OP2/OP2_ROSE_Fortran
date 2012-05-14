@@ -55,6 +55,7 @@ CPPCUDAHostSubroutine::createReductionUpdateStatements (
 
   SgBasicBlock * loopBody1 = buildBasicBlock ();
 
+  unsigned int dat_num = parallelLoop->getOpDatArgNum (OP_DAT_ArgumentGroup);
   if (parallelLoop->isArray (OP_DAT_ArgumentGroup) || parallelLoop->isPointer (
       OP_DAT_ArgumentGroup))
   {
@@ -62,7 +63,7 @@ CPPCUDAHostSubroutine::createReductionUpdateStatements (
 
     SgPntrArrRefExp * arrayExpression1 = buildPntrArrRefExp (
         variableDeclarations->getReference (getReductionArrayHostName (
-            OP_DAT_ArgumentGroup)), variableDeclarations->getReference (
+            dat_num)), variableDeclarations->getReference (
             getIterationCounterVariableName (2)));
 
     SgMultiplyOp * multiplyExpression =
@@ -74,7 +75,7 @@ CPPCUDAHostSubroutine::createReductionUpdateStatements (
         getIterationCounterVariableName (2)), multiplyExpression);
 
     SgDotExp * dotExpression = buildDotExp (variableDeclarations->getReference (
-        getOpDatName (OP_DAT_ArgumentGroup)), buildOpaqueVarRefExp (
+        getOpDatName (dat_num)), buildOpaqueVarRefExp (
         OP2::RunTimeVariableNames::data, subroutineScope));
 
     SgCastExp * castExpression = buildCastExp (dotExpression, buildPointerType (
@@ -135,12 +136,11 @@ CPPCUDAHostSubroutine::createReductionUpdateStatements (
   else
   {
     SgPointerDerefExp * pointerDerefenceExpression1 = buildPointerDerefExp (
-        variableDeclarations->getReference (getReductionArrayHostName (
-            OP_DAT_ArgumentGroup)));
+        variableDeclarations->getReference (getReductionArrayHostName (dat_num)));
 
     SgPntrArrRefExp * arrayExpression = buildPntrArrRefExp (
         variableDeclarations->getReference (getReductionArrayHostName (
-            OP_DAT_ArgumentGroup)), variableDeclarations->getReference (
+            dat_num)), variableDeclarations->getReference (
             getIterationCounterVariableName (1)));
 
     if (parallelLoop->isIncremented (OP_DAT_ArgumentGroup))
@@ -154,7 +154,7 @@ CPPCUDAHostSubroutine::createReductionUpdateStatements (
     {
       SgPointerDerefExp * pointerDerefenceExpression2 = buildPointerDerefExp (
           variableDeclarations->getReference (getReductionArrayHostName (
-              OP_DAT_ArgumentGroup)));
+              dat_num)));
 
       SgFunctionCallExp * maxCallExpression =
           OP2::Macros::createMaxCallStatement (subroutineScope,
@@ -169,7 +169,7 @@ CPPCUDAHostSubroutine::createReductionUpdateStatements (
     {
       SgPointerDerefExp * pointerDerefenceExpression2 = buildPointerDerefExp (
           variableDeclarations->getReference (getReductionArrayHostName (
-              OP_DAT_ArgumentGroup)));
+              dat_num)));
 
       SgFunctionCallExp * minCallExpression =
           OP2::Macros::createMinCallStatement (subroutineScope,

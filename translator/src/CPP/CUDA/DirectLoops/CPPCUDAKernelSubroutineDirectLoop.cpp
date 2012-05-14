@@ -660,11 +660,12 @@ CPPCUDAKernelSubroutineDirectLoop::createOpDatFormalParameterDeclarations ()
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfArgumentGroups (); ++i)
   {
     if (parallelLoop->isOpMatArg (i)) continue;
+    unsigned int dat_num = parallelLoop->getOpDatArgNum (i);
     if (parallelLoop->isDuplicateOpDat (i) == false)
     {
       if (parallelLoop->isReductionRequired (i))
       {
-        string const & variableName = getReductionArrayDeviceName (i);
+        string const & variableName = getReductionArrayDeviceName (dat_num);
 
         Debug::getInstance ()->debugMessage ("Reduction type",
             Debug::HIGHEST_DEBUG_LEVEL, __FILE__, __LINE__);
@@ -681,7 +682,7 @@ CPPCUDAKernelSubroutineDirectLoop::createOpDatFormalParameterDeclarations ()
         Debug::getInstance ()->debugMessage ("OP_DAT: direct",
             Debug::HIGHEST_DEBUG_LEVEL, __FILE__, __LINE__);
 
-        string const & variableName = getOpDatName (i);
+        string const & variableName = getOpDatName (dat_num);
 
         variableDeclarations->add (
             variableName,
@@ -694,7 +695,7 @@ CPPCUDAKernelSubroutineDirectLoop::createOpDatFormalParameterDeclarations ()
         Debug::getInstance ()->debugMessage ("Read",
             Debug::HIGHEST_DEBUG_LEVEL, __FILE__, __LINE__);
 
-        string const & variableName = getOpDatName (parallelLoop->getOpDatArgNum (i));
+        string const & variableName = getOpDatName (dat_num);
       }
     }
   }
