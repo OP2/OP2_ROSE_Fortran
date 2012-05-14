@@ -551,7 +551,16 @@ CPPProgramDeclarationsAndDefinitions::detectAndHandleOP2Definition (
 
     OpDatDefinition * opDatDeclaration;
 
-    if (functionCallExpression->get_args ()->get_expressions ().size ()
+    if (iequals (functionCallExpression->getAssociatedFunctionSymbol ()->get_name ().getString (),
+                 "op_decl_vec"))
+    {
+      SgExpression * old = functionCallExpression->get_args ()->get_expressions ()[0];
+      
+      opDatDeclaration = new CPPImperialOpDatDefinition (
+        getOpDatDefinition (isSgVarRefExp (old)->get_symbol ()->get_name ().getString ()),
+                            variableName);
+    }
+    else if (functionCallExpression->get_args ()->get_expressions ().size ()
         == CPPImperialOpDatDefinition::getNumberOfExpectedArguments ())
     {
       opDatDeclaration = new CPPImperialOpDatDefinition (
