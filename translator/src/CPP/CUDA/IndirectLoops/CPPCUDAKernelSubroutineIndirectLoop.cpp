@@ -486,6 +486,61 @@ CPPCUDAKernelSubroutineIndirectLoop::createInitialiseIncrementAccessStatements (
 }
 
 void
+CPPCUDAKernelSubroutineIndirectLoop::createStageToVectorDatStatements (SgBasicBlock * loopBody)
+{
+  using namespace SageBuilder;
+  using namespace SageInterface;
+  using namespace LoopVariableNames;
+  using namespace PlanFunctionVariableNames;
+  using namespace OP2VariableNames;
+  using namespace OP2::RunTimeVariableNames;
+
+  unsigned int count = 1;
+  for (unsigned int i=1; i <= parallelLoop->getNumberOfArgumentGroups (); i++ ) {
+    if (parallelLoop->isOpMatArg (i)) continue;
+    if (parallelLoop->isIndirect (i) && parallelLoop->getOpIndexValue (i) < 0) // OP_ALL
+    {
+      int ntimes = declarations->getOpMapDefinition (parallelLoop->getOpMapName (i))->getDimension ();
+      unsigned int dat_num = parallelLoop->getOpDatArgNum (i);
+      SgExpression * datvec = variableDeclarations->getReference (getOpDatVecName (dat_num));
+      SgVarRefExp * itvar;
+      if (parallelLoop->getNumberOfOpMatArgumentGroups () > 0)
+      {
+        itvar = variableDeclarations->getReference (
+          getIterationCounterVariableName (2));
+      }
+      else
+      {
+        itvar = variableDeclarations->getReference (
+          getIterationCounterVariableName (1));
+      }
+
+      SgAddOp * addexp = buildAddOp (itvar,
+                                     variableDeclarations->getReference (sharedMemoryOffset));
+
+      for (int j = 0; j < ntimes; j++)
+      {
+        SgPntrArrRefExp * arrexp =
+          buildPntrArrRefExp (variableDeclarations->getReference (
+                                getGlobalToLocalMappingName (count++)), addexp);
+
+        SgMultiplyOp * multexp = buildMultiplyOp (arrexp,
+                                                  buildIntVal (parallelLoop->getOpDatDimension (i)));
+
+        SgExpression * exp = buildAddOp (
+          variableDeclarations->getReference (
+            getIndirectOpDatSharedMemoryName (dat_num)),
+          multexp);
+
+        SgStatement * s = buildAssignStatement (buildPntrArrRefExp (datvec,
+                                                                    buildIntVal (j)), exp);
+        appendStatement (s, loopBody);
+      }
+    }
+  }
+}
+
+void
 CPPCUDAKernelSubroutineIndirectLoop::createExecutionLoopStatements ()
 {
   using namespace SageBuilder;
@@ -549,6 +604,8 @@ CPPCUDAKernelSubroutineIndirectLoop::createExecutionLoopStatements ()
     appendStatementList (
         createInitialiseIncrementAccessStatements ()->getStatementList (),
         ifBody);
+
+    createStageToVectorDatStatements (ifBody);
 
     appendStatement (createUserSubroutineCallStatement (), ifBody);
 
@@ -663,49 +720,8 @@ CPPCUDAKernelSubroutineIndirectLoop::createExecutionLoopStatements ()
       }
     }
 
-    unsigned int count = 1;
-    for (unsigned int i=1; i <= parallelLoop->getNumberOfArgumentGroups (); i++ ) {
-      if (parallelLoop->isOpMatArg (i)) continue;
-      if (parallelLoop->isIndirect (i) && parallelLoop->getOpIndexValue (i) < 0) // OP_ALL
-      {
-        int ntimes = declarations->getOpMapDefinition (parallelLoop->getOpMapName (i))->getDimension ();
-        unsigned int dat_num = parallelLoop->getOpDatArgNum (i);
-        SgExpression * datvec = variableDeclarations->getReference (getOpDatVecName (dat_num));
-        SgVarRefExp * itvar;
-        if (parallelLoop->getNumberOfOpMatArgumentGroups () > 0)
-        {
-          itvar = variableDeclarations->getReference (
-              getIterationCounterVariableName (2));
-        }
-        else
-        {
-          itvar = variableDeclarations->getReference (
-              getIterationCounterVariableName (1));
-        }
+    createStageToVectorDatStatements (loopBody);
 
-        SgAddOp * addexp = buildAddOp (itvar,
-            variableDeclarations->getReference (sharedMemoryOffset));
-
-        for (int j = 0; j < ntimes; j++)
-        {
-          SgPntrArrRefExp * arrexp =
-            buildPntrArrRefExp (variableDeclarations->getReference (
-                    getGlobalToLocalMappingName (count++)), addexp);
-
-          SgMultiplyOp * multexp = buildMultiplyOp (arrexp,
-              buildIntVal (parallelLoop->getOpDatDimension (i)));
-
-          SgExpression * exp = buildAddOp (
-              variableDeclarations->getReference (
-                  getIndirectOpDatSharedMemoryName (dat_num)),
-              multexp);
-
-          SgStatement * s = buildAssignStatement (buildPntrArrRefExp (datvec,
-                  buildIntVal (j)), exp);
-          appendStatement (s, loopBody);
-        }
-      }
-    }
     appendStatement (createUserSubroutineCallStatement (), loopBody);
 
     SgVarRefExp * nthread = variableDeclarations->getReference (numberOfActiveThreads);
