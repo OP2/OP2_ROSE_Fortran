@@ -41,6 +41,14 @@ parser.add_option("-C",
                   help="Runs the source-to-source compiler.",
                   default=False)
 
+parser.add_option("-I",
+          "--include",
+                  action="append",
+                  dest="includes",
+                  help="Specifiy additional include directories (can be given more than once).",
+                  default=[],
+                  metavar="<PATH>")
+
 parser.add_option(cudaFlag,
                   action="store_true",
                   dest="cuda",
@@ -309,11 +317,12 @@ def getCPPCompilationCommand (filesToCompile):
     # Get the command to source-to-source translate the Fortran code
     translatorHome = getTranslatorHome ()
     translatorPath = translatorHome + sep + 'translator' + sep + 'bin' + sep + 'translator'
-    includePath    = translatorHome + sep + 'support' + sep + 'C++'
+    includePaths   = opts.includes + [translatorHome + sep + 'support' + sep + 'C++']
 
-    cmd = translatorPath + ' -d ' + str(opts.debug) + ' ' + getBackendTarget () + ' -I' + includePath + ' '
+    cmd = translatorPath + ' -d ' + str(opts.debug) + ' ' + getBackendTarget ()
+    cmd += ' '.join('-I' + includePath for includePath in includePaths)
     for f in filesToCompile:
-        cmd += f + ' '
+        cmd += ' ' + f
 
     return cmd
 
