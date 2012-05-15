@@ -191,10 +191,10 @@ def clean ():
             remove(file)
 
 def outputStdout (stdoutLines):
-    print('==================================== STANDARD OUTPUT ===========================================')
+    print('=========================== STANDARD OUTPUT ==================================')
     for line in stdoutLines.splitlines():
         print(line)
-    print('================================================================================================')
+    print('==============================================================================')
 
 def getBackendTarget ():
     # Check that the backend selected is sane before returning which was chosen
@@ -348,11 +348,11 @@ def runCompiler (cmd):
 
         outputStdout (stdoutLines)
 
-        print('==================================== STANDARD ERROR ============================================')
+        print('=========================== STANDARD ERROR ===================================')
         lines = stderrLines.splitlines()
         for line in lines:
             print (line)
-        print('================================================================================================')
+        print('==============================================================================')
         exit(1)
 
     if opts.debug > 0:
