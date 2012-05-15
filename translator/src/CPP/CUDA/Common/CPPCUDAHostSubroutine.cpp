@@ -203,13 +203,19 @@ CPPCUDAHostSubroutine::createReductionUpdateStatements (
 void
 CPPCUDAHostSubroutine::createReductionEpilogueStatements ()
 {
+  createReductionEpilogueStatements (isSgBasicBlock (subroutineScope));
+}
+
+void
+CPPCUDAHostSubroutine::createReductionEpilogueStatements (SgBasicBlock * block)
+{
   using namespace SageBuilder;
   using namespace SageInterface;
   using namespace OP2VariableNames;
   using namespace ReductionVariableNames;
 
   Debug::getInstance ()->debugMessage (
-      "Creating reduction prologue statements", Debug::FUNCTION_LEVEL,
+      "Creating reduction epilogue statements", Debug::FUNCTION_LEVEL,
       __FILE__, __LINE__);
 
   SgFunctionCallExp
@@ -219,14 +225,14 @@ CPPCUDAHostSubroutine::createReductionEpilogueStatements ()
                   reductionBytes));
 
   appendStatement (buildExprStatement (moveReductionArraysToHostCall),
-      subroutineScope);
+      block);
 
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfArgumentGroups (); ++i)
   {
     if (parallelLoop->isOpMatArg (i)) continue;
     if (parallelLoop->isReductionRequired (i))
     {
-      appendStatement (createReductionUpdateStatements (i), subroutineScope);
+      appendStatement (createReductionUpdateStatements (i), block);
     }
   }
 }
@@ -370,6 +376,12 @@ CPPCUDAHostSubroutine::createReductionInitialisationStatements (
 void
 CPPCUDAHostSubroutine::createReductionPrologueStatements ()
 {
+  createReductionPrologueStatements (isSgBasicBlock (subroutineScope));
+}
+
+void
+CPPCUDAHostSubroutine::createReductionPrologueStatements (SgBasicBlock * block)
+{
   using namespace SageBuilder;
   using namespace SageInterface;
   using namespace OP2VariableNames;
@@ -378,7 +390,7 @@ CPPCUDAHostSubroutine::createReductionPrologueStatements ()
   using namespace OP2::RunTimeVariableNames;
 
   Debug::getInstance ()->debugMessage (
-      "Creating reduction epilogue statements", Debug::FUNCTION_LEVEL,
+      "Creating reduction prologue statements", Debug::FUNCTION_LEVEL,
       __FILE__, __LINE__);
 
   /*
@@ -390,7 +402,7 @@ CPPCUDAHostSubroutine::createReductionPrologueStatements ()
   SgExprStatement * assignmentStatement1 = buildAssignStatement (
       variableDeclarations->getReference (reductionBytes), buildIntVal (0));
 
-  appendStatement (assignmentStatement1, subroutineScope);
+  appendStatement (assignmentStatement1, block);
 
   /*
    * ======================================================
@@ -402,7 +414,7 @@ CPPCUDAHostSubroutine::createReductionPrologueStatements ()
       variableDeclarations->getReference (reductionSharedMemorySize),
       buildIntVal (0));
 
-  appendStatement (assignmentStatement2, subroutineScope);
+  appendStatement (assignmentStatement2, block);
 
   /*
    * ======================================================
@@ -418,7 +430,7 @@ CPPCUDAHostSubroutine::createReductionPrologueStatements ()
     {
       SgDotExp * dotExpression = buildDotExp (
           variableDeclarations->getReference (getOpDatName (dat_num)),
-          buildOpaqueVarRefExp (data, subroutineScope));
+          buildOpaqueVarRefExp (data, block));
 
       if (parallelLoop->isArray (i) || parallelLoop->isPointer (i))
       {
@@ -429,7 +441,7 @@ CPPCUDAHostSubroutine::createReductionPrologueStatements ()
             variableDeclarations->getReference (getReductionArrayHostName (dat_num)),
             castExpression);
 
-        appendStatement (assignmentStatement3, subroutineScope);
+        appendStatement (assignmentStatement3, block);
       }
       else
       {
@@ -442,7 +454,7 @@ CPPCUDAHostSubroutine::createReductionPrologueStatements ()
             variableDeclarations->getReference (getReductionArrayHostName (dat_num)),
             addressOfExpression);
 
-        appendStatement (assignmentStatement3, subroutineScope);
+        appendStatement (assignmentStatement3, block);
       }
 
       SgSizeOfOp * sizeOfExpression = buildSizeOfOp (
@@ -474,7 +486,7 @@ CPPCUDAHostSubroutine::createReductionPrologueStatements ()
           roundUpCallExpression);
 
       appendStatement (buildExprStatement (assignmentStatement3),
-          subroutineScope);
+          block);
 
       SgFunctionCallExp * maxCallExpression =
           OP2::Macros::createMaxCallStatement (subroutineScope,
@@ -485,7 +497,7 @@ CPPCUDAHostSubroutine::createReductionPrologueStatements ()
           variableDeclarations->getReference (reductionSharedMemorySize),
           maxCallExpression);
 
-      appendStatement (assignmentStatement4, subroutineScope);
+      appendStatement (assignmentStatement4, block);
     }
   }
 
@@ -497,10 +509,10 @@ CPPCUDAHostSubroutine::createReductionPrologueStatements ()
 
   SgFunctionCallExp * reallocateReductionArraysExpression =
       CUDA::OP2RuntimeSupport::getReallocateReductionArraysCallStatement (
-          subroutineScope, variableDeclarations->getReference (reductionBytes));
+        subroutineScope, variableDeclarations->getReference (reductionBytes));
 
   appendStatement (buildExprStatement (reallocateReductionArraysExpression),
-      subroutineScope);
+      block);
 
   /*
    * ======================================================
@@ -511,7 +523,7 @@ CPPCUDAHostSubroutine::createReductionPrologueStatements ()
   SgExprStatement * assignmentStatement5 = buildAssignStatement (
       variableDeclarations->getReference (reductionBytes), buildIntVal (0));
 
-  appendStatement (assignmentStatement5, subroutineScope);
+  appendStatement (assignmentStatement5, block);
 
   /*
    * ======================================================
@@ -529,36 +541,36 @@ CPPCUDAHostSubroutine::createReductionPrologueStatements ()
           * addExpression1 =
               buildAddOp (
                   CUDA::OP2RuntimeSupport::getPointerToMemoryAllocatedForHostReductionArray (
-                      subroutineScope), variableDeclarations->getReference (
+                      block), variableDeclarations->getReference (
                       reductionBytes));
 
       SgDotExp * dotExpression1 = buildDotExp (
           variableDeclarations->getReference (getOpDatName (dat_num)),
-          buildOpaqueVarRefExp (data, subroutineScope));
+          buildOpaqueVarRefExp (data, block));
 
       SgExprStatement * assignmentStatement4 = buildAssignStatement (
           dotExpression1, addExpression1);
 
-      appendStatement (assignmentStatement4, subroutineScope);
+      appendStatement (assignmentStatement4, block);
 
       SgAddOp
           * addExpression2 =
               buildAddOp (
                   CUDA::OP2RuntimeSupport::getPointerToMemoryAllocatedForDeviceReductionArray (
-                      subroutineScope), variableDeclarations->getReference (
+                      block), variableDeclarations->getReference (
                       reductionBytes));
 
       SgDotExp * dotExpression2 = buildDotExp (
           variableDeclarations->getReference (getOpDatName (dat_num)),
-          buildOpaqueVarRefExp (data_d, subroutineScope));
+          buildOpaqueVarRefExp (data_d, block));
 
       SgExprStatement * assignmentStatement5 = buildAssignStatement (
           dotExpression2, addExpression2);
 
-      appendStatement (assignmentStatement5, subroutineScope);
+      appendStatement (assignmentStatement5, block);
 
       appendStatement (createReductionInitialisationStatements (i),
-          subroutineScope);
+          block);
 
       /*
        * ======================================================
@@ -595,7 +607,7 @@ CPPCUDAHostSubroutine::createReductionPrologueStatements ()
           roundUpCallExpression);
 
       appendStatement (buildExprStatement (assignmentStatement6),
-          subroutineScope);
+          block);
     }
   }
 
@@ -606,7 +618,7 @@ CPPCUDAHostSubroutine::createReductionPrologueStatements ()
                   reductionBytes));
 
   appendStatement (buildExprStatement (moveReductionArraysToDeviceCall),
-      subroutineScope);
+      block);
 }
 
 void

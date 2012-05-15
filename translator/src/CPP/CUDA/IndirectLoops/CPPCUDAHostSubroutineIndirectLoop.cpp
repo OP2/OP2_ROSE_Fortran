@@ -294,6 +294,11 @@ CPPCUDAHostSubroutineIndirectLoop::createPlanFunctionExecutionStatements ()
   }
   appendStatement (assignmentStatement3, loopBody);
 
+  if (parallelLoop->isReductionRequired ())
+  {
+    createReductionPrologueStatements (loopBody);
+  }
+
   /*
    * ======================================================
    * New statement
@@ -315,6 +320,10 @@ CPPCUDAHostSubroutineIndirectLoop::createPlanFunctionExecutionStatements ()
 
   appendStatement (buildExprStatement (threadSynchronizeExpression), loopBody);
 
+  if (parallelLoop->isReductionRequired ())
+  {
+    createReductionEpilogueStatements (loopBody);
+  }
   /*
    * ======================================================
    * New statement
@@ -596,11 +605,6 @@ CPPCUDAHostSubroutineIndirectLoop::createStatements ()
   if (parallelLoop->getNumberOfOpMatArgumentGroups () > 0)
   {
     createConvertMatDataStatements ();
-  }
-
-  if (parallelLoop->isReductionRequired ())
-  {
-    createReductionEpilogueStatements ();
   }
 }
 
