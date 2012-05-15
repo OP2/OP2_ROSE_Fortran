@@ -89,8 +89,16 @@ CPPCUDAKernelSubroutineIndirectLoop::createUserSubroutineCallStatement ()
             "Indirect OP_DAT with increment access", Debug::OUTER_LOOP_LEVEL,
             __FILE__, __LINE__);
 
-        parameterExpression = variableDeclarations->getReference (
-            getOpDatLocalName (dat_num));
+        if (parallelLoop->getOpIndexValue (i) < 0 && !parallelLoop->isDuplicateOpDat (i)) // OP_ALL
+        {
+          parameterExpression = variableDeclarations->getReference (
+              getOpDatVecName (dat_num));
+        }
+        else
+        {
+          parameterExpression = variableDeclarations->getReference (
+              getOpDatLocalName (dat_num));
+        }
       }
       else
       {
