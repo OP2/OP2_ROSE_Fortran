@@ -442,9 +442,20 @@ CPPImperialOpMatDefinition::CPPImperialOpMatDefinition (
   dimension = isSgIntVal (
       parameters->get_expressions ()[indexDimension])->get_value ();
 
-  string type = isSgStringVal (
-      isSgCastExp (
-          parameters->get_expressions ()[indexTypeName])->get_operand ())->get_value ();
+  SgExpression * exp = parameters->get_expressions ()[indexTypeName];
+  string type;
+  if (isSgStringVal (exp))
+  {
+    type = isSgStringVal (exp)->get_value ();
+  }
+  else if (isSgCastExp (exp))
+  {
+    type = isSgStringVal (isSgCastExp (exp)->get_operand ())->get_value ();
+  }
+  else
+  {
+    ROSE_ASSERT (false);
+  }
 
   /*
    * FIXME: is there a better way to derive the base type?
@@ -654,9 +665,20 @@ CPPOxfordOpMatDefinition::CPPOxfordOpMatDefinition (
   dimension = isSgIntVal (
       parameters->get_expressions ()[indexDimension])->get_value ();
 
-  string type = isSgStringVal (
-      isSgCastExp (
-          parameters->get_expressions ()[indexTypeName])->get_operand ())->get_value ();
+  SgExpression * exp = parameters->get_expressions ()[indexTypeName];
+  string type;
+  if (isSgStringVal (exp))
+  {
+    type = isSgStringVal (exp)->get_value ();
+  }
+  else if (isSgCastExp (exp))
+  {
+    type = isSgStringVal (isSgCastExp (exp)->get_operand ())->get_value ();
+  }
+  else
+  {
+    ROSE_ASSERT (false);
+  }
 
   /*
    * FIXME: is there a better way to derive the base type?
