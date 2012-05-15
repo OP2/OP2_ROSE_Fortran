@@ -152,7 +152,7 @@ CPPSubroutinesGeneration::patchCallsToParallelLoops ()
                 hostSubroutine->getSubroutineName (), buildVoidType (),
                 hostSubroutine->getCopyOfFormalParameters (), fileScope);
 
-        SgStatement * declarationStatement = findLastDeclarationStatement (
+        SgStatement * declarationStatement = findFirstDefiningFunctionDecl (
             fileScope);
 
         insertStatementBefore (declarationStatement, nonDefininingDeclaration);
