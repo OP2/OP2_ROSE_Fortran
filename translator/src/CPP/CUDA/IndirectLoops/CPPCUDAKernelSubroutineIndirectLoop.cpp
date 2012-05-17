@@ -65,6 +65,7 @@ CPPCUDAKernelSubroutineIndirectLoop::createUserSubroutineCallStatement ()
     itvar = variableDeclarations->getReference (
         getIterationCounterVariableName (1));
   }
+  unsigned int count = 1;
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfArgumentGroups (); ++i)
   {
     if (parallelLoop->isOpMatArg (i))
@@ -119,7 +120,7 @@ CPPCUDAKernelSubroutineIndirectLoop::createUserSubroutineCallStatement ()
 
           SgPntrArrRefExp * arrayExpression1 =
             buildPntrArrRefExp (variableDeclarations->getReference (
-                    getGlobalToLocalMappingName (dat_num)), addExpression1);
+                    getGlobalToLocalMappingName (count++)), addExpression1);
 
           SgMultiplyOp * multiplyExpression1 = buildMultiplyOp (arrayExpression1,
               buildIntVal (parallelLoop->getOpDatDimension (i)));
@@ -322,6 +323,7 @@ CPPCUDAKernelSubroutineIndirectLoop::createStageOutFromLocalMemoryToSharedMemory
 
   SgBasicBlock * ifBody = buildBasicBlock ();
 
+  unsigned int count = 1;
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfArgumentGroups (); ++i)
   {
     if (parallelLoop->isOpMatArg (i)) continue;
@@ -335,7 +337,7 @@ CPPCUDAKernelSubroutineIndirectLoop::createStageOutFromLocalMemoryToSharedMemory
               1)), variableDeclarations->getReference (sharedMemoryOffset));
 
       SgPntrArrRefExp * arrayExpression1 = buildPntrArrRefExp (
-          variableDeclarations->getReference (getGlobalToLocalMappingName (dat_num)),
+          variableDeclarations->getReference (getGlobalToLocalMappingName (count++)),
           addExpression1);
 
       SgMultiplyOp * multiplyExpression1 = buildMultiplyOp (arrayExpression1,
