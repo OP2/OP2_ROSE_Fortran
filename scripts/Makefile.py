@@ -19,6 +19,8 @@ allBackendOptions = [openclFlag, cudaFlag, openmpFlag]
 
 helpShortFlag = "-h"
 
+kernel_basename = ''
+
 parser.add_option("-c",
                   "--config",
                   action="store",
@@ -131,7 +133,10 @@ def getArchiveFileName ():
         return "files_openmp.zip"
 
 def getCUDACompilationUnitName (generatedCompilationUnit):
-    return generatedCompilationUnit[:-4] + ".cu"
+    if kernel_basename == '':
+        return generatedCompilationUnit[:-4] + ".cu"
+    else:
+        return kernel_basename + ".cu"
 
 def getBackendCreatedFiles ():
     from os import path
@@ -241,7 +246,7 @@ def getCompilationFiles ():
     # Get the files to translate from the mandatory 'config' file
     from os import path
     from string import split
-
+    global kernel_basename
     configFile = None
     if opts.config:
         configFile = opts.config
@@ -263,7 +268,8 @@ def getCompilationFiles ():
                 filesToCompile.append(f)
                 if not path.isfile(f):
                     debug.exitMessage("File '" + f + "' does not exist.")
-
+        if line.startswith('kernel_basename'):
+            kernel_basename = words[1].strip()
     if not filesToCompile:
         debug.exitMessage("You did not specify which files need to compiled. Use files=<list/of/files> in the configuration file.")
 
