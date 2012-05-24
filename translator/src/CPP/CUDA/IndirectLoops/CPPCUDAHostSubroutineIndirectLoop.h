@@ -63,6 +63,9 @@ class CPPCUDAHostSubroutineIndirectLoop: public CPPCUDAHostSubroutine
     createAllocMatDataStatements ();
 
     void
+    createSetMaxBlocksPerGrid ();
+
+    void
     createConvertMatDataStatements ();
 
     void

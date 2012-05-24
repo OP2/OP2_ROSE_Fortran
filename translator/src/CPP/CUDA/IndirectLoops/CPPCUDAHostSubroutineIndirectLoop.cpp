@@ -569,6 +569,61 @@ CPPCUDAHostSubroutineIndirectLoop::createConvertMatDataStatements ()
 }
 
 void
+CPPCUDAHostSubroutineIndirectLoop::createSetMaxBlocksPerGrid ()
+{
+  using namespace SageBuilder;
+  using namespace SageInterface;
+  using namespace OP2VariableNames;
+  using namespace LoopVariableNames;
+  using namespace PlanFunctionVariableNames;
+
+  SgVarRefExp * itvar = variableDeclarations->getReference (getIterationCounterVariableName (1));
+  SgExprStatement * init = buildAssignStatement (
+    itvar,
+    buildIntVal (0));
+  SgArrowExp * ncol = buildArrowExp (
+    variableDeclarations->getReference (planRet),
+    buildOpaqueVarRefExp (ncolors, subroutineScope));
+  SgLessThanOp * test = buildLessThanOp (itvar, ncol);
+
+  SgPlusPlusOp * increment = buildPlusPlusOp (itvar);
+
+  SgBasicBlock * body = buildBasicBlock ();
+
+  SgVarRefExp * blocks = variableDeclarations->getReference (CUDA::blocksPerGrid);
+
+  // Zero blocksPerGrid
+  appendStatement(buildAssignStatement (blocks, buildIntVal (0)),
+                  subroutineScope);
+
+
+  SgExprListExp * parms = buildExprListExp ();
+  parms->append_expression (blocks);
+  SgPntrArrRefExp * nblk = buildPntrArrRefExp (
+      buildOpaqueVarRefExp (ncolblk, subroutineScope),
+      variableDeclarations->getReference (getIterationCounterVariableName (1)));
+
+  SgArrowExp * nblocks = buildArrowExp (
+    variableDeclarations->getReference (planRet),
+    nblk);
+  appendStatement (
+    buildAssignStatement (variableDeclarations->getReference (getIterationCounterVariableName (2)),
+                          nblocks), body);
+  parms->append_expression (variableDeclarations->getReference (getIterationCounterVariableName (2)));
+
+  SgExprStatement * assign = buildAssignStatement (
+    blocks,
+    buildFunctionCallExp ("MAX", buildVoidType (), parms, subroutineScope));
+
+  appendStatement (assign, body);
+  SgForStatement * forLoopStatement = buildForStatement (
+    init, buildExprStatement (test),
+    increment, body);
+
+  
+  appendStatement (forLoopStatement, subroutineScope);
+}
+void
 CPPCUDAHostSubroutineIndirectLoop::createStatements ()
 {
   using namespace SageBuilder;
@@ -576,11 +631,6 @@ CPPCUDAHostSubroutineIndirectLoop::createStatements ()
 
   Debug::getInstance ()->debugMessage ("Creating statements",
       Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
-
-  if (parallelLoop->isReductionRequired ())
-  {
-    createReductionPrologueStatements ();
-  }
 
   appendStatementList (
       createInitialisePlanFunctionArrayStatements ()->getStatementList (),
