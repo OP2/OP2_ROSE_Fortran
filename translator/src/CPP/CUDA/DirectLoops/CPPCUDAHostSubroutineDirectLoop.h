@@ -48,6 +48,9 @@ class CPPCUDAHostSubroutineDirectLoop: public CPPCUDAHostSubroutine
     void
     createCUDASharedVariableDeclarations ();
 
+    void
+    createSetSharedMemorySizeStatement ();
+
     virtual void
     createKernelFunctionCallStatement (SgScopeStatement * scope);
 

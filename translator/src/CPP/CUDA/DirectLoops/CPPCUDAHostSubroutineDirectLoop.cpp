@@ -179,6 +179,32 @@ CPPCUDAHostSubroutineDirectLoop::createCUDAKernelInitialisationStatements ()
 }
 
 void
+CPPCUDAHostSubroutineDirectLoop::createSetSharedMemorySizeStatement ()
+{
+  using namespace SageBuilder;
+  using namespace SageInterface;
+  using namespace OP2VariableNames;
+  using namespace ReductionVariableNames;
+
+  if (!parallelLoop->isReductionRequired ())
+  {
+    return;
+  }
+
+  SgVarRefExp * smem = variableDeclarations->getReference (CUDA::sharedMemorySize);
+  SgVarRefExp * rmem = variableDeclarations->getReference (reductionSharedMemorySize);
+  SgExprListExp * parms = buildExprListExp ();
+  parms->append_expression (smem);
+
+  parms->append_expression (buildMultiplyOp (rmem, variableDeclarations->getReference (CUDA::threadsPerBlock)));
+  SgExprStatement * assign = buildAssignStatement (
+    variableDeclarations->getReference (CUDA::sharedMemorySize),
+    buildFunctionCallExp ("MAX", buildVoidType (), parms, subroutineScope));
+
+  appendStatement (assign, subroutineScope);
+}
+
+void
 CPPCUDAHostSubroutineDirectLoop::createStatements ()
 {
   using namespace SageBuilder;
@@ -192,6 +218,7 @@ CPPCUDAHostSubroutineDirectLoop::createStatements ()
   if (parallelLoop->isReductionRequired ())
   {
     createReductionPrologueStatements ();
+    createSetSharedMemorySizeStatement ();
   }
 
   createKernelFunctionCallStatement (subroutineScope);
