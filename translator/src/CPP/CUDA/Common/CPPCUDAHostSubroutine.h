@@ -54,17 +54,11 @@ class CPPCUDAHostSubroutine: public CPPHostSubroutine
     virtual void
     createReductionEpilogueStatements ();
 
-    virtual void
-    createReductionEpilogueStatements (SgBasicBlock * block);
-
     SgForStatement *
     createReductionInitialisationStatements (unsigned int OP_DAT_ArgumentGroup);
 
     virtual void
     createReductionPrologueStatements ();
-
-    virtual void
-    createReductionPrologueStatements (SgBasicBlock * block);
 
     virtual void
     createReductionDeclarations ();
