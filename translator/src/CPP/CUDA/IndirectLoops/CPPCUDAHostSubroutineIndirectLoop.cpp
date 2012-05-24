@@ -154,6 +154,10 @@ CPPCUDAHostSubroutineIndirectLoop::createKernelFunctionCallStatement (
         actualParameters->append_expression (arrowExpression);
       }
     }
+    else
+    {
+      count++;
+    }
   }
 
   actualParameters->append_expression (buildArrowExp (
