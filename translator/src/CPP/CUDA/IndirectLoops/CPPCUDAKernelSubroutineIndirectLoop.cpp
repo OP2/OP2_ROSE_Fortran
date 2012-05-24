@@ -1173,7 +1173,8 @@ CPPCUDAKernelSubroutineIndirectLoop::createStageInVariableDeclarations ()
 
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
-    if (parallelLoop->isIndirect (i) && parallelLoop->isIncremented (i))
+    if ( (parallelLoop->isIndirect (i) && parallelLoop->isIncremented (i))
+         || (parallelLoop->isGlobal (i) && !parallelLoop->isReductionRequired (i)))
     {
       string const & variableName = getOpDatLocalName (i);
 
