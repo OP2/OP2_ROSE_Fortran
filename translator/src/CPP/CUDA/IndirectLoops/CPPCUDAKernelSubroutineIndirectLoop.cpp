@@ -1050,6 +1050,11 @@ CPPCUDAKernelSubroutineIndirectLoop::createStatements ()
   using namespace SageBuilder;
   using namespace SageInterface;
 
+  if (parallelLoop->isReductionRequired ())
+  {
+    createReductionPrologueStatements ();
+  }
+
   appendStatement (createThreadZeroStatements (), subroutineScope);
 
   appendStatement (buildExprStatement (
