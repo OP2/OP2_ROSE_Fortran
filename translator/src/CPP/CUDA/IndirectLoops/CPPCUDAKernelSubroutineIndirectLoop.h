@@ -64,6 +64,9 @@ class CPPCUDAKernelSubroutineIndirectLoop: public CPPCUDAKernelSubroutine
     void
     createStageToVectorDatStatements (SgBasicBlock * block);
 
+    void
+    createInitialiseIncrementedVectorDatStatements ();
+
     virtual void
     createExecutionLoopStatements ();
 
