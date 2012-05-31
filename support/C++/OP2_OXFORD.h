@@ -5,6 +5,10 @@
 #ifndef __OP2_OXFORD_H
 #define __OP2_OXFORD_H
 
+#include "op_lib_cpp.h"
+#include "op_lib_mat.h"
+
+/*
 typedef struct
 {
 } op_set;
@@ -85,10 +89,27 @@ op_diagnostic_output();
 void
 op_timing_output();
 
+int op_i(int);
+*/
+
 op_itspace
 op_iteration_space (op_set, int, int);
 
-int op_i(int);
+typedef struct
+{
+  op_map map;
+  op_dat dat;
+} op_field_struct;
+
+extern "C" {
+
+op_field_struct extract_op_scalar_field(void *, char const *, int, int);
+op_field_struct extract_op_vector_field(void *, char const *, int, int);
+op_field_struct extract_op_tensor_field(void *, char const *, int, int);
+
+void * get_state();
+
+}
 
 // 1 OP_ARG
 template <typename T1>
