@@ -204,6 +204,9 @@ namespace OP2VariableNames
   getOpMatEntryName (unsigned int n);
 
   std::string const
+  getOpMatOffsetName (unsigned int n);
+
+  std::string const
   getOpMatMapName (unsigned int n);
 
   std::string const

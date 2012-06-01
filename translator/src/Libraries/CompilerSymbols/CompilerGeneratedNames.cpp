@@ -169,6 +169,15 @@ OP2VariableNames::getOpMatEntryName (unsigned int n)
 }
 
 std::string const
+OP2VariableNames::getOpMatOffsetName (unsigned int n)
+{
+  using boost::lexical_cast;
+  using std::string;
+
+  return "matOffset" + lexical_cast <string> (n);
+}
+  
+std::string const
 OP2VariableNames::getOpMatMapName (unsigned int n)
 {
   using std::string;

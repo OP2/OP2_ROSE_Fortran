@@ -67,6 +67,9 @@ class CPPCUDAKernelSubroutineIndirectLoop: public CPPCUDAKernelSubroutine
     void
     createInitialiseIncrementedVectorDatStatements ();
 
+    void
+    createInitialiseMatOffsetStatements ();
+
     virtual void
     createExecutionLoopStatements ();
 

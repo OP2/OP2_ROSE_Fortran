@@ -72,7 +72,9 @@ CPPCUDAKernelSubroutineIndirectLoop::createUserSubroutineCallStatement ()
     {
       unsigned int mat_num = parallelLoop->getOpMatArgNum (i);
       SgExpression * exp;
-      exp = variableDeclarations->getReference (getIterationCounterVariableName (1));
+      SgVarRefExp * itvar = variableDeclarations->getReference (getIterationCounterVariableName (1));
+      SgVarRefExp * offset = variableDeclarations->getReference (getOpMatOffsetName (mat_num));
+      exp = buildAddOp (itvar, offset);
 
       exp = buildAddOp (variableDeclarations->getReference (getOpMatName (mat_num)),
                         exp);
@@ -1313,6 +1315,7 @@ CPPCUDAKernelSubroutineIndirectLoop::createInitialiseIncrementedVectorDatStateme
   {
     if (parallelLoop->isOpMatArg (i)) continue;
     unsigned int dat_num = parallelLoop->getOpDatArgNum (i);
+
     if (parallelLoop->isIndirect (i) && parallelLoop->getOpIndexValue (i) < 0
         && parallelLoop->isIncremented (i))
     {
@@ -1331,6 +1334,67 @@ CPPCUDAKernelSubroutineIndirectLoop::createInitialiseIncrementedVectorDatStateme
       }
     }
   }
+}
+
+void
+CPPCUDAKernelSubroutineIndirectLoop::createInitialiseMatOffsetStatements ()
+{
+  using namespace SageBuilder;
+  using namespace SageInterface;
+  using namespace LoopVariableNames;
+  using namespace OP2VariableNames;
+  using namespace PlanFunctionVariableNames;
+  using std::string;
+  using boost::lexical_cast;
+
+  SgBasicBlock * loopBody = buildBasicBlock ();
+
+  SgVarRefExp * itvar = variableDeclarations->getReference (
+    getIterationCounterVariableName (1));
+
+  // No need to generate loop if there are no op_mat arguments
+  if (parallelLoop->getNumberOfArgumentGroups ()
+      == parallelLoop->getNumberOfOpDatArgumentGroups ())
+  {
+    return;
+  }
+
+  for (unsigned int i = 1; i <= parallelLoop->getNumberOfArgumentGroups (); i++)
+  {
+    if (!parallelLoop->isOpMatArg (i)) continue;
+
+    unsigned int mat_num = parallelLoop->getOpMatArgNum (i);
+
+    Debug::getInstance ()->debugMessage (
+      "Initialising matrix offsets for matrix " + lexical_cast <string> (mat_num),
+      Debug::OUTER_LOOP_LEVEL, __FILE__, __LINE__);
+
+    OpArgMatDefinition * arg_mat = parallelLoop->getOpMatArg (mat_num);
+
+    int rmapdim = declarations->getOpMapDefinition (arg_mat->getMap1Name ())->getDimension ();
+    int cmapdim = declarations->getOpMapDefinition (arg_mat->getMap2Name ())->getDimension ();
+
+    SgExpression * exp = buildIntVal (rmapdim * cmapdim);
+    SgVarRefExp * elems = variableDeclarations->getReference (pnelems);
+    SgVarRefExp * matoffset = variableDeclarations->getReference (getOpMatOffsetName (mat_num));
+    exp = buildMultiplyOp (exp, buildPntrArrRefExp (elems, itvar));
+
+    SgStatement * increment = buildExprStatement (buildPlusAssignOp (matoffset, exp));
+    appendStatement (increment, loopBody);
+    // zero it outside the loop
+    SgStatement * assign = buildAssignStatement (matoffset, buildIntVal (0));
+
+    appendStatement (assign, subroutineScope);
+  }
+
+  SgPlusPlusOp * stride = buildPlusPlusOp (itvar);
+  SgExprStatement * init = buildAssignStatement (itvar, buildIntVal (0));
+  SgLessThanOp * test = buildLessThanOp (itvar,
+    CUDA::getBlockId (BLOCK_X, subroutineScope));
+  SgForStatement * loop = buildForStatement (
+    init, buildExprStatement (test), stride, loopBody);
+
+  appendStatement (loop, subroutineScope);
 }
 
 void
@@ -1359,6 +1423,8 @@ CPPCUDAKernelSubroutineIndirectLoop::createStatements ()
       subroutineScope);
 
   createInitialiseIncrementedVectorDatStatements ();
+
+  createInitialiseMatOffsetStatements ();
 
   createExecutionLoopStatements ();
 
@@ -1573,7 +1639,17 @@ CPPCUDAKernelSubroutineIndirectLoop::createLocalVariableDeclarations ()
   {
     if (parallelLoop->isOpMatArg (i))
     {
-      continue;
+      unsigned int mat_num = parallelLoop->getOpMatArgNum (i);
+
+      string name = getOpMatOffsetName (mat_num);
+
+      Debug::getInstance ()->debugMessage ("Creating matrix offset declaration for matrix "
+        + lexical_cast <string> (mat_num), Debug::INNER_LOOP_LEVEL, __FILE__, __LINE__);
+
+      SgVariableDeclaration * var =
+        RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
+          name, buildIntType (), subroutineScope);
+      variableDeclarations->add (name, var);
     }
     else
     {
