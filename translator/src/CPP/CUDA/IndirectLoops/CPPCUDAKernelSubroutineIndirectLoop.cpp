@@ -616,29 +616,6 @@ CPPCUDAKernelSubroutineIndirectLoop::createExecutionLoopStatements ()
 
   SgLessThanOp * upperBoundExpression;
 
-  /*
-   * Need to zero mat entry calls if accessing via OP_INC
-   */
-  for (unsigned int i = 1; i <= parallelLoop->getNumberOfArgumentGroups (); ++i)
-  {
-    if (parallelLoop->isOpMatArg (i))
-    {
-      unsigned int mat_num = parallelLoop->getOpMatArgNum (i);
-      OpArgMatDefinition * arg_mat = parallelLoop->getOpMatArg (mat_num);
-      OpMatDefinition * mat = declarations->getOpMatDefinition (arg_mat->getMatName ());
-      SgExprStatement * exp = buildAssignStatement (
-        buildPntrArrRefExp (variableDeclarations->getReference (getOpMatName (mat_num)),
-                            variableDeclarations->getReference (getIterationCounterVariableName (1))),
-        buildCastExp(buildIntVal(0), mat->getBaseType ()));
-      /* Only need to zero if incrementing (for OP_WRITE we can just
-       * leave it) */
-      if (iequals (arg_mat->getAccessType (), OP2::OP_INC))
-      {
-        appendStatement (exp, loopBody);
-      }
-    }
-  }
-
   if (parallelLoop->hasIncrementedOpDats ())
   {
     SgExprStatement * assignmentStatement1 = buildAssignStatement (
