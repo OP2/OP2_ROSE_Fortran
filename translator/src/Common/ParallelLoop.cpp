@@ -400,15 +400,25 @@ ParallelLoop::isStageInNeeded (unsigned int OP_DAT_ArgumentGroup)
    * ======================================================
    * We need a scratchpad variable when:
    * a) The data is to be reduced
+   * For direct loops:
+   * b) The data dimension exceeds one
+   * For indirect loops
    * b) The data is indirect AND incremented
-   * c) The data is direct AND its dimension exceeds one
    * ======================================================
    */
 
-  return isReductionRequired (OP_DAT_ArgumentGroup) || (isIndirect (
-      OP_DAT_ArgumentGroup) && isIncremented (OP_DAT_ArgumentGroup))
-      || (isDirect (OP_DAT_ArgumentGroup) && getOpDatDimension (
-          OP_DAT_ArgumentGroup) > 1);
+  bool localVariableRequired = false;
+  
+  localVariableRequired = localVariableRequired ||
+    isReductionRequired (OP_DAT_ArgumentGroup);
+  
+  if ( isDirectLoop () ) localVariableRequired = localVariableRequired ||
+    (getOpDatDimension (OP_DAT_ArgumentGroup) > 1);
+  
+  else localVariableRequired = localVariableRequired ||
+    (isIndirect (OP_DAT_ArgumentGroup) && isIncremented (OP_DAT_ArgumentGroup));
+  
+  return localVariableRequired;
 }
 
 void

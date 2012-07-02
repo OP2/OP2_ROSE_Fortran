@@ -673,7 +673,7 @@ CPPOpenMPKernelSubroutineIndirectLoop::createInitialiseSharedVariableStatements 
     {
       if (parallelLoop->isIndirect (i))
       {
-        previousOpDat = i;
+        previousOpDat = i-1;
 
         if (firstIndirectOp)
         {
