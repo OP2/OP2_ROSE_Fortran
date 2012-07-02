@@ -69,6 +69,7 @@ RoseHelper::forceOutputOfCodeToFile (SgNode * root)
         if (locatedNode != NULL)
         {
           locatedNode->setOutputInCodeGeneration ();
+          locatedNode->setCompilerGenerated ();
         }
       }
   };

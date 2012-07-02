@@ -309,7 +309,13 @@ CommandLine::parse (int argc, char ** argv)
 
         ROSEArguments.push_back (argv[i]);
 
-        Globals::getInstance ()->addInputFile (p.filename ());
+#if BOOST_FILESYSTEM_VERSION == 3
+	string filename = p.filename ().string ();
+#else
+	string filename = p.filename ();
+#endif
+
+        Globals::getInstance ()->addInputFile (filename);
       }
       else
       {
