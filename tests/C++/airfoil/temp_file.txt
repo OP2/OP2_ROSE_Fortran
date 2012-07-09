@@ -1,0 +1,2057 @@
+Pre-processing OP2 header includes in file 'airfoil.cpp'
+Pre-processing OP2 header includes in file 'kernels.cpp'
+/tmp/RR908TMP/translator/bin/translator -d 5 --opencl -I/tmp/RR908TMP/support/C++ airfoil.cpp kernels.cpp
+Running: '/tmp/RR908TMP/translator/bin/translator -d 5 --opencl -I/tmp/RR908TMP/support/C++ airfoil.cpp kernels.cpp'
+=========================== STANDARD OUTPUT ==================================
+[CommandLine.cpp:306] -I/tmp/RR908TMP/support/C++ is a ROSE option.
+[Globals.cpp:168] Adding file 'C++'.
+[CommandLine.cpp:306] airfoil.cpp is a ROSE option.
+[Globals.cpp:168] Adding file 'airfoil.cpp'.
+[CommandLine.cpp:306] kernels.cpp is a ROSE option.
+[Globals.cpp:168] Adding file 'kernels.cpp'.
+[Translator.cpp:478] Translation starting.
+[Translator.cpp:372] C++ project detected.
+[Translator.cpp:224] OpenCL code generation selected.
+[CPPProgramDeclarationsAndDefinitions.cpp:538] Source file 'airfoil.cpp' detected.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_copysign.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_copysignf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_copysignl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_acosf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_acosl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_asinf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_asinl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_atanf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_atanl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_atan2f.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_atan2l.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_ceilf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_ceill.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_coshf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_coshl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_floorf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_floorl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_fmodf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_fmodl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_frexpf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_frexpl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_ldexpf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_ldexpl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_log10f.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_log10l.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_modff.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_modfl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_powf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_powl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_sinhf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_sinhl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_tanf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_tanl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_tanhf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_tanhl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_powil.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_powi.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_powif.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_strchr.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_strrchr.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_strpbrk.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_strstr.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_nansf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_nans.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_nansl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_fabs.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_fabsf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_fabsl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_cosf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_cosl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_sinf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_sinl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_sqrtf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_sqrtl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_fpclassify.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_return_address.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_frame_address.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_expect.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_prefetch.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_huge_val.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_huge_valf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_huge_vall.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_inf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_inff.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_infl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_nan.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_nanf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_nanl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_nans.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_nansf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_nansl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_clz.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_ctz.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_popcount.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_parity.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_ffsl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_clzl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_ctzl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_popcountl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_parityl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_ffsll.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_clzll.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_ctzll.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_popcountll.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_parityll.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_powi.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_powif.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_powil.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __sync_lock_test_and_set.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __sync_lock_release.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_memmove.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_memchr.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __ctype_get_mb_cur_max.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: atof.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: atoi.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: atol.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: atoll.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: strtod.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: strtof.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: strtold.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: strtol.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: strtoul.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: strtoq.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: strtouq.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: strtoll.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: strtoull.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: strtol_l.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: strtoul_l.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: strtoll_l.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: strtoull_l.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: strtod_l.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: strtof_l.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: strtold_l.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: l64a.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: a64l.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: select.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: pselect.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: gnu_dev_major.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: gnu_dev_minor.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: gnu_dev_makedev.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: random.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: srandom.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: initstate.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: setstate.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: random_r.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: srandom_r.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: initstate_r.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: setstate_r.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: rand.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: srand.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: rand_r.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: drand48.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: erand48.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: lrand48.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: nrand48.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: mrand48.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: jrand48.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: srand48.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: seed48.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: lcong48.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: drand48_r.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: erand48_r.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: lrand48_r.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: nrand48_r.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: mrand48_r.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: jrand48_r.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: srand48_r.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: seed48_r.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: lcong48_r.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: malloc.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: calloc.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: realloc.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: free.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: cfree.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: alloca.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: valloc.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: posix_memalign.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: abort.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: atexit.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: at_quick_exit.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: on_exit.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: exit.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: quick_exit.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: _Exit.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: getenv.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __secure_getenv.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: putenv.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: setenv.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: unsetenv.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: clearenv.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: mktemp.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: mkstemp.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: mkstemp64.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: mkstemps.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: mkstemps64.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: mkdtemp.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: mkostemp.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: mkostemp64.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: mkostemps.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: mkostemps64.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: system.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: canonicalize_file_name.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: realpath.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: bsearch.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: qsort.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: qsort_r.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: abs.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: labs.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: llabs.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: div.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: ldiv.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: lldiv.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: ecvt.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: fcvt.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: gcvt.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: qecvt.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: qfcvt.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: qgcvt.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: ecvt_r.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: fcvt_r.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: qecvt_r.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: qfcvt_r.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: mblen.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: mbtowc.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: wctomb.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: mbstowcs.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: wcstombs.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: rpmatch.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: getsubopt.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: setkey.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: posix_openpt.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: grantpt.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: unlockpt.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: ptsname.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: ptsname_r.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: getpt.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: getloadavg.
+[CPPProgramDeclarationsAndDefinitions.cpp:595] Found type definition: __codecvt_result.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: _IO_cookie_init.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __underflow.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __uflow.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __overflow.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: _IO_getc.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: _IO_putc.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: _IO_feof.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: _IO_ferror.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: _IO_peekc_locked.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: _IO_flockfile.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: _IO_funlockfile.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: _IO_ftrylockfile.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: _IO_vfscanf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: _IO_vfprintf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: _IO_padn.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: _IO_sgetn.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: _IO_seekoff.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: _IO_seekpos.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: _IO_free_backup_area.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: remove.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: rename.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: renameat.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: tmpfile.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: tmpfile64.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: tmpnam.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: tmpnam_r.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: tempnam.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: fclose.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: fflush.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: fflush_unlocked.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: fcloseall.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: fopen.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: freopen.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: fopen64.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: freopen64.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: fdopen.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: fopencookie.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: fmemopen.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: open_memstream.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: setbuf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: setvbuf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: setbuffer.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: setlinebuf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: fprintf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: printf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: sprintf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: vfprintf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: vprintf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: vsprintf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: snprintf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: vsnprintf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: vasprintf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __asprintf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: asprintf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: vdprintf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: dprintf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: fscanf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: scanf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: sscanf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: vfscanf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: vscanf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: vsscanf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: fgetc.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: getc.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: getchar.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: getc_unlocked.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: getchar_unlocked.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: fgetc_unlocked.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: fputc.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: putc.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: putchar.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: fputc_unlocked.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: putc_unlocked.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: putchar_unlocked.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: getw.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: putw.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: fgets.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: gets.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: fgets_unlocked.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __getdelim.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: getdelim.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: getline.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: fputs.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: puts.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: ungetc.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: fread.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: fwrite.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: fputs_unlocked.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: fread_unlocked.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: fwrite_unlocked.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: fseek.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: ftell.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: rewind.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: fseeko.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: ftello.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: fgetpos.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: fsetpos.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: fseeko64.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: ftello64.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: fgetpos64.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: fsetpos64.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: clearerr.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: feof.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: ferror.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: clearerr_unlocked.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: feof_unlocked.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: ferror_unlocked.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: perror.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: fileno.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: fileno_unlocked.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: popen.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: pclose.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: ctermid.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: cuserid.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: obstack_printf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: obstack_vprintf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: flockfile.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: ftrylockfile.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: funlockfile.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: memcpy.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: memmove.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: memccpy.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: memset.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: memcmp.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: memchr.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: memchr.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: rawmemchr.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: rawmemchr.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: memrchr.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: memrchr.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: strcpy.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: strncpy.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: strcat.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: strncat.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: strcmp.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: strncmp.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: strcoll.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: strxfrm.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: strcoll_l.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: strxfrm_l.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: strdup.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: strndup.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: strchr.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: strchr.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: strrchr.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: strrchr.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: strchrnul.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: strchrnul.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: strcspn.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: strspn.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: strpbrk.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: strpbrk.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: strstr.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: strstr.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: strtok.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __strtok_r.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: strtok_r.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: strcasestr.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: strcasestr.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: memmem.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __mempcpy.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: mempcpy.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: strlen.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: strnlen.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: strerror.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: strerror_r.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: strerror_l.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __bzero.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: bcopy.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: bzero.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: bcmp.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: index.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: index.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: rindex.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: rindex.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: ffs.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: ffsl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: ffsll.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: strcasecmp.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: strncasecmp.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: strcasecmp_l.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: strncasecmp_l.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: strsep.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: strsignal.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __stpcpy.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: stpcpy.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __stpncpy.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: stpncpy.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: strverscmp.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: strfry.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: memfrob.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: basename.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: basename.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: acos.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __acos.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: asin.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __asin.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: atan.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __atan.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: atan2.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __atan2.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: cos.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __cos.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: sin.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __sin.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: tan.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __tan.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: cosh.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __cosh.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: sinh.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __sinh.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: tanh.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __tanh.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: sincos.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __sincos.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: acosh.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __acosh.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: asinh.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __asinh.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: atanh.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __atanh.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: exp.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __exp.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: frexp.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __frexp.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: ldexp.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __ldexp.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: log.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __log.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: log10.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __log10.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: modf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __modf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: exp10.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __exp10.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: pow10.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __pow10.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: expm1.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __expm1.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: log1p.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __log1p.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: logb.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __logb.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: exp2.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __exp2.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: log2.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __log2.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: pow.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __pow.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: sqrt.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __sqrt.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: hypot.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __hypot.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: cbrt.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __cbrt.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: ceil.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __ceil.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: fabs.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __fabs.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: floor.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __floor.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: fmod.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __fmod.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __isinf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __finite.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: isinf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: finite.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: drem.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __drem.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: significand.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __significand.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: copysign.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __copysign.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: nan.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __nan.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __isnan.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: isnan.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: j0.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __j0.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: j1.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __j1.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: jn.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __jn.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: y0.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __y0.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: y1.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __y1.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: yn.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __yn.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: erf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __erf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: erfc.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __erfc.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: lgamma.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __lgamma.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: tgamma.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __tgamma.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: gamma.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __gamma.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: lgamma_r.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __lgamma_r.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: rint.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __rint.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: nextafter.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __nextafter.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: nexttoward.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __nexttoward.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: remainder.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __remainder.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: scalbn.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __scalbn.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: ilogb.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __ilogb.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: scalbln.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __scalbln.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: nearbyint.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __nearbyint.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: round.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __round.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: trunc.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __trunc.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: remquo.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __remquo.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: lrint.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __lrint.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: llrint.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __llrint.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: lround.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __lround.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: llround.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __llround.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: fdim.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __fdim.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: fmax.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __fmax.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: fmin.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __fmin.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __fpclassify.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __signbit.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: fma.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __fma.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: scalb.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __scalb.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: acosf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __acosf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: asinf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __asinf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: atanf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __atanf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: atan2f.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __atan2f.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: cosf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __cosf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: sinf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __sinf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: tanf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __tanf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: coshf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __coshf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: sinhf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __sinhf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: tanhf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __tanhf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: sincosf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __sincosf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: acoshf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __acoshf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: asinhf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __asinhf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: atanhf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __atanhf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: expf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __expf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: frexpf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __frexpf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: ldexpf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __ldexpf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: logf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __logf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: log10f.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __log10f.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: modff.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __modff.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: exp10f.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __exp10f.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: pow10f.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __pow10f.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: expm1f.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __expm1f.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: log1pf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __log1pf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: logbf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __logbf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: exp2f.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __exp2f.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: log2f.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __log2f.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: powf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __powf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: sqrtf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __sqrtf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: hypotf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __hypotf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: cbrtf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __cbrtf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: ceilf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __ceilf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: fabsf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __fabsf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: floorf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __floorf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: fmodf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __fmodf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __isinff.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __finitef.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: isinff.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: finitef.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: dremf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __dremf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: significandf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __significandf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: copysignf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __copysignf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: nanf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __nanf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __isnanf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: isnanf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: j0f.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __j0f.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: j1f.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __j1f.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: jnf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __jnf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: y0f.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __y0f.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: y1f.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __y1f.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: ynf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __ynf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: erff.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __erff.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: erfcf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __erfcf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: lgammaf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __lgammaf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: tgammaf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __tgammaf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: gammaf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __gammaf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: lgammaf_r.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __lgammaf_r.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: rintf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __rintf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: nextafterf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __nextafterf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: nexttowardf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __nexttowardf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: remainderf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __remainderf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: scalbnf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __scalbnf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: ilogbf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __ilogbf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: scalblnf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __scalblnf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: nearbyintf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __nearbyintf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: roundf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __roundf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: truncf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __truncf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: remquof.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __remquof.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: lrintf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __lrintf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: llrintf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __llrintf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: lroundf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __lroundf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: llroundf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __llroundf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: fdimf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __fdimf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: fmaxf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __fmaxf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: fminf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __fminf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __fpclassifyf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __signbitf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: fmaf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __fmaf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: scalbf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __scalbf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: acosl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __acosl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: asinl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __asinl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: atanl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __atanl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: atan2l.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __atan2l.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: cosl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __cosl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: sinl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __sinl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: tanl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __tanl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: coshl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __coshl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: sinhl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __sinhl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: tanhl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __tanhl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: sincosl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __sincosl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: acoshl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __acoshl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: asinhl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __asinhl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: atanhl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __atanhl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: expl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __expl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: frexpl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __frexpl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: ldexpl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __ldexpl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: logl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __logl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: log10l.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __log10l.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: modfl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __modfl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: exp10l.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __exp10l.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: pow10l.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __pow10l.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: expm1l.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __expm1l.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: log1pl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __log1pl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: logbl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __logbl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: exp2l.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __exp2l.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: log2l.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __log2l.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: powl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __powl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: sqrtl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __sqrtl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: hypotl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __hypotl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: cbrtl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __cbrtl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: ceill.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __ceill.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: fabsl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __fabsl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: floorl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __floorl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: fmodl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __fmodl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __isinfl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __finitel.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: isinfl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: finitel.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: dreml.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __dreml.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: significandl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __significandl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: copysignl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __copysignl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: nanl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __nanl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __isnanl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: isnanl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: j0l.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __j0l.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: j1l.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __j1l.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: jnl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __jnl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: y0l.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __y0l.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: y1l.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __y1l.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: ynl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __ynl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: erfl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __erfl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: erfcl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __erfcl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: lgammal.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __lgammal.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: tgammal.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __tgammal.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: gammal.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __gammal.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: lgammal_r.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __lgammal_r.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: rintl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __rintl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: nextafterl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __nextafterl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: nexttowardl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __nexttowardl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: remainderl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __remainderl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: scalbnl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __scalbnl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: ilogbl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __ilogbl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: scalblnl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __scalblnl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: nearbyintl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __nearbyintl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: roundl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __roundl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: truncl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __truncl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: remquol.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __remquol.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: lrintl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __lrintl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: llrintl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __llrintl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: lroundl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __lroundl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: llroundl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __llroundl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: fdiml.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __fdiml.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: fmaxl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __fmaxl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: fminl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __fminl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __fpclassifyl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __signbitl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: fmal.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __fmal.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: scalbl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __scalbl.
+[CPPProgramDeclarationsAndDefinitions.cpp:595] Found type definition: __unnamed_enum___F24_L202_C1_FP_NAN__COMMA__FP_INFINITE__COMMA__FP_ZERO__COMMA__FP_SUBNORMAL__COMMA__FP_NORMAL.
+[CPPProgramDeclarationsAndDefinitions.cpp:595] Found type definition: _LIB_VERSION_TYPE.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: matherr.
+[CPPProgramDeclarationsAndDefinitions.cpp:765] Registering type reference for 'op_set'.
+[CPPProgramDeclarationsAndDefinitions.cpp:757] Registering type reference for 'op_map'.
+[CPPProgramDeclarationsAndDefinitions.cpp:749] Registering type reference for 'op_dat'.
+[CPPProgramDeclarationsAndDefinitions.cpp:773] Registering type reference for 'op_access'.
+[CPPProgramDeclarationsAndDefinitions.cpp:595] Found type definition: op_access.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: op_init.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: op_exit.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: op_decl_set.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: op_decl_map.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: op_fetch_data.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: op_arg_dat.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: op_diagnostic_output.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: op_timing_output.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: save_soln.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: res_calc.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: bres_calc.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: adt_calc.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: update.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: fusedOne.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: fusedTwo.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: main.
+[CPPProgramDeclarationsAndDefinitions.cpp:404] Handling OP2 definition.
+[CPPProgramDeclarationsAndDefinitions.cpp:414] OP_SET declaration call found.
+[CPPOP2Definitions.cpp:242] Found an OP_SET declaration: 'nodes'. Its dimension is contained in 'nnode'.
+[CPPProgramDeclarationsAndDefinitions.cpp:404] Handling OP2 definition.
+[CPPProgramDeclarationsAndDefinitions.cpp:414] OP_SET declaration call found.
+[CPPOP2Definitions.cpp:242] Found an OP_SET declaration: 'edges'. Its dimension is contained in 'nedge'.
+[CPPProgramDeclarationsAndDefinitions.cpp:404] Handling OP2 definition.
+[CPPProgramDeclarationsAndDefinitions.cpp:414] OP_SET declaration call found.
+[CPPOP2Definitions.cpp:242] Found an OP_SET declaration: 'bedges'. Its dimension is contained in 'nbedge'.
+[CPPProgramDeclarationsAndDefinitions.cpp:404] Handling OP2 definition.
+[CPPProgramDeclarationsAndDefinitions.cpp:414] OP_SET declaration call found.
+[CPPOP2Definitions.cpp:242] Found an OP_SET declaration: 'cells'. Its dimension is contained in 'ncell'.
+[CPPProgramDeclarationsAndDefinitions.cpp:404] Handling OP2 definition.
+[CPPProgramDeclarationsAndDefinitions.cpp:452] OP_MAP declaration call found.
+[CPPOP2Definitions.cpp:276] Found an OP_MAP declaration: 'pedge'. Mapping from 'edges' to 'nodes' through 'edge' with 2 mappings per element.
+[CPPProgramDeclarationsAndDefinitions.cpp:404] Handling OP2 definition.
+[CPPProgramDeclarationsAndDefinitions.cpp:452] OP_MAP declaration call found.
+[CPPOP2Definitions.cpp:276] Found an OP_MAP declaration: 'pecell'. Mapping from 'edges' to 'cells' through 'ecell' with 2 mappings per element.
+[CPPProgramDeclarationsAndDefinitions.cpp:404] Handling OP2 definition.
+[CPPProgramDeclarationsAndDefinitions.cpp:452] OP_MAP declaration call found.
+[CPPOP2Definitions.cpp:276] Found an OP_MAP declaration: 'pbedge'. Mapping from 'bedges' to 'nodes' through 'bedge' with 2 mappings per element.
+[CPPProgramDeclarationsAndDefinitions.cpp:404] Handling OP2 definition.
+[CPPProgramDeclarationsAndDefinitions.cpp:452] OP_MAP declaration call found.
+[CPPOP2Definitions.cpp:276] Found an OP_MAP declaration: 'pbecell'. Mapping from 'bedges' to 'cells' through 'becell' with 1 mappings per element.
+[CPPProgramDeclarationsAndDefinitions.cpp:404] Handling OP2 definition.
+[CPPProgramDeclarationsAndDefinitions.cpp:452] OP_MAP declaration call found.
+[CPPOP2Definitions.cpp:276] Found an OP_MAP declaration: 'pcell'. Mapping from 'cells' to 'nodes' through 'cell' with 4 mappings per element.
+[CPPProgramDeclarationsAndDefinitions.cpp:404] Handling OP2 definition.
+[CPPProgramDeclarationsAndDefinitions.cpp:486] OP_DAT declaration call found.
+[CPPOP2Definitions.cpp:226] Found an OP_DAT declaration: 'p_bound'. The data pertains to the set 'bedges'. Its actual type is SgPointerType and its dimension is 1.
+[CPPProgramDeclarationsAndDefinitions.cpp:404] Handling OP2 definition.
+[CPPProgramDeclarationsAndDefinitions.cpp:486] OP_DAT declaration call found.
+[CPPOP2Definitions.cpp:226] Found an OP_DAT declaration: 'p_x'. The data pertains to the set 'nodes'. Its actual type is SgPointerType and its dimension is 2.
+[CPPProgramDeclarationsAndDefinitions.cpp:404] Handling OP2 definition.
+[CPPProgramDeclarationsAndDefinitions.cpp:486] OP_DAT declaration call found.
+[CPPOP2Definitions.cpp:226] Found an OP_DAT declaration: 'p_q'. The data pertains to the set 'cells'. Its actual type is SgPointerType and its dimension is 4.
+[CPPProgramDeclarationsAndDefinitions.cpp:404] Handling OP2 definition.
+[CPPProgramDeclarationsAndDefinitions.cpp:486] OP_DAT declaration call found.
+[CPPOP2Definitions.cpp:226] Found an OP_DAT declaration: 'p_qold'. The data pertains to the set 'cells'. Its actual type is SgPointerType and its dimension is 4.
+[CPPProgramDeclarationsAndDefinitions.cpp:404] Handling OP2 definition.
+[CPPProgramDeclarationsAndDefinitions.cpp:486] OP_DAT declaration call found.
+[CPPOP2Definitions.cpp:226] Found an OP_DAT declaration: 'p_adt'. The data pertains to the set 'cells'. Its actual type is SgPointerType and its dimension is 1.
+[CPPProgramDeclarationsAndDefinitions.cpp:404] Handling OP2 definition.
+[CPPProgramDeclarationsAndDefinitions.cpp:486] OP_DAT declaration call found.
+[CPPOP2Definitions.cpp:226] Found an OP_DAT declaration: 'p_res'. The data pertains to the set 'cells'. Its actual type is SgPointerType and its dimension is 4.
+[CPPProgramDeclarationsAndDefinitions.cpp:663] OP_CONST declaration call found.
+[CPPOP2Definitions.cpp:324] Found an OP_CONST declaration: 'gam' Its dimension is 1.
+[CPPProgramDeclarationsAndDefinitions.cpp:663] OP_CONST declaration call found.
+[CPPOP2Definitions.cpp:324] Found an OP_CONST declaration: 'gm1' Its dimension is 1.
+[CPPProgramDeclarationsAndDefinitions.cpp:663] OP_CONST declaration call found.
+[CPPOP2Definitions.cpp:324] Found an OP_CONST declaration: 'cfl' Its dimension is 1.
+[CPPProgramDeclarationsAndDefinitions.cpp:663] OP_CONST declaration call found.
+[CPPOP2Definitions.cpp:324] Found an OP_CONST declaration: 'eps' Its dimension is 1.
+[CPPProgramDeclarationsAndDefinitions.cpp:663] OP_CONST declaration call found.
+[CPPOP2Definitions.cpp:324] Found an OP_CONST declaration: 'mach' Its dimension is 1.
+[CPPProgramDeclarationsAndDefinitions.cpp:663] OP_CONST declaration call found.
+[CPPOP2Definitions.cpp:324] Found an OP_CONST declaration: 'alpha' Its dimension is 1.
+[CPPProgramDeclarationsAndDefinitions.cpp:663] OP_CONST declaration call found.
+[CPPOP2Definitions.cpp:324] Found an OP_CONST declaration: 'qinf' Its dimension is 4.
+[CPPProgramDeclarationsAndDefinitions.cpp:703] Found 'op_par_loop' with (host) user subroutine 'save_soln'.
+[ParallelLoop.cpp:44] Parallel loop created.
+[CPPProgramDeclarationsAndDefinitions.cpp:334] Analysing OP_PAR_LOOP actual arguments.
+[CPPProgramDeclarationsAndDefinitions.cpp:290] Setting properties of OP_DAT argument '1' (Oxford API).
+[CPPProgramDeclarationsAndDefinitions.cpp:61] 'p_q' has been declared through OP_DECL_DAT.
+[CPPProgramDeclarationsAndDefinitions.cpp:100] Setting access descriptor for OP_DAT 1.
+[CPPProgramDeclarationsAndDefinitions.cpp:111] ...READ access descriptor.
+[CPPProgramDeclarationsAndDefinitions.cpp:308] ...DIRECT mapping descriptor.
+[CPPProgramDeclarationsAndDefinitions.cpp:290] Setting properties of OP_DAT argument '2' (Oxford API).
+[CPPProgramDeclarationsAndDefinitions.cpp:61] 'p_qold' has been declared through OP_DECL_DAT.
+[CPPProgramDeclarationsAndDefinitions.cpp:100] Setting access descriptor for OP_DAT 2.
+[CPPProgramDeclarationsAndDefinitions.cpp:118] ...WRITE access descriptor.
+[CPPProgramDeclarationsAndDefinitions.cpp:308] ...DIRECT mapping descriptor.
+[CPPProgramDeclarationsAndDefinitions.cpp:703] Found 'op_par_loop' with (host) user subroutine 'adt_calc'.
+[ParallelLoop.cpp:44] Parallel loop created.
+[CPPProgramDeclarationsAndDefinitions.cpp:334] Analysing OP_PAR_LOOP actual arguments.
+[CPPProgramDeclarationsAndDefinitions.cpp:290] Setting properties of OP_DAT argument '1' (Oxford API).
+[CPPProgramDeclarationsAndDefinitions.cpp:61] 'p_x' has been declared through OP_DECL_DAT.
+[CPPProgramDeclarationsAndDefinitions.cpp:100] Setting access descriptor for OP_DAT 1.
+[CPPProgramDeclarationsAndDefinitions.cpp:111] ...READ access descriptor.
+[CPPProgramDeclarationsAndDefinitions.cpp:315] ...INDIRECT mapping descriptor.
+[CPPProgramDeclarationsAndDefinitions.cpp:290] Setting properties of OP_DAT argument '2' (Oxford API).
+[CPPProgramDeclarationsAndDefinitions.cpp:61] 'p_x' has been declared through OP_DECL_DAT.
+[CPPProgramDeclarationsAndDefinitions.cpp:100] Setting access descriptor for OP_DAT 2.
+[CPPProgramDeclarationsAndDefinitions.cpp:111] ...READ access descriptor.
+[CPPProgramDeclarationsAndDefinitions.cpp:315] ...INDIRECT mapping descriptor.
+[CPPProgramDeclarationsAndDefinitions.cpp:290] Setting properties of OP_DAT argument '3' (Oxford API).
+[CPPProgramDeclarationsAndDefinitions.cpp:61] 'p_x' has been declared through OP_DECL_DAT.
+[CPPProgramDeclarationsAndDefinitions.cpp:100] Setting access descriptor for OP_DAT 3.
+[CPPProgramDeclarationsAndDefinitions.cpp:111] ...READ access descriptor.
+[CPPProgramDeclarationsAndDefinitions.cpp:315] ...INDIRECT mapping descriptor.
+[CPPProgramDeclarationsAndDefinitions.cpp:290] Setting properties of OP_DAT argument '4' (Oxford API).
+[CPPProgramDeclarationsAndDefinitions.cpp:61] 'p_x' has been declared through OP_DECL_DAT.
+[CPPProgramDeclarationsAndDefinitions.cpp:100] Setting access descriptor for OP_DAT 4.
+[CPPProgramDeclarationsAndDefinitions.cpp:111] ...READ access descriptor.
+[CPPProgramDeclarationsAndDefinitions.cpp:315] ...INDIRECT mapping descriptor.
+[CPPProgramDeclarationsAndDefinitions.cpp:290] Setting properties of OP_DAT argument '5' (Oxford API).
+[CPPProgramDeclarationsAndDefinitions.cpp:61] 'p_q' has been declared through OP_DECL_DAT.
+[CPPProgramDeclarationsAndDefinitions.cpp:100] Setting access descriptor for OP_DAT 5.
+[CPPProgramDeclarationsAndDefinitions.cpp:111] ...READ access descriptor.
+[CPPProgramDeclarationsAndDefinitions.cpp:308] ...DIRECT mapping descriptor.
+[CPPProgramDeclarationsAndDefinitions.cpp:290] Setting properties of OP_DAT argument '6' (Oxford API).
+[CPPProgramDeclarationsAndDefinitions.cpp:61] 'p_adt' has been declared through OP_DECL_DAT.
+[CPPProgramDeclarationsAndDefinitions.cpp:100] Setting access descriptor for OP_DAT 6.
+[CPPProgramDeclarationsAndDefinitions.cpp:118] ...WRITE access descriptor.
+[CPPProgramDeclarationsAndDefinitions.cpp:308] ...DIRECT mapping descriptor.
+[CPPProgramDeclarationsAndDefinitions.cpp:703] Found 'op_par_loop' with (host) user subroutine 'res_calc'.
+[ParallelLoop.cpp:44] Parallel loop created.
+[CPPProgramDeclarationsAndDefinitions.cpp:334] Analysing OP_PAR_LOOP actual arguments.
+[CPPProgramDeclarationsAndDefinitions.cpp:290] Setting properties of OP_DAT argument '1' (Oxford API).
+[CPPProgramDeclarationsAndDefinitions.cpp:61] 'p_x' has been declared through OP_DECL_DAT.
+[CPPProgramDeclarationsAndDefinitions.cpp:100] Setting access descriptor for OP_DAT 1.
+[CPPProgramDeclarationsAndDefinitions.cpp:111] ...READ access descriptor.
+[CPPProgramDeclarationsAndDefinitions.cpp:315] ...INDIRECT mapping descriptor.
+[CPPProgramDeclarationsAndDefinitions.cpp:290] Setting properties of OP_DAT argument '2' (Oxford API).
+[CPPProgramDeclarationsAndDefinitions.cpp:61] 'p_x' has been declared through OP_DECL_DAT.
+[CPPProgramDeclarationsAndDefinitions.cpp:100] Setting access descriptor for OP_DAT 2.
+[CPPProgramDeclarationsAndDefinitions.cpp:111] ...READ access descriptor.
+[CPPProgramDeclarationsAndDefinitions.cpp:315] ...INDIRECT mapping descriptor.
+[CPPProgramDeclarationsAndDefinitions.cpp:290] Setting properties of OP_DAT argument '3' (Oxford API).
+[CPPProgramDeclarationsAndDefinitions.cpp:61] 'p_q' has been declared through OP_DECL_DAT.
+[CPPProgramDeclarationsAndDefinitions.cpp:100] Setting access descriptor for OP_DAT 3.
+[CPPProgramDeclarationsAndDefinitions.cpp:111] ...READ access descriptor.
+[CPPProgramDeclarationsAndDefinitions.cpp:315] ...INDIRECT mapping descriptor.
+[CPPProgramDeclarationsAndDefinitions.cpp:290] Setting properties of OP_DAT argument '4' (Oxford API).
+[CPPProgramDeclarationsAndDefinitions.cpp:61] 'p_q' has been declared through OP_DECL_DAT.
+[CPPProgramDeclarationsAndDefinitions.cpp:100] Setting access descriptor for OP_DAT 4.
+[CPPProgramDeclarationsAndDefinitions.cpp:111] ...READ access descriptor.
+[CPPProgramDeclarationsAndDefinitions.cpp:315] ...INDIRECT mapping descriptor.
+[CPPProgramDeclarationsAndDefinitions.cpp:290] Setting properties of OP_DAT argument '5' (Oxford API).
+[CPPProgramDeclarationsAndDefinitions.cpp:61] 'p_adt' has been declared through OP_DECL_DAT.
+[CPPProgramDeclarationsAndDefinitions.cpp:100] Setting access descriptor for OP_DAT 5.
+[CPPProgramDeclarationsAndDefinitions.cpp:111] ...READ access descriptor.
+[CPPProgramDeclarationsAndDefinitions.cpp:315] ...INDIRECT mapping descriptor.
+[CPPProgramDeclarationsAndDefinitions.cpp:290] Setting properties of OP_DAT argument '6' (Oxford API).
+[CPPProgramDeclarationsAndDefinitions.cpp:61] 'p_adt' has been declared through OP_DECL_DAT.
+[CPPProgramDeclarationsAndDefinitions.cpp:100] Setting access descriptor for OP_DAT 6.
+[CPPProgramDeclarationsAndDefinitions.cpp:111] ...READ access descriptor.
+[CPPProgramDeclarationsAndDefinitions.cpp:315] ...INDIRECT mapping descriptor.
+[CPPProgramDeclarationsAndDefinitions.cpp:290] Setting properties of OP_DAT argument '7' (Oxford API).
+[CPPProgramDeclarationsAndDefinitions.cpp:61] 'p_res' has been declared through OP_DECL_DAT.
+[CPPProgramDeclarationsAndDefinitions.cpp:100] Setting access descriptor for OP_DAT 7.
+[CPPProgramDeclarationsAndDefinitions.cpp:125] ...INCREMENT access descriptor.
+[CPPProgramDeclarationsAndDefinitions.cpp:315] ...INDIRECT mapping descriptor.
+[CPPProgramDeclarationsAndDefinitions.cpp:290] Setting properties of OP_DAT argument '8' (Oxford API).
+[CPPProgramDeclarationsAndDefinitions.cpp:61] 'p_res' has been declared through OP_DECL_DAT.
+[CPPProgramDeclarationsAndDefinitions.cpp:100] Setting access descriptor for OP_DAT 8.
+[CPPProgramDeclarationsAndDefinitions.cpp:125] ...INCREMENT access descriptor.
+[CPPProgramDeclarationsAndDefinitions.cpp:315] ...INDIRECT mapping descriptor.
+[CPPProgramDeclarationsAndDefinitions.cpp:703] Found 'op_par_loop' with (host) user subroutine 'bres_calc'.
+[ParallelLoop.cpp:44] Parallel loop created.
+[CPPProgramDeclarationsAndDefinitions.cpp:334] Analysing OP_PAR_LOOP actual arguments.
+[CPPProgramDeclarationsAndDefinitions.cpp:290] Setting properties of OP_DAT argument '1' (Oxford API).
+[CPPProgramDeclarationsAndDefinitions.cpp:61] 'p_x' has been declared through OP_DECL_DAT.
+[CPPProgramDeclarationsAndDefinitions.cpp:100] Setting access descriptor for OP_DAT 1.
+[CPPProgramDeclarationsAndDefinitions.cpp:111] ...READ access descriptor.
+[CPPProgramDeclarationsAndDefinitions.cpp:315] ...INDIRECT mapping descriptor.
+[CPPProgramDeclarationsAndDefinitions.cpp:290] Setting properties of OP_DAT argument '2' (Oxford API).
+[CPPProgramDeclarationsAndDefinitions.cpp:61] 'p_x' has been declared through OP_DECL_DAT.
+[CPPProgramDeclarationsAndDefinitions.cpp:100] Setting access descriptor for OP_DAT 2.
+[CPPProgramDeclarationsAndDefinitions.cpp:111] ...READ access descriptor.
+[CPPProgramDeclarationsAndDefinitions.cpp:315] ...INDIRECT mapping descriptor.
+[CPPProgramDeclarationsAndDefinitions.cpp:290] Setting properties of OP_DAT argument '3' (Oxford API).
+[CPPProgramDeclarationsAndDefinitions.cpp:61] 'p_q' has been declared through OP_DECL_DAT.
+[CPPProgramDeclarationsAndDefinitions.cpp:100] Setting access descriptor for OP_DAT 3.
+[CPPProgramDeclarationsAndDefinitions.cpp:111] ...READ access descriptor.
+[CPPProgramDeclarationsAndDefinitions.cpp:315] ...INDIRECT mapping descriptor.
+[CPPProgramDeclarationsAndDefinitions.cpp:290] Setting properties of OP_DAT argument '4' (Oxford API).
+[CPPProgramDeclarationsAndDefinitions.cpp:61] 'p_adt' has been declared through OP_DECL_DAT.
+[CPPProgramDeclarationsAndDefinitions.cpp:100] Setting access descriptor for OP_DAT 4.
+[CPPProgramDeclarationsAndDefinitions.cpp:111] ...READ access descriptor.
+[CPPProgramDeclarationsAndDefinitions.cpp:315] ...INDIRECT mapping descriptor.
+[CPPProgramDeclarationsAndDefinitions.cpp:290] Setting properties of OP_DAT argument '5' (Oxford API).
+[CPPProgramDeclarationsAndDefinitions.cpp:61] 'p_res' has been declared through OP_DECL_DAT.
+[CPPProgramDeclarationsAndDefinitions.cpp:100] Setting access descriptor for OP_DAT 5.
+[CPPProgramDeclarationsAndDefinitions.cpp:125] ...INCREMENT access descriptor.
+[CPPProgramDeclarationsAndDefinitions.cpp:315] ...INDIRECT mapping descriptor.
+[CPPProgramDeclarationsAndDefinitions.cpp:290] Setting properties of OP_DAT argument '6' (Oxford API).
+[CPPProgramDeclarationsAndDefinitions.cpp:61] 'p_bound' has been declared through OP_DECL_DAT.
+[CPPProgramDeclarationsAndDefinitions.cpp:100] Setting access descriptor for OP_DAT 6.
+[CPPProgramDeclarationsAndDefinitions.cpp:111] ...READ access descriptor.
+[CPPProgramDeclarationsAndDefinitions.cpp:308] ...DIRECT mapping descriptor.
+[CPPProgramDeclarationsAndDefinitions.cpp:703] Found 'op_par_loop' with (host) user subroutine 'update'.
+[ParallelLoop.cpp:44] Parallel loop created.
+[CPPProgramDeclarationsAndDefinitions.cpp:334] Analysing OP_PAR_LOOP actual arguments.
+[CPPProgramDeclarationsAndDefinitions.cpp:290] Setting properties of OP_DAT argument '1' (Oxford API).
+[CPPProgramDeclarationsAndDefinitions.cpp:61] 'p_qold' has been declared through OP_DECL_DAT.
+[CPPProgramDeclarationsAndDefinitions.cpp:100] Setting access descriptor for OP_DAT 1.
+[CPPProgramDeclarationsAndDefinitions.cpp:111] ...READ access descriptor.
+[CPPProgramDeclarationsAndDefinitions.cpp:308] ...DIRECT mapping descriptor.
+[CPPProgramDeclarationsAndDefinitions.cpp:290] Setting properties of OP_DAT argument '2' (Oxford API).
+[CPPProgramDeclarationsAndDefinitions.cpp:61] 'p_q' has been declared through OP_DECL_DAT.
+[CPPProgramDeclarationsAndDefinitions.cpp:100] Setting access descriptor for OP_DAT 2.
+[CPPProgramDeclarationsAndDefinitions.cpp:118] ...WRITE access descriptor.
+[CPPProgramDeclarationsAndDefinitions.cpp:308] ...DIRECT mapping descriptor.
+[CPPProgramDeclarationsAndDefinitions.cpp:290] Setting properties of OP_DAT argument '3' (Oxford API).
+[CPPProgramDeclarationsAndDefinitions.cpp:61] 'p_res' has been declared through OP_DECL_DAT.
+[CPPProgramDeclarationsAndDefinitions.cpp:100] Setting access descriptor for OP_DAT 3.
+[CPPProgramDeclarationsAndDefinitions.cpp:132] ...READ/WRITE access descriptor.
+[CPPProgramDeclarationsAndDefinitions.cpp:308] ...DIRECT mapping descriptor.
+[CPPProgramDeclarationsAndDefinitions.cpp:290] Setting properties of OP_DAT argument '4' (Oxford API).
+[CPPProgramDeclarationsAndDefinitions.cpp:61] 'p_adt' has been declared through OP_DECL_DAT.
+[CPPProgramDeclarationsAndDefinitions.cpp:100] Setting access descriptor for OP_DAT 4.
+[CPPProgramDeclarationsAndDefinitions.cpp:111] ...READ access descriptor.
+[CPPProgramDeclarationsAndDefinitions.cpp:308] ...DIRECT mapping descriptor.
+[CPPProgramDeclarationsAndDefinitions.cpp:198] Setting properties of OP_GBL argument '5' (Oxford API).
+[CPPProgramDeclarationsAndDefinitions.cpp:100] Setting access descriptor for OP_DAT 5.
+[CPPProgramDeclarationsAndDefinitions.cpp:125] ...INCREMENT access descriptor.
+[CPPProgramDeclarationsAndDefinitions.cpp:538] Source file 'kernels.cpp' detected.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_copysign.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_copysignf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_copysignl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_acosf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_acosl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_asinf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_asinl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_atanf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_atanl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_atan2f.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_atan2l.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_ceilf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_ceill.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_coshf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_coshl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_floorf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_floorl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_fmodf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_fmodl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_frexpf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_frexpl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_ldexpf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_ldexpl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_log10f.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_log10l.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_modff.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_modfl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_powf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_powl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_sinhf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_sinhl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_tanf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_tanl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_tanhf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_tanhl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_powil.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_powi.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_powif.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_strchr.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_strrchr.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_strpbrk.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_strstr.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_nansf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_nans.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_nansl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_fabs.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_fabsf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_fabsl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_cosf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_cosl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_sinf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_sinl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_sqrtf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_sqrtl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_fpclassify.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_return_address.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_frame_address.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_expect.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_prefetch.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_huge_val.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_huge_valf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_huge_vall.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_inf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_inff.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_infl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_nan.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_nanf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_nanl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_nans.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_nansf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_nansl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_clz.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_ctz.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_popcount.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_parity.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_ffsl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_clzl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_ctzl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_popcountl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_parityl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_ffsll.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_clzll.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_ctzll.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_popcountll.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_parityll.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_powi.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_powif.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_powil.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __sync_lock_test_and_set.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __sync_lock_release.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_memmove.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __builtin_memchr.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: acos.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __acos.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: asin.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __asin.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: atan.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __atan.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: atan2.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __atan2.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: cos.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __cos.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: sin.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __sin.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: tan.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __tan.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: cosh.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __cosh.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: sinh.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __sinh.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: tanh.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __tanh.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: sincos.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __sincos.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: acosh.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __acosh.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: asinh.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __asinh.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: atanh.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __atanh.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: exp.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __exp.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: frexp.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __frexp.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: ldexp.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __ldexp.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: log.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __log.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: log10.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __log10.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: modf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __modf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: exp10.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __exp10.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: pow10.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __pow10.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: expm1.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __expm1.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: log1p.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __log1p.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: logb.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __logb.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: exp2.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __exp2.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: log2.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __log2.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: pow.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __pow.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: sqrt.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __sqrt.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: hypot.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __hypot.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: cbrt.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __cbrt.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: ceil.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __ceil.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: fabs.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __fabs.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: floor.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __floor.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: fmod.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __fmod.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __isinf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __finite.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: isinf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: finite.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: drem.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __drem.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: significand.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __significand.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: copysign.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __copysign.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: nan.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __nan.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __isnan.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: isnan.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: j0.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __j0.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: j1.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __j1.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: jn.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __jn.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: y0.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __y0.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: y1.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __y1.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: yn.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __yn.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: erf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __erf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: erfc.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __erfc.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: lgamma.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __lgamma.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: tgamma.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __tgamma.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: gamma.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __gamma.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: lgamma_r.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __lgamma_r.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: rint.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __rint.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: nextafter.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __nextafter.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: nexttoward.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __nexttoward.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: remainder.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __remainder.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: scalbn.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __scalbn.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: ilogb.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __ilogb.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: scalbln.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __scalbln.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: nearbyint.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __nearbyint.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: round.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __round.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: trunc.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __trunc.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: remquo.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __remquo.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: lrint.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __lrint.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: llrint.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __llrint.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: lround.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __lround.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: llround.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __llround.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: fdim.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __fdim.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: fmax.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __fmax.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: fmin.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __fmin.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __fpclassify.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __signbit.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: fma.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __fma.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: scalb.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __scalb.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: acosf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __acosf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: asinf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __asinf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: atanf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __atanf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: atan2f.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __atan2f.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: cosf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __cosf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: sinf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __sinf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: tanf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __tanf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: coshf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __coshf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: sinhf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __sinhf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: tanhf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __tanhf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: sincosf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __sincosf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: acoshf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __acoshf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: asinhf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __asinhf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: atanhf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __atanhf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: expf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __expf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: frexpf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __frexpf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: ldexpf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __ldexpf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: logf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __logf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: log10f.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __log10f.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: modff.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __modff.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: exp10f.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __exp10f.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: pow10f.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __pow10f.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: expm1f.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __expm1f.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: log1pf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __log1pf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: logbf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __logbf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: exp2f.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __exp2f.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: log2f.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __log2f.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: powf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __powf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: sqrtf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __sqrtf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: hypotf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __hypotf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: cbrtf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __cbrtf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: ceilf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __ceilf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: fabsf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __fabsf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: floorf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __floorf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: fmodf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __fmodf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __isinff.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __finitef.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: isinff.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: finitef.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: dremf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __dremf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: significandf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __significandf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: copysignf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __copysignf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: nanf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __nanf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __isnanf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: isnanf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: j0f.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __j0f.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: j1f.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __j1f.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: jnf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __jnf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: y0f.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __y0f.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: y1f.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __y1f.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: ynf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __ynf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: erff.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __erff.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: erfcf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __erfcf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: lgammaf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __lgammaf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: tgammaf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __tgammaf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: gammaf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __gammaf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: lgammaf_r.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __lgammaf_r.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: rintf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __rintf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: nextafterf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __nextafterf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: nexttowardf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __nexttowardf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: remainderf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __remainderf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: scalbnf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __scalbnf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: ilogbf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __ilogbf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: scalblnf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __scalblnf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: nearbyintf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __nearbyintf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: roundf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __roundf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: truncf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __truncf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: remquof.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __remquof.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: lrintf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __lrintf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: llrintf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __llrintf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: lroundf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __lroundf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: llroundf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __llroundf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: fdimf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __fdimf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: fmaxf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __fmaxf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: fminf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __fminf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __fpclassifyf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __signbitf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: fmaf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __fmaf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: scalbf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __scalbf.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: acosl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __acosl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: asinl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __asinl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: atanl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __atanl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: atan2l.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __atan2l.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: cosl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __cosl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: sinl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __sinl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: tanl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __tanl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: coshl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __coshl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: sinhl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __sinhl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: tanhl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __tanhl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: sincosl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __sincosl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: acoshl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __acoshl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: asinhl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __asinhl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: atanhl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __atanhl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: expl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __expl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: frexpl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __frexpl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: ldexpl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __ldexpl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: logl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __logl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: log10l.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __log10l.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: modfl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __modfl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: exp10l.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __exp10l.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: pow10l.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __pow10l.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: expm1l.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __expm1l.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: log1pl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __log1pl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: logbl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __logbl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: exp2l.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __exp2l.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: log2l.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __log2l.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: powl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __powl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: sqrtl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __sqrtl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: hypotl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __hypotl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: cbrtl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __cbrtl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: ceill.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __ceill.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: fabsl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __fabsl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: floorl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __floorl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: fmodl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __fmodl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __isinfl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __finitel.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: isinfl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: finitel.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: dreml.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __dreml.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: significandl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __significandl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: copysignl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __copysignl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: nanl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __nanl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __isnanl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: isnanl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: j0l.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __j0l.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: j1l.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __j1l.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: jnl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __jnl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: y0l.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __y0l.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: y1l.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __y1l.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: ynl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __ynl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: erfl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __erfl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: erfcl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __erfcl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: lgammal.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __lgammal.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: tgammal.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __tgammal.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: gammal.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __gammal.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: lgammal_r.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __lgammal_r.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: rintl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __rintl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: nextafterl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __nextafterl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: nexttowardl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __nexttowardl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: remainderl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __remainderl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: scalbnl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __scalbnl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: ilogbl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __ilogbl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: scalblnl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __scalblnl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: nearbyintl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __nearbyintl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: roundl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __roundl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: truncl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __truncl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: remquol.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __remquol.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: lrintl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __lrintl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: llrintl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __llrintl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: lroundl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __lroundl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: llroundl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __llroundl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: fdiml.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __fdiml.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: fmaxl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __fmaxl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: fminl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __fminl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __fpclassifyl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __signbitl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: fmal.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __fmal.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: scalbl.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: __scalbl.
+[CPPProgramDeclarationsAndDefinitions.cpp:595] Found type definition: __unnamed_enum___F24_L202_C1_FP_NAN__COMMA__FP_INFINITE__COMMA__FP_ZERO__COMMA__FP_SUBNORMAL__COMMA__FP_NORMAL.
+[CPPProgramDeclarationsAndDefinitions.cpp:595] Found type definition: _LIB_VERSION_TYPE.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: matherr.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: save_soln.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: res_calc.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: bres_calc.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: adt_calc.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: update.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: fusedOne.
+[CPPProgramDeclarationsAndDefinitions.cpp:582] Found declaration: fusedTwo.
+[SubroutinesGeneration.h:135] Generating file 'rose_opencl_code.cpp'.
+[SubroutinesGeneration.h:141] Creating source file 'rose_opencl_code.cpp'.
+[CPPOpenCLSubroutinesGeneration.cpp:158] Adding '#include' statements to main file.
+[CPPOpenCLConstantDeclarations.cpp:50] Adding variables with constant access specifiers to module.
+[CPPOpenCLConstantDeclarations.cpp:63] Analysing OP_DECL_CONST with name 'alpha'.
+[CPPOpenCLConstantDeclarations.cpp:63] Analysing OP_DECL_CONST with name 'cfl'.
+[CPPOpenCLConstantDeclarations.cpp:63] Analysing OP_DECL_CONST with name 'eps'.
+[CPPOpenCLConstantDeclarations.cpp:63] Analysing OP_DECL_CONST with name 'gam'.
+[CPPOpenCLConstantDeclarations.cpp:63] Analysing OP_DECL_CONST with name 'gm1'.
+[CPPOpenCLConstantDeclarations.cpp:63] Analysing OP_DECL_CONST with name 'mach'.
+[CPPOpenCLConstantDeclarations.cpp:63] Analysing OP_DECL_CONST with name 'qinf'.
+[CPPModuleDeclarations.cpp:56] Adding variables to file to control OP2 block size and partition size settings.
+[CPPOpenCLSubroutinesGeneration.cpp:64] Creating reduction subroutines.
+[ParallelLoop.cpp:295] This argument is incremented.
+[ParallelLoop.cpp:295] This argument is incremented.
+[ParallelLoop.cpp:295] This argument is incremented.
+[ParallelLoop.cpp:295] This argument is incremented.
+[ParallelLoop.cpp:295] This argument is incremented.
+[CPPOpenCLSubroutinesGeneration.cpp:80] Creating reduction subroutines 2.
+[Subroutine.h:153] Subroutine name = ReductionFloat4.
+[CPPOpenCLReductionSubroutine.cpp:793] Creating reduction subroutine.
+[CPPOpenCLReductionSubroutine.cpp:671] Creating local variable declarations.
+[CPPOpenCLReductionSubroutine.cpp:635] Creating statements.
+[CPPOpenCLReductionSubroutine.cpp:591] Creating shared variable initialisation statements.
+[CPPOpenCLReductionSubroutine.cpp:406] Creating first round of statements to perform reduction.
+[CPPOpenCLReductionSubroutine.cpp:203] Creating second round of statements to perform reduction.
+[CPPOpenCLSubroutinesGeneration.cpp:94] Creating reduction subroutines 3.
+[CPPOpenCLSubroutinesGeneration.cpp:113] Analysing user subroutine 'adt_calc'.
+[Subroutine.h:153] Subroutine name = adt_calc_modified.
+[CPPUserSubroutine.cpp:55] Found reference to OP_DECL_CONST 'gam'.
+[CPPUserSubroutine.cpp:55] Found reference to OP_DECL_CONST 'gm1'.
+[CPPUserSubroutine.cpp:55] Found reference to OP_DECL_CONST 'cfl'.
+[CPPUserSubroutine.cpp:98] Outputting formal parameters.
+[CPPUserSubroutine.cpp:73] Outputting and modifying statements.
+[RoseHelper.cpp:55] Forcing output of syntax tree in output file.
+[Subroutine.h:153] Subroutine name = adt_calc_kernel.
+[CPPOpenCLKernelSubroutineIndirectLoop.cpp:1641] <Kernel, Indirect, OpenCL>.
+[CPPOpenCLKernelSubroutineIndirectLoop.cpp:1623] Creating formal parameter declarations.
+[CPPOpenCLKernelSubroutineIndirectLoop.cpp:1509] Creating OP_DAT formal parameters.
+[CPPOpenCLKernelSubroutineIndirectLoop.cpp:1349] Creating plan formal parameter declarations.
+[CPPOpenCLKernelSubroutine.cpp:369] Creating OP_DECL_CONST formal parameter declarations.
+[CPPOpenCLKernelSubroutineIndirectLoop.cpp:1230] Creating local variable declarations.
+[CPPOpenCLKernelSubroutineIndirectLoop.cpp:1154] Creating local thread variables.
+[CPPOpenCLKernelSubroutineIndirectLoop.cpp:1183] Creating local variable declarations needed to execute kernel.
+[CPPOpenCLKernelSubroutineIndirectLoop.cpp:1249] Creating shared indirection mapping for OP_DAT 1.
+[CPPOpenCLKernelSubroutineIndirectLoop.cpp:1275] Creating indirection size argument for OP_DAT 1.
+[CPPOpenCLKernelSubroutineIndirectLoop.cpp:1299] Creating shared memory pointer for OP_DAT 1.
+[CPPOpenCLKernelSubroutineIndirectLoop.cpp:1323] New shared memory declaration NOT needed for OP_DAT 2.
+[CPPOpenCLKernelSubroutineIndirectLoop.cpp:1323] New shared memory declaration NOT needed for OP_DAT 3.
+[CPPOpenCLKernelSubroutineIndirectLoop.cpp:1323] New shared memory declaration NOT needed for OP_DAT 4.
+[CPPOpenCLKernelSubroutineIndirectLoop.cpp:980] Creating thread zero statements.
+[CPPOpenCLKernelSubroutineIndirectLoop.cpp:868] Creating statements to initialise sizes of indirect OP_DATs.
+[CPPOpenCLKernelSubroutineIndirectLoop.cpp:699] Creating statements to set indirection map pointers.
+[CPPOpenCLKernelSubroutineIndirectLoop.cpp:763] Creating statements to initialise OP_DAT shared memory pointers.
+[CPPOpenCLKernelSubroutineIndirectLoop.cpp:563] Creating statements to initialise shared memory.
+[CPPOpenCLKernelSubroutineIndirectLoop.cpp:475] Creating main execution loop statements.
+[CPPOpenCLKernelSubroutineIndirectLoop.cpp:57] Creating call to user device subroutine.
+[CPPOpenCLKernelSubroutineIndirectLoop.cpp:80] Indirect OP_DAT with read/read-write/write access.
+[CPPOpenCLKernelSubroutineIndirectLoop.cpp:80] Indirect OP_DAT with read/read-write/write access.
+[CPPOpenCLKernelSubroutineIndirectLoop.cpp:80] Indirect OP_DAT with read/read-write/write access.
+[CPPOpenCLKernelSubroutineIndirectLoop.cpp:80] Indirect OP_DAT with read/read-write/write access.
+[CPPOpenCLKernelSubroutineIndirectLoop.cpp:101] Direct OP_DAT.
+[CPPOpenCLKernelSubroutineIndirectLoop.cpp:101] Direct OP_DAT.
+[CPPOpenCLKernelSubroutineIndirectLoop.cpp:172] Creating increment and write access epilogue statements.
+[Subroutine.h:153] Subroutine name = adt_calc_host.
+[CPPOpenCLHostSubroutineIndirectLoop.cpp:709] Creating OpenCL host subroutine for indirect loop.
+[CPPHostSubroutine.cpp:121] Creating host subroutine formal parameters.
+[CPPOpenCLHostSubroutine.cpp:1160] Creating OpenCL configuration launch local variable declarations.
+[CPPOpenCLHostSubroutineIndirectLoop.cpp:654] Creating local variable declarations for plan function.
+[CPPOpenCLHostSubroutineIndirectLoop.cpp:621] Creating statements.
+[CPPHostSubroutine.cpp:53] Creating statements to initialise plan function variables.
+[CPPOpenCLHostSubroutineIndirectLoop.cpp:580] Creating statement to call plan function.
+[CPPOpenCLHostSubroutineIndirectLoop.cpp:432] Creating plan function execution statements.
+[CPPOpenCLHostSubroutine.cpp:365] Adding actual op_allocate_constant statements.
+[CPPOpenCLHostSubroutine.cpp:130] Adding initial timing statements.
+[CPPOpenCLHostSubroutineIndirectLoop.cpp:56] Creating statements to set up OpenCL kernel arguments.
+[CPPOpenCLHostSubroutine.cpp:421] Adding actual parameters for OP_DECL_CONSTs.
+[CPPOpenCLHostSubroutine.cpp:1075] Creating statements to launch OpenCL kernel.
+[CPPOpenCLHostSubroutine.cpp:201] Adding final timing statements.
+[CPPOpenCLHostSubroutine.cpp:227] 0.
+[CPPOpenCLHostSubroutine.cpp:234] OP_kernels[0].name.
+[CPPOpenCLSubroutinesGeneration.cpp:113] Analysing user subroutine 'bres_calc'.
+[Subroutine.h:153] Subroutine name = bres_calc_modified.
+[CPPUserSubroutine.cpp:55] Found reference to OP_DECL_CONST 'gm1'.
+[CPPUserSubroutine.cpp:55] Found reference to OP_DECL_CONST 'qinf'.
+[CPPUserSubroutine.cpp:55] Found reference to OP_DECL_CONST 'gm1'.
+[CPPUserSubroutine.cpp:55] Found reference to OP_DECL_CONST 'qinf'.
+[CPPUserSubroutine.cpp:55] Found reference to OP_DECL_CONST 'qinf'.
+[CPPUserSubroutine.cpp:55] Found reference to OP_DECL_CONST 'qinf'.
+[CPPUserSubroutine.cpp:55] Found reference to OP_DECL_CONST 'qinf'.
+[CPPUserSubroutine.cpp:55] Found reference to OP_DECL_CONST 'qinf'.
+[CPPUserSubroutine.cpp:55] Found reference to OP_DECL_CONST 'qinf'.
+[CPPUserSubroutine.cpp:55] Found reference to OP_DECL_CONST 'qinf'.
+[CPPUserSubroutine.cpp:55] Found reference to OP_DECL_CONST 'eps'.
+[CPPUserSubroutine.cpp:55] Found reference to OP_DECL_CONST 'qinf'.
+[CPPUserSubroutine.cpp:55] Found reference to OP_DECL_CONST 'qinf'.
+[CPPUserSubroutine.cpp:55] Found reference to OP_DECL_CONST 'qinf'.
+[CPPUserSubroutine.cpp:55] Found reference to OP_DECL_CONST 'qinf'.
+[CPPUserSubroutine.cpp:55] Found reference to OP_DECL_CONST 'qinf'.
+[CPPUserSubroutine.cpp:55] Found reference to OP_DECL_CONST 'qinf'.
+[CPPUserSubroutine.cpp:55] Found reference to OP_DECL_CONST 'qinf'.
+[CPPUserSubroutine.cpp:55] Found reference to OP_DECL_CONST 'qinf'.
+[CPPUserSubroutine.cpp:98] Outputting formal parameters.
+[CPPUserSubroutine.cpp:73] Outputting and modifying statements.
+[RoseHelper.cpp:55] Forcing output of syntax tree in output file.
+[Subroutine.h:153] Subroutine name = bres_calc_kernel.
+[CPPOpenCLKernelSubroutineIndirectLoop.cpp:1641] <Kernel, Indirect, OpenCL>.
+[CPPOpenCLKernelSubroutineIndirectLoop.cpp:1623] Creating formal parameter declarations.
+[CPPOpenCLKernelSubroutineIndirectLoop.cpp:1509] Creating OP_DAT formal parameters.
+[ParallelLoop.cpp:295] This argument is incremented.
+[CPPOpenCLKernelSubroutineIndirectLoop.cpp:1349] Creating plan formal parameter declarations.
+[CPPOpenCLKernelSubroutine.cpp:369] Creating OP_DECL_CONST formal parameter declarations.
+[CPPOpenCLKernelSubroutineIndirectLoop.cpp:1230] Creating local variable declarations.
+[CPPOpenCLKernelSubroutineIndirectLoop.cpp:1154] Creating local thread variables.
+[CPPOpenCLKernelSubroutineIndirectLoop.cpp:1183] Creating local variable declarations needed to execute kernel.
+[ParallelLoop.cpp:295] This argument is incremented.
+[CPPOpenCLKernelSubroutineIndirectLoop.cpp:1249] Creating shared indirection mapping for OP_DAT 1.
+[CPPOpenCLKernelSubroutineIndirectLoop.cpp:1249] Creating shared indirection mapping for OP_DAT 3.
+[CPPOpenCLKernelSubroutineIndirectLoop.cpp:1249] Creating shared indirection mapping for OP_DAT 4.
+[CPPOpenCLKernelSubroutineIndirectLoop.cpp:1249] Creating shared indirection mapping for OP_DAT 5.
+[CPPOpenCLKernelSubroutineIndirectLoop.cpp:1275] Creating indirection size argument for OP_DAT 1.
+[CPPOpenCLKernelSubroutineIndirectLoop.cpp:1275] Creating indirection size argument for OP_DAT 3.
+[CPPOpenCLKernelSubroutineIndirectLoop.cpp:1275] Creating indirection size argument for OP_DAT 4.
+[CPPOpenCLKernelSubroutineIndirectLoop.cpp:1275] Creating indirection size argument for OP_DAT 5.
+[CPPOpenCLKernelSubroutineIndirectLoop.cpp:1299] Creating shared memory pointer for OP_DAT 1.
+[CPPOpenCLKernelSubroutineIndirectLoop.cpp:1323] New shared memory declaration NOT needed for OP_DAT 2.
+[CPPOpenCLKernelSubroutineIndirectLoop.cpp:1299] Creating shared memory pointer for OP_DAT 3.
+[CPPOpenCLKernelSubroutineIndirectLoop.cpp:1299] Creating shared memory pointer for OP_DAT 4.
+[CPPOpenCLKernelSubroutineIndirectLoop.cpp:1299] Creating shared memory pointer for OP_DAT 5.
+[ParallelLoop.cpp:295] This argument is incremented.
+[CPPOpenCLKernelSubroutineIndirectLoop.cpp:1114] Creating local variable declarations needed for incremented OP_DATS.
+[CPPOpenCLKernelSubroutineIndirectLoop.cpp:980] Creating thread zero statements.
+[ParallelLoop.cpp:295] This argument is incremented.
+[CPPOpenCLKernelSubroutineIndirectLoop.cpp:921] Creating thread zero statements for incremented OP_DATs.
+[CPPOpenCLKernelSubroutineIndirectLoop.cpp:868] Creating statements to initialise sizes of indirect OP_DATs.
+[CPPOpenCLKernelSubroutineIndirectLoop.cpp:699] Creating statements to set indirection map pointers.
+[CPPOpenCLKernelSubroutineIndirectLoop.cpp:763] Creating statements to initialise OP_DAT shared memory pointers.
+[CPPOpenCLKernelSubroutineIndirectLoop.cpp:563] Creating statements to initialise shared memory.
+[CPPOpenCLKernelSubroutineIndirectLoop.cpp:475] Creating main execution loop statements.
+[ParallelLoop.cpp:295] This argument is incremented.
+[CPPOpenCLKernelSubroutineIndirectLoop.cpp:400] Creating statements to initialise scratchpad memory.
+[CPPOpenCLKernelSubroutineIndirectLoop.cpp:410] Creating statements for OP_DAT 5.
+[CPPOpenCLKernelSubroutineIndirectLoop.cpp:57] Creating call to user device subroutine.
+[CPPOpenCLKernelSubroutineIndirectLoop.cpp:80] Indirect OP_DAT with read/read-write/write access.
+[CPPOpenCLKernelSubroutineIndirectLoop.cpp:80] Indirect OP_DAT with read/read-write/write access.
+[CPPOpenCLKernelSubroutineIndirectLoop.cpp:80] Indirect OP_DAT with read/read-write/write access.
+[CPPOpenCLKernelSubroutineIndirectLoop.cpp:80] Indirect OP_DAT with read/read-write/write access.
+[CPPOpenCLKernelSubroutineIndirectLoop.cpp:71] Indirect OP_DAT with increment access.
+[CPPOpenCLKernelSubroutineIndirectLoop.cpp:101] Direct OP_DAT.
+[CPPOpenCLKernelSubroutineIndirectLoop.cpp:291] Creating stage out from local memory to shared memory statements.
+[CPPOpenCLKernelSubroutineIndirectLoop.cpp:172] Creating increment and write access epilogue statements.
+[Subroutine.h:153] Subroutine name = bres_calc_host.
+[CPPOpenCLHostSubroutineIndirectLoop.cpp:709] Creating OpenCL host subroutine for indirect loop.
+[CPPHostSubroutine.cpp:121] Creating host subroutine formal parameters.
+[CPPOpenCLHostSubroutine.cpp:1160] Creating OpenCL configuration launch local variable declarations.
+[CPPOpenCLHostSubroutineIndirectLoop.cpp:654] Creating local variable declarations for plan function.
+[ParallelLoop.cpp:295] This argument is incremented.
+[CPPOpenCLHostSubroutineIndirectLoop.cpp:621] Creating statements.
+[ParallelLoop.cpp:295] This argument is incremented.
+[CPPHostSubroutine.cpp:53] Creating statements to initialise plan function variables.
+[CPPOpenCLHostSubroutineIndirectLoop.cpp:580] Creating statement to call plan function.
+[CPPOpenCLHostSubroutineIndirectLoop.cpp:432] Creating plan function execution statements.
+[CPPOpenCLHostSubroutine.cpp:365] Adding actual op_allocate_constant statements.
+[CPPOpenCLHostSubroutine.cpp:130] Adding initial timing statements.
+[CPPOpenCLHostSubroutineIndirectLoop.cpp:56] Creating statements to set up OpenCL kernel arguments.
+[CPPOpenCLHostSubroutine.cpp:421] Adding actual parameters for OP_DECL_CONSTs.
+[CPPOpenCLHostSubroutine.cpp:1075] Creating statements to launch OpenCL kernel.
+[CPPOpenCLHostSubroutine.cpp:201] Adding final timing statements.
+[CPPOpenCLHostSubroutine.cpp:227] 1.
+[CPPOpenCLHostSubroutine.cpp:234] OP_kernels[1].name.
+[ParallelLoop.cpp:295] This argument is incremented.
+[CPPOpenCLSubroutinesGeneration.cpp:113] Analysing user subroutine 'res_calc'.
+[Subroutine.h:153] Subroutine name = res_calc_modified.
+[CPPUserSubroutine.cpp:55] Found reference to OP_DECL_CONST 'gm1'.
+[CPPUserSubroutine.cpp:55] Found reference to OP_DECL_CONST 'gm1'.
+[CPPUserSubroutine.cpp:55] Found reference to OP_DECL_CONST 'eps'.
+[CPPUserSubroutine.cpp:98] Outputting formal parameters.
+[CPPUserSubroutine.cpp:73] Outputting and modifying statements.
+[RoseHelper.cpp:55] Forcing output of syntax tree in output file.
+[Subroutine.h:153] Subroutine name = res_calc_kernel.
+[CPPOpenCLKernelSubroutineIndirectLoop.cpp:1641] <Kernel, Indirect, OpenCL>.
+[CPPOpenCLKernelSubroutineIndirectLoop.cpp:1623] Creating formal parameter declarations.
+[CPPOpenCLKernelSubroutineIndirectLoop.cpp:1509] Creating OP_DAT formal parameters.
+[ParallelLoop.cpp:295] This argument is incremented.
+[CPPOpenCLKernelSubroutineIndirectLoop.cpp:1349] Creating plan formal parameter declarations.
+[CPPOpenCLKernelSubroutine.cpp:369] Creating OP_DECL_CONST formal parameter declarations.
+[CPPOpenCLKernelSubroutineIndirectLoop.cpp:1230] Creating local variable declarations.
+[CPPOpenCLKernelSubroutineIndirectLoop.cpp:1154] Creating local thread variables.
+[CPPOpenCLKernelSubroutineIndirectLoop.cpp:1183] Creating local variable declarations needed to execute kernel.
+[ParallelLoop.cpp:295] This argument is incremented.
+[ParallelLoop.cpp:295] This argument is incremented.
+[CPPOpenCLKernelSubroutineIndirectLoop.cpp:1249] Creating shared indirection mapping for OP_DAT 1.
+[CPPOpenCLKernelSubroutineIndirectLoop.cpp:1249] Creating shared indirection mapping for OP_DAT 3.
+[CPPOpenCLKernelSubroutineIndirectLoop.cpp:1249] Creating shared indirection mapping for OP_DAT 5.
+[CPPOpenCLKernelSubroutineIndirectLoop.cpp:1249] Creating shared indirection mapping for OP_DAT 7.
+[CPPOpenCLKernelSubroutineIndirectLoop.cpp:1275] Creating indirection size argument for OP_DAT 1.
+[CPPOpenCLKernelSubroutineIndirectLoop.cpp:1275] Creating indirection size argument for OP_DAT 3.
+[CPPOpenCLKernelSubroutineIndirectLoop.cpp:1275] Creating indirection size argument for OP_DAT 5.
+[CPPOpenCLKernelSubroutineIndirectLoop.cpp:1275] Creating indirection size argument for OP_DAT 7.
+[CPPOpenCLKernelSubroutineIndirectLoop.cpp:1299] Creating shared memory pointer for OP_DAT 1.
+[CPPOpenCLKernelSubroutineIndirectLoop.cpp:1323] New shared memory declaration NOT needed for OP_DAT 2.
+[CPPOpenCLKernelSubroutineIndirectLoop.cpp:1299] Creating shared memory pointer for OP_DAT 3.
+[CPPOpenCLKernelSubroutineIndirectLoop.cpp:1323] New shared memory declaration NOT needed for OP_DAT 4.
+[CPPOpenCLKernelSubroutineIndirectLoop.cpp:1299] Creating shared memory pointer for OP_DAT 5.
+[CPPOpenCLKernelSubroutineIndirectLoop.cpp:1323] New shared memory declaration NOT needed for OP_DAT 6.
+[CPPOpenCLKernelSubroutineIndirectLoop.cpp:1299] Creating shared memory pointer for OP_DAT 7.
+[CPPOpenCLKernelSubroutineIndirectLoop.cpp:1323] New shared memory declaration NOT needed for OP_DAT 8.
+[ParallelLoop.cpp:295] This argument is incremented.
+[CPPOpenCLKernelSubroutineIndirectLoop.cpp:1114] Creating local variable declarations needed for incremented OP_DATS.
+[CPPOpenCLKernelSubroutineIndirectLoop.cpp:980] Creating thread zero statements.
+[ParallelLoop.cpp:295] This argument is incremented.
+[CPPOpenCLKernelSubroutineIndirectLoop.cpp:921] Creating thread zero statements for incremented OP_DATs.
+[CPPOpenCLKernelSubroutineIndirectLoop.cpp:868] Creating statements to initialise sizes of indirect OP_DATs.
+[CPPOpenCLKernelSubroutineIndirectLoop.cpp:699] Creating statements to set indirection map pointers.
+[CPPOpenCLKernelSubroutineIndirectLoop.cpp:763] Creating statements to initialise OP_DAT shared memory pointers.
+[CPPOpenCLKernelSubroutineIndirectLoop.cpp:563] Creating statements to initialise shared memory.
+[CPPOpenCLKernelSubroutineIndirectLoop.cpp:475] Creating main execution loop statements.
+[ParallelLoop.cpp:295] This argument is incremented.
+[CPPOpenCLKernelSubroutineIndirectLoop.cpp:400] Creating statements to initialise scratchpad memory.
+[CPPOpenCLKernelSubroutineIndirectLoop.cpp:410] Creating statements for OP_DAT 7.
+[CPPOpenCLKernelSubroutineIndirectLoop.cpp:410] Creating statements for OP_DAT 8.
+[CPPOpenCLKernelSubroutineIndirectLoop.cpp:57] Creating call to user device subroutine.
+[CPPOpenCLKernelSubroutineIndirectLoop.cpp:80] Indirect OP_DAT with read/read-write/write access.
+[CPPOpenCLKernelSubroutineIndirectLoop.cpp:80] Indirect OP_DAT with read/read-write/write access.
+[CPPOpenCLKernelSubroutineIndirectLoop.cpp:80] Indirect OP_DAT with read/read-write/write access.
+[CPPOpenCLKernelSubroutineIndirectLoop.cpp:80] Indirect OP_DAT with read/read-write/write access.
+[CPPOpenCLKernelSubroutineIndirectLoop.cpp:80] Indirect OP_DAT with read/read-write/write access.
+[CPPOpenCLKernelSubroutineIndirectLoop.cpp:80] Indirect OP_DAT with read/read-write/write access.
+[CPPOpenCLKernelSubroutineIndirectLoop.cpp:71] Indirect OP_DAT with increment access.
+[CPPOpenCLKernelSubroutineIndirectLoop.cpp:71] Indirect OP_DAT with increment access.
+[CPPOpenCLKernelSubroutineIndirectLoop.cpp:291] Creating stage out from local memory to shared memory statements.
+[CPPOpenCLKernelSubroutineIndirectLoop.cpp:172] Creating increment and write access epilogue statements.
+[Subroutine.h:153] Subroutine name = res_calc_host.
+[CPPOpenCLHostSubroutineIndirectLoop.cpp:709] Creating OpenCL host subroutine for indirect loop.
+[CPPHostSubroutine.cpp:121] Creating host subroutine formal parameters.
+[CPPOpenCLHostSubroutine.cpp:1160] Creating OpenCL configuration launch local variable declarations.
+[CPPOpenCLHostSubroutineIndirectLoop.cpp:654] Creating local variable declarations for plan function.
+[ParallelLoop.cpp:295] This argument is incremented.
+[ParallelLoop.cpp:295] This argument is incremented.
+[CPPOpenCLHostSubroutineIndirectLoop.cpp:621] Creating statements.
+[ParallelLoop.cpp:295] This argument is incremented.
+[ParallelLoop.cpp:295] This argument is incremented.
+[CPPHostSubroutine.cpp:53] Creating statements to initialise plan function variables.
+[CPPOpenCLHostSubroutineIndirectLoop.cpp:580] Creating statement to call plan function.
+[CPPOpenCLHostSubroutineIndirectLoop.cpp:432] Creating plan function execution statements.
+[CPPOpenCLHostSubroutine.cpp:365] Adding actual op_allocate_constant statements.
+[CPPOpenCLHostSubroutine.cpp:130] Adding initial timing statements.
+[CPPOpenCLHostSubroutineIndirectLoop.cpp:56] Creating statements to set up OpenCL kernel arguments.
+[CPPOpenCLHostSubroutine.cpp:421] Adding actual parameters for OP_DECL_CONSTs.
+[CPPOpenCLHostSubroutine.cpp:1075] Creating statements to launch OpenCL kernel.
+[CPPOpenCLHostSubroutine.cpp:201] Adding final timing statements.
+[CPPOpenCLHostSubroutine.cpp:227] 2.
+[CPPOpenCLHostSubroutine.cpp:234] OP_kernels[2].name.
+[ParallelLoop.cpp:295] This argument is incremented.
+[ParallelLoop.cpp:295] This argument is incremented.
+[CPPOpenCLSubroutinesGeneration.cpp:113] Analysing user subroutine 'save_soln'.
+[Subroutine.h:153] Subroutine name = save_soln_modified.
+[CPPUserSubroutine.cpp:98] Outputting formal parameters.
+[CPPUserSubroutine.cpp:73] Outputting and modifying statements.
+[RoseHelper.cpp:55] Forcing output of syntax tree in output file.
+[Subroutine.h:153] Subroutine name = save_soln_kernel.
+[CPPOpenCLKernelSubroutineDirectLoop.cpp:767] Creating OpenCL kernel for direct loop.
+[CPPOpenCLKernelSubroutineDirectLoop.cpp:647] Creating OP_DAT formal parameter declarations.
+[CPPOpenCLKernelSubroutineDirectLoop.cpp:675] OP_DAT: direct.
+[CPPOpenCLKernelSubroutineDirectLoop.cpp:675] OP_DAT: direct.
+[CPPOpenCLKernelSubroutine.cpp:369] Creating OP_DECL_CONST formal parameter declarations.
+[CPPOpenCLKernelSubroutineDirectLoop.cpp:601] Creating local variable declarations.
+[CPPOpenCLKernelSubroutineDirectLoop.cpp:571] Creating local thread variables.
+[CPPOpenCLKernelSubroutineDirectLoop.cpp:547] Creating OpenCL shared variable declarations.
+[CPPOpenCLKernelSubroutineDirectLoop.cpp:519] Creating Statements.
+[CPPOpenCLKernelSubroutineDirectLoop.cpp:503] Creating thread ID initialisation statement.
+[CPPOpenCLKernelSubroutineDirectLoop.cpp:466] Creating initialisation statements for offset in OpenCL shared variables.
+[CPPOpenCLKernelSubroutineDirectLoop.cpp:362] Creating execution loop statements.
+[CPPOpenCLKernelSubroutineDirectLoop.cpp:395] Creating statements to stage in from device memory to shared memory for OP_DAT 1.
+[CPPOpenCLKernelSubroutineDirectLoop.cpp:403] Creating statements to stage in from shared memory to local memory for OP_DAT 1.
+[CPPOpenCLKernelSubroutineDirectLoop.cpp:52] Creating call to user device subroutine.
+[CPPOpenCLKernelSubroutineDirectLoop.cpp:63] Direct OP_DAT.
+[CPPOpenCLKernelSubroutineDirectLoop.cpp:63] Direct OP_DAT.
+[CPPOpenCLKernelSubroutineDirectLoop.cpp:420] Creating statements to stage out from local memory to shared memory for OP_DAT 2.
+[CPPOpenCLKernelSubroutineDirectLoop.cpp:428] Creating statements to stage out from shared memory to device memory for OP_DAT 2.
+[Subroutine.h:153] Subroutine name = save_soln_host.
+[CPPOpenCLHostSubroutineDirectLoop.cpp:383] Creating host subroutine of direct loop.
+[CPPHostSubroutine.cpp:121] Creating host subroutine formal parameters.
+[CPPOpenCLHostSubroutine.cpp:1160] Creating OpenCL configuration launch local variable declarations.
+[CPPOpenCLHostSubroutineDirectLoop.cpp:351] Creating CUDA configuration parameters.
+[CPPOpenCLHostSubroutineDirectLoop.cpp:322] Creating statements.
+[CPPOpenCLHostSubroutineDirectLoop.cpp:211] Creating OpenCL kernel initialisation statements.
+[CPPOpenCLHostSubroutine.cpp:130] Adding initial timing statements.
+[CPPOpenCLHostSubroutineDirectLoop.cpp:52] Creating statements to call OpenCL kernel.
+[CPPOpenCLHostSubroutine.cpp:421] Adding actual parameters for OP_DECL_CONSTs.
+[CPPOpenCLHostSubroutine.cpp:1075] Creating statements to launch OpenCL kernel.
+[CPPOpenCLHostSubroutine.cpp:201] Adding final timing statements.
+[CPPOpenCLHostSubroutine.cpp:227] 3.
+[CPPOpenCLHostSubroutine.cpp:234] OP_kernels[3].name.
+[CPPOpenCLSubroutinesGeneration.cpp:113] Analysing user subroutine 'update'.
+[Subroutine.h:153] Subroutine name = update_modified.
+[CPPUserSubroutine.cpp:98] Outputting formal parameters.
+[CPPUserSubroutine.cpp:73] Outputting and modifying statements.
+[RoseHelper.cpp:55] Forcing output of syntax tree in output file.
+[Subroutine.h:153] Subroutine name = update_kernel.
+[CPPOpenCLKernelSubroutineDirectLoop.cpp:767] Creating OpenCL kernel for direct loop.
+[CPPOpenCLKernelSubroutineDirectLoop.cpp:647] Creating OP_DAT formal parameter declarations.
+[CPPOpenCLKernelSubroutineDirectLoop.cpp:675] OP_DAT: direct.
+[CPPOpenCLKernelSubroutineDirectLoop.cpp:675] OP_DAT: direct.
+[CPPOpenCLKernelSubroutineDirectLoop.cpp:675] OP_DAT: direct.
+[CPPOpenCLKernelSubroutineDirectLoop.cpp:675] OP_DAT: direct.
+[ParallelLoop.cpp:295] This argument is incremented.
+[CPPOpenCLKernelSubroutineDirectLoop.cpp:658] Reduction type.
+[CPPOpenCLKernelSubroutine.cpp:369] Creating OP_DECL_CONST formal parameter declarations.
+[CPPOpenCLKernelSubroutineDirectLoop.cpp:601] Creating local variable declarations.
+[CPPOpenCLKernelSubroutineDirectLoop.cpp:571] Creating local thread variables.
+[CPPOpenCLKernelSubroutineDirectLoop.cpp:547] Creating OpenCL shared variable declarations.
+[ParallelLoop.cpp:295] This argument is incremented.
+[CPPOpenCLKernelSubroutine.cpp:328] Creating declarations needed for reduction.
+[ParallelLoop.cpp:295] This argument is incremented.
+[CPPOpenCLKernelSubroutineDirectLoop.cpp:519] Creating Statements.
+[CPPOpenCLKernelSubroutineDirectLoop.cpp:503] Creating thread ID initialisation statement.
+[ParallelLoop.cpp:295] This argument is incremented.
+[CPPOpenCLKernelSubroutine.cpp:53] Creating reduction prologue statements.
+[ParallelLoop.cpp:295] This argument is incremented.
+[CPPOpenCLKernelSubroutineDirectLoop.cpp:466] Creating initialisation statements for offset in OpenCL shared variables.
+[CPPOpenCLKernelSubroutineDirectLoop.cpp:362] Creating execution loop statements.
+[CPPOpenCLKernelSubroutineDirectLoop.cpp:395] Creating statements to stage in from device memory to shared memory for OP_DAT 1.
+[CPPOpenCLKernelSubroutineDirectLoop.cpp:403] Creating statements to stage in from shared memory to local memory for OP_DAT 1.
+[CPPOpenCLKernelSubroutineDirectLoop.cpp:395] Creating statements to stage in from device memory to shared memory for OP_DAT 3.
+[CPPOpenCLKernelSubroutineDirectLoop.cpp:403] Creating statements to stage in from shared memory to local memory for OP_DAT 3.
+[CPPOpenCLKernelSubroutineDirectLoop.cpp:52] Creating call to user device subroutine.
+[CPPOpenCLKernelSubroutineDirectLoop.cpp:63] Direct OP_DAT.
+[CPPOpenCLKernelSubroutineDirectLoop.cpp:63] Direct OP_DAT.
+[CPPOpenCLKernelSubroutineDirectLoop.cpp:63] Direct OP_DAT.
+[CPPOpenCLKernelSubroutineDirectLoop.cpp:63] Direct OP_DAT.
+[ParallelLoop.cpp:295] This argument is incremented.
+[CPPOpenCLKernelSubroutineDirectLoop.cpp:80] Reduction argument.
+[CPPOpenCLKernelSubroutineDirectLoop.cpp:420] Creating statements to stage out from local memory to shared memory for OP_DAT 2.
+[CPPOpenCLKernelSubroutineDirectLoop.cpp:428] Creating statements to stage out from shared memory to device memory for OP_DAT 2.
+[CPPOpenCLKernelSubroutineDirectLoop.cpp:420] Creating statements to stage out from local memory to shared memory for OP_DAT 3.
+[CPPOpenCLKernelSubroutineDirectLoop.cpp:428] Creating statements to stage out from shared memory to device memory for OP_DAT 3.
+[ParallelLoop.cpp:295] This argument is incremented.
+[CPPOpenCLKernelSubroutine.cpp:157] Creating reduction epilogue statements.
+[ParallelLoop.cpp:295] This argument is incremented.
+[ParallelLoop.cpp:295] This argument is incremented.
+[Subroutine.h:153] Subroutine name = update_host.
+[CPPOpenCLHostSubroutineDirectLoop.cpp:383] Creating host subroutine of direct loop.
+[CPPHostSubroutine.cpp:121] Creating host subroutine formal parameters.
+[CPPOpenCLHostSubroutine.cpp:1160] Creating OpenCL configuration launch local variable declarations.
+[CPPOpenCLHostSubroutineDirectLoop.cpp:351] Creating CUDA configuration parameters.
+[ParallelLoop.cpp:295] This argument is incremented.
+[CPPOpenCLHostSubroutine.cpp:1026] Creating local variable declarations needed for reduction.
+[ParallelLoop.cpp:295] This argument is incremented.
+[CPPOpenCLHostSubroutine.cpp:1054] Creating host reduction pointer 'reductionArrayHost5'.
+[CPPOpenCLHostSubroutineDirectLoop.cpp:322] Creating statements.
+[CPPOpenCLHostSubroutineDirectLoop.cpp:211] Creating OpenCL kernel initialisation statements.
+[CPPOpenCLHostSubroutine.cpp:130] Adding initial timing statements.
+[ParallelLoop.cpp:295] This argument is incremented.
+[CPPOpenCLHostSubroutine.cpp:785] Creating reduction epilogue statements.
+[ParallelLoop.cpp:295] This argument is incremented.
+[ParallelLoop.cpp:295] This argument is incremented.
+[CPPOpenCLHostSubroutine.cpp:649] Creating statements to initialise reduction variable.
+[CPPOpenCLHostSubroutineDirectLoop.cpp:52] Creating statements to call OpenCL kernel.
+[CPPOpenCLHostSubroutine.cpp:421] Adding actual parameters for OP_DECL_CONSTs.
+[CPPOpenCLHostSubroutine.cpp:1075] Creating statements to launch OpenCL kernel.
+[ParallelLoop.cpp:295] This argument is incremented.
+[CPPOpenCLHostSubroutine.cpp:617] Creating reduction prologue statements.
+[ParallelLoop.cpp:295] This argument is incremented.
+[CPPOpenCLHostSubroutine.cpp:458] Creating statements to update reduction variable.
+[CPPOpenCLHostSubroutine.cpp:201] Adding final timing statements.
+[CPPOpenCLHostSubroutine.cpp:227] 4.
+[CPPOpenCLHostSubroutine.cpp:234] OP_kernels[4].name.
+[CPPSubroutinesGeneration.cpp:88] Patching calls to OP_PAR_LOOPs.
+[CPPSubroutinesGeneration.cpp:103] Analysing OP_PAR_LOOP for user subroutine 'adt_calc'.
+[CPPSubroutinesGeneration.cpp:144] Analysing file 'airfoil.cpp'.
+[CPPSubroutinesGeneration.cpp:103] Analysing OP_PAR_LOOP for user subroutine 'bres_calc'.
+[CPPSubroutinesGeneration.cpp:144] Analysing file 'airfoil.cpp'.
+[CPPSubroutinesGeneration.cpp:103] Analysing OP_PAR_LOOP for user subroutine 'res_calc'.
+[CPPSubroutinesGeneration.cpp:144] Analysing file 'airfoil.cpp'.
+[CPPSubroutinesGeneration.cpp:103] Analysing OP_PAR_LOOP for user subroutine 'save_soln'.
+[CPPSubroutinesGeneration.cpp:144] Analysing file 'airfoil.cpp'.
+[CPPSubroutinesGeneration.cpp:103] Analysing OP_PAR_LOOP for user subroutine 'update'.
+[CPPSubroutinesGeneration.cpp:144] Analysing file 'airfoil.cpp'.
+[CPPSubroutinesGeneration.cpp:57] Adding OP2 include directive.
+[SubroutinesGeneration.h:212] File 'airfoil.cpp' has been modified.
+[Translator.cpp:92] Unparsing 'airfoil.cpp'.
+[Translator.cpp:114] File 'kernels.cpp' remains unchanged.
+[Translator.cpp:102] Unparsing generated file 'rose_opencl_code.cpp'.
+[Translator.cpp:581] Translation completed.
+==============================================================================
+Post-processing OP2 header includes in file 'airfoil.cpp'
+Post-processing OP2 header includes in file 'kernels.cpp'
+Postprocessing generated file 'rose_airfoil_opencl.cpp'
+Postprocessing generated file 'rose_kernels_opencl.cpp'
+
+**************************************************************** WARNING *****************************************************************
+* Good news: I am generating a Makefile for you called 'Makefile.opencl' to compile the code I just generated on your behalf!
+* Bad news: in order to succesfully compile the generated code via this Makefile, you must set an environment variable 'OP2_INSTALL_PATH'.
+* This environment variable should point to the directory '<prefix>/OP2-Common/op2'.
+* Otherwise, the OP2 include and library directories will not be found and the make process is doomed to fail.
+******************************************************************************************************************************************

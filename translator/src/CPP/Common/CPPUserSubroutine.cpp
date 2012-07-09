@@ -77,7 +77,7 @@ CPPUserSubroutine::createStatements ()
 
   for (vector <SgStatement *>::iterator it = originalStatements.begin (); it
       != originalStatements.end (); ++it)
-  {
+  { 
     appendStatement (*it, subroutineScope);
   }
 }
@@ -90,6 +90,7 @@ CPPUserSubroutine::createLocalVariableDeclarations ()
 void
 CPPUserSubroutine::createFormalParameterDeclarations ()
 {
+  using namespace SageBuilder;
   using std::string;
   using std::vector;
 
@@ -98,6 +99,8 @@ CPPUserSubroutine::createFormalParameterDeclarations ()
 
   SgFunctionParameterList * originalParameters =
       originalSubroutine->get_parameterList ();
+
+  int opDatIndex = 1;
 
   for (SgInitializedNamePtrList::iterator paramIt =
       originalParameters->get_args ().begin (); paramIt
@@ -111,11 +114,52 @@ CPPUserSubroutine::createFormalParameterDeclarations ()
         * variableDeclaration =
             RoseStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
                 variableName, type, subroutineScope, formalParameters);
+
+
+    if (parallelLoop->isDirectLoop ()) 
+    {
+      //if (!parallelLoop->isDirect (opDatIndex)) 
+      //{
+        int dimension = parallelLoop->getOpDatDimension (opDatIndex);
+
+        if (!parallelLoop->isIncremented (opDatIndex))
+        {
+          if (dimension == 1)
+          {
+            (*variableDeclaration->get_variables ().begin ())->get_storageModifier ().setOpenclGlobal ();
+          } else
+          {
+            //(*variableDeclaration->get_variables ().begin ())->get_storageModifier ().setOpenclLocal ();
+          }
+        }
+      //}
+    } else 
+    {
+      if (!parallelLoop->isDirect (opDatIndex))
+      {
+        if (!parallelLoop->isIncremented (opDatIndex)) 
+        {
+          (*variableDeclaration->get_variables ().begin ())->get_storageModifier ().setOpenclLocal ();
+        }
+      } else
+      {
+        if (parallelLoop->isIncremented (opDatIndex)) 
+        {
+          (*variableDeclaration->get_variables ().begin ())->get_storageModifier ().setOpenclLocal ();
+        } else
+        {
+          (*variableDeclaration->get_variables ().begin ())->get_storageModifier ().setOpenclGlobal ();
+        } 
+      }      
+    }
+    //(*variableDeclaration->get_variables ().begin())->get_storageModifier ().setOpenclLocal ();
+    ++opDatIndex;
   }
 
 /*
  * Nicolas: unused by OPEN, CUDA ? is that needed for OpenCL ?
- 
+ * Roxana: this is needed for the current OpenCL implementation. 
+*/ 
   for (vector <string>::const_iterator it = referencedOpDeclConsts.begin (); it
       != referencedOpDeclConsts.end (); ++it)
   {
@@ -123,12 +167,23 @@ CPPUserSubroutine::createFormalParameterDeclarations ()
 
     SgType * type = opConst->getType ();
 
+    string variableName = opConst->getVariableName ();
+
+    if (variableName.compare("qinf") == 0 || variableName.compare("*qinf") == 0) {
+      type = buildOpaqueType("float ", subroutineScope);  
+    } 
+
     SgVariableDeclaration
         * variableDeclaration =
             RoseStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
-                *it, type, subroutineScope, formalParameters);
+                *it, buildPointerType (type), subroutineScope, formalParameters);
+
+
+    //TODO: let's not write architecture dependent stuff in the CPP COmmon library! 
+    //But not sure how...
+    (*variableDeclaration->get_variables ().begin())->get_storageModifier ().setOpenclConstant ();
   }
-*/
+/* */
 }
 
 CPPUserSubroutine::CPPUserSubroutine (SgScopeStatement * moduleScope,

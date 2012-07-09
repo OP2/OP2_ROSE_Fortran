@@ -170,6 +170,8 @@ CPPOpenCLKernelSubroutine::createReductionEpilogueStatements ()
                 getIterationCounterVariableName (1)));
 
         SgMultiplyOp * multiplyExpression = buildMultiplyOp (
+            //OpenCL::getGlobalWorkItemIDCallStatement (subroutineScope), buildIntVal (
+            //    parallelLoop->getOpDatDimension (i)));
             OpenCL::getWorkGroupIDCallStatement (subroutineScope), buildIntVal (
                 parallelLoop->getOpDatDimension (i)));
 
@@ -253,7 +255,7 @@ CPPOpenCLKernelSubroutine::createReductionEpilogueStatements ()
       else
       {
         SgMultiplyOp * multiplyExpression = buildMultiplyOp (
-            OpenCL::getWorkGroupIDCallStatement (subroutineScope), buildIntVal (
+            OpenCL::getGlobalWorkItemIDCallStatement (subroutineScope), buildIntVal (
                 parallelLoop->getOpDatDimension (i)));
 
         SgPntrArrRefExp * arrayExpression2 =
@@ -358,6 +360,7 @@ CPPOpenCLKernelSubroutine::createReductionVariableDeclarations ()
 void
 CPPOpenCLKernelSubroutine::createOpDeclConstFormalParameterDeclarations ()
 {
+  using namespace SageBuilder;
   using std::string;
   using std::vector;
 
@@ -370,12 +373,19 @@ CPPOpenCLKernelSubroutine::createOpDeclConstFormalParameterDeclarations ()
       != ((CPPUserSubroutine *) userSubroutine)->lastOpConstReference (); ++it)
   {
     string const & variableName = *it;
+  
+    SgType * type = declarations->getOpConstDefinition (variableName)->getType ();
+  
+    if (variableName.compare("qinf") == 0) 
+    {
+      type = buildOpaqueType("float ", subroutineScope); 
+    }
 
     SgVariableDeclaration
         * variableDeclaration =
             RoseStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
                 variableName,
-                declarations->getOpConstDefinition (variableName)->getType (),
+                buildPointerType (type),
                 subroutineScope, formalParameters);
 
     (*variableDeclaration->get_variables ().begin ())->get_storageModifier ().setOpenclConstant ();

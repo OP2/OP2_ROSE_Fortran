@@ -89,11 +89,8 @@ FortranCUDAKernelSubroutineDirectLoop::createUserSubroutineCallStatement ()
       Debug::getInstance ()->debugMessage ("Reduction argument",
           Debug::OUTER_LOOP_LEVEL, __FILE__, __LINE__);
 
-      SgVarRefExp * varExpression = variableDeclarations->getReference (
+      parameterExpression = variableDeclarations->getReference (
           getOpDatLocalName (i));
-
-      parameterExpression = buildPntrArrRefExp (
-        varExpression, buildIntVal (0));
     }
     else if (parallelLoop->isGlobal (i))
     {
@@ -104,7 +101,7 @@ FortranCUDAKernelSubroutineDirectLoop::createUserSubroutineCallStatement ()
       {
         Debug::getInstance ()->debugMessage (
             "OP_GBL with read access (Scalar)", Debug::HIGHEST_DEBUG_LEVEL,
-            __FILE__, __LINE__);        
+            __FILE__, __LINE__);
 
         parameterExpression = variableDeclarations->getReference (getOpDatName (
             i));

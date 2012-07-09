@@ -40,6 +40,428 @@
 #include "CompilerGeneratedNames.h"
 #include "OP2.h"
 #include "Exceptions.h"
+#include "CPPParallelLoop.h"
+#include "PlanFunctionNames.h"
+
+void
+CPPOpenCLHostSubroutine::addHashDefs (
+    SgScopeStatement * scope)
+{
+  using namespace SageBuilder;
+  using namespace SageInterface;
+  using namespace OP2VariableNames;
+  using std::string;
+  using std::map;
+
+  string const & kernelVariableName = parallelLoop->getUserSubroutineName ();
+
+  CPPProgramDeclarationsAndDefinitions * programDeclarations = 
+      constantDeclarations->getProgramDeclarations ();
+
+  int index = 0;
+  int found = 0;
+	for (map <string, ParallelLoop *>::const_iterator it =
+		 programDeclarations->firstParallelLoop (); it
+		 != programDeclarations->lastParallelLoop () && !found; ++it)
+  {
+    if (it->second->getUserSubroutineName ().compare (kernelVariableName) == 0) 
+    {
+      found = 1;
+    } 
+    else 
+    {
+      ++index;
+    }
+  }
+
+  char buffer[100];
+  sprintf(buffer, "%d", index);
+ 
+  string opBlockSizeString = "OP_BLOCK_SIZE_";
+  opBlockSizeString += buffer;
+
+  SgExprStatement * assignBlkSize = buildAssignStatement (
+      variableDeclarations->getReference (
+          getBlockSizeVariableName (kernelVariableName)),
+      buildOpaqueVarRefExp (opBlockSizeString, scope));
+
+  appendStatement (assignBlkSize, scope); 
+
+  string temp = "\n#ifdef " + opBlockSizeString + "\n";  
+
+  addTextForUnparser (assignBlkSize, temp, 
+      AstUnparseAttribute::e_before);
+
+  addTextForUnparser (assignBlkSize, "\n#endif\n",
+      AstUnparseAttribute::e_after);
+
+  if (!parallelLoop->isDirectLoop ()) 
+  {
+    string opPartSizeString = "OP_PART_SIZE_";
+    opPartSizeString += buffer;
+
+    SgExprStatement * assignPartSize = buildAssignStatement (
+        variableDeclarations->getReference (
+            getPartitionSizeVariableName (kernelVariableName)),
+        buildOpaqueVarRefExp (opPartSizeString, scope));
+
+    appendStatement (assignPartSize, scope);
+
+    temp = "\n#ifdef " + opPartSizeString + "\n";
+  
+    addTextForUnparser (assignPartSize, temp, 
+      AstUnparseAttribute::e_before);
+  
+    addTextForUnparser (assignPartSize, "\n#endif\n",
+        AstUnparseAttribute::e_after);
+  }
+}
+
+void
+CPPOpenCLHostSubroutine::addTimingInitialDeclaration (
+    SgScopeStatement * scope)
+{
+  using namespace SageBuilder;
+  using namespace SageInterface;
+  using std::string;
+  
+  Debug::getInstance ()->debugMessage (
+      "Adding initial timing statements", Debug::FUNCTION_LEVEL,
+      __FILE__, __LINE__);
+
+  string const cpuT1 = "cpu_t1";
+
+  SgVariableDeclaration * cpuT1Declaration =  
+      RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
+          cpuT1, buildDoubleType (), scope);
+  
+  variableDeclarations->add (cpuT1, cpuT1Declaration);
+
+  string const cpuT2 = "cpu_t2";
+
+  SgVariableDeclaration * cpuT2Declaration =  
+      RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
+          cpuT2, buildDoubleType (), scope);
+  
+  variableDeclarations->add (cpuT2, cpuT2Declaration);
+
+  string const wallT1 = "wall_t1";
+
+  SgVariableDeclaration * wallT1Declaration =  
+      RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
+          wallT1, buildDoubleType (), scope);
+  
+  variableDeclarations->add (wallT1, wallT1Declaration);
+
+  string const wallT2 = "wall_t2";
+
+  SgVariableDeclaration * wallT2Declaration =  
+      RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
+          wallT2, buildDoubleType (), scope);
+  
+  variableDeclarations->add (wallT2, wallT2Declaration);
+
+  addTextForUnparser(wallT2Declaration, "\nop_timers(&cpu_t1, &wall_t1);\n",
+      AstUnparseAttribute::e_after);
+
+/*  SgFunctionCallExp * opTimerInitialExp = 
+      OpenCL::OP2RuntimeSupport::getOpTimerCallStatement (scope, 
+          variableDeclarations->getReference (cpuT1),
+          variableDeclarations->getReference (wallT1));
+
+  appendStatement (buildExprStatement (opTimerInitialExp), scope);
+
+  SgFunctionCallExp * opTimerInitialExp = 
+      OpenCL::getOpTimer (scope, 
+          buildOpaqueVarRefExp (cpuT1, scope),
+          buildOpaqueVarRefExp (wallT1, scope));
+          //variableDeclarations->getReference (cpuT1), 
+          //variableDeclarations->getReference (wallT1));
+
+  Debug::getInstance ()->debugMessage (
+      "build expr statement next", Debug::FUNCTION_LEVEL,
+      __FILE__, __LINE__);
+
+  appendStatement (buildExprStatement (opTimerInitialExp), scope);*/
+  
+}
+
+void
+CPPOpenCLHostSubroutine::addTimingFinalDeclaration (
+    SgScopeStatement * scope) {
+  using namespace SageInterface;
+  using namespace SageBuilder;
+  using namespace OP2VariableNames;
+  using namespace OP2::RunTimeVariableNames;
+  using std::string;
+  using std::map;
+  
+  Debug::getInstance ()->debugMessage (
+      "Adding final timing statements", Debug::FUNCTION_LEVEL,
+      __FILE__, __LINE__);
+
+  string const & kernelVariableName = parallelLoop->getUserSubroutineName ();
+
+  CPPProgramDeclarationsAndDefinitions * programDeclarations = 
+      constantDeclarations->getProgramDeclarations ();
+
+  int index = 0;
+  int found = 0;
+	for (map <string, ParallelLoop *>::const_iterator it =
+		 programDeclarations->firstParallelLoop (); it
+		 != programDeclarations->lastParallelLoop () && !found; ++it)
+  {
+    if (it->second->getUserSubroutineName ().compare (kernelVariableName) == 0) 
+    {
+      found = 1;
+    } 
+    else 
+    {
+      ++index;
+    }
+  }
+
+  char buffer[100];
+  sprintf(buffer, "%d", index);
+  Debug::getInstance ()->debugMessage (
+      buffer, Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+  
+  string opKernelsString = "OP_kernels[";
+  opKernelsString += buffer;
+  opKernelsString += "].name";
+
+  Debug::getInstance ()->debugMessage (
+      opKernelsString, Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+
+  SgExprStatement * opKernelsName = buildAssignStatement (
+      buildOpaqueVarRefExp (opKernelsString, scope), 
+      buildOpaqueVarRefExp (getUserSubroutineName (), scope));
+
+  appendStatement (opKernelsName, scope);
+   
+  opKernelsString = "OP_kernels[";
+  opKernelsString += buffer;
+  opKernelsString += "].count";
+
+  SgAddOp * incrementByOne = buildAddOp (
+      buildOpaqueVarRefExp (opKernelsString, scope), 
+      buildIntVal(1));
+
+  SgExprStatement * opKernelsCount = buildAssignStatement (
+      buildOpaqueVarRefExp (opKernelsString, scope), 
+      incrementByOne);
+      
+  appendStatement (opKernelsCount, scope);
+
+  SgSubtractOp * subtractWallTime = buildSubtractOp (
+      variableDeclarations->getReference ("wall_t2"),
+      variableDeclarations->getReference ("wall_t1"));
+ 
+  opKernelsString = "OP_kernels[";
+  opKernelsString += buffer;
+  opKernelsString += "].time";
+
+  SgAddOp * addToTime = buildAddOp (
+      buildOpaqueVarRefExp (opKernelsString, scope),
+      subtractWallTime);
+
+  SgExprStatement * opKernelsTime =  buildAssignStatement (
+      buildOpaqueVarRefExp (opKernelsString, scope),
+      addToTime);
+
+  appendStatement (opKernelsTime, scope);
+
+  addTextForUnparser(opKernelsName, "\nop_timers(&cpu_t2, &wall_t2);\n",
+      AstUnparseAttribute::e_after); 
+
+  string opTimingRealloc = "\nop_timing_realloc(";
+  opTimingRealloc += buffer;
+  opTimingRealloc += ");\n";
+
+  addTextForUnparser(opKernelsName, opTimingRealloc,
+      AstUnparseAttribute::e_before);
+
+  opKernelsString = "OP_kernels[";
+  opKernelsString += buffer;
+  opKernelsString += "].transfer";
+
+  if (parallelLoop->isDirectLoop ()) 
+  {
+  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i) 
+  {
+    if (parallelLoop->isDirect (i)) 
+    {
+    float accessTypeNoTransfers = 1.0;
+    
+    if (parallelLoop->isReadAndWritten (i))
+    {
+      accessTypeNoTransfers = 2.0;
+    }  
+ 
+    SgMultiplyOp * transfer = buildMultiplyOp (
+        buildCastExp (
+            buildArrowExp (
+                buildOpaqueVarRefExp (getOpSetName (), scope), 
+                buildOpaqueVarRefExp (OP2::RunTimeVariableNames::size, scope)), 
+                  buildFloatType ()), 
+        buildDotExp (variableDeclarations->getReference (getOpDatName (i)),
+            buildOpaqueVarRefExp (OP2::RunTimeVariableNames::size, scope)));
+
+    SgMultiplyOp * timesTransfer = buildMultiplyOp (
+        transfer,
+        buildFloatVal (accessTypeNoTransfers));
+
+    SgAddOp * addToTransfer = buildAddOp (
+        buildOpaqueVarRefExp (opKernelsString, scope),
+        timesTransfer);
+
+    SgExprStatement * opKernelsDat = buildAssignStatement (
+        buildOpaqueVarRefExp (opKernelsString, scope),
+        addToTransfer);
+
+    appendStatement (opKernelsDat, scope);
+    }
+  }
+  } 
+  else 
+  {
+    using namespace PlanFunctionVariableNames;
+  
+    SgAddOp * transfer1 = buildAddOp (
+        buildOpaqueVarRefExp (opKernelsString, scope),
+        buildArrowExp (variableDeclarations->getReference (planRet),
+            buildOpaqueVarRefExp ("transfer", scope)));
+    
+    SgExprStatement * opKernelsTransfer1 = buildAssignStatement (
+        buildOpaqueVarRefExp (opKernelsString, scope),
+        transfer1);
+
+    appendStatement (opKernelsTransfer1, scope);
+  
+    SgAddOp * transfer2 = buildAddOp (
+        buildOpaqueVarRefExp (opKernelsString, scope),
+        buildArrowExp (variableDeclarations->getReference (planRet),
+            buildOpaqueVarRefExp ("transfer2", scope)));
+  
+    SgExprStatement * opKernelsTransfer2 = buildAssignStatement (
+        buildOpaqueVarRefExp (opKernelsString, scope),
+        transfer2);
+    
+    appendStatement (opKernelsTransfer2, scope);
+  } 
+}
+
+void
+CPPOpenCLHostSubruotine::addTimingFullDeclaration (
+    SgScopeStatement * scope)
+{
+  using namespace SageBuilder;
+  using namespace SageInterface;
+  using std::string;
+
+  string const tQueueName = "tQueue";
+
+  SgVariableDeclaration * tQueue = 
+      RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
+         tQueueName, buildUnsignedLongType (), scope);
+  
+  variableDeclarations->add (tQueueName, tQueue);
+
+  string const tSubmitName = "tSubmit";
+
+  SgVariableDeclaration * tSubmit = 
+      RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
+          tSubmitName, buildUnsignedLongType (), scope);
+  
+  variableDeclarations->add (tSubmitName, tSubmit);
+
+  string const tStartName = "tStart";
+ 
+  SgVariableDeclaration * tStart = 
+      RoseStatementsAndExpressiosnBuilder::appendVariableDeclaration (
+          tStartName, buildUnsignedLongType (), scope);
+
+  variableDeclarations->add (tStartName, tStart);
+
+  string const tEndName = "tEnd";
+   
+  SgVariableDelcaration * tEnd = 
+      RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
+          tEndName, buildUnsignedLongType (), scope);
+
+  variableDeclarations->add (tEndName, tEnd);
+
+  string const tElapsedName = "tElapsed";
+
+  SgVariableDeclaration * tElapsed = 
+      RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
+        tElapsedName, buildUnsignedLongType (), scope);
+
+  variableDeclarations->add (tElapsedName, tElapsed);  
+
+  addTextForUnparser (tQueue, "\n#ifdef PROFILE\n", 
+      AstUnparseAttribute::e_before); 
+
+  //INCOMPLETE DUE TO THE FACT THAT THE NECESSARY STUFF DOES NOT EXIST 
+  //IN OP_KERNELS
+  
+}
+
+void 
+CPPOpenCLHostSubroutine::addAllocateConstants (
+    SgScopeStatement * scope)
+{
+  using namespace SageBuilder;
+  using namespace SageInterface;
+  using std::string;
+  using std::vector;
+
+  Debug::getInstance ()->debugMessage (
+      "Adding actual op_allocate_constant statements", Debug::FUNCTION_LEVEL,
+      __FILE__, __LINE__);
+
+  for (vector <string>::const_iterator it = 
+      ((CPPUserSubroutine *) userSubroutine)->firstOpConstReference (); it 
+      != ((CPPUserSubroutine *) userSubroutine)->lastOpConstReference (); ++it)
+  {
+   
+   
+  string variableName = *it + "_d";
+  SgVariableDeclaration * variableDeclaration = 
+      RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
+          variableName, OpenCL::getMemoryType(scope), scope);
+
+  variableDeclarations->add (variableName, variableDeclaration);
+
+  //SgType * type = constantDeclarations->getDeclarations ()->getReference(*it)->
+  //    get_type ();
+
+
+  //if (variableName.compare ("qinf_d") == 0)
+  //{
+      
+  //   type = buildOpaqueType ("4 * sizeof(float )", subroutineScope);
+
+  //}
+
+  SgFunctionCallExp * constantAllocation = 
+      OpenCL::getAllocateConstantExpression (subroutineScope, variableName,
+          variableDeclarations->getReference (*it), 
+          constantDeclarations->getDeclarations ()->getReference(*it)->
+          get_type ()); 
+
+  /*SgFunctionCallExp * constantAllocation =  
+      OpenCL::getAllocateConstantExpression (subroutineScope,
+          variableDeclarations->getReference (*it),
+          type);*/
+
+  SgExprStatement * assignmentStatement = buildAssignStatement (
+      variableDeclarations->getReference (variableName), 
+      constantAllocation);
+  
+  appendStatement (assignmentStatement, scope);
+  }
+}
 
 void
 CPPOpenCLHostSubroutine::addOpDeclConstActualParameters (
@@ -58,11 +480,13 @@ CPPOpenCLHostSubroutine::addOpDeclConstActualParameters (
       ((CPPUserSubroutine *) userSubroutine)->firstOpConstReference (); it
       != ((CPPUserSubroutine *) userSubroutine)->lastOpConstReference (); ++it)
   {
-    SgFunctionCallExp * kernelArgumentExpression =
-        OpenCL::getSetKernelArgumentCallExpression (subroutineScope,
-            variableDeclarations->getReference (OpenCL::kernelPointer),
-            argumentCounter++, OpenCL::getMemoryType (scope),
-            variableDeclarations->getReference (*it));
+
+  string variableName = *it + "_d";
+  SgFunctionCallExp * kernelArgumentExpression =
+      OpenCL::getSetKernelArgumentCallExpression (subroutineScope,
+          variableDeclarations->getReference (OpenCL::kernelPointer),
+          argumentCounter++, OpenCL::getMemoryType (scope),
+          buildOpaqueVarRefExp(variableName, scope));
 
     SgBitOrOp * orExpression = buildBitOrOp (
         variableDeclarations->getReference (OpenCL::errorCode),
@@ -575,9 +999,11 @@ CPPOpenCLHostSubroutine::createReductionPrologueStatements ()
       SgAddOp
           * addExpression2 =
               buildAddOp (
-                  OpenCL::OP2RuntimeSupport::getPointerToMemoryAllocatedForDeviceReductionArray (
-                      subroutineScope), variableDeclarations->getReference (
-                      reductionBytes));
+                  buildCastExp (
+                      OpenCL::OP2RuntimeSupport::getPointerToMemoryAllocatedForDeviceReductionArray (
+                          subroutineScope), buildPointerType (buildOpaqueType("char", subroutineScope))), 
+                  variableDeclarations->getReference (
+                  reductionBytes));
 
       SgDotExp * dotExpression2 = buildDotExp (
           variableDeclarations->getReference (getOpDatName (i)),
@@ -789,6 +1215,8 @@ CPPOpenCLHostSubroutine::createOpenCLConfigurationLaunchDeclarations ()
       "Creating OpenCL configuration launch local variable declarations",
       Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
+  addHashDefs (subroutineScope);
+
   variableDeclarations->add (OpenCL::blocksPerGrid,
       RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
           OpenCL::blocksPerGrid, OpenCL::getSizeType (subroutineScope),
@@ -830,7 +1258,8 @@ CPPOpenCLHostSubroutine::CPPOpenCLHostSubroutine (
     CPPOpenCLKernelSubroutine * calleeSubroutine,
     CPPParallelLoop * parallelLoop, CPPModuleDeclarations * moduleDeclarations,
     CPPUserSubroutine * userSubroutine,
-    CPPOpenCLConstantDeclarations * constantDeclarations) :
+    CPPOpenCLConstantDeclarations * constantDeclarations,
+    CPPProgramDeclarationsAndDefinitions * declarations) :
   CPPHostSubroutine (moduleScope, calleeSubroutine, parallelLoop),
       moduleDeclarations (moduleDeclarations), userSubroutine (userSubroutine),
       constantDeclarations (constantDeclarations)

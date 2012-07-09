@@ -54,7 +54,7 @@ namespace OpenCL
   std::string const CLK_LOCAL_MEM_FENCE = "CLK_LOCAL_MEM_FENCE";
   std::string const errorCode = "errorCode";
   std::string const event = "event";
-  std::string const commandQueue = "commandQueue";
+  std::string const commandQueue = "cqCommandQueue";
   std::string const kernelPointer = "kernelPointer";
 
   /*
@@ -152,6 +152,26 @@ namespace OpenCL
    */
   SgType *
   getDoublePrecisionFloatType (SgScopeStatement * scope);
+  
+  /*
+   * ======================================================
+   * Function call to set an OpenCL constant allocation
+   * ======================================================
+   */
+  SgFunctionCallExp *
+  getAllocateConstantExpression(SgScopeStatement * scope,
+      std::string constantName, 
+      SgVarRefExp * constant, SgType * constantType);
+
+  /*
+   * ======================================================
+   * Function call to set an OpenCL kernel buffer 
+   * argument
+   * ======================================================
+   */
+  SgFunctionCallExp *
+  getSetKernelArgumentCallBufferExpression (SgScopeStatement * scope,
+      SgVarRefExp * openCLKernel, int argumentIndex, SgExpression * bufferRef);
 
   /*
    * ======================================================
@@ -225,6 +245,15 @@ namespace OpenCL
    * ======================================================
    */
   SgFunctionCallExp *
+  getGlobalWorkItemIDCallStatement (SgScopeStatement * scope, 
+      SgExpression * expression = NULL);
+
+  /*
+   * ======================================================
+   * Function call to OpenCL get_group_id.
+   * ======================================================
+   */
+  SgFunctionCallExp *
   getWorkGroupIDCallStatement (SgScopeStatement * scope,
       SgExpression * expression = NULL);
 
@@ -236,8 +265,23 @@ namespace OpenCL
   SgFunctionCallExp *
   createWorkItemsSynchronisationCallStatement (SgScopeStatement * scope);
 
+/*  SgFunctionCallExp *
+  getOpTimer (SgScopeStatement * scope, SgVarRefExp * cpuTime, SgVarRefExp * wallTime);
+*/
+
+//  SgFunctionCallExp *
+//  getOpTimerCallStatement (SgScopeStatement * scope);
+
   namespace OP2RuntimeSupport
   {
+    SgFunctionCallExp * 
+    getOpTimerCallStatement (SgScopeStatement * scope,
+    SgVarRefExp * cpuTime, SgVarRefExp * wallTime);
+
+    SgFunctionCallExp *
+    getOpTimingReallocCallStatement (SgScopeStatement * scope,
+    SgExpression * index);
+
     SgFunctionCallExp *
     getKernel (SgScopeStatement * scope, std::string const & kernelName);
 

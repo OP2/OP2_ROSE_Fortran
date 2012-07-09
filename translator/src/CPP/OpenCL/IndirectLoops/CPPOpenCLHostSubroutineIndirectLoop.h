@@ -68,7 +68,8 @@ class CPPOpenCLHostSubroutineIndirectLoop: public CPPOpenCLHostSubroutine
         CPPParallelLoop * parallelLoop,
         CPPModuleDeclarations * moduleDeclarations,
         CPPUserSubroutine * userSubroutine,
-        CPPOpenCLConstantDeclarations * constantDeclarations);
+        CPPOpenCLConstantDeclarations * constantDeclarations,
+        CPPProgramDeclarationsAndDefinitions * declarations);
 };
 
 #endif

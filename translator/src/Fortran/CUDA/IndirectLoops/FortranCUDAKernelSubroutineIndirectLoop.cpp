@@ -217,14 +217,8 @@ FortranCUDAKernelSubroutineIndirectLoop::createUserSubroutineCallStatement ()
     }
     else if (parallelLoop->isReductionRequired (i))
     {
-      /*      parameterExpression = variableDeclarations->getReference (
-              getOpDatLocalName (i)); */
-
-      SgVarRefExp * varExpression = variableDeclarations->getReference (
+      parameterExpression = variableDeclarations->getReference (
           getOpDatLocalName (i));
-
-      parameterExpression = buildPntrArrRefExp (
-        varExpression, buildIntVal (0));
     }
     else if (parallelLoop->isGlobal (i))
     {

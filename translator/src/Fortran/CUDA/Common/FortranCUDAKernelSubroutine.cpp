@@ -350,20 +350,27 @@ FortranCUDAKernelSubroutine::createCUDAStageInVariablesVariableDeclarations ()
   {
     string const & variableName = getOpDatLocalName (i);
 
-    if ( parallelLoop->isStageInNeeded (i) )
+    if (parallelLoop->isStageInNeeded (i))
     {
-      if ( parallelLoop->getOpDatDimension (i) > 1 || parallelLoop->isGlobal (i) )
+      if (parallelLoop->isGlobal (i) && parallelLoop->isArray (i) == false)
+      {
         variableDeclarations->add (variableName,
+            FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
+                variableName, parallelLoop->getOpDatBaseType (i),
+                subroutineScope));
+      }
+      else
+      {
+        if (parallelLoop->isIncremented (i) == true)
+        {
+          variableDeclarations->add (variableName,
               FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
                   variableName, FortranTypesBuilder::getArray_RankOne (
                       parallelLoop->getOpDatBaseType (i), 0, buildIntVal (
                           parallelLoop->getOpDatDimension (i) - 1)),
                   subroutineScope));
-      else                  
-        variableDeclarations->add (variableName,
-            FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
-                variableName, parallelLoop->getOpDatBaseType (i),
-                subroutineScope));
+        }
+      }
     }
   }
 }

@@ -588,7 +588,7 @@ CPPCUDAKernelSubroutineIndirectLoop::createInitialiseCUDASharedVariablesStatemen
             appendStatement (assignmentStatement, loopBody);
           }
         }
-        else if ( !parallelLoop->isWritten (i) )
+        else
         {
           SgDivideOp * divideExpression = buildDivideOp (
               variableDeclarations->getReference (

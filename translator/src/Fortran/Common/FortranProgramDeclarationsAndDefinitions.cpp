@@ -451,11 +451,7 @@ FortranProgramDeclarationsAndDefinitions::visit (SgNode * node)
   {
     path p = system_complete (path (isSgSourceFile (node)->getFileName ()));
 
-#if BOOST_FILESYSTEM_VERSION == 3
-    currentSourceFile = p.filename ().string ();
-#else
     currentSourceFile = p.filename ();
-#endif
 
     Debug::getInstance ()->debugMessage ("Source file '" + currentSourceFile
         + "' detected", Debug::OUTER_LOOP_LEVEL, __FILE__, __LINE__ );

@@ -50,7 +50,8 @@
 //
 // OP header file
 //
-#include "op_lib_cpp.h"
+//#include "op_lib_cpp.h"
+#include "OP2_OXFORD.h"
 
 //
 // Variables referenced in kernels with global scope

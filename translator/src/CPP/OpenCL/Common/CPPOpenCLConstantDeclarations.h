@@ -45,6 +45,7 @@ class CPPOpenCLConstantDeclarations
   private:
 
     ScopedVariableDeclarations * variableDeclarations;
+    CPPProgramDeclarationsAndDefinitions * programDeclarations;
 
   private:
 
@@ -56,6 +57,9 @@ class CPPOpenCLConstantDeclarations
 
     ScopedVariableDeclarations *
     getDeclarations ();
+
+    CPPProgramDeclarationsAndDefinitions * 
+    getProgramDeclarations ();
 
     CPPOpenCLConstantDeclarations (
         CPPProgramDeclarationsAndDefinitions * declarations,

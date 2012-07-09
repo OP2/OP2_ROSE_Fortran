@@ -84,41 +84,36 @@ template <class TGenerator>
           if (file != NULL)
           {
             path p = system_complete (path (file->getFileName ()));
-#if BOOST_FILESYSTEM_VERSION == 3
-	    string filename = p.filename ().string ();
-#else
-	    string filename = p.filename ();
-#endif
 
-            if (generator->isDirty (filename))
+            if (generator->isDirty (p.filename ()))
             {
               Debug::getInstance ()->debugMessage ("Unparsing '"
-                  + filename + "'", Debug::FUNCTION_LEVEL, __FILE__,
+                  + p.filename () + "'", Debug::FUNCTION_LEVEL, __FILE__,
                   __LINE__);
 
-              outputFiles.push_back ("rose_" + filename);
+              outputFiles.push_back ("rose_" + p.filename ());
 
               file->unparse ();
             }
-            else if (iequals (filename, generator->getFileName ()))
+            else if (iequals (p.filename (), generator->getFileName ()))
             {
               Debug::getInstance ()->debugMessage ("Unparsing generated file '"
-                  + filename + "'", Debug::FUNCTION_LEVEL, __FILE__,
+                  + p.filename () + "'", Debug::FUNCTION_LEVEL, __FILE__,
                   __LINE__);
 
-              outputFiles.push_back (filename);
+              outputFiles.push_back (p.filename ());
 
-              generatedFile = filename;
+              generatedFile = p.filename ();
 
               file->unparse ();
             }
             else
             {
-              Debug::getInstance ()->debugMessage ("File '" + filename
+              Debug::getInstance ()->debugMessage ("File '" + p.filename ()
                   + "' remains unchanged", Debug::FUNCTION_LEVEL, __FILE__,
                   __LINE__);
 
-              outputFiles.push_back ("rose_" + filename);
+              outputFiles.push_back ("rose_" + p.filename ());
 
               file->unparse ();
             }

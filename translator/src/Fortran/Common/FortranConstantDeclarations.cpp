@@ -36,6 +36,7 @@
 #include "ScopedVariableDeclarations.h"
 #include "Debug.h"
 #include <rose.h>
+#include "../../../../../ROSE/rose-0.9.5a-15165_build/src/frontend/SageIII/Cxx_Grammar.h"
 
 SgVarRefExp *
 FortranConstantDeclarations::getReferenceToNewVariable (

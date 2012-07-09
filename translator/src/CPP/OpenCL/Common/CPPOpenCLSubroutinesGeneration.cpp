@@ -131,7 +131,7 @@ CPPOpenCLSubroutinesGeneration::createSubroutines ()
       hostSubroutines[userSubroutineName]
           = new CPPOpenCLHostSubroutineDirectLoop (moduleScope,
               kernelSubroutine, parallelLoop, moduleDeclarations,
-              userDeviceSubroutine, constantDeclarations);
+              userDeviceSubroutine, constantDeclarations, declarations);
     }
     else
     {
@@ -142,7 +142,7 @@ CPPOpenCLSubroutinesGeneration::createSubroutines ()
       hostSubroutines[userSubroutineName]
           = new CPPOpenCLHostSubroutineIndirectLoop (moduleScope,
               kernelSubroutine, parallelLoop, moduleDeclarations,
-              userDeviceSubroutine, constantDeclarations);
+              userDeviceSubroutine, constantDeclarations, declarations);
     }
   }
 }
@@ -151,17 +151,35 @@ void
 CPPOpenCLSubroutinesGeneration::addHeaderIncludes ()
 {
   using namespace SageInterface;
+  using std::string;
 
   Debug::getInstance ()->debugMessage (
       "Adding '#include' statements to main file", Debug::FUNCTION_LEVEL,
       __FILE__, __LINE__);
 
-  addTextForUnparser (moduleScope, "\n#include <CL/cl.h>\n",
+  std::string ROUND_UP = "\n#define ROUND_UP(bytes) (((bytes) + 15) & ~15)\n";
+  std::string MIN = "\n#define MIN(a,b) ((a<b) ? (a) : (b))\n";
+  std::string ZERO_float = "\n#define ZERO_float 0.0f\n";  
+
+/*  addTextForUnparser (moduleScope, ROUND_UP, 
       AstUnparseAttribute::e_after);
 
-  addTextForUnparser (moduleScope, "#include \""
-      + OP2::Libraries::CPP::mainLibrary + "\"\n",
+  addTextForUnparser (moduleScope, MIN,
+      AstUnparseAttribute::e_after);
+  
+  addTextForUnpraser (moduleScope, ZERO_float,
+      AstUnparseAttribute::e_after);
+*/
+  
+  addTextForUnparser (moduleScope, "\n#define ROUND_UP(bytes) (((bytes) + 15) & ~15)\n\n#define MIN(a,b) ((a<b) ? (a) : (b))\n\n#define ZERO_float 0.0f\n",
+    AstUnparseAttribute::e_after);
+  addTextForUnparser (moduleScope, "\n#include <CL/cl.h>\n\n#include \"op_opencl_rt_support.h\"\n",
+      //AstUnparseAttribute::e_after);
       AstUnparseAttribute::e_before);
+
+  //addTextForUnparser (moduleScope, "#include \""
+  //    + OP2::Libraries::CPP::mainLibrary + "\"\n",
+  //    AstUnparseAttribute::e_before);
 }
 
 CPPOpenCLSubroutinesGeneration::CPPOpenCLSubroutinesGeneration (

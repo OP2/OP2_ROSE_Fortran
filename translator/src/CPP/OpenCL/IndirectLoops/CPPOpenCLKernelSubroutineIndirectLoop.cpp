@@ -260,7 +260,8 @@ CPPOpenCLKernelSubroutineIndirectLoop::createIncrementAndWriteAccessEpilogueStat
           SgPlusAssignOp * strideExpression = buildPlusAssignOp (
               variableDeclarations->getReference (
                   getIterationCounterVariableName (1)),
-              OpenCL::getWorkGroupIDCallStatement (subroutineScope));
+              //OpenCL::getGlobalWorkItemIDCallStatement (subroutineScope));
+              OpenCL::getLocalWorkGroupSizeCallStatement (subroutineScope));
 
           SgForStatement * forStatement = buildForStatement (
               initialisationExpression, buildExprStatement (
@@ -794,20 +795,26 @@ CPPOpenCLKernelSubroutineIndirectLoop::createSetOpDatSharedMemoryPointerStatemen
          * ======================================================
          */
 
+        SgDivideOp * divisionOp = buildDivideOp (
+            variableDeclarations->getReference (nbytes),
+            buildSizeOfOp (parallelLoop->getOpDatBaseType (i)));
+
         SgPntrArrRefExp * arrayExpression2 = buildPntrArrRefExp (
             variableDeclarations->getReference (getSharedMemoryDeclarationName (
                 parallelLoop->getUserSubroutineName ())),
-            variableDeclarations->getReference (nbytes));
+            //variableDeclarations->getReference (nbytes));
+            divisionOp);
 
         SgAddressOfOp * addressOfExpression2 = buildAddressOfOp (
             arrayExpression2);
 
-        SgCastExp * castExpression2 = buildCastExp (addressOfExpression2,
-            buildPointerType (parallelLoop->getOpDatBaseType (i)));
+        //SgCastExp * castExpression2 = buildCastExp (addressOfExpression2,
+        //    buildPointerType (parallelLoop->getOpDatBaseType (i)));
 
         SgExprStatement * assignmentStatement2 = buildAssignStatement (
             variableDeclarations->getReference (
-                getIndirectOpDatSharedMemoryName (i)), castExpression2);
+                //getIndirectOpDatSharedMemoryName (i)), castExpression2);
+                getIndirectOpDatSharedMemoryName (i)), addressOfExpression2);
 
         appendStatement (assignmentStatement2, block);
 
@@ -981,7 +988,8 @@ CPPOpenCLKernelSubroutineIndirectLoop::createThreadZeroStatements ()
    */
 
   SgAddOp * arrayIndexExpression1 = buildAddOp (
-      OpenCL::getGlobalWorkGroupSizeCallStatement (subroutineScope),
+      //OpenCL::getGlobalWorkGroupSizeCallStatement (subroutineScope),
+      OpenCL::getWorkGroupIDCallStatement (subroutineScope),
       variableDeclarations->getReference (blockOffset));
 
   SgPntrArrRefExp * arrayExpression1 = buildPntrArrRefExp (
@@ -1194,7 +1202,7 @@ CPPOpenCLKernelSubroutineIndirectLoop::createExecutionLocalVariableDeclarations 
       RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (nbytes,
           buildIntType (), subroutineScope);
 
-  variableDeclaration3->get_declarationModifier ().get_storageModifier ().setOpenclLocal ();
+  //variableDeclaration3->get_declarationModifier ().get_storageModifier ().setOpenclLocal ();
 
   variableDeclarations ->add (nbytes, variableDeclaration3);
 
@@ -1244,10 +1252,12 @@ CPPOpenCLKernelSubroutineIndirectLoop::createLocalVariableDeclarations ()
 
         SgVariableDeclaration * variableDeclaration =
             RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
-                variableName, buildPointerType (buildIntType ()),
+                variableName, 
+                //buildOpaqueType (buildPointerType (buildIntType ())->class_name () + " __local ", subroutineScope),
+                buildOpaqueType (" int* __local ", subroutineScope),
                 subroutineScope);
 
-        variableDeclaration->get_declarationModifier ().get_storageModifier ().setOpenclLocal ();
+        variableDeclaration->get_declarationModifier ().get_storageModifier ().setOpenclGlobal ();
 
         variableDeclarations->add (variableName, variableDeclaration);
       }
@@ -1292,8 +1302,10 @@ CPPOpenCLKernelSubroutineIndirectLoop::createLocalVariableDeclarations ()
 
         SgVariableDeclaration * variableDeclaration =
             RoseStatementsAndExpressionsBuilder::appendVariableDeclaration (
-                variableName, buildPointerType (parallelLoop->getOpDatBaseType (
-                    i)), subroutineScope);
+                variableName,
+                //buildPointerType (parallelLoop->getOpDatBaseType (i)), 
+                buildOpaqueType (" float * __local ", subroutineScope), 
+                subroutineScope);
 
         variableDeclaration->get_declarationModifier ().get_storageModifier ().setOpenclLocal ();
 
@@ -1474,7 +1486,7 @@ CPPOpenCLKernelSubroutineIndirectLoop::createPlanFormalParameterDeclarations ()
       * variableDeclaration9 =
           RoseStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
               getSharedMemoryDeclarationName (
-                  parallelLoop->getUserSubroutineName ()), buildIntType (),
+                  parallelLoop->getUserSubroutineName ()), buildPointerType (buildFloatType ()),
               subroutineScope, formalParameters);
 
   (*variableDeclaration9->get_variables ().begin ())->get_storageModifier ().setOpenclLocal ();

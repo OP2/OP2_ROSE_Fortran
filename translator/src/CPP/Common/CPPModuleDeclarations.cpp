@@ -37,6 +37,7 @@
 #include "Debug.h"
 #include "CompilerGeneratedNames.h"
 #include <rose.h>
+#include "OP2.h"
 
 void
 CPPModuleDeclarations::addParallelLoopSettingsVariables (
@@ -46,12 +47,15 @@ CPPModuleDeclarations::addParallelLoopSettingsVariables (
   using namespace SageBuilder;
   using namespace SageInterface;
   using namespace OP2VariableNames;
+  using namespace OP2::Macros;
   using std::map;
   using std::string;
 
   Debug::getInstance ()->debugMessage (
       "Adding variables to file to control OP2 block size and partition size settings",
       Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+
+  SgVariableDeclaration * variableDeclaration1;
 
   for (map <string, ParallelLoop *>::const_iterator it =
       declarations->firstParallelLoop (); it
@@ -65,7 +69,7 @@ CPPModuleDeclarations::addParallelLoopSettingsVariables (
     std::string const & variableName1 = getBlockSizeVariableName (
         userSubroutineName);
 
-    SgVariableDeclaration * variableDeclaration1 = buildVariableDeclaration (
+    variableDeclaration1 = buildVariableDeclaration (
         variableName1, buildIntType (), buildAssignInitializer (buildIntVal (
             512), buildIntType ()), moduleScope);
 
@@ -80,13 +84,26 @@ CPPModuleDeclarations::addParallelLoopSettingsVariables (
 
       SgVariableDeclaration * variableDeclaration2 = buildVariableDeclaration (
           variableName2, buildIntType (), buildAssignInitializer (buildIntVal (
-              0), buildIntType ()), moduleScope);
+              512), buildIntType ()), moduleScope);
 
       variableDeclarations ->add (variableName2, variableDeclaration2);
 
       appendStatement (variableDeclaration2, moduleScope);
     }
-  }
+  } 
+   
+    string opWarpsize = warpSizeMacro + "_0";
+
+    string fullLine = "\n#define " + warpSizeMacro + " " + opWarpsize + "\n";
+    string temp = "\n#ifdef " + opWarpsize + "\n" + fullLine + "\n#endif\n";
+/*    addTextForUnparser (variableDeclaration1, temp,
+        AstUnparseAttribute::e_after);*/
+
+    addTextForUnparser (variableDeclaration1, temp,
+        AstUnparseAttribute::e_after);
+
+/*    addTextForUnparser (variableDeclaration1, "\n#endif\n", 
+        AstUnparseAttribute::e_after);*/
 }
 
 ScopedVariableDeclarations *

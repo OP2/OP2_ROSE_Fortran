@@ -78,11 +78,19 @@ CPPOpenCLConstantDeclarations::getDeclarations ()
   return variableDeclarations;
 }
 
+CPPProgramDeclarationsAndDefinitions * 
+CPPOpenCLConstantDeclarations::getProgramDeclarations () 
+{
+  return programDeclarations;
+}
+
 CPPOpenCLConstantDeclarations::CPPOpenCLConstantDeclarations (
     CPPProgramDeclarationsAndDefinitions * declarations,
     SgScopeStatement * moduleScope)
 {
   variableDeclarations = new ScopedVariableDeclarations ();
+
+  programDeclarations = declarations;  
 
   addDeclarations (declarations, moduleScope);
 }

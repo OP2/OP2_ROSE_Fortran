@@ -434,7 +434,7 @@ CPPOpenCLKernelSubroutineDirectLoop::createExecutionLoopStatements ()
 
   SgAssignOp * initialisationExpression = buildAssignOp (
       variableDeclarations->getReference (getIterationCounterVariableName (1)),
-      OpenCL::getWorkGroupIDCallStatement (subroutineScope));
+      OpenCL::getGlobalWorkItemIDCallStatement (subroutineScope));
 
   SgLessThanOp * upperBoundExpression = buildLessThanOp (
       variableDeclarations->getReference (getIterationCounterVariableName (1)),

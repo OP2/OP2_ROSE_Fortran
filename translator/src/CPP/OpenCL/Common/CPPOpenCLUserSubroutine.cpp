@@ -39,5 +39,6 @@ CPPOpenCLUserSubroutine::CPPOpenCLUserSubroutine (
     CPPProgramDeclarationsAndDefinitions * declarations) :
   CPPUserSubroutine (moduleScope, parallelLoop, declarations)
 {
+
   subroutineHeaderStatement->get_functionModifier ().setInline ();
 }
