@@ -1074,6 +1074,11 @@ CPPCUDAKernelSubroutineIndirectLoop::createStatements ()
   appendStatementList (
       createIncrementAndWriteAccessEpilogueStatements ()->getStatementList (),
       subroutineScope);
+
+  if (parallelLoop->isReductionRequired ())
+  {
+    createReductionEpilogueStatements ();
+  }
 }
 
 void
