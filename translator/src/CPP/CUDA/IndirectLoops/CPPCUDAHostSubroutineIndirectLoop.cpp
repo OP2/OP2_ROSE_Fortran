@@ -163,6 +163,7 @@ CPPCUDAHostSubroutineIndirectLoop::createPlanFunctionExecutionStatements ()
   using namespace SageInterface;
   using namespace OP2VariableNames;
   using namespace LoopVariableNames;
+  using namespace ReductionVariableNames;
   using namespace PlanFunctionVariableNames;
 
   Debug::getInstance ()->debugMessage (
@@ -209,15 +210,12 @@ CPPCUDAHostSubroutineIndirectLoop::createPlanFunctionExecutionStatements ()
    * ======================================================
    */
 
-  SgArrowExp * arrowExpression3 = buildArrowExp (
-      variableDeclarations->getReference (planRet), buildOpaqueVarRefExp (
-          nshared, subroutineScope));
+  SgExprStatement * assignmentStatement4 = buildAssignStatement (
+      variableDeclarations->getReference (CUDA::threadsPerBlock),
+      variableDeclarations->getReference (getBlockSizeVariableName (
+          parallelLoop->getUserSubroutineName ())));
 
-  SgExprStatement * assignmentStatement3 = buildAssignStatement (
-      variableDeclarations->getReference (CUDA::sharedMemorySize),
-      arrowExpression3);
-
-  appendStatement (assignmentStatement3, loopBody);
+  appendStatement (assignmentStatement4, loopBody);
 
   /*
    * ======================================================
@@ -225,12 +223,27 @@ CPPCUDAHostSubroutineIndirectLoop::createPlanFunctionExecutionStatements ()
    * ======================================================
    */
 
-  SgExprStatement * assignmentStatement4 = buildAssignStatement (
-      variableDeclarations->getReference (CUDA::threadsPerBlock),
-      variableDeclarations->getReference (getBlockSizeVariableName (
-          parallelLoop->getUserSubroutineName ())));
+  SgArrowExp * arrowExpression3 = buildArrowExp (
+      variableDeclarations->getReference (planRet), buildOpaqueVarRefExp (
+          nshared, subroutineScope));
 
-  appendStatement (assignmentStatement4, loopBody);
+  SgVarRefExp * smem = variableDeclarations->getReference (CUDA::sharedMemorySize);
+
+  SgExprStatement * assignmentStatement3;
+  if (parallelLoop->isReductionRequired())
+  {
+    SgExprListExp * parms = buildExprListExp ();
+    parms->append_expression (arrowExpression3);
+    parms->append_expression (buildMultiplyOp (variableDeclarations->getReference (reductionSharedMemorySize),
+                                               variableDeclarations->getReference (CUDA::threadsPerBlock)));
+    assignmentStatement3 = buildAssignStatement (smem,
+      buildFunctionCallExp ("MAX", buildVoidType (), parms, subroutineScope));
+  }
+  else
+  {
+    assignmentStatement3 = buildAssignStatement (smem, arrowExpression3);
+  }
+  appendStatement (assignmentStatement3, loopBody);
 
   /*
    * ======================================================
@@ -339,6 +352,61 @@ CPPCUDAHostSubroutineIndirectLoop::createPlanFunctionCallStatement ()
 }
 
 void
+CPPCUDAHostSubroutineIndirectLoop::createSetMaxBlocksPerGrid ()
+{
+  using namespace SageBuilder;
+  using namespace SageInterface;
+  using namespace OP2VariableNames;
+  using namespace LoopVariableNames;
+  using namespace PlanFunctionVariableNames;
+
+  SgVarRefExp * itvar = variableDeclarations->getReference (getIterationCounterVariableName (1));
+  SgExprStatement * init = buildAssignStatement (
+    itvar,
+    buildIntVal (0));
+  SgArrowExp * ncol = buildArrowExp (
+    variableDeclarations->getReference (planRet),
+    buildOpaqueVarRefExp (ncolors, subroutineScope));
+  SgLessThanOp * test = buildLessThanOp (itvar, ncol);
+
+  SgPlusPlusOp * increment = buildPlusPlusOp (itvar);
+
+  SgBasicBlock * body = buildBasicBlock ();
+
+  SgVarRefExp * blocks = variableDeclarations->getReference (CUDA::blocksPerGrid);
+
+  // Zero blocksPerGrid
+  appendStatement(buildAssignStatement (blocks, buildIntVal (0)),
+                  subroutineScope);
+
+
+  SgExprListExp * parms = buildExprListExp ();
+  parms->append_expression (blocks);
+  SgPntrArrRefExp * nblk = buildPntrArrRefExp (
+      buildOpaqueVarRefExp (ncolblk, subroutineScope),
+      variableDeclarations->getReference (getIterationCounterVariableName (1)));
+
+  SgArrowExp * nblocks = buildArrowExp (
+    variableDeclarations->getReference (planRet),
+    nblk);
+  appendStatement (
+    buildAssignStatement (variableDeclarations->getReference (getIterationCounterVariableName (2)),
+                          nblocks), body);
+  parms->append_expression (variableDeclarations->getReference (getIterationCounterVariableName (2)));
+
+  SgExprStatement * assign = buildAssignStatement (
+    blocks,
+    buildFunctionCallExp ("MAX", buildVoidType (), parms, subroutineScope));
+
+  appendStatement (assign, body);
+  SgForStatement * forLoopStatement = buildForStatement (
+    init, buildExprStatement (test),
+    increment, body);
+
+  appendStatement (forLoopStatement, subroutineScope);
+}
+
+void
 CPPCUDAHostSubroutineIndirectLoop::createStatements ()
 {
   using namespace SageBuilder;
@@ -347,16 +415,17 @@ CPPCUDAHostSubroutineIndirectLoop::createStatements ()
   Debug::getInstance ()->debugMessage ("Creating statements",
       Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
-  if (parallelLoop->isReductionRequired ())
-  {
-    createReductionPrologueStatements ();
-  }
-
   appendStatementList (
       createInitialisePlanFunctionArrayStatements ()->getStatementList (),
       subroutineScope);
 
   appendStatement (createPlanFunctionCallStatement (), subroutineScope);
+
+  if (parallelLoop->isReductionRequired ())
+  {
+    createSetMaxBlocksPerGrid ();
+    createReductionPrologueStatements ();
+  }
 
   appendStatementList (
       createPlanFunctionExecutionStatements ()->getStatementList (),

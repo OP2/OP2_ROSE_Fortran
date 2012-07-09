@@ -1050,6 +1050,11 @@ CPPCUDAKernelSubroutineIndirectLoop::createStatements ()
   using namespace SageBuilder;
   using namespace SageInterface;
 
+  if (parallelLoop->isReductionRequired ())
+  {
+    createReductionPrologueStatements ();
+  }
+
   appendStatement (createThreadZeroStatements (), subroutineScope);
 
   appendStatement (buildExprStatement (
@@ -1069,6 +1074,11 @@ CPPCUDAKernelSubroutineIndirectLoop::createStatements ()
   appendStatementList (
       createIncrementAndWriteAccessEpilogueStatements ()->getStatementList (),
       subroutineScope);
+
+  if (parallelLoop->isReductionRequired ())
+  {
+    createReductionEpilogueStatements ();
+  }
 }
 
 void
@@ -1173,7 +1183,8 @@ CPPCUDAKernelSubroutineIndirectLoop::createStageInVariableDeclarations ()
 
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
-    if (parallelLoop->isIndirect (i) && parallelLoop->isIncremented (i))
+    if ( (parallelLoop->isIndirect (i) && parallelLoop->isIncremented (i))
+         || (parallelLoop->isGlobal (i) && !parallelLoop->isReductionRequired (i)))
     {
       string const & variableName = getOpDatLocalName (i);
 
