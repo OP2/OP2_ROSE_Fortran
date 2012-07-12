@@ -56,6 +56,9 @@ class CPPCUDAHostSubroutineIndirectLoop: public CPPCUDAHostSubroutine
     createStatements ();
 
     void
+    createSetMaxBlocksPerGrid ();
+
+    void
     createPlanFunctionDeclarations ();
 
     virtual void

@@ -541,7 +541,8 @@ CPPCUDAKernelSubroutineDirectLoop::createStageInVariableDeclarations ()
   {
     if (parallelLoop->isDuplicateOpDat (i) == false)
     {
-      if (parallelLoop->isDirect (i) && parallelLoop->getOpDatDimension (i) > 1)
+      if ( (parallelLoop->isDirect (i) && parallelLoop->getOpDatDimension (i) > 1)
+           || (parallelLoop->isGlobal (i) && !parallelLoop->isReductionRequired (i)))
       {
         string const & variableName = getOpDatLocalName (i);
 
