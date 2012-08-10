@@ -50,9 +50,9 @@ class Globals
     
     bool preprocessOption;
 	
-	bool syntacticFusionOption;
+    bool syntacticFusionOption;
 
-	std::string syntacticFusionKernels;
+    std::string syntacticFusionKernels;
 
     bool uDrawOption;
 
@@ -60,6 +60,17 @@ class Globals
 
     std::string freeVariablesModuleName;
 
+    /*
+     * ======================================================
+     * This boolean is valid when CUDA, OpenMP and OpenCL
+     * back-ends are selected. MPI + sequential processes is
+     * a independent back-end. This boolean selects if
+     * one of the follownig combinations shall be generated:
+     * MPI+CUDA, MPI+OpenMP, MPI+OpenCL
+     * ======================================================
+     */
+    bool includesMPI;
+    
   private:
 
     /*
@@ -131,11 +142,11 @@ class Globals
     bool
     syntacticFusion () const;
 
-	void
-	setSyntacticFusionKernels (std::string kernels);
+    void
+    setSyntacticFusionKernels (std::string kernels);
 	
-	std::string
-	getSyntacticFusionKernels () const;
+    std::string
+    getSyntacticFusionKernels () const;
 	
     void
     setOutputUDrawGraphs ();
@@ -154,6 +165,12 @@ class Globals
 
     std::string const
     getFreeVariablesModuleName () const;
+    
+    void setIncludesMPI () { includesMPI = true; }
+
+    void unsetIncludesMPI () { includesMPI = false; }
+    
+    bool getIncludesMPI () const { return includesMPI; }
 };
 
 #endif

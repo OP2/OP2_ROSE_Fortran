@@ -59,6 +59,8 @@ Globals::Globals ()
   preprocessOption = false;
 
   uDrawOption = false;
+  
+  includesMPI = false;
 }
 
 /*

@@ -71,8 +71,16 @@ namespace CUDA
   std::string const threadsPerBlock = "threadsPerBlock";
   std::string const sharedMemorySize = "dynamicSharedMemorySize";
   std::string const threadSynchRet = "threadSynchRet";
-  std::string const fortranCplanFunction = "cplan";
+  std::string const fortranCplanFunction = "FortranPlanCaller";
 
+  /*
+   * ======================================================
+   * Standard number of blocks per grid in direct loops
+   * (may be overwritten by getBlockSize function)
+   * ======================================================
+   */
+  int const nblocksDirectLoops = 200;
+  
   /*
    * ======================================================
    * Returns an opaque variable reference to either

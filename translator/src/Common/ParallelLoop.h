@@ -54,6 +54,25 @@ enum ACCESS_CODE_VALUE
   READ_ACCESS, WRITE_ACCESS, RW_ACCESS, INC_ACCESS, MAX_ACCESS, MIN_ACCESS
 };
 
+/*
+ * ======================================================
+ * Relative position inside op_args of arguments
+ * ======================================================
+ */
+
+#define DAT_POSITION 0  //covers also the global reference
+#define IDX_POSITION 1
+#define MAP_POSITION 2
+#define DAT_ACC_POSITION 3
+#define GBL_DIM_POSITION 1
+#define GBL_SCALAR_ARG_NUM 2
+#define GBL_SCALAR_ACC_POSITION 1
+#define GBL_ARRAY_ACC_POSITION 2
+#define GENERIC_DIM_POSITION 3
+#define GENERIC_TYPE_POSITION 4
+#define GENERIC_ACC_POSITION 5
+
+
 class ParallelLoop
 {
   protected:

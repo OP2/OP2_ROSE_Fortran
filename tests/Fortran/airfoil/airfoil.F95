@@ -26,11 +26,12 @@ program AIRFOIL
   type(op_map) :: pedge, pecell, pcell, pbedge, pbecell
 
   ! integer reference (valid inside the OP2 library) for op_data 
-  type(op_dat) :: p_bound, p_x, p_q, p_qold, p_adt, p_res, p_rms, p_qdim
+  type(op_dat) :: p_bound, p_x, p_q, p_qold, p_adt, p_res
   
   ! arrays used in data
   integer(4), dimension(:), allocatable, target :: ecell, bound, edge, bedge, becell, cell
-  real(8), dimension(:), allocatable, target :: x, q, qold, adt, res, rms
+  real(8), dimension(:), allocatable, target :: x, q, qold, adt, res
+  real(8) :: rms
 
   character(kind=c_char,len=10) :: savesolnName = C_CHAR_'save_soln'//C_NULL_CHAR
   character(kind=c_char, len=9) :: adtcalcName  = C_CHAR_'adt_calc' // C_NULL_CHAR
@@ -56,6 +57,14 @@ program AIRFOIL
   character(kind=c_char,len=4) :: adtName   = C_CHAR_'adt'//C_NULL_CHAR
   character(kind=c_char,len=4) :: resName   = C_CHAR_'res'//C_NULL_CHAR
 
+  character(kind=c_char,len=4) :: gamName   = C_CHAR_'gam'//C_NULL_CHAR
+  character(kind=c_char,len=4) :: gm1Name   = C_CHAR_'gm1'//C_NULL_CHAR
+  character(kind=c_char,len=4) :: cflName   = C_CHAR_'cfl'//C_NULL_CHAR
+  character(kind=c_char,len=4) :: epsName   = C_CHAR_'eps'//C_NULL_CHAR
+  character(kind=c_char,len=5) :: machName   = C_CHAR_'mach'//C_NULL_CHAR
+  character(kind=c_char,len=6) :: alphaName   = C_CHAR_'alpha'//C_NULL_CHAR
+  character(kind=c_char,len=5) :: qinfName   = C_CHAR_'qinf'//C_NULL_CHAR
+
   integer(4) :: debugiter, retDebug
   real(8) :: datad
 
@@ -78,7 +87,6 @@ program AIRFOIL
   allocate ( qold ( 4 * ncell ) )
   allocate ( res ( 4 * ncell ) )
   allocate ( adt ( ncell ) )
-  allocate ( rms (1) )
 
   print *, "Getting data"
   call getSetInfo ( nnode, ncell, nedge, nbedge, cell, edge, ecell, bedge, becell, bound, x, q, qold, res, adt )
@@ -116,30 +124,27 @@ program AIRFOIL
   call op_decl_dat ( cells, 1, adt, p_adt, adtName )
   call op_decl_dat ( cells, 4, res, p_res, resName )
 
-  print *, "Declaring OP2 globals"
-  call op_decl_gbl ( rms, p_rms, 1 )
-  qdim = 4
-  call op_decl_gbl ( qdim, p_qdim )
+  print *, "Declaring OP2 constants"
+  call op_decl_const (gam, 1, gamName)
+  call op_decl_const (gm1, 1, gm1Name)
+  call op_decl_const (cfl, 1, cflName)
+  call op_decl_const (eps, 1, epsName)
+  call op_decl_const (mach, 1, machName)
+  call op_decl_const (alpha, 1, alphaName)
+  call op_decl_const (qinf, 4, qinfName)
 
-  call op_decl_const (gam, 1)
-  call op_decl_const (gm1, 1)
-  call op_decl_const (cfl, 1)
-  call op_decl_const (eps, 1)
-  call op_decl_const (mach, 1)
-  call op_decl_const (alpha, 1)
-  call op_decl_const (qinf, 4)
+  qdim = 4
 
 
     ! main time-marching loop
 
   do niter = 1, iterationNumber
 
-    call save_soln_subroutine ( cells, p_qdim, p_q, p_qold )
+    call save_soln_subroutine ( cells, qdim, p_q, p_qold )
 
 !     call op_par_loop_2 ( save_soln, cells, &
-!                        & p_q,    -1, OP_ID, OP_READ, &
-!                        & p_qold, -1, OP_ID, OP_WRITE &
-!                        & )
+!                        & op_arg_dat (p_q,    -1, OP_ID, OP_READ), &
+!                        & op_arg_dat (p_qold, -1, OP_ID, OP_WRITE))
 
     ! predictor/corrector update loop
 
@@ -147,54 +152,50 @@ program AIRFOIL
 
       ! calculate area/timstep
       call op_par_loop_6 ( adt_calc, cells, &
-                         & p_x,    1, pcell, OP_READ, &
-                         & p_x,    2, pcell, OP_READ, &
-                         & p_x,    3, pcell, OP_READ, &
-                         & p_x,    4, pcell, OP_READ, &
-                         & p_q,   -1, OP_ID, OP_READ, &
-                         & p_adt, -1, OP_ID, OP_WRITE &
-                         & )
+                         & op_arg_dat (p_x,    1, pcell, OP_READ), &
+                         & op_arg_dat (p_x,    2, pcell, OP_READ), &
+                         & op_arg_dat (p_x,    3, pcell, OP_READ), &
+                         & op_arg_dat (p_x,    4, pcell, OP_READ), &
+                         & op_arg_dat (p_q,   -1, OP_ID, OP_READ), &
+                         & op_arg_dat (p_adt, -1, OP_ID, OP_WRITE))
 
       ! calculate flux residual
       call op_par_loop_8 ( res_calc, edges, &
-                         & p_x,    1, pedge,  OP_READ, &
-                         & p_x,    2, pedge,  OP_READ, &
-                         & p_q,    1, pecell, OP_READ, &
-                         & p_q,    2, pecell, OP_READ, &
-                         & p_adt,  1, pecell, OP_READ, &
-                         & p_adt,  2, pecell, OP_READ, &
-                         & p_res,  1, pecell, OP_INC,  &
-                         & p_res,  2, pecell, OP_INC   &
-                         &)
+                         & op_arg_dat (p_x,    1, pedge,  OP_READ), &
+                         & op_arg_dat (p_x,    2, pedge,  OP_READ), &
+                         & op_arg_dat (p_q,    1, pecell, OP_READ), &
+                         & op_arg_dat (p_q,    2, pecell, OP_READ), &
+                         & op_arg_dat (p_adt,  1, pecell, OP_READ), &
+                         & op_arg_dat (p_adt,  2, pecell, OP_READ), &
+                         & op_arg_dat (p_res,  1, pecell, OP_INC),  &
+                         & op_arg_dat (p_res,  2, pecell, OP_INC))
 
       call op_par_loop_6 ( bres_calc, bedges, &
-                          & p_x,      1, pbedge,  OP_READ, &
-                          & p_x,      2, pbedge,  OP_READ, &
-                          & p_q,      1, pbecell, OP_READ, &
-                          & p_adt,    1, pbecell, OP_READ, &
-                          & p_res,    1, pbecell, OP_INC,  &
-                          & p_bound, -1, OP_ID, OP_READ   &
-                          & )
+                          & op_arg_dat (p_x,      1, pbedge,  OP_READ), &
+                          & op_arg_dat (p_x,      2, pbedge,  OP_READ), &
+                          & op_arg_dat (p_q,      1, pbecell, OP_READ), &
+                          & op_arg_dat (p_adt,    1, pbecell, OP_READ), &
+                          & op_arg_dat (p_res,    1, pbecell, OP_INC),  &
+                          & op_arg_dat (p_bound, -1, OP_ID, OP_READ))
 
       ! update flow field
       
-      rms(1) = 0.0
+      rms = 0.0
 
       call op_par_loop_5 ( update, cells, &
-                         & p_qold, -1, OP_ID,  OP_READ,  &
-                         & p_q,    -1, OP_ID,  OP_WRITE, &
-                         & p_res,  -1, OP_ID,  OP_RW,    &
-                         & p_adt,  -1, OP_ID,  OP_READ,  &
-                         & p_rms,  -1, OP_GBL, OP_INC    &
-                       & )
+                         & op_arg_dat (p_qold, -1, OP_ID,  OP_READ),  &
+                         & op_arg_dat (p_q,    -1, OP_ID,  OP_WRITE), &
+                         & op_arg_dat (p_res,  -1, OP_ID,  OP_RW),    &
+                         & op_arg_dat (p_adt,  -1, OP_ID,  OP_READ),  &
+                         & op_arg_gbl (rms, OP_INC))
 
 
     end do ! internal loop
 
     ncellr = real ( ncell )
-    rms(1) = sqrt ( rms(1) / ncellr )
+    rms = sqrt ( rms / ncellr )
 
-    if (mod(niter,100) .eq. 0) print *, "=====> Iteration result ", rms(1)
+    if (mod(niter,100) .eq. 0) print *, "=====> Iteration result ", rms
 
   end do ! external loop
 
@@ -211,19 +212,19 @@ program AIRFOIL
 end program AIRFOIL
 
 
-subroutine save_soln_subroutine ( set, p_qdim, src, dest )
+subroutine save_soln_subroutine ( set, qdim, src, dest )
 
   use OP2_FORTRAN_DECLARATIONS
   use AIRFOIL_SEQ
 
   implicit none
   type(op_set) :: set
-  type(op_dat) :: p_qdim, src, dest
+  integer(4) :: qdim
+  type(op_dat) :: src, dest
 
   call op_par_loop_3 ( save_soln_qdim, set, &
-       		     & p_qdim, -1, OP_GBL, OP_READ, &
-                     & src,  -1, OP_ID, 4, "real8", OP_READ, &
-                     & dest, -1, OP_ID, 4, "real8", OP_WRITE &
-                     & )
+                     & op_arg_gbl (qdim, OP_READ), &
+                     & op_arg_dat_generic (src,  -1, OP_ID, 4, "real8", OP_READ), &
+                     & op_arg_dat_generic (dest, -1, OP_ID, 4, "real8", OP_WRITE))
 
 end subroutine

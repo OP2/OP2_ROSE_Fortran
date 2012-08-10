@@ -150,4 +150,21 @@ class OpenCLOption: public CommandLineOption
     }
 };
 
+class MPIOption: public CommandLineOption
+{
+  public:
+
+    virtual void
+    run ()
+    {
+      Globals::getInstance ()->setIncludesMPI ();
+    }
+
+    MPIOption (std::string helpMessage, std::string longOption) :
+      CommandLineOption (helpMessage, "", longOption)
+    {
+    }
+};
+
+
 #endif

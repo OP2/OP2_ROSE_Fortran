@@ -117,10 +117,20 @@ ParallelLoop::checkArguments ()
 bool
 ParallelLoop::isDirectLoop ()
 {
+  using boost::lexical_cast;
+  using std::string;
+  
+  Debug::getInstance ()->debugMessage ("Checking if this is a direct loop, number of arguments: " +
+    lexical_cast < string > (getNumberOfArgumentGroups ()), Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+
   for (unsigned int i = 1; i <= getNumberOfArgumentGroups (); ++i)
   {
     if (isOpMatArg (i) || OpDatMappingDescriptors[i] == INDIRECT)
     {
+      Debug::getInstance ()->debugMessage ("Argument '" +
+        lexical_cast < string > (i) + "' is indirect, then this is an indirect loop",
+        Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+      
       return false;
     }
   }

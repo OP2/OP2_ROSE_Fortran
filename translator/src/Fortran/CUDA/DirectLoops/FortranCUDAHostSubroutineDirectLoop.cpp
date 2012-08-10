@@ -42,6 +42,7 @@
 #include "Debug.h"
 #include "Exceptions.h"
 #include "CUDA.h"
+#include <Globals.h>
 
 void
 FortranCUDAHostSubroutineDirectLoop::createKernelFunctionCallStatement (
@@ -75,8 +76,7 @@ FortranCUDAHostSubroutineDirectLoop::createKernelFunctionCallStatement (
             variableDeclarations->getReference (getReductionArrayDeviceName (i)));
       }
       else if (parallelLoop->isDirect (i))
-      {
-        
+      {        
 /* Carlo: no more opDatNDevice as arguments */        
 /*        actualParameters->append_expression (
             moduleDeclarations->getDeclarations()->getReference (getOpDatDeviceName (i) +
@@ -99,8 +99,9 @@ FortranCUDAHostSubroutineDirectLoop::createKernelFunctionCallStatement (
   }
 
   SgExpression * dotExpression = buildDotExp (
-      variableDeclarations->getReference (getOpSetName ()),
-      buildOpaqueVarRefExp (size, subroutineScope));
+    variableDeclarations->getReference (getOpSetName ()),
+      buildDotExp ( buildOpaqueVarRefExp (Fortran::setPtr, scope),
+          buildOpaqueVarRefExp (size, scope)));      
 
   actualParameters->append_expression (dotExpression);
 
@@ -135,6 +136,7 @@ FortranCUDAHostSubroutineDirectLoop::createCUDAKernelInitialisationStatements ()
   using namespace SageInterface;
   using namespace OP2VariableNames;
   using namespace OP2::Macros;
+  using namespace CUDA;
   using boost::lexical_cast;
   using std::string;
   using std::max;
@@ -147,14 +149,14 @@ FortranCUDAHostSubroutineDirectLoop::createCUDAKernelInitialisationStatements ()
    * ======================================================
    * The following values are copied from Mike Giles'
    * implementation and may be subject to future changes
+   * \warning: removed magic number, now in CUDA.h
    * ======================================================
    */
-  int const nblocks = 200;
-  int const nthreads = 128;
+  //int const nblocks = 200;
 
   SgExprStatement * assignmentStatement1 = buildAssignStatement (
       variableDeclarations->getReference (CUDA::blocksPerGrid), buildIntVal (
-          nblocks));
+          nblocksDirectLoops));
 
   appendStatement (assignmentStatement1, subroutineScope);
 
@@ -165,35 +167,11 @@ FortranCUDAHostSubroutineDirectLoop::createCUDAKernelInitialisationStatements ()
    * ======================================================
    */
 
-  Debug::getInstance ()->debugMessage ("Creating call to partition size setting function",
+  Debug::getInstance ()->debugMessage ("Creating call to block size setting function",
     Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
-  SgVarRefExp * parameter1 = variableDeclarations->getReference (
-    getUserSubroutineName ());
-
-  SgDotExp * parameter2 = buildDotExp (variableDeclarations->getReference (
-    getOpSetName ()), buildOpaqueVarRefExp (OP2::RunTimeVariableNames::size,
-      subroutineScope));
-
-  SgExprListExp * actualParameters = buildExprListExp (parameter1, parameter2);
-
-  SgFunctionSymbol * functionSymbol =
-    FortranTypesBuilder::buildNewFortranFunction (OP2::FortranSpecific::RunTimeFunctions::getBlockSizeFunctionName,
-      subroutineScope);
-
-  SgFunctionCallExp * functionCall = buildFunctionCallExp (functionSymbol,
-    actualParameters);
-
-  SgExprStatement * statement2 = buildAssignStatement (
-    variableDeclarations->getReference (CUDA::threadsPerBlock), functionCall);
-
-  appendStatement (statement2, subroutineScope);
-
-  /*  SgExprStatement * assignmentStatement2 = buildAssignStatement (
-      variableDeclarations->getReference (CUDA::threadsPerBlock), buildIntVal (
-          nthreads));
-
-	  appendStatement (assignmentStatement2, subroutineScope);*/
+    
+  appendBlockSizeFunctionCall (subroutineScope);
 
   SgExprStatement * assignmentStatement3 = buildAssignStatement (
       variableDeclarations->getReference (warpSize), buildOpaqueVarRefExp (
@@ -322,7 +300,14 @@ FortranCUDAHostSubroutineDirectLoop::createStatements ()
   Debug::getInstance ()->debugMessage ("Creating statements",
       Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
-  createEarlyExitStatement (subroutineScope);
+  initialiseNumberOfOpArgs (subroutineScope);
+  
+  appendPopulationOpArgArray (subroutineScope);
+      
+  if ( Globals::getInstance ()->getIncludesMPI () )
+    appendCallMPIHaloExchangeFunction (subroutineScope);
+  
+  createEarlyExitStatementNewLibrary (subroutineScope);
 
   initialiseProfilingVariablesDeclaration ();
 
@@ -370,6 +355,12 @@ FortranCUDAHostSubroutineDirectLoop::createStatements ()
   createDumpOfOutputStatements (subroutineScope,
     OP2::FortranSpecific::RunTimeFunctions::getDumpOpDatFromDeviceFunctionName);
 
+  if ( Globals::getInstance ()->getIncludesMPI () )
+  {
+    appendCallsToMPIReduce (subroutineScope);
+    appendCallMPISetDirtyBit (subroutineScope);
+  }
+  
   createEndTimerHost ();
   createEndTimerSynchroniseHost ();
   createElapsedTimeHost ();
@@ -382,6 +373,14 @@ FortranCUDAHostSubroutineDirectLoop::createLocalVariableDeclarations ()
   Debug::getInstance ()->debugMessage ("Creating local variable declarations",
       Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
+  /*
+   * ======================================================
+   * Declare array of op_args and variable with number
+   * of parameters
+   * ======================================================
+   */
+  createCommonLocalVariableDeclarations (subroutineScope);
+      
   createOpDatDimensionsDeclaration ();
 
   createOpDatCardinalitiesDeclaration ();

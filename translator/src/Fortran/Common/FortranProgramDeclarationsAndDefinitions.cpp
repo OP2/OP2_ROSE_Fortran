@@ -39,6 +39,7 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/filesystem.hpp>
+//#include <tr1_impl/functional>
 
 void
 FortranProgramDeclarationsAndDefinitions::setOpGblProperties (
@@ -51,42 +52,51 @@ FortranProgramDeclarationsAndDefinitions::setOpGblProperties (
   Debug::getInstance ()->debugMessage ("'" + variableName + "' is an OP_GBL",
       Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
-  OpGblDefinition * opGblDeclaration = getOpGblDefinition (variableName);
+ /*
+  * ======================================================
+  * With op_arg_gbl, there is not anymore a global
+  * variable declaration, but the dimension can be 
+  * obtained directly from the function actual parameters
+  * ======================================================
+  */
   
-  FortranOpGblDefinition * fortanOpGBL =
-      dynamic_cast <FortranOpGblDefinition *> (opGblDeclaration);
-      
-  if (fortanOpGBL == NULL)
-  {
-    Debug::getInstance ()->debugMessage ("'" + variableName + "' is a scalar",
-        Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+//   OpGblDefinition * opGblDeclaration = getOpGblDefinition (variableName);
+//   
+//   FortranOpGblDefinition * fortanOpGBL =
+//       dynamic_cast <FortranOpGblDefinition *> (opGblDeclaration);
+//      
+//   if (fortanOpGBL == NULL)
+//   {
+//     Debug::getInstance ()->debugMessage ("'" + variableName + "' is a scalar",
+//         Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+// 
+//    /*
+//     * ======================================================
+//     * Since this is a scalar, set the dimension to 1
+//     * ======================================================
+//     */
+// 
+//     parallelLoop->setOpDatDimension (OP_DAT_ArgumentGroup, 1);
+//   }
+//   else
+//   {
+//     Debug::getInstance ()->debugMessage ("'" + variableName
+//         + "' is NOT a scalar, but has dimension " + lexical_cast<string> (opGblDeclaration->getDimension ()),
+//         Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+// 
+//     parallelLoop->setOpDatDimension (OP_DAT_ArgumentGroup,
+//         opGblDeclaration->getDimension ());
+//   }
 
-    /*
-     * ======================================================
-     * Since this is a scalar, set the dimension to 1
-     * ======================================================
-     */
-
-    parallelLoop->setOpDatDimension (OP_DAT_ArgumentGroup, 1);
-  }
-  else
-  {
-    Debug::getInstance ()->debugMessage ("'" + variableName
-        + "' is NOT a scalar, but has dimension " + lexical_cast<string> (opGblDeclaration->getDimension ()),
-        Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
-
-    parallelLoop->setOpDatDimension (OP_DAT_ArgumentGroup,
-        opGblDeclaration->getDimension ());
-  }
-
-  parallelLoop->setUniqueOpDat (variableName);
-
-  parallelLoop->setOpDatType (OP_DAT_ArgumentGroup,
-      opGblDeclaration->getBaseType ());
-
-  parallelLoop->setOpDatVariableName (OP_DAT_ArgumentGroup, variableName);
-
-  parallelLoop->setDuplicateOpDat (OP_DAT_ArgumentGroup, false);
+   
+//   parallelLoop->setUniqueOpDat (variableName);
+// 
+//   parallelLoop->setOpDatType (OP_DAT_ArgumentGroup,
+//       opGblDeclaration->getBaseType ());
+// 
+//   parallelLoop->setOpDatVariableName (OP_DAT_ArgumentGroup, variableName);
+// 
+//   parallelLoop->setDuplicateOpDat (OP_DAT_ArgumentGroup, false);
 }
 
 void
@@ -113,6 +123,10 @@ FortranProgramDeclarationsAndDefinitions::setOpDatProperties (
 
   if (parallelLoop->isUniqueOpDat (variableName))
   {
+    Debug::getInstance ()->debugMessage ("'" + variableName
+      + "' is unique for this call (or the first one encountered)", Debug::FUNCTION_LEVEL,
+      __FILE__, __LINE__);
+      
     parallelLoop->setUniqueOpDat (variableName);
 
     parallelLoop->setDuplicateOpDat (OP_DAT_ArgumentGroup, false);
@@ -125,6 +139,10 @@ FortranProgramDeclarationsAndDefinitions::setOpDatProperties (
   }
   else
   {
+    Debug::getInstance ()->debugMessage ("'" + variableName
+      + "' is NOT unique for this call", Debug::FUNCTION_LEVEL,
+      __FILE__, __LINE__);    
+
     parallelLoop->setDuplicateOpDat (OP_DAT_ArgumentGroup, true);
   }
 }
@@ -165,14 +183,14 @@ FortranProgramDeclarationsAndDefinitions::setOpDatPropertiesGeneric (
 void
 FortranProgramDeclarationsAndDefinitions::setParallelLoopAccessDescriptor (
     FortranParallelLoop * parallelLoop, SgExprListExp * actualArguments,
-    unsigned int OP_DAT_ArgumentGroup, unsigned int argumentPosition)
+    unsigned int OP_DAT_ArgumentGroup, unsigned int accessPosition)
 {
   using boost::iequals;
   using boost::lexical_cast;
   using std::string;
 
   SgVarRefExp * accessExpression = isSgVarRefExp (
-      actualArguments->get_expressions ()[argumentPosition]);
+      actualArguments->get_expressions ()[accessPosition]);
 
   string const accessValue =
       accessExpression->get_symbol ()->get_name ().getString ();
@@ -227,6 +245,32 @@ FortranProgramDeclarationsAndDefinitions::setParallelLoopAccessDescriptor (
   }
 }
 
+SgVarRefExp *
+FortranProgramDeclarationsAndDefinitions::getOpDatReferenceFromOpArg (SgExprListExp * opArgArguments)
+{
+  SgVarRefExp * opDatReference = NULL;
+
+  if (isSgDotExp (opArgArguments ->get_expressions ()[DAT_POSITION]) != NULL)
+    opDatReference = isSgVarRefExp (isSgDotExp (opArgArguments ->get_expressions ()[DAT_POSITION]) ->get_rhs_operand ());
+  else
+    opDatReference = isSgVarRefExp (opArgArguments->get_expressions ()[DAT_POSITION]);
+
+  return opDatReference;
+}
+
+SgVarRefExp *
+FortranProgramDeclarationsAndDefinitions::getOpMapReferenceFromOpArg (SgExprListExp * opArgArguments)
+{
+  SgVarRefExp * opMapReference = NULL;
+      
+  if (isSgDotExp (opArgArguments ->get_expressions ()[MAP_POSITION]) != NULL)        
+    opMapReference = isSgVarRefExp (isSgDotExp (opArgArguments ->get_expressions ()[MAP_POSITION])->get_rhs_operand ());
+  else        
+    opMapReference = isSgVarRefExp (opArgArguments ->get_expressions ()[MAP_POSITION]);
+
+  return opMapReference;
+}
+
 void
 FortranProgramDeclarationsAndDefinitions::analyseParallelLoopArguments (
     FortranParallelLoop * parallelLoop, SgExprListExp * actualArguments,
@@ -247,97 +291,69 @@ FortranProgramDeclarationsAndDefinitions::analyseParallelLoopArguments (
   
   /*
    * ======================================================
-   * The actual offset between args is given by the kind
-   * of op_arg encountered (i.e. standard or generic)
-   * For this reason, the offset index is incremented
-   * according to the kind of argument encountered
+   * Loops over the arguments to populate the parallel loop object
+   * Each object in the actualArguments array is a function call
+   * We analyse the arguments of each call
+   * \warning: the args start from position 2 (the first two args are
+   * the user kernel reference and the iteration set
    * ======================================================
    */
-   
-  for (unsigned int offset = parallelLoop->NUMBER_OF_NON_OP_DAT_ARGUMENTS; offset
-      < actualArguments->get_expressions ().size (); )
+  
+  for ( int i = 2; i < numberOfOpArgs + 2; i++ )
   {
-    /*
-     * ======================================================
-     * Get the OP_DAT variable name
-     * ======================================================
-     */
-
-    unsigned int opDatArgumentPosition = offset
-        + parallelLoop->POSITION_OF_OP_DAT;
-
-    SgVarRefExp * opDatReference;
-
-    if (isSgDotExp (actualArguments->get_expressions ()[opDatArgumentPosition])
-        != NULL)
-    {
-      opDatReference
-          = isSgVarRefExp (
-              isSgDotExp (
-                  actualArguments->get_expressions ()[opDatArgumentPosition])->get_rhs_operand ());
-    }
-    else
-    {
-      opDatReference = isSgVarRefExp (
-          actualArguments->get_expressions ()[opDatArgumentPosition]);
-    }
-
-    string const opDatName =
-        opDatReference->get_symbol ()->get_name ().getString ();
-
-    unsigned int opMapArgumentPosition = offset
-        + parallelLoop->POSITION_OF_MAPPING;
+   /*
+    * ======================================================
+    * Distinguish between op_dat and global variable by
+    * checking the function name
+    * ======================================================
+    */
+    SgFunctionCallExp * functionExpression = isSgFunctionCallExp (
+      actualArguments->get_expressions ()[i]);
+    
+    ROSE_ASSERT (functionExpression != NULL);
+    
+    string functionName = functionExpression ->getAssociatedFunctionSymbol ()->
+      get_name ().getString ();
+    
+    SgExprListExp * opArgArguments = functionExpression ->get_args ();
+    ROSE_ASSERT (opArgArguments );
 
     /*
      * ======================================================
-     * Get the OP_MAP name
-     * ======================================================
+     * Assume that this is not an op_mat, possibly amend later
+     * ======================================================     
      */
+    parallelLoop->setIsOpMatArg (OP_DAT_ArgumentGroup, false);
+    
+    if ( functionName == "op_arg_dat" )
+    {     
+     /*
+      * ======================================================
+      * Obtain the op_dat reference and its name
+      * ======================================================
+      */
+     
+      SgVarRefExp * opDatReference = NULL;
 
-    SgVarRefExp * opMapReference;
+      opDatReference = getOpDatReferenceFromOpArg (opArgArguments);
 
-    if (isSgDotExp (actualArguments->get_expressions ()[opMapArgumentPosition])
-        != NULL)
-    {
-      opMapReference
-          = isSgVarRefExp (
-              isSgDotExp (
-                  actualArguments->get_expressions ()[opMapArgumentPosition])->get_rhs_operand ());
-    }
-    else
-    {
-      opMapReference = isSgVarRefExp (
-          actualArguments->get_expressions ()[opMapArgumentPosition]);
-    }
+      ROSE_ASSERT (opDatReference != NULL);
 
-    string const mappingValue =
-        opMapReference->get_symbol ()->get_name ().getString ();
+      string const opDatName = opDatReference->get_symbol ()->get_name ().getString ();
 
-    Debug::getInstance ()->debugMessage ("OP_DAT '" + opDatName + "'",
-        Debug::OUTER_LOOP_LEVEL, __FILE__, __LINE__);
+     /*
+      * ======================================================
+      * Obtain the map reference and name, and select access
+      * type (direct or indirect)
+      * ======================================================            
+      */
+      SgVarRefExp * opMapReference;
 
-    if (iequals (mappingValue, OP2::OP_GBL))
-    {
-      /*
-       * ======================================================
-       * OP_GBL signals that the op_arg is a global variable
-       * No generic interface is allowed in this case
-       * ======================================================
-       */
-      Debug::getInstance ()->debugMessage ("...GLOBAL mapping descriptor",
-          Debug::OUTER_LOOP_LEVEL, __FILE__, __LINE__);
+      opMapReference = getOpMapReferenceFromOpArg (opArgArguments);
 
-      setOpGblProperties (parallelLoop, opDatName, OP_DAT_ArgumentGroup);
+      ROSE_ASSERT (opMapReference != NULL);
 
-      parallelLoop->setOpMapValue (OP_DAT_ArgumentGroup, GLOBAL);
-
-      setParallelLoopAccessDescriptor (parallelLoop, actualArguments,
-        OP_DAT_ArgumentGroup, offset + parallelLoop->POSITION_OF_ACCESS);
-      
-      offset += parallelLoop->NUMBER_OF_ARGUMENTS_PER_OP_DAT;
-    }
-    else
-    {
+      string const mappingValue = opMapReference->get_symbol ()->get_name ().getString ();
 
       if (iequals (mappingValue, OP2::OP_ID))
       {
@@ -359,85 +375,214 @@ FortranProgramDeclarationsAndDefinitions::analyseParallelLoopArguments (
 
         parallelLoop->setOpMapValue (OP_DAT_ArgumentGroup, INDIRECT);
       }
-           
-      /*
-       * ======================================================
-       * Check if the op_arg is a standard or generic one
-       * and set the op_dat properties consequently
-       * ======================================================
-       */
-      int accessDescriptorPositionStandardLoop = offset
-        + parallelLoop->NUMBER_OF_ARGUMENTS_PER_OP_DAT - 1;
 
-      /*
-       * ======================================================
-       * I am looking for either a string (OP_INC, OP_RW, ..)
-       * or an integer, denoting the dimension
-       * ======================================================
-       */
-      SgIntVal * opDatDimension = isSgIntVal (
-        actualArguments->get_expressions ()[accessDescriptorPositionStandardLoop]);
+      setOpDatProperties (parallelLoop, opDatName, OP_DAT_ArgumentGroup);
 
-      /*
-       * ======================================================
-       * Found a access string => standard op_args
-       * Not found a dimension => generic op_args
-       * ======================================================
-       */ 
-      if ( opDatDimension == NULL )
+      setParallelLoopAccessDescriptor (parallelLoop, opArgArguments, OP_DAT_ArgumentGroup, DAT_ACC_POSITION);
+    }
+    else if ( functionName == "op_arg_gbl" )
+    {
+
+      Debug::getInstance ()->debugMessage ("...GLOBAL mapping descriptor",
+        Debug::OUTER_LOOP_LEVEL, __FILE__, __LINE__);
+
+     /*
+      * ======================================================
+      * Get the OP_GBL variable reference and name
+      * ======================================================
+      */
+      SgVarRefExp * opDatReference;
+
+      if (isSgDotExp (opArgArguments->get_expressions ()[DAT_POSITION])
+          != NULL)
       {
-        setOpDatProperties (parallelLoop, opDatName, OP_DAT_ArgumentGroup);
-
-        setParallelLoopAccessDescriptor (parallelLoop, actualArguments,
-            OP_DAT_ArgumentGroup, offset + parallelLoop->POSITION_OF_ACCESS);
-
-        offset += parallelLoop->NUMBER_OF_ARGUMENTS_PER_OP_DAT;
+        opDatReference
+            = isSgVarRefExp (
+                isSgDotExp (
+                    opArgArguments->get_expressions ()[DAT_POSITION])->get_rhs_operand ());
       }
       else
       {
+        opDatReference = isSgVarRefExp (
+            opArgArguments->get_expressions ()[DAT_POSITION]);
+      }
+
+      string const globalName =
+          opDatReference->get_symbol ()->get_name ().getString ();
+      
+
+     /*
+      * ======================================================
+      * Get the OP_GBL dimension: check the number of args
+      * to the op_arg_gbl function (3 = array, 2 = scalar)
+      * ======================================================
+      */
+      if ( opArgArguments->get_expressions ().size () == GBL_SCALAR_ARG_NUM )
+      {
+
+        Debug::getInstance ()->debugMessage ("'" + globalName + "' is a scalar",
+            Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+
        /*
         * ======================================================
-        * In case of generic loop, I have to read also the
-        * dimension and type to be able to set the op_dat info
-        * in the parallel loop class
+        * Since this is a scalar, set the dimension to 1
         * ======================================================
         */
 
-//        unsigned int dimArgumentPosition = offset
-//          + parallelLoop->POSITION_OF_DIMENSION;
-                
-//        SgIntVal * opDataDimension = isSgIntVal (
-//          actualArguments->get_expressions ()[dimArgumentPosition]);
-
-//        ROSE_ASSERT (opDataDimension != NULL);
-
-        unsigned int typeArgumentPosition = offset
-          + parallelLoop->POSITION_OF_TYPE;
-        
-        SgStringVal * opDataBaseTypeString = isSgStringVal (
-          actualArguments->get_expressions ()[typeArgumentPosition]);
-
-        ROSE_ASSERT (opDataBaseTypeString != NULL);
-        
-        SgType * opDataBaseType = getTypeFromString (opDataBaseTypeString->get_value (),
-          opDatName);
-          
-        setOpDatPropertiesGeneric (parallelLoop, opDatName, opDatDimension->get_value (),
-          opDataBaseType, OP_DAT_ArgumentGroup);
-          
-        setParallelLoopAccessDescriptor (parallelLoop, actualArguments,
-            OP_DAT_ArgumentGroup, offset + parallelLoop->POSITION_OF_ACCESS_GENERIC);
-
-        offset += parallelLoop->NUMBER_OF_ARGUMENTS_PER_OP_DAT_GENERIC;
+        parallelLoop->setOpDatDimension (OP_DAT_ArgumentGroup, 1);
       }
+      else
+      {
+        SgIntVal * intValExp = isSgIntVal (opArgArguments->get_expressions ()[GBL_DIM_POSITION]);
+        ROSE_ASSERT (intValExp != NULL);
+        
+        int globalDimension = intValExp->get_value ();
+        
+        parallelLoop->setOpDatDimension (OP_DAT_ArgumentGroup, globalDimension);
+        
+        Debug::getInstance ()->debugMessage ("'" + globalName
+          + "' is NOT a scalar, but has dimension " + lexical_cast<string> (globalDimension),
+          Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+      }
+
+     /*
+      * ======================================================
+      * Set the other fields
+      * ======================================================
+      */
+      parallelLoop->setOpDatType (OP_DAT_ArgumentGroup,
+        (opArgArguments->get_expressions ()[DAT_POSITION])->get_type ());
+     
+      parallelLoop->setUniqueOpDat (globalName);
+
+      parallelLoop->setOpDatVariableName (OP_DAT_ArgumentGroup, globalName);
+
+      parallelLoop->setDuplicateOpDat (OP_DAT_ArgumentGroup, false);
+
+      parallelLoop->setOpMapValue (OP_DAT_ArgumentGroup, GLOBAL);
+
+      if ( opArgArguments->get_expressions ().size () == GBL_SCALAR_ARG_NUM )       
+        setParallelLoopAccessDescriptor (parallelLoop, opArgArguments,
+          OP_DAT_ArgumentGroup, GBL_SCALAR_ACC_POSITION);
+      else        
+        setParallelLoopAccessDescriptor (parallelLoop, opArgArguments,
+          OP_DAT_ArgumentGroup, GBL_ARRAY_ACC_POSITION);
+    }
+    else if ( functionName == "op_arg_dat_generic" )
+    {
+      Debug::getInstance ()->debugMessage ("Found generic op_dat",
+        Debug::OUTER_LOOP_LEVEL, __FILE__, __LINE__);
+
+      /*
+       * ======================================================
+       * Obtain the op_dat reference and its name
+       * ======================================================
+       */
+      SgVarRefExp * opDatReference = NULL;
+
+      opDatReference = getOpDatReferenceFromOpArg (opArgArguments);
+
+      ROSE_ASSERT (opDatReference != NULL);
+
+      string const opDatName = opDatReference->get_symbol ()->get_name ().getString ();      
+
+      /*
+       * ======================================================
+       * Obtain the map reference and name, and select access
+       * type (direct or indirect)
+       * ======================================================
+       */
+      SgVarRefExp * opMapReference;
+
+      opMapReference = getOpMapReferenceFromOpArg (opArgArguments);
+
+      ROSE_ASSERT (opMapReference != NULL);
+
+      string const mappingValue = opMapReference->get_symbol ()->get_name ().getString ();
+
+      if (iequals (mappingValue, OP2::OP_ID))
+        {
+          /*
+           * ======================================================
+           * OP_ID signals identity mapping and therefore direct
+           * access to the data
+           * ======================================================
+           */
+          Debug::getInstance ()->debugMessage ("...DIRECT mapping descriptor",
+            Debug::OUTER_LOOP_LEVEL, __FILE__, __LINE__);
+
+          parallelLoop->setOpMapValue (OP_DAT_ArgumentGroup, DIRECT);
+        }
+      else
+        {
+          Debug::getInstance ()->debugMessage ("...INDIRECT mapping descriptor",
+            Debug::OUTER_LOOP_LEVEL, __FILE__, __LINE__);
+
+          parallelLoop->setOpMapValue (OP_DAT_ArgumentGroup, INDIRECT);
+        }
+
+      /*
+       * ======================================================
+       * In case of generic loop, I have to read also the
+       * dimension and type to be able to set the op_dat info
+       * in the parallel loop class
+       * ======================================================
+       */
+      SgIntVal * opDatDimension = isSgIntVal (
+        opArgArguments->get_expressions ()[GENERIC_DIM_POSITION]);
+
+        
+      SgStringVal * opDataBaseTypeString = isSgStringVal (
+        opArgArguments->get_expressions ()[GENERIC_TYPE_POSITION]);
+
+      ROSE_ASSERT (opDataBaseTypeString != NULL);
+        
+      SgType * opDataBaseType = getTypeFromString (opDataBaseTypeString->get_value (),
+        opDatName);
+
+      ROSE_ASSERT (opDataBaseType != NULL);
+
+      setOpDatPropertiesGeneric (parallelLoop, opDatName, opDatDimension->get_value (),
+         opDataBaseType, OP_DAT_ArgumentGroup);
+
+      Debug::getInstance ()->debugMessage ("Getting access",
+        Debug::OUTER_LOOP_LEVEL, __FILE__, __LINE__);
+
+      setParallelLoopAccessDescriptor (parallelLoop, opArgArguments,
+        OP_DAT_ArgumentGroup, GENERIC_ACC_POSITION);
+    } 
+    else if ( functionName == "op_arg_mat" )
+    {
+      Debug::getInstance ()->debugMessage ("Unsupported argument type",
+        Debug::OUTER_LOOP_LEVEL, __FILE__, __LINE__);
+    }
+    else
+    {
+      Debug::getInstance ()->debugMessage ("Argument type not recognised",
+        Debug::OUTER_LOOP_LEVEL, __FILE__, __LINE__);      
     }
 
-    parallelLoop->setIsOpMatArg (OP_DAT_ArgumentGroup, false);
+   /*
+    * ======================================================
+    * This identifies the argument position in the data
+    * structures, while the iteration variable 'i' identifies
+    * the corresponding op_arg position in the op_par_loop
+    * arguments (i == OP_DAT_ArgumentGroup + 2)
+    * ======================================================
+    */
+
     OP_DAT_ArgumentGroup++;
   }
-
-  parallelLoop->setNumberOfOpDatArgumentGroups (OP_DAT_ArgumentGroup - 1);
+  
+  parallelLoop->setNumberOfOpDatArgumentGroups (numberOfOpArgs);
   parallelLoop->setNumberOfOpMatArgumentGroups (0);
+  
+  if ( parallelLoop->isDirectLoop () )
+    Debug::getInstance ()->debugMessage ("This is a DIRECT parallel loop",
+      Debug::OUTER_LOOP_LEVEL, __FILE__, __LINE__);
+  else
+    Debug::getInstance ()->debugMessage ("This is an INDIRECT parallel loop",
+      Debug::OUTER_LOOP_LEVEL, __FILE__, __LINE__);  
 }
 
 void
@@ -447,6 +592,7 @@ FortranProgramDeclarationsAndDefinitions::visit (SgNode * node)
   using boost::filesystem::system_complete;
   using boost::iequals;
   using boost::starts_with;
+  using boost::lexical_cast;
   using std::string;
 
   if (isSgSourceFile (node))
@@ -664,6 +810,10 @@ FortranProgramDeclarationsAndDefinitions::visit (SgNode * node)
 
             parallelLoops[userSubroutineName] = parallelLoop;
 
+            Debug::getInstance ()->debugMessage ("Parallel loop with '"
+                + lexical_cast <string> (numberOfOpArgs)  + "' arguments",
+                Debug::OUTER_LOOP_LEVEL, __FILE__, __LINE__);
+                        
             analyseParallelLoopArguments (parallelLoop, actualArguments,
               numberOfOpArgs);
 

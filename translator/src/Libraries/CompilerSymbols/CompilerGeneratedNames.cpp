@@ -41,7 +41,8 @@
 
 namespace
 {
-  std::string const OpDatPrefix = "opDat";
+  std::string const OpArgPrefix = "opArg";
+  std::string const OpDatPrefix = "opDat";  
   std::string const Size = "Size";
 }
 
@@ -182,6 +183,15 @@ OP2VariableNames::getOpMatMap2Name (unsigned int n)
   using std::string;
 
   return getOpMatName (n) + "Map2";
+}
+
+std::string const
+OP2VariableNames::getOpArgName (unsigned int OP_DAT_ArgumentGroup)
+{
+  using boost::lexical_cast;
+  using std::string;
+
+  return OpArgPrefix + lexical_cast <string> (OP_DAT_ArgumentGroup);
 }
 
 std::string const

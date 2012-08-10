@@ -110,6 +110,8 @@ namespace BooleanVariableNames
 
 namespace OP2VariableNames
 {
+  std::string const opArgArray = "opArgArray";
+  std::string const numberOfOpDats = "numberOfOpDats";
   std::string const localOffset = "localOffset";
   std::string const moduloResult = "moduloResult";
   std::string const nbytes = "nbytes";
@@ -146,7 +148,21 @@ namespace OP2VariableNames
   std::string const accumulatorKernelTime = "accumulatorKernelTime";
 
   std::string const printProfilingInformation = "printProfInfo";
+  std::string const getSetSizeFunctionName = "getSetSizeFromOpArg";
 
+  /*
+   * ======================================================
+   * MPI support function names
+   * ======================================================
+   */
+  std::string const opMpiHaloExchanges = "op_mpi_halo_exchanges";
+  std::string const opMpiWaitAll = "op_mpi_wait_all";
+  std::string const opMpiSetDirtyBit = "op_mpi_set_dirtybit";
+  std::string const opMpiReduceInt = "op_mpi_reduce_int";
+  std::string const opMpiReduceDouble = "op_mpi_reduce_double";
+  std::string const opMpiReduceFloat = "op_mpi_reduce_float";
+  std::string const opMpiReduceBool = "op_mpi_reduce_bool";
+  std::string const returnMPIHaloExchange = "returnMPIHaloExchange";
 
   std::string const
   getBlockSizeVariableName (std::string const & suffix);
@@ -209,6 +225,15 @@ namespace OP2VariableNames
   std::string const
   getOpMatMap2Name (unsigned int n);
 
+  /*
+   * ======================================================
+   * Returns the name of an OP_ARG variable as
+   * i-th parameter to the parallel loop
+   * ======================================================
+   */
+  std::string const
+  getOpArgName (unsigned int OP_DAT_ArgumentGroup);  
+  
   /*
    * ======================================================
    * Returns the name of an OP_DAT variable in this OP_DAT

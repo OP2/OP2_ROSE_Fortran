@@ -103,13 +103,14 @@ namespace OP2
     std::string const dim = "dim";
     std::string const index = "index";
     std::string const set = "set";
-    std::string const size = "size";
+    std::string const size = "size";    
 
     namespace Fortran
     {
       std::string const dataPtr = "dataPtr";
       std::string const mapPtr = "mapPtr";
-      std::string const setPtr = "setPtr";      
+      std::string const setPtr = "setPtr";
+      std::string const setCPtr = "setCPtr";
     }
   }
 
@@ -199,11 +200,11 @@ namespace OP2
 
       namespace CUDANames
       {
-	std::string const cudaEventType = "cudaEvent";
-	std::string const cudaEventCreateFunction = "cudaEventCreate";
-	std::string const cudaEventRecordFunction = "cudaEventRecord";
-	std::string const cudaEventSynchroniseFunction = "cudaEventSynchronize";
-	std::string const cudaEventElapsedTimeFunction = "cudaEventElapsedTime";       
+        std::string const cudaEventType = "cudaEvent";
+        std::string const cudaEventCreateFunction = "cudaEventCreate";
+        std::string const cudaEventRecordFunction = "cudaEventRecord";
+        std::string const cudaEventSynchroniseFunction = "cudaEventSynchronize";
+        std::string const cudaEventElapsedTimeFunction = "cudaEventElapsedTime";       
       }
   }
   

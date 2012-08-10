@@ -195,14 +195,14 @@ end subroutine adt_calc
 subroutine res_calc ( x1, x2, q1, q2, adt1, adt2, res1, res2 ) 
   implicit none
 
-  real(8), dimension(*) :: x1
-  real(8), dimension(*) :: x2
-  real(8), dimension(*) :: q1
-  real(8), dimension(*) :: q2
-  real(8), dimension(*) :: adt1
-  real(8), dimension(*) :: adt2
-  real(8), dimension(*) :: res1
-  real(8), dimension(*) :: res2
+  real(8), dimension(2) :: x1
+  real(8), dimension(2) :: x2
+  real(8), dimension(4) :: q1
+  real(8), dimension(4) :: q2
+  real(8), dimension(1) :: adt1
+  real(8), dimension(1) :: adt2
+  real(8), dimension(4) :: res1
+  real(8), dimension(4) :: res2
 
   real(8) :: dx, dy, mu, ri, p1, vol1, p2, vol2, f
 

@@ -46,8 +46,7 @@ namespace PlanFunctionVariableNames
    */
 
   std::string const numberOfIndirectOpDats = "numberOfIndirectOpDats";
-  std::string const numberOfColours = "numOfColours";
-  std::string const numberOfOpDats = "numberOfOpDats";
+  std::string const numberOfColours = "numOfColours";  
   std::string const accessDescriptorArray = "accessDescriptorArray";
   std::string const opDatArray = "opDatArray";
   std::string const opDatTypesArray = "opDatTypesArray";
@@ -71,6 +70,7 @@ namespace PlanFunctionVariableNames
   std::string const nblocks = "nblocks";
   std::string const ncolblk = "ncolblk";
   std::string const ncolors = "ncolors";
+  std::string const ncolorsCore = "ncolors_core";
   std::string const nelems = "nelems";
   std::string const nindirect = "nindirect";
   std::string const nshared = "nshared";

@@ -226,73 +226,74 @@ FortranSubroutinesGeneration::patchCallsToParallelLoops (
       /*
        * ======================================================
        * Increment of index depends on op_arg type (standard
-       * or generic)
+       * or generic).
+       * \warning: THIS IS UNNECESSARY WITH THE OP_ARGS
        * ======================================================
        */      
-      for (unsigned int offset = parallelLoop->NUMBER_OF_NON_OP_DAT_ARGUMENTS; offset
-          < arguments.size (); )
-      {
-        int accessDescriptorPositionStandardLoop = offset
-          + parallelLoop->NUMBER_OF_ARGUMENTS_PER_OP_DAT - 1;
-
-        /*
-         * ======================================================
-         * I am looking for either a string (OP_INC, OP_RW, ..)
-         * or an integer, denoting the dimension
-         * ======================================================
-         */
-          
-        SgIntVal * opDatDimension = isSgIntVal (
-          arguments[accessDescriptorPositionStandardLoop]);
-
-        /*
-         * ======================================================
-         * Found a access string => standard op_args
-         * Not found a dimension => generic op_args
-         * ======================================================
-         */ 
-        if ( opDatDimension == NULL )
-        {
-          Debug::getInstance ()->debugMessage ("Standard op_arg",
-            Debug::OUTER_LOOP_LEVEL, __FILE__, __LINE__);          
-
-          offset += parallelLoop->NUMBER_OF_ARGUMENTS_PER_OP_DAT;
-
-          Debug::getInstance ()->debugMessage ("Standard op_arg, offset = " +
-            lexical_cast<string> ( offset ),
-            Debug::OUTER_LOOP_LEVEL, __FILE__, __LINE__);
-        }
-        else
-        {
-        /*
-         * ======================================================
-         * Generic loops have additional dimension and type 
-         * string information as parameters. These must be
-         * removed to make correspond the call signature
-         * to the definition one
-         * parallelLoop->NUMBER_OF_ARGUMENTS_PER_OP_DAT_GENERIC - 1;
-         * is the distance between the type string of an op_arg,
-         * and the dimension of the following one
-         * ======================================================
-         */   
-          int dimensionPosition = offset + parallelLoop->POSITION_OF_DIMENSION;
-          int typeStringPosition = offset + parallelLoop->POSITION_OF_TYPE;
-          
-          Debug::getInstance ()->debugMessage ("generic op_arg: erasing dimension and type from argument list, offset is " +
-          lexical_cast<string> ( offset ) + " and limit is " + lexical_cast<string> (arguments.size ()),
-            Debug::OUTER_LOOP_LEVEL, __FILE__, __LINE__);
-          
-          arguments.erase (arguments.begin () + dimensionPosition, arguments.begin () + typeStringPosition +1);
-          
-          offset += parallelLoop->NUMBER_OF_ARGUMENTS_PER_OP_DAT;
-          
-          Debug::getInstance ()->debugMessage ("generic op_arg: erasing dimension and type from argument list, offset is " +
-            lexical_cast<string> ( offset ) + " and limit is " + lexical_cast<string> (arguments.size ()),
-            Debug::OUTER_LOOP_LEVEL, __FILE__, __LINE__);
-          
-        }
-      }
-        
+//       for (unsigned int offset = parallelLoop->NUMBER_OF_NON_OP_DAT_ARGUMENTS; offset
+//           < arguments.size (); )
+//       {
+//         int accessDescriptorPositionStandardLoop = offset
+//           + parallelLoop->NUMBER_OF_ARGUMENTS_PER_OP_DAT - 1;
+// 
+//         /*
+//          * ======================================================
+//          * I am looking for either a string (OP_INC, OP_RW, ..)
+//          * or an integer, denoting the dimension
+//          * ======================================================
+//          */
+//           
+//         SgIntVal * opDatDimension = isSgIntVal (
+//           arguments[accessDescriptorPositionStandardLoop]);
+// 
+//         /*
+//          * ======================================================
+//          * Found a access string => standard op_args
+//          * Not found a dimension => generic op_args
+//          * ======================================================
+//          */ 
+//         if ( opDatDimension == NULL )
+//         {
+//           Debug::getInstance ()->debugMessage ("Standard op_arg",
+//             Debug::OUTER_LOOP_LEVEL, __FILE__, __LINE__);          
+// 
+//           offset += parallelLoop->NUMBER_OF_ARGUMENTS_PER_OP_DAT;
+// 
+//           Debug::getInstance ()->debugMessage ("Standard op_arg, offset = " +
+//             lexical_cast<string> ( offset ),
+//             Debug::OUTER_LOOP_LEVEL, __FILE__, __LINE__);
+//         }
+//         else
+//         {
+//         /*
+//          * ======================================================
+//          * Generic loops have additional dimension and type 
+//          * string information as parameters. These must be
+//          * removed to make correspond the call signature
+//          * to the definition one
+//          * parallelLoop->NUMBER_OF_ARGUMENTS_PER_OP_DAT_GENERIC - 1;
+//          * is the distance between the type string of an op_arg,
+//          * and the dimension of the following one
+//          * ======================================================
+//          */   
+//           int dimensionPosition = offset + parallelLoop->POSITION_OF_DIMENSION;
+//           int typeStringPosition = offset + parallelLoop->POSITION_OF_TYPE;
+//           
+//           Debug::getInstance ()->debugMessage ("generic op_arg: erasing dimension and type from argument list, offset is " +
+//           lexical_cast<string> ( offset ) + " and limit is " + lexical_cast<string> (arguments.size ()),
+//             Debug::OUTER_LOOP_LEVEL, __FILE__, __LINE__);
+//           
+//           arguments.erase (arguments.begin () + dimensionPosition, arguments.begin () + typeStringPosition +1);
+//           
+//           offset += parallelLoop->NUMBER_OF_ARGUMENTS_PER_OP_DAT;
+//           
+//           Debug::getInstance ()->debugMessage ("generic op_arg: erasing dimension and type from argument list, offset is " +
+//             lexical_cast<string> ( offset ) + " and limit is " + lexical_cast<string> (arguments.size ()),
+//             Debug::OUTER_LOOP_LEVEL, __FILE__, __LINE__);
+//           
+//         }
+//       }
+//         
       /*
        * ======================================================
        * Set where the function call is invoked as a transformation

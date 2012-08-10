@@ -52,7 +52,7 @@ namespace OpenMP
   namespace Fortran
   {
     std::string const libraryName = "OMP_LIB";
-    std::string const cPlanFunction = "cplan_OpenMP";
+    std::string const cPlanFunction = "FortranPlanCaller";
     std::string const fileName = "rose_openmp_code.F90";
   }
 

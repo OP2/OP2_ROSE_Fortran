@@ -27,6 +27,11 @@ use, intrinsic :: ISO_C_BINDING
   integer:: id, dim
   end type op_dat
 
+  type op_arg
+    type(op_dat) :: dat
+    integer(4) :: acc
+  end type op_arg
+
   ! declaration of identity map
   type(op_map) :: OP_ID, OP_GBL
 
@@ -39,19 +44,27 @@ use, intrinsic :: ISO_C_BINDING
                    & op_decl_dat_integer_4_3, &
                    & op_decl_dat_logical
   end interface op_decl_dat
- 
-  interface op_decl_gbl
-     module procedure op_decl_gbl_real_8_0, &
-                    & op_decl_gbl_real_8_1, &
-                    & op_decl_gbl_real_8_2, &
-                    & op_decl_gbl_real_8_3, &
-                    & op_decl_gbl_integer_4_0, &
-                    & op_decl_gbl_integer_4_1, &
-                    & op_decl_gbl_integer_4_2, &
-                    & op_decl_gbl_integer_4_3, &
-                    & op_decl_gbl_logical_0, &
-                    & op_decl_gbl_logical_1
-  end interface op_decl_gbl     
+
+  interface op_arg_gbl
+    module procedure op_arg_gbl_real8_0, &
+                   & op_arg_gbl_real8_1, &
+                   & op_arg_gbl_integer4_0, &
+                   & op_arg_gbl_integer4_1, &
+                   & op_arg_gbl_logical
+  end interface op_arg_gbl
+
+!   interface op_decl_gbl
+!      module procedure op_decl_gbl_real_8_0, &
+!                     & op_decl_gbl_real_8_1, &
+!                     & op_decl_gbl_real_8_2, &
+!                     & op_decl_gbl_real_8_3, &
+!                     & op_decl_gbl_integer_4_0, &
+!                     & op_decl_gbl_integer_4_1, &
+!                     & op_decl_gbl_integer_4_2, &
+!                     & op_decl_gbl_integer_4_3, &
+!                     & op_decl_gbl_logical_0, &
+!                     & op_decl_gbl_logical_1
+!   end interface op_decl_gbl     
 
  interface op_decl_const
      module procedure op_decl_const_scalar_logical, &
@@ -143,131 +156,148 @@ contains
     character(kind=c_char,len=*) :: datname
   end subroutine op_decl_dat_logical
 
-  subroutine op_decl_gbl_real_8_0 ( dat, data)
-    real(8) :: dat   
-    type(op_dat) :: data
-  end subroutine op_decl_gbl_real_8_0
-  
-  subroutine op_decl_gbl_real_8_1 ( dat, data, dim)
+  type(op_arg) function op_arg_dat (dat, idx, map, acc)
+    type(op_dat) :: dat
+    integer(4) :: idx
+    type(op_map) :: map
+    integer(4) :: acc
+  end function
+
+  type(op_arg) function op_arg_dat_generic (dat, idx, map, dim, type, acc)
+    type(op_dat) :: dat
+    integer(4) :: idx
+    type(op_map) :: map
+    integer :: dim
+    character(kind=c_char,len=*) :: type
+    integer(4) :: acc
+  end function
+
+  type(op_arg) function op_arg_gbl_real8_0 (dat, acc)
+    real(8) :: dat
+    integer(4) :: acc
+  end function
+
+  type(op_arg) function op_arg_gbl_real8_1 (dat, dim, acc)
     real(8), dimension(:) :: dat
-    type(op_dat) :: data
-    integer :: dim
-  end subroutine op_decl_gbl_real_8_1
+    integer(4) :: dim
+    integer(4) :: acc
+  end function
 
-  subroutine op_decl_gbl_real_8_2 ( dat, data, dim)
-    real(8), dimension(:,:) :: dat
-    type(op_dat) :: data
-    integer :: dim
-  end subroutine op_decl_gbl_real_8_2
-
-  subroutine op_decl_gbl_integer_4_2 ( dat, data, dim)
-    integer(4), dimension(:,:) :: dat    
-    type(op_dat) :: data
-    integer :: dim
-  end subroutine op_decl_gbl_integer_4_2
-
-  subroutine op_decl_gbl_real_8_3 ( dat, data, dim)
-    real(8), dimension(:,:,:) :: dat
-    type(op_dat) :: data
-    integer :: dim
-  end subroutine op_decl_gbl_real_8_3
-
-  subroutine op_decl_gbl_integer_4_0 ( dat, data)
+  type(op_arg) function op_arg_gbl_integer4_0 (dat, acc)
     integer(4) :: dat
-    type(op_dat) :: data    
-  end subroutine op_decl_gbl_integer_4_0
+    integer(4) :: acc
+  end function
 
-  subroutine op_decl_gbl_integer_4_1 ( dat, data, dim)
+  type(op_arg) function op_arg_gbl_integer4_1 (dat, dim, acc)
     integer(4), dimension(:) :: dat
-    type(op_dat) :: data
-    integer :: dim
-  end subroutine op_decl_gbl_integer_4_1
+    integer(4) :: dim
+    integer(4) :: acc
+  end function
 
-  subroutine op_decl_gbl_integer_4_3 ( dat, data, dim)
-    integer(4), dimension(:,:,:) :: dat
-    type(op_dat) :: data
-    integer :: dim
-  end subroutine op_decl_gbl_integer_4_3
+  type(op_arg) function op_arg_gbl_logical (dat, acc)
+    logical :: dat
+    integer(4) :: acc
+  end function
 
-    subroutine op_decl_gbl_logical_0 ( dat, data)
-        
-        logical :: dat
-        type(op_dat) :: data
-        
-    end subroutine op_decl_gbl_logical_0
 
-    subroutine op_decl_gbl_logical_1 ( dat, data, gbldim)
-        
-        logical, dimension(*):: dat        
-        type(op_dat) :: data
-        integer :: gbldim
-       
-    end subroutine op_decl_gbl_logical_1
-
-  subroutine op_decl_const_scalar_logical ( data, dim )
+  subroutine op_decl_const_scalar_logical ( data, dim, constname )
     
     integer(4) :: dim
     logical :: data
+    character(kind=c_char,len=*), optional :: constname
   
   end subroutine op_decl_const_scalar_logical
 
-  subroutine op_decl_const_scalar_real_4 ( data, dim )
+  subroutine op_decl_const_scalar_real_4 ( data, dim, constname )
     
     integer(4) :: dim
     real(4) :: data
+    character(kind=c_char,len=*), optional :: constname
   
   end subroutine op_decl_const_scalar_real_4
 
-  subroutine op_decl_const_scalar_real_8 ( data, dim )
+  subroutine op_decl_const_scalar_real_8 ( data, dim, constname )
     
     integer(4) :: dim
     real(8) :: data
+    character(kind=c_char,len=*), optional :: constname
   
   end subroutine op_decl_const_scalar_real_8
 
-  subroutine op_decl_const_scalar_integer_4 ( data, dim )
+  subroutine op_decl_const_scalar_integer_4 ( data, dim, constname )
     
     integer(4) :: dim
     integer(4) :: data
-  
+    character(kind=c_char,len=*), optional :: constname
+
   end subroutine op_decl_const_scalar_integer_4
 
-
-
-  subroutine op_decl_const_logical ( data, dim )
+  subroutine op_decl_const_logical ( data, dim, constname )
     
     integer(4) :: dim
     logical, dimension(:) :: data
+    character(kind=c_char,len=*), optional :: constname
   
   end subroutine op_decl_const_logical
 
-  subroutine op_decl_const_real_4 ( data, dim )
+  subroutine op_decl_const_real_4 ( data, dim, constname )
     
     integer(4) :: dim
     real(4), dimension(:) :: data
-  
+    character(kind=c_char,len=*), optional :: constname
+
   end subroutine op_decl_const_real_4
 
-  subroutine op_decl_const_real_8 ( data, dim )
+  subroutine op_decl_const_real_8 ( data, dim, constname )
     
     integer(4) :: dim
     real(8), dimension(:) :: data
+    character(kind=c_char,len=*), optional :: constname
   
   end subroutine op_decl_const_real_8
 
-  subroutine op_decl_const_integer_4 ( data, dim )
+  subroutine op_decl_const_integer_4 ( data, dim, constname )
     
     integer(4) :: dim
     integer(4), dimension(:) :: data
+    character(kind=c_char,len=*), optional :: constname
   
   end subroutine op_decl_const_integer_4
 
-  subroutine op_decl_const_real_8_2 ( data, dim1, dim2 )
+  subroutine op_decl_const_real_8_2 ( data, dim1, dim2, constname )
     
     integer(4) :: dim1, dim2
     real(8), dimension(:,:) :: data
+    character(kind=c_char,len=*), optional :: constname
   
   end subroutine op_decl_const_real_8_2
 
-
 end module OP2_FORTRAN_DECLARATIONS
+
+
+! fake MPI module
+! module mpi
+! 
+!   integer(4) :: MPI_COMM_WORLD
+!   integer(4) :: MPI_INTEGER
+!   integer(4) :: MPI_REAL8
+! 
+!   contains
+! 
+!     subroutine MPI_COMM_SIZE (a, b, c)
+!       integer(4) :: a, b, c
+!     end subroutine
+! 
+!     subroutine MPI_Comm_rank(a, b, c)
+!       integer(4) :: a, b, c
+!     end subroutine
+
+!     subroutine MPI_Scatterv (g_array, sendcnts, displs, data_type, l_array, sizes, data_type, zeroed, comm, mpi_err)
+!       real(8), dimension(*):: g_array
+!       integer, allocatable :: sendcnts(*), displs(*)
+!       real(8), dimension(*):: l_array
+!       integer(4) sizes, data_type, zeroed, comm, mpi_err
+!     end subroutine
+
+! end module mpi
+

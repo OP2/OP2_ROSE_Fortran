@@ -66,6 +66,66 @@ class FortranHostSubroutine: public HostSubroutine <SgProcedureHeaderStatement>
     
     void
     createDumpOfOutputDeclarations (SgScopeStatement * subroutineScope);
+
+    /*
+     * ======================================================
+     * Calls the op_mpi_halo_exchanges
+     * ======================================================
+     */    
+    void
+    appendCallMPIHaloExchangeFunction (SgScopeStatement * scope);
+
+    /*
+     * ======================================================
+     * Calls the op_mpi_wait_all (called in if-then)
+     * ======================================================
+     */    
+    void
+    appendCallMPIWaitAll (SgScopeStatement * scope);
+
+    /*
+     * ======================================================
+     * Calls the op_mpi_set_dirtybit. Needs a scope
+     * because it is called in different contexts
+     * ======================================================
+     */
+    void
+    appendCallMPISetDirtyBit (SgScopeStatement * scope);
+
+    /*
+     * ======================================================
+     * Populates the opArgArray variable with formal params.
+     * ======================================================
+     */
+    void
+    appendPopulationOpArgArray (SgScopeStatement * scope);
+
+    /*
+     * ======================================================
+     * Initialise the variable counting the number of input
+     * op_args
+     * ======================================================
+     */
+    void
+    initialiseNumberOfOpArgs (SgScopeStatement * scope);
+
+   /*
+    * ======================================================
+    * Declare array of op_args and variable with number
+    * of parameters
+    * ======================================================
+    */
+    void
+    createCommonLocalVariableDeclarations (SgScopeStatement * scope);
+
+    /*
+     * ======================================================
+     * Appends one call to op_mpi_reduce for each reduction
+     * argument
+     * ======================================================
+     */
+    void
+    appendCallsToMPIReduce (SgScopeStatement * scope);
     
     /*
      * ======================================================
@@ -73,8 +133,8 @@ class FortranHostSubroutine: public HostSubroutine <SgProcedureHeaderStatement>
      * ======================================================
      */
     void
-      createDumpOfOutputStatements (SgScopeStatement * subroutineScope, std::string const dumpOpDatFunctionName);
-    
+    createDumpOfOutputStatements (SgScopeStatement * subroutineScope, std::string const dumpOpDatFunctionName);
+
     FortranHostSubroutine (SgScopeStatement * moduleScope, Subroutine <
         SgProcedureHeaderStatement> * calleeSubroutine,
         FortranParallelLoop * parallelLoop);

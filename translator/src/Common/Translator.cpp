@@ -309,8 +309,8 @@ checkBackendOption ()
     vector <TargetLanguage::BACKEND> values;
     values.push_back (TargetLanguage::CUDA);
     values.push_back (TargetLanguage::OPENMP);
-    values.push_back (TargetLanguage::OPENCL);
-
+    values.push_back (TargetLanguage::OPENCL);    
+    
     string backendsString;
 
     unsigned int i = 1;
@@ -345,6 +345,9 @@ addCommandLineOptions ()
       new OpenCLOption ("Generate OpenCL code", TargetLanguage::toString (
           TargetLanguage::OPENCL)));
 
+  CommandLine::getInstance ()->addOption (
+      new MPIOption ("Generate OpenCL code", "mpi"));
+          
   CommandLine::getInstance ()->addOption (new FreeVariablesModuleOption (
       "The module containing free variables referenced in user kernels"));
 

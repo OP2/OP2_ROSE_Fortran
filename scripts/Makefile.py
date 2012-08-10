@@ -53,6 +53,12 @@ parser.add_option(openclFlag,
                   help="Generate code for OpenCL backend.",
                   default=False)
 
+parser.add_option("--mpi",
+                  action="store_true",
+                  dest="mpi",
+                  help="Generate support for MPI backend.",
+                  default=False)
+
 parser.add_option("-d",
                   "--debug",
                   action="store",
@@ -292,6 +298,9 @@ def getFortranCompilationCommand (filesToCompile, freeVariablesModuleName):
 	op2Path        = translatorHome + sep + 'support' + sep + 'Fortran'
 
 	cmd = translatorPath + ' -d ' + str(opts.debug) + ' ' + getBackendTarget ()
+
+	if opts.mpi == True:
+		cmd += ' --mpi '
 
 	auxiliaryFiles = ['ISO_C_BINDING.F95', 'OP2.F95']
 

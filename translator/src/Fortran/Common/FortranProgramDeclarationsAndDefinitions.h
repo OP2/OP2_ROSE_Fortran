@@ -70,9 +70,14 @@ class FortranProgramDeclarationsAndDefinitions: public ProgramDeclarationsAndDef
         SgType * opDatBaseType, int OP_DAT_ArgumentGroup);
         
     void
-    setParallelLoopAccessDescriptor (FortranParallelLoop * parallelLoop,
-        SgExprListExp * actualArguments, unsigned int OP_DAT_ArgumentGroup,
-        unsigned int argumentPosition);
+    setParallelLoopAccessDescriptor (FortranParallelLoop * parallelLoop, SgExprListExp * actualArguments,
+      unsigned int argumentPosition, unsigned int accessPosition);
+
+    SgVarRefExp *
+    getOpDatReferenceFromOpArg (SgExprListExp * opArgArguments);
+
+    SgVarRefExp *
+    getOpMapReferenceFromOpArg (SgExprListExp * opArgArguments);
 
     void
     analyseParallelLoopArguments (FortranParallelLoop * parallelLoop,

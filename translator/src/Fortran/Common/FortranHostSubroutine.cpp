@@ -30,16 +30,17 @@
  */
 
 
-#include "FortranHostSubroutine.h"
-#include "FortranStatementsAndExpressionsBuilder.h"
-#include "RoseStatementsAndExpressionsBuilder.h"
-#include "FortranTypesBuilder.h"
-#include "FortranParallelLoop.h"
-#include "OP2.h"
-#include "CompilerGeneratedNames.h"
-#include "Debug.h"
+#include <FortranHostSubroutine.h>
+#include <FortranStatementsAndExpressionsBuilder.h>
+#include <RoseStatementsAndExpressionsBuilder.h>
+#include <FortranTypesBuilder.h>
+#include <FortranParallelLoop.h>
+#include <OP2.h>
+#include <CompilerGeneratedNames.h>
+#include <Debug.h>
 #include <boost/algorithm/string/predicate.hpp>
 #include <rose.h>
+#include <Globals.h>
 
 /*
  * ======================================================
@@ -96,50 +97,24 @@ FortranHostSubroutine::createFormalParameterDeclarations ()
               OP_SET, subroutineScope)->get_type (), subroutineScope,
           formalParameters, 1, INTENT_IN));
 
+
   /*
    * ======================================================
-   * Add OP_DAT, indirection, OP_MAP, access arguments for
-   * each OP_DAT argument group
+   * Add OP_ARGs to formal parameters
    * ======================================================
    */
-
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
-  {
-    string const & opDatvariableName = getOpDatName (i);
+  {  
+    string const & opArgVariableName = getOpArgName (i);
 
     variableDeclarations->add (
-        opDatvariableName,
+        opArgVariableName,
         FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
-            opDatvariableName, FortranTypesBuilder::buildClassDeclaration (
-                OP2::OP_DAT, subroutineScope)->get_type (), subroutineScope,
+            opArgVariableName, FortranTypesBuilder::buildClassDeclaration (
+                OP2::OP_ARG, subroutineScope)->get_type (), subroutineScope,
             formalParameters, 1, INTENT_IN));
-
-    string const & indirectionVariableName = getOpIndirectionName (i);
-
-    variableDeclarations->add (
-        indirectionVariableName,
-        FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
-            indirectionVariableName,
-            FortranTypesBuilder::getFourByteInteger (), subroutineScope,
-            formalParameters, 1, INTENT_IN));
-
-    string const & opMapVariableName = getOpMapName (i);
-
-    variableDeclarations->add (
-        opMapVariableName,
-        FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
-            opMapVariableName, FortranTypesBuilder::buildClassDeclaration (
-                OP2::OP_MAP, subroutineScope)->get_type (), subroutineScope,
-            formalParameters, 1, INTENT_IN));
-
-    string const & accessVariableName = getOpAccessName (i);
-
-    variableDeclarations->add (
-        accessVariableName,
-        FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
-            accessVariableName, FortranTypesBuilder::getFourByteInteger (),
-            subroutineScope, formalParameters, 1, INTENT_IN));
   }
+    
 }
 
 void
@@ -148,13 +123,15 @@ FortranHostSubroutine::createEarlyExitStatement (SgScopeStatement * subroutineSc
   using namespace SageBuilder;
   using namespace SageInterface;
   using namespace OP2VariableNames;
+  using namespace OP2::RunTimeVariableNames;
   using std::string;
   
   string const sizeField = "size";
   
   SgDotExp * setSizeField = buildDotExp (
     variableDeclarations->getReference (getOpSetName ()),
-    buildOpaqueVarRefExp (sizeField, subroutineScope));
+    buildDotExp ( buildOpaqueVarRefExp (Fortran::setPtr, subroutineScope),
+      buildOpaqueVarRefExp (size, subroutineScope)));
 
   SgExpression * conditionSetZero = buildEqualityOp (setSizeField, buildIntVal (0) );
 
@@ -168,7 +145,6 @@ FortranHostSubroutine::createEarlyExitStatement (SgScopeStatement * subroutineSc
     RoseStatementsAndExpressionsBuilder::buildIfStatementWithEmptyElse (
     conditionSetZero , ifBody);
 
-  
   appendStatement (ifSetIsZero, subroutineScope);
 }
 
@@ -178,23 +154,31 @@ FortranHostSubroutine::createEarlyExitStatementNewLibrary (SgScopeStatement * su
   using namespace SageBuilder;
   using namespace SageInterface;
   using namespace OP2VariableNames;
+  using namespace OP2;  
+
   using std::string;
   
-  string const sizeField = OP2::RunTimeVariableNames::size;
-  string const setPtr = OP2::RunTimeVariableNames::Fortran::setPtr;
-  
-  SgDotExp * setPtrField = buildDotExp (
-    variableDeclarations->getReference (getOpSetName ()),
-    buildOpaqueVarRefExp (setPtr, subroutineScope));
+  string const sizeField = RunTimeVariableNames::size;
+  string const setPtr = RunTimeVariableNames::Fortran::setPtr;
   
   SgDotExp * setSizeField = buildDotExp (
-    setPtrField,
-    buildOpaqueVarRefExp (sizeField, subroutineScope));
+    variableDeclarations->getReference (getOpSetName ()),
+    buildDotExp ( buildOpaqueVarRefExp (RunTimeVariableNames::Fortran::setPtr,
+        subroutineScope),
+      buildOpaqueVarRefExp (RunTimeVariableNames::size, subroutineScope)));
 
   SgExpression * conditionSetZero = buildEqualityOp (setSizeField, buildIntVal (0) );
 
   SgBasicBlock * ifBody = buildBasicBlock ();
-  
+
+  /*
+   * ======================================================
+   * In case of MPI we need to set the dirty bits
+   * ======================================================
+   */
+  if ( Globals::getInstance ()->getIncludesMPI () )
+    appendCallMPISetDirtyBit (ifBody);
+
   SgReturnStmt * returnStatement = buildReturnStmt (buildNullExpression ());
   
   appendStatement (returnStatement, ifBody);
@@ -243,8 +227,6 @@ FortranHostSubroutine::createDumpOfOutputStatements (SgScopeStatement * subrouti
 
   appendStatement (incrementCalledTimes, subroutineScope);
   
-  bool firstCall = true;
-  
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
     if (parallelLoop->isDuplicateOpDat (i) == false)
@@ -255,7 +237,7 @@ FortranHostSubroutine::createDumpOfOutputStatements (SgScopeStatement * subrouti
         
         SgStringVal * userSubroutineExpression = buildStringVal (parallelLoop->getUserSubroutineName ());
 
-        SgStringVal * opDatLabel = buildStringVal (getOpDatName (i));
+        SgStringVal * opDatLabel = buildStringVal (getOpArgName (i));
         
         SgFunctionSymbol * functionSymbol =
             FortranTypesBuilder::buildNewFortranFunction ("CHAR", subroutineScope);
@@ -274,7 +256,7 @@ FortranHostSubroutine::createDumpOfOutputStatements (SgScopeStatement * subrouti
           concatenationExpression1, functionCallExpSlashZero);
           
         SgVarRefExp * opDatReference = variableDeclarations->getReference (
-          getOpDatName (i));
+          getOpArgName (i));
             
         actualParameters->append_expression (opDatReference);
         actualParameters->append_expression (concatenationExpression2);
@@ -311,6 +293,202 @@ FortranHostSubroutine::createDumpOfOutputStatements (SgScopeStatement * subrouti
       }
     }
   }
+}
+
+void
+FortranHostSubroutine::appendCallMPIHaloExchangeFunction (SgScopeStatement * scope)
+{
+  using namespace SageBuilder;
+  using namespace SageInterface;
+  using namespace OP2;
+  using namespace OP2VariableNames;
+  
+  SgExprListExp * actualParameters = buildExprListExp ();
+
+  SgExpression * setCPtrField = buildDotExp (
+    variableDeclarations->getReference (getOpSetName ()),
+    buildOpaqueVarRefExp (RunTimeVariableNames::Fortran::setCPtr, subroutineScope));
+  
+  actualParameters->append_expression (setCPtrField);
+  actualParameters->append_expression (variableDeclarations->getReference (numberOfOpDats));
+  actualParameters->append_expression (variableDeclarations->getReference (opArgArray));
+  
+  SgFunctionSymbol * functionSymbolSetDirtyBit = FortranTypesBuilder::buildNewFortranFunction (
+      opMpiHaloExchanges, subroutineScope);
+
+  SgFunctionCallExp * functionCall = buildFunctionCallExp (functionSymbolSetDirtyBit,
+    actualParameters);
+
+  SgExprStatement * assignHaloCall = buildAssignStatement (variableDeclarations->getReference (
+    returnMPIHaloExchange), functionCall);
+    
+  appendStatement (assignHaloCall, scope);
+}
+
+void
+FortranHostSubroutine::appendCallMPISetDirtyBit (SgScopeStatement * scope)
+{
+  using namespace SageBuilder;
+  using namespace SageInterface;
+  using namespace OP2;
+  using namespace OP2VariableNames;
+
+  SgExprListExp * actualParameters = buildExprListExp ();    
+        
+  actualParameters->append_expression (variableDeclarations->getReference (numberOfOpDats));
+  actualParameters->append_expression (variableDeclarations->getReference (opArgArray));
+
+  SgFunctionSymbol * functionSymbolSetDirtyBit =
+    FortranTypesBuilder::buildNewFortranSubroutine (
+      opMpiSetDirtyBit, subroutineScope);
+
+  SgFunctionCallExp * functionCall = buildFunctionCallExp (functionSymbolSetDirtyBit,
+    actualParameters);
+
+  appendStatement (buildExprStatement (functionCall), scope);
+}
+
+void
+FortranHostSubroutine::appendCallMPIWaitAll (SgScopeStatement * scope)
+{
+  using namespace SageBuilder;
+  using namespace SageInterface;
+  using namespace OP2;
+  using namespace OP2VariableNames;
+
+  SgExprListExp * actualParameters = buildExprListExp ();    
+        
+  actualParameters->append_expression (variableDeclarations->getReference (numberOfOpDats));
+  actualParameters->append_expression (variableDeclarations->getReference (opArgArray));
+
+  SgFunctionSymbol * functionSymbolSetDirtyBit = FortranTypesBuilder::buildNewFortranSubroutine (
+      opMpiWaitAll, subroutineScope);
+
+  SgFunctionCallExp * functionCall = buildFunctionCallExp (functionSymbolSetDirtyBit,
+    actualParameters);
+
+  appendStatement (buildExprStatement (functionCall), scope);
+}
+
+void
+FortranHostSubroutine::appendPopulationOpArgArray (SgScopeStatement * scope)
+{
+  using namespace SageBuilder;
+  using namespace SageInterface;
+  using namespace OP2;
+  using namespace OP2VariableNames;
+
+  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
+  {
+     SgPntrArrRefExp * arrayIndexExpression = buildPntrArrRefExp (
+         variableDeclarations->getReference (opArgArray), buildIntVal (i));
+
+     SgExprStatement * assignmentStatement = buildAssignStatement (
+         arrayIndexExpression, variableDeclarations->getReference (
+          getOpArgName (i)));
+
+     appendStatement (assignmentStatement, scope);
+  }
+}
+
+void
+FortranHostSubroutine::initialiseNumberOfOpArgs (SgScopeStatement * scope)
+{
+  using namespace SageBuilder;
+  using namespace SageInterface;
+  using namespace OP2;
+  using namespace OP2VariableNames;
+
+  SgExprStatement * assignmentStatement2 = buildAssignStatement (
+      variableDeclarations->getReference (numberOfOpDats), buildIntVal (
+          parallelLoop->getNumberOfOpDatArgumentGroups ()));
+
+  appendStatement (assignmentStatement2, scope);
+}
+
+void
+FortranHostSubroutine::createCommonLocalVariableDeclarations (SgScopeStatement * scope)
+{
+  using namespace OP2;
+  using namespace OP2VariableNames;
+  using namespace std;
+  
+  string const & opArgArrayVariableName = opArgArray;
+  
+  variableDeclarations->add (
+      opArgArrayVariableName,
+      FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
+          opArgArrayVariableName, FortranTypesBuilder::getArrayTypePlainDimension(FortranTypesBuilder::buildClassDeclaration (
+              OP_ARG, subroutineScope)->get_type (), parallelLoop->getNumberOfArgumentGroups ()), scope));
+
+  variableDeclarations->add (numberOfOpDats,
+      FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
+          numberOfOpDats, FortranTypesBuilder::getFourByteInteger (),
+          scope));
+
+  variableDeclarations->add (returnMPIHaloExchange,
+      FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
+          returnMPIHaloExchange, FortranTypesBuilder::getFourByteInteger (),
+          scope));
+}
+
+void
+FortranHostSubroutine::appendCallsToMPIReduce (SgScopeStatement * scope)
+{
+  using namespace SageBuilder;
+  using namespace SageInterface;
+  using namespace OP2;
+  using namespace OP2VariableNames;
+  using namespace ReductionVariableNames;
+  using namespace std;
+
+  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
+  {
+    if (parallelLoop->isReductionRequired (i) == true)
+    {
+      SgExprListExp * actualParameters = buildExprListExp ();    
+
+      actualParameters->append_expression (
+        variableDeclarations->getReference (getOpArgName (i)));
+      actualParameters->append_expression (
+        buildDotExp (variableDeclarations->getReference (getOpArgName (i)),
+          buildOpaqueVarRefExp (RunTimeVariableNames::data, subroutineScope)));
+
+      string functionName;
+
+      if ( isSgTypeInt (parallelLoop->getOpDatBaseType (i)) )
+      
+        functionName = opMpiReduceInt;
+      
+      else if ( isSgTypeDouble (parallelLoop->getOpDatBaseType (i)))
+        
+        functionName = opMpiReduceDouble;
+      
+      else if ( isSgTypeFloat (parallelLoop->getOpDatBaseType (i)))
+      
+        functionName = opMpiReduceFloat;
+      
+      else if ( isSgTypeBool (parallelLoop->getOpDatBaseType (i)))
+      
+        functionName = opMpiReduceBool;
+        
+      else
+      {
+        Debug::getInstance ()->debugMessage (
+          "Type of global reduction unsupported in MPI", Debug::FUNCTION_LEVEL,
+          __FILE__, __LINE__);
+      }
+
+      SgFunctionSymbol * functionSymbolMPIReduce = FortranTypesBuilder::buildNewFortranSubroutine (
+          functionName, subroutineScope);
+
+      SgFunctionCallExp * functionCall = buildFunctionCallExp (functionSymbolMPIReduce,
+        actualParameters);
+
+      appendStatement (buildExprStatement (functionCall), scope);
+    }
+  }
+  
 }
 
 FortranHostSubroutine::FortranHostSubroutine (SgScopeStatement * moduleScope,

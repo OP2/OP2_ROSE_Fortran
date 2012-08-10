@@ -361,15 +361,15 @@ FortranCUDAKernelSubroutine::createCUDAStageInVariablesVariableDeclarations ()
       }
       else
       {
-        if (parallelLoop->isIncremented (i) == true)
-        {
+//        if (parallelLoop->isIncremented (i) == true)
+//        {
           variableDeclarations->add (variableName,
               FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
                   variableName, FortranTypesBuilder::getArray_RankOne (
                       parallelLoop->getOpDatBaseType (i), 0, buildIntVal (
                           parallelLoop->getOpDatDimension (i) - 1)),
                   subroutineScope));
-        }
+//        }
       }
     }
   }

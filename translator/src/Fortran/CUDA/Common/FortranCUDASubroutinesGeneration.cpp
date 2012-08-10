@@ -170,7 +170,7 @@ FortranCUDASubroutinesGeneration::createSubroutines ()
   using namespace OP2VariableNames;
   using std::string;
   using std::map;
-
+  
   string const & printProfilingInformationName = printProfilingInformation;
 
   FortranPrintProfilingInformationSubroutine * printProfilingInformationSubroutineInstance =
@@ -384,6 +384,7 @@ FortranCUDASubroutinesGeneration::addLibraries ()
   vector <string> libs;
 
   libs.push_back (OP2::Libraries::Fortran::declarations);
+  libs.push_back (OP2::Libraries::Fortran::runtimeSupport);
   libs.push_back (OP2::Libraries::Fortran::CBindings);
   libs.push_back (CUDA::Libraries::Fortran::CUDARuntimeSupport);
   libs.push_back (CUDA::Libraries::Fortran::CUDALaunchParameters);

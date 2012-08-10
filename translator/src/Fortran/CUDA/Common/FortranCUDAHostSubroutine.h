@@ -122,6 +122,9 @@ class FortranCUDAHostSubroutine: public FortranHostSubroutine
 
     void
     createIterationVariablesDeclarations ();
+
+    void
+    appendBlockSizeFunctionCall (SgScopeStatement * scope);
     
     FortranCUDAHostSubroutine (SgScopeStatement * moduleScope,
         FortranKernelSubroutine * kernelSubroutine,

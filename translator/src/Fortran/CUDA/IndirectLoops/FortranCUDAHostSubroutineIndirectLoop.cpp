@@ -30,20 +30,21 @@
  */
 
 
-#include "FortranCUDAHostSubroutineIndirectLoop.h"
-#include "FortranParallelLoop.h"
-#include "FortranOpDatDimensionsDeclaration.h"
-#include "FortranCUDAModuleDeclarations.h"
-#include "FortranCUDAOpDatCardinalitiesDeclarationIndirectLoop.h"
-#include "FortranTypesBuilder.h"
-#include "FortranStatementsAndExpressionsBuilder.h"
-#include "RoseStatementsAndExpressionsBuilder.h"
-#include "RoseHelper.h"
-#include "CompilerGeneratedNames.h"
-#include "PlanFunctionNames.h"
-#include "OP2.h"
-#include "CUDA.h"
-#include "Debug.h"
+#include <FortranCUDAHostSubroutineIndirectLoop.h>
+#include <FortranParallelLoop.h>
+#include <FortranOpDatDimensionsDeclaration.h>
+#include <FortranCUDAModuleDeclarations.h>
+#include <FortranCUDAOpDatCardinalitiesDeclarationIndirectLoop.h>
+#include <FortranTypesBuilder.h>
+#include <FortranStatementsAndExpressionsBuilder.h>
+#include <RoseStatementsAndExpressionsBuilder.h>
+#include <RoseHelper.h>
+#include <CompilerGeneratedNames.h>
+#include <PlanFunctionNames.h>
+#include <OP2.h>
+#include <CUDA.h>
+#include <Debug.h>
+#include <Globals.h>
 
 void
 FortranCUDAHostSubroutineIndirectLoop::createKernelFunctionCallStatement (
@@ -212,6 +213,32 @@ FortranCUDAHostSubroutineIndirectLoop::createPlanFunctionExecutionStatements ()
 
   /*
    * ======================================================
+   * Calling the MPI wait all function if col == ncolors
+   * ======================================================
+   */
+  if ( Globals::getInstance ()->getIncludesMPI () )
+  {
+    SgBasicBlock * ifBody = buildBasicBlock ();
+
+    appendCallMPIWaitAll (ifBody);    
+    
+    SgDotExp * planNColorsField = buildDotExp (variableDeclarations->getReference (
+      getActualPlanVariableName (parallelLoop->getUserSubroutineName ())),
+      buildOpaqueVarRefExp (ncolorsCore, subroutineScope));
+
+    SgExpression * ifGuardExpression = buildEqualityOp (
+      variableDeclarations->getReference (getIterationCounterVariableName (2)),
+      planNColorsField);
+      
+    SgIfStmt * ifLastColor =
+      RoseStatementsAndExpressionsBuilder::buildIfStatementWithEmptyElse (
+        ifGuardExpression, ifBody);
+
+    appendStatement (ifLastColor, loopBody);
+  }
+  
+  /*
+   * ======================================================
    * Statement to initialise the grid dimension of the
    * CUDA kernel
    * ======================================================
@@ -237,29 +264,10 @@ FortranCUDAHostSubroutineIndirectLoop::createPlanFunctionExecutionStatements ()
    * ======================================================
    */
   
-  Debug::getInstance ()->debugMessage ("Creating call to partition size setting function",
+  Debug::getInstance ()->debugMessage ("Creating call to block size setting function",
       Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
-  SgVarRefExp * parameter1 = variableDeclarations->getReference (
-      getUserSubroutineName ());
-
-  SgDotExp * parameter2 = buildDotExp (variableDeclarations->getReference (
-      getOpSetName ()), buildOpaqueVarRefExp (OP2::RunTimeVariableNames::size,
-      subroutineScope));
-
-  SgExprListExp * actualParameters = buildExprListExp (parameter1, parameter2);
-
-  SgFunctionSymbol * functionSymbol =
-      FortranTypesBuilder::buildNewFortranFunction (OP2::FortranSpecific::RunTimeFunctions::getBlockSizeFunctionName,
-          subroutineScope);
-
-  SgFunctionCallExp * functionCall = buildFunctionCallExp (functionSymbol,
-      actualParameters);
-
-  SgExprStatement * statement2 = buildAssignStatement (
-      variableDeclarations->getReference (CUDA::threadsPerBlock), functionCall);
-
-  appendStatement (statement2, loopBody);
+  appendBlockSizeFunctionCall (subroutineScope);
 
   /*
    * ======================================================
@@ -407,7 +415,8 @@ FortranCUDAHostSubroutineIndirectLoop::createConvertPlanFunctionParametersStatem
       variableDeclarations->getReference (ncolblk));
 
   SgDotExp * dotExpressionF3 = buildDotExp (variableDeclarations->getReference (
-      set), buildOpaqueVarRefExp (size, block));
+      set), buildDotExp ( buildOpaqueVarRefExp (Fortran::setPtr, block),
+          buildOpaqueVarRefExp (size, block)));
 
   SgAggregateInitializer * parameterExpressionF3 =
       FortranStatementsAndExpressionsBuilder::buildShapeExpression (
@@ -639,8 +648,8 @@ FortranCUDAHostSubroutineIndirectLoop::createConvertPlanFunctionParametersStatem
 
   SgExprStatement * assignmentStatementM = buildAssignStatement (
       variableDeclarations->getReference (pthrcolSize), buildDotExp (
-          variableDeclarations->getReference (set), buildOpaqueVarRefExp (size,
-              block)));
+          variableDeclarations->getReference (set), buildDotExp ( buildOpaqueVarRefExp (Fortran::setPtr, block),
+          buildOpaqueVarRefExp (size, block))));
 
   appendStatement (assignmentStatementM, block);
 
@@ -806,8 +815,9 @@ FortranCUDAHostSubroutineIndirectLoop::createConvertGlobalToLocalMappingStatemen
       SgBasicBlock * ifBody = buildBasicBlock ();
 
       SgDotExp * dotExpression1 = buildDotExp (
-          variableDeclarations->getReference (set), buildOpaqueVarRefExp (size,
-              block));
+          variableDeclarations->getReference (set),
+          buildDotExp ( buildOpaqueVarRefExp (Fortran::setPtr, block),
+            buildOpaqueVarRefExp (size, block)));
 
       SgExprStatement * statement1 = buildAssignStatement (
           variableDeclarations->getReference (getGlobalToLocalMappingSizeName (i)), dotExpression1);
@@ -873,103 +883,6 @@ FortranCUDAHostSubroutineIndirectLoop::createPlanFunctionParametersPreparationSt
 
   SgBasicBlock * block = buildBasicBlock ();
 
-  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
-  {
-    SgDotExp * dotExpression = buildDotExp (variableDeclarations->getReference (
-        getOpDatName (i)), buildOpaqueVarRefExp (
-        OP2::RunTimeVariableNames::index, block));
-
-    SgPntrArrRefExp * arrayIndexExpression = buildPntrArrRefExp (
-        variableDeclarations->getReference (opDatArray), buildIntVal (i));
-
-    SgExprStatement * assignmentStatement = buildAssignStatement (
-        arrayIndexExpression, dotExpression);
-
-    appendStatement (assignmentStatement, block);
-  }
-
-  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
-  {
-    SgExpression * arrayIndexExpression = buildPntrArrRefExp (
-        variableDeclarations->getReference (mappingIndicesArray), buildIntVal (
-            i));
-
-    SgExprStatement * assignmentStatement = buildAssignStatement (
-        arrayIndexExpression, variableDeclarations->getReference (
-            getOpIndirectionName (i)));
-
-    appendStatement (assignmentStatement, block);
-  }
-
-  SgExpression * initializationExpression = buildAssignOp (
-      variableDeclarations->getReference (getIterationCounterVariableName (1)),
-      buildIntVal (1));
-
-  SgExpression * upperBoundExpression = buildIntVal (
-      parallelLoop->getNumberOfOpDatArgumentGroups ());
-
-  /*
-   * ======================================================
-   * Build the body of the do-loop
-   * ======================================================
-   */
-
-  SgPntrArrRefExp * arrayIndexExpression1 = buildPntrArrRefExp (
-      variableDeclarations->getReference (mappingIndicesArray),
-      variableDeclarations->getReference (getIterationCounterVariableName (1)));
-
-  SgSubtractOp * subtractExpression1 = buildSubtractOp (arrayIndexExpression1,
-      buildIntVal (1));
-
-  SgExprStatement * assignmentStatement1 = buildAssignStatement (
-      arrayIndexExpression1, subtractExpression1);
-
-  SgBasicBlock * ifBody = buildBasicBlock (assignmentStatement1);
-
-  SgExpression * ifGuardExpression = buildNotEqualOp (arrayIndexExpression1,
-      buildIntVal (-1));
-
-  SgIfStmt * ifStatement =
-      RoseStatementsAndExpressionsBuilder::buildIfStatementWithEmptyElse (
-          ifGuardExpression, ifBody);
-
-  SgBasicBlock * loopBody = buildBasicBlock (ifStatement);
-
-  SgFortranDo * fortranDoStatement =
-      FortranStatementsAndExpressionsBuilder::buildFortranDoStatement (
-          initializationExpression, upperBoundExpression, buildIntVal (1),
-          loopBody);
-
-  appendStatement (fortranDoStatement, block);
-
-  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
-  {
-    SgDotExp * dotExpression = buildDotExp (variableDeclarations->getReference (
-        getOpMapName (i)), buildOpaqueVarRefExp (
-        OP2::RunTimeVariableNames::index, block));
-
-    SgPntrArrRefExp * arrayIndexExpression = buildPntrArrRefExp (
-        variableDeclarations->getReference (mappingArray), buildIntVal (i));
-
-    SgExprStatement * assignmentStatement = buildAssignStatement (
-        arrayIndexExpression, dotExpression);
-
-    appendStatement (assignmentStatement, block);
-  }
-
-  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
-  {
-    SgPntrArrRefExp * arrayIndexExpression = buildPntrArrRefExp (
-        variableDeclarations->getReference (accessDescriptorArray),
-        buildIntVal (i));
-
-    SgExprStatement * assignmentStatement = buildAssignStatement (
-        arrayIndexExpression, variableDeclarations->getReference (
-            getOpAccessName (i)));
-
-    appendStatement (assignmentStatement, block);
-  }
-
   /*
    * ======================================================
    * Set up a mapping between OP_DATs and indirection
@@ -1029,12 +942,6 @@ FortranCUDAHostSubroutineIndirectLoop::createPlanFunctionParametersPreparationSt
     appendStatement (assignmentStatement, block);
   }
 
-  SgExprStatement * assignmentStatement2 = buildAssignStatement (
-      variableDeclarations->getReference (numberOfOpDats), buildIntVal (
-          parallelLoop->getNumberOfOpDatArgumentGroups ()));
-
-  appendStatement (assignmentStatement2, block);
-
   SgExprStatement * assignmentStatement3 = buildAssignStatement (
       variableDeclarations->getReference (numberOfIndirectOpDats), buildIntVal (
           parallelLoop->getNumberOfDistinctIndirectOpDats ()));
@@ -1059,35 +966,39 @@ FortranCUDAHostSubroutineIndirectLoop::createPlanFunctionCallStatement ()
       getUserSubroutineName ());
 
   SgDotExp * parameter2 = buildDotExp (variableDeclarations->getReference (
-      getOpSetName ()), buildOpaqueVarRefExp (OP2::RunTimeVariableNames::index,
+      getOpSetName ()), buildOpaqueVarRefExp (OP2::RunTimeVariableNames::Fortran::setCPtr,
       subroutineScope));
 
-  SgVarRefExp * parameter3 =
-      variableDeclarations->getReference (numberOfOpDats);
+  SgVarRefExp * parameter3 = variableDeclarations->getReference (
+      planPartitionSize);
+            
+  SgVarRefExp * parameter4 = variableDeclarations->getReference (numberOfOpDats);
 
-  SgVarRefExp * parameter4 = variableDeclarations->getReference (opDatArray);
+  SgVarRefExp * parameter5 = variableDeclarations->getReference (opArgArray);
 
-  SgVarRefExp * parameter5 = variableDeclarations->getReference (
-      mappingIndicesArray);
+//   SgVarRefExp * parameter5 = variableDeclarations->getReference (
+//       mappingIndicesArray);
+// 
+//   SgVarRefExp * parameter6 = variableDeclarations->getReference (mappingArray);
+// 
+//   SgVarRefExp * parameter7 = variableDeclarations->getReference (
+//       accessDescriptorArray);
 
-  SgVarRefExp * parameter6 = variableDeclarations->getReference (mappingArray);
-
-  SgVarRefExp * parameter7 = variableDeclarations->getReference (
-      accessDescriptorArray);
-
-  SgVarRefExp * parameter8 = variableDeclarations->getReference (
+  SgVarRefExp * parameter6 = variableDeclarations->getReference (
       numberOfIndirectOpDats);
 
-  SgVarRefExp * parameter9 = variableDeclarations->getReference (
+  SgVarRefExp * parameter7 = variableDeclarations->getReference (
       indirectionDescriptorArray);
 
-  SgVarRefExp * parameter10 = variableDeclarations->getReference (
-      planPartitionSize);
+/*  SgVarRefExp * parameter10 = variableDeclarations->getReference (
+      planPartitionSize);*/
       
       
   SgExprListExp * actualParameters = buildExprListExp (parameter1, parameter2,
-      parameter3, parameter4, parameter5, parameter6, parameter7, parameter8,
-      parameter9, parameter10);
+      parameter3, parameter4, parameter5, parameter6, parameter7);
+
+    /*, parameter7, parameter8,
+      parameter9, parameter10);*/
 
   SgFunctionSymbol * functionSymbol =
       FortranTypesBuilder::buildNewFortranFunction (CUDA::fortranCplanFunction,
@@ -1194,6 +1105,7 @@ FortranCUDAHostSubroutineIndirectLoop::createPartitionSizeInitialisationFromEnvi
   using namespace PlanFunctionVariableNames;
   using namespace LoopVariableNames;
   using namespace OP2::Macros;
+  using namespace OP2::RunTimeVariableNames;
   using std::string;
 
   Debug::getInstance ()->debugMessage ("Creating call to partition size setting function",
@@ -1202,9 +1114,15 @@ FortranCUDAHostSubroutineIndirectLoop::createPartitionSizeInitialisationFromEnvi
   SgVarRefExp * parameter1 = variableDeclarations->getReference (
       getUserSubroutineName ());
 
-  SgDotExp * parameter2 = buildDotExp (variableDeclarations->getReference (
-      getOpSetName ()), buildOpaqueVarRefExp (OP2::RunTimeVariableNames::size,
-      subroutineScope));
+  SgDotExp * parameter2 = buildDotExp (
+    variableDeclarations->getReference (getOpSetName ()),
+    buildDotExp ( buildOpaqueVarRefExp (Fortran::setPtr, subroutineScope),
+      buildOpaqueVarRefExp (size, subroutineScope)));
+
+      
+//   SgDotExp * parameter2 = buildDotExp (variableDeclarations->getReference (
+//       getOpSetName ()), buildDotExp ( buildOpaqueVarRefExp (OP2::RunTimeVariableNames::size,
+//       subroutineScope));
 
 
   SgExprListExp * actualParameters = buildExprListExp (parameter1, parameter2);
@@ -1233,7 +1151,14 @@ FortranCUDAHostSubroutineIndirectLoop::createStatements ()
   Debug::getInstance ()->debugMessage ("Creating statements",
       Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
-  createEarlyExitStatement (subroutineScope);
+  initialiseNumberOfOpArgs (subroutineScope);
+
+  appendPopulationOpArgArray (subroutineScope);
+  
+  if ( Globals::getInstance ()->getIncludesMPI () )
+    appendCallMPIHaloExchangeFunction (subroutineScope);  
+  
+  createEarlyExitStatementNewLibrary (subroutineScope);
 
   Debug::getInstance ()->debugMessage (
        "Host subroutine indirect loop, creating profiling declarations",
@@ -1308,10 +1233,17 @@ FortranCUDAHostSubroutineIndirectLoop::createStatements ()
   }
 
   appendStatement (createDeallocateStatements (), subroutineScope);
-  
-  createDumpOfOutputStatements (subroutineScope,
-    OP2::FortranSpecific::RunTimeFunctions::getDumpOpDatFromDeviceFunctionName);  
 
+  Debug::getInstance ()->debugMessage (
+       "Host subroutine indirect loop, after deallocation",
+      Debug::CONSTRUCTOR_LEVEL, __FILE__, __LINE__);  
+
+  if ( Globals::getInstance ()->getIncludesMPI () )
+  {
+    appendCallsToMPIReduce (subroutineScope);
+    appendCallMPISetDirtyBit (subroutineScope);
+  }
+  
   createEndTimerHost ();
   createEndTimerSynchroniseHost ();
   createElapsedTimeHost ();
@@ -1481,8 +1413,7 @@ FortranCUDAHostSubroutineIndirectLoop::createExecutionPlanDeclarations ()
   // Carlo: already declared in common ancestor of direct and indirect loop
 /*  fourByteIntegerVariables.push_back (getIterationCounterVariableName (1));
   fourByteIntegerVariables.push_back (getIterationCounterVariableName (2));  */
-
-  fourByteIntegerVariables.push_back (numberOfOpDats);
+  
   fourByteIntegerVariables.push_back (numberOfIndirectOpDats);
   fourByteIntegerVariables.push_back (blockOffset);
   fourByteIntegerVariables.push_back (pindSizesSize);
@@ -1577,12 +1508,20 @@ FortranCUDAHostSubroutineIndirectLoop::createExecutionPlanDeclarations ()
 void
 FortranCUDAHostSubroutineIndirectLoop::createLocalVariableDeclarations ()
 {
+  /*
+   * ======================================================
+   * Declare array of op_args and variable with number
+   * of parameters
+   * ======================================================
+   */
+  createCommonLocalVariableDeclarations (subroutineScope);
+  
   createOpDatDimensionsDeclaration ();
 
   createOpDatCardinalitiesDeclaration ();
 
-  createDataMarshallingDeclarations ();
-
+  createDataMarshallingDeclarations ();  
+  
   createCUDAConfigurationLaunchDeclarations ();
 
   createExecutionPlanDeclarations ();

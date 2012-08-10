@@ -211,64 +211,30 @@ FortranOpenMPSubroutinesGeneration::addLibraries ()
       "Adding 'use' statements to OpenMP module", Debug::FUNCTION_LEVEL,
       __FILE__, __LINE__);
 
-  /*
-   * ======================================================
-   * Module including OP2 declarations
-   * ======================================================
-   */
+  vector <string> libs;
 
-  SgUseStatement* useStatement1 = new SgUseStatement (
-      RoseHelper::getFileInfo (), OP2::Libraries::Fortran::declarations, false);
+  libs.push_back (OP2::Libraries::Fortran::declarations);
+  libs.push_back (OP2::Libraries::Fortran::runtimeSupport);
+  libs.push_back (OP2::Libraries::Fortran::CBindings);
+  libs.push_back (OpenMP::Fortran::libraryName);  
 
-  useStatement1->set_definingDeclaration (useStatement1);
+  SgUseStatement * lastUseStmt = NULL;
+  
+  for (vector <string>::const_iterator it = libs.begin (); it != libs.end (); ++it)
+  {
+    SgUseStatement* useStatement = new SgUseStatement (
+        RoseHelper::getFileInfo (), *it, false);
 
-  appendStatement (useStatement1, moduleScope);
+    useStatement->set_definingDeclaration (useStatement);
 
-  /*
-   * ======================================================
-   * Module including OP2 run-time support
-   * ======================================================
-   */
+    appendStatement (useStatement, moduleScope);
+    
+    lastUseStmt = useStatement;
+  }
 
-  SgUseStatement* useStatement2 = new SgUseStatement (
-      RoseHelper::getFileInfo (), OP2::Libraries::Fortran::runtimeSupport,
-      false);
-
-  useStatement2->set_definingDeclaration (useStatement2);
-
-  appendStatement (useStatement2, moduleScope);
-
-  /*
-   * ======================================================
-   * Module including free variables referenced in
-   * user kernels
-   * ======================================================
-   */
-
-//  SgUseStatement* useStatement3 = new SgUseStatement (
-//      RoseHelper::getFileInfo (),
-//      Globals::getInstance ()->getFreeVariablesModuleName (), false);
-
-//  useStatement3->set_definingDeclaration (useStatement3);
-
-//  appendStatement (useStatement3, moduleScope);
-
-  /*
-   * ======================================================
-   * Module including OpenMP run-time support
-   * ======================================================
-   */
-
-  SgUseStatement* useStatement4 = new SgUseStatement (
-      RoseHelper::getFileInfo (), OpenMP::Fortran::libraryName, false);
-
-  useStatement4->set_definingDeclaration (useStatement4);
-
-  appendStatement (useStatement4, moduleScope);
-
-  addTextForUnparser (useStatement4, OpenMP::getIfDirectiveString (),
+  addTextForUnparser (lastUseStmt, OpenMP::getIfDirectiveString (),
       AstUnparseAttribute::e_before);
 
-  addTextForUnparser (useStatement4, OpenMP::getEndIfDirectiveString (),
+  addTextForUnparser (lastUseStmt, OpenMP::getEndIfDirectiveString (),
       AstUnparseAttribute::e_after);
 }

@@ -1202,6 +1202,7 @@ FortranOpenMPHostSubroutineIndirectLoop::createPlanFunctionLocalVariableDeclarat
 {
   using namespace PlanFunctionVariableNames;
   using namespace LoopVariableNames;
+  using namespace OP2VariableNames;
 
   Debug::getInstance ()->debugMessage (
       "Creating local variable declarations for plan function",
