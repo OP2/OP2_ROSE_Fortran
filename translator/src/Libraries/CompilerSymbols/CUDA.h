@@ -71,7 +71,6 @@ namespace CUDA
   std::string const threadsPerBlock = "threadsPerBlock";
   std::string const sharedMemorySize = "dynamicSharedMemorySize";
   std::string const threadSynchRet = "threadSynchRet";
-  std::string const fortranCplanFunction = "FortranPlanCaller";
 
   /*
    * ======================================================

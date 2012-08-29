@@ -69,6 +69,23 @@ class FortranHostSubroutine: public HostSubroutine <SgProcedureHeaderStatement>
 
     /*
      * ======================================================
+     * Preparation of arguments for the plan function (common
+     * between OpenMP and CUDA) - only for indirect loops
+     * ======================================================
+     */
+    SgBasicBlock *
+    createPlanFunctionParametersPreparationStatements ();
+
+    /*
+     * ======================================================
+     * Call to plan function - only for indirect loops
+     * ======================================================
+     */
+    SgExprStatement *
+    createPlanFunctionCallStatement ();
+    
+    /*
+     * ======================================================
      * Calls the op_mpi_halo_exchanges
      * ======================================================
      */    

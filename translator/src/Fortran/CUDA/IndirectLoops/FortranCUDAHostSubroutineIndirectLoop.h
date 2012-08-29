@@ -57,12 +57,6 @@ class FortranCUDAHostSubroutineIndirectLoop: public FortranCUDAHostSubroutine
     SgBasicBlock *
     createConvertPlanFunctionParametersStatements ();
 
-    SgBasicBlock *
-    createPlanFunctionParametersPreparationStatements ();
-
-    SgExprStatement *
-    createPlanFunctionCallStatement ();
-
     void
     createCardinalitiesInitialisationStatements ();
 

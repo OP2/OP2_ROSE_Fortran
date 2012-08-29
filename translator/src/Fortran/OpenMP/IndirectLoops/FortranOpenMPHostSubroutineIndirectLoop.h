@@ -52,14 +52,8 @@ class FortranOpenMPHostSubroutineIndirectLoop: public FortranOpenMPHostSubroutin
     SgBasicBlock *
     createPlanFunctionEpilogueStatements ();
 
-    SgExprStatement *
-    createPlanFunctionCallStatement ();
-
     SgBasicBlock *
     createSetUpOpDatTypeArrayStatements ();
-
-    SgBasicBlock *
-    createSetUpPlanFunctionActualParametersStatements ();
 
     SgBasicBlock *
     createPlanFunctionStatements ();

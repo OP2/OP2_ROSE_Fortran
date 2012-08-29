@@ -98,7 +98,9 @@ namespace PlanFunctionVariableNames
   std::string const thrcol = "thrcol";
   std::string const planPartitionSize = "partitionSize";
   std::string const blockSize = "blockSize";
+  std::string const fortranCplanFunction = "FortranPlanCaller";
 
+  
   /*
    * ======================================================
    * Get the variable name for an actual plan with this

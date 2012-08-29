@@ -421,38 +421,6 @@ FortranOpenMPHostSubroutine::createTransferOpDatStatements ()
 
   appendStatement (buildExprStatement (assignExpression1), block);
 
-  if (parallelLoop->isDirectLoop () == false)
-  {
-    for (unsigned int i = 1; i
-        <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
-    {
-      SgDotExp * dotExpression = buildDotExp (
-          variableDeclarations->getReference (getOpMapName (i)),
-          buildOpaqueVarRefExp (Fortran::mapPtr, block));
-
-      SgPointerAssignOp * assignExpression = new SgPointerAssignOp (
-          RoseHelper::getFileInfo (), variableDeclarations->getReference (
-              getOpMapCoreName (i)), dotExpression, buildVoidType ());
-
-      assignExpression->set_endOfConstruct (RoseHelper::getFileInfo ());
-
-      appendStatement (buildExprStatement (assignExpression), block);
-    }
-  }
-
-  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
-  {
-    SgDotExp * dotExpression = buildDotExp (variableDeclarations->getReference (
-        getOpDatName (i)), buildOpaqueVarRefExp (Fortran::dataPtr, block));
-
-    SgPointerAssignOp * assignExpression = new SgPointerAssignOp (
-        RoseHelper::getFileInfo (), variableDeclarations->getReference (
-            getOpDatCoreName (i)), dotExpression, buildVoidType ());
-
-    assignExpression->set_endOfConstruct (RoseHelper::getFileInfo ());
-
-    appendStatement (buildExprStatement (assignExpression), block);
-  }
 
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
@@ -480,7 +448,7 @@ FortranOpenMPHostSubroutine::createTransferOpDatStatements ()
     if (parallelLoop->isDuplicateOpDat (i) == false)
     {
       SgDotExp * dotExpression1 = buildDotExp (
-          variableDeclarations->getReference (getOpDatCoreName (i)),
+          variableDeclarations->getReference (getOpArgName (i)),
           buildOpaqueVarRefExp (dim, block));
 
       if (parallelLoop->isReductionRequired (i))
@@ -525,7 +493,7 @@ FortranOpenMPHostSubroutine::createTransferOpDatStatements ()
     if (parallelLoop->isDuplicateOpDat (i) == false)
     {
       SgDotExp * dotExpression = buildDotExp (
-          variableDeclarations->getReference (getOpDatCoreName (i)),
+          variableDeclarations->getReference (getOpArgName (i)),
           buildOpaqueVarRefExp (dat, block));
 
       SgStatement * callStatement;
@@ -542,7 +510,6 @@ FortranOpenMPHostSubroutine::createTransferOpDatStatements ()
         SgAggregateInitializer * shapeExpression =
             FortranStatementsAndExpressionsBuilder::buildShapeExpression (
                 variableDeclarations->getReference (getOpDatCardinalityName (i)));
-
 
         callStatement =
           FortranStatementsAndExpressionsBuilder::createCToFortranPointerCallStatement (

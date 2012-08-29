@@ -37,6 +37,7 @@
 #include <FortranParallelLoop.h>
 #include <OP2.h>
 #include <CompilerGeneratedNames.h>
+#include <PlanFunctionNames.h>
 #include <Debug.h>
 #include <boost/algorithm/string/predicate.hpp>
 #include <rose.h>
@@ -210,6 +211,139 @@ FortranHostSubroutine::createDumpOfOutputDeclarations (SgScopeStatement * subrou
           
 }
 
+SgBasicBlock *
+FortranHostSubroutine::createPlanFunctionParametersPreparationStatements ()
+{
+  using namespace SageBuilder;
+  using namespace SageInterface;
+  using namespace PlanFunctionVariableNames;
+  using namespace OP2::RunTimeVariableNames;
+  using namespace OP2VariableNames;
+  using namespace LoopVariableNames;
+
+  Debug::getInstance ()->debugMessage (
+      "Creating statements to prepare plan function parameters",
+      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+
+  SgBasicBlock * block = buildBasicBlock ();
+
+  /*
+   * ======================================================
+   * Set up a mapping between OP_DATs and indirection
+   * values. At the beginning everything is set to undefined
+   * ======================================================
+   */
+
+  std::map <std::string, int> indexValues;
+
+  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
+  {
+    if (parallelLoop->isIndirect (i))
+    {
+      indexValues[parallelLoop->getOpDatVariableName (i)] = -1;
+    }
+  }
+
+  /*
+   * ======================================================
+   * Start at the value defined by Mike Giles in his
+   * implementation
+   * ======================================================
+   */
+  unsigned int nextIndex = 0;
+
+  for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
+  {
+    SgPntrArrRefExp * arrayIndexExpression = buildPntrArrRefExp (
+        variableDeclarations->getReference (indirectionDescriptorArray),
+        buildIntVal (i));
+
+    SgExprStatement * assignmentStatement;
+
+    if (parallelLoop->isIndirect (i))
+    {
+      if (indexValues[parallelLoop->getOpDatVariableName (i)] == -1)
+      {
+        assignmentStatement = buildAssignStatement (arrayIndexExpression,
+            buildIntVal (nextIndex));
+
+        indexValues[parallelLoop->getOpDatVariableName (i)] = nextIndex;
+
+        nextIndex++;
+      }
+      else
+      {
+        assignmentStatement = buildAssignStatement (arrayIndexExpression,
+            buildIntVal (indexValues[parallelLoop->getOpDatVariableName (i)]));
+      }
+    }
+    else
+    {
+      assignmentStatement = buildAssignStatement (arrayIndexExpression,
+          buildIntVal (-1));
+    }
+
+    appendStatement (assignmentStatement, block);
+  }
+
+  SgExprStatement * assignmentStatement3 = buildAssignStatement (
+      variableDeclarations->getReference (numberOfIndirectOpDats), buildIntVal (
+          parallelLoop->getNumberOfDistinctIndirectOpDats ()));
+
+  appendStatement (assignmentStatement3, block);
+
+  return block;
+}
+
+SgExprStatement *
+FortranHostSubroutine::createPlanFunctionCallStatement ()
+{
+  using namespace SageBuilder;
+  using namespace SageInterface;
+  using namespace PlanFunctionVariableNames;
+  using namespace OP2VariableNames;
+
+  Debug::getInstance ()->debugMessage ("Creating plan function call statement",
+      Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+
+  SgVarRefExp * parameter1 = variableDeclarations->getReference (
+      getUserSubroutineName ());
+
+  SgDotExp * parameter2 = buildDotExp (variableDeclarations->getReference (
+      getOpSetName ()), buildOpaqueVarRefExp (OP2::RunTimeVariableNames::Fortran::setCPtr,
+      subroutineScope));
+
+  SgVarRefExp * parameter3 = variableDeclarations->getReference (
+      planPartitionSize);
+            
+  SgVarRefExp * parameter4 = variableDeclarations->getReference (numberOfOpDats);
+
+  SgVarRefExp * parameter5 = variableDeclarations->getReference (opArgArray);
+
+  SgVarRefExp * parameter6 = variableDeclarations->getReference (
+      numberOfIndirectOpDats);
+
+  SgVarRefExp * parameter7 = variableDeclarations->getReference (
+      indirectionDescriptorArray);
+      
+  SgExprListExp * actualParameters = buildExprListExp (parameter1, parameter2,
+      parameter3, parameter4, parameter5, parameter6, parameter7);
+
+  SgFunctionSymbol * functionSymbol =
+      FortranTypesBuilder::buildNewFortranFunction (fortranCplanFunction,
+          subroutineScope);
+
+  SgFunctionCallExp * functionCall = buildFunctionCallExp (functionSymbol,
+      actualParameters);
+
+  SgExprStatement * assignmentStatement = buildAssignStatement (
+      variableDeclarations->getReference (getPlanReturnVariableName (
+          parallelLoop->getUserSubroutineName ())), functionCall);
+
+  return assignmentStatement;
+}
+
+
 void
 FortranHostSubroutine::createDumpOfOutputStatements (SgScopeStatement * subroutineScope,
   std::string const dumpOpDatFunctionName)
@@ -217,6 +351,7 @@ FortranHostSubroutine::createDumpOfOutputStatements (SgScopeStatement * subrouti
   using namespace SageBuilder;
   using namespace SageInterface;
   using namespace OP2VariableNames;
+  using namespace PlanFunctionVariableNames;
   
   SgExpression * incrementCalledTimesExpr = buildAssignOp (
     variableDeclarations->getReference (OP2VariableNames::calledTimes),
