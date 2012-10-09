@@ -58,7 +58,7 @@ class FortranOpenMPHostSubroutineDirectLoop: public FortranOpenMPHostSubroutine
 
     FortranOpenMPHostSubroutineDirectLoop (SgScopeStatement * moduleScope,
         FortranOpenMPKernelSubroutine * kernelSubroutine,
-        FortranParallelLoop * parallelLoop);
+        FortranParallelLoop * parallelLoop, FortranOpenMPModuleDeclarations * moduleDeclarations);
 };
 
 #endif

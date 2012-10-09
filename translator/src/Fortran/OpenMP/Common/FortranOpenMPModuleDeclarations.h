@@ -38,7 +38,7 @@
 
 class FortranOpenMPModuleDeclarations: public FortranModuleDeclarations
 {
-  protected:
+  public:
 
     FortranOpenMPModuleDeclarations (FortranParallelLoop * parallelLoop,
         SgScopeStatement * moduleScope);

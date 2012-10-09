@@ -163,7 +163,7 @@ subroutine adt_calc ( x1, x2, x3, x4, q, adt )
   real(8), dimension(*) :: x3
   real(8), dimension(*) :: x4
   real(8), dimension(*) :: q
-  real(8), dimension(1) :: adt
+  real(8) :: adt
 
   real(8) :: dx, dy, ri, u, v, c
 
@@ -174,21 +174,21 @@ subroutine adt_calc ( x1, x2, x3, x4, q, adt )
 
   dx = x2(1) - x1(1)
   dy = x2(2) - x1(2)
-  adt(1) = abs ( u * dy - v * dx ) + c * sqrt ( dx*dx + dy*dy )
+  adt = abs ( u * dy - v * dx ) + c * sqrt ( dx*dx + dy*dy )
 
   dx = x3(1) - x2(1)
   dy = x3(2) - x2(2)
-  adt(1) = adt(1) + abs ( u * dy - v * dx ) + c * sqrt ( dx*dx + dy*dy )
+  adt = adt + abs ( u * dy - v * dx ) + c * sqrt ( dx*dx + dy*dy )
 
   dx = x4(1) - x3(1)
   dy = x4(2) - x3(2)
-  adt(1) = adt(1) + abs ( u * dy - v * dx ) + c * sqrt ( dx*dx + dy*dy )
+  adt = adt + abs ( u * dy - v * dx ) + c * sqrt ( dx*dx + dy*dy )
 
   dx = x1(1) - x4(1)
   dy = x1(2) - x4(2)
-  adt(1) = adt(1) + abs ( u * dy - v * dx ) + c * sqrt ( dx*dx + dy*dy )
+  adt = adt + abs ( u * dy - v * dx ) + c * sqrt ( dx*dx + dy*dy )
 
-  adt(1) = adt(1) / cfl
+  adt = adt / cfl
 
 end subroutine adt_calc
 
@@ -199,8 +199,8 @@ subroutine res_calc ( x1, x2, q1, q2, adt1, adt2, res1, res2 )
   real(8), dimension(2) :: x2
   real(8), dimension(4) :: q1
   real(8), dimension(4) :: q2
-  real(8), dimension(1) :: adt1
-  real(8), dimension(1) :: adt2
+  real(8) :: adt1
+  real(8) :: adt2
   real(8), dimension(4) :: res1
   real(8), dimension(4) :: res2
 
@@ -217,7 +217,7 @@ subroutine res_calc ( x1, x2, q1, q2, adt1, adt2, res1, res2 )
   p2   = gm1 * (q2(4)-0.5 * ri*(q2(2)*q2(2)+q2(3)*q2(3)))
   vol2 =  ri * (q2(2)*dy - q2(3)*dx)
 
-  mu = 0.5 * ((adt1(1))+(adt2(1))) * eps
+  mu = 0.5 * ((adt1)+(adt2)) * eps
 
   f = 0.5 * (vol1 * q1(1)         + vol2* q2(1)        ) + mu*(q1(1)-q2(1))
   res1(1) = res1(1) + f
@@ -240,12 +240,12 @@ end subroutine res_calc
 subroutine bres_calc ( x1, x2, q1, adt1, res1, bound ) 
   implicit none
 
-  real(8), dimension(*) :: x1
-  real(8), dimension(*) :: x2
-  real(8), dimension(*)  :: q1
-  real(8), dimension(*) :: adt1
-  real(8), dimension(*) :: res1
-  integer(4), dimension(*) :: bound
+  real(8), dimension(2) :: x1
+  real(8), dimension(2) :: x2
+  real(8), dimension(4) :: q1
+  real(8) :: adt1
+  real(8), dimension(4) :: res1
+  integer(4), dimension(1) :: bound
 
   real(8) :: dx, dy, mu, ri, p1, vol1, p2, vol2, f
 
@@ -266,7 +266,7 @@ subroutine bres_calc ( x1, x2, q1, adt1, res1, bound )
     p2   = gm1*(qinf(4)-0.5 * ri * (qinf(2)*qinf(2)+qinf(3)*qinf(3)));
     vol2 =  ri*(qinf(2)*dy - qinf(3)*dx);
 
-    mu = (adt1(1)) * eps;
+    mu = (adt1) * eps;
 
     f = 0.5 * (vol1 * q1(1)         + vol2 * qinf(1)        ) + mu*(q1(1)-qinf(1));
     res1(1) = res1(1) + f;

@@ -46,6 +46,9 @@
 #include "OpenMP.h"
 #include "OP2.h"
 #include <boost/algorithm/string.hpp>
+#include "CompilerGeneratedNames.h"
+#include <FortranPrintProfilingInformationSubroutine.h>
+
 
 void
 FortranOpenMPSubroutinesGeneration::createReductionSubroutines ()
@@ -55,9 +58,20 @@ FortranOpenMPSubroutinesGeneration::createReductionSubroutines ()
 void
 FortranOpenMPSubroutinesGeneration::createSubroutines ()
 {
+  using namespace OP2VariableNames;  
   using std::string;
   using std::map;
 
+  Debug::getInstance ()->debugMessage ("Creating subroutines: appending profiling subroutine",
+    Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
+
+  string const & printProfilingInformationName = printProfilingInformation;
+
+  FortranPrintProfilingInformationSubroutine * printProfilingInformationSubroutineInstance =
+    new FortranPrintProfilingInformationSubroutine (printProfilingInformationName,
+      moduleScope, moduleDeclarations, declarations);
+  
+  
   Debug::getInstance ()->debugMessage ("Creating subroutines: appending constants initialisation subroutine",
     Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
   
@@ -152,7 +166,8 @@ FortranOpenMPSubroutinesGeneration::createSubroutines ()
 
       hostSubroutines[userSubroutineName]
           = new FortranOpenMPHostSubroutineDirectLoop (moduleScope,
-              kernelSubroutine, parallelLoop);
+              kernelSubroutine, parallelLoop, 
+              static_cast <FortranOpenMPModuleDeclarations *> (moduleDeclarations[userSubroutineName]));
     }
     else
     {
@@ -199,6 +214,10 @@ FortranOpenMPSubroutinesGeneration::createModuleDeclarations ()
           = new FortranOpenMPModuleDeclarationsIndirectLoop (parallelLoop,
               moduleScope);
     }
+    else
+      moduleDeclarations[userSubroutineName]
+          = new FortranOpenMPModuleDeclarations (parallelLoop,
+              moduleScope);
   }
 }
 

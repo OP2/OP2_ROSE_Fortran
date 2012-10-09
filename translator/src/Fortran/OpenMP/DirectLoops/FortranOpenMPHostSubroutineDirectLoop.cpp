@@ -32,6 +32,7 @@
 
 #include "FortranOpenMPHostSubroutineDirectLoop.h"
 #include "FortranOpenMPKernelSubroutine.h"
+#include "FortranOpenMPModuleDeclarations.h"
 #include "FortranStatementsAndExpressionsBuilder.h"
 #include "FortranTypesBuilder.h"
 #include "RoseStatementsAndExpressionsBuilder.h"
@@ -194,6 +195,10 @@ FortranOpenMPHostSubroutineDirectLoop::createStatements ()
   using namespace SageInterface;
 
   createEarlyExitStatementNewLibrary (subroutineScope);
+
+  initialiseProfilingVariablesDeclaration ();
+
+  createStartTimerHost ();
   
   appendStatement (createInitialiseNumberOfThreadsStatements (),
       subroutineScope);
@@ -205,12 +210,31 @@ FortranOpenMPHostSubroutineDirectLoop::createStatements ()
     createReductionPrologueStatements ();
   }
 
+  createEndTimerHost ();
+  createEndTimerSynchroniseHost ();
+  createElapsedTimeHost ();
+  createAccumulateTimesHost ();
+
+  createStartTimerKernel ();
+
   createOpenMPLoopStatements ();
 
+  createEndTimerKernel ();
+  createEndTimerSynchroniseKernel ();
+  createElapsedTimeKernel ();
+  createAccumulateTimesKernel ();
+
+  createStartTimerHost ();
+  
   if (parallelLoop->isReductionRequired ())
   {
     createReductionEpilogueStatements ();
   }
+
+  createEndTimerHost ();
+  createEndTimerSynchroniseHost ();
+  createElapsedTimeHost ();
+  createAccumulateTimesHost ();
 }
 
 void
@@ -224,16 +248,33 @@ FortranOpenMPHostSubroutineDirectLoop::createLocalVariableDeclarations ()
   {
     createReductionDeclarations ();
   }
+  
+  /*
+   * ======================================================
+   * Profiling declarations. Eventually, this should only
+   * be done if a certain compiler option is turned on
+   * ======================================================
+   */
+
+  createProfilingVariablesDeclaration ();
 }
 
 FortranOpenMPHostSubroutineDirectLoop::FortranOpenMPHostSubroutineDirectLoop (
     SgScopeStatement * moduleScope,
     FortranOpenMPKernelSubroutine * kernelSubroutine,
-    FortranParallelLoop * parallelLoop) :
+    FortranParallelLoop * parallelLoop,
+    FortranOpenMPModuleDeclarations * moduleDeclarations) :
   FortranOpenMPHostSubroutine (moduleScope, kernelSubroutine, parallelLoop)
 {
   Debug::getInstance ()->debugMessage (
       "OpenMP host subroutine creation for direct loop",
+      Debug::CONSTRUCTOR_LEVEL, __FILE__, __LINE__);
+
+  variableDeclarations->addVisibilityToSymbolsFromOuterScope (
+      moduleDeclarations->getDeclarations ());
+
+  Debug::getInstance ()->debugMessage (
+      "OpenMP creating formal parameter declarations",
       Debug::CONSTRUCTOR_LEVEL, __FILE__, __LINE__);
 
   createFormalParameterDeclarations ();

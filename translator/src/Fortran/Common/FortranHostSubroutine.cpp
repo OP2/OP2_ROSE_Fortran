@@ -622,8 +622,7 @@ FortranHostSubroutine::appendCallsToMPIReduce (SgScopeStatement * scope)
 
       appendStatement (buildExprStatement (functionCall), scope);
     }
-  }
-  
+  } 
 }
 
 FortranHostSubroutine::FortranHostSubroutine (SgScopeStatement * moduleScope,

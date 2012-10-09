@@ -150,8 +150,8 @@ class FortranHostSubroutine: public HostSubroutine <SgProcedureHeaderStatement>
      * ======================================================
      */
     void
-    createDumpOfOutputStatements (SgScopeStatement * subroutineScope, std::string const dumpOpDatFunctionName);
-
+    createDumpOfOutputStatements (SgScopeStatement * subroutineScope, std::string const dumpOpDatFunctionName);    
+    
     FortranHostSubroutine (SgScopeStatement * moduleScope, Subroutine <
         SgProcedureHeaderStatement> * calleeSubroutine,
         FortranParallelLoop * parallelLoop);

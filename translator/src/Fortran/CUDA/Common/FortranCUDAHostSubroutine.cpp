@@ -1267,20 +1267,7 @@ FortranCUDAHostSubroutine::createTransferOpDatStatements ()
    * ======================================================
    * First creates the postfix name
    * ======================================================
-   */   
-//   boost::crc_32_type result;
-//   
-//   string uniqueKernelName = "";
-//   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
-//   {
-//     uniqueKernelName.append ("_");
-//     uniqueKernelName.append (parallelLoop->getOpDatVariableName (i));
-//   }
-//   
-//   result.process_bytes (uniqueKernelName.c_str (), uniqueKernelName.length ());
-//   
-//   string const postfixName = "_" + lexical_cast <string> (result.checksum ());
-
+   */
   string const postfixName = getPostfixNameAsConcatOfOpArgsNames (parallelLoop);
 
       
@@ -1307,13 +1294,7 @@ FortranCUDAHostSubroutine::createTransferOpDatStatements ()
 
         SgVarRefExp * parameterExpression2A = NULL;
 
-/*        if (parallelLoop->isDirectLoop ())
-          parameterExpression2A =
-              variableDeclarations->getReference (getOpDatDeviceName (i));
-        else */
-
-
-          parameterExpression2A =
+        parameterExpression2A =
              moduleDeclarations->getDeclarations()->getReference (getOpDatDeviceName (i) + 
                 parallelLoop->getUserSubroutineName () + postfixName);
 

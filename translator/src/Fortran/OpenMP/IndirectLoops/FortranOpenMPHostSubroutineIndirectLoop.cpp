@@ -156,7 +156,9 @@ FortranOpenMPHostSubroutineIndirectLoop::createConvertGlobalToLocalMappingStatem
   using namespace SageInterface;
   using namespace PlanFunctionVariableNames;
   using namespace OP2VariableNames;
-
+  using namespace OP2::RunTimeVariableNames;  
+  using namespace std;
+  
   Debug::getInstance ()->debugMessage (
       "Creating statements to convert global-to-local mapping arrays",
       Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
@@ -177,15 +179,17 @@ FortranOpenMPHostSubroutineIndirectLoop::createConvertGlobalToLocalMappingStatem
       SgVarRefExp * parameterExpression2 = variableDeclarations->getReference (
           getGlobalToLocalMappingName (i,
               parallelLoop->getUserSubroutineName ()));
-
-      SgDotExp * dotExpression = buildDotExp (
-          variableDeclarations->getReference (getOpSetCoreName ()),
-          buildOpaqueVarRefExp (OP2::RunTimeVariableNames::size,
-              subroutineScope));
+              
+      string const sizeField = "size";
+      
+      SgDotExp * setSizeField = buildDotExp (
+        variableDeclarations->getReference (getOpSetName ()),
+        buildDotExp ( buildOpaqueVarRefExp (Fortran::setPtr, subroutineScope),
+          buildOpaqueVarRefExp (size, subroutineScope)));
 
       SgAggregateInitializer * parameterExpression3 =
           FortranStatementsAndExpressionsBuilder::buildShapeExpression (
-              dotExpression);
+              setSizeField);
 
       SgStatement
           * callStatement =
@@ -282,6 +286,8 @@ FortranOpenMPHostSubroutineIndirectLoop::createPlanFunctionEpilogueStatements ()
   using namespace SageInterface;
   using namespace PlanFunctionVariableNames;
   using namespace OP2VariableNames;
+  using namespace OP2::RunTimeVariableNames;  
+  using namespace std;
 
   Debug::getInstance ()->debugMessage (
       "Creating plan function epilogue statements", Debug::FUNCTION_LEVEL,
@@ -291,7 +297,7 @@ FortranOpenMPHostSubroutineIndirectLoop::createPlanFunctionEpilogueStatements ()
 
   /*
    * ======================================================
-   * New C-To-Fortran pointer conversion call
+   * Convert plan structure
    * ======================================================
    */
 
@@ -310,7 +316,7 @@ FortranOpenMPHostSubroutineIndirectLoop::createPlanFunctionEpilogueStatements ()
 
   /*
    * ======================================================
-   * New C-To-Fortran pointer conversion call
+   * Convert nindirect
    * ======================================================
    */
 
@@ -336,7 +342,7 @@ FortranOpenMPHostSubroutineIndirectLoop::createPlanFunctionEpilogueStatements ()
 
   /*
    * ======================================================
-   * New C-To-Fortran pointer conversion call
+   * Convert ind_maps
    * ======================================================
    */
 
@@ -363,7 +369,7 @@ FortranOpenMPHostSubroutineIndirectLoop::createPlanFunctionEpilogueStatements ()
 
   /*
    * ======================================================
-   * New C-To-Fortran pointer conversion call
+   * Convert maps
    * ======================================================
    */
 
@@ -390,7 +396,7 @@ FortranOpenMPHostSubroutineIndirectLoop::createPlanFunctionEpilogueStatements ()
 
   /*
    * ======================================================
-   * New C-To-Fortran pointer conversion call
+   * Convert ncolblk
    * ======================================================
    */
 
@@ -403,13 +409,16 @@ FortranOpenMPHostSubroutineIndirectLoop::createPlanFunctionEpilogueStatements ()
       getColourToNumberOfBlocksArrayName (
           parallelLoop->getUserSubroutineName ()));
 
-  SgDotExp * dotExpressionE3 = buildDotExp (variableDeclarations->getReference (
-      getOpSetCoreName ()), buildOpaqueVarRefExp (
-      OP2::RunTimeVariableNames::size, subroutineScope));
+  string const sizeField = "size";
+  
+  SgDotExp * setSizeField = buildDotExp (
+    variableDeclarations->getReference (getOpSetName ()),
+    buildDotExp ( buildOpaqueVarRefExp (Fortran::setPtr, subroutineScope),
+      buildOpaqueVarRefExp (size, subroutineScope)));
 
   SgAggregateInitializer * parameterExpressionE3 =
       FortranStatementsAndExpressionsBuilder::buildShapeExpression (
-          dotExpressionE3);
+          setSizeField);
 
   SgStatement
       * callStatementE =
@@ -421,7 +430,7 @@ FortranOpenMPHostSubroutineIndirectLoop::createPlanFunctionEpilogueStatements ()
 
   /*
    * ======================================================
-   * New C-To-Fortran pointer conversion call
+   * Convert ind_sizes
    * ======================================================
    */
 
@@ -455,7 +464,7 @@ FortranOpenMPHostSubroutineIndirectLoop::createPlanFunctionEpilogueStatements ()
 
   /*
    * ======================================================
-   * New C-To-Fortran pointer conversion call
+   * Convert ind_offs
    * ======================================================
    */
 
@@ -489,7 +498,7 @@ FortranOpenMPHostSubroutineIndirectLoop::createPlanFunctionEpilogueStatements ()
 
   /*
    * ======================================================
-   * New C-To-Fortran pointer conversion call
+   * Convert blkmap
    * ======================================================
    */
 
@@ -519,7 +528,7 @@ FortranOpenMPHostSubroutineIndirectLoop::createPlanFunctionEpilogueStatements ()
 
   /*
    * ======================================================
-   * New C-To-Fortran pointer conversion call
+   * Convert offset
    * ======================================================
    */
 
@@ -549,7 +558,7 @@ FortranOpenMPHostSubroutineIndirectLoop::createPlanFunctionEpilogueStatements ()
 
   /*
    * ======================================================
-   * New C-To-Fortran pointer conversion call
+   * Convert nelems
    * ======================================================
    */
 
@@ -580,7 +589,7 @@ FortranOpenMPHostSubroutineIndirectLoop::createPlanFunctionEpilogueStatements ()
 
   /*
    * ======================================================
-   * New C-To-Fortran pointer conversion call
+   * Convert nthrcol
    * ======================================================
    */
 
@@ -611,7 +620,7 @@ FortranOpenMPHostSubroutineIndirectLoop::createPlanFunctionEpilogueStatements ()
 
   /*
    * ======================================================
-   * New C-To-Fortran pointer conversion call
+   * Convert thrcol (relies on setSizeField built above)
    * ======================================================
    */
 
@@ -623,13 +632,9 @@ FortranOpenMPHostSubroutineIndirectLoop::createPlanFunctionEpilogueStatements ()
   SgVarRefExp * parameterExpressionL2 = variableDeclarations->getReference (
       getThreadColourArrayName (parallelLoop->getUserSubroutineName ()));
 
-  SgDotExp * dotExpressionL3 = buildDotExp (variableDeclarations->getReference (
-      getOpSetCoreName ()), buildOpaqueVarRefExp (
-      OP2::RunTimeVariableNames::size, subroutineScope));
-
   SgAggregateInitializer * parameterExpressionL3 =
       FortranStatementsAndExpressionsBuilder::buildShapeExpression (
-          dotExpressionL3);
+          setSizeField);
 
   SgStatement
       * callStatementL =
@@ -641,7 +646,7 @@ FortranOpenMPHostSubroutineIndirectLoop::createPlanFunctionEpilogueStatements ()
 
   /*
    * ======================================================
-   * New C-To-Fortran pointer conversion calls
+   * Convert maps (ind_maps)
    * ======================================================
    */
 
@@ -649,7 +654,7 @@ FortranOpenMPHostSubroutineIndirectLoop::createPlanFunctionEpilogueStatements ()
 
   /*
    * ======================================================
-   * New C-To-Fortran pointer conversion calls
+   * Convert maps (loc_maps)
    * ======================================================
    */
 
@@ -894,12 +899,20 @@ FortranOpenMPHostSubroutineIndirectLoop::createStatements ()
 
   createEarlyExitStatementNewLibrary (subroutineScope);
 
+  initialiseProfilingVariablesDeclaration ();
+
+  createStartTimerHost ();
+  
   appendStatement (createInitialisePartitionSizeStatements (),
       subroutineScope);
 
   appendStatement (createInitialiseNumberOfThreadsStatements (),
       subroutineScope);
 
+  initialiseNumberOfOpArgs (subroutineScope);
+
+  appendPopulationOpArgArray (subroutineScope);
+      
   if (parallelLoop->isReductionRequired ())
   {
     createReductionPrologueStatements ();
@@ -908,13 +921,56 @@ FortranOpenMPHostSubroutineIndirectLoop::createStatements ()
   appendStatement (createPlanFunctionStatements (), subroutineScope);
 
   appendStatement (createTransferOpDatStatements (), subroutineScope);
+
+  Debug::getInstance ()->debugMessage (
+    "Host subroutine indirect loop, creating end timer 1",
+    Debug::CONSTRUCTOR_LEVEL, __FILE__, __LINE__);
+
+  createEndTimerHost ();
+  Debug::getInstance ()->debugMessage (
+    "Host subroutine indirect loop, creating end timer 2",
+    Debug::CONSTRUCTOR_LEVEL, __FILE__, __LINE__);
+
+  createEndTimerSynchroniseHost ();
+  
+    Debug::getInstance ()->debugMessage (
+    "Host subroutine indirect loop, creating end timer 3",
+    Debug::CONSTRUCTOR_LEVEL, __FILE__, __LINE__);
+
+  createElapsedTimeHost ();
+  
+    Debug::getInstance ()->debugMessage (
+    "Host subroutine indirect loop, creating end timer 4",
+    Debug::CONSTRUCTOR_LEVEL, __FILE__, __LINE__);
+  
+  createAccumulateTimesHost ();
+
+  Debug::getInstance ()->debugMessage (
+       "Host subroutine indirect loop, start time for kernel",
+      Debug::CONSTRUCTOR_LEVEL, __FILE__, __LINE__);
+
+  createStartTimerKernel ();
+
   
   createPlanFunctionExecutionStatements ();
 
+  createEndTimerKernel ();
+  createEndTimerSynchroniseKernel ();
+  createElapsedTimeKernel ();
+  createAccumulateTimesKernel ();
+
+  createStartTimerHost ();  
+  
   if (parallelLoop->isReductionRequired ())
   {
     createReductionEpilogueStatements ();
   }
+  
+  createEndTimerHost ();
+  createEndTimerSynchroniseHost ();
+  createElapsedTimeHost ();
+  createAccumulateTimesHost ();
+
 }
 
 void
@@ -1008,6 +1064,15 @@ FortranOpenMPHostSubroutineIndirectLoop::createLocalVariableDeclarations ()
   {
     createReductionDeclarations ();
   }
+
+  /*
+   * ======================================================
+   * Profiling declarations. Eventually, this should only
+   * be done if a certain compiler option is turned on
+   * ======================================================
+   */
+
+  createProfilingVariablesDeclaration ();  
 }
 
 FortranOpenMPHostSubroutineIndirectLoop::FortranOpenMPHostSubroutineIndirectLoop (

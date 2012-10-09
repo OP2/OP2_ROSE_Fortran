@@ -72,6 +72,47 @@ class FortranOpenMPHostSubroutine: public FortranHostSubroutine
     void
     createOpenMPLocalVariableDeclarations ();
 
+    /*
+     * ======================================================
+     * Profiling routines
+     * ======================================================
+     */
+    void
+    createProfilingVariablesDeclaration ();
+
+    void
+    initialiseProfilingVariablesDeclaration ();
+
+    void
+    createStartTimerHost ();
+
+    void
+    createEndTimerHost ();
+
+    void
+    createStartTimerKernel ();
+
+    void
+    createEndTimerKernel ();
+
+    void
+    createEndTimerSynchroniseHost ();
+
+    void
+    createEndTimerSynchroniseKernel ();
+
+    void
+    createElapsedTimeHost ();
+
+    void
+    createElapsedTimeKernel ();
+
+    void
+    createAccumulateTimesHost ();
+
+    void
+    createAccumulateTimesKernel ();    
+    
     FortranOpenMPHostSubroutine (SgScopeStatement * moduleScope,
         FortranKernelSubroutine * kernelSubroutine,
         FortranParallelLoop * parallelLoop);
