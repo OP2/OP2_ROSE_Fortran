@@ -40,6 +40,7 @@
 #include "CompilerGeneratedNames.h"
 #include "OP2.h"
 #include "OpenMP.h"
+#include "PlanFunctionNames.h"
 
 void
 FortranOpenMPHostSubroutine::createReductionEpilogueStatements ()
@@ -1097,29 +1098,17 @@ FortranOpenMPHostSubroutine::createAccumulateTimesHost ()
   using namespace SageInterface;
   using namespace OP2VariableNames;
   using std::string;
-
-  std::cout << "here1" << std::endl;
   
   string const postfixName = getPostfixNameAsConcatOfOpArgsNames (parallelLoop);
   
-  std::cout << "here2" << std::endl;
-  
   string const & variableNameHost = loopTimeHost +
     parallelLoop->getUserSubroutineName () + postfixName;
-    
-  std::cout << "here3, " << variableNameHost << std::endl;          
-  
-
   
   SgVarRefExp * varNameHost = variableDeclarations->getReference (variableNameHost);
-  
-  std::cout << "here3.1, " << variableNameHost << std::endl;  
   
   SgAssignOp * accumulateHostTimes = buildAssignOp (
     varNameHost, buildAddOp (varNameHost,
       variableDeclarations->getReference (accumulatorHostTime)));
-
-  std::cout << "here4" << std::endl;
       
   appendStatement (buildExprStatement(accumulateHostTimes), subroutineScope);
 }
@@ -1143,6 +1132,91 @@ FortranOpenMPHostSubroutine::createAccumulateTimesKernel ()
 
   appendStatement (buildExprStatement(accumulateKernelTimes), subroutineScope);
 }
+
+void
+FortranOpenMPHostSubroutine::updateLoopTimingInfo ()
+{
+  using namespace SageBuilder;
+  using namespace SageInterface;
+  using namespace OP2VariableNames;
+  using namespace PlanFunctionVariableNames;
+  using std::string;
+  
+  SgFunctionSymbol * functionSymbol =
+    FortranTypesBuilder::buildNewFortranFunction (OP2::FortranSpecific::OpenMPNames::updateTimingFunction, 
+      subroutineScope);
+
+  SgExprListExp * actualParameters = buildExprListExp ();
+  
+  FortranParallelLoop * fortranParallelLoop = (FortranParallelLoop *) parallelLoop;
+  
+  actualParameters->append_expression (
+    buildIntVal (fortranParallelLoop->getIncrementalID ()));
+
+  string const & kernelVariableName = getUserSubroutineName ();
+
+  actualParameters->append_expression (
+      variableDeclarations->getReference (kernelVariableName));
+    
+  actualParameters->append_expression ( buildDivideOp (  
+    variableDeclarations->getReference (accumulatorKernelTime),
+    buildFloatVal (1000.0)));
+    
+    
+  if ( parallelLoop->isDirectLoop () )
+  {
+    // TODO!
+    
+    actualParameters->append_expression (buildFloatVal (0.0));
+    actualParameters->append_expression (buildFloatVal (0.0));
+    
+/*    SgExpression * sumExpression = NULL;
+    
+    for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
+    {
+      if (parallelLoop->isDuplicateOpDat (i) == false)
+      {
+        if (parallelLoop->isReductionRequired (i) == false)
+        {
+            
+          
+        }
+      }
+    }
+    
+    SgAssignOp * sumArgSizes = buildAssignStatement (
+      variableDeclarations->getReference (sumOfArgSizes),
+      sumExpression);
+
+    actualParameters->append_expression (transferAccess);*/
+  }
+  else
+  {
+    SgDotExp * transferAccess = buildDotExp (
+      variableDeclarations->getReference (getActualPlanVariableName (
+        parallelLoop->getUserSubroutineName ())), buildOpaqueVarRefExp (
+        transfer, subroutineScope));
+    
+    actualParameters->append_expression (transferAccess);
+
+    SgDotExp * transfer2Access = buildDotExp (
+      variableDeclarations->getReference (getActualPlanVariableName (
+        parallelLoop->getUserSubroutineName ())), buildOpaqueVarRefExp (
+        transfer2, subroutineScope));
+        
+    actualParameters->append_expression (transfer2Access);    
+  }
+
+  SgFunctionCallExp * functionCallExp = buildFunctionCallExp (
+    functionSymbol, actualParameters);
+
+  SgExprStatement * assignFunctionCall = buildAssignStatement (
+    variableDeclarations->getReference (returnSetKernelTiming),
+    functionCallExp);
+
+  appendStatement (assignFunctionCall, subroutineScope);
+}
+
 
 
 FortranOpenMPHostSubroutine::FortranOpenMPHostSubroutine (

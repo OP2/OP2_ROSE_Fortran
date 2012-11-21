@@ -54,6 +54,14 @@ class FortranProgramDeclarationsAndDefinitions: public ProgramDeclarationsAndDef
 
     std::string currentModuleName;
 
+    /*
+     * ======================================================
+     * Unique ID for parallel loops
+     * ======================================================
+     */
+
+    int IDCounter;
+
   private:
 
     void

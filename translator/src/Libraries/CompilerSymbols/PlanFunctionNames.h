@@ -99,6 +99,8 @@ namespace PlanFunctionVariableNames
   std::string const planPartitionSize = "partitionSize";
   std::string const blockSize = "blockSize";
   std::string const fortranCplanFunction = "FortranPlanCaller";
+  std::string const transfer = "transfer";
+  std::string const transfer2 = "transfer2";
 
   
   /*

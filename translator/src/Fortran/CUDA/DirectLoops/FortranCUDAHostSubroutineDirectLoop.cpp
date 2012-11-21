@@ -194,6 +194,7 @@ FortranCUDAHostSubroutineDirectLoop::createCUDAKernelInitialisationStatements ()
 
   unsigned int sharedOpDatMemorySize = 0;
   unsigned int sharedReductionMemorySize = 0;
+  unsigned int reductionMemoryRequirements = 0;
 
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
   {
@@ -210,36 +211,17 @@ FortranCUDAHostSubroutineDirectLoop::createCUDAKernelInitialisationStatements ()
         }
       }
       else if (parallelLoop->isReductionRequired (i))
-      {
-        unsigned int reductionMemoryRequirements =
-            parallelLoop->getOpDatDimension (i) * parallelLoop->getSizeOfOpDat (
-                i);
-
-        if (reductionMemoryRequirements > sharedReductionMemorySize)
-        {
-          sharedReductionMemorySize = reductionMemoryRequirements;
-        }
+      {        
+        reductionMemoryRequirements = max (
+          reductionMemoryRequirements,
+          parallelLoop->getOpDatDimension (i) * parallelLoop->getSizeOfOpDat (i));
       }
     }
   }
 
-  if (sharedOpDatMemorySize == 0 && sharedReductionMemorySize == 0)
-  {
-    throw Exceptions::CUDA::SharedMemorySizeException (
-        "The shared memory size will be set to zero during kernel launch");
-  }
-  else
-  {
-    Debug::getInstance ()->debugMessage (
-        "The shared memory size will be set to " + lexical_cast <string> (max (
-            sharedOpDatMemorySize, sharedReductionMemorySize))
-            + " during kernel launch", Debug::OUTER_LOOP_LEVEL, __FILE__,
-        __LINE__);
-  }
-
   SgExprStatement * assignmentStatement4 = buildAssignStatement (
       variableDeclarations->getReference (CUDA::sharedMemorySize), buildIntVal (
-          max (sharedOpDatMemorySize, sharedReductionMemorySize)));
+          sharedOpDatMemorySize));
 
   appendStatement (assignmentStatement4, subroutineScope);
 
@@ -269,6 +251,37 @@ FortranCUDAHostSubroutineDirectLoop::createCUDAKernelInitialisationStatements ()
       multiplyExpression6);
 
   appendStatement (assignmentStatement6, subroutineScope);
+ 
+  /*
+   * ======================================================
+   * Compute shared memory size as maximum between the
+   * number of bytes needed by the staging and the ones
+   * needed by the reduction (only in case of reduction)
+   * ======================================================
+   */
+  if ( parallelLoop->isReductionRequired () )
+  {
+    SgExpression * sharedMemoryBytesPerWholeReduction = buildMultiplyOp (
+      buildIntVal (reductionMemoryRequirements),
+      variableDeclarations->getReference (CUDA::threadsPerBlock));
+    
+    SgFunctionSymbol * maxFunctionSymbol =
+        FortranTypesBuilder::buildNewFortranFunction ("max",
+            subroutineScope);
+
+    SgExprListExp * actualParameters = buildExprListExp (
+      variableDeclarations->getReference (CUDA::sharedMemorySize),
+      sharedMemoryBytesPerWholeReduction);
+
+    SgFunctionCallExp * maxSharedMemoryCall = buildFunctionCallExp (
+        maxFunctionSymbol, actualParameters);
+      
+    SgExprStatement * assignFinalSharedMemorySize = buildAssignStatement (
+      variableDeclarations->getReference (CUDA::sharedMemorySize),
+      maxSharedMemoryCall);
+      
+    appendStatement (assignFinalSharedMemorySize, subroutineScope);
+  }
 }
 
 void

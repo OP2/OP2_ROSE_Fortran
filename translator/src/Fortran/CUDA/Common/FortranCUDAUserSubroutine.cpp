@@ -246,7 +246,7 @@ FortranCUDAUserSubroutine::createStatements ()
                 variableDeclaration =
                       FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
                           variableName, type, subroutineScope,
-                          formalParameters, 0); //, CUDA_SHARED);
+                          formalParameters, 0);
               else
                   variableDeclaration =
                       FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
@@ -255,19 +255,13 @@ FortranCUDAUserSubroutine::createStatements ()
 
                 ROSE_ASSERT ( variableDeclaration != NULL );
             }
-            else if (parallelLoop->isGlobal (OP_DAT_ArgumentGroup)
-                     && !parallelLoop->isArray (OP_DAT_ArgumentGroup)
+            else if (parallelLoop->isGlobal (OP_DAT_ArgumentGroup)                     
                      && parallelLoop->isRead (OP_DAT_ArgumentGroup))
             {
               Debug::getInstance ()->debugMessage ("'" + variableName
-                + "' is a GLOBAL SCALAR formal parameter which is READ",
+                + "' is a GLOBAL formal parameter which is READ",
                 Debug::HIGHEST_DEBUG_LEVEL, __FILE__, __LINE__);
 
-              if ( isUserKernel == true )
-                SgVariableDeclaration * variableDeclaration =
-                  FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
-                    variableName, type, subroutineScope, formalParameters, 1, VALUE);
-              else
                 SgVariableDeclaration * variableDeclaration =
                   FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
                     variableName, type, subroutineScope, formalParameters, 0);
@@ -282,7 +276,7 @@ FortranCUDAUserSubroutine::createStatements ()
               if ( isUserKernel == true )
                 SgVariableDeclaration * variableDeclaration =
                   FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (
-                    variableName, type, subroutineScope, formalParameters, 0); //, CUDA_DEVICE);
+                    variableName, type, subroutineScope, formalParameters, 0);
               else
                 SgVariableDeclaration * variableDeclaration =
                   FortranStatementsAndExpressionsBuilder::appendVariableDeclarationAsFormalParameter (

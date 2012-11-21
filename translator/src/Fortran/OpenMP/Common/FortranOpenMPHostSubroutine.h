@@ -112,7 +112,10 @@ class FortranOpenMPHostSubroutine: public FortranHostSubroutine
 
     void
     createAccumulateTimesKernel ();    
-    
+
+    void
+    updateLoopTimingInfo ();
+
     FortranOpenMPHostSubroutine (SgScopeStatement * moduleScope,
         FortranKernelSubroutine * kernelSubroutine,
         FortranParallelLoop * parallelLoop);

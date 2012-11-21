@@ -148,7 +148,8 @@ namespace OP2VariableNames
   std::string const accumulatorKernelTime = "accumulatorKernelTime";
   std::string const timeArrayStart = "timeArrayStart";
   std::string const timeArrayEnd = "timeArrayEnd";
-  
+  std::string const returnSetKernelTiming = "returnSetKernelTiming";
+
   std::string const printProfilingInformation = "printProfInfo";
   std::string const getSetSizeFunctionName = "getSetSizeFromOpArg";
 

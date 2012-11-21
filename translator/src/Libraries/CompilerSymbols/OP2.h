@@ -206,6 +206,11 @@ namespace OP2
         std::string const cudaEventSynchroniseFunction = "cudaEventSynchronize";
         std::string const cudaEventElapsedTimeFunction = "cudaEventElapsedTime";       
       }
+      
+      namespace OpenMPNames
+      {
+        std::string const updateTimingFunction = "setKernelTime";
+      }
   }
   
   namespace PreprocessorDirectives

@@ -30,19 +30,21 @@
  */
 
 
-#include "FortranOpenMPHostSubroutineIndirectLoop.h"
-#include "FortranParallelLoop.h"
-#include "FortranOpenMPKernelSubroutine.h"
-#include "FortranOpenMPModuleDeclarationsIndirectLoop.h"
-#include "FortranStatementsAndExpressionsBuilder.h"
-#include "FortranTypesBuilder.h"
-#include "RoseStatementsAndExpressionsBuilder.h"
-#include "RoseHelper.h"
-#include "CompilerGeneratedNames.h"
-#include "PlanFunctionNames.h"
-#include "OP2.h"
-#include "OpenMP.h"
-#include "Debug.h"
+#include <FortranOpenMPHostSubroutineIndirectLoop.h>
+#include <FortranParallelLoop.h>
+#include <FortranOpenMPKernelSubroutine.h>
+#include <FortranOpenMPModuleDeclarationsIndirectLoop.h>
+#include <FortranStatementsAndExpressionsBuilder.h>
+#include <FortranTypesBuilder.h>
+#include <RoseStatementsAndExpressionsBuilder.h>
+#include <RoseHelper.h>
+#include <CompilerGeneratedNames.h>
+#include <PlanFunctionNames.h>
+#include <OP2.h>
+#include <OpenMP.h>
+#include <Debug.h>
+#include <Globals.h>
+
 
 void
 FortranOpenMPHostSubroutineIndirectLoop::createKernelFunctionCallStatement (
@@ -897,8 +899,6 @@ FortranOpenMPHostSubroutineIndirectLoop::createStatements ()
   using namespace SageInterface;
   using namespace PlanFunctionVariableNames;
 
-  createEarlyExitStatementNewLibrary (subroutineScope);
-
   initialiseProfilingVariablesDeclaration ();
 
   createStartTimerHost ();
@@ -912,7 +912,12 @@ FortranOpenMPHostSubroutineIndirectLoop::createStatements ()
   initialiseNumberOfOpArgs (subroutineScope);
 
   appendPopulationOpArgArray (subroutineScope);
-      
+
+  if ( Globals::getInstance ()->getIncludesMPI () )
+    appendCallMPIHaloExchangeFunction (subroutineScope);  
+
+  createEarlyExitStatementNewLibrary (subroutineScope);
+
   if (parallelLoop->isReductionRequired ())
   {
     createReductionPrologueStatements ();
@@ -965,12 +970,19 @@ FortranOpenMPHostSubroutineIndirectLoop::createStatements ()
   {
     createReductionEpilogueStatements ();
   }
-  
+
+  if ( Globals::getInstance ()->getIncludesMPI () )
+  {
+    appendCallsToMPIReduce (subroutineScope);
+    appendCallMPISetDirtyBit (subroutineScope);
+  }
+
   createEndTimerHost ();
   createEndTimerSynchroniseHost ();
   createElapsedTimeHost ();
   createAccumulateTimesHost ();
 
+  updateLoopTimingInfo ();
 }
 
 void

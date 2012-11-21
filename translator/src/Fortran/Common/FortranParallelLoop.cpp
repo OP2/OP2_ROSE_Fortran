@@ -57,6 +57,6 @@ FortranParallelLoop::isCardinalityDeclarationNeeded (
 
 FortranParallelLoop::FortranParallelLoop (
     SgFunctionCallExp * functionCallExpression) :
-  ParallelLoop (functionCallExpression)
+  ParallelLoop (functionCallExpression), loopID (-1)
 {
 }

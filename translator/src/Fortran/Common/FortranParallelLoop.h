@@ -107,6 +107,13 @@ class FortranParallelLoop: public ParallelLoop
     static unsigned int const POSITION_OF_ACCESS_GENERIC = 5;
 
     static unsigned int const POSITION_OF_FIRST_DAT_DIMENSION_GENERIC = 5;
+
+    /*
+     * ======================================================
+     * Unique ID of loop
+     * ======================================================
+     */
+    int loopID;
     
   protected:
     
@@ -133,6 +140,12 @@ class FortranParallelLoop: public ParallelLoop
 
     void
     setGenericLoop () { isGenericParallelLoop = true; }
+    
+    void
+    setIncrementalID (int counter) { loopID = counter; }
+
+    int
+    getIncrementalID () { return loopID; }
 };
 
 #endif

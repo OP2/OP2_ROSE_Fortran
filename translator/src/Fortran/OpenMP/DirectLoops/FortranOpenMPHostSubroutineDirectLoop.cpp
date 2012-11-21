@@ -30,17 +30,18 @@
  */
 
 
-#include "FortranOpenMPHostSubroutineDirectLoop.h"
-#include "FortranOpenMPKernelSubroutine.h"
-#include "FortranOpenMPModuleDeclarations.h"
-#include "FortranStatementsAndExpressionsBuilder.h"
-#include "FortranTypesBuilder.h"
-#include "RoseStatementsAndExpressionsBuilder.h"
-#include "CompilerGeneratedNames.h"
-#include "OP2.h"
-#include "RoseHelper.h"
-#include "Debug.h"
-#include "OpenMP.h"
+#include <FortranOpenMPHostSubroutineDirectLoop.h>
+#include <FortranOpenMPKernelSubroutine.h>
+#include <FortranOpenMPModuleDeclarations.h>
+#include <FortranStatementsAndExpressionsBuilder.h>
+#include <FortranTypesBuilder.h>
+#include <RoseStatementsAndExpressionsBuilder.h>
+#include <CompilerGeneratedNames.h>
+#include <OP2.h>
+#include <RoseHelper.h>
+#include <Debug.h>
+#include <OpenMP.h>
+#include <Globals.h>
 
 void
 FortranOpenMPHostSubroutineDirectLoop::createKernelFunctionCallStatement (
@@ -194,12 +195,15 @@ FortranOpenMPHostSubroutineDirectLoop::createStatements ()
 {
   using namespace SageInterface;
 
-  createEarlyExitStatementNewLibrary (subroutineScope);
-
   initialiseProfilingVariablesDeclaration ();
 
-  createStartTimerHost ();
+  createStartTimerHost ();  
   
+  if ( Globals::getInstance ()->getIncludesMPI () )
+    appendCallMPIHaloExchangeFunction (subroutineScope);
+  
+  createEarlyExitStatementNewLibrary (subroutineScope);
+
   appendStatement (createInitialiseNumberOfThreadsStatements (),
       subroutineScope);
 
@@ -231,10 +235,18 @@ FortranOpenMPHostSubroutineDirectLoop::createStatements ()
     createReductionEpilogueStatements ();
   }
 
+  if ( Globals::getInstance ()->getIncludesMPI () )
+  {
+    appendCallsToMPIReduce (subroutineScope);
+    appendCallMPISetDirtyBit (subroutineScope);
+  }
+
   createEndTimerHost ();
   createEndTimerSynchroniseHost ();
   createElapsedTimeHost ();
   createAccumulateTimesHost ();
+ 
+  updateLoopTimingInfo ();
 }
 
 void
@@ -243,6 +255,8 @@ FortranOpenMPHostSubroutineDirectLoop::createLocalVariableDeclarations ()
   createOpDatLocalVariableDeclarations ();
 
   createOpenMPLocalVariableDeclarations ();
+
+  createCommonLocalVariableDeclarations (subroutineScope);
 
   if (parallelLoop->isReductionRequired ())
   {

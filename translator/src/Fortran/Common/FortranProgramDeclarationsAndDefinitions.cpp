@@ -818,6 +818,9 @@ FortranProgramDeclarationsAndDefinitions::visit (SgNode * node)
               numberOfOpArgs);
 
             parallelLoop->checkArguments ();
+            
+            parallelLoop->setIncrementalID (IDCounter);
+            IDCounter++;
           }
           else
           {
@@ -933,7 +936,7 @@ FortranProgramDeclarationsAndDefinitions::getFileNameForSubroutine (
 }
 
 FortranProgramDeclarationsAndDefinitions::FortranProgramDeclarationsAndDefinitions (
-    SgProject * project)
+    SgProject * project) : IDCounter (0)
 {
   Debug::getInstance ()->debugMessage (
       "Obtaining declarations and definitions", Debug::CONSTRUCTOR_LEVEL,

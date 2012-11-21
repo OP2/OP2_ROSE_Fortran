@@ -164,15 +164,26 @@ FortranCUDAKernelSubroutineIndirectLoop::createUserSubroutineCallStatement ()
 
         SgAddOp * addExpression5 = buildAddOp (addExpression4, dotExpression1);
 
-        SgSubscriptExpression * subscriptExpression =
+        SgExpression * accessExpression = NULL;        
+
+        if (parallelLoop->getOpDatDimension (i) > 1)
+        {
+        
+          accessExpression=
             new SgSubscriptExpression (RoseHelper::getFileInfo (),
                 addExpression2, addExpression5, buildIntVal (1));
 
-        subscriptExpression->set_endOfConstruct (RoseHelper::getFileInfo ());
+          accessExpression->set_endOfConstruct (RoseHelper::getFileInfo ());
+        }
+        else
+        {
+          accessExpression = addExpression2;
+        }
 
         parameterExpression = buildPntrArrRefExp (
             variableDeclarations->getReference (autosharedVariableName),
-            buildExprListExp (subscriptExpression));
+            buildExprListExp (accessExpression));
+//            buildExprListExp (subscriptExpression));
       }
     }
     else if (parallelLoop->isDirect (i))

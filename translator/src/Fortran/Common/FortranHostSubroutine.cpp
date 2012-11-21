@@ -565,6 +565,12 @@ FortranHostSubroutine::createCommonLocalVariableDeclarations (SgScopeStatement *
       FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
           returnMPIHaloExchange, FortranTypesBuilder::getFourByteInteger (),
           scope));
+
+  variableDeclarations->add (returnSetKernelTiming,
+      FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
+          returnSetKernelTiming, FortranTypesBuilder::getFourByteInteger (),
+          scope));
+
 }
 
 void
