@@ -59,10 +59,13 @@ namespace OP2
   std::string const OP_DAT_GBL = "op_dat_gbl";
   std::string const OP_DECL_CONST = "op_decl_const";
   std::string const OP_DECL_DAT = "op_decl_dat";
-  std::string const OP_DECL_GBL = "op_decl_gbl";
+  std::string const OP_DECL_DAT_HDF5 = "op_decl_dat_hdf5";
+//  std::string const OP_DECL_GBL = "op_decl_gbl";
   std::string const OP_DECL_MAP = "op_decl_map";
+  std::string const OP_DECL_MAP_HDF5 = "op_decl_map_hdf5";
   std::string const OP_DECL_MAT = "op_decl_mat";
   std::string const OP_DECL_SET = "op_decl_set";
+  std::string const OP_DECL_SET_HDF5 = "op_decl_set_hdf5";  
   std::string const OP_DECL_SUBSET = "op_decl_subset";
   std::string const OP_DECL_SPARSITY = "op_decl_sparsity";
   std::string const OP_GBL = "op_gbl";

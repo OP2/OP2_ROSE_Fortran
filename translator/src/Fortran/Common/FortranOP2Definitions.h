@@ -45,8 +45,11 @@ class FortranOpDatDefinition: public OpDatDefinition
      * ======================================================
      * Models an OP_DAT definition in Fortran.
      *
-     * The following style is assumed:
+     * The following style is assumed for non-HDF5 declarations:
      * OP_DECL_DAT (OpSetName, setCardinality, data, OpDatName)
+     *
+     * The following style is assumed for non-HDF5 declarations:
+     * OP_DECL_DAT_HDF5 (OpSetName, setCardinality, data, HDF5fileName, OpDatName)
      * ======================================================
      */
 
@@ -59,6 +62,8 @@ class FortranOpDatDefinition: public OpDatDefinition
     static int const index_data = 2;
 
     static int const index_OpDatName = 3;
+    
+    static int const index_OpDatNameHDF5 = 4;
 
   public:
 
@@ -68,7 +73,7 @@ class FortranOpDatDefinition: public OpDatDefinition
       return 4;
     }
 
-    FortranOpDatDefinition (SgExprListExp * parameters);
+    FortranOpDatDefinition (SgExprListExp * parameters, bool isHDF5Format);
 };
 
 class FortranOpSetDefinition: public OpSetDefinition
@@ -77,8 +82,12 @@ class FortranOpSetDefinition: public OpSetDefinition
      * ======================================================
      * Models an OP_SET definition in Fortran.
      *
-     * The following style is assumed:
-     * OP_DECL_SET (setCardinalityName, OpSetName)
+     * The following style is assumed for non-HDF5 
+     * declarations:
+     * OP_DECL_SET (setCardinalityName, OpSetName, opSetStringName)
+     *
+     * For HDF5 declarations:
+     * OP_DECL_SET (setCardinalityName, OpSetName, HDF5fileName, opSetStringName)     
      * ======================================================
      */
 
@@ -86,8 +95,8 @@ class FortranOpSetDefinition: public OpSetDefinition
 
     static int const index_setCardinalityName = 0;
 
-    static int const index_OpSetName = 1;
-
+    static int const index_OpSetName = 1;        
+    
   public:
 
     static unsigned int
@@ -96,7 +105,13 @@ class FortranOpSetDefinition: public OpSetDefinition
       return 2;
     }
 
-    FortranOpSetDefinition (SgExprListExp * parameters);
+    static unsigned int
+    getNumberOfExpectedArgumentsHDF5 ()
+    {
+      return 3;
+    }
+
+    FortranOpSetDefinition (SgExprListExp * parameters, bool isHDF5Format);
 };
 
 class FortranOpMapDefinition: public OpMapDefinition
@@ -105,8 +120,11 @@ class FortranOpMapDefinition: public OpMapDefinition
      * ======================================================
      * Models an OP_MAP definition in Fortran.
      *
-     * The following style is assumed:
+     * The following style is assumed for non-HDF5 declarations:
      * OP_DECL_MAP (source_OpSetName, destination_OpSetName, dimension, mappingCardinalityName, mappingName, OpMapName)
+     *
+     * The following style is assumed for HDF5 declarations:
+     * OP_DECL_MAP_HDF5 (source_OpSetName, destination_OpSetName, dimension, mappingCardinalityName, mappingName, HDF5fileName, OpMapName)     
      * ======================================================
      */
 
@@ -127,6 +145,8 @@ class FortranOpMapDefinition: public OpMapDefinition
     static int const index_mappingName = 4;
 
     static int const index_OpMapName = 5;
+    
+    static int const index_OpMapNameHDF5 = 6;
 
   public:
 
@@ -142,7 +162,7 @@ class FortranOpMapDefinition: public OpMapDefinition
       return mappingCardinalityName;
     }
 
-    FortranOpMapDefinition (SgExprListExp * parameters);
+    FortranOpMapDefinition (SgExprListExp * parameters, bool isHDF5Format);
 };
 
 class FortranOpGblDefinition: public OpGblDefinition

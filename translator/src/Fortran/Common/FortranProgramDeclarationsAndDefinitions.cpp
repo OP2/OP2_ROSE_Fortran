@@ -30,16 +30,15 @@
  */
 
 
-#include "FortranProgramDeclarationsAndDefinitions.h"
-#include "FortranOP2Definitions.h"
-#include "FortranParallelLoop.h"
-#include "Globals.h"
-#include "Exceptions.h"
-#include "OP2.h"
+#include <FortranProgramDeclarationsAndDefinitions.h>
+#include <FortranOP2Definitions.h>
+#include <FortranParallelLoop.h>
+#include <Globals.h>
+#include <Exceptions.h>
+#include <OP2.h>
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/filesystem.hpp>
-//#include <tr1_impl/functional>
 
 void
 FortranProgramDeclarationsAndDefinitions::setOpGblProperties (
@@ -51,52 +50,6 @@ FortranProgramDeclarationsAndDefinitions::setOpGblProperties (
 
   Debug::getInstance ()->debugMessage ("'" + variableName + "' is an OP_GBL",
       Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
-
- /*
-  * ======================================================
-  * With op_arg_gbl, there is not anymore a global
-  * variable declaration, but the dimension can be 
-  * obtained directly from the function actual parameters
-  * ======================================================
-  */
-  
-//   OpGblDefinition * opGblDeclaration = getOpGblDefinition (variableName);
-//   
-//   FortranOpGblDefinition * fortanOpGBL =
-//       dynamic_cast <FortranOpGblDefinition *> (opGblDeclaration);
-//      
-//   if (fortanOpGBL == NULL)
-//   {
-//     Debug::getInstance ()->debugMessage ("'" + variableName + "' is a scalar",
-//         Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
-// 
-//    /*
-//     * ======================================================
-//     * Since this is a scalar, set the dimension to 1
-//     * ======================================================
-//     */
-// 
-//     parallelLoop->setOpDatDimension (OP_DAT_ArgumentGroup, 1);
-//   }
-//   else
-//   {
-//     Debug::getInstance ()->debugMessage ("'" + variableName
-//         + "' is NOT a scalar, but has dimension " + lexical_cast<string> (opGblDeclaration->getDimension ()),
-//         Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
-// 
-//     parallelLoop->setOpDatDimension (OP_DAT_ArgumentGroup,
-//         opGblDeclaration->getDimension ());
-//   }
-
-   
-//   parallelLoop->setUniqueOpDat (variableName);
-// 
-//   parallelLoop->setOpDatType (OP_DAT_ArgumentGroup,
-//       opGblDeclaration->getBaseType ());
-// 
-//   parallelLoop->setOpDatVariableName (OP_DAT_ArgumentGroup, variableName);
-// 
-//   parallelLoop->setDuplicateOpDat (OP_DAT_ArgumentGroup, false);
 }
 
 void
@@ -685,21 +638,26 @@ FortranProgramDeclarationsAndDefinitions::visit (SgNode * node)
         Debug::getInstance ()->debugMessage ("Found function call '"
             + calleeName + "'", Debug::OUTER_LOOP_LEVEL, __FILE__, __LINE__);
 
-        if (iequals (calleeName, OP2::OP_DECL_SET))
+        if ( iequals (calleeName, OP2::OP_DECL_SET) ||
+             iequals (calleeName, OP2::OP_DECL_SET_HDF5) )
         {
           /*
            * ======================================================
            * An OP_SET variable declared through an OP_DECL_SET call
            * ======================================================
            */
-
+          bool isHDF5Format = false;
+          
+          if ( iequals (calleeName, OP2::OP_DECL_SET_HDF5) ) isHDF5Format = true;
+          
           FortranOpSetDefinition * opSetDeclaration =
-              new FortranOpSetDefinition (actualArguments);
+              new FortranOpSetDefinition (actualArguments, isHDF5Format);
 
           OpSetDefinitions[opSetDeclaration->getVariableName ()]
               = opSetDeclaration;
-        }
-        else if (iequals (calleeName, OP2::OP_DECL_MAP))
+        }        
+        else if ( iequals (calleeName, OP2::OP_DECL_MAP) ||
+                  iequals (calleeName, OP2::OP_DECL_MAP_HDF5) )
         {
           /*
            * ======================================================
@@ -707,51 +665,33 @@ FortranProgramDeclarationsAndDefinitions::visit (SgNode * node)
            * ======================================================
            */
 
+          bool isHDF5Format = false;
+          
+          if ( iequals (calleeName, OP2::OP_DECL_MAP_HDF5) ) isHDF5Format = true;
+
           FortranOpMapDefinition * opMapDeclaration =
-              new FortranOpMapDefinition (actualArguments);
+              new FortranOpMapDefinition (actualArguments, isHDF5Format);
 
           OpMapDefinitions[opMapDeclaration->getVariableName ()]
               = opMapDeclaration;
         }
-        else if (iequals (calleeName, OP2::OP_DECL_DAT))
+        else if ( iequals (calleeName, OP2::OP_DECL_DAT) ||
+                  iequals (calleeName, OP2::OP_DECL_DAT_HDF5) )
         {
           /*
            * ======================================================
            * An OP_DAT variable declared through an OP_DECL_DAT call
            * ======================================================
            */
+          bool isHDF5Format = false;
+          
+          if ( iequals (calleeName, OP2::OP_DECL_DAT_HDF5) ) isHDF5Format = true;
 
           FortranOpDatDefinition * opDatDeclaration =
-              new FortranOpDatDefinition (actualArguments);
+              new FortranOpDatDefinition (actualArguments, isHDF5Format);
 
           OpDatDefinitions[opDatDeclaration->getVariableName ()]
               = opDatDeclaration;
-        }
-        else if (iequals (calleeName, OP2::OP_DECL_GBL))
-        {
-          /*
-           * ======================================================
-           * An OP_DAT variable declared through an OP_DECL_GBL call
-           * ======================================================
-           */
-
-          OpGblDefinition * opGblDeclaration;
-
-          if (actualArguments->get_expressions ().size ()
-              == FortranOpGblDefinition::getNumberOfExpectedArguments ())
-          {
-            opGblDeclaration = new FortranOpGblDefinition (actualArguments);
-          }
-          else
-          {
-            ROSE_ASSERT (actualArguments->get_expressions().size() == FortranOpGblScalarDefinition::getNumberOfExpectedArguments());
-
-            opGblDeclaration = new FortranOpGblScalarDefinition (
-                actualArguments);
-          }
-
-          OpGblDefinitions[opGblDeclaration->getVariableName ()]
-              = opGblDeclaration;
         }
         else if (iequals (calleeName, OP2::OP_DECL_CONST))
         {

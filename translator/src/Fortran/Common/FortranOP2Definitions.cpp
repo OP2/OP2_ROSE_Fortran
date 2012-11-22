@@ -35,7 +35,7 @@
 #include <boost/lexical_cast.hpp>
 #include <rose.h>
 
-FortranOpDatDefinition::FortranOpDatDefinition (SgExprListExp * parameters)
+FortranOpDatDefinition::FortranOpDatDefinition (SgExprListExp * parameters, bool isHDF5Format)
 {
   using boost::lexical_cast;
   using std::string;
@@ -98,8 +98,8 @@ FortranOpDatDefinition::FortranOpDatDefinition (SgExprListExp * parameters)
    * ======================================================
    */
 
-  SgVarRefExp * opDatVariableReference;
-
+  SgVarRefExp * opDatVariableReference;        
+  
   if (isSgDotExp (parameters->get_expressions ()[index_OpDatName]) != NULL)
   {
     opDatVariableReference = isSgVarRefExp (isSgDotExp (
@@ -126,7 +126,7 @@ FortranOpDatDefinition::FortranOpDatDefinition (SgExprListExp * parameters)
       Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 }
 
-FortranOpSetDefinition::FortranOpSetDefinition (SgExprListExp * parameters)
+FortranOpSetDefinition::FortranOpSetDefinition (SgExprListExp * parameters, bool isHDF5Format)
 {
   /*
    * ======================================================
@@ -178,7 +178,7 @@ FortranOpSetDefinition::FortranOpSetDefinition (SgExprListExp * parameters)
       + "'", Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 }
 
-FortranOpMapDefinition::FortranOpMapDefinition (SgExprListExp * parameters)
+FortranOpMapDefinition::FortranOpMapDefinition (SgExprListExp * parameters, bool isHDF5Format)
 {
   using boost::lexical_cast;
   using std::string;
@@ -243,7 +243,7 @@ FortranOpMapDefinition::FortranOpMapDefinition (SgExprListExp * parameters)
 
   /*
    * ======================================================
-   * Get dimension of
+   * Get dimension of mapping
    * ======================================================
    */
 
@@ -274,15 +274,19 @@ FortranOpMapDefinition::FortranOpMapDefinition (SgExprListExp * parameters)
 
   SgVarRefExp * mappingVariableReference;
 
-  if (isSgDotExp (parameters->get_expressions ()[index_mappingName]) != NULL)
+  int index_OpMapNameBothCases = index_OpMapName;
+  
+  if ( isHDF5Format ) index_OpMapNameBothCases = index_OpMapNameHDF5;
+  
+  if (isSgDotExp (parameters->get_expressions ()[index_OpMapNameBothCases]) != NULL)
   {
     mappingVariableReference = isSgVarRefExp (isSgDotExp (
-        parameters->get_expressions ()[index_mappingName])->get_rhs_operand ());
+        parameters->get_expressions ()[index_OpMapNameBothCases])->get_rhs_operand ());
   }
   else
   {
     mappingVariableReference = isSgVarRefExp (
-        parameters->get_expressions ()[index_mappingName]);
+        parameters->get_expressions ()[index_OpMapNameBothCases]);
   }
 
   mappingName
@@ -293,9 +297,9 @@ FortranOpMapDefinition::FortranOpMapDefinition (SgExprListExp * parameters)
    * Get name of OP_MAP
    * ======================================================
    */
-
+  
   variableName
-      = isSgVarRefExp (parameters->get_expressions ()[index_OpMapName])->get_symbol ()->get_name ().getString ();
+      = isSgVarRefExp (parameters->get_expressions ()[index_mappingName])->get_symbol ()->get_name ().getString ();
 
   ROSE_ASSERT (sourceOpSetName.empty () == false);
   ROSE_ASSERT (destinationOpSetName.empty () == false);
