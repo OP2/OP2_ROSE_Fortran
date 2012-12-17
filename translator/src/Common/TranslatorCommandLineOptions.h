@@ -166,5 +166,38 @@ class MPIOption: public CommandLineOption
     }
 };
 
+class NoStageOption: public CommandLineOption
+{
+  public:
+
+    virtual void
+    run ()
+    {
+      Globals::getInstance ()->setNoStage ();
+    }
+
+    NoStageOption (std::string helpMessage, std::string longOption) :
+      CommandLineOption (helpMessage, "", longOption)
+    {
+    }
+};
+
+class VectorisableOption: public CommandLineOption
+{
+  public:
+
+    virtual void
+    run ()
+    {
+      Globals::getInstance ()->setVectorisable ();
+    }
+
+    VectorisableOption (std::string helpMessage, std::string longOption) :
+      CommandLineOption (helpMessage, "", longOption)
+    {
+    }
+};
+
+
 
 #endif

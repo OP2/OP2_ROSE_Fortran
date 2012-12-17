@@ -142,11 +142,9 @@ class FortranOpMapDefinition: public OpMapDefinition
 
     static int const index_mappingCardinalityName = 3;
 
-    static int const index_mappingName = 4;
-
-    static int const index_OpMapName = 5;
+    static int const index_OpMapName = 4;
     
-    static int const index_OpMapNameHDF5 = 6;
+    static int const index_mappingName = 5;    
 
   public:
 

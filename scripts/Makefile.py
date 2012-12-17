@@ -59,6 +59,18 @@ parser.add_option("--mpi",
                   help="Generate support for MPI backend.",
                   default=False)
 
+parser.add_option("--no-stage",
+                  action="store_true",
+                  dest="nostage",
+                  help="Do not generate code for staging into scratchpad memory.",
+                  default=False)
+
+parser.add_option("--vectorisable",
+                  action="store_true",
+                  dest="vectorisable",
+                  help="Prepare OpenMP kernel for vectorisation.",
+                  default=False)
+
 parser.add_option("-d",
                   "--debug",
                   action="store",
@@ -301,6 +313,12 @@ def getFortranCompilationCommand (filesToCompile, freeVariablesModuleName):
 
 	if opts.mpi == True:
 		cmd += ' --mpi '
+
+	if opts.nostage == True:
+		cmd += ' --no-stage '
+
+	if opts.vectorisable == True:
+		cmd += ' --vectorisable '
 
 	auxiliaryFiles = ['ISO_C_BINDING.F95', 'OP2.F95']
 

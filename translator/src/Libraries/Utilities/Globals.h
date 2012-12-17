@@ -70,6 +70,23 @@ class Globals
      * ======================================================
      */
     bool includesMPI;
+
+    /*
+     * ======================================================
+     * Boolean reflecting the selection of the -nostage
+     * option
+     * ======================================================
+     */
+    bool noStage;
+
+    /*
+     * ======================================================
+     * If activated, the OpenMP kernel will process iterations
+     * by groups of the vector size (VS macro must be set at
+     * low level compilation time)
+     * ======================================================
+     */
+    bool vectorisable;
     
   private:
 
@@ -171,6 +188,19 @@ class Globals
     void unsetIncludesMPI () { includesMPI = false; }
     
     bool getIncludesMPI () const { return includesMPI; }
+    
+    void setNoStage () { noStage = true; }
+
+    void unsetNoStage () { noStage = false; }
+    
+    bool getNoStage () const { return noStage; }
+
+    void setVectorisable () { vectorisable = true; }
+
+    void unsetVectorisable () { vectorisable = false; }
+    
+    bool getVectorisable () const { return vectorisable; }
+    
 };
 
 #endif

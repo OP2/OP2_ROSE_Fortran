@@ -667,8 +667,14 @@ FortranProgramDeclarationsAndDefinitions::visit (SgNode * node)
 
           bool isHDF5Format = false;
           
-          if ( iequals (calleeName, OP2::OP_DECL_MAP_HDF5) ) isHDF5Format = true;
+          if ( iequals (calleeName, OP2::OP_DECL_MAP_HDF5) )
+          {
+            isHDF5Format = true;
 
+            Debug::getInstance ()->debugMessage ("This is the HDF5 version: '"
+              + calleeName + "'", Debug::OUTER_LOOP_LEVEL, __FILE__, __LINE__);
+          }
+          
           FortranOpMapDefinition * opMapDeclaration =
               new FortranOpMapDefinition (actualArguments, isHDF5Format);
 

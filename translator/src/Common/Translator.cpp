@@ -347,7 +347,13 @@ addCommandLineOptions ()
 
   CommandLine::getInstance ()->addOption (
       new MPIOption ("Generate OpenCL code", "mpi"));
-          
+
+  CommandLine::getInstance ()->addOption (
+      new NoStageOption ("Does not generate staging code", "no-stage"));
+
+  CommandLine::getInstance ()->addOption (
+      new VectorisableOption ("Generate vectorisable code", "vectorisable"));
+      
   CommandLine::getInstance ()->addOption (new FreeVariablesModuleOption (
       "The module containing free variables referenced in user kernels"));
 

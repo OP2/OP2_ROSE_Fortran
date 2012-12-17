@@ -40,6 +40,7 @@
 #include "RoseHelper.h"
 #include "Debug.h"
 #include "OpenMP.h"
+#include "Globals.h"
 
 SgStatement *
 FortranOpenMPKernelSubroutineIndirectLoop::createUserSubroutineCallStatement ()
@@ -51,16 +52,26 @@ FortranOpenMPKernelSubroutineIndirectLoop::createUserSubroutineCallStatement ()
   using boost::lexical_cast;
   using std::string;
   
+ /*
+  * ======================================================
+  * Tracks when a new argument reference is needed
+  * (used to refer to same opDat variable)
+  * ======================================================
+  */
+  
+  bool newArgument= true;
+  SgVarRefExp * argumentReference = NULL;
+  SgVarRefExp * mappingReference = NULL;
+  
   Debug::getInstance ()->debugMessage ("Creating call to user kernel",
       Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
 
   SgExprListExp * actualParameters = buildExprListExp ();
 
   for (unsigned int i = 1; i <= parallelLoop->getNumberOfOpDatArgumentGroups (); ++i)
-  {
+  {    
     Debug::getInstance ()->debugMessage ("Considering parameter" + lexical_cast<string> (i),
         Debug::FUNCTION_LEVEL, __FILE__, __LINE__);
-
     
     if (parallelLoop->isReductionRequired (i))
     {
@@ -73,79 +84,167 @@ FortranOpenMPKernelSubroutineIndirectLoop::createUserSubroutineCallStatement ()
           getOpDatName (i)));
     }
     else if (parallelLoop->isIndirect (i))
-    {
-      if (parallelLoop->isIncremented (i))
       {
-        actualParameters->append_expression (
-            variableDeclarations->getReference (getOpDatLocalName (i)));
+        if (parallelLoop->isIncremented (i))
+        {
+          if ( !Globals::getInstance ()->getNoStage () )
+          {
+            actualParameters->append_expression (
+              variableDeclarations->getReference (getOpDatLocalName (i)));
+          }
+          else
+          {
+            
+            Debug::getInstance ()->debugMessage ("Parameter name is:" + getOpDatName (i),
+              Debug::FUNCTION_LEVEL, __FILE__, __LINE__);         
+
+            if ( !newArgument && parallelLoop->isDuplicateOpDat (i) ) newArgument = false;
+            else newArgument = true;
+            if ( newArgument )
+            {
+              Debug::getInstance ()->debugMessage ("First time seeing:" + getOpDatName (i),
+                Debug::FUNCTION_LEVEL, __FILE__, __LINE__);         
+              
+              argumentReference = variableDeclarations->getReference (getOpDatName (i));
+              mappingReference = variableDeclarations->getReference (getIndirectOpDatMapName (i));
+              newArgument = false;
+            }
+
+            SgAddOp * indirectMapAccess = buildAddOp (
+                buildAddOp (variableDeclarations->getReference (getIterationCounterVariableName (1)),
+                    variableDeclarations->getReference (getIterationCounterVariableName (2))),
+                buildIntVal (1));
+
+            SgPntrArrRefExp * opMapReference =
+              buildPntrArrRefExp (mappingReference, indirectMapAccess);
+                
+            SgMultiplyOp * opDatAccess = buildMultiplyOp (
+                opMapReference, buildIntVal (parallelLoop->getOpDatDimension (i)));
+                
+            SgPntrArrRefExp * arrayExpression =
+              buildPntrArrRefExp (argumentReference, opDatAccess);
+
+              actualParameters->append_expression (arrayExpression);          
+
+          }
       }
       else
       {
-        SgAddOp * addExpression1 = buildAddOp (
-            variableDeclarations->getReference (
-                getIterationCounterVariableName (1)),
-            variableDeclarations->getReference (OpenMP::threadBlockOffset));
-
-        SgPntrArrRefExp * arrayExpression1 =
-            buildPntrArrRefExp (variableDeclarations->getReference (
-                getGlobalToLocalMappingName (i)), addExpression1);
-
-        SgMultiplyOp * multiplyExpression = buildMultiplyOp (arrayExpression1,
-            buildIntVal (parallelLoop->getOpDatDimension (i)));
-
-        SgAddOp * addExpression2 = buildAddOp (buildIntVal (1),
-            multiplyExpression);
-            
-        /*
-         * ======================================================
-         * Dimension 1 arrays are passed as scalars in Hydra.
-         * OP2 assumption is that the user kernel will declare
-         * them as scalars.
-         * ======================================================
-         */
-        if ( parallelLoop->getOpDatDimension (i) == 1 )
+        if ( !Globals::getInstance ()->getNoStage () )
         {
-          SgPntrArrRefExp
-              * arrayExpression =
-                  buildPntrArrRefExp (
-                      buildVarRefExp (
-                          sharedIndirectionDeclarations[parallelLoop->getOpDatVariableName (
-                              i)]), addExpression2);
+          SgAddOp * addExpression1 = NULL;
+          if ( Globals::getInstance ()->getVectorisable () )
+          addExpression1 = buildAddOp (
+            buildAddOp (buildMultiplyOp (variableDeclarations->getReference (getIterationCounterVariableName (1)),
+              buildOpaqueVarRefExp ("VS", subroutineScope)),
+              variableDeclarations->getReference (getIterationCounterVariableName (2))),
+              variableDeclarations->getReference (OpenMP::threadBlockOffset));
+          else
+          addExpression1 = buildAddOp (
+            variableDeclarations->getReference (getIterationCounterVariableName (1)),            
+              variableDeclarations->getReference (OpenMP::threadBlockOffset));
+            
+              
+          SgPntrArrRefExp * arrayExpression1 =
+              buildPntrArrRefExp (variableDeclarations->getReference (
+                  getGlobalToLocalMappingName (i)), addExpression1);
 
-          actualParameters->append_expression (arrayExpression);
+          SgMultiplyOp * multiplyExpression = buildMultiplyOp (arrayExpression1,
+              buildIntVal (parallelLoop->getOpDatDimension (i)));
+
+          SgAddOp * addExpression2 = buildAddOp (buildIntVal (1),
+              multiplyExpression);
+              
+         /*
+          * ======================================================
+          * Dimension 1 arrays are passed as scalars in Hydra.
+          * OP2 assumption is that the user kernel will declare
+          * them as scalars.
+          * ======================================================
+          */
+          if ( parallelLoop->getOpDatDimension (i) == 1 )
+          {
+            SgPntrArrRefExp
+                * arrayExpression =
+                    buildPntrArrRefExp (
+                        buildVarRefExp (
+                            sharedIndirectionDeclarations[parallelLoop->getOpDatVariableName (
+                                i)]), addExpression2);
+
+            actualParameters->append_expression (arrayExpression);
+          }
+          else
+          {          
+            SgAddOp * addExpression3 = buildAddOp (addExpression2, buildIntVal (
+                parallelLoop->getOpDatDimension (i)));
+
+            SgSubtractOp * subtractExpression = buildSubtractOp (addExpression3,
+                buildIntVal (1));
+
+            SgSubscriptExpression * subscriptExpression =
+                new SgSubscriptExpression (RoseHelper::getFileInfo (),
+                    addExpression2, subtractExpression, buildIntVal (1));
+
+            subscriptExpression->set_endOfConstruct (RoseHelper::getFileInfo ());
+
+            SgPntrArrRefExp
+                * arrayExpression =
+                    buildPntrArrRefExp (
+                        buildVarRefExp (
+                            sharedIndirectionDeclarations[parallelLoop->getOpDatVariableName (
+                                i)]), subscriptExpression);
+
+            actualParameters->append_expression (arrayExpression);
+          }
         }
         else
-        {          
-          SgAddOp * addExpression3 = buildAddOp (addExpression2, buildIntVal (
-              parallelLoop->getOpDatDimension (i)));
-
-          SgSubtractOp * subtractExpression = buildSubtractOp (addExpression3,
+        {
+          Debug::getInstance ()->debugMessage ("Parameter name is:" + getOpDatName (i),
+            Debug::FUNCTION_LEVEL, __FILE__, __LINE__);         
+            
+          if ( parallelLoop->isDuplicateOpDat (i) ) newArgument = false;
+          
+          if ( newArgument )
+          {
+            argumentReference = variableDeclarations->getReference (getOpDatName (i));
+            mappingReference = variableDeclarations->getReference (getIndirectOpDatMapName (i));
+            newArgument = false;
+          }
+          
+          SgAddOp * indirectMapAccess = buildAddOp (
+              variableDeclarations->getReference (
+                  getIterationCounterVariableName (1)),
               buildIntVal (1));
 
-          SgSubscriptExpression * subscriptExpression =
-              new SgSubscriptExpression (RoseHelper::getFileInfo (),
-                  addExpression2, subtractExpression, buildIntVal (1));
+          SgPntrArrRefExp * opMapReference =
+            buildPntrArrRefExp (mappingReference, indirectMapAccess);
+              
+          SgMultiplyOp * opDatAccess = buildMultiplyOp (
+              opMapReference, buildIntVal (parallelLoop->getOpDatDimension (i)));
+              
+          SgPntrArrRefExp * arrayExpression =
+            buildPntrArrRefExp (argumentReference, opDatAccess);
 
-          subscriptExpression->set_endOfConstruct (RoseHelper::getFileInfo ());
-
-          SgPntrArrRefExp
-              * arrayExpression =
-                  buildPntrArrRefExp (
-                      buildVarRefExp (
-                          sharedIndirectionDeclarations[parallelLoop->getOpDatVariableName (
-                              i)]), subscriptExpression);
-
-          actualParameters->append_expression (arrayExpression);
+            actualParameters->append_expression (arrayExpression);          
         }
       }
     }
     else
     {
-      SgAddOp * addExpression1 = buildAddOp (
-          variableDeclarations->getReference (getIterationCounterVariableName (
-              1)), variableDeclarations->getReference (
-              OpenMP::threadBlockOffset));
+      SgAddOp * addExpression1 = NULL;
+      
+      if ( Globals::getInstance ()->getVectorisable () )
+        addExpression1 = buildAddOp (
+            buildAddOp (buildMultiplyOp (variableDeclarations->getReference (getIterationCounterVariableName (1)),
+              buildOpaqueVarRefExp ("VS", subroutineScope)),
+              variableDeclarations->getReference (getIterationCounterVariableName (2))),
+            variableDeclarations->getReference (OpenMP::threadBlockOffset));
+      else
+        addExpression1 = buildAddOp (
+          variableDeclarations->getReference (getIterationCounterVariableName (1)),          
+            variableDeclarations->getReference (OpenMP::threadBlockOffset));
 
+            
       SgMultiplyOp * multiplyExpression = buildMultiplyOp (addExpression1,
           buildIntVal (parallelLoop->getOpDatDimension (i)));
 
@@ -222,10 +321,19 @@ FortranOpenMPKernelSubroutineIndirectLoop::createStageOutIncrementedOpDatStateme
   {
     if (parallelLoop->isIndirect (i) && parallelLoop->isIncremented (i))
     {
-      SgAddOp * addExpression = buildAddOp (variableDeclarations->getReference (
-          getIterationCounterVariableName (1)),
+      SgAddOp * addExpression = NULL;
+      
+      if ( Globals::getInstance ()->getVectorisable () )
+        addExpression = buildAddOp (
+          buildAddOp (buildMultiplyOp (variableDeclarations->getReference (getIterationCounterVariableName (1)),
+              buildOpaqueVarRefExp ("VS", subroutineScope)),
+            variableDeclarations->getReference (getIterationCounterVariableName (2))),
           variableDeclarations->getReference (OpenMP::threadBlockOffset));
-
+      else
+        addExpression = buildAddOp (
+          variableDeclarations->getReference (getIterationCounterVariableName (1)),            
+          variableDeclarations->getReference (OpenMP::threadBlockOffset));
+        
       SgPntrArrRefExp * arrayExpression = buildPntrArrRefExp (
           variableDeclarations->getReference (getGlobalToLocalMappingName (i)),
           addExpression);
@@ -252,7 +360,7 @@ FortranOpenMPKernelSubroutineIndirectLoop::createStageOutIncrementedOpDatStateme
 
       SgAddOp * addExpression1 = buildAddOp (
           variableDeclarations->getReference (getIterationCounterVariableName (
-              2)), multiplyExpression);
+              3)), multiplyExpression);
 
       SgAddOp * addExpression2 = buildAddOp (buildIntVal (1), addExpression1);
 
@@ -269,7 +377,7 @@ FortranOpenMPKernelSubroutineIndirectLoop::createStageOutIncrementedOpDatStateme
       SgPntrArrRefExp * arrayExpression3 = buildPntrArrRefExp (
           variableDeclarations->getReference (getOpDatLocalName (i)),
           variableDeclarations->getReference (getIterationCounterVariableName (
-              2)));
+              3)));
 
       SgAddOp * addExpression3 =
           buildAddOp (arrayExpression2, arrayExpression3);
@@ -281,7 +389,7 @@ FortranOpenMPKernelSubroutineIndirectLoop::createStageOutIncrementedOpDatStateme
 
       SgAssignOp * innerLoopLowerBound = buildAssignOp (
           variableDeclarations->getReference (getIterationCounterVariableName (
-              2)), buildIntVal (0));
+              3)), buildIntVal (0));
 
       SgSubtractOp * innerLoopUpperBound = buildSubtractOp (buildIntVal (
           parallelLoop->getOpDatDimension (i)), buildIntVal (1));
@@ -349,7 +457,7 @@ FortranOpenMPKernelSubroutineIndirectLoop::createIncrementedOpDatPrologueStateme
       SgPntrArrRefExp * arrayExpression = buildPntrArrRefExp (
           variableDeclarations->getReference (getOpDatLocalName (i)),
           variableDeclarations->getReference (getIterationCounterVariableName (
-              2)));
+              3)));
 
       SgExprStatement * assignmentStatement = buildAssignStatement (
           arrayExpression, buildIntVal (0));
@@ -358,7 +466,7 @@ FortranOpenMPKernelSubroutineIndirectLoop::createIncrementedOpDatPrologueStateme
 
       SgAssignOp * lowerBound = buildAssignOp (
           variableDeclarations->getReference (getIterationCounterVariableName (
-              2)), buildIntVal (0));
+              3)), buildIntVal (0));
 
       SgSubtractOp * upperBound = buildSubtractOp (buildIntVal (
           parallelLoop->getOpDatDimension (i)), buildIntVal (1));
@@ -391,74 +499,225 @@ FortranOpenMPKernelSubroutineIndirectLoop::createExecutionLoopStatements ()
 
   if (parallelLoop->hasIncrementedOpDats ())
   {
-    SgExprStatement * assignmentStatement1 = buildAssignStatement (
-        variableDeclarations->getReference (colour2), buildIntVal (-1));
+    if ( !Globals::getInstance ()->getVectorisable () )
+    {
+      SgExprStatement * assignmentStatement1 = buildAssignStatement (
+          variableDeclarations->getReference (colour2), buildIntVal (-1));
 
-    appendStatement (assignmentStatement1, loopBody);
+      appendStatement (assignmentStatement1, loopBody);
 
-    SgBasicBlock * ifBody = buildBasicBlock ();
+      SgBasicBlock * ifBody = buildBasicBlock ();
 
-    appendStatement (createIncrementedOpDatPrologueStatements (), ifBody);
+      appendStatement (createIncrementedOpDatPrologueStatements (), ifBody);
 
-    appendStatement (createUserSubroutineCallStatement (), ifBody);
+      appendStatement (createUserSubroutineCallStatement (), ifBody);
 
-    SgAddOp * addExpression1 = buildAddOp (variableDeclarations->getReference (
-        getIterationCounterVariableName (1)),
-        variableDeclarations->getReference (OpenMP::threadBlockOffset));
+      SgAddOp * addExpression1 = buildAddOp (variableDeclarations->getReference (
+          getIterationCounterVariableName (1)),
+          variableDeclarations->getReference (OpenMP::threadBlockOffset));
 
-    SgPntrArrRefExp * arrayExpression1 = buildPntrArrRefExp (
-        variableDeclarations->getReference (getThreadColourArrayName ()),
-        addExpression1);
+      SgPntrArrRefExp * arrayExpression1 = buildPntrArrRefExp (
+          variableDeclarations->getReference (getThreadColourArrayName ()),
+          addExpression1);
 
-    SgExprStatement * assignmentStatement2 = buildAssignStatement (
-        variableDeclarations->getReference (colour2), arrayExpression1);
+      SgExprStatement * assignmentStatement2 = buildAssignStatement (
+          variableDeclarations->getReference (colour2), arrayExpression1);
 
-    appendStatement (assignmentStatement2, ifBody);
+      appendStatement (assignmentStatement2, ifBody);
 
-    SgExpression * ifGuardExpression =
-        buildLessThanOp (variableDeclarations->getReference (
-            getIterationCounterVariableName (1)),
-            variableDeclarations->getReference (numberOfActiveThreads));
+      SgExpression * ifGuardExpression =
+          buildLessThanOp (variableDeclarations->getReference (
+              getIterationCounterVariableName (1)),
+              variableDeclarations->getReference (numberOfActiveThreads));
 
-    SgIfStmt * ifStatement =
-        RoseStatementsAndExpressionsBuilder::buildIfStatementWithEmptyElse (
-            ifGuardExpression, ifBody);
+      SgIfStmt * ifStatement =
+          RoseStatementsAndExpressionsBuilder::buildIfStatementWithEmptyElse (
+              ifGuardExpression, ifBody);
 
-    appendStatement (ifStatement, loopBody);
+      appendStatement (ifStatement, loopBody);
 
-    appendStatement (createStageOutIncrementedOpDatStatements (), loopBody);
+      if ( !Globals::getInstance ()->getNoStage () )
+        appendStatement (createStageOutIncrementedOpDatStatements (), loopBody);
 
-    SgAssignOp * lowerBound =
-        buildAssignOp (variableDeclarations->getReference (
-            getIterationCounterVariableName (1)), buildIntVal (0));
+      SgAssignOp * lowerBound =
+          buildAssignOp (variableDeclarations->getReference (
+              getIterationCounterVariableName (1)), buildIntVal (0));
 
-    SgSubtractOp * upperBound = buildSubtractOp (
-        variableDeclarations->getReference (numberOfActiveThreadsCeiling),
-        buildIntVal (1));
+      SgSubtractOp * upperBound = buildSubtractOp (
+          variableDeclarations->getReference (numberOfActiveThreadsCeiling),
+          buildIntVal (1));
 
-    SgFortranDo * loopStatement =
-        FortranStatementsAndExpressionsBuilder::buildFortranDoStatement (
-            lowerBound, upperBound, buildIntVal (1), loopBody);
+      SgFortranDo * loopStatement =
+          FortranStatementsAndExpressionsBuilder::buildFortranDoStatement (
+              lowerBound, upperBound, buildIntVal (1), loopBody);
 
-    appendStatement (loopStatement, subroutineScope);
+      appendStatement (loopStatement, subroutineScope);
+    }
+    else
+    {
+      
+     /*
+      * ======================================================
+      * Vectorisable code
+      * ======================================================
+      */
+
+      SgExprStatement * assignmentStatement1 = buildAssignStatement (
+          variableDeclarations->getReference (colour2), buildIntVal (-1));
+
+      appendStatement (assignmentStatement1, loopBody);
+
+      SgBasicBlock * ifBody = buildBasicBlock ();
+
+      appendStatement (createIncrementedOpDatPrologueStatements (), ifBody);
+
+      appendStatement (createUserSubroutineCallStatement (), ifBody);
+
+      SgAddOp * addExpression1 = buildAddOp (buildAddOp (
+          buildMultiplyOp (variableDeclarations->getReference (getIterationCounterVariableName (1)),
+              buildOpaqueVarRefExp ("VS", subroutineScope)),
+          variableDeclarations->getReference (getIterationCounterVariableName (2))),
+          variableDeclarations->getReference (OpenMP::threadBlockOffset));
+
+      SgPntrArrRefExp * arrayExpression1 = buildPntrArrRefExp (
+          variableDeclarations->getReference (getThreadColourArrayName ()),
+          addExpression1);
+
+      SgExprStatement * assignmentStatement2 = buildAssignStatement (
+          variableDeclarations->getReference (colour2), arrayExpression1);
+
+      appendStatement (assignmentStatement2, ifBody);
+
+      SgExpression * ifGuardExpression =
+          buildLessThanOp ( buildAddOp (
+          buildMultiplyOp (variableDeclarations->getReference (getIterationCounterVariableName (1)),
+              buildOpaqueVarRefExp ("VS", subroutineScope)),
+          variableDeclarations->getReference (getIterationCounterVariableName (2))),
+              variableDeclarations->getReference (numberOfActiveThreads));
+
+      SgIfStmt * ifStatement =
+          RoseStatementsAndExpressionsBuilder::buildIfStatementWithEmptyElse (
+              ifGuardExpression, ifBody);
+
+      appendStatement (ifStatement, loopBody);
+
+      if ( !Globals::getInstance ()->getNoStage () )
+        appendStatement (createStageOutIncrementedOpDatStatements (), loopBody);
+
+      SgAssignOp * lowerBoundInner =
+          buildAssignOp (variableDeclarations->getReference (
+              getIterationCounterVariableName (2)), buildIntVal (0));
+
+      SgSubtractOp * upperBoundInner = buildSubtractOp (
+          buildOpaqueVarRefExp ("VS", subroutineScope),
+          buildIntVal (1));      
+
+      SgExpression * ifGuardOutOfIterationSpace =
+          buildLessThanOp ( buildAddOp (
+          buildMultiplyOp (variableDeclarations->getReference (getIterationCounterVariableName (1)),
+            buildOpaqueVarRefExp ("VS", subroutineScope)),
+          variableDeclarations->getReference (getIterationCounterVariableName (2))),
+              variableDeclarations->getReference (numberOfActiveThreads));
+      
+      SgIfStmt * ifOutOfIterationSpace =
+          RoseStatementsAndExpressionsBuilder::buildIfStatementWithEmptyElse (
+              ifGuardOutOfIterationSpace, loopBody);
+
+      SgBasicBlock * ifOutOfIterationSpaceBlock = buildBasicBlock (
+        ifOutOfIterationSpace);
+          
+     SgFortranDo * innerLoop =
+          FortranStatementsAndExpressionsBuilder::buildFortranDoStatement (
+              lowerBoundInner, upperBoundInner, buildIntVal (1), ifOutOfIterationSpaceBlock);
+
+      SgAssignOp * lowerBound =
+          buildAssignOp (variableDeclarations->getReference (
+              getIterationCounterVariableName (1)), buildIntVal (0));
+
+      SgSubtractOp * upperBound = buildSubtractOp (
+          variableDeclarations->getReference (numberOfActiveThreadsCeiling),
+          buildIntVal (1));
+
+      SgBasicBlock * outerLoopBody = buildBasicBlock (innerLoop);
+
+      SgFortranDo * loopStatement =
+          FortranStatementsAndExpressionsBuilder::buildFortranDoStatement (
+              lowerBound, buildDivideOp (
+                upperBound, buildOpaqueVarRefExp ("VS", subroutineScope)),
+                buildIntVal (1), outerLoopBody);
+
+      appendStatement (loopStatement, subroutineScope);
+    }
   }
   else
   {
-    appendStatement (createUserSubroutineCallStatement (), loopBody);
+    if ( !Globals::getInstance ()->getVectorisable () )
+    {
+    
+      appendStatement (createUserSubroutineCallStatement (), loopBody);
 
-    SgAssignOp * lowerBound =
-        buildAssignOp (variableDeclarations->getReference (
-            getIterationCounterVariableName (1)), buildIntVal (0));
+      SgAssignOp * lowerBound =
+          buildAssignOp (variableDeclarations->getReference (
+              getIterationCounterVariableName (1)), buildIntVal (0));
 
-    SgSubtractOp * upperBound = buildSubtractOp (
-        variableDeclarations->getReference (numberOfActiveThreads),
-        buildIntVal (1));
+      SgSubtractOp * upperBound = buildSubtractOp (
+          variableDeclarations->getReference (numberOfActiveThreads),
+          buildIntVal (1));
 
-    SgFortranDo * loopStatement =
-        FortranStatementsAndExpressionsBuilder::buildFortranDoStatement (
-            lowerBound, upperBound, buildIntVal (1), loopBody);
+      SgFortranDo * loopStatement =
+          FortranStatementsAndExpressionsBuilder::buildFortranDoStatement (
+              lowerBound, upperBound, buildIntVal (1), loopBody);
 
-    appendStatement (loopStatement, subroutineScope);
+      appendStatement (loopStatement, subroutineScope);
+    }
+    else
+    {
+      appendStatement (createUserSubroutineCallStatement (), loopBody);
+
+      SgExpression * ifGuardExpression =
+          buildLessThanOp ( buildAddOp (
+          buildMultiplyOp (variableDeclarations->getReference (getIterationCounterVariableName (1)),
+            buildOpaqueVarRefExp ("VS", subroutineScope)),
+          variableDeclarations->getReference (getIterationCounterVariableName (2))),
+              variableDeclarations->getReference (numberOfActiveThreads));
+      
+      SgIfStmt * ifOutOfIterationSpace =
+          RoseStatementsAndExpressionsBuilder::buildIfStatementWithEmptyElse (
+              ifGuardExpression, loopBody);
+
+      SgBasicBlock * ifOutOfIterationSpaceBlock = buildBasicBlock (
+        ifOutOfIterationSpace);
+      
+      SgAssignOp * lowerBoundInner =
+          buildAssignOp (variableDeclarations->getReference (
+              getIterationCounterVariableName (2)), buildIntVal (0));
+
+      SgSubtractOp * upperBoundInner = buildSubtractOp (
+          buildOpaqueVarRefExp ("VS", subroutineScope),
+          buildIntVal (1));      
+
+     SgFortranDo * innerLoop =
+          FortranStatementsAndExpressionsBuilder::buildFortranDoStatement (
+              lowerBoundInner, upperBoundInner, buildIntVal (1), ifOutOfIterationSpaceBlock);
+
+      SgAssignOp * lowerBound =
+          buildAssignOp (variableDeclarations->getReference (
+              getIterationCounterVariableName (1)), buildIntVal (0));
+
+      SgSubtractOp * upperBound = buildSubtractOp (
+          variableDeclarations->getReference (numberOfActiveThreads),
+          buildIntVal (1));
+
+      SgBasicBlock * outerLoopBody = buildBasicBlock (innerLoop);
+              
+      SgFortranDo * loopStatement =
+          FortranStatementsAndExpressionsBuilder::buildFortranDoStatement (
+              lowerBound, buildDivideOp (
+                upperBound, buildOpaqueVarRefExp ("VS", subroutineScope)),
+                buildIntVal (1), outerLoopBody);
+
+      appendStatement (loopStatement, subroutineScope);      
+    }
   }
 }
 
@@ -1208,11 +1467,13 @@ FortranOpenMPKernelSubroutineIndirectLoop::createStatements ()
 
   createInitialiseSharedVariableStatements ();
 
-  createStageInStatements ();
+  if ( Globals::getInstance ()->getNoStage () == false )
+    createStageInStatements ();
 
   createExecutionLoopStatements ();
   
-  createStageOutStatements ();
+  if ( Globals::getInstance ()->getNoStage () == false )
+    createStageOutStatements ();
 }
 
 void
@@ -1382,7 +1643,11 @@ FortranOpenMPKernelSubroutineIndirectLoop::createExecutionLocalVariableDeclarati
       FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
           getIterationCounterVariableName (2),
           FortranTypesBuilder::getFourByteInteger (), subroutineScope));
-}
+          
+  variableDeclarations ->add (getIterationCounterVariableName (3),
+      FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
+          getIterationCounterVariableName (3),
+          FortranTypesBuilder::getFourByteInteger (), subroutineScope));}
 
 void
 FortranOpenMPKernelSubroutineIndirectLoop::createIndirectOpDatSizeLocalVariableDeclarations ()

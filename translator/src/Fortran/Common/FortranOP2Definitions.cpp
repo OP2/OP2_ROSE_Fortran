@@ -204,6 +204,10 @@ FortranOpMapDefinition::FortranOpMapDefinition (SgExprListExp * parameters, bool
         parameters->get_expressions ()[index_sourceOpSetName]);
   }
 
+
+  Debug::getInstance ()->debugMessage ("After getting source set'",
+    Debug::OUTER_LOOP_LEVEL, __FILE__, __LINE__);
+
   sourceOpSetName
       = opSetSourceVariableReference->get_symbol ()->get_name ().getString ();
 
@@ -229,6 +233,9 @@ FortranOpMapDefinition::FortranOpMapDefinition (SgExprListExp * parameters, bool
         parameters->get_expressions ()[index_destinationOpSetName]);
   }
 
+  Debug::getInstance ()->debugMessage ("After getting target set'",
+    Debug::OUTER_LOOP_LEVEL, __FILE__, __LINE__);
+
   destinationOpSetName
       = opSetDestinationVariableReference->get_symbol ()->get_name ().getString ();
 
@@ -240,6 +247,10 @@ FortranOpMapDefinition::FortranOpMapDefinition (SgExprListExp * parameters, bool
 
   dimension
       = isSgIntVal (parameters->get_expressions ()[index_dimension])->get_value ();
+
+      
+  Debug::getInstance ()->debugMessage ("After getting dimension'",
+    Debug::OUTER_LOOP_LEVEL, __FILE__, __LINE__);
 
   /*
    * ======================================================
@@ -266,28 +277,31 @@ FortranOpMapDefinition::FortranOpMapDefinition (SgExprListExp * parameters, bool
   mappingCardinalityName
       = mappingCardinalityVariableReference->get_symbol ()->get_name ().getString ();
 
+  Debug::getInstance ()->debugMessage ("After getting map cardinality name'",
+    Debug::OUTER_LOOP_LEVEL, __FILE__, __LINE__);
+
   /*
    * ======================================================
-   * Get mapping name
+   * Get mapping variable name
    * ======================================================
    */
 
   SgVarRefExp * mappingVariableReference;
-
-  int index_OpMapNameBothCases = index_OpMapName;
   
-  if ( isHDF5Format ) index_OpMapNameBothCases = index_OpMapNameHDF5;
-  
-  if (isSgDotExp (parameters->get_expressions ()[index_OpMapNameBothCases]) != NULL)
+  if (isSgDotExp (parameters->get_expressions ()[index_OpMapName]) != NULL)
   {
     mappingVariableReference = isSgVarRefExp (isSgDotExp (
-        parameters->get_expressions ()[index_OpMapNameBothCases])->get_rhs_operand ());
+        parameters->get_expressions ()[index_OpMapName])->get_rhs_operand ());
   }
   else
   {
     mappingVariableReference = isSgVarRefExp (
-        parameters->get_expressions ()[index_OpMapNameBothCases]);
+        parameters->get_expressions ()[index_OpMapName]);
   }
+
+  Debug::getInstance ()->debugMessage ("After getting map name'",
+    Debug::OUTER_LOOP_LEVEL, __FILE__, __LINE__);
+
 
   mappingName
       = mappingVariableReference->get_symbol ()->get_name ().getString ();
@@ -297,10 +311,14 @@ FortranOpMapDefinition::FortranOpMapDefinition (SgExprListExp * parameters, bool
    * Get name of OP_MAP
    * ======================================================
    */
-  
+
   variableName
       = isSgVarRefExp (parameters->get_expressions ()[index_mappingName])->get_symbol ()->get_name ().getString ();
 
+  Debug::getInstance ()->debugMessage ("After getting variable name'",
+    Debug::OUTER_LOOP_LEVEL, __FILE__, __LINE__);
+
+      
   ROSE_ASSERT (sourceOpSetName.empty () == false);
   ROSE_ASSERT (destinationOpSetName.empty () == false);
   ROSE_ASSERT (dimension > 0);

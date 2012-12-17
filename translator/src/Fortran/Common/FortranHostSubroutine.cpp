@@ -129,6 +129,8 @@ FortranHostSubroutine::createEarlyExitStatement (SgScopeStatement * subroutineSc
   
   string const sizeField = "size";
   
+  
+  
   SgDotExp * setSizeField = buildDotExp (
     variableDeclarations->getReference (getOpSetName ()),
     buildDotExp ( buildOpaqueVarRefExp (Fortran::setPtr, subroutineScope),
@@ -161,22 +163,21 @@ FortranHostSubroutine::createEarlyExitStatementNewLibrary (SgScopeStatement * su
   
   string const sizeField = RunTimeVariableNames::size;
   string const setPtr = RunTimeVariableNames::Fortran::setPtr;
-  
-  SgDotExp * setSizeField = buildDotExp (
-    variableDeclarations->getReference (getOpSetName ()),
-    buildDotExp ( buildOpaqueVarRefExp (RunTimeVariableNames::Fortran::setPtr,
-        subroutineScope),
-      buildOpaqueVarRefExp (RunTimeVariableNames::size, subroutineScope)));
 
-  SgExpression * conditionSetZero = buildEqualityOp (setSizeField, buildIntVal (0) );
+  SgExpression * conditionSetZero = buildEqualityOp (variableDeclarations->getReference (
+    returnMPIHaloExchange), buildIntVal (0));
 
   SgBasicBlock * ifBody = buildBasicBlock ();
 
   /*
    * ======================================================
-   * In case of MPI we need to set the dirty bits
+   * In case of MPI we need to wait for halo exchanges and 
+   * set the dirty bits
    * ======================================================
    */
+  if ( Globals::getInstance ()->getIncludesMPI () )
+    appendCallMPIWaitAll (ifBody);
+  
   if ( Globals::getInstance ()->getIncludesMPI () )
     appendCallMPISetDirtyBit (ifBody);
 
