@@ -6,6 +6,7 @@
 #include <ParallelLoop.h>
 #include <OP2.h>
 #include <CompilerGeneratedNames.h>
+#include <Globals.h>
 
 void
 FortranPrintProfilingInformationSubroutine::createStatements ()
@@ -89,7 +90,8 @@ FortranPrintProfilingInformationSubroutine::FortranPrintProfilingInformationSubr
       this->subroutineName.c_str (), buildVoidType (), formalParameters,
       SgProcedureHeaderStatement::e_subroutine_subprogram_kind, moduleScope);
 
-  subroutineHeaderStatement->get_functionModifier ().setCudaHost ();
+  if ( Globals::getInstance ()->getTargetBackend () == TargetLanguage::CUDA )
+    subroutineHeaderStatement->get_functionModifier ().setCudaHost ();
       
   subroutineScope = subroutineHeaderStatement->get_definition ()->get_body ();
 
