@@ -916,7 +916,8 @@ FortranOpenMPHostSubroutineIndirectLoop::createStatements ()
   if ( Globals::getInstance ()->getIncludesMPI () )
     appendCallMPIHaloExchangeFunction (subroutineScope);  
 
-  createEarlyExitStatementNewLibrary (subroutineScope);
+  if ( Globals::getInstance ()->getIncludesMPI () )
+    createEarlyExitStatementNewLibrary (subroutineScope);
 
   if (parallelLoop->isReductionRequired ())
   {
