@@ -7,6 +7,8 @@
 #include <OP2.h>
 #include <CompilerGeneratedNames.h>
 #include <Globals.h>
+#include <FortranTypesBuilder.h>
+#include <FortranModuleDeclarations.h>
 
 void
 FortranPrintProfilingInformationSubroutine::createStatements ()
@@ -17,7 +19,6 @@ FortranPrintProfilingInformationSubroutine::createStatements ()
   using namespace OP2::FortranSpecific::RunTimeFunctions;
   using std::string;
   using std::map;
-
 
   for (map <string, ParallelLoop *>::const_iterator it =
       parallelLoopsDeclarations->firstParallelLoop (); it
@@ -54,13 +55,32 @@ FortranPrintProfilingInformationSubroutine::createStatements ()
       AstUnparseAttribute::e_after);
 
     addTextForUnparser (subroutineScope, printStatement2,
-	AstUnparseAttribute::e_after);
+      AstUnparseAttribute::e_after);
 
     addTextForUnparser (subroutineScope, printStatement3,
-	AstUnparseAttribute::e_after);
+      AstUnparseAttribute::e_after);
 
     addTextForUnparser (subroutineScope, printStatement4,
-	AstUnparseAttribute::e_after);
+      AstUnparseAttribute::e_after);
+  }
+  
+  for (map <string, ParallelLoop *>::const_iterator it =
+      parallelLoopsDeclarations->firstParallelLoop (); it
+      != parallelLoopsDeclarations->lastParallelLoop (); ++it)
+  {
+    string const userSubroutineName = it->first;
+
+    string const postfixName = getPostfixNameAsConcatOfOpArgsNames (it->second);
+
+    string const & variableNameKernel = loopTimeKernel +
+      userSubroutineName + postfixName;
+
+    SgAssignOp * assignSumIncremental = buildAssignOp (
+      variableDeclarations->getReference (OP2VariableNames::sumKernelTimes),
+      buildAddOp (variableDeclarations->getReference (OP2VariableNames::sumKernelTimes),
+        moduleDeclarations[userSubroutineName]->getDeclarations ()->getReference (variableNameKernel)));
+
+    appendStatement (buildExprStatement (assignSumIncremental), subroutineScope);
   }
 }
 
@@ -73,7 +93,10 @@ FortranPrintProfilingInformationSubroutine::createFormalParameterDeclarations ()
 void
 FortranPrintProfilingInformationSubroutine::createLocalVariableDeclarations ()
 {
-
+    variableDeclarations->add (OP2VariableNames::sumKernelTimes,
+      FortranStatementsAndExpressionsBuilder::appendVariableDeclaration (
+          OP2VariableNames::sumKernelTimes, FortranTypesBuilder::getSinglePrecisionFloat (),
+          subroutineScope));
 }
 
 FortranPrintProfilingInformationSubroutine::FortranPrintProfilingInformationSubroutine (
@@ -97,9 +120,11 @@ FortranPrintProfilingInformationSubroutine::FortranPrintProfilingInformationSubr
 
   appendStatement (subroutineHeaderStatement, moduleScope);
 
-    implicitStatement = FortranStatementsAndExpressionsBuilder::buildImplicitNoneStatement ();
+  implicitStatement = FortranStatementsAndExpressionsBuilder::buildImplicitNoneStatement ();
 
-    //appendStatement (implicitStatement, subroutineScope);
+   appendStatement (implicitStatement, subroutineScope);
+
+  createLocalVariableDeclarations ();
 
   createStatements ();
 }

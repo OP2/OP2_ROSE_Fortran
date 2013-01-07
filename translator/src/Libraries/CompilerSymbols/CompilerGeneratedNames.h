@@ -166,6 +166,7 @@ namespace OP2VariableNames
   std::string const opMpiReduceFloat = "op_mpi_reduce_float";
   std::string const opMpiReduceBool = "op_mpi_reduce_bool";
   std::string const returnMPIHaloExchange = "returnMPIHaloExchange";
+  std::string const sumKernelTimes = "sumKernelTimes";
 
   std::string const
   getBlockSizeVariableName (std::string const & suffix);
