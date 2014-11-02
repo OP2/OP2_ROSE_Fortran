@@ -1,0 +1,5 @@
+doc-sphinx
+translator/obj/*.o
+ROSE/rose-*_inst
+ROSE/rose-*_build
+translator/bin/translator
