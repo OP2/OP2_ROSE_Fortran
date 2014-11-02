@@ -1,13 +1,44 @@
 #! /usr/bin/env python
 
-import sys
+"""    Generator for the op_par_loop reference implementation. Usage:
+
+    op_par_loop_gen.py [-b] [maxargs]
+
+      -b       create a backup
+      maxargs  maximum number of kernel arguments to generate for"""
+
+import sys, os, getopt, shutil
+
+def get_options():
+    try:
+        opts, args = getopt.getopt(sys.argv[1:], "b")
+    except getopt.error, msg:
+        print msg
+        print __doc__
+        sys.exit(-1)
+
+    opts_dict = {}
+    for opt in opts:
+        key = opt[0].lstrip('-')
+        value = opt[1]
+        opts_dict[key] = value
+
+    return opts_dict, args
+
+opts,args = get_options()
+keys = opts.keys()
 
 maxargs = 8
-if len(sys.argv) > 1:
-  maxargs = int(sys.argv[1])
+if len(args) > 0:
+  maxargs = int(args[0])
 
 file_c = "../reference/op_par_loop_ref.c"
 file_h = "../common/op_par_loop.h"
+
+if 'b' in keys:
+  for filepath in [file_c, file_h]:
+    if os.path.isfile(filepath):
+      shutil.copy(filepath, filepath+".bak")
 
 header_h = """/*
   Open source copyright declaration based on BSD open source template:
@@ -217,8 +248,10 @@ with open(file_h,"w") as h:
       } else {
         arg_set ( i, &arg%d, &ptr%d );
       }
+    } else if (arg%d.dat->rank == 2) {
+      memset(ptr%d, 0, arg%d.map[0]->dim * arg%d.map[1]->dim * arg%d.dat->size);
     }
-""" % tuple(10*[i])
+""" % tuple(15*[i])
 
       # build kernel call
       par_loop_body += "\n    kernel(" + ", ".join(["ptr%d" % i for i in range(numargs)]) + ");\n"

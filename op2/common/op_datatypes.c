@@ -235,6 +235,12 @@ static void print_array_int( FILE* f, int const * v, size_t n ) {
   fprintf(f, "\n");
 }
 
+static void print_array_double( FILE* f, double const * v, size_t n ) {
+  for (size_t i = 0; i < n; ++i)
+    fprintf(f, "%.4g ", v[i]);
+  fprintf(f, "\n");
+}
+
 void dump_map ( op_map const * map, char const * filename ) {
   FILE *f = fopen(filename, "w");
   fprintf(f,"%s %d\n\n", map->name, map->dim);
@@ -244,7 +250,11 @@ void dump_map ( op_map const * map, char const * filename ) {
 
 void dump_dat ( op_dat const * dat, char const * filename ) {
   FILE *f = fopen(filename, "w");
-  fprintf(f,"%s %d %d %x %x\n", dat->name, dat->dim, dat->size, dat->dat, dat->dat_d);
+  /*fprintf(f,"%s %d %d %p %p\n", dat->name, dat->dim, dat->size, dat->dat, dat->dat_d);*/
+  int size = dat->set[0] ? dat->set[0]->size : 1;
+  for (int i = 0; i < size; ++i) {
+    print_array_double(f, (double*)(dat->dat) + i*dat->dim, dat->dim);
+  }
   fclose(f);
 }
 

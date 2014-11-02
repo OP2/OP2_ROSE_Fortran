@@ -162,12 +162,14 @@ void op_mat_mult ( const op_dat * mat, const op_dat * v_in, op_dat * v_out ) {
 void op_solve ( const op_dat * mat, const op_dat * b, op_dat * x ) {
   assert( mat && b && x );
   assert( mat->rank == 2 && b->rank == 1 && x->rank == 1 );
+  printf("Solving system A*x=b of size %dx%d\n", mat->set[0]->size, mat->set[1]->size);
 
   Vec p_b = op_create_vec(b);
   Vec p_x = op_create_vec(x);
   Mat A = (Mat) mat->dat;
   KSP ksp;
   PC pc;
+  int its;
 
   KSPCreate(PETSC_COMM_WORLD,&ksp);
   KSPSetOperators(ksp,A,A,DIFFERENT_NONZERO_PATTERN);
@@ -176,9 +178,13 @@ void op_solve ( const op_dat * mat, const op_dat * b, op_dat * x ) {
   KSPSetTolerances(ksp,1.e-7,PETSC_DEFAULT,PETSC_DEFAULT,PETSC_DEFAULT);
 
   KSPSolve(ksp,p_b,p_x);
+  KSPGetIterationNumber(ksp,&its);
+  printf("Converged in %d iterations\n", its);
 
   //KSPView(ksp,PETSC_VIEWER_STDOUT_WORLD);
+  MatView((Mat) mat->dat,PETSC_VIEWER_STDOUT_WORLD);
   //VecView(p_x, PETSC_VIEWER_STDOUT_WORLD);
+  //VecView(p_b, PETSC_VIEWER_STDOUT_WORLD);
 
   VecDestroy(p_b);
   VecDestroy(p_x);
